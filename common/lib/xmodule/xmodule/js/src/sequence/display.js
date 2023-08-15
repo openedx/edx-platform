@@ -466,19 +466,16 @@
         };
 
         Sequence.prototype.shouldNavigateModal = function (direction, newPosition) {
-            if($('.submit-attempt-container').length > 0 && $("span.status").attr("class").split(' ').indexOf('unanswered') > -1){
+            if($('.submit-attempt-container').length > 0 && $("span.status").attr("class").split(' ').indexOf('unanswered') > -1 && $('#navigationModal').length > 0){
                 if(direction == 'next'){
-                    $('#navigate-question').html('Go to Next Question');
                     $('#navigationModal').attr('data-event-type', 'sequential');
                     $('#navigationModal').attr('data-navigate', 'next');
                 }
                 else if(direction == 'previous'){
-                    $('#navigate-question').html('Go to Previous Question');
                     $('#navigationModal').attr('data-event-type', 'sequential');
                     $('#navigationModal').attr('data-navigate', 'previous');
                 }
                 else if(newPosition !== undefined){
-                    $('#navigate-question').html('Leave Question');
                     $('#navigationModal').attr('data-new-position', newPosition);
                     $('#navigationModal').attr('data-event-type', 'direct');
                 }
