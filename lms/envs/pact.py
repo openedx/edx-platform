@@ -15,3 +15,5 @@ MIDDLEWARE = MIDDLEWARE + [
     'common.test.pacts.middleware.AuthenticationMiddleware',
     'openedx.core.djangoapps.user_api.accounts.tests.pact.user-middleware',
 ]
+
+PACT_BYPASS_AUTHENTICATION = True
