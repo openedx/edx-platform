@@ -95,7 +95,7 @@ def _generate_items_for_subtask(
 
     items_for_task = []
 
-    with track_memory_usage('course_email.subtask_generation.memory', course_id):
+    with track_memory_usage(course_id):
         for queryset in item_querysets:
             for item in queryset.values(*all_item_fields).iterator():
                 if len(items_for_task) == items_per_task and num_subtasks < total_num_subtasks - 1:

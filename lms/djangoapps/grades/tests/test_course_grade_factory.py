@@ -102,7 +102,7 @@ class TestCourseGradeFactory(GradeTestBase):
     @ddt.data((True, False))
     def test_read_zero(self, create_if_needed):
         grade_factory = CourseGradeFactory()
-        course_grade = grade_factory.read(self.request.user, self.course, create_if_needed=create_if_needed)
+        course_grade = grade_factory.read(self.request.user, self.course)
         if create_if_needed:
             self._assert_zero_grade(course_grade, ZeroCourseGrade)
         else:

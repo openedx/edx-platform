@@ -20,8 +20,7 @@ from .common import *
 
 STATIC_GRAB = True
 
-LOGGING = get_logger_config(ENV_ROOT / "log",
-                            logging_env="dev")
+LOGGING = get_logger_config(logging_env="dev")
 
 DATABASES = {
     'default': {

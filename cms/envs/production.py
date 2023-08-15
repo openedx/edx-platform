@@ -274,8 +274,7 @@ for feature, value in ENV_FEATURES.items():
 for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
     INSTALLED_APPS.append(app)
 
-LOGGING = get_logger_config(LOG_DIR,
-                            logging_env=ENV_TOKENS.get('LOGGING_ENV', LOGGING_ENV),
+LOGGING = get_logger_config(logging_env=ENV_TOKENS.get('LOGGING_ENV', LOGGING_ENV),
                             service_variant=SERVICE_VARIANT)
 
 # The following variables use (or) instead of the default value inside (get). This is to enforce using the Lazy Text

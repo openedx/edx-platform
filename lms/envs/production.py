@@ -319,8 +319,7 @@ local_loglevel = ENV_TOKENS.get('LOCAL_LOGLEVEL', 'INFO')
 LOG_DIR = ENV_TOKENS.get('LOG_DIR', LOG_DIR)
 DATA_DIR = path(ENV_TOKENS.get('DATA_DIR', DATA_DIR))
 
-LOGGING = get_logger_config(LOG_DIR,
-                            logging_env=ENV_TOKENS.get('LOGGING_ENV', LOGGING_ENV),
+LOGGING = get_logger_config(logging_env=ENV_TOKENS.get('LOGGING_ENV', LOGGING_ENV),
                             local_loglevel=local_loglevel,
                             service_variant=SERVICE_VARIANT)
 

@@ -140,7 +140,8 @@ class SignatureValidator(RequestValidator):
         """
         raise NotImplementedError
 
-    def dummy_access_token(self):  # lint-amnesty, pylint: disable=invalid-overridden-method
+    # lint-amnesty, pylint: disable=invalid-overridden-method
+    def dummy_access_token(self):
         """
         Unused abstract method from super class. See documentation in RequestValidator
         """
@@ -152,25 +153,26 @@ class SignatureValidator(RequestValidator):
         """
         raise NotImplementedError
 
-    def verify_realms(self, token, request):
+    def verify_realms(self, token, realms, request):
         """
         Unused abstract method from super class. See documentation in RequestValidator
         """
         raise NotImplementedError
 
-    def validate_realms(self, client_key, token, request, uri=None):
+    def validate_realms(self, client_key, token, request, uri=None, realms=None):
         """
         Unused abstract method from super class. See documentation in RequestValidator
         """
         raise NotImplementedError
 
-    def save_verifier(self, token, request):
+    def save_verifier(self, token, verifier, request):
         """
         Unused abstract method from super class. See documentation in RequestValidator
         """
         raise NotImplementedError
 
-    def dummy_request_token(self):  # lint-amnesty, pylint: disable=invalid-overridden-method
+    # lint-amnesty, pylint: disable=invalid-overridden-method
+    def dummy_request_token(self):
         """
         Unused abstract method from super class. See documentation in RequestValidator
         """
@@ -212,13 +214,13 @@ class SignatureValidator(RequestValidator):
         """
         raise NotImplementedError
 
-    def validate_requested_realms(self, client_key, request):
+    def validate_requested_realms(self, client_key, realms, request):
         """
         Unused abstract method from super class. See documentation in RequestValidator
         """
         raise NotImplementedError
 
-    def validate_verifier(self, client_key, token, request):
+    def validate_verifier(self, client_key, token, verifier, request):
         """
         Unused abstract method from super class. See documentation in RequestValidator
         """

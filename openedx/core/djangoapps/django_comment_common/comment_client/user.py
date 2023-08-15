@@ -111,7 +111,6 @@ class User(models.Model):
             params,
             metric_action='user.active_threads',
             metric_tags=self._metric_tags,
-            paged_results=True,
         )
         return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
 
@@ -131,7 +130,6 @@ class User(models.Model):
             params,
             metric_action='user.subscribed_threads',
             metric_tags=self._metric_tags,
-            paged_results=True
         )
         return utils.CommentClientPaginatedResult(
             collection=response.get('collection', []),

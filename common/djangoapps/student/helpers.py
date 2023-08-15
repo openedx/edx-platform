@@ -595,7 +595,7 @@ def _cert_info(user, enrollment, cert_status):
     if status in {'generating', 'downloadable', 'notpassing', 'restricted', 'auditing', 'unverified'}:
         cert_grade_percent = -1
         persisted_grade_percent = -1
-        persisted_grade = CourseGradeFactory().read(user, course=course_overview, create_if_needed=False)
+        persisted_grade = CourseGradeFactory().read(user, course=course_overview)
         if persisted_grade is not None:
             persisted_grade_percent = persisted_grade.percent
 
@@ -813,7 +813,7 @@ def user_has_passing_grade_in_course(enrollment):
     try:
         user = enrollment.user
         course = enrollment.course_overview
-        course_grade = CourseGradeFactory().read(user, course, create_if_needed=False)
+        course_grade = CourseGradeFactory().read(user, course)
         if course_grade:
             return course_grade.passed
     except AttributeError:

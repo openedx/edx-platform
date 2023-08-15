@@ -30,7 +30,7 @@ class BlockstoreXBlockRuntime(XBlockRuntime):
     A runtime designed to work with Blockstore, reading and writing
     XBlock field data directly from Blockstore.
     """
-    def parse_xml_file(self, id_generator=None):
+    def parse_xml_file(self, fileobj, id_generator=None):
         raise NotImplementedError("Use parse_olx_file() instead")
 
     def get_block(self, usage_id, for_parent=None):

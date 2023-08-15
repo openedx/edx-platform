@@ -22,5 +22,5 @@ class DebugFileUploader(FileUploadHandler):  # lint-amnesty, pylint: disable=mis
 
         return raw_data
 
-    def file_complete(self):
+    def file_complete(self, file_size):
         return None
