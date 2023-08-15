@@ -90,11 +90,9 @@ class TestSafeOrNot(unittest.TestCase):  # lint-amnesty, pylint: disable=missing
         if not jail_code.is_configured("python"):
 
             # Can't test for forbiddenness if CodeJail rest service isn't enabled.
-            # codejailservice must be running and the following environment variables must be set, i.e.
-            # ENABLE_CODEJAIL_REST_SERVICE: True
-            # CODE_JAIL_REST_SERVICE_HOST: http://codejailservice:8550
+            # Remote codejailservice must be running, see https://github.com/eduNEXT/tutor-contrib-codejail/
             if not is_codejail_rest_service_enabled():
-                pytest.skip(reason="Codejail has to be configured and enabled to run this test.")
+                pytest.skip(reason="Local or remote codejail has to be configured and enabled to run this test.")
 
         g = {}
         with pytest.raises(SafeExecException) as cm:
