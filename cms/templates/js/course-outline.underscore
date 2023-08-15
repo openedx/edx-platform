@@ -169,7 +169,7 @@ if (is_proctored_exam) {
                         </a>
                     </li>
                 <% } %>
-                <% if (enableCopyPasteUnits) { %>
+                <% if (typeof enableCopyPasteUnits !== "undefined" && enableCopyPasteUnits) { %>
                     <!--
                         If the ENABLE_COPY_PASTE_UNITS feature flag is enabled, all these actions (besides "Publish")
                         appear in a menu. We use .nav-dd on the parent element and .nav-item on this button to get the
