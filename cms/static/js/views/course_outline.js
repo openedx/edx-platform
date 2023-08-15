@@ -340,7 +340,16 @@ function(
                     parent_locator: parentLocator,
                     staged_content: "clipboard",
                 }).then((data) => {
-                    this.refresh(); // Update this and replace the placeholder with the actual pasted unit.
+                    // Update this and replace the placeholder with the actual pasted unit.
+                    this.refresh().done(() => {
+                        // Prompt the user to rename unit after it's pasted
+                        const newUnitLocator = data.locator;
+                        const newUnitEditNameBtn = $(`li.outline-unit[data-locator="${newUnitLocator}"]`).find(
+                            '.xblock-field-value-edit'
+                        );
+                        newUnitEditNameBtn && newUnitEditNameBtn[0] && newUnitEditNameBtn[0].click();
+                    });
+
                     return data;
                 }).fail(() => {
                     $placeholderEl.remove();
