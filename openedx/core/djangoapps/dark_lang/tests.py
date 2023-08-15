@@ -244,8 +244,8 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
         Assert that the language set in cookies is equal to value
         """
         lang_cookie = self.client.cookies.get(settings.LANGUAGE_COOKIE_NAME)
-        lang_cookie = lang_cookie.value if lang_cookie is not None and lang_cookie.value != '' else UNSET
-        assert value == lang_cookie
+        lang_cookie_value = lang_cookie.value if lang_cookie is not None and lang_cookie.value != '' else UNSET
+        assert value == lang_cookie_value
 
     def _post_set_preview_lang(self, preview_language):
         """
@@ -298,6 +298,7 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
 
         # Set a language and clear it to ensure the clear is working as expected
         self._post_set_preview_lang('notclear')
+        self.assert_cookie_lang_equals('notclear')
         self._post_clear_preview_lang()
         self.client.get('/home')
         self.assert_cookie_lang_equals(UNSET)
