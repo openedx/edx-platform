@@ -218,6 +218,7 @@ def container_handler(request, usage_key_string):
                 'templates': CONTAINER_TEMPLATES,
                 # Status of the user's clipboard, exactly as would be returned from the "GET clipboard" REST API.
                 'user_clipboard': user_clipboard,
+                'is_sourced_block': xblock.location.block_type == 'library_sourced',
             })
     else:
         return HttpResponseBadRequest("Only supports HTML requests")

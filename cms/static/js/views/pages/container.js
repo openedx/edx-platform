@@ -27,6 +27,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             'click .show-actions-menu-button': 'showXBlockActionsMenu',
             'click .new-component-button': 'scrollToNewComponentButtons',
             'click .paste-component-button': 'pasteComponent',
+            'change .header-library-checkbox': 'toggleLibraryComponent'
         },
 
         options: {
@@ -48,6 +49,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             BasePage.prototype.initialize.call(this, options);
             this.viewClass = options.viewClass || this.defaultViewClass;
             this.isLibraryPage = (this.model.attributes.category === 'library');
+            this.isLibrarySourced = (this.model.attributes.category === 'library_sourced');
             this.nameEditor = new XBlockStringFieldEditor({
                 el: this.$('.wrapper-xblock-field'),
                 model: this.model
@@ -101,6 +103,12 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     model: this.model
                 });
                 this.unitOutlineView.render();
+
+            }
+            if (this.isLibrarySourced) {
+                this.selectedLibraryComponents = [];
+                this.storedSelectedLibraryComponents = [];
+                this.getSelectedLibraryComponents();
             }
 
             this.listenTo(Backbone, 'move:onXBlockMoved', this.onXBlockMoved);
@@ -499,6 +507,60 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             XBlockUtils.deleteXBlock(xblockInfo).done(function() {
                 self.onDelete(xblockElement);
             });
+        },
+
+        getSelectedLibraryComponents: function() {
+            var self = this;
+            var locator = this.$el.find('.studio-xblock-wrapper').data('locator');
+            $.getJSON(
+                ModuleUtils.getUpdateUrl(locator) + '/handler/get_block_ids',
+                function(data) {
+                    self.selectedLibraryComponents = Array.from(data.source_block_ids);
+                    self.storedSelectedLibraryComponents = Array.from(data.source_block_ids);
+                }
+            );
+        },
+
+        saveSelectedLibraryComponents: function(e) {
+            var self = this;
+            var locator = this.$el.find('.studio-xblock-wrapper').data('locator');
+            e.preventDefault();
+            $.postJSON(
+                ModuleUtils.getUpdateUrl(locator) + '/handler/submit_studio_edits',
+                {values: {source_block_ids: self.storedSelectedLibraryComponents}},
+                function() {
+                    self.selectedLibraryComponents = Array.from(self.storedSelectedLibraryComponents);
+                    self.toggleSaveButton();
+                }
+            );
+        },
+
+        toggleLibraryComponent: function(event) {
+            var componentId = $(event.target).closest('.studio-xblock-wrapper').data('locator');
+            var storeIndex = this.storedSelectedLibraryComponents.indexOf(componentId);
+            if (storeIndex > -1) {
+              this.storedSelectedLibraryComponents.splice(storeIndex, 1);
+              this.toggleSaveButton();
+            } else {
+              this.storedSelectedLibraryComponents.push(componentId);
+              this.toggleSaveButton();
+            }
+        },
+
+        toggleSaveButton: function() {
+            var $saveButton = $('.nav-actions .save-button');
+            if (JSON.stringify(this.selectedLibraryComponents.sort()) === JSON.stringify(this.storedSelectedLibraryComponents.sort())) {
+              $saveButton.addClass('is-hidden');
+              window.removeEventListener('beforeunload', this.onBeforePageUnloadCallback);
+            } else {
+              $saveButton.removeClass('is-hidden');
+              window.addEventListener('beforeunload', this.onBeforePageUnloadCallback);
+            }
+        },
+
+        onBeforePageUnloadCallback: function (event) {
+            event.preventDefault();
+            event.returnValue = '';
         },
 
         onDelete: function(xblockElement) {

@@ -163,7 +163,10 @@ class LibraryToolsService:
             raise ValueError(f"Requested library {library_key} not found.")
         if user_perms and not user_perms.can_read(library_key):
             raise PermissionDenied()
-        filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)
+        if hasattr(dest_block, 'capa_type'):
+            filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)
+        else:
+            filter_children = None
         if filter_children:
             # Apply simple filtering based on CAPA problem types:
             source_blocks.extend(self._problem_type_filter(library, dest_block.capa_type))
