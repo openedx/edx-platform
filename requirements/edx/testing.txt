@@ -220,6 +220,7 @@ cryptography==38.0.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
+    #   django-fernet-fields-v2
     #   djfernet
     #   edx-enterprise
     #   jwcrypto
@@ -266,6 +267,7 @@ django==3.2.20
     #   django-config-models
     #   django-cors-headers
     #   django-crum
+    #   django-fernet-fields-v2
     #   django-filter
     #   django-js-asset
     #   django-method-override
@@ -364,6 +366,10 @@ django-environ==0.10.0
     # via
     #   -r requirements/edx/base.txt
     #   openedx-blockstore
+django-fernet-fields-v2==0.9
+    # via
+    #   -r requirements/edx/base.txt
+    #   edx-enterprise
 django-filter==23.2
     # via
     #   -r requirements/edx/base.txt
@@ -493,7 +499,6 @@ djangorestframework-xml==2.0.0
 djfernet==0.8.1
     # via
     #   -r requirements/edx/base.txt
-    #   edx-enterprise
     #   edxval
 docutils==0.19
     # via
@@ -579,7 +584,9 @@ edx-drf-extensions==8.8.0
     #   edx-when
     #   edxval
 edx-enterprise @ git+https://github.com/openedx/edx-enterprise.git@replace_django_fernet
-    # via -r requirements/edx/base.txt
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/base.txt
 edx-event-bus-kafka==5.3.0
     # via -r requirements/edx/base.txt
 edx-event-bus-redis==0.3.1
@@ -980,7 +987,7 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/base.txt
 optimizely-sdk==4.1.1
     # via -r requirements/edx/base.txt
-ora2==5.2.3
+ora2==5.2.4
     # via -r requirements/edx/base.txt
 oscrypto==1.3.0
     # via
