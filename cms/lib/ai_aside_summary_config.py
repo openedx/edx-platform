@@ -35,8 +35,8 @@ class AiAsideSummaryConfig:
         Define if the summary configuration is enabled in ai_aside
         """
         try:
-            from ai_aside.config_api.api import is_course_present, is_summary_enabled
-            if not is_course_present(self.course_key):
+            from ai_aside.config_api.api import is_course_settings_present, is_summary_enabled
+            if not is_course_settings_present(self.course_key):
                 return None
             return is_summary_enabled(self.course_key, unit_key)
         except (ModuleNotFoundError, ImportError):
