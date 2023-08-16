@@ -28,11 +28,7 @@ from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from cms.djangoapps.contentstore.toggles import use_new_problem_editor
 from openedx.core.lib.xblock_utils import get_aside_from_xblock, is_xblock_aside
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
-try:
-    # Technically this is a django app plugin, so we should not error if it's not installed:
-    import openedx.core.djangoapps.content_staging.api as content_staging_api
-except ImportError:
-    content_staging_api = None
+from openedx.core.djangoapps.content_staging import api as content_staging_api
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from ..toggles import use_new_unit_page
@@ -198,10 +194,7 @@ def container_handler(request, usage_key_string):
                 index += 1
 
             # Get the status of the user's clipboard so they can paste components if they have something to paste
-            if content_staging_api:
-                user_clipboard = content_staging_api.get_user_clipboard_json(request.user.id, request)
-            else:
-                user_clipboard = {"content": None}
+            user_clipboard = content_staging_api.get_user_clipboard_json(request.user.id, request)
             return render_to_response('container.html', {
                 'language_code': request.LANGUAGE_CODE,
                 'context_course': course,  # Needed only for display of menus at top of page.
