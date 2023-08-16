@@ -162,6 +162,11 @@ def retry_revoke_subscriptions_verified_access(self, revocable_entitlement_uuids
     Task to process course access revoke and move to audit.
     This is called only if call to get_courses_completion_status fails due to any exception.
     """
+    LOGGER.info("B2C_SUBSCRIPTIONS: Running retry_revoke_subscriptions_verified_access for user [%s],"
+                " entitlement_uuids %s and entitled_course_ids %s",
+                username,
+                revocable_entitlement_uuids,
+                entitled_course_ids)
     course_entitlements = CourseEntitlement.objects.filter(uuid__in=revocable_entitlement_uuids)
     course_entitlements = course_entitlements.select_related('user').select_related('enrollment_course_run')
     if course_entitlements.exists():
@@ -171,22 +176,17 @@ def retry_revoke_subscriptions_verified_access(self, revocable_entitlement_uuids
                 countdown = 2 ** self.request.retries
                 self.retry(countdown=countdown, max_retries=3)
             except MaxRetriesExceededError:
-                log.exception(
+                LOGGER.exception(
                     'B2C_SUBSCRIPTIONS: Failed to process retry_revoke_subscriptions_verified_access '
                     'for user [%s] and entitlement_uuids %s',
                     username,
                     revocable_entitlement_uuids
                 )
                 return
-        log.info('B2C_SUBSCRIPTIONS: Starting revoke_entitlements_and_downgrade_courses_to_audit for user [%s] and '
-                 'awarded_cert_course_ids %s and revocable_entitlement_uuids %s from retry task',
-                 username,
-                 awarded_cert_course_ids,
-                 revocable_entitlement_uuids)
         revoke_entitlements_and_downgrade_courses_to_audit(course_entitlements, username, awarded_cert_course_ids,
                                                            revocable_entitlement_uuids)
     else:
-        log.info('B2C_SUBSCRIPTIONS: Entitlements not found for the provided entitlements uuids %s '
-                 'for user [%s] duing the retry_revoke_subscriptions_verified_access task',
-                 revocable_entitlement_uuids,
-                 username)
+        LOGGER.info('B2C_SUBSCRIPTIONS: Entitlements not found for the provided entitlements uuids %s '
+                    'for user [%s] duing the retry_revoke_subscriptions_verified_access task',
+                    revocable_entitlement_uuids,
+                    username)

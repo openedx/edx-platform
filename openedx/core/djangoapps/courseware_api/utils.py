@@ -3,15 +3,9 @@ Courseware API Mixins.
 """
 
 from babel.numbers import get_currency_symbol
-from django.conf import settings
-
-from lti_consumer.api import get_lti_1p3_launch_start_url
-from lti_consumer.data import Lti1p3LaunchData
-from lti_consumer.models import LtiConfiguration
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollmentCelebration, UserCelebration
-from lms.djangoapps.courseware.access import get_user_role
 from lms.djangoapps.courseware.utils import can_show_verified_upgrade, verified_upgrade_deadline_link
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.discounts.applicability import can_show_streak_discount_coupon
@@ -72,41 +66,3 @@ def serialize_upgrade_info(user, course_overview, enrollment):
         'sku': mode.sku,
         'upgrade_url': verified_upgrade_deadline_link(user, course_overview),
     }
-
-
-def get_learning_assistant_launch_url(user, course_key, enrollment_object, overview):
-    """
-    Return the launch URL for an LTI based learning assistant
-    """
-    config_id = getattr(settings, 'LEARNING_ASSISTANT_CONFIG_ID', None)
-    if not config_id:
-        return None
-
-    try:
-        lti_config = LtiConfiguration.objects.get(config_id=config_id)
-    except LtiConfiguration.DoesNotExist:
-        return None
-
-    if lti_config.version != 'lti_1p3':
-        return None
-
-    user_role = get_user_role(user, course_key)
-    if (
-        (enrollment_object and enrollment_object.mode not in CourseMode.VERIFIED_MODES)
-        and (user_role != 'staff' or user_role != 'instructor')
-    ):
-        return None
-
-    launch_data = Lti1p3LaunchData(
-        user_id=user.id,
-        user_role=user_role,
-        email=user.email,
-        config_id=config_id,
-        resource_link_id='-'.join([str(config_id), str(course_key)]),
-        context_id=str(course_key),
-        context_type=['course_offering'],
-        context_title=overview.display_name
-    )
-
-    lti_url = get_lti_1p3_launch_start_url(launch_data)
-    return lti_url

@@ -5,7 +5,7 @@ APIs.
 """
 from opaque_keys.edx.keys import UsageKey
 from rest_framework.test import APIClient
-from xmodule.modulestore.django import contentstore, modulestore
+from xmodule.modulestore.django import contentstore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, upload_file_to_course
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory, ToyCourseFactory
 
@@ -34,7 +34,7 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
 
         # Check how many blocks are in the vertical currently
         parent_key = course_key.make_usage_key("vertical", "vertical_test")  # This is the vertical that holds the video
-        orig_vertical = modulestore().get_item(parent_key)
+        orig_vertical = self.store.get_item(parent_key)
         assert len(orig_vertical.children) == 4
 
         # Copy the video
@@ -51,15 +51,53 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
         new_block_key = UsageKey.from_string(paste_response.json()["locator"])
 
         # Now there should be an extra block in the vertical:
-        updated_vertical = modulestore().get_item(parent_key)
+        updated_vertical = self.store.get_item(parent_key)
         assert len(updated_vertical.children) == 5
         assert updated_vertical.children[-1] == new_block_key
         # And it should match the original:
-        orig_video = modulestore().get_item(video_key)
-        new_video = modulestore().get_item(new_block_key)
+        orig_video = self.store.get_item(video_key)
+        new_video = self.store.get_item(new_block_key)
         assert new_video.youtube_id_1_0 == orig_video.youtube_id_1_0
         # The new block should store a reference to where it was copied from
         assert new_video.copied_from_block == str(video_key)
+
+    def test_copy_and_paste_unit(self):
+        """
+        Test copying a unit (vertical) from one course into another
+        """
+        course_key, client = self._setup_course()
+        dest_course = CourseFactory.create(display_name='Destination Course')
+        with self.store.bulk_operations(dest_course.id):
+            dest_chapter = BlockFactory.create(parent=dest_course, category='chapter', display_name='Section')
+            dest_sequential = BlockFactory.create(parent=dest_chapter, category='sequential', display_name='Subsection')
+
+        # Copy the unit
+        unit_key = course_key.make_usage_key("vertical", "vertical_test")
+        copy_response = client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(unit_key)}, format="json")
+        assert copy_response.status_code == 200
+
+        # Paste the unit
+        paste_response = client.post(XBLOCK_ENDPOINT, {
+            "parent_locator": str(dest_sequential.location),
+            "staged_content": "clipboard",
+        }, format="json")
+        assert paste_response.status_code == 200
+        dest_unit_key = UsageKey.from_string(paste_response.json()["locator"])
+
+        # Now there should be a one unit/vertical as a child of the destination sequential/subsection:
+        updated_sequential = self.store.get_item(dest_sequential.location)
+        assert updated_sequential.children == [dest_unit_key]
+        # And it should match the original:
+        orig_unit = self.store.get_item(unit_key)
+        dest_unit = self.store.get_item(dest_unit_key)
+        assert len(orig_unit.children) == len(dest_unit.children)
+        # Check details of the fourth child (a poll)
+        orig_poll = self.store.get_item(orig_unit.children[3])
+        dest_poll = self.store.get_item(dest_unit.children[3])
+        assert dest_poll.display_name == orig_poll.display_name
+        assert dest_poll.question == orig_poll.question
+        # The new block should store a reference to where it was copied from
+        assert dest_unit.copied_from_block == str(unit_key)
 
     def test_paste_with_assets(self):
         """

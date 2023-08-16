@@ -81,6 +81,7 @@
                 // Send the data to the server as an AJAX request. Attach a callback that will
                 // be fired on server's response.
                 $.postWithPrefix(
+                    // eslint-disable-next-line no-useless-concat
                     this.ajax_url + '/' + 'reset_poll',
                     {},
                     function(response) {
@@ -184,6 +185,7 @@
                     answer.textEl.html(HtmlUtils.HTML(value).toString());
 
                     if (_this.shortVersion === true) {
+                        // eslint-disable-next-line no-shadow
                         $.each(answer, function(index, value) {
                             if (value instanceof jQuery) {
                                 value.addClass('short');
@@ -293,6 +295,7 @@
                 this.jsonConfig = JSON.parse(this.questionEl.children('.poll_question_div').html());
 
                 $.postWithPrefix(
+                    // eslint-disable-next-line no-useless-concat
                     '' + this.questionEl.data('ajax-url') + '/' + 'get_state', {},
                     function(response) {
                         _this.jsonConfig.poll_answer = response.poll_answer;

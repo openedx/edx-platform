@@ -46,6 +46,7 @@ define([
             var view = getView(this.collection, this.tabsCollection),
                 chapters = getText('.course-title'),
                 sections = getText('.course-subtitle'),
+                // eslint-disable-next-line no-shadow
                 notes = getText('.note-excerpt-p');
 
             expect(this.tabsCollection).toHaveLength(1);
