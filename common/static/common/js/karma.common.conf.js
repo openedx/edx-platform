@@ -42,7 +42,9 @@ var path = require('path');
 var _ = require('underscore');
 
 var appRoot = path.join(__dirname, '../../../../');
+// eslint-disable-next-line import/no-extraneous-dependencies
 var webdriver = require('selenium-webdriver');
+// eslint-disable-next-line import/no-extraneous-dependencies
 var firefox = require('selenium-webdriver/firefox');
 
 var webpackConfig = require(path.join(appRoot, 'webpack.dev.config.js'));

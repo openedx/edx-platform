@@ -217,20 +217,8 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
             'notification_preference_config': {
                 'discussion': {
                     'enabled': True,
-                    'core_notification_types': ['new_comment_on_response'],
+                    'core_notification_types': ['new_comment_on_response', 'new_comment', 'new_response'],
                     'notification_types': {
-                        'new_comment': {
-                            'web': True,
-                            'email': True,
-                            'push': True,
-                            'info': 'Comment on post'
-                        },
-                        'new_response': {
-                            'web': True,
-                            'email': True,
-                            'push': True,
-                            'info': 'Response on post'
-                        },
                         'core': {
                             'web': True,
                             'email': True,
@@ -239,7 +227,7 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                         }
                     },
                     'non_editable': {
-                        'new_comment': ['web', 'email']
+                        'core': ['web']
                     }
                 }
             }
@@ -268,9 +256,6 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         ('discussion', None, None, True, status.HTTP_200_OK, 'app_update'),
         ('discussion', None, None, False, status.HTTP_200_OK, 'app_update'),
         ('invalid_notification_app', None, None, True, status.HTTP_400_BAD_REQUEST, None),
-
-        ('discussion', 'new_comment', 'web', True, status.HTTP_200_OK, 'type_update'),
-        ('discussion', 'new_response', 'web', False, status.HTTP_200_OK, 'type_update'),
 
         ('discussion', 'core', 'email', True, status.HTTP_200_OK, 'type_update'),
         ('discussion', 'core', 'email', False, status.HTTP_200_OK, 'type_update'),

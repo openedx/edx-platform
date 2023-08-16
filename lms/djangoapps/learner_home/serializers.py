@@ -10,6 +10,7 @@ from django.urls import reverse
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
+from openedx_filters.learning.filters import CourseEnrollmentAPIRenderStarted
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.features.course_experience import course_home_url
@@ -243,6 +244,15 @@ class EnrollmentSerializer(serializers.Serializer):
 
     def get_hasOptedOutOfEmail(self, enrollment):
         return enrollment.course_id in self.context.get("course_optouts", [])
+
+    def to_representation(self, instance):
+        """Serialize the enrollment instance to be able to update the values before the API finishes rendering."""
+        serialized_enrollment = super().to_representation(instance)
+        course_key, serialized_enrollment = CourseEnrollmentAPIRenderStarted().run_filter(
+            course_key=instance.course_id,
+            serialized_enrollment=serialized_enrollment,
+        )
+        return serialized_enrollment
 
 
 class GradeDataSerializer(serializers.Serializer):

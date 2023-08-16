@@ -191,6 +191,7 @@
                     } else {
                         state.videoPlayer.player = new HTML5Video.Player(state.el, commonPlayerConfig);
                     }
+                    // eslint-disable-next-line no-multi-assign
                     player = state.videoEl = state.videoPlayer.player.videoEl;
                     player[0].addEventListener(eventToBeTriggered, state.videoPlayer.onLoadMetadataHtml5, false);
                     player.on('remove', state.videoPlayer.destroy);
@@ -209,6 +210,7 @@
                     });
 
                     state.el.on('initialize', function() {
+                        // eslint-disable-next-line no-shadow, no-multi-assign
                         var player = state.videoEl = state.el.find('iframe'),
                             videoWidth = player.attr('width') || player.width(),
                             videoHeight = player.attr('height') || player.height();
@@ -226,7 +228,9 @@
             }
 
             function _updateVcrAndRegion(state, isYoutube) {
+                // eslint-disable-next-line no-shadow
                 var update = function(state) {
+                    // eslint-disable-next-line no-shadow
                     var duration = state.videoPlayer.duration(),
                         time;
 
@@ -453,6 +457,7 @@
             }
 
             function seekTo(time) {
+                // eslint-disable-next-line no-shadow
                 var duration = this.videoPlayer.duration();
 
                 if ((typeof time !== 'number') || (time > duration) || (time < 0)) {
@@ -659,6 +664,7 @@
                     this.videoPlayer.player.setPlaybackRate(this.speed);
                 }
 
+                // eslint-disable-next-line no-shadow
                 var duration = this.videoPlayer.duration(),
                     time = this.videoPlayer.figureOutStartingTime(duration);
 
@@ -682,6 +688,7 @@
                     'is-ended', 'is-cued'
                 ].join(' '));
 
+                // eslint-disable-next-line default-case
                 switch (event.data) {
                 case this.videoPlayer.PlayerState.UNSTARTED:
                     this.el.addClass('is-unstarted');
@@ -716,6 +723,7 @@
                 this.el.trigger('error', [code]);
             }
 
+            // eslint-disable-next-line no-shadow
             function figureOutStartEndTime(duration) {
                 var videoPlayer = this.videoPlayer;
 
@@ -737,6 +745,7 @@
                 }
             }
 
+            // eslint-disable-next-line no-shadow
             function figureOutStartingTime(duration) {
                 var savedVideoPosition = this.config.savedVideoPosition,
 

@@ -83,6 +83,7 @@ define([
         });
 
         it('will not render header and footer if there are no notes', function() {
+            // eslint-disable-next-line no-shadow
             var notes = {
                 count: 0,
                 current_page: 1,
@@ -100,6 +101,7 @@ define([
 
         it('can go to a page number', function() {
             var requests = AjaxHelpers.requests(this);
+            // eslint-disable-next-line no-shadow
             var notes = Helpers.createNotesData(
                 {
                     numNotesToCreate: 10,
@@ -187,6 +189,7 @@ define([
 
         it('sends correct page size value', function() {
             var requests = AjaxHelpers.requests(this);
+            // eslint-disable-next-line no-shadow
             var notes = Helpers.createNotesData(
                 {
                     numNotesToCreate: 5,

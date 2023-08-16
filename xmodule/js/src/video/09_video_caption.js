@@ -481,6 +481,7 @@
                 // get start and caption. If startTime and endTime
                 // are specified, filter by that range.
                 var times = this.getStartEndTimes();
+                // eslint-disable-next-line prefer-spread
                 var results = this.sjson.filter.apply(this.sjson, times);
                 var start = results.start;
                 var captions = results.captions;
@@ -1056,6 +1057,7 @@
                     // if start and end times are defined, limit search.
                     // else, use the entire list of video captions
                     params = [time].concat(times);
+                    // eslint-disable-next-line prefer-spread
                     newIndex = this.sjson.search.apply(this.sjson, params);
 
                     if (
@@ -1282,6 +1284,7 @@
                 var captions = this.captionDisplayEl['0'];
 
                 if (typeof Draggabilly === 'function') {
+                    // eslint-disable-next-line no-new
                     new Draggabilly(captions, {containment: true});
                 } else {
                     console.log('Closed captioning available but not draggable');
