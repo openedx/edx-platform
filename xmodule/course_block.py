@@ -61,11 +61,12 @@ COURSE_VIDEO_SHARING_NONE = 'all-off'
 # .. toggle_name: FEATURES['CREATE_COURSE_WITH_DEFAULT_ENROLLMENT_START_DATE']
 # .. toggle_implementation: SettingDictToggle
 # .. toggle_default: False
-# .. toggle_description: When enabled the newly created courses will have the enrollment_start_date
-#   set to DEFAULT_START_DATE.
+# .. toggle_description: The default behavior, when this is disabled, is that newly created course has no
+#   enrollment_start date set. When the feature is enabled - the newly created courses will have the
+#   enrollment_start_date set to DEFAULT_START_DATE.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2023-06-22
-# .. toggle_target_removal_date: None
+# .. toggle_target_removal_date: This is intended to be a permanent option.
 CREATE_COURSE_WITH_DEFAULT_ENROLLMENT_START_DATE = SettingDictToggle(
     "FEATURES", "CREATE_COURSE_WITH_DEFAULT_ENROLLMENT_START_DATE", default=False, module_name=__name__
 )
