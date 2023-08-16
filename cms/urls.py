@@ -3,9 +3,9 @@ Urls of Studio.
 """
 
 from django.conf import settings
-from django.conf.urls import include
 from django.conf.urls.static import static
 from django.contrib.admin import autodiscover as django_autodiscover
+from django.urls import include
 from django.urls import path, re_path
 from django.utils.translation import gettext_lazy as _
 from auth_backends.urls import oauth2_urlpatterns

@@ -1,5 +1,6 @@
 """ Contenstore API v1 URLs. """
 
+from django.urls import path
 from django.urls import re_path
 from django.conf import settings
 
@@ -67,8 +68,8 @@ urlpatterns = [
         fr'^videos/encodings/{settings.COURSE_ID_PATTERN}$',
         videos.VideoEncodingsDownloadView.as_view(), name='studio_content_videos_encodings'
     ),
-    re_path(
-        r'^videos/features/$',
+    path(
+        'videos/features/',
         videos.VideoFeaturesView.as_view(), name='studio_content_videos_features'
     ),
     re_path(
