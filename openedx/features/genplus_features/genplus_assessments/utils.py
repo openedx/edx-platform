@@ -376,6 +376,7 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
         List[Dict]: Returns a list of dictionaries
             containing the student aggregate result data.
     """
+    from openedx.features.genplus_features.genplus_learning.utils import generate_report_data
     usage_key = UsageKey.from_string(usage_key_str).map_into_course(course_key)
     user = get_user_model().objects.get(pk=user_id)
 
@@ -404,7 +405,8 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
                 try:
                     user_state_iterator = user_state_client.iter_all_for_block(
                         block_key, student_list=student_list)
-                    for username, state in block.generate_report_data(user_state_iterator):
+                    for username, state in generate_report_data(block, user_state_iterator):
+                        state['block_key'] = block_key
                         generated_report_data[username].append(state)
                 except NotImplementedError:
                     pass
@@ -502,7 +504,7 @@ def students_aggregate_result(user_states, aggregate_result, problem_choices):
     for user_state in user_states:
         user_answer = user_state['Answer']
         correct_answer = user_state['Correct Answer']
-        keys = user_answer.split(',')
+        keys = user_answer.split('||')
         for k in keys:
             k = k.strip()
             if k not in aggregate_result:
