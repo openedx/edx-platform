@@ -3,7 +3,7 @@ Contain the middleware logic needed during pact verification
 """
 from django.contrib import auth
 from django.utils.deprecation import MiddlewareMixin
-from lms.envs.pact import PACT_BYPASS_AUTHENTICATION
+from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
 
 User = auth.get_user_model()
@@ -20,7 +20,7 @@ class AuthenticationMiddleware(MiddlewareMixin):
     """
 
     def __init__(self, get_response):
-        if PACT_BYPASS_AUTHENTICATION == False:
+        if getattr(settings, 'PACT_BYPASS_AUTHENTICATION', None) is False:
             raise MiddlewareNotUsed
         super().__init__(get_response)
         self.auth_user = User.objects.get_or_create(username='pact_staff', is_staff=True)[0]
