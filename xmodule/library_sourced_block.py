@@ -18,13 +18,12 @@ from xblock.fields import List, Scope, String
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
-from xmodule.mako_module import MakoTemplateBlockBase
+from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.studio_editable import StudioEditableBlock as EditableChildrenMixin
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.x_module import (
     STUDENT_VIEW,
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
     XModuleToXBlockMixin,
@@ -45,7 +44,6 @@ class LibrarySourcedBlock(
     StudioEditableXBlockMixin,
     MakoTemplateBlockBase,
     XModuleToXBlockMixin,
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
     EditableChildrenMixin,
@@ -87,26 +85,8 @@ class LibrarySourcedBlock(
     has_author_view = True
 
     resources_dir = 'assets/library_source_block'
-
-    preview_view_js = {
-        'js': [],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    preview_view_css = {
-        'scss': [],
-    }
-
     mako_template = 'widgets/metadata-edit.html'
     studio_js_module_name = "VerticalDescriptor"
-    studio_view_js = {
-        'js': [
-            resource_string(__name__, 'js/src/vertical/edit.js'),
-        ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    studio_view_css = {
-        'scss': [],
-    }
 
     def __str__(self):
         return f"LibrarySourcedBlock: {self.display_name}"
@@ -138,15 +118,16 @@ class LibrarySourcedBlock(
             'can_reorder': can_reorder,
         }))
 
-    def studio_view(self, _context):
+    def studio_view(self, context):
         """
         Return the studio view.
         """
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
         )
-        add_webpack_to_fragment(fragment, 'LibrarySourcedBlockStudio')
+        add_webpack_js_to_fragment(fragment, 'LibrarySourcedBlockStudio')
         shim_xmodule_js(fragment, self.studio_js_module_name)
+
 
         return fragment
 

@@ -75,6 +75,10 @@ module.exports = {
             './xmodule/js/src/xmodule.js',
             './xmodule/js/src/vertical/edit.js'
         ],
+        LibrarySourcedBlockStudio: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/vertical/edit.js'
+        ],
         PollBlockDisplay: [
             './xmodule/js/src/xmodule.js',
             './xmodule/js/src/javascript_loader.js',
