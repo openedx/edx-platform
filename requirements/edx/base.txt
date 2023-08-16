@@ -463,7 +463,7 @@ edx-django-utils==5.7.0
     #   openedx-blockstore
     #   ora2
     #   super-csv
-edx-drf-extensions==8.8.0
+edx-drf-extensions==8.9.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-completion
@@ -479,7 +479,7 @@ edx-enterprise==4.0.16
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
-edx-event-bus-kafka==5.3.0
+edx-event-bus-kafka==5.3.1
     # via -r requirements/edx/kernel.in
 edx-event-bus-redis==0.3.1
     # via -r requirements/edx/kernel.in
@@ -516,7 +516,7 @@ edx-proctoring-proctortrack==1.0.5
     # via -r requirements/edx/kernel.in
 edx-rbac==1.8.0
     # via edx-enterprise
-edx-rest-api-client==5.5.2
+edx-rest-api-client==5.6.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
@@ -748,7 +748,7 @@ oauthlib==3.0.1
     #   social-auth-core
 olxcleaner==0.2.1
     # via -r requirements/edx/kernel.in
-openedx-blockstore==1.3.1
+openedx-blockstore==1.4.0
     # via -r requirements/edx/kernel.in
 openedx-calc==3.0.1
     # via -r requirements/edx/kernel.in
@@ -958,7 +958,7 @@ random2==1.0.1
     # via -r requirements/edx/kernel.in
 recommender-xblock==2.0.1
     # via -r requirements/edx/bundled.in
-redis==4.6.0
+redis==5.0.0
     # via
     #   -r requirements/edx/kernel.in
     #   walrus
