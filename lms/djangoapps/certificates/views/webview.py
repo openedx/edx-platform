@@ -420,7 +420,12 @@ def _update_badge_context(context, course, user):
     """
     badge = None
     if badges_enabled() and course.issue_badges:
-        badges = get_completion_badge(course.location.course_key, user).get_for_user(user)
+        completion_badge = get_completion_badge(course.location.course_key, user)
+        if completion_badge is not None:
+            badges = completion_badge.get_for_user(user)
+        else:
+            badges = None
+
         if badges:
             badge = badges[0]
     context['badge'] = badge
