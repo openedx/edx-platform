@@ -73,6 +73,10 @@ BULK_EMAIL_ROUTING_KEY_SMALL_JOBS: edx.lms.core.default
 CACHES:
     celery:
         BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+        OPTIONS:
+            no_delay: true
+            ignore_exc: true
+            use_pooling: true
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: celery
         LOCATION:
@@ -80,12 +84,20 @@ CACHES:
         TIMEOUT: '7200'
     configuration:
         BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+        OPTIONS:
+            no_delay: true
+            ignore_exc: true
+            use_pooling: true
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: 78f87108afce
         LOCATION:
         - edx.devstack.memcached:11211
     course_structure_cache:
         BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+        OPTIONS:
+            no_delay: true
+            ignore_exc: true
+            use_pooling: true
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: course_structure
         LOCATION:
@@ -93,6 +105,10 @@ CACHES:
         TIMEOUT: '7200'
     default:
         BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+        OPTIONS:
+            no_delay: true
+            ignore_exc: true
+            use_pooling: true
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: default
         LOCATION:
@@ -100,12 +116,20 @@ CACHES:
         VERSION: '1'
     general:
         BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+        OPTIONS:
+            no_delay: true
+            ignore_exc: true
+            use_pooling: true
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: general
         LOCATION:
         - edx.devstack.memcached:11211
     mongo_metadata_inheritance:
         BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+        OPTIONS:
+            no_delay: true
+            ignore_exc: true
+            use_pooling: true
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: mongo_metadata_inheritance
         LOCATION:
@@ -113,6 +137,10 @@ CACHES:
         TIMEOUT: 300
     staticfiles:
         BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+        OPTIONS:
+            no_delay: true
+            ignore_exc: true
+            use_pooling: true
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: 78f87108afce_general
         LOCATION:
