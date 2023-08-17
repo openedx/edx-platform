@@ -53,6 +53,8 @@ Steps
       import requests
 
       client_id = "vovj0AItd9EnrOKjkDli0HpSF9HoooaTY9yueafn"
+      # Client secretes should not be exposed in your code, we put it here to
+      # make the example more clear.
       client_secret = "a3Fkwr24dfDSlIXt3v3q4Ob41CYQNZyGmtK8Y8ax0srpIa2vJON3OC5Rvj1i1wizsIUv1W1qM1Q2XPeuyjucNixsHXZsuw1dn2B9nH3IyjSvuFb5KoydDvWX8Hx8znqD"
 
       credential = f"{client_id}:{client_secret}"
@@ -62,7 +64,7 @@ Steps
       data = {"grant_type": "client_credentials", "token_type": "jwt"}
 
       token_request = requests.post(
-          "http://localhost:8000/oauth2/access_token", headers=headers, data=data
+          "http://lms.example.com/oauth2/access_token", headers=headers, data=data
       )
       access_token = token_request.json()["access_token"]
 
@@ -76,7 +78,7 @@ Steps
 
 
       enrollment_request = requests.get(
-          "http://localhost:8000/api/enrollment/v1/enrollment",
+          "http://lms.example.com/api/enrollment/v1/enrollment",
           headers={"Authorization": f"JWT {access_token}"},
       )
 
@@ -84,3 +86,5 @@ Steps
 .. seealso::
 
    * :doc:`/concepts/rest_apis`
+
+   * :doc:`/references/auth_code_samples`
