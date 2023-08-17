@@ -202,24 +202,16 @@ class LibraryToolsService:
             library_key = library_key.replace(branch=ModuleStoreEnum.BranchName.library, version_guid=version)
 
         library = self._get_library(library_key, is_v2_lib)
+
         if library is None:
             raise ValueError(f"Requested library {library_key} not found.")
         if user_perms and not user_perms.can_read(library_key):
             raise PermissionDenied()
-        if hasattr(dest_block, 'capa_type'):
-            filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)
-        else:
-            filter_children = None
-        if filter_children:
-            # Apply simple filtering based on CAPA problem types:
-            source_blocks.extend(self._problem_type_filter(library, dest_block.capa_type))
-        else:
-            source_blocks.extend(library.children)
 
         if not is_v2_lib:
             if user_perms and not user_perms.can_read(library_key):
                 raise PermissionDenied()
-            if filter_children:
+            if hasattr(dest_block, 'capa_type') and (dest_block.capa_type != ANY_CAPA_TYPE_VALUE):
                 # Apply simple filtering based on CAPA problem types:
                 source_blocks.extend(self._problem_type_filter(library, dest_block.capa_type))
             else:
