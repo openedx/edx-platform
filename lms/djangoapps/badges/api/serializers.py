@@ -16,7 +16,8 @@ class BadgeClassSerializer(serializers.ModelSerializer):
 
     class Meta(object):
         model = BadgeClass
-        fields = ('slug', 'issuing_component', 'display_name', 'course_id', 'description', 'criteria', 'image_url')
+        fields = ('slug', 'issuing_component', 'display_name', 'course_id', 'description', 'criteria', 'image_url',
+                  'mode', 'badgr_server_slug')
 
 
 class BadgeAssertionSerializer(serializers.ModelSerializer):

@@ -103,7 +103,8 @@ def get_completion_badge(course_id, user):
         course_id=course_id,
         mode=mode,
         display_name=course.display_name,
-        image_file_handle=CourseCompleteImageConfiguration.image_for_mode(mode)
+        image_file_handle=CourseCompleteImageConfiguration.image_for_mode(mode),
+        create=False
     )
 
 
