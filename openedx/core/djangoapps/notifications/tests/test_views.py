@@ -224,7 +224,9 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                             'email': True,
                             'push': True,
                             'info': ''
-                        }
+                        },
+                        'new_discussion_post': {'web': False, 'email': False, 'push': False, 'info': ''},
+                        'new_question_post': {'web': False, 'email': False, 'push': False, 'info': ''}
                     },
                     'non_editable': {
                         'core': ['web']
