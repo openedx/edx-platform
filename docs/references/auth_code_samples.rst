@@ -17,7 +17,7 @@ Get a JWT with a Username and Password
    from pprint import pprint
 
    token_request = requests.post(
-       f"http://localhost:8000/oauth2/access_token",
+       f"http://lms.example.com/oauth2/access_token",
        data={
            "client_id": "login-service-client-id",
            "grant_type": "password",
@@ -62,7 +62,7 @@ Get a JWT with a client_id and client_secret
    data = {"grant_type": "client_credentials", "token_type": "jwt"}
 
    token_request = requests.post(
-       "http://localhost:8000/oauth2/access_token", headers=headers, data=data
+       "http://lms.example.com/oauth2/access_token", headers=headers, data=data
    )
 
    pprint(token_request.json())
@@ -105,7 +105,7 @@ Refresh a JWT Using a Refresh Token
    refresh_token = token_request.json()['refresh_token']
 
    refreshed_token_request = requests.post(
-       f"http://localhost:8000/oauth2/access_token",
+       f"http://lms.example.com/oauth2/access_token",
        data={
            "client_id": "login-service-client-id",
            "grant_type": "refresh_token",
@@ -135,7 +135,7 @@ Use a JWT Header to call an API
    access_token = token_request.json()["access_token"]
 
    enrollment_request = requests.get(
-       "http://localhost:8000/api/enrollment/v1/enrollment",
+       "http://lms.example.com/api/enrollment/v1/enrollment",
        headers={"Authorization": f"JWT {access_token}"},
    )
 
