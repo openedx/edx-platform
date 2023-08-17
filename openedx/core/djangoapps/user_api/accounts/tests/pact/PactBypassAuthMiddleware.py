@@ -20,9 +20,9 @@ class AuthenticationMiddleware(MiddlewareMixin):
     """
 
     def __init__(self, get_response):
-        if getattr(settings, 'PACT_BYPASS_AUTHENTICATION', None) is False:
-            raise MiddlewareNotUsed
         super().__init__(get_response)
+        if not getattr(settings, 'PACT_BYPASS_AUTHENTICATION', None):
+            raise MiddlewareNotUsed
         self.auth_user = User.objects.get_or_create(username='pact_staff', is_staff=True)[0]
         self.get_response = get_response
 
