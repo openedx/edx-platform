@@ -8,6 +8,8 @@ Authentication Related Code Samples
    examples are useful but you should generally not expose any of these tokens
    to systems or clients you don't trust.
 
+.. _JWT from user:
+
 Get a JWT with a Username and Password
 **************************************
 
@@ -38,6 +40,8 @@ Get a JWT with a Username and Password
     'token_type': 'JWT'}
 
 .. note:: The client type must be ``public`` for this to work.
+
+.. _JWT from application:
 
 Get a JWT with a client_id and client_secret
 ********************************************
