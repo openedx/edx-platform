@@ -29,4 +29,4 @@ one before you can call the API again.
 
    * `Open edX Rest API Conventions <https://openedx.atlassian.net/wiki/spaces/AC/pages/18350757/Open+edX+REST+API+Conventions>`
 
-
+   * `edX Enterprise REST API Auth Guide <https://edx-enterprise-api.readthedocs.io/en/latest/authentication.html>`
