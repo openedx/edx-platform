@@ -18,7 +18,7 @@ CLIPBOARD_ENDPOINT = "/api/content-staging/v1/clipboard/"
 SAMPLE_VIDEO_OLX = """
     <video
         url_name="sample_video"
-        display_name="default"
+        display_name="Copy of 'default'"
         youtube="0.75:JMD_ifUUfsU,1.00:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY"
         youtube_id_0_75="JMD_ifUUfsU"
         youtube_id_1_0="OEoXaMPEzfM"
@@ -156,7 +156,7 @@ class ClipboardTestCase(ModuleStoreTestCase):
         # For HTML, we really want to be sure that the OLX is serialized in this exact format (using CDATA), so we check
         # the actual string directly rather than using assertXmlEqual():
         assert olx_response.content.decode() == dedent("""
-            <html url_name="toyhtml" display_name="Text"><![CDATA[
+            <html url_name="toyhtml" display_name="Copy of 'Text'"><![CDATA[
             <a href='/static/handouts/sample_handout.txt'>Sample</a>
             ]]></html>
         """).lstrip()

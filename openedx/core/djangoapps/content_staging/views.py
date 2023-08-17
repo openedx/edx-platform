@@ -123,6 +123,13 @@ class ClipboardEndpoint(APIView):
             raise NotFound("The requested usage key does not exist.") from exc
         block_data = serialize_xblock_to_olx(block)
 
+        # Prepend `Copy of ...` to block
+        block_display_name = block_metadata_utils.display_name_with_default(block)
+        block_data.olx_str = block_data.olx_str.replace(
+            f"display_name=\"{block_display_name}\"",
+            f"display_name=\"Copy of '{block_display_name}'\""
+        )
+
         expired_ids = []
         with transaction.atomic():
             # Mark all of the user's existing StagedContent rows as EXPIRED
@@ -143,7 +150,7 @@ class ClipboardEndpoint(APIView):
                 status=StagedContentStatus.READY,
                 block_type=usage_key.block_type,
                 olx=block_data.olx_str,
-                display_name=block_metadata_utils.display_name_with_default(block),
+                display_name=block_display_name,
                 suggested_url_name=usage_key.block_id,
             )
             (clipboard, _created) = UserClipboard.objects.update_or_create(user=request.user, defaults={
