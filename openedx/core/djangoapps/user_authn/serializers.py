@@ -53,6 +53,7 @@ class ContextDataSerializer(serializers.Serializer):
     autoSubmitRegForm = serializers.BooleanField(default=False)
     syncLearnerProfileData = serializers.BooleanField(default=False)
     countryCode = serializers.CharField(allow_null=True)
+    welcomePageRedirectUrl = serializers.CharField(allow_null=True)
     pipelineUserDetails = serializers.SerializerMethodField()
 
     def get_pipelineUserDetails(self, obj):

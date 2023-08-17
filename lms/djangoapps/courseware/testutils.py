@@ -44,9 +44,8 @@ class RenderXBlockTestMixin(MasqueradeMixin, metaclass=ABCMeta):
         '<div class="container"',
     ]
 
-    # DOM elements that appear in an xBlock,
-    # but are excluded from the xBlock-only rendering.
-    XBLOCK_REMOVED_HTML_ELEMENTS = [
+    # DOM elements that should only be present when viewing the XBlock as staff.
+    XBLOCK_STAFF_DEBUG_INFO = [
         '<div class="wrap-instructor-info"',
     ]
 
@@ -143,14 +142,14 @@ class RenderXBlockTestMixin(MasqueradeMixin, metaclass=ABCMeta):
         if login:
             self.login()
 
-    def verify_response(self, expected_response_code=200, url_params=None):
+    def verify_response(self, expected_response_code=200, url_params=None, is_staff=False):
         """
         Helper method that calls the endpoint, verifies the expected response code, and returns the response.
 
         Arguments:
             expected_response_code: The expected response code.
             url_params: URL parameters that will be encoded and passed to the request.
-
+            is_staff: Whether the user has staff permissions in the course.
         """
         if url_params:
             url_params = urlencode(url_params)
@@ -158,8 +157,9 @@ class RenderXBlockTestMixin(MasqueradeMixin, metaclass=ABCMeta):
         response = self.get_response(self.block_to_be_tested.location, url_params)
         if expected_response_code == 200:
             self.assertContains(response, self.html_block.data, status_code=expected_response_code)
-            unexpected_elements = self.block_specific_chrome_html_elements
-            unexpected_elements += self.COURSEWARE_CHROME_HTML_ELEMENTS + self.XBLOCK_REMOVED_HTML_ELEMENTS
+            unexpected_elements = self.block_specific_chrome_html_elements + self.COURSEWARE_CHROME_HTML_ELEMENTS
+            if not is_staff:
+                unexpected_elements += self.XBLOCK_STAFF_DEBUG_INFO
             for chrome_element in unexpected_elements:
                 self.assertNotContains(response, chrome_element)
         else:
@@ -202,12 +202,12 @@ class RenderXBlockTestMixin(MasqueradeMixin, metaclass=ABCMeta):
         #   (3) definition - HTML block
         #   (4) definition - edx_notes decorator (original_get_html)
         with check_mongo_calls(4):
-            self.verify_response()
+            self.verify_response(is_staff=True)
 
     def test_success_unenrolled_staff(self):
         self.setup_course()
         self.setup_user(admin=True, enroll=False, login=True)
-        self.verify_response()
+        self.verify_response(is_staff=True)
 
     def test_success_unenrolled_staff_masquerading_as_student(self):
         self.setup_course()

@@ -332,6 +332,7 @@ AWS_QUERYSTRING_AUTH = AUTH_TOKENS.get('AWS_QUERYSTRING_AUTH', True)
 
 AWS_DEFAULT_ACL = 'private'
 AWS_BUCKET_ACL = AWS_DEFAULT_ACL
+# The number of seconds that a generated URL is valid for.
 AWS_QUERYSTRING_EXPIRE = 7 * 24 * 60 * 60  # 7 days
 AWS_S3_CUSTOM_DOMAIN = AUTH_TOKENS.get('AWS_S3_CUSTOM_DOMAIN', 'edxuploads.s3.amazonaws.com')
 

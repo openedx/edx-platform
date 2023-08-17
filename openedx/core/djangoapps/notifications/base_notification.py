@@ -14,7 +14,7 @@ COURSE_NOTIFICATION_TYPES = {
         'name': 'new_comment_on_response',
         'is_core': True,
         'info': 'Comment on response',
-        'content_template': _('<{p}><{strong}>{replier_name}</{strong}> replied on your response in '
+        'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on your response to the post '
                               '<{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
             'post_title': 'Post title',
@@ -25,13 +25,10 @@ COURSE_NOTIFICATION_TYPES = {
     'new_comment': {
         'notification_app': 'discussion',
         'name': 'new_comment',
-        'is_core': False,
-        'web': True,
-        'email': True,
-        'push': True,
+        'is_core': True,
         'info': 'Comment on post',
         'non_editable': ['web', 'email'],
-        'content_template': _('<{p}><{strong}>{replier_name}</{strong}> replied on <{strong}>{author_name}'
+        'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on <{strong}>{author_name}\'s'
                               '</{strong}> response to your post <{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
             'post_title': 'Post title',
@@ -43,10 +40,7 @@ COURSE_NOTIFICATION_TYPES = {
     'new_response': {
         'notification_app': 'discussion',
         'name': 'new_response',
-        'is_core': False,
-        'web': True,
-        'email': True,
-        'push': True,
+        'is_core': True,
         'info': 'Response on post',
         'non_editable': [],
         'content_template': _('<{p}><{strong}>{replier_name}</{strong}> responded to your '
@@ -66,7 +60,7 @@ COURSE_NOTIFICATION_APPS = {
         'core_web': True,
         'core_email': True,
         'core_push': True,
-        'non_editable': []
+        'non_editable': ['web']
     }
 }
 

@@ -43,11 +43,15 @@ from ..videos import (
     ENABLE_VIDEO_UPLOAD_PAGINATION,
     KEY_EXPIRATION_IN_SECONDS,
     VIDEO_IMAGE_UPLOAD_ENABLED,
-    PUBLIC_VIDEO_SHARE,
-    StatusDisplayStrings,
-    TranscriptProvider,
+)
+from cms.djangoapps.contentstore.video_storage_handlers import (
     _get_default_video_image_url,
-    convert_video_status, storage_service_bucket, storage_service_key
+    TranscriptProvider,
+    StatusDisplayStrings,
+    convert_video_status,
+    storage_service_bucket,
+    storage_service_key,
+    PUBLIC_VIDEO_SHARE
 )
 
 
@@ -210,7 +214,7 @@ class VideoUploadPostTestsMixin:
     """
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
     @patch('boto.s3.key.Key')
-    @patch('cms.djangoapps.contentstore.views.videos.S3Connection')
+    @patch('cms.djangoapps.contentstore.video_storage_handlers.S3Connection')
     def test_post_success(self, mock_conn, mock_key):
         files = [
             {
@@ -467,7 +471,7 @@ class VideosHandlerTestCase(
 
     @override_settings(AWS_ACCESS_KEY_ID="test_key_id", AWS_SECRET_ACCESS_KEY="test_secret")
     @patch("boto.s3.key.Key")
-    @patch("cms.djangoapps.contentstore.views.videos.S3Connection")
+    @patch("cms.djangoapps.contentstore.video_storage_handlers.S3Connection")
     @ddt.data(
         (
             [
@@ -529,7 +533,7 @@ class VideosHandlerTestCase(
             self.assertEqual(response['error'], "Request 'files' entry contain unsupported content_type")
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
-    @patch('cms.djangoapps.contentstore.views.videos.S3Connection')
+    @patch('cms.djangoapps.contentstore.video_storage_handlers.S3Connection')
     def test_upload_with_non_ascii_charaters(self, mock_conn):
         """
         Test that video uploads throws error message when file name contains special characters.
@@ -552,7 +556,7 @@ class VideosHandlerTestCase(
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret', AWS_SECURITY_TOKEN='token')
     @patch('boto.s3.key.Key')
-    @patch('cms.djangoapps.contentstore.views.videos.S3Connection')
+    @patch('cms.djangoapps.contentstore.video_storage_handlers.S3Connection')
     @override_waffle_flag(ENABLE_DEVSTACK_VIDEO_UPLOADS, active=True)
     def test_devstack_upload_connection(self, mock_conn, mock_key):
         files = [{'file_name': 'first.mp4', 'content_type': 'video/mp4'}]
@@ -580,7 +584,7 @@ class VideosHandlerTestCase(
         )
 
     @patch('boto.s3.key.Key')
-    @patch('cms.djangoapps.contentstore.views.videos.S3Connection')
+    @patch('cms.djangoapps.contentstore.video_storage_handlers.S3Connection')
     def test_send_course_to_vem_pipeline(self, mock_conn, mock_key):
         """
         Test that uploads always go to VEM S3 bucket by default.
@@ -610,7 +614,7 @@ class VideosHandlerTestCase(
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
     @patch('boto.s3.key.Key')
-    @patch('cms.djangoapps.contentstore.views.videos.S3Connection')
+    @patch('cms.djangoapps.contentstore.video_storage_handlers.S3Connection')
     @ddt.data(
         {
             'global_waffle': True,
@@ -770,7 +774,7 @@ class VideosHandlerTestCase(
         # Test should fail if video not found
         self.assertEqual(True, False, 'Invalid edx_video_id')
 
-    @patch('cms.djangoapps.contentstore.views.videos.LOGGER')
+    @patch('cms.djangoapps.contentstore.video_storage_handlers.LOGGER')
     def test_video_status_update_request(self, mock_logger):
         """
         Verifies that video status update request works as expected.
@@ -1447,8 +1451,8 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
     @ddt.unpack
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
     @patch('boto.s3.key.Key')
-    @patch('cms.djangoapps.contentstore.views.videos.S3Connection')
-    @patch('cms.djangoapps.contentstore.views.videos.get_transcript_preferences')
+    @patch('cms.djangoapps.contentstore.video_storage_handlers.S3Connection')
+    @patch('cms.djangoapps.contentstore.video_storage_handlers.get_transcript_preferences')
     def test_transcript_preferences_metadata(self, transcript_preferences, is_video_transcript_enabled,
                                              mock_transcript_preferences, mock_conn, mock_key):
         """

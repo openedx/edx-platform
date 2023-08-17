@@ -29,11 +29,15 @@ describe('Unenroll View', () => {
 
     it('switch between slides', () => {
         view = initView();
+        // eslint-disable-next-line no-undef
         expect($('.slide1').hasClass('hidden')).toEqual(true);
         view.switchToSlideOne();
+        // eslint-disable-next-line no-undef
         expect($('.slide1').hasClass('hidden')).toEqual(false);
+        // eslint-disable-next-line no-undef
         expect($('.slide2').hasClass('hidden')).toEqual(true);
         view.switchToSlideTwo();
+        // eslint-disable-next-line no-undef
         expect($('.slide2').hasClass('hidden')).toEqual(false);
     });
 });

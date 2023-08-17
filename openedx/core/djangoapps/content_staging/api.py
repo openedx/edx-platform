@@ -44,7 +44,7 @@ def get_user_clipboard(user_id: int, only_ready: bool = True) -> UserClipboardDa
     )
 
 
-def get_user_clipboard_json(user_id: int, request: HttpRequest = None):
+def get_user_clipboard_json(user_id: int, request: HttpRequest | None = None):
     """
     Get the detailed status of the user's clipboard, in exactly the same format
     as returned from the
@@ -88,7 +88,7 @@ def get_staged_content_static_files(staged_content_id: int) -> list[StagedConten
     sc = _StagedContent.objects.get(pk=staged_content_id)
 
     def str_to_key(source_key_str: str):
-        if not str:
+        if not source_key_str:
             return None
         try:
             return AssetKey.from_string(source_key_str)

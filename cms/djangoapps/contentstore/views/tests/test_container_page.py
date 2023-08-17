@@ -9,8 +9,8 @@ from unittest.mock import Mock, patch
 
 from django.http import Http404
 from django.test.client import RequestFactory
-from django.utils import http
 from pytz import UTC
+from urllib.parse import quote
 
 import cms.djangoapps.contentstore.views.component as views
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
@@ -67,10 +67,10 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
                 '<a href="/course/{course}{subsection_parameters}">Lesson 1</a>'
             ).format(
                 course=re.escape(str(self.course.id)),
-                section_parameters=re.escape('?show={}'.format(http.urlquote(
+                section_parameters=re.escape('?show={}'.format(quote(
                     str(self.chapter.location).encode()
                 ))),
-                subsection_parameters=re.escape('?show={}'.format(http.urlquote(
+                subsection_parameters=re.escape('?show={}'.format(quote(
                     str(self.sequential.location).encode()
                 ))),
             ),
@@ -97,7 +97,7 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
                 ).format(
                     course=re.escape(str(self.course.id)),
                     unit_parameters=re.escape(str(self.vertical.location)),
-                    subsection_parameters=re.escape('?show={}'.format(http.urlquote(
+                    subsection_parameters=re.escape('?show={}'.format(quote(
                         str(self.sequential.location).encode()
                     ))),
                 ),
