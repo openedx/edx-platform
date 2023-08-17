@@ -8,6 +8,7 @@ from openedx.core.constants import COURSE_ID_PATTERN
 
 from .views import (
     CourseDetailsView,
+    CourseTeamView,
     CourseGradingView,
     CourseSettingsView,
     ProctoredExamSettingsView,
@@ -42,6 +43,11 @@ urlpatterns = [
         fr'^course_details/{COURSE_ID_PATTERN}$',
         CourseDetailsView.as_view(),
         name="course_details"
+    ),
+    re_path(
+        fr'^course_team/{COURSE_ID_PATTERN}$',
+        CourseTeamView.as_view(),
+        name="course_team"
     ),
     re_path(
         fr'^course_grading/{COURSE_ID_PATTERN}$',
