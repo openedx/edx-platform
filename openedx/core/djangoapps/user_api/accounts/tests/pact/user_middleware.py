@@ -9,7 +9,7 @@ from django.core.exceptions import MiddlewareNotUsed
 User = auth.get_user_model()
 
 
-class AuthenticationMiddleware(MiddlewareMixin):
+class PactBypassAuthMiddleware(MiddlewareMixin):
     """
     Middleware to add default authentication into the requests for pact verification.
 
