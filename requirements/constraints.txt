@@ -31,8 +31,9 @@ django-storages==1.9.1
 edx-enterprise==4.0.16
 
 # django-oauth-toolkit version >2.0.0 has breaking changes.
-# and versions from 1.3.3 to 2.0.0 have some migrations related changes.
-# so upgrading minor version one by one.
+# More details mentioned on this issue https://github.com/openedx/edx-platform/issues/32884
+# Versions from 1.3.3 to 2.0.0 have some migrations related changes.
+# so we're upgrading minor versions one by one.
 django-oauth-toolkit==1.4.1
 
 # Will be updated once we update python-dateutil package
