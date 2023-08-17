@@ -1274,7 +1274,7 @@ random2==1.0.1
     # via -r requirements/edx/base.txt
 recommender-xblock==2.0.1
     # via -r requirements/edx/base.txt
-redis==4.6.0
+redis==5.0.0
     # via
     #   -r requirements/edx/base.txt
     #   walrus
