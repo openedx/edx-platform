@@ -383,7 +383,7 @@ django-multi-email-field==0.7.0
     #   edx-enterprise
 django-mysql==4.11.0
     # via -r requirements/edx/base.txt
-django-oauth-toolkit==1.3.2
+django-oauth-toolkit==1.4.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
