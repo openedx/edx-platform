@@ -16,7 +16,7 @@
 <%!
 from lms.djangoapps.branding import api as branding_api
 from django.urls import reverse
-from django.utils.http import urlquote_plus
+from urllib.parse import quote_plus
 from django.utils.translation import gettext as _
 from django.utils.translation import get_language_bidi
 from lms.djangoapps.courseware.access import has_access
@@ -241,6 +241,6 @@ from common.djangoapps.pipeline_mako import render_require_js_path_overrides
 
 <%def name="login_query()">${
   u"?next={next}".format(
-    next=urlquote_plus(login_redirect_url if login_redirect_url else request.path)
+    next=quote_plus(login_redirect_url if login_redirect_url else request.path)
   ) if (login_redirect_url or (request and not request.path.startswith("/logout"))) else ""
 }</%def>
