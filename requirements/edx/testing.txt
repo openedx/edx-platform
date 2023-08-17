@@ -14,7 +14,7 @@ aiosignal==1.3.1
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
-algoliasearch==3.0.0
+algoliasearch==2.6.3
     # via -r requirements/edx/base.txt
 amqp==5.1.1
     # via
@@ -1271,7 +1271,7 @@ random2==1.0.1
     # via -r requirements/edx/base.txt
 recommender-xblock==2.0.1
     # via -r requirements/edx/base.txt
-redis==5.0.0
+redis==4.6.0
     # via
     #   -r requirements/edx/base.txt
     #   walrus

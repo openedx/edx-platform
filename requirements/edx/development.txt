@@ -26,7 +26,7 @@ alabaster==0.7.13
     # via
     #   -r requirements/edx/doc.txt
     #   sphinx
-algoliasearch==3.0.0
+algoliasearch==2.6.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1691,7 +1691,7 @@ recommender-xblock==2.0.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-redis==5.0.0
+redis==4.6.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
