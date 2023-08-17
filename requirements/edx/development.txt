@@ -1255,7 +1255,6 @@ numpy==1.22.4
     #   shapely
 oauthlib==3.0.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   django-oauth-toolkit

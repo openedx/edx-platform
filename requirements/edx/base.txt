@@ -740,7 +740,6 @@ numpy==1.22.4
     #   shapely
 oauthlib==3.0.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   django-oauth-toolkit
     #   lti-consumer-xblock
