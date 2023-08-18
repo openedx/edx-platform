@@ -391,6 +391,23 @@ class NotificationListAPIViewTest(APITestCase):
             '<p><strong>test_user</strong> responded to your post <strong>This is a test post.</strong></p>'
         )
 
+    @mock.patch("eventtracking.tracker.emit")
+    def test_list_notifications_with_tray_opened_param(self, mock_emit):
+        """
+        Test event emission with tray_opened param is provided.
+        """
+        self.client.login(username=self.user.username, password='test')
+
+        # Make a request to the view with the tray_opened query parameter set to True.
+        response = self.client.get(self.url + "?tray_opened=True")
+
+        # Assert that the response is successful.
+        self.assertEqual(response.status_code, 200)
+
+        event_name, event_data = mock_emit.call_args[0]
+        self.assertEqual(event_name, 'edx.notifications.tray_opened')
+        self.assertEqual(event_data['user_id'], self.user.id)
+
     def test_list_notifications_without_authentication(self):
         """
         Test that the view returns 403 if the user is not authenticated.
@@ -621,7 +638,7 @@ class NotificationReadAPIViewTestCase(APITestCase):
         notifications = Notification.objects.filter(user=self.user, id=notification_id, last_read__isnull=False)
         self.assertEqual(notifications.count(), 1)
         event_name, event_data = mock_emit.call_args[0]
-        self.assertEqual(event_name, 'edx.notification.read')
+        self.assertEqual(event_name, 'edx.notifications.read')
         self.assertEqual(event_data.get('notification_metadata').get('notification_id'), notification_id)
         self.assertEqual(event_data['notification_app'], 'discussion')
         self.assertEqual(event_data['notification_type'], 'Type A')
