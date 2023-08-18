@@ -368,11 +368,6 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
         video1_image_url = get_course_video_image_url(course_id=course_id, edx_video_id=video1_edx_video_id)
         self.assertIsNone(video1_image_url)
 
-from unittest import mock
-
-from django.core.files.storage import get_storage_class
-from storages.backends.s3boto3 import S3Boto3Storage
-
 
 class S3Boto3TestCase(TestCase):
     """ verify s3boto3 returns valid backend."""
