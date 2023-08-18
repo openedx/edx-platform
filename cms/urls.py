@@ -277,12 +277,12 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
     urlpatterns += static(
-        settings.VIDEO_IMAGE_SETTINGS['STORAGE_KWARGS']['base_url'],
+        settings.VIDEO_IMAGE_SETTINGS['BASE_URL'],
         document_root=settings.VIDEO_IMAGE_SETTINGS['STORAGE_KWARGS']['location']
     )
 
     urlpatterns += static(
-        settings.VIDEO_TRANSCRIPTS_SETTINGS['STORAGE_KWARGS']['base_url'],
+        settings.VIDEO_TRANSCRIPTS_SETTINGS['BASE_URL'],
         document_root=settings.VIDEO_TRANSCRIPTS_SETTINGS['STORAGE_KWARGS']['location']
     )
 
