@@ -54,13 +54,12 @@ Get a JWT with a client_id and client_secret
    from pprint import pprint
 
    client_id = "ukbclQB8aPh7hgsy8ifPXkPf7fRqgUq1w21f2YZa"
-   # Note this should actually be secert and probably not in your code but
+   # Note this should actually be secret and probably not in your code but
    # provided here in the example
    client_secret = "xkN0BJ19q9Jk8UPUppEtC1xe4764c81ioFtlegvokbmnAC7CFCT5gG1Og5nnFmCNc3NHNhUwWWDRVcBfnLSZ4xAlEmSePzfkFtLE06cwR1MuSc0gx9LUEjRrTs3j2vgK"
 
    credential = f"{client_id}:{client_secret}"
    encoded_credential = base64.b64encode(credential.encode("utf-8")).decode("utf-8")
-
 
    headers = {"Authorization": f"Basic {encoded_credential}", "Cache-Control": "no-cache"}
    data = {"grant_type": "client_credentials", "token_type": "jwt"}
