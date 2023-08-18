@@ -371,13 +371,22 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
 
 class S3Boto3TestCase(TestCase):
     """ verify s3boto3 returns valid backend."""
-    def setUp(self):
-        self.storage = S3Boto3Storage()
-
-    def test_valid_backend_returns(self):
+    def test_video_backend(self):
         self.assertEqual(
             S3Boto3Storage,
             get_storage_class(
                 'storages.backends.s3boto3.S3Boto3Storage',
             )(**settings.VIDEO_IMAGE_SETTINGS.get('STORAGE_KWARGS', {})).__class__
         )
+
+    @override_settings(VIDEO_IMAGE_SETTINGS={
+        'STORAGE_CLASS': 'storages.backends.s3boto3.S3Boto3Storage',
+        'STORAGE_KWARGS':
+            {'bucket_name': 'awaisqureshi', 'default_acl': None, 'base_url': '/', 'location': 'abc/def'}}
+    )
+    def test_boto3_backend_with_params(self):
+        storage = get_storage_class(
+            settings.VIDEO_IMAGE_SETTINGS.get('STORAGE_CLASS', {})
+        )(**settings.VIDEO_IMAGE_SETTINGS.get('STORAGE_KWARGS', {}))
+
+        self.assertEqual(S3Boto3Storage, storage.__class__)
