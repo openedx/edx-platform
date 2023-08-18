@@ -381,7 +381,7 @@ class S3Boto3TestCase(TestCase):
 
     def test_no_video_thumbnail_downloaded(self):
         self.assertEqual(
-            'S3Boto3Storage',
+            S3Boto3Storage,
             get_storage_class(
                 'storages.backends.s3boto3.S3Boto3Storage',
             )(**settings.VIDEO_IMAGE_SETTINGS.get('STORAGE_KWARGS', {})).__class__
