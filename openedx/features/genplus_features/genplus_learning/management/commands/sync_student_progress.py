@@ -1,17 +1,43 @@
-import pytz
+import logging
 from datetime import datetime
+
+import pytz
 from django.core.management.base import BaseCommand, CommandError
-from openedx.features.genplus_features.genplus_learning.models import UnitCompletion, Unit
-from openedx.features.genplus_features.genplus_learning.utils import get_course_completion, get_progress_and_completion_status
 
+from openedx.features.genplus_features.genplus_learning.models import Unit, UnitCompletion
+from openedx.features.genplus_features.genplus_learning.utils import (
+    get_course_completion,
+    get_progress_and_completion_status
+)
 
+logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     help = 'Sync student progress'
 
+    def add_arguments(self, parser):
+        """
+        Add arguments to the command parser.
+        """
+        parser.add_argument("user_ids", nargs="*", type=int)
+        parser.add_argument(
+            '--all-users', '--all',
+            dest='all_users',
+            action='store_true',
+            default=False,
+            help='Sync progress for user courses.',
+        )
+
     def handle(self, *args, **options):
+        print(args, options)
+        if not options.get('all_users') and len(options.get('user_ids')) < 1:
+            raise CommandError('At least one user or --all-users must be specified.')
+
         try:
             course_ids = Unit.objects.all().values_list('course', flat=True)
-            in_progress_completion = UnitCompletion.objects.filter(progress__gt=0, course_key__in=course_ids)
+            filters = dict(progress__gt=0, course_key__in=course_ids)
+            if not options.get('all_users'):
+                filters['user_id__in'] = options.get('user_ids')
+            in_progress_completion = UnitCompletion.objects.filter(**filters)
             updated_users = []
             for completion in in_progress_completion:
                 user = completion.user
@@ -35,9 +61,12 @@ class Command(BaseCommand):
                     }
                     UnitCompletion.objects.update_or_create(user=user, course_key=course_key, defaults=defaults)
                     updated_users.append(user)
-                    self.stdout.write(self.style.SUCCESS(f"Processed course completion of user {user}, for course {course_key}"))
+                    self.stdout.write(
+                        self.style.SUCCESS(f"Processed course completion of user {user}, for course {course_key}")
+                    )
 
             self.stdout.write(f"Updated {len(updated_users)} users progress")
             self.stdout.write(self.style.SUCCESS('DONE!!'))
-        except:
+        except Exception as e:
+            logger.exception(e)
             self.stdout.write(self.style.ERROR('FAILED!!'))
