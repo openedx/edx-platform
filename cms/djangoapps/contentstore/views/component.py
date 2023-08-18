@@ -195,6 +195,9 @@ def container_handler(request, usage_key_string):
 
             # Get the status of the user's clipboard so they can paste components if they have something to paste
             user_clipboard = content_staging_api.get_user_clipboard_json(request.user.id, request)
+            library_block_types = [problem_type['component'] for problem_type in LIBRARY_BLOCK_TYPES]
+            is_library_xblock = xblock.location.block_type in library_block_types
+
             return render_to_response('container.html', {
                 'language_code': request.LANGUAGE_CODE,
                 'context_course': course,  # Needed only for display of menus at top of page.
@@ -203,6 +206,7 @@ def container_handler(request, usage_key_string):
                 'xblock_locator': xblock.location,
                 'unit': unit,
                 'is_unit_page': is_unit_page,
+                'is_collapsible': is_library_xblock,
                 'subsection': subsection,
                 'section': section,
                 'position': index,
@@ -219,6 +223,7 @@ def container_handler(request, usage_key_string):
                 # Status of the user's clipboard, exactly as would be returned from the "GET clipboard" REST API.
                 'user_clipboard': user_clipboard,
                 'is_sourced_block': xblock.location.block_type == 'library_sourced',
+                'is_fullwidth_content': is_library_xblock,
             })
     else:
         return HttpResponseBadRequest("Only supports HTML requests")

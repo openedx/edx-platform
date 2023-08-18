@@ -85,8 +85,26 @@ class LibrarySourcedBlock(
     has_author_view = True
 
     resources_dir = 'assets/library_source_block'
+
+    preview_view_js = {
+        'js': [],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+    }
+    preview_view_css = {
+        'scss': [],
+    }
+
     mako_template = 'widgets/metadata-edit.html'
     studio_js_module_name = "VerticalDescriptor"
+    studio_view_js = {
+        'js': [
+            resource_string(__name__, 'js/src/vertical/edit.js'),
+        ],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+    }
+    studio_view_css = {
+        'scss': [],
+    }
 
     def __str__(self):
         return f"LibrarySourcedBlock: {self.display_name}"
@@ -147,6 +165,7 @@ class LibrarySourcedBlock(
             # to make edits to the children
             context['can_move'] = False
             context['selectable'] = True
+            context['can_collapse'] = True
             self.render_children(context, fragment, can_reorder=False, can_add=False)
             return fragment
         context['is_loading'] = is_loading
@@ -242,6 +261,17 @@ class LibrarySourcedBlock(
                     _("A library has not been selected yet."),
                     action_class='edit-button',
                     action_label=_("Select a Library.")
+                )
+            )
+            return validation
+
+        if not self.children:
+            validation.set_summary(
+                StudioValidationMessage(
+                    StudioValidationMessage.NOT_CONFIGURED,
+                    _("There are no problem types in the specified libraries."),
+                    action_class='edit-button',
+                    action_label=_("Select another Library.")
                 )
             )
             return validation

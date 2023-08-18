@@ -25,6 +25,9 @@ from xmodule.validation import StudioValidationMessage
 from xmodule.x_module import AUTHOR_VIEW
 from xmodule.capa_block import ProblemBlock
 
+from .test_course_block import DummySystem as TestImportSystem
+
+dummy_render = lambda block, _: Fragment(block.data)  # pylint: disable=invalid-name
 
 class LibraryContentTest(MixedSplitTestCase):
     """
@@ -66,6 +69,32 @@ class LibraryContentTest(MixedSplitTestCase):
             return descriptor
 
         block.runtime.get_block_for_descriptor = get_block
+
+
+@ddt.ddt
+class LibraryContentGeneralTest(LibraryContentTest):
+    """
+    Test the base functionality of the LibraryContentBlock.
+    """
+
+    @ddt.data(
+        ('library-v1:ProblemX+PR0B', LibraryLocator),
+        ('lib:ORG:test-1', LibraryLocatorV2)
+    )
+    @ddt.unpack
+    def test_source_library_key(self, library_key, expected_locator_type):
+        """
+        Test the source_library_key property of the xblock.
+
+        The method should correctly work either with V1 or V2 libraries.
+        """
+        library = self.make_block(
+            "library_content",
+            self.vertical,
+            max_count=1,
+            source_library_id=library_key
+        )
+        assert isinstance(library.source_library_key, expected_locator_type)
 
 
 @ddt.ddt

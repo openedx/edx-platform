@@ -17,10 +17,10 @@ use_new_video_gallery_flow = use_video_gallery_flow()
 xblock_url = xblock_studio_url(xblock)
 show_inline = xblock.has_children and not xblock_url
 section_class = "level-nesting" if show_inline else "level-element"
-collapsible_class = "is-collapsible" if xblock.has_children else ""
 label = determine_label(xblock.display_name_with_default, xblock.scope_ids.block_type)
 messages = xblock.validate().to_json()
 block_is_unit = is_unit(xblock)
+is_sourced_block = xblock.location.block_type == 'library_sourced'
 %>
 
 <%namespace name='static' file='static_content.html'/>
@@ -48,7 +48,7 @@ block_is_unit = is_unit(xblock)
     <div class="studio-xblock-wrapper" data-locator="${xblock.location}" data-course-key="${xblock.location.course_key}">
     % endif
 
-    <section class="wrapper-xblock ${section_class} ${collapsible_class}
+    <section class="wrapper-xblock is-collapsible ${section_class}
     % if is_visible_to_specific_partition_groups(xblock):
         has-group-visibility-set
     % endif
@@ -133,6 +133,14 @@ block_is_unit = is_unit(xblock)
                                     </button>
                                 </li>
                             % endif
+                            % if can_collapse:
+                                <li class="action-item action-collapse">
+                                    <button data-tooltip="${_("Collapse")}" class="btn-default collapse-button action-button ui-toggle-expansion">
+                                    <span class="fa fa-chevron-up" aria-hidden="true"></span>
+                                    <span class="sr">${_("Collapse")}</span>
+                                    </button>
+                                </li>
+                            % endif
                         % endif
                         % if can_add and not enable_copy_paste:
                             <!-- If we can add, we can delete. -->
@@ -213,7 +221,7 @@ block_is_unit = is_unit(xblock)
                 <li class="action-item action-view">
                     <a href="${xblock_url}" class="action-button">
                         ## Translators: this is a verb describing the action of viewing more details
-                        <span class="action-button-text">${_('View')}</span>
+                        <span class="action-button-text">${_('Configure') if is_sourced_block else _('View')}</span>
                         <span class="icon fa fa-arrow-right" aria-hidden="true"></span>
                     </a>
                 </li>
