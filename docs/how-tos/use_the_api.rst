@@ -3,7 +3,7 @@ How To Use the REST API
 
 .. How-tos should have a short introduction sentence that captures the user's goal and introduces the steps.
 
-This how-to will help get setup to be able to make aunthenticated requests to
+This how-to will help you get setup to be able to make authenticated requests to
 the edx-platform REST API.
 
 Assumptions
@@ -44,7 +44,7 @@ Steps
 #. Save the ``client_id`` and ``client_secret``.
 
 #. The best way to interact with the edx-platform REST API is by making
-   requests using the JWT Authorization header.  User the ``client_id`` and
+   requests using the JWT Authorization header.  Use the ``client_id`` and
    ``client_secret`` to get a JWT token.
 
    .. code-block:: python
@@ -53,7 +53,7 @@ Steps
       import requests
 
       client_id = "vovj0AItd9EnrOKjkDli0HpSF9HoooaTY9yueafn"
-      # Client secretes should not be exposed in your code, we put it here to
+      # Client secrets should not be exposed in your code, we put it here to
       # make the example more clear.
       client_secret = "a3Fkwr24dfDSlIXt3v3q4Ob41CYQNZyGmtK8Y8ax0srpIa2vJON3OC5Rvj1i1wizsIUv1W1qM1Q2XPeuyjucNixsHXZsuw1dn2B9nH3IyjSvuFb5KoydDvWX8Hx8znqD"
 
