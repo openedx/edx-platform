@@ -59,6 +59,7 @@ from openedx.core.djangoapps.credit.models import CreditRequest, CreditRequireme
 from openedx.core.djangoapps.external_user_ids.models import ExternalId, ExternalIdType
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.profile_images.images import remove_profile_images
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
 from openedx.core.djangoapps.user_api.accounts.utils import handle_retirement_cancellation
@@ -577,6 +578,15 @@ class DeactivateLogoutView(APIView):
         Marks the user as having no password set for deactivation purposes,
         and logs the user out.
         """
+
+        # Ensure the account deletion is not disable
+        enable_account_deletion =  configuration_helpers.get_value(
+            'ENABLE_ACCOUNT_DELETION', settings.FEATURES.get('ENABLE_ACCOUNT_DELETION', False)
+        )
+
+        if not enable_account_deletion:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
         user_model = get_user_model()
         try:
             # Get the username from the request and check that it exists
