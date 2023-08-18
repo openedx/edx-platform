@@ -104,9 +104,8 @@ Refresh a JWT Using a Refresh Token
 
    import requests
 
-   # See above examples for how to get a JWT token with a refresh token
-   # "Get a JWT with a Username and Password"
-   # The reponse from that request will include a `refresh_token`
+   # See "Get a JWT with a Username and Password" for how to get a refresh token.
+   # The reponse from that request will include a `refresh_token` attribute.
    refresh_token = token_request.json()['refresh_token']
 
    refreshed_token_request = requests.post(
