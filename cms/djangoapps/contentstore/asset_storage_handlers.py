@@ -361,6 +361,7 @@ def _get_assets_in_json_format(assets, course_key):
             thumbnail_asset_key,
             asset_is_locked,
             course_key,
+            asset['length'],
         )
 
         assets_in_json_format.append(asset_in_json)
@@ -435,6 +436,7 @@ def _upload_asset(request, course_key):
             content.thumbnail_location,
             locked,
             course_key,
+            content.length,
         ),
         'msg': _('Upload completed')
     })
@@ -491,12 +493,13 @@ def _get_file_too_large_error_message(filename):
 def _get_file_content_and_path(file_metadata, course_key):
     """returns contents of the uploaded file and path for temporary uploaded file"""
     content_location = StaticContent.compute_location(course_key, file_metadata['filename'])
+    upload_file_size = str(file_metadata['upload_file_size'])
     upload_file = file_metadata['upload_file']
 
     file_can_be_chunked = upload_file.multiple_chunks()
 
     static_content_partial = partial(StaticContent, content_location, file_metadata['filename'],
-                                     file_metadata['mime_type'])
+                                     file_metadata['mime_type'], length=upload_file_size)
 
     if file_can_be_chunked:
         content = static_content_partial(upload_file.chunks())
@@ -599,7 +602,7 @@ def _delete_thumbnail(thumbnail_location, course_key, asset_key):  # lint-amnest
             logging.warning('Could not delete thumbnail: %s', thumbnail_location)
 
 
-def get_asset_json(display_name, content_type, date, location, thumbnail_location, locked, course_key):
+def get_asset_json(display_name, content_type, date, location, thumbnail_location, locked, course_key, file_size):
     '''
     Helper method for formatting the asset information to send to client.
     '''
@@ -617,5 +620,6 @@ def get_asset_json(display_name, content_type, date, location, thumbnail_locatio
         'locked': locked,
         'static_full_url': StaticContent.get_canonicalized_asset_path(course_key, portable_url, '', []),
         # needed for Backbone delete/update.
-        'id': str(location)
+        'id': str(location),
+        'file_size': file_size,
     }
