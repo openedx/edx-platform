@@ -375,6 +375,7 @@ from storages.backends.s3boto3 import S3Boto3Storage
 
 
 class S3Boto3TestCase(TestCase):
+    """ verify s3boto3 returns valid backend."""
     def setUp(self):
         self.storage = S3Boto3Storage()
         self.storage._connections.connection = mock.MagicMock()
