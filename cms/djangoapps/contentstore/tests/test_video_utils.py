@@ -373,9 +373,8 @@ class S3Boto3TestCase(TestCase):
     """ verify s3boto3 returns valid backend."""
     def setUp(self):
         self.storage = S3Boto3Storage()
-        self.storage._connections.connection = mock.MagicMock()
 
-    def test_no_video_thumbnail_downloaded(self):
+    def test_valid_backend_returns(self):
         self.assertEqual(
             S3Boto3Storage,
             get_storage_class(
