@@ -213,7 +213,7 @@ class GetItemTest(ItemTest):
         self.assertNotRegex(html, r"wrapper-xblock[^-]+")
 
         # Verify that the header and article tags are still added
-        self.assertIn('<header class="xblock-header xblock-header-vertical">', html)
+        self.assertIn('<header class="xblock-header xblock-header-vertical ">', html)
         self.assertIn('<article class="xblock-render">', html)
 
     def test_get_container_fragment(self):

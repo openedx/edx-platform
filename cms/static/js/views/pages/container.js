@@ -26,6 +26,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             'click .delete-button': 'deleteXBlock',
             'click .show-actions-menu-button': 'showXBlockActionsMenu',
             'click .new-component-button': 'scrollToNewComponentButtons',
+            'click .save-button': 'saveSelectedLibraryComponents',
             'click .paste-component-button': 'pasteComponent',
             'change .header-library-checkbox': 'toggleLibraryComponent'
         },
@@ -499,6 +500,78 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                 });
         },
 
+        duplicateXBlock: function(event) {
+            event.preventDefault();
+            this.duplicateComponent(this.findXBlockElement(event.target));
+        },
+
+        showMoveXBlockModal: function(event) {
+            var xblockElement = this.findXBlockElement(event.target),
+                parentXBlockElement = xblockElement.parents('.studio-xblock-wrapper'),
+                modal = new MoveXBlockModal({
+                sourceXBlockInfo: XBlockUtils.findXBlockInfo(xblockElement, this.model),
+                sourceParentXBlockInfo: XBlockUtils.findXBlockInfo(parentXBlockElement, this.model),
+                XBlockURLRoot: this.getURLRoot(),
+                outlineURL: this.options.outlineURL
+            });
+
+            event.preventDefault();
+            modal.show();
+        },
+
+        deleteXBlock: function(event) {
+            event.preventDefault();
+            this.deleteComponent(this.findXBlockElement(event.target));
+        },
+
+        createPlaceholderElement: function() {
+            return $('<div/>', {class: 'studio-xblock-wrapper'});
+        },
+
+        createComponent: function(template, target) {
+            // A placeholder element is created in the correct location for the new xblock
+            // and then onNewXBlock will replace it with a rendering of the xblock. Note that
+            // for xblocks that can't be replaced inline, the entire parent will be refreshed.
+            var parentElement = this.findXBlockElement(target),
+                parentLocator = parentElement.data('locator'),
+                buttonPanel = target.closest('.add-xblock-component'),
+                listPanel = buttonPanel.prev(),
+                scrollOffset = ViewUtils.getScrollOffset(buttonPanel),
+                $placeholderEl = $(this.createPlaceholderElement()),
+                requestData = _.extend(template, {
+                    parent_locator: parentLocator
+                }),
+                placeholderElement;
+            placeholderElement = $placeholderEl.appendTo(listPanel);
+            return $.postJSON(this.getURLRoot() + '/', requestData,
+                _.bind(this.onNewXBlock, this, placeholderElement, scrollOffset, false))
+                .fail(function() {
+                    // Remove the placeholder if the update failed
+                    placeholderElement.remove();
+            });
+        },
+
+        duplicateComponent: function(xblockElement) {
+            // A placeholder element is created in the correct location for the duplicate xblock
+            // and then onNewXBlock will replace it with a rendering of the xblock. Note that
+            // for xblocks that can't be replaced inline, the entire parent will be refreshed.
+            var self = this,
+                parentElement = self.findXBlockElement(xblockElement.parent()),
+                scrollOffset = ViewUtils.getScrollOffset(xblockElement),
+                $placeholderEl = $(self.createPlaceholderElement()),
+                placeholderElement;
+
+            placeholderElement = $placeholderEl.insertAfter(xblockElement);
+            XBlockUtils.duplicateXBlock(xblockElement, parentElement)
+                .done(function(data) {
+                    self.onNewXBlock(placeholderElement, scrollOffset, true, data);
+                })
+                .fail(function() {
+                    // Remove the placeholder if the update failed
+                    placeholderElement.remove();
+                });
+        },
+
         deleteComponent: function(xblockElement) {
             var self = this,
                 xblockInfo = new XBlockInfo({
@@ -539,22 +612,22 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             var componentId = $(event.target).closest('.studio-xblock-wrapper').data('locator');
             var storeIndex = this.storedSelectedLibraryComponents.indexOf(componentId);
             if (storeIndex > -1) {
-              this.storedSelectedLibraryComponents.splice(storeIndex, 1);
-              this.toggleSaveButton();
+                this.storedSelectedLibraryComponents.splice(storeIndex, 1);
+                this.toggleSaveButton();
             } else {
-              this.storedSelectedLibraryComponents.push(componentId);
-              this.toggleSaveButton();
+                this.storedSelectedLibraryComponents.push(componentId);
+                this.toggleSaveButton();
             }
         },
 
         toggleSaveButton: function() {
             var $saveButton = $('.nav-actions .save-button');
             if (JSON.stringify(this.selectedLibraryComponents.sort()) === JSON.stringify(this.storedSelectedLibraryComponents.sort())) {
-              $saveButton.addClass('is-hidden');
-              window.removeEventListener('beforeunload', this.onBeforePageUnloadCallback);
+                $saveButton.addClass('is-hidden');
+                window.removeEventListener('beforeunload', this.onBeforePageUnloadCallback);
             } else {
-              $saveButton.removeClass('is-hidden');
-              window.addEventListener('beforeunload', this.onBeforePageUnloadCallback);
+                $saveButton.removeClass('is-hidden');
+                window.addEventListener('beforeunload', this.onBeforePageUnloadCallback);
             }
         },
 

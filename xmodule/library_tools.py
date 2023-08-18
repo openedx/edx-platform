@@ -1,8 +1,6 @@
 """
 XBlock runtime services for LibraryContentBlock
 """
-import hashlib
-
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from opaque_keys import InvalidKeyError
@@ -16,6 +14,7 @@ from opaque_keys.edx.locator import (
 )
 from search.search_engine_base import SearchEngine
 from xblock.fields import Scope
+from user_tasks.models import UserTaskStatus
 
 from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.xblock.api import load_block
@@ -25,6 +24,10 @@ from xmodule.capa_block import ProblemBlock
 from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.tasks import update_children_task, get_import_task_status
+
+from openedx.core.djangoapps.content_libraries import api as library_api
+from openedx.core.djangoapps.content_libraries.models import ContentLibrary
 
 from common.djangoapps.student.auth import has_studio_write_access
 from openedx.core.djangoapps.content_libraries import api as library_api
@@ -182,9 +185,6 @@ class LibraryToolsService:
         NOTE: V1 libraies blocks definition ID should be the
         exact same definition ID used in the copy block.
 
-        This method will update dest_block's 'source_library_version' field to
-        store the version number of the libraries used, so we easily determine
-        if dest_block is up to date or not.
         """
         if user_perms and not user_perms.can_write(dest_block.location.course_key):
             raise PermissionDenied()
@@ -211,28 +211,19 @@ class LibraryToolsService:
         if not is_v2_lib:
             if user_perms and not user_perms.can_read(library_key):
                 raise PermissionDenied()
-            if hasattr(dest_block, 'capa_type') and (dest_block.capa_type != ANY_CAPA_TYPE_VALUE):
-                # Apply simple filtering based on CAPA problem types:
-                source_blocks.extend(self._problem_type_filter(library, dest_block.capa_type))
-            else:
-                source_blocks.extend(library.children)
+        update_children_task.delay(self.user_id, str(dest_block.location), version)
 
-            with self.store.bulk_operations(dest_block.location.course_key):
-                dest_block.source_library_version = str(library.location.library_key.version_guid)
-                self.store.update_item(dest_block, self.user_id)
-                head_validation = not version
-                dest_block.children = self.store.copy_from_template(
-                    source_blocks, dest_block.location, self.user_id, head_validation=head_validation
-                )
-                # ^-- copy_from_template updates the children in the DB
-                # but we must also set .children here to avoid overwriting the DB again
-        else:
-            # TODO: add filtering by capa_type when V2 library will support different problem types
-            source_blocks = library_api.get_library_blocks(library_key, block_types=None)
-            source_block_ids = [str(block.usage_key) for block in source_blocks]
-            dest_block.source_library_version = str(library.version)
-            self.store.update_item(dest_block, self.user_id)
-            self.import_from_blockstore(dest_block, source_block_ids)
+    def import_task_status(self, location):
+        """
+        Return task status for update_children_task.
+        """
+        return get_import_task_status(location)
+
+    def is_loading(self, location):
+        """
+        Return True if status is IN_PROGRESS.
+        """
+        return self.import_task_status(location) == UserTaskStatus.IN_PROGRESS
 
     def list_available_libraries(self):
         """

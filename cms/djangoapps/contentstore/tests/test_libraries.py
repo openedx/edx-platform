@@ -106,7 +106,7 @@ class LibraryTestCase(ModuleStoreTestCase):
             lib_content_block.runtime._services['user'] = user_service  # pylint: disable=protected-access
 
         handler_url = reverse_usage_url(
-            'component_handler',
+            'preview_handler',
             lib_content_block.location,
             kwargs={'handler': 'refresh_children'}
         )
@@ -359,8 +359,6 @@ class TestLibraries(LibraryTestCase):
         self.assertEqual(resp.status_code, 200)
         lc_block = modulestore().get_item(lc_block.location)
         self.assertEqual(len(lc_block.children), 1)  # Children should not be deleted due to a bad setting.
-        html_block = modulestore().get_item(lc_block.children[0])
-        self.assertEqual(html_block.data, data_value)
 
     def test_refreshes_children_if_libraries_change(self):
         """ Tests that children are automatically refreshed if libraries list changes """
@@ -406,7 +404,7 @@ class TestLibraries(LibraryTestCase):
         html_block = modulestore().get_item(lc_block.children[0])
         self.assertEqual(html_block.data, data2)
 
-    @patch("xmodule.library_tools.SearchEngine.get_search_engine", Mock(return_value=None, autospec=True))
+    @patch("xmodule.tasks.SearchEngine.get_search_engine", Mock(return_value=None, autospec=True))
     def test_refreshes_children_if_capa_type_change(self):
         """ Tests that children are automatically refreshed if capa type field changes """
         name1, name2 = "Option Problem", "Multiple Choice Problem"
@@ -993,27 +991,23 @@ class TestOverrides(LibraryTestCase):
         self.library = store.get_library(self.lib_key)
 
         # Refresh our reference to the block
-        self.lc_block = store.get_item(self.lc_block.location)
+        self.lc_block = self._refresh_children(self.lc_block)
         self.problem_in_course = store.get_item(self.problem_in_course.location)
 
         # The library has changed...
         self.assertEqual(len(self.library.children), 2)
 
-        # But the block hasn't.
-        self.assertEqual(len(self.lc_block.children), 1)
-        self.assertEqual(self.problem_in_course.location, self.lc_block.children[0])
-        self.assertEqual(self.problem_in_course.display_name, self.original_display_name)
+        # and the block has changed too.
+        self.assertEqual(len(self.lc_block.children), 2)
 
         # Duplicate self.lc_block:
         duplicate = store.get_item(
             duplicate_block(self.course.location, self.lc_block.location, self.user)
         )
         # The duplicate should have identical children to the original:
-        self.assertEqual(len(duplicate.children), 1)
+        self.assertEqual(len(duplicate.children), 2)
         self.assertTrue(self.lc_block.source_library_version)
         self.assertEqual(self.lc_block.source_library_version, duplicate.source_library_version)
-        problem2_in_course = store.get_item(duplicate.children[0])
-        self.assertEqual(problem2_in_course.display_name, self.original_display_name)
 
 
 class TestIncompatibleModuleStore(LibraryTestCase):

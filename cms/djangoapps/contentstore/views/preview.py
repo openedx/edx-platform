@@ -45,7 +45,7 @@ from openedx.core.lib.xblock_utils import (
     wrap_xblock_aside
 )
 
-from ..utils import get_visibility_partition_info
+from ..utils import get_visibility_partition_info, StudioPermissionsService
 from .access import get_user_role
 from .session_kv_store import SessionKeyValueStore
 
@@ -198,6 +198,7 @@ def _prepare_runtime_for_preview(request, block):
         deprecated_anonymous_user_id = anonymous_id_for_user(request.user, None)
 
     services = {
+        "studio_user_permissions": StudioPermissionsService(request.user),
         "i18n": XBlockI18nService,
         'mako': mako_service,
         "settings": SettingsService(),
@@ -313,6 +314,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'can_edit': can_edit,
             'enable_copy_paste': enable_copy_paste,
             'can_edit_visibility': context.get('can_edit_visibility', is_course),
+            'is_loading': context.get('is_loading', False),
             'is_selected': context.get('is_selected', False),
             'selectable': context.get('selectable', False),
             'selected_groups_label': selected_groups_label,
