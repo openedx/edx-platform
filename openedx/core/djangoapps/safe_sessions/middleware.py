@@ -380,7 +380,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
 
             try:
                 safe_cookie_data = SafeCookieData.parse(cookie_data_string)  # Step 1
-
+                request.cookie_data_string = cookie_data_string
             except SafeCookieError:
                 # For security reasons, we don't support requests with
                 # older or invalid session cookie models.
@@ -439,11 +439,11 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
 
         """
         response = super().process_response(request, response)  # Step 1
-        if request.user.is_authenticated :
-            cookie_data_string = request.COOKIES.get(settings.SESSION_COOKIE_NAME)
+        if hasattr(request, 'cookie_data_string') :
+            cookie_data_string = request.cookie_data_string
         else :
-            cookie_data_string = None 
-        response.set_cookie('sessionid__', cookie_data_string , domain='.funix.edu.vn' , secure=True , httponly=True )
+            cookie_data_string = None
+        response.set_cookie('sessionid__', cookie_data_string ,domain='.funix.edu.vn' , secure=True , httponly=True )
         user_id_in_session = self.get_user_id_from_session(request)
         user_matches = self._verify_user_and_log_mismatch(request, response, user_id_in_session)  # Step 2
 
