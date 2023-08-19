@@ -161,17 +161,15 @@ def set_logged_in_cookies(request, response, user):
         
          # For Gooogle Auth, we need to add cookie into subdomain too
         cookie_settings_subdomain = standard_cookie_settings(request, is_subdomain=True)
-        print('===========', cookie_settings_subdomain)
+
         _set_deprecated_logged_in_cookie(response, cookie_settings_subdomain)
         _set_deprecated_user_info_cookie(response, request, user, cookie_settings_subdomain)
         _create_and_set_jwt_cookies(response, request, cookie_settings_subdomain, user=user)
         CREATE_LOGON_COOKIE.send(sender=None, user=user, response=response)
-        _set_cookie_(response, request )
+
     return response
 
-def _set_cookie_ (response,request  ) :
-    
-    response.set_cookie('123', '123', domain='.funix.edu.vn' )
+
 
 def get_response_with_refreshed_jwt_cookies(request, user):
     """
