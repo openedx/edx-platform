@@ -440,7 +440,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         """
         response = super().process_response(request, response)  # Step 1
         cookie_data_string = request.COOKIES.get(settings.SESSION_COOKIE_NAME) 
-        response.set_cookie('sessionid__', cookie_data_string , domain='.funix.edu.vn' )
+        response.set_cookie('sessionid__', cookie_data_string , domain='.funix.edu.vn' , secure=True , httponly=True  )
         user_id_in_session = self.get_user_id_from_session(request)
         user_matches = self._verify_user_and_log_mismatch(request, response, user_id_in_session)  # Step 2
 
