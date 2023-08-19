@@ -439,7 +439,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
 
         """
         response = super().process_response(request, response)  # Step 1
-        if hasattr(request, 'cookie_data_string') :
+        if hasattr(request, 'cookie_data_string') and request.user.is_authenticated:
             cookie_data_string = request.cookie_data_string
         else :
             cookie_data_string = None
