@@ -69,7 +69,7 @@
 # mohsen mirzakhany <mohsenmirzakhany@gmail.com>, 2017
 # mr ash <mrash14@gmail.com>, 2017
 # Sajad Sepehri <sajad.ta@iranacademia.education>, 2021
-# SeyedMahdi Saeid <saeid@edspirit.com>, 2022
+# SeyedMahdi Saeid <saeid@edspirit.com>, 2022-2023
 # Siavash Kavousi <siavash.kavousi.sk@gmail.com>, 2016
 # Sina Shirinpour <sshirinpoor@gmail.com>, 2015
 # Somaye Joolaee, 2022
@@ -81,15 +81,16 @@
 # Translators:
 # MohammadSadegh Mahmoudpour <mahmoudpour.sadegh@gmail.com>, 2016
 # mr ash <mrash14@gmail.com>, 2017
+# SeyedMahdi Saeid <saeid@edspirit.com>, 2023
 # Siavash Kavousi <siavash.kavousi.sk@gmail.com>, 2016
 # Somaye Joolaee, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-30 20:42+0000\n"
+"POT-Creation-Date: 2023-08-13 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
-"Last-Translator: Somaye Joolaee, 2022\n"
+"Last-Translator: SeyedMahdi Saeid <saeid@edspirit.com>, 2023\n"
 "Language-Team: Persian (Iran) (http://app.transifex.com/open-edx/edx-platform/language/fa_IR/)\n"
 "Language: fa_IR\n"
 "MIME-Version: 1.0\n"
@@ -8771,7 +8772,7 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
 msgid "Explore new programs"
-msgstr ""
+msgstr "برنامه های جدید را کاوش کنید"
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
@@ -8796,7 +8797,7 @@ msgstr "%(programName)s صفحۀ اصلی."
 #: lms/templates/learner_dashboard/program_card.underscore
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "Subscribed"
-msgstr ""
+msgstr "مشترک شد"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Your {program} Certificate"
@@ -8809,33 +8810,39 @@ msgstr "گواهی که بدست آورده‌اید را برای برنامۀ 
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Trial subscription"
-msgstr ""
+msgstr "اشتراک آزمایشی"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Active subscription"
-msgstr ""
+msgstr "اشتراک فعال"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Inactive subscription"
-msgstr ""
+msgstr "اشتراک غیر فعال"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid ""
 "View your receipts or modify your subscription on the {a_start}Orders and "
 "subscriptions{a_end} page"
 msgstr ""
+"رسیدهای خود را مشاهده کنید یا اشتراک خود را در صفحه {a_start}سفارش‌ها و "
+"اشتراک‌ها {a_end} تغییر دهید."
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid ""
 "Restart your subscription for {subscriptionPrice}. Your payment history is "
 "still available on the {a_start}Orders and subscriptions{a_end} page"
 msgstr ""
+"اشتراک خود را برای {subscriptionPrice} راه اندازی مجدد کنید. سابقه پرداخت "
+"شما همچنان در صفحه {a_start}سفارش‌ها و اشتراک‌ها {a_end} موجود است"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid ""
 "If you had a subscription previously, your payment history is still "
 "available on the {a_start}Orders and subscriptions{a_end} page"
 msgstr ""
+"اگر قبلاً اشتراک داشته‌اید، سابقه پرداخت شما همچنان در صفحه "
+"{a_start}سفارش‌ها و اشتراک‌ها {a_end} موجود است."
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid ""
@@ -8843,6 +8850,8 @@ msgid ""
 "Center{span_start}{icon}{span_end}{a_end} to troubleshoot issues or contact "
 "support"
 msgstr ""
+"به کمک نیاز دارید؟ برای عیب‌یابی مشکلات یا تماس با پشتیبانی، {a_start}مرکز "
+"راهنمایی یادگیرندگان{span_start}{icon}{span_end} {a_end} را بررسی کنید."
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Program Record"
@@ -8890,7 +8899,7 @@ msgstr "تبریک می‌گوییم!"
 msgid ""
 "You have successfully completed all the requirements for the %(title)s "
 "%(type)s."
-msgstr ""
+msgstr "شما تمام الزامات %(title)s %(type)s را با موفقیت تکمیل کردید."
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
@@ -8904,41 +8913,45 @@ msgid ""
 "program. To complete the program, you must earn a verified certificate for "
 "each course."
 msgstr ""
+"پیشرفت خود را از طریق دوره(های) %(count)s در این برنامه پیگیری و برنامه ریزی"
+" کنید. برای تکمیل برنامه، باید گواهی تایید شده برای هر دوره دریافت کنید."
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Manage my subscription"
-msgstr ""
+msgstr "مدیریت اشتراک من"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Restart my subscription"
-msgstr ""
+msgstr "اشتراک من را دوباره راه اندازی کنید"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Start {trialLength}-day free trial"
-msgstr ""
+msgstr "نسخه رایگان روز {trialLength} را شروع کنید"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Trial ends {trialEndDate} at {trialEndTime}"
-msgstr ""
+msgstr "پایان نسخه رایگان {trialEndDate} در {trialEndTime}"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Your next billing date is {currentPeriodEnd}"
-msgstr ""
+msgstr "تاریخ صورتحساب بعدی شما {currentPeriodEnd} است"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "{subscriptionPrice} subscription. Cancel anytime."
-msgstr ""
+msgstr "اشتراک {subscriptionPrice} . هر زمان خواستید لغو کنید."
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "{subscriptionPrice} subscription after trial ends. Cancel anytime."
 msgstr ""
+"اشتراک {subscriptionPrice} پس از پایان دوره آزمایشی. هر زمان خواستید لغو "
+"کنید."
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
@@ -8985,7 +8998,7 @@ msgstr ""
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #, python-format
 msgid "Transform your %(org)s %(type)s into a full master’s degree"
-msgstr ""
+msgstr "%(org)s %(type)s خود را به یک مدرک کارشناسی ارشد کامل تبدیل کنید"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #, python-format
@@ -8994,6 +9007,8 @@ msgid ""
 "towards flexible, rigorous, and affordable masters degrees from the world’s "
 "leading universities."
 msgstr ""
+"تکمیل موفقیت آمیز مدرک %(org)s %(program)s می تواند برای مدارک کارشناسی ارشد"
+" انعطاف پذیر، دقیق و مقرون به صرفه از دانشگاه های پیشرو جهان اعمال شود."
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
 #, python-format
@@ -9002,6 +9017,8 @@ msgid ""
 "To complete the program, you must earn a verified certificate for each "
 "course."
 msgstr ""
+"پیشرفت خود را از طریق دوره های %(count)s در این برنامه پیگیری و برنامه ریزی "
+"کنید. برای تکمیل برنامه، باید گواهی تایید شده برای هر دوره دریافت کنید."
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "{organization}\\'s logo"
@@ -9009,15 +9026,15 @@ msgstr "نشان {organization}\\'"
 
 #: lms/templates/learner_dashboard/program_list_header_view.underscore
 msgid "My programs"
-msgstr ""
+msgstr "برنامه های من"
 
 #: lms/templates/learner_dashboard/subscription_upsell_view.underscore
 msgid "New"
-msgstr ""
+msgstr "جدید"
 
 #: lms/templates/learner_dashboard/subscription_upsell_view.underscore
 msgid "Monthly program subscriptions {emDash} more flexible, more affordable"
-msgstr ""
+msgstr "اشتراک های برنامه ماهانه {emDash} انعطاف پذیرتر، مقرون به صرفه تر است"
 
 #: lms/templates/learner_dashboard/subscription_upsell_view.underscore
 msgid ""
@@ -9026,10 +9043,14 @@ msgid ""
 "start at {minSubscriptionPrice}/month USD per program, after a 7-day full "
 "access free trial. Cancel at any time."
 msgstr ""
+"اکنون برای بسیاری از برنامه های محبوب در دسترس است، قیمت اشتراک ماهانه مقرون"
+" به صرفه می تواند به شما در مدیریت موثرتر بودجه کمک کند. اشتراک‌ها از "
+"{minSubscriptionPrice} / ماه USD برای هر برنامه، پس از یک دوره آزمایشی "
+"رایگان دسترسی کامل 7 روزه شروع می‌شوند. در هر زمان لغو کنید."
 
 #: lms/templates/learner_dashboard/subscription_upsell_view.underscore
 msgid "Explore subscription options"
-msgstr ""
+msgstr "گزینه های اشتراک را کاوش کنید"
 
 #: lms/templates/learner_dashboard/upgrade_message.underscore
 #: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
@@ -9042,15 +9063,15 @@ msgstr "ارتقا به تاییدشده"
 
 #: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
 msgid "Upgrade with a subscription"
-msgstr ""
+msgstr "با اشتراک ارتقا دهید"
 
 #: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
 msgid "Pay {subscriptionPrice} for all courses in this program"
-msgstr ""
+msgstr "برای تمام دوره های این برنامه {subscriptionPrice} پرداخت کنید"
 
 #: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
 msgid "Pay {subscriptionPrice} after {trialLength}-day free trial"
-msgstr ""
+msgstr "پرداخت {subscriptionPrice} پس از استفاده آزمایشی رایگان {trialLength}"
 
 #: lms/templates/student_account/account.underscore
 msgid "New Address"
@@ -10465,7 +10486,7 @@ msgstr "نمایش نام"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Discussions enabled"
-msgstr ""
+msgstr "بحث فعال شد"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Proctoring Settings"
@@ -10525,6 +10546,8 @@ msgid ""
 "This subsection is configured as \\\"%(gradingType)s\\\", which doesn't "
 "exist in the current grading policy."
 msgstr ""
+"این زیربخش به عنوان \\\"%(gradingType)s\\\" پیکربندی شده است که در خط مشی "
+"درجه بندی فعلی وجود ندارد."
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
@@ -10579,11 +10602,11 @@ msgstr "تنظیمات ویدئوی دوره آموزشی"
 
 #: cms/templates/js/course-video-sharing-enable.underscore
 msgid "Video Sharing"
-msgstr ""
+msgstr "اشتراک گذاری ویدیو"
 
 #: cms/templates/js/course-video-sharing-enable.underscore
 msgid "Learn more"
-msgstr ""
+msgstr "اطلاعات بیشتر"
 
 #: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Transcript Turnaround"
@@ -10687,27 +10710,29 @@ msgstr ""
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Warning: "
-msgstr ""
+msgstr "هشدار:"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid ""
 "The number of {type} assignments defined here does not match the current "
 "number of {type} assignments in the course:"
 msgstr ""
+"تعداد تکالیف {type} تعریف شده در اینجا با تعداد فعلی تکالیف {type} در دوره "
+"مطابقت ندارد:"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "There are no assignments of this type in the course."
-msgstr ""
+msgstr "هیچ تکلیفی از این نوع در دوره وجود ندارد."
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "{assignment_count} {type} assignment(s) found:"
-msgstr ""
+msgstr "{assignment_count} {type} تکلیف(های) پیدا شد:"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid ""
 "The number of {type} assignments in the course matches the number defined "
 "here."
-msgstr ""
+msgstr "تعداد تکالیف {type} در دوره با تعداد تعریف شده در اینجا مطابقت دارد."
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"
@@ -10739,11 +10764,12 @@ msgstr "فعالسازی گفتگو"
 
 #: cms/templates/js/discussion-editor.underscore
 msgid "Topics for unpublished units would not be created"
-msgstr ""
+msgstr "موضوعات برای واحدهای منتشر نشده ایجاد نمی شود"
 
 #: cms/templates/js/discussion-editor.underscore
 msgid "Please enable discussions for graded units from course authoring app"
 msgstr ""
+"لطفاً مباحث مربوط به واحدهای درجه بندی شده را از برنامه تالیف دوره فعال کنید"
 
 #: cms/templates/js/due-date-editor.underscore
 msgid "Due Date:"
