@@ -204,7 +204,7 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlMixin):  # lint-amn
                 'login_msg': login_msg,
             }
             fragment.add_content(
-                self.runtime.service(self, 'mako').render_template('discussion/_discussion_inline.html', context)
+                self.runtime.service(self, 'mako').render_lms_template('discussion/_discussion_inline.html', context)
             )
 
         fragment.initialize_js('DiscussionInlineBlock')
@@ -216,7 +216,8 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlMixin):  # lint-amn
         Renders author view for Studio.
         """
         fragment = Fragment()
-        fragment.add_content(self.runtime.service(self, 'mako').render_template(
+        # For historic reasons, this template is in the LMS templates folder:
+        fragment.add_content(self.runtime.service(self, 'mako').render_lms_template(
             'discussion/_discussion_inline_studio.html',
             {
                 'discussion_id': self.discussion_id,

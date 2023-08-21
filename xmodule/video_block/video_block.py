@@ -258,7 +258,7 @@ class VideoBlock(
         Return the studio view.
         """
         fragment = Fragment(
-            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
+            self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
         add_sass_to_fragment(fragment, 'VideoBlockEditor.scss')
         add_webpack_js_to_fragment(fragment, 'VideoBlockEditor')
@@ -498,7 +498,7 @@ class VideoBlock(
                 organization=organization
             )
 
-        return self.runtime.service(self, 'mako').render_template('video.html', template_context)
+        return self.runtime.service(self, 'mako').render_lms_template('video.html', template_context)
 
     def get_course_video_sharing_override(self):
         """
