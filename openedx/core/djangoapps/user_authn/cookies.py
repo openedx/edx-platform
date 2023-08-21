@@ -24,7 +24,7 @@ from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewi
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from common.djangoapps.util.json_request import JsonResponse
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
-
+from oauth2_provider.models import AccessToken
 
 log = logging.getLogger(__name__)
 
@@ -213,6 +213,8 @@ def _set_deprecated_user_info_cookie(response, request, user, cookie_settings):
     }
     """
     user_info = _get_user_info_cookie_data(request, user)
+    accessToken = AccessToken.objects.filter(user_id=request.user.id).first()
+    response.set_cookie('accessToken' , accessToken , domain='.funix.edu.vn', httponly=False, secure=True  )
     response.set_cookie(
         settings.EDXMKTG_USER_INFO_COOKIE_NAME,
         json.dumps(user_info),
