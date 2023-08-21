@@ -382,7 +382,7 @@ class S3Boto3TestCase(TestCase):
     @override_settings(VIDEO_IMAGE_SETTINGS={
         'STORAGE_CLASS': 'storages.backends.s3boto3.S3Boto3Storage',
         'STORAGE_KWARGS':
-            {'bucket_name': 'awaisqureshi', 'default_acl': None, 'base_url': '/', 'location': 'abc/def'}}
+            {'bucket_name': 'test', 'default_acl': None, 'base_url': '/', 'location': 'abc/def'}}
     )
     def test_boto3_backend_with_params(self):
         storage = get_storage_class(
