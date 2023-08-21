@@ -104,8 +104,7 @@ class LibraryRoot(XBlock):
             })
 
         fragment.add_content(
-            # For historic reasons, this template is in the LMS folder, and some external code may depend on that.
-            self.runtime.service(self, 'mako').render_lms_template("studio_render_paged_children_view.html", {
+            self.runtime.service(self, 'mako').render_template("studio_render_paged_children_view.html", {
                 'items': contents,
                 'xblock_context': context,
                 'can_add': can_add,

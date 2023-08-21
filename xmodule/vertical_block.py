@@ -161,8 +161,7 @@ class VerticalBlock(
                     child_context['username'], str(self.location)),  # pylint: disable=no-member
             })
 
-        mako_service = self.runtime.service(self, 'mako')
-        fragment.add_content(mako_service.render_lms_template('vert_module.html', fragment_context))
+        fragment.add_content(self.runtime.service(self, 'mako').render_template('vert_module.html', fragment_context))
 
         add_webpack_js_to_fragment(fragment, 'VerticalStudentView')
         fragment.initialize_js('VerticalStudentView')
