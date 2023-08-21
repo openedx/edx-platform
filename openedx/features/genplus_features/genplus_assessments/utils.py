@@ -494,9 +494,11 @@ def students_aggregate_result(user_states, aggregate_result, problem_choices):
             containing the students aggregate result data.
     """
     for key in problem_choices.keys():
+        key = key.strip()
         choice = problem_choices[key]
         if choice['statement'] not in aggregate_result:
-            aggregate_result[choice['statement']] = {
+            statement=choice['statement'].strip()
+            aggregate_result[statement] = {
                 'count': 0,
                 'is_correct': choice['correct'] == 'true'
             }
