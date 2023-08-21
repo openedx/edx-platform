@@ -352,6 +352,7 @@ def _get_assets_in_json_format(assets, course_key):
     for asset in assets:
         thumbnail_asset_key = _get_thumbnail_asset_key(asset, course_key)
         asset_is_locked = asset.get('locked', False)
+        asset_file_size = asset.get('length', None)
 
         asset_in_json = get_asset_json(
             asset['displayname'],
@@ -361,7 +362,7 @@ def _get_assets_in_json_format(assets, course_key):
             thumbnail_asset_key,
             asset_is_locked,
             course_key,
-            asset['length'],
+            asset_file_size,
         )
 
         assets_in_json_format.append(asset_in_json)
@@ -427,6 +428,7 @@ def _upload_asset(request, course_key):
     # readback the saved content - we need the database timestamp
     readback = contentstore().find(content.location)
     locked = getattr(content, 'locked', False)
+    length = getattr(content, 'length', None)
     return JsonResponse({
         'asset': get_asset_json(
             content.name,
@@ -436,7 +438,7 @@ def _upload_asset(request, course_key):
             content.thumbnail_location,
             locked,
             course_key,
-            content.length,
+            length,
         ),
         'msg': _('Upload completed')
     })
@@ -602,7 +604,7 @@ def _delete_thumbnail(thumbnail_location, course_key, asset_key):  # lint-amnest
             logging.warning('Could not delete thumbnail: %s', thumbnail_location)
 
 
-def get_asset_json(display_name, content_type, date, location, thumbnail_location, locked, course_key, file_size):
+def get_asset_json(display_name, content_type, date, location, thumbnail_location, locked, course_key, file_size=None):
     '''
     Helper method for formatting the asset information to send to client.
     '''
