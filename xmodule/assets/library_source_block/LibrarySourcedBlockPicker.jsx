@@ -12,6 +12,7 @@ class LibrarySourcedBlockPicker extends React.Component {
         this.state = {
             libraries: [],
             xblocks: [],
+            // eslint-disable-next-line react/no-unused-state
             searchedLibrary: '',
             libraryLoading: false,
             xblocksLoading: false,
@@ -29,8 +30,10 @@ class LibrarySourcedBlockPicker extends React.Component {
         this.fetchLibraries();
     }
 
+    // eslint-disable-next-line react/sort-comp
     fetchLibraries(textSearch = '', page = 1, append = false) {
         this.setState({
+            // eslint-disable-next-line react/no-access-state-in-setstate
             libraries: append ? this.state.libraries : [],
             libraryLoading: true,
         }, async function() {
@@ -38,6 +41,7 @@ class LibrarySourcedBlockPicker extends React.Component {
                 let res = await fetch(`/api/libraries/v2/?pagination=true&page=${page}&text_search=${textSearch}`);
                 res = await res.json();
                 this.setState({
+                    // eslint-disable-next-line react/no-access-state-in-setstate
                     libraries: this.state.libraries.concat(res.results),
                     libraryLoading: false,
                 }, () => {
@@ -60,6 +64,7 @@ class LibrarySourcedBlockPicker extends React.Component {
 
     fetchXblocks(library, textSearch = '', page = 1, append = false) {
         this.setState({
+            // eslint-disable-next-line react/no-access-state-in-setstate
             xblocks: append ? this.state.xblocks : [],
             xblocksLoading: true,
         }, async function() {
@@ -67,6 +72,7 @@ class LibrarySourcedBlockPicker extends React.Component {
                 let res = await fetch(`/api/libraries/v2/${library}/blocks/?pagination=true&page=${page}&text_search=${textSearch}`);
                 res = await res.json();
                 this.setState({
+                    // eslint-disable-next-line react/no-access-state-in-setstate
                     xblocks: this.state.xblocks.concat(res.results),
                     xblocksLoading: false,
                 }, () => {
@@ -90,6 +96,7 @@ class LibrarySourcedBlockPicker extends React.Component {
     onLibrarySearchInput(event) {
         event.persist();
         this.setState({
+            // eslint-disable-next-line react/no-unused-state
             searchedLibrary: event.target.value,
         });
         if (!this.debouncedFetchLibraries) {
@@ -118,6 +125,7 @@ class LibrarySourcedBlockPicker extends React.Component {
     }
 
     onXblockSelected(event) {
+        // eslint-disable-next-line prefer-const, react/no-access-state-in-setstate
         let state = new Set(this.state.selectedXblocks);
         if (event.target.checked) {
             state.add(event.target.value);
@@ -136,6 +144,7 @@ class LibrarySourcedBlockPicker extends React.Component {
         } else {
             value = event.target.dataset.value;
         }
+        // eslint-disable-next-line prefer-const, react/no-access-state-in-setstate
         let state = new Set(this.state.selectedXblocks);
         state.delete(value);
         this.setState({
@@ -156,6 +165,7 @@ class LibrarySourcedBlockPicker extends React.Component {
                     <div className="message has-warnings" style={{margin: 0, color: 'white'}}>
                         <p className="warning">
                             <span className="icon fa fa-warning" aria-hidden="true" />
+                            {/* eslint-disable-next-line react/no-unescaped-entities */}
                             Hitting 'Save and Import' will import the latest versions of the selected blocks, overwriting any changes done to this block post-import.
                         </p>
                     </div>
@@ -195,9 +205,11 @@ class LibrarySourcedBlockPicker extends React.Component {
                             {
                                 Array.from(this.state.selectedXblocks).map(block => (
                                     <li key={block} className={styles.element} style={{display: 'flex'}}>
+                                        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
                                         <label className={styles.elementItem}>
                                             {block}
                                         </label>
+                                        {/* eslint-disable-next-line react/button-has-type */}
                                         <button className={[styles.remove]} data-value={block} onClick={this.onDeleteClick} aria-label="Remove block">
                                             <span aria-hidden="true" className="icon fa fa-times" />
                                         </button>
@@ -213,6 +225,7 @@ class LibrarySourcedBlockPicker extends React.Component {
 }
 
 LibrarySourcedBlockPicker.propTypes = {
+    // eslint-disable-next-line react/forbid-prop-types
     selectedXblocks: PropTypes.array,
 };
 

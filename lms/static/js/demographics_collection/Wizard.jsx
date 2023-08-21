@@ -1,10 +1,14 @@
 /* global gettext */
 import React from 'react';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import isFunction from 'lodash/isFunction';
 
 const Page = ({children}) => children;
+// eslint-disable-next-line react/function-component-definition
 const Header = () => null;
+// eslint-disable-next-line react/function-component-definition
 const Closer = () => null;
+// eslint-disable-next-line react/function-component-definition
 const ErrorPage = () => null;
 export default class Wizard extends React.Component {
     constructor(props) {
@@ -15,6 +19,7 @@ export default class Wizard extends React.Component {
             currentPage: 1,
             totalPages: 0,
             pages: [],
+            // eslint-disable-next-line react/no-unused-state
             wizardContext: {},
         };
 
@@ -27,6 +32,7 @@ export default class Wizard extends React.Component {
         const wizardContext = this.props.wizardContext;
         const closer = this.findSubComponentByType(Wizard.Closer.name)[0];
         pages.push(closer);
+        // eslint-disable-next-line react/no-unused-state
         this.setState({pages, totalPages, wizardContext});
     }
 
@@ -41,6 +47,7 @@ export default class Wizard extends React.Component {
     }
 
     // this needs to handle the case of no provided header
+    // eslint-disable-next-line react/sort-comp
     renderHeader() {
         const header = this.findSubComponentByType(Wizard.Header.name)[0];
         return header.props.children({currentPage: this.state.currentPage, totalPages: this.state.totalPages});
@@ -71,6 +78,7 @@ export default class Wizard extends React.Component {
                     {errorPage.props.children}
                 </div>
                 <div className="wizard-footer justify-content-end h-100 d-flex flex-column">
+                    {/* eslint-disable-next-line react/button-has-type, react/no-unknown-property */}
                     <button className="wizard-button colored" arial-label={gettext('close questionnaire')} onClick={this.props.onWizardComplete}>{gettext('Close')}</button>
                 </div>
             </div>
@@ -110,7 +118,9 @@ export default class Wizard extends React.Component {
                 </div>
                 {this.renderPage()}
                 <div className="wizard-footer justify-content-end h-100 d-flex flex-column">
+                    {/* eslint-disable-next-line react/button-has-type */}
                     <button className={`wizard-button ${finalPage && 'colored'}`} onClick={this.wizardComplete} aria-label={gettext('finish later')}>{finalPage ? gettext('Return to my dashboard') : gettext('Finish later')}</button>
+                    {/* eslint-disable-next-line react/button-has-type */}
                     <button className="wizard-button colored" hidden={finalPage} onClick={this.handleNext} aria-label={gettext('next page')}>{gettext('Next')}</button>
                 </div>
             </div>

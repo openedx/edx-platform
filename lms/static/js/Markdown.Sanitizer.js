@@ -2,6 +2,7 @@
     var output, Converter;
     if (typeof exports === 'object' && typeof require === 'function') { // we're in a CommonJS (e.g. Node.js) module
         output = exports;
+        // eslint-disable-next-line global-require
         Converter = require('./Markdown.Converter').Converter;
     } else {
         output = window.Markdown;
@@ -63,7 +64,8 @@
             tagname = tags[ctag].replace(/<\/?(\w+).*/, '$1');
             // skip any already paired tags
             // and skip tags in our ignore list; assume they're self-closed
-            if (tagpaired[ctag] || ignoredtags.search('<' + tagname + '>') > -1) { continue; } // eslint-disable-line max-len, xss-lint: disable=javascript-concat-html
+            // eslint-disable-next-line no-continue
+            if (tagpaired[ctag] || ignoredtags.search('<' + tagname + '>') > -1) { continue; } // xss-lint: disable=javascript-concat-html
 
             tag = tags[ctag];
             match = -1;
@@ -72,14 +74,14 @@
                 // this is an opening tag
                 // search forwards (next tags), look for closing tags
                 for (var ntag = ctag + 1; ntag < tagcount; ntag++) {
-                    if (!tagpaired[ntag] && tags[ntag] === '</' + tagname + '>') { // eslint-disable-line max-len, xss-lint: disable=javascript-concat-html
+                    if (!tagpaired[ntag] && tags[ntag] === '</' + tagname + '>') { // xss-lint: disable=javascript-concat-html
                         match = ntag;
                         break;
                     }
                 }
             }
 
-            // eslint-disable-next-line brace-style
+            /* eslint-disable-next-line brace-style, no-multi-assign */
             if (match == -1) { needsRemoval = tagremove[ctag] = true; } // mark for removal
             else { tagpaired[match] = true; } // mark paired
         }
@@ -89,6 +91,7 @@
         // delete all orphaned tags from the string
 
         var ctag = 0;
+        // eslint-disable-next-line no-shadow
         html = html.replace(re, function(match) {
             var res = tagremove[ctag] ? '' : match;
             ctag++;

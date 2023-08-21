@@ -98,8 +98,6 @@ dummy_locales:
 
 # Directories we don't search for strings.
 ignore_dirs:
-    - common/static/xmodule/modules
-    - common/static/xmodule/descriptors
     # Directories with no user-facing code.
     - '*/migrations'
     - '*/envs'

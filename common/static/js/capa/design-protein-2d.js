@@ -66,7 +66,7 @@
             //when Check button is clicked
             var problem = $('#protex_container').parents('.problem');
             var check_button = problem.find('input.check');
-        	var input_field = problem.find('input[type=hidden]');
+            var input_field = problem.find('input[type=hidden]');
             check_button.on('click', function() {
                 var protex_answer = protexCheckAnswer();
                 var value = {protex_answer: protex_answer};

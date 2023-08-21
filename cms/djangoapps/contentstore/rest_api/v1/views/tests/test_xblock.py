@@ -17,10 +17,10 @@ from cms.djangoapps.contentstore.tests.test_utils import AuthorizeStaffTestCase
 TEST_LOCATOR = "block-v1:dede+aba+weagi+type@problem+block@ba6327f840da49289fb27a9243913478"
 
 
-class XblockViewTestCase(AuthorizeStaffTestCase):
+class XBlockViewTestCase(AuthorizeStaffTestCase):
     """
     This base class supports tests with the various HTTP methods (GET, POST, PUT, PATCH, and DELETE).
-    Tests for each such message are organized by classes that derive from this one (e.g., XblockViewGetTest).
+    Tests for each such message are organized by classes that derive from this one (e.g., XBlockViewGetTest).
     Each derived class supplies get_test_data() to govern what goes into the body of the HTTP request.
     Each derived class optionally overrides get_url_params() to govern request parameter values.
     Additionally, each derived class supplies send_request() to bring it all together when making a request.
@@ -88,7 +88,7 @@ class XblockViewTestCase(AuthorizeStaffTestCase):
         return response
 
 
-class XblockViewGetTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
+class XBlockViewGetTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
     """
     Test GET operation on xblocks
     """
@@ -131,7 +131,7 @@ class XblockViewGetTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
         assert data["courseKey"] == self.get_course_key_string()
 
 
-class XblockViewPostTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
+class XBlockViewPostTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
     """
     Test POST operation on xblocks - Create a new xblock for a parent xblock
     """
@@ -190,7 +190,7 @@ class XblockViewPostTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
         assert data["courseKey"] == self.get_course_key_string()
 
 
-class XblockViewPutTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
+class XBlockViewPutTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
     """
     Test PUT operation on xblocks - update an xblock
     """
@@ -247,7 +247,7 @@ class XblockViewPutTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
         assert data["courseKey"] == self.get_course_key_string()
 
 
-class XblockViewPatchTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
+class XBlockViewPatchTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
     """
     Test PATCH operation on xblocks - update an xblock
     """
@@ -304,7 +304,7 @@ class XblockViewPatchTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
         assert data["courseKey"] == self.get_course_key_string()
 
 
-class XblockViewDeleteTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
+class XBlockViewDeleteTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
     """
     Test DELETE operation on xblocks - delete an xblock
     """

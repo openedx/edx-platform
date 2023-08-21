@@ -430,18 +430,17 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         assert 'can_access_proctored_exams' in courseware_data
         assert courseware_data['can_access_proctored_exams'] == result
 
-    @ddt.data(
-        True,
-        False
-    )
-    def test_learning_assistant_launch_url(self, enabled):
-        with override_waffle_flag(COURSEWARE_LEARNING_ASSISTANT, active=enabled):
-            response = self.client.get(self.url)
-        launch_url = response.json()['learning_assistant_launch_url']
-        if enabled:
-            assert launch_url == ""
-        else:
-            assert launch_url is None
+    @override_waffle_flag(COURSEWARE_LEARNING_ASSISTANT, active=False)
+    def test_learning_assistant_enabled_disabled_waffle_flag(self):
+        response = self.client.get(self.url)
+        learning_assistant_enabled = response.json()['learning_assistant_enabled']
+        self.assertFalse(learning_assistant_enabled)
+
+    @override_waffle_flag(COURSEWARE_LEARNING_ASSISTANT, active=True)
+    def test_learning_assistant_enabled_enabled_waffle_flag(self):
+        response = self.client.get(self.url)
+        learning_assistant_enabled = response.json()['learning_assistant_enabled']
+        self.assertTrue(learning_assistant_enabled)
 
 
 @ddt.ddt

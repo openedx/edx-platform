@@ -360,13 +360,11 @@ class CoursewareMeta:
             return enrollment_active and CourseMode.is_eligible_for_certificate(enrollment_mode)
 
     @property
-    def learning_assistant_launch_url(self):
+    def learning_assistant_enabled(self):
         """
-        Returns a URL for the learning assistant LTI launch if applicable, otherwise None
+        Returns a boolean representing whether the requesting user should have access to the Xpert Learning Assistant.
         """
-        if learning_assistant_is_active(self.course_key):
-            return ""  # TODO: replace empty string with LTI launch URL as part of MST-1975
-        return None
+        return learning_assistant_is_active(self.course_key)
 
 
 class CoursewareInformation(RetrieveAPIView):
@@ -457,7 +455,7 @@ class CoursewareInformation(RetrieveAPIView):
             verified mode. Will update to reverify URL if necessary.
         * linkedin_add_to_profile_url: URL to add the effective user's certificate to a LinkedIn Profile.
         * user_needs_integrity_signature: Whether the user needs to sign the integrity agreement for the course
-        * learning_assistant_launch_url: URL for the LTI launch of a learning assistant
+        * learning_assistant_enabled: Whether the Xpert Learning Assistant is enabled for the requesting user
 
     **Parameters:**
 

@@ -12,12 +12,14 @@ define(['js/views/baseview', 'js/views/course_info_update', 'js/views/course_inf
 
             render: function() {
                 // instantiate the ClassInfoUpdateView and delegate the proper dom to it
+                // eslint-disable-next-line no-new
                 new CourseInfoUpdateView({
                     el: $('body.updates'),
                     collection: this.model.get('updates'),
                     base_asset_url: this.model.get('base_asset_url')
                 });
 
+                // eslint-disable-next-line no-new
                 new CourseInfoHandoutView({
                     el: this.$('#course-handouts-view'),
                     model: this.model.get('handouts'),

@@ -11,9 +11,11 @@ import ddt
 import pytz
 import requests
 from django.conf import settings
+from django.core.files.storage import get_storage_class
 from django.core.files.uploadedfile import UploadedFile
 from django.test.utils import override_settings
 from edxval.api import create_profile, create_video, get_course_video_image_url, update_video_image
+from storages.backends.s3boto3 import S3Boto3Storage
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.video_utils import (
@@ -365,3 +367,26 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
         # Verify that no image is attached to video1.
         video1_image_url = get_course_video_image_url(course_id=course_id, edx_video_id=video1_edx_video_id)
         self.assertIsNone(video1_image_url)
+
+
+class S3Boto3TestCase(TestCase):
+    """ verify s3boto3 returns valid backend."""
+    def test_video_backend(self):
+        self.assertEqual(
+            S3Boto3Storage,
+            get_storage_class(
+                'storages.backends.s3boto3.S3Boto3Storage',
+            )(**settings.VIDEO_IMAGE_SETTINGS.get('STORAGE_KWARGS', {})).__class__
+        )
+
+    @override_settings(VIDEO_IMAGE_SETTINGS={
+        'STORAGE_CLASS': 'storages.backends.s3boto3.S3Boto3Storage',
+        'STORAGE_KWARGS':
+            {'bucket_name': 'test', 'default_acl': None, 'base_url': '/', 'location': 'abc/def'}}
+    )
+    def test_boto3_backend_with_params(self):
+        storage = get_storage_class(
+            settings.VIDEO_IMAGE_SETTINGS.get('STORAGE_CLASS', {})
+        )(**settings.VIDEO_IMAGE_SETTINGS.get('STORAGE_KWARGS', {}))
+
+        self.assertEqual(S3Boto3Storage, storage.__class__)

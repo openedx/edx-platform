@@ -41,8 +41,8 @@ the corresponding folders in any enabled themes, as part of the edx-platform bui
 It is collected into the static root, and then linked to from XBlock fragments by the
 ``add_sass_to_fragment`` function in `builtin_assets.py`_.
 
-.. _AnnotatableBlockDisplay: https://github.com/openedx/edx-platform/tree/master/xmodule/assets/AnnotatableBlockDisplay.scss
-.. _AnnotatableBlockEditor: https://github.com/openedx/edx-platform/tree/master/xmodule/assets/AnnotatableBlockEditor.scss
+.. _AnnotatableBlockDisplay.scss: https://github.com/openedx/edx-platform/tree/master/xmodule/assets/AnnotatableBlockDisplay.scss
+.. _AnnotatableBlockEditor.scss: https://github.com/openedx/edx-platform/tree/master/xmodule/assets/AnnotatableBlockEditor.scss
 .. _annotatable/_display.scss: https://github.com/openedx/edx-platform/tree/master/xmodule/assets/annotatable/_display.scss
 .. _simplify things: https://github.com/openedx/edx-platform/issues/32621
 
@@ -59,8 +59,7 @@ Currently, edx-platform XBlock JS is defined both here in `xmodule/assets`_ and 
 
 * For many older blocks, their JS is:
 
-  * copied to ``common/static/xmodule`` by `static_content.py`_ (aka ``xmodule_assets``),
-  * then bundled using a generated Webpack config at ``common/static/xmodule/webpack.xmodule.config.js``,
+  * bundled using a `webpack.builtinblocks.config.js`_,
   * which is included into `webpack.common.config.js`_,
   * allowing it to be included into XBlock fragments using ``add_webpack_js_to_fragment`` from `builtin_assets.py`_.
 
@@ -75,15 +74,7 @@ Currently, edx-platform XBlock JS is defined both here in `xmodule/assets`_ and 
   * `VerticalBlock`_
   * `LibrarySourcedBlock`_
 
-* Some XBlock JS is also processed through Django Pipeline and used in a couple specific legacy places.
-
-As part of an `active build refactoring`_:
-
-* We update the older builtin XBlocks to reference their JS directly rather than using copies of it.
-* We will move ``webpack.xmodule.config.js`` here instead of generating it.
-* We will consolidate all edx-platform XBlock JS here in `xmodule/assets`_.
-* We will remove XBlock JS from Django Pipeline.
-* We will delete the ``xmodule_assets`` script.
+As part of an `active build refactoring`_, we will soon consolidate all edx-platform XBlock JS here in `xmodule/assets`_.
 
 .. _xmodule/assets: https://github.com/openedx/edx-platform/tree/master/xmodule/assets
 .. _xmodule/js: https://github.com/openedx/edx-platform/tree/master/xmodule/js
@@ -96,4 +87,5 @@ As part of an `active build refactoring`_:
 .. _builtin_assets.py: https://github.com/openedx/edx-platform/tree/master/xmodule/util/builtin_assets.py
 .. _static_content.py: https://github.com/openedx/edx-platform/blob/master/xmodule/static_content.py
 .. _library_source_block/style.css: https://github.com/openedx/edx-platform/blob/master/xmodule/assets/library_source_block/style.css
+.. _webpack.builtinblocks.config.js: https://github.com/openedx/edx-platform/blob/master/webpack.builtinblocks.config.js
 .. _webpack.common.config.js: https://github.com/openedx/edx-platform/blob/master/webpack.common.config.js
