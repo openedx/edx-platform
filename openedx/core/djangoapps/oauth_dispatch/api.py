@@ -33,13 +33,7 @@ def create_dot_access_token(request, user, client, expires_in=None, scopes=None)
         request_validator=dot_settings.OAUTH2_VALIDATOR_CLASS(),
     )
     _populate_create_access_token_request(request, user, client, scopes)
-    token = token_generator.create_token(request, refresh_token=True)
-    # This save_token call is required with BearerAuthentication. Once the DEPR for
-    # BearerAuthentication is complete and it has been fully removed, we may no
-    # longer need to save the token, since JWT tokens don't rely on the database.
-    # See DEPR https://github.com/openedx/edx-drf-extensions/issues/284
-    token_generator.request_validator.save_token(token, request)
-    return token
+    return token_generator.create_token(request, refresh_token=True)
 
 
 def _get_expires_in_value(expires_in):

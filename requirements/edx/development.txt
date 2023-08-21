@@ -520,7 +520,7 @@ django-mysql==4.11.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-django-oauth-toolkit==1.4.1
+django-oauth-toolkit==1.3.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -1253,8 +1253,9 @@ numpy==1.22.4
     #   openedx-calc
     #   scipy
     #   shapely
-oauthlib==3.2.2
+oauthlib==3.0.1
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   django-oauth-toolkit

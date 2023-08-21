@@ -11,8 +11,8 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from oauthlib.common import Request
 from oauthlib.oauth1.rfc5849.signature import (
     collect_parameters,
-    signature_base_string,
-    base_string_uri,
+    construct_base_string,
+    normalize_base_string_uri,
     normalize_parameters,
     sign_hmac_sha1
 )
@@ -154,10 +154,10 @@ class LTIAuthBackend(BaseAuth):
         # we proceed through the entire validation before rejecting any request for any reason.
         # However, as noted there, the value of doing this is dubious.
         try:
-            base_uri = base_string_uri(request.uri)
+            base_uri = normalize_base_string_uri(request.uri)
             parameters = collect_parameters(uri_query=request.uri_query, body=request.body)
             parameters_string = normalize_parameters(parameters)
-            base_string = signature_base_string(request.http_method, base_uri, parameters_string)
+            base_string = construct_base_string(request.http_method, base_uri, parameters_string)
 
             computed_signature = sign_hmac_sha1(base_string, str(lti_consumer_secret), '')
             submitted_signature = request.oauth_signature
