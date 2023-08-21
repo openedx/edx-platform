@@ -4,7 +4,7 @@ DEFAULT_AUTHENTICATION_CLASSES for observability purposes.
 """
 from edx_django_utils.monitoring import set_custom_attribute
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from rest_framework.authentication import BasicAuthentication, SessionAuthentication
+from rest_framework.authentication import SessionAuthentication
 
 
 class DefaultSessionAuthentication(SessionAuthentication):
@@ -30,38 +30,6 @@ class DefaultSessionAuthentication(SessionAuthentication):
             return user_and_auth
         except Exception as exception:
             set_custom_attribute('session_auth_result', 'failure')
-            raise
-
-
-class DefaultBasicAuthentication(BasicAuthentication):
-    """
-    Default BasicAuthentication with observability
-
-    Note that BasicAuthentication was a default because it was a DRF default.
-    Observability will be used to determine if BasicAuthentication could
-    instead be dropped as a default.
-    """
-
-    def authenticate(self, request):
-        # .. custom_attribute_name: using_default_auth_classes
-        # .. custom_attribute_description: This custom attribute will always be
-        #     True (if not NULL), and signifies that a default authentication
-        #     class was used. This can be used to find endpoints using the
-        #     default authentication classes.
-        set_custom_attribute('using_default_auth_classes', True)
-
-        try:
-            user_and_auth = super().authenticate(request)
-            if user_and_auth:
-                # .. custom_attribute_name: basic_auth_result
-                # .. custom_attribute_description: The result of basic auth, represented
-                #      by: 'success', 'failure', or 'skipped'.
-                set_custom_attribute('basic_auth_result', 'success')
-            else:
-                set_custom_attribute('basic_auth_result', 'skipped')
-            return user_and_auth
-        except Exception as exception:
-            set_custom_attribute('basic_auth_result', 'failure')
             raise
 
 
