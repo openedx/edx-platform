@@ -81,7 +81,7 @@
 # Saman Ismael <saman.2791@gmail.com>, 2013
 # Saman Ismael <saman.2791@gmail.com>, 2013
 # Sarina Canelake <sarina@tcril.org>, 2014
-# SeyedMahdi Saeid <saeid@edspirit.com>, 2022
+# SeyedMahdi Saeid <saeid@edspirit.com>, 2022-2023
 # Siavash Kavousi <siavash.kavousi.sk@gmail.com>, 2016
 # matata <sina_meftah@yahoo.com>, 2014
 # Sina Shirinpour <sshirinpoor@gmail.com>, 2015
@@ -101,7 +101,7 @@
 # Reza Amini <reza.amini234@gmail.com>, 2014
 # Saman Ismael <saman.2791@gmail.com>, 2013
 # Sarina Canelake <sarina@tcril.org>, 2014
-# SeyedMahdi Saeid <saeid@edspirit.com>, 2022
+# SeyedMahdi Saeid <saeid@edspirit.com>, 2022-2023
 # Siavash Kavousi <siavash.kavousi.sk@gmail.com>, 2016
 # Sina Shirinpour <sshirinpoor@gmail.com>, 2015
 # Somaye Joolaee, 2022
@@ -134,7 +134,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-23 20:42+0000\n"
+"POT-Creation-Date: 2023-08-13 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Somaye Joolaee, 2022\n"
 "Language-Team: Persian (Iran) (https://app.transifex.com/open-edx/teams/6205/fa_IR/)\n"
@@ -14072,7 +14072,7 @@ msgstr "نشانه‌گذاری این صفحه"
 
 #: lms/templates/conditional_block.html
 msgid "You do not have access to this dependency block."
-msgstr ""
+msgstr "شما به این بلوک وابستگی دسترسی ندارید."
 
 #: lms/templates/course.html
 msgid "LEARN MORE"
@@ -14599,15 +14599,15 @@ msgstr "بازگشت به %s"
 
 #: lms/templates/public_video.html
 msgid "Learn more about this course"
-msgstr ""
+msgstr "درباره این دوره بیشتر بدانید"
 
 #: lms/templates/public_video.html
 msgid "Go to course"
-msgstr ""
+msgstr "برو به دوره"
 
 #: lms/templates/public_video.html
 msgid "Enroll in this course"
-msgstr ""
+msgstr "در این دوره ثبت نام کنید"
 
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
@@ -14865,15 +14865,15 @@ msgstr "صفحه بعدی"
 
 #: lms/templates/studio_render_children_view.html
 msgid "Paste Component"
-msgstr ""
+msgstr "چسباندن مولفه"
 
 #: lms/templates/studio_render_children_view.html
 msgid "From:"
-msgstr ""
+msgstr "از جانب:"
 
 #: lms/templates/studio_render_children_view.html
 msgid "What's in my clipboard?"
-msgstr ""
+msgstr "در کلیپ بورد من چیست؟"
 
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
@@ -15003,15 +15003,15 @@ msgstr "بارگیری پرونده تصویری"
 
 #: lms/templates/video.html
 msgid "Share this video"
-msgstr ""
+msgstr "این ویدئو را به اشتراک بگذارید"
 
 #: lms/templates/video.html
 msgid "Share on {site}"
-msgstr ""
+msgstr "در {site} به اشتراک بگذارید"
 
 #: lms/templates/video.html
 msgid "Copy"
-msgstr ""
+msgstr "کپی "
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -18403,7 +18403,7 @@ msgstr "مدارس"
 
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Register for free"
-msgstr ""
+msgstr "عضویت رایگان"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Profile"
@@ -19362,7 +19362,7 @@ msgstr "افزودن همکار"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Limited Staff"
-msgstr ""
+msgstr "پرسنل محدود"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -19371,10 +19371,15 @@ msgid ""
 "grades and access all course data. Limited Staff don't have access to your "
 "course in Studio. You can only give course team roles to enrolled users."
 msgstr ""
+"اعضای تیم دوره با نقش کارکنان محدود به شما در مدیریت دوره کمک می کنند. "
+"کارکنان محدود می توانند یادگیرندگان را ثبت نام کنند و از ثبت نام خارج کنند، "
+"همچنین نمرات آنها را تغییر دهند و به همه داده های دوره دسترسی داشته باشند. "
+"کارکنان محدود به دوره شما در استودیو دسترسی ندارند. شما فقط می توانید نقش "
+"های تیم دوره را به کاربران ثبت نام شده بدهید."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Limited Staff"
-msgstr ""
+msgstr "کارکنان محدود را اضافه کنید"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Admin"
@@ -19599,6 +19604,8 @@ msgid ""
 "You can include keywords in your messages. For list of available keywords "
 "see the {start_link}documentation{end_link}."
 msgstr ""
+"می توانید کلمات کلیدی را در پیام های خود قرار دهید. برای فهرست کلمات کلیدی "
+"موجود به {start_link}مستندات {end_link} مراجعه کنید."
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"
@@ -21382,6 +21389,8 @@ msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
 "{unit_link} as the URL value."
 msgstr ""
+"برای ایجاد پیوند به این واحد از یک جزء HTML در این دوره، {unit_link} به "
+"عنوان مقدار URL وارد کنید."
 
 #: cms/templates/course-create-rerun.html
 msgid "Create a Course Rerun of:"
@@ -21570,14 +21579,16 @@ msgid ""
 "order to display the discussions sidebar, discussions xBlocks will no longer"
 " be visible to learners."
 msgstr ""
+"این دوره از نسخه ارتقا یافته انجمن گفتگوی edx استفاده می کند. برای نمایش "
+"نوار کناری بحث‌ها، xBlocks بحث دیگر برای فراگیران قابل مشاهده نخواهد بود."
 
 #: cms/templates/course_outline.html
 msgid " Learn more"
-msgstr ""
+msgstr "بیشتر بدانید"
 
 #: cms/templates/course_outline.html
 msgid "Share feedback"
-msgstr ""
+msgstr "اشتراک‌گذاری بازخورد"
 
 #: cms/templates/course_outline.html
 #: cms/templates/widgets/deprecated-course-key-warning.html
@@ -24276,11 +24287,11 @@ msgstr "تنظیم دسترسی"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"
-msgstr ""
+msgstr "کپی به کلیپ بورد"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"
-msgstr ""
+msgstr "مدیریت دسترسی"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
@@ -24641,7 +24652,7 @@ msgstr "طرح کلی"
 
 #: cms/templates/widgets/header.html
 msgid "Files & Media"
-msgstr ""
+msgstr "فایل ها و رسانه ها"
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"
