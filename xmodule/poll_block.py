@@ -135,7 +135,7 @@ class PollBlock(
             'ajax_url': self.ajax_url,
             'configuration_json': self.dump_poll(),
         }
-        fragment.add_content(self.runtime.service(self, 'mako').render_template('poll.html', params))
+        fragment.add_content(self.runtime.service(self, 'mako').render_lms_template('poll.html', params))
         add_sass_to_fragment(fragment, 'PollBlockDisplay.scss')
         add_webpack_js_to_fragment(fragment, 'PollBlockDisplay')
         shim_xmodule_js(fragment, 'Poll')

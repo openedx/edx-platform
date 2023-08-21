@@ -356,7 +356,7 @@ class ProblemBlock(
         Return the studio view.
         """
         fragment = Fragment(
-            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
+            self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
         add_sass_to_fragment(fragment, 'ProblemBlockEditor.scss')
         add_webpack_js_to_fragment(fragment, 'ProblemBlockEditor')
@@ -898,7 +898,7 @@ class ProblemBlock(
         """
         curr_score, total_possible = self.get_display_progress()
 
-        return self.runtime.service(self, 'mako').render_template('problem_ajax.html', {
+        return self.runtime.service(self, 'mako').render_lms_template('problem_ajax.html', {
             'element_id': self.location.html_id(),
             'id': str(self.location),
             'ajax_url': self.ajax_url,
@@ -1247,7 +1247,7 @@ class ProblemBlock(
             'submit_disabled_cta': submit_disabled_ctas[0] if submit_disabled_ctas else None,
         }
 
-        html = self.runtime.service(self, 'mako').render_template('problem.html', context)
+        html = self.runtime.service(self, 'mako').render_lms_template('problem.html', context)
 
         if encapsulate:
             html = HTML('<div id="problem_{id}" class="problem" data-url="{ajax_url}">{html}</div>').format(
@@ -1548,7 +1548,7 @@ class ProblemBlock(
 
         return {
             'answers': new_answers,
-            'correct_status_html': self.runtime.service(self, 'mako').render_template(
+            'correct_status_html': self.runtime.service(self, 'mako').render_lms_template(
                 'status_span.html',
                 {'status': Status('correct', self.runtime.service(self, "i18n").gettext)}
             )
