@@ -516,7 +516,7 @@ class SequenceBlock(
         if not self._can_user_view_content(course):
             banner_text = self._hidden_content_banner_text(course)
 
-            hidden_content_html = self.runtime.service(self, 'mako').render_template(
+            hidden_content_html = self.runtime.service(self, 'mako').render_lms_template(
                 'hidden_content.html',
                 {
                     'self_paced': course.self_paced,
@@ -589,7 +589,7 @@ class SequenceBlock(
             parent_block_id = self.get_parent().scope_ids.usage_id.block_id
             params['chapter_completion_aggregator_url'] = '/'.join(
                 [settings.COMPLETION_AGGREGATOR_URL, str(self.scope_ids.usage_id.context_key), parent_block_id]) + '/'
-        fragment.add_content(self.runtime.service(self, 'mako').render_template("seq_block.html", params))
+        fragment.add_content(self.runtime.service(self, 'mako').render_lms_template("seq_block.html", params))
 
         self._capture_full_seq_item_metrics(children)
         self._capture_current_unit_metrics(children)
