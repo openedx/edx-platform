@@ -23,10 +23,10 @@ class DefaultSessionAuthentication(SessionAuthentication):
             if user_and_auth:
                 # .. custom_attribute_name: session_auth_result
                 # .. custom_attribute_description: The result of session auth, represented
-                #      by: 'success', 'failure', or 'skipped'.
+                #      by: 'success', 'failure', or 'n/a'.
                 set_custom_attribute('session_auth_result', 'success')
             else:
-                set_custom_attribute('session_auth_result', 'skipped')
+                set_custom_attribute('session_auth_result', 'n/a')
             return user_and_auth
         except Exception as exception:
             set_custom_attribute('session_auth_result', 'failure')
