@@ -548,7 +548,7 @@ def get_problem_attributes(raw_data, block_key):
             responses['question_text'] = e.text
         elif e.text and e.tag == 'choice':
             choice_dict = {
-                'statement': e.text,
+                'statement': str(e.text).strip(),
                 'correct': e.attrib.get('correct')
             }
             if e.attrib.get('correct') == 'true':
@@ -596,8 +596,8 @@ def students_multiple_choice_response(user_states, user):
     for user_state in user_states:
         user_answer = user_state['Answer']
         correct_answer = user_state['Correct Answer']
-        user_answer_list = [x.strip() for x in user_answer.split(",")]
-        correct_answer_list = [x.strip() for x in correct_answer.split(",")]
+        user_answer_list = [x.strip() for x in user_answer.split("||")]
+        correct_answer_list = [x.strip() for x in correct_answer.split("||")]
         student_response_dict = {
             'username': user.username,
             'full_name': user.profile.name,
