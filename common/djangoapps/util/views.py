@@ -102,7 +102,7 @@ def jsonable_server_error(request, template_name='500.html'):
     500 error handler that serves JSON on an AJAX request, and proxies
     to the Django default `server_error` view otherwise.
     """
-    if request.is_ajax():
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         msg = {"error": "The edX servers encountered an error"}
         return HttpResponseServerError(json.dumps(msg))
     else:
