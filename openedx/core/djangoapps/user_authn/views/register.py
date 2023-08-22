@@ -689,30 +689,12 @@ class RegistrationView(APIView):
         if status_code == 200:
             # keeping this `success` field in for now, as we have outstanding clients expecting this
             response_dict['success'] = True
-        else:
-            self._log_validation_errors(request, response_dict, status_code)
         if redirect_url:
             response_dict['redirect_url'] = redirect_url
         if error_code:
             response_dict['error_code'] = error_code
             set_custom_attribute('register_error_code', error_code)
         return JsonResponse(response_dict, status=status_code)
-
-    def _log_validation_errors(self, request, errors, status_code):
-        try:
-            for field_key, errors in errors.items():  # lint-amnesty, pylint: disable=redefined-argument-from-local
-                for error in errors:
-                    log.info(
-                        'message=registration_failed, status_code=%d, agent="%s", field="%s", error="%s"',
-                        status_code,
-                        request.META.get('HTTP_USER_AGENT', ''),
-                        field_key,
-                        error['user_message']
-                    )
-        except:  # pylint: disable=bare-except
-            log.exception("Failed to log registration validation error")
-            pass  # lint-amnesty, pylint: disable=unnecessary-pass
-
 
 # pylint: disable=line-too-long
 class RegistrationValidationView(APIView):
