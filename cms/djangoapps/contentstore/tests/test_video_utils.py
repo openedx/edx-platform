@@ -376,7 +376,7 @@ class S3Boto3TestCase(TestCase):
 
     def setUp(self):
         self.storage = S3Boto3Storage()
-        self.storage._connections.connection = MagicMock()
+        self.storage._connections.connection = MagicMock()  # pylint: disable=protected-access
 
     def test_video_backend(self):
         self.assertEqual(
@@ -408,7 +408,7 @@ class S3Boto3TestCase(TestCase):
         content = ContentFile('new content')
 
         storage = S3Boto3Storage(**{'bucket_name': 'test'})
-        storage._connections.connection = MagicMock()
+        storage._connections.connection = MagicMock()  # pylint: disable=protected-access
 
         storage.save(name, content)
         storage.bucket.Object.assert_called_once_with(name)
@@ -436,7 +436,7 @@ class S3Boto3TestCase(TestCase):
         name = 'test_storage_save.txt'
         content = ContentFile('new content')
         storage = S3Boto3Storage(**{'bucket_name': 'test', 'default_acl': default_acl})
-        storage._connections.connection = MagicMock()
+        storage._connections.connection = MagicMock()  # pylint: disable=protected-access
 
         storage.save(name, content)
         storage.bucket.Object.assert_called_once_with(name)
@@ -466,7 +466,7 @@ class S3Boto3TestCase(TestCase):
             content = ContentFile('new content')
 
             storage = S3Boto3Storage(**{'bucket_name': 'test', 'default_acl': None})
-            storage._connections.connection = MagicMock()
+            storage._connections.connection = MagicMock()   # pylint: disable=protected-access
 
             storage.save(name, content)
             storage.bucket.Object.assert_called_once_with(name)
