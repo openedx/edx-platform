@@ -104,15 +104,12 @@ class ContentObjectTag(ObjectTag):
             return BlockUsageLocator.from_string(str(self.object_id))
 
 
-class ContentTaxonomy(Taxonomy):
+class ContentTaxonomyMixin:
     """
     Taxonomy which can only tag Content objects (e.g. XBlocks or Courses) via ContentObjectTag.
 
     Also ensures a valid TaxonomyOrg owner relationship with the content object.
     """
-
-    class Meta:
-        proxy = True
 
     @classmethod
     def taxonomies_for_org(
@@ -164,3 +161,13 @@ class ContentTaxonomy(Taxonomy):
         ).exists():
             return False
         return super()._check_taxonomy(content_tag)
+
+
+class ContentTaxonomy(ContentTaxonomyMixin, Taxonomy):
+    """
+    Taxonomy that accepts ContentTags,
+    and ensures a valid TaxonomyOrg owner relationship with the content object.
+    """
+
+    class Meta:
+        proxy = True

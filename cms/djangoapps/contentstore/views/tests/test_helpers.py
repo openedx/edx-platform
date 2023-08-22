@@ -3,7 +3,7 @@ Unit tests for helpers.py.
 """
 
 
-from django.utils import http
+from urllib.parse import quote
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, LibraryFactory  # lint-amnesty, pylint: disable=wrong-import-order
@@ -27,7 +27,7 @@ class HelpersTestCase(CourseTestCase):
                                       display_name="Week 1")
         self.assertEqual(
             xblock_studio_url(chapter),
-            f'{course_url}?show={http.urlquote(str(chapter.location).encode())}'
+            f'{course_url}?show={quote(str(chapter.location).encode())}'
         )
 
         # Verify sequential URL
@@ -35,7 +35,7 @@ class HelpersTestCase(CourseTestCase):
                                          display_name="Lesson 1")
         self.assertEqual(
             xblock_studio_url(sequential),
-            f'{course_url}?show={http.urlquote(str(sequential.location).encode())}'
+            f'{course_url}?show={quote(str(sequential.location).encode())}'
         )
 
         # Verify unit URL

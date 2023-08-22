@@ -26,7 +26,7 @@ from cms.djangoapps.contentstore.toggles import exam_setting_view_enabled
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.student import auth
-from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
+from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access, STUDIO_EDIT_ROLES
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
@@ -1321,6 +1321,35 @@ def get_course_settings(request, course_key, course_block):
             )
 
     return settings_context
+
+
+def get_course_team(auth_user, course_key, user_perms):
+    """
+    Utils is used to get context of all CMS users who are editors for the specified course.
+    It is used for both DRF and django views.
+    """
+
+    from cms.djangoapps.contentstore.views.user import user_with_role
+
+    course_block = modulestore().get_course(course_key)
+    instructors = set(CourseInstructorRole(course_key).users_with_role())
+    # the page only lists staff and assumes they're a superset of instructors. Do a union to ensure.
+    staff = set(CourseStaffRole(course_key).users_with_role()).union(instructors)
+
+    formatted_users = []
+    for user in instructors:
+        formatted_users.append(user_with_role(user, 'instructor'))
+    for user in staff - instructors:
+        formatted_users.append(user_with_role(user, 'staff'))
+
+    course_team_context = {
+        'context_course': course_block,
+        'show_transfer_ownership_hint': auth_user in instructors and len(instructors) == 1,
+        'users': formatted_users,
+        'allow_actions': bool(user_perms & STUDIO_EDIT_ROLES),
+    }
+
+    return course_team_context
 
 
 def get_course_grading(course_key):

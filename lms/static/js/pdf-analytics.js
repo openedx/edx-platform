@@ -83,6 +83,7 @@ $(window).bind('find findhighlightallchange findagain findcasesensitivitychange'
         message.status = $('#findMsg').text();
         message.page = PDFViewerApplication.page;
         var event_name = 'search';
+        // eslint-disable-next-line default-case
         switch (event.type) {
         case 'find':
             event_name += '.executed';

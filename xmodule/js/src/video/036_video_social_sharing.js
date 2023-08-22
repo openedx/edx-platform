@@ -1,4 +1,5 @@
 (function(define) {
+    // eslint-disable-next-line lines-around-directive
     'use strict';
 
     // VideoSocialSharingHandler module.
@@ -50,7 +51,6 @@
                     this.closeBtn.on('click', this.hideHandler);
                     this.toggleBtn.on('click', this.showHandler);
                     this.copyBtn.on('click', this.copyHandler);
-                  
                 },
 
                 // Fire an analytics event on share button click.
@@ -61,17 +61,17 @@
                 },
 
                 hideHandler: function(event) {
-                  this.shareContainer.hide();
-                  this.toggleBtn.show();
+                    this.shareContainer.hide();
+                    this.toggleBtn.show();
                 },
 
                 showHandler: function(event) {
-                  this.shareContainer.show();
-                  this.toggleBtn.hide();
+                    this.shareContainer.show();
+                    this.toggleBtn.hide();
                 },
 
                 copyHandler: function(event) {
-                  navigator.clipboard.writeText(this.copyBtn.data('url'));
+                    navigator.clipboard.writeText(this.copyBtn.data('url'));
                 },
 
                 // Send an analytics event for share button tracking.

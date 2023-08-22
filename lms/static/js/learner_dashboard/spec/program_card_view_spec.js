@@ -58,6 +58,7 @@ describe('Program card View', () => {
             not_started: 3,
         },
     ];
+    // eslint-disable-next-line no-undef
     const subscriptionCollection = new Backbone.Collection([{
         resource_id: 'a87e5eac-3c93-45a1-a8e1-4c79ca8401c8',
         subscription_state: 'active',
@@ -99,6 +100,7 @@ describe('Program card View', () => {
     });
 
     it('should call reEvaluatePicture if reLoadBannerImage is called', () => {
+        // eslint-disable-next-line no-undef
         spyOn(ProgramCardView, 'reEvaluatePicture');
         view.reLoadBannerImage();
         expect(ProgramCardView.reEvaluatePicture).toHaveBeenCalled();
@@ -107,6 +109,7 @@ describe('Program card View', () => {
     it('should handle exceptions from reEvaluatePicture', () => {
         const message = 'Picturefill had exceptions';
 
+        // eslint-disable-next-line no-undef
         spyOn(ProgramCardView, 'reEvaluatePicture').and.callFake(() => {
             const error = { name: message };
 

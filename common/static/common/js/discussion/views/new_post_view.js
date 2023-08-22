@@ -38,6 +38,7 @@
                 var _ref;
                 this.mode = options.mode || 'inline';
                 this.startHeader = options.startHeader;
+                // eslint-disable-next-line no-cond-assign
                 if ((_ref = this.mode) !== 'tab' && _ref !== 'inline') {
                     throw new Error('invalid mode: ' + this.mode);
                 }
@@ -199,6 +200,7 @@
                 url = DiscussionUtil.urlFor('create_thread', topicId);
                 return DiscussionUtil.safeAjax({
                     $elem: $(event.target),
+                    // eslint-disable-next-line no-void
                     $loading: event ? $(event.target) : void 0,
                     url: url,
                     type: 'POST',

@@ -1114,6 +1114,11 @@ CACHES = {
         'LOCATION': ['localhost:11211'],
         'TIMEOUT': '86400',  # This data should be long-lived for performance, BundleCache handles invalidation
         'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+        'OPTIONS': {
+            'no_delay': True,
+            'ignore_exc': True,
+            'use_pooling': True,
+        }
     },
     'course_structure_cache': {
         'KEY_PREFIX': 'course_structure',
@@ -1121,6 +1126,11 @@ CACHES = {
         'LOCATION': ['localhost:11211'],
         'TIMEOUT': '7200',
         'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+        'OPTIONS': {
+            'no_delay': True,
+            'ignore_exc': True,
+            'use_pooling': True,
+        }
     },
     'celery': {
         'KEY_PREFIX': 'celery',
@@ -1128,6 +1138,11 @@ CACHES = {
         'LOCATION': ['localhost:11211'],
         'TIMEOUT': '7200',
         'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+        'OPTIONS': {
+            'no_delay': True,
+            'ignore_exc': True,
+            'use_pooling': True,
+        }
     },
     'mongo_metadata_inheritance': {
         'KEY_PREFIX': 'mongo_metadata_inheritance',
@@ -1135,12 +1150,22 @@ CACHES = {
         'LOCATION': ['localhost:11211'],
         'TIMEOUT': 300,
         'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+        'OPTIONS': {
+            'no_delay': True,
+            'ignore_exc': True,
+            'use_pooling': True,
+        }
     },
     'staticfiles': {
         'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'KEY_PREFIX': 'staticfiles_general',
         'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+        'OPTIONS': {
+            'no_delay': True,
+            'ignore_exc': True,
+            'use_pooling': True,
+        }
     },
     'default': {
         'VERSION': '1',
@@ -1148,18 +1173,33 @@ CACHES = {
         'LOCATION': ['localhost:11211'],
         'KEY_PREFIX': 'default',
         'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+        'OPTIONS': {
+            'no_delay': True,
+            'ignore_exc': True,
+            'use_pooling': True,
+        }
     },
     'configuration': {
         'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'KEY_PREFIX': 'configuration',
         'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+        'OPTIONS': {
+            'no_delay': True,
+            'ignore_exc': True,
+            'use_pooling': True,
+        }
     },
     'general': {
         'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'KEY_PREFIX': 'general',
         'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+        'OPTIONS': {
+            'no_delay': True,
+            'ignore_exc': True,
+            'use_pooling': True,
+        }
     },
 }
 
@@ -1952,11 +1992,7 @@ TRANSLATORS_GUIDE = 'https://edx.readthedocs.org/projects/edx-developer-guide/en
                     'conventions/internationalization/i18n_translators_guide.html'
 
 #################################### AWS #######################################
-# S3BotoStorage insists on a timeout for uploaded assets. We should make it
-# permanent instead, but rather than trying to figure out exactly where that
-# setting is, I'm just bumping the expiration time to something absurd (100
-# years). This is only used if DEFAULT_FILE_STORAGE is overriden to use S3
-# in the global settings.py
+# The number of seconds that a generated URL is valid for.
 AWS_QUERYSTRING_EXPIRE = 10 * 365 * 24 * 60 * 60  # 10 years
 AWS_SES_REGION_NAME = 'us-east-1'
 AWS_SES_REGION_ENDPOINT = 'email.us-east-1.amazonaws.com'
@@ -2848,22 +2884,6 @@ BLOCK_STRUCTURES_SETTINGS = dict(
     #   For more information, check https://github.com/openedx/edx-platform/pull/13388 and
     #   https://github.com/openedx/edx-platform/pull/14571.
     TASK_MAX_RETRIES=5,
-
-    # .. toggle_name: BLOCK_STRUCTURES_SETTINGS['PRUNING_ACTIVE']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: When `True`, only a specified number of versions of block structure
-    #   files are kept for each structure, and the rest are cleaned up. The number of versions that
-    #   are kept can be specified in the `BlockStructureConfiguration`, which can be edited in
-    #   Django Admin. The default number of versions that are kept is `5`.
-    # .. toggle_warning: This toggle will likely be deprecated and removed.
-    # .. toggle_use_cases: temporary
-    # .. toggle_creation_date: 2018-03-22
-    # .. toggle_target_removal_date: 2018-06-22
-    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/14571,
-    #   https://github.com/openedx/edx-platform/pull/17760,
-    #   https://openedx.atlassian.net/browse/DEPR-146
-    PRUNING_ACTIVE=False,
 )
 
 ################################ Bulk Email ###################################
@@ -3290,6 +3310,11 @@ CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
 ######################### Django Rest Framework ########################
 
 REST_FRAMEWORK = {
+    # These default classes add observability around endpoints using defaults, and should
+    # not be used anywhere else.
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'openedx.core.djangolib.default_auth_classes.DefaultSessionAuthentication',
+    ],
     'DEFAULT_PAGINATION_CLASS': 'edx_rest_framework_extensions.paginators.DefaultPagination',
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
@@ -3307,7 +3332,7 @@ REST_FRAMEWORK = {
 
 # .. setting_name: REGISTRATION_VALIDATION_RATELIMIT
 # .. setting_default: 30/7d
-# .. setting_description: Whenver a user tries to register on edx, the data entered during registration
+# .. setting_description: Whenever a user tries to register on edx, the data entered during registration
 #    is validated via RegistrationValidationView.
 #    It's POST endpoint is rate-limited up to 30 requests per IP Address in a week by default.
 #    It was introduced because an attacker can guess or brute force a series of names to enumerate valid users.
@@ -3772,7 +3797,7 @@ VIDEO_IMAGE_SETTINGS = dict(
     VIDEO_IMAGE_MAX_BYTES=2 * 1024 * 1024,    # 2 MB
     VIDEO_IMAGE_MIN_BYTES=2 * 1024,       # 2 KB
     # Backend storage
-    # STORAGE_CLASS='storages.backends.s3boto.S3BotoStorage',
+    # STORAGE_CLASS='storages.backends.s3boto3.S3Boto3Storage',
     # STORAGE_KWARGS=dict(bucket='video-image-bucket'),
     STORAGE_KWARGS=dict(
         location=MEDIA_ROOT,
@@ -3788,7 +3813,7 @@ VIDEO_IMAGE_MAX_AGE = 31536000
 VIDEO_TRANSCRIPTS_SETTINGS = dict(
     VIDEO_TRANSCRIPTS_MAX_BYTES=3 * 1024 * 1024,    # 3 MB
     # Backend storage
-    # STORAGE_CLASS='storages.backends.s3boto.S3BotoStorage',
+    # STORAGE_CLASS='storages.backends.s3boto3.S3Boto3Storage',
     # STORAGE_KWARGS=dict(bucket='video-transcripts-bucket'),
     STORAGE_KWARGS=dict(
         location=MEDIA_ROOT,
@@ -5129,7 +5154,7 @@ BUNDLE_ASSET_URL_STORAGE_SECRET = None
 #  See `blockstore.apps.bundles.storage.LongLivedSignedUrlStorage` for details.
 BUNDLE_ASSET_STORAGE_SETTINGS = dict(
     # Backend storage
-    # STORAGE_CLASS='storages.backends.s3boto.S3BotoStorage',
+    # STORAGE_CLASS='storages.backends.s3boto3.S3Boto3Storage',
     # STORAGE_KWARGS=dict(bucket='bundle-asset-bucket', location='/path-to-bundles/'),
     STORAGE_CLASS='django.core.files.storage.FileSystemStorage',
     STORAGE_KWARGS=dict(
@@ -5334,3 +5359,7 @@ SUBSCRIPTIONS_SERVICE_WORKER_USERNAME = 'subscriptions_worker'
 ############## NOTIFICATIONS EXPIRY ##############
 NOTIFICATIONS_EXPIRY = 60
 EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
+
+#### django-simple-history##
+# disable indexing on date field its coming from django-simple-history.
+SIMPLE_HISTORY_DATE_INDEX = False

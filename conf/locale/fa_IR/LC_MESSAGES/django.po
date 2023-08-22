@@ -9,6 +9,7 @@
 # Amir Jebelli <amir.jebelli@gmail.com>, 2016
 # arashdehghan <arashdehghan@gmail.com>, 2014
 # Bashir Mahmoudi <bashirmahmoudi@gmail.com>, 2015
+# Diana Huang <dkh@edx.org>, 2023
 # saeed farzad <security.registered@gmail.com>, 2013
 # Emad Rad, 2022
 # frad <faezeh.rad@intersystems.com>, 2014
@@ -31,7 +32,7 @@
 # Saman Ismael <saman.2791@gmail.com>, 2013
 # Saman Ismael <saman.2791@gmail.com>, 2013
 # Sarina Canelake <sarina@tcril.org>, 2014
-# SeyedMahdi Saeid <saeid@edspirit.com>, 2022
+# SeyedMahdi Saeid <saeid@edspirit.com>, 2022-2023
 # Siavash Kavousi <siavash.kavousi.sk@gmail.com>, 2016
 # Sina Shirinpour <sshirinpoor@gmail.com>, 2015
 # smctech <tech@smallmedia.org.uk>, 2016
@@ -53,7 +54,7 @@
 # MohammadSadegh Mahmoudpour <mahmoudpour.sadegh@gmail.com>, 2016
 # mr ash <mrash14@gmail.com>, 2017
 # Saman Ismael <saman.2791@gmail.com>, 2013
-# SeyedMahdi Saeid <saeid@edspirit.com>, 2022
+# SeyedMahdi Saeid <saeid@edspirit.com>, 2022-2023
 # Sina Shirinpour <sshirinpoor@gmail.com>, 2015
 # smsyazdan <smsyazdan@gmail.com>, 2014
 # Somaye Joolaee, 2022
@@ -80,7 +81,7 @@
 # Saman Ismael <saman.2791@gmail.com>, 2013
 # Saman Ismael <saman.2791@gmail.com>, 2013
 # Sarina Canelake <sarina@tcril.org>, 2014
-# SeyedMahdi Saeid <saeid@edspirit.com>, 2022
+# SeyedMahdi Saeid <saeid@edspirit.com>, 2022-2023
 # Siavash Kavousi <siavash.kavousi.sk@gmail.com>, 2016
 # matata <sina_meftah@yahoo.com>, 2014
 # Sina Shirinpour <sshirinpoor@gmail.com>, 2015
@@ -100,7 +101,7 @@
 # Reza Amini <reza.amini234@gmail.com>, 2014
 # Saman Ismael <saman.2791@gmail.com>, 2013
 # Sarina Canelake <sarina@tcril.org>, 2014
-# SeyedMahdi Saeid <saeid@edspirit.com>, 2022
+# SeyedMahdi Saeid <saeid@edspirit.com>, 2022-2023
 # Siavash Kavousi <siavash.kavousi.sk@gmail.com>, 2016
 # Sina Shirinpour <sshirinpoor@gmail.com>, 2015
 # Somaye Joolaee, 2022
@@ -133,7 +134,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-02 20:42+0000\n"
+"POT-Creation-Date: 2023-08-13 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Somaye Joolaee, 2022\n"
 "Language-Team: Persian (Iran) (https://app.transifex.com/open-edx/teams/6205/fa_IR/)\n"
@@ -156,11 +157,64 @@ msgstr "واحد"
 msgid "Problem"
 msgstr "مساله"
 
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+#: xmodule/video_block/video_handlers.py
+#, python-brace-format
+msgid "The following parameters are required: {missing}."
+msgstr "مقادیر زیر ضروری هستند: {missing}"
+
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: xmodule/video_block/video_handlers.py
+msgid ""
+"There is a problem with this transcript file. Try to upload a different "
+"file."
+msgstr "مشکلی در این زیرنویس است. پروندۀ دیگری را بارگذاری کنید. "
+
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+#: xmodule/video_block/video_handlers.py
+#, python-brace-format
+msgid "A transcript with the \"{language_code}\" language code already exists."
+msgstr "زیرنویسی با این کد زبانی \"{language_code}\" از قبل در سامانه وجود دارد. "
+
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: xmodule/video_block/video_handlers.py
+msgid "A transcript file is required."
+msgstr "نیاز به پرونده زیرنویس است."
+
 #: cms/djangoapps/contentstore/utils.py
 #: cms/djangoapps/contentstore/views/block.py
 #: cms/djangoapps/contentstore/views/component.py xmodule/html_block.py
 msgid "Text"
 msgstr "متن"
+
+#. Translators: This is the status for a video that the servers have
+#. successfully processed
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#: openedx/core/djangoapps/content_staging/data.py
+msgid "Ready"
+msgstr "آماده"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#: lms/djangoapps/instructor/views/api.py
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Name"
+msgstr "نام"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#: xmodule/video_block/video_xfields.py
+msgid "Video ID"
+msgstr "شناسه ویدیو"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This is listed as the duration for a video that has not
+#. yet reached the point in its processing by the servers where its
+#. duration is determined.
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
+msgid "Pending"
+msgstr "در حال انتظار"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
@@ -194,63 +248,21 @@ msgstr "پیشرفته"
 msgid "Entrance Exam"
 msgstr "آزمون ورودی"
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#: xmodule/video_block/video_handlers.py
-#, python-brace-format
-msgid "The following parameters are required: {missing}."
-msgstr "مقادیر زیر ضروری هستند: {missing}"
-
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#: cms/djangoapps/contentstore/views/transcripts_ajax.py
-#: xmodule/video_block/video_handlers.py
-msgid ""
-"There is a problem with this transcript file. Try to upload a different "
-"file."
-msgstr "مشکلی در این زیرنویس است. پروندۀ دیگری را بارگذاری کنید. "
-
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#: xmodule/video_block/video_handlers.py
-#, python-brace-format
-msgid "A transcript with the \"{language_code}\" language code already exists."
-msgstr "زیرنویسی با این کد زبانی \"{language_code}\" از قبل در سامانه وجود دارد. "
-
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#: cms/djangoapps/contentstore/views/transcripts_ajax.py
-#: xmodule/video_block/video_handlers.py
-msgid "A transcript file is required."
-msgstr "نیاز به پرونده زیرنویس است."
-
-#. Translators: This is the status for a video that the servers have
-#. successfully processed
-#: cms/djangoapps/contentstore/views/videos.py
-#: openedx/core/djangoapps/content_staging/data.py
-msgid "Ready"
-msgstr "آماده"
-
-#: cms/djangoapps/contentstore/views/videos.py
-#: lms/djangoapps/instructor/views/api.py
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "Name"
-msgstr "نام"
-
-#: cms/djangoapps/contentstore/views/videos.py
-#: xmodule/video_block/video_xfields.py
-msgid "Video ID"
-msgstr "شناسه ویدیو"
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This is listed as the duration for a video that has not
-#. yet reached the point in its processing by the servers where its
-#. duration is determined.
-#: cms/djangoapps/contentstore/views/videos.py
-#: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
-msgid "Pending"
-msgstr "در حال انتظار"
-
 #: cms/djangoapps/contentstore/xblock_storage_handlers/create_xblock.py
 #: xmodule/library_content_block.py
 msgid "Empty"
 msgstr "خالی"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#: openedx/core/djangoapps/xblock/rest_api/views.py
+msgid "Invalid data"
+msgstr "داده معتبر نیست"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#: openedx/core/djangoapps/xblock/rest_api/views.py
+#, python-brace-format
+msgid "Invalid data ({details})"
+msgstr "داده نامعتبر ({details})"
 
 #: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
 msgid "Django site admin"
@@ -294,7 +306,7 @@ msgstr ""
 
 #: common/djangoapps/course_modes/helpers.py
 msgid "You're enrolled as a verified student"
-msgstr "شما به عنوان فراگیر تایید شده ثبت‌نام کردید"
+msgstr "شما به عنوان یک دانش آموز تأیید شده ثبت نام کرده اید"
 
 #: common/djangoapps/course_modes/helpers.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -307,7 +319,7 @@ msgstr "روبان/نشان شناسه‌ی کاربری تأیید شده"
 
 #: common/djangoapps/course_modes/helpers.py
 msgid "You're enrolled as an honor code student"
-msgstr "شما به عنوان فراگیر تابع قوانین صداقت ثبت نام کردید."
+msgstr "شما به عنوان دانش آموز کد افتخار ثبت نام کرده اید"
 
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
@@ -319,7 +331,7 @@ msgstr "قوانین صداقت"
 
 #: common/djangoapps/course_modes/helpers.py
 msgid "You're enrolled as a professional education student"
-msgstr "شما به عنوان فراگیر تحصیلات حرفه‌ای ثبت نام کردید."
+msgstr "شما به عنوان دانشجوی آموزش حرفه ای ثبت نام کرده اید"
 
 #: common/djangoapps/course_modes/helpers.py
 msgid "Professional Ed"
@@ -350,13 +362,13 @@ msgid ""
 "this mode. Leave this blank if users can enroll in this mode until "
 "enrollment closes for the course."
 msgstr ""
-"اختیاری: بعد از این تاریخ/زمان، کاربران دیگر قادر به ثبت نام در این حالت "
-"نیستند. اگر کاربران می توانند تا زمان بسته شدن ثبت‌نام برای این دوره در این "
-"حالت ثبت‌نام کنند، اینجا را خالی بگذارید."
+"اختیاری: پس از این تاریخ/زمان، کاربران دیگر نمی توانند در این حالت ثبت نام "
+"کنند. اگر کاربران می توانند در این حالت ثبت نام کنند تا زمانی که ثبت نام "
+"برای دوره بسته شود، این قسمت را خالی بگذارید."
 
 #: common/djangoapps/course_modes/models.py
 msgid "Lock upgrade deadline date"
-msgstr ""
+msgstr "تاریخ مهلت ارتقا را قفل کنید"
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -364,6 +376,8 @@ msgid ""
 "date. Set to False if there is no upgrade deadline or to use the default "
 "upgrade deadline."
 msgstr ""
+"اختیاری: برای جلوگیری از اعمال تغییرات بر روی تاریخ پایان از گزینه True "
+"استفاده نمایید. در غیر این صورت از گزینه False استفاده نمایید."
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -381,6 +395,9 @@ msgid ""
 "the course. Leave this blank if the course has not yet been migrated to the "
 "ecommerce service."
 msgstr ""
+"اختیاری: این Android SKU برای این حالت از دوره در play store رجیستر شده است."
+" اگر دوره هنوز به سرویس تجارت الکترونیک منتقل نشده است، این قسمت را خالی "
+"بگذارید."
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -388,6 +405,8 @@ msgid ""
 "course.  Leave this blank if the course has not yet been migrated to the "
 "ecommerce service."
 msgstr ""
+"اختیاری: این iOS SKU برای این حالت از دوره در app store رجیستر شده است. اگر "
+"دوره هنوز به سرویس تجارت الکترونیک منتقل نشده است، این قسمت را خالی بگذارید."
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -425,7 +444,6 @@ msgstr "{currency_symbol}{price}"
 #. Translators: This refers to the cost of the course. In this case, the
 #. course costs nothing so it is free.
 #: common/djangoapps/course_modes/models.py
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
 #: lms/templates/course_modes/track_selection.html
 msgid "Free"
 msgstr "رایگان"
@@ -2276,11 +2294,11 @@ msgstr "بازکردن ادکس"
 
 #: lms/djangoapps/branding/api.py
 msgid "Cookie Policy"
-msgstr ""
+msgstr "خط مشی کوکی"
 
 #: lms/djangoapps/branding/api.py
 msgid "Your Privacy Choices"
-msgstr ""
+msgstr "انتخاب های حریم خصوصی شما"
 
 #: lms/djangoapps/branding/api.py
 msgid "Trademark Policy"
@@ -3367,11 +3385,11 @@ msgstr "محتوای دوره آموزشی و منابع اضافی را با ص
 
 #: lms/djangoapps/courseware/plugins.py
 msgid "Open Response Assessment Settings"
-msgstr ""
+msgstr "تنظیمات ارزیابی مربوط به پاسخ باز"
 
 #: lms/djangoapps/courseware/plugins.py
 msgid "Course level settings for Open Response Assessment."
-msgstr ""
+msgstr "تنظیمات سطح دوره برای ارزیابی پاسخ باز."
 
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
 #: openedx/features/course_experience/__init__.py xmodule/tabs.py
@@ -4914,7 +4932,7 @@ msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "Whether to display this block in the table of contents"
-msgstr ""
+msgstr "نمایش این بلوک در فهرست مطالب"
 
 #. Translators: "TOC" stands for "Table of Contents"
 #: lms/djangoapps/lms_xblock/mixin.py
@@ -4922,6 +4940,8 @@ msgid ""
 "What format this block is in (used for deciding which grader to apply, and "
 "what to show in the TOC)"
 msgstr ""
+"این بلوک در چه قالبی است (برای تصمیم‌گیری اینکه کدام درجه‌بندی باید اعمال "
+"شود و چه چیزی در TOC نشان داده شود استفاده می‌شود)"
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "Course Chrome"
@@ -5851,55 +5871,6 @@ msgstr "اجازه‌دادن"
 #: lms/templates/ccx/schedule.html
 msgid "Error"
 msgstr "خطا"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Check out this course on edx"
-msgstr "این دوره آموزشی را در edx بررسی کنید"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Enroll now"
-msgstr "الان ثبت‌نام کنید"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-#: lms/templates/courseware/course_about.html
-#: lms/templates/dashboard/_dashboard_course_resume.html
-msgid "View Course"
-msgstr "مشاهده دوره آموزشی"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Estimated 6 weeks"
-msgstr "تقریبا 6 هفته"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "4-6 hours per week"
-msgstr "4-6 ساعت در هفته"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Self-paced"
-msgstr "خودآموز"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Progress at your own speed"
-msgstr "با سرعت مورد نظر خودتان پیشرفت کنید"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Optional upgrade available"
-msgstr "امکان ارتقا اختیاری فراهم است"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.txt
-#, python-format
-msgid "Check out this course on %(platform_name)s."
-msgstr "این دوره آموزشی را در %(platform_name)s بررسی کنید."
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.txt
-#, python-format
-msgid "This email message was automatically sent by %(lms_url)s "
-msgstr "این رایانامه به‌طور خودکار توسط %(lms_url)s ارسال شد"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/subject.txt
-#, python-format
-msgid "%(display_name)s"
-msgstr "%(display_name)s"
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 msgid "ID Verification Approved"
@@ -7071,7 +7042,7 @@ msgstr "منقضی‌شده"
 
 #: openedx/core/djangoapps/content_staging/models.py
 msgid "Staged Content"
-msgstr ""
+msgstr "محتوای مرحله بندی شده"
 
 #: openedx/core/djangoapps/content_staging/models.py
 msgid ""
@@ -7081,10 +7052,15 @@ msgid ""
 "            e.g. \"video\" if a video is staged, or \"vertical\" for a unit.\n"
 "        "
 msgstr ""
+"\n"
+"            فقط محتوای OLX پشتیبانی می شود, و این فیلد باید از همان تگ ریشه OLX استفاده کند.\n"
+"           برای مثال \"video\" اگر از تگ \"video\" استفاده شده است.\n"
+"\n"
+"        "
 
 #: openedx/core/djangoapps/content_staging/models.py
 msgid "Original usage key/ID of the thing that is in the clipboard."
-msgstr ""
+msgstr "استفاده اصلی کلید/شناسه از چیزی که در کلیپ بورد است."
 
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
@@ -7384,6 +7360,8 @@ msgid ""
 "The Posting availabilty in discussions whether it will be enabled, scheduled"
 " or indefinitely disabled."
 msgstr ""
+"در دسترس بودن ارسال در بحث فعال، برنامه ریزی شده یا به طور نامحدود غیرفعال "
+"می شود."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "The LTI configuration data for this context/provider."
@@ -7556,17 +7534,22 @@ msgstr "مسیرهای یادگیرنده"
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
 msgid ""
-"<{p}><{strong}>{replier_name}</{strong}> replied on your response in "
-"<{strong}>{post_title}</{strong}></{p}>"
+"<{p}><{strong}>{replier_name}</{strong}> commented on your response to the "
+"post <{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> در مورد پاسخ شما به پست نظر داد "
+"<{strong}>{post_title}</{strong}></{p}>"
 
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
 msgid ""
-"<{p}><{strong}>{replier_name}</{strong}> replied on "
-"<{strong}>{author_name}</{strong}> response to your post "
+"<{p}><{strong}>{replier_name}</{strong}> commented on "
+"<{strong}>{author_name}'s</{strong}> response to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> در مورد پاسخ "
+"<{strong}>{author_name}</{strong}> به پست شما نظر داد "
+"<{strong}>{post_title}</{strong}></{p}>"
 
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
@@ -7574,30 +7557,32 @@ msgid ""
 "<{p}><{strong}>{replier_name}</{strong}> responded to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> به پست شما پاسخ داد "
+"<{strong}>{post_title}</{strong}></{p}>"
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "The notification preference config version is not up to date."
-msgstr ""
+msgstr "نسخه پیکربندی اولویت اعلان به‌روز نیست."
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "Invalid app name."
-msgstr ""
+msgstr "نام برنامه نامعتبر است."
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "Notifications marked as seen."
-msgstr ""
+msgstr "اعلان‌ها همانطور که دیده می‌شوند علامت‌گذاری شدند."
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "Notification marked read."
-msgstr ""
+msgstr "اعلان به عنوان خوانده شده علامت گذاری شد."
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "Notifications marked read."
-msgstr ""
+msgstr "اعلان ها به عنوان خوانده شده علامت گذاری شد."
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "Invalid app_name or notification_id."
-msgstr ""
+msgstr "app_name یا notification_id نامعتبر است."
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid ""
@@ -8076,8 +8061,8 @@ msgid ""
 "Usernames can only contain letters (A-Z, a-z), numerals (0-9), underscores "
 "(_), and hyphens (-)."
 msgstr ""
-"نام‌های کاربری فقط می‌توانند شامل حروف (الف-ی)، اعداد (0-9) ، زیر خط (_) و "
-"خط تیره (-) باشند."
+"نام‌های کاربری فقط می‌توانند شامل حروف (A-Z, a-z)، اعداد (0-9) ، زیر خط (_) "
+"و خط تیره (-) باشند."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid ""
@@ -8399,6 +8384,8 @@ msgid ""
 "Comma separated file that have username and user_email of the users that "
 "needs to be retired"
 msgstr ""
+"فایل جدا شده با کاما که دارای نام کاربری و ایمیل از کاربرانی است که باید "
+"بازنشسته شوند"
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -9068,6 +9055,18 @@ msgid ""
 "to date."
 msgstr ""
 "شما با موفقیت برنامۀ آموزشی خود را تغییر داده‌اید و تقویم شما روزآمد است."
+
+#: openedx/features/content_tagging/models/base.py wiki/models/article.py
+msgid "owner"
+msgstr "مالک"
+
+#: openedx/features/content_tagging/models/base.py
+msgid ""
+"Organization that is related to this taxonomy.If None, then this taxonomy is"
+" related to all organizations."
+msgstr ""
+"سازمانی که به این طبقه بندی مربوط می شود. اگر هیچ کدام، پس این طبقه بندی به "
+"همه سازمان ها مربوط می شود."
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
@@ -10293,6 +10292,9 @@ msgid ""
 "Copy the component location ID of a component from its Settings dialog in "
 "Studio."
 msgstr ""
+"شناسه‌های مکان مؤلفه، از همه مؤلفه‌های منبع، برای تعیین اینکه آیا محتوای این"
+" بلوک شرطی به یادگیرنده نشان داده می‌شود یا خیر، استفاده می‌شود. شناسه مکان "
+"کامپوننت یک جزء را از گفتگوی تنظیمات آن در استودیو کپی کنید."
 
 #: xmodule/conditional_block.py
 msgid "Conditional Attribute"
@@ -10303,6 +10305,8 @@ msgid ""
 "The attribute of the source components that determines whether a learner is "
 "shown the content of this conditional block."
 msgstr ""
+"ویژگی مؤلفه های منبع که تعیین می کند آیا محتوای این بلوک شرطی به یادگیرنده "
+"نشان داده می شود یا خیر."
 
 #: xmodule/conditional_block.py
 msgid "Conditional Value"
@@ -10313,6 +10317,8 @@ msgid ""
 "The value that the conditional attribute of the source components must match"
 " before a learner is shown the content of this conditional block."
 msgstr ""
+"مقداری که ویژگی شرطی مؤلفه‌های منبع باید با آن مطابقت داشته باشد، قبل از "
+"اینکه یادگیرنده محتوای این بلوک شرطی را نشان دهد."
 
 #: xmodule/conditional_block.py
 msgid "Blocked Content Message"
@@ -10326,6 +10332,10 @@ msgid ""
 "your message to give learners a direct link to required units. For example, "
 "'You must complete {link} before you can access this unit'."
 msgstr ""
+"پیامی که برای نمایش محتوای این بلوک شرطی در زمانی که همه شرایط برآورده نشده "
+"اند به زبان آموزان نشان داده می شود. {link} را در متن پیام خود قرار دهید تا "
+"به زبان آموزان پیوند مستقیمی به واحدهای مورد نیاز داده شود. به عنوان مثال، "
+"'شما باید {link} را تکمیل کنید تا بتوانید به این واحد دسترسی پیدا کنید'."
 
 #: xmodule/conditional_block.py
 #, python-brace-format
@@ -10373,7 +10383,7 @@ msgstr "تاریخی که ثبت‌نام برای این کلاس به پايا
 
 #: xmodule/course_block.py
 msgid "Start time when this block is visible"
-msgstr ""
+msgstr "زمان شروع وقتی که این بلوک قابل مشاهده است"
 
 #: xmodule/course_block.py
 msgid "Date that this class ends"
@@ -11056,7 +11066,7 @@ msgstr "شناسه آزمون ورودی"
 
 #: xmodule/course_block.py
 msgid "Content block identifier (location) of entrance exam."
-msgstr ""
+msgstr "شناسه بلوک محتوایی (مکان) آزمون."
 
 #: xmodule/course_block.py
 msgid "Social Media Sharing URL"
@@ -11256,7 +11266,7 @@ msgstr ""
 
 #: xmodule/course_block.py
 msgid "Video Sharing Options"
-msgstr ""
+msgstr "گزینه های اشتراک گذاری ویدیو"
 
 #: xmodule/course_block.py
 msgid ""
@@ -11264,16 +11274,21 @@ msgid ""
 "three values: 'all-on', 'all-off' and 'per-video'. with 'per-video' as the "
 "default."
 msgstr ""
+"گزینه های اشتراک گذاری ویدیو را برای دوره مشخص کنید. این را می توان روی یکی "
+"از سه مقدار تنظیم کرد: 'all-on', 'all-off' و 'per-video'. با 'per-video' به "
+"عنوان پیش فرض."
 
 #: xmodule/course_block.py
 msgid "Force Flexible Grading for Peer ORAs"
-msgstr ""
+msgstr "درجه بندی انعطاف پذیر اجباری برای ORA های همتا"
 
 #: xmodule/course_block.py
 msgid ""
 "Setting this flag will force on the flexible grading option for all peer-"
 "graded ORAs in this course."
 msgstr ""
+"تنظیم این flag گزینه درجه بندی انعطاف پذیر را برای همه ORAهای همتا در این "
+"دوره اعمال می کند."
 
 #: xmodule/course_block.py
 msgid "Course Instructor"
@@ -11440,7 +11455,7 @@ msgstr ""
 
 #: xmodule/html_block.py
 msgid "Html contents to display for this block"
-msgstr ""
+msgstr "محتوای Html برای نمایش برای این بلوک"
 
 #: xmodule/html_block.py
 msgid "Source code for LaTeX documents. This feature is not well-supported."
@@ -11522,6 +11537,8 @@ msgid ""
 "Enter the number of components to display to each student. Set it to -1 to "
 "display all components."
 msgstr ""
+"تعداد مؤلفه های مورد نیاز برای نمایش به هر دانش آموز را وارد کنید. آن را روی"
+" -1 تنظیم کنید تا همه اجزا نمایش داده شوند."
 
 #: xmodule/library_content_block.py
 msgid "Problem Type"
@@ -12090,13 +12107,15 @@ msgstr ""
 
 #: xmodule/modulestore/inheritance.py
 msgid "Tag this block as part of an Entrance Exam section"
-msgstr ""
+msgstr "این بلوک را به عنوان بخشی از یک بخش آزمون ورودی تگ کنید"
 
 #: xmodule/modulestore/inheritance.py
 msgid ""
 "Enter true or false. If true, answer submissions for problem blocks will be "
 "considered in the Entrance Exam scoring/gating algorithm."
 msgstr ""
+"درست یا نادرست را وارد کنید. اگر درست باشد، پاسخ‌های ارسالی برای بلوک‌های "
+"مشکل در الگوریتم نمره‌دهی/دریافت آزمون ورودی در نظر گرفته می‌شود."
 
 #: xmodule/modulestore/xml_importer.py
 msgid "Error while reading {}. Check file for XML errors."
@@ -12104,7 +12123,7 @@ msgstr "خطا هنگام خواندن {}. پرونده را برای خطاها
 
 #: xmodule/modulestore/xml_importer.py
 msgid "Failed to import block: {} at location: {}"
-msgstr ""
+msgstr "بلوک وارد نشد: {} در مکان: {}"
 
 #: xmodule/partitions/enrollment_track_partition_generator.py
 #: cms/templates/group_configurations.html
@@ -12160,6 +12179,8 @@ msgid ""
 "Tag this course block as an Entrance Exam. Note, you must enable Entrance "
 "Exams for this course setting to take effect."
 msgstr ""
+"این بلوک درس را به عنوان یک آزمون ورودی تگ کنید. توجه داشته باشید، برای "
+"اعمال تنظیمات این دوره، باید Entrance Exams را فعال کنید."
 
 #: xmodule/seq_block.py
 msgid "Is Time Limited"
@@ -12296,7 +12317,7 @@ msgstr "پیکربندی گروه"
 
 #: xmodule/split_test_block.py
 msgid "Which child block students in a particular group_id should see"
-msgstr ""
+msgstr "کدام بلوک دانش آموزان را در این group-id مشخص باید دید"
 
 #: xmodule/split_test_block.py
 #, python-brace-format
@@ -12371,6 +12392,8 @@ msgid ""
 "Here's a fun clip from a class I'm taking on {social_account_handle} from {organization_name}.\n"
 "\n"
 msgstr ""
+"این یک کلیپ سرگرم کننده از کلاسی است که من در {social_account_handle} از {organization_name} شرکت می کنم.\n"
+"\n"
 
 #: xmodule/video_block/sharing_sites.py
 #, python-brace-format
@@ -12378,6 +12401,8 @@ msgid ""
 "Here's a fun clip from a class I'm taking on {social_account_handle}.\n"
 "\n"
 msgstr ""
+"این یک کلیپ سرگرم کننده از کلاسی است که در {social_account_handle} شرکت می کنم.\n"
+"\n"
 
 #: xmodule/video_block/sharing_sites.py
 #, python-brace-format
@@ -12385,6 +12410,8 @@ msgid ""
 "Here's a fun clip from a class I'm taking from {organization_name}.\n"
 "\n"
 msgstr ""
+"این یک کلیپ سرگرم کننده از کلاسی است که من از {organization_name} می خوانم.\n"
+"\n"
 
 #: xmodule/video_block/sharing_sites.py
 #, python-brace-format
@@ -12392,11 +12419,13 @@ msgid ""
 "Here's a fun clip from a class I'm taking on {platform_name}.\n"
 "\n"
 msgstr ""
+"این یک کلیپ سرگرم کننده از کلاسی است که در {platform_name} شرکت می کنم.\n"
+"\n"
 
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid "Can't get transcript link from Youtube for {youtube_id}."
-msgstr ""
+msgstr "پیوند رونوشت از YouTube برای {youtube_id} دریافت نمی‌شود."
 
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
@@ -12832,6 +12861,17 @@ msgstr "درخواست بازتولید همه طرح درس دوره‌های �
 msgid "Regenerate *all* course outlines"
 msgstr "بازتولید *همه* طرح‌ درس‌ها"
 
+#: cms/djangoapps/contentstore/asset_storage_handlers.py
+msgid "Upload completed"
+msgstr "بارگذاری کامل شد"
+
+#: cms/djangoapps/contentstore/asset_storage_handlers.py
+#, python-brace-format
+msgid ""
+"File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
+msgstr ""
+"اندازۀ پروندۀ  {filename} بیش از{maximum_size_in_megabytes} مگابایت است"
+
 #: cms/djangoapps/contentstore/course_group_config.py
 msgid ""
 "The groups in this configuration can be mapped to cohorts in the Instructor "
@@ -13089,6 +13129,10 @@ msgstr "درست است برای پنهان‌سازی برگه و نادرست�
 msgid "Change the visibility of tabs in a course."
 msgstr "نمایان‌بودن زبانه‌ها را در یک دوره آموزشی تغییر دهید."
 
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+msgid "The information you entered is incorrect."
+msgstr "اطلاعاتی ورودی، نادرست است."
+
 #: cms/djangoapps/contentstore/utils.py cms/templates/visibility_editor.html
 msgid "Deleted Group"
 msgstr "گروه حذف‌شده"
@@ -13116,6 +13160,123 @@ msgstr "کپی '{0}' "
 #: cms/djangoapps/contentstore/utils.py
 msgid "Invalid prerequisite course key"
 msgstr "کلید دوره پیش‌نیاز معتبر نیست"
+
+#. #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
+#. Translators: This is the status of an active video upload
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#: cms/templates/import.html
+msgid "Uploading"
+msgstr "در حال بارگذاری..."
+
+#. Translators: This is the status for a video that the servers are currently
+#. processing
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "In Progress"
+msgstr "درحال پیشرفت"
+
+#. Translators: This is the status for a video that is uploaded completely
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Uploaded"
+msgstr "بارگذاری شد"
+
+#. Translators: This is the status for a video that the servers have failed to
+#. process
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Failed"
+msgstr "ناموفق"
+
+#. Translators: This is the status for a video that is cancelled during upload
+#. by user
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Cancelled"
+msgstr "لغو شد"
+
+#. Translators: This is the status for a video which has failed
+#. due to being flagged as a duplicate by an external or internal CMS
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Failed Duplicate"
+msgstr "تکرار موفق نبود"
+
+#. Translators: This is the status for a video which has duplicate token for
+#. youtube
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "YouTube Duplicate"
+msgstr "YouTube تکراری"
+
+#. Translators: This is the status for a video for which an invalid
+#. processing token was provided in the course settings
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Invalid Token"
+msgstr "کد معتبر نیست"
+
+#. Translators: This is the status for a video that was included in a course
+#. import
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Imported"
+msgstr "واردشده به سامانه"
+
+#. Translators: This is the status for a video that is in an unknown state
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Unknown"
+msgstr "ناشناخته"
+
+#. Translators: This is the status for a video that is having its
+#. transcription in progress on servers
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Transcription in Progress"
+msgstr "زیرنویس در جریان است"
+
+#. Translators: This is the status for a video whose transcription is complete
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Transcript Ready"
+msgstr "زیرنویس آماده است"
+
+#. Translators: This is the status for a video whose transcription job was
+#. failed for some languages
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Partial Failure"
+msgstr "تاحدی ناموفق "
+
+#. Translators: This is the status for a video whose transcription job has
+#. failed altogether
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Transcript Failed"
+msgstr "متن زیرنویس رد شد"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "An image file is required."
+msgstr "فایل تصویری ضروری است."
+
+#. Translators: This is the header for a CSV file column
+#. containing URLs for video encodings for the named profile
+#. (e.g. desktop, mobile high quality, mobile low quality)
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#, python-brace-format
+msgid "{profile_name} URL"
+msgstr "نشانی اینترنتی {profile_name}"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Duration"
+msgstr "مدت زمان"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Date Added"
+msgstr "تاریخ اضافه شدن"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Status"
+msgstr "وضعیت"
+
+#. Translators: This is the suggested filename when downloading the URL
+#. listing for videos uploaded through Studio
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#, python-brace-format
+msgid "{course}_video_urls"
+msgstr "{course}_آدرس_فیلم"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "A non zero positive integer is expected"
+msgstr "عددی صحیح به غیر از صفر مجاز است."
 
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
@@ -13170,17 +13331,6 @@ msgid ""
 msgstr ""
 "نام پروندۀ تصویری باید شامل حروف، اعداد، خط فاصله (-) و زیر خط (_) باشد."
 
-#: cms/djangoapps/contentstore/views/assets.py
-msgid "Upload completed"
-msgstr "بارگذاری کامل شد"
-
-#: cms/djangoapps/contentstore/views/assets.py
-#, python-brace-format
-msgid ""
-"File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
-msgstr ""
-"اندازۀ پروندۀ  {filename} بیش از{maximum_size_in_megabytes} مگابایت است"
-
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "must have name of the certificate"
 msgstr "باید نام گواهی را همراه داشته باشد"
@@ -13210,7 +13360,7 @@ msgstr "محتوای کتابخانه"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Drag and Drop"
-msgstr ""
+msgstr "بکش و رهاکن "
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
@@ -13357,13 +13507,9 @@ msgstr "\"{organization_key}\" شناسۀ سازمانی معتبری نیست."
 msgid "Access restricted to: {list_of_groups}"
 msgstr "دسترسی محدود شد به: {list_of_groups}"
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-msgid "The information you entered is incorrect."
-msgstr "اطلاعاتی ورودی، نادرست است."
-
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Transcripts are supported only for \"video\" blocks."
-msgstr ""
+msgstr "رونوشت‌ها فقط برای بلوک‌های «ویدئو» پشتیبانی می‌شوند."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Cannot find item by locator."
@@ -13439,143 +13585,18 @@ msgid "You may not remove the last Admin. Add another Admin first."
 msgstr ""
 "شما نمی‌توانید آخرین مدیر را حذف کنید. لازم است ابتدا مدیر دیگری بیفزایید."
 
-#. #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
-#. Translators: This is the status of an active video upload
-#: cms/djangoapps/contentstore/views/videos.py cms/templates/import.html
-msgid "Uploading"
-msgstr "در حال بارگذاری..."
-
-#. Translators: This is the status for a video that the servers are currently
-#. processing
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "In Progress"
-msgstr "درحال پیشرفت"
-
-#. Translators: This is the status for a video that is uploaded completely
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Uploaded"
-msgstr "بارگذاری شد"
-
-#. Translators: This is the status for a video that the servers have failed to
-#. process
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Failed"
-msgstr "ناموفق"
-
-#. Translators: This is the status for a video that is cancelled during upload
-#. by user
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Cancelled"
-msgstr "لغو شد"
-
-#. Translators: This is the status for a video which has failed
-#. due to being flagged as a duplicate by an external or internal CMS
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Failed Duplicate"
-msgstr "تکرار موفق نبود"
-
-#. Translators: This is the status for a video which has duplicate token for
-#. youtube
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "YouTube Duplicate"
-msgstr "YouTube تکراری"
-
-#. Translators: This is the status for a video for which an invalid
-#. processing token was provided in the course settings
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Invalid Token"
-msgstr "کد معتبر نیست"
-
-#. Translators: This is the status for a video that was included in a course
-#. import
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Imported"
-msgstr "واردشده به سامانه"
-
-#. Translators: This is the status for a video that is in an unknown state
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Unknown"
-msgstr "ناشناخته"
-
-#. Translators: This is the status for a video that is having its
-#. transcription in progress on servers
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Transcription in Progress"
-msgstr "زیرنویس در جریان است"
-
-#. Translators: This is the status for a video whose transcription is complete
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Transcript Ready"
-msgstr "زیرنویس آماده است"
-
-#. Translators: This is the status for a video whose transcription job was
-#. failed for some languages
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Partial Failure"
-msgstr "تاحدی ناموفق "
-
-#. Translators: This is the status for a video whose transcription job has
-#. failed altogether
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Transcript Failed"
-msgstr "متن زیرنویس رد شد"
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "An image file is required."
-msgstr "فایل تصویری ضروری است."
-
-#. Translators: This is the header for a CSV file column
-#. containing URLs for video encodings for the named profile
-#. (e.g. desktop, mobile high quality, mobile low quality)
-#: cms/djangoapps/contentstore/views/videos.py
-#, python-brace-format
-msgid "{profile_name} URL"
-msgstr "نشانی اینترنتی {profile_name}"
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Duration"
-msgstr "مدت زمان"
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Date Added"
-msgstr "تاریخ اضافه شدن"
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Status"
-msgstr "وضعیت"
-
-#. Translators: This is the suggested filename when downloading the URL
-#. listing for videos uploaded through Studio
-#: cms/djangoapps/contentstore/views/videos.py
-#, python-brace-format
-msgid "{course}_video_urls"
-msgstr "{course}_آدرس_فیلم"
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "A non zero positive integer is expected"
-msgstr "عددی صحیح به غیر از صفر مجاز است."
-
 #: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Libraries cannot have more than {limit} components"
 msgstr "کتابخانه‌ها نمی‌توانند بیش از {limit} مؤلفه داشته باشند"
 
 #: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
-msgid "Invalid data"
-msgstr "داده معتبر نیست"
-
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
-#, python-brace-format
-msgid "Invalid data ({details})"
-msgstr "داده معتبر ({details}) نیست"
-
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "There was a problem pasting your component."
-msgstr ""
+msgstr "در الصاق مؤلفه شما مشکلی پیش آمد."
 
 #: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "Your clipboard is empty or invalid."
-msgstr ""
+msgstr "کلیپ بورد شما خالی یا نامعتبر است."
 
 #: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
@@ -14051,7 +14072,7 @@ msgstr "نشانه‌گذاری این صفحه"
 
 #: lms/templates/conditional_block.html
 msgid "You do not have access to this dependency block."
-msgstr ""
+msgstr "شما به این بلوک وابستگی دسترسی ندارید."
 
 #: lms/templates/course.html
 msgid "LEARN MORE"
@@ -14578,15 +14599,15 @@ msgstr "بازگشت به %s"
 
 #: lms/templates/public_video.html
 msgid "Learn more about this course"
-msgstr ""
+msgstr "درباره این دوره بیشتر بدانید"
 
 #: lms/templates/public_video.html
 msgid "Go to course"
-msgstr ""
+msgstr "برو به دوره"
 
 #: lms/templates/public_video.html
 msgid "Enroll in this course"
-msgstr ""
+msgstr "در این دوره ثبت نام کنید"
 
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
@@ -14844,15 +14865,15 @@ msgstr "صفحه بعدی"
 
 #: lms/templates/studio_render_children_view.html
 msgid "Paste Component"
-msgstr ""
+msgstr "چسباندن مولفه"
 
 #: lms/templates/studio_render_children_view.html
 msgid "From:"
-msgstr ""
+msgstr "از جانب:"
 
 #: lms/templates/studio_render_children_view.html
 msgid "What's in my clipboard?"
-msgstr ""
+msgstr "در کلیپ بورد من چیست؟"
 
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
@@ -14982,15 +15003,15 @@ msgstr "بارگیری پرونده تصویری"
 
 #: lms/templates/video.html
 msgid "Share this video"
-msgstr ""
+msgstr "این ویدئو را به اشتراک بگذارید"
 
 #: lms/templates/video.html
 msgid "Share on {site}"
-msgstr ""
+msgstr "در {site} به اشتراک بگذارید"
 
 #: lms/templates/video.html
 msgid "Copy"
-msgstr ""
+msgstr "کپی "
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -16745,6 +16766,11 @@ msgid "You are enrolled in this course"
 msgstr "شما در این دوره آموزشی ثبت‌نام کرده‌اید"
 
 #: lms/templates/courseware/course_about.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
+msgid "View Course"
+msgstr "مشاهده دوره آموزشی"
+
+#: lms/templates/courseware/course_about.html
 msgid "Enrollment in this course is by invitation only"
 msgstr "ثبت‌نام در این کلاس فقط با دعوت مجاز است"
 
@@ -18377,7 +18403,7 @@ msgstr "مدارس"
 
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Register for free"
-msgstr ""
+msgstr "عضویت رایگان"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Profile"
@@ -19335,6 +19361,27 @@ msgid "Add Staff"
 msgstr "افزودن همکار"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Limited Staff"
+msgstr "پرسنل محدود"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"Course team members with the Limited Staff role help you manage your course."
+" Limited Staff can enroll and unenroll learners, as well as modify their "
+"grades and access all course data. Limited Staff don't have access to your "
+"course in Studio. You can only give course team roles to enrolled users."
+msgstr ""
+"اعضای تیم دوره با نقش کارکنان محدود به شما در مدیریت دوره کمک می کنند. "
+"کارکنان محدود می توانند یادگیرندگان را ثبت نام کنند و از ثبت نام خارج کنند، "
+"همچنین نمرات آنها را تغییر دهند و به همه داده های دوره دسترسی داشته باشند. "
+"کارکنان محدود به دوره شما در استودیو دسترسی ندارند. شما فقط می توانید نقش "
+"های تیم دوره را به کاربران ثبت نام شده بدهید."
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Add Limited Staff"
+msgstr "کارکنان محدود را اضافه کنید"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Admin"
 msgstr "مدیر"
 
@@ -19557,6 +19604,8 @@ msgid ""
 "You can include keywords in your messages. For list of available keywords "
 "see the {start_link}documentation{end_link}."
 msgstr ""
+"می توانید کلمات کلیدی را در پیام های خود قرار دهید. برای فهرست کلمات کلیدی "
+"موجود به {start_link}مستندات {end_link} مراجعه کنید."
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"
@@ -21340,6 +21389,8 @@ msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
 "{unit_link} as the URL value."
 msgstr ""
+"برای ایجاد پیوند به این واحد از یک جزء HTML در این دوره، {unit_link} به "
+"عنوان مقدار URL وارد کنید."
 
 #: cms/templates/course-create-rerun.html
 msgid "Create a Course Rerun of:"
@@ -21528,14 +21579,16 @@ msgid ""
 "order to display the discussions sidebar, discussions xBlocks will no longer"
 " be visible to learners."
 msgstr ""
+"این دوره از نسخه ارتقا یافته انجمن گفتگوی edx استفاده می کند. برای نمایش "
+"نوار کناری بحث‌ها، xBlocks بحث دیگر برای فراگیران قابل مشاهده نخواهد بود."
 
 #: cms/templates/course_outline.html
 msgid " Learn more"
-msgstr ""
+msgstr "بیشتر بدانید"
 
 #: cms/templates/course_outline.html
 msgid "Share feedback"
-msgstr ""
+msgstr "اشتراک‌گذاری بازخورد"
 
 #: cms/templates/course_outline.html
 #: cms/templates/widgets/deprecated-course-key-warning.html
@@ -24234,11 +24287,11 @@ msgstr "تنظیم دسترسی"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"
-msgstr ""
+msgstr "کپی به کلیپ بورد"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"
-msgstr ""
+msgstr "مدیریت دسترسی"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
@@ -24599,7 +24652,7 @@ msgstr "طرح کلی"
 
 #: cms/templates/widgets/header.html
 msgid "Files & Media"
-msgstr ""
+msgstr "فایل ها و رسانه ها"
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"
@@ -24949,10 +25002,6 @@ msgstr "تغییریافته"
 #: wiki/models/article.py
 msgid "Article properties last modified"
 msgstr "آخرین تغییرات ویژگی‌های مقاله"
-
-#: wiki/models/article.py
-msgid "owner"
-msgstr "مالک"
 
 #: wiki/models/article.py
 msgid ""

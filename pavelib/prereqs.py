@@ -128,6 +128,23 @@ def node_prereqs_installation():
     """
     Configures npm and installs Node prerequisites
     """
+    # Before July 2023, these directories were created and written to
+    # as root. Afterwards, they are created as being owned by the
+    # `app` user -- but also need to be deleted by that user (due to
+    # how npm runs post-install scripts.) Developers with an older
+    # devstack installation who are reprovisioning will see errors
+    # here if the files are still owned by root. Deleting the files in
+    # advance prevents this error.
+    #
+    # This hack should probably be left in place for at least a year.
+    # See ADR 17 for more background on the transition.
+    sh("rm -rf common/static/common/js/vendor/ common/static/common/css/vendor/")
+    # At the time of this writing, the js dir has git-versioned files
+    # but the css dir does not, so the latter would have been created
+    # as root-owned (in the process of creating the vendor
+    # subdirectory). Delete it only if empty, just in case
+    # git-versioned files are added later.
+    sh("rmdir common/static/common/css || true")
 
     # NPM installs hang sporadically. Log the installation process so that we
     # determine if any packages are chronic offenders.
@@ -177,7 +194,7 @@ def install_node_prereqs():
         print(NO_PREREQ_MESSAGE)
         return
 
-    prereq_cache("Node prereqs", ["package.json"], node_prereqs_installation)
+    prereq_cache("Node prereqs", ["package.json", "package-lock.json"], node_prereqs_installation)
 
 
 # To add a package to the uninstall list, just add it to this list! No need

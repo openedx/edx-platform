@@ -6,6 +6,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {StatusAlert} from '@edx/paragon/static';
 
+// eslint-disable-next-line import/prefer-default-export
 export class StatusAlertRenderer {
     constructor(message, selector, afterselector) {
         this.shiftFocus = this.shiftFocus.bind(this);
