@@ -1,4 +1,4 @@
-.# Version constraints for pip-installation.
+# Version constraints for pip-installation.
 #
 # This file doesn't install any packages. It specifies version constraints
 # that will be applied if a package is needed.
