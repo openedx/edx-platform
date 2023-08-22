@@ -356,6 +356,15 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
         showXBlockActionsMenu: function(event) {
             const showActionsButton = event.currentTarget;
             const subMenu = showActionsButton.parentElement.querySelector('.wrapper-nav-sub');
+
+            // Close all open dropdowns
+            const elements = document.querySelectorAll("li.action-item.action-actions-menu.nav-item");
+            elements.forEach(element => {
+                if (element !== showActionsButton.parentElement) {
+                    element.querySelector('.wrapper-nav-sub').classList.remove('is-shown');
+                }
+            });
+
             // Code in 'base.js' normally handles toggling these dropdowns but since this one is
             // not present yet during the domReady event, we have to handle displaying it ourselves.
             subMenu.classList.toggle('is-shown');

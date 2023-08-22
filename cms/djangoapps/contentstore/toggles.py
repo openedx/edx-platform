@@ -198,17 +198,17 @@ def individualize_anonymous_user_id(course_id):
     return INDIVIDUALIZE_ANONYMOUS_USER_ID.is_enabled(course_id)
 
 
-# .. toggle_name: contentstore.enable_copy_paste_feature
+# .. toggle_name: contentstore.enable_copy_paste_units
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: Moves most component-level actions into a submenu and adds new "Copy Component" and "Paste
-#   Component" actions which can be used to copy components (XBlocks) within or among courses.
+# .. toggle_description: Moves most unit-level actions into a submenu and adds new "Copy Unit" and "Paste
+#   Unit" actions which can be used to copy units within or among courses.
 # .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-02-28
-# .. toggle_target_removal_date: 2023-05-01
+# .. toggle_creation_date: 2023-08-01
+# .. toggle_target_removal_date: 2023-10-01
 # .. toggle_tickets: https://github.com/openedx/modular-learning/issues/11 https://github.com/openedx/modular-learning/issues/50
-ENABLE_COPY_PASTE_FEATURE = WaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.enable_copy_paste_feature',
+ENABLE_COPY_PASTE_UNITS = WaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.enable_copy_paste_units',
     __name__,
     CONTENTSTORE_LOG_PREFIX,
 )

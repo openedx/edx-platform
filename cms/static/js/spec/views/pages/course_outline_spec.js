@@ -313,7 +313,7 @@ describe('CourseOutlinePage', function() {
             'staff-lock-editor', 'unit-access-editor', 'discussion-editor', 'content-visibility-editor',
             'settings-modal-tabs', 'timed-examination-preference-editor', 'access-editor',
             'show-correctness-editor', 'highlights-editor', 'highlights-enable-editor',
-            'course-highlights-enable', 'course-video-sharing-enable'
+            'course-highlights-enable', 'course-video-sharing-enable', 'summary-configuration-editor'
         ]);
         appendSetFixtures(mockOutlinePage);
         mockCourseJSON = createMockCourseJSON({}, [
@@ -2489,6 +2489,41 @@ describe('CourseOutlinePage', function() {
                 outlinePage.$('.outline-unit .configure-button').click();
                 expect($('.modal-section .edit-discussion')).not.toExist();
             });
+        });
+
+        describe('summary configuration', function() {
+            it('hides summary configuration settings if summary_configuration_enabled is not a boolean', function() {
+                getUnitStatus({summary_configuration_enabled: null});
+                outlinePage.$('.outline-unit .configure-button').click();
+                expect($('.modal-section .summary-configuration')).not.toExist();
+            });
+
+            it('shows summary configuration settings if summary_configuration_enabled is true', function() {
+                getUnitStatus({summary_configuration_enabled: true});
+                outlinePage.$('.outline-unit .configure-button').click();
+                expect($('.modal-section .summary-configuration')).toExist();
+            });
+
+            it('shows summary configuration settings if summary_configuration_enabled is false', function() {
+                getUnitStatus({summary_configuration_enabled: false});
+                outlinePage.$('.outline-unit .configure-button').click();
+                expect($('.modal-section .summary-configuration')).toExist();
+            });
+
+            it('can be updated', function() {
+                getUnitStatus({summary_configuration_enabled: false});
+                outlinePage.$('.outline-unit .configure-button').click();
+                expect($('#summary_configuration_enabled').is(':checked')).toBe(false);
+                $('#summary_configuration_enabled').prop('checked', true).trigger('change');
+                $('.wrapper-modal-window .action-save').click();
+                AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-unit', {
+                    summary_configuration_enabled: true,
+                    publish: 'republish',
+                    metadata: {
+                        visible_to_staff_only: null,
+                    }
+                });
+            })
         });
 
         verifyTypePublishable('unit', function(options) {
