@@ -101,20 +101,16 @@ def get_taxonomies_for_org(
 
 
 def get_content_tags(
-    object_id: str, taxonomy: Taxonomy = None, valid_only=True
+    object_id: str, taxonomy_id: str = None
 ) -> Iterator[ContentObjectTag]:
     """
     Generates a list of content tags for a given object.
 
     Pass taxonomy to limit the returned object_tags to a specific taxonomy.
-
-    Pass valid_only=False when displaying tags to content authors, so they can see invalid tags too.
-    Invalid tags will (probably) be hidden from learners.
     """
     for object_tag in oel_tagging.get_object_tags(
         object_id=object_id,
-        taxonomy=taxonomy,
-        valid_only=valid_only,
+        taxonomy_id=taxonomy_id,
     ):
         yield ContentObjectTag.cast(object_tag)
 

@@ -60,6 +60,7 @@ attrs==23.1.0
     #   lti-consumer-xblock
     #   openedx-blockstore
     #   openedx-events
+    #   openedx-learning
     #   referencing
 babel==2.11.0
     # via
@@ -125,6 +126,7 @@ celery==5.3.1
     #   edx-celeryutils
     #   edx-enterprise
     #   event-tracking
+    #   openedx-learning
 certifi==2023.7.22
     # via
     #   -r requirements/edx/base.txt
