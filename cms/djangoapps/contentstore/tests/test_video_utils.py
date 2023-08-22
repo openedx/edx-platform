@@ -417,7 +417,6 @@ class S3Boto3TestCase(TestCase):
         obj.upload_fileobj.assert_called_with(
             content,
             ExtraArgs={
-                'ACL': 'public-read',   # it will come from 1.9.1
                 'ContentType': 'text/plain',
             }
         )
