@@ -105,7 +105,7 @@ class FunixRelativeDateLibary():
 			print('=====completed_assignments======', asm.title , asm.block_key, index, last_complete_date)
 			index += 1
 			last_complete_date = asm.complete_date
-			relativate_date = FunixRelativeDate.objects.filter(user_id=user.id, course_id=str(course_id), block_id=el.block_key, type='block', index=index)[0]
+			relativate_date = FunixRelativeDate.objects.filter(user_id=user.id, course_id=str(course_id), block_id=asm.block_key, type='block', index=index)[0]
 			if relativate_date:
 				relativate_date = relativate_date[0]
 				print('relativate_date:')
