@@ -754,7 +754,7 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     """
     # In this case, we are using Session based authentication, so we need to check CSRF token.
     if request.user.is_authenticated:
-        error = CsrfViewMiddleware().process_view(request, None, (), {})
+        error = CsrfViewMiddleware(get_response=lambda request: None).process_view(request, None, (), {})
         if error:
             return error
 

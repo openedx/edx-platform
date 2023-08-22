@@ -155,9 +155,6 @@ BLOCK_STRUCTURES_SETTINGS = dict(
 
     # Maximum number of retries per task.
     TASK_MAX_RETRIES=5,
-
-    # Backend storage options
-    PRUNING_ACTIVE=False,
 )
 
 ############################ FEATURE CONFIGURATION #############################

@@ -54,9 +54,13 @@ RUN apt-get update && \
         python3-venv \
         python3.8 \
         python3.8-minimal \
+        # python3-dev: required for building mysqlclient python package version 2.2.0
+        python3-dev \
         libpython3.8 \
         libpython3.8-stdlib \
         libmysqlclient21 \
+        # libmysqlclient-dev: required for building mysqlclient python package version 2.2.0
+        libmysqlclient-dev \
         pkg-config \
         libssl1.1 \
         libxmlsec1-openssl \
@@ -86,13 +90,10 @@ FROM minimal-system as builder-production
 RUN apt-get update && \
     apt-get -y install --no-install-recommends \
         curl \
-        pkg-config \
-        libmysqlclient-dev \
         libssl-dev \
         libxml2-dev \
         libxmlsec1-dev \
         libxslt1-dev \
-        python3-dev \
         libffi-dev \
         libfreetype6-dev \
         libgeos-dev \

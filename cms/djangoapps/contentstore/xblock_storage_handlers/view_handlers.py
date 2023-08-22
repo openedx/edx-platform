@@ -40,6 +40,7 @@ from xblock.fields import Scope
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 from cms.djangoapps.contentstore.toggles import ENABLE_COPY_PASTE_UNITS
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
+from cms.lib.ai_aside_summary_config import AiAsideSummaryConfig
 from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.static_replace import replace_static_urls
 from common.djangoapps.student.auth import (
@@ -280,6 +281,7 @@ def modify_xblock(usage_key, request):
         prereq_min_completion=request_data.get("prereqMinCompletion"),
         publish=request_data.get("publish"),
         fields=request_data.get("fields"),
+        summary_configuration_enabled=request_data.get("summary_configuration_enabled"),
     )
 
 
@@ -354,6 +356,7 @@ def _save_xblock(  # lint-amnesty, pylint: disable=too-many-statements
     prereq_min_completion=None,
     publish=None,
     fields=None,
+    summary_configuration_enabled=None,
 ):
     """
     Saves xblock w/ its fields. Has special processing for grader_type, publish, and nullout and Nones in metadata.
@@ -529,6 +532,12 @@ def _save_xblock(  # lint-amnesty, pylint: disable=too-many-statements
         # Used by Bok Choy tests and by republishing of staff locks.
         if publish == "make_public":
             modulestore().publish(xblock.location, user.id)
+
+        # If summary_configuration_enabled is not None, use AIAsideSummary to update it.
+        if xblock.category == "vertical" and summary_configuration_enabled is not None:
+            AiAsideSummaryConfig(course.id).set_summary_settings(xblock.location, {
+                'enabled': summary_configuration_enabled
+            })
 
         # Note that children aren't being returned until we have a use case.
         return JsonResponse(result, encoder=EdxJSONEncoder)
@@ -1049,6 +1058,7 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
     user=None,
     course=None,
     is_concise=False,
+    summary_configuration=None,
 ):
     """
     Creates the information needed for client-side XBlockInfo.
@@ -1098,6 +1108,10 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
     should_visit_children = include_child_info and (
         course_outline and not is_xblock_unit or not course_outline
     )
+
+    if summary_configuration is None:
+        summary_configuration = AiAsideSummaryConfig(xblock.location.course_key)
+
     if should_visit_children and xblock.has_children:
         child_info = _create_xblock_child_info(
             xblock,
@@ -1107,6 +1121,7 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             user=user,
             course=course,
             is_concise=is_concise,
+            summary_configuration=summary_configuration,
         )
     else:
         child_info = None
@@ -1357,6 +1372,9 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             xblock, course=course
         )
 
+        if is_xblock_unit and summary_configuration.is_enabled():
+            xblock_info["summary_configuration_enabled"] = summary_configuration.is_summary_enabled(xblock_info['id'])
+
     return xblock_info
 
 
@@ -1550,6 +1568,7 @@ def _create_xblock_child_info(
     user=None,
     course=None,
     is_concise=False,
+    summary_configuration=None,
 ):
     """
     Returns information about the children of an xblock, as well as about the primary category
@@ -1576,6 +1595,7 @@ def _create_xblock_child_info(
                 user=user,
                 course=course,
                 is_concise=is_concise,
+                summary_configuration=summary_configuration,
             )
             for child in xblock.get_children()
         ]

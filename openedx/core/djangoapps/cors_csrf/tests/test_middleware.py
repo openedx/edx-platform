@@ -35,7 +35,7 @@ class TestCorsMiddlewareProcessRequest(TestCase):
     @override_settings(FEATURES={'ENABLE_CORS_HEADERS': True})
     def setUp(self):
         super().setUp()
-        self.middleware = CorsCSRFMiddleware()
+        self.middleware = CorsCSRFMiddleware(get_response=lambda request: None)
 
     def check_not_enabled(self, request):
         """
@@ -83,7 +83,7 @@ class TestCorsMiddlewareProcessRequest(TestCase):
     )
     def test_disabled_no_cors_headers(self):
         with pytest.raises(MiddlewareNotUsed):
-            CorsCSRFMiddleware()
+            CorsCSRFMiddleware(get_response=lambda request: None)
 
     @override_settings(CORS_ORIGIN_WHITELIST=['https://bar.com'])
     def test_disabled_wrong_cors_domain(self):
@@ -122,12 +122,12 @@ class TestCsrfCrossDomainCookieMiddleware(TestCase):
     )
     def setUp(self):
         super().setUp()
-        self.middleware = CsrfCrossDomainCookieMiddleware()
+        self.middleware = CsrfCrossDomainCookieMiddleware(get_response=lambda request: None)
 
     @override_settings(FEATURES={'ENABLE_CROSS_DOMAIN_CSRF_COOKIE': False})
     def test_disabled_by_feature_flag(self):
         with pytest.raises(MiddlewareNotUsed):
-            CsrfCrossDomainCookieMiddleware()
+            CsrfCrossDomainCookieMiddleware(get_response=lambda request: None)
 
     @ddt.data('CROSS_DOMAIN_CSRF_COOKIE_NAME', 'CROSS_DOMAIN_CSRF_COOKIE_DOMAIN')
     def test_improperly_configured(self, missing_setting):
@@ -140,7 +140,7 @@ class TestCsrfCrossDomainCookieMiddleware(TestCase):
 
         with override_settings(**settings):
             with pytest.raises(ImproperlyConfigured):
-                CsrfCrossDomainCookieMiddleware()
+                CsrfCrossDomainCookieMiddleware(get_response=lambda request: None)
 
     @override_settings(
         CROSS_DOMAIN_CSRF_COOKIE_NAME=COOKIE_NAME,
