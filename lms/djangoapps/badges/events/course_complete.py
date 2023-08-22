@@ -127,7 +127,7 @@ def course_badge_check(user, course_key):
     badgr_password = get_value_from_django_settings_override('BADGR_PASSWORD', None, site)
     badgr_flag = get_value_from_django_settings_override('BADGR_FLAG', False, site)
     badge_class = get_completion_badge(course_key, user)
-    LOGGER.info('badgr_flag "%s"', badgr_flag)
+
     if not badgr_flag or not badge_class:
         # We're not configured to make a badge for this course mode.
         return

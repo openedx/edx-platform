@@ -55,7 +55,6 @@ from student.models import LinkedInAddToProfileConfiguration
 from util import organizations_helpers as organization_api
 from util.date_utils import strftime_localized
 from util.views import handle_500
-from lms.djangoapps.badges.utils import badges_enabled
 
 log = logging.getLogger(__name__)
 _ = translation.ugettext
