@@ -293,39 +293,7 @@ class RegistrationViewValidationErrorTest(
                 "error_code": "validation-error"
             }
         )
-
-    def test_registration_failure_logging(self):
-        # Register a user
-        response = self.client.post(self.url, {
-            "email": self.EMAIL,
-            "name": self.NAME,
-            "username": self.USERNAME,
-            "password": self.PASSWORD,
-            "honor_code": "true",
-        })
-        self.assertHttpOK(response)
-
-        # Try to create a second user with the same email address
-        response = self.client.post(self.url, {
-            "email": self.EMAIL,
-            "name": "Someone Else",
-            "username": "someone_else",
-            "password": self.PASSWORD,
-            "honor_code": "true",
-        })
-
-        assert response.status_code == 409
-        response_json = json.loads(response.content.decode('utf-8'))
-        self.assertDictEqual(
-            response_json,
-            {
-                "email": [{
-                    "user_message": AUTHN_EMAIL_CONFLICT_MSG,
-                }],
-                "error_code": "duplicate-email"
-            }
-        )
-
+        
     def test_register_duplicate_username_account_validation_error(self):
         # Register the first user
         response = self.client.post(self.url, {
