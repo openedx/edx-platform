@@ -23,7 +23,7 @@
 # LIU,SHU-HAO <jeremy55662004@gmail.com>, 2014-2015
 # 8cdb4758e2f8f89e1b6f455d24a57c7b_26aedc9 <d42fecad8431def0e25dc12221e713ed_169300>, 2014
 # MOH CHIN LAM <chinlam91@gmail.com>, 2015
-# 區壬豪 <oldmon@livemail.tw>, 2014
+# Nicholas Ou <oldmon@livemail.tw>, 2014
 # Lin Yu-Chun <iftwoplustwoequalsfive@gmail.com>, 2013
 # Sarina Canelake <sarina@tcril.org>, 2014
 # Shawn Li <tp9106@gmail.com>, 2017
@@ -40,7 +40,7 @@
 # Zhen-Rong Chen <zhenrc@gmail.com>, 2014
 # Zhen-Rong Chen <zhenrc@gmail.com>, 2014-2015
 # Zhen-Rong Chen <zhenrc@gmail.com>, 2014
-# 區壬豪 <oldmon@livemail.tw>, 2020
+# Nicholas Ou <oldmon@livemail.tw>, 2020
 # KUN-MIN SYU <qwer20108@gmail.com>, 2014
 # 薛念林 <nlhsueh@mail.fcu.edu.tw>, 2016
 # 陳子琦 <christtabris@gmail.com>, 2014
@@ -132,7 +132,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-02 20:42+0000\n"
+"POT-Creation-Date: 2023-08-13 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Andrew Lau <alau52@yahoo.com>, 2017\n"
 "Language-Team: Chinese (Taiwan) (http://app.transifex.com/open-edx/edx-platform/language/zh_TW/)\n"
@@ -186,6 +186,7 @@ msgstr "刪除"
 #: cms/static/js/views/validation.js
 #: common/static/common/js/components/utils/view_utils.js
 #: lms/static/js/Markdown.Editor.js
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: xmodule/js/src/html/edit.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
@@ -2342,9 +2343,9 @@ msgstr "成功註冊以下使用者："
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"allowed to enroll once they register:"
-msgstr "成功發送登記電子郵件。一旦完成帳號註冊，以下使用者將被允許註冊課程："
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be allowed to enroll once they register:"
+msgstr ""
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -2354,9 +2355,9 @@ msgstr "一旦帳號註冊，以下使用者將被允許註冊課程："
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"enrolled once they register:"
-msgstr "成功發送課程註冊電子郵件。一旦完成帳號註冊，以下使用者將被註冊於課程中："
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be enrolled once they register:"
+msgstr ""
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -2752,6 +2753,10 @@ msgid ""
 "Links are generated on demand and expire within 5 minutes due to the "
 "sensitive nature of student information."
 msgstr "連結將在有需求時才產生，並僅維持5分鐘以維護學生訊息隱私。"
+
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
+msgid "You have access to the {enterpriseName} dashboard"
+msgstr ""
 
 #: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 msgid ""
@@ -9788,6 +9793,13 @@ msgstr ""
 #: cms/templates/js/course-outline.underscore
 msgid "Subsection is hidden after due date"
 msgstr "小節在截止日期後隱藏"
+
+#: cms/templates/js/course-outline.underscore
+#, python-format
+msgid ""
+"This subsection is configured as \\\"%(gradingType)s\\\", which doesn't "
+"exist in the current grading policy."
+msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore

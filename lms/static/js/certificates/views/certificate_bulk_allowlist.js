@@ -82,8 +82,8 @@
                     // inner function generate div and display response messages.
                     $('<div/>', {
                         class: 'message ' + group
-                    }).appendTo('.bulk-exception-results').prepend( // eslint-disable-line max-len, xss-lint: disable=javascript-jquery-insert-into-target,javascript-jquery-prepend
-                        "<button type='button' id= '" + group + "' class='arrow'> + </button>" + heading) // eslint-disable-line max-len, xss-lint: disable=javascript-concat-html
+                    }).appendTo('.bulk-exception-results').prepend( // xss-lint: disable=javascript-jquery-insert-into-target,javascript-jquery-prepend
+                        "<button type='button' id= '" + group + "' class='arrow'> + </button>" + heading) // xss-lint: disable=javascript-concat-html
                         .append($('<ul/>', {
                             class: group
                         }));
@@ -91,7 +91,7 @@
                     for (var i = 0; i < displayData.length; i++) { // eslint-disable-line vars-on-top
                         $('<li/>', {
                             text: displayData[i]
-                        }).appendTo('div.message > .' + group); // eslint-disable-line max-len, xss-lint: disable=javascript-jquery-insert-into-target
+                        }).appendTo('div.message > .' + group); // xss-lint: disable=javascript-jquery-insert-into-target
                     }
                     $('div.message > .' + group).hide();
                 }

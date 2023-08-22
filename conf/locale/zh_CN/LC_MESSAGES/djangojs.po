@@ -230,7 +230,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-06-23 10:50+0000\n"
+"POT-Creation-Date: 2023-08-13 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: jsgang <jsgang9@gmail.com>, 2015-2017,2020\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -284,6 +284,7 @@ msgstr "删除"
 #: cms/static/js/views/validation.js
 #: common/static/common/js/components/utils/view_utils.js
 #: lms/static/js/Markdown.Editor.js
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: xmodule/js/src/html/edit.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
@@ -2466,9 +2467,9 @@ msgstr "以下用户已经成功选课："
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"allowed to enroll once they register:"
-msgstr "选课邮件已成功发送至以下用户，他们注册后即可选课："
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be allowed to enroll once they register:"
+msgstr ""
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -2478,9 +2479,9 @@ msgstr "这些用户一旦注册即可选课："
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"enrolled once they register:"
-msgstr "选课邮件已成功发送至这些用户，他们注册后即已选课："
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be enrolled once they register:"
+msgstr ""
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -2885,6 +2886,10 @@ msgid ""
 "Links are generated on demand and expire within 5 minutes due to the "
 "sensitive nature of student information."
 msgstr "由于包含涉及学生的敏感信息，生成的链接将在5分钟后失效。"
+
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
+msgid "You have access to the {enterpriseName} dashboard"
+msgstr ""
 
 #: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 msgid ""
@@ -9957,6 +9962,13 @@ msgstr "结课日期过后隐藏小节"
 #: cms/templates/js/course-outline.underscore
 msgid "Subsection is hidden after due date"
 msgstr "截止日期过后隐藏小节"
+
+#: cms/templates/js/course-outline.underscore
+#, python-format
+msgid ""
+"This subsection is configured as \\\"%(gradingType)s\\\", which doesn't "
+"exist in the current grading policy."
+msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore

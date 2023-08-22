@@ -76,6 +76,15 @@ from opaque_keys.edx.locator import (
     LibraryUsageLocatorV2,
     LibraryLocator as LibraryLocatorV1
 )
+from openedx_events.content_authoring.data import ContentLibraryData, LibraryBlockData
+from openedx_events.content_authoring.signals import (
+    CONTENT_LIBRARY_CREATED,
+    CONTENT_LIBRARY_DELETED,
+    CONTENT_LIBRARY_UPDATED,
+    LIBRARY_BLOCK_CREATED,
+    LIBRARY_BLOCK_DELETED,
+    LIBRARY_BLOCK_UPDATED,
+)
 
 from organizations.models import Organization
 from xblock.core import XBlock
@@ -90,14 +99,7 @@ from openedx.core.djangoapps.content_libraries.models import (
     ContentLibraryPermission,
     ContentLibraryBlockImportTask,
 )
-from openedx.core.djangoapps.content_libraries.signals import (
-    CONTENT_LIBRARY_CREATED,
-    CONTENT_LIBRARY_UPDATED,
-    CONTENT_LIBRARY_DELETED,
-    LIBRARY_BLOCK_CREATED,
-    LIBRARY_BLOCK_UPDATED,
-    LIBRARY_BLOCK_DELETED,
-)
+
 from openedx.core.djangoapps.xblock.api import (
     get_block_display_name,
     get_learning_context_impl,
@@ -266,14 +268,6 @@ class LibraryBundleLink:
     # Opaque key: If the linked bundle is a library or other learning context whose opaque key we can deduce, then this
     # is the key. If we don't know what type of blockstore bundle this link is pointing to, then this is blank.
     opaque_key = attr.ib(type=LearningContextKey, default=None)
-
-
-class AccessLevel:  # lint-amnesty, pylint: disable=function-redefined
-    """ Enum defining library access levels/permissions """
-    ADMIN_LEVEL = ContentLibraryPermission.ADMIN_LEVEL
-    AUTHOR_LEVEL = ContentLibraryPermission.AUTHOR_LEVEL
-    READ_LEVEL = ContentLibraryPermission.READ_LEVEL
-    NO_ACCESS = None
 
 
 # General APIs
@@ -460,7 +454,11 @@ def create_library(
         )
     except IntegrityError:
         raise LibraryAlreadyExists(slug)  # lint-amnesty, pylint: disable=raise-missing-from
-    CONTENT_LIBRARY_CREATED.send(sender=None, library_key=ref.library_key)
+    CONTENT_LIBRARY_CREATED.send_event(
+        content_library=ContentLibraryData(
+            library_key=ref.library_key
+        )
+    )
     return ContentLibraryMetadata(
         key=ref.library_key,
         bundle_uuid=bundle.uuid,
@@ -610,7 +608,11 @@ def update_library(
         assert isinstance(description, str)
         fields["description"] = description
     update_bundle(ref.bundle_uuid, **fields)
-    CONTENT_LIBRARY_UPDATED.send(sender=None, library_key=ref.library_key)
+    CONTENT_LIBRARY_UPDATED.send_event(
+        content_library=ContentLibraryData(
+            library_key=ref.library_key
+        )
+    )
 
 
 def delete_library(library_key):
@@ -625,7 +627,11 @@ def delete_library(library_key):
     # system, which is a better state than having a reference to a library with
     # no backing blockstore bundle.
     ref.delete()
-    CONTENT_LIBRARY_DELETED.send(sender=None, library_key=ref.library_key)
+    CONTENT_LIBRARY_DELETED.send_event(
+        content_library=ContentLibraryData(
+            library_key=ref.library_key
+        )
+    )
     try:
         delete_bundle(bundle_uuid)
     except:
@@ -762,7 +768,12 @@ def set_library_block_olx(usage_key, new_olx_str):
     write_draft_file(draft.uuid, metadata.def_key.olx_path, new_olx_str.encode('utf-8'))
     # Clear the bundle cache so everyone sees the new block immediately:
     BundleCache(metadata.def_key.bundle_uuid, draft_name=DRAFT_NAME).clear()
-    LIBRARY_BLOCK_UPDATED.send(sender=None, library_key=usage_key.context_key, usage_key=usage_key)
+    LIBRARY_BLOCK_UPDATED.send_event(
+        library_block=LibraryBlockData(
+            library_key=usage_key.context_key,
+            usage_key=usage_key
+        )
+    )
 
 
 def create_library_block(library_key, block_type, definition_id):
@@ -811,7 +822,12 @@ def create_library_block(library_key, block_type, definition_id):
     # Clear the bundle cache so everyone sees the new block immediately:
     BundleCache(ref.bundle_uuid, draft_name=DRAFT_NAME).clear()
     # Now return the metadata about the new block:
-    LIBRARY_BLOCK_CREATED.send(sender=None, library_key=ref.library_key, usage_key=usage_key)
+    LIBRARY_BLOCK_CREATED.send_event(
+        library_block=LibraryBlockData(
+            library_key=ref.library_key,
+            usage_key=usage_key
+        )
+    )
     return get_library_block(usage_key)
 
 
@@ -864,7 +880,12 @@ def delete_library_block(usage_key, remove_from_parent=True):
         pass
     # Clear the bundle cache so everyone sees the deleted block immediately:
     lib_bundle.cache.clear()
-    LIBRARY_BLOCK_DELETED.send(sender=None, library_key=lib_bundle.library_key, usage_key=usage_key)
+    LIBRARY_BLOCK_DELETED.send_event(
+        library_block=LibraryBlockData(
+            library_key=lib_bundle.library_key,
+            usage_key=usage_key
+        )
+    )
 
 
 def create_library_block_child(parent_usage_key, block_type, definition_id):
@@ -888,7 +909,12 @@ def create_library_block_child(parent_usage_key, block_type, definition_id):
     parent_block.runtime.add_child_include(parent_block, include_data)
     parent_block.save()
     ref = ContentLibrary.objects.get_by_key(parent_usage_key.context_key)
-    LIBRARY_BLOCK_UPDATED.send(sender=None, library_key=ref.library_key, usage_key=metadata.usage_key)
+    LIBRARY_BLOCK_UPDATED.send_event(
+        library_block=LibraryBlockData(
+            library_key=ref.library_key,
+            usage_key=metadata.usage_key
+        )
+    )
     return metadata
 
 
@@ -938,7 +964,12 @@ def add_library_block_static_asset_file(usage_key, file_name, file_content):
     file_metadata = blockstore_cache.get_bundle_file_metadata_with_cache(
         bundle_uuid=def_key.bundle_uuid, path=file_path, draft_name=DRAFT_NAME,
     )
-    LIBRARY_BLOCK_UPDATED.send(sender=None, library_key=lib_bundle.library_key, usage_key=usage_key)
+    LIBRARY_BLOCK_UPDATED.send_event(
+        library_block=LibraryBlockData(
+            library_key=lib_bundle.library_key,
+            usage_key=usage_key
+        )
+    )
     return LibraryXBlockStaticFile(path=file_metadata.path, url=file_metadata.url, size=file_metadata.size)
 
 
@@ -959,7 +990,12 @@ def delete_library_block_static_asset_file(usage_key, file_name):
     write_draft_file(draft.uuid, file_path, contents=None)
     # Clear the bundle cache so everyone sees the new file immediately:
     lib_bundle.cache.clear()
-    LIBRARY_BLOCK_UPDATED.send(sender=None, library_key=lib_bundle.library_key, usage_key=usage_key)
+    LIBRARY_BLOCK_UPDATED.send_event(
+        library_block=LibraryBlockData(
+            library_key=lib_bundle.library_key,
+            usage_key=usage_key
+        )
+    )
 
 
 def get_allowed_block_types(library_key):  # pylint: disable=unused-argument
@@ -1052,7 +1088,11 @@ def create_bundle_link(library_key, link_id, target_opaque_key, version=None):
     set_draft_link(draft.uuid, link_id, target_bundle_uuid, version)
     # Clear the cache:
     LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME).cache.clear()
-    CONTENT_LIBRARY_UPDATED.send(sender=None, library_key=library_key)
+    CONTENT_LIBRARY_UPDATED.send_event(
+        content_library=ContentLibraryData(
+            library_key=library_key
+        )
+    )
 
 
 def update_bundle_link(library_key, link_id, version=None, delete=False):
@@ -1076,7 +1116,11 @@ def update_bundle_link(library_key, link_id, version=None, delete=False):
         set_draft_link(draft.uuid, link_id, link.bundle_uuid, version)
     # Clear the cache:
     LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME).cache.clear()
-    CONTENT_LIBRARY_UPDATED.send(sender=None, library_key=library_key)
+    CONTENT_LIBRARY_UPDATED.send_event(
+        content_library=ContentLibraryData(
+            library_key=library_key
+        )
+    )
 
 
 def publish_changes(library_key):
@@ -1092,7 +1136,12 @@ def publish_changes(library_key):
         return  # If there is no draft, no action is needed.
     LibraryBundle(library_key, ref.bundle_uuid).cache.clear()
     LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME).cache.clear()
-    CONTENT_LIBRARY_UPDATED.send(sender=None, library_key=library_key, update_blocks=True)
+    CONTENT_LIBRARY_UPDATED.send_event(
+        content_library=ContentLibraryData(
+            library_key=library_key,
+            update_blocks=True
+        )
+    )
 
 
 def revert_changes(library_key):
@@ -1108,7 +1157,12 @@ def revert_changes(library_key):
     else:
         return  # If there is no draft, no action is needed.
     LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME).cache.clear()
-    CONTENT_LIBRARY_UPDATED.send(sender=None, library_key=library_key, update_blocks=True)
+    CONTENT_LIBRARY_UPDATED.send_event(
+        content_library=ContentLibraryData(
+            library_key=library_key,
+            update_blocks=True
+        )
+    )
 
 
 # Import from Courseware

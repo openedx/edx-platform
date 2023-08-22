@@ -8,7 +8,6 @@ from django.http import Http404
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
-from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.utils.translation import gettext as _
 from web_fragments.fragment import Fragment
 
@@ -104,8 +103,6 @@ class PreviewLanguageFragmentView(EdxFragmentView):
         Clears the preview language for the current user.
         """
         delete_user_preference(request.user, DARK_LANGUAGE_KEY)
-        if LANGUAGE_SESSION_KEY in request.session:
-            del request.session[LANGUAGE_SESSION_KEY]
         PageLevelMessages.register_success_message(
             request,
             _('Language reset to the default')

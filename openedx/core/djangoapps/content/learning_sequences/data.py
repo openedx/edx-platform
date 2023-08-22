@@ -213,7 +213,7 @@ class CourseOutlineData:
     course_visibility: CourseVisibility = attr.ib(validator=attr.validators.in_(CourseVisibility))
 
     # Entrance Exam ID
-    entrance_exam_id = attr.ib(type=str)
+    entrance_exam_id = attr.ib(type=Optional[str])
 
     def __attrs_post_init__(self):
         """Post-init hook that validates and inits the `sequences` field."""

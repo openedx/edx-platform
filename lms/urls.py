@@ -164,7 +164,7 @@ urlpatterns = [
                              namespace='catalog')),
 
     # Update session view
-    path('lang_pref/session_language', lang_pref_views.update_session_language, name='session_language'),
+    path('lang_pref/update_language', lang_pref_views.update_language, name='update_language'),
 
     # Multiple course modes and identity verification
     path(
@@ -1029,12 +1029,6 @@ if getattr(settings, 'PROVIDER_STATES_URL', None):
             courseware_xblock_handler_provider_state,
             name='courseware_xblock_handler_provider_state',
         )
-    ]
-
-# save_for_later API urls
-if settings.ENABLE_SAVE_FOR_LATER:
-    urlpatterns += [
-        path('', include('lms.djangoapps.save_for_later.urls')),
     ]
 
 # Enhanced Staff Grader (ESG) URLs

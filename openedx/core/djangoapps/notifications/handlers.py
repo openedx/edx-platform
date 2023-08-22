@@ -32,7 +32,7 @@ def course_enrollment_post_save(signal, sender, enrollment, metadata, **kwargs):
             )
         except IntegrityError:
             log.info(f'CourseNotificationPreference already exists for user {enrollment.user} '
-                     f'and course {enrollment.course_id}')
+                     f'and course {enrollment.course.course_key}')
 
 
 @receiver(COURSE_UNENROLLMENT_COMPLETED)

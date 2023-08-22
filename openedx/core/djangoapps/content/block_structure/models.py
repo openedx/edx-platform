@@ -234,11 +234,9 @@ class BlockStructureModel(TimeStampedModel):
             with _storage_error_handling(bs_model, operation):
                 bs_model.data.save('', ContentFile(serialized_data))
 
-        cls._log(bs_model, operation, serialized_data)
-
         if not created:
             cls._prune_files(data_usage_key)
-
+        cls._log(bs_model, operation, serialized_data)
         return bs_model, created
 
     def __str__(self):
@@ -255,9 +253,6 @@ class BlockStructureModel(TimeStampedModel):
         """
         Deletes previous file versions for data_usage_key.
         """
-        if not settings.BLOCK_STRUCTURES_SETTINGS.get('PRUNING_ACTIVE', False):
-            return
-
         if num_to_keep is None:
             num_to_keep = config.num_versions_to_keep()
 
@@ -272,7 +267,6 @@ class BlockStructureModel(TimeStampedModel):
                 data_usage_key,
                 num_to_keep,
             )
-
         except Exception:  # pylint: disable=broad-except
             log.exception('BlockStructure: Exception when deleting old files; data_usage_key: %s.', data_usage_key)
 

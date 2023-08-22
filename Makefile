@@ -1,7 +1,8 @@
 # Do things in edx-platform
 .PHONY: base-requirements check-types clean \
   compile-requirements detect_changed_source_translations dev-requirements \
-  docker_auth docker_build docker_push docker_tag docs extract_translations \
+  docker_auth docker_build docker_tag_build_push_lms docker_tag_build_push_lms_dev \
+  docker_tag_build_push_cms docker_tag_build_push_cms_dev docs extract_translations \
   guides help lint-imports local-requirements migrate migrate-lms migrate-cms \
   pre-requirements pull pull_translations push_translations requirements shell swagger \
   technical-docs test-requirements ubuntu-requirements upgrade-package upgrade
@@ -94,12 +95,13 @@ shell: ## launch a bash shell in a Docker container with all edx-platform depend
 # Order is very important in this list: files must appear after everything they include!
 REQ_FILES = \
 	requirements/edx/coverage \
-	requirements/edx/doc \
 	requirements/edx/paver \
 	requirements/edx-sandbox/py38 \
 	requirements/edx/base \
+	requirements/edx/doc \
 	requirements/edx/testing \
 	requirements/edx/development \
+	requirements/edx/assets \
 	scripts/xblock/requirements
 
 define COMMON_CONSTRAINTS_TEMP_COMMENT
@@ -117,6 +119,8 @@ compile-requirements: pre-requirements $(COMMON_CONSTRAINTS_TXT) ## Re-compile *
 	@# Bootstrapping: Rebuild pip and pip-tools first, and then install them
 	@# so that if there are any failures we'll know now, rather than the next
 	@# time someone tries to use the outputs.
+	sed '/^django-simple-history==/d' requirements/common_constraints.txt > requirements/common_constraints.tmp
+	mv requirements/common_constraints.tmp requirements/common_constraints.txt
 	pip-compile -v --allow-unsafe ${COMPILE_OPTS} -o requirements/pip.txt requirements/pip.in
 	pip install -r requirements/pip.txt
 
@@ -142,30 +146,26 @@ upgrade-package: ## update just one package to the latest usable release
 check-types: ## run static type-checking tests
 	mypy
 
-docker_build:
+docker_auth:
+	echo "$$DOCKERHUB_PASSWORD" | docker login -u "$$DOCKERHUB_USERNAME" --password-stdin
+
+docker_build: docker_auth
 	DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development -t openedx/lms-dev
 	DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target production -t openedx/lms
 	DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=cms --build-arg SERVICE_PORT=8010 --target development -t openedx/cms-dev
 	DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=cms --build-arg SERVICE_PORT=8010 --target production -t openedx/cms
 
-docker_tag: docker_build
-	docker tag openedx/lms     openedx/lms:${GITHUB_SHA}
-	docker tag openedx/lms-dev openedx/lms-dev:${GITHUB_SHA}
-	docker tag openedx/cms     openedx/cms:${GITHUB_SHA}
-	docker tag openedx/cms-dev openedx/cms-dev:${GITHUB_SHA}
+docker_tag_build_push_lms: docker_auth
+	docker buildx build -t openedx/lms:latest -t openedx/lms:${GITHUB_SHA} --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target production --push .
 
-docker_auth:
-	echo "$$DOCKERHUB_PASSWORD" | docker login -u "$$DOCKERHUB_USERNAME" --password-stdin
+docker_tag_build_push_lms_dev: docker_auth
+	docker buildx build -t openedx/lms-dev:latest -t openedx/lms-dev:${GITHUB_SHA} --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
 
-docker_push: docker_tag docker_auth ## push to docker hub
-	docker push "openedx/lms:latest"
-	docker push "openedx/lms:${GITHUB_SHA}"
-	docker push "openedx/lms-dev:latest"
-	docker push "openedx/lms-dev:${GITHUB_SHA}"
-	docker push "openedx/cms:latest"
-	docker push "openedx/cms:${GITHUB_SHA}"
-	docker push "openedx/cms-dev:latest"
-	docker push "openedx/cms-dev:${GITHUB_SHA}"
+docker_tag_build_push_cms: docker_auth
+	docker buildx build -t openedx/cms:latest -t openedx/cms:${GITHUB_SHA} --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=cms --build-arg SERVICE_PORT=8010 --target production --push .
+
+docker_tag_build_push_cms_dev: docker_auth
+	docker buildx build -t openedx/cms-dev:latest -t openedx/cms-dev:${GITHUB_SHA} --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=cms --build-arg SERVICE_PORT=8010 --target development --push .
 
 lint-imports:
 	lint-imports

@@ -27,6 +27,7 @@ define(['jquery', 'gettext', 'common/js/components/utils/view_utils', 'js/views/
                             if (detailedReason) {
                                 reason = detailedReason;
                             }
+                        // eslint-disable-next-line no-empty
                         } catch (e) {}
                     }
                     errorHandler(reason);
