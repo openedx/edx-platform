@@ -9,7 +9,6 @@ from unittest.mock import Mock, patch
 
 import ddt
 import pytest
-from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.test import TestCase
 from django.utils.timezone import now
@@ -80,7 +79,6 @@ class BlockStructureModelTestCase(TestCase):
         return bsm
 
     @patch('openedx.core.djangoapps.content.block_structure.models.log')
-    @patch.dict(settings.BLOCK_STRUCTURES_SETTINGS, {'PRUNING_ACTIVE': False})
     def test_update_or_create(self, mock_log):
         serialized_data = 'initial data'
 
