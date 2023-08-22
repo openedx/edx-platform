@@ -54,7 +54,7 @@ class TestXForwardedForMiddleware(TestCase):
         request = RequestFactory().get('/somewhere')
         request.META.update(add_meta)
 
-        XForwardedForMiddleware().process_request(request)
+        XForwardedForMiddleware(get_response=lambda request: None).process_request(request)
 
         assert request.META.items() >= expected_meta_include.items()
 
@@ -70,7 +70,7 @@ class TestXForwardedForMiddleware(TestCase):
         if xff is not None:
             request.META['HTTP_X_FORWARDED_FOR'] = xff
 
-        XForwardedForMiddleware().process_request(request)
+        XForwardedForMiddleware(get_response=lambda request: None).process_request(request)
 
         mock_set_custom_attribute.assert_has_calls([
             call('ip_chain.raw', expected_raw),
