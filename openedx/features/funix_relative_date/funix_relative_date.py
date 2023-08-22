@@ -89,6 +89,8 @@ class FunixRelativeDateLibary():
 		# Delete all old date
 		# FunixRelativeDateDAO.delete_all_date(user_id=user.id, course_id=course_id)
 
+		for asm in assignment_blocks :
+			print('=====assignment_blocks======', asm.title)
 		# Get goal
 		goal = models.LearnGoal.get_goal(course_id=course_id, user_id=str(user.id))
 		index = 0
@@ -100,6 +102,7 @@ class FunixRelativeDateLibary():
 
 		completed_assignments.sort(key=lambda x: x.complete_date)
 		for asm in completed_assignments:
+			print('=====completed_assignments======', asm.title)
 			index += 1
 			last_complete_date = asm.complete_date
 			FunixRelativeDate(user_id=user.id, course_id=str(course_id), block_id=asm.block_key, type='block', index=index, date=last_complete_date).save()
