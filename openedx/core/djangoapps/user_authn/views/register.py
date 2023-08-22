@@ -696,6 +696,7 @@ class RegistrationView(APIView):
             set_custom_attribute('register_error_code', error_code)
         return JsonResponse(response_dict, status=status_code)
 
+
 # pylint: disable=line-too-long
 class RegistrationValidationView(APIView):
     """
