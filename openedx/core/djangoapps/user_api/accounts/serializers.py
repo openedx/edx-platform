@@ -121,7 +121,7 @@ class UserReadOnlySerializer(serializers.Serializer):
         except ObjectDoesNotExist:
             account_recovery = None
 
-        accomplishments_shared = badges_enabled(self.context.get('request').site)
+        accomplishments_shared = badges_enabled()
 
         data = {
             "username": user.username,

@@ -28,12 +28,11 @@ def requires_badges_enabled(function):
     return wrapped
 
 
-def badges_enabled(site=None):
+def badges_enabled():
     """
     returns a boolean indicating whether or not openbadges are enabled.
     """
-    from openedx.features.edly.utils import get_value_from_django_settings_override
-    return get_value_from_django_settings_override('BADGR_FLAG', False, site)
+    return settings.FEATURES.get('ENABLE_OPENBADGES', False)
 
 
 def deserialize_count_specs(text):
