@@ -70,9 +70,9 @@ class RmUnify(BaseRmUnify):
         for school in schools:
             obj, created = School.objects.update_or_create(
                 name=school['DisplayName'],
-                external_id=school['ExternalId'],
+                guid= school['OrganisationGuid'],
                 type=SchoolTypes.RM_UNIFY,
-                defaults={"guid": school['OrganisationGuid']}
+                defaults={"external_id": school['ExternalId']}
             )
             response = 'created' if created else 'updated'
             logger.info('{} has been {} successfully.'.format(school['DisplayName'], response))
