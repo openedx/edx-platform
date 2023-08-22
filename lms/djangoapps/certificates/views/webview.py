@@ -418,7 +418,18 @@ def _update_badge_context(context, course, user):
     """
     Updates context with badge info.
     """
+    from figures.sites import get_site_for_course
+    from openedx.features.edly.utils import get_value_from_django_settings_override
+
     badge = None
+    course_key = course.location.course_key
+    site = get_site_for_course(course_key)
+    badgr_flag = get_value_from_django_settings_override('BADGR_FLAG', False, site)
+
+    if not badgr_flag:
+        context['badge'] = badge
+        return
+
     if badges_enabled() and course.issue_badges:
         completion_badge = get_completion_badge(course.location.course_key, user)
         if completion_badge is not None:
