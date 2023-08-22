@@ -293,7 +293,7 @@ class RegistrationViewValidationErrorTest(
                 "error_code": "validation-error"
             }
         )
-        
+
     def test_register_duplicate_username_account_validation_error(self):
         # Register the first user
         response = self.client.post(self.url, {
