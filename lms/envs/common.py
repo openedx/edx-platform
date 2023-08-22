@@ -3326,12 +3326,10 @@ CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
 ######################### Django Rest Framework ########################
 
 REST_FRAMEWORK = {
-    # This matches the original DRF default of Session and Basic Authentication, but
-    # adds observability to help us potentially adjust the defaults. We would like to
-    # add JwtAuthentication and drop BasicAuthentication, based on our findings.
+    # These default classes add observability around endpoints using defaults, and should
+    # not be used anywhere else.
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'openedx.core.djangolib.default_auth_classes.DefaultSessionAuthentication',
-        'openedx.core.djangolib.default_auth_classes.DefaultBasicAuthentication'
     ],
     'DEFAULT_PAGINATION_CLASS': 'edx_rest_framework_extensions.paginators.DefaultPagination',
     'DEFAULT_RENDERER_CLASSES': (
