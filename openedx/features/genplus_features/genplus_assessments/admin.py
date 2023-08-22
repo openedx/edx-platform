@@ -1,6 +1,6 @@
 from django.contrib import admin
 from openedx.features.genplus_features.genplus_assessments.models import UserResponse, UserRating, SkillAssessmentResponse, SkillAssessmentQuestion
-
+from .constants import SkillReflectionQuestionType
 
 class BaseModelAdmin(admin.ModelAdmin):
     def __init__(self, model, admin_site):
@@ -50,7 +50,7 @@ class SkillAssessmentResponseAdmin(admin.ModelAdmin):
 
     def get_question_type(self, obj):
         try:
-            return obj.question.problem_type
+            return SkillReflectionQuestionType(obj.question.problem_type).name
         except AttributeError:
             return '-'
 
