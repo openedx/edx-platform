@@ -4,6 +4,7 @@ Tests for CourseDetails
 
 
 import datetime
+from django.test import override_settings
 import pytest
 import ddt
 from pytz import UTC
@@ -29,27 +30,37 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
 
     def setUp(self):
         super().setUp()
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(default_enrollment_start=True)
 
-    def test_virgin_fetch(self):
-        details = CourseDetails.fetch(self.course.id)
-        assert details.org == self.course.location.org, 'Org not copied into'
-        assert details.course_id == self.course.location.course, 'Course_id not copied into'
-        assert details.run == self.course.location.run, 'Course run not copied into'
-        assert details.course_image_name == self.course.course_image
-        assert details.start_date.tzinfo is not None
-        assert details.end_date is None, ('end date somehow initialized ' + str(details.end_date))
-        assert details.enrollment_start is None,\
-            ('enrollment_start date somehow initialized ' + str(details.enrollment_start))
-        assert details.enrollment_end is None,\
-            ('enrollment_end date somehow initialized ' + str(details.enrollment_end))
-        assert details.certificate_available_date is None,\
-            ('certificate_available_date date somehow initialized ' + str(details.certificate_available_date))
-        assert details.syllabus is None, ('syllabus somehow initialized' + str(details.syllabus))
-        assert details.intro_video is None, ('intro_video somehow initialized' + str(details.intro_video))
-        assert details.effort is None, ('effort somehow initialized' + str(details.effort))
-        assert details.language is None, ('language somehow initialized' + str(details.language))
-        assert not details.self_paced
+    @ddt.data(True, False)
+    def test_virgin_fetch(self, should_have_default_enroll_start):
+        features = settings.FEATURES.copy()
+        features['CREATE_COURSE_WITH_DEFAULT_ENROLLMENT_START_DATE'] = should_have_default_enroll_start
+
+        with override_settings(FEATURES=features):
+            course = CourseFactory.create(default_enrollment_start=should_have_default_enroll_start)
+            details = CourseDetails.fetch(course.id)
+            wrong_enrollment_start_msg = (
+                'enrollment_start not copied into'
+                if should_have_default_enroll_start
+                else f'enrollment_start date somehow initialized {str(details.enrollment_start)}'
+            )
+            assert details.org == course.location.org, 'Org not copied into'
+            assert details.course_id == course.location.course, 'Course_id not copied into'
+            assert details.run == course.location.run, 'Course run not copied into'
+            assert details.course_image_name == course.course_image
+            assert details.start_date.tzinfo is not None
+            assert details.end_date is None, ('end date somehow initialized ' + str(details.end_date))
+            assert details.enrollment_start == course.enrollment_start, wrong_enrollment_start_msg
+            assert details.enrollment_end is None,\
+                ('enrollment_end date somehow initialized ' + str(details.enrollment_end))
+            assert details.certificate_available_date is None,\
+                ('certificate_available_date date somehow initialized ' + str(details.certificate_available_date))
+            assert details.syllabus is None, ('syllabus somehow initialized' + str(details.syllabus))
+            assert details.intro_video is None, ('intro_video somehow initialized' + str(details.intro_video))
+            assert details.effort is None, ('effort somehow initialized' + str(details.effort))
+            assert details.language is None, ('language somehow initialized' + str(details.language))
+            assert not details.self_paced
 
     def test_update_and_fetch(self):
         jsondetails = CourseDetails.fetch(self.course.id)
