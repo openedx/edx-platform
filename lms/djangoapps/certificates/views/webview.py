@@ -55,6 +55,7 @@ from student.models import LinkedInAddToProfileConfiguration
 from util import organizations_helpers as organization_api
 from util.date_utils import strftime_localized
 from util.views import handle_500
+from lms.djangoapps.badges.utils import badges_enabled
 
 log = logging.getLogger(__name__)
 _ = translation.ugettext
@@ -418,8 +419,13 @@ def _update_badge_context(context, course, user):
     """
     Updates context with badge info.
     """
+    from figures.sites import get_site_for_course
+
     badge = None
-    if badges_enabled() and course.issue_badges:
+    course_key = course.location.course_key
+    site = get_site_for_course(course_key)
+
+    if badges_enabled(site) and course.issue_badges:
         completion_badge = get_completion_badge(course.location.course_key, user)
         if completion_badge is not None:
             badges = completion_badge.get_for_user(user)

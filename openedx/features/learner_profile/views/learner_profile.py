@@ -125,7 +125,7 @@ def learner_profile_context(request, profile_username, user_is_staff):
         )
         context['achievements_fragment'] = achievements_fragment
 
-    if badges_enabled():
+    if badges_enabled(request.site):
         context['data']['badges_api_url'] = reverse("badges_api:user_assertions", kwargs={'username': profile_username})
 
     return context

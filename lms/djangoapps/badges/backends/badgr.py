@@ -276,28 +276,28 @@ class BadgrBackend(BadgeBackend):
         token is cached but expired, renew it. If all fails or a token has
         not yet been cached, create a new one.
         """
-        tokens = {}
-        cached_response = TieredCache.get_cached_response(
-            settings.BADGR_TOKENS_CACHE_KEY)
-        if cached_response.is_found:
-            cached_tokens = cached_response.value
-            # add a 5 seconds buffer to the cutoff timestamp to make sure
-            # the token will not expire while in use
-            expiry_cutoff = (
-                datetime.datetime.utcnow() + datetime.timedelta(seconds=5))
-            if cached_tokens.get('expires_at') > expiry_cutoff:
-                tokens = cached_tokens
-            else:
-                # renew the tokens with the cached `refresh_token`
-                refresh_token = self._decrypt_token(cached_tokens.get(
-                    'refresh_token'))
-                tokens = self._get_and_cache_oauth_tokens(
-                    refresh_token=refresh_token)
+        # tokens = {}
+        # cached_response = TieredCache.get_cached_response(
+        #     settings.BADGR_TOKENS_CACHE_KEY)
+        # if cached_response.is_found:
+        #     cached_tokens = cached_response.value
+        #     # add a 5 seconds buffer to the cutoff timestamp to make sure
+        #     # the token will not expire while in use
+        #     expiry_cutoff = (
+        #         datetime.datetime.utcnow() + datetime.timedelta(seconds=5))
+        #     if cached_tokens.get('expires_at') > expiry_cutoff:
+        #         tokens = cached_tokens
+        #     else:
+        #         # renew the tokens with the cached `refresh_token`
+        #         refresh_token = self._decrypt_token(cached_tokens.get(
+        #             'refresh_token'))
+        #         tokens = self._get_and_cache_oauth_tokens(
+        #             refresh_token=refresh_token)
 
         # if no tokens are cached or something went wrong with
         # retreiving/renewing them, go and create new tokens
-        if not tokens:
-            tokens = self._get_and_cache_oauth_tokens()
+        # if not tokens:
+        tokens = self._get_and_cache_oauth_tokens()
         return self._decrypt_token(tokens.get('access_token'))
 
     def _get_headers(self):
