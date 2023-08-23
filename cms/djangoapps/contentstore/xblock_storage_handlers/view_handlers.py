@@ -146,6 +146,14 @@ def _is_library_component_limit_reached(usage_key):
 
 
 def _get_block_parent_children(xblock):
+    '''
+    Extract parent ID information from the given xblock and report it in the response
+    Extract child ID information from the given xblock and report it in the response
+
+    Note that no effort is made to look up all settings for this xblock's parent or childrent;
+    the blocks are merely identified. If further informaiton regarding them is required, another
+    call with those blocks as subjects may be made into this handler.
+    '''
     response = {}
     if hasattr(xblock, "parent") and xblock.parent:
         response["parent"] = {
@@ -199,7 +207,7 @@ def handle_xblock(request, usage_key_string=None):
                 # TODO: pass fields to get_block_info and only return those
                 with modulestore().bulk_operations(usage_key.course_key):
                     data = request.data
-                    if ("customReadToken" in data["fields"]):
+                    if "customReadToken" in data["fields"]:
                         log.info("*** customReadToken detected ***")
                     response = get_block_info(get_xblock(usage_key, request.user))
                     parent_children = _get_block_parent_children(get_xblock(usage_key, request.user))
