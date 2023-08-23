@@ -1,3 +1,7 @@
+"""
+Unit tests for event bus tests for course unenrollments
+"""
+
 import unittest
 from datetime import datetime, timezone
 from unittest import mock
@@ -23,7 +27,7 @@ class UnenrollmentEventBusTests(unittest.TestCase):
     Tests for unenrollment events that interact with the event bus.
     """
     @override_settings(ENABLE_SEND_ENROLLMENT_EVENTS_OVER_BUS=False)
-    @mock.patch('lms.djangoapps.certificates.signals.get_producer', autospec=True)
+    @mock.patch('common.djangoapps.student.handlers.get_producer', autospec=True)
     def test_event_disabled(self, mock_producer):
         """
         Test to verify that we do not push `CERTIFICATE_CREATED` events to the event bus if the
@@ -61,7 +65,7 @@ class UnenrollmentEventBusTests(unittest.TestCase):
 
         # verify that the data sent to the event bus matches what we expect
         print(mock_producer.return_value)
-        print(mock_producer.return_value.send.call_args) 
+        print(mock_producer.return_value.send.call_args)
         data = mock_producer.return_value.send.call_args.kwargs
         assert data['event_data']['enrollment'] == enrollment
         assert data['topic'] == 'course-unenrollment-completed'
