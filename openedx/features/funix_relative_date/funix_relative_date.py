@@ -96,7 +96,7 @@ class FunixRelativeDateLibary():
 		completed_assignments = [asm for asm in assignment_blocks if asm.complete]
 		uncompleted_assignments = [asm for asm in assignment_blocks if not asm.complete]
 
-
+		FunixRelativeDateDAO.delete_all_date(user_id=user.id, course_id=course_id)
 
 
 		completed_assignments.sort(key=lambda x: x.complete_date)
@@ -108,7 +108,7 @@ class FunixRelativeDateLibary():
 
 		left_time = float(goal.hours_per_day) * 60
 		arr = []
-		FunixRelativeDateDAO.delete_all_date(user_id=user.id, course_id=course_id)
+		
 		for asm in uncompleted_assignments:
 			effort_time = asm.effort_time
 			if effort_time <= left_time:
