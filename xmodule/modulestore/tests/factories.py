@@ -123,6 +123,11 @@ class CourseFactory(XModuleFactory):
         run = kwargs.pop('run', name)
         user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
         emit_signals = kwargs.pop('emit_signals', False)
+        # By default course has enrollment_start in the future which means course is closed for enrollment.
+        # We're setting the 'enrollment_start' field to None to reduce number of arguments needed to setup course.
+        # Use the 'default_enrollment_start=True' kwarg to skip this and use the default enrollment_start date.
+        if not kwargs.get('enrollment_start', kwargs.pop('default_enrollment_start', False)):
+            kwargs['enrollment_start'] = None
 
         # Pass the metadata just as field=value pairs
         kwargs.update(kwargs.pop('metadata', {}))

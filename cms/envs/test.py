@@ -98,8 +98,6 @@ STATICFILES_DIRS += [
 STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
 STATIC_URL = "/static/"
 
-BLOCK_STRUCTURES_SETTINGS['PRUNING_ACTIVE'] = True
-
 # Update module store settings per defaults for tests
 update_module_store_settings(
     MODULESTORE,

@@ -327,8 +327,6 @@ FILE_UPLOAD_HANDLERS = [
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 ]
 
-BLOCK_STRUCTURES_SETTINGS['PRUNING_ACTIVE'] = True
-
 ########################### Server Ports ###################################
 
 # These ports are carefully chosen so that if the browser needs to
