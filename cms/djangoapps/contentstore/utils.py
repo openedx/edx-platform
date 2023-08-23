@@ -1,9 +1,9 @@
 """
 Common utility functions useful throughout the contentstore
 """
-
-from collections import defaultdict
+import configparser
 import logging
+from collections import defaultdict
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from uuid import uuid4
@@ -13,6 +13,7 @@ from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils import translation
 from django.utils.translation import gettext as _
+from help_tokens.core import HelpUrlExpert
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocator
@@ -1372,6 +1373,18 @@ def get_course_grading(course_key):
     }
 
     return grading_context
+
+
+def get_help_urls():
+    """
+    Utils is used to get help tokens urls.
+    """
+    ini = HelpUrlExpert.the_one()
+    ini.config = configparser.ConfigParser()
+    ini.config.read(ini.ini_file_name)
+    tokens = list(ini.config['pages'].keys())
+    help_tokens = {token: HelpUrlExpert.the_one().url_for_token(token) for token in tokens}
+    return help_tokens
 
 
 class StudioPermissionsService:

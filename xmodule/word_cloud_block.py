@@ -253,7 +253,7 @@ class WordCloudBlock(  # pylint: disable=abstract-method
         Renders the output that a student will see.
         """
         fragment = Fragment()
-        fragment.add_content(self.runtime.service(self, 'mako').render_template('word_cloud.html', {
+        fragment.add_content(self.runtime.service(self, 'mako').render_lms_template('word_cloud.html', {
             'ajax_url': self.ajax_url,
             'display_name': self.display_name,
             'instructions': self.instructions,
@@ -279,7 +279,7 @@ class WordCloudBlock(  # pylint: disable=abstract-method
         Return the studio view.
         """
         fragment = Fragment(
-            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
+            self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
         add_webpack_js_to_fragment(fragment, 'WordCloudBlockEditor')
         shim_xmodule_js(fragment, self.studio_js_module_name)
