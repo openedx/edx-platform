@@ -3,7 +3,7 @@ Tests for experimentation views
 """
 
 from unittest.mock import patch
-
+import json 
 import six.moves.urllib.parse
 from datetime import timedelta
 from django.conf import settings
@@ -341,3 +341,92 @@ class ExperimentUserMetaDataViewTests(APITestCase, ModuleStoreTestCase):
         response = self.client.get(reverse('api_experiments:user_metadata', args=call_args_with_bogus_course))
         assert response.status_code == 404
         assert response.json()['message'] == 'Provided course is not found'
+
+class ExperimentUserGreetingViewTests(ModuleStoreTestCase):
+    
+    test_server_prefix = "http://testserver"
+
+    @patch("lms.djangoapps.experiments.utils.requests.post")
+    def test_UserMetaDataView_success_without_goodbye(self, post_mock):
+        """Request succeeds when logged-in instructor"""
+        expected_keys = (
+            "id",
+            "experiment_id",
+            "key",
+            "value",
+            "created",
+            "modified",
+        )
+        self.client.login(username=self.user.username, password=self.user_password)
+
+        url = reverse("lms.djangoapps.experiments:user_greeting")
+        data = {"greeting": "HORRRAY"}
+        assert ExperimentData.objects.count() == 0
+        response = self.client.post(
+            url, data=json.dumps(data), content_type="application/json"
+        )
+
+        post_mock.assert_not_called()
+        assert response.status_code == 201
+        assert ExperimentData.objects.count() == 1
+        assert ExperimentData.objects.first().user.username == self.user.username
+        assert ExperimentData.objects.first().value == "HORRRAY"
+        for key in expected_keys:
+            assert key in response.json().keys()
+
+        response = self.client.post(
+            url, data=json.dumps(data), content_type="application/json"
+        )
+        # second won't create a record, but update existing
+        post_mock.assert_not_called()
+        assert response.status_code == 200
+
+    @patch("lms.djangoapps.experiments.utils.requests.post")
+    def test_UserMetaDataView_success_with_goodbye(self, post_mock):
+        """Request succeeds when logged-in instructor"""
+        expected_keys = (
+            "id",
+            "experiment_id",
+            "key",
+            "value",
+            "created",
+            "modified",
+        )
+        self.client.login(username=self.user.username, password=self.user_password)
+
+        url = reverse("lms.djangoapps.experiments:user_greeting")
+        data = {"greeting": "hello"}
+        assert ExperimentData.objects.count() == 0
+        response = self.client.post(
+            url, data=json.dumps(data), content_type="application/json"
+        )
+
+        post_mock.assert_called_with(
+            f"{self.test_server_prefix}{url}", json={"greeting": "goodbye"}
+        )
+        assert response.status_code == 201
+        assert ExperimentData.objects.count() == 1
+        assert ExperimentData.objects.first().user.username == self.user.username
+        assert ExperimentData.objects.first().value == "hello"
+        for key in expected_keys:
+            assert key in response.json().keys()
+
+        response = self.client.post(
+            url, data=json.dumps(data), content_type="application/json"
+        )
+        post_mock.assert_called_with(
+            f"{self.test_server_prefix}{url}", json={"greeting": "goodbye"}
+        )
+        assert response.status_code == 200
+
+    @patch("lms.djangoapps.experiments.utils.requests.post")
+    def test_UserMetaDataView_failure(self, post_mock):
+        """Request fails when made by anonymous user"""
+        url = reverse("lms.djangoapps.experiments:user_greeting")
+        data = {"greeting": "HORRRAY"}
+        response = self.client.post(
+            url, data=json.dumps(data), content_type="application/json"
+        )
+
+        assert response.status_code == 404
+        post_mock.assert_not_called()

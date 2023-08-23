@@ -20,10 +20,10 @@ from lms.djangoapps.courseware import courses  # lint-amnesty, pylint: disable=r
 from lms.djangoapps.experiments import filters, serializers
 from lms.djangoapps.experiments.models import ExperimentData, ExperimentKeyValue
 from lms.djangoapps.experiments.permissions import IsStaffOrOwner, IsStaffOrReadOnly, IsStaffOrReadOnlyForSelf
-from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
+from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context, propagate_on_payload
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.lib.courses import get_course_by_id
-
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 User = get_user_model()  # pylint: disable=invalid-name
 
 
@@ -116,3 +116,44 @@ class UserMetaDataView(APIView):  # lint-amnesty, pylint: disable=missing-class-
         context = get_experiment_user_metadata_context(course, user)
         user_metadata = context.get('user_metadata')
         return JsonResponse(user_metadata)
+
+
+class UserGreetingView(APIView):
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    serializer_class = serializers.ExperimentKeyValueSerializer
+    experiment_id = 100
+
+    @propagate_on_payload(
+        key="greeting",
+        value="hello",
+        to_viewname="api_experiments:user_greeting",
+        payload={"greeting":"goodbye"},
+    )
+    def post(self, request, *args, **kwargs):
+        """
+        receives geetings from polite users...
+        If the greeting is “hello”, then the view, should call itself again
+        with {"greeting","goodbye"}.
+        """
+        user = request.user
+        if user.is_anonymous:
+            message = "Provided user is not found"
+            return JsonResponse({"message": message}, status=404)
+        
+        greeting_value: str = request.data.get("greeting", "")
+        obj, created = ExperimentData.objects.update_or_create(
+            user=user,
+            experiment_id=self.experiment_id,
+            key=self.__class__.__name__,
+            defaults={"value": greeting_value},
+        )
+        
+        data = self.serializer_class(obj).data
+        status = 201 if created else 200
+        return JsonResponse(data, status=status)
+
+

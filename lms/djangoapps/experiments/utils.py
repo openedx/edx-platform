@@ -2,7 +2,9 @@
 Utilities to facilitate experimentation
 """
 
-
+from functools import wraps
+from django.urls import reverse
+import requests
 import logging
 from decimal import Decimal
 
@@ -475,3 +477,30 @@ def get_program_context(course, user_enrollments):
             }
     return program_key
 # TODO: clean up as part of REVEM-199 (START)
+
+
+def propagate_on_payload(key, value, to_viewname, payload):
+# TODO: this can be moved to a: /lms/djangoapps/experiments/decorators.py
+    def decorator(func):
+        @wraps(func)
+        def wrapper(self, request, *args, **kwargs):
+            response = func(self, request, *args, **kwargs)
+            incoming = request.data.get(key, "")
+            logger.warning(f"incoming greeting saying: {incoming}")
+
+            if incoming == value and response.status_code in [200,201]:
+                try:
+                    url: str = request.build_absolute_uri(reverse(to_viewname))
+                    propagation = requests.post(url, json=payload)
+                    propagation.raise_for_status()
+
+                except requests.HTTPError as exc:
+                    logger.error(f"failed request to propagate  reason: {exc}")
+                except Exception as exc:
+                    logger.error(f"propagate_on_payload exec, reason: {exc}")
+
+            return response
+
+        return wrapper
+
+    return decorator
