@@ -37,7 +37,7 @@ class AuthoringMixin(XBlockMixin):
         """
         fragment = Fragment()
         from cms.djangoapps.contentstore.utils import reverse_course_url
-        fragment.add_content(self.runtime.service(self, 'mako').render_template('visibility_editor.html', {
+        fragment.add_content(self.runtime.service(self, 'mako').render_cms_template('visibility_editor.html', {
             'xblock': self,
             'manage_groups_url': reverse_course_url('group_configurations_list_handler', self.location.course_key),
         }))

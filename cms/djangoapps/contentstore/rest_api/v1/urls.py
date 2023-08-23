@@ -17,6 +17,7 @@ from .views import (
     assets,
     videos,
     transcripts,
+    HelpUrlsView,
 )
 
 app_name = 'v1'
@@ -85,5 +86,10 @@ urlpatterns = [
     re_path(
         fr'^video_transcripts/{settings.COURSE_ID_PATTERN}$',
         transcripts.TranscriptView.as_view(), name='studio_content_video_transcripts'
+    ),
+    path(
+        'help_urls',
+        HelpUrlsView.as_view(),
+        name="help_urls"
     ),
 ]
