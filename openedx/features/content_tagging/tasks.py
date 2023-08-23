@@ -69,7 +69,7 @@ def update_course_tags(course_key_str: str) -> bool:
         _update_tags(course_key, lang)
 
         return True
-    except Exception as e: # pylint: disable=broad-except
+    except Exception as e:  # pylint: disable=broad-except
         log.error("Error updating tags for Course with id: %s. %s", course_key, e)
         return False
 
@@ -113,7 +113,7 @@ def update_xblock_tags(usage_key_str: str):
         _update_tags(usage_key, lang)
 
         return True
-    except Exception as e: # pylint: disable=broad-except
+    except Exception as e:  # pylint: disable=broad-except
         log.error("Error updating tags for XBlock with id: %s. %s", usage_key, e)
         return False, e
 
