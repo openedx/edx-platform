@@ -133,27 +133,23 @@ class FunixRelativeDateLibary():
 		else :
 
 			new_assignments  = []
-			completed_assignments.sort(key=lambda x: x.complete_date)
-			for asm in completed_assignments:
-				index += 1
-				last_complete_date = asm.complete_date
-				relativate_date = FunixRelativeDate.objects.filter(user_id=user.id, course_id=str(course_id), block_id=asm.block_key, type='block', index=index)[0]
-				print('=====completed_assignments=========', relativate_date.block_id , relativate_date.index)
+			# completed_assignments.sort(key=lambda x: x.complete_date)
+			# for asm in completed_assignments:
+			# 	index += 1
+			# 	last_complete_date = asm.complete_date
+			# 	relativate_date = FunixRelativeDate.objects.filter(user_id=user.id, course_id=str(course_id), block_id=asm.block_key, type='block', index=index)[0]
+			# 	print('=====completed_assignments=========', relativate_date.block_id , relativate_date.index)
 			
 			for index,asm in enumerate(uncompleted_assignments) : 
 				if str(asm.block_key) == str(block_id):
 					new_assignments  = uncompleted_assignments[index:]
-					break
-						
+					break		
 			for asm in new_assignments:
-				
 				effort_time = asm.effort_time
 				if effort_time <= left_time:
 					arr.append(asm)
 					left_time -= effort_time
 				else:
-					
-     
 					last_complete_date = get_time(last_complete_date, goal)
 					for el in arr:
 						try :
@@ -167,14 +163,10 @@ class FunixRelativeDateLibary():
 						except :
 							None
 					left_time = float(goal.hours_per_day) * 60
-					# if  'Assigment' in asm.title :
-				
-						
-					
 					if effort_time > left_time or 'Assignment' in asm.title:
 						try:
 							index += 1
-							print('==============', asm.title, asm.block_key, index)
+							print('=======asm=======', asm.title, asm.block_key, index)
 							day_need = math.ceil(effort_time / left_time)			
 							relativate_date = FunixRelativeDate.objects.filter(user_id=user.id, course_id=str(course_id), block_id=asm.block_key, type='block', index=index)[0]
 							if str(asm.block_key) == block_id :
