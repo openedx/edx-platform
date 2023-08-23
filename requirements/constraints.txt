@@ -131,8 +131,3 @@ click==8.1.6
 
 # plz upgrade this in separate ticket
 redis==4.6.0
-
-# openedx-learning new version has some changes which are breaking quality tests
-# See https://github.com/openedx/openedx-learning/pull/68 for the changes.
-# It needs to be updated in a separate issue.
-openedx-learning==0.1.2
