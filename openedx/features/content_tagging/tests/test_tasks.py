@@ -72,7 +72,7 @@ class TestCourseAutoTagging(CommonMixedModuleStoreSetup):
             mock_update_course_tags.assert_called_with(course_key_str)
 
         # Make the actual call synchronously
-        assert update_course_tags(course_key_str) == True
+        assert update_course_tags(course_key_str)
 
         # Check if the tags are created in the Course
         assert self._check_tag(course.id, LANGUAGE_TAXONOMY_ID, "Portuguese")
@@ -90,7 +90,7 @@ class TestCourseAutoTagging(CommonMixedModuleStoreSetup):
             mock_update_xblock_tags.assert_any_call(usage_key_str)
 
         # Make the actual call synchronously
-        assert update_xblock_tags(usage_key_str) == True
+        assert update_xblock_tags(usage_key_str)
 
         # Check if the tags are created in the XBlock
         assert self._check_tag(usage_key_str, LANGUAGE_TAXONOMY_ID, "Portuguese")
@@ -103,7 +103,7 @@ class TestCourseAutoTagging(CommonMixedModuleStoreSetup):
             mock_update_course_tags.assert_called_with(course_key_str)
 
         # Make the actual call synchronously
-        assert update_course_tags(course_key_str) == True
+        assert update_course_tags(course_key_str)
 
         self.store.publish(sequential.location, self.user_id)
         with patch.object(delete_xblock_tags, "delay") as mock_delete_xblock_tags:
