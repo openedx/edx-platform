@@ -34,7 +34,7 @@ edx-enterprise==4.0.17
 #    mentioned on this issue https://github.com/openedx/edx-platform/issues/32884
 # 2. Versions from 1.5.0 to 2.0.0 have some migrations related changes.
 #    so we're upgrading minor versions one by one.
-django-oauth-toolkit==1.4.1
+django-oauth-toolkit==1.5.0
 
 # Will be updated once we update python-dateutil package
 matplotlib<3.4.0
