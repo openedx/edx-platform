@@ -133,6 +133,12 @@ class FunixRelativeDateLibary():
 		else :
 
 			new_assignments  = []
+			completed_assignments.sort(key=lambda x: x.complete_date)
+			for asm in completed_assignments:
+				index += 1
+				last_complete_date = asm.complete_date
+				relativate_date = FunixRelativeDate.objects.filter(user_id=user.id, course_id=str(course_id), block_id=asm.block_key, type='block', index=index)[0]
+				print('=====completed_assignments=========', relativate_date.block_id , relativate_date.index)
 			
 			for index,asm in enumerate(uncompleted_assignments) : 
 				if str(asm.block_key) == str(block_id):
