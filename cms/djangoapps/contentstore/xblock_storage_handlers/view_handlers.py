@@ -144,6 +144,7 @@ def _is_library_component_limit_reached(usage_key):
     total_children = len(parent.children)
     return total_children + 1 > settings.MAX_BLOCKS_PER_CONTENT_LIBRARY
 
+
 def _get_block_parent_children(xblock):
     response = {}
     if hasattr(xblock, "parent") and xblock.parent:
@@ -156,10 +157,11 @@ def _get_block_parent_children(xblock):
             {
                 "block_type": child.block_type,
                 "block_id": child.block_id
-             }
+            }
             for child in xblock.children
         ]
     return response
+
 
 def handle_xblock(request, usage_key_string=None):
     """
