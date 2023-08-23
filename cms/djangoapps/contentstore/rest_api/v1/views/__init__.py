@@ -9,3 +9,4 @@ from .settings import CourseSettingsView
 from .xblock import XblockView
 from .assets import AssetsView
 from .videos import VideosView
+from .help_urls import HelpUrlsView

@@ -132,6 +132,7 @@ class CourseGoalsRecordUserActivity(APIView):
         course_key = request.data.get('course_key')
 
         if not user_id or not course_key:
+            log.error('User id and course key are required. %s %s', user_id, course_key)
             return Response(
                 'User id and course key are required',
                 status=status.HTTP_400_BAD_REQUEST,
@@ -141,6 +142,7 @@ class CourseGoalsRecordUserActivity(APIView):
             user_id = int(user_id)
             user = User.objects.get(id=user_id)
         except User.DoesNotExist:
+            log.error('Provided user id does not correspond to an existing user %s', user_id)
             return Response(
                 'Provided user id does not correspond to an existing user',
                 status=status.HTTP_400_BAD_REQUEST,
@@ -149,6 +151,7 @@ class CourseGoalsRecordUserActivity(APIView):
         try:
             course_key = CourseKey.from_string(course_key)
         except InvalidKeyError:
+            log.error('Provided course key is not valid %s', course_key)
             return Response(
                 'Provided course key is not valid',
                 status=status.HTTP_400_BAD_REQUEST,

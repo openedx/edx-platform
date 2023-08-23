@@ -26,7 +26,7 @@ class RecommendationsPanel extends React.Component {
     };
 
     getCourseList = async () => {
-        const coursesRecommendationData = await fetch(`${this.props.lmsRootUrl}/api/learner_recommendations/courses/`)
+        const coursesRecommendationData = await fetch(`${this.props.lmsRootUrl}/api/edx_recommendations/learner_dashboard/amplitude/`)
             .then(response => response.json())
             .catch(() => ({
                 courses: this.props.generalRecommendations,
