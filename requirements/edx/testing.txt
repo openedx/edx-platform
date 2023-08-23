@@ -66,7 +66,6 @@ attrs==23.1.0
     #   lti-consumer-xblock
     #   openedx-blockstore
     #   openedx-events
-    #   openedx-learning
     #   referencing
 babel==2.11.0
     # via
@@ -132,7 +131,6 @@ celery==5.3.1
     #   edx-celeryutils
     #   edx-enterprise
     #   event-tracking
-    #   openedx-learning
 certifi==2023.7.22
     # via
     #   -r requirements/edx/base.txt
@@ -983,7 +981,9 @@ openedx-filters==1.5.0
     #   -r requirements/edx/base.txt
     #   lti-consumer-xblock
 openedx-learning==0.1.2
-    # via -r requirements/edx/base.txt
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/base.txt
 openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/base.txt
 optimizely-sdk==4.1.1
