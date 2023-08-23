@@ -60,7 +60,6 @@ attrs==23.1.0
     #   lti-consumer-xblock
     #   openedx-blockstore
     #   openedx-events
-    #   openedx-learning
     #   referencing
 babel==2.11.0
     # via
@@ -126,7 +125,6 @@ celery==5.3.1
     #   edx-celeryutils
     #   edx-enterprise
     #   event-tracking
-    #   openedx-learning
 certifi==2023.7.22
     # via
     #   -r requirements/edx/base.txt
@@ -570,7 +568,7 @@ edx-milestones==0.5.0
     # via -r requirements/edx/base.txt
 edx-name-affirmation==2.3.6
     # via -r requirements/edx/base.txt
-edx-opaque-keys[django]==2.4.0
+edx-opaque-keys[django]==2.5.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-bulk-grades
@@ -913,7 +911,9 @@ openedx-filters==1.5.0
     #   -r requirements/edx/base.txt
     #   lti-consumer-xblock
 openedx-learning==0.1.2
-    # via -r requirements/edx/base.txt
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/base.txt
 openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/base.txt
 optimizely-sdk==4.1.1
@@ -1382,6 +1382,7 @@ typing-extensions==4.7.1
     #   -r requirements/edx/base.txt
     #   asgiref
     #   django-countries
+    #   edx-opaque-keys
     #   kombu
     #   pydata-sphinx-theme
     #   pylti1p3

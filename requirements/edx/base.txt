@@ -43,7 +43,6 @@ attrs==23.1.0
     #   lti-consumer-xblock
     #   openedx-blockstore
     #   openedx-events
-    #   openedx-learning
     #   referencing
 babel==2.11.0
     # via
@@ -99,7 +98,6 @@ celery==5.3.1
     #   edx-celeryutils
     #   edx-enterprise
     #   event-tracking
-    #   openedx-learning
 certifi==2023.7.22
     # via
     #   -r requirements/edx/paver.txt
@@ -493,7 +491,7 @@ edx-milestones==0.5.0
     # via -r requirements/edx/kernel.in
 edx-name-affirmation==2.3.6
     # via -r requirements/edx/kernel.in
-edx-opaque-keys[django]==2.4.0
+edx-opaque-keys[django]==2.5.0
     # via
     #   -r requirements/edx/kernel.in
     #   -r requirements/edx/paver.txt
@@ -773,7 +771,9 @@ openedx-filters==1.5.0
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
 openedx-learning==0.1.2
-    # via -r requirements/edx/kernel.in
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/kernel.in
 openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/kernel.in
 optimizely-sdk==4.1.1
@@ -1124,8 +1124,10 @@ tqdm==4.66.1
     # via nltk
 typing-extensions==4.7.1
     # via
+    #   -r requirements/edx/paver.txt
     #   asgiref
     #   django-countries
+    #   edx-opaque-keys
     #   kombu
     #   pylti1p3
     #   snowflake-connector-python
