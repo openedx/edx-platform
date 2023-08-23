@@ -102,12 +102,12 @@ class FunixRelativeDateLibary():
 
 		completed_assignments.sort(key=lambda x: x.complete_date)
 		for asm in completed_assignments:
-			print('=====completed_assignments======', asm.title , asm.block_key, index, last_complete_date)
 			index += 1
+			print('=====completed_assignments======', asm.title , asm.block_key, index, last_complete_date)
 			last_complete_date = asm.complete_date
-			relativate_date = FunixRelativeDate.objects.filter(user_id=user.id, course_id=str(course_id), block_id=asm.block_key, type='block', index=index)[0]
-			if relativate_date:
-				print('relativate_date:')
+			# relativate_date = FunixRelativeDate.objects.filter(user_id=user.id, course_id=str(course_id), block_id=asm.block_key, type='block', index=index)[0]
+			# if relativate_date:
+			# 	print('relativate_date:')
 			FunixRelativeDate(user_id=user.id, course_id=str(course_id), block_id=asm.block_key, type='block', index=index, date=last_complete_date).save()
 
 		left_time = float(goal.hours_per_day) * 60
