@@ -36,8 +36,6 @@ edx-enterprise==4.0.17
 #    so we're upgrading minor versions one by one.
 django-oauth-toolkit==1.4.1
 
-# Will be updated once we update python-dateutil package
-matplotlib<3.4.0
 
 # constrained in opaque_keys. migration guide here: https://pymongo.readthedocs.io/en/4.0/migrate-to-pymongo4.html
 # Major upgrade will be done in separate ticket.
@@ -127,3 +125,14 @@ libsass==0.10.0
 
 # incremental upgrade
 django-simple-history==3.3.0
+
+# greater version breaking upgrade builds
+click==8.1.6
+
+# plz upgrade this in separate ticket
+redis==4.6.0
+
+# openedx-learning new version has some changes which are breaking quality tests
+# See https://github.com/openedx/openedx-learning/pull/68 for the changes.
+# It needs to be updated in a separate issue.
+openedx-learning==0.1.2
