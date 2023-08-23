@@ -89,8 +89,7 @@ class FunixRelativeDateLibary():
 		# Delete all old date
 		# FunixRelativeDateDAO.delete_all_date(user_id=user.id, course_id=course_id)
 
-		for asm in assignment_blocks :
-			print('=====assignment_blocks======', asm.title)
+
 		# Get goal
 		goal = models.LearnGoal.get_goal(course_id=course_id, user_id=str(user.id))
 		index = 0
@@ -103,11 +102,9 @@ class FunixRelativeDateLibary():
 		completed_assignments.sort(key=lambda x: x.complete_date)
 		for asm in completed_assignments:
 			index += 1
-			print('=====completed_assignments======', asm.title , asm.block_key, index, last_complete_date)
+			print('=====completed_assignments======', asm.title , asm.block_key, index, asm.complete_date)
 			last_complete_date = asm.complete_date
-			# relativate_date = FunixRelativeDate.objects.filter(user_id=user.id, course_id=str(course_id), block_id=asm.block_key, type='block', index=index)[0]
-			# if relativate_date:
-			# 	print('relativate_date:')
+
 			FunixRelativeDate(user_id=user.id, course_id=str(course_id), block_id=asm.block_key, type='block', index=index, date=last_complete_date).save()
 
 		left_time = float(goal.hours_per_day) * 60
@@ -136,6 +133,13 @@ class FunixRelativeDateLibary():
 						arr = [asm]
 						left_time -= effort_time
 		else :
+			completed_assignments.sort(key=lambda x: x.complete_date)
+			for asm in completed_assignments:
+				index += 1
+				print('=====completed_assignments======', asm.title , asm.block_key, index, asm.complete_date)
+				last_complete_date = asm.complete_date
+				FunixRelativeDate(user_id=user.id, course_id=str(course_id), block_id=asm.block_key, type='block', index=index, date=last_complete_date).save()
+			
 			new_assignments  = []
 			for index,asm in enumerate(uncompleted_assignments) : 
 				if str(asm.block_key) == str(block_id):
