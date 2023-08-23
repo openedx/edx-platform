@@ -146,8 +146,8 @@ def tag_content_object(
 
 
 # Expose the oel_tagging APIs
-
 get_taxonomy = oel_tagging.get_taxonomy
 get_taxonomies = oel_tagging.get_taxonomies
 get_tags = oel_tagging.get_tags
+delete_object_tags = oel_tagging.delete_object_tags
 resync_object_tags = oel_tagging.resync_object_tags
