@@ -32,6 +32,11 @@ def _has_taxonomy(taxonomy: Taxonomy, content_object) -> bool:
 
 
 def _update_tags(content_object, lang) -> None:
+    """
+    Update the tags for a content_object.
+
+    If the content_object already have a tag for the language taxonomy, it will be skipped.
+    """
     lang_taxonomy = Taxonomy.objects.get(pk=LANGUAGE_TAXONOMY_ID)
 
     if lang and not _has_taxonomy(lang_taxonomy, content_object):
@@ -64,7 +69,7 @@ def update_course_tags(course_key_str: str) -> bool:
         _update_tags(course_key, lang)
 
         return True
-    except Exception as e:
+    except Exception as e: # pylint: disable=broad-except
         log.error("Error updating tags for Course with id: %s. %s", course_key, e)
         return False
 
@@ -108,7 +113,7 @@ def update_xblock_tags(usage_key_str: str):
         _update_tags(usage_key, lang)
 
         return True
-    except Exception as e:
+    except Exception as e: # pylint: disable=broad-except
         log.error("Error updating tags for XBlock with id: %s. %s", usage_key, e)
         return False, e
 
