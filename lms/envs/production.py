@@ -455,11 +455,9 @@ if AWS_SECRET_ACCESS_KEY == "":
 
 # these variable already exists in cms with `private` value. django-storages starting `1.10.1` 
 # does not set acl values till 1.9.1 default-acl is `public-read`. To maintain the behaviour 
-# same with upcoming version setting it to `public-read`.
-
+# same with upcoming version setting it to `public-read`
 AWS_DEFAULT_ACL = 'public-read'
 AWS_BUCKET_ACL = AWS_DEFAULT_ACL
-
 AWS_STORAGE_BUCKET_NAME = AUTH_TOKENS.get('AWS_STORAGE_BUCKET_NAME', 'edxuploads')
 
 # Disabling querystring auth instructs Boto to exclude the querystring parameters (e.g. signature, access key) it
