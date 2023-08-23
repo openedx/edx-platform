@@ -4,7 +4,6 @@ Instructor Dashboard Views
 import datetime
 import logging
 from functools import reduce
-from unittest.mock import patch
 
 import markupsafe
 import pytz
