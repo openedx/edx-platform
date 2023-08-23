@@ -453,8 +453,9 @@ AWS_SECRET_ACCESS_KEY = AUTH_TOKENS.get("AWS_SECRET_ACCESS_KEY", AWS_SECRET_ACCE
 if AWS_SECRET_ACCESS_KEY == "":
     AWS_SECRET_ACCESS_KEY = None
 
-# these variable already exists in cms with `private` value. django-storages starting `1.10.1` does not set acl values.
-# till 1.9.1 default-acl is `public-read`. To maintain the behaviour same with upcoming version setting it to `public-read`.
+# these variable already exists in cms with `private` value. django-storages starting `1.10.1` 
+# does not set acl values till 1.9.1 default-acl is `public-read`. To maintain the behaviour 
+# same with upcoming version setting it to `public-read`.
 
 AWS_DEFAULT_ACL = 'public-read'
 AWS_BUCKET_ACL = AWS_DEFAULT_ACL
