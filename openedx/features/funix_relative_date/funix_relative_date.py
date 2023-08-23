@@ -158,14 +158,14 @@ class FunixRelativeDateLibary():
 					for el in arr:
 						try :
 							index += 1
-
+							print('====el========', el.title, el.block_key , index)
 							relativate_date = FunixRelativeDate.objects.filter(user_id=user.id, course_id=str(course_id), block_id=el.block_key, type='block', index=index)[0]
 
 							relativate_date.date = last_complete_date
 							relativate_date.save()
 							#FunixRelativeDate(user_id=user.id, course_id=str(course_id), block_id=el.block_key, type='block', index=index, date=last_complete_date).save()
 						except :
-							FunixRelativeDateDAO.delete_all_date(user_id=user.id, course_id=course_id)
+							None
 					left_time = float(goal.hours_per_day) * 60
 					# if  'Assigment' in asm.title :
 				
@@ -174,7 +174,7 @@ class FunixRelativeDateLibary():
 					if effort_time > left_time or 'Assignment' in asm.title:
 						try:
 							index += 1
-							
+							print('==============', asm.title, asm.block_key, index)
 							day_need = math.ceil(effort_time / left_time)			
 							relativate_date = FunixRelativeDate.objects.filter(user_id=user.id, course_id=str(course_id), block_id=asm.block_key, type='block', index=index)[0]
 							if str(asm.block_key) == block_id :
@@ -187,7 +187,7 @@ class FunixRelativeDateLibary():
 							# FunixRelativeDate(user_id=user.id, course_id=str(course_id), block_id=asm.block_key, type='block', index=index, date=last_complete_date).save()
 							arr = []
 						except :
-							FunixRelativeDateDAO.delete_all_date(user_id=user.id, course_id=course_id)
+							None
 					else:
 						arr = [asm]
 						left_time -= effort_time
