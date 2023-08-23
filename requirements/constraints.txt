@@ -127,3 +127,9 @@ libsass==0.10.0
 
 # incremental upgrade
 django-simple-history==3.3.0
+
+# greater version breaking upgrade builds
+click==8.1.6
+
+#  upgrade this in separate ticket
+redis==4.6.0
