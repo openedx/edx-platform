@@ -214,7 +214,7 @@ class BlockStructureModel(TimeStampedModel):
         """
         try:
             return cls.objects.get(data_usage_key=data_usage_key)
-        except cls.DoesNotExist:
+        except:
             log.info('BlockStructure: Not found in table; %s.', data_usage_key)
             raise BlockStructureNotFound(data_usage_key)  # lint-amnesty, pylint: disable=raise-missing-from
 

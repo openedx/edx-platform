@@ -10,7 +10,6 @@ from django.core.management.base import BaseCommand
 import openedx.core.djangoapps.content.block_structure.api as api
 import openedx.core.djangoapps.content.block_structure.store as store
 import openedx.core.djangoapps.content.block_structure.tasks as tasks
-from openedx.core.djangoapps.content.block_structure.config import enable_storage_backing_for_cache_in_request
 from openedx.core.lib.command_utils import (
     get_mutually_exclusive_required_option,
     parse_course_keys,
@@ -129,8 +128,6 @@ class Command(BaseCommand):
         """
         Generates course blocks for the given course_keys per the given options.
         """
-        if options.get('with_storage'):
-            enable_storage_backing_for_cache_in_request()
 
         for course_key in course_keys:
             try:
