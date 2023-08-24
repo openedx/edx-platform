@@ -89,6 +89,9 @@ def handle_assets(request, course_key_string=None, asset_key_string=None):
 
 
 def get_asset_usage_path(request, course_key, asset_key_string):
+    """
+    Get a list of units with ancestors that use given asset.
+    """
     course_key = CourseKey.from_string(course_key)
     if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
@@ -108,27 +111,26 @@ def get_asset_usage_path(request, course_key, asset_key_string):
         blocks.extend(vertical.get_children())
 
     for block in blocks:
-            is_video_block = getattr(block, 'category', '') == 'video' 
-            if is_video_block:
-                handout = getattr(block, 'handout', '')
-                if handout and str(asset_location) in handout:
-                    unit = block.get_parent()
-                    subsection = unit.get_parent()
-                    subsection_display_name = getattr(subsection, 'display_name', '')
-                    unit_display_name = getattr(unit, 'display_name', '')
-                    xblock_display_name = getattr(block, 'display_name', '')
-                    usage_locations.append(f'{subsection_display_name} - {unit_display_name} / {xblock_display_name}')
-            else:
-                data = getattr(block, 'data', '')
-                if static_path in data or str(asset_location) in data:
-                    unit = block.get_parent()
-                    subsection = unit.get_parent()
-                    subsection_display_name = getattr(subsection, 'display_name', '')
-                    unit_display_name = getattr(unit, 'display_name', '')
-                    xblock_display_name = getattr(block, 'display_name', '')
-                    usage_locations.append(f'{subsection_display_name} - {unit_display_name} / {xblock_display_name}')
+        is_video_block = getattr(block, 'category', '') == 'video'
+        if is_video_block:
+            handout = getattr(block, 'handout', '')
+            if handout and str(asset_location) in handout:
+                unit = block.get_parent()
+                subsection = unit.get_parent()
+                subsection_display_name = getattr(subsection, 'display_name', '')
+                unit_display_name = getattr(unit, 'display_name', '')
+                xblock_display_name = getattr(block, 'display_name', '')
+                usage_locations.append(f'{subsection_display_name} - {unit_display_name} / {xblock_display_name}')
+        else:
+            data = getattr(block, 'data', '')
+            if static_path in data or str(asset_location) in data:
+                unit = block.get_parent()
+                subsection = unit.get_parent()
+                subsection_display_name = getattr(subsection, 'display_name', '')
+                unit_display_name = getattr(unit, 'display_name', '')
+                xblock_display_name = getattr(block, 'display_name', '')
+                usage_locations.append(f'{subsection_display_name} - {unit_display_name} / {xblock_display_name}')
     return JsonResponse({'usage_locations': usage_locations})
-
 
 
 def _get_response_format(request):
