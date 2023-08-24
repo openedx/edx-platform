@@ -206,12 +206,10 @@ def handle_xblock(request, usage_key_string=None):
                     return JsonResponse(ancestor_info)
                 # TODO: pass fields to get_block_info and only return those
                 with modulestore().bulk_operations(usage_key.course_key):
-                    data = request.data
-                    if "customReadToken" in data["fields"]:
-                        log.info("*** customReadToken detected ***")
                     response = get_block_info(get_xblock(usage_key, request.user))
-                    parent_children = _get_block_parent_children(get_xblock(usage_key, request.user))
-                    response.update(parent_children)
+                    if "customReadToken" in fields:
+                        parent_children = _get_block_parent_children(get_xblock(usage_key, request.user))
+                        response.update(parent_children)
                 return JsonResponse(response)
             else:
                 return HttpResponse(status=406)
