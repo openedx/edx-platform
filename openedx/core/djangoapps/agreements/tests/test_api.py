@@ -10,10 +10,15 @@ from openedx.core.djangoapps.agreements.api import (
     create_integrity_signature,
     get_integrity_signature,
     get_integrity_signatures_for_course,
+    get_lti_tools_receiving_pii
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from ..models import (
+    LTIPIITool, LTIPIISignature,
+)
+from opaque_keys.edx.keys import CourseKey
 
 LOGGER_NAME = "openedx.core.djangoapps.agreements.api"
 
@@ -98,3 +103,36 @@ class TestIntegritySignatureApi(SharedModuleStoreTestCase):
         """
         self.assertEqual(signature.user, self.user)
         self.assertEqual(signature.course_key, self.course.id)
+
+
+@skip_unless_lms
+class TestLTIPIIToolsApi(SharedModuleStoreTestCase):
+    """
+    Tests for the lti pii tool sharing API. To make sure the list of LTI tools can be retreived from the Model.
+    """
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.course = CourseFactory()
+        cls.course_id = str(cls.course.id)
+        cls.course_and_tools = LTIPIITool.objects.create(
+            course_key=CourseKey.from_string(cls.course_id),
+            lti_tools={"first_lti_tool": "This is the first tool",
+                       "second_lti_tool": "This is the second tool", },
+            lti_tools_hash=112233,
+        )
+
+    def test_get_lti_tools_receiving_pii(self):
+        """
+        Test to get an integrity signature
+        """
+        tool_list = get_lti_tools_receiving_pii(self.course_id)
+        #print(tool_list)
+
+        #self._assert_ltitools(tool_list)
+
+    def _assert_ltitools(self, tool_list):
+        """
+        Helper function to assert the returned list has the correct
+        """
+        self.assertEqual(self.course_and_tools, tool_list)

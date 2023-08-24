@@ -12,6 +12,8 @@ from openedx.core.djangoapps.agreements.models import IntegritySignature
 from openedx.core.djangoapps.agreements.models import LTIPIITool
 from openedx.core.djangoapps.agreements.models import LTIPIISignature
 
+from .data import LTIToolsReceivingPIIData
+
 log = logging.getLogger(__name__)
 User = get_user_model()
 
@@ -72,7 +74,7 @@ def get_integrity_signatures_for_course(course_id):
     return IntegritySignature.objects.filter(course_key=course_key)
 
 
-def get_ltipiitool(course_id):
+def get_lti_tools_receiving_pii(course_id):
     """
     Get a course's LTI tools that share PII.
 
@@ -80,66 +82,107 @@ def get_ltipiitool(course_id):
         * course_id (str)
 
     Returns:
-        * A QuerySet of LTIPIITool object.
+        * A List of LTI tools sharing PII.
     """
+
     course_key = CourseKey.from_string(course_id)
     course_ltipiitools = LTIPIITool.objects.get(course_key=course_key)
-    return course_ltipiitools
+
+    return LTIToolsReceivingPIIData(
+        lii_tools_receiving_pii=course_ltipiitools,
+    )
 
 
-def set_ltipiitool(course_id, lti_tools, lti_tools_hash):
+def user_lit_pii_signature_needed(username, course_id):
     """
-    Creates or updates a course's list of LTI tools that share PII.
+    Determines if a user needs to acknowledge the LTI PII Agreement
 
     Arguments:
-        * course_key (str)
-        * lti_tools (str)
-        * lti_tools_hash (int)
+        * username (str)
 
     Returns:
-        * True or False depending on if the write was successful
+        * True if the user needs to sign a new acknowledgement.
+        * False if the acknowledgements are up to date.
     """
-    course_key = CourseKey.from_string(course_id)
-    LTIPIITool.objects.update_or_create(
-        course_key=course_key,
-        lti_tools=lti_tools,
-        lti_tools_hash=lti_tools_hash)
-    
+    if _course_has_lti_pii_tools(course_id):
+        if _user_lti_pii_signature_exists(username, course_id):
+            if _user_needs_signature_update(username, course_id):
+                # up to date
+                return False
+            else:
+                # lti pii signature needs to be updated
+                return True
+        else:
+            # write a new lti pii signature
+            return True
+    else:
+        return False
 
-def get_ltipiisignature(username, course_id):
+
+def _course_has_lti_pii_tools(course_id):
     """
-    Get a lti pii signature for a specific user.
+    Determines if a specifc course has lti tools sharing pii
 
     Arguments:
-        * course_key (str)
-        * user (User)
+        * course_id (str)
 
     Returns:
-        * An IntegritySignature object, or None if one does not exist for the
-        user + course combination.
+        * True if the course does have a list.
+        * False if the course does not.
     """
     course_key = CourseKey.from_string(course_id)
+    course_lti_pii_tools = LTIPIITool.objects.get(course_key)
+
+    if not course_lti_pii_tools:
+        # empty queryset, meaning no tools
+        return False
+    else:
+        return True
+
+
+def _user_lti_pii_signature_exists(username, course_id):
+    """
+    Determines if a user's lti pii signature exists for a specfic course
+
+    Arguments:
+        * username (str)
+        * course_id (str)
+
+    Returns:
+        * True if user has a signature for the given course.
+        * False if the user does not have a signature for the given course.
+    """
     user = User.objects.get(username=username)
-    try:
-        return LTIPIISignature.objects.get(user=user, course_key=course_key)
-    except ObjectDoesNotExist:
-        return None
-
-
-def set_ltipiisignature(course_id, lti_tools, lti_tools_hash):
-    """
-    Creates or updates a user's acknowledgement of sharing PII via LTI tools.
-
-    Arguments:
-        * course_key (str)
-        * lti_tools (str)
-        * lti_tools_hash (int)
-
-    Returns:
-        * True or False depending on if the write was successful
-    """
     course_key = CourseKey.from_string(course_id)
-    LTIPIITool.objects.update_or_create(
-        course_key=course_key,
-        lti_tools=lti_tools,
-        lti_tools_hash=lti_tools_hash)
+
+    signature = LTIPIISignature.objects.get(user=user, course_key=course_key)
+    if not signature:
+        return False
+    else:
+        return True
+
+
+def _user_needs_signature_update(username, course_id):
+    """
+        Determines if a user's existing lti pii signature is out-of-date for a given course.
+
+        Arguments:
+            * username (str)
+            * course_id (str)
+
+        Returns:
+            * True if user has a signature for the given course.
+            * False if the user does not have a signature for the given course.
+        """
+
+    user = User.objects.get(username=username)
+    course_key = CourseKey.from_string(course_id)
+
+    user_lti_pii_signature_hash = LTIPIISignature.objects.get(course_key=course_key, user=user).lti_tools_hash
+    course_lti_pii_tools_hash = LTIPIITool.objects.get(course_key=course_key).lti_tools_hash
+
+    if (user_lti_pii_signature_hash == course_lti_pii_tools_hash):
+        # Hashes are equal, therefor update is not need
+        return False
+    else:
+        return True
