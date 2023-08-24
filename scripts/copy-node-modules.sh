@@ -2,10 +2,12 @@
 # Copy certain npm-installed assets from node_modules to other folders in
 # edx-platform. These assets are used by certain especially-old legacy LMS & CMS
 # frontends that are not set up to import from node_modules directly.
-# Many of the destination folders are named "vendor", because they originally
+
+# App code refers to these copied modules via symlinks named "vendor" because they originally
 # held vendored-in (directly-committed) libraries; once we moved most frontends
-# to use NPM, we decided to keep library versions in-sync by copying to the
-# former "vendor" directories.
+# to use NPM, we decided to keep library versions in-sync by copying into the former "vendor" directories.
+# Eventually, we  but established "vendor" symlinks because
+# updaing all referecnes would have been too difficult.
 
 # Enable stricter error handling.
 set -euo pipefail
@@ -18,8 +20,8 @@ COL_OFF="\e[0m"   # Normal color
 # https://github.com/openedx/wg-developer-experience/issues/150
 # https://github.com/openedx/wg-developer-experience/issues/151
 node_modules="node_modules"
-vendor_js="common/static/common/js/vendor"
-vendor_css="common/static/common/css/vendor"
+target_js="common/static/node_copies/js"
+target_css="common/static/node_copies/css"
 
 # Stylized logging.
 log ( ) {
@@ -38,20 +40,20 @@ log "===========================================================================
 log "Copying required assets from node_modules..."
 log "-------------------------------------------------------------------------------"
 
-log "Ensuring vendor directories exist..."
-log_and_run mkdir -p "$vendor_js"
-log_and_run mkdir -p "$vendor_css"
+log "Ensuring target directories exist..."
+log_and_run mkdir -p "$target_js"
+log_and_run mkdir -p "$target_css"
 
-log "Copying studio-frontend JS & CSS from node_modules into vendor directores..."
+log "Copying studio-frontend JS & CSS from node_modules into target directores..."
 while read -r -d $'\0' src_file ; do
     if [[ "$src_file" = *.css ]] || [[ "$src_file" = *.css.map ]] ; then
-        log_and_run cp --force "$src_file" "$vendor_css"
+        log_and_run cp --force "$src_file" "$target_css"
     else
-        log_and_run cp --force "$src_file" "$vendor_js"
+        log_and_run cp --force "$src_file" "$target_js"
     fi
 done < <(find "$node_modules/@edx/studio-frontend/dist" -type f -print0)
 
-log "Copying certain JS modules from node_modules into vendor directory..."
+log "Copying certain JS modules from node_modules into target directory..."
 log_and_run cp --force \
     "$node_modules/backbone.paginator/lib/backbone.paginator.js" \
     "$node_modules/backbone/backbone.js" \
@@ -67,23 +69,23 @@ log_and_run cp --force \
     "$node_modules/underscore.string/dist/underscore.string.js" \
     "$node_modules/underscore/underscore.js" \
     "$node_modules/which-country/index.js" \
-    "$vendor_js"
+    "$target_js"
 
-log "Copying certain JS developer modules into vendor directory..."
+log "Copying certain JS developer modules into target directory..."
 if [[ "${NODE_ENV:-production}" = development ]] ; then
-    log_and_run cp --force "$node_modules/sinon/pkg/sinon.js" "$vendor_js"
-    log_and_run cp --force "$node_modules/squirejs/src/Squire.js" "$vendor_js"
+    log_and_run cp --force "$node_modules/sinon/pkg/sinon.js" "$target_js"
+    log_and_run cp --force "$node_modules/squirejs/src/Squire.js" "$target_js"
 else
     # TODO: https://github.com/openedx/edx-platform/issues/31768
     # In the old implementation of this scipt (pavelib/assets.py), these two
-    # developer libraries were copied into the JS vendor directory whether not
+    # developer libraries were copied into the JS target directory whether not
     # the build was for prod or dev. In order to exactly match the output of
     # the old script, this script will also copy them in for prod builds.
     # However, in the future, it would be good to only copy them for dev
     # builds. Furthermore, these libraries should not be `npm install`ed
     # into prod builds in the first place.
-    log_and_run cp --force "$node_modules/sinon/pkg/sinon.js" "$vendor_js" || true      # "|| true" means "tolerate errors"; in this case,
-    log_and_run cp --force "$node_modules/squirejs/src/Squire.js" "$vendor_js" || true  # that's "tolerate if these files don't exist."
+    log_and_run cp --force "$node_modules/sinon/pkg/sinon.js" "$target_js" || true      # "|| true" means "tolerate errors"; in this case,
+    log_and_run cp --force "$node_modules/squirejs/src/Squire.js" "$target_js" || true  # that's "tolerate if these files don't exist."
 fi
 
 log "-------------------------------------------------------------------------------"

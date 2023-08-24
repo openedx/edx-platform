@@ -1,5 +1,6 @@
-# Vendor files and generated test artifacts
+# Vendor files, copies of node_modules, and generated test artifacts
 **/vendor
+**/node_copies
 test_root/staticfiles
 
 

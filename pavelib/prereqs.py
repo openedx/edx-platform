@@ -138,13 +138,7 @@ def node_prereqs_installation():
     #
     # This hack should probably be left in place for at least a year.
     # See ADR 17 for more background on the transition.
-    sh("rm -rf common/static/common/js/vendor/ common/static/common/css/vendor/")
-    # At the time of this writing, the js dir has git-versioned files
-    # but the css dir does not, so the latter would have been created
-    # as root-owned (in the process of creating the vendor
-    # subdirectory). Delete it only if empty, just in case
-    # git-versioned files are added later.
-    sh("rmdir common/static/common/css || true")
+    sh("rm -rf common/static/node_copies")
 
     # NPM installs hang sporadically. Log the installation process so that we
     # determine if any packages are chronic offenders.
