@@ -332,3 +332,8 @@ urlpatterns.extend(get_plugin_url_patterns(ProjectType.CMS))
 urlpatterns += [
     path('api/contentstore/', include('cms.djangoapps.contentstore.rest_api.urls'))
 ]
+
+# Content tagging
+urlpatterns += [
+    path('api/content_tagging/', include(('openedx.features.content_tagging.urls'))),
+]
