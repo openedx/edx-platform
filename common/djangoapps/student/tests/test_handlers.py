@@ -9,16 +9,14 @@ from uuid import uuid4
 
 from django.test.utils import override_settings
 from common.djangoapps.student.handlers import course_unenrollment_receiver
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import (
+    UserFactory,
+    CourseEnrollmentFactory,
+)
 
 from openedx_events.data import EventsMetadata
 from openedx_events.learning.signals import COURSE_UNENROLLMENT_COMPLETED
 from pytest import mark
-
-from openedx.features.enterprise_support.tests.factories import (
-    EnterpriseCourseEnrollmentFactory,
-    EnterpriseCustomerUserFactory,
-)
 
 
 @mark.django_db
@@ -43,10 +41,7 @@ class UnenrollmentEventBusTests(unittest.TestCase):
         Test to verify that we push `COURSE_UNENROLLMENT_COMPLETED` events to the event bus.
         """
         user = UserFactory()
-        enterprise_customer_user = EnterpriseCustomerUserFactory(user_id=user.id)
-        enrollment = EnterpriseCourseEnrollmentFactory(
-            enterprise_customer_user=enterprise_customer_user,
-        )
+        enrollment = CourseEnrollmentFactory(user=user)
 
         event_metadata = EventsMetadata(
             event_type=COURSE_UNENROLLMENT_COMPLETED.event_type,
