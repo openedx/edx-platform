@@ -13,7 +13,6 @@ from edx_toggles.toggles.testutils import override_waffle_switch
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
-import openedx.core.djangoapps.content.block_structure.config as block_structure_config
 from openedx.core.djangoapps.content.block_structure.signals import update_block_structure_on_course_publish
 from cms.djangoapps.coursegraph.management.commands.dump_to_neo4j import ModuleStoreSerializer
 from cms.djangoapps.coursegraph.management.commands.tests.utils import MockGraph, MockNodeMatcher
@@ -541,8 +540,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         assert len(submitted) == len(self.course_strings)
 
         # simulate one of the courses being published
-        with override_waffle_switch(block_structure_config.STORAGE_BACKING_FOR_CACHE, True):
-            update_block_structure_on_course_publish(None, self.course.id)
+        update_block_structure_on_course_publish(None, self.course.id)
 
         # make sure only the published course was dumped
         submitted, __ = self.mss.dump_courses_to_neo4j(credentials)

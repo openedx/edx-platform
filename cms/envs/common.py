@@ -155,6 +155,11 @@ BLOCK_STRUCTURES_SETTINGS = dict(
 
     # Maximum number of retries per task.
     TASK_MAX_RETRIES=5,
+    STORAGE_CLASS='django.core.files.storage.FileSystemStorage',
+    STORAGE_KWARGS=dict(
+        location=MEDIA_ROOT,
+        base_url=MEDIA_URL,
+   ),
 )
 
 ############################ FEATURE CONFIGURATION #############################
