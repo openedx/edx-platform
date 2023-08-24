@@ -925,12 +925,17 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
 
             GET /api/enrollment/v1/enrollments?course_id={course_id}&username={username}
 
+            GET /api/enrollment/v1/enrollments?email={email},{email}
+
         **Query Parameters for GET**
 
             * course_id: Filters the result to course enrollments for the course corresponding to the
               given course ID. The value must be URL encoded. Optional.
 
             * username: List of comma-separated usernames. Filters the result to the course enrollments
+              of the given users. Optional.
+
+            * email: List of comma-separated emails. Filters the result to the course enrollments
               of the given users. Optional.
 
             * page_size: Number of results to return per page. Optional.
@@ -995,9 +1000,12 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
         queryset = CourseEnrollment.objects.all()
         course_id = form.cleaned_data.get('course_id')
         usernames = form.cleaned_data.get('username')
+        emails = form.cleaned_data.get('email')
 
         if course_id:
             queryset = queryset.filter(course_id=course_id)
         if usernames:
             queryset = queryset.filter(user__username__in=usernames)
+        if emails:
+            queryset = queryset.filter(user__email__in=emails)
         return queryset
