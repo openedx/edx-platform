@@ -1654,10 +1654,21 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
             'is_learning_mfe': is_learning_mfe,
             'is_mobile_app': is_mobile_app,
             'render_course_wide_assets': True,
+            'disable_default_css': get_disable_default_css(fragment),
 
             **optimization_flags,
         }
         return render_to_response('courseware/courseware-chromeless.html', context)
+
+
+def get_disable_default_css(fragment):
+    """
+    Returns True if the request has a query parameter to disable default css.
+    """
+    html = fragment.body_html()
+    print('====================')
+    print(html)
+    return '"DISABLE_DEFAULT_CSS": true' in html
 
 
 def get_optimization_flags_for_content(block, fragment):

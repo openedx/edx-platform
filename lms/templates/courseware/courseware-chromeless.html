@@ -32,8 +32,10 @@ ${static.get_page_title_breadcrumbs(course_name())}
 </%block>
 
 <%block name="headextra">
-<%static:css group='style-course-vendor'/>
-<%static:css group='style-course'/>
+% if not disable_default_css:
+  <%static:css group='style-course-vendor'/>
+  <%static:css group='style-course'/>
+%endif
 ## Utility: Notes
 % if edx_notes_enabled:
 <%static:css group='style-student-notes'/>
