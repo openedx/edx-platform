@@ -27,7 +27,7 @@ django-storages==1.10.1
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==4.0.17
+edx-enterprise==4.0.18
 
 # 1. django-oauth-toolkit version >=2.0.0 has breaking changes. More details
 #    mentioned on this issue https://github.com/openedx/edx-platform/issues/32884
@@ -35,8 +35,6 @@ edx-enterprise==4.0.17
 #    so we're upgrading minor versions one by one.
 django-oauth-toolkit==1.4.1
 
-# Will be updated once we update python-dateutil package
-matplotlib<3.4.0
 
 # constrained in opaque_keys. migration guide here: https://pymongo.readthedocs.io/en/4.0/migrate-to-pymongo4.html
 # Major upgrade will be done in separate ticket.
@@ -126,3 +124,14 @@ libsass==0.10.0
 
 # incremental upgrade
 django-simple-history==3.3.0
+
+# greater version breaking upgrade builds
+click==8.1.6
+
+# plz upgrade this in separate ticket
+redis==4.6.0
+
+# openedx-learning new version has some changes which are breaking quality tests
+# See https://github.com/openedx/openedx-learning/pull/68 for the changes.
+# It needs to be updated in a separate issue.
+openedx-learning==0.1.2

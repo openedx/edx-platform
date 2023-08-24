@@ -2238,6 +2238,12 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
             HTTP_ACCEPT='*/*',
         )
         self._assert_redirect_url(response, expected_redirect)
+        assert response.status_code == 200
+
+        # Check that authenticated user details are also returned in
+        # the response for successful registration
+        decoded_response = json.loads(response.content.decode('utf-8'))
+        assert decoded_response['authenticated_user'] == {'username': self.USERNAME, 'user_id': 1}
 
     @mock.patch('openedx.core.djangoapps.user_authn.views.register._record_is_marketable_attribute')
     def test_logs_for_error_when_setting_is_marketable_attribute(self, set_is_marketable_attr):

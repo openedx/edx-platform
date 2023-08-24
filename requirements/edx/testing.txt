@@ -534,7 +534,9 @@ edx-bulk-grades==1.0.2
     #   -r requirements/edx/base.txt
     #   staff-graded-xblock
 edx-ccx-keys==1.2.1
-    # via -r requirements/edx/base.txt
+    # via
+    #   -r requirements/edx/base.txt
+    #   lti-consumer-xblock
 edx-celeryutils==1.2.3
     # via
     #   -r requirements/edx/base.txt
@@ -567,7 +569,7 @@ edx-django-utils==5.7.0
     #   openedx-blockstore
     #   ora2
     #   super-csv
-edx-drf-extensions==8.9.0
+edx-drf-extensions==8.9.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-completion
@@ -579,7 +581,7 @@ edx-drf-extensions==8.9.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.0.17
+edx-enterprise==4.0.18
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -598,7 +600,7 @@ edx-milestones==0.5.0
     # via -r requirements/edx/base.txt
 edx-name-affirmation==2.3.6
     # via -r requirements/edx/base.txt
-edx-opaque-keys[django]==2.4.0
+edx-opaque-keys[django]==2.5.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-bulk-grades
@@ -726,7 +728,7 @@ geoip2==4.7.0
     # via -r requirements/edx/base.txt
 glob2==0.7
     # via -r requirements/edx/base.txt
-grimp==2.5
+grimp==3.0
     # via import-linter
 gunicorn==21.2.0
     # via -r requirements/edx/base.txt
@@ -757,7 +759,7 @@ idna==3.4
     #   rfc3986
     #   snowflake-connector-python
     #   yarl
-import-linter==1.10.0
+import-linter==1.11.1
     # via -r requirements/edx/testing.in
 importlib-metadata==6.8.0
     # via
@@ -858,7 +860,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/base.txt
     #   ora2
-lti-consumer-xblock==9.6.0
+lti-consumer-xblock==9.6.1
     # via -r requirements/edx/base.txt
 lxml==4.9.3
     # via
@@ -929,7 +931,7 @@ mysqlclient==2.2.0
     # via
     #   -r requirements/edx/base.txt
     #   openedx-blockstore
-newrelic==8.10.0
+newrelic==8.10.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -962,6 +964,7 @@ openedx-calc==3.0.1
 openedx-django-pyfs==3.4.0
     # via
     #   -r requirements/edx/base.txt
+    #   lti-consumer-xblock
     #   xblock
 openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
@@ -977,7 +980,9 @@ openedx-filters==1.5.0
     #   -r requirements/edx/base.txt
     #   lti-consumer-xblock
 openedx-learning==0.1.2
-    # via -r requirements/edx/base.txt
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/base.txt
 openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/base.txt
 optimizely-sdk==4.1.1
@@ -1091,9 +1096,9 @@ pycryptodomex==3.18.0
     #   lti-consumer-xblock
     #   pyjwkest
     #   snowflake-connector-python
-pydantic==2.1.1
+pydantic==2.2.1
     # via fastapi
-pydantic-core==2.4.0
+pydantic-core==2.6.1
     # via pydantic
 pygments==2.16.1
     # via
@@ -1275,6 +1280,7 @@ recommender-xblock==2.0.1
     # via -r requirements/edx/base.txt
 redis==4.6.0
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   walrus
 referencing==0.30.2
@@ -1492,7 +1498,7 @@ tox==3.28.0
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/testing.in
     #   tox-battery
-tox-battery==0.6.1
+tox-battery==0.6.2
     # via -r requirements/edx/testing.in
 tqdm==4.66.1
     # via
@@ -1505,6 +1511,7 @@ typing-extensions==4.7.1
     #   asgiref
     #   astroid
     #   django-countries
+    #   edx-opaque-keys
     #   faker
     #   fastapi
     #   grimp
