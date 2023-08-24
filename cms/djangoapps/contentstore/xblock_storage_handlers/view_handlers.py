@@ -145,6 +145,32 @@ def _is_library_component_limit_reached(usage_key):
     return total_children + 1 > settings.MAX_BLOCKS_PER_CONTENT_LIBRARY
 
 
+def _get_block_parent_children(xblock):
+    '''
+    Extract parent ID information from the given xblock and report it in the response
+    Extract child ID information from the given xblock and report it in the response
+
+    Note that no effort is made to look up all settings for this xblock's parent or childrent;
+    the blocks are merely identified. If further informaiton regarding them is required, another
+    call with those blocks as subjects may be made into this handler.
+    '''
+    response = {}
+    if hasattr(xblock, "parent") and xblock.parent:
+        response["parent"] = {
+            "block_type": xblock.parent.block_type,
+            "block_id": xblock.parent.block_id
+        }
+    if hasattr(xblock, "children") and xblock.children:
+        response["children"] = [
+            {
+                "block_type": child.block_type,
+                "block_id": child.block_id
+            }
+            for child in xblock.children
+        ]
+    return response
+
+
 def handle_xblock(request, usage_key_string=None):
     """
     Service method with all business logic for handling xblock requests.
@@ -181,6 +207,9 @@ def handle_xblock(request, usage_key_string=None):
                 # TODO: pass fields to get_block_info and only return those
                 with modulestore().bulk_operations(usage_key.course_key):
                     response = get_block_info(get_xblock(usage_key, request.user))
+                    if "customReadToken" in fields:
+                        parent_children = _get_block_parent_children(get_xblock(usage_key, request.user))
+                        response.update(parent_children)
                 return JsonResponse(response)
             else:
                 return HttpResponse(status=406)
@@ -267,6 +296,7 @@ def handle_xblock(request, usage_key_string=None):
 
 def modify_xblock(usage_key, request):
     request_data = request.json
+    print(f'In modify_xblock with data = {request_data.get("data")}, fields = {request_data.get("fields")}')
     return _save_xblock(
         request.user,
         get_xblock(usage_key, request.user),
@@ -977,6 +1007,7 @@ def get_block_info(
     rewrite_static_links=True,
     include_ancestor_info=False,
     include_publishing_info=False,
+    include_children_predicate=False,
 ):
     """
     metadata, data, id representation of a leaf block fetcher.
@@ -1000,6 +1031,7 @@ def get_block_info(
             data=data,
             metadata=own_metadata(xblock),
             include_ancestor_info=include_ancestor_info,
+            include_children_predicate=include_children_predicate
         )
         if include_publishing_info:
             add_container_page_publishing_info(xblock, xblock_info)
