@@ -14718,7 +14718,7 @@ msgstr "Bu ders hakkında daha fazla bilgi"
 
 #: lms/templates/public_video.html
 msgid "Go to course"
-msgstr ""
+msgstr "Derse git"
 
 #: lms/templates/public_video.html
 msgid "Enroll in this course"
@@ -15120,7 +15120,7 @@ msgstr "Video dosyasını indir"
 
 #: lms/templates/video.html
 msgid "Share this video"
-msgstr ""
+msgstr "Bu videoyu paylaş"
 
 #: lms/templates/video.html
 msgid "Share on {site}"
@@ -15128,7 +15128,7 @@ msgstr "{site} sitesinde paylaş"
 
 #: lms/templates/video.html
 msgid "Copy"
-msgstr ""
+msgstr "Kopyala"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -15532,6 +15532,21 @@ msgid ""
 "distribute or modify the APIs or any API Content (including adaptation, "
 "editing, excerpting, or creating derivative works)."
 msgstr ""
+"API'lerin ve tüm API İçeriğinin {platform_name} ve ortaklarının değerli "
+"fikri mülkiyetlerini içerdiğini kabul ve beyan edersiniz. API'ler ve tüm API"
+" İçeriği, Amerika Birleşik Devletleri ve yabancı ülkelerdeki telif hakkı, "
+"ticari marka ve diğer yasalar tarafından korunmaktadır. Açıkça verilmemişse,"
+" API'ler ve API İçeriği'ndeki tüm haklar saklıdır. API'leri veya herhangi "
+"bir API İçeriği'ni kullanarak, API'lerdeki veya API İçeriği'ndeki herhangi "
+"bir hakkın sahipliğini elde etmezsiniz. API'lerde veya herhangi bir API "
+"İçeriği'nde sahiplik iddia etmemeli veya iddia etmeye çalışmamalı veya "
+"kendinizi veya şirketinizi veya Uygulamanızı herhangi bir API İçeriği'nin "
+"kaynağı olarak yanlış tanıtmamalısınız. Herhangi bir API İçeriği'ni tamamen "
+"veya kısmen kendi adınıza veya herhangi bir üçüncü taraf adına değiştiremez,"
+" türev çalışmalar oluşturamaz veya kullanmaya, lisanslamaya veya herhangi "
+"bir şekilde istismar etmeye teşebbüs edemezsiniz. API'leri veya herhangi bir"
+" API İçeriği'ni dağıtamaz veya değiştiremezsiniz (uyarlama, düzenleme, "
+"alıntı yapma veya türev çalışmalar oluşturma dahil)."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -15550,6 +15565,21 @@ msgid ""
 "other entities providing information, API Content or services for the APIs, "
 "the course instructors and their staffs."
 msgstr ""
+"API'lerde, API İçeriği'nde veya API'ler üzerinde veya API'ler aracılığıyla "
+"sunulan hizmetlerde veya bunlar aracılığıyla görünen tüm isimler, logolar ve"
+" mühürler (\"Ticari Markalar\"), varsa, ilgili sahiplerinin mülkiyetindedir."
+" API İçeriği'ne dahil edilen veya eşlik eden telif hakkı, Ticari Marka veya "
+"diğer mülkiyet hakları bildirimlerini kaldıramaz, değiştiremez veya "
+"gizleyemezsiniz. Herhangi bir {platform_name} Paydaşının (bundan sonra "
+"tanımlandığı gibi) veya diğer üçüncü tarafın, Ticari Markalar dahil ancak "
+"bunlarla sınırlı olmamak üzere, söz konusu {platform_name} Paydaşının veya "
+"üçüncü tarafın sahip olduğu veya kontrol ettiği API İçeriği'ne erişimi iptal"
+" etmesi durumunda, söz konusu {platform_name} Paydaşına veya üçüncü tarafa "
+"ait tüm API İçeriği'nin Uygulamanızdan ve ağlarınızdan, sistemlerinizden ve "
+"sunucularınızdan mümkün olan en kısa sürede silinmesini sağlamalısınız. "
+"\"{platform_name_capitalized} Paydaşları\" MIT, Harvard ve API'ler için "
+"bilgi, API İçeriği veya hizmetleri sağlayan diğer kuruluşlar, ders "
+"eğitmenleri ve onların personeli anlamına gelir."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
