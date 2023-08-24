@@ -28,6 +28,7 @@ from .models import BlockStructureConfiguration
 #   https://github.com/openedx/edx-platform/pull/14770,
 #   https://openedx.atlassian.net/browse/DEPR-145
 
+
 @request_cached()
 def num_versions_to_keep():
     """

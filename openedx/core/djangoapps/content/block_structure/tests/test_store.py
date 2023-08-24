@@ -2,12 +2,10 @@
 Tests for block_structure/cache.py
 """
 
-import pytest
 import ddt
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from ..config.models import BlockStructureConfiguration
-from ..exceptions import BlockStructureNotFound
 from ..store import BlockStructureStore
 from .helpers import ChildrenMapTestMixin, MockCache, MockTransformer, UsageKeyFactoryMixin
 
