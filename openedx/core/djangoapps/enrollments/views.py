@@ -699,17 +699,17 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
 
         has_api_key_permissions = self.has_api_key_permissions(request)
 
-        # Check if the user or user_email was defined.
+        # Check if the user or email was defined.
         if not username:
-            user_email = request.data.get('user_email')
-            if user_email:
+            email = request.data.get('email')
+            if email:
                 try:
-                    username = User.objects.get(email=user_email).username
+                    username = User.objects.get(email=email).username
                 except ObjectDoesNotExist:
                     return Response(
                         status=status.HTTP_406_NOT_ACCEPTABLE,
                         data={
-                            'message': f'The user with the email address {user_email} does not exist.'
+                            'message': f'The user with the email address {email} does not exist.'
                         }
                     )
             else:

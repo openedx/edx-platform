@@ -236,7 +236,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
                 'course_details': {
                     'course_id': str(self.course.id)
                 },
-                'user_email': self.user.email
+                'email': self.user.email
             },
             format='json'
         )
@@ -251,7 +251,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
                     'course_id': str(self.course.id)
                 },
                 'user': self.user.username,
-                'user_email': 'another_email@example.com'
+                'email': 'another_email@example.com'
             },
             format='json'
         )
