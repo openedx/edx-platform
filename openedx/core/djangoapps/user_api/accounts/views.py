@@ -580,7 +580,7 @@ class DeactivateLogoutView(APIView):
         """
 
         # Ensure the account deletion is not disable
-        enable_account_deletion =  configuration_helpers.get_value(
+        enable_account_deletion = configuration_helpers.get_value(
             'ENABLE_ACCOUNT_DELETION', settings.FEATURES.get('ENABLE_ACCOUNT_DELETION', False)
         )
 
