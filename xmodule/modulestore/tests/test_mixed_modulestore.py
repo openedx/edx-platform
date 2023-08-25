@@ -541,11 +541,10 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #    find: get draft, get ancestors up to course (2-6), compute inheritance
     #    sends: update problem and then each ancestor up to course (edit info)
     # split:
-    #    mysql: SplitModulestoreCourseIndex - select (by course_id), update, update historical record,
-    #           select (by course_id, from XBLOCK_UPDATED handler in Content Tagging)
-    #    find: definitions (calculator field), structures
+    #    mysql: SplitModulestoreCourseIndex - select (by course_id), update, update historical record
+    #    find: definitions (calculator field), structures, XBLOCK_UPDATED handler call
     #    sends: 2 sends to update index & structure (note, it would also be definition if a content field changed)
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 6, 5), (ModuleStoreEnum.Type.split, 4, 2, 2))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 6, 5), (ModuleStoreEnum.Type.split, 3, 2, 2))
     @ddt.unpack
     def test_update_item(self, default_ms, num_mysql, max_find, max_send):
         """
