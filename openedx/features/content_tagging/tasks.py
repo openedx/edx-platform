@@ -112,9 +112,11 @@ def update_xblock_tags(usage_key_str: str) -> bool:
 
         if usage_key.course_key.is_course:
             course = modulestore().get_course(usage_key.course_key)
+            if course is None:
+                return True
             lang = course.language
         else:
-            return False
+            return True
 
         _update_tags(usage_key, lang)
 
