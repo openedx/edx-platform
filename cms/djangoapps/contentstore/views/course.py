@@ -1606,11 +1606,13 @@ def group_configurations_list_handler(request, course_key_string):
                     # Add it to the front of the list if it should be shown.
                     if should_show_enrollment_track:
                         displayable_partitions.insert(0, partition)
+                elif partition['scheme'] == "group":
+                    has_content_groups = True
+                    displayable_partitions.append(partition)
                 elif partition['scheme'] != RANDOM_SCHEME:
                     # Experiment group configurations are handled explicitly above. We don't
                     # want to display their groups twice.
                     displayable_partitions.append(partition)
-
             # Set the sort-order. Higher numbers sort earlier
             scheme_priority = defaultdict(lambda: -1, {
                 ENROLLMENT_SCHEME: 1,
@@ -1621,6 +1623,7 @@ def group_configurations_list_handler(request, course_key_string):
             # This will add ability to add new groups in the view.
             if not has_content_groups:
                 displayable_partitions.append(GroupConfiguration.get_or_create_content_group(store, course))
+                displayable_partitions.append(GroupConfiguration.get_or_create_content_group(store, course, scheme_name="group"))
             return render_to_response('group_configurations.html', {
                 'context_course': course,
                 'group_configuration_url': group_configuration_url,

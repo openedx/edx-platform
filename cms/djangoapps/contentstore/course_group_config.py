@@ -115,7 +115,7 @@ class GroupConfiguration:
             raise GroupConfigurationsValidationError(_("unable to load this type of group configuration"))  # lint-amnesty, pylint: disable=raise-missing-from
 
     @staticmethod
-    def _get_usage_dict(course, unit, block, scheme_name=None):
+    def _get_usage_dict(course, unit, block, scheme_name=COHORT_SCHEME):
         """
         Get usage info for unit/block.
         """
@@ -348,7 +348,7 @@ class GroupConfiguration:
         return partition_configuration
 
     @staticmethod
-    def get_or_create_content_group(store, course, scheme_name):
+    def get_or_create_content_group(store, course, scheme_name=COHORT_SCHEME):
         """
         Returns the first user partition from the course which uses the
         CohortPartitionScheme, or generates one if no such partition is
@@ -363,7 +363,7 @@ class GroupConfiguration:
         if content_group_configuration is None:
             content_group_configuration = UserPartition(
                 id=generate_int_id(MINIMUM_GROUP_ID, MYSQL_MAX_INT, GroupConfiguration.get_used_ids(course)),
-                name=CONTENT_GROUP_CONFIGURATION_NAME,
+                name=f"Content Groups for {scheme_name}",
                 description=CONTENT_GROUP_CONFIGURATION_DESCRIPTION,
                 groups=[],
                 scheme_id=scheme_name,
