@@ -10,7 +10,6 @@ the SessionMiddleware.
 
 
 from django.conf import settings
-from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.utils.translation.trans_real import parse_accept_lang_header
 from django.utils.deprecation import MiddlewareMixin
 
@@ -155,6 +154,5 @@ class DarkLangMiddleware(MiddlewareMixin):
         if not preview_lang:
             return
 
-        # Set the session key to the requested preview lang
-        request.session[LANGUAGE_SESSION_KEY] = preview_lang
+        # Set the response language_cookie to the requested preview lang
         set_language_cookie(request, response, preview_lang)

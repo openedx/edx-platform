@@ -397,7 +397,7 @@ class LibraryContentBlock(
                 'content': rendered_child.content,
             })
 
-        fragment.add_content(self.runtime.service(self, 'mako').render_template('vert_module.html', {
+        fragment.add_content(self.runtime.service(self, 'mako').render_lms_template('vert_module.html', {
             'items': contents,
             'xblock_context': context,
             'show_bookmark_button': False,
@@ -427,7 +427,7 @@ class LibraryContentBlock(
                 if max_count < 0:
                     max_count = len(self.children)
 
-                fragment.add_content(self.runtime.service(self, 'mako').render_template(
+                fragment.add_content(self.runtime.service(self, 'mako').render_cms_template(
                     "library-block-author-preview-header.html", {
                         'max_count': max_count,
                         'display_name': self.display_name or self.url_name,
@@ -450,7 +450,7 @@ class LibraryContentBlock(
         Return the studio view.
         """
         fragment = Fragment(
-            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
+            self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit_helpers.js'))
         add_webpack_js_to_fragment(fragment, 'LibraryContentBlockEditor')
