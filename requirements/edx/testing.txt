@@ -10,6 +10,7 @@ aiohttp==3.8.5
     # via
     #   -r requirements/edx/base.txt
     #   geoip2
+    #   openai
 aiosignal==1.3.1
     # via
     #   -r requirements/edx/base.txt
@@ -583,7 +584,7 @@ edx-drf-extensions==8.9.1
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.0.18
+edx-enterprise==4.1.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -959,6 +960,10 @@ oauthlib==3.2.2
     #   social-auth-core
 olxcleaner==0.2.1
     # via -r requirements/edx/base.txt
+openai==0.27.9
+    # via
+    #   -r requirements/edx/base.txt
+    #   edx-enterprise
 openedx-blockstore==1.4.0
     # via -r requirements/edx/base.txt
 openedx-calc==3.0.1
@@ -1305,6 +1310,7 @@ requests==2.31.0
     #   edx-rest-api-client
     #   geoip2
     #   mailsnake
+    #   openai
     #   optimizely-sdk
     #   pact-python
     #   pyjwkest
@@ -1504,6 +1510,7 @@ tqdm==4.66.1
     # via
     #   -r requirements/edx/base.txt
     #   nltk
+    #   openai
 typing-extensions==4.7.1
     # via
     #   -r requirements/edx/base.txt
