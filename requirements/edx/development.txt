@@ -17,6 +17,7 @@ aiohttp==3.8.5
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   geoip2
+    #   openai
 aiosignal==1.3.1
     # via
     #   -r requirements/edx/doc.txt
@@ -746,7 +747,7 @@ edx-drf-extensions==8.9.1
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.0.18
+edx-enterprise==4.1.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -1268,6 +1269,11 @@ olxcleaner==0.2.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
+openai==0.27.9
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
+    #   edx-enterprise
 openedx-blockstore==1.4.0
     # via
     #   -r requirements/edx/doc.txt
@@ -1296,7 +1302,7 @@ openedx-events==8.5.0
     #   -r requirements/edx/testing.txt
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
-openedx-filters==1.5.0
+openedx-filters==1.6.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1315,6 +1321,7 @@ optimizely-sdk==4.1.1
     #   -r requirements/edx/testing.txt
 ora2==5.2.4
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
 oscrypto==1.3.0
@@ -1728,6 +1735,7 @@ requests==2.31.0
     #   edx-rest-api-client
     #   geoip2
     #   mailsnake
+    #   openai
     #   optimizely-sdk
     #   pact-python
     #   pyjwkest
@@ -2035,6 +2043,7 @@ tqdm==4.66.1
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   nltk
+    #   openai
 types-pytz==2023.3.0.1
     # via django-stubs
 types-pyyaml==6.0.12.11

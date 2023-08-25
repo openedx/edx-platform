@@ -49,7 +49,7 @@ class TaxonomyOrg(models.Model):
 
     @classmethod
     def get_relationships(
-        cls, taxonomy: Taxonomy, rel_type: RelType, org_short_name: str = None
+        cls, taxonomy: Taxonomy, rel_type: RelType, org_short_name: Union[str, None] = None
     ) -> QuerySet:
         """
         Returns the relationships of the given rel_type and taxonomy where:
