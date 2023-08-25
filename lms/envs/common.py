@@ -1044,7 +1044,7 @@ FEATURES = {
     # .. toggle_warning: For consistency in user experience, keep the value in sync with the setting of the same name
     #   in the LMS and CMS.
     # .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/31813'
-    'ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS': True,
+    'ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API

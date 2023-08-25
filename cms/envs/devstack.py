@@ -302,7 +302,7 @@ CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 # .. toggle_warning: For consistency in user experience, keep the value in sync with the setting of the same name
 #   in the LMS and CMS.
 # .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/31813'
-FEATURES['ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS'] = True
+FEATURES['ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS'] = False
 EVENT_BUS_PRODUCER = 'edx_event_bus_redis.create_producer'
 EVENT_BUS_REDIS_CONNECTION_URL = 'redis://:password@edx.devstack.redis:6379/'
 EVENT_BUS_TOPIC_PREFIX = 'dev'
