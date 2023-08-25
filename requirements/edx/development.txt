@@ -1296,7 +1296,7 @@ openedx-events==8.5.0
     #   -r requirements/edx/testing.txt
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
-openedx-filters==1.5.0
+openedx-filters==1.6.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
