@@ -669,7 +669,7 @@ libsass==0.10.0
     #   -r requirements/edx/paver.txt
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==9.6.1
+lti-consumer-xblock==9.6.2
     # via -r requirements/edx/kernel.in
 lxml==4.9.3
     # via
@@ -728,7 +728,7 @@ mysqlclient==2.2.0
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-blockstore
-newrelic==8.10.1
+newrelic==8.11.0
     # via
     #   -r requirements/edx/bundled.in
     #   edx-django-utils
@@ -768,7 +768,7 @@ openedx-events==8.5.0
     #   -r requirements/edx/kernel.in
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
-openedx-filters==1.5.0
+openedx-filters==1.6.0
     # via
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
@@ -778,7 +778,7 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/kernel.in
 optimizely-sdk==4.1.1
     # via -r requirements/edx/bundled.in
-ora2==5.2.4
+ora2==5.2.5
     # via -r requirements/edx/bundled.in
 oscrypto==1.3.0
     # via snowflake-connector-python
