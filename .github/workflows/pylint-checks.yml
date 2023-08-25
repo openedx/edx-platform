@@ -71,7 +71,7 @@ jobs:
   # https://github.com/marketplace/actions/alls-green#why
   # https://github.com/orgs/community/discussions/33579
   success:
-    name: Tests successful
+    name: Pylint checks successful
     if: always()
     needs:
       - run-pylint
