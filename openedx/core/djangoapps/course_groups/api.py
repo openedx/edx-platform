@@ -92,6 +92,12 @@ def get_course_groups(course_id=None):
     )
     return list(query_set)
 
+def get_course_groups_qs(course_id=None):
+    query_set = CourseUserGroup.objects.filter(
+        course_id=course_id,
+        group_type=CourseUserGroup.GROUPS,
+    )
+    return query_set
 
 def is_group_exists(course_key, name):
     """
