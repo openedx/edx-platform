@@ -76,23 +76,29 @@ def update_course_tags(course_key_str: str) -> bool:
 
 @shared_task(base=LoggedTask)
 @set_code_owner_attribute
-def delete_course_tags(course_key_str: str):
+def delete_course_tags(course_key_str: str) -> bool:
     """
     Delete the tags for a Course.
 
     Params:
         course_key_str (str): identifier of the Course
     """
-    course_key = CourseKey.from_string(course_key_str)
+    try:
+        course_key = CourseKey.from_string(course_key_str)
 
-    log.info("Deleting tags for Course with id: %s", course_key)
+        log.info("Deleting tags for Course with id: %s", course_key)
 
-    _delete_tags(course_key)
+        _delete_tags(course_key)
+
+        return True
+    except Exception as e:  # pylint: disable=broad-except
+        log.error("Error deleting tags for Course with id: %s. %s", course_key, e)
+        return False
 
 
 @shared_task(base=LoggedTask)
 @set_code_owner_attribute
-def update_xblock_tags(usage_key_str: str):
+def update_xblock_tags(usage_key_str: str) -> bool:
     """
     Updates the tags for a XBlock.
 
@@ -115,20 +121,26 @@ def update_xblock_tags(usage_key_str: str):
         return True
     except Exception as e:  # pylint: disable=broad-except
         log.error("Error updating tags for XBlock with id: %s. %s", usage_key, e)
-        return False, e
+        return False
 
 
 @shared_task(base=LoggedTask)
 @set_code_owner_attribute
-def delete_xblock_tags(usage_key_str: str):
+def delete_xblock_tags(usage_key_str: str) -> bool:
     """
     Delete the tags for a XBlock.
 
     Params:
         usage_key_str (str): identifier of the XBlock
     """
-    usage_key = UsageKey.from_string(usage_key_str)
+    try:
+        usage_key = UsageKey.from_string(usage_key_str)
 
-    log.info("Deleting tags for XBlock with id: %s", usage_key)
+        log.info("Deleting tags for XBlock with id: %s", usage_key)
 
-    _delete_tags(usage_key)
+        _delete_tags(usage_key)
+
+        return True
+    except Exception as e:  # pylint: disable=broad-except
+        log.error("Error deleting tags for XBlock with id: %s. %s", usage_key, e)
+        return False
