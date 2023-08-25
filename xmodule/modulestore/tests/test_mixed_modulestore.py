@@ -541,7 +541,8 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #    find: get draft, get ancestors up to course (2-6), compute inheritance
     #    sends: update problem and then each ancestor up to course (edit info)
     # split:
-    #    mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record
+    #    mysql: SplitModulestoreCourseIndex - select (by course_id), update, update historical record,
+    #           select (by course_id, from XBLOCK_UPDATED handler in Content Tagging)
     #    find: definitions (calculator field), structures
     #    sends: 2 sends to update index & structure (note, it would also be definition if a content field changed)
     @ddt.data((ModuleStoreEnum.Type.mongo, 0, 6, 5), (ModuleStoreEnum.Type.split, 3, 2, 2))
@@ -1069,15 +1070,17 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             assert self.store.has_changes(parent)
 
     # Draft
+    #   mysql: delete oel_tagging_objecttag from XBLOCK_DELETED handler in Content Tagging
     #   Find: find parents (definition.children query), get parent, get course (fill in run?),
     #         find parents of the parent (course), get inheritance items,
     #         get item (to delete subtree), get inheritance again.
     #   Sends: delete item, update parent
     # Split
-    #   mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record
+    #   mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record,
+    #          delete oel_tagging_objecttag from XBLOCK_DELETED handler in Content Tagging
     #   Find: active_versions, 2 structures (published & draft), definition (unnecessary)
     #   Sends: updated draft and published structures and active_versions
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 6, 2), (ModuleStoreEnum.Type.split, 4, 2, 3))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 6, 2), (ModuleStoreEnum.Type.split, 5, 2, 3))
     @ddt.unpack
     def test_delete_item(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -1099,14 +1102,16 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             self.store.get_item(self.writable_chapter_location, revision=ModuleStoreEnum.RevisionOption.published_only)
 
     # Draft:
+    #   mysql: delete oel_tagging_objecttag from XBLOCK_DELETED handler in Content Tagging
     #    find: find parent (definition.children), count versions of item, get parent, count grandparents,
     #          inheritance items, draft item, draft child, inheritance
     #    sends: delete draft vertical and update parent
     # Split:
-    #    mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record
+    #    mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record,
+    #           delete oel_tagging_objecttag from XBLOCK_DELETED handler in Content Tagging
     #    find: draft and published structures, definition (unnecessary)
     #    sends: update published (why?), draft, and active_versions
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 8, 2), (ModuleStoreEnum.Type.split, 4, 3, 3))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 8, 2), (ModuleStoreEnum.Type.split, 5, 3, 3))
     @ddt.unpack
     def test_delete_private_vertical(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -1154,13 +1159,15 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         assert vert_loc not in course.children
 
     # Draft:
+    #   mysql: delete oel_tagging_objecttag from XBLOCK_DELETED handler in Content Tagging
     #   find: find parent (definition.children) 2x, find draft item, get inheritance items
     #   send: one delete query for specific item
     # Split:
-    #   mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record
+    #   mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record,
+    #          delete oel_tagging_objecttag from XBLOCK_DELETED handler in Content Tagging
     #   find: structure (cached)
     #   send: update structure and active_versions
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 3, 1), (ModuleStoreEnum.Type.split, 4, 1, 2))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 3, 1), (ModuleStoreEnum.Type.split, 5, 1, 2))
     @ddt.unpack
     def test_delete_draft_vertical(self, default_ms, num_mysql, max_find, max_send):
         """
