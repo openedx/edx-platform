@@ -471,6 +471,11 @@ class SequenceBlock(
         return self._student_or_public_view(context or {}, prereq_met, prereq_meta_info, None, PUBLIC_VIEW)
 
     def author_view(self, context):  # lint-amnesty, pylint: disable=missing-function-docstring
+        print('@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+        print(self.__dict__)
+        print(context)
+        print('@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+
         context = context or {}
         context['exclude_units'] = True
         if 'position' in context:

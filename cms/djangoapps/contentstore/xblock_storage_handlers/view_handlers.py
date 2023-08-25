@@ -150,6 +150,8 @@ def handle_xblock(request, usage_key_string=None):
     This method is used both by the internal xblock_handler API and by
     the public studio content API.
     """
+    print(f'WEEQUEST: {print(request.__dict__)}')
+
     if usage_key_string:
         usage_key = usage_key_with_run(usage_key_string)
 
@@ -222,7 +224,7 @@ def handle_xblock(request, usage_key_string=None):
                 request.user,
                 request.json.get("display_name"),
             )
-
+            print(f'CALL CALLBACK: {request.method}')
             _post_editor_saved_callback(get_xblock(dest_usage_key, request.user))
 
             return JsonResponse(

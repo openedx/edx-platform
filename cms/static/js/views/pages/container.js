@@ -9,9 +9,12 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
     'js/views/pages/container_subviews', 'js/views/unit_outline', 'js/views/utils/xblock_utils',
     'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt', 'js/utils/module',
 ],
-function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView, AddXBlockComponent,
-    EditXBlockModal, MoveXBlockModal, XBlockInfo, XBlockStringFieldEditor, XBlockAccessEditor,
-    ContainerSubviews, UnitOutlineView, XBlockUtils, NotificationView, PromptView,  ModuleUtils) {
+function($, _, Backbone, gettext, BasePage,
+    ViewUtils, ContainerView, XBlockView,
+    AddXBlockComponent, EditXBlockModal, MoveXBlockModal,
+    XBlockInfo, XBlockStringFieldEditor, XBlockAccessEditor,
+    ContainerSubviews, UnitOutlineView, XBlockUtils,
+    NotificationView, PromptView,  ModuleUtils) {
     'use strict';
 
     var XBlockContainerPage = BasePage.extend({
@@ -586,6 +589,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
         getSelectedLibraryComponents: function() {
             var self = this;
             var locator = this.$el.find('.studio-xblock-wrapper').data('locator');
+            console.log(ModuleUtils);
             $.getJSON(
                 ModuleUtils.getUpdateUrl(locator) + '/handler/get_block_ids',
                 function(data) {
