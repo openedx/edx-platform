@@ -48,6 +48,9 @@ log = logging.getLogger(__name__)
 
 class AboutPageRecommendationsView(APIView):
     """
+    IMPORTANT: Please do not update or use this API. This code has been moved to edx-recommendations plugin.
+    Please use that plugin for further code changes. This API will be removed as part of VAN-1427.
+
     **Example Request**
 
     GET api/learner_recommendations/amplitude/{course_id}/
@@ -135,6 +138,9 @@ class AboutPageRecommendationsView(APIView):
 
 class CrossProductRecommendationsView(APIView):
     """
+    IMPORTANT: Please do not update or use this API. This code has been moved to edx_recommendations plugin.
+    Please use that plugin for further code changes. This API will be removed as part of VAN-1427.
+
     **Example Request**
 
     GET api/learner_recommendations/cross_product/{course_id}/

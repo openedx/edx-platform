@@ -110,8 +110,9 @@ def get_discussable_units(course, enable_graded_units, discussable_units=None):
                 for unit in get_units(subsection):
                     idx += 1
                     if not is_discussable_unit(unit, store, enable_graded_units, subsection):
-                        unit.discussion_enabled = False
-                        store.update_item(unit, unit.published_by, emit_signals=False)
+                        if unit.discussion_enabled:
+                            log.info(f"Unit {unit.location} of course {course.id} has discussion enabled "
+                                     f"but is not discussable")
                         continue
                     # check if discussable_units is type of list and discussable_units is empty
                     # it means if discussable_units is empty then we should not create any topic

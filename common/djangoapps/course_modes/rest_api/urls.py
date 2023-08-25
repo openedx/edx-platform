@@ -3,7 +3,7 @@ URL definitions for the course_modes API.
 """
 
 
-from django.conf.urls import include
+from django.urls import include
 from django.urls import path
 
 app_name = 'common.djangoapps.course_modes.rest_api'

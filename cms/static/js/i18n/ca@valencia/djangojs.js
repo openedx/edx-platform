@@ -834,8 +834,6 @@
     "Successfully enrolled the following users:": "Els seg\u00fcents usuaris han estat donats d'alta correctament:",
     "Successfully rescored problem for user {user}": "S'ha pogut reescriure la puntuaci\u00f3 del problema de l'usuari {user}",
     "Successfully reset the attempts for user {user}": "S'han reiniciat amb \u00e8xit els intents per l'usuari {user}",
-    "Successfully sent enrollment emails to the following users. They will be allowed to enroll once they register:": "S'han enviat correctament els emails d'alta dels seg\u00fcents usuaris. Es podran donar d'alta un cop s'enregistrin:",
-    "Successfully sent enrollment emails to the following users. They will be enrolled once they register:": "S'han enviat correctament els emails d'alta als seg\u00fcents usuaris. Seran donats d'alta un cop s'enregistrin:",
     "Support education research by providing additional information": "Donar suport a la recerca en educaci\u00f3 proporcionant informaci\u00f3 addicional",
     "Supported": "Compatible",
     "Supported file types: {supportedVideoTypes}": "Tipus de fitxers admesos:  {supportedVideoTypes}",

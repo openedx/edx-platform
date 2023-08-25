@@ -12,26 +12,46 @@ CACHES:
     KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
     KEY_PREFIX: integration_celery
     LOCATION: ['edx.devstack.memcached:11211']
+    OPTIONS:
+      no_delay: true
+      ignore_exc: true
+      use_pooling: true
   default:
     BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
     KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
     KEY_PREFIX: sandbox_default
     LOCATION: ['edx.devstack.memcached:11211']
+    OPTIONS:
+      no_delay: true
+      ignore_exc: true
+      use_pooling: true
   general:
     BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
     KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
     KEY_PREFIX: sandbox_general
     LOCATION: ['edx.devstack.memcached:11211']
+    OPTIONS:
+      no_delay: true
+      ignore_exc: true
+      use_pooling: true
   mongo_metadata_inheritance:
     BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
     KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
     KEY_PREFIX: integration_mongo_metadata_inheritance
     LOCATION: ['edx.devstack.memcached:11211']
+    OPTIONS:
+      no_delay: true
+      ignore_exc: true
+      use_pooling: true
   staticfiles:
     BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
     KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
     KEY_PREFIX: integration_static_files
     LOCATION: ['edx.devstack.memcached:11211']
+    OPTIONS:
+      no_delay: true
+      ignore_exc: true
+      use_pooling: true
 CELERY_BROKER_HOSTNAME: localhost
 CELERY_BROKER_PASSWORD: celery
 CELERY_BROKER_TRANSPORT: amqp

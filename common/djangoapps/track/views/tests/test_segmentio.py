@@ -118,7 +118,7 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
 
     @data('foo/bar/baz', 'course-v1:foo+bar+baz')
     def test_success(self, course_id):
-        middleware = TrackMiddleware()
+        middleware = TrackMiddleware(get_response=lambda request: None)
 
         request = self.create_request(
             data=self.create_segmentio_event_json(data={'foo': 'bar'}, course_id=course_id),
@@ -278,7 +278,7 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
     @unpack
     def test_video_event(self, name, event_type):
         course_id = 'foo/bar/baz'
-        middleware = TrackMiddleware()
+        middleware = TrackMiddleware(get_response=lambda request: None)
 
         input_payload = {
             'current_time': 132.134456,
@@ -414,7 +414,7 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
         was sent instead of edx.video.position.changed
         """
         course_id = 'foo/bar/baz'
-        middleware = TrackMiddleware()
+        middleware = TrackMiddleware(get_response=lambda request: None)
         input_payload = {
             "code": "mobile",
             "new_time": 89.699177437,

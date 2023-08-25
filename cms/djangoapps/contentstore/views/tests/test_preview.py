@@ -186,7 +186,7 @@ class PureXBlock(XBlock):
         Renders the output that a student will see.
         """
         fragment = Fragment()
-        fragment.add_content(self.runtime.service(self, 'mako').render_template('edxmako.html', context))
+        fragment.add_content(self.runtime.service(self, 'mako').render_lms_template('edxmako.html', context))
         return fragment
 
 
