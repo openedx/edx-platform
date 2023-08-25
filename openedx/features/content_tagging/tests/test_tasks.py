@@ -7,13 +7,14 @@ import ddt
 from django.conf import settings
 from django.core.management import call_command
 from django.test.utils import override_settings
-from openedx_tagging.core.tagging.models import ObjectTag
+from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
 from organizations.models import Organization
 
 from openedx.core.lib.tests import attr
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.test_mixed_modulestore import CommonMixedModuleStoreSetup
 
+from ..models import ContentLanguageTaxonomy, TaxonomyOrg
 from ..tasks import delete_xblock_tags, update_course_tags, update_xblock_tags
 
 if not settings.configured:
@@ -45,7 +46,12 @@ class TestCourseAutoTagging(CommonMixedModuleStoreSetup):
         # Run fixtures to create the system defined tags
         super().setUpClass()
         call_command("loaddata", "--app=oel_tagging", "language_taxonomy.yaml")
-        call_command("loaddata", "--app=content_tagging", "system_defined.yaml")
+
+        # Configure language taxonomy
+        language_taxonomy = Taxonomy.objects.get(id=-1)
+        language_taxonomy.taxonomy_class = ContentLanguageTaxonomy
+        language_taxonomy.save()
+        TaxonomyOrg.objects.create(id=-1, taxonomy_id=-1, org=None)
 
     def setUp(self):
         super().setUp()
