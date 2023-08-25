@@ -112,6 +112,7 @@ def get_grouped_user_partition(course):
     or None if one is not found. Note that it is currently recommended that each course have only
     one cohorted user partition.
     """
+    from platform_plugin_groups.scheme import GroupPartitionScheme
     for user_partition in course.user_partitions:
         if user_partition.scheme == GroupPartitionScheme:
             return user_partition
