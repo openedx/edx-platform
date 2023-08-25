@@ -528,6 +528,17 @@ FEATURES = {
     # .. toggle_creation_date: 2023-03-31
     # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/32015
     'DISABLE_ADVANCED_SETTINGS': False,
+
+    # .. toggle_name: FEATURES['ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Temporary configuration which enables sending xblock events over the event bus.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2023-02-21
+    # .. toggle_warning: For consistency in user experience, keep the value in sync with the setting of the same name
+    #   in the LMS and CMS.
+    # .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/31813'
+    'ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS': True,
 }
 
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE
