@@ -923,7 +923,7 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/base.txt
 optimizely-sdk==4.1.1
     # via -r requirements/edx/base.txt
-ora2==5.2.4
+ora2==5.2.5
     # via -r requirements/edx/base.txt
 oscrypto==1.3.0
     # via
