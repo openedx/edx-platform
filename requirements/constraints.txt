@@ -27,7 +27,7 @@ django-storages==1.10.1
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==4.0.18
+edx-enterprise==4.1.0
 
 # 1. django-oauth-toolkit version >=2.0.0 has breaking changes. More details
 #    mentioned on this issue https://github.com/openedx/edx-platform/issues/32884
@@ -131,7 +131,5 @@ click==8.1.6
 # plz upgrade this in separate ticket
 redis==4.6.0
 
-# openedx-learning new version has some changes which are breaking quality tests
-# See https://github.com/openedx/openedx-learning/pull/68 for the changes.
-# It needs to be updated in a separate issue.
-openedx-learning==0.1.2
+# holding off ora date config feature
+ora2==5.2.4
