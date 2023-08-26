@@ -699,7 +699,15 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
 
         has_api_key_permissions = self.has_api_key_permissions(request)
 
-        # Check if the user or email was defined.
+        # Check that the user specified is either the same user, or this is a server-to-server request.
+        if username != request.user.username and not has_api_key_permissions \
+                and not GlobalStaff().has_user(request.user):
+            # Return a 404 instead of a 403 (Unauthorized). If one user is looking up
+            # other users, do not let them deduce the existence of an enrollment.
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        # A provided user has priority over a provided email.
+        # Fallback on request user if neither is provided.
         if not username:
             email = request.data.get('email')
             if email:
@@ -714,13 +722,6 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     )
             else:
                 username = request.user.username
-
-        # Check that the user specified is either the same user, or this is a server-to-server request.
-        if username != request.user.username and not has_api_key_permissions \
-                and not GlobalStaff().has_user(request.user):
-            # Return a 404 instead of a 403 (Unauthorized). If one user is looking up
-            # other users, do not let them deduce the existence of an enrollment.
-            return Response(status=status.HTTP_404_NOT_FOUND)
 
         if mode not in (CourseMode.AUDIT, CourseMode.HONOR, None) and not has_api_key_permissions \
                 and not GlobalStaff().has_user(request.user):
