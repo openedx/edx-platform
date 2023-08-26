@@ -545,7 +545,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #    mysql: SplitModulestoreCourseIndex - select (by course_id), update, update historical record, XBLOCK_UPDATED handler call
     #    find: definitions (calculator field), structures, XBLOCK_UPDATED handler call
     #    sends: 2 sends to update index & structure (note, it would also be definition if a content field changed)
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 6, 5), (ModuleStoreEnum.Type.split, 4, 2, 2))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 6, 5), (ModuleStoreEnum.Type.split, 4, 3, 2))
     @ddt.unpack
     @override_settings(
         CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
@@ -2065,7 +2065,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
     # Draft: get all items which can be or should have parents
     # Split: active_versions (mysql), structure (mongo)
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 1, 0), (ModuleStoreEnum.Type.split, 1, 1, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 1, 0), (ModuleStoreEnum.Type.split, 0, 1, 0))
     @ddt.unpack
     @override_settings(
         CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
