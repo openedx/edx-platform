@@ -7,7 +7,9 @@
 acid-xblock==0.2.1
     # via -r requirements/edx/kernel.in
 aiohttp==3.8.5
-    # via geoip2
+    # via
+    #   geoip2
+    #   openai
 aiosignal==1.3.1
     # via aiohttp
 algoliasearch==2.6.3
@@ -479,7 +481,7 @@ edx-drf-extensions==8.9.1
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.0.18
+edx-enterprise==4.1.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -751,6 +753,8 @@ oauthlib==3.2.2
     #   social-auth-core
 olxcleaner==0.2.1
     # via -r requirements/edx/kernel.in
+openai==0.27.9
+    # via edx-enterprise
 openedx-blockstore==1.4.0
     # via -r requirements/edx/kernel.in
 openedx-calc==3.0.1
@@ -768,7 +772,7 @@ openedx-events==8.5.0
     #   -r requirements/edx/kernel.in
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
-openedx-filters==1.5.0
+openedx-filters==1.6.0
     # via
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
@@ -779,7 +783,9 @@ openedx-mongodbproxy==0.2.0
 optimizely-sdk==4.1.1
     # via -r requirements/edx/bundled.in
 ora2==5.2.4
-    # via -r requirements/edx/bundled.in
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/bundled.in
 oscrypto==1.3.0
     # via snowflake-connector-python
 packaging==23.1
@@ -987,6 +993,7 @@ requests==2.31.0
     #   edx-rest-api-client
     #   geoip2
     #   mailsnake
+    #   openai
     #   optimizely-sdk
     #   pyjwkest
     #   pylti1p3
@@ -1121,7 +1128,9 @@ tinycss2==1.1.1
 tomlkit==0.12.1
     # via snowflake-connector-python
 tqdm==4.66.1
-    # via nltk
+    # via
+    #   nltk
+    #   openai
 typing-extensions==4.7.1
     # via
     #   -r requirements/edx/paver.txt
