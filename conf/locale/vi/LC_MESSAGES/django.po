@@ -22371,14 +22371,6 @@ msgid "Expand or Collapse"
 msgstr "Mở rộng hoặc Thu gọn"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Access Settings"
-msgstr "Những Thiết lập Truy cập"
-
-#: cms/templates/studio_xblock_wrapper.html
-msgid "Set Access"
-msgstr "Thiết lạp Truy cập"
-
-#: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"
 msgstr ""
 

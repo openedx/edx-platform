@@ -185,6 +185,7 @@
 # Juan Fernando Villa <elite.linux@gmail.com>, 2015
 # Juan <juan.marrero@utec.edu.uy>, 2015
 # Juliana Kang <jkang@edx.org>, 2021
+# Julia Peixoto, 2023
 # Lalo Cabrera <laloogcabrera@yahoo.com.mx>, 2014
 # Laura Silva <lingison@edx.org>, 2016-2017
 # 5d3923a435bd1af79454b9836d4c0111_a3a4fae <556e7ad92465a56b545f9e78fb091a63_215518>, 2014
@@ -294,7 +295,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-30 20:42+0000\n"
+"POT-Creation-Date: 2023-08-20 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://app.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -17463,7 +17464,7 @@ msgstr "Inscripción cerrada"
 
 #: lms/templates/courseware/course_about.html
 msgid "Enroll Now"
-msgstr "Incríbase ahora"
+msgstr "Inscríbase ahora"
 
 #: lms/templates/courseware/course_about.html
 msgid "View About Page in studio"
@@ -25134,14 +25135,6 @@ msgstr ""
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
 msgstr "Expandir o Colapsar"
-
-#: cms/templates/studio_xblock_wrapper.html
-msgid "Access Settings"
-msgstr "Configuraciones de Acceso"
-
-#: cms/templates/studio_xblock_wrapper.html
-msgid "Set Access"
-msgstr "Configuración de Acceso"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"
