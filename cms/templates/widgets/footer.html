@@ -41,24 +41,5 @@ from openedx.core.djangolib.markup import HTML, Text
           </ol>
         </nav>
     </div>
-
-    <div class="footer-content-secondary" aria-label="${_("Legal")}">
-      <div class="footer-about-copyright">
-        ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
-        <p>
-          ## Translators: 'edX' and 'Open edX' are trademarks of 'edX Inc.'. Please do not translate any of these trademarks and company names.
-          ${Text(_("edX, Open edX, and the edX and Open edX logos are registered trademarks of {link_start}edX Inc.{link_end}")).format(
-            link_start=HTML(u"<a href='https://www.edx.org/'>"),
-            link_end=HTML(u"</a>")
-          )}
-        </p>
-      </div>
-
-      <div class="footer-about-openedx">
-        <a href="https://open.edx.org" title="${_("Powered by Open edX")}">
-          <img alt="${_("Powered by Open edX")}" src="https://logos.openedx.org/open-edx-logo-tag.png">
-        </a>
-      </div>
-    </div>
   </footer>
 </div>
