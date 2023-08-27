@@ -25109,14 +25109,6 @@ msgid "Expand or Collapse"
 msgstr "Déplier ou Replier"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Access Settings"
-msgstr "Paramètres d'accès"
-
-#: cms/templates/studio_xblock_wrapper.html
-msgid "Set Access"
-msgstr "Définir l'accès"
-
-#: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"
 msgstr ""
 

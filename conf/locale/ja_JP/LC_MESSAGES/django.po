@@ -21760,14 +21760,6 @@ msgid "Expand or Collapse"
 msgstr "開くまたは閉じる"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Access Settings"
-msgstr "アクセス設定"
-
-#: cms/templates/studio_xblock_wrapper.html
-msgid "Set Access"
-msgstr "アクセスを設定"
-
-#: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"
 msgstr ""
 
