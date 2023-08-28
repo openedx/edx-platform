@@ -1,7 +1,9 @@
 """
 Content Tagging APIs
 """
-from typing import Iterator, List, Type, Union
+from __future__ import annotations
+
+from typing import Iterator
 
 import openedx_tagging.core.tagging.api as oel_tagging
 from django.db.models import QuerySet
@@ -14,12 +16,12 @@ from .models import ContentObjectTag, ContentTaxonomy, TaxonomyOrg
 
 def create_taxonomy(
     name: str,
-    description: str = None,
+    description: str | None = None,
     enabled=True,
     required=False,
     allow_multiple=False,
     allow_free_text=False,
-    taxonomy_class: Type = ContentTaxonomy,
+    taxonomy_class: type[ContentTaxonomy] | None = None,
 ) -> Taxonomy:
     """
     Creates, saves, and returns a new Taxonomy with the given attributes.
@@ -40,7 +42,7 @@ def create_taxonomy(
 def set_taxonomy_orgs(
     taxonomy: Taxonomy,
     all_orgs=False,
-    orgs: List[Organization] = None,
+    orgs: list[Organization | None] | None = None,
     relationship: TaxonomyOrg.RelType = TaxonomyOrg.RelType.OWNER,
 ):
     """
@@ -116,9 +118,9 @@ def get_content_tags(
 
 def tag_content_object(
     taxonomy: Taxonomy,
-    tags: List,
+    tags: list,
     object_id: CourseKey | UsageKey,
-) -> List[ContentObjectTag]:
+) -> list[ContentObjectTag]:
     """
     This is the main API to use when you want to add/update/delete tags from a content object (e.g. an XBlock or
     course).
