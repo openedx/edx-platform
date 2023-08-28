@@ -1,6 +1,7 @@
 """
 Defines asynchronous celery task for auto-tagging content
 """
+from __future__ import annotations
 
 import logging
 
