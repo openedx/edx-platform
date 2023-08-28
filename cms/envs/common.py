@@ -158,7 +158,7 @@ BLOCK_STRUCTURES_SETTINGS = dict(
 
     #block structures are stored in a more permanent storage
     #which provides an additional backup for cache misses
-    STORAGE_CLASS='django.core.files.storage.FileSystemStorage',    
+    STORAGE_CLASS='django.core.files.storage.FileSystemStorage',
     STORAGE_KWARGS=dict(
         location=MEDIA_ROOT,
         base_url=MEDIA_URL,
