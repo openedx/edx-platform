@@ -483,6 +483,7 @@ class TestGetCourseAssignments(CompletionWaffleTestMixin, ModuleStoreTestCase):
         assert not assignments[0].complete
 
 class TestGetCourseAssignmentsORA(CompletionWaffleTestMixin, ModuleStoreTestCase):
+    """ Tests for ora-related behavior in get_course_assignments """
     TODAY = datetime.datetime(2023, 8, 2, 12, 23, 45, tzinfo=pytz.UTC)
 
     def setUp(self):
@@ -492,11 +493,24 @@ class TestGetCourseAssignmentsORA(CompletionWaffleTestMixin, ModuleStoreTestCase
         self.addCleanup(self.freezer.stop)
 
     def _date(self, t):
+        """ Helper to easily generate sequential days """
         return datetime.timedelta(days=t) + self.TODAY
 
     def _setup_course(self, course_dates=None, subsection_dates=None, ora_dates=None, date_config_type="manual"):
         """
-        Set
+        Setup a course with one section, subsection, unit, and ORA
+
+        With no arguments, the timeline of due dates is:
+        T  | Date
+        --------
+        -1 | Course Starts
+         0 | Current frozen time
+         1 | Subsection, submission, and self-assessment open
+         2 | submission is due
+         4 | self-assessment is due and peer assessment opens
+         5 | peer assessment is due
+         6 | subsection is due
+        10 | course ends
         """
         course_dates = course_dates or (self._date(-1), self._date(10))
         subsection_dates = subsection_dates or (self._date(1), self._date(6))
@@ -554,6 +568,12 @@ class TestGetCourseAssignmentsORA(CompletionWaffleTestMixin, ModuleStoreTestCase
         expected_date_peer,
         expected_date_self
     ):
+        """
+        Helper to assert that
+         - there are four date blocks
+         - The first one is for the subsection and the next three are the ora steps
+         - the steps have the expected due dates
+         """
         assert len(assignments) == 4
 
         assert assignments[0].block_key == self.subsection.location
@@ -570,6 +590,10 @@ class TestGetCourseAssignmentsORA(CompletionWaffleTestMixin, ModuleStoreTestCase
         assert assignments[3].date == expected_date_self
 
     def test_ora_date_config__manual(self):
+        """
+        When manual config is set, the dates for ora setps should be the step
+        due dates
+        """
         self._setup_course()
         self.assert_ora_course_assignments(
             get_course_assignments(self.course.location.context_key, self.user, None),
@@ -579,6 +603,9 @@ class TestGetCourseAssignmentsORA(CompletionWaffleTestMixin, ModuleStoreTestCase
         )
     
     def test_ora_date_config__subsection(self):
+        """
+        When subsection config is set, the dates for ora steps should all be the subsection due date
+        """
         self._setup_course(date_config_type='subsection')
         self.assert_ora_course_assignments(
             get_course_assignments(self.course.location.context_key, self.user, None),
@@ -588,6 +615,9 @@ class TestGetCourseAssignmentsORA(CompletionWaffleTestMixin, ModuleStoreTestCase
         )
 
     def test_ora_date_config__course_end(self):
+        """
+        When manual config is set, the dates for ora steps should all be the course end date
+        """
         self._setup_course(date_config_type='course_end')
         self.assert_ora_course_assignments(
             get_course_assignments(self.course.location.context_key, self.user, None),
@@ -598,7 +628,7 @@ class TestGetCourseAssignmentsORA(CompletionWaffleTestMixin, ModuleStoreTestCase
 
     def test_course_end_none(self):
         """
-        Test that if the course has no end date defined and if the ora date config
+        If the course has no end date defined and if the ora date config
         is set to course end, don't include due dates for the ORA assignment in the due dates
         """
         self._setup_course(
@@ -611,7 +641,7 @@ class TestGetCourseAssignmentsORA(CompletionWaffleTestMixin, ModuleStoreTestCase
 
     def test_subsection_none(self):
         """
-        Test that if the subsection has no due date defined and if the ora date config
+        If the subsection has no due date defined and if the ora date config
         is set to subsection, don't include due dates for the ORA assignment in the due dates
         """
         self._setup_course(
