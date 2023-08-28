@@ -74,6 +74,29 @@ def get_integrity_signatures_for_course(course_id):
     return IntegritySignature.objects.filter(course_key=course_key)
 
 
+def create_lti_pii_signature(username, course_id, lti_tools):
+    """
+    Creates an lti pii tool signature. If the signature already exist, do not create a new one.
+    Arguments:
+        * course_key (str)
+        * lti_tools (str)
+        * lti_tools_hash (int)
+    Returns:
+        * True or False depending on if the write was successful
+    """
+    user = User.objects.get(username=username)
+    course_key = CourseKey.from_string(course_id)
+    lti_tools_hash = hash(lti_tools)
+
+    signature, created = LTIPIISignature.objects.get_or_create(
+        user=user,
+        course_key=course_key,
+        lti_tools=lti_tools,
+        lti_tools_hash=lti_tools_hash)
+
+    return signature
+
+
 def get_lti_tools_receiving_pii(course_id):
     """
     Get a course's LTI tools that share PII.
@@ -181,7 +204,7 @@ def _user_needs_signature_update(username, course_id):
     user_lti_pii_signature_hash = LTIPIISignature.objects.get(course_key=course_key, user=user).lti_tools_hash
     course_lti_pii_tools_hash = LTIPIITool.objects.get(course_key=course_key).lti_tools_hash
 
-    if (user_lti_pii_signature_hash == course_lti_pii_tools_hash):
+    if user_lti_pii_signature_hash == course_lti_pii_tools_hash:
         # Hashes are equal, therefor update is not need
         return False
     else:
