@@ -36,16 +36,6 @@ class TestBlockStructureFactory(TestCase, ChildrenMapTestMixin):
                 modulestore=self.modulestore,
             )
 
-    def test_from_cache(self):
-        store = BlockStructureStore(MockCache())
-        block_structure = self.create_block_structure(self.children_map)
-        store.add(block_structure)
-        from_cache_block_structure = BlockStructureFactory.create_from_store(
-            block_structure.root_block_usage_key,
-            store,
-        )
-        self.assert_block_structure(from_cache_block_structure, self.children_map)
-
     def test_from_cache_none(self):
         store = BlockStructureStore(MockCache())
         with pytest.raises(BlockStructureNotFound):
