@@ -865,16 +865,20 @@ def skill_reflection_response(skills, likert_questions, nuance_interrogation_que
             submissions = list(question.submissions.filter(problem_location=getattr(question, location_key)).all())
             stats = defaultdict(int)
 
+            question_stats = {'qid': question.id, 'skill': skill, 'title': None, 'points': None, 'submissions': []}
+
             for submission in submissions:
                 question_response = submission.question_response
                 response_text = question_response['student_response']['response_text']
                 stats[response_text] += 1
-                stats['points'] = question_response['student_response']['points']
+                if not question_stats['title']:
+                    question_stats['title'] = question_response['question']
 
             if stats:
-                key = f'total_{response_key}_{skill.lower()}'
-                response[key] = response.get(key, 0) + len(submissions)
-                response[response_key].append({'skill': skill, **stats})
+                for sk in stats.keys():
+                    question_stats['submissions'].append({'key': sk, "value": stats[sk]})
+
+                response[response_key].append(question_stats)
 
     process_question_responses(likert_questions, 'intros', 'start_unit_location')
     process_question_responses(likert_questions, 'outros', 'end_unit_location')
