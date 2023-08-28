@@ -115,7 +115,7 @@ class ContentTaxonomyMixin:
     def taxonomies_for_org(
         cls,
         queryset: QuerySet,
-        org: Organization = None,
+        org: Organization | None = None,
     ) -> QuerySet:
         """
         Filters the given QuerySet to those ContentTaxonomies which are available for the given organization.

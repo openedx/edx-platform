@@ -21,17 +21,17 @@ log = logging.getLogger(__name__)
 User = get_user_model()
 
 
-def _has_taxonomy(taxonomy: Taxonomy, content_object) -> bool:
+def _has_taxonomy(taxonomy: Taxonomy, content_object: CourseKey | UsageKey) -> bool:
     """
     Return True if this Taxonomy have some Tag set in the content_object
     """
     _exausted = object()
 
-    content_tags = api.get_content_tags(object_id=content_object, taxonomy_id=taxonomy.id)
+    content_tags = api.get_content_tags(object_id=str(content_object), taxonomy_id=taxonomy.id)
     return next(content_tags, _exausted) is not _exausted
 
 
-def _update_tags(content_object, lang) -> None:
+def _update_tags(content_object: CourseKey | UsageKey, lang) -> None:
     """
     Update the tags for a content_object.
 
@@ -45,8 +45,8 @@ def _update_tags(content_object, lang) -> None:
         api.tag_content_object(lang_taxonomy, [lang_tag.id], content_object)
 
 
-def _delete_tags(content_object) -> None:
-    api.delete_object_tags(content_object)
+def _delete_tags(content_object: CourseKey | UsageKey) -> None:
+    api.delete_object_tags(str(content_object))
 
 
 @shared_task(base=LoggedTask)
@@ -65,9 +65,9 @@ def update_course_tags(course_key_str: str) -> bool:
         log.info("Updating tags for Course with id: %s", course_key)
 
         course = modulestore().get_course(course_key)
-        lang = course.language
-
-        _update_tags(course_key, lang)
+        if (course):
+            lang = course.language
+            _update_tags(course_key, lang)
 
         return True
     except Exception as e:  # pylint: disable=broad-except

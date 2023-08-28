@@ -5,8 +5,7 @@ from typing import Iterator, List, Type, Union
 
 import openedx_tagging.core.tagging.api as oel_tagging
 from django.db.models import QuerySet
-from opaque_keys.edx.keys import LearningContextKey
-from opaque_keys.edx.locator import BlockUsageLocator
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx_tagging.core.tagging.models import Taxonomy
 from organizations.models import Organization
 
@@ -80,7 +79,7 @@ def set_taxonomy_orgs(
 
 def get_taxonomies_for_org(
     enabled=True,
-    org_owner: Organization = None,
+    org_owner: Organization | None = None,
 ) -> QuerySet:
     """
     Generates a list of the enabled Taxonomies available for the given org, sorted by name.
@@ -101,7 +100,7 @@ def get_taxonomies_for_org(
 
 
 def get_content_tags(
-    object_id: str, taxonomy_id: str = None
+    object_id: str, taxonomy_id: str | None = None
 ) -> Iterator[ContentObjectTag]:
     """
     Generates a list of content tags for a given object.
@@ -118,7 +117,7 @@ def get_content_tags(
 def tag_content_object(
     taxonomy: Taxonomy,
     tags: List,
-    object_id: Union[BlockUsageLocator, LearningContextKey],
+    object_id: CourseKey | UsageKey,
 ) -> List[ContentObjectTag]:
     """
     This is the main API to use when you want to add/update/delete tags from a content object (e.g. an XBlock or
