@@ -4,7 +4,11 @@ from datetime import datetime
 import pytz
 from django.core.management.base import BaseCommand, CommandError
 
-from openedx.features.genplus_features.genplus_learning.models import Unit, UnitCompletion
+from openedx.features.genplus_features.genplus_learning.models import (
+    Unit,
+    UnitCompletion,
+    UnitBlockCompletion,
+)
 from openedx.features.genplus_features.genplus_learning.utils import (
     get_course_completion,
     get_progress_and_completion_status
@@ -60,6 +64,11 @@ class Command(BaseCommand):
                         'completion_date': datetime.now().replace(tzinfo=pytz.UTC)
                     }
                     UnitCompletion.objects.update_or_create(user=user, course_key=course_key, defaults=defaults)
+                    UnitBlockCompletion.objects.filter(course_key=course_key).update(
+                        progress=progress,
+                        is_complete=is_complete,
+                        completion_date=datetime.now().replace(tzinfo=pytz.UTC),
+                    )
                     updated_users.append(user)
                     self.stdout.write(
                         self.style.SUCCESS(f"Processed course completion of user {user}, for course {course_key}")
