@@ -132,7 +132,7 @@ class BlockStructureStore:
         Returns the model associated with the given key.
         """
         return BlockStructureModel.get(root_block_usage_key)
-      
+
     def _update_or_create_model(self, block_structure, serialized_data):
         """
         Updates or creates the model for the given block_structure
@@ -145,7 +145,6 @@ class BlockStructureStore:
             **self._version_data_of_block(root_block)
         )
         return bs_model
-
 
     def _add_to_cache(self, serialized_data, bs_model):
         """
@@ -216,7 +215,7 @@ class BlockStructureStore:
         BlockStructureModel.
         """
         return str(bs_model)
-        
+
     @staticmethod
     def _version_data_of_block(root_block):
         """
