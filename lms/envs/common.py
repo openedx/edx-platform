@@ -3801,9 +3801,10 @@ VIDEO_IMAGE_SETTINGS = dict(
     # STORAGE_KWARGS=dict(bucket='video-image-bucket'),
     STORAGE_KWARGS=dict(
         location=MEDIA_ROOT,
-        base_url=MEDIA_URL,
     ),
     DIRECTORY_PREFIX='video-images/',
+    BASE_URL=MEDIA_URL,
+
 )
 
 VIDEO_IMAGE_MAX_AGE = 31536000
@@ -3817,9 +3818,9 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
     # STORAGE_KWARGS=dict(bucket='video-transcripts-bucket'),
     STORAGE_KWARGS=dict(
         location=MEDIA_ROOT,
-        base_url=MEDIA_URL,
     ),
     DIRECTORY_PREFIX='video-transcripts/',
+    BASE_URL=MEDIA_URL,
 )
 
 VIDEO_TRANSCRIPTS_MAX_AGE = 31536000
