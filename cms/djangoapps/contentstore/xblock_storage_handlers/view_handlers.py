@@ -177,9 +177,8 @@ def handle_xblock(request, usage_key_string=None):
     This method is used both by the internal xblock_handler API and by
     the public studio content API.
     """
-    print(f'WEEQUEST: {print(request.__dict__)}')
-
     if usage_key_string:
+
         usage_key = usage_key_with_run(usage_key_string)
 
         access_check = (
@@ -220,7 +219,10 @@ def handle_xblock(request, usage_key_string=None):
             _delete_item(usage_key, request.user)
             return JsonResponse()
         else:  # Since we have a usage_key, we are updating an existing xblock.
-            return modify_xblock(usage_key, request)
+            modified_xblock = modify_xblock(usage_key, request)
+            _post_editor_saved_callback(get_xblock(usage_key, request.user))
+            return modified_xblock
+
 
     elif request.method in ("PUT", "POST"):
         if "duplicate_source_locator" in request.json:
@@ -254,7 +256,6 @@ def handle_xblock(request, usage_key_string=None):
                 request.user,
                 request.json.get("display_name"),
             )
-            print(f'CALL CALLBACK: {request.method}')
             _post_editor_saved_callback(get_xblock(dest_usage_key, request.user))
 
             return JsonResponse(
@@ -300,7 +301,6 @@ def handle_xblock(request, usage_key_string=None):
 
 def modify_xblock(usage_key, request):
     request_data = request.json
-    print(f'In modify_xblock with data = {request_data.get("data")}, fields = {request_data.get("fields")}')
     return _save_xblock(
         request.user,
         get_xblock(usage_key, request.user),

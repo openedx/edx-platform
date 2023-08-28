@@ -114,12 +114,7 @@ class LibrarySourcedBlock(
         Renders the children of the module with HTML appropriate for Studio. If can_reorder is True,
         then the children will be rendered to support drag and drop.
         """
-        print('render_children')
         contents = []
-
-        print("*@*@*@*@*@*@*@*@*@*@")
-        print(self.get_children())
-        print("*@*@*@*@*@*@*@*@*@*@")
         for child in self.get_children():  # pylint: disable=no-member
             if can_reorder:
                 context['reorderable_items'].add(child.location)
@@ -157,7 +152,6 @@ class LibrarySourcedBlock(
         """
         Renders the Studio preview view.
         """
-        print('*****************************')
         fragment = Fragment()
         root_xblock = context.get('root_xblock')
         is_root = root_xblock and root_xblock.location == self.location  # pylint: disable=no-member
@@ -165,7 +159,6 @@ class LibrarySourcedBlock(
         # We don't display the editor if is_root as that page should represent the student_view without any ambiguity
         is_loading = self.tools.is_loading(self.location)
         if is_root and not is_loading:
-            print('hello world')
             context = {} if not context else copy(context)  # Isolate context - without this there are weird
             # bugs in Studio EditableChildrenMixin.render_children will render HTML that allows instructors
             # to make edits to the children
@@ -184,8 +177,6 @@ class LibrarySourcedBlock(
         Generator returning XBlock instances of the children selected for the
         current user.
         """
-        print('*****************************')
-        print( self.source_block_ids)
         for block_id in self.source_block_ids:
             usage_key = UsageKey.from_string(block_id)
             yield self.runtime.get_block(usage_key)
@@ -277,7 +268,7 @@ class LibrarySourcedBlock(
             validation.set_summary(
                 StudioValidationMessage(
                     StudioValidationMessage.NOT_CONFIGURED,
-                    _("There are no problem types in the specified libraries."),
+                    _("There is no content in the specified library."),
                     action_class='edit-button',
                     action_label=_("Select another Library.")
                 )
@@ -344,7 +335,6 @@ class LibrarySourcedBlock(
         """
         If source_library_id has been edited, refresh_children automatically.
         """
-        print('post_editor_saved')
         try:
             if self.source_library_id:
                 self.refresh_children()
@@ -365,7 +355,6 @@ class LibrarySourcedBlock(
         the version number of the libraries used, so we easily determine if
         this block is up to date or not.
         """
-        print('Begin refresh_children')
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         if not self.tools:
             return Response("Library Tools unavailable in current runtime.", status=400)

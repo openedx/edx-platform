@@ -7,7 +7,7 @@ import json
 import logging
 import random
 from copy import copy
-from gettext import ngettext
+from gettext import ngettext, gettext
 
 import bleach
 from django.conf import settings
@@ -652,7 +652,10 @@ class LibraryContentBlock(
                 validation,
                 StudioValidationMessage(
                     StudioValidationMessage.WARNING,
-                    _('There are no matching problem types in the specified libraries.'),
+                    (
+                        gettext(
+                            'There are no problems in the specified library of type {capa_type}.',
+                    )).format(capa_type= self.capa_type),
                     action_class='edit-button',
                     action_label=_("Select another problem type.")
                 )
