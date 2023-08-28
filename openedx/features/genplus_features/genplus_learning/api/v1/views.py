@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.features.genplus_features.genplus.models import GenUser, Student, Class, Activity
 from openedx.features.genplus_features.common.display_messages import SuccessMessages, ErrorMessages
-from openedx.features.genplus_features.genplus.api.v1.permissions import IsStudentOrTeacher, IsTeacher, IsStudent
+from openedx.features.genplus_features.genplus.api.v1.permissions import IsStudentOrTeacher, IsTeacher, IsStudent, IsUserFromSameSchool
 from openedx.features.genplus_features.genplus_learning.models import (Program, ProgramEnrollment, ProgramAccessRole,
                                                                        ClassUnit, ClassLesson, UnitCompletion,
                                                                        UnitBlockCompletion)
@@ -55,7 +55,7 @@ class ProgramViewSet(viewsets.ModelViewSet):
 class ClassStudentViewSet(mixins.ListModelMixin,
                           viewsets.GenericViewSet):
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
-    permission_classes = [IsAuthenticated, IsTeacher]
+    permission_classes = [IsAuthenticated, IsTeacher, IsUserFromSameSchool]
     serializer_class = ClassStudentSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['gen_user__user__username']
@@ -82,7 +82,7 @@ class ClassStudentViewSet(mixins.ListModelMixin,
 
 class ClassSummaryViewSet(viewsets.ModelViewSet):
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
-    permission_classes = [IsAuthenticated, IsTeacher]
+    permission_classes = [IsAuthenticated, IsTeacher, IsUserFromSameSchool]
     serializer_class = ClassSummarySerializer
     queryset = Class.visible_objects.all()
 

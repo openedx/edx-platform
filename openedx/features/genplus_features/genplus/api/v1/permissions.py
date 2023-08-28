@@ -1,6 +1,6 @@
 from rest_framework import permissions
-from openedx.features.genplus_features.genplus.models import GenUser
-from openedx.features.genplus_features.genplus.constants import SchoolTypes
+from openedx.features.genplus_features.genplus.models import GenUser, Class
+from django.shortcuts import get_object_or_404
 
 
 class IsGenUser(permissions.BasePermission):
@@ -27,6 +27,17 @@ class IsTeacher(permissions.BasePermission):
         return IsGenUser().has_permission(request, view) and request.user.gen_user.is_teacher
 
 
+class IsUserFromSameSchool(permissions.BasePermission):
+    message = 'Requested class school matches the user school'
+
+    def has_permission(self, request, view):
+        class_id = view.kwargs.get('pk', None) or view.kwargs.get('class_id', None)
+        if class_id:
+                requested_class = get_object_or_404(Class, pk=class_id)
+                return requested_class.school.pk == request.user.gen_user.school.pk
+        return False
+
+
 class IsStudentOrTeacher(permissions.BasePermission):
     message = 'Current user is neither a Genplus Student or Teacher'
 
@@ -46,3 +57,5 @@ class IsAdmin(permissions.BasePermission):
 
     def has_permission(self, request, view):
         return request.user.is_superuser
+
+

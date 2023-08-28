@@ -17,7 +17,7 @@ from openedx.features.genplus_features.genplus_assessments.models import (
     SkillAssessmentQuestion,
 )
 from openedx.features.genplus_features.genplus_learning.models import Unit, Program, ProgramAccessRole
-from openedx.features.genplus_features.genplus.api.v1.permissions import IsTeacher, IsStudentOrTeacher, IsAdmin
+from openedx.features.genplus_features.genplus.api.v1.permissions import IsTeacher, IsStudentOrTeacher, IsAdmin, IsUserFromSameSchool
 from .serializers import (
     ClassSerializer,
     TextAssessmentSerializer,
@@ -47,7 +47,7 @@ logger = logging.getLogger(__name__)
 # TODO: remove this endpoint
 class ClassFilterApiView(views.APIView):
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
-    permission_classes = [IsAuthenticated, IsTeacher]
+    permission_classes = [IsAuthenticated, IsTeacher, IsUserFromSameSchool]
 
     def get(self, request, **kwargs):
         class_id = kwargs.get('class_id', None)
@@ -68,7 +68,7 @@ class StudentAnswersViewSet(viewsets.ViewSet):
                 containing the students analytics
     """
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
-    permission_classes = [IsAuthenticated, IsTeacher]
+    permission_classes = [IsAuthenticated, IsTeacher, IsUserFromSameSchool]
 
     def students_problem_response(self, request, **kwargs):
         class_id = kwargs.get('class_id', None)
@@ -118,7 +118,7 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
                 containing the students aggregate or individual class base result data.
     """
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
-    permission_classes = [IsAuthenticated, IsStudentOrTeacher]
+    permission_classes = [IsAuthenticated, IsStudentOrTeacher, IsUserFromSameSchool]
     intro_assessments = []
     outro_assessments = []
 

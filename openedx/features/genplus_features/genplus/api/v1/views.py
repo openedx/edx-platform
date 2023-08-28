@@ -153,7 +153,7 @@ class ClassViewSet(GenzMixin, viewsets.ModelViewSet):
         return Class.visible_objects.filter(school=self.school)
 
     def list(self, request, *args, **kwargs):  # pylint: disable=unused-argument
-        favorite_classes = self.gen_user.teacher.favorite_classes.all()
+        favorite_classes = self.gen_user.teacher.favorite_classes.filter(school=self.school)
         favorite_classes_serializer = self.get_serializer(favorite_classes, many=True)
         class_queryset = self.filter_queryset(self.get_queryset())
         class_serializer = self.get_serializer(
