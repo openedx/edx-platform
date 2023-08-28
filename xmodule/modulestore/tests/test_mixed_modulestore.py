@@ -30,7 +30,6 @@ import pytest
 # before importing the module
 # TODO remove this import and the configuration -- xmodule should not depend on django!
 from django.conf import settings
-from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator  # pylint: disable=unused-import
 from pytz import UTC
@@ -548,11 +547,6 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #    sends: 2 sends to update index & structure (note, it would also be definition if a content field changed)
     @ddt.data((ModuleStoreEnum.Type.mongo, 0, 6, 5), (ModuleStoreEnum.Type.split, 4, 3, 2))
     @ddt.unpack
-    @override_settings(
-        CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
-        CELERY_ALWAYS_EAGER=True,
-        BROKER_BACKEND="memory",
-    )
     def test_update_item(self, default_ms, num_mysql, max_find, max_send):
         """
         Update should succeed for r/w dbs
@@ -1088,11 +1082,6 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #   Sends: updated draft and published structures and active_versions
     @ddt.data((ModuleStoreEnum.Type.mongo, 1, 6, 2), (ModuleStoreEnum.Type.split, 5, 2, 3))
     @ddt.unpack
-    @override_settings(
-        CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
-        CELERY_ALWAYS_EAGER=True,
-        BROKER_BACKEND="memory",
-    )
     def test_delete_item(self, default_ms, num_mysql, max_find, max_send):
         """
         Delete should reject on r/o db and work on r/w one
@@ -1124,11 +1113,6 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #    sends: update published (why?), draft, and active_versions
     @ddt.data((ModuleStoreEnum.Type.mongo, 1, 8, 2), (ModuleStoreEnum.Type.split, 5, 3, 3))
     @ddt.unpack
-    @override_settings(
-        CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
-        CELERY_ALWAYS_EAGER=True,
-        BROKER_BACKEND="memory",
-    )
     def test_delete_private_vertical(self, default_ms, num_mysql, max_find, max_send):
         """
         Because old mongo treated verticals as the first layer which could be draft, it has some interesting
@@ -1185,11 +1169,6 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #   send: update structure and active_versions
     @ddt.data((ModuleStoreEnum.Type.mongo, 1, 3, 1), (ModuleStoreEnum.Type.split, 5, 1, 2))
     @ddt.unpack
-    @override_settings(
-        CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
-        CELERY_ALWAYS_EAGER=True,
-        BROKER_BACKEND="memory",
-    )
     def test_delete_draft_vertical(self, default_ms, num_mysql, max_find, max_send):
         """
         Test deleting a draft vertical which has a published version.
@@ -2068,11 +2047,6 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     # Split: active_versions (mysql), structure (mongo)
     @ddt.data((ModuleStoreEnum.Type.mongo, 0, 1, 0), (ModuleStoreEnum.Type.split, 0, 1, 0))
     @ddt.unpack
-    @override_settings(
-        CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
-        CELERY_ALWAYS_EAGER=True,
-        BROKER_BACKEND="memory",
-    )
     def test_get_orphans(self, default_ms, num_mysql, max_find, max_send):
         """
         Test finding orphans.
