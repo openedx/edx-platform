@@ -229,7 +229,7 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
     @ddt.unpack
     def test_query_counts_uncached(self, store_type, expected_mongo_queries, with_storage_backing, num_sql_queries):
         course = self._create_course(store_type)
-            clear_course_from_cache(course.id)
+        clear_course_from_cache(course.id)
         self._get_blocks(
             course,
             expected_mongo_queries,
