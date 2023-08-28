@@ -22173,14 +22173,6 @@ msgid "Expand or Collapse"
 msgstr "展开或折叠"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Access Settings"
-msgstr "访问设置"
-
-#: cms/templates/studio_xblock_wrapper.html
-msgid "Set Access"
-msgstr "设置访问限制"
-
-#: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"
 msgstr ""
 
