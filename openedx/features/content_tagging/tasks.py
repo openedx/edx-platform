@@ -53,7 +53,8 @@ def _delete_tags(content_object) -> None:
 @set_code_owner_attribute
 def update_course_tags(course_key_str: str) -> bool:
     """
-    Updates the tags for a Course.
+    Updates the automatically-managed tags for a course
+    (whenever a course is created or updated)
 
     Params:
         course_key_str (str): identifier of the Course
@@ -78,7 +79,7 @@ def update_course_tags(course_key_str: str) -> bool:
 @set_code_owner_attribute
 def delete_course_tags(course_key_str: str) -> bool:
     """
-    Delete the tags for a Course.
+    Delete the tags for a Course (when the course itself has been deleted).
 
     Params:
         course_key_str (str): identifier of the Course
@@ -100,7 +101,8 @@ def delete_course_tags(course_key_str: str) -> bool:
 @set_code_owner_attribute
 def update_xblock_tags(usage_key_str: str) -> bool:
     """
-    Updates the tags for a XBlock.
+    Updates the automatically-managed tags for a XBlock
+    (whenever an XBlock is created/updated).
 
     Params:
         usage_key_str (str): identifier of the XBlock
@@ -130,7 +132,7 @@ def update_xblock_tags(usage_key_str: str) -> bool:
 @set_code_owner_attribute
 def delete_xblock_tags(usage_key_str: str) -> bool:
     """
-    Delete the tags for a XBlock.
+    Delete the tags for a XBlock (when the XBlock itself is deleted).
 
     Params:
         usage_key_str (str): identifier of the XBlock
