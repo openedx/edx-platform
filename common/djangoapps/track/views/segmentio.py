@@ -289,8 +289,8 @@ def send_event(request, method, **params):
     segment_key = helpers.get_current_site_configuration().get_secret_value('SEGMENT_KEY')
     if segment_key:
         data['writeKey'] = segment_key
-        data['messageId'] = 'ajs-' + uuid.uuid4().hex
-        site_response = requests.post(url, json=data)
+        data['messageId'] = 'ajs-next-' + uuid.uuid4().hex
+        site_response = requests.post(url, json=data)  # noqa: F841
     return HttpResponse(
         main_response.content,
         status=main_response.status_code,
