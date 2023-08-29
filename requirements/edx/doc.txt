@@ -559,7 +559,7 @@ edx-enterprise==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-edx-event-bus-kafka==5.3.1
+edx-event-bus-kafka==5.4.0
     # via -r requirements/edx/base.txt
 edx-event-bus-redis==0.3.1
     # via -r requirements/edx/base.txt
@@ -656,7 +656,7 @@ fastavro==1.8.2
     # via
     #   -r requirements/edx/base.txt
     #   openedx-events
-filelock==3.12.2
+filelock==3.12.3
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
@@ -796,7 +796,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/base.txt
     #   ora2
-lti-consumer-xblock==9.6.1
+lti-consumer-xblock==9.6.2
     # via -r requirements/edx/base.txt
 lxml==4.9.3
     # via
@@ -865,7 +865,7 @@ mysqlclient==2.2.0
     # via
     #   -r requirements/edx/base.txt
     #   openedx-blockstore
-newrelic==8.11.0
+newrelic==9.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -908,7 +908,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.0.1
     # via -r requirements/edx/base.txt
-openedx-events==8.5.0
+openedx-events==8.6.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-event-bus-kafka
@@ -1392,6 +1392,7 @@ typing-extensions==4.7.1
     #   asgiref
     #   django-countries
     #   edx-opaque-keys
+    #   filelock
     #   kombu
     #   pydata-sphinx-theme
     #   pylti1p3
