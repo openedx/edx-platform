@@ -65,6 +65,7 @@ class TestRedirectDashboardPageStep(PipelineStep):
             redirect_to="https://custom-dashboard.com",
         )
 
+
 class TestRenderCustomResponse(PipelineStep):
     """
     Pipeline step for testing the instructor dashboard rendering process.
