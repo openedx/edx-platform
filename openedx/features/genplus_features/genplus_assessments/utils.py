@@ -852,7 +852,7 @@ def skill_reflection_response(skills, likert_questions, nuance_interrogation_que
     :param nuance_interrogation_questions:
     :return: {}
     """
-    response = {
+    _response = {
         'skills': skills,
         'intros': [],
         'outros': [],
@@ -863,26 +863,55 @@ def skill_reflection_response(skills, likert_questions, nuance_interrogation_que
         for question in questions:
             skill = question.skill.name
             submissions = list(question.submissions.filter(problem_location=getattr(question, location_key)).all())
+            total_submissions = question.submissions.filter(problem_location=getattr(question, location_key)).count()
             stats = defaultdict(int)
 
-            question_stats = {'qid': question.id, 'skill': skill, 'title': None, 'points': None, 'submissions': []}
+            question_stats = {
+                'qid': question.id,
+                'skill': skill,
+                'title': None,
+                'submissions': [],
+                'total_submissions': total_submissions
+            }
+            points_dict = {}
 
             for submission in submissions:
                 question_response = submission.question_response
                 response_text = question_response['student_response']['response_text']
                 stats[response_text] += 1
+                points_dict[response_text] = question_response['student_response']['points']
                 if not question_stats['title']:
                     question_stats['title'] = question_response['question']
 
             if stats:
                 for sk in stats.keys():
-                    question_stats['submissions'].append({'key': sk, "value": stats[sk]})
+                    question_stats['submissions'].append({'key': sk, "value": stats[sk], 'points': points_dict[sk]})
 
-                response[response_key].append(question_stats)
+                _response[response_key].append(question_stats)
 
     process_question_responses(likert_questions, 'intros', 'start_unit_location')
     process_question_responses(likert_questions, 'outros', 'end_unit_location')
     process_question_responses(nuance_interrogation_questions, 'nuance_interrogation', 'start_unit_location')
+
+    def populate_likerts():
+        question_map = {}
+        for intro, outro in itertools.zip_longest(_response['intros'], _response['outros']):
+            question_map[intro['qid']] = question_map.get(intro['qid'], {
+                'title':intro['title'],
+                'skill':intro['skill'],
+            })
+            if intro:
+                question_map[intro['qid']]['intro'] = intro
+            if outro:
+                question_map[intro['qid']]['outro'] = outro
+        return question_map.values()
+
+    response = {
+        'skills': skills,
+        'likerts': populate_likerts(),
+        'nuance_interrogation': _response['nuance_interrogation'],
+    }
+
     return response
 
 
