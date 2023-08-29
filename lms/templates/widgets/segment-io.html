@@ -5,19 +5,25 @@
 % if settings.LMS_SEGMENT_KEY and settings.LMS_SEGMENT_SITE:
 ## begin Copy from edx-platform/cms/templates/widgets/segment-io.html
 ## Appsembler: begin Segment Site
-<script>
-!function(){
-    var realOpen = XMLHttpRequest.prototype.open;
-    var originalAPI = '${settings.SEGMENT_ORIGINAL_API}';
-    var replicateAPI = '${settings.SEGMENT_REPLICATE_API}';
-    XMLHttpRequest.prototype.open = function() {
-        if (arguments[1].substr(0, originalAPI.length) === originalAPI) {
-            arguments[1] = replicateAPI + arguments[1].substr(originalAPI.length);
+<script type="text/javascript">
+  !function(){
+      var originalAPI = '${settings.SEGMENT_ORIGINAL_API}';
+      var replicateAPI = '${settings.SEGMENT_REPLICATE_API}';
+      function replaceFetchResourceForSegmentSite(resource){
+        if (resource.substr(0, originalAPI.length) === originalAPI) {
+              resource = replicateAPI + resource.substr(originalAPI.length);
         }
-        return realOpen.apply(this, arguments);
-    };
-}();
-</script>
+        return resource;
+      }
+      const { fetch: originalFetch } = window;
+      window.fetch = async (...args) => {
+          let [resource, config ] = args;
+          resource = replaceFetchResourceForSegmentSite(resource);
+          const response = await originalFetch(resource, config);
+          return response;
+      };
+  }();
+  </script>
 ## Appsembler: end Segment Site
 ## end Copy
 % endif
