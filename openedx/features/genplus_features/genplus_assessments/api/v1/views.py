@@ -520,10 +520,13 @@ class ProgramFilterMixin(views.APIView):
     def get_program_queryset(self):
         program_id = self.request.GET.get('program_id')
         program_ids = [program_id]
-        qs = Program.get_active_programs()
         if program_id is None:
-            program_ids = ProgramAccessRole.objects.filter(user=self.request.user).values_list('program',
-                                                                                               flat=True).distinct()
+            class_id = self.kwargs['class_id']
+            gen_class = Class.objects.prefetch_related('students').get(pk=class_id)
+            program_ids = [gen_class.program_id]
+
+        qs = Program.get_active_programs()
+
         qs = qs.filter(id__in=program_ids)
         return qs
 
@@ -531,6 +534,7 @@ class ProgramFilterMixin(views.APIView):
 class SkillReflectionApiView(ProgramFilterMixin):
 
     def get(self, request, **kwargs):
+        class_id = kwargs['class_id']
         skills = self.get_program_queryset().values_list('units__skill__name', flat=True).distinct().all()
         courses = self.get_program_queryset().values_list('units__course', flat=True).all()
         likert_questions = SkillAssessmentQuestion.objects.filter(
@@ -547,6 +551,7 @@ class SkillReflectionApiView(ProgramFilterMixin):
             skills,
             likert_questions,
             nuance_interogation_questions,
+            class_id,
         )
 
         return Response(response)

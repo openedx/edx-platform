@@ -13,7 +13,7 @@ from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.courseware.models import StudentModule
 from openedx.features.genplus_features.genplus.constants import JournalTypes
-from openedx.features.genplus_features.genplus.models import Student, JournalPost
+from openedx.features.genplus_features.genplus.models import Student, JournalPost, Class
 from openedx.features.genplus_features.genplus_learning.models import Unit
 from openedx.features.genplus_features.genplus_assessments.constants import ProblemTypes, ProblemSetting, JOURNAL_STYLE, \
     TOTAL_PROBLEM_SCORE, SkillAssessmentTypes, SkillAssessmentResponseTime
@@ -844,7 +844,7 @@ def get_user_assessment_result(user, raw_data, program):
     return aggregate_result
 
 
-def skill_reflection_response(skills, likert_questions, nuance_interrogation_questions):
+def skill_reflection_response(skills, likert_questions, nuance_interrogation_questions, class_id):
     """
     This is to prepare a response for skill reflection combined view
     :param skills:
@@ -906,10 +906,14 @@ def skill_reflection_response(skills, likert_questions, nuance_interrogation_que
                 question_map[intro['qid']]['outro'] = outro
         return question_map.values()
 
+    gen_class = Class.objects.prefetch_related('students').get(pk=class_id)
+    total_students = gen_class.students.exclude(gen_user__user__isnull=True).count()
+
     response = {
         'skills': skills,
         'likerts': populate_likerts(),
         'nuance_interrogation': _response['nuance_interrogation'],
+        'class_students': total_students
     }
 
     return response
