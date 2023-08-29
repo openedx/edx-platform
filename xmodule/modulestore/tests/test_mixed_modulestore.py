@@ -100,6 +100,7 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest, OpenEdxEventsTestMixin):
         'db': DB,
         'collection': COLLECTION,
         'asset_collection': ASSET_COLLECTION,
+        'replicaSet': None,
     }
     OPTIONS = {
         'stores': [
@@ -269,7 +270,12 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest, OpenEdxEventsTestMixin):
             mappings=mappings,
             **self.options
         )
+
         self.addCleanup(self.store.close_all_connections)
+
+        self.patcher = patch("openedx.features.content_tagging.tasks.modulestore", return_value=self.store)
+        self.addCleanup(self.patcher.stop)
+        self.patcher.start()
 
     def initdb(self, default):
         """
