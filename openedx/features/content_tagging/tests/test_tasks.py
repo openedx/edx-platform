@@ -118,9 +118,6 @@ class TestAutoTagging(ModuleStoreTestCase):
         sequential = self.store.create_child(self.user_id, course.location, "sequential", "test_sequential")
         vertical = self.store.create_child(self.user_id, sequential.location, "vertical", "test_vertical")
 
-        # Publish sequential changes
-        # self.store.publish(sequential.location, self.user_id)
-
         usage_key_str = str(vertical.location)
 
         # Check if the tags are created in the XBlock
