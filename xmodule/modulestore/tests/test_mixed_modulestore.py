@@ -273,9 +273,9 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest, OpenEdxEventsTestMixin):
 
         self.addCleanup(self.store.close_all_connections)
 
-        self.patcher = patch("openedx.features.content_tagging.tasks.modulestore", return_value=self.store)
-        self.addCleanup(self.patcher.stop)
-        self.patcher.start()
+        patcher = patch("openedx.features.content_tagging.tasks.modulestore", return_value=self.store)
+        self.addCleanup(patcher.stop)
+        patcher.start()
 
     def initdb(self, default):
         """
