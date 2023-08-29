@@ -699,6 +699,7 @@ def _ora_assessment_to_assignment(
     date_config_type = block_data.get_xblock_field(ora_block, 'date_config_type', 'manual')
     assignment_type = block_data.get_xblock_field(ora_block, 'format', None)
     block_title = block_data.get_xblock_field(ora_block, 'title', _('Open Response Assessment'))
+    course_key = block_data.root_block_usage_key
 
     if date_config_type == 'subsection':
         assessment_start = block_data.get_xblock_field(ora_block, 'start')
@@ -706,7 +707,6 @@ def _ora_assessment_to_assignment(
         extra_info = None
     elif date_config_type == 'course_end':
         assessment_start = None
-        course_key = block_data.root_block_usage_key
         assessment_due = block_data.get_xblock_field(course_key, 'end')
         extra_info = None
     else:
