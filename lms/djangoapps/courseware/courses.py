@@ -629,10 +629,11 @@ def get_course_assignments(course_key, user, include_access=False):  # lint-amne
                     subsection_key, title, url, due, contains_gated_content,
                     complete, past_due, assignment_type, None, first_component_block_id
                 ))
-            assignments.extend(get_ora_blocks_as_assignments(course_usage_key, subsection_key, block_data, now))
+            assignments.extend(get_ora_blocks_as_assignments(block_data, subsection_key))
     return assignments
 
-def get_ora_blocks_as_assignments(course_key, subsection_key, block_data, now):
+
+def get_ora_blocks_as_assignments(block_data, subsection_key):
     """
     Given a subsection key, navigate through descendents and find open response assessments.
     For each graded ORA, return a list of "Assignment" tuples that map to the individual steps
@@ -644,22 +645,17 @@ def get_ora_blocks_as_assignments(course_key, subsection_key, block_data, now):
         descendent = descendents.pop()
         descendents.extend(block_data.get_children(descendent))
         if block_data.get_xblock_field(descendent, 'category', None) == 'openassessment':
-            ora_assignments.extend(get_ora_as_assignments(course_key, descendent, block_data, now))
+            ora_assignments.extend(get_ora_as_assignments(block_data, descendent))
     return ora_assignments
 
-def get_ora_as_assignments(course_key, ora_block, block_data, now):
+
+def get_ora_as_assignments(block_data, ora_block):
     """
     Given an individual ORA, return the list of individual ORA steps as Assignment tuples
     """
     graded = block_data.get_xblock_field(ora_block, 'graded', False)
     has_score = block_data.get_xblock_field(ora_block, 'has_score', False)
     weight = block_data.get_xblock_field(ora_block, 'weight', 1)
-    date_config_type = block_data.get_xblock_field(ora_block, 'date_config_type', 'manual')
-    subsection_start = block_data.get_xblock_field(ora_block, 'start')
-    subsection_due = block_data.get_xblock_field(ora_block, 'due')
-    course_end = block_data.get_xblock_field(course_key, 'end')
-    assignment_type = block_data.get_xblock_field(ora_block, 'format', None)
-    block_title = block_data.get_xblock_field(ora_block, 'title', _('Open Response Assessment'))
 
     if not (graded and has_score and (weight is None or weight > 0)):
         return []
@@ -680,62 +676,87 @@ def get_ora_as_assignments(course_key, ora_block, block_data, now):
     # Loop through all steps and construct Assignment tuples from them
     assignments = []
     for assessment in all_assessments:
-        if date_config_type == 'subsection':
-            assessment_start = subsection_start
-            assessment_due = subsection_due
-            extra_info = None
-        elif date_config_type == 'course_end':
-            assessment_start = None
-            assessment_due = course_end
-            extra_info = None
-        else:
-            assessment_start, assessment_due = None, None
-            if assessment.get('start'):
-                assessment_start = parse_date(assessment.get('start')).replace(tzinfo=pytz.UTC)
-            if assessment.get('due'):
-                assessment_due = parse_date(assessment.get('due')).replace(tzinfo=pytz.UTC)
-            extra_info = _(
-                "This Open Response Assessment's due dates are set by your instructor and can't be shifted."
-            ),
-
-        if assessment_due is None:
-            continue
-            
-        assessment_name = assessment.get('name')
-        if assessment_name is None:
-            continue
-
-        if assessment_name == 'self-assessment':
-            assessment_type = _("Self Assessment")
-        elif assessment_name == 'peer-assessment':
-            assessment_type = _("Peer Assessment")
-        elif assessment_name == 'staff-assessment':
-            assessment_type = _("Staff Assessment")
-        elif assessment_name == 'submission':
-            assessment_type = _("Submission")
-        else:
-            assessment_type = assessment_name
-        title = f"{block_title} ({assessment_type})"
-        url = ''
-        assignment_released = not assessment_start or assessment_start < now
-        if assignment_released:
-            url = reverse('jump_to', args=[course_key, ora_block])
-
-        past_due = not complete and assessment_due and assessment_due < now
-        first_component_block_id = str(ora_block)
-        assignments.append(_Assignment(
+        assignment = _ora_assessment_to_assignment(
+            block_data,
             ora_block,
-            title,
-            url,
-            assessment_due,
-            False,
             complete,
-            past_due,
-            assignment_type,
-            extra_info,
-            first_component_block_id,
-        ))
+            assessment
+        )
+        if assignment is not None:
+            assignments.append(assignment)
     return assignments
+
+
+def _ora_assessment_to_assignment(
+    block_data,
+    ora_block,
+    complete,
+    assessment
+):
+    """
+    Create an assignment from an ORA assessment dict
+    """
+    date_config_type = block_data.get_xblock_field(ora_block, 'date_config_type', 'manual')
+    assignment_type = block_data.get_xblock_field(ora_block, 'format', None)
+    block_title = block_data.get_xblock_field(ora_block, 'title', _('Open Response Assessment'))
+
+    if date_config_type == 'subsection':
+        assessment_start = block_data.get_xblock_field(ora_block, 'start')
+        assessment_due = block_data.get_xblock_field(ora_block, 'due')
+        extra_info = None
+    elif date_config_type == 'course_end':
+        assessment_start = None
+        course_key = block_data.root_block_usage_key
+        assessment_due = block_data.get_xblock_field(course_key, 'end')
+        extra_info = None
+    else:
+        assessment_start, assessment_due = None, None
+        if assessment.get('start'):
+            assessment_start = parse_date(assessment.get('start')).replace(tzinfo=pytz.UTC)
+        if assessment.get('due'):
+            assessment_due = parse_date(assessment.get('due')).replace(tzinfo=pytz.UTC)
+        extra_info = _(
+            "This Open Response Assessment's due dates are set by your instructor and can't be shifted."
+        )
+
+    if assessment_due is None:
+        return None
+
+    assessment_name = assessment.get('name')
+    if assessment_name is None:
+        return None
+
+    if assessment_name == 'self-assessment':
+        assessment_type = _("Self Assessment")
+    elif assessment_name == 'peer-assessment':
+        assessment_type = _("Peer Assessment")
+    elif assessment_name == 'staff-assessment':
+        assessment_type = _("Staff Assessment")
+    elif assessment_name == 'submission':
+        assessment_type = _("Submission")
+    else:
+        assessment_type = assessment_name
+    title = f"{block_title} ({assessment_type})"
+    url = ''
+    now = datetime.now(pytz.UTC)
+    assignment_released = not assessment_start or assessment_start < now
+    if assignment_released:
+        url = reverse('jump_to', args=[course_key, ora_block])
+
+    past_due = not complete and assessment_due and assessment_due < now
+    first_component_block_id = str(ora_block)
+    return _Assignment(
+        ora_block,
+        title,
+        url,
+        assessment_due,
+        False,
+        complete,
+        past_due,
+        assignment_type,
+        extra_info,
+        first_component_block_id,
+    )
 
 
 def get_first_component_of_block(block_key, block_data):

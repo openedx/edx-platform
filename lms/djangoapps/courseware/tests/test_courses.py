@@ -482,6 +482,7 @@ class TestGetCourseAssignments(CompletionWaffleTestMixin, ModuleStoreTestCase):
         assert len(assignments) == 1
         assert not assignments[0].complete
 
+
 class TestGetCourseAssignmentsORA(CompletionWaffleTestMixin, ModuleStoreTestCase):
     """ Tests for ora-related behavior in get_course_assignments """
     TODAY = datetime.datetime(2023, 8, 2, 12, 23, 45, tzinfo=pytz.UTC)
@@ -496,6 +497,7 @@ class TestGetCourseAssignmentsORA(CompletionWaffleTestMixin, ModuleStoreTestCase
         """ Helper to easily generate sequential days """
         return datetime.timedelta(days=t) + self.TODAY
 
+    # pylint: disable=attribute-defined-outside-init
     def _setup_course(self, course_dates=None, subsection_dates=None, ora_dates=None, date_config_type="manual"):
         """
         Setup a course with one section, subsection, unit, and ORA
@@ -519,7 +521,7 @@ class TestGetCourseAssignmentsORA(CompletionWaffleTestMixin, ModuleStoreTestCase
             'self': (self._date(1), self._date(4)),
             'peer': (self._date(4), self._date(5))
         }
-        
+
         self.course = CourseFactory(start=course_dates[0], end=course_dates[1])
         self.section = BlockFactory(parent=self.course, category='chapter')
         self.subsection = BlockFactory(
@@ -530,7 +532,7 @@ class TestGetCourseAssignmentsORA(CompletionWaffleTestMixin, ModuleStoreTestCase
             due=subsection_dates[1],
         )
         vertical = BlockFactory(parent=self.subsection, category='vertical')
-        
+
         rubric_assessments = [
             {
                 'name': 'peer-assessment',
@@ -553,13 +555,12 @@ class TestGetCourseAssignmentsORA(CompletionWaffleTestMixin, ModuleStoreTestCase
             submission_due=ora_dates['response'][1].isoformat(),
             date_config_type=date_config_type
         )
-        
+
         self.course_end = course_dates[1]
         self.subsection_due = subsection_dates[1]
         self.submission_due = ora_dates['response'][1]
         self.peer_due = ora_dates['peer'][1]
         self.self_due = ora_dates['self'][1]
-
 
     def assert_ora_course_assignments(
         self,
@@ -582,7 +583,7 @@ class TestGetCourseAssignmentsORA(CompletionWaffleTestMixin, ModuleStoreTestCase
         assert assignments[3].block_key == self.openassessment.location
 
         assert 'Submission' in assignments[1].title
-        assert 'Peer' in assignments[2].title 
+        assert 'Peer' in assignments[2].title
         assert 'Self' in assignments[3].title
 
         assert assignments[1].date == expected_date_submission
@@ -601,7 +602,7 @@ class TestGetCourseAssignmentsORA(CompletionWaffleTestMixin, ModuleStoreTestCase
             self.peer_due,
             self.self_due
         )
-    
+
     def test_ora_date_config__subsection(self):
         """
         When subsection config is set, the dates for ora steps should all be the subsection due date
