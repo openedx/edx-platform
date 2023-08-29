@@ -18,7 +18,6 @@ from xblock.fields import Scope, ScopeIds, String
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.x_module import (
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
     XModuleToXBlockMixin,
@@ -47,7 +46,6 @@ class ErrorFields:
 class ErrorBlock(
     ErrorFields,
     XModuleToXBlockMixin,
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
 ):  # pylint: disable=abstract-method
@@ -62,7 +60,7 @@ class ErrorBlock(
         """
         Return a fragment that contains the html for the student view.
         """
-        fragment = Fragment(self.runtime.service(self, 'mako').render_template('module-error.html', {
+        fragment = Fragment(self.runtime.service(self, 'mako').render_lms_template('module-error.html', {
             'staff_access': True,
             'data': self.contents,
             'error': self.error_msg,

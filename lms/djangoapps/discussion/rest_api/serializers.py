@@ -427,10 +427,9 @@ class ThreadSerializer(_ContentSerializer):
 
     def get_preview_body(self, obj):
         """
-        Returns a cleaned and truncated version of the thread's body to display in a
-        preview capacity.
+        Returns a cleaned version of the thread's body to display in a preview capacity.
         """
-        return strip_tags(self.get_rendered_body(obj)).replace('\n', ' ')
+        return strip_tags(self.get_rendered_body(obj)).replace('\n', ' ').replace('&nbsp;', ' ')
 
     def get_close_reason(self, obj):
         """

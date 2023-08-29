@@ -9,12 +9,14 @@ class ExploreNewProgramsView extends Backbone.View {
         const defaults = {
             el: '.program-advertise',
         };
+        // eslint-disable-next-line prefer-object-spread
         super(Object.assign({}, defaults, options));
     }
 
     initialize(data) {
         this.tpl = HtmlUtils.template(exploreTpl);
         this.context = data.context;
+        // eslint-disable-next-line no-undef
         this.$parentEl = $(this.parentEl);
 
         if (this.context.marketingUrl) {

@@ -33,7 +33,7 @@ class TestRateLimiting(TestCase):
         """
         More realistic test since XFF middleware meddles with REMOTE_ADDR.
         """
-        XForwardedForMiddleware().process_request(self.request)
+        XForwardedForMiddleware(get_response=lambda request: None).process_request(self.request)
         assert ratelimit.real_ip(None, self.request) == '1.2.3.4'
 
     @override_waffle_switch(USE_LEGACY_IP, True)
@@ -45,7 +45,7 @@ class TestRateLimiting(TestCase):
         """
         Again, but with XFF Middleware running first.
         """
-        XForwardedForMiddleware().process_request(self.request)
+        XForwardedForMiddleware(get_response=lambda request: None).process_request(self.request)
         assert ratelimit.real_ip(None, self.request) == '7.8.9.0'
 
     def test_request_post_email(self):

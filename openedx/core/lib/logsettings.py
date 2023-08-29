@@ -126,14 +126,14 @@ def log_python_warnings():
     warnings.filterwarnings('ignore', 'Setting _field_data is deprecated')
     warnings.filterwarnings('ignore', 'Setting _field_data via the constructor is deprecated')
     warnings.filterwarnings('ignore', '.*unclosed.*', category=ResourceWarning)
-    try:
-        # There are far too many of these deprecation warnings in startup to output for every management command;
-        # suppress them until we've fixed at least the most common ones as reported by the test suite
-        from django.utils.deprecation import RemovedInDjango40Warning, RemovedInDjango41Warning
-        warnings.simplefilter('ignore', RemovedInDjango40Warning)
-        warnings.simplefilter('ignore', RemovedInDjango41Warning)
-    except ImportError:
-        pass
+    # try:
+    #     # There are far too many of these deprecation warnings in startup to output for every management command;
+    #     # suppress them until we've fixed at least the most common ones as reported by the test suite
+    #     from django.utils.deprecation import RemovedInDjango50Warning, RemovedInDjango51Warning
+    #     warnings.simplefilter('ignore', RemovedInDjango50Warning)
+    #     warnings.simplefilter('ignore', RemovedInDjango51Warning)
+    # except ImportError:
+    #     pass
     logging.captureWarnings(True)
 
 

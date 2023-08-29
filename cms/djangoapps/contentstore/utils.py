@@ -1,9 +1,9 @@
 """
 Common utility functions useful throughout the contentstore
 """
-
-from collections import defaultdict
+import configparser
 import logging
+from collections import defaultdict
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from uuid import uuid4
@@ -13,6 +13,7 @@ from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils import translation
 from django.utils.translation import gettext as _
+from help_tokens.core import HelpUrlExpert
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocator
@@ -26,7 +27,7 @@ from cms.djangoapps.contentstore.toggles import exam_setting_view_enabled
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.student import auth
-from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
+from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access, STUDIO_EDIT_ROLES
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
@@ -972,13 +973,12 @@ def get_subsections_by_assignment_type(course_key):
     return subsections_by_assignment_type
 
 
-def update_course_discussions_settings(course_key):
+def update_course_discussions_settings(course):
     """
     Updates course provider_type when new course is created
     """
-    provider = DiscussionsConfiguration.get(context_key=course_key).provider_type
+    provider = DiscussionsConfiguration.get(context_key=course.id).provider_type
     store = modulestore()
-    course = store.get_course(course_key)
     course.discussions_settings['provider_type'] = provider
     store.update_item(course, course.published_by)
 
@@ -1324,6 +1324,35 @@ def get_course_settings(request, course_key, course_block):
     return settings_context
 
 
+def get_course_team(auth_user, course_key, user_perms):
+    """
+    Utils is used to get context of all CMS users who are editors for the specified course.
+    It is used for both DRF and django views.
+    """
+
+    from cms.djangoapps.contentstore.views.user import user_with_role
+
+    course_block = modulestore().get_course(course_key)
+    instructors = set(CourseInstructorRole(course_key).users_with_role())
+    # the page only lists staff and assumes they're a superset of instructors. Do a union to ensure.
+    staff = set(CourseStaffRole(course_key).users_with_role()).union(instructors)
+
+    formatted_users = []
+    for user in instructors:
+        formatted_users.append(user_with_role(user, 'instructor'))
+    for user in staff - instructors:
+        formatted_users.append(user_with_role(user, 'staff'))
+
+    course_team_context = {
+        'context_course': course_block,
+        'show_transfer_ownership_hint': auth_user in instructors and len(instructors) == 1,
+        'users': formatted_users,
+        'allow_actions': bool(user_perms & STUDIO_EDIT_ROLES),
+    }
+
+    return course_team_context
+
+
 def get_course_grading(course_key):
     """
     Utils is used to get context of course grading.
@@ -1344,6 +1373,18 @@ def get_course_grading(course_key):
     }
 
     return grading_context
+
+
+def get_help_urls():
+    """
+    Utils is used to get help tokens urls.
+    """
+    ini = HelpUrlExpert.the_one()
+    ini.config = configparser.ConfigParser()
+    ini.config.read(ini.ini_file_name)
+    tokens = list(ini.config['pages'].keys())
+    help_tokens = {token: HelpUrlExpert.the_one().url_for_token(token) for token in tokens}
+    return help_tokens
 
 
 class StudioPermissionsService:

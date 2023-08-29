@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 NOTIFICATION_CHANNELS = ['web', 'push', 'email']
 
 # Update this version when there is a change to any course specific notification type or app.
-COURSE_NOTIFICATION_CONFIG_VERSION = 1
+COURSE_NOTIFICATION_CONFIG_VERSION = 2
 
 
 def get_course_notification_preference_config():
@@ -127,7 +127,7 @@ class CourseNotificationPreference(TimeStampedModel):
         unique_together = ('user', 'course_id')
 
     def __str__(self):
-        return f'{self.user.username} - {self.course_id} - {self.notification_preference_config}'
+        return f'{self.user.username} - {self.course_id}'
 
     @staticmethod
     def get_updated_user_course_preferences(user, course_id):

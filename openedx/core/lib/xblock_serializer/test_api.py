@@ -244,3 +244,46 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
             </problem>
             """
         )
+
+    def test_jsinput_extra_files(self):
+        """
+        Test JSInput problems with extra static files.
+        """
+        course = CourseFactory.create(display_name='JSInput Testing course', run="JSI")
+        jsinput_files = [
+            ("simple-question.html", "./common/test/data/uploads/simple-question.html"),
+            ("simple-question.js", "./common/test/data/uploads/simple-question.js"),
+            ("simple-question.css", "./common/test/data/uploads/simple-question.css"),
+            ("image.jpg", "./common/test/data/uploads/image.jpg"),
+            ("jschannel.js", "./common/static/js/capa/src/jschannel.js"),
+        ]
+        for filename, full_path in jsinput_files:
+            upload_file_to_course(
+                course_key=course.id,
+                contentstore=contentstore(),
+                source_file=full_path,
+                target_filename=filename,
+            )
+
+        jsinput_problem = BlockFactory.create(
+            parent_location=course.location,
+            category="problem",
+            display_name="JSInput Problem",
+            data="<problem><jsinput html_file='/static/simple-question.html' /></problem>",
+        )
+
+        # The jsinput problem should contain the html_file along with extra static files:
+
+        serialized = api.serialize_xblock_to_olx(jsinput_problem)
+        assert len(serialized.static_files) == 5
+        for file in serialized.static_files:
+            self.assertIn(file.name, list(map(lambda f: f[0], jsinput_files)))
+
+        self.assertXmlEqual(
+            serialized.olx_str,
+            """
+            <problem display_name="JSInput Problem" url_name="JSInput_Problem">
+                <jsinput html_file='/static/simple-question.html' />
+            </problem>
+            """
+        )

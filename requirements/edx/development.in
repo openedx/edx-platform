@@ -13,9 +13,13 @@
 -r ../pip-tools.txt                     # pip-tools and its dependencies, for managing requirements files
 -r testing.txt                          # Dependencies for running the various test suites
 -r doc.txt                              # Dependencies for building the documentation locally.
+-r assets.txt                           # Allow developers to rebuild assets with `npm run build`.
 
 click                                   # Used for perf_tests utilities in modulestore
 django-debug-toolbar                    # A set of panels that display debug information about the current request/response
+django-stubs                            # Typing stubs for Django, so it works with mypy
+djangorestframework-stubs               # Typing stubs for DRF
 mypy                                    # static type checking
 pywatchman                              # More efficient checking for runserver reload trigger events
 vulture                                 # Detects possible dead/unused code, used in scripts/find-dead-code.sh
+watchdog                                # Used by `npm run watch` to auto-recompile when assets are changed

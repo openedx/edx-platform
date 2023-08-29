@@ -5,7 +5,7 @@
 <%namespace name='static' file='../static_content.html'/>
 
 <%!
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 %>
 % if len(course_date_blocks) > 0:
     <h3 class="hd hd-6 handouts-header">${_("Upcoming Dates")}</h3>

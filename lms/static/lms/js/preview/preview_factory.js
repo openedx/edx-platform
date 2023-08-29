@@ -64,10 +64,12 @@
                             if (result.success) {
                                 ViewUtils.reload();
                             } else {
+                                // eslint-disable-next-line no-alert
                                 alert(result.error);
                             }
                         },
                         error: function() {
+                            // eslint-disable-next-line no-alert
                             alert('Error: cannot connect to server');
                         }
                     });

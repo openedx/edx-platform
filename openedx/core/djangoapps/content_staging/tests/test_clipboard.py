@@ -42,20 +42,17 @@ class ClipboardTestCase(ModuleStoreTestCase):
         client.login(username=self.user.username, password=self.user_password)
         response = client.get(CLIPBOARD_ENDPOINT)
         # We don't consider this a 404 error, it's a 200 with an empty response
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {
+        assert response.status_code == 200
+        assert response.json() == {
             "content": None,
             "source_usage_key": "",
             "source_context_title": "",
             "source_edit_url": "",
-        })
+        }
         ## The Python method for getting the API response should be identical:
-        self.assertEqual(
-            response.json(),
-            python_api.get_user_clipboard_json(self.user.id, response.wsgi_request),
-        )
+        assert response.json() == python_api.get_user_clipboard_json(self.user.id, response.wsgi_request)
         # And the pure python API should return None
-        self.assertEqual(python_api.get_user_clipboard(self.user.id), None)
+        assert python_api.get_user_clipboard(self.user.id) is None
 
     def _setup_course(self):
         """ Set up the "Toy Course" and an APIClient for testing clipboard functionality. """
@@ -66,8 +63,8 @@ class ClipboardTestCase(ModuleStoreTestCase):
 
         # Initial conditions: clipboard is empty:
         response = client.get(CLIPBOARD_ENDPOINT)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["content"], None)
+        assert response.status_code == 200
+        assert response.json()["content"] is None
 
         return (course_key, client)
 
@@ -82,27 +79,27 @@ class ClipboardTestCase(ModuleStoreTestCase):
         response = client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(video_key)}, format="json")
 
         # Validate the response:
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_data = response.json()
-        self.assertEqual(response_data["source_usage_key"], str(video_key))
-        self.assertEqual(response_data["source_context_title"], "Toy Course")
-        self.assertEqual(response_data["content"], {**response_data["content"], **{
+        assert response_data["source_usage_key"] == str(video_key)
+        assert response_data["source_context_title"] == "Toy Course"
+        assert response_data["content"] == {**response_data["content"], **{
             "block_type": "video",
             "block_type_display": "Video",
             # To ensure API stability, we are hard-coding these expected values:
             "purpose": "clipboard",
             "status": "ready",
             "display_name": "default",  # Weird name but that's what defined in the toy course
-        }})
+        }}
         # Test the actual OLX in the clipboard:
         olx_url = response_data["content"]["olx_url"]
         olx_response = client.get(olx_url)
-        self.assertEqual(olx_response.status_code, 200)
-        self.assertEqual(olx_response.get("Content-Type"), "application/vnd.openedx.xblock.v1.video+xml")
+        assert olx_response.status_code == 200
+        assert olx_response.get("Content-Type") == "application/vnd.openedx.xblock.v1.video+xml"
         self.assertXmlEqual(olx_response.content.decode(), SAMPLE_VIDEO_OLX)
 
         # Now if we GET the clipboard again, the GET response should exactly equal the last POST response:
-        self.assertEqual(client.get(CLIPBOARD_ENDPOINT).json(), response_data)
+        assert client.get(CLIPBOARD_ENDPOINT).json() == response_data
 
     def test_copy_video_python_get(self):
         """
@@ -113,25 +110,25 @@ class ClipboardTestCase(ModuleStoreTestCase):
         # Copy the video
         video_key = course_key.make_usage_key("video", "sample_video")
         response = client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(video_key)}, format="json")
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Get the clipboard status using python:
         clipboard_data = python_api.get_user_clipboard(self.user.id)
-        self.assertIsNotNone(clipboard_data)
-        self.assertEqual(clipboard_data.source_usage_key, video_key)
+        assert clipboard_data is not None
+        assert clipboard_data.source_usage_key == video_key
         # source_context_title is not in the python API because it's easy to retrieve a course's name from python code.
-        self.assertEqual(clipboard_data.content.block_type, "video")
+        assert clipboard_data.content.block_type == "video"
         # To ensure API stability, we are hard-coding these expected values:
-        self.assertEqual(clipboard_data.content.purpose, "clipboard")
-        self.assertEqual(clipboard_data.content.status, "ready")
-        self.assertEqual(clipboard_data.content.display_name, "default")
+        assert clipboard_data.content.purpose == "clipboard"
+        assert clipboard_data.content.status == "ready"
+        assert clipboard_data.content.display_name == "default"
         # Test the actual OLX in the clipboard:
         olx_data = python_api.get_staged_content_olx(clipboard_data.content.id)
         self.assertXmlEqual(olx_data, SAMPLE_VIDEO_OLX)
 
     def test_copy_html(self):
         """
-        Test copying an HTML from the course
+        Test copying an HTML XBlock from the course
         """
         course_key, client = self._setup_course()
 
@@ -140,32 +137,104 @@ class ClipboardTestCase(ModuleStoreTestCase):
         response = client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(html_key)}, format="json")
 
         # Validate the response:
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_data = response.json()
-        self.assertEqual(response_data["source_usage_key"], str(html_key))
-        self.assertEqual(response_data["source_context_title"], "Toy Course")
-        self.assertEqual(response_data["content"], {**response_data["content"], **{
+        assert response_data["source_usage_key"] == str(html_key)
+        assert response_data["source_context_title"] == "Toy Course"
+        assert response_data["content"] == {**response_data["content"], **{
             "block_type": "html",
             # To ensure API stability, we are hard-coding these expected values:
             "purpose": "clipboard",
             "status": "ready",
             "display_name": "Text",  # Has no display_name set so we fallback to this default
-        }})
+        }}
         # Test the actual OLX in the clipboard:
         olx_url = response_data["content"]["olx_url"]
         olx_response = client.get(olx_url)
-        self.assertEqual(olx_response.status_code, 200)
-        self.assertEqual(olx_response.get("Content-Type"), "application/vnd.openedx.xblock.v1.html+xml")
+        assert olx_response.status_code == 200
+        assert olx_response.get("Content-Type") == "application/vnd.openedx.xblock.v1.html+xml"
         # For HTML, we really want to be sure that the OLX is serialized in this exact format (using CDATA), so we check
         # the actual string directly rather than using assertXmlEqual():
-        self.assertEqual(olx_response.content.decode(), dedent("""
+        assert olx_response.content.decode() == dedent("""
             <html url_name="toyhtml" display_name="Text"><![CDATA[
             <a href='/static/handouts/sample_handout.txt'>Sample</a>
             ]]></html>
-        """).lstrip())
+        """).lstrip()
 
         # Now if we GET the clipboard again, the GET response should exactly equal the last POST response:
-        self.assertEqual(client.get(CLIPBOARD_ENDPOINT).json(), response_data)
+        assert client.get(CLIPBOARD_ENDPOINT).json() == response_data
+
+    def test_copy_unit(self):
+        """
+        Test copying a unit (vertical block) from the course
+        """
+        course_key, client = self._setup_course()
+
+        # Copy the HTML
+        unit_key = course_key.make_usage_key("vertical", "vertical_test")
+        response = client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(unit_key)}, format="json")
+
+        # Validate the response:
+        assert response.status_code == 200
+        response_data = response.json()
+        assert response_data["source_usage_key"] == str(unit_key)
+        assert response_data["source_context_title"] == "Toy Course"
+        assert response_data["content"] == {**response_data["content"], **{
+            "block_type": "vertical",
+            # To ensure API stability, we are hard-coding these expected values:
+            "purpose": "clipboard",
+            "status": "ready",
+            "display_name": "vertical test",  # Has no display_name set so display_name_with_default falls back to this
+        }}
+        # Test the actual OLX in the clipboard:
+        olx_url = response_data["content"]["olx_url"]
+        olx_response = client.get(olx_url)
+        assert olx_response.status_code == 200
+        assert olx_response.get("Content-Type") == "application/vnd.openedx.xblock.v1.vertical+xml"
+        self.assertXmlEqual(olx_response.content.decode(), """
+            <vertical url_name="vertical_test">
+                <video
+                    url_name="sample_video"
+                    display_name="default"
+                    youtube="0.75:JMD_ifUUfsU,1.00:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY"
+                    youtube_id_0_75="JMD_ifUUfsU"
+                    youtube_id_1_0="OEoXaMPEzfM"
+                    youtube_id_1_25="AKqURZnYqpk"
+                    youtube_id_1_5="DYpADpL7jAY"
+                />
+                <video
+                    url_name="separate_file_video"
+                    display_name="default"
+                    youtube="0.75:JMD_ifUUfsU,1.00:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY"
+                    youtube_id_0_75="JMD_ifUUfsU"
+                    youtube_id_1_0="OEoXaMPEzfM"
+                    youtube_id_1_25="AKqURZnYqpk"
+                    youtube_id_1_5="DYpADpL7jAY"
+                />
+                <video
+                    url_name="video_with_end_time"
+                    display_name="default"
+                    youtube="0.75:JMD_ifUUfsU,1.00:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY"
+                    end_time="00:00:10"
+                    youtube_id_0_75="JMD_ifUUfsU"
+                    youtube_id_1_0="OEoXaMPEzfM"
+                    youtube_id_1_25="AKqURZnYqpk"
+                    youtube_id_1_5="DYpADpL7jAY"
+                />
+                <poll_question
+                    url_name="T1_changemind_poll_foo_2"
+                    display_name="Change your answer"
+                    reset="false"
+                >
+                    &lt;p&gt;Have you changed your mind?&lt;/p&gt;
+                    <answer id="yes">Yes</answer>
+                    <answer id="no">No</answer>
+                </poll_question>
+            </vertical>
+        """)
+
+        # Now if we GET the clipboard again, the GET response should exactly equal the last POST response:
+        assert client.get(CLIPBOARD_ENDPOINT).json() == response_data
 
     def test_copy_several_things(self):
         """
@@ -176,29 +245,29 @@ class ClipboardTestCase(ModuleStoreTestCase):
         # Copy the video and validate the response:
         video_key = course_key.make_usage_key("video", "sample_video")
         response = client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(video_key)}, format="json")
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         video_clip_data = response.json()
-        self.assertEqual(video_clip_data["source_usage_key"], str(video_key))
-        self.assertEqual(video_clip_data["content"]["block_type"], "video")
+        assert video_clip_data["source_usage_key"] == str(video_key)
+        assert video_clip_data["content"]["block_type"] == "video"
         old_olx_url = video_clip_data["content"]["olx_url"]
-        self.assertEqual(client.get(old_olx_url).status_code, 200)
+        assert client.get(old_olx_url).status_code == 200
 
         # Now copy some HTML:
         html_key = course_key.make_usage_key("html", "toyhtml")
         response = client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(html_key)}, format="json")
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Now check the clipboard:
         response = client.get(CLIPBOARD_ENDPOINT)
         html_clip_data = response.json()
-        self.assertEqual(html_clip_data["source_usage_key"], str(html_key))
-        self.assertEqual(html_clip_data["content"]["block_type"], "html")
-        self.assertEqual(html_clip_data["content"]["block_type_display"], "Text")
+        assert html_clip_data["source_usage_key"] == str(html_key)
+        assert html_clip_data["content"]["block_type"] == "html"
+        assert html_clip_data["content"]["block_type_display"] == "Text"
         ## The Python method for getting the API response should be identical:
-        self.assertEqual(html_clip_data, python_api.get_user_clipboard_json(self.user.id, response.wsgi_request))
+        assert html_clip_data == python_api.get_user_clipboard_json(self.user.id, response.wsgi_request)
 
         # The OLX link from the video will no longer work:
-        self.assertEqual(client.get(old_olx_url).status_code, 404)
+        assert client.get(old_olx_url).status_code == 404
 
     def test_copy_static_assets(self):
         """
@@ -218,7 +287,7 @@ class ClipboardTestCase(ModuleStoreTestCase):
         response = client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(html_key)}, format="json")
 
         # Validate the response:
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_data = response.json()
         staged_content_id = response_data["content"]["id"]
         olx_str = python_api.get_staged_content_olx(staged_content_id)
@@ -253,7 +322,7 @@ class ClipboardTestCase(ModuleStoreTestCase):
         response = client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(html_block.location)}, format="json")
 
         # Validate the response:
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_data = response.json()
         staged_content_id = response_data["content"]["id"]
         olx_str = python_api.get_staged_content_olx(staged_content_id)
@@ -274,9 +343,9 @@ class ClipboardTestCase(ModuleStoreTestCase):
         html_key = course_key.make_usage_key("html", "toyhtml")
         with self.allow_transaction_exception():
             response = nonstaff_client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(html_key)}, format="json")
-            self.assertEqual(response.status_code, 403)
+            assert response.status_code == 403
         response = nonstaff_client.get(CLIPBOARD_ENDPOINT)
-        self.assertEqual(response.json()["content"], None)
+        assert response.json()["content"] is None
 
     def test_no_stealing_clipboard_content(self):
         """
@@ -293,11 +362,10 @@ class ClipboardTestCase(ModuleStoreTestCase):
         # Then another user tries to get the OLX:
         olx_url = response.json()["content"]["olx_url"]
         response = nonstaff_client.get(olx_url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def assertXmlEqual(self, xml_str_a: str, xml_str_b: str) -> bool:
         """ Assert that the given XML strings are equal, ignoring attribute order and some whitespace variations. """
-        self.assertEqual(
-            ElementTree.canonicalize(xml_str_a, strip_text=True),
-            ElementTree.canonicalize(xml_str_b, strip_text=True),
-        )
+        a = ElementTree.canonicalize(xml_str_a, strip_text=True)
+        b = ElementTree.canonicalize(xml_str_b, strip_text=True)
+        assert a == b
