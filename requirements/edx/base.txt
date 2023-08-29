@@ -481,7 +481,7 @@ edx-drf-extensions==8.9.1
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.1.1
+edx-enterprise==4.1.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
