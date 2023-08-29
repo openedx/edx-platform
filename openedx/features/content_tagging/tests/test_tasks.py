@@ -3,32 +3,29 @@ Test for auto-tagging content
 """
 from __future__ import annotations
 
+import logging
 from unittest.mock import patch
 
-import ddt
-from django.conf import settings
 from django.core.management import call_command
-from django.test.utils import override_settings
 from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
 from organizations.models import Organization
 
-from openedx.core.lib.tests import attr
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.test_mixed_modulestore import CommonMixedModuleStoreSetup
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
 
 from .. import api
 from ..models import ContentLanguageTaxonomy, TaxonomyOrg
 
-if not settings.configured:
-    settings.configure()
-
 LANGUAGE_TAXONOMY_ID = -1
 
 
-class TestCourseAutoTagging(CommonMixedModuleStoreSetup):
+class TestAutoTagging(ModuleStoreTestCase):
     """
-    Test if the handlers are callend and if they call the right tasks
+    Test if the Course and XBlock tags are automatically created
     """
+
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     def _check_tag(self, object_id: str, taxonomy_id: int, value: str | None):
         """
@@ -48,32 +45,40 @@ class TestCourseAutoTagging(CommonMixedModuleStoreSetup):
     @classmethod
     def setUpClass(cls):
         # Run fixtures to create the system defined tags
-        super().setUpClass()
         call_command("loaddata", "--app=oel_tagging", "language_taxonomy.yaml")
 
         # Configure language taxonomy
         language_taxonomy = Taxonomy.objects.get(id=-1)
         language_taxonomy.taxonomy_class = ContentLanguageTaxonomy
         language_taxonomy.save()
-        TaxonomyOrg.objects.create(id=-1, taxonomy_id=-1, org=None)
+
+        # Enable Language taxonomy for all orgs
+        TaxonomyOrg.objects.create(id=-1, taxonomy=language_taxonomy, org=None)
+
+        super().setUpClass()
 
     def setUp(self):
         super().setUp()
+        # Create user
+        self.user = UserFactory.create()
+        self.user_id = self.user.id
+
         self.orgA = Organization.objects.create(name="Organization A", short_name="orgA")
-        self.initdb(ModuleStoreEnum.Type.split)
         self.patcher = patch("openedx.features.content_tagging.tasks.modulestore", return_value=self.store)
         self.addCleanup(self.patcher.stop)
         self.patcher.start()
 
-    def tearDown(self):
-        self.patcher.stop()
-        super().tearDown()
-
     def test_create_course(self):
         # Create course
+        logging.warning("Creating course")
         course = self.store.create_course(
-            self.orgA.short_name, "test_course", "test_run", self.user_id, fields={"language": "pt"}
+            self.orgA.short_name,
+            "test_course",
+            "test_run",
+            self.user_id,
+            fields={"language": "pt"},
         )
+        logging.warning("Creating course: done")
 
         # Check if the tags are created in the Course
         assert self._check_tag(course.id, LANGUAGE_TAXONOMY_ID, "Portuguese")
@@ -81,7 +86,11 @@ class TestCourseAutoTagging(CommonMixedModuleStoreSetup):
     def test_update_course(self):
         # Create course
         course = self.store.create_course(
-            self.orgA.short_name, "test_course", "test_run", self.user_id, fields={"language": "pt"}
+            self.orgA.short_name,
+            "test_course",
+            "test_run",
+            self.user_id,
+            fields={"language": "pt"},
         )
 
         # Simulates user manually changing a tag
@@ -98,7 +107,11 @@ class TestCourseAutoTagging(CommonMixedModuleStoreSetup):
     def test_create_delete_xblock(self):
         # Create course
         course = self.store.create_course(
-            self.orgA.short_name, "test_course", "test_run", self.user_id, fields={"language": "pt"}
+            self.orgA.short_name,
+            "test_course",
+            "test_run",
+            self.user_id,
+            fields={"language": "pt"},
         )
 
         # Create XBlocks
@@ -106,7 +119,7 @@ class TestCourseAutoTagging(CommonMixedModuleStoreSetup):
         vertical = self.store.create_child(self.user_id, sequential.location, "vertical", "test_vertical")
 
         # Publish sequential changes
-        self.store.publish(sequential.location, self.user_id)
+        # self.store.publish(sequential.location, self.user_id)
 
         usage_key_str = str(vertical.location)
 
