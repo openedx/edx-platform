@@ -12,6 +12,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
     role = serializers.CharField(source='gen_user.role')
     school = serializers.CharField(source='gen_user.school.name')
     school_type = serializers.CharField(source='gen_user.school.type')
+    is_school_active = serializers.BooleanField(source='gen_user.school.is_active')
     csrf_token = serializers.SerializerMethodField('get_csrf_token')
     has_changed_password = serializers.SerializerMethodField('get_password_changed')
 
@@ -56,7 +57,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ('id', 'name', 'username', 'csrf_token', 'role',
-                  'first_name', 'last_name', 'email', 'school', 'school_type', 'has_changed_password')
+                  'first_name', 'last_name', 'email', 'school', 'school_type', 'is_school_active', 'has_changed_password')
 
 
 class TeacherSerializer(serializers.ModelSerializer):

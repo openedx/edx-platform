@@ -20,7 +20,10 @@ def register_gen_user(user, gen_user_data):
     school = None
     if organisation_id and organisation_name:
         school, created = School.objects.get_or_create(guid=organisation_id, type=SchoolTypes.RM_UNIFY, name=organisation_name)
-
+        if created:
+            # setting school as inactive is case it does not exist in our platform
+            school.is_active = False
+            school.save()
     # required field in genplus user registration
     if not school:
         raise ValidationError("School not found for this gen user")

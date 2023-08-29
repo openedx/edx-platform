@@ -78,6 +78,7 @@ class SchoolAdmin(admin.ModelAdmin):
         'guid',
         'name',
         'type',
+        'is_active',
         'external_id',
         'classes',
         'total_students',

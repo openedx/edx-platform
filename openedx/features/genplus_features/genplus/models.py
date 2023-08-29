@@ -19,6 +19,8 @@ class School(TimeStampedModel):
     name = models.CharField(max_length=64)
     external_id = models.CharField(max_length=32)
     type = models.CharField(blank=True, null=True, max_length=32, choices=SCHOOL_CHOICES)
+    is_active = models.BooleanField(default=True,
+                                    help_text='If De-selected the users related to this school cannot access the platform')
 
     def __str__(self):
         return self.name

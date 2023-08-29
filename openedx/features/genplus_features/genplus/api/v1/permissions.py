@@ -8,7 +8,8 @@ class IsGenUser(permissions.BasePermission):
 
     def has_permission(self, request, view):
         try:
-            return request.user and request.user.gen_user
+            # check gen_user exists and related school is active
+            return request.user and request.user.gen_user and request.user.gen_user.school.is_active
         except GenUser.DoesNotExist:
             return False
 
