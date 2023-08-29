@@ -701,6 +701,11 @@ def _ora_assessment_to_assignment(
     block_title = block_data.get_xblock_field(ora_block, 'title', _('Open Response Assessment'))
     course_key = block_data.root_block_usage_key
 
+    # Steps with no "due" date, like staff or training, should not show up here
+    assessment_step_due = assessment.get('start')
+    if assessment_step_due is None:
+        return None
+
     if date_config_type == 'subsection':
         assessment_start = block_data.get_xblock_field(ora_block, 'start')
         assessment_due = block_data.get_xblock_field(ora_block, 'due')

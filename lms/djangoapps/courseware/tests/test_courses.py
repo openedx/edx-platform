@@ -483,6 +483,7 @@ class TestGetCourseAssignments(CompletionWaffleTestMixin, ModuleStoreTestCase):
         assert not assignments[0].complete
 
 
+@ddt.ddt
 class TestGetCourseAssignmentsORA(CompletionWaffleTestMixin, ModuleStoreTestCase):
     """ Tests for ora-related behavior in get_course_assignments """
     TODAY = datetime.datetime(2023, 8, 2, 12, 23, 45, tzinfo=pytz.UTC)
@@ -498,7 +499,14 @@ class TestGetCourseAssignmentsORA(CompletionWaffleTestMixin, ModuleStoreTestCase
         return datetime.timedelta(days=t) + self.TODAY
 
     # pylint: disable=attribute-defined-outside-init
-    def _setup_course(self, course_dates=None, subsection_dates=None, ora_dates=None, date_config_type="manual"):
+    def _setup_course(
+        self,
+        course_dates=None,
+        subsection_dates=None,
+        ora_dates=None,
+        date_config_type="manual",
+        additional_rubric_assessments=None
+    ):
         """
         Setup a course with one section, subsection, unit, and ORA
 
@@ -547,6 +555,9 @@ class TestGetCourseAssignmentsORA(CompletionWaffleTestMixin, ModuleStoreTestCase
                 'due': ora_dates['self'][1].isoformat(),
             }
         ]
+        if additional_rubric_assessments:
+            rubric_assessments.extend(additional_rubric_assessments)
+
         self.openassessment = BlockFactory(
             parent=vertical,
             category='openassessment',
@@ -661,3 +672,30 @@ class TestGetCourseAssignmentsORA(CompletionWaffleTestMixin, ModuleStoreTestCase
         assignments = get_course_assignments(self.course.location.context_key, self.user, None)
         assert len(assignments) == 1
         assert assignments[0].block_key == subsection_2.location
+
+    @ddt.data('manual', 'subsection', 'course_end')
+    def test_ora_steps_with_no_due_date(self, config_type):
+        additional_assessments = [
+            {
+                'name': 'assessment_that_is_never_due',
+                'some_setting': 'whatever',
+                'another_setting': 'meh',
+            },
+            {
+                'name': 'another_ssessment_that_is_never_due',
+                'favorite_fruit': 'pear',
+                'favorite_color': 'green',
+            }
+        ]
+        self._setup_course(
+            additional_rubric_assessments=additional_assessments,
+            date_config_type=config_type,
+        )
+
+        # There are no dates for these other steps
+        assignments = get_course_assignments(self.course.location.context_key, self.user, None)
+        assert len(assignments) == 4
+        assert assignments[0].block_key == self.subsection.location
+        assert 'Submission' in assignments[1].title
+        assert 'Peer' in assignments[2].title
+        assert 'Self' in assignments[3].title
