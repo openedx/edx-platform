@@ -537,6 +537,7 @@ such that the value can be defined later than this assignment (file load order).
             if (successes.length && dataFromServer.action === 'remove') {
                 // Translators: A list of users appears after this sentence;
                 renderList(gettext('These users were successfully removed as beta testers:'), (function() {
+                    // eslint-disable-next-line no-shadow
                     var j, len1, results;
                     results = [];
                     for (j = 0, len1 = successes.length; j < len1; j++) {
@@ -549,6 +550,7 @@ such that the value can be defined later than this assignment (file load order).
             if (errors.length && dataFromServer.action === 'add') {
                 // Translators: A list of users appears after this sentence;
                 renderList(gettext('These users were not added as beta testers:'), (function() {
+                    // eslint-disable-next-line no-shadow
                     var j, len1, results;
                     results = [];
                     for (j = 0, len1 = errors.length; j < len1; j++) {
@@ -561,6 +563,7 @@ such that the value can be defined later than this assignment (file load order).
             if (errors.length && dataFromServer.action === 'remove') {
                 // Translators: A list of users appears after this sentence;
                 renderList(gettext('These users were not removed as beta testers:'), (function() {
+                    // eslint-disable-next-line no-shadow
                     var j, len1, results;
                     results = [];
                     for (j = 0, len1 = errors.length; j < len1; j++) {
@@ -575,6 +578,7 @@ such that the value can be defined later than this assignment (file load order).
                     gettext('Users must create and activate their account before they can be promoted to beta tester.'))
                 );
                 return renderList(gettext('Could not find users associated with the following identifiers:'), (function() { // eslint-disable-line max-len
+                    // eslint-disable-next-line no-shadow
                     var j, len1, results;
                     results = [];
                     for (j = 0, len1 = noUsers.length; j < len1; j++) {
@@ -765,7 +769,7 @@ such that the value can be defined later than this assignment (file load order).
             }
             if (allowed.length && emailStudents) {
                 // Translators: A list of users appears after this sentence;
-                renderList(gettext('Successfully sent enrollment emails to the following users. They will be allowed to enroll once they register:'), (function() { // eslint-disable-line max-len
+                renderList(gettext('Email cannot be sent to the following users via batch enrollment. They will be allowed to enroll once they register:'), (function() { // eslint-disable-line max-len
                     var k, len2, results;
                     results = [];
                     for (k = 0, len2 = allowed.length; k < len2; k++) {
@@ -789,7 +793,7 @@ such that the value can be defined later than this assignment (file load order).
             }
             if (autoenrolled.length && emailStudents) {
                 // Translators: A list of users appears after this sentence;
-                renderList(gettext('Successfully sent enrollment emails to the following users. They will be enrolled once they register:'), (function() { // eslint-disable-line max-len
+                renderList(gettext('Email cannot be sent to the following users via batch enrollment. They will be enrolled once they register:'), (function() { // eslint-disable-line max-len
                     var k, len2, results;
                     results = [];
                     for (k = 0, len2 = autoenrolled.length; k < len2; k++) {

@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
 
+// eslint-disable-next-line react/function-component-definition
 const ReportStatus = ({
     error, succeeded, inProgress, reportPath,
 }) => {
@@ -53,7 +54,9 @@ ReportStatus.propTypes = {
 ReportStatus.defaultProps = {
     error: null,
     reportPath: null,
+    // eslint-disable-next-line react/default-props-match-prop-types
     reportPreview: null,
+    // eslint-disable-next-line react/default-props-match-prop-types
     reportName: null,
 };
 

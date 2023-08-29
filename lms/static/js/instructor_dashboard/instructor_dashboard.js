@@ -89,6 +89,7 @@ such that the value can be defined later than this assignment (file load order).
         return safeWaiter;
     }());
 
+    // eslint-disable-next-line new-parens
     sectionsHaveLoaded = new SafeWaiter;
 
     $(function() {
@@ -198,6 +199,7 @@ such that the value can be defined later than this assignment (file load order).
                 $element: idashContent.find('.' + CSS_IDASH_SECTION + '#open_response_assessment')
             }
         ];
+        // eslint-disable-next-line no-void
         if (edx.instructor_dashboard.proctoring !== void 0) {
             sectionsToInitialize = sectionsToInitialize.concat([
                 {

@@ -21,6 +21,7 @@ from openedx.core.djangoapps.content_libraries.tests.base import (
     URL_BLOCK_RENDER_VIEW,
     URL_BLOCK_GET_HANDLER_URL,
     URL_BLOCK_METADATA_URL,
+    URL_BLOCK_FIELDS_URL,
 )
 from openedx.core.djangoapps.content_libraries.tests.user_state_block import UserStateTestBlock
 from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIGHTS_RESERVED, CC_4_BY
@@ -41,6 +42,9 @@ class ContentLibraryContentTestMixin:
         # Create a couple students that the tests can use
         self.student_a = UserFactory.create(username="Alice", email="alice@example.com", password="edx")
         self.student_b = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
+
+        # staff user
+        self.staff_user = UserFactory(password="edx", is_staff=True)
 
         # Create a collection using Blockstore API directly only because there
         # is not yet any Studio REST API for doing so:
@@ -181,6 +185,43 @@ class ContentLibraryRuntimeTestMixin(ContentLibraryContentTestMixin):
         }, metadata_view_result.data["index_dictionary"])
         assert metadata_view_result.data['student_view_data'] is None
         # Capa doesn't provide student_view_data
+
+    @skip_unless_cms  # modifying blocks only works properly in Studio
+    def test_xblock_fields(self):
+        """
+        Test the XBlock fields API
+        """
+        # act as staff:
+        client = APIClient()
+        client.login(username=self.staff_user.username, password='edx')
+
+        # create/save a block using the library APIs first
+        unit_block_key = library_api.create_library_block(self.library.key, "unit", "fields-u1").usage_key
+        block_key = library_api.create_library_block_child(unit_block_key, "html", "fields-p1").usage_key
+        new_olx = """
+        <html display_name="New Text Block">
+            <p>This is some <strong>HTML</strong>.</p>
+        </html>
+        """.strip()
+        library_api.set_library_block_olx(block_key, new_olx)
+        library_api.publish_changes(self.library.key)
+
+        # Check the GET API for the block:
+        fields_get_result = client.get(URL_BLOCK_FIELDS_URL.format(block_key=block_key))
+        assert fields_get_result.data['display_name'] == 'New Text Block'
+        assert fields_get_result.data['data'].strip() == '<p>This is some <strong>HTML</strong>.</p>'
+        assert fields_get_result.data['metadata']['display_name'] == 'New Text Block'
+
+        # Check the POST API for the block:
+        fields_post_result = client.post(URL_BLOCK_FIELDS_URL.format(block_key=block_key), data={
+            'data': '<p>test</p>',
+            'metadata': {
+                'display_name': 'New Display Name',
+            }
+        }, format='json')
+        block_saved = xblock_api.load_block(block_key, self.staff_user)
+        assert block_saved.data == '\n<p>test</p>\n'
+        assert xblock_api.get_block_display_name(block_saved) == 'New Display Name'
 
 
 @requires_blockstore

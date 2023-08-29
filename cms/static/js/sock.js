@@ -2,8 +2,10 @@ import * as domReady from 'domReady';
 import * as $ from 'jquery';
 import 'jquery.smoothScroll';
 
+// eslint-disable-next-line no-unused-expressions
 'use strict';
 
+// eslint-disable-next-line import/no-mutable-exports
 var toggleSock = function(e) {
     e.preventDefault();
 
@@ -38,4 +40,5 @@ domReady(function() {
     $('.cta-show-sock').bind('click', toggleSock);
 });
 
+// eslint-disable-next-line import/prefer-default-export
 export {toggleSock};

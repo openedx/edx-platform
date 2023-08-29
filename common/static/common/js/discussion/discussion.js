@@ -58,6 +58,7 @@
             };
 
             Discussion.prototype.setSortComparator = function(sortBy) {
+                // eslint-disable-next-line default-case
                 switch (sortBy) {
                 case 'activity':
                     this.comparator = this.sortByDateRecentFirst;
@@ -95,6 +96,7 @@
                 if (_.contains(['unread', 'unanswered', 'flagged'], options.filter)) {
                     data[options.filter] = true;
                 }
+                // eslint-disable-next-line default-case
                 switch (mode) {
                 case 'search':
                     url = DiscussionUtil.urlFor('search');

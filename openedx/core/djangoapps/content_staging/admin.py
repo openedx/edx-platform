@@ -30,12 +30,12 @@ class UserClipboardAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'source_usage_key', 'content__display_name')
     readonly_fields = ('source_context_key', 'get_source_context_title')
 
+    @admin.display(description='Content')
     def content_link(self, obj):
         """ Display the StagedContent object as a link """
         url = reverse('admin:content_staging_stagedcontent_change', args=[obj.content.pk])
         return format_html('<a href="{}">{}</a>', url, obj.content)
-    content_link.short_description = 'Content'
 
+    @admin.display(description='Source Context Title')
     def get_source_context_title(self, obj):
         return obj.get_source_context_title()
-    get_source_context_title.short_description = 'Source Context Title'

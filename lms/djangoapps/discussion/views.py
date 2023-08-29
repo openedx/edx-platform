@@ -288,7 +288,7 @@ def forum_form_discussion(request, course_key):
     """
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
     request.user.is_community_ta = utils.is_user_community_ta(request.user, course.id)
-    if request.is_ajax():
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         user = cc.User.from_django_user(request.user)
         user_info = user.to_dict()
 
@@ -354,7 +354,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
     request.user.is_community_ta = utils.is_user_community_ta(request.user, course.id)
 
-    if request.is_ajax():
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         cc_user = cc.User.from_django_user(request.user)
         user_info = cc_user.to_dict()
         is_staff = has_permission(request.user, 'openclose_thread', course.id)
@@ -413,8 +413,8 @@ def _find_thread(request, course, discussion_id, thread_id):
     """
     try:
         thread = cc.Thread.find(thread_id).retrieve(
-            with_responses=request.is_ajax(),
-            recursive=request.is_ajax(),
+            with_responses=request.headers.get('x-requested-with') == 'XMLHttpRequest',
+            recursive=request.headers.get('x-requested-with') == 'XMLHttpRequest',
             user_id=request.user.id,
             response_skip=request.GET.get("resp_skip"),
             response_limit=request.GET.get("resp_limit")
@@ -644,7 +644,7 @@ def user_profile(request, course_key, user_id):
     """
     try:
         context = create_user_profile_context(request, course_key, user_id)
-        if request.is_ajax():
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return utils.JsonResponse({
                 'discussion_data': context['threads'],
                 'page': context['page'],
@@ -721,7 +721,7 @@ def followed_threads(request, course_key, user_id):
                 paginated_results.collection,
                 request.user, user_info
             )
-        if request.is_ajax():
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             is_staff = has_permission(request.user, 'openclose_thread', course.id)
             is_community_ta = utils.is_user_community_ta(request.user, course.id)
             return utils.JsonResponse({

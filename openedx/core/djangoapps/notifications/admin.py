@@ -12,6 +12,8 @@ class NotificationAdmin(admin.ModelAdmin):
     Admin for Notifications
     """
     raw_id_fields = ('user',)
+    search_fields = ('course_id', 'user__username')
+    list_filter = ('app_name',)
 
 
 class CourseNotificationPreferenceAdmin(admin.ModelAdmin):
@@ -20,7 +22,8 @@ class CourseNotificationPreferenceAdmin(admin.ModelAdmin):
     """
     model = CourseNotificationPreference
     raw_id_fields = ('user',)
-    list_display = ['get_username', 'course_id', 'notification_preference_config']
+    list_display = ('get_username', 'course_id', 'notification_preference_config')
+    search_fields = ('course_id', 'user__username')
 
     @admin.display(description='Username', ordering='user__username')
     def get_username(self, obj):

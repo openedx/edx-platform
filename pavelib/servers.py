@@ -235,27 +235,6 @@ def run_all_servers(options):
 
 @task
 @needs('pavelib.prereqs.install_prereqs')
-@cmdopts([
-    ("settings=", "s", "Django settings"),
-    ("fake-initial", None, "Fake the initial migrations"),
-])
-@timed
-def update_db(options):
-    """
-    Migrates the lms and cms across all databases
-    """
-    settings = getattr(options, 'settings', DEFAULT_SETTINGS)
-    fake = "--fake-initial" if getattr(options, 'fake_initial', False) else ""
-    for system in ('lms', 'cms'):
-        # pylint: disable=line-too-long
-        sh("NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{system} --traceback --pythonpath=. {fake}".format(
-            settings=settings,
-            system=system,
-            fake=fake))
-
-
-@task
-@needs('pavelib.prereqs.install_prereqs')
 @consume_args
 @timed
 def check_settings(args):

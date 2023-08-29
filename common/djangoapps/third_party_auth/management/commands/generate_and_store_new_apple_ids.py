@@ -151,7 +151,7 @@ class Command(BaseCommand):
             new_apple_id = ''
         except (requests.exceptions.JSONDecodeError, AttributeError):
             log.info('JSONDecodeError/AttributeError for transfer_id %s.', transfer_id)
-            transfer_id = ''
+            new_apple_id = ''
 
         return new_apple_id
 

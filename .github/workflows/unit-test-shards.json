@@ -64,7 +64,6 @@
       "lms/djangoapps/ora_staff_grader/",
       "lms/djangoapps/program_enrollments/",
       "lms/djangoapps/rss_proxy/",
-      "lms/djangoapps/save_for_later/",
       "lms/djangoapps/static_template_view/",
       "lms/djangoapps/staticbook/",
       "lms/djangoapps/support/",

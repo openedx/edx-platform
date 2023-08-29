@@ -43,6 +43,10 @@ class XBlockSerializer:
             if py_lib_zip_file:
                 self.static_files.append(py_lib_zip_file)
 
+            js_input_files = utils.get_js_input_files_if_using(self.olx_str, course_key)
+            for js_input_file in js_input_files:
+                self.static_files.append(js_input_file)
+
     def _serialize_block(self, block) -> etree.Element:
         """ Serialize an XBlock to OLX/XML. """
         if block.scope_ids.usage_id.block_type == 'html':

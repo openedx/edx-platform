@@ -65,13 +65,8 @@ class TestXBlockI18nService(ModuleStoreTestCase):
         self.test_language = 'dummy language'
         self.request = mock.Mock()
         self.course = CourseFactory.create()
-        self.field_data = mock.Mock()
         self.block = BlockFactory(category="pure", parent=self.course)
-        _prepare_runtime_for_preview(
-            self.request,
-            self.block,
-            self.field_data,
-        )
+        _prepare_runtime_for_preview(self.request, self.block)
         self.addCleanup(translation.deactivate)
 
     def get_block_i18n_service(self, block):
@@ -123,7 +118,6 @@ class TestXBlockI18nService(ModuleStoreTestCase):
             # Check that the old ugettext has been put back into place
             self.assertEqual(i18n_service.ugettext(self.test_language), 'dummy language')
 
-    @mock.patch('django.utils.translation.ugettext', mock.Mock(return_value='XYZ-TEST-LANGUAGE'))
     @mock.patch('django.utils.translation.gettext', mock.Mock(return_value='XYZ-TEST-LANGUAGE'))
     def test_django_translator_in_use_with_empty_block(self):
         """
@@ -132,7 +126,7 @@ class TestXBlockI18nService(ModuleStoreTestCase):
         i18n_service = XBlockI18nService(None)
         self.assertEqual(i18n_service.ugettext(self.test_language), 'XYZ-TEST-LANGUAGE')
 
-    @mock.patch('django.utils.translation.ugettext', mock.Mock(return_value='XYZ-TEST-LANGUAGE'))
+    @mock.patch('django.utils.translation.gettext', mock.Mock(return_value='XYZ-TEST-LANGUAGE'))
     def test_message_catalog_translations(self):
         """
         Test: Message catalog from FakeTranslation should return required translations.

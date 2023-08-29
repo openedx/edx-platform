@@ -45,7 +45,8 @@ def rewrite_absolute_static_urls(text, course_id):
         /static/SCI_1.2_Image_.png
     format for consistency and portability.
     """
-    assert isinstance(course_id, CourseKey)
+    if not course_id.is_course:
+        return text  # We can't rewrite URLs for libraries, which don't have "Files & Uploads".
     asset_full_url_re = r'https?://[^/]+/(?P<maybe_asset_key>[^\s\'"&]+)'
 
     def check_asset_key(match_obj):
@@ -128,6 +129,58 @@ def _has_python_script(olx: str) -> bool:
         if check in olx:
             return True
     return False
+
+
+def get_js_input_files_if_using(olx: str, course_id: CourseKey) -> [StaticFile]:
+    """
+    When a problem uses JSInput and references an html file uploaded to the course (i.e. uses /static/),
+    all the other related static asset files that it depends on should also be included.
+    """
+    static_files = []
+    html_file_fullpath = _extract_local_html_path(olx)
+    if html_file_fullpath:
+        html_filename = html_file_fullpath.split('/')[-1]
+        asset_key = StaticContent.get_asset_key_from_path(course_id, html_filename)
+        html_file_content = AssetManager.find(asset_key, throw_on_not_found=False)
+        if html_file_content:
+            static_assets = _extract_static_assets(str(html_file_content.data))
+            for static_asset in static_assets:
+                url = '/' + str(StaticContent.compute_location(course_id, static_asset))
+                static_files.append(StaticFile(name=static_asset, url=url, data=None))
+
+    return static_files
+
+
+def _extract_static_assets(html_file_content_data: str) -> [str]:
+    """
+    Extracts all the static assets with relative paths that are present in the html content
+    """
+    # Regular expression that looks for URLs that are inside HTML tag
+    # attributes (src or href) with relative paths.
+    # The pattern looks for either src or href, followed by an equals sign
+    # and then captures everything until it finds the closing quote (single or double)
+    assets_re = r'\b(?:src|href)\s*=\s*(?![\'"]?(?:https?://))["\']([^\'"]*?\.[^\'"]*?)["\']'
+
+    # Find all matches in the HTML code
+    matches = re.findall(assets_re, html_file_content_data)
+
+    return matches
+
+
+def _extract_local_html_path(olx: str) -> str | None:
+    """
+    Check if the given OlX <problem> block string contains a `jsinput` tag and the `html_file` attribute
+    is referencing a file in `/static/`. If so, extract the relative path of the html file in the OLX
+    """
+    if "<jsinput" in olx:
+        # Regular expression to match html_file="/static/[anything].html" in both single and double quotes and
+        # extract the "/static/[anything].html" part from the input strings.
+        local_html_file_re = r'html_file=([\"\'])(?P<url>\/static\/[^\"\']*\.html)\1'
+        matches = re.search(local_html_file_re, olx)
+        if matches:
+            return matches.group('url')  # Output example: /static/question.html
+
+    return None
 
 
 @contextmanager
