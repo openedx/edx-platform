@@ -14,9 +14,9 @@ django-hijack-admin==2.1.10
 honeycomb-beeline==2.12.1
 
 # Patched upstream packages
+https://github.com/mitodl/edx-sga/archive/refs/tags/v0.22.0.tar.gz
 https://github.com/edx-solutions/xblock-google-drive/archive/589d9f51f9b.tar.gz  # v0.2.0 but the repo has no tags
 https://github.com/appsembler/edx-ora2/archive/2.7.6-appsembler.1.tar.gz
-https://github.com/appsembler/edx-sga/archive/v0.11.0.appsembler2.tar.gz
 https://github.com/appsembler/edx-proctoring/archive/v2.4.0-appsembler1.tar.gz
 
 # Tahoe plugins and customizations
