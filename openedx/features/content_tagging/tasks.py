@@ -59,7 +59,6 @@ def update_course_tags(course_key_str: str) -> bool:
         course_key_str (str): identifier of the Course
     """
     try:
-        logging.error('teste')
         course_key = CourseKey.from_string(course_key_str)
 
         log.info("Updating tags for Course with id: %s", course_key)
