@@ -551,7 +551,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #           XBLOCK_UPDATED handler call
     #    find: definitions (calculator field), structures, XBLOCK_UPDATED handler call
     #    sends: 2 sends to update index & structure (note, it would also be definition if a content field changed)
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 6, 5), (ModuleStoreEnum.Type.split, 4, 3, 2))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 6, 5), (ModuleStoreEnum.Type.split, 6, 3, 2))
     @ddt.unpack
     def test_update_item(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -1086,7 +1086,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #          delete oel_tagging_objecttag from XBLOCK_DELETED handler in Content Tagging
     #   Find: active_versions, 2 structures (published & draft), definition (unnecessary)
     #   Sends: updated draft and published structures and active_versions
-    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 6, 2), (ModuleStoreEnum.Type.split, 5, 2, 3))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 5, 2), (ModuleStoreEnum.Type.split, 5, 2, 3))
     @ddt.unpack
     def test_delete_item(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -1216,7 +1216,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #          executed twice, possibly unnecessarily)
     #   find: 2 reads of structure, definition (s/b lazy; so, unnecessary),
     #         plus 1 wildcard find in draft mongo which has none
-    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 3, 0), (ModuleStoreEnum.Type.split, 2, 3, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 2, 0), (ModuleStoreEnum.Type.split, 2, 3, 0))
     @ddt.unpack
     def test_get_courses(self, default_ms, num_mysql, max_find, max_send):
         self.initdb(default_ms)
@@ -1256,7 +1256,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
     # draft is 2: find out which ms owns course, get item
     # split: active_versions (mysql), structure, definition (to load course wiki string)
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 3, 0), (ModuleStoreEnum.Type.split, 1, 2, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 2, 0), (ModuleStoreEnum.Type.split, 1, 2, 0))
     @ddt.unpack
     def test_get_course(self, default_ms, num_mysql, max_find, max_send):
         """
