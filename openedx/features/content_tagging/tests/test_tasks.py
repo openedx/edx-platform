@@ -19,6 +19,7 @@ from ..models import ContentLanguageTaxonomy, TaxonomyOrg
 LANGUAGE_TAXONOMY_ID = -1
 
 
+@skip_unless_cms  # Auto-tagging is only available in the CMS
 class TestAutoTagging(ModuleStoreTestCase):
     """
     Test if the Course and XBlock tags are automatically created
