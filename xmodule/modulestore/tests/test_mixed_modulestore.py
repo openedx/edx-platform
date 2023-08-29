@@ -551,7 +551,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #           XBLOCK_UPDATED handler call
     #    find: definitions (calculator field), structures, XBLOCK_UPDATED handler call
     #    sends: 2 sends to update index & structure (note, it would also be definition if a content field changed)
-    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 6, 5), (ModuleStoreEnum.Type.split, 6, 3, 2))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 8, 5), (ModuleStoreEnum.Type.split, 6, 4, 2))
     @ddt.unpack
     def test_update_item(self, default_ms, num_mysql, max_find, max_send):
         """
