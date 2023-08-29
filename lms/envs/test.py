@@ -167,6 +167,7 @@ update_module_store_settings(
         'port': MONGO_PORT_NUM,
         'db': f'test_xmodule_{THIS_UUID}',
         'collection': 'test_modulestore',
+        'replicaSet': None,
     },
 )
 
