@@ -65,7 +65,7 @@ from common.djangoapps.student.models import (
 )
 from common.djangoapps.util.milestones_helpers import get_pre_requisite_courses_not_completed
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from common.djangoapps.student.models import LastHistoryActivateDAO
+from common.djangoapps.student.models import LastHistoryActivateDAO,  FormBeginCourseDAO
 
 log = logging.getLogger("edx.student")
 
@@ -886,6 +886,10 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     # context.update({
     #     'resume_button_urls': resume_button_urls
     # })
+    check_form = FormBeginCourseDAO.checkSuccess(user_id=user.id)
+    
+    if check_form :
+        return redirect('fill_form')
     
    
     dashboard_template = 'dashboard.html'
@@ -912,3 +916,22 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         )
 
     return response
+
+
+
+@login_required
+@ensure_csrf_cookie
+@add_maintenance_banner
+def form_begin_login (request) :
+    user = request.user
+    check_form = FormBeginCourseDAO.checkSuccess(user_id=user.id)
+    if check_form == False :
+        return redirect('dashboard')
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        FormBeginCourseDAO.create_form(user_id=user, first_name=first_name, last_name=last_name)
+        return redirect('dashboard')
+        
+        
+    return render_to_response('fill_form.html')

@@ -3707,3 +3707,27 @@ class UserPasswordToggleHistory(TimeStampedModel):
 
     def __str__(self):
         return self.comment
+
+
+
+class FormBeginCourse(models.Model):
+    first_name = models.CharField( max_length=255, null=True)
+    last_name = models.CharField( max_length=255, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    
+    def __str__(self):
+        return "%s %s %s" % (self.user_id)
+class FormBeginCourseDAO () :
+    @classmethod
+    def checkSuccess (self,user_id):
+        isCheck = FormBeginCourse.objects.filter(user=user_id).exists()
+        
+        if isCheck :
+            return False
+        else :
+            return True
+    
+    @classmethod
+    def create_form(self,user_id, first_name, last_name):
+        return FormBeginCourse.objects.create(user=user_id, first_name=first_name, last_name=last_name)
