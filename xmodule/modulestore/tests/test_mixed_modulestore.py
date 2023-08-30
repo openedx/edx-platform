@@ -100,7 +100,6 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest, OpenEdxEventsTestMixin):
         'db': DB,
         'collection': COLLECTION,
         'asset_collection': ASSET_COLLECTION,
-        'replicaSet': None,
     }
     OPTIONS = {
         'stores': [
@@ -270,12 +269,7 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest, OpenEdxEventsTestMixin):
             mappings=mappings,
             **self.options
         )
-
         self.addCleanup(self.store.close_all_connections)
-
-        patcher = patch("openedx.features.content_tagging.tasks.modulestore", return_value=self.store)
-        self.addCleanup(patcher.stop)
-        patcher.start()
 
     def initdb(self, default):
         """
@@ -547,11 +541,10 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #    find: get draft, get ancestors up to course (2-6), compute inheritance
     #    sends: update problem and then each ancestor up to course (edit info)
     # split:
-    #    mysql: SplitModulestoreCourseIndex - select (by course_id), update, update historical record,
-    #           XBLOCK_UPDATED handler call
-    #    find: definitions (calculator field), structures, XBLOCK_UPDATED handler call
+    #    mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record
+    #    find: definitions (calculator field), structures
     #    sends: 2 sends to update index & structure (note, it would also be definition if a content field changed)
-    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 8, 5), (ModuleStoreEnum.Type.split, 6, 4, 2))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 6, 5), (ModuleStoreEnum.Type.split, 3, 2, 2))
     @ddt.unpack
     def test_update_item(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -1076,17 +1069,15 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             assert self.store.has_changes(parent)
 
     # Draft
-    #   mysql: delete oel_tagging_objecttag from XBLOCK_DELETED handler in Content Tagging
     #   Find: find parents (definition.children query), get parent, get course (fill in run?),
     #         find parents of the parent (course), get inheritance items,
     #         get item (to delete subtree), get inheritance again.
     #   Sends: delete item, update parent
     # Split
-    #   mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record,
-    #          delete oel_tagging_objecttag from XBLOCK_DELETED handler in Content Tagging
+    #   mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record
     #   Find: active_versions, 2 structures (published & draft), definition (unnecessary)
     #   Sends: updated draft and published structures and active_versions
-    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 5, 2), (ModuleStoreEnum.Type.split, 5, 2, 3))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 6, 2), (ModuleStoreEnum.Type.split, 4, 2, 3))
     @ddt.unpack
     def test_delete_item(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -1108,16 +1099,14 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             self.store.get_item(self.writable_chapter_location, revision=ModuleStoreEnum.RevisionOption.published_only)
 
     # Draft:
-    #   mysql: delete oel_tagging_objecttag from XBLOCK_DELETED handler in Content Tagging
     #    find: find parent (definition.children), count versions of item, get parent, count grandparents,
     #          inheritance items, draft item, draft child, inheritance
     #    sends: delete draft vertical and update parent
     # Split:
-    #    mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record,
-    #           delete oel_tagging_objecttag from XBLOCK_DELETED handler in Content Tagging
+    #    mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record
     #    find: draft and published structures, definition (unnecessary)
     #    sends: update published (why?), draft, and active_versions
-    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 8, 2), (ModuleStoreEnum.Type.split, 5, 3, 3))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 8, 2), (ModuleStoreEnum.Type.split, 4, 3, 3))
     @ddt.unpack
     def test_delete_private_vertical(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -1165,15 +1154,13 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         assert vert_loc not in course.children
 
     # Draft:
-    #   mysql: delete oel_tagging_objecttag from XBLOCK_DELETED handler in Content Tagging
     #   find: find parent (definition.children) 2x, find draft item, get inheritance items
     #   send: one delete query for specific item
     # Split:
-    #   mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record,
-    #          delete oel_tagging_objecttag from XBLOCK_DELETED handler in Content Tagging
+    #   mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record
     #   find: structure (cached)
     #   send: update structure and active_versions
-    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 3, 1), (ModuleStoreEnum.Type.split, 5, 1, 2))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 3, 1), (ModuleStoreEnum.Type.split, 4, 1, 2))
     @ddt.unpack
     def test_delete_draft_vertical(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -1216,7 +1203,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #          executed twice, possibly unnecessarily)
     #   find: 2 reads of structure, definition (s/b lazy; so, unnecessary),
     #         plus 1 wildcard find in draft mongo which has none
-    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 2, 0), (ModuleStoreEnum.Type.split, 2, 3, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 3, 0), (ModuleStoreEnum.Type.split, 2, 3, 0))
     @ddt.unpack
     def test_get_courses(self, default_ms, num_mysql, max_find, max_send):
         self.initdb(default_ms)
@@ -1256,7 +1243,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
     # draft is 2: find out which ms owns course, get item
     # split: active_versions (mysql), structure, definition (to load course wiki string)
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 2, 0), (ModuleStoreEnum.Type.split, 1, 2, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 3, 0), (ModuleStoreEnum.Type.split, 1, 2, 0))
     @ddt.unpack
     def test_get_course(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -2051,7 +2038,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
     # Draft: get all items which can be or should have parents
     # Split: active_versions (mysql), structure (mongo)
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 1, 0), (ModuleStoreEnum.Type.split, 0, 1, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 1, 0), (ModuleStoreEnum.Type.split, 1, 1, 0))
     @ddt.unpack
     def test_get_orphans(self, default_ms, num_mysql, max_find, max_send):
         """
