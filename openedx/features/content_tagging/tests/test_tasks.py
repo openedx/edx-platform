@@ -3,7 +3,6 @@ Test for auto-tagging content
 """
 from __future__ import annotations
 
-import logging
 from unittest.mock import patch
 
 from django.core.management import call_command
