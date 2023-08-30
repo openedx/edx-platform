@@ -146,6 +146,7 @@ def tag_content_object(
 
 
 # Expose the oel_tagging APIs
+
 get_taxonomy = oel_tagging.get_taxonomy
 get_taxonomies = oel_tagging.get_taxonomies
 get_tags = oel_tagging.get_tags
