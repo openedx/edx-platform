@@ -878,6 +878,11 @@ def skill_reflection_response(skills, likert_questions, nuance_interrogation_que
             for submission in submissions:
                 question_response = submission.question_response
                 response_text = question_response['student_response']['response_text']
+                choices = question_response['choices'].values()
+                for c in choices:
+                    txt=c['text']
+                    stats[txt]=stats.get(txt,0)
+                    points_dict[txt] = points_dict.get(txt, 0)
                 stats[response_text] += 1
                 points_dict[response_text] = question_response['student_response']['points']
                 if not question_stats['title']:
