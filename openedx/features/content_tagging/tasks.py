@@ -31,11 +31,9 @@ def _has_taxonomy(taxonomy: Taxonomy, content_object: CourseKey | UsageKey) -> b
     return next(content_tags, _exausted) is not _exausted
 
 
-def _update_tags(content_object: CourseKey | UsageKey, lang) -> None:
+def _set_initial_language_tag(content_object: CourseKey | UsageKey, lang) -> None:
     """
-    Update the tags for a content_object.
-
-    If the content_object already have a tag for the language taxonomy, it will be skipped.
+    Create a tag for the language taxonomy in the content_object if it doesn't exist.
     """
     lang_taxonomy = Taxonomy.objects.get(pk=LANGUAGE_TAXONOMY_ID)
 
@@ -66,7 +64,7 @@ def update_course_tags(course_key_str: str) -> bool:
         course = modulestore().get_course(course_key)
         if course:
             lang = course.language
-            _update_tags(course_key, lang)
+            _set_initial_language_tag(course_key, lang)
 
         return True
     except Exception as e:  # pylint: disable=broad-except
@@ -117,7 +115,7 @@ def update_xblock_tags(usage_key_str: str) -> bool:
         else:
             return True
 
-        _update_tags(usage_key, lang)
+        _set_initial_language_tag(usage_key, lang)
 
         return True
     except Exception as e:  # pylint: disable=broad-except
