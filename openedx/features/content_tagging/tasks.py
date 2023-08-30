@@ -7,6 +7,7 @@ import logging
 
 from celery import shared_task
 from celery_utils.logged_task import LoggedTask
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx_tagging.core.tagging.models import Taxonomy
@@ -31,15 +32,39 @@ def _has_taxonomy(taxonomy: Taxonomy, content_object: CourseKey | UsageKey) -> b
     return next(content_tags, _exausted) is not _exausted
 
 
-def _set_initial_language_tag(content_object: CourseKey | UsageKey, lang) -> None:
+def _set_initial_language_tag(content_object: CourseKey | UsageKey, lang: str) -> None:
     """
     Create a tag for the language taxonomy in the content_object if it doesn't exist.
+
+    If the language is not configured in the plataform or the language tag doesn't exist,
+    use the default language of the platform.
     """
     lang_taxonomy = Taxonomy.objects.get(pk=LANGUAGE_TAXONOMY_ID)
 
     if lang and not _has_taxonomy(lang_taxonomy, content_object):
         tags = api.get_tags(lang_taxonomy)
-        lang_tag = next(tag for tag in tags if tag.external_id == lang)
+        is_language_configured = any(lang_code == lang for lang_code, _ in settings.LANGUAGES) is not None
+        if not is_language_configured:
+            logging.warning(
+                "Language not configured in the plataform: %s. Using default language: %s",
+                lang,
+                settings.LANGUAGE_CODE,
+            )
+            lang = settings.LANGUAGE_CODE
+
+        lang_tag = next((tag for tag in tags if tag.external_id == lang), None)
+        if lang_tag is None:
+            if not is_language_configured:
+                logging.error(
+                    "Language tag not found for default language: %s. Skipping", lang
+                )
+                return
+
+            logging.warning(
+                "Language tag not found for language: %s. Using default language: %s", lang, settings.LANGUAGE_CODE
+            )
+            lang_tag = next(tag for tag in tags if tag.external_id == settings.LANGUAGE_CODE)
+
         api.tag_content_object(lang_taxonomy, [lang_tag.id], content_object)
 
 
