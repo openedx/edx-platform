@@ -357,7 +357,7 @@ django-statici18n==2.4.0
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
     #   xblock-drag-and-drop-v2
-django-storages==1.11.1
+django-storages==1.12.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
