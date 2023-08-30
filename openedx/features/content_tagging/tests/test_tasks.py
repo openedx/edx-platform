@@ -7,6 +7,7 @@ import logging
 from unittest.mock import patch
 
 from django.core.management import call_command
+from edx_toggles.toggles.testutils import override_waffle_switch
 from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
 from organizations.models import Organization
 
@@ -16,11 +17,13 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, 
 
 from .. import api
 from ..models import ContentLanguageTaxonomy, TaxonomyOrg
+from ..toggles import CONTENT_TAGGING_AUTO
 
 LANGUAGE_TAXONOMY_ID = -1
 
 
 @skip_unless_cms  # Auto-tagging is only available in the CMS
+@override_waffle_switch(CONTENT_TAGGING_AUTO, active=True)
 class TestAutoTagging(ModuleStoreTestCase):
     """
     Test if the Course and XBlock tags are automatically created
@@ -71,7 +74,6 @@ class TestAutoTagging(ModuleStoreTestCase):
 
     def test_create_course(self):
         # Create course
-        logging.warning("Creating course")
         course = self.store.create_course(
             self.orgA.short_name,
             "test_course",
@@ -79,7 +81,6 @@ class TestAutoTagging(ModuleStoreTestCase):
             self.user_id,
             fields={"language": "pt"},
         )
-        logging.warning("Creating course: done")
 
         # Check if the tags are created in the Course
         assert self._check_tag(course.id, LANGUAGE_TAXONOMY_ID, "Portuguese")
