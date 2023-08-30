@@ -1,7 +1,4 @@
 from django.db import migrations
-from openedx.features.content_tagging.models import (
-    ContentOrganizationTaxonomy,
-)
 
 
 def load_system_defined_org_taxonomies(apps, _schema_editor):
@@ -37,6 +34,7 @@ def revert_system_defined_org_taxonomies(apps, _schema_editor):
         allow_free_text=False,
         visible_to_authors=False,
     )
+    ContentOrganizationTaxonomy = apps.get_model("content_tagging", "ContentOrganizationTaxonomy")
     org_taxonomy.taxonomy_class = ContentOrganizationTaxonomy
     org_taxonomy.save()
 
