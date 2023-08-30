@@ -329,6 +329,7 @@ django-oauth-toolkit==1.4.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
+    #   edx-enterprise
 django-object-actions==4.1.0
     # via edx-enterprise
 django-pipeline==2.1.0
@@ -481,7 +482,7 @@ edx-drf-extensions==8.9.1
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.1.1
+edx-enterprise==4.1.5
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
