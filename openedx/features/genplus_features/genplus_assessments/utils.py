@@ -880,9 +880,10 @@ def skill_reflection_response(skills, likert_questions, nuance_interrogation_que
                 response_text = question_response['student_response']['response_text']
                 choices = question_response['choices'].values()
                 for c in choices:
-                    txt=c['text']
+                    txt = c['text']
+                    points = c.get('points', None)
                     stats[txt]=stats.get(txt,0)
-                    points_dict[txt] = points_dict.get(txt, 0)
+                    points_dict[txt] = points_dict.get(txt, points)
                 stats[response_text] += 1
                 points_dict[response_text] = question_response['student_response']['points']
                 if not question_stats['title']:
