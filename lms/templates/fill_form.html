@@ -1,13 +1,40 @@
 
-<form id="fill-form" method="post">
-    <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-    <label for="first_name">First Name:</label>
-    <input type="text" id="first_name" name="first_name" required><br>
-    
-    <label for="last_name">Last Name:</label>
-    <input type="text" id="last_name" name="last_name" required><br>
-    
-    <button type="submit" id="save-and-go-dashboard">Save and Go to Dashboard</button>
-</form>
+<!DOCTYPE html>
+<html>
+
+
+  <title>Fill Form </title>
+
+<link rel="stylesheet" type="text/css" href="../static/fill_form/fill_form.css">
+<body>
+    <div class="body-form">
+        <div class="bg-form">
+
+        </div>
+        <form id="fill-form" method="post">
+            <div>
+                <h1>Title-Form</h1>
+                <span>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quod ab sint fuga odio voluptatum odit dolores blanditiis architecto culpa tenetur eum placeat earum quis, delectus corrupti ipsa, tempore porro temporibus!</span>
+            </div>
+            <div class="input-form">
+                
+                <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+                <label for="first_name">First Name:</label>
+                <input type="text" id="first_name" name="first_name" required><br>
+                    
+                <label for="last_name">Last Name:</label>
+                <input type="text" id="last_name" name="last_name" required><br>
+               
+            </div>
+            <div>
+                <button type="submit" >Submit</button>
+            </div>
+            
+        </form>
+    </div>
+
+
+</body>
+</html>
 
 
