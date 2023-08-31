@@ -4598,12 +4598,12 @@ msgstr "تمدید تاریخ مقرر"
 #: lms/djangoapps/instructor/views/tools.py
 #, python-brace-format
 msgid "Users with due date extensions for {0}"
-msgstr "کاربران با افزونه‌های موعد مقرر برای {0}"
+msgstr "کاربران با تمدید سررسید برای {0}"
 
 #: lms/djangoapps/instructor/views/tools.py
 #, python-brace-format
 msgid "Due date extensions for {0} {1} ({2})"
-msgstr "افزونه‌های موعد مقرر برای {0} {1} ({2})"
+msgstr "تمدید سررسید برای {0} {1} ( {2} )"
 
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "Requested task is already running"
@@ -24276,14 +24276,6 @@ msgstr ""
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
 msgstr "گسترده یا فشرده"
-
-#: cms/templates/studio_xblock_wrapper.html
-msgid "Access Settings"
-msgstr "تنظیمات دسترسی"
-
-#: cms/templates/studio_xblock_wrapper.html
-msgid "Set Access"
-msgstr "تنظیم دسترسی"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"

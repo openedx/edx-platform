@@ -240,7 +240,7 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
         expected_context = {
             'replier_name': self.user_3.username,
             'post_title': self.thread.title,
-            'author_name': 'dummy',
+            'author_name': 'dummy\'s',
             'course_name': self.course.display_name,
         }
         self.assertDictEqual(args_comment.context, expected_context)
@@ -309,6 +309,36 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
             _get_mfe_url(self.course.id, self.thread.id)
         )
         self.assertEqual(args_comment.app_name, 'discussion')
+
+
+class TestSendCommentNotification(ForumsEnableMixin, CommentsServiceMockMixin, ModuleStoreTestCase):
+    """
+    Test case to send new_comment notification
+    """
+    def setUp(self):
+        super().setUp()
+        httpretty.reset()
+        httpretty.enable()
+
+        self.course = CourseFactory.create()
+        self.user_1 = UserFactory.create()
+        self.user_2 = UserFactory.create()
+
+    def test_new_comment_notification(self):
+        handler = Mock()
+        USER_NOTIFICATION_REQUESTED.connect(handler)
+
+        thread = ThreadMock(thread_id=1, creator=self.user_1, title='test thread')
+        response = ThreadMock(thread_id=2, creator=self.user_2, title='test response')
+        self.register_get_comment_response({
+            'id': response.id,
+            'thread_id': 'abc',
+            'user_id': response.user_id
+        })
+        send_response_notifications(thread, self.course, self.user_2, parent_id=response.id)
+        handler.assert_called_once()
+        context = handler.call_args[1]['notification_data'].context
+        self.assertEqual(context['author_name'], 'their')
 
 
 @ddt.ddt
