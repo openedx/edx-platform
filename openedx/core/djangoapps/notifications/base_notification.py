@@ -25,7 +25,7 @@ COURSE_NOTIFICATION_TYPES = {
         'notification_app': 'discussion',
         'name': 'new_comment',
         'is_core': True,
-        'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on <{strong}>{author_name}\'s'
+        'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on <{strong}>{author_name}'
                               '</{strong}> response to your post <{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
             'post_title': 'Post title',
