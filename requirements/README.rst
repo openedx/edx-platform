@@ -12,22 +12,29 @@ directly in the requirements directory.)
 
 .. _OEP-18: https://github.com/openedx/open-edx-proposals/blob/master/oeps/oep-0018-bp-python-dependencies.rst
 
-Upgrading all dependencies
-**************************
+While the ``*.in`` files are intended to be updated manually, the ``*.txt`` files should only be manipulated using Makefile targets in a Linux environment (to match our build and deploy systems). For developers on Mac, this can be achieved by using the GitHub workflows or by running Make targets from inside devstack's lms-shell or another Linux environment.
 
-You can use the `upgrade-requirements Github Workflow <https://github.com/openedx/edx-platform/actions/workflows/upgrade-python-requirements.yml>`_  to make a PR that upgrades as many packages as possible.
+If you don't have write permissions to openedx/edx-platform, you'll need to run these workflows on a fork.
 
-Upgrading just one dependency
-*****************************
+Workflows and Makefile targets
+******************************
+
+Add a dependency
+================
+
+To add a Python dependency, specify it in the appropriate ``requirements/edx/*.in`` file, push that up to a branch, and then use the `compile-python-requirements.yml workflow <https://github.com/openedx/edx-platform/actions/workflows/compile-python-requirements.yml>`_ to run ``make compile-requirements`` against your branch. This will ensure the lockfiles are updated with any transitive dependencies and will ping you on a PR for updating your branch.
+
+Upgrade just one dependency
+===========================
 
 Want to upgrade just *one* dependency without pulling in other upgrades? You can `run the upgrade-one-python-dependency.yml workflow <https://github.com/openedx/edx-platform/actions/workflows/upgrade-one-python-dependency.yml>`_ to have a pull request made against a branch of your choice.
 
-Or, if you need to do it locally, you can use the ``upgrade-package`` make target directly. For example, you could run ``make upgrade-package package=ecommerce``. But the GitHub workflow is likely easier.
+Or, if you need to do it locally, you can use the ``upgrade-package`` make target directly. For example, you could run ``make upgrade-package package=ecommerce``.
 
 If your dependency is pinned in constraints.txt, you'll need to enter an explicit version number in the appropriate field when running the workflow; this will include an update to the constraint file in the resulting PR.
 
-Downgrading a dependency
-************************
+Downgrade a dependency
+======================
 
 If you instead need to surgically *downgrade* a dependency:
 
@@ -36,9 +43,12 @@ If you instead need to surgically *downgrade* a dependency:
      # frobulator 2.x has breaking API changes; see https://github.com/openedx/edx-platform/issue/1234567 for fixing it
      frobulator<2.0.0
 
-2. Run ``make compile-requirements``
+2. After pushing that up to a branch, use the `compile-python-requirements.yml workflow <https://github.com/openedx/edx-platform/actions/workflows/compile-python-requirements.yml>`_ to run ``make compile-requirements`` against your branch.
 
-This is considerably safer than trying to manually edit the ``*.txt`` files, which can easily result in incompatible dependency versions.
+Upgrade all dependencies
+========================
+
+ You can use the `upgrade-requirements Github Workflow <https://github.com/openedx/edx-platform/actions/workflows/upgrade-python-requirements.yml>`_ to make a PR that upgrades as many packages as possible to newer versions. This is a wrapper around ``make upgrade`` and is run on a schedule to keep dependencies up to date.
 
 Inconsistent dependencies
 *************************

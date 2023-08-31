@@ -15,6 +15,7 @@ jobs:
       matrix:
         os: [ ubuntu-20.04 ]
         python-version: [ 3.8 ]
+        django-version: [ "4.2", "pinned" ]
         mongo-version: ["4"]
         mysql-version: ["5.7", "8"]
     services:
@@ -92,6 +93,9 @@ jobs:
     - name: Install Python dependencies
       run: |
         make dev-requirements
+        if [[ "${{ matrix.django-version }}" != "pinned" ]]; then
+                  sudo pip install "django==${{ matrix.django-version }}.0"
+        fi
 
     - name: Run Tests
       env:
@@ -99,7 +103,9 @@ jobs:
         # This is from the LMS dir on purpose since we don't need anything different for the CMS yet.
         STUDIO_CFG: lms/envs/minimal.yml
       run: |
-        echo "Running the LMS migrations."
-        ./manage.py lms migrate
-        echo "Running the CMS migrations."
-        ./manage.py cms migrate
+        if: [[ matrix.django-version == 'pinned' &&  matrix.mysql-version == '57' || matrix.django-version == '4.2' &&  matrix.mysql-version == '8' ]]; then
+            echo "Running the LMS migrations."
+            ./manage.py lms migrate
+            echo "Running the CMS migrations."
+            ./manage.py cms migrate
+        fi
