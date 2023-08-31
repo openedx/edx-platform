@@ -24,7 +24,7 @@ from openedx.core.djangoapps.notifications.serializers import NotificationCourse
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..base_notification import COURSE_NOTIFICATION_APPS
+from ..base_notification import COURSE_NOTIFICATION_APPS, NotificationAppManager
 
 
 @ddt.ddt
@@ -223,7 +223,8 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                             'web': True,
                             'email': True,
                             'push': True,
-                            'info': ''
+                            'info': 'Notifications for responses and comments on your posts, and the ones you’re '
+                                    'following, including endorsements to your responses and on your posts.'
                         },
                         'new_discussion_post': {'web': False, 'email': False, 'push': False, 'info': ''},
                         'new_question_post': {'web': False, 'email': False, 'push': False, 'info': ''}
@@ -304,6 +305,12 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
             self.assertEqual(event_data['notification_type'], notification_type or '')
             self.assertEqual(event_data['notification_channel'], notification_channel or '')
             self.assertEqual(event_data['value'], value)
+
+    def test_info_is_not_saved_in_json(self):
+        default_prefs = NotificationAppManager().get_notification_app_preferences()
+        for notification_app, app_prefs in default_prefs.items():
+            for _, type_prefs in app_prefs.get('notification_types', {}).items():
+                assert 'info' not in type_prefs.keys()
 
 
 class NotificationListAPIViewTest(APITestCase):
