@@ -107,3 +107,14 @@ class PipelineOverridesTest(SamlIntegrationTestUtilities, IntegrationTestMixin, 
                 mock_randint.side_effect = [1, 2, 4]
                 final_username = pipeline.get_username(strategy, details, self.provider.backend_class())
                 assert expected_username == final_username['username']
+
+    def test_get_username(self):
+        """
+        Test get_username method when the first username candidate is available
+        """
+        details = {
+            "username": 'invalid'
+        }
+        __, strategy = self.get_request_and_strategy()
+        final_username = pipeline.get_username(strategy, details, self.provider.backend_class())
+        assert final_username['username'] == 'invalid'
