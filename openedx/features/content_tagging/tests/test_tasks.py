@@ -6,8 +6,9 @@ from __future__ import annotations
 from unittest.mock import patch
 
 from django.core.management import call_command
+from django.test import override_settings
 from edx_toggles.toggles.testutils import override_waffle_switch
-from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
+from openedx_tagging.core.tagging.models import ObjectTag, Tag, Taxonomy
 from organizations.models import Organization
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -83,6 +84,66 @@ class TestAutoTagging(ModuleStoreTestCase):
 
         # Check if the tags are created in the Course
         assert self._check_tag(course.id, LANGUAGE_TAXONOMY_ID, "Portuguese")
+
+    @override_settings(LANGUAGE_CODE='pt')
+    def test_create_course_invalid_language(self):
+        # Create course
+        course = self.store.create_course(
+            self.orgA.short_name,
+            "test_course",
+            "test_run",
+            self.user_id,
+            fields={"language": "11"},
+        )
+
+        # Check if the tags are created in the Course is the system default
+        assert self._check_tag(course.id, LANGUAGE_TAXONOMY_ID, "Portuguese")
+
+    @override_settings(LANGUAGES=[('pt', 'Portuguese')], LANGUAGE_CODE='pt')
+    def test_create_course_unsuported_language(self):
+        # Create course
+        course = self.store.create_course(
+            self.orgA.short_name,
+            "test_course",
+            "test_run",
+            self.user_id,
+            fields={"language": "en"},
+        )
+
+        # Check if the tags are created in the Course is the system default
+        assert self._check_tag(course.id, LANGUAGE_TAXONOMY_ID, "Portuguese")
+
+    @override_settings(LANGUAGE_CODE='pt')
+    def test_create_course_no_tag_language(self):
+        # Remove English tag
+        Tag.objects.filter(taxonomy_id=LANGUAGE_TAXONOMY_ID, value="English").delete()
+        # Create course
+        course = self.store.create_course(
+            self.orgA.short_name,
+            "test_course",
+            "test_run",
+            self.user_id,
+            fields={"language": "en"},
+        )
+
+        # Check if the tags are created in the Course is the system default
+        assert self._check_tag(course.id, LANGUAGE_TAXONOMY_ID, "Portuguese")
+
+    @override_settings(LANGUAGE_CODE='pt')
+    def test_create_course_no_tag_default_language(self):
+        # Remove Portuguese tag
+        Tag.objects.filter(taxonomy_id=LANGUAGE_TAXONOMY_ID, value="Portuguese").delete()
+        # Create course
+        course = self.store.create_course(
+            self.orgA.short_name,
+            "test_course",
+            "test_run",
+            self.user_id,
+            fields={"language": "11"},
+        )
+
+        # No tags created
+        assert self._check_tag(course.id, LANGUAGE_TAXONOMY_ID, None)
 
     def test_update_course(self):
         # Create course
