@@ -140,7 +140,7 @@ class Command(BaseCommand):
             action = tasks.update_course_in_cache_v2 if options.get('force_update') else tasks.get_course_in_cache_v2
             task_options = {'routing_key': options['routing_key']} if options.get('routing_key') else {}
             result = action.apply_async(
-                kwargs=dict(course_id=str(course_key), with_storage=options.get('with_storage')),
+                kwargs=dict(course_id=str(course_key)),
                 **task_options
             )
             log.info('BlockStructure: ENQUEUED generating for course: %s, task_id: %s.', course_key, result.id)
