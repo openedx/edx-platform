@@ -276,7 +276,7 @@ class NotificationPreferenceValidationTest(ModuleStoreTestCase):
         Tests if COURSE_NOTIFICATION_TYPES constant has all required keys with valid
         data type for core notification type
         """
-        str_keys = ['notification_app', 'name', 'info', 'email_template']
+        str_keys = ['notification_app', 'name', 'email_template']
         notification_types = base_notification.COURSE_NOTIFICATION_TYPES
         assert "" not in notification_types.keys()
         for notification_type in notification_types.values():

@@ -13,7 +13,6 @@ COURSE_NOTIFICATION_TYPES = {
         'notification_app': 'discussion',
         'name': 'new_comment_on_response',
         'is_core': True,
-        'info': 'Comment on response',
         'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on your response to the post '
                               '<{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
@@ -26,8 +25,6 @@ COURSE_NOTIFICATION_TYPES = {
         'notification_app': 'discussion',
         'name': 'new_comment',
         'is_core': True,
-        'info': 'Comment on post',
-        'non_editable': ['web', 'email'],
         'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on <{strong}>{author_name}\'s'
                               '</{strong}> response to your post <{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
@@ -41,8 +38,6 @@ COURSE_NOTIFICATION_TYPES = {
         'notification_app': 'discussion',
         'name': 'new_response',
         'is_core': True,
-        'info': 'Response on post',
-        'non_editable': [],
         'content_template': _('<{p}><{strong}>{replier_name}</{strong}> responded to your '
                               'post <{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
@@ -51,6 +46,38 @@ COURSE_NOTIFICATION_TYPES = {
         },
         'email_template': '',
     },
+    'new_discussion_post': {
+        'notification_app': 'discussion',
+        'name': 'new_discussion_post',
+        'is_core': False,
+        'info': '',
+        'web': False,
+        'email': False,
+        'push': False,
+        'non_editable': [],
+        'content_template': _('<{p}><{strong}>{username}</{strong}> posted <{strong}>{post_title}</{strong}></{p}>'),
+        'content_context': {
+            'post_title': 'Post title',
+            'username': 'Post author name',
+        },
+        'email_template': '',
+    },
+    'new_question_post': {
+        'notification_app': 'discussion',
+        'name': 'new_question_post',
+        'is_core': False,
+        'info': '',
+        'web': False,
+        'email': False,
+        'push': False,
+        'non_editable': [],
+        'content_template': _('<{p}><{strong}>{username}</{strong}> asked <{strong}>{post_title}</{strong}></{p}>'),
+        'content_context': {
+            'post_title': 'Post title',
+            'username': 'Post author name',
+        },
+        'email_template': '',
+    }
 }
 
 COURSE_NOTIFICATION_APPS = {
