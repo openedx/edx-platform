@@ -83,7 +83,8 @@ COURSE_NOTIFICATION_TYPES = {
 COURSE_NOTIFICATION_APPS = {
     'discussion': {
         'enabled': True,
-        'core_info': '',
+        'core_info': _('Notifications for responses and comments on your posts, and the ones you’re '
+                       'following, including endorsements to your responses and on your posts.'),
         'core_web': True,
         'core_email': True,
         'core_push': True,
@@ -206,7 +207,7 @@ class NotificationTypeManager:
         Returns notification types for the given notification app.
         """
         return [
-            notification_type for _, notification_type in self.notification_types.items()
+            notification_type.copy() for _, notification_type in self.notification_types.items()
             if notification_type.get('notification_app', None) == notification_app
         ]
 
@@ -247,7 +248,6 @@ class NotificationTypeManager:
                 'web': notification_type.get('web', False),
                 'email': notification_type.get('email', False),
                 'push': notification_type.get('push', False),
-                'info': notification_type.get('info', ''),
             }
         return non_core_notification_type_preferences
 
@@ -279,7 +279,6 @@ class NotificationAppManager:
             'web': notification_app_attrs.get('core_web', False),
             'email': notification_app_attrs.get('core_email', False),
             'push': notification_app_attrs.get('core_push', False),
-            'info': notification_app_attrs.get('core_info', ''),
         }
 
     def add_core_notification_non_editable(self, notification_app_attrs, non_editable_channels):
