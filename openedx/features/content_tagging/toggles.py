@@ -3,7 +3,7 @@
 Toggles for content tagging
 """
 
-from edx_toggles.toggles import WaffleSwitch
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 # .. toggle_name: content_tagging.auto
 # .. toggle_implementation: WaffleSwitch
@@ -14,4 +14,4 @@ from edx_toggles.toggles import WaffleSwitch
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2023-08-30
 # .. toggle_tickets: https://github.com/openedx/modular-learning/issues/79
-CONTENT_TAGGING_AUTO = WaffleSwitch('content_tagging.auto', __name__)
+CONTENT_TAGGING_AUTO = CourseWaffleFlag('content_tagging.auto', __name__)

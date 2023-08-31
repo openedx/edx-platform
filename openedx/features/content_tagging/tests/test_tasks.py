@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 from django.core.management import call_command
 from django.test import override_settings
-from edx_toggles.toggles.testutils import override_waffle_switch
+from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx_tagging.core.tagging.models import ObjectTag, Tag, Taxonomy
 from organizations.models import Organization
 
@@ -23,7 +23,7 @@ LANGUAGE_TAXONOMY_ID = -1
 
 
 @skip_unless_cms  # Auto-tagging is only available in the CMS
-@override_waffle_switch(CONTENT_TAGGING_AUTO, active=True)
+@override_waffle_flag(CONTENT_TAGGING_AUTO, active=True)
 class TestAutoTagging(ModuleStoreTestCase):
     """
     Test if the Course and XBlock tags are automatically created
@@ -39,7 +39,8 @@ class TestAutoTagging(ModuleStoreTestCase):
         """
         object_tag = ObjectTag.objects.filter(object_id=object_id, taxonomy_id=taxonomy_id).first()
         if value is None:
-            assert not object_tag, f"Expected no tag for taxonomy_id={taxonomy_id}, but one found with value={value}"
+            assert not object_tag, f"Expected no tag for taxonomy_id={taxonomy_id}, " \
+                f"but one found with value={object_tag.value}"
         else:
             assert object_tag, f"Tag for taxonomy_id={taxonomy_id} with value={value} with expected, but none found"
             assert object_tag.value == value, f"Tag value mismatch {object_tag.value} != {value}"
@@ -189,4 +190,51 @@ class TestAutoTagging(ModuleStoreTestCase):
         self.store.delete_item(vertical.location, self.user_id)
 
         # Check if the tags are deleted
+        assert self._check_tag(usage_key_str, LANGUAGE_TAXONOMY_ID, None)
+
+    @override_waffle_flag(CONTENT_TAGGING_AUTO, active=False)
+    def test_waffle_disabled_create_update_course(self):
+        # Create course
+        course = self.store.create_course(
+            self.orgA.short_name,
+            "test_course",
+            "test_run",
+            self.user_id,
+            fields={"language": "pt"},
+        )
+
+        # No tags created
+        assert self._check_tag(course.id, LANGUAGE_TAXONOMY_ID, None)
+
+        # Update course language
+        course.language = "en"
+        self.store.update_item(course, self.user_id)
+
+        # No tags created
+        assert self._check_tag(course.id, LANGUAGE_TAXONOMY_ID, None)
+
+    @override_waffle_flag(CONTENT_TAGGING_AUTO, active=False)
+    def test_waffle_disabled_create_delete_xblock(self):
+        # Create course
+        course = self.store.create_course(
+            self.orgA.short_name,
+            "test_course",
+            "test_run",
+            self.user_id,
+            fields={"language": "pt"},
+        )
+
+        # Create XBlocks
+        sequential = self.store.create_child(self.user_id, course.location, "sequential", "test_sequential")
+        vertical = self.store.create_child(self.user_id, sequential.location, "vertical", "test_vertical")
+
+        usage_key_str = str(vertical.location)
+
+        # No tags created
+        assert self._check_tag(course.id, LANGUAGE_TAXONOMY_ID, None)
+
+        # Delete the XBlock
+        self.store.delete_item(vertical.location, self.user_id)
+
+        # Still no tags
         assert self._check_tag(usage_key_str, LANGUAGE_TAXONOMY_ID, None)

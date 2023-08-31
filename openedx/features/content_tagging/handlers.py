@@ -24,12 +24,12 @@ def auto_tag_course(**kwargs):
     """
     Automatically tag course based on their metadata
     """
-    if not CONTENT_TAGGING_AUTO.is_enabled():
-        return
-
     course_data = kwargs.get("course", None)
     if not course_data or not isinstance(course_data, CourseData):
         log.error("Received null or incorrect data for event")
+        return
+
+    if not CONTENT_TAGGING_AUTO.is_enabled(course_data.course_key):
         return
 
     update_course_tags.delay(str(course_data.course_key))
@@ -41,12 +41,12 @@ def auto_tag_xblock(**kwargs):
     """
     Automatically tag XBlock based on their metadata
     """
-    if not CONTENT_TAGGING_AUTO.is_enabled():
-        return
-
     xblock_info = kwargs.get("xblock_info", None)
     if not xblock_info or not isinstance(xblock_info, XBlockData):
         log.error("Received null or incorrect data for event")
+        return
+
+    if not CONTENT_TAGGING_AUTO.is_enabled(xblock_info.usage_key.course_key):
         return
 
     if xblock_info.block_type == "course":
@@ -61,12 +61,12 @@ def delete_tag_xblock(**kwargs):
     """
     Automatically delete XBlock auto tags.
     """
-    if not CONTENT_TAGGING_AUTO.is_enabled():
-        return
-
     xblock_info = kwargs.get("xblock_info", None)
     if not xblock_info or not isinstance(xblock_info, XBlockData):
         log.error("Received null or incorrect data for event")
+        return
+
+    if not CONTENT_TAGGING_AUTO.is_enabled(xblock_info.usage_key.course_key):
         return
 
     if xblock_info.block_type == "course":
