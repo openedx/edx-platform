@@ -6,6 +6,7 @@ We can use this command to enable/disable commerce configuration or disable chec
 
 import logging
 
+import django
 from django.core.management import BaseCommand
 
 from ...models import CommerceConfiguration
@@ -53,13 +54,23 @@ class Command(BaseCommand):
         checkout_on_ecommerce = options.get('checkout_on_ecommerce')
 
         # We are keeping id=1, because as of now, there are only one commerce configuration for the system.
-        CommerceConfiguration.objects.update_or_create(
+        if django.VERSION >= (4,2):
+            CommerceConfiguration.objects.update_or_create(
             id=1,
             defaults={
                 'enabled': not disable,
                 'checkout_on_ecommerce_service': checkout_on_ecommerce,
-            }
+            },
+            
         )
+        else:
+            CommerceConfiguration.objects.update_or_create(
+                id=1,
+                defaults={
+                    'enabled': not disable,
+                    'checkout_on_ecommerce_service': checkout_on_ecommerce,
+                }
+            )
         logger.info(
             'Commerce Configuration {configuration_status} with checkout on ecommerce {checkout_status}.'.format(
                 configuration_status="disabled" if disable else "enabled",
