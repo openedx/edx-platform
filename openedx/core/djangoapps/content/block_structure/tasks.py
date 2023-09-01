@@ -14,7 +14,6 @@ from opaque_keys.edx.keys import CourseKey
 
 from xmodule.capa.responsetypes import LoncapaProblemError
 from openedx.core.djangoapps.content.block_structure import api
-from openedx.core.djangoapps.content.block_structure.config import enable_storage_backing_for_cache_in_request
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger('edx.celery.task')
@@ -62,8 +61,6 @@ def _update_course_in_cache(self, **kwargs):
     """
     Updates the course blocks (mongo -> BlockStructure) for the specified course.
     """
-    if kwargs.get('with_storage'):
-        enable_storage_backing_for_cache_in_request()
     _call_and_retry_if_needed(self, api.update_course_in_cache, **kwargs)
 
 
@@ -93,8 +90,6 @@ def _get_course_in_cache(self, **kwargs):
     """
     Gets the course blocks for the specified course, updating the cache if needed.
     """
-    if kwargs.get('with_storage'):
-        enable_storage_backing_for_cache_in_request()
     _call_and_retry_if_needed(self, api.get_course_in_cache, **kwargs)
 
 

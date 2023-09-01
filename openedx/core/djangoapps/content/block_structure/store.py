@@ -120,40 +120,31 @@ class BlockStructureStore:
         Returns whether the data in storage for the given key is
         already up-to-date with the version in the given modulestore.
         """
-        if config.STORAGE_BACKING_FOR_CACHE.is_enabled():
-            try:
-                bs_model = self._get_model(root_block_usage_key)
-                root_block = modulestore.get_item(root_block_usage_key)
-                return self._version_data_of_model(bs_model) == self._version_data_of_block(root_block)
-            except BlockStructureNotFound:
-                pass
-
-        return False
+        try:
+            bs_model = self._get_model(root_block_usage_key)
+            root_block = modulestore.get_item(root_block_usage_key)
+            return self._version_data_of_model(bs_model) == self._version_data_of_block(root_block)
+        except BlockStructureNotFound:
+            pass
 
     def _get_model(self, root_block_usage_key):
         """
         Returns the model associated with the given key.
         """
-        if config.STORAGE_BACKING_FOR_CACHE.is_enabled():
-            return BlockStructureModel.get(root_block_usage_key)
-        else:
-            return StubModel(root_block_usage_key)
+        return BlockStructureModel.get(root_block_usage_key)
 
     def _update_or_create_model(self, block_structure, serialized_data):
         """
         Updates or creates the model for the given block_structure
         and serialized_data.
         """
-        if config.STORAGE_BACKING_FOR_CACHE.is_enabled():
-            root_block = block_structure[block_structure.root_block_usage_key]
-            bs_model, _ = BlockStructureModel.update_or_create(
-                serialized_data,
-                data_usage_key=block_structure.root_block_usage_key,
-                **self._version_data_of_block(root_block)
-            )
-            return bs_model
-        else:
-            return StubModel(block_structure.root_block_usage_key)
+        root_block = block_structure[block_structure.root_block_usage_key]
+        bs_model, _ = BlockStructureModel.update_or_create(
+            serialized_data,
+            data_usage_key=block_structure.root_block_usage_key,
+            **self._version_data_of_block(root_block)
+        )
+        return bs_model
 
     def _add_to_cache(self, serialized_data, bs_model):
         """
@@ -183,12 +174,7 @@ class BlockStructureStore:
         """
         Returns the serialized data for the given BlockStructureModel
         from storage.
-        Raises:
-             BlockStructureNotFound if not found.
         """
-        if not config.STORAGE_BACKING_FOR_CACHE.is_enabled():
-            raise BlockStructureNotFound(bs_model.data_usage_key)
-
         return bs_model.get_serialized_data()
 
     def _serialize(self, block_structure):
@@ -226,14 +212,9 @@ class BlockStructureStore:
     def _encode_root_cache_key(bs_model):
         """
         Returns the cache key to use for the given
-        BlockStructureModel or StubModel.
+        BlockStructureModel.
         """
-        if config.STORAGE_BACKING_FOR_CACHE.is_enabled():
-            return str(bs_model)
-        return "v{version}.root.key.{root_usage_key}".format(
-            version=str(BlockStructureBlockData.VERSION),
-            root_usage_key=str(bs_model.data_usage_key),
-        )
+        return str(bs_model)
 
     @staticmethod
     def _version_data_of_block(root_block):
