@@ -26,7 +26,7 @@ from .events import (
     notification_preference_update_event,
     notification_preferences_viewed_event,
     notification_read_event,
-    notifications_app_all_read_event,
+    notifications_app_all_read_event, notification_tray_opened_event,
 )
 from .models import Notification
 from .serializers import (
@@ -261,6 +261,9 @@ class NotificationListAPIView(generics.ListAPIView):
         """
         expiry_date = datetime.now(UTC) - timedelta(days=settings.NOTIFICATIONS_EXPIRY)
         app_name = self.request.query_params.get('app_name')
+
+        if self.request.query_params.get('tray_opened'):
+            notification_tray_opened_event(self.request.user)
 
         if app_name:
             return Notification.objects.filter(
