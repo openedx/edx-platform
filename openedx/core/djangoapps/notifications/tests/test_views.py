@@ -24,7 +24,7 @@ from openedx.core.djangoapps.notifications.serializers import NotificationCourse
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..base_notification import COURSE_NOTIFICATION_APPS
+from ..base_notification import COURSE_NOTIFICATION_APPS, NotificationAppManager
 
 
 @ddt.ddt
@@ -223,8 +223,11 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                             'web': True,
                             'email': True,
                             'push': True,
-                            'info': ''
-                        }
+                            'info': 'Notifications for responses and comments on your posts, and the ones you’re '
+                                    'following, including endorsements to your responses and on your posts.'
+                        },
+                        'new_discussion_post': {'web': False, 'email': False, 'push': False, 'info': ''},
+                        'new_question_post': {'web': False, 'email': False, 'push': False, 'info': ''}
                     },
                     'non_editable': {
                         'core': ['web']
@@ -302,6 +305,12 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
             self.assertEqual(event_data['notification_type'], notification_type or '')
             self.assertEqual(event_data['notification_channel'], notification_channel or '')
             self.assertEqual(event_data['value'], value)
+
+    def test_info_is_not_saved_in_json(self):
+        default_prefs = NotificationAppManager().get_notification_app_preferences()
+        for notification_app, app_prefs in default_prefs.items():
+            for _, type_prefs in app_prefs.get('notification_types', {}).items():
+                assert 'info' not in type_prefs.keys()
 
 
 class NotificationListAPIViewTest(APITestCase):
@@ -381,6 +390,23 @@ class NotificationListAPIViewTest(APITestCase):
             data[0]['content'],
             '<p><strong>test_user</strong> responded to your post <strong>This is a test post.</strong></p>'
         )
+
+    @mock.patch("eventtracking.tracker.emit")
+    def test_list_notifications_with_tray_opened_param(self, mock_emit):
+        """
+        Test event emission with tray_opened param is provided.
+        """
+        self.client.login(username=self.user.username, password='test')
+
+        # Make a request to the view with the tray_opened query parameter set to True.
+        response = self.client.get(self.url + "?tray_opened=True")
+
+        # Assert that the response is successful.
+        self.assertEqual(response.status_code, 200)
+
+        event_name, event_data = mock_emit.call_args[0]
+        self.assertEqual(event_name, 'edx.notifications.tray_opened')
+        self.assertEqual(event_data['user_id'], self.user.id)
 
     def test_list_notifications_without_authentication(self):
         """
@@ -612,7 +638,7 @@ class NotificationReadAPIViewTestCase(APITestCase):
         notifications = Notification.objects.filter(user=self.user, id=notification_id, last_read__isnull=False)
         self.assertEqual(notifications.count(), 1)
         event_name, event_data = mock_emit.call_args[0]
-        self.assertEqual(event_name, 'edx.notification.read')
+        self.assertEqual(event_name, 'edx.notifications.read')
         self.assertEqual(event_data.get('notification_metadata').get('notification_id'), notification_id)
         self.assertEqual(event_data['notification_app'], 'discussion')
         self.assertEqual(event_data['notification_type'], 'Type A')
