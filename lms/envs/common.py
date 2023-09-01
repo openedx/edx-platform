@@ -2892,7 +2892,7 @@ BLOCK_STRUCTURES_SETTINGS = dict(
     STORAGE_KWARGS=dict(
         location=MEDIA_ROOT,
         base_url=MEDIA_URL,
-        ),       
+    ),
 )
 
 ################################ Bulk Email ###################################
