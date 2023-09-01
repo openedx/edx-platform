@@ -102,6 +102,7 @@ REQ_FILES = \
 	requirements/edx/testing \
 	requirements/edx/development \
 	requirements/edx/assets \
+	requirements/edx/semgrep \
 	scripts/xblock/requirements
 
 define COMMON_CONSTRAINTS_TEMP_COMMENT

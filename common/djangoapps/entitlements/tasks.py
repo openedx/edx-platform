@@ -157,6 +157,7 @@ def expire_and_create_entitlements(self, entitlement_ids, support_username):
 
 
 @shared_task(bind=True)
+@set_code_owner_attribute
 def retry_revoke_subscriptions_verified_access(self, revocable_entitlement_uuids, entitled_course_ids, username):
     """
     Task to process course access revoke and move to audit.
