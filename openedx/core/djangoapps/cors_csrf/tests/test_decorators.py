@@ -25,4 +25,4 @@ class TestEnsureCsrfCookieCrossDomain(TestCase):
         response = wrapped_view(request)
         response_meta = json.loads(response.content.decode('utf-8'))
         assert response_meta['CROSS_DOMAIN_CSRF_COOKIE_USED'] is True
-        assert response_meta['CSRF_COOKIE_USED'] is True
+        assert response_meta['CSRF_COOKIE_NEEDS_UPDATE'] is True

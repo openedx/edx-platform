@@ -125,7 +125,7 @@ class CsrfCrossDomainCookieMiddleware(MiddlewareMixin):
         # If so, we can send the cross-domain CSRF cookie.
         should_set_cookie = (
             request.META.get('CROSS_DOMAIN_CSRF_COOKIE_USED', False) and
-            request.META.get('CSRF_COOKIE_USED', False) and
+            request.META.get('CSRF_COOKIE_NEEDS_UPDATE', False) and
             request.META.get('CSRF_COOKIE') is not None
         )
 

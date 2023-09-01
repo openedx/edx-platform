@@ -16,7 +16,7 @@ jobs:
         os: [ ubuntu-20.04 ]
         python-version: [ 3.8 ]
         mongo-version: ["4"]
-        mysql-version: ["5.7", "8"]
+        mysql-version: ["8"]
     services:
       mongo:
         image: mongo:${{ matrix.mongo-version }}
