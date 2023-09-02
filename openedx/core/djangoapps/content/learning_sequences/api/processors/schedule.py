@@ -1,11 +1,12 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
+from __future__ import annotations
+
 import logging
 from collections import defaultdict  # lint-amnesty, pylint: disable=unused-import
 from datetime import datetime, timedelta
-from typing import Dict
 
 from edx_when.api import get_dates_for_course
-from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=unused-import
+from opaque_keys.edx.keys import UsageKey, CourseKey  # lint-amnesty, pylint: disable=unused-import
 from openedx.core import types
 
 from common.djangoapps.student.auth import user_has_role
@@ -37,7 +38,7 @@ class ScheduleOutlineProcessor(OutlineProcessor):
     def __init__(self, course_key: CourseKey, user: types.User, at_time: datetime):
         super().__init__(course_key, user, at_time)
         self.dates = None
-        self.keys_to_schedule_fields: Dict[str, Dict[str, datetime]] = defaultdict(dict)
+        self.keys_to_schedule_fields: dict[UsageKey, dict[str, datetime]] = defaultdict(dict)
         self._course_start = None
         self._course_end = None
         self._is_beta_tester = False
