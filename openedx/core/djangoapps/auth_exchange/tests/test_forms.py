@@ -4,7 +4,6 @@ Tests for OAuth token exchange forms
 """
 
 
-import unittest
 import pytest
 
 import httpretty
