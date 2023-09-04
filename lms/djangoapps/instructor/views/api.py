@@ -2703,7 +2703,7 @@ def send_email(request, course_id):
         log.warning(f"Email is not enabled for course {course_id}")
         return HttpResponseForbidden("Email is not enabled for this course.")
 
-    targets = json.loads(request.POST.get("send_to"))
+    targets = json.loads(request.POST.get("send_to")) + ["individual-students"]
     subject = request.POST.get("subject")
     message = request.POST.get("message")
     # optional, this is a date and time in the form of an ISO8601 string

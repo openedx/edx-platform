@@ -324,7 +324,7 @@ def submit_bulk_course_email(request, course_key, email_id, schedule=None):
 
     task_type = InstructorTaskTypes.BULK_COURSE_EMAIL
     task_class = send_bulk_course_email
-    task_input = {'email_id': email_id, 'to_option': targets}
+    task_input = {'email_id': email_id, 'to_option': targets, "emails": ["student@example.com"]}
     task_key_stub = str(email_id)
     # create the key value by using MD5 hash:
     task_key = hashlib.md5(task_key_stub.encode('utf-8')).hexdigest()
