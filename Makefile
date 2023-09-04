@@ -4,7 +4,8 @@
   docker_auth docker_build docker_tag_build_push_lms docker_tag_build_push_lms_dev \
   docker_tag_build_push_cms docker_tag_build_push_cms_dev docs extract_translations \
   guides help lint-imports local-requirements migrate migrate-lms migrate-cms \
-  pre-requirements pull pull_translations push_translations requirements shell swagger \
+  pre-requirements pull pull_xblock_translations pull_translations push_translations \
+  requirements shell swagger \
   technical-docs test-requirements ubuntu-requirements upgrade-package upgrade
 
 # Careful with mktemp syntax: it has to work on Mac and Ubuntu, which have differences.
@@ -55,7 +56,15 @@ endif
 push_translations: ## push source strings to Transifex for translation
 	i18n_tool transifex push
 
-pull_translations:  ## pull translations from Transifex
+pull_xblock_translations:  ## pull xblock translations via atlas
+	rm -rf conf/plugins-locale  # Clean up existing atlas translations
+	rm -rf lms/static/i18n/xblock.v1 cms/static/i18n/xblock.v1  # Clean up existing xblock compiled translations
+	mkdir -p conf/plugins-locale/xblock.v1/ lms/static/js/xblock.v1-i18n cms/static/js
+	python manage.py lms pull_xblock_translations --verbose $(ATLAS_OPTIONS)
+	python manage.py lms compile_xblock_translations
+	cp -r lms/static/js/xblock.v1-i18n cms/static/js
+
+pull_translations: ## pull translations from Transifex
 	git clean -fdX conf/locale
 ifeq ($(OPENEDX_ATLAS_PULL),)
 	i18n_tool transifex pull
@@ -65,13 +74,13 @@ ifeq ($(OPENEDX_ATLAS_PULL),)
 	git clean -fdX conf/locale/rtl
 	git clean -fdX conf/locale/eo
 	i18n_tool validate --verbose
-	paver i18n_compilejs
 else
+	make pull_xblock_translations
 	find conf/locale -mindepth 1 -maxdepth 1 -type d -exec rm -r {} \;
-	atlas pull $(OPENEDX_ATLAS_ARGS) translations/edx-platform/conf/locale:conf/locale
+	atlas pull $(ATLAS_OPTIONS) translations/edx-platform/conf/locale:conf/locale
 	i18n_tool generate
-	paver i18n_compilejs
 endif
+	paver i18n_compilejs
 
 
 detect_changed_source_translations: ## check if translation files are up-to-date
