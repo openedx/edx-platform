@@ -190,10 +190,9 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
         set_custom_attribute('register_user_tpa', pipeline.running(request))
     extended_profile_fields = configuration_helpers.get_value('extended_profile_fields', [])
     # Can't have terms of service for certain SHIB users, like at Stanford
-    registration_fields = getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
     tos_required = (
-        registration_fields.get('terms_of_service') != 'hidden' or
-        registration_fields.get('honor_code') != 'hidden'
+        extra_fields.get('terms_of_service') != 'hidden' or
+        extra_fields.get('honor_code') != 'hidden'
     )
 
     form = AccountCreationForm(
