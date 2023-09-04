@@ -520,7 +520,7 @@ class ProgramFilterMixin(views.APIView):
     def get_program_queryset(self):
         program_id = self.request.GET.get('program_id')
         program_ids = [program_id]
-        if program_id is None:
+        if program_id is None and self.kwargs.get('class_id'):
             class_id = self.kwargs['class_id']
             gen_class = Class.objects.prefetch_related('students').get(pk=class_id)
             program_ids = [gen_class.program_id]

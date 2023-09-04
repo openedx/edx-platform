@@ -948,8 +948,11 @@ def skill_reflection_individual_response(skills, likert_questions, nuance_interr
             ).first()
             if submission:
                 question_response = submission.question_response
+                question=question_response['question']
+                choices=question_response['choices']
                 response_text = question_response['student_response']['response_text']
-                response[response_key].append({'skill': skill, 'response_text': response_text})
+                response[response_key].append(
+                    {'skill': skill, 'response_text': response_text, 'question': question, 'choices': choices.values()})
 
     process_question_responses(likert_questions, 'intros', 'start_unit_location')
     process_question_responses(likert_questions, 'outros', 'end_unit_location')
