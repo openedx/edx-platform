@@ -9,5 +9,4 @@ from .base import (
 from .system_defined import (
     ContentLanguageTaxonomy,
     ContentAuthorTaxonomy,
-    ContentOrganizationTaxonomy,
 )

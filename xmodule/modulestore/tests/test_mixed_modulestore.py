@@ -538,13 +538,15 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         assert len(items_in_tree) == expected_items_in_tree
 
     # draft:
+    #    mysql: check CONTENT_TAGGING_AUTO CourseWaffleFlag
     #    find: get draft, get ancestors up to course (2-6), compute inheritance
     #    sends: update problem and then each ancestor up to course (edit info)
     # split:
-    #    mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record
+    #    mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record,
+    #           check CONTENT_TAGGING_AUTO CourseWaffleFlag
     #    find: definitions (calculator field), structures
     #    sends: 2 sends to update index & structure (note, it would also be definition if a content field changed)
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 6, 5), (ModuleStoreEnum.Type.split, 3, 2, 2))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 6, 5), (ModuleStoreEnum.Type.split, 4, 2, 2))
     @ddt.unpack
     def test_update_item(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -1069,15 +1071,17 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             assert self.store.has_changes(parent)
 
     # Draft
+    #   mysql: check CONTENT_TAGGING_AUTO CourseWaffleFlag
     #   Find: find parents (definition.children query), get parent, get course (fill in run?),
     #         find parents of the parent (course), get inheritance items,
     #         get item (to delete subtree), get inheritance again.
     #   Sends: delete item, update parent
     # Split
-    #   mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record
+    #   mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record,
+    #          check CONTENT_TAGGING_AUTO CourseWaffleFlag
     #   Find: active_versions, 2 structures (published & draft), definition (unnecessary)
     #   Sends: updated draft and published structures and active_versions
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 6, 2), (ModuleStoreEnum.Type.split, 4, 2, 3))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 6, 2), (ModuleStoreEnum.Type.split, 5, 2, 3))
     @ddt.unpack
     def test_delete_item(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -1099,14 +1103,16 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             self.store.get_item(self.writable_chapter_location, revision=ModuleStoreEnum.RevisionOption.published_only)
 
     # Draft:
+    #    mysql: check CONTENT_TAGGING_AUTO CourseWaffleFlag
     #    find: find parent (definition.children), count versions of item, get parent, count grandparents,
     #          inheritance items, draft item, draft child, inheritance
     #    sends: delete draft vertical and update parent
     # Split:
-    #    mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record
+    #    mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record,
+    #           check CONTENT_TAGGING_AUTO CourseWaffleFlag
     #    find: draft and published structures, definition (unnecessary)
     #    sends: update published (why?), draft, and active_versions
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 8, 2), (ModuleStoreEnum.Type.split, 4, 3, 3))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 8, 2), (ModuleStoreEnum.Type.split, 5, 3, 3))
     @ddt.unpack
     def test_delete_private_vertical(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -1154,13 +1160,15 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         assert vert_loc not in course.children
 
     # Draft:
+    #   mysql: check CONTENT_TAGGING_AUTO CourseWaffleFlag
     #   find: find parent (definition.children) 2x, find draft item, get inheritance items
     #   send: one delete query for specific item
     # Split:
-    #   mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record
+    #   mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record,
+    #          check CONTENT_TAGGING_AUTO CourseWaffleFlag
     #   find: structure (cached)
     #   send: update structure and active_versions
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 3, 1), (ModuleStoreEnum.Type.split, 4, 1, 2))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 3, 1), (ModuleStoreEnum.Type.split, 5, 1, 2))
     @ddt.unpack
     def test_delete_draft_vertical(self, default_ms, num_mysql, max_find, max_send):
         """
