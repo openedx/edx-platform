@@ -424,10 +424,10 @@ class DiscussionsConfiguration(TimeStampedModel):
     )
     posting_restrictions = models.CharField(
         max_length=15,
-        default=PostingRestriction.SCHEDULED,
+        default=PostingRestriction.DISABLED,
         choices=PostingRestriction.choices,
         help_text=_(
-            "The Posting availabilty in discussions whether it will be enabled, scheduled or indefinitely disabled."
+            "The Posting availability in discussions whether it will be enabled, scheduled or indefinitely disabled."
         )
     )
     lti_configuration = models.ForeignKey(

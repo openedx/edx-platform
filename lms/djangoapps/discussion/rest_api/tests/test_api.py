@@ -71,7 +71,8 @@ from lms.djangoapps.discussion.rest_api.tests.utils import (
 )
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
-from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider, \
+    PostingRestriction
 from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course_task
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
@@ -151,6 +152,9 @@ def _set_course_discussion_blackout(course, user_id):
         datetime.now(UTC) - timedelta(days=3),
         datetime.now(UTC) + timedelta(days=3)
     ]
+    configuration = DiscussionsConfiguration.get(course.id)
+    configuration.posting_restrictions = PostingRestriction.SCHEDULED
+    configuration.save()
     modulestore().update_item(course, user_id)
 
 
