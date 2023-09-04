@@ -1024,6 +1024,11 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):  # lin
             )
     else:
         final_username = storage.user.get_username(user)
+    logger.info(
+        '[THIRD_PARTY_AUTH] get_username complete: '
+        f'details={details}, '
+        f'final_username={final_username}'
+    )
     return {'username': final_username}
 
 

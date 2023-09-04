@@ -329,6 +329,7 @@ django-oauth-toolkit==1.4.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
+    #   edx-enterprise
 django-object-actions==4.1.0
     # via edx-enterprise
 django-pipeline==2.1.0
@@ -469,7 +470,7 @@ edx-django-utils==5.7.0
     #   openedx-blockstore
     #   ora2
     #   super-csv
-edx-drf-extensions==8.9.1
+edx-drf-extensions==8.9.2
     # via
     #   -r requirements/edx/kernel.in
     #   edx-completion
@@ -481,11 +482,11 @@ edx-drf-extensions==8.9.1
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.1.1
+edx-enterprise==4.1.6
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
-edx-event-bus-kafka==5.3.1
+edx-event-bus-kafka==5.4.0
     # via -r requirements/edx/kernel.in
 edx-event-bus-redis==0.3.1
     # via -r requirements/edx/kernel.in
@@ -671,7 +672,7 @@ libsass==0.10.0
     #   -r requirements/edx/paver.txt
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==9.6.1
+lti-consumer-xblock==9.6.2
     # via -r requirements/edx/kernel.in
 lxml==4.9.3
     # via
@@ -730,7 +731,7 @@ mysqlclient==2.2.0
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-blockstore
-newrelic==8.11.0
+newrelic==9.0.0
     # via
     #   -r requirements/edx/bundled.in
     #   edx-django-utils
