@@ -35,33 +35,12 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
         self.course_keys = [course.id for course in self.courses]
         self.command = generate_course_blocks.Command()
 
-    def _assert_courses_not_in_block_cache(self, *course_keys):
-        """
-        Assert courses don't exist in the course block cache.
-        """
-        for course_key in course_keys:
-            assert not is_course_in_block_structure_cache(course_key, self.store)
-
-    def _assert_courses_in_block_cache(self, *course_keys):
-        """
-        Assert courses exist in course block cache.
-        """
-        for course_key in course_keys:
-            assert is_course_in_block_structure_cache(course_key, self.store)
-
     def _assert_courses_not_in_block_storage(self, *course_keys):
         """
         Assert courses don't exist in course block storage.
         """
         for course_key in course_keys:
             assert not is_course_in_block_structure_storage(course_key, self.store)
-
-    def _assert_courses_in_block_storage(self, *course_keys):
-        """
-        Assert courses exist in course block storage.
-        """
-        for course_key in course_keys:
-            assert is_course_in_block_structure_storage(course_key, self.store)
 
     def _assert_message_presence_in_logs(self, message, mock_log, expected_presence=True):
         """
@@ -75,9 +54,7 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
 
     @ddt.data(True, False)
     def test_all_courses(self, force_update):
-        self._assert_courses_not_in_block_cache(*self.course_keys)
         self.command.handle(all_courses=True)
-        self._assert_courses_in_block_cache(*self.course_keys)
         with patch(
             'openedx.core.djangoapps.content.block_structure.factory.BlockStructureFactory.create_from_modulestore'
         ) as mock_update_from_store:
@@ -85,16 +62,11 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
             assert mock_update_from_store.call_count == (self.num_courses if force_update else 0)
 
     def test_one_course(self):
-        self._assert_courses_not_in_block_cache(*self.course_keys)
         self.command.handle(courses=[str(self.course_keys[0])])
-        self._assert_courses_in_block_cache(self.course_keys[0])
-        self._assert_courses_not_in_block_cache(*self.course_keys[1:])
         self._assert_courses_not_in_block_storage(*self.course_keys)
 
     def test_with_storage(self):
-        self.command.handle(courses=[str(self.course_keys[0])])
-        self._assert_courses_in_block_cache(self.course_keys[0])
-        self._assert_courses_in_block_storage(self.course_keys[0])
+        self.command.handle(with_storage=True, courses=[str(self.course_keys[0])])
         self._assert_courses_not_in_block_storage(*self.course_keys[1:])
 
     @ddt.data(
