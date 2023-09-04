@@ -59,7 +59,7 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
             'openedx.core.djangoapps.content.block_structure.factory.BlockStructureFactory.create_from_modulestore'
         ) as mock_update_from_store:
             self.command.handle(all_courses=True, force_update=force_update)
-            assert mock_update_from_store.call_count == (self.num_courses if force_update else 0)
+            assert mock_update_from_store.call_count == self.num_courses
 
     def test_one_course(self):
         self.command.handle(courses=[str(self.course_keys[0])])
