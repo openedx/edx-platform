@@ -1,3 +1,6 @@
+
+
+
 """
 This is the common settings file, intended to set sane defaults.
 
@@ -3204,7 +3207,7 @@ INSTALLED_APPS = [
     'lms.djangoapps.learner_dashboard',
 
     # Needed whether or not enabled, due to migrations
-    'lms.djangoapps.badges.apps.BadgesConfig',
+    # 'lms.djangoapps.badges.apps.BadgesConfig',
 
     # Enables default site and redirects
     'django_sites_extensions',
