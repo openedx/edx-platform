@@ -173,7 +173,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     global_email_context = _get_course_email_context(course)
 
     recipient_qsets = [
-        target.get_users(course_id, user_id)
+        target.get_users(course_id, user_id, task_input.get("emails", []))
         for target in targets
     ]
     # Use union here to combine the qsets instead of the | operator.  This avoids generating an
