@@ -134,7 +134,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-08-20 20:42+0000\n"
+"POT-Creation-Date: 2023-08-27 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Alfredo Guillem, 2022\n"
 "Language-Team: German (Germany) (http://app.transifex.com/open-edx/edx-platform/language/de_DE/)\n"
@@ -11675,6 +11675,14 @@ msgstr ""
 "die Einheit veröffentlicht haben. Nur Lerneinheiten, die explizit vor den "
 "Lernenden verborgen sind, bleiben verborgen, nachdem Sie diese Option für "
 "%(xblockType)s deaktiviert haben  ."
+
+#: cms/templates/js/summary-configuration-editor.underscore
+msgid "Xpert unit summaries"
+msgstr ""
+
+#: cms/templates/js/summary-configuration-editor.underscore
+msgid "Enable summaries"
+msgstr ""
 
 #: cms/templates/js/team-member.underscore
 msgid "Current Role:"

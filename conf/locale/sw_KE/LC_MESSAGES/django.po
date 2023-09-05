@@ -85,7 +85,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-08-06 20:42+0000\n"
+"POT-Creation-Date: 2023-08-27 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Swahili (Kenya) (https://app.transifex.com/open-edx/teams/6205/sw_KE/)\n"
@@ -3335,6 +3335,16 @@ msgstr ""
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Good"
 msgstr "Vizuri"
+
+#. Translators: Replier commented on "your" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "your"
+msgstr ""
+
+#. Translators: Replier commented on "their" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "their"
+msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #, python-format
@@ -6882,7 +6892,7 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "<{p}><{strong}>{replier_name}</{strong}> commented on "
-"<{strong}>{author_name}'s</{strong}> response to your post "
+"<{strong}>{author_name}</{strong}> response to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
 
@@ -6891,6 +6901,26 @@ msgstr ""
 msgid ""
 "<{p}><{strong}>{replier_name}</{strong}> responded to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> posted "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> asked "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+msgid ""
+"Notifications for responses and comments on your posts, and the ones you’re "
+"following, including endorsements to your responses and on your posts."
 msgstr ""
 
 #: openedx/core/djangoapps/notifications/views.py
@@ -13065,24 +13095,6 @@ msgid "The keys are valid for a limited amount of time. Has the key expired?"
 msgstr ""
 "Nywila zinatumika kwa muda maalum. Je nywila zimemaliza muda wa matumizi "
 "yake?"
-
-#: lms/templates/library-block-author-preview-header.html
-msgid ""
-"Showing all matching content eligible to be added into {display_name}. Each "
-"student will be assigned {max_count} component drawn randomly from this "
-"list."
-msgid_plural ""
-"Showing all matching content eligible to be added into {display_name}. Each "
-"student will be assigned {max_count} components drawn randomly from this "
-"list."
-msgstr[0] ""
-"Kuonyesha uwiyano wa liliyomo linalo stahili kuongezwa kwa {display_name}. "
-"Kila mwanafunzi atagawiwa {max_count} kipengele kilicho chotwa kwa "
-"kubahatisha kutoka kwenye orodha."
-msgstr[1] ""
-"Kuonyesha mawiyano yote ya yaliyomo yanayo stahili kuongezwa kwa "
-"{display_name}. Wanafunzi wote watagawiwa {max_count} vipengele "
-"vilivyochotwa kwa kubahatisha kutoka kwenye orodha."
 
 #. Translators:  "External resource" means that this learning module is hosted
 #. on a platform external to the edX LMS
@@ -21360,6 +21372,18 @@ msgid ""
 "below."
 msgstr ""
 
+#: cms/templates/library-block-author-preview-header.html
+msgid ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} component drawn randomly from this "
+"list."
+msgid_plural ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} components drawn randomly from this "
+"list."
+msgstr[0] ""
+msgstr[1] ""
+
 #: cms/templates/library.html
 msgid "Content Library"
 msgstr ""
@@ -22593,10 +22617,6 @@ msgstr ""
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Muongozo"
-
-#: cms/templates/widgets/header.html
-msgid "Files & Media"
-msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"
