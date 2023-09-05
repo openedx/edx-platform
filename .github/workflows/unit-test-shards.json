@@ -2,7 +2,6 @@
   "lms-1": {
     "settings": "lms.envs.test",
     "paths": [
-      "lms/djangoapps/badges/",
       "lms/djangoapps/branding/",
       "lms/djangoapps/bulk_email/",
       "lms/djangoapps/bulk_enroll/",

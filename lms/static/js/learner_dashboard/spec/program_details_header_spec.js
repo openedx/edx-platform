@@ -81,7 +81,7 @@ describe('Program Details Header View', () => {
         expect(view.$('.org-logo').attr('alt'))
             .toEqual(`${context.programData.authoring_organizations[0].name}'s logo`);
     });
-
+    
     it('should render the subscription badge if subscription is active', () => {
         expect(view.$('.meta-info .badge').html().trim()).toEqual('Subscribed');
     });
