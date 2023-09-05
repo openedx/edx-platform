@@ -3967,6 +3967,16 @@ msgstr ""
 msgid "Good"
 msgstr "Bien"
 
+#. Translators: Replier commented on "your" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "your"
+msgstr "su"
+
+#. Translators: Replier commented on "their" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "their"
+msgstr "su"
+
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #, python-format
 msgid ""
@@ -7960,7 +7970,7 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "<{p}><{strong}>{replier_name}</{strong}> commented on "
-"<{strong}>{author_name}'s</{strong}> response to your post "
+"<{strong}>{author_name}</{strong}> response to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
 "<{p}><{strong}>{replier_name}</{strong}> respondió el "
@@ -7975,6 +7985,28 @@ msgid ""
 msgstr ""
 "<{p}><{strong}>{replier_name}</{strong}> respondió a su publicación "
 "<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> posted "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> asked "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+msgid ""
+"Notifications for responses and comments on your posts, and the ones you’re "
+"following, including endorsements to your responses and on your posts."
+msgstr ""
+"Notificaciones de respuestas y comentarios sobre tus publicaciones y las que"
+" sigues, incluidos respaldos a tus respuestas y a tus publicaciones."
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "The notification preference config version is not up to date."
@@ -14960,28 +14992,6 @@ msgstr "¿Tu cliente de correo electrónico separó la URL en dos líneas?"
 #: lms/templates/invalid_email_key.html
 msgid "The keys are valid for a limited amount of time. Has the key expired?"
 msgstr "Las claves son válidas por un tiempo limitado. ¿Ha expirado su clave?"
-
-#: lms/templates/library-block-author-preview-header.html
-msgid ""
-"Showing all matching content eligible to be added into {display_name}. Each "
-"student will be assigned {max_count} component drawn randomly from this "
-"list."
-msgid_plural ""
-"Showing all matching content eligible to be added into {display_name}. Each "
-"student will be assigned {max_count} components drawn randomly from this "
-"list."
-msgstr[0] ""
-"Mostrando el contenido elegible para ser añadido a {display_name}. Cada "
-"estudiante accederá a {max_count} componente tomado aleatoriamente de esta "
-"lista."
-msgstr[1] ""
-"Mostrando el contenido elegible para ser añadido a {display_name}. Cada "
-"estudiante accederá a {max_count} componentes tomados aleatoriamente de esta"
-" lista."
-msgstr[2] ""
-"Mostrando el contenido elegible para ser añadido a {display_name}. Cada "
-"estudiante accederá a {max_count} componentes tomados aleatoriamente de esta"
-" lista."
 
 #. Translators:  "External resource" means that this learning module is hosted
 #. on a platform external to the edX LMS
@@ -24114,6 +24124,28 @@ msgstr ""
 "en su buzón de entrada. ¿Aún no encuentra el correo de verificación? Pida "
 "ayuda a través del vínculo siguiente."
 
+#: cms/templates/library-block-author-preview-header.html
+msgid ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} component drawn randomly from this "
+"list."
+msgid_plural ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} components drawn randomly from this "
+"list."
+msgstr[0] ""
+"Mostrando el contenido elegible para ser añadido a {display_name}. Cada "
+"estudiante accederá a {max_count} componente tomado aleatoriamente de esta "
+"lista."
+msgstr[1] ""
+"Mostrando el contenido elegible para ser añadido a {display_name}. Cada "
+"estudiante accederá a {max_count} componentes tomados aleatoriamente de esta"
+" lista."
+msgstr[2] ""
+"Mostrando el contenido elegible para ser añadido a {display_name}. Cada "
+"estudiante accederá a {max_count} componentes tomados aleatoriamente de esta"
+" lista."
+
 #: cms/templates/library.html
 msgid "Content Library"
 msgstr "Librerías de contenido"
@@ -25504,10 +25536,6 @@ msgstr "Navegación del curso"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Estructura"
-
-#: cms/templates/widgets/header.html
-msgid "Files & Media"
-msgstr "Archivos y medios"
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"
