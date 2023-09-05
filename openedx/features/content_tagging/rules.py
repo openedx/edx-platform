@@ -1,5 +1,7 @@
 """Django rules-based permissions for tagging"""
 
+from __future__ import annotations
+
 import openedx_tagging.core.tagging.rules as oel_tagging
 import rules
 from django.contrib.auth import get_user_model
@@ -35,48 +37,12 @@ def is_taxonomy_user(user: User, taxonomy: oel_tagging.Taxonomy = None) -> bool:
     return False
 
 
-def is_taxonomy_admin(user: User) -> bool:
-    """
-    Returns True if the given user is a Taxonomy Admin.
-
-    Taxonomy Admins include global staff and superusers.
-    """
-    return oel_tagging.is_taxonomy_admin(user)
-
-
-@rules.predicate
-def can_view_taxonomy(user: User, taxonomy: oel_tagging.Taxonomy = None) -> bool:
-    """
-    Everyone can potentially view a taxonomy (taxonomy=None). The object permission must be checked
-    to determine if the user can view a specific taxonomy.
-    Only taxonomy admins can view a disabled taxonomy.
-    """
-    if not taxonomy:
-        return True
-
-    taxonomy = taxonomy.cast()
-
-    return taxonomy.enabled or is_taxonomy_admin(user)
-
-
 @rules.predicate
 def can_add_taxonomy(user: User) -> bool:
     """
     Only taxonomy admins can add taxonomies.
     """
-    return is_taxonomy_admin(user)
-
-
-@rules.predicate
-def can_change_taxonomy(user: User, taxonomy: oel_tagging.Taxonomy = None) -> bool:
-    """
-    Only taxonomy admins can change a taxonomies.
-    Even taxonomy admins cannot change system taxonomies.
-    """
-    if taxonomy:
-        taxonomy = taxonomy.cast()
-
-    return (not taxonomy or (not taxonomy.system_defined)) and is_taxonomy_admin(user)
+    return oel_tagging.is_taxonomy_admin(user)
 
 
 @rules.predicate
@@ -88,7 +54,7 @@ def can_change_taxonomy_tag(user: User, tag: oel_tagging.Tag = None) -> bool:
     taxonomy = tag.taxonomy if tag else None
     if taxonomy:
         taxonomy = taxonomy.cast()
-    return is_taxonomy_admin(user) and (
+    return oel_tagging.is_taxonomy_admin(user) and (
         not tag
         or not taxonomy
         or (taxonomy and not taxonomy.allow_free_text and not taxonomy.system_defined)
@@ -110,9 +76,9 @@ def can_change_object_tag(user: User, object_tag: oel_tagging.ObjectTag = None) 
 
 # Taxonomy
 rules.set_perm("oel_tagging.add_taxonomy", can_add_taxonomy)
-rules.set_perm("oel_tagging.change_taxonomy", can_change_taxonomy)
-rules.set_perm("oel_tagging.delete_taxonomy", can_change_taxonomy)
-rules.set_perm("oel_tagging.view_taxonomy", can_view_taxonomy)
+rules.set_perm("oel_tagging.change_taxonomy", oel_tagging.can_change_taxonomy)
+rules.set_perm("oel_tagging.delete_taxonomy", oel_tagging.can_change_taxonomy)
+rules.set_perm("oel_tagging.view_taxonomy", oel_tagging.can_view_taxonomy)
 
 # Tag
 rules.set_perm("oel_tagging.add_tag", can_change_taxonomy_tag)
