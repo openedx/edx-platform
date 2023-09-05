@@ -2,7 +2,7 @@ import Backbone from 'backbone';
 
 import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
-import progressViewTpl from '../../../templates/learner_dashboard//progress_circle_view.underscore';
+import progressViewTpl from '../../../templates/learner_dashboard/progress_circle_view.underscore';
 import progressSegmentTpl from '../../../templates/learner_dashboard/progress_circle_segment.underscore';
 
 class ProgressCircleView extends Backbone.View {
@@ -26,6 +26,7 @@ class ProgressCircleView extends Backbone.View {
     }
 
     render() {
+        // eslint-disable-next-line no-undef
         const data = $.extend({}, this.model.toJSON(), {
             circleSegments: this.getProgressSegments(),
             x: this.x,
@@ -62,6 +63,7 @@ class ProgressCircleView extends Backbone.View {
         };
 
         for (let i = 0; i < total; i += 1) {
+            // eslint-disable-next-line no-undef
             const segmentData = $.extend({}, data, {
                 classList: (i >= this.model.get('progress').completed) ? 'incomplete' : 'complete',
                 degrees: data.degrees + (i * degreeInc),

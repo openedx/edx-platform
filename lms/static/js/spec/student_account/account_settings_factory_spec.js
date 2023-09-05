@@ -53,7 +53,6 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
             Helpers.expectLoadingErrorIsVisible(accountSettingsView, true);
         });
 
-
         it('shows loading error when UserPreferencesModel fails to load', function() {
             requests = AjaxHelpers.requests(this);
 
@@ -108,7 +107,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
             AjaxHelpers.respondWithJson(requests, Helpers.createAccountSettingsData());
             AjaxHelpers.respondWithJson(requests, Helpers.TIME_ZONE_RESPONSE);
             AjaxHelpers.respondWithJson(requests, Helpers.createUserPreferencesData());
-            AjaxHelpers.respondWithJson(requests, {});  // Page viewed analytics event
+            AjaxHelpers.respondWithJson(requests, {}); // Page viewed analytics event
 
             var sectionsData = accountSettingsView.options.tabSections.aboutTabSections;
 
@@ -136,6 +135,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
                 sectionsData[1].fields[2]
             ];
             _.each(dropdownFields, function(field) {
+                // eslint-disable-next-line no-shadow
                 var view = field.view;
                 FieldViewsSpecHelpers.verifyDropDownField(view, {
                     title: view.options.title,
@@ -272,7 +272,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
             AjaxHelpers.respondWithJson(requests, Helpers.createAccountSettingsData());
             AjaxHelpers.respondWithJson(requests, Helpers.TIME_ZONE_RESPONSE);
             AjaxHelpers.respondWithJson(requests, Helpers.createUserPreferencesData());
-            AjaxHelpers.respondWithJson(requests, {});  // Page viewed analytics event
+            AjaxHelpers.respondWithJson(requests, {}); // Page viewed analytics event
 
             sectionsData = accountSettingsView.options.tabSections.aboutTabSections;
 
@@ -322,7 +322,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
                     title: view.options.title,
                     valueAttribute: view.options.valueAttribute,
                     helpMessage: '',
-                    validValue: Helpers.FIELD_OPTIONS[1][0],    // dummy option for dropdown field
+                    validValue: Helpers.FIELD_OPTIONS[1][0], // dummy option for dropdown field
                     invalidValue1: Helpers.FIELD_OPTIONS[2][0], // dummy option for dropdown field
                     invalidValue2: Helpers.FIELD_OPTIONS[3][0], // dummy option for dropdown field
                     validationError: 'Nope, this will not do!',

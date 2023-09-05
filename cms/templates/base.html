@@ -63,6 +63,7 @@ from openedx.core.release import RELEASE_LINE
     <script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="path_prefix" content="${EDX_ROOT_URL}">
+    <%block name="header_meta"></%block>
     <% favicon_url = branding_api.get_favicon_url() %>
     <link rel="icon" type="image/x-icon" href="${favicon_url}"/>
     <%static:css group='style-vendor'/>

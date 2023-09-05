@@ -178,11 +178,11 @@ class InstructorTask(models.Model):
                     too_long -= (len(traceback_string) + len('traceback'))
                 else:
                     # truncate the traceback:
-                    task_progress['traceback'] = traceback_string[:-(too_long + len(tag))] + tag
+                    task_progress['traceback'] = traceback_string[(too_long + len(tag)):] + tag
                     too_long = 0
             if too_long > 0:
                 # we need to shorten the message:
-                task_progress['message'] = task_progress['message'][:-(too_long + len(tag))] + tag
+                task_progress['message'] = task_progress['message'][(too_long + len(tag)):] + tag
             json_output = json.dumps(task_progress)
         return json_output
 
@@ -233,7 +233,7 @@ class ReportStore:
             return DjangoStorageReportStore(
                 storage_class=DJANGO_STORE_STORAGE_CLASS,
                 storage_kwargs={
-                    'bucket': config['BUCKET'],
+                    'bucket_name': config['BUCKET'],
                     'location': config['ROOT_PATH'],
                     'custom_domain': config.get("CUSTOM_DOMAIN", None),
                     'querystring_expire': 300,

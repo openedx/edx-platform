@@ -18,7 +18,6 @@ from xblock.fields import Scope, ScopeIds, String
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.x_module import (
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
     XModuleToXBlockMixin,
@@ -47,7 +46,6 @@ class ErrorFields:
 class ErrorBlock(
     ErrorFields,
     XModuleToXBlockMixin,
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
 ):  # pylint: disable=abstract-method
@@ -62,7 +60,7 @@ class ErrorBlock(
         """
         Return a fragment that contains the html for the student view.
         """
-        fragment = Fragment(self.runtime.service(self, 'mako').render_template('module-error.html', {
+        fragment = Fragment(self.runtime.service(self, 'mako').render_lms_template('module-error.html', {
             'staff_access': True,
             'data': self.contents,
             'error': self.error_msg,
@@ -97,8 +95,8 @@ class ErrorBlock(
         if location.block_type == 'error':
             location = location.replace(
                 # Pick a unique url_name -- the sha1 hash of the contents.
-                # NOTE: We could try to pull out the url_name of the errored descriptor,
-                # but url_names aren't guaranteed to be unique between descriptor types,
+                # NOTE: We could try to pull out the url_name of the errored block,
+                # but url_names aren't guaranteed to be unique between block types,
                 # and ErrorBlock can wrap any type.  When the wrapped block is fixed,
                 # it will be written out with the original url_name.
                 name=hashlib.sha1(contents.encode('utf8')).hexdigest()
@@ -141,19 +139,19 @@ class ErrorBlock(
         )
 
     @classmethod
-    def from_descriptor(cls, descriptor, error_msg=None):
+    def from_block(cls, block, error_msg=None):
         return cls._construct(
-            descriptor.runtime,
-            str(descriptor),
+            block.runtime,
+            str(block),
             error_msg,
-            location=descriptor.location,
-            for_parent=descriptor.get_parent() if descriptor.has_cached_parent else None
+            location=block.location,
+            for_parent=block.get_parent() if block.has_cached_parent else None
         )
 
     @classmethod
     def from_xml(cls, xml_data, system, id_generator,  # pylint: disable=arguments-differ
                  error_msg=None):
-        '''Create an instance of this descriptor from the supplied data.
+        '''Create an instance of this block from the supplied data.
 
         Does not require that xml_data be parseable--just stores it and exports
         as-is if not.

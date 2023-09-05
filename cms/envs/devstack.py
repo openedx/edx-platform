@@ -49,6 +49,11 @@ LMS_ROOT_URL = f'http://{LMS_BASE}'
 FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
 FRONTEND_REGISTER_URL = LMS_ROOT_URL + '/register'
+
+################################## Video Pipeline Settings #########################
+
+FEATURES['ENABLE_VIDEO_UPLOAD_PIPELINE'] = True
+
 ########################### PIPELINE #################################
 
 # Skip packaging and optimization in development
@@ -99,7 +104,6 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.request.RequestPanel',
     'debug_toolbar.panels.sql.SQLPanel',
     'debug_toolbar.panels.signals.SignalsPanel',
-    'debug_toolbar.panels.logging.LoggingPanel',
     'debug_toolbar.panels.profiling.ProfilingPanel',
     'debug_toolbar.panels.history.HistoryPanel',
 )
@@ -156,7 +160,10 @@ CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
 FEATURES['CERTIFICATES_HTML_VIEW'] = True
 
 ########################## AUTHOR PERMISSION #######################
-FEATURES['ENABLE_CREATOR_GROUP'] = False
+FEATURES['ENABLE_CREATOR_GROUP'] = True
+
+########################## Library creation organizations restriction #######################
+FEATURES['ENABLE_ORGANIZATION_STAFF_ACCESS_FOR_CONTENT_LIBRARIES'] = True
 
 ################### FRONTEND APPLICATION PUBLISHER URL ###################
 FEATURES['FRONTEND_APP_PUBLISHER_URL'] = 'http://localhost:18400'
@@ -296,10 +303,13 @@ CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 #   in the LMS and CMS.
 # .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/31813'
 FEATURES['ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS'] = True
-EVENT_BUS_PRODUCER = 'edx_event_bus_kafka.create_producer'
-EVENT_BUS_KAFKA_SCHEMA_REGISTRY_URL = 'http://edx.devstack.schema-registry:8081'
-EVENT_BUS_KAFKA_BOOTSTRAP_SERVERS = 'edx.devstack.kafka:29092'
+FEATURES['ENABLE_SEND_ENROLLMENT_EVENTS_OVER_BUS'] = True
+EVENT_BUS_PRODUCER = 'edx_event_bus_redis.create_producer'
+EVENT_BUS_REDIS_CONNECTION_URL = 'redis://:password@edx.devstack.redis:6379/'
 EVENT_BUS_TOPIC_PREFIX = 'dev'
+EVENT_BUS_CONSUMER = 'edx_event_bus_redis.RedisEventConsumer'
+EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC = 'course-authoring-xblock-lifecycle'
+EVENT_BUS_ENROLLMENT_LIFECYCLE_TOPIC = 'course-authoring-enrollment-lifecycle'
 
 ################# New settings must go ABOVE this line #################
 ########################################################################

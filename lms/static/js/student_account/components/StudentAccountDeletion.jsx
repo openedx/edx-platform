@@ -1,11 +1,11 @@
 /* globals gettext */
-/* eslint-disable react/no-danger, import/prefer-default-export */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Icon, StatusAlert } from '@edx/paragon/static';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 import StudentAccountDeletionModal from './StudentAccountDeletionModal';
 
+// eslint-disable-next-line import/prefer-default-export
 export class StudentAccountDeletion extends React.Component {
     constructor(props) {
         super(props);
@@ -115,14 +115,17 @@ export class StudentAccountDeletion extends React.Component {
                 </p>
                 <p
                     className="account-settings-header-subtitle"
+                    // eslint-disable-next-line react/no-danger
                     dangerouslySetInnerHTML={{ __html: loseAccessText }}
                 />
                 <p
                     className="account-settings-header-subtitle-warning"
+                    // eslint-disable-next-line react/no-danger
                     dangerouslySetInnerHTML={{ __html: acctDeletionWarningText }}
                 />
                 <p
                     className="account-settings-header-subtitle"
+                    // eslint-disable-next-line react/no-danger
                     dangerouslySetInnerHTML={{ __html: changeAcctInfoText }}
                 />
                 <Button
@@ -133,33 +136,37 @@ export class StudentAccountDeletion extends React.Component {
                     inputRef={(input) => { this.modalTrigger = input; }}
                     onClick={this.loadDeletionModal}
                 />
-                {showError &&
-          <StatusAlert
-              dialog={(
-                  <div className="modal-alert">
-                      <div className="icon-wrapper">
-                          <Icon id="delete-confirmation-body-error-icon" className={['fa', 'fa-exclamation-circle']} />
+                {showError
+          && (
+              <StatusAlert
+                  dialog={(
+                      <div className="modal-alert">
+                          <div className="icon-wrapper">
+                              <Icon id="delete-confirmation-body-error-icon" className={['fa', 'fa-exclamation-circle']} />
+                          </div>
+                          <div className="alert-content">
+                              {socialAuthConnected && isActive
+                    // eslint-disable-next-line react/no-danger
+                    && <p dangerouslySetInnerHTML={{ __html: socialAuthError }} />}
+                              {/* eslint-disable-next-line react/no-danger */}
+                              {!isActive && <p dangerouslySetInnerHTML={{ __html: activationError }} /> }
+                          </div>
                       </div>
-                      <div className="alert-content">
-                          {socialAuthConnected && isActive &&
-                    <p dangerouslySetInnerHTML={{ __html: socialAuthError }} />
-                          }
-                          {!isActive && <p dangerouslySetInnerHTML={{ __html: activationError }} /> }
-                      </div>
-                  </div>
-              )}
-              alertType="danger"
-              dismissible={false}
-              open
-          />
-                }
-                {deletionModalOpen && <StudentAccountDeletionModal
-                    onClose={this.closeDeletionModal}
-                    additionalSiteSpecificDeletionText={this.props.additionalSiteSpecificDeletionText}
-                    mktgRootLink={this.props.mktgRootLink}
-                    platformName={this.props.platformName}
-                    siteName={this.props.siteName}
-                />}
+                  )}
+                  alertType="danger"
+                  dismissible={false}
+                  open
+              />
+          )}
+                {deletionModalOpen && (
+                    <StudentAccountDeletionModal
+                        onClose={this.closeDeletionModal}
+                        additionalSiteSpecificDeletionText={this.props.additionalSiteSpecificDeletionText}
+                        mktgRootLink={this.props.mktgRootLink}
+                        platformName={this.props.platformName}
+                        siteName={this.props.siteName}
+                    />
+                )}
             </div>
         );
     }
@@ -168,6 +175,7 @@ export class StudentAccountDeletion extends React.Component {
 StudentAccountDeletion.propTypes = {
     isActive: PropTypes.bool.isRequired,
     socialAccountLinks: PropTypes.shape({
+        // eslint-disable-next-line react/forbid-prop-types
         providers: PropTypes.arrayOf(PropTypes.object),
     }).isRequired,
     additionalSiteSpecificDeletionText: PropTypes.string,

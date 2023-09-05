@@ -151,7 +151,7 @@ var accessible_modal = function(trigger, closeButtonId, modalId, mainPageId) {
     // see http://accessibility.oit.ncsu.edu/blog/2013/09/13/the-incredible-accessible-modal-dialog/
     // for more information on managing modals
     //
-    var initialFocus
+    var initialFocus;
     $(trigger).click(function() {
         $focusedElementBeforeModal = $(trigger);
 
@@ -203,6 +203,7 @@ $(function() {
     var SRAlert;
 
     SRAlert = (function() {
+        // eslint-disable-next-line no-shadow
         function SRAlert() {
             // This initialization sometimes gets done twice, so take to only create a single reader-feedback div.
             var readerFeedbackID = 'reader-feedback',

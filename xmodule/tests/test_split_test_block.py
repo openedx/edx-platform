@@ -106,7 +106,7 @@ class SplitTestBlockTest(XModuleXmlImportTest, PartitionTestCase):
             self.course,
             course_id=self.course.id,
         )
-        self.course.runtime._runtime_services['partitions'] = partitions_service  # pylint: disable=protected-access
+        self.course.runtime._services['partitions'] = partitions_service  # pylint: disable=protected-access
 
         # Mock user_service user
         user_service = Mock()
@@ -142,7 +142,7 @@ class SplitTestBlockLMSTest(SplitTestBlockTest):
     @ddt.unpack
     def test_child(self, user_tag, child_url_name):
         self.user_partition.scheme.current_group = self.user_partition.groups[user_tag]
-        assert self.split_test_block.child_descriptor.url_name == child_url_name
+        assert self.split_test_block.child_block.url_name == child_url_name
 
     @ddt.data((0, 'HTML FOR GROUP 0'), (1, 'HTML FOR GROUP 1'))
     @ddt.unpack
@@ -153,14 +153,14 @@ class SplitTestBlockLMSTest(SplitTestBlockTest):
     @ddt.data(0, 1)
     def test_child_missing_tag_value(self, _user_tag):
         # If user_tag has a missing value, we should still get back a valid child url
-        assert self.split_test_block.child_descriptor.url_name in ['split_test_cond0', 'split_test_cond1']
+        assert self.split_test_block.child_block.url_name in ['split_test_cond0', 'split_test_cond1']
 
     @ddt.data(100, 200, 300, 400, 500, 600, 700, 800, 900, 1000)
     def test_child_persist_new_tag_value_when_tag_missing(self, _user_tag):
         # If a user_tag has a missing value, a group should be saved/persisted for that user.
         # So, we check that we get the same url_name when we call on the url_name twice.
         # We run the test ten times so that, if our storage is failing, we'll be most likely to notice it.
-        assert self.split_test_block.child_descriptor.url_name == self.split_test_block.child_descriptor.url_name
+        assert self.split_test_block.child_block.url_name == self.split_test_block.child_block.url_name
 
     # Patch the definition_to_xml for the html children.
     @patch('xmodule.html_block.HtmlBlock.definition_to_xml')
@@ -170,7 +170,7 @@ class SplitTestBlockLMSTest(SplitTestBlockTest):
         def_to_xml.return_value = lxml.etree.Element('html')
 
         # Mock out the process_xml
-        # Expect it to return a child descriptor for the SplitTestDescriptor when called.
+        # Expect it to return a child block for the SplitTestDescriptor when called.
         self.course.runtime.process_xml = Mock()
 
         # Write out the xml.

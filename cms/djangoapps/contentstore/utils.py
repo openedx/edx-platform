@@ -1,37 +1,87 @@
 """
 Common utility functions useful throughout the contentstore
 """
-
-from collections import defaultdict
+import configparser
 import logging
+from collections import defaultdict
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import datetime, timezone
+from uuid import uuid4
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils import translation
 from django.utils.translation import gettext as _
+from help_tokens.core import HelpUrlExpert
+from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocator
+from openedx_events.content_authoring.data import DuplicatedXBlockData
+from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
+from milestones import api as milestones_api
 from pytz import UTC
+from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.toggles import exam_setting_view_enabled
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.student import auth
+from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access, STUDIO_EDIT_ROLES
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.roles import (
+    CourseInstructorRole,
+    CourseStaffRole,
+    GlobalStaff,
+)
+from common.djangoapps.util.course import get_link_for_about_page
+from common.djangoapps.util.milestones_helpers import (
+    is_prerequisite_courses_enabled,
+    is_valid_course_key,
+    remove_prerequisite_course,
+    set_prerequisite_courses,
+    get_namespace_choices,
+    generate_milestone_namespace
+)
+from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
+from openedx.core import toggles as core_toggles
 from openedx.core.djangoapps.course_apps.toggles import proctoring_settings_modal_view_enabled
+from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.django_comment_common.models import assign_default_role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+from openedx.core.djangoapps.models.course_details import CourseDetails
+from openedx.core.lib.courses import course_image_url
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
+from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
+from cms.djangoapps.contentstore.toggles import (
+    use_new_advanced_settings_page,
+    use_new_course_outline_page,
+    use_new_export_page,
+    use_new_files_uploads_page,
+    use_new_grading_page,
+    use_new_course_team_page,
+    use_new_home_page,
+    use_new_import_page,
+    use_new_schedule_details_page,
+    use_new_unit_page,
+    use_new_updates_page,
+    use_new_video_uploads_page,
+    use_new_custom_pages,
+)
 from cms.djangoapps.contentstore.toggles import use_new_text_editor, use_new_video_editor
+from cms.djangoapps.models.settings.course_grading import CourseGradingModel
+from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions_service import get_all_partitions_for_course  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.services import SettingsService, ConfigurationService, TeamsConfigurationService
+
 
 log = logging.getLogger(__name__)
 
@@ -212,6 +262,174 @@ def get_editor_page_base_url(course_locator) -> str:
     return editor_url
 
 
+def get_studio_home_url():
+    """
+    Gets course authoring microfrontend URL for Studio Home view.
+    """
+    studio_home_url = None
+    if use_new_home_page():
+        mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
+        if mfe_base_url:
+            studio_home_url = f'{mfe_base_url}/home'
+    return studio_home_url
+
+
+def get_schedule_details_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for schedule and details pages view.
+    """
+    schedule_details_url = None
+    if use_new_schedule_details_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/settings/details'
+        if mfe_base_url:
+            schedule_details_url = course_mfe_url
+    return schedule_details_url
+
+
+def get_advanced_settings_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for advanced settings page view.
+    """
+    advanced_settings_url = None
+    if use_new_advanced_settings_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/settings/advanced'
+        if mfe_base_url:
+            advanced_settings_url = course_mfe_url
+    return advanced_settings_url
+
+
+def get_grading_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for grading page view.
+    """
+    grading_url = None
+    if use_new_grading_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/settings/grading'
+        if mfe_base_url:
+            grading_url = course_mfe_url
+    return grading_url
+
+
+def get_course_team_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for course team page view.
+    """
+    course_team_url = None
+    if use_new_course_team_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/course_team'
+        if mfe_base_url:
+            course_team_url = course_mfe_url
+    return course_team_url
+
+
+def get_updates_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for updates page view.
+    """
+    updates_url = None
+    if use_new_updates_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/course_info'
+        if mfe_base_url:
+            updates_url = course_mfe_url
+    return updates_url
+
+
+def get_import_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for import page view.
+    """
+    import_url = None
+    if use_new_import_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/import'
+        if mfe_base_url:
+            import_url = course_mfe_url
+    return import_url
+
+
+def get_export_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for export page view.
+    """
+    export_url = None
+    if use_new_export_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/export'
+        if mfe_base_url:
+            export_url = course_mfe_url
+    return export_url
+
+
+def get_files_uploads_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for files and uploads page view.
+    """
+    files_uploads_url = None
+    if use_new_files_uploads_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/assets'
+        if mfe_base_url:
+            files_uploads_url = course_mfe_url
+    return files_uploads_url
+
+
+def get_video_uploads_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for files and uploads page view.
+    """
+    video_uploads_url = None
+    if use_new_video_uploads_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/videos/'
+        if mfe_base_url:
+            video_uploads_url = course_mfe_url
+    return video_uploads_url
+
+
+def get_course_outline_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for course oultine page view.
+    """
+    course_outline_url = None
+    if use_new_course_outline_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}'
+        if mfe_base_url:
+            course_outline_url = course_mfe_url
+    return course_outline_url
+
+
+def get_unit_url(course_locator, unit_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for unit page view.
+    """
+    unit_url = None
+    if use_new_unit_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/container/{unit_locator}'
+        if mfe_base_url:
+            unit_url = course_mfe_url
+    return unit_url
+
+
+def get_custom_pages_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for custom pages view.
+    """
+    custom_pages_url = None
+    if use_new_custom_pages(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/custom-pages'
+        if mfe_base_url:
+            custom_pages_url = course_mfe_url
+    return custom_pages_url
+
+
 def course_import_olx_validation_is_enabled():
     """
     Check if course olx validation is enabled on course import.
@@ -371,7 +589,7 @@ def get_split_group_display_name(xblock, course):
 
     Arguments:
         xblock (XBlock): The courseware component.
-        course (XBlock): The course descriptor.
+        course (XBlock): The course block.
 
     Returns:
         group name (String): Group name of the matching group xblock.
@@ -398,14 +616,14 @@ def get_user_partition_info(xblock, schemes=None, course=None):
         schemes (iterable of str): If provided, filter partitions to include only
             schemes with the provided names.
 
-        course (XBlock): The course descriptor.  If provided, uses this to look up the user partitions
+        course (XBlock): The course block.  If provided, uses this to look up the user partitions
             instead of loading the course.  This is useful if we're calling this function multiple
             times for the same course want to minimize queries to the modulestore.
 
     Returns: list
 
     Example Usage:
-    >>> get_user_partition_info(block, schemes=["cohort", "verification"])
+    >>> get_user_partition_info(xblock, schemes=["cohort", "verification"])
     [
         {
             "id": 12345,
@@ -508,7 +726,7 @@ def get_visibility_partition_info(xblock, course=None):
     Arguments:
         xblock (XBlock): The component being edited.
 
-        course (XBlock): The course descriptor.  If provided, uses this to look up the user partitions
+        course (XBlock): The course block.  If provided, uses this to look up the user partitions
             instead of loading the course.  This is useful if we're calling this function multiple
             times for the same course want to minimize queries to the modulestore.
 
@@ -568,8 +786,8 @@ def get_xblock_aside_instance(usage_key):
     :param usage_key: Usage key of aside xblock
     """
     try:
-        descriptor = modulestore().get_item(usage_key.usage_key)
-        for aside in descriptor.runtime.get_asides(descriptor):
+        xblock = modulestore().get_item(usage_key.usage_key)
+        for aside in xblock.runtime.get_asides(xblock):
             if aside.scope_ids.block_type == usage_key.aside_type:
                 return aside
     except ItemNotFoundError:
@@ -753,3 +971,438 @@ def get_subsections_by_assignment_type(course_key):
                         f'{section.display_name} - {subsection.display_name}'
                     )
     return subsections_by_assignment_type
+
+
+def update_course_discussions_settings(course):
+    """
+    Updates course provider_type when new course is created
+    """
+    provider = DiscussionsConfiguration.get(context_key=course.id).provider_type
+    store = modulestore()
+    course.discussions_settings['provider_type'] = provider
+    store.update_item(course, course.published_by)
+
+
+def duplicate_block(
+    parent_usage_key,
+    duplicate_source_usage_key,
+    user,
+    dest_usage_key=None,
+    display_name=None,
+    shallow=False,
+    is_child=False
+):
+    """
+    Duplicate an existing xblock as a child of the supplied parent_usage_key. You can
+    optionally specify what usage key the new duplicate block will use via dest_usage_key.
+
+    If shallow is True, does not copy children. Otherwise, this function calls itself
+    recursively, and will set the is_child flag to True when dealing with recursed child
+    blocks.
+    """
+    store = modulestore()
+    with store.bulk_operations(duplicate_source_usage_key.course_key):
+        source_item = store.get_item(duplicate_source_usage_key)
+        if not dest_usage_key:
+            # Change the blockID to be unique.
+            dest_usage_key = source_item.location.replace(name=uuid4().hex)
+
+        category = dest_usage_key.block_type
+
+        duplicate_metadata, asides_to_create = gather_block_attributes(
+            source_item, display_name=display_name, is_child=is_child,
+        )
+
+        dest_block = store.create_item(
+            user.id,
+            dest_usage_key.course_key,
+            dest_usage_key.block_type,
+            block_id=dest_usage_key.block_id,
+            definition_data=source_item.get_explicitly_set_fields_by_scope(Scope.content),
+            metadata=duplicate_metadata,
+            runtime=source_item.runtime,
+            asides=asides_to_create
+        )
+
+        children_handled = False
+
+        if hasattr(dest_block, 'studio_post_duplicate'):
+            # Allow an XBlock to do anything fancy it may need to when duplicated from another block.
+            # These blocks may handle their own children or parenting if needed. Let them return booleans to
+            # let us know if we need to handle these or not.
+            load_services_for_studio(dest_block.runtime, user)
+            children_handled = dest_block.studio_post_duplicate(store, source_item)
+
+        # Children are not automatically copied over (and not all xblocks have a 'children' attribute).
+        # Because DAGs are not fully supported, we need to actually duplicate each child as well.
+        if source_item.has_children and not shallow and not children_handled:
+            dest_block.children = dest_block.children or []
+            for child in source_item.children:
+                dupe = duplicate_block(dest_block.location, child, user=user, is_child=True)
+                if dupe not in dest_block.children:  # _duplicate_block may add the child for us.
+                    dest_block.children.append(dupe)
+            store.update_item(dest_block, user.id)
+
+        # pylint: disable=protected-access
+        if 'detached' not in source_item.runtime.load_block_type(category)._class_tags:
+            parent = store.get_item(parent_usage_key)
+            # If source was already a child of the parent, add duplicate immediately afterward.
+            # Otherwise, add child to end.
+            if source_item.location in parent.children:
+                source_index = parent.children.index(source_item.location)
+                parent.children.insert(source_index + 1, dest_block.location)
+            else:
+                parent.children.append(dest_block.location)
+            store.update_item(parent, user.id)
+
+        # .. event_implemented_name: XBLOCK_DUPLICATED
+        XBLOCK_DUPLICATED.send_event(
+            time=datetime.now(timezone.utc),
+            xblock_info=DuplicatedXBlockData(
+                usage_key=dest_block.location,
+                block_type=dest_block.location.block_type,
+                source_usage_key=duplicate_source_usage_key,
+            )
+        )
+
+        return dest_block.location
+
+
+def update_from_source(*, source_block, destination_block, user_id):
+    """
+    Update a block to have all the settings and attributes of another source.
+
+    Copies over all attributes and settings of a source block to a destination
+    block. Blocks must be the same type. This function does not modify or duplicate
+    children.
+
+    This function is useful when a block, originally copied from a source block, drifts
+    and needs to be updated to match the original.
+
+    The modulestore function copy_from_template will copy a block's children recursively,
+    replacing the target block's children. It does not, however, update any of the target
+    block's settings. copy_from_template, then, is useful for cases like the Library
+    Content Block, where the children are the same across all instances, but the settings
+    may differ.
+
+    By contrast, for cases where we're copying a block that has drifted from its source,
+    we need to update the target block's settings, but we don't want to replace its children,
+    or, at least, not only replace its children. update_from_source is useful for these cases.
+
+    This function is meant to be imported by pluggable django apps looking to manage duplicated
+    sections of a course. It is placed here for lack of a more appropriate location, since this
+    code has not yet been brought up to the standards in OEP-45.
+    """
+    duplicate_metadata, asides = gather_block_attributes(source_block, display_name=source_block.display_name)
+    for key, value in duplicate_metadata.items():
+        setattr(destination_block, key, value)
+    for key, value in source_block.get_explicitly_set_fields_by_scope(Scope.content).items():
+        setattr(destination_block, key, value)
+    modulestore().update_item(
+        destination_block,
+        user_id,
+        metadata=duplicate_metadata,
+        asides=asides,
+    )
+
+
+def gather_block_attributes(source_item, display_name=None, is_child=False):
+    """
+    Gather all the attributes of the source block that need to be copied over to a new or updated block.
+    """
+    # Update the display name to indicate this is a duplicate (unless display name provided).
+    # Can't use own_metadata(), b/c it converts data for JSON serialization -
+    # not suitable for setting metadata of the new block
+    duplicate_metadata = {}
+    for field in source_item.fields.values():
+        if field.scope == Scope.settings and field.is_set_on(source_item):
+            duplicate_metadata[field.name] = field.read_from(source_item)
+
+    if is_child:
+        display_name = display_name or source_item.display_name or source_item.category
+
+    if display_name is not None:
+        duplicate_metadata['display_name'] = display_name
+    else:
+        if source_item.display_name is None:
+            duplicate_metadata['display_name'] = _("Duplicate of {0}").format(source_item.category)
+        else:
+            duplicate_metadata['display_name'] = _("Duplicate of '{0}'").format(source_item.display_name)
+
+    asides_to_create = []
+    for aside in source_item.runtime.get_asides(source_item):
+        for field in aside.fields.values():
+            if field.scope in (Scope.settings, Scope.content,) and field.is_set_on(aside):
+                asides_to_create.append(aside)
+                break
+
+    for aside in asides_to_create:
+        for field in aside.fields.values():
+            if field.scope not in (Scope.settings, Scope.content,):
+                field.delete_from(aside)
+    return duplicate_metadata, asides_to_create
+
+
+def load_services_for_studio(runtime, user):
+    """
+    Function to set some required services used for XBlock edits and studio_view.
+    (i.e. whenever we're not loading _prepare_runtime_for_preview.) This is required to make information
+    about the current user (especially permissions) available via services as needed.
+    """
+    services = {
+        "user": DjangoXBlockUserService(user),
+        "studio_user_permissions": StudioPermissionsService(user),
+        "mako": MakoService(),
+        "settings": SettingsService(),
+        "lti-configuration": ConfigurationService(CourseAllowPIISharingInLTIFlag),
+        "teams_configuration": TeamsConfigurationService(),
+        "library_tools": LibraryToolsService(modulestore(), user.id)
+    }
+
+    runtime._services.update(services)  # lint-amnesty, pylint: disable=protected-access
+
+
+def update_course_details(request, course_key, payload, course_block):
+    """
+    Utils is used to update course details.
+    It is used for both DRF and django views.
+    """
+
+    from .views.entrance_exam import create_entrance_exam, delete_entrance_exam, update_entrance_exam
+
+    # if pre-requisite course feature is enabled set pre-requisite course
+    if is_prerequisite_courses_enabled():
+        prerequisite_course_keys = payload.get('pre_requisite_courses', [])
+        if prerequisite_course_keys:
+            if not all(is_valid_course_key(course_key) for course_key in prerequisite_course_keys):
+                raise ValidationError(_("Invalid prerequisite course key"))
+            set_prerequisite_courses(course_key, prerequisite_course_keys)
+        else:
+            # None is chosen, so remove the course prerequisites
+            course_milestones = milestones_api.get_course_milestones(
+                course_key=course_key,
+                relationship="requires",
+            )
+            for milestone in course_milestones:
+                entrance_exam_namespace = generate_milestone_namespace(
+                    get_namespace_choices().get('ENTRANCE_EXAM'),
+                    course_key
+                )
+                if milestone["namespace"] != entrance_exam_namespace:
+                    remove_prerequisite_course(course_key, milestone)
+
+    # If the entrance exams feature has been enabled, we'll need to check for some
+    # feature-specific settings and handle them accordingly
+    # We have to be careful that we're only executing the following logic if we actually
+    # need to create or delete an entrance exam from the specified course
+    if core_toggles.ENTRANCE_EXAMS.is_enabled():
+        course_entrance_exam_present = course_block.entrance_exam_enabled
+        entrance_exam_enabled = payload.get('entrance_exam_enabled', '') == 'true'
+        ee_min_score_pct = payload.get('entrance_exam_minimum_score_pct', None)
+        # If the entrance exam box on the settings screen has been checked...
+        if entrance_exam_enabled:
+            # Load the default minimum score threshold from settings, then try to override it
+            entrance_exam_minimum_score_pct = float(settings.ENTRANCE_EXAM_MIN_SCORE_PCT)
+            if ee_min_score_pct:
+                entrance_exam_minimum_score_pct = float(ee_min_score_pct)
+            if entrance_exam_minimum_score_pct.is_integer():
+                entrance_exam_minimum_score_pct = entrance_exam_minimum_score_pct / 100
+            # If there's already an entrance exam defined, we'll update the existing one
+            if course_entrance_exam_present:
+                exam_data = {
+                    'entrance_exam_minimum_score_pct': entrance_exam_minimum_score_pct
+                }
+                update_entrance_exam(request, course_key, exam_data)
+            # If there's no entrance exam defined, we'll create a new one
+            else:
+                create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct)
+
+        # If the entrance exam box on the settings screen has been unchecked,
+        # and the course has an entrance exam attached...
+        elif not entrance_exam_enabled and course_entrance_exam_present:
+            delete_entrance_exam(request, course_key)
+
+    # Perform the normal update workflow for the CourseDetails model
+    return CourseDetails.update_from_json(course_key, payload, request.user)
+
+
+def get_course_settings(request, course_key, course_block):
+    """
+    Utils is used to get context of course settings.
+    It is used for both DRF and django views.
+    """
+
+    from .views.course import get_courses_accessible_to_user, _process_courses_list
+
+    credit_eligibility_enabled = settings.FEATURES.get('ENABLE_CREDIT_ELIGIBILITY', False)
+    upload_asset_url = reverse_course_url('assets_handler', course_key)
+
+    # see if the ORG of this course can be attributed to a defined configuration . In that case, the
+    # course about page should be editable in Studio
+    publisher_enabled = configuration_helpers.get_value_for_org(
+        course_block.location.org,
+        'ENABLE_PUBLISHER',
+        settings.FEATURES.get('ENABLE_PUBLISHER', False)
+    )
+    marketing_enabled = configuration_helpers.get_value_for_org(
+        course_block.location.org,
+        'ENABLE_MKTG_SITE',
+        settings.FEATURES.get('ENABLE_MKTG_SITE', False)
+    )
+    enable_extended_course_details = configuration_helpers.get_value_for_org(
+        course_block.location.org,
+        'ENABLE_EXTENDED_COURSE_DETAILS',
+        settings.FEATURES.get('ENABLE_EXTENDED_COURSE_DETAILS', False)
+    )
+
+    about_page_editable = not publisher_enabled
+    enrollment_end_editable = GlobalStaff().has_user(request.user) or not publisher_enabled
+    short_description_editable = configuration_helpers.get_value_for_org(
+        course_block.location.org,
+        'EDITABLE_SHORT_DESCRIPTION',
+        settings.FEATURES.get('EDITABLE_SHORT_DESCRIPTION', True)
+    )
+    sidebar_html_enabled = ENABLE_COURSE_ABOUT_SIDEBAR_HTML.is_enabled()
+
+    verified_mode = CourseMode.verified_mode_for_course(course_key, include_expired=True)
+    upgrade_deadline = (verified_mode and verified_mode.expiration_datetime and
+                        verified_mode.expiration_datetime.isoformat())
+    settings_context = {
+        'context_course': course_block,
+        'course_locator': course_key,
+        'lms_link_for_about_page': get_link_for_about_page(course_block),
+        'course_image_url': course_image_url(course_block, 'course_image'),
+        'banner_image_url': course_image_url(course_block, 'banner_image'),
+        'video_thumbnail_image_url': course_image_url(course_block, 'video_thumbnail_image'),
+        'details_url': reverse_course_url('settings_handler', course_key),
+        'about_page_editable': about_page_editable,
+        'marketing_enabled': marketing_enabled,
+        'short_description_editable': short_description_editable,
+        'sidebar_html_enabled': sidebar_html_enabled,
+        'upload_asset_url': upload_asset_url,
+        'course_handler_url': reverse_course_url('course_handler', course_key),
+        'language_options': settings.ALL_LANGUAGES,
+        'credit_eligibility_enabled': credit_eligibility_enabled,
+        'is_credit_course': False,
+        'show_min_grade_warning': False,
+        'enrollment_end_editable': enrollment_end_editable,
+        'is_prerequisite_courses_enabled': is_prerequisite_courses_enabled(),
+        'is_entrance_exams_enabled': core_toggles.ENTRANCE_EXAMS.is_enabled(),
+        'enable_extended_course_details': enable_extended_course_details,
+        'upgrade_deadline': upgrade_deadline,
+        'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_block.id),
+    }
+    if is_prerequisite_courses_enabled():
+        courses, in_process_course_actions = get_courses_accessible_to_user(request)
+        # exclude current course from the list of available courses
+        courses = [course for course in courses if course.id != course_key]
+        if courses:
+            courses, __ = _process_courses_list(courses, in_process_course_actions)
+        settings_context.update({'possible_pre_requisite_courses': courses})
+
+    if credit_eligibility_enabled:
+        if is_credit_course(course_key):
+            # get and all credit eligibility requirements
+            credit_requirements = get_credit_requirements(course_key)
+            # pair together requirements with same 'namespace' values
+            paired_requirements = {}
+            for requirement in credit_requirements:
+                namespace = requirement.pop("namespace")
+                paired_requirements.setdefault(namespace, []).append(requirement)
+
+            # if 'minimum_grade_credit' of a course is not set or 0 then
+            # show warning message to course author.
+            show_min_grade_warning = False if course_block.minimum_grade_credit > 0 else True  # lint-amnesty, pylint: disable=simplifiable-if-expression
+            settings_context.update(
+                {
+                    'is_credit_course': True,
+                    'credit_requirements': paired_requirements,
+                    'show_min_grade_warning': show_min_grade_warning,
+                }
+            )
+
+    return settings_context
+
+
+def get_course_team(auth_user, course_key, user_perms):
+    """
+    Utils is used to get context of all CMS users who are editors for the specified course.
+    It is used for both DRF and django views.
+    """
+
+    from cms.djangoapps.contentstore.views.user import user_with_role
+
+    course_block = modulestore().get_course(course_key)
+    instructors = set(CourseInstructorRole(course_key).users_with_role())
+    # the page only lists staff and assumes they're a superset of instructors. Do a union to ensure.
+    staff = set(CourseStaffRole(course_key).users_with_role()).union(instructors)
+
+    formatted_users = []
+    for user in instructors:
+        formatted_users.append(user_with_role(user, 'instructor'))
+    for user in staff - instructors:
+        formatted_users.append(user_with_role(user, 'staff'))
+
+    course_team_context = {
+        'context_course': course_block,
+        'show_transfer_ownership_hint': auth_user in instructors and len(instructors) == 1,
+        'users': formatted_users,
+        'allow_actions': bool(user_perms & STUDIO_EDIT_ROLES),
+    }
+
+    return course_team_context
+
+
+def get_course_grading(course_key):
+    """
+    Utils is used to get context of course grading.
+    It is used for both DRF and django views.
+    """
+
+    course_block = modulestore().get_course(course_key)
+    course_details = CourseGradingModel.fetch(course_key)
+    course_assignment_lists = get_subsections_by_assignment_type(course_key)
+    grading_context = {
+        'context_course': course_block,
+        'course_locator': course_key,
+        'course_details': course_details,
+        'grading_url': reverse_course_url('grading_handler', course_key),
+        'is_credit_course': is_credit_course(course_key),
+        'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_key),
+        'course_assignment_lists': dict(course_assignment_lists)
+    }
+
+    return grading_context
+
+
+def get_help_urls():
+    """
+    Utils is used to get help tokens urls.
+    """
+    ini = HelpUrlExpert.the_one()
+    ini.config = configparser.ConfigParser()
+    ini.config.read(ini.ini_file_name)
+    tokens = list(ini.config['pages'].keys())
+    help_tokens = {token: HelpUrlExpert.the_one().url_for_token(token) for token in tokens}
+    return help_tokens
+
+
+class StudioPermissionsService:
+    """
+    Service that can provide information about a user's permissions.
+
+    Deprecated. To be replaced by a more general authorization service.
+
+    Only used by LibraryContentBlock (and library_tools.py).
+    """
+
+    def __init__(self, user):
+        self._user = user
+
+    def can_read(self, course_key):
+        """ Does the user have read access to the given course/library? """
+        return has_studio_read_access(self._user, course_key)
+
+    def can_write(self, course_key):
+        """ Does the user have read access to the given course/library? """
+        return has_studio_write_access(self._user, course_key)

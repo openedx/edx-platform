@@ -6,11 +6,14 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
     'common/js/components/utils/view_utils', 'js/views/container', 'js/views/xblock',
     'js/views/components/add_xblock', 'js/views/modals/edit_xblock', 'js/views/modals/move_xblock_modal',
     'js/models/xblock_info', 'js/views/xblock_string_field_editor', 'js/views/xblock_access_editor',
-    'js/views/pages/container_subviews', 'js/views/unit_outline', 'js/views/utils/xblock_utils'],
+    'js/views/pages/container_subviews', 'js/views/unit_outline', 'js/views/utils/xblock_utils',
+    'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
+],
 function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView, AddXBlockComponent,
     EditXBlockModal, MoveXBlockModal, XBlockInfo, XBlockStringFieldEditor, XBlockAccessEditor,
-    ContainerSubviews, UnitOutlineView, XBlockUtils) {
+    ContainerSubviews, UnitOutlineView, XBlockUtils, NotificationView, PromptView) {
     'use strict';
+
     var XBlockContainerPage = BasePage.extend({
         // takes XBlockInfo as a model
 
@@ -22,16 +25,17 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             'click .move-button': 'showMoveXBlockModal',
             'click .delete-button': 'deleteXBlock',
             'click .show-actions-menu-button': 'showXBlockActionsMenu',
-            'click .new-component-button': 'scrollToNewComponentButtons'
+            'click .new-component-button': 'scrollToNewComponentButtons',
+            'click .paste-component-button': 'pasteComponent',
         },
 
         options: {
             collapsedClass: 'is-collapsed',
-            canEdit: true // If not specified, assume user has permission to make changes
+            canEdit: true, // If not specified, assume user has permission to make changes
+            clipboardData: { content: null },
         },
 
         view: 'container_preview',
-
 
         defaultViewClass: ContainerView,
 
@@ -100,6 +104,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             }
 
             this.listenTo(Backbone, 'move:onXBlockMoved', this.onXBlockMoved);
+            this.clipboardBroadcastChannel = new BroadcastChannel("studio_clipboard_channel");
         },
 
         getViewParameters: function() {
@@ -147,6 +152,11 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
 
                     // Re-enable Backbone events for any updated DOM elements
                     self.delegateEvents();
+
+                    // Show/hide the paste button
+                    if (!self.isLibraryPage) {
+                        self.initializePasteButton();
+                    }
                 },
                 block_added: options && options.block_added
             });
@@ -182,22 +192,144 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             }
         },
 
+        initializePasteButton() {
+            if (this.options.canEdit) {
+                // We should have the user's clipboard status.
+                const data = this.options.clipboardData;
+                this.refreshPasteButton(data);
+                // Refresh the status when something is copied on another tab:
+                this.clipboardBroadcastChannel.onmessage = (event) => { this.refreshPasteButton(event.data); };
+            } else {
+                this.$(".paste-component").hide();
+            }
+        },
+
+        /**
+         * Given the latest information about the user's clipboard, hide or show the Paste button as appropriate.
+         */
+        refreshPasteButton(data) {
+            // 'data' is the same data returned by the "get clipboard status" API endpoint
+            // i.e. /api/content-staging/v1/clipboard/
+            if (this.options.canEdit && data.content) {
+                if (["vertical", "sequential", "chapter", "course"].includes(data.content.block_type)) {
+                    // This is not suitable for pasting into a unit.
+                    this.$(".paste-component").hide();
+                } else if (data.content.status === "expired") {
+                    // This has expired and can no longer be pasted.
+                    this.$(".paste-component").hide();
+                } else {
+                    // The thing in the clipboard can be pasted into this unit:
+                    const detailsPopupEl = this.$(".clipboard-details-popup")[0];
+                    detailsPopupEl.querySelector(".detail-block-name").innerText = data.content.display_name;
+                    detailsPopupEl.querySelector(".detail-block-type").innerText = data.content.block_type_display;
+                    detailsPopupEl.querySelector(".detail-course-name").innerText = data.source_context_title;
+                    if (data.source_edit_url) {
+                        detailsPopupEl.setAttribute("href", data.source_edit_url);
+                        detailsPopupEl.classList.remove("no-edit-link");
+                    } else {
+                        detailsPopupEl.setAttribute("href", "#");
+                        detailsPopupEl.classList.add("no-edit-link");
+                    }
+                    this.$(".paste-component").show();
+                }
+            } else {
+                this.$(".paste-component").hide();
+            }
+        },
+
+        /** The user has clicked on the "Paste Component button" */
+        pasteComponent(event) {
+            event.preventDefault();
+            // Get the ID of the container (usually a unit/vertical) that we're pasting into:
+            const parentElement = this.findXBlockElement(event.target);
+            const parentLocator = parentElement.data('locator');
+            // Create a placeholder XBlock while we're pasting:
+            const $placeholderEl = $(this.createPlaceholderElement());
+            const addComponentsPanel = $(event.target).closest('.paste-component').prev();
+            const listPanel = addComponentsPanel.prev();
+            const scrollOffset = ViewUtils.getScrollOffset(addComponentsPanel);
+            const placeholderElement = $placeholderEl.appendTo(listPanel);
+
+            // Start showing a "Pasting" notification:
+            ViewUtils.runOperationShowingMessage(gettext('Pasting'), () => {
+                return $.postJSON(this.getURLRoot() + '/', {
+                    parent_locator: parentLocator,
+                    staged_content: "clipboard",
+                }).then((data) => {
+                    this.onNewXBlock(placeholderElement, scrollOffset, false, data);
+                    return data;
+                }).fail(() => {
+                    // Remove the placeholder if the paste failed
+                    placeholderElement.remove();
+                });
+            }).done((data) => {
+                const {
+                    conflicting_files: conflictingFiles,
+                    error_files: errorFiles,
+                    new_files: newFiles,
+                } = data.static_file_notices;
+
+                const notices = [];
+                if (errorFiles.length) {
+                    notices.push((next) => new PromptView.Error({
+                        title: gettext("Some errors occurred"),
+                        message: (
+                            gettext("The following required files could not be added to the course:") +
+                            " " + errorFiles.join(", ")
+                        ),
+                        actions: {primary: {text: gettext("OK"), click: (x) => { x.hide(); next(); }}},
+                    }));
+                }
+                if (conflictingFiles.length) {
+                    notices.push((next) => new PromptView.Warning({
+                        title: gettext("You may need to update a file(s) manually"),
+                        message: (
+                            gettext(
+                                "The following files already exist in this course but don't match the " +
+                                "version used by the component you pasted:"
+                            ) + " " + conflictingFiles.join(", ")
+                        ),
+                        actions: {primary: {text: gettext("OK"), click: (x) => { x.hide(); next(); }}},
+                    }));
+                }
+                if (newFiles.length) {
+                    notices.push(() => new NotificationView.Confirmation({
+                        title: gettext("New files were added to this course's Files & Uploads"),
+                        message: (
+                            gettext("The following required files were imported to this course:") +
+                            " "  + newFiles.join(", ")
+                        ),
+                        closeIcon: true,
+                    }));
+                }
+                if (notices.length) {
+                    // Show the notices, one at a time:
+                    const showNext = () => {
+                        const view = notices.shift()(showNext);
+                        view.show();
+                    }
+                    // Delay to avoid conflict with the "Pasting..." notification.
+                    setTimeout(showNext, 1250);
+                }
+            });
+        },
+
         editXBlock: function(event, options) {
             event.preventDefault();
 
-            if(!options || options.view !== 'visibility_view' ){
-                const primaryHeader = $(event.target).closest('.xblock-header-primary')
+            if (!options || options.view !== 'visibility_view') {
+                const primaryHeader = $(event.target).closest('.xblock-header-primary');
 
-                var useNewTextEditor = primaryHeader.attr("use-new-editor-text"),
-                    useNewVideoEditor = primaryHeader.attr("use-new-editor-video"),
-                    useNewProblemEditor = primaryHeader.attr("use-new-editor-problem"),
-                    blockType = primaryHeader.attr("data-block-type");
+                var useNewTextEditor = primaryHeader.attr('use-new-editor-text'),
+                    useNewVideoEditor = primaryHeader.attr('use-new-editor-video'),
+                    useNewProblemEditor = primaryHeader.attr('use-new-editor-problem'),
+                    blockType = primaryHeader.attr('data-block-type');
 
-                if( (useNewTextEditor === "True" && blockType === "html") ||
-                        (useNewVideoEditor === "True" && blockType === "video") ||
-                        (useNewProblemEditor === "True" && blockType === "problem")
+                if((useNewTextEditor === 'True' && blockType === 'html')
+                        || (useNewVideoEditor === 'True' && blockType === 'video')
+                        || (useNewProblemEditor === 'True' && blockType === 'problem')
                 ) {
-                    var destinationUrl = primaryHeader.attr("authoring_MFE_base_url") + '/' + blockType + '/' + encodeURI(primaryHeader.attr("data-usage-id"));
+                    var destinationUrl = primaryHeader.attr('authoring_MFE_base_url') + '/' + blockType + '/' + encodeURI(primaryHeader.attr('data-usage-id'));
                     window.location.href = destinationUrl;
                     return;
                 }
@@ -219,14 +351,23 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
          * If the new "Actions" menu is enabled, most XBlock actions like
          * Duplicate, Move, Delete, Manage Access, etc. are moved into this
          * menu. For this event, we just toggle displaying the menu.
-         * @param {*} event 
+         * @param {*} event
          */
         showXBlockActionsMenu: function(event) {
             const showActionsButton = event.currentTarget;
-            const subMenu = showActionsButton.parentElement.querySelector(".wrapper-nav-sub");
+            const subMenu = showActionsButton.parentElement.querySelector('.wrapper-nav-sub');
+
+            // Close all open dropdowns
+            const elements = document.querySelectorAll("li.action-item.action-actions-menu.nav-item");
+            elements.forEach(element => {
+                if (element !== showActionsButton.parentElement) {
+                    element.querySelector('.wrapper-nav-sub').classList.remove('is-shown');
+                }
+            });
+
             // Code in 'base.js' normally handles toggling these dropdowns but since this one is
             // not present yet during the domReady event, we have to handle displaying it ourselves.
-            subMenu.classList.toggle("is-shown");
+            subMenu.classList.toggle('is-shown');
             // if propagation is not stopped, the event will bubble up to the
             // body element, which will close the dropdown.
             event.stopPropagation();
@@ -307,6 +448,8 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     const status = data.content?.status;
                     if (status === "ready") {
                         // The XBlock has been copied and is ready to use.
+                        this.refreshPasteButton(data); // Update our UI
+                        this.clipboardBroadcastChannel.postMessage(data); // And notify any other open tabs
                         return data;
                     } else if (status === "loading") {
                         // The clipboard is being loaded asynchonously.
@@ -316,6 +459,8 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                             $.getJSON(clipboardEndpoint, (pollData) => {
                                 const newStatus = pollData.content?.status;
                                 if (newStatus === "ready") {
+                                    this.refreshPasteButton(data);
+                                    this.clipboardBroadcastChannel.postMessage(pollData);
                                     deferred.resolve(pollData);
                                 } else if (newStatus === "loading") {
                                     setTimeout(checkStatus, 1_000);
@@ -387,20 +532,27 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
         },
 
         onNewXBlock: function(xblockElement, scrollOffset, is_duplicate, data) {
-            var useNewTextEditor = this.$('.xblock-header-primary').attr("use-new-editor-text"),
-                useNewVideoEditor = this.$('.xblock-header-primary').attr("use-new-editor-video"),
-                useNewProblemEditor = this.$('.xblock-header-primary').attr("use-new-editor-problem");
+            var useNewTextEditor = this.$('.xblock-header-primary').attr('use-new-editor-text'),
+                useNewVideoEditor = this.$('.xblock-header-primary').attr('use-new-editor-video'),
+                useVideoGalleryFlow = this.$('.xblock-header-primary').attr("use-video-gallery-flow"),
+                useNewProblemEditor = this.$('.xblock-header-primary').attr('use-new-editor-problem');
 
-            //find the block type in the locator if availible
-            if(data.hasOwnProperty('locator')){
+            // find the block type in the locator if availible
+            if(data.hasOwnProperty('locator')) {
                 var matchBlockTypeFromLocator = /\@(.*?)\+/;
                 var blockType = data.locator.match(matchBlockTypeFromLocator);
             }
-            if((useNewTextEditor === "True" && blockType.includes("html")) ||
-                    (useNewVideoEditor === "True" && blockType.includes("video"))||
-                    (useNewProblemEditor === "True" && blockType.includes("problem"))
+            if((useNewTextEditor === 'True' && blockType.includes('html'))
+                    || (useNewVideoEditor === 'True' && blockType.includes('video'))
+                    || (useNewProblemEditor === 'True' && blockType.includes('problem'))
             ){
-                var destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/' + blockType[1] + '/' + encodeURI(data.locator);
+                var destinationUrl;
+                if (useVideoGalleryFlow === "True" && blockType.includes("video")) {
+                    destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/course-videos/' + encodeURI(data.locator);
+                }
+                else {
+                    destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/' + blockType[1] + '/' + encodeURI(data.locator);
+                }
                 window.location.href = destinationUrl;
                 return;
             }
@@ -464,7 +616,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             return temporaryView.render({
                 success: function() {
                     self.onXBlockRefresh(temporaryView, block_added, is_duplicate);
-                    temporaryView.unbind();  // Remove the temporary view
+                    temporaryView.unbind(); // Remove the temporary view
                 },
                 initRuntimeData: this
             });

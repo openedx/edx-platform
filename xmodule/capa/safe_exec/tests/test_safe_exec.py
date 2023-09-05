@@ -9,14 +9,13 @@ import unittest
 
 import pytest
 import random2 as random
-import six
 from codejail import jail_code
 from codejail.django_integration import ConfigureCodeJailMiddleware
 from codejail.safe_exec import SafeExecException
 from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
 from django.test import override_settings
-from six import text_type, unichr
+from six import unichr
 from six.moves import range
 
 from xmodule.capa.safe_exec import safe_exec, update_hash
@@ -77,7 +76,7 @@ class TestSafeExec(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-
         g = {}
         with pytest.raises(SafeExecException) as cm:
             safe_exec("1/0", g)
-        assert 'ZeroDivisionError' in text_type(cm.value)
+        assert 'ZeroDivisionError' in str(cm.value)
 
 
 class TestSafeOrNot(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -93,8 +92,8 @@ class TestSafeOrNot(unittest.TestCase):  # lint-amnesty, pylint: disable=missing
         g = {}
         with pytest.raises(SafeExecException) as cm:
             safe_exec('import sys; sys.exit(1)', g)
-        assert "SystemExit" not in text_type(cm)
-        assert "Couldn't execute jailed code" in text_type(cm)
+        assert "SystemExit" not in str(cm)
+        assert "Couldn't execute jailed code" in str(cm)
 
     def test_can_do_something_forbidden_if_run_unsafely(self):
         '''
@@ -104,7 +103,7 @@ class TestSafeOrNot(unittest.TestCase):  # lint-amnesty, pylint: disable=missing
         g = {}
         with pytest.raises(SystemExit) as cm:
             safe_exec('import sys; sys.exit(1)', g, unsafely=True)
-        assert "SystemExit" in text_type(cm)
+        assert "SystemExit" in str(cm)
 
 
 class TestLimitConfiguration(unittest.TestCase):
@@ -153,7 +152,7 @@ class TestLimitConfiguration(unittest.TestCase):
             # middleware is automatically initialized because it's an element of
             # `settings.MIDDLEWARE`).
             try:
-                ConfigureCodeJailMiddleware()
+                ConfigureCodeJailMiddleware(get_response=lambda request: None)
             except MiddlewareNotUsed:
                 pass
 
@@ -262,7 +261,7 @@ class TestSafeExecCaching(unittest.TestCase):
         # Check that using non-ASCII unicode does not raise an encoding error.
         # Try several non-ASCII unicode characters.
         for code in [129, 500, 2 ** 8 - 1, 2 ** 16 - 1]:
-            code_with_unichr = six.text_type("# ") + unichr(code)
+            code_with_unichr = str("# ") + unichr(code)
             try:
                 safe_exec(code_with_unichr, {}, cache=DictCache({}))
             except UnicodeEncodeError:

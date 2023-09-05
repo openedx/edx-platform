@@ -4,20 +4,22 @@
 import itertools
 import unittest
 from datetime import datetime, timedelta
+import sys
 from unittest.mock import Mock, patch
 
-import pytest
 import ddt
 from dateutil import parser
 from django.conf import settings
 from django.test import override_settings
 from fs.memoryfs import MemoryFS
 from opaque_keys.edx.keys import CourseKey
+import pytest
 from pytz import utc
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 
 from openedx.core.lib.teams_config import TeamsConfig, DEFAULT_COURSE_RUN_MAX_TEAM_SIZE
 import xmodule.course_block
+from xmodule.course_metadata_utils import DEFAULT_START_DATE
 from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 from xmodule.modulestore.exceptions import InvalidProctoringProvider
@@ -32,10 +34,22 @@ _LAST_WEEK = _TODAY - timedelta(days=7)
 _NEXT_WEEK = _TODAY + timedelta(days=7)
 
 
-class CourseFieldsTestCase(unittest.TestCase):
+@ddt.ddt()
+class CourseFieldsTestCase(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def test_default_start_date(self):
-        assert xmodule.course_block.CourseFields.start.default == datetime(2030, 1, 1, tzinfo=utc)
+        assert xmodule.course_block.CourseFields.start.default == DEFAULT_START_DATE
+
+    @ddt.data(True, False)
+    def test_default_enrollment_start_date(self, should_have_default_enroll_start):
+        features = settings.FEATURES.copy()
+        features['CREATE_COURSE_WITH_DEFAULT_ENROLLMENT_START_DATE'] = should_have_default_enroll_start
+        with override_settings(FEATURES=features):
+            # reimport, so settings override could take effect
+            del sys.modules['xmodule.course_block']
+            import xmodule.course_block  # lint-amnesty, pylint: disable=redefined-outer-name, reimported
+            expected = DEFAULT_START_DATE if should_have_default_enroll_start else None
+            assert xmodule.course_block.CourseFields.enrollment_start.default == expected
 
 
 class DummySystem(ImportSystem):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
@@ -235,36 +249,36 @@ class IsNewCourseTestCase(unittest.TestCase):
             assert d.start_date_is_still_default == s[3]
 
     def test_display_organization(self):
-        descriptor = get_dummy_course(start='2012-12-02T12:00', is_new=True)
-        assert descriptor.location.org != descriptor.display_org_with_default
-        assert descriptor.display_org_with_default == f'{ORG}_display'
+        block = get_dummy_course(start='2012-12-02T12:00', is_new=True)
+        assert block.location.org != block.display_org_with_default
+        assert block.display_org_with_default == f'{ORG}_display'
 
     def test_display_coursenumber(self):
-        descriptor = get_dummy_course(start='2012-12-02T12:00', is_new=True)
-        assert descriptor.location.course != descriptor.display_number_with_default
-        assert descriptor.display_number_with_default == f'{COURSE}_display'
+        block = get_dummy_course(start='2012-12-02T12:00', is_new=True)
+        assert block.location.course != block.display_number_with_default
+        assert block.display_number_with_default == f'{COURSE}_display'
 
     def test_is_newish(self):
-        descriptor = get_dummy_course(start='2012-12-02T12:00', is_new=True)
-        assert descriptor.is_newish is True
+        block = get_dummy_course(start='2012-12-02T12:00', is_new=True)
+        assert block.is_newish is True
 
-        descriptor = get_dummy_course(start='2013-02-02T12:00', is_new=False)
-        assert descriptor.is_newish is False
+        block = get_dummy_course(start='2013-02-02T12:00', is_new=False)
+        assert block.is_newish is False
 
-        descriptor = get_dummy_course(start='2013-02-02T12:00', is_new=True)
-        assert descriptor.is_newish is True
+        block = get_dummy_course(start='2013-02-02T12:00', is_new=True)
+        assert block.is_newish is True
 
-        descriptor = get_dummy_course(start='2013-01-15T12:00')
-        assert descriptor.is_newish is True
+        block = get_dummy_course(start='2013-01-15T12:00')
+        assert block.is_newish is True
 
-        descriptor = get_dummy_course(start='2013-03-01T12:00')
-        assert descriptor.is_newish is True
+        block = get_dummy_course(start='2013-03-01T12:00')
+        assert block.is_newish is True
 
-        descriptor = get_dummy_course(start='2012-10-15T12:00')
-        assert descriptor.is_newish is False
+        block = get_dummy_course(start='2012-10-15T12:00')
+        assert block.is_newish is False
 
-        descriptor = get_dummy_course(start='2012-12-31T12:00')
-        assert descriptor.is_newish is True
+        block = get_dummy_course(start='2012-12-31T12:00')
+        assert block.is_newish is True
 
 
 class DiscussionTopicsTestCase(unittest.TestCase):

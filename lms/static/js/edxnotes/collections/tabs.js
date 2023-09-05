@@ -1,5 +1,7 @@
+// eslint-disable-next-line no-shadow-restricted-names
 (function(define, undefined) {
     'use strict';
+
     define([
         'backbone', 'js/edxnotes/models/tab'
     ], function(Backbone, TabModel) {

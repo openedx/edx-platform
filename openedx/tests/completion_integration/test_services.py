@@ -226,13 +226,13 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
                                  if child.scope_ids.block_type == 'library_content'][0]
 
         ## Ensure the library_content_block is properly set up
-        # This is needed so we can call get_child_descriptors
+        # This is needed so we can call get_child_blocks
         self._bind_course_block(library_content_block)
         # Make sure the runtime knows that the block's children vary per-user:
         assert library_content_block.has_dynamic_children()
         assert len(library_content_block.children) == 3
         # Check how many children each user will see:
-        assert len(library_content_block.get_child_descriptors()) == 1
+        assert len(library_content_block.get_child_blocks()) == 1
 
         # No problems are complete yet
         assert not self.completion_service.vertical_is_complete(lib_vertical)
@@ -246,7 +246,7 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
         # Library content problems aren't complete yet
         assert not self.completion_service.vertical_is_complete(lib_vertical)
 
-        for child in library_content_block.get_child_descriptors():
+        for child in library_content_block.get_child_blocks():
             BlockCompletion.objects.submit_completion(
                 user=self.user,
                 block_key=child.scope_ids.usage_id,

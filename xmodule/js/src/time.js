@@ -1,4 +1,4 @@
-
+// eslint-disable-next-line no-shadow
 function format(time, formatFull) {
     var hours, minutes, seconds;
 
@@ -9,8 +9,8 @@ function format(time, formatFull) {
     seconds = Math.floor(time);
     minutes = Math.floor(seconds / 60);
     hours = Math.floor(minutes / 60);
-    seconds = seconds % 60;
-    minutes = minutes % 60;
+    seconds %= 60;
+    minutes %= 60;
 
     if (formatFull) {
         return '' + _pad(hours) + ':' + _pad(minutes) + ':' + _pad(seconds % 60);
@@ -28,6 +28,7 @@ function formatFull(time) {
 }
 
 function convert(time, oldSpeed, newSpeed) {
+    // eslint-disable-next-line no-mixed-operators
     return (time * oldSpeed / newSpeed).toFixed(3);
 }
 
@@ -39,4 +40,4 @@ function _pad(number) {
     }
 }
 
-export { format, formatFull, convert }
+export {format, formatFull, convert};

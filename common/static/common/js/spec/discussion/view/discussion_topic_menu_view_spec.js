@@ -1,12 +1,14 @@
 /* globals DiscussionTopicMenuView, DiscussionSpecHelper, DiscussionCourseSettings, _ */
 (function() {
     'use strict';
+
     describe('DiscussionTopicMenuView', function() {
         var ExpectedDiscussionId;
         beforeEach(function() {
             this.createTopicView = function(options) {
                 options = _.extend({
                     course_settings: this.course_settings,
+                    // eslint-disable-next-line no-void
                     topicId: void 0
                 }, options);
                 this.view = new DiscussionTopicMenuView(options);

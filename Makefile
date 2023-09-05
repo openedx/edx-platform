@@ -1,6 +1,11 @@
 # Do things in edx-platform
-.PHONY: clean extract_translations help pull pull_translations push_translations requirements shell upgrade
-.PHONY: api-docs docs guides swagger
+.PHONY: base-requirements check-types clean \
+  compile-requirements detect_changed_source_translations dev-requirements \
+  docker_auth docker_build docker_tag_build_push_lms docker_tag_build_push_lms_dev \
+  docker_tag_build_push_cms docker_tag_build_push_cms_dev docs extract_translations \
+  guides help lint-imports local-requirements migrate migrate-lms migrate-cms \
+  pre-requirements pull pull_translations push_translations requirements shell swagger \
+  technical-docs test-requirements ubuntu-requirements upgrade-package upgrade
 
 # Careful with mktemp syntax: it has to work on Mac and Ubuntu, which have differences.
 PRIVATE_FILES := $(shell mktemp -u /tmp/private_files.XXXXXX)
@@ -19,24 +24,17 @@ clean: ## archive and delete most git-ignored files
 	tar xf $(PRIVATE_FILES)
 	rm $(PRIVATE_FILES)
 
-SWAGGER = docs/swagger.yaml
+SWAGGER = docs/lms-openapi.yaml
 
-docs: api-docs guides technical-docs ## build all the developer documentation for this repository
+docs: guides technical-docs ## build all the developer documentation for this repository
 
 swagger: ## generate the swagger.yaml file
 	DJANGO_SETTINGS_MODULE=docs.docs_settings python manage.py lms generate_swagger --generator-class=edx_api_doc_tools.ApiSchemaGenerator -o $(SWAGGER)
 
-api-docs-sphinx: swagger	## generate the sphinx source files for api-docs
-	rm -f docs/api/gen/*
-	python docs/sw2sphinxopenapi.py $(SWAGGER) docs/api/gen
-
-api-docs: api-docs-sphinx	## build the REST api docs
-	cd docs/api; make html
-
 technical-docs:  ## build the technical docs
 	$(MAKE) -C docs/technical html
 
-guides:	## build the developer guide docs
+guides:	swagger ## build the developer guide docs
 	cd docs/guides; make clean html
 
 extract_translations: ## extract localizable strings from sources
@@ -97,12 +95,13 @@ shell: ## launch a bash shell in a Docker container with all edx-platform depend
 # Order is very important in this list: files must appear after everything they include!
 REQ_FILES = \
 	requirements/edx/coverage \
-	requirements/edx/doc \
 	requirements/edx/paver \
 	requirements/edx-sandbox/py38 \
 	requirements/edx/base \
+	requirements/edx/doc \
 	requirements/edx/testing \
 	requirements/edx/development \
+	requirements/edx/assets \
 	scripts/xblock/requirements
 
 define COMMON_CONSTRAINTS_TEMP_COMMENT
@@ -113,13 +112,15 @@ COMMON_CONSTRAINTS_TXT=requirements/common_constraints.txt
 .PHONY: $(COMMON_CONSTRAINTS_TXT)
 $(COMMON_CONSTRAINTS_TXT):
 	wget -O "$(@)" https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt || touch "$(@)"
-	echo "$(COMMON_CONSTRAINTS_TEMP_COMMENT)" | cat - $(@) > temp && mv temp $(@)
+	printf "$(COMMON_CONSTRAINTS_TEMP_COMMENT)" | cat - $(@) > temp && mv temp $(@)
 
 compile-requirements: export CUSTOM_COMPILE_COMMAND=make upgrade
 compile-requirements: pre-requirements $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements to *.txt
 	@# Bootstrapping: Rebuild pip and pip-tools first, and then install them
 	@# so that if there are any failures we'll know now, rather than the next
 	@# time someone tries to use the outputs.
+	sed '/^django-simple-history==/d' requirements/common_constraints.txt > requirements/common_constraints.tmp
+	mv requirements/common_constraints.tmp requirements/common_constraints.txt
 	pip-compile -v --allow-unsafe ${COMPILE_OPTS} -o requirements/pip.txt requirements/pip.in
 	pip install -r requirements/pip.txt
 
@@ -138,36 +139,46 @@ compile-requirements: pre-requirements $(COMMON_CONSTRAINTS_TXT) ## Re-compile *
 upgrade:  ## update the pip requirements files to use the latest releases satisfying our constraints
 	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade"
 
+upgrade-package: ## update just one package to the latest usable release
+	@test -n "$(package)" || { echo "\nUsage: make upgrade_package package=...\n"; exit 1; }
+	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade-package $(package)"
+
 check-types: ## run static type-checking tests
 	mypy
 
-docker_build:
+docker_auth:
+	echo "$$DOCKERHUB_PASSWORD" | docker login -u "$$DOCKERHUB_USERNAME" --password-stdin
+
+docker_build: docker_auth
 	DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development -t openedx/lms-dev
 	DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target production -t openedx/lms
 	DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=cms --build-arg SERVICE_PORT=8010 --target development -t openedx/cms-dev
 	DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=cms --build-arg SERVICE_PORT=8010 --target production -t openedx/cms
 
-docker_tag: docker_build
-	docker tag openedx/lms     openedx/lms:${GITHUB_SHA}
-	docker tag openedx/lms-dev openedx/lms-dev:${GITHUB_SHA}
-	docker tag openedx/cms     openedx/cms:${GITHUB_SHA}
-	docker tag openedx/cms-dev openedx/cms-dev:${GITHUB_SHA}
+docker_tag_build_push_lms: docker_auth
+	docker buildx build -t openedx/lms:latest -t openedx/lms:${GITHUB_SHA} --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target production --push .
 
-docker_auth:
-	echo "$$DOCKERHUB_PASSWORD" | docker login -u "$$DOCKERHUB_USERNAME" --password-stdin
+docker_tag_build_push_lms_dev: docker_auth
+	docker buildx build -t openedx/lms-dev:latest -t openedx/lms-dev:${GITHUB_SHA} --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
 
-docker_push: docker_tag docker_auth ## push to docker hub
-	docker push "openedx/lms:latest"
-	docker push "openedx/lms:${GITHUB_SHA}"
-	docker push "openedx/lms-dev:latest"
-	docker push "openedx/lms-dev:${GITHUB_SHA}"
-	docker push "openedx/cms:latest"
-	docker push "openedx/cms:${GITHUB_SHA}"
-	docker push "openedx/cms-dev:latest"
-	docker push "openedx/cms-dev:${GITHUB_SHA}"
+docker_tag_build_push_cms: docker_auth
+	docker buildx build -t openedx/cms:latest -t openedx/cms:${GITHUB_SHA} --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=cms --build-arg SERVICE_PORT=8010 --target production --push .
+
+docker_tag_build_push_cms_dev: docker_auth
+	docker buildx build -t openedx/cms-dev:latest -t openedx/cms-dev:${GITHUB_SHA} --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=cms --build-arg SERVICE_PORT=8010 --target development --push .
 
 lint-imports:
 	lint-imports
+
+migrate-lms:
+	python manage.py lms showmigrations --database default --traceback --pythonpath=.
+	python manage.py lms migrate --database default --traceback --pythonpath=.
+
+migrate-cms:
+	python manage.py cms showmigrations --database default --traceback --pythonpath=.
+	python manage.py cms migrate --database default --noinput --traceback --pythonpath=.
+
+migrate: migrate-lms migrate-cms
 
 # WARNING (EXPERIMENTAL):
 # This installs the Ubuntu requirements necessary to make `pip install` and some other basic

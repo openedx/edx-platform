@@ -16,6 +16,7 @@ import ddt
 from ccx_keys.locator import CCXBlockUsageLocator
 from django.core.cache import InvalidCacheBackendError, caches
 from opaque_keys.edx.locator import BlockUsageLocator, CourseKey, CourseLocator, LocalId
+from testfixtures import LogCapture
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
 
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin
@@ -34,6 +35,7 @@ from xmodule.modulestore.exceptions import (
 )
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.split_mongo import BlockKey
+from xmodule.modulestore.split_mongo.mongo_connection import CourseStructureCache
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
@@ -514,7 +516,7 @@ class SplitModuleTest(unittest.TestCase):
 
     def findByIdInResult(self, collection, _id):  # pylint: disable=invalid-name
         """
-        Result is a collection of descriptors. Find the one whose block id
+        Result is a collection of blocks. Find the one whose block id
         matches the _id.
         """
         for element in collection:
@@ -576,7 +578,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         assert course.display_name == 'The Ancient Greek Hero', 'wrong display name'
         assert course.advertised_start == 'Fall 2013', 'advertised_start'
         assert len(course.children) == 4, 'children'
-        # check dates and graders--forces loading of descriptor
+        # check dates and graders--forces loading of block
         assert course.edited_by == TEST_ASSISTANT_USER_ID
         self.assertDictEqual(course.grade_cutoffs, {"Pass": 0.45})
 
@@ -662,7 +664,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         assert course.advertised_start is None
         assert len(course.children) == 0
         assert course.definition_locator.definition_id != head_course.definition_locator.definition_id
-        # check dates and graders--forces loading of descriptor
+        # check dates and graders--forces loading of block
         assert course.edited_by == TEST_ASSISTANT_USER_ID
         self.assertDictEqual(course.grade_cutoffs, {"Pass": 0.55})
 
@@ -676,7 +678,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         assert course.display_name == 'The Ancient Greek Hero'
         assert course.advertised_start == 'Fall 2013'
         assert len(course.children) == 4
-        # check dates and graders--forces loading of descriptor
+        # check dates and graders--forces loading of block
         assert course.edited_by == TEST_ASSISTANT_USER_ID
         self.assertDictEqual(course.grade_cutoffs, {"Pass": 0.45})
 
@@ -840,6 +842,43 @@ class TestCourseStructureCache(CacheIsolationMixin, SplitModuleTest):
         # now make sure that you get the same structure
         assert cached_structure == not_cached_structure
 
+    @patch('django.core.cache.cache.set')
+    @patch('xmodule.modulestore.split_mongo.mongo_connection.get_cache')
+    def test_course_structure_cache_with_data_chunk_greater_than_one_mb(self, mock_get_cache, mock_set_cache):
+        enabled_cache = caches['default']
+        mock_get_cache.return_value = enabled_cache
+        mock_set_cache.side_effect = Exception
+
+        course_cache = CourseStructureCache()
+
+        size = 300000000
+        # this data_chunk will be compressed before being cached
+        data_chunk = b'\x00' * size
+
+        logger_name = 'xmodule.modulestore.split_mongo.mongo_connection'
+        expected_message = 'Data caching (course structure) failed on chunk size: 1.25 MB'
+        with LogCapture(logger_name) as capture:
+            course_cache.set('my_data_chunk', data_chunk)
+
+        self.assertEqual(capture.records[0].name, logger_name)
+        self.assertEqual(capture.records[0].msg, expected_message)
+        self.assertEqual(capture.records[0].levelname, 'INFO')
+
+    @patch('xmodule.modulestore.split_mongo.mongo_connection.get_cache')
+    def test_course_structure_cache_with_data_chunk_lesser_than_one_mb(self, mock_get_cache):
+        enabled_cache = caches['default']
+        mock_get_cache.return_value = enabled_cache
+        course_cache = CourseStructureCache()
+        size = 30000
+        data_chunk = b'\x00' * size
+
+        logger_name = 'xmodule.modulestore.split_mongo.mongo_connection'
+        with LogCapture(logger_name) as capture:
+            course_cache.set('my_data_chunk', data_chunk)
+
+        # data chunk was less than 1MB so no logs were added.
+        self.assertEqual(len(capture.records), 0)
+
     def _get_structure(self, course):
         """
         Helper function to get a structure from a course.
@@ -928,7 +967,7 @@ class SplitModuleItemTests(SplitModuleTest):
             assert block.display_name == 'The Ancient Greek Hero'
             assert block.advertised_start == 'Fall 2013'
             assert len(block.children) == 4
-            # check dates and graders--forces loading of descriptor
+            # check dates and graders--forces loading of block
             assert block.edited_by == TEST_ASSISTANT_USER_ID
             self.assertDictEqual(
                 block.grade_cutoffs, {"Pass": 0.45},
@@ -1061,7 +1100,7 @@ class SplitModuleItemTests(SplitModuleTest):
 
     def test_get_children(self):
         """
-        Test the existing get_children method on xdescriptors
+        Test the existing get_children method on xblocks
         """
         locator = BlockUsageLocator(
             CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT), 'course', 'head12345'
@@ -1080,7 +1119,7 @@ class SplitModuleItemTests(SplitModuleTest):
 
 def version_agnostic(children):
     """
-    children: list of descriptors
+    children: list of blocks
     Returns the `children` list with each member version-agnostic
     """
     return [child.version_agnostic() for child in children]

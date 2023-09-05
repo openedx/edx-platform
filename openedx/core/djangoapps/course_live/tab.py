@@ -1,20 +1,40 @@
 """
 Configurations to render Course Live Tab
 """
+from django.contrib.auth.base_user import AbstractBaseUser
 from django.utils.translation import gettext_lazy
 from lti_consumer.models import LtiConfiguration
+from opaque_keys.edx.keys import CourseKey
 
-
-from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
-from xmodule.course_block import CourseBlock
-from xmodule.tabs import TabFragmentViewMixin
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
 from lms.djangoapps.courseware.tabs import EnrolledTab
 from openedx.core.djangoapps.course_live.config.waffle import ENABLE_COURSE_LIVE
 from openedx.core.djangoapps.course_live.models import CourseLiveConfiguration
-from openedx.core.djangoapps.course_live.providers import ProviderManager, HasGlobalCredentials
+from openedx.core.djangoapps.course_live.providers import HasGlobalCredentials, ProviderManager
 from openedx.core.lib.cache_utils import request_cached
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from openedx.features.lti_course_tab.tab import LtiCourseLaunchMixin
+from xmodule.course_block import CourseBlock
+from xmodule.tabs import TabFragmentViewMixin
+
+
+@request_cached()
+def provider_is_zoom(course_key: CourseKey) -> bool:
+    """
+    Check if the provider exists and is Zoom.
+    """
+    course_live_configurations = CourseLiveConfiguration.get(course_key)
+
+    if not course_live_configurations:
+        return False
+    return course_live_configurations.provider_type == "zoom"
+
+
+def user_is_staff_or_instructor(user: AbstractBaseUser, course: CourseBlock) -> bool:
+    """
+    Check if the user is a staff or instructor for the course.
+    """
+    return CourseStaffRole(course.id).has_user(user) or CourseInstructorRole(course.id).has_user(user)
 
 
 class CourseLiveTab(LtiCourseLaunchMixin, TabFragmentViewMixin, EnrolledTab):
@@ -74,14 +94,15 @@ class CourseLiveTab(LtiCourseLaunchMixin, TabFragmentViewMixin, EnrolledTab):
 
     def _get_pii_lti_parameters(self, course, request):
         pii_config = super()._get_pii_lti_parameters(course, request)
-        provider_type = ''
-
-        course_live_configurations = CourseLiveConfiguration.get(course.id)
-        if course_live_configurations:
-            provider_type = course_live_configurations.provider_type
-
-        if provider_type == 'zoom' and (CourseStaffRole(course.id).has_user(request.user) or
-                                        CourseInstructorRole(course.id).has_user(request.user)):
+        if provider_is_zoom(course.id) and user_is_staff_or_instructor(request.user, course):
             pii_config['person_contact_email_primary'] = request.user.email
-
         return pii_config
+
+    def _get_lti_roles(self, user: AbstractBaseUser, course_key: CourseKey) -> str:
+        """
+        Get LTI roles for the user and course.
+        If the user is a global staff member, return the student role.
+        """
+        if provider_is_zoom(course_key) and GlobalStaff().has_user(user):
+            return self.ROLE_MAP.get('student')
+        return super()._get_lti_roles(user, course_key)

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-shadow-restricted-names
 (function(define, undefined) {
     'use strict';
 
@@ -30,4 +31,3 @@
         };
     });
 }).call(this, define || RequireJS.define);
-

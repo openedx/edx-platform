@@ -110,11 +110,18 @@ def get_discussable_units(course, enable_graded_units, discussable_units=None):
                 for unit in get_units(subsection):
                     idx += 1
                     if not is_discussable_unit(unit, store, enable_graded_units, subsection):
-                        unit.discussion_enabled = False
-                        store.update_item(unit, unit.published_by, emit_signals=False)
+                        if unit.discussion_enabled:
+                            log.info(f"Unit {unit.location} of course {course.id} has discussion enabled "
+                                     f"but is not discussable")
                         continue
-                    if discussable_units and (str(unit.location) not in discussable_units):
+                    # check if discussable_units is type of list and discussable_units is empty
+                    # it means if discussable_units is empty then we should not create any topic
+                    if isinstance(discussable_units, list) and not discussable_units:
                         continue
+
+                    if isinstance(discussable_units, list) and (str(unit.location) not in discussable_units):
+                        continue
+
                     yield DiscussionTopicContext(
                         usage_key=unit.location,
                         title=unit.display_name,
@@ -191,6 +198,7 @@ def update_unit_discussion_state_from_discussion_blocks(course_key: CourseKey, u
     course = store.get_course(course_key)
     provider = course.discussions_settings.get('provider', None)
     # Only migrate to the new discussion provider if the current provider is the legacy provider.
+    log.info(f"Current provider for {course_key} is {provider}")
     if provider is not None and provider != Provider.LEGACY and not force:
         return
 

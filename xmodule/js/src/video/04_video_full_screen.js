@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define('video/04_video_full_screen.js', ['edx-ui-toolkit/js/utils/html-utils'], function(HtmlUtils) {
         var template = [
             '<button class="control add-fullscreen" aria-disabled="false" title="',
@@ -161,6 +162,20 @@
             return this.videoFullScreen.height;
         }
 
+        function notifyParent(fullscreenOpen) {
+            if (window !== window.parent) {
+                // This is used by the Learning MFE to know about changing fullscreen mode.
+                // The MFE is then able to respond appropriately and scroll window to the previous position.
+                window.parent.postMessage({
+                    type: 'plugin.videoFullScreen',
+                    payload: {
+                        open: fullscreenOpen
+                    }
+                }, document.referrer
+                );
+            }
+        }
+
         /**
      * Event handler to toggle fullscreen mode.
      * @param {jquery Event} event
@@ -178,6 +193,7 @@
                 return;
             }
 
+            // eslint-disable-next-line no-multi-assign
             this.videoFullScreen.fullScreenState = this.isFullScreen = false;
             fullScreenClassNameEl.removeClass('video-fullscreen');
             $(window).scrollTop(this.scrollPos);
@@ -192,6 +208,8 @@
                 this.resizer.delta.reset().setMode('width');
             }
             this.el.trigger('fullscreen', [this.isFullScreen]);
+
+            this.videoFullScreen.notifyParent(false);
         }
 
         function handleEnter() {
@@ -202,6 +220,9 @@
                 return;
             }
 
+            this.videoFullScreen.notifyParent(true);
+
+            // eslint-disable-next-line no-multi-assign
             this.videoFullScreen.fullScreenState = this.isFullScreen = true;
             fullScreenClassNameEl.addClass('video-fullscreen');
             this.videoFullScreen.fullScreenEl
@@ -267,7 +288,8 @@
                 handleFullscreenChange: handleFullscreenChange,
                 toggle: toggle,
                 toggleHandler: toggleHandler,
-                updateControlsHeight: updateControlsHeight
+                updateControlsHeight: updateControlsHeight,
+                notifyParent: notifyParent
             };
 
             state.bindTo(methodsDict, state.videoFullScreen, state);

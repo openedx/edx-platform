@@ -2,8 +2,7 @@
 <%
   import hashlib
   from openedx.core.djangolib.js_utils import js_escaped_string
-  from six import text_type
-  hlskey = hashlib.md5(text_type(module.location).encode('utf-8')).hexdigest()
+  hlskey = hashlib.md5(str(module.location).encode('utf-8')).hexdigest()
 %>
 
   <section id="hls-modal-${hlskey}" class="upload-modal modal" style="overflow:scroll; background:#ddd; padding: 10px 0;box-shadow: 0 0 5px 0 #555;" >

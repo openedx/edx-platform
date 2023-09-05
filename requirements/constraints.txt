@@ -16,32 +16,29 @@
 # the next major release, ensure the installed version is within boundaries.
 celery>=5.2.2,<6.0.0
 
+
 # required for celery>=5.2.0;<5.3.0
 click>=8.0,<9.0
 
-# django-storages version 1.9 drops support for boto storage backend.
-django-storages<1.9
+# django-storages version 1.11.1 is major version upgrade.
+django-storages==1.11.1
+
 
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.61.14
+edx-enterprise==4.1.6
 
-# oauthlib>3.0.1 causes test failures ( also remove the django-oauth-toolkit constraint when this is fixed )
-oauthlib==3.0.1
+# 1. django-oauth-toolkit version >=2.0.0 has breaking changes. More details
+#    mentioned on this issue https://github.com/openedx/edx-platform/issues/32884
+# 2. Versions from 1.5.0 to 2.0.0 have some migrations related changes.
+#    so we're upgrading minor versions one by one.
+django-oauth-toolkit==1.4.1
 
-# django-auth-toolkit==1.3.3 requires oauthlib>=3.1.0 which is pinned because of test failures
-django-oauth-toolkit<=1.3.2
-
-# Will be updated once we update python-dateutil package
-matplotlib<3.4.0
 
 # constrained in opaque_keys. migration guide here: https://pymongo.readthedocs.io/en/4.0/migrate-to-pymongo4.html
 # Major upgrade will be done in separate ticket.
 pymongo<4.0.0
-
-# python3-saml==1.10.0 version started breaking a11y tests
-python3-saml<1.10.0
 
 # greater version has breaking changes and requires some migration steps.
 django-webpack-loader==0.7.0
@@ -95,3 +92,44 @@ django-ipware==4.0.2
 # Pinning this version for now so this could be fixed in a separate PR later on
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/32093
 pytz<2023
+
+# urllib3>=2.0.0 conflicts with elastic search && snowflake-connector-python packages
+# which require urllib3<2 for now.
+# Issue for unpinning: https://github.com/openedx/edx-platform/issues/32222
+urllib3<2.0.0
+
+# Sphinx==5.3.0 requires docutils<0.20
+# Issue to unpin Sphinx to resolve this constraint: https://github.com/openedx/edx-lint/issues/338
+docutils<0.20
+
+# greater version has dropped few dependencies. Fix this in other ticket.
+drf-yasg<1.21.6
+
+# Adding pin to avoid any major upgrade
+djangorestframework<3.15.0
+
+# tests failing with greater version. Fix this in separate ticket.
+pillow<10.0.0
+
+# The version of django-stubs we can use depends on which Django release we're using
+# 1.16.0 works with Django 3.2 through 4.1
+django-stubs==1.16.0
+djangorestframework-stubs==3.14.0  # Pinned to match django-stubs. Remove this when we can remove the above pin.
+
+# Our legacy Sass code is incompatible with anything except this ancient libsass version.
+# Here is a ticket to upgrade, but it's of debatable importance given that we are rapidly moving
+# away from legacy LMS/CMS frontends:
+# https://github.com/openedx/edx-platform/issues/31616
+libsass==0.10.0
+
+# incremental upgrade
+django-simple-history==3.3.0
+
+# greater version breaking upgrade builds
+click==8.1.6
+
+# plz upgrade this in separate ticket
+redis==4.6.0
+
+# holding off ora date config feature
+ora2==5.2.4

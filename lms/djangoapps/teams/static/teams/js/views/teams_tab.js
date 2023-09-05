@@ -68,6 +68,7 @@
                 // to use regular expressions within Backbone
                 // routes, allowing us to capture which tab
                 // name is being routed to.
+                // eslint-disable-next-line no-multi-assign
                 router = this.router = new Backbone.Router();
                 _.each([
                     [':default', _.bind(this.routeNotFound, this)],
@@ -81,10 +82,14 @@
                     ['topics/:topic_id/search(/)', _.bind(this.searchTeams, this)],
                     ['topics/:topic_id/create-team(/)', _.bind(this.newTeam, this)],
                     ['teams/:topic_id/:team_id(/)', _.bind(this.browseTeam, this)],
+                    // eslint-disable-next-line prefer-regex-literals
                     [new RegExp('^(browse)/?$'), _.bind(this.goToTab, this)],
+                    // eslint-disable-next-line prefer-regex-literals
                     [new RegExp('^(my-teams)/?$'), _.bind(this.goToTab, this)],
+                    // eslint-disable-next-line prefer-regex-literals
                     [new RegExp('^(manage)/?$'), _.bind(this.goToTab, this)]
                 ], function(route) {
+                    // eslint-disable-next-line prefer-spread
                     router.route.apply(router, route);
                 });
 
@@ -95,6 +100,7 @@
                             _.bind(this.editTeamMembers, this)
                         ]
                     ], function(route) {
+                        // eslint-disable-next-line prefer-spread
                         router.route.apply(router, route);
                     });
                 }
@@ -162,6 +168,7 @@
                     });
                 }
 
+                // eslint-disable-next-line no-multi-assign
                 this.mainView = this.tabbedView = this.createViewWithHeader({
                     title: gettext('Teams'),
                     description: this.getTeamsTabViewDescription(),
@@ -200,8 +207,8 @@
                     ));
                 } else if (xhr.status === 500) {
                     TeamUtils.showMessage(gettext(
-                        'Your request could not be completed due to a server problem. Reload the page' +
-                            ' and try again. If the issue persists, click the Help tab to report the problem.'
+                        'Your request could not be completed due to a server problem. Reload the page'
+                            + ' and try again. If the issue persists, click the Help tab to report the problem.'
                     ));
                 }
             },
@@ -218,6 +225,7 @@
             browseTopic: function(topicID) {
                 var self = this;
                 this.getTeamsView(topicID).done(function(teamsView) {
+                    // eslint-disable-next-line no-multi-assign
                     self.teamsView = self.mainView = teamsView;
                     self.render();
                     TeamAnalytics.emitPageViewed('single-topic', topicID, null);
@@ -257,8 +265,8 @@
                         topic: topic,
                         title: gettext('Create a New Team'),
                         description: gettext(
-                            'Create a new team if you can\'t find an existing team to join, ' +
-                                'or if you would like to learn with friends you know.'
+                            'Create a new team if you can\'t find an existing team to join, '
+                                + 'or if you would like to learn with friends you know.'
                         ),
                         breadcrumbs: view.createBreadcrumbs(topic),
                         mainView: new TeamEditView({
@@ -294,8 +302,8 @@
                     editViewWithHeader = self.createViewWithHeader({
                         title: gettext('Edit Team'),
                         description: gettext(
-                            'If you make significant changes, ' +
-                                'make sure you notify members of the team before making these changes.'
+                            'If you make significant changes, '
+                                + 'make sure you notify members of the team before making these changes.'
                         ),
                         breadcrumbs: self.createBreadcrumbs(topic, team),
                         mainView: view,
@@ -326,8 +334,8 @@
                         breadcrumbs: self.createBreadcrumbs(topic, team),
                         title: gettext('Membership'),
                         description: gettext(
-                            'You can remove members from this team, ' +
-                                'especially if they have not participated in the team\'s activity.'
+                            'You can remove members from this team, '
+                                + 'especially if they have not participated in the team\'s activity.'
                         ),
                         topic: topic,
                         team: team
@@ -394,8 +402,8 @@
                         collection: collection,
                         showSortControls: options.showSortControls
                     }),
-                    searchFieldView = this.shouldShowSearch(topic) ?
-                        new SearchFieldView({
+                    searchFieldView = this.shouldShowSearch(topic)
+                        ? new SearchFieldView({
                             type: 'teams',
                             label: gettext('Search teams'),
                             collection: collection
@@ -498,7 +506,6 @@
                 return this.context.userInfo.privileged || this.context.userInfo.staff;
             },
 
-
             /**
                  * Returns whether the "Manage" tab should be shown to the user.
                  */
@@ -528,15 +535,15 @@
             getTeamsTabViewDescription: function() {
                 if (this.context.hasOpenTopic) {
                     return gettext(
-                        'See all teams you belong to and all public ' +
-                            'teams in your course, organized by topic. ' +
-                            'Join an open public team to collaborate with other learners ' +
-                            'who are interested in the same topic as you are.'
+                        'See all teams you belong to and all public '
+                            + 'teams in your course, organized by topic. '
+                            + 'Join an open public team to collaborate with other learners '
+                            + 'who are interested in the same topic as you are.'
                     );
                 } else if (this.context.hasPublicManagedTopic) {
                     return gettext(
-                        'See all teams you belong to and all public ' +
-                            'teams in your course, organized by topic.'
+                        'See all teams you belong to and all public '
+                            + 'teams in your course, organized by topic.'
                     );
                 } else {
                     return gettext('See all teams you belong to.');
@@ -720,8 +727,8 @@
             readOnlyDiscussion: function(team) {
                 var userInfo = this.context.userInfo;
                 return !(
-                    userInfo.privileged ||
-                        _.any(team.attributes.membership, function(membership) {
+                    userInfo.privileged
+                        || _.any(team.attributes.membership, function(membership) {
                             return membership.user.username === userInfo.username;
                         })
                 );

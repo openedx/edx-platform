@@ -139,6 +139,7 @@ def get_test_system(
     user_service = StubUserService(
         user=user,
         anonymous_user_id='student',
+        deprecated_anonymous_user_id='student',
         user_is_staff=user_is_staff,
         user_role='student',
         request_country_code=user_location,
@@ -160,14 +161,6 @@ def get_test_system(
     services = {
         'user': user_service,
         'mako': mako_service,
-        'xqueue': XQueueService(
-            url='http://xqueue.url',
-            django_auth={},
-            basic_auth=[],
-            default_queuename='testqueue',
-            waittime=10,
-            construct_callback=Mock(name='get_test_system.xqueue.construct_callback', side_effect="/"),
-        ),
         'replace_urls': replace_url_service,
         'cache': CacheService(DoNothingCache()),
         'field-data': DictFieldData({}),
@@ -191,7 +184,7 @@ def prepare_block_runtime(
     add_get_block=False,
 ):
     """
-    Sets properties in the runtime of the specified descriptor that is
+    Sets properties in the runtime of the specified block that is
     required for tests.
     """
 
@@ -202,6 +195,7 @@ def prepare_block_runtime(
     user_service = StubUserService(
         user=user,
         anonymous_user_id='student',
+        deprecated_anonymous_user_id='student',
         user_is_staff=user_is_staff,
         user_role='student',
         request_country_code=user_location,
@@ -222,14 +216,6 @@ def prepare_block_runtime(
     services = {
         'user': user_service,
         'mako': mako_service,
-        'xqueue': XQueueService(
-            url='http://xqueue.url',
-            django_auth={},
-            basic_auth=[],
-            default_queuename='testqueue',
-            waittime=10,
-            construct_callback=Mock(name='get_test_system.xqueue.construct_callback', side_effect="/"),
-        ),
         'replace_urls': replace_url_service,
         'cache': CacheService(DoNothingCache()),
         'field-data': DictFieldData({}),

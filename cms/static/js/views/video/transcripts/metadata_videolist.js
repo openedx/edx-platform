@@ -6,6 +6,7 @@ define(
     ],
     function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
         'use strict';
+
         var VideoList = AbstractEditor.extend({
         // Time that we wait since the last time user typed.
             inputDelay: 300,
@@ -152,7 +153,6 @@ define(
                 });
             },
 
-
             /**
          * Returns the placeholders for the values currently displayed in the
          * editor/view.
@@ -223,8 +223,10 @@ define(
                 }
 
                 if (this.$extraVideosBar.hasClass('is-visible')) {
+                    // eslint-disable-next-line prefer-spread
                     this.closeExtraVideosBar.apply(this, arguments);
                 } else {
+                    // eslint-disable-next-line prefer-spread
                     this.openExtraVideosBar.apply(this, arguments);
                 }
             },

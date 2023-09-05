@@ -16,10 +16,10 @@ isort:skip_file
 
 from lxml.etree import XMLParser as _XMLParser
 from lxml.etree import *  # lint-amnesty, pylint: disable=redefined-builtin
-from lxml.etree import _Element, _ElementTree
-
-# This should be imported after lxml.etree so that it overrides the following attributes.
-from defusedxml.lxml import XML, fromstring, parse
+# These private elements are used in some libraries to also defuse xml exploits for their own purposes.
+# We need to re-expose them so that the libraries still work.
+from lxml.etree import _Comment, _Element, _ElementTree, _Entity, _ProcessingInstruction
+from .xmlparser import XML, fromstring, parse
 
 
 class XMLParser(_XMLParser):  # pylint: disable=function-redefined

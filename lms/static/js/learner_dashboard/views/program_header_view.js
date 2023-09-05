@@ -12,6 +12,7 @@ class ProgramHeaderView extends Backbone.View {
         const defaults = {
             el: '.js-program-header',
         };
+        // eslint-disable-next-line prefer-object-spread
         super(Object.assign({}, defaults, options));
     }
 
@@ -27,6 +28,7 @@ class ProgramHeaderView extends Backbone.View {
     }
 
     getLogo() {
+        // eslint-disable-next-line prefer-destructuring
         const type = this.model.get('programData').type;
         let logo = false;
 
@@ -40,10 +42,22 @@ class ProgramHeaderView extends Backbone.View {
         return logo;
     }
 
+    getIsSubscribed() {
+        const isSubscriptionEligible = this.model.get('isSubscriptionEligible');
+        const subscriptionData = this.model.get('subscriptionData')?.[0];
+
+        return (
+            isSubscriptionEligible &&
+            subscriptionData?.subscription_state === 'active'
+        );
+    }
+
     render() {
+        // eslint-disable-next-line no-undef
         const data = $.extend(this.model.toJSON(), {
             breakpoints: this.breakpoints,
             logo: this.getLogo(),
+            isSubscribed: this.getIsSubscribed(),
         });
 
         if (this.model.get('programData')) {

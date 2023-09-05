@@ -26,6 +26,7 @@ const BLOCK_TYPE_NAME = {
 };
 
 const BlockType = PropTypes.shape({
+    // eslint-disable-next-line react/forbid-prop-types
     children: PropTypes.array,
     display_name: PropTypes.string.isRequired,
     id: PropTypes.string.isRequired,
@@ -33,7 +34,10 @@ const BlockType = PropTypes.shape({
     type: PropTypes.string.isRequired,
 });
 
-export const BlockList = ({ blocks, selectedBlock, onSelectBlock, onChangeRoot }) => (
+// eslint-disable-next-line react/function-component-definition
+export const BlockList = ({
+    blocks, selectedBlock, onSelectBlock, onChangeRoot,
+}) => (
     <ul className="block-list">
         {blocks.map(block => (
             <li
@@ -45,12 +49,13 @@ export const BlockList = ({ blocks, selectedBlock, onSelectBlock, onChangeRoot }
                     onClick={() => onSelectBlock(block.id)}
                     label={block.display_name}
                 />
-                {block.children &&
-        <Button
-            onClick={() => onChangeRoot(block.id)}
-            label={RightIcon}
-        />
-                }
+                {block.children
+        && (
+            <Button
+                onClick={() => onChangeRoot(block.id)}
+                label={RightIcon}
+            />
+        )}
             </li>
         ))}
     </ul>
@@ -68,38 +73,40 @@ BlockList.defaultProps = {
     selectedBlock: null,
 };
 
-
-export const BlockBrowser = ({ blocks, selectedBlock, onSelectBlock, onChangeRoot, className }) =>
-    !!blocks && (
-        <div className={classNames('block-browser', className)}>
-            <div className="header">
-                <Button
-                    disabled={!blocks.parent}
-                    onClick={() => blocks.parent && onChangeRoot(blocks.parent)}
-                    label={UpIcon}
-                />
-                <span className="title">
-                    {gettext('Browsing')} {gettext(BLOCK_TYPE_NAME[blocks.type])} &quot;
-                    <a
-                        href="#_"
-                        onClick={(event) => {
-                            event.preventDefault();
-                            onSelectBlock(blocks.id);
-                        }}
-                        title={`${gettext('Select')} ${gettext(BLOCK_TYPE_NAME[blocks.type])}`}
-                    >
-                        {blocks.display_name}
-                    </a>&quot;:
-                </span>
-            </div>
-            <BlockList
-                blocks={blocks.children}
-                selectedBlock={selectedBlock}
-                onSelectBlock={onSelectBlock}
-                onChangeRoot={onChangeRoot}
+// eslint-disable-next-line react/function-component-definition
+export const BlockBrowser = ({
+    // eslint-disable-next-line react/prop-types
+    blocks, selectedBlock, onSelectBlock, onChangeRoot, className,
+}) => !!blocks && (
+    <div className={classNames('block-browser', className)}>
+        <div className="header">
+            <Button
+                disabled={!blocks.parent}
+                onClick={() => blocks.parent && onChangeRoot(blocks.parent)}
+                label={UpIcon}
             />
+            <span className="title">
+                {gettext('Browsing')} {gettext(BLOCK_TYPE_NAME[blocks.type])} &quot;
+                <a
+                    href="#_"
+                    onClick={(event) => {
+                        event.preventDefault();
+                        onSelectBlock(blocks.id);
+                    }}
+                    title={`${gettext('Select')} ${gettext(BLOCK_TYPE_NAME[blocks.type])}`}
+                >
+                    {blocks.display_name}
+                </a>&quot;:
+            </span>
         </div>
-    );
+        <BlockList
+            blocks={blocks.children}
+            selectedBlock={selectedBlock}
+            onSelectBlock={onSelectBlock}
+            onChangeRoot={onChangeRoot}
+        />
+    </div>
+);
 
 BlockBrowser.propTypes = {
     blocks: BlockType,

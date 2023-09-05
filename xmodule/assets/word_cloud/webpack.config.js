@@ -2,6 +2,7 @@
 
 'use strict';
 
+// eslint-disable-next-line no-var, import/no-extraneous-dependencies
 var path = require('path');
 
 module.exports = {
@@ -41,7 +42,7 @@ module.exports = {
             path.resolve(__dirname, '../../../../../../node_modules'),
         ],
         alias: {
-            'edx-ui-toolkit': 'edx-ui-toolkit/src/',  // @TODO: some paths in toolkit are not valid relative paths
+            'edx-ui-toolkit': 'edx-ui-toolkit/src/', // @TODO: some paths in toolkit are not valid relative paths
         },
         extensions: ['.js', '.jsx', '.json'],
     },

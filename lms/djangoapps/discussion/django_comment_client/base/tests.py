@@ -1451,7 +1451,6 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.course = CourseFactory.create()
         cls.password = "test password"
         seed_permissions_roles(cls.course.id)
 
@@ -1952,7 +1951,7 @@ class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRe
 class SegmentIOForumThreadViewedEventTestCase(SegmentIOTrackingTestCaseBase):
 
     def _raise_navigation_event(self, label, include_name):
-        middleware = TrackMiddleware()
+        middleware = TrackMiddleware(get_response=lambda request: None)
         kwargs = {'label': label}
         if include_name:
             kwargs['name'] = 'edx.bi.app.navigation.screen'

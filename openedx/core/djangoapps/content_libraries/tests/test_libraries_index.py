@@ -165,7 +165,7 @@ class ContentLibraryIndexerTestMixin:
         self._set_library_block_asset(block["id"], "whatever.png", b"data")
         verify_uncommitted_libraries(library_key, True, False)
         commit_library_and_verify(library_key)
-        self._delete_library_block_asset(block["id"], "whatever.png", expect_response=204)
+        self._delete_library_block_asset(block["id"], "whatever.png")
         verify_uncommitted_libraries(library_key, True, False)
         commit_library_and_verify(library_key)
 

@@ -4,12 +4,13 @@
     waitForProtex();
 
     function waitForProtex() {
-        if (typeof(protex) !== 'undefined' && protex) {
+        if (typeof protex !== 'undefined' && protex) {
             protex.onInjectionDone('protex');
+        // eslint-disable-next-line brace-style
         }
         /* if (typeof(protex) !== "undefined") {
             //initializeProtex();
-        }*/
+        } */
         else {
             setTimeout(function() { waitForProtex(); }, timeout);
         }
@@ -50,7 +51,6 @@
         updateProtexField();
     };
 
-
     /* function initializeProtex() {
         //Check to see if the two exported GWT functions protexSetTargetShape
         // and protexCheckAnswer have been appended to global scope -- this
@@ -66,7 +66,7 @@
             //when Check button is clicked
             var problem = $('#protex_container').parents('.problem');
             var check_button = problem.find('input.check');
-        	var input_field = problem.find('input[type=hidden]');
+            var input_field = problem.find('input[type=hidden]');
             check_button.on('click', function() {
                 var protex_answer = protexCheckAnswer();
                 var value = {protex_answer: protex_answer};
@@ -81,5 +81,5 @@
         else {
             setTimeout(function() {initializeProtex(); }, timeout);
         }
-    }*/
+    } */
 }).call(this);

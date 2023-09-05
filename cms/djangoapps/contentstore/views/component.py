@@ -10,6 +10,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseBadRequest
+from django.shortcuts import redirect
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET
 from opaque_keys import InvalidKeyError
@@ -27,12 +28,17 @@ from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from cms.djangoapps.contentstore.toggles import use_new_problem_editor
 from openedx.core.lib.xblock_utils import get_aside_from_xblock, is_xblock_aside
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
+from openedx.core.djangoapps.content_staging import api as content_staging_api
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-
-from ..utils import get_lms_link_for_item, get_sibling_urls, reverse_course_url
-from .helpers import get_parent_xblock, is_unit, xblock_type_display_name
-from .block import add_container_page_publishing_info, create_xblock_info, load_services_for_studio
+from ..toggles import use_new_unit_page
+from ..utils import get_lms_link_for_item, get_sibling_urls, reverse_course_url, get_unit_url
+from ..helpers import get_parent_xblock, is_unit, xblock_type_display_name
+from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
+    add_container_page_publishing_info,
+    create_xblock_info,
+    load_services_for_studio,
+)
 
 __all__ = [
     'container_handler',
@@ -122,7 +128,6 @@ def container_handler(request, usage_key_string):
                 course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
             except ItemNotFoundError:
                 return HttpResponseBadRequest()
-
             component_templates = get_component_templates(course)
             ancestor_xblocks = []
             parent = get_parent_xblock(xblock)
@@ -130,6 +135,9 @@ def container_handler(request, usage_key_string):
 
             is_unit_page = is_unit(xblock)
             unit = xblock if is_unit_page else None
+
+            if is_unit_page and use_new_unit_page(course.id):
+                return redirect(get_unit_url(course.id, unit.location))
 
             is_first = True
             block = xblock
@@ -185,6 +193,8 @@ def container_handler(request, usage_key_string):
                     break
                 index += 1
 
+            # Get the status of the user's clipboard so they can paste components if they have something to paste
+            user_clipboard = content_staging_api.get_user_clipboard_json(request.user.id, request)
             return render_to_response('container.html', {
                 'language_code': request.LANGUAGE_CODE,
                 'context_course': course,  # Needed only for display of menus at top of page.
@@ -205,7 +215,9 @@ def container_handler(request, usage_key_string):
                 'xblock_info': xblock_info,
                 'draft_preview_link': preview_lms_link,
                 'published_preview_link': lms_link,
-                'templates': CONTAINER_TEMPLATES
+                'templates': CONTAINER_TEMPLATES,
+                # Status of the user's clipboard, exactly as would be returned from the "GET clipboard" REST API.
+                'user_clipboard': user_clipboard,
             })
     else:
         return HttpResponseBadRequest("Only supports HTML requests")
@@ -292,8 +304,8 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
     # by the components in the order listed in COMPONENT_TYPES.
     component_types = COMPONENT_TYPES[:]
 
-    # Libraries do not support discussions and openassessment and other libraries
-    component_not_supported_by_library = ['discussion', 'library', 'openassessment']
+    # Libraries do not support discussions, drag-and-drop, and openassessment and other libraries
+    component_not_supported_by_library = ['discussion', 'library', 'openassessment', 'drag-and-drop-v2']
     if library:
         component_types = [component for component in component_types
                            if component not in set(component_not_supported_by_library)]
@@ -317,11 +329,14 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
             # TODO: Once mixins are defined per-application, rather than per-runtime,
             # this should use a cms mixed-in class. (cpennington)
             template_id = None
-            display_name = xblock_type_display_name(category, _('Blank'))  # this is the Blank Advanced problem
+            display_name = xblock_type_display_name(category, _('Blank'))
             # The ORA "blank" assessment should be Peer Assessment Only
             if category == 'openassessment':
                 display_name = _("Peer Assessment Only")
                 template_id = "peer-assessment"
+            elif category == 'problem':
+                # Override generic "Problem" name to describe this blank template:
+                display_name = _("Blank Advanced Problem")
             templates_for_category.append(
                 create_template_dict(display_name, category, support_level_without_template, template_id, 'advanced')
             )
@@ -552,18 +567,18 @@ def component_handler(request, usage_key_string, handler, suffix=''):
 
     try:
         if is_xblock_aside(usage_key):
-            # Get the descriptor for the block being wrapped by the aside (not the aside itself)
-            descriptor = modulestore().get_item(usage_key.usage_key)
-            handler_descriptor = get_aside_from_xblock(descriptor, usage_key.aside_type)
-            asides = [handler_descriptor]
+            # Get the block being wrapped by the aside (not the aside itself)
+            block = modulestore().get_item(usage_key.usage_key)
+            handler_block = get_aside_from_xblock(block, usage_key.aside_type)
+            asides = [handler_block]
         else:
-            descriptor = modulestore().get_item(usage_key)
-            handler_descriptor = descriptor
+            block = modulestore().get_item(usage_key)
+            handler_block = block
             asides = []
-        load_services_for_studio(handler_descriptor.runtime, request.user)
-        resp = handler_descriptor.handle(handler, req, suffix)
+        load_services_for_studio(handler_block.runtime, request.user)
+        resp = handler_block.handle(handler, req, suffix)
     except NoSuchHandlerError:
-        log.info("XBlock %s attempted to access missing handler %r", handler_descriptor, handler, exc_info=True)
+        log.info("XBlock %s attempted to access missing handler %r", handler_block, handler, exc_info=True)
         raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
     # unintentional update to handle any side effects of handle call
@@ -572,7 +587,7 @@ def component_handler(request, usage_key_string, handler, suffix=''):
     # TNL 101-62 studio write permission is also checked for editing content.
 
     if has_course_author_access(request.user, usage_key.course_key):
-        modulestore().update_item(descriptor, request.user.id, asides=asides)
+        modulestore().update_item(block, request.user.id, asides=asides)
     else:
         #fail quietly if user is not course author.
         log.warning(

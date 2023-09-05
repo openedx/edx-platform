@@ -1080,6 +1080,36 @@ class ContentStoreTest(ContentStoreTestCase):
         """Test new course creation - happy path"""
         self.assert_created_course()
 
+    @ddt.data(True, False)
+    @mock.patch(
+        'cms.djangoapps.contentstore.views.course.default_enable_flexible_peer_openassessments'
+    )
+    def test_create_course__default_enable_flexible_peer_openassessments(
+        self,
+        mock_toggle_state,
+        mock_default_enable_flexible_peer_openassessments
+    ):
+        """
+        Test that flex peer grading is forced on, when enabled
+        """
+        # Given a new course run
+        test_course_data = {}
+        test_course_data.update(self.course_data)
+        course_key = _get_course_id(self.store, test_course_data)
+
+        # ... with org configured to / not to enable flex grading
+        mock_default_enable_flexible_peer_openassessments.return_value = mock_toggle_state
+
+        # When I create a new course
+        new_course_data = _create_course(self, course_key, test_course_data)
+
+        # Then the process completes successfully
+        new_course_key = CourseKey.from_string(new_course_data['course_key'])
+        new_course = self.store.get_course(new_course_key)
+
+        # ... and our setting got toggled appropriately on the course
+        self.assertEqual(new_course.force_on_flexible_peer_openassessments, mock_toggle_state)
+
     @override_settings(DEFAULT_COURSE_LANGUAGE='hr')
     def test_create_course_default_language(self):
         """Test new course creation and verify default language"""
@@ -1713,17 +1743,17 @@ class MetadataSaveTestCase(ContentStoreTestCase):
         """
         video_data = VideoBlock.parse_video_xml(video_sample_xml)
         video_data.pop('source')
-        self.video_descriptor = BlockFactory.create(
+        self.video_block = BlockFactory.create(
             parent_location=course.location, category='video',
             **video_data
         )
 
     def test_metadata_not_persistence(self):
         """
-        Test that descriptors which set metadata fields in their
+        Test that blocks which set metadata fields in their
         constructor are correctly deleted.
         """
-        self.assertIn('html5_sources', own_metadata(self.video_descriptor))
+        self.assertIn('html5_sources', own_metadata(self.video_block))
         attrs_to_strip = {
             'show_captions',
             'youtube_id_1_0',
@@ -1736,13 +1766,13 @@ class MetadataSaveTestCase(ContentStoreTestCase):
             'track'
         }
 
-        location = self.video_descriptor.location
+        location = self.video_block.location
 
         for field_name in attrs_to_strip:
-            delattr(self.video_descriptor, field_name)
+            delattr(self.video_block, field_name)
 
-        self.assertNotIn('html5_sources', own_metadata(self.video_descriptor))
-        self.store.update_item(self.video_descriptor, self.user.id)
+        self.assertNotIn('html5_sources', own_metadata(self.video_block))
+        self.store.update_item(self.video_block, self.user.id)
         block = self.store.get_item(location)
 
         self.assertNotIn('html5_sources', own_metadata(block))
@@ -2047,12 +2077,12 @@ class ContentLicenseTest(ContentStoreTestCase):
     def test_video_license_export(self):
         content_store = contentstore()
         root_dir = path(mkdtemp_clean())
-        video_descriptor = BlockFactory.create(
+        video_block = BlockFactory.create(
             parent_location=self.course.location, category='video',
             license="all-rights-reserved"
         )
         export_course_to_xml(self.store, content_store, self.course.id, root_dir, 'test_license')
-        fname = f"{video_descriptor.scope_ids.usage_id.block_id}.xml"
+        fname = f"{video_block.scope_ids.usage_id.block_id}.xml"
         video_file_path = root_dir / "test_license" / "video" / fname
         with video_file_path.open() as f:
             video_xml = etree.parse(f)
@@ -2104,6 +2134,8 @@ class EntryPageTestCase(TestCase):
 def _create_course(test, course_key, course_data):
     """
     Creates a course via an AJAX request and verifies the URL returned in the response.
+
+    Returns the data of the POST response
     """
     course_url = get_url('course_handler', course_key, 'course_key_string')
     response = test.client.ajax_post(course_url, course_data)
@@ -2111,6 +2143,8 @@ def _create_course(test, course_key, course_data):
     data = parse_json(response)
     test.assertNotIn('ErrMsg', data)
     test.assertEqual(data['url'], course_url)
+
+    return data
 
 
 def _get_course_id(store, course_data):

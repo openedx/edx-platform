@@ -16,9 +16,9 @@ from ..x_module import PUBLIC_VIEW, STUDENT_VIEW
 from . import get_test_descriptor_system, get_test_system
 
 
-def instantiate_descriptor(**field_data):
+def instantiate_block(**field_data):
     """
-    Instantiate descriptor with most properties.
+    Instantiate block with most properties.
     """
     system = get_test_descriptor_system()
     course_key = CourseLocator('org', 'course', 'run')
@@ -138,6 +138,7 @@ class HtmlBlockSubstitutionTestCase(unittest.TestCase):  # lint-amnesty, pylint:
         field_data = DictFieldData({'data': sample_xml})
         module_system = get_test_system(user=AnonymousUser())
         block = HtmlBlock(module_system, field_data, Mock())
+        block.runtime.service(block, 'user')._deprecated_anonymous_user_id = ''  # pylint: disable=protected-access
         assert block.get_html() == sample_xml
 
 
@@ -152,8 +153,8 @@ class HtmlBlockIndexingTestCase(unittest.TestCase):
                 <p>Hello World!</p>
             </html>
         '''
-        descriptor = instantiate_descriptor(data=sample_xml)
-        assert descriptor.index_dictionary() ==\
+        block = instantiate_block(data=sample_xml)
+        assert block.index_dictionary() ==\
                {'content': {'html_content': ' Hello World! ', 'display_name': 'Text'}, 'content_type': 'Text'}
 
     def test_index_dictionary_cdata_html_block(self):
@@ -163,8 +164,8 @@ class HtmlBlockIndexingTestCase(unittest.TestCase):
                 <![CDATA[This is just a CDATA!]]>
             </html>
         '''
-        descriptor = instantiate_descriptor(data=sample_xml_cdata)
-        assert descriptor.index_dictionary() ==\
+        block = instantiate_block(data=sample_xml_cdata)
+        assert block.index_dictionary() ==\
                {'content': {'html_content': ' This has CDATA in it. ', 'display_name': 'Text'}, 'content_type': 'Text'}
 
     def test_index_dictionary_multiple_spaces_html_block(self):
@@ -173,8 +174,8 @@ class HtmlBlockIndexingTestCase(unittest.TestCase):
                 <p>     Text has spaces :)  </p>
             </html>
         '''
-        descriptor = instantiate_descriptor(data=sample_xml_tab_spaces)
-        assert descriptor.index_dictionary() ==\
+        block = instantiate_block(data=sample_xml_tab_spaces)
+        assert block.index_dictionary() ==\
                {'content': {'html_content': ' Text has spaces :) ', 'display_name': 'Text'}, 'content_type': 'Text'}
 
     def test_index_dictionary_html_block_with_comment(self):
@@ -184,8 +185,8 @@ class HtmlBlockIndexingTestCase(unittest.TestCase):
                 <!-- Html Comment -->
             </html>
         '''
-        descriptor = instantiate_descriptor(data=sample_xml_comment)
-        assert descriptor.index_dictionary() == {'content': {'html_content': ' This has HTML comment in it. ', 'display_name': 'Text'}, 'content_type': 'Text'}  # pylint: disable=line-too-long
+        block = instantiate_block(data=sample_xml_comment)
+        assert block.index_dictionary() == {'content': {'html_content': ' This has HTML comment in it. ', 'display_name': 'Text'}, 'content_type': 'Text'}  # pylint: disable=line-too-long
 
     def test_index_dictionary_html_block_with_both_comments_and_cdata(self):
         sample_xml_mix_comment_cdata = '''
@@ -197,8 +198,8 @@ class HtmlBlockIndexingTestCase(unittest.TestCase):
                 <p>HTML end.</p>
             </html>
         '''
-        descriptor = instantiate_descriptor(data=sample_xml_mix_comment_cdata)
-        assert descriptor.index_dictionary() ==\
+        block = instantiate_block(data=sample_xml_mix_comment_cdata)
+        assert block.index_dictionary() ==\
                {'content': {'html_content': ' This has HTML comment in it. HTML end. ',
                             'display_name': 'Text'}, 'content_type': 'Text'}
 
@@ -216,8 +217,8 @@ class HtmlBlockIndexingTestCase(unittest.TestCase):
                 </script>
             </html>
         '''
-        descriptor = instantiate_descriptor(data=sample_xml_style_script_tags)
-        assert descriptor.index_dictionary() ==\
+        block = instantiate_block(data=sample_xml_style_script_tags)
+        assert block.index_dictionary() ==\
                {'content': {'html_content': ' This has HTML comment in it. HTML end. ',
                             'display_name': 'Text'}, 'content_type': 'Text'}
 
@@ -315,7 +316,7 @@ class CourseInfoBlockTestCase(unittest.TestCase):
         template_name = f"{info_block.TEMPLATE_DIR}/course_updates.html"
         info_block.get_html()
         # Assertion to validate that render function is called with the expected context
-        info_block.runtime.service(info_block, 'mako').render_template.assert_called_once_with(
+        info_block.runtime.service(info_block, 'mako').render_lms_template.assert_called_once_with(
             template_name,
             expected_context
         )

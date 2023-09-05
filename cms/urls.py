@@ -3,9 +3,9 @@ Urls of Studio.
 """
 
 from django.conf import settings
-from django.conf.urls import include
 from django.conf.urls.static import static
 from django.contrib.admin import autodiscover as django_autodiscover
+from django.urls import include
 from django.urls import path, re_path
 from django.utils.translation import gettext_lazy as _
 from auth_backends.urls import oauth2_urlpatterns
@@ -76,8 +76,8 @@ urlpatterns = oauth2_urlpatterns + [
     path('api/user/', include('openedx.core.djangoapps.user_api.urls')),
 
     # Update session view
-    path('lang_pref/session_language', openedx.core.djangoapps.lang_pref.views.update_session_language,
-         name='session_language'
+    path('lang_pref/update_language', openedx.core.djangoapps.lang_pref.views.update_language,
+         name='update_language'
          ),
 
     # Darklang View to change the preview language (or dark language)
@@ -123,6 +123,9 @@ urlpatterns = oauth2_urlpatterns + [
     re_path(fr'^assets/{settings.COURSE_KEY_PATTERN}/{settings.ASSET_KEY_PATTERN}?$',
             contentstore_views.assets_handler,
             name='assets_handler'),
+    re_path(fr'^assets/{settings.COURSE_KEY_PATTERN}/{settings.ASSET_KEY_PATTERN}/usage',
+            contentstore_views.asset_usage_path_handler,
+            name='asset_usage_path_handler'),
     re_path(fr'^import/{COURSELIKE_KEY_PATTERN}$', contentstore_views.import_handler,
             name='import_handler'),
     re_path(fr'^import_status/{COURSELIKE_KEY_PATTERN}/(?P<filename>.+)$',
@@ -164,11 +167,7 @@ urlpatterns = oauth2_urlpatterns + [
             contentstore_views.video_images_handler, name='video_images_handler'),
     path('video_images_upload_enabled', contentstore_views.video_images_upload_enabled,
          name='video_images_upload_enabled'),
-    re_path(
-        fr'^video_features/{settings.COURSE_KEY_PATTERN}',
-        contentstore_views.get_video_features,
-        name='video_features'
-    ),
+    path('video_features/', contentstore_views.get_video_features, name='video_features'),
     re_path(fr'^transcript_preferences/{settings.COURSE_KEY_PATTERN}$',
             contentstore_views.transcript_preferences_handler, name='transcript_preferences_handler'),
     re_path(fr'^transcript_credentials/{settings.COURSE_KEY_PATTERN}$',
@@ -281,12 +280,12 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
     urlpatterns += static(
-        settings.VIDEO_IMAGE_SETTINGS['STORAGE_KWARGS']['base_url'],
+        settings.VIDEO_IMAGE_SETTINGS['BASE_URL'],
         document_root=settings.VIDEO_IMAGE_SETTINGS['STORAGE_KWARGS']['location']
     )
 
     urlpatterns += static(
-        settings.VIDEO_TRANSCRIPTS_SETTINGS['STORAGE_KWARGS']['base_url'],
+        settings.VIDEO_TRANSCRIPTS_SETTINGS['BASE_URL'],
         document_root=settings.VIDEO_TRANSCRIPTS_SETTINGS['STORAGE_KWARGS']['location']
     )
 
@@ -332,7 +331,12 @@ from openedx.core.djangoapps.plugins.constants import ProjectType  # isort:skip
 
 urlpatterns.extend(get_plugin_url_patterns(ProjectType.CMS))
 
-# Contentstore
+# Contentstore REST APIs
 urlpatterns += [
     path('api/contentstore/', include('cms.djangoapps.contentstore.rest_api.urls'))
+]
+
+# Content tagging
+urlpatterns += [
+    path('api/content_tagging/', include(('openedx.features.content_tagging.urls'))),
 ]

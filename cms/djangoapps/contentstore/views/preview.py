@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 from opaque_keys.edx.keys import UsageKey
+from rest_framework.request import Request
 from web_fragments.fragment import Fragment
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xblock.exceptions import NoSuchHandlerError
@@ -23,10 +24,10 @@ from xmodule.partitions.partitions_service import PartitionService
 from xmodule.services import SettingsService, TeamsConfigurationService
 from xmodule.studio_editable import has_author_view
 from xmodule.util.sandboxing import SandboxService
-from xmodule.util.xmodule_django import add_webpack_to_fragment
-from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment
+from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, XModuleMixin
 from cms.djangoapps.xblock_config.models import StudioConfig
-from cms.djangoapps.contentstore.toggles import individualize_anonymous_user_id, ENABLE_COPY_PASTE_FEATURE
+from cms.djangoapps.contentstore.toggles import individualize_anonymous_user_id
 from cms.lib.xblock.field_data import CmsFieldData
 from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.static_replace.wrapper import replace_urls_wrapper
@@ -65,8 +66,8 @@ def preview_handler(request, usage_key_string, handler, suffix=''):
     """
     usage_key = UsageKey.from_string(usage_key_string)
 
-    descriptor = modulestore().get_item(usage_key)
-    instance = _load_preview_block(request, descriptor)
+    block = modulestore().get_item(usage_key)
+    instance = _load_preview_block(request, block)
 
     # Let the module handle the AJAX
     req = django_to_webob_request(request)
@@ -148,19 +149,17 @@ def preview_layout_asides(block, context, frag, view_name, aside_frag_fns, wrap_
     return result
 
 
-def _prepare_runtime_for_preview(request, block, field_data):
+def _prepare_runtime_for_preview(request, block):
     """
     Sets properties in the runtime of the specified block that is
     required for rendering block previews.
 
     request: The active django request
-    field_data: Wrapped field data for previews
+    block: An XBlock
     """
 
     course_id = block.location.course_key
     display_name_only = (block.category == 'static_tab')
-
-    replace_url_service = ReplaceURLService(course_id=course_id)
 
     wrappers = [
         # This wrapper wraps the block in the template specified above
@@ -174,7 +173,7 @@ def _prepare_runtime_for_preview(request, block, field_data):
 
         # This wrapper replaces urls in the output that start with /static
         # with the correct course-specific url for the static content
-        partial(replace_urls_wrapper, replace_url_service=replace_url_service, static_replace_only=True),
+        partial(replace_urls_wrapper, replace_url_service=ReplaceURLService, static_replace_only=True),
         _studio_wrap_xblock,
     ]
 
@@ -192,32 +191,27 @@ def _prepare_runtime_for_preview(request, block, field_data):
         # stick the license wrapper in front
         wrappers.insert(0, partial(wrap_with_license, mako_service=mako_service))
 
-    preview_anonymous_user_id = 'student'
+    anonymous_user_id = deprecated_anonymous_user_id = 'student'
     if individualize_anonymous_user_id(course_id):
-        # There are blocks (capa, html, and video) where we do not want to scope
-        # the anonymous_user_id to specific courses. These are captured in the
-        # block attribute 'requires_per_student_anonymous_id'. Please note,
-        # the course_id field in AnynomousUserID model is blank if value is None.
-        if getattr(block, 'requires_per_student_anonymous_id', False):
-            preview_anonymous_user_id = anonymous_id_for_user(request.user, None)
-        else:
-            preview_anonymous_user_id = anonymous_id_for_user(request.user, course_id)
+        anonymous_user_id = anonymous_id_for_user(request.user, course_id)
+        # See the docstring of `DjangoXBlockUserService`.
+        deprecated_anonymous_user_id = anonymous_id_for_user(request.user, None)
 
     services = {
-        "field-data": field_data,
         "i18n": XBlockI18nService,
         'mako': mako_service,
         "settings": SettingsService(),
         "user": DjangoXBlockUserService(
             request.user,
             user_role=get_user_role(request.user, course_id),
-            anonymous_user_id=preview_anonymous_user_id,
+            anonymous_user_id=anonymous_user_id,
+            deprecated_anonymous_user_id=deprecated_anonymous_user_id,
         ),
         "partitions": StudioPartitionService(course_id=course_id),
         "teams_configuration": TeamsConfigurationService(),
         "sandbox": SandboxService(contentstore=contentstore, course_id=course_id),
         "cache": CacheService(cache),
-        'replace_urls': replace_url_service
+        'replace_urls': ReplaceURLService
     }
 
     block.runtime.get_block_for_descriptor = partial(_load_preview_block, request)
@@ -226,7 +220,7 @@ def _prepare_runtime_for_preview(request, block, field_data):
     # Set up functions to modify the fragment produced by student_view
     block.runtime.wrappers = wrappers
     block.runtime.wrappers_asides = wrappers_asides
-    block.runtime._runtime_services.update(services)  # lint-amnesty, pylint: disable=protected-access
+    block.runtime._services.update(services)  # pylint: disable=protected-access
 
     # xmodules can check for this attribute during rendering to determine if
     # they are being rendered for preview (i.e. in Studio)
@@ -256,29 +250,27 @@ class StudioPartitionService(PartitionService):
         return None
 
 
-def _load_preview_block(request, descriptor):
+def _load_preview_block(request: Request, block: XModuleMixin):
     """
-    Return a preview XBlock instantiated from the supplied descriptor. Will use mutable fields
+    Return a preview XBlock instantiated from the supplied block. Will use mutable fields
     if XBlock supports an author_view. Otherwise, will use immutable fields and student_view.
 
     request: The active django request
-    descriptor: An XModuleDescriptor
+    block: An XModuleMixin
     """
     student_data = KvsFieldData(SessionKeyValueStore(request))
-    if has_author_view(descriptor):
+    if has_author_view(block):
         wrapper = partial(CmsFieldData, student_data=student_data)
     else:
         wrapper = partial(LmsFieldData, student_data=student_data)
 
-    # wrap the _field_data upfront to pass to _prepare_runtime_for_preview
-    wrapped_field_data = wrapper(descriptor._field_data)  # pylint: disable=protected-access
-    _prepare_runtime_for_preview(request, descriptor, wrapped_field_data)
+    _prepare_runtime_for_preview(request, block)
 
-    descriptor.bind_for_student(
+    block.bind_for_student(
         request.user.id,
         [wrapper]
     )
-    return descriptor
+    return block
 
 
 def _is_xblock_reorderable(xblock, context):
@@ -307,8 +299,8 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             selected_groups_label = _('Access restricted to: {list_of_groups}').format(list_of_groups=selected_groups_label)  # lint-amnesty, pylint: disable=line-too-long
         course = modulestore().get_course(xblock.location.course_key)
         can_edit = context.get('can_edit', True)
-        # Copy-paste is a new feature; while we are beta-testing it, only beta users with the Waffle flag enabled see it
-        enable_copy_paste = can_edit and ENABLE_COPY_PASTE_FEATURE.is_enabled()
+        # Is this a course or a library?
+        is_course = xblock.scope_ids.usage_id.context_key.is_course
         template_context = {
             'xblock_context': context,
             'xblock': xblock,
@@ -317,27 +309,26 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'is_root': is_root,
             'is_reorderable': is_reorderable,
             'can_edit': can_edit,
-            'enable_copy_paste': enable_copy_paste,
-            'can_edit_visibility': context.get('can_edit_visibility', xblock.scope_ids.usage_id.context_key.is_course),
+            'can_edit_visibility': context.get('can_edit_visibility', is_course),
             'selected_groups_label': selected_groups_label,
             'can_add': context.get('can_add', True),
-            'can_move': context.get('can_move', xblock.scope_ids.usage_id.context_key.is_course),
+            'can_move': context.get('can_move', is_course),
             'language': getattr(course, 'language', None)
         }
 
-        add_webpack_to_fragment(frag, "js/factories/xblock_validation")
+        add_webpack_js_to_fragment(frag, "js/factories/xblock_validation")
 
         html = render_to_string('studio_xblock_wrapper.html', template_context)
         frag = wrap_fragment(frag, html)
     return frag
 
 
-def get_preview_fragment(request, descriptor, context):
+def get_preview_fragment(request, block, context):
     """
     Returns the HTML returned by the XModule's student_view or author_view (if available),
-    specified by the descriptor and idx.
+    specified by the block and idx.
     """
-    block = _load_preview_block(request, descriptor)
+    block = _load_preview_block(request, block)
 
     preview_view = AUTHOR_VIEW if has_author_view(block) else STUDENT_VIEW
 

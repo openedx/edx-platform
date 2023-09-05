@@ -3,12 +3,12 @@ Unit tests for helpers.py.
 """
 
 
-from django.utils import http
+from urllib.parse import quote
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, LibraryFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
-from ..helpers import xblock_studio_url, xblock_type_display_name
+from ...helpers import xblock_studio_url, xblock_type_display_name
 
 
 class HelpersTestCase(CourseTestCase):
@@ -27,7 +27,7 @@ class HelpersTestCase(CourseTestCase):
                                       display_name="Week 1")
         self.assertEqual(
             xblock_studio_url(chapter),
-            f'{course_url}?show={http.urlquote(str(chapter.location).encode())}'
+            f'{course_url}?show={quote(str(chapter.location).encode())}'
         )
 
         # Verify sequential URL
@@ -35,7 +35,7 @@ class HelpersTestCase(CourseTestCase):
                                          display_name="Lesson 1")
         self.assertEqual(
             xblock_studio_url(sequential),
-            f'{course_url}?show={http.urlquote(str(sequential.location).encode())}'
+            f'{course_url}?show={quote(str(sequential.location).encode())}'
         )
 
         # Verify unit URL
@@ -52,6 +52,8 @@ class HelpersTestCase(CourseTestCase):
         video = BlockFactory.create(parent_location=child_vertical.location, category="video",
                                     display_name="My Video")
         self.assertIsNone(xblock_studio_url(video))
+        # Verify video URL with find_parent=True
+        self.assertEqual(xblock_studio_url(video, find_parent=True), f'/container/{child_vertical.location}')
 
         # Verify library URL
         library = LibraryFactory.create()

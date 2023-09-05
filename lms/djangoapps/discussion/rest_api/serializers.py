@@ -206,10 +206,9 @@ class _ContentSerializer(serializers.Serializer):
         """
         is_staff = user_id in self.context["course_staff_user_ids"] or user_id in self.context["moderator_user_ids"]
         is_ta = user_id in self.context["ta_user_ids"]
-        is_global_staff = self.context["is_global_staff"]
 
         return (
-            "Staff" if (is_staff or is_global_staff) else
+            "Staff" if is_staff else
             "Community TA" if is_ta else
             None
         )
@@ -428,10 +427,9 @@ class ThreadSerializer(_ContentSerializer):
 
     def get_preview_body(self, obj):
         """
-        Returns a cleaned and truncated version of the thread's body to display in a
-        preview capacity.
+        Returns a cleaned version of the thread's body to display in a preview capacity.
         """
-        return strip_tags(self.get_rendered_body(obj)).replace('\n', ' ')
+        return strip_tags(self.get_rendered_body(obj)).replace('\n', ' ').replace('&nbsp;', ' ')
 
     def get_close_reason(self, obj):
         """

@@ -4,6 +4,7 @@ define([
 ],
 function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
     'use strict';
+
     describe('Library Instructor Access Page', function() {
         var changeRoleUrl = 'dummy_change_role_url/@@EMAIL@@';
         var team_member_fixture = readFixtures('team-member.underscore');
@@ -29,9 +30,15 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                 ManageUsersFactory(
                     'Mock Library',
                     [
-                        {id: 1, email: 'honor@example.com', username: 'honor', role: 'staff'},
-                        {id: 2, email: 'audit@example.com', username: 'audit', role: 'instructor'},
-                        {id: 3, email: 'staff@example.com', username: 'staff', role: 'library_user'}
+                        {
+                            id: 1, email: 'honor@example.com', username: 'honor', role: 'staff'
+                        },
+                        {
+                            id: 2, email: 'audit@example.com', username: 'audit', role: 'instructor'
+                        },
+                        {
+                            id: 3, email: 'staff@example.com', username: 'staff', role: 'library_user'
+                        }
                     ],
                     changeRoleUrl,
                     10000,
@@ -98,7 +105,6 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                 AjaxHelpers.expectNoRequests(requests);
             });
 
-
             it("can remove a user's permission to access the library", function() {
                 var requests = AjaxHelpers.requests(this);
                 var promptSpy = ViewHelpers.createPromptSpy();
@@ -124,9 +130,15 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                 ManageUsersFactory(
                     'Mock Library',
                     [
-                        {id: 1, email: 'honor@example.com', username: 'honor', role: 'staff'},
-                        {id: 2, email: 'audit@example.com', username: 'audit', role: 'instructor'},
-                        {id: 3, email: 'staff@example.com', username: 'staff', role: 'library_user'}
+                        {
+                            id: 1, email: 'honor@example.com', username: 'honor', role: 'staff'
+                        },
+                        {
+                            id: 2, email: 'audit@example.com', username: 'audit', role: 'instructor'
+                        },
+                        {
+                            id: 3, email: 'staff@example.com', username: 'staff', role: 'library_user'
+                        }
                     ],
                     'dummy_change_role_url',
                     10000,

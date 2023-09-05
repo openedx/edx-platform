@@ -75,7 +75,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                 this);
             gradeCollection.each(function(gradeModel) {
                 var graderType = gradeModel.get('type');
-                var graderTypeAssignmentList = self.courseAssignmentLists[graderType]
+                var graderTypeAssignmentList = self.courseAssignmentLists[graderType];
                 if (graderTypeAssignmentList === undefined) {
                     graderTypeAssignmentList = [];
                 }
@@ -139,7 +139,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
             this.model.set('minimum_grade_credit', newVal, {validate: true});
         },
         updateModel: function(event) {
-            if (!this.selectorToField[event.currentTarget.id]) return;
+            if (!this.selectorToField[event.currentTarget.id]) { return; }
 
             switch (this.selectorToField[event.currentTarget.id]) {
             case 'grace_period':
@@ -164,8 +164,8 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
 
         // A does not have a drag bar (cannot change its upper limit)
         // Need to insert new bars in right place.
-        GRADES: ['A', 'B', 'C', 'D'],	// defaults for new grade designators
-        descendingCutoffs: [],  // array of { designation : , cutoff : }
+        GRADES: ['A', 'B', 'C', 'D'], // defaults for new grade designators
+        descendingCutoffs: [], // array of { designation : , cutoff : }
         gradeBarWidth: null, // cache of value since it won't change (more certain)
 
         renderCutoffBar: function() {
@@ -183,7 +183,8 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                     descriptor: cutoff.designation,
                     width: nextWidth,
                     contenteditable: true,
-                    removable: removable})
+                    removable: removable
+                })
                 );
                 if (draggable) {
                     var newBar = gradelist.children().last(); // get the dom object not the unparsed string
@@ -224,11 +225,11 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
             $(event.currentTarget).siblings.toggleClass('is-shown');
         },
 
-
         startMoveClosure: function() {
         // set min/max widths
             var cachethis = this;
             var widthPerPoint = cachethis.gradeBarWidth / 100;
+            // eslint-disable-next-line no-shadow
             return function(event, ui) {
                 var barIndex = ui.element.index();
                 var offset = 1;
@@ -245,6 +246,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
         moveBarClosure: function() {
         // 0th ele doesn't have a bar; so, will never invoke this
             var cachethis = this;
+            // eslint-disable-next-line no-shadow
             return function(event, ui) {
                 var barIndex = ui.element.index();
                 var offset = 1;
@@ -254,6 +256,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                     : offset);
                 // minus 2 b/c minus 1 is the element we're effecting. It's max is just shy of the next one above it
                 var max = (barIndex >= 2 ? cachethis.descendingCutoffs[barIndex - 2].cutoff - offset : 100);
+                // eslint-disable-next-line no-mixed-operators
                 var percentage = Math.min(Math.max(ui.size.width / cachethis.gradeBarWidth * 100, min), max);
                 cachethis.descendingCutoffs[barIndex - 1].cutoff = Math.round(percentage);
                 cachethis.renderGradeRanges();
@@ -272,6 +275,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
 
         stopDragClosure: function() {
             var cachethis = this;
+            // eslint-disable-next-line no-shadow
             return function(event, ui) {
             // for some reason the resize is setting height to 0
                 cachethis.saveCutoffs();
@@ -296,7 +300,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
             var _this = this;
             var gradeElements = this.$el.find('.grades .letter-grade[contenteditable=true]');
             _.each(gradeElements, function(element, index) {
-                if (index !== 0) $(element).text(_this.GRADES[index]);
+                if (index !== 0) { $(element).text(_this.GRADES[index]); }
             });
         },
 
@@ -329,7 +333,8 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                 descriptor: this.GRADES[gradeLength],
                 width: targetWidth,
                 contenteditable: true,
-                removable: true});
+                removable: true
+            });
             var gradeDom = this.$el.find('.grades');
             gradeDom.children().last().before(HtmlUtils.ensureHtml(newGradeHtml).toString());
             var newEle = gradeDom.children()[gradeLength];
@@ -375,8 +380,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
         },
 
         failLabel: function() {
-            if (this.descendingCutoffs.length === 1) return 'Fail';
-            else return 'F';
+            if (this.descendingCutoffs.length === 1) { return 'Fail'; } else { return 'F'; }
         },
         setFailLabel: function() {
             this.$el.find('.grades .letter-grade').last().text(this.failLabel());
@@ -388,6 +392,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
         // Instrument grading scale
         // convert cutoffs to inversely ordered list
             var modelCutoffs = this.model.get('grade_cutoffs');
+            // eslint-disable-next-line guard-for-in
             for (var cutoff in modelCutoffs) {
                 this.descendingCutoffs.push({designation: cutoff, cutoff: Math.round(modelCutoffs[cutoff] * 100)});
             }
@@ -404,7 +409,8 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                     self.renderCutoffBar();
                 },
                 reset: true,
-                silent: true});
+                silent: true
+            });
         },
         showNotificationBar: function() {
         // We always call showNotificationBar with the same args, just

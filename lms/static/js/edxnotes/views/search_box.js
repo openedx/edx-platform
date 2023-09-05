@@ -1,5 +1,7 @@
+// eslint-disable-next-line no-shadow-restricted-names
 (function(define, undefined) {
     'use strict';
+
     define([
         'jquery',
         'underscore',
@@ -123,6 +125,7 @@
                 if (jXHR.responseText) {
                     try {
                         message = $.parseJSON(jXHR.responseText).error;
+                    // eslint-disable-next-line no-empty
                     } catch (error) { }
                 }
 

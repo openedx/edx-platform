@@ -1,6 +1,7 @@
 /* globals Discussion, DiscussionSpecHelper, DiscussionThreadProfileView, Thread */
 (function() {
     'use strict';
+
     describe('DiscussionThreadProfileView', function() {
         var checkBody, checkPostWithImages, makeThread, makeView, spyConvertMath;
         beforeEach(function() {
@@ -52,22 +53,23 @@
                 expectedText = 'Test body';
                 // I really have no idea what it is supposed to mean - probably just iteration, but better be safe
                 for (
+                    // eslint-disable-next-line no-multi-assign
                     i = _i = 0, _ref = numberOfImages - 1;
                     _ref >= 0 ? _i <= _ref : _i >= _ref;
                     i = _ref >= 0 ? ++_i : --_i
                 ) {
-                    threadData.body = threadData.body + imageTag;
+                    threadData.body += imageTag;
                     if (i === 0) {
-                        expectedHtml = expectedHtml + imageTag;
+                        expectedHtml += imageTag;
                     } else {
-                        expectedHtml = expectedHtml + '<em>image omitted</em>';
+                        expectedHtml += '<em>image omitted</em>';
                     }
                 }
             }
             threadData.body = threadData.body + '<em>' + testText + '</em></p>';
             if (numberOfImages > 1) {
-                expectedHtml = expectedHtml + '<em>' + expectedText +
-                    '</em></p><p><em>Some images in this post have been omitted</em></p>';
+                expectedHtml = expectedHtml + '<em>' + expectedText
+                    + '</em></p><p><em>Some images in this post have been omitted</em></p>';
             } else {
                 expectedHtml = expectedHtml + '<em>' + expectedText + '</em></p>';
             }
@@ -127,9 +129,10 @@
                 for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
                     truncatedText = _ref1[_j];
                     it(
-                        'body with ' + numImages + ' images and ' + (truncatedText ? 'truncated' : 'untruncated') +
-                        ' text',
+                        'body with ' + numImages + ' images and ' + (truncatedText ? 'truncated' : 'untruncated')
+                        + ' text',
                         // eslint-disable no-loop-func
+                        // eslint-disable-next-line no-loop-func
                         function() {
                             return checkPostWithImages(numImages, truncatedText, this.threadData, this.imageTag);
                         }

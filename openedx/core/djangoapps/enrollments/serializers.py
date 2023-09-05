@@ -33,7 +33,7 @@ class StringListField(serializers.CharField):
 
 class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
-    Serialize a course descriptor and related information.
+    Serialize a course block and related information.
     """
 
     course_id = serializers.CharField(source="id")
@@ -79,7 +79,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
     """Serializes CourseEnrollment models
 
     Aggregates all data from the Course Enrollment table, and pulls in the serialization for
-    the Course Descriptor and course modes, to give a complete representation of course enrollment.
+    the Course block and course modes, to give a complete representation of course enrollment.
 
     """
     course_details = CourseSerializer(source="course_overview")

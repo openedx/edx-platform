@@ -8,6 +8,7 @@ import logging
 from django.conf import settings
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock, XBlockMixin
+from xblock.fields import String, Scope
 
 log = logging.getLogger(__name__)
 
@@ -36,10 +37,17 @@ class AuthoringMixin(XBlockMixin):
         """
         fragment = Fragment()
         from cms.djangoapps.contentstore.utils import reverse_course_url
-        fragment.add_content(self.runtime.service(self, 'mako').render_template('visibility_editor.html', {
+        fragment.add_content(self.runtime.service(self, 'mako').render_cms_template('visibility_editor.html', {
             'xblock': self,
             'manage_groups_url': reverse_course_url('group_configurations_list_handler', self.location.course_key),
         }))
         fragment.add_javascript_url(self._get_studio_resource_url('/js/xblock/authoring.js'))
         fragment.initialize_js('VisibilityEditorInit')
         return fragment
+
+    copied_from_block = String(
+        # Note: used by the content_staging app. This field is not needed in the LMS.
+        help="ID of the block that this one was copied from, if any. Used when copying and pasting blocks in Studio.",
+        scope=Scope.settings,
+        enforce_type=True,
+    )

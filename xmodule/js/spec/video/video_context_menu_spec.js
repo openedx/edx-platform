@@ -1,6 +1,7 @@
 /* globals _ */
 (function() {
     'use strict';
+
     describe('Video Context Menu', function() {
         var state, openMenu, keyPressEvent, openSubmenuMouse, openSubmenuKeyboard, closeSubmenuMouse,
             closeSubmenuKeyboard, menu, menuItems, menuSubmenuItem, submenu, submenuItems, overlay, $playButton;
@@ -21,24 +22,28 @@
             return $.Event('keydown', {keyCode: key});
         };
 
+        // eslint-disable-next-line no-shadow
         openSubmenuMouse = function(menuSubmenuItem) {
             menuSubmenuItem.mouseover();
             jasmine.clock().tick(200);
             expect(menuSubmenuItem).toHaveClass('is-opened');
         };
 
+        // eslint-disable-next-line no-shadow
         openSubmenuKeyboard = function(menuSubmenuItem, keyCode) {
             menuSubmenuItem.focus().trigger(keyPressEvent(keyCode || $.ui.keyCode.RIGHT));
             expect(menuSubmenuItem).toHaveClass('is-opened');
             expect(menuSubmenuItem.children().last().children().first()).toBeFocused();
         };
 
+        // eslint-disable-next-line no-shadow
         closeSubmenuMouse = function(menuSubmenuItem) {
             menuSubmenuItem.mouseleave();
             jasmine.clock().tick(200);
             expect(menuSubmenuItem).not.toHaveClass('is-opened');
         };
 
+        // eslint-disable-next-line no-shadow
         closeSubmenuKeyboard = function(menuSubmenuItem) {
             menuSubmenuItem.children().first().focus().trigger(keyPressEvent($.ui.keyCode.LEFT));
             expect(menuSubmenuItem).not.toHaveClass('is-opened');

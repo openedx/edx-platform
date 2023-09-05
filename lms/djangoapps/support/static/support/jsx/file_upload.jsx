@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 
 import ShowProgress from './upload_progress';
 
-
 class FileUpload extends React.Component {
     constructor(props) {
         super(props);
@@ -52,10 +51,12 @@ class FileUpload extends React.Component {
             allowedFileTypes = ['gif', 'png', 'jpg', 'jpeg', 'pdf'];
 
         // remove file from input and upload it to zendesk after validation
+        // eslint-disable-next-line no-undef
         $(e.target).val('');
 
         if (file.size > maxFileSize) {
             errorList.push(gettext('Files that you upload must be smaller than 5MB in size.'));
+        // eslint-disable-next-line no-undef
         } else if ($.inArray(file.name.split('.').pop().toLowerCase(), allowedFileTypes) === -1) {
             errorList.push(gettext('Files that you upload must be PDFs or image files in .gif, .jpg, .jpeg, or .png format.'));
         }
@@ -82,6 +83,7 @@ class FileUpload extends React.Component {
         request.upload.onprogress = function renderProgress(event) {
             if (event.lengthComputable) {
                 const percentComplete = (event.loaded / event.total) * 100;
+                // eslint-disable-next-line no-undef
                 $('.progress-bar-striped').css({ width: `${percentComplete}%` });
             }
         };
@@ -136,25 +138,27 @@ class FileUpload extends React.Component {
                     </div>
                 </div>
                 <div className="progress-container">
-                    {this.state.fileInProgress &&
-          <ShowProgress
-              fileName={this.state.fileInProgress}
-              request={this.state.currentRequest}
-          />
-                    }
+                    {this.state.fileInProgress
+          && (
+              <ShowProgress
+                  fileName={this.state.fileInProgress}
+                  request={this.state.currentRequest}
+              />
+          )}
                 </div>
                 <div className="uploaded-files">
                     {
-                        this.state.fileList.map(file =>
-                            (<div key={file.fileToken} className="row">
+                        this.state.fileList.map(file => (
+                            <div key={file.fileToken} className="row">
                                 <div className="col-sm-12">
                                     <span className="file-name">{file.fileName}</span>
                                     <span className="file-action remove-upload">
+                                        {/* eslint-disable-next-line react/button-has-type */}
                                         <button className="btn btn-link" id={file.fileToken} onClick={this.removeFile}>{gettext('Remove file')}</button>
                                     </span>
                                 </div>
-                            </div>),
-                        )
+                            </div>
+                        ))
                     }
                 </div>
             </div>

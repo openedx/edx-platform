@@ -1,5 +1,6 @@
 import React from 'react';
 
+// eslint-disable-next-line import/prefer-default-export, react/function-component-definition
 export const SelectWithInput = (props) => {
     const {
         selectName,
@@ -21,6 +22,7 @@ export const SelectWithInput = (props) => {
         <div className="d-flex flex-column pb-3">
             <label htmlFor={selectName}>{labelText}</label>
             <select
+                // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus
                 className="form-control"
                 name={selectName}
@@ -31,20 +33,21 @@ export const SelectWithInput = (props) => {
             >
                 {options}
             </select>
-            {showInput &&
-        <input
-            className="form-control"
-            aria-label={`${selectName} description field`}
-            type={inputType}
-            name={inputName}
-            id={inputId}
-            onChange={inputOnChange}
-            onBlur={inputOnBlur}
-            value={inputValue}
-            disabled={disabled}
-            maxLength={255}
-        />
-            }
+            {showInput
+        && (
+            <input
+                className="form-control"
+                aria-label={`${selectName} description field`}
+                type={inputType}
+                name={inputName}
+                id={inputId}
+                onChange={inputOnChange}
+                onBlur={inputOnBlur}
+                value={inputValue}
+                disabled={disabled}
+                maxLength={255}
+            />
+        )}
         </div>
-    )
-}
+    );
+};

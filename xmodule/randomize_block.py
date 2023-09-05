@@ -11,7 +11,6 @@ from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.seq_block import SequenceMixin
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
-    HTMLSnippet,
     ResourceTemplates,
     STUDENT_VIEW,
     XModuleMixin,
@@ -26,7 +25,6 @@ class RandomizeBlock(
     MakoTemplateBlockBase,
     XmlMixin,
     XModuleToXBlockMixin,
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
 ):
@@ -85,7 +83,7 @@ class RandomizeBlock(
 
         return child
 
-    def get_child_descriptors(self):
+    def get_child_blocks(self):
         """
         For grading--return just the chosen child.
         """
@@ -99,7 +97,7 @@ class RandomizeBlock(
         The student view.
         """
         if self.child is None:
-            # raise error instead?  In fact, could complain on descriptor load...
+            # raise error instead?  In fact, could complain on block load...
             return Fragment(content="<div>Nothing to randomize between</div>")
 
         return self.child.render(STUDENT_VIEW, context)
@@ -120,6 +118,6 @@ class RandomizeBlock(
     def has_dynamic_children(self):
         """
         Grading needs to know that only one of the children is actually "real".  This
-        makes it use block.get_child_descriptors().
+        makes it use block.get_child_blocks().
         """
         return True

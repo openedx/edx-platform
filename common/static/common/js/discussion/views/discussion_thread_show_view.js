@@ -1,6 +1,7 @@
 /* globals DiscussionUtil, DiscussionContentShowView, MathJax */
 (function() {
     'use strict';
+
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
             for (var key in parent) {
@@ -32,6 +33,7 @@
                 this.mode = options.mode || 'inline';
                 this.startHeader = options.startHeader;
                 this.is_commentable_divided = options.is_commentable_divided;
+                // eslint-disable-next-line no-cond-assign
                 if ((_ref = this.mode) !== 'tab' && _ref !== 'inline') {
                     throw new Error('invalid mode: ' + this.mode);
                 }

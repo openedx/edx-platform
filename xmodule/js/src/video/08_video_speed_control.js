@@ -1,5 +1,6 @@
 (function(requirejs, require, define) {
     'use strict';
+
     define(
         'video/08_video_speed_control.js', [
             'video/00_iterator.js',
@@ -32,7 +33,7 @@
                 template: [
                     '<div class="speeds menu-container" role="application">',
                     '<p class="sr instructions">',
-                    gettext('Press UP to enter the speed menu then use the UP and DOWN arrow keys to navigate the different speeds, then press ENTER to change to the selected speed.'),  // eslint-disable-line max-len, indent
+                    gettext('Press UP to enter the speed menu then use the UP and DOWN arrow keys to navigate the different speeds, then press ENTER to change to the selected speed.'), // eslint-disable-line max-len, indent
                     '</p>',
                     '<button class="control speed-button" aria-disabled="false" aria-expanded="false"',
                     'title="',
@@ -183,6 +184,7 @@
                         isTouch = state.isTouch,
                         video = document.createElement('video');
 
+                    // eslint-disable-next-line no-extra-boolean-cast
                     return !isTouch || (isHtml5 && !Boolean(video.playbackRate));
                 },
 
@@ -326,6 +328,7 @@
                     var KEY = $.ui.keyCode,
                         keyCode = event.keyCode;
 
+                    // eslint-disable-next-line default-case
                     switch (keyCode) {
                     // Open menu and focus on last element of list above it.
                     case KEY.ENTER:
@@ -361,6 +364,7 @@
                         index = parent.index(),
                         speed = parent.data('speed');
 
+                    // eslint-disable-next-line default-case
                     switch (event.keyCode) {
                     // Close menu.
                     case KEY.TAB:

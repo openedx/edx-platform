@@ -41,6 +41,7 @@ var edx = edx || {};
             * @param {JQuery selector} params.el - The payment form element.
             * @returns {CartView}
             */
+            // eslint-disable-next-line no-shadow
             initialize: function(params) {
                 this.$el = params.el;
                 _.bindAll(view,
@@ -120,7 +121,7 @@ var edx = edx || {};
             // before going to make payment
             // if exists then trigger click event of the apply code button
             var code = $('div.code-input input#input_code').val();
-            if (typeof(code) !== 'undefined' && code != '') {
+            if (typeof code !== 'undefined' && code != '') {
                 $('div.code-input #submit-code').trigger('click');
                 return false;
             }

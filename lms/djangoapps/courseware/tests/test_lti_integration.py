@@ -40,11 +40,11 @@ class TestLTI(BaseTestXmodule):
         mocked_decoded_signature = 'my_signature='
 
         # Note: this course_id is actually a course_key
-        context_id = str(self.item_descriptor.course_id)
-        user_service = self.item_descriptor.runtime.service(self.item_descriptor, 'user')
+        context_id = str(self.block.course_id)
+        user_service = self.block.runtime.service(self.block, 'user')
         user_id = str(user_service.get_current_user().opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID))
         hostname = settings.LMS_BASE
-        resource_link_id = str(urllib.parse.quote(f'{hostname}-{self.item_descriptor.location.html_id()}'))
+        resource_link_id = str(urllib.parse.quote(f'{hostname}-{self.block.location.html_id()}'))
 
         sourcedId = "{context}:{resource_link}:{user_id}".format(
             context=urllib.parse.quote(context_id),
@@ -75,14 +75,14 @@ class TestLTI(BaseTestXmodule):
         saved_sign = oauthlib.oauth1.Client.sign
 
         self.expected_context = {
-            'display_name': self.item_descriptor.display_name,
+            'display_name': self.block.display_name,
             'input_fields': self.correct_headers,
-            'element_class': self.item_descriptor.category,
-            'element_id': self.item_descriptor.location.html_id(),
+            'element_class': self.block.category,
+            'element_id': self.block.location.html_id(),
             'launch_url': 'http://www.example.com',  # default value
             'open_in_a_new_page': True,
-            'form_url': self.item_descriptor.runtime.handler_url(
-                self.item_descriptor,
+            'form_url': self.block.runtime.handler_url(
+                self.block,
                 'preview_handler'
             ).rstrip('/?'),
             'hide_launch': False,
@@ -90,11 +90,11 @@ class TestLTI(BaseTestXmodule):
             'module_score': None,
             'comment': '',
             'weight': 1.0,
-            'ask_to_send_username': self.item_descriptor.ask_to_send_username,
-            'ask_to_send_email': self.item_descriptor.ask_to_send_email,
-            'description': self.item_descriptor.description,
-            'button_text': self.item_descriptor.button_text,
-            'accept_grades_past_due': self.item_descriptor.accept_grades_past_due,
+            'ask_to_send_username': self.block.ask_to_send_username,
+            'ask_to_send_email': self.block.ask_to_send_email,
+            'description': self.block.description,
+            'button_text': self.block.button_text,
+            'accept_grades_past_due': self.block.accept_grades_past_due,
         }
 
         def mocked_sign(self, *args, **kwargs):
@@ -117,12 +117,12 @@ class TestLTI(BaseTestXmodule):
         self.addCleanup(patcher.stop)
 
     def test_lti_constructor(self):
-        generated_content = self.item_descriptor.render(STUDENT_VIEW).content
+        generated_content = self.block.render(STUDENT_VIEW).content
         expected_content = self.runtime.render_template('lti.html', self.expected_context)
         assert generated_content == expected_content
 
     def test_lti_preview_handler(self):
-        generated_content = self.item_descriptor.preview_handler(None, None).body
+        generated_content = self.block.preview_handler(None, None).body
         expected_content = self.runtime.render_template('lti_form.html', self.expected_context)
         assert generated_content.decode('utf-8') == expected_content
 

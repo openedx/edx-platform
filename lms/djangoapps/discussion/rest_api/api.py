@@ -40,7 +40,11 @@ from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.toggles_utils import reported_content_email_notification_enabled
 from lms.djangoapps.discussion.views import is_privileged_user
-from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
+from openedx.core.djangoapps.discussions.models import (
+    DiscussionsConfiguration,
+    DiscussionTopicLink,
+    Provider,
+)
 from openedx.core.djangoapps.discussions.utils import get_accessible_discussion_xblocks
 from openedx.core.djangoapps.django_comment_common import comment_client
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
@@ -116,6 +120,7 @@ from .serializers import (
     UserStatsSerializer,
     get_context
 )
+from .tasks import send_thread_created_notification
 from .utils import (
     AttributeDict,
     add_stats_for_users_with_no_discussion_content,
@@ -123,7 +128,9 @@ from .utils import (
     discussion_open_for_user,
     get_usernames_for_course,
     get_usernames_from_search_string,
-    set_attribute
+    is_posting_allowed,
+    send_response_notifications,
+    set_attribute,
 )
 
 
@@ -166,7 +173,7 @@ class DiscussionEntity(Enum):
 
 def _get_course(course_key: CourseKey, user: User, check_tab: bool = True) -> CourseBlock:
     """
-    Get the course descriptor, raising CourseNotFoundError if the course is not found or
+    Get the course block, raising CourseNotFoundError if the course is not found or
     the user cannot access forums for the course, and DiscussionDisabledError if the
     discussion tab is disabled for the course.
 
@@ -324,9 +331,14 @@ def get_course(request, course_key):
     course_config = DiscussionsConfiguration.get(course_key)
     EDIT_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_EDIT_REASON_CODES", {})
     CLOSE_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_CLOSE_REASON_CODES", {})
+    is_posting_enabled = is_posting_allowed(
+        course_config.posting_restrictions,
+        course.get_discussion_blackout_datetimes()
+    )
 
     return {
         "id": str(course_key),
+        "is_posting_enabled": is_posting_enabled,
         "blackouts": [
             {
                 "start": _format_datetime(blackout["start"]),
@@ -1457,6 +1469,8 @@ def create_thread(request, thread_data):
     track_thread_created_event(request, course, cc_thread, actions_form.cleaned_data["following"],
                                from_mfe_sidebar)
 
+    thread_id = cc_thread.attributes['id']
+    send_thread_created_notification.apply_async(args=[thread_id, str(course.id), request.user.id])
     return api_thread
 
 
@@ -1503,7 +1517,8 @@ def create_comment(request, comment_data):
 
     track_comment_created_event(request, course, cc_comment, cc_thread["commentable_id"], followed=False,
                                 from_mfe_sidebar=from_mfe_sidebar)
-
+    send_response_notifications(thread=cc_thread, course=course, creator=request.user,
+                                parent_id=comment_data.get("parent_id"))
     return api_comment
 
 

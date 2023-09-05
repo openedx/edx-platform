@@ -453,6 +453,11 @@ AWS_SECRET_ACCESS_KEY = AUTH_TOKENS.get("AWS_SECRET_ACCESS_KEY", AWS_SECRET_ACCE
 if AWS_SECRET_ACCESS_KEY == "":
     AWS_SECRET_ACCESS_KEY = None
 
+# these variable already exists in cms with `private` value. django-storages starting `1.10.1`
+# does not set acl values till 1.9.1 default-acl is `public-read`. To maintain the behaviour
+# same with upcoming version setting it to `public-read`.
+AWS_DEFAULT_ACL = 'public-read'
+AWS_BUCKET_ACL = AWS_DEFAULT_ACL
 AWS_STORAGE_BUCKET_NAME = AUTH_TOKENS.get('AWS_STORAGE_BUCKET_NAME', 'edxuploads')
 
 # Disabling querystring auth instructs Boto to exclude the querystring parameters (e.g. signature, access key) it
@@ -463,7 +468,7 @@ AWS_S3_CUSTOM_DOMAIN = AUTH_TOKENS.get('AWS_S3_CUSTOM_DOMAIN', 'edxuploads.s3.am
 if AUTH_TOKENS.get('DEFAULT_FILE_STORAGE'):
     DEFAULT_FILE_STORAGE = AUTH_TOKENS.get('DEFAULT_FILE_STORAGE')
 elif AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 else:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
@@ -490,6 +495,18 @@ XQUEUE_INTERFACE = AUTH_TOKENS.get('XQUEUE_INTERFACE', XQUEUE_INTERFACE)
 # Get the MODULESTORE from auth.json, but if it doesn't exist,
 # use the one from common.py
 MODULESTORE = convert_module_store_setting_if_needed(AUTH_TOKENS.get('MODULESTORE', MODULESTORE))
+
+# After conversion above, the modulestore will have a "stores" list with all defined stores, for all stores, add the
+# fs_root entry to derived collection so that if it's a callable it can be resolved.  We need to do this because the
+# `derived_collection_entry` takes an exact index value but the config file might have overidden the number of stores
+# and so we can't be sure that the 2 we define in common.py will be there when we try to derive settings.  This could
+# lead to execptions being thrown when the `derive_settings` call later in this file tries to update settings.  We call
+# the derived_collection_entry function here to ensure that we update the fs_root for any callables that remain after
+# we've updated the MODULESTORE setting from our config file.
+for idx, store in enumerate(MODULESTORE['default']['OPTIONS']['stores']):
+    if 'OPTIONS' in store and 'fs_root' in store["OPTIONS"]:
+        derived_collection_entry('MODULESTORE', 'default', 'OPTIONS', 'stores', idx, 'OPTIONS', 'fs_root')
+
 MONGODB_LOG = AUTH_TOKENS.get('MONGODB_LOG', {})
 
 EMAIL_HOST_USER = AUTH_TOKENS.get('EMAIL_HOST_USER', '')  # django default is ''
@@ -909,6 +926,15 @@ ENTERPRISE_CATALOG_INTERNAL_ROOT_URL = ENV_TOKENS.get(
     ENTERPRISE_CATALOG_INTERNAL_ROOT_URL
 )
 
+OPENAI_API_KEY = ENV_TOKENS.get('OPENAI_API_KEY', '')
+LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT = ENV_TOKENS.get('LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT', '')
+LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT = ENV_TOKENS.get(
+    'LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT',
+    ''
+)
+LEARNER_PROGRESS_PROMPT_FOR_ACTIVE_CONTRACT = ENV_TOKENS.get('LEARNER_PROGRESS_PROMPT_FOR_ACTIVE_CONTRACT', '')
+LEARNER_PROGRESS_PROMPT_FOR_NON_ACTIVE_CONTRACT = ENV_TOKENS.get('LEARNER_PROGRESS_PROMPT_FOR_NON_ACTIVE_CONTRACT', '')
+
 ############## ENTERPRISE SERVICE LMS CONFIGURATION ##################################
 # The LMS has some features embedded that are related to the Enterprise service, but
 # which are not provided by the Enterprise service. These settings override the
@@ -1089,3 +1115,6 @@ SURVEY_REPORT_ENDPOINT = ENV_TOKENS.get('SURVEY_REPORT_ENDPOINT',
 ANONYMOUS_SURVEY_REPORT = False
 
 AVAILABLE_DISCUSSION_TOURS = ENV_TOKENS.get('AVAILABLE_DISCUSSION_TOURS', [])
+
+############## NOTIFICATIONS EXPIRY ##############
+NOTIFICATIONS_EXPIRY = ENV_TOKENS.get('NOTIFICATIONS_EXPIRY', NOTIFICATIONS_EXPIRY)

@@ -517,6 +517,7 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             200,
             {
                 "id": str(self.course.id),
+                "is_posting_enabled": True,
                 "blackouts": [],
                 "thread_list_url": "http://testserver/api/discussion/v1/threads/?course_id=course-v1%3Ax%2By%2Bz",
                 "following_thread_list_url": (
@@ -1359,7 +1360,10 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         super().setUp()
         self.url = reverse("thread-list")
 
-    def test_basic(self):
+    @mock.patch(
+        'lms.djangoapps.discussion.rest_api.tasks.send_thread_created_notification.apply_async'
+    )
+    def test_basic(self, mock_notification_task):
         self.register_get_user_response(self.user)
         cs_thread = make_minimal_cs_thread({
             "id": "test_thread",
@@ -1380,6 +1384,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             content_type="application/json"
         )
         assert response.status_code == 200
+        mock_notification_task.assert_called_once()
         response_data = json.loads(response.content.decode('utf-8'))
         assert response_data == self.expected_thread_data({
             "read": True,

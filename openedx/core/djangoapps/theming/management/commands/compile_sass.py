@@ -18,7 +18,7 @@ class Command(BaseCommand):
     help = 'Compile and collect themed assets...'
 
     # NOTE (CCB): This allows us to compile static assets in Docker containers without database access.
-    requires_system_checks = False
+    requires_system_checks = []
 
     def add_arguments(self, parser):
         """

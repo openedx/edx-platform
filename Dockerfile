@@ -54,9 +54,14 @@ RUN apt-get update && \
         python3-venv \
         python3.8 \
         python3.8-minimal \
+        # python3-dev: required for building mysqlclient python package version 2.2.0
+        python3-dev \
         libpython3.8 \
         libpython3.8-stdlib \
         libmysqlclient21 \
+        # libmysqlclient-dev: required for building mysqlclient python package version 2.2.0
+        libmysqlclient-dev \
+        pkg-config \
         libssl1.1 \
         libxmlsec1-openssl \
         # lynx: Required by https://github.com/openedx/edx-platform/blob/b489a4ecb122/openedx/core/lib/html_to_text.py#L16
@@ -85,13 +90,10 @@ FROM minimal-system as builder-production
 RUN apt-get update && \
     apt-get -y install --no-install-recommends \
         curl \
-        pkg-config \
-        libmysqlclient-dev \
         libssl-dev \
         libxml2-dev \
         libxmlsec1-dev \
         libxslt1-dev \
-        python3-dev \
         libffi-dev \
         libfreetype6-dev \
         libgeos-dev \
@@ -114,12 +116,19 @@ COPY requirements requirements
 RUN pip install -r requirements/pip.txt
 RUN pip install -r requirements/edx/base.txt
 
-# Install node and node modules
+# Install node and npm
 RUN nodeenv /edx/app/edxapp/nodeenv --node=16.14.0 --prebuilt
 RUN npm install -g npm@8.5.x
+
+# This script is used by an npm post-install hook.
+# We copy it into the image now so that it will be available when we run `npm install` in the next step.
+# The script itself will copy certain modules into some uber-legacy parts of edx-platform which still use RequireJS.
+COPY scripts/copy-node-modules.sh scripts/copy-node-modules.sh
+
+# Install node modules
 COPY package.json package.json
 COPY package-lock.json package-lock.json
-RUN npm set progress=false && npm install
+RUN npm set progress=false && npm ci
 
 # The builder-development stage is a temporary stage that installs python modules required for development purposes
 # The built artifacts from this stage are then copied to the development stage.

@@ -9,6 +9,7 @@ var edx = edx || {};
 
 (function($, _) {
     'use strict';
+
     var errorView,
         $el = $('#incourse-reverify-container');
 

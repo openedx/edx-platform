@@ -28,6 +28,7 @@
         TabsEdit = (function(_super) {
             __extends(TabsEdit, _super);
 
+            // eslint-disable-next-line no-shadow
             function TabsEdit() {
                 var self = this;
                 this.deleteTab = function() {

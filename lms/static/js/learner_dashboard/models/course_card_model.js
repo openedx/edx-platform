@@ -34,6 +34,7 @@ class CourseCardModel extends Backbone.Model {
             desiredCourseRun = enrolledCourseRun;
         } else if (openEnrollmentCourseRuns.length > 0) {
             if (openEnrollmentCourseRuns.length === 1) {
+                // eslint-disable-next-line prefer-destructuring
                 desiredCourseRun = openEnrollmentCourseRuns[0];
             } else {
                 desiredCourseRun = CourseCardModel.getUnselectedCourseRun(openEnrollmentCourseRuns);
@@ -56,6 +57,7 @@ class CourseCardModel extends Backbone.Model {
         if (courseRuns && courseRuns.length > 0) {
             const courseRun = courseRuns[0];
 
+            // eslint-disable-next-line no-undef
             $.extend(unselectedRun, {
                 marketing_url: courseRun.marketing_url,
                 is_enrollment_open: courseRun.is_enrollment_open,
@@ -69,13 +71,14 @@ class CourseCardModel extends Backbone.Model {
 
     getEnrollableCourseRuns() {
         const rawCourseRuns = this.context.course_runs.filter(run => (
-            run.is_enrollment_open &&
-      !run.is_enrolled &&
-      !run.is_course_ended &&
-      run.status === 'published'
+            run.is_enrollment_open
+      && !run.is_enrolled
+      && !run.is_course_ended
+      && run.status === 'published'
         ));
 
         // Deep copy to avoid mutating this.context.
+        // eslint-disable-next-line no-undef
         const enrollableCourseRuns = $.extend(true, [], rawCourseRuns);
 
         // These are raw course runs from the server. The start
@@ -95,10 +98,10 @@ class CourseCardModel extends Backbone.Model {
 
     getUpcomingCourseRuns() {
         return this.context.course_runs.filter(run => (
-            !run.is_enrollment_open &&
-      !run.is_enrolled &&
-      !run.is_course_ended &&
-      run.status === 'published'
+            !run.is_enrollment_open
+      && !run.is_enrolled
+      && !run.is_course_ended
+      && run.status === 'published'
         ));
     }
 
@@ -128,6 +131,7 @@ class CourseCardModel extends Backbone.Model {
             if (upgradeableSeats.length > 0) {
                 const upgradeableSeat = upgradeableSeats[0];
                 if (upgradeableSeat) {
+                    // eslint-disable-next-line prefer-destructuring
                     const currency = upgradeableSeat.currency;
                     if (currency === 'USD') {
                         return `$${upgradeableSeat.price}`;
@@ -142,17 +146,17 @@ class CourseCardModel extends Backbone.Model {
     formatDateString(run) {
         const pacingType = run.pacing_type;
         let dateString;
-        let start = CourseCardModel.valueIsDefined(run.start_date) ?
-            run.advertised_start || run.start_date :
-            this.get('start_date');
+        let start = CourseCardModel.valueIsDefined(run.start_date)
+            ? run.advertised_start || run.start_date
+            : this.get('start_date');
         if (start === undefined) {
-            start = CourseCardModel.valueIsDefined(run.start) ?
-                run.advertised_start || CourseCardModel.formatDate(run.start) : undefined;
+            start = CourseCardModel.valueIsDefined(run.start)
+                ? run.advertised_start || CourseCardModel.formatDate(run.start) : undefined;
         }
         let end = CourseCardModel.valueIsDefined(run.end_date) ? run.end_date : this.get('end_date');
         if (end === undefined) {
-            end = CourseCardModel.valueIsDefined(run.end) ?
-                CourseCardModel.formatDate(run.end) : undefined;
+            end = CourseCardModel.valueIsDefined(run.end)
+                ? CourseCardModel.formatDate(run.end) : undefined;
         }
         const now = new Date();
         const startDate = new Date(start);
@@ -160,9 +164,9 @@ class CourseCardModel extends Backbone.Model {
 
         if (pacingType === 'self_paced') {
             if (start) {
-                dateString = startDate > now ?
-                    StringUtils.interpolate(gettext('(Self-paced) Starts {start}'), { start }) :
-                    StringUtils.interpolate(gettext('(Self-paced) Started {start}'), { start });
+                dateString = startDate > now
+                    ? StringUtils.interpolate(gettext('(Self-paced) Starts {start}'), { start })
+                    : StringUtils.interpolate(gettext('(Self-paced) Started {start}'), { start });
             } else if (end && endDate > now) {
                 dateString = StringUtils.interpolate(gettext('(Self-paced) Ends {end}'), { end });
             } else if (end && endDate < now) {
@@ -171,9 +175,9 @@ class CourseCardModel extends Backbone.Model {
         } else if (start && end) {
             dateString = `${start} - ${end}`;
         } else if (start) {
-            dateString = startDate > now ?
-                StringUtils.interpolate(gettext('Starts {start}'), { start }) :
-                StringUtils.interpolate(gettext('Started {start}'), { start });
+            dateString = startDate > now
+                ? StringUtils.interpolate(gettext('Starts {start}'), { start })
+                : StringUtils.interpolate(gettext('Started {start}'), { start });
         } else if (end) {
             dateString = StringUtils.interpolate(gettext('Ends {end}'), { end });
         }

@@ -27,6 +27,7 @@ function(
     DropdownMenuView
 ) {
     'use strict';
+
     var $body;
 
     function smoothScrollLink(e) {
