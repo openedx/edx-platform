@@ -78,7 +78,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-08-20 20:42+0000\n"
+"POT-Creation-Date: 2023-08-27 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Kyoto University <edxkyotoux@gmail.com>, 2017\n"
 "Language-Team: Japanese (Japan) (http://app.transifex.com/open-edx/edx-platform/language/ja_JP/)\n"
@@ -10587,6 +10587,14 @@ msgid ""
 msgstr ""
 " %(xblockType)s "
 "を受講者に公開する場合、公開日以降ユニットを公開した時点でコンテンツを見ることができるようになります。%(xblockType)sのオプションを取消にすると、明示的に非表示にしているユニットのみ非表示になります。"
+
+#: cms/templates/js/summary-configuration-editor.underscore
+msgid "Xpert unit summaries"
+msgstr ""
+
+#: cms/templates/js/summary-configuration-editor.underscore
+msgid "Enable summaries"
+msgstr ""
 
 #: cms/templates/js/team-member.underscore
 msgid "Current Role:"
