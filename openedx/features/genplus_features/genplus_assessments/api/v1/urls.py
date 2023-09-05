@@ -25,6 +25,6 @@ urlpatterns = [
             'post': 'update_skills_assessment_question_mapping'
         }), name='skills-assessment-question-mapping'),
     url(r'^save-rating-response/$', SaveRatingResponseApiView.as_view()),
-    url(r'skill-reflection/(?P<class_id>\d+)$', SkillReflectionApiView.as_view()),
+    url(r'skill-reflection/(?P<class_id>\d+)/$', SkillReflectionApiView.as_view()),
     url(r'skill-reflection-individual/(?P<user_id>\d+)/$', SkillReflectionIndividualApiView.as_view()),
 ]

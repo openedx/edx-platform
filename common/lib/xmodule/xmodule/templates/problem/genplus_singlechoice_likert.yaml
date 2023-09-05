@@ -24,10 +24,10 @@ data: |
                 <strong class="question-text">Did you and your partner communicate effectively?</strong>
               </span>
               <choicegroup type="MultipleChoice">
-                <choice class="choice_0" correct="true" point="1">Very Uncomfortable</choice>
-                <choice class="choice_1" correct="true" point="2">Uncomfortable</choice>
-                <choice class="choice_2" correct="true" point="3">Comfortable</choice>
-                <choice class="choice_3" correct="true" point="4">Very Comfortable</choice>
+                <choice class="choice_0" correct="true" point="1">Not confident at all</choice>
+                <choice class="choice_1" correct="true" point="2">Not confident</choice>
+                <choice class="choice_2" correct="true" point="3">Confident</choice>
+                <choice class="choice_3" correct="true" point="4">Very confident</choice>
               </choicegroup>
             </multiplechoiceresponse>
           </div>
