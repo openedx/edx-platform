@@ -226,12 +226,7 @@ if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
     urlpatterns += [
         re_path(r'^api/mobile/(?P<api_version>v(2|1|0.5))/', include('lms.djangoapps.mobile_api.urls')),
     ]
-
-if settings.FEATURES.get('ENABLE_OPENBADGES'):
-    urlpatterns += [
-        path('api/badges/v1/', include(('lms.djangoapps.badges.api.urls', 'badges'), namespace='badges_api')),
-    ]
-
+    
 urlpatterns += [
     path('openassessment/fileupload/', include('openassessment.fileupload.urls')),
 ]

@@ -75,8 +75,6 @@ from common.djangoapps.xblock_django.constants import (
     ATTR_KEY_USER_IS_STAFF,
     ATTR_KEY_USER_ROLE,
 )
-from lms.djangoapps.badges.tests.factories import BadgeClassFactory
-from lms.djangoapps.badges.tests.test_models import get_image
 from lms.djangoapps.courseware import block_render as render
 from lms.djangoapps.courseware.access_response import AccessResponse
 from lms.djangoapps.courseware.courses import get_course_info_section, get_course_with_access
@@ -2396,25 +2394,6 @@ class TestBadgingService(LMSXBlockServiceMixin):
         self.course = CourseFactory.create(metadata={'issue_badges': toggle})
         self._prepare_runtime()
         assert self.block.runtime.service(self.block, 'badging').course_badges_enabled is toggle
-
-    @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
-    def test_get_badge_class(self):
-        self._prepare_runtime()
-        badge_service = self.block.runtime.service(self.block, 'badging')
-        premade_badge_class = BadgeClassFactory.create()
-        # Ignore additional parameters. This class already exists.
-        # We should get back the first class we created, rather than a new one.
-        with get_image('good') as image_handle:
-            badge_class = badge_service.get_badge_class(
-                slug='test_slug', issuing_component='test_component', description='Attempted override',
-                criteria='test', display_name='Testola', image_file_handle=image_handle
-            )
-        # These defaults are set on the factory.
-        assert badge_class.criteria == 'https://example.com/syllabus'
-        assert badge_class.display_name == 'Test Badge'
-        assert badge_class.description == "Yay! It's a test badge."
-        # File name won't always be the same.
-        assert badge_class.image.path == premade_badge_class.image.path
 
 
 class TestI18nService(LMSXBlockServiceMixin):

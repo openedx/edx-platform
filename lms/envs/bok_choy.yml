@@ -6,7 +6,6 @@ AWS_ACCESS_KEY_ID: ''
 AWS_SECRET_ACCESS_KEY: ''
 BUGS_EMAIL: bugs@example.com
 BULK_EMAIL_DEFAULT_FROM_EMAIL: no-reply@example.com
-BADGING_BACKEND: 'lms.djangoapps.badges.backends.tests.dummy_backend.DummyBackend'
 BLOCK_STRUCTURES_SETTINGS:
   # We have CELERY_ALWAYS_EAGER set to True, so there's no asynchronous
   # code running and the celery routing is unimportant.

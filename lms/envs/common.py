@@ -3206,9 +3206,6 @@ INSTALLED_APPS = [
     # Learner's dashboard
     'lms.djangoapps.learner_dashboard',
 
-    # Needed whether or not enabled, due to migrations
-    # 'lms.djangoapps.badges.apps.BadgesConfig',
-
     # Enables default site and redirects
     'django_sites_extensions',
 
@@ -3662,15 +3659,6 @@ REGISTRATION_EMAIL_PATTERNS_ALLOWED = None
 ########################## CERTIFICATE NAME ########################
 CERT_NAME_SHORT = "Certificate"
 CERT_NAME_LONG = "Certificate of Achievement"
-
-#################### OpenBadges Settings #######################
-
-# .. setting_name: BADGING_BACKEND
-# .. setting_default: 'lms.djangoapps.badges.backends.badgr.BadgrBackend'
-# .. setting_description: The backend service class (or callable) for creating OpenBadges. It must implement
-#    the interface provided by lms.djangoapps.badges.backends.base.BadgeBackend
-# .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
-BADGING_BACKEND = 'lms.djangoapps.badges.backends.badgr.BadgrBackend'
 
 # .. setting_name: BADGR_BASE_URL
 # .. setting_default: 'http://localhost:8005'
