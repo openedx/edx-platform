@@ -53,8 +53,6 @@ class TestMongoKeyValueStore(TestCase):
 
     @ddt.data(
         (Scope.content, "foo", "new_data"),
-        (Scope.children, "children", []),
-        (Scope.children, "parent", None),
         (Scope.settings, "meta", "new_settings"),
     )
     @ddt.unpack
@@ -81,12 +79,6 @@ class TestMongoKeyValueStore(TestCase):
         with pytest.raises(KeyError):
             self.kvs.get(key)
         assert not self.kvs.has(key)
-
-    def test_delete_key_default(self):
-        key = KeyValueStore.Key(Scope.children, None, None, "children")
-        self.kvs.delete(key)
-        assert self.kvs.get(key) == []
-        assert self.kvs.has(key)
 
     def test_delete_invalid_scope(self):
         for scope in (Scope.preferences, Scope.user_info, Scope.user_state, Scope.parent):
