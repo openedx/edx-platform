@@ -1,7 +1,13 @@
 """
 Models for course roles schema
 """
+from django.contrib.auth import get_user_model
 from django.db import models
+
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from organizations.models import Organization
+
+User = get_user_model()
 
 
 class CourseRolesRole(models.Model):
@@ -45,6 +51,27 @@ class CourseRolesRolePermissions(models.Model):
 
     def __str__(self):
         return f"{self.role} - {self.permission}"
+
+
+class CourseRolesUserRole(models.Model):
+    """
+    Model for a course roles user role.
+    """
+    user = models.ManyToManyField(User)
+    role = models.ForeignKey('CourseRolesRole', on_delete=models.CASCADE)
+    course = models.ForeignKey(
+        CourseOverview,
+        db_constraint=False,
+        on_delete=models.DO_NOTHING,
+        null=True,
+    )
+    org = models.ForeignKey(Organization, on_delete=models.DO_NOTHING, null=False)
+
+    class Meta:
+        unique_together = ('user', 'role', 'course')
+
+    def __str__(self):
+        return f"{self.user} - {self.course_id} - {self.role}"
 
 
 class CourseRolesService(models.Model):
