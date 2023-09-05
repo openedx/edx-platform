@@ -67,9 +67,6 @@ class CourseRolesUserRole(models.Model):
     )
     org = models.ForeignKey(Organization, on_delete=models.DO_NOTHING, null=False)
 
-    class Meta:
-        unique_together = ('user', 'role', 'course')
-
     def __str__(self):
         return f"{self.user} - {self.course_id} - {self.role}"
 
