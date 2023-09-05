@@ -13,7 +13,7 @@ import unittest
 from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
 from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
 from lms.djangoapps.discussion.rest_api.tests.utils import CommentsServiceMockMixin, ThreadMock
-from openedx.core.djangoapps.discussions.models import PostingRestriction
+from openedx.core.djangoapps.discussions.models import PostingRestriction, DiscussionsConfiguration
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -43,6 +43,9 @@ class DiscussionAPIUtilsTestCase(ModuleStoreTestCase):
         self.course = CourseFactory.create()
         self.course.discussion_blackouts = [datetime.now(UTC) - timedelta(days=3),
                                             datetime.now(UTC) + timedelta(days=3)]
+        configuration = DiscussionsConfiguration.get(self.course.id)
+        configuration.posting_restrictions = PostingRestriction.SCHEDULED
+        configuration.save()
         self.student_role = RoleFactory(name='Student', course_id=self.course.id)
         self.moderator_role = RoleFactory(name='Moderator', course_id=self.course.id)
         self.community_ta_role = RoleFactory(name='Community TA', course_id=self.course.id)

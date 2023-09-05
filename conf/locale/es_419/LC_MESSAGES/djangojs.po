@@ -182,7 +182,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-08-20 20:42+0000\n"
+"POT-Creation-Date: 2023-08-27 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Jesica Greco, 2023\n"
 "Language-Team: Spanish (Latin America) (http://app.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -11750,6 +11750,14 @@ msgstr ""
 "contenido a partir de la fecha de liberación siempre que haya publicado la "
 "unidad. Sólo las unidades que están ocultos explícitamente permanecerán "
 "ocultas después de quitar esta opción para %(xblockType)s."
+
+#: cms/templates/js/summary-configuration-editor.underscore
+msgid "Xpert unit summaries"
+msgstr "Resúmenes de unidades de expertos"
+
+#: cms/templates/js/summary-configuration-editor.underscore
+msgid "Enable summaries"
+msgstr "Habilitar resúmenes"
 
 #: cms/templates/js/team-member.underscore
 msgid "Current Role:"
