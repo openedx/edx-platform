@@ -21,7 +21,6 @@ from common.djangoapps.student.models import (
     UserPasswordToggleHistory,
     UserProfile
 )
-from lms.djangoapps.badges.utils import badges_enabled
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import errors
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
@@ -136,7 +135,6 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
         except ObjectDoesNotExist:
             activation_key = None
 
-        accomplishments_shared = badges_enabled()
         data = {
             "username": user.username,
             "url": self.context.get('request').build_absolute_uri(
@@ -164,7 +162,6 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
             "level_of_education": None,
             "mailing_address": None,
             "requires_parental_consent": None,
-            "accomplishments_shared": accomplishments_shared,
             "account_privacy": self.configuration.get('default_visibility'),
             "social_links": None,
             "extended_profile_fields": None,

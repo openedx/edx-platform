@@ -250,9 +250,6 @@ class AccountViewSet(ViewSet):
               If "custom", the user has selectively chosen a subset of shareable
               fields to make visible to others via the User Preferences API.
 
-            * accomplishments_shared: Signals whether badges are enabled on the
-              platform and should be fetched.
-
             * phone_number: The phone number for the user. String of numbers with
               an optional `+` sign at the start.
 

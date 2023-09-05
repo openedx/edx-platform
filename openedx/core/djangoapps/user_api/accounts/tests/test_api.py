@@ -625,7 +625,6 @@ class AccountSettingsOnCreationTest(CreateAccountMixin, TestCase):
             'requires_parental_consent': True,
             'language_proficiencies': [],
             'account_privacy': PRIVATE_VISIBILITY,
-            'accomplishments_shared': False,
             'extended_profile': [],
             'secondary_email': None,
             'secondary_email_enabled': None,
