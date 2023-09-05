@@ -24,6 +24,17 @@ class CourseRolesRole(models.Model):
         return self.name
 
 
+class CourseRolesPermission(models.Model):
+    """
+    Model for a course roles permission.
+    """
+    name = models.CharField(max_length=255, unique=True)
+    description = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
 class CourseRolesService(models.Model):
     """
     Model for a course roles service.
