@@ -23,6 +23,7 @@ User = get_user_model()
 
 TAXONOMY_ORG_LIST_URL = "/api/content_tagging/v1/taxonomies/"
 TAXONOMY_ORG_DETAIL_URL = "/api/content_tagging/v1/taxonomies/{pk}/"
+OBJECT_TAG_LIST_URL = "/api/content_tagging/v1/object_tags/{object_id}/"
 
 
 def check_taxonomy(
@@ -52,7 +53,7 @@ def check_taxonomy(
     assert data["visible_to_authors"] == visible_to_authors
 
 
-class TestTaxonomyViewSetMixin:
+class TestTaxonomyObjectsMixin:
     """
     Sets up data for testing Content Taxonomies.
     """
@@ -168,7 +169,7 @@ class TestTaxonomyViewSetMixin:
 @skip_unless_cms
 @ddt.ddt
 @override_settings(FEATURES={"ENABLE_CREATOR_GROUP": True})
-class TestTaxonomyViewSet(TestTaxonomyViewSetMixin, APITestCase):
+class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
     """
     Test cases for TaxonomyViewSet when ENABLE_CREATOR_GROUP is True
     """
@@ -639,3 +640,29 @@ class TestTaxonomyViewSetNoCreatorGroup(TestTaxonomyViewSet):  # pylint: disable
 
     The permissions are the same for when ENABLED_CREATOR_GRUP is True
     """
+
+@skip_unless_cms
+@ddt.ddt
+class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
+    """
+    Testing various cases for the ObjectTagView.
+    """
+    def setUp(self):
+        super().setUp()
+
+
+    @ddt.data(
+        (None, status.HTTP_403_FORBIDDEN),
+    )
+    @ddt.unpack
+    def test_tag_object(self, user_attr, expected_status):
+        url = OBJECT_TAG_LIST_URL.format(object_id="abc")
+
+        if user_attr:
+            user = getattr(self, user_attr)
+            self.client.force_authenticate(user=user)
+
+        response = self.client.put(url, format="json")
+        assert response.status_code == expected_status
+
+

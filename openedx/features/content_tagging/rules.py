@@ -2,18 +2,20 @@
 
 from __future__ import annotations
 
+from typing import Union
+
+import django.contrib.auth.models
 import openedx_tagging.core.tagging.rules as oel_tagging
 import rules
-from django.contrib.auth import get_user_model
 
-from common.djangoapps.student.auth import is_content_creator
+from common.djangoapps.student.auth import is_content_creator, has_studio_write_access
 
 from .models import TaxonomyOrg
 
-User = get_user_model()
+UserType = Union[django.contrib.auth.models.User, django.contrib.auth.models.AnonymousUser]
 
 
-def is_taxonomy_user(user: User, taxonomy: oel_tagging.Taxonomy = None) -> bool:
+def is_taxonomy_user(user: UserType, taxonomy: oel_tagging.Taxonomy | None = None) -> bool:
     """
     Returns True if the given user is a Taxonomy User for the given content taxonomy.
 
@@ -38,15 +40,16 @@ def is_taxonomy_user(user: User, taxonomy: oel_tagging.Taxonomy = None) -> bool:
 
 
 @rules.predicate
-def can_add_taxonomy(user: User) -> bool:
+def can_change_object_tag_objectid(user: UserType, object_id: str) -> bool:
     """
-    Only taxonomy admins can add taxonomies.
+    Everyone that has permission to edit the object should be able to tag it.
     """
-    return oel_tagging.is_taxonomy_admin(user)
+
+    return has_studio_write_access(user, object_id)
 
 
 @rules.predicate
-def can_change_taxonomy_tag(user: User, tag: oel_tagging.Tag = None) -> bool:
+def can_change_taxonomy_tag(user: UserType, tag: oel_tagging.Tag | None = None) -> bool:
     """
     Even taxonomy admins cannot add tags to system taxonomies (their tags are system-defined), or free-text taxonomies
     (these don't have predefined tags).
@@ -61,21 +64,8 @@ def can_change_taxonomy_tag(user: User, tag: oel_tagging.Tag = None) -> bool:
     )
 
 
-@rules.predicate
-def can_change_object_tag(user: User, object_tag: oel_tagging.ObjectTag = None) -> bool:
-    """
-    Taxonomy users can create or modify object tags on enabled taxonomies.
-    """
-    taxonomy = object_tag.taxonomy if object_tag else None
-    if taxonomy:
-        taxonomy = taxonomy.cast()
-    return is_taxonomy_user(user, taxonomy) and (
-        not object_tag or not taxonomy or (taxonomy and taxonomy.cast().enabled)
-    )
-
-
 # Taxonomy
-rules.set_perm("oel_tagging.add_taxonomy", can_add_taxonomy)
+rules.set_perm("oel_tagging.add_taxonomy", oel_tagging.is_taxonomy_admin)
 rules.set_perm("oel_tagging.change_taxonomy", oel_tagging.can_change_taxonomy)
 rules.set_perm("oel_tagging.delete_taxonomy", oel_tagging.can_change_taxonomy)
 rules.set_perm("oel_tagging.view_taxonomy", oel_tagging.can_view_taxonomy)
@@ -87,7 +77,11 @@ rules.set_perm("oel_tagging.delete_tag", can_change_taxonomy_tag)
 rules.set_perm("oel_tagging.view_tag", rules.always_allow)
 
 # ObjectTag
-rules.set_perm("oel_tagging.add_object_tag", can_change_object_tag)
-rules.set_perm("oel_tagging.change_object_tag", can_change_object_tag)
-rules.set_perm("oel_tagging.delete_object_tag", can_change_object_tag)
+rules.set_perm("oel_tagging.add_object_tag", oel_tagging.can_change_object_tag)
+rules.set_perm("oel_tagging.change_object_tag", oel_tagging.can_change_object_tag)
+rules.set_perm("oel_tagging.delete_object_tag", oel_tagging.can_change_object_tag)
 rules.set_perm("oel_tagging.view_object_tag", rules.always_allow)
+
+# Users can tag objects using tags from any taxonomy that they have permission to view
+rules.set_perm("oel_tagging.change_objecttag_taxonomy", is_taxonomy_user)
+rules.set_perm("oel_tagging.change_objecttag_objectid", can_change_object_tag_objectid)
