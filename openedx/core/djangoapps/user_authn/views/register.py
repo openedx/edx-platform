@@ -529,15 +529,11 @@ class RegistrationView(APIView):
         email = data.get('email')
         username = data.get('username')
         errors = {}
-        if User.objects.filter(email=email, username=username).exists():
-            user = User.objects.get(email=email, username=username)
+        if User.objects.filter(email=email).exists():
+            user = User.objects.get(email=email)
             edly_access_user = create_edly_access_role(request, user)
             create_learner_link_with_permission_groups(edly_access_user)
             return self._create_response(request, {}, status_code=200)
-
-        elif User.objects.filter(email=email).exists():
-            errors["email"] = [{"user_message": "Email {} already exists".format(email)}]
-            return self._create_response(request, errors, status_code=400)
 
         elif User.objects.filter(username=username).exists():
             errors["username"] = [{"user_message": "Username {} already exists.".format(username)}]
