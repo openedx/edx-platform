@@ -1788,6 +1788,9 @@ INSTALLED_APPS = [
 
     # Blockstore
     'blockstore.apps.bundles',
+
+    # Course Roles
+    'openedx.core.djangoapps.course_roles',
 ]
 
 
