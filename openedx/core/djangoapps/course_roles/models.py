@@ -35,6 +35,18 @@ class CourseRolesPermission(models.Model):
         return self.name
 
 
+class CourseRolesRolePermissions(models.Model):
+    """
+    Model for a course roles role permission.
+    """
+    role = models.ForeignKey('CourseRolesRole', on_delete=models.CASCADE)
+    permission = models.ManyToManyField('CourseRolesPermission')
+    allowed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.role} - {self.permission}"
+
+
 class CourseRolesService(models.Model):
     """
     Model for a course roles service.
