@@ -1323,7 +1323,7 @@ optimizely-sdk==4.1.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-ora2==5.3.0
+ora2 @ git+https://github.com/openedx/edx-ora2@aurora/bff-datalayer
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
