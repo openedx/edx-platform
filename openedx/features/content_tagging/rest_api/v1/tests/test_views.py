@@ -7,6 +7,7 @@ from urllib.parse import parse_qs, urlparse
 import ddt
 from django.contrib.auth import get_user_model
 from django.test.testcases import override_settings
+from opaque_keys.edx.locator import CourseLocator
 from openedx_tagging.core.tagging.models import Taxonomy
 from openedx_tagging.core.tagging.models.system_defined import SystemDefinedTaxonomy
 from openedx_tagging.core.tagging.rest_api.v1.serializers import TaxonomySerializer
@@ -14,8 +15,9 @@ from organizations.models import Organization
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from common.djangoapps.student.auth import update_org_role
-from common.djangoapps.student.roles import OrgContentCreatorRole
+from common.djangoapps.student.auth import add_users, update_org_role
+from common.djangoapps.student.roles import CourseStaffRole, OrgContentCreatorRole
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.features.content_tagging.models import TaxonomyOrg
 
@@ -23,7 +25,7 @@ User = get_user_model()
 
 TAXONOMY_ORG_LIST_URL = "/api/content_tagging/v1/taxonomies/"
 TAXONOMY_ORG_DETAIL_URL = "/api/content_tagging/v1/taxonomies/{pk}/"
-OBJECT_TAG_LIST_URL = "/api/content_tagging/v1/object_tags/{object_id}/"
+OBJECT_TAG_UPDATE_URL = "/api/content_tagging/v1/object_tags/{object_id}/?taxonomy={taxonomy_id}"
 
 
 def check_taxonomy(
@@ -114,13 +116,13 @@ class TestTaxonomyObjectsMixin:
         )
 
         # OrgA taxonomy
-        self.tA1 = Taxonomy.objects.create(name="tA1", enabled=True)
+        self.tA1 = Taxonomy.objects.create(name="tA1", enabled=True, allow_free_text=True)
         TaxonomyOrg.objects.create(
             taxonomy=self.tA1,
             org=self.orgA,
             rel_type=TaxonomyOrg.RelType.OWNER,
         )
-        self.tA2 = Taxonomy.objects.create(name="tA2", enabled=False)
+        self.tA2 = Taxonomy.objects.create(name="tA2", enabled=False, allow_free_text=True)
         TaxonomyOrg.objects.create(
             taxonomy=self.tA2,
             org=self.orgA,
@@ -454,7 +456,7 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
     @ddt.unpack
     def test_update_taxonomy_system_defined(self, update_value, expected_status):
         """
-        Test that we can't update system_defined field
+        Test that we can"t update system_defined field
         """
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.st1.pk)
 
@@ -550,7 +552,7 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
     @ddt.unpack
     def test_patch_taxonomy_system_defined(self, update_value, expected_status):
         """
-        Test that we can't patch system_defined field
+        Test that we can"t patch system_defined field
         """
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.st1.pk)
 
@@ -625,7 +627,7 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
         response = self.client.delete(url)
         assert response.status_code == expected_status
 
-        # If we were able to delete the taxonomy, check that it's really gone
+        # If we were able to delete the taxonomy, check that it"s really gone
         if status.is_success(expected_status):
             response = self.client.get(url)
             assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -650,17 +652,35 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
     """
     def setUp(self):
         super().setUp()
+        self.courseA = CourseLocator("orgA", "101", "test")
+        add_users(self.userS, CourseStaffRole(self.courseA), self.userA)
 
     @ddt.data(
-        (None, status.HTTP_403_FORBIDDEN),
+        # userA and userS are staff in courseA
+        (None, "courseA", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
+        ("user", "courseA", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
+        ("userA", "courseA", "tA1", ["Tag 1"], status.HTTP_200_OK),
+        ("userS", "courseA", "tA1", ["Tag 1"], status.HTTP_200_OK),
+        # Only userS is Tagging Admin and can tag using disable taxonomies
+        (None, "courseA", "tA2", ["Tag 1"], status.HTTP_403_FORBIDDEN),
+        ("user", "courseA", "tA2", ["Tag 1"], status.HTTP_403_FORBIDDEN),
+        ("userA", "courseA", "tA2", ["Tag 1"], status.HTTP_403_FORBIDDEN),
+        ("userS", "courseA", "tA2", ["Tag 1"], status.HTTP_200_OK),
     )
     @ddt.unpack
-    def test_tag_object(self, user_attr, expected_status):
-        url = OBJECT_TAG_LIST_URL.format(object_id="abc")
+    def test_tag_coure(self, user_attr, course_attr, taxonomy_attr, tag_values, expected_status):
 
         if user_attr:
             user = getattr(self, user_attr)
             self.client.force_authenticate(user=user)
 
-        response = self.client.put(url, format="json")
+        course = getattr(self, course_attr)
+        taxonomy = getattr(self, taxonomy_attr)
+
+        url = OBJECT_TAG_UPDATE_URL.format(object_id=course, taxonomy_id=taxonomy.pk)
+
+        response = self.client.put(url, {"tags": tag_values}, format="json")
+
+        if response.status_code != expected_status:
+            breakpoint()
         assert response.status_code == expected_status

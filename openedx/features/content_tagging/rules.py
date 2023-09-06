@@ -7,6 +7,7 @@ from typing import Union
 import django.contrib.auth.models
 import openedx_tagging.core.tagging.rules as oel_tagging
 import rules
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from common.djangoapps.student.auth import is_content_creator, has_studio_write_access
 
@@ -15,19 +16,16 @@ from .models import TaxonomyOrg
 UserType = Union[django.contrib.auth.models.User, django.contrib.auth.models.AnonymousUser]
 
 
-def is_taxonomy_user(user: UserType, taxonomy: oel_tagging.Taxonomy | None = None) -> bool:
+def is_taxonomy_user(user: UserType, taxonomy: oel_tagging.Taxonomy) -> bool:
     """
     Returns True if the given user is a Taxonomy User for the given content taxonomy.
 
     Taxonomy users include global staff and superusers, plus course creators who can create courses for any org.
-    Otherwise, we need a taxonomy provided to determine if the user is an org-level course creator for one of the
-    orgs allowed to use this taxonomy.
+    Otherwise, we need to check taxonomy provided to determine if the user is an org-level course creator for one of
+    the orgs allowed to use this taxonomy. Only global staff and superusers can use disabled system taxonomies.
     """
     if oel_tagging.is_taxonomy_admin(user):
         return True
-
-    if not taxonomy:
-        return is_content_creator(user, None)
 
     taxonomy_orgs = TaxonomyOrg.get_organizations(
         taxonomy=taxonomy,
@@ -44,8 +42,16 @@ def can_change_object_tag_objectid(user: UserType, object_id: str) -> bool:
     """
     Everyone that has permission to edit the object should be able to tag it.
     """
+    course_key = CourseKey.from_string(object_id)
+    return has_studio_write_access(user, course_key)
 
-    return has_studio_write_access(user, object_id)
+@rules.predicate
+def can_change_object_tag_taxonomy(user: UserType, taxonomy: oel_tagging.Taxonomy) -> bool:
+    """
+    Taxonomy users can tag objects using tags from any taxonomy that they have permission to view. Only taxonomy admins
+    can tag objects using tags from disabled taxonomies.
+    """
+    return oel_tagging.is_taxonomy_admin(user) or (taxonomy.cast().enabled and is_taxonomy_user(user, taxonomy))
 
 
 @rules.predicate
@@ -83,5 +89,5 @@ rules.set_perm("oel_tagging.delete_object_tag", oel_tagging.can_change_object_ta
 rules.set_perm("oel_tagging.view_object_tag", rules.always_allow)
 
 # Users can tag objects using tags from any taxonomy that they have permission to view
-rules.set_perm("oel_tagging.change_objecttag_taxonomy", is_taxonomy_user)
+rules.set_perm("oel_tagging.change_objecttag_taxonomy", can_change_object_tag_taxonomy)
 rules.set_perm("oel_tagging.change_objecttag_objectid", can_change_object_tag_objectid)
