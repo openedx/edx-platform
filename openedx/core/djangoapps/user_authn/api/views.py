@@ -72,8 +72,11 @@ class MFEContextView(APIView):
 
         context = {
             'context_data': get_mfe_context(request, redirect_to, third_party_auth_hint),
-            'registration_fields': {},
+            'registration_fields': {
+                'fields': {},
+            },
             'optional_fields': {
+                'fields': {},
                 'extended_profile': []
             },
         }

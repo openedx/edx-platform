@@ -146,6 +146,8 @@ class BaseTestVideoXBlock(BaseTestXmodule):
             # a lot of tests code, parse and set the values as fields.
             fields_data = VideoBlock.parse_video_xml(data)
             kwargs.update(fields_data)
+        kwargs.pop('source', None)
+        kwargs.get('metadata', {}).pop('source', None)
         super().initialize_module(**kwargs)
 
     def setUp(self):
