@@ -502,14 +502,20 @@ such that the value can be defined later than this assignment (file load order).
                 }));
                 $idsList = $('<ul/>');
                 $taskResSection.append($idsList);
-                for (j = 0, len1 = ids.length; j < len1; j++) {
-                    identifier = ids[j];
-                    $idsList.append($('<li/>', {
-                        text: identifier
-                    }));
-                }
+                if (ids && ids.length > 0) {
+                    for (j = 0, len1 = ids.length; j < len1; j++) {
+                        identifier = ids[j];
+                        $idsList.append($('<li/>', {
+                            text: identifier
+                        }));
+                    }
+                } 
                 return displayResponse.$task_response.append($taskResSection);
             };
+            if (errors.length === 0 && successes.length === 0 && noUsers.length === 0) {
+                // Translators: For cases when the input field is empty;
+                renderList(gettext('This field must not be blank'), []);
+            }
             if (successes.length && dataFromServer.action === 'add') {
                 var j, len1, inActiveUsers, activeUsers; // eslint-disable-line vars-on-top
                 activeUsers = [];
@@ -570,9 +576,6 @@ such that the value can be defined later than this assignment (file load order).
                 }()));
             }
             if (noUsers.length) {
-                noUsers.push($(
-                    gettext('Users must create and activate their account before they can be promoted to beta tester.'))
-                );
                 return renderList(gettext('Could not find users associated with the following identifiers:'), (function() { // eslint-disable-line max-len
                     var j, len1, results;
                     results = [];
@@ -580,6 +583,9 @@ such that the value can be defined later than this assignment (file load order).
                         sr = noUsers[j];
                         results.push(sr.identifier);
                     }
+                    results.unshift(
+                        gettext('Users must create and activate their account before they can be promoted to beta tester.')
+                    );
                     return results;
                 }()));
             }
@@ -694,14 +700,28 @@ such that the value can be defined later than this assignment (file load order).
                 }));
                 $idsList = $('<ul/>');
                 $taskResSection.append($idsList);
-                for (h = 0, len3 = ids.length; h < len3; h++) {
-                    identifier = ids[h];
-                    $idsList.append($('<li/>', {
-                        text: identifier
-                    }));
+                if (ids && ids.length > 0) {
+                    for (h = 0, len3 = ids.length; h < len3; h++) {
+                        identifier = ids[h];
+                        $idsList.append($('<li/>', {
+                            text: identifier
+                        }));
+                    }
                 }
                 return displayResponse.$task_response.append($taskResSection);
             };
+            if (
+                invalidIdentifier.length === 0
+                && errors.length === 0
+                && enrolled.length === 0
+                && allowed.length === 0
+                && autoenrolled.length === 0
+                && notenrolled.length === 0
+                && notunenrolled.length === 0
+            ) {
+                // Translators: For cases when the input field is empty;
+                renderList(gettext('This field must not be blank'), []);
+            }
             if (invalidIdentifier.length) {
                 renderList(gettext('The following email addresses and/or usernames are invalid:'), (function() {
                     var m, len4, results;
