@@ -12,7 +12,13 @@ from openedx.features.genplus_features.genplus_learning.models import (Program, 
                                                                        ClassUnit, ClassLesson, UnitCompletion,
                                                                        UnitBlockCompletion)
 from openedx.features.genplus_features.genplus_learning.utils import get_absolute_url, get_user_next_program_lesson
-from .serializers import ProgramSerializer, ClassStudentSerializer, ActivitySerializer, ClassUnitSerializer
+from .serializers import (
+    ProgramSerializer,
+    ClassStudentSerializer,
+    ActivitySerializer,
+    ClassUnitSerializer,
+    ProgramShortSerializer
+)
 from openedx.features.genplus_features.genplus.api.v1.serializers import ClassSummarySerializer
 
 
@@ -51,6 +57,10 @@ class ProgramViewSet(viewsets.ModelViewSet):
             permission_classes.append(IsTeacher)
         return [permission() for permission in permission_classes]
 
+class ProgramAPIViewSet(ProgramViewSet):
+    authentication_classes = [SessionAuthenticationCrossDomainCsrf]
+    permission_classes = [IsAuthenticated, IsStudentOrTeacher]
+    serializer_class = ProgramShortSerializer
 
 class ClassStudentViewSet(mixins.ListModelMixin,
                           viewsets.GenericViewSet):

@@ -532,6 +532,8 @@ class ProgramFilterMixin(views.APIView):
 
 
 class SkillReflectionApiView(ProgramFilterMixin):
+    authentication_classes = [SessionAuthenticationCrossDomainCsrf]
+    permission_classes = [IsAuthenticated, IsStudentOrTeacher]
 
     def get(self, request, **kwargs):
         class_id = kwargs['class_id']
@@ -558,6 +560,9 @@ class SkillReflectionApiView(ProgramFilterMixin):
 
 
 class SkillReflectionIndividualApiView(ProgramFilterMixin):
+    authentication_classes = [SessionAuthenticationCrossDomainCsrf]
+    permission_classes = [IsAuthenticated, IsStudentOrTeacher]
+
     def get(self, request, **kwargs):
         user_id = kwargs['user_id']
         skills = self.get_program_queryset().values_list('units__skill__name', flat=True).distinct().all()

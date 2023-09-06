@@ -10,11 +10,13 @@ from .views import (
     ClassStudentViewSet,
     ClassSummaryViewSet,
     StudentDashboardAPIView,
-    ActivityViewSet
+    ActivityViewSet,
+    ProgramAPIViewSet,
 )
 
 router = DefaultRouter()
 router.register('lessons', ProgramViewSet, basename='lessons')
+router.register('program', ProgramAPIViewSet, basename='programs')
 router.register('class-summary', ClassSummaryViewSet, basename='class-summary')
 router.register('activities', ActivityViewSet, basename='activities')
 

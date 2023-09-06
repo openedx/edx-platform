@@ -91,12 +91,7 @@ class AssessmentUnitSerializer(serializers.ModelSerializer):
         return get_user_next_course_lesson(gen_user.user, obj.id)
 
 
-class ProgramSerializer(serializers.ModelSerializer):
-    units = serializers.SerializerMethodField()
-    intro_unit = AssessmentUnitSerializer(many=False, read_only=True)
-    outro_unit = AssessmentUnitSerializer(many=False, read_only=True)
-    year_group_name = serializers.CharField(source='year_group.name')
-    program_name = serializers.CharField(source='year_group.program_name')
+class BaseProgramSerializer(serializers.ModelSerializer):
     is_currently_active_program = serializers.SerializerMethodField()
 
     def get_is_currently_active_program(self, obj):
@@ -109,6 +104,14 @@ class ProgramSerializer(serializers.ModelSerializer):
             return student.active_class.program.id == obj.id
         return False
 
+    class Meta:
+        model = Program
+class ProgramSerializer(BaseProgramSerializer):
+    units = serializers.SerializerMethodField()
+    intro_unit = AssessmentUnitSerializer(many=False, read_only=True)
+    outro_unit = AssessmentUnitSerializer(many=False, read_only=True)
+    year_group_name = serializers.CharField(source='year_group.name')
+    program_name = serializers.CharField(source='year_group.program_name')
 
     class Meta:
         model = Program
@@ -271,3 +274,21 @@ class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
         fields = ('id', 'type', 'actor', 'action_object', 'target', 'is_read', 'created')
+
+
+class ProgramShortSerializer(BaseProgramSerializer):
+    class Meta:
+        model = Program
+        fields = (
+            'banner_image',
+            'end_date',
+            'id',
+            'is_currently_active_program',
+            'slug',
+            'staff_browsable',
+            'start_date',
+            'status',
+            'student_browsable',
+            'uuid',
+            'year_group',
+        )
