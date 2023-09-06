@@ -29,6 +29,6 @@ urlpatterns = [
         name='activate_secondary_email'
     ),
     
-    path('api/resume-url/', views.get_resume_button_urls, name='get_resume_button_urls'),
-    path('fill_form/', views.form_begin_login, name='fill_form')
+    path('api/resume-url/', views.get_resume_button_urls, name='get_resume_button_urls') ,
+    path('survey-form/', views.form_begin_login, name='survey_form')
 ]

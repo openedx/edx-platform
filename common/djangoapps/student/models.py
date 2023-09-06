@@ -3710,18 +3710,27 @@ class UserPasswordToggleHistory(TimeStampedModel):
 
 
 
-class FormBeginCourse(models.Model):
-    first_name = models.CharField( max_length=255, null=True)
-    last_name = models.CharField( max_length=255, null=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    
+class ListSurveyQuestion (models.Model):
+    question = models.CharField( max_length=255, null=True)
+    type = models.CharField( max_length=255, null=True)
+    survey_id = models.IntegerField()
+    config = models.JSONField(null=True)
     def __str__(self):
-        return "%s %s %s" % (self.user_id)
-class FormBeginCourseDAO () :
+        return f"{self.question}"
+
+
+
+class SurveyForm(models.Model):
+    question = models.ForeignKey(ListSurveyQuestion, on_delete=models.CASCADE)  
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    answer_text =  models.CharField( max_length=255, null=True)
+    def __str__(self):
+        return f"{self.user} - Question: {self.question} - Answer: {self.answer_text}  " 
+    
+class SurveyFormDAO () :
     @classmethod
     def checkSuccess (self,user_id):
-        isCheck = FormBeginCourse.objects.filter(user=user_id).exists()
+        isCheck = SurveyForm.objects.filter(user=user_id).exists()
         
         if isCheck :
             return False
@@ -3729,5 +3738,6 @@ class FormBeginCourseDAO () :
             return True
     
     @classmethod
-    def create_form(self,user_id, first_name, last_name):
-        return FormBeginCourse.objects.create(user=user_id, first_name=first_name, last_name=last_name)
+    def create_form(self,user_id, question , answer_text):
+        
+        return SurveyForm.objects.create(user_id=user_id, question=question, answer_text=answer_text)

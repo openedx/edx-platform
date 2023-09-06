@@ -11,16 +11,19 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='formBeginCourse',
+            name='listSurveyQuestion',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('first_name', models.CharField( max_length=255, null=True)),
-                ('last_name', models.CharField( max_length=255, null=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-
+                ('survey_id' , models.IntegerField()),
+                ('question', models.CharField( max_length=255, null=True)),
+                ('type', models.CharField( max_length=255, null=True)),
+                ('config', models.JSONField(null=True))
             ],
-            options={
-                'ordering': ('user'),
+           options={
+                'ordering': ('question'),
             },
         ),
+        
+    
     ]
+    

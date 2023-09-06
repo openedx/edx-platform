@@ -65,7 +65,8 @@ from common.djangoapps.student.models import (
 )
 from common.djangoapps.util.milestones_helpers import get_pre_requisite_courses_not_completed
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from common.djangoapps.student.models import LastHistoryActivateDAO,  FormBeginCourseDAO
+from common.djangoapps.student.models import LastHistoryActivateDAO , SurveyFormDAO , ListSurveyQuestion
+
 
 log = logging.getLogger("edx.student")
 
@@ -478,7 +479,7 @@ def get_dashboard_course_limit():
     get course limit from configuration
     """
     course_limit = getattr(settings, 'DASHBOARD_COURSE_LIMIT', None)
-    return course_limit
+    return 30
 
 
 def check_for_unacknowledged_notices(context):
@@ -886,12 +887,12 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     # context.update({
     #     'resume_button_urls': resume_button_urls
     # })
-    check_form = FormBeginCourseDAO.checkSuccess(user_id=user.id)
+    check_form = SurveyFormDAO.checkSuccess(user_id=user.id)
     
     if check_form :
-        return redirect('fill_form')
+        return redirect('survey_form')
     
-   
+    
     dashboard_template = 'dashboard.html'
     try:
         # .. filter_implemented_name: DashboardRenderStarted
@@ -924,14 +925,65 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
 @add_maintenance_banner
 def form_begin_login (request) :
     user = request.user
-    check_form = FormBeginCourseDAO.checkSuccess(user_id=user.id)
+    check_form = SurveyFormDAO.checkSuccess(user_id=user.id)
     if check_form == False :
         return redirect('dashboard')
+    listQuestion = ListSurveyQuestion.objects.all()
+
+    
+    survey_dict = {}  
+
+    for item in listQuestion:
+        survey_id = item.survey_id
+        if survey_id not in survey_dict:
+            survey_dict[survey_id] = []
+        survey_dict[survey_id].append(item)
+    
+
+    question = []
+    questions = []
+    result = []
+    
+    for survey_id, items in survey_dict.items():
+        if len(items) == 1:
+
+            question.append(items[0])
+            result.append(items[0])
+        else:
+            title = ''
+            for q in items :
+                if 'title' in q.type :
+                    title = q.question
+                    
+                    
+  
+            combined_item = {
+                'id': survey_id, 
+                'survey_id': survey_id,
+                "title" : title,
+                'config':  items
+            }
+            questions.append(combined_item)
+            result.append(combined_item)
+
+    context = {
+         'question':  question ,
+         'questions' : questions,
+
+         
+    }
+
     if request.method == 'POST':
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        FormBeginCourseDAO.create_form(user_id=user, first_name=first_name, last_name=last_name)
-        return redirect('dashboard')
+        
+        for q in listQuestion :
+            if 'title' not in q.type:
+                aws = request.POST.getlist(str(q.question))
+                for a in aws:
+                    SurveyFormDAO.create_form(user_id=user.id, question=q , answer_text=a)
+                
+                              
+        return redirect('dashboard')        
+         
         
         
-    return render_to_response('fill_form.html')
+    return render_to_response('survey_form.html' , context)

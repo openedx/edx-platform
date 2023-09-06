@@ -1,0 +1,207 @@
+<%page expression_filter="h"/>
+ <%inherit file="main_survey.html" /> 
+ <%def name="online_help_token()"><% return "learnerdashboard" %></%def> 
+ <%namespace name='static' file='static_content.html'/> 
+
+
+
+
+<%block name="pagetitle">Survey Form</%block>
+
+
+<Link rel='stylesheet' href="../static/survey_form/survey_form.css" />
+
+
+<div>
+    <form method="post">
+        <div id="formContainer">
+            <div class="survey-form"  style="display: block;">
+                <div class="title-survey">
+                    <h3>Welcome Funix!</h3>
+                    <p> In the next few minutes, you'll take the first steps on your learning journey:</p>
+                </div>
+                <div class="container-survey">
+                    <div class="survey-item">
+                        <div class="circle">
+                            <span class="number">1</span>
+                        </div>
+                        <span>Answer a few questions to help us personalize your experience</span>
+                    </div>
+                    <div class="survey-item">
+                        <div class="circle  with-line">
+                            <span class="number">2</span>
+                        </div>
+                        <span>See the projects you will build to graduate</span>
+                    </div>
+                    <div class="survey-item">
+                        <div class="circle">
+                            <span class="number">3</span>
+                        </div>
+                        <span>Go To Classroom</span>
+                    </div>
+                </div> 
+            </div>
+            % if question :
+            % for q in question:
+              <div class="survey-form"  style="display: none;">
+                  <div class="card">
+                      <div class="card-header">
+                      <span>${q.question}</span>
+                      </div>
+                      <div class="card-body">
+                      % if q.config['option'] and 'radio' in q.type :
+                          % for index,option in enumerate(q.config['option']) :
+                             <div>
+                               <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+                                 <input id="${option}" type=${q.type} name="${q.question}" value="${option}"/>
+                                 <label for="${option}" >${option}</label>
+                             </div>
+                          % endfor
+                      % endif
+                  
+                      % if 'checkbox' in q.type:
+                          % for option in q.config['option'] :
+                          <div>
+                              <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+                              <input type="${q.type}" name="${q.question}" value="${option}" id="${option}"  />
+                              <label for="${option}">${option}</label>
+                          </div>
+                          % endfor
+                      % endif     
+                    
+                      % if 'text' in q.type :
+                                  <span>
+                                      ${q.question}
+                                  </span>
+                                  <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+                                  <input type='text' name="${q.question}" />
+                        % endif
+                            % if 'select' in q.type :
+                                <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+                                    <span>${q.question}</span>
+                                    <select name="${q.question}">
+                                        % for option in q.config['option']:
+                                            <option value="${option}">${option}</option>
+                                        % endfor
+                                    </select>
+                            %endif
+                          
+                      </div>
+                  </div>
+              </div>
+             
+              % endfor
+          % endif
+          % if questions :
+               % for item in questions : 
+               <div class="survey-form"  style="display: none;">
+                  <div class="card">
+                      <div class="card-header">
+                      <span>${item['title']}</span>
+                      </div>
+                      <div class="card-body">
+                          % for q in item['config'] :
+                              % if 'text' in q.type :
+                                  <span>
+                                      ${q.question}
+                                  </span>
+                                  <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+                                  <input type='text' name="${q.question}" />
+                              % endif
+                              % if 'select' in q.type :
+                                <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+                                  <span>${q.question}</span>
+                                  <select name="${q.question}">
+                                        % for option in q.config['option']:
+                                            <option value="${option}">${option}</option>
+                                        % endfor
+                                  </select>
+                             %endif
+                             % if 'checkbox' in q.type :
+                                % for option in q.config['option'] :
+                                <div>
+                                    <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+                                    <input type="${q.type}" name="${q.question}" value="${option}" id="${option}"  />
+                                    <label for="${option}">${option}</label>
+                                </div>
+                                % endfor
+                            % endif
+                            % if 'radio' in q.type:
+                                % for index,option in enumerate(q.config['option']) :
+                                    <div>
+                                    <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+                                        <input id="${option}" type=${q.type} name="${q.question}" value="${option}"/>
+                                        <label for="${option}" >${option}</label>
+                                    </div>
+                                % endfor
+                            %endif
+                          % endfor
+                    
+                              
+                          
+                      </div>
+                  </div>
+              </div>
+              % endfor   
+
+          %endif
+
+
+        </div>
+
+        <div style="padding-top:20px">
+            <div class="survey-btn">
+                <button class="backButton" type="button" onclick="changeForm(-1)" style="display: none;">Back</button>
+                <button class="nextButton" type="button" onclick="changeForm(1)">Let's Go</button>
+                <button class="submitButton" type="submit" style="display: none;">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+
+<script>
+    let currentFormIndex = 0;
+    const forms = document.querySelectorAll('.survey-form');
+    const backButton = document.querySelector('.backButton');
+    const nextButton = document.querySelector('.nextButton');
+    const submitButton = document.querySelector('.submitButton');
+
+    function changeForm(step) {
+        forms[currentFormIndex].style.display = 'none';
+        currentFormIndex += step;
+
+        if (currentFormIndex < 0) {
+            currentFormIndex = 0;
+        } else if (currentFormIndex >= forms.length) {
+            currentFormIndex = forms.length - 1;
+        }
+
+        forms[currentFormIndex].style.display = 'block';
+
+
+        backButton.style.display = currentFormIndex === 0 ? 'none' : 'block';
+        nextButton.style.display = currentFormIndex === forms.length - 1 ? 'none' : 'block';
+        submitButton.style.display = currentFormIndex === forms.length - 1 ? 'block' : 'none';
+
+
+        if (currentFormIndex === 0) {
+            nextButton.textContent = "Let's Go";
+        } else {
+            nextButton.textContent = "Next";
+        }
+    }
+
+
+    backButton.style.display = 'none';
+
+
+    if (forms.length <= 1) {
+        nextButton.style.display = 'none';
+    }
+</script>
+
+
+
