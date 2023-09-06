@@ -241,7 +241,7 @@ FEATURES = {
 
     # Allows to configure the LMS to provide CORS headers to serve requests from other
     # domains
-    'ENABLE_CORS_HEADERS': False,
+    'ENABLE_CORS_HEADERS': True,
 
     # Can be turned off if course lists need to be hidden. Effects views and templates.
     # .. toggle_name: FEATURES['COURSES_ARE_BROWSABLE']
@@ -3521,7 +3521,7 @@ FEATURES['ENABLE_CREDIT_ELIGIBILITY'] = ENABLE_CREDIT_ELIGIBILITY
 
 if FEATURES.get('ENABLE_CORS_HEADERS'):
     CORS_ALLOW_CREDENTIALS = True
-    CORS_ORIGIN_WHITELIST = ()
+    CORS_ORIGIN_WHITELIST = ('https://code-xseries.funix.edu.vn')
     CORS_ORIGIN_ALLOW_ALL = True
     CORS_ALLOW_INSECURE = True
     CORS_ALLOW_HEADERS = corsheaders_default_headers + (
