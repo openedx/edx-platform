@@ -125,26 +125,26 @@ class ExpectedErrorMiddleware:
         _log_and_monitor_expected_errors(request, exception, 'middleware')
 
 
-# .. setting_name: EXPECTED_ERRORS
+# .. setting_name: IGNORED_ERRORS
 # .. setting_default: None
 # .. setting_description: Used to configure logging and monitoring for expected errors.
 #     This setting is configured of a list of dicts. See setting and toggle annotations for
-#     ``EXPECTED_ERRORS[N]['XXX']`` for details of each item in the dict.
+#     ``IGNORED_ERRORS[N]['XXX']`` for details of each item in the dict.
 #     If this setting is a non-empty list, all uncaught errors processed will get a ``checked_error_expected_from``
 #     attribute, whether they are expected or not. Those errors that are processed and match a 'MODULE_AND_CLASS'
 #     (documented elsewhere), will get an ``error_expected`` custom attribute. Unexpected errors would be errors with
 #     ``error_expected IS NULL``. For additional diagnostic information for ignored errors, see the
-#     EXPECTED_ERRORS[N]['IS_IGNORED'] annotation.
+#     IGNORED_ERRORS[N]['IS_IGNORED'] annotation.
 # .. setting_warning: We use Django Middleware and a DRF custom error handler to find uncaught errors. Some errors may
 #     slip through the cracks, like ValidationError. Any error where ``checked_error_expected_from IS NULL`` is
 #     an error that was not processed.
 
-# .. setting_name: EXPECTED_ERRORS[N]['MODULE_AND_CLASS']
+# .. setting_name: IGNORED_ERRORS[N]['MODULE_AND_CLASS']
 # .. setting_default: None
 # .. setting_description: Required error module and class name that is expected. For example,
 #     ``rest_framework.exceptions.PermissionDenied``.
 
-# .. toggle_name: EXPECTED_ERRORS[N]['IS_IGNORED']
+# .. toggle_name: IGNORED_ERRORS[N]['IS_IGNORED']
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: True
 # .. toggle_description: Set this to False if the errors are not ignored by monitoring, but only expected, like
@@ -163,14 +163,14 @@ class ExpectedErrorMiddleware:
 # .. toggle_use_cases: opt_out
 # .. toggle_creation_date: 2021-03-11
 
-# .. toggle_name: EXPECTED_ERRORS[N]['LOG_ERROR']
+# .. toggle_name: IGNORED_ERRORS[N]['LOG_ERROR']
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
 # .. toggle_description: If True, the error will be logged with a message like: "Expected error ...".
 # .. toggle_use_cases: opt_in
 # .. toggle_creation_date: 2021-03-11
 
-# .. toggle_name: EXPECTED_ERRORS[N]['LOG_STACK_TRACE']
+# .. toggle_name: IGNORED_ERRORS[N]['LOG_STACK_TRACE']
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
 # .. toggle_description: If True, the stacktrace will be included with the logging message.
@@ -178,7 +178,7 @@ class ExpectedErrorMiddleware:
 # .. toggle_use_cases: opt_in
 # .. toggle_creation_date: 2021-03-11
 
-# .. setting_name: EXPECTED_ERRORS[N]['REASON_EXPECTED']
+# .. setting_name: IGNORED_ERRORS[N]['REASON_EXPECTED']
 # .. setting_default: None
 # .. setting_description: Required string explaining why the error is expected and/or ignored for documentation
 #     purposes.
@@ -193,7 +193,7 @@ def _get_expected_error_settings_dict():
     """
     Returns a dict of dicts of expected error settings used for logging and monitoring.
 
-    The contents of the EXPECTED_ERRORS Django Setting list is processed for efficient lookup by module.Class.
+    The contents of the IGNORED_ERRORS Django Setting list is processed for efficient lookup by module.Class.
 
     Returns:
          (dict): dict of dicts, mapping module-and-class name to settings for proper handling of expected errors.
@@ -220,7 +220,7 @@ def _get_expected_error_settings_dict():
     if _EXPECTED_ERROR_SETTINGS_DICT is not None:
         return _EXPECTED_ERROR_SETTINGS_DICT
 
-    expected_errors = getattr(settings, 'EXPECTED_ERRORS', None)
+    expected_errors = getattr(settings, 'IGNORED_ERRORS', None)
     if expected_errors is None:
         _EXPECTED_ERROR_SETTINGS_DICT = {}
         return _EXPECTED_ERROR_SETTINGS_DICT
@@ -242,27 +242,27 @@ def _get_expected_error_settings_dict():
             # validate configuration
             if not isinstance(module_and_class, str):
                 log.error(
-                    "Skipping EXPECTED_ERRORS[%d] setting. 'MODULE_AND_CLASS' set to [%s] and should be module.Class, "
+                    "Skipping IGNORED_ERRORS[%d] setting. 'MODULE_AND_CLASS' set to [%s] and should be module.Class, "
                     "like 'rest_framework.exceptions.PermissionDenied'.",
                     index, module_and_class
                 )
                 continue
             if ':' in module_and_class:
                 log.warning(
-                    "Replacing ':' with '.' in EXPECTED_ERRORS[%d]['MODULE_AND_CLASS'], which was set to %s. Note that "
+                    "Replacing ':' with '.' in IGNORED_ERRORS[%d]['MODULE_AND_CLASS'], which was set to %s. Note that "
                     "monitoring and logging will not include the ':'.",
                     index, module_and_class
                 )
                 module_and_class = module_and_class.replace(":", ".")
             if module_and_class in expected_error_settings_dict:
                 log.warning(
-                    "EXPECTED_ERRORS[%d] setting is overriding an earlier setting. 'MODULE_AND_CLASS' [%s] is defined "
+                    "IGNORED_ERRORS[%d] setting is overriding an earlier setting. 'MODULE_AND_CLASS' [%s] is defined "
                     "multiple times.",
                     index, module_and_class
                 )
             if not processed_expected_error['reason_expected']:
                 log.error(
-                    "Skipping EXPECTED_ERRORS[%d] setting. 'REASON_EXPECTED' is required to document why %s is an "
+                    "Skipping IGNORED_ERRORS[%d] setting. 'REASON_EXPECTED' is required to document why %s is an "
                     "expected error.",
                     index, module_and_class
                 )
@@ -270,7 +270,7 @@ def _get_expected_error_settings_dict():
             expected_error_settings_dict[module_and_class] = processed_expected_error
     except Exception as e:  # pylint: disable=broad-except
         set_custom_attribute('expected_errors_setting_misconfigured', repr(e))
-        log.exception(f'Error processing setting EXPECTED_ERRORS. {repr(e)}')
+        log.exception(f'Error processing setting IGNORED_ERRORS. {repr(e)}')
 
     _EXPECTED_ERROR_SETTINGS_DICT = expected_error_settings_dict
     return _EXPECTED_ERROR_SETTINGS_DICT
