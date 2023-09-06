@@ -130,6 +130,3 @@ click==8.1.6
 
 # plz upgrade this in separate ticket
 redis==4.6.0
-
-# holding off ora date config feature
-ora2==5.3.0
