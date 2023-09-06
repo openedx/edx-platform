@@ -186,7 +186,6 @@ class LibraryToolsService:
         exact same definition ID used in the copy block.
 
         """
-        print('Begin update_children_task')
         if user_perms and not user_perms.can_write(dest_block.location.course_key):
             raise PermissionDenied()
 
@@ -212,7 +211,6 @@ class LibraryToolsService:
         if not is_v2_lib:
             if user_perms and not user_perms.can_read(library_key):
                 raise PermissionDenied()
-        print('End update_children_task')
         update_children_task.delay(self.user_id, str(dest_block.location), version)
 
     def import_task_status(self, location):

@@ -146,8 +146,11 @@ def _get_library(store, library_key, is_v2_lib):
 
 
 def _problem_type_filter(store, library, capa_type):
-    """ Filters library children by capa type"""
-    search_engine = SearchEngine.get_search_engine(index="library_index")
+    """ Filters library children by capa type."""
+    try:
+        search_engine = SearchEngine.get_search_engine(index="library_index")
+    except:
+        search_engine = None
     if search_engine:
         filter_clause = {
             "library": str(normalize_key_for_search(library.location.library_key)),
@@ -275,15 +278,14 @@ def update_children_task(self, user_id, dest_block_key, version=None):
             source_blocks.extend(_problem_type_filter(store, library, dest_block.capa_type))
         else:
             source_blocks.extend(library.children)
-
         with store.bulk_operations(dest_block.location.course_key):
             try:
+                dest_block.source_library_version = str(library.location.library_key.version_guid)
+                store.update_item(dest_block, user_id)
                 head_validation = not version
                 dest_block.children = store.copy_from_template(
                     source_blocks, dest_block.location, user_id, head_validation=head_validation
                 )
-                dest_block.source_library_version = str(library.location.library_key.version_guid)
-                store.update_item(dest_block, user_id)
                 # ^-- copy_from_template updates the children in the DB
                 # but we must also set .children here to avoid overwriting the DB again
             except Exception as exception:  # pylint: disable=broad-except
