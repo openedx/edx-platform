@@ -641,6 +641,7 @@ class TestTaxonomyViewSetNoCreatorGroup(TestTaxonomyViewSet):  # pylint: disable
     The permissions are the same for when ENABLED_CREATOR_GRUP is True
     """
 
+
 @skip_unless_cms
 @ddt.ddt
 class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
@@ -649,7 +650,6 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
     """
     def setUp(self):
         super().setUp()
-
 
     @ddt.data(
         (None, status.HTTP_403_FORBIDDEN),
@@ -664,5 +664,3 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
 
         response = self.client.put(url, format="json")
         assert response.status_code == expected_status
-
-
