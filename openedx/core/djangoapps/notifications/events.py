@@ -69,7 +69,7 @@ def notification_generated_event(user_ids, app_name, notification_type, course_k
     context = contexts.course_context_from_course_id(course_key)
     event_data = {
         'recipients_id': user_ids,
-        'course_id': course_key,
+        'course_id': str(course_key),
         'notification_type': notification_type,
         'notification_app': app_name,
     }
