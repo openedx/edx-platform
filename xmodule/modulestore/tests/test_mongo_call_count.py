@@ -17,11 +17,13 @@ from xmodule.modulestore.tests.utils import (
     TEST_DATA_DIR,
     MemoryCache,
     MixedModulestoreBuilder,
+    MongoModulestoreBuilder,
     VersioningModulestoreBuilder
 )
 from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
+MIXED_OLD_MONGO_MODULESTORE_BUILDER = MixedModulestoreBuilder([('draft', MongoModulestoreBuilder())])
 MIXED_SPLIT_MODULESTORE_BUILDER = MixedModulestoreBuilder([('split', VersioningModulestoreBuilder())])
 
 
@@ -38,6 +40,7 @@ class CountMongoCallsXMLRoundtrip(TestCase):
         self.addCleanup(rmtree, self.export_dir, ignore_errors=True)
 
     @ddt.data(
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 287, 779, 702, 702),
         (MIXED_SPLIT_MODULESTORE_BUILDER, 37, 16, 190, 189),
     )
     @ddt.unpack
@@ -138,6 +141,19 @@ class CountMongoCallsCourseTraversal(TestCase):
     @ddt.data(
         # These two lines show the way this traversal *should* be done
         # (if you'll eventually access all the fields and load all the definitions anyway).
+        # 'lazy' does not matter in old Mongo.
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, None, False, True, 322),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, None, True, True, 322),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, False, True, 506),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, True, True, 506),
+        # As shown in these two lines: whether or not the XBlock fields are accessed,
+        # the same number of mongo calls are made in old Mongo for depth=None.
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, None, False, False, 322),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, None, True, False, 322),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, False, False, 506),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, True, False, 506),
+        # The line below shows the way this traversal *should* be done
+        # (if you'll eventually access all the fields and load all the definitions anyway).
         (MIXED_SPLIT_MODULESTORE_BUILDER, None, False, True, 2),
         (MIXED_SPLIT_MODULESTORE_BUILDER, None, True, True, 37),
         (MIXED_SPLIT_MODULESTORE_BUILDER, 0, False, True, 37),
@@ -161,6 +177,7 @@ class CountMongoCallsCourseTraversal(TestCase):
                     self._traverse_blocks_in_course(start_block, access_all_block_fields)
 
     @ddt.data(
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 324),
         (MIXED_SPLIT_MODULESTORE_BUILDER, 3),
     )
     @ddt.unpack

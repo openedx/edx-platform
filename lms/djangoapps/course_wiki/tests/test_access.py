@@ -5,7 +5,7 @@ Tests for wiki permissions
 
 from django.contrib.auth.models import Group
 from wiki.models import URLPath
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.student.tests.factories import InstructorFactory
@@ -18,14 +18,14 @@ from common.djangoapps.student.tests.factories import UserFactory
 
 class TestWikiAccessBase(ModuleStoreTestCase):
     """Base class for testing wiki access."""
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     def setUp(self):
         super().setUp()
 
         self.wiki = get_or_create_root()
 
-        self.course_math101 = CourseFactory.create(org='org', number='math101', display_name='Course')  # lint-amnesty, pylint: disable=line-too-long
+        self.course_math101 = CourseFactory.create(org='org', number='math101', display_name='Course', metadata={'use_unique_wiki_id': 'false'})  # lint-amnesty, pylint: disable=line-too-long
         self.course_math101_staff = self.create_staff_for_course(self.course_math101)
 
         wiki_math101 = self.create_urlpath(self.wiki, course_wiki_slug(self.course_math101))
@@ -33,7 +33,7 @@ class TestWikiAccessBase(ModuleStoreTestCase):
         wiki_math101_page_page = self.create_urlpath(wiki_math101_page, 'Grandchild')
         self.wiki_math101_pages = [wiki_math101, wiki_math101_page, wiki_math101_page_page]
 
-        self.course_math101b = CourseFactory.create(org='org', number='math101b', display_name='Course')  # lint-amnesty, pylint: disable=line-too-long
+        self.course_math101b = CourseFactory.create(org='org', number='math101b', display_name='Course', metadata={'use_unique_wiki_id': 'true'})  # lint-amnesty, pylint: disable=line-too-long
         self.course_math101b_staff = self.create_staff_for_course(self.course_math101b)
 
         wiki_math101b = self.create_urlpath(self.wiki, course_wiki_slug(self.course_math101b))

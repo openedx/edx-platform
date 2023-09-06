@@ -11,6 +11,7 @@ from django.core.management import call_command
 from path import Path as path
 
 from openedx.core.djangoapps.django_comment_common.utils import are_permissions_roles_seeded
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -72,3 +73,23 @@ class TestImport(ModuleStoreTestCase):
         # Now load up the course with a similar course_id and verify it loads
         call_command('import', self.content_dir, self.course_dir)
         self.assertIsNotNone(store.get_course(self.truncated_key))
+
+    def test_existing_course_with_different_modulestore(self):
+        """
+        Checks that a course that originally existed in old mongo can be re-imported when
+        split is the default modulestore.
+        """
+        with modulestore().default_store(ModuleStoreEnum.Type.mongo):
+            call_command('import', self.content_dir, self.good_dir)
+
+        # Clear out the modulestore mappings, else when the next import command goes to create a destination
+        # course_key, it will find the existing course and return the mongo course_key. To reproduce TNL-1362,
+        # the destination course_key needs to be the one for split modulestore.
+        modulestore().mappings = {}
+
+        with modulestore().default_store(ModuleStoreEnum.Type.split):
+            call_command('import', self.content_dir, self.good_dir)
+            course = modulestore().get_course(self.base_course_key)
+            # With the bug, this fails because the chapter's course_key is the split mongo form,
+            # while the course's course_key is the old mongo form.
+            self.assertEqual(str(course.location.course_key), str(course.children[0].course_key))

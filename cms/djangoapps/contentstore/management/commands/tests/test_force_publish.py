@@ -58,6 +58,15 @@ class TestForcePublish(SharedModuleStoreTestCase):
         with self.assertRaisesRegex(CommandError, errstring):
             call_command('force_publish', 'course-v1:org+course+run')
 
+    def test_force_publish_non_split(self):
+        """
+        Test 'force_publish' command doesn't work on non split courses
+        """
+        course = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
+        errstring = 'The owning modulestore does not support this command.'
+        with self.assertRaisesRegex(CommandError, errstring):
+            call_command('force_publish', str(course.id))
+
 
 class TestForcePublishModifications(ModuleStoreTestCase):
     """

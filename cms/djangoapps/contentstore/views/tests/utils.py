@@ -18,9 +18,9 @@ class StudioPageTestCase(CourseTestCase):
 
     def setUp(self):
         super().setUp()
-        self.chapter = BlockFactory.create(parent=self.course,
+        self.chapter = BlockFactory.create(parent_location=self.course.location,
                                            category='chapter', display_name="Week 1")
-        self.sequential = BlockFactory.create(parent=self.chapter,
+        self.sequential = BlockFactory.create(parent_location=self.chapter.location,
                                               category='sequential', display_name="Lesson 1")
 
     def get_page_html(self, xblock):

@@ -30,6 +30,7 @@ from xmodule.modulestore.tests.utils import (
 )
 
 _TODAY = datetime.now(utc)
+_LAST_MONTH = _TODAY - timedelta(days=30)
 _LAST_WEEK = _TODAY - timedelta(days=7)
 _NEXT_WEEK = _TODAY + timedelta(days=7)
 
@@ -48,9 +49,34 @@ class CourseMetadataUtilsTestCase(TestCase):
 
         mongo_builder = MongoModulestoreBuilder()
         split_builder = VersioningModulestoreBuilder()
-        mixed_builder = MixedModulestoreBuilder([('split', split_builder), ('mongo', mongo_builder)])
+        mixed_builder = MixedModulestoreBuilder([('mongo', mongo_builder), ('split', split_builder)])
 
         with mixed_builder.build_without_contentstore() as (__, mixed_store):
+            with mixed_store.default_store('mongo'):
+                self.demo_course = mixed_store.create_course(
+                    org="edX",
+                    course="DemoX.1",
+                    run="Fall_2014",
+                    user_id=-3,  # -3 refers to a "testing user"
+                    fields={
+                        "start": _LAST_MONTH,
+                        "end": _LAST_WEEK,
+                        "enrollment_start": _LAST_MONTH,
+                        "enrollment_end": _LAST_WEEK
+                    }
+                )
+            with mixed_store.default_store('mongo'):
+                self.demo_course_enrollment_end = mixed_store.create_course(
+                    org="edX",
+                    course="DemoX.2",
+                    run="Fall_2014_1",
+                    user_id=-3,  # -3 refers to a "testing user"
+                    fields={
+                        "start": _LAST_MONTH,
+                        "end": _LAST_WEEK,
+                        "enrollment_end": _LAST_WEEK
+                    }
+                )
             with mixed_store.default_store('split'):
                 self.html_course = mixed_store.create_course(
                     org="UniversityX",
@@ -119,6 +145,11 @@ class CourseMetadataUtilsTestCase(TestCase):
 
         function_tests = [
             FunctionTest(clean_course_key, [
+                # Test with a Mongo course and '=' as padding.
+                TestScenario(
+                    (self.demo_course.id, '='),
+                    "course_MVSFQL2EMVWW6WBOGEXUMYLMNRPTEMBRGQ======"
+                ),
                 # Test with a Split course and '~' as padding.
                 TestScenario(
                     (self.html_course.id, '~'),
@@ -126,26 +157,39 @@ class CourseMetadataUtilsTestCase(TestCase):
                 ),
             ]),
             FunctionTest(url_name_for_block, [
+                TestScenario((self.demo_course,), self.demo_course.location.block_id),
                 TestScenario((self.html_course,), self.html_course.location.block_id),
             ]),
             FunctionTest(display_name_with_default_escaped, [
+                # Test course with no display name.
+                TestScenario((self.demo_course,), "Empty"),
                 # Test course with a display name that contains characters that need escaping.
                 TestScenario((self.html_course,), "Intro to html"),
             ]),
             FunctionTest(display_name_with_default, [
+                # Test course with no display name.
+                TestScenario((self.demo_course,), "Empty"),
                 # Test course with a display name that contains characters that need escaping.
                 TestScenario((self.html_course,), "Intro to <div>html</div>"),
             ]),
             FunctionTest(number_for_course_location, [
+                TestScenario((self.demo_course.location,), "DemoX.1"),
                 TestScenario((self.html_course.location,), "CS-203"),
             ]),
             FunctionTest(has_course_started, [
+                TestScenario((self.demo_course.start,), True),
                 TestScenario((self.html_course.start,), False),
             ]),
             FunctionTest(has_course_ended, [
+                TestScenario((self.demo_course.end,), True),
                 TestScenario((self.html_course.end,), False),
             ]),
             FunctionTest(is_enrollment_open, [
+                TestScenario((self.demo_course.enrollment_start, self.demo_course.enrollment_end,), False),
+                TestScenario((
+                    self.demo_course_enrollment_end.enrollment_start,
+                    self.demo_course_enrollment_end.enrollment_end
+                ), False),
                 TestScenario((self.html_course.enrollment_start, self.html_course.enrollment_end,), False),
                 TestScenario((
                     self.html_course_enrollment_start.enrollment_start,

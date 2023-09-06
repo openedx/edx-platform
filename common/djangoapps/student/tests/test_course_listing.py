@@ -103,13 +103,12 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         """
         Test the course list for regular staff when get_course returns an ErrorBlock
         """
-        store = modulestore()
-        course_key = store.make_course_key('Org1', 'Course1', 'Run1')
-        self._create_course_with_access_groups(course_key)
+        # pylint: disable=protected-access
+        mongo_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
+        course_key = mongo_store.make_course_key('Org1', 'Course1', 'Run1')
+        self._create_course_with_access_groups(course_key, default_store=ModuleStoreEnum.Type.mongo)
 
-        with mock.patch(
-            'xmodule.modulestore.split_mongo.caching_descriptor_system.SplitMongoKVS', mock.Mock(side_effect=Exception)
-        ):
+        with mock.patch('xmodule.modulestore.mongo.base.MongoKeyValueStore', mock.Mock(side_effect=Exception)):
             assert isinstance(modulestore().get_course(course_key), ErrorBlock)
 
             # Invalidate (e.g., delete) the corresponding CourseOverview, forcing get_course to be called.
@@ -123,14 +122,14 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         Create good courses, courses that won't load, and deleted courses which still have
         roles. Test course listing.
         """
-        store = modulestore()
+        mongo_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)  # lint-amnesty, pylint: disable=protected-access
 
-        good_location = store.make_course_key('testOrg', 'testCourse', 'RunBabyRun')
-        self._create_course_with_access_groups(good_location)
+        good_location = mongo_store.make_course_key('testOrg', 'testCourse', 'RunBabyRun')
+        self._create_course_with_access_groups(good_location, default_store=ModuleStoreEnum.Type.mongo)
 
-        course_location = store.make_course_key('testOrg', 'doomedCourse', 'RunBabyRun')
-        self._create_course_with_access_groups(course_location)
-        store.delete_course(course_location, ModuleStoreEnum.UserID.test)
+        course_location = mongo_store.make_course_key('testOrg', 'doomedCourse', 'RunBabyRun')
+        self._create_course_with_access_groups(course_location, default_store=ModuleStoreEnum.Type.mongo)
+        mongo_store.delete_course(course_location, ModuleStoreEnum.UserID.test)
 
         courses_list = list(get_course_enrollments(self.student, None, []))
         assert len(courses_list) == 1, courses_list
