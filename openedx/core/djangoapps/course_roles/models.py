@@ -46,7 +46,7 @@ class CourseRolesRolePermissions(models.Model):
     Model for a course roles role permission.
     """
     role = models.ForeignKey('CourseRolesRole', on_delete=models.CASCADE)
-    permission = models.ManyToManyField('CourseRolesPermission')
+    permission = models.ForeignKey('CourseRolesPermission', on_delete=models.CASCADE)
     allowed = models.BooleanField(default=False)
 
     def __str__(self):
@@ -57,7 +57,7 @@ class CourseRolesUserRole(models.Model):
     """
     Model for a course roles user role.
     """
-    user = models.ManyToManyField(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     role = models.ForeignKey('CourseRolesRole', on_delete=models.CASCADE)
     course = models.ForeignKey(
         CourseOverview,
@@ -67,8 +67,11 @@ class CourseRolesUserRole(models.Model):
     )
     org = models.ForeignKey(Organization, on_delete=models.DO_NOTHING, null=False)
 
+    class Meta:
+        unique_together = ('user', 'role', 'course')
+
     def __str__(self):
-        return f"{self.user} - {self.course_id} - {self.role}"
+        return f"{self.user} - {self.course} - {self.role}"
 
 
 class CourseRolesService(models.Model):
