@@ -134,7 +134,6 @@ class ExpectedErrorMiddleware:
 #     attribute, whether they are expected or not. Those errors that are processed and match a 'MODULE_AND_CLASS'
 #     (documented elsewhere), will get an ``error_expected`` custom attribute. Unexpected errors would be errors with
 #     ``error_expected IS NULL``. For additional diagnostic information for ignored errors, see the
-#     IGNORED_ERRORS[N]['IS_IGNORED'] annotation.
 # .. setting_warning: We use Django Middleware and a DRF custom error handler to find uncaught errors. Some errors may
 #     slip through the cracks, like ValidationError. Any error where ``checked_error_expected_from IS NULL`` is
 #     an error that was not processed.
@@ -143,25 +142,6 @@ class ExpectedErrorMiddleware:
 # .. setting_default: None
 # .. setting_description: Required error module and class name that is expected. For example,
 #     ``rest_framework.exceptions.PermissionDenied``.
-
-# .. toggle_name: IGNORED_ERRORS[N]['IS_IGNORED']
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: True
-# .. toggle_description: Set this to False if the errors are not ignored by monitoring, but only expected, like
-#      for temporary problems that may take some time to fix. If True, adds the custom attributes
-#      ``error_ignored_class`` and ``error_ignored_message`` to help diagnose issues with ignored errors, since
-#      this data is not otherwise available. For example of ignoring errors in New Relic, see:
-#      https://docs.newrelic.com/docs/agents/manage-apm-agents/agent-data/manage-errors-apm-collect-ignore-or-mark-expected/#ignore  pylint: disable=line-too-long,useless-suppression
-#      To query for ignored errors, you would use ``error_ignored_class IS NOT NULL``.
-#      Note: This is defaulted to True because it will be easier for us to detect if True is not the correct value, by
-#      seeing that these errors aren't actually ignored.
-# .. toggle_warning: At this time, this toggle does not actually configure the error to be ignored. It is meant to match
-#     the ignored error configuration found elsewhere. When monitoring, no errors should ever have the attribute
-#     ``error_ignored_class``. Only Transactions should have this custom attribute. If found for an error, it means we
-#     are stating an error should be ignored when it is not actually configured as such, or the configuration is not
-#     working.
-# .. toggle_use_cases: opt_out
-# .. toggle_creation_date: 2021-03-11
 
 # .. toggle_name: IGNORED_ERRORS[N]['LOG_ERROR']
 # .. toggle_implementation: DjangoSetting
