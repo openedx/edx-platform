@@ -3,6 +3,7 @@ Contain celery tasks
 """
 from celery import shared_task
 from django.contrib.auth import get_user_model
+from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.locator import CourseKey
 from lms.djangoapps.courseware.courses import get_course_with_access
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
@@ -14,6 +15,7 @@ User = get_user_model()
 
 
 @shared_task
+@set_code_owner_attribute
 def send_thread_created_notification(thread_id, course_key_str, user_id):
     """
     Send notification when a new thread is created

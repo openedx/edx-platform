@@ -33,6 +33,7 @@ annotated-types==0.5.0
     # via pydantic
 anyio==3.7.1
     # via
+    #   fastapi
     #   httpcore
     #   starlette
 appdirs==1.4.4
@@ -124,7 +125,7 @@ botocore==1.10.84
     #   s3transfer
 bridgekeeper==0.9
     # via -r requirements/edx/base.txt
-celery==5.3.1
+celery==5.3.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -259,7 +260,7 @@ dill==0.3.7
     # via pylint
 distlib==0.3.7
     # via virtualenv
-django==3.2.20
+django==3.2.21
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.txt
@@ -364,7 +365,7 @@ django-crum==0.7.9
     #   edx-rbac
     #   edx-toggles
     #   super-csv
-django-environ==0.10.0
+django-environ==0.11.2
     # via
     #   -r requirements/edx/base.txt
     #   openedx-blockstore
@@ -555,7 +556,7 @@ edx-django-release-util==1.3.0
     #   -r requirements/edx/base.txt
     #   edxval
     #   openedx-blockstore
-edx-django-sites-extensions==4.0.0
+edx-django-sites-extensions==4.0.1
     # via -r requirements/edx/base.txt
 edx-django-utils==5.7.0
     # via
@@ -695,7 +696,7 @@ factory-boy==3.3.0
     # via -r requirements/edx/testing.in
 faker==19.3.1
     # via factory-boy
-fastapi==0.103.0
+fastapi==0.103.1
     # via pact-python
 fastavro==1.8.2
     # via
@@ -840,7 +841,7 @@ jwcrypto==1.5.0
     # via
     #   -r requirements/edx/base.txt
     #   pylti1p3
-kombu==5.3.1
+kombu==5.3.2
     # via
     #   -r requirements/edx/base.txt
     #   celery
@@ -961,7 +962,7 @@ oauthlib==3.2.2
     #   social-auth-core
 olxcleaner==0.2.1
     # via -r requirements/edx/base.txt
-openai==0.27.10
+openai==0.28.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -993,7 +994,7 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/base.txt
 optimizely-sdk==4.1.1
     # via -r requirements/edx/base.txt
-ora2==5.2.4
+ora2==5.3.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -1191,7 +1192,7 @@ pysrt==1.1.2
     # via
     #   -r requirements/edx/base.txt
     #   edxval
-pytest==7.4.0
+pytest==7.4.1
     # via
     #   -r requirements/edx/testing.in
     #   pylint-pytest
@@ -1240,7 +1241,7 @@ python-slugify==8.0.1
     # via
     #   -r requirements/edx/base.txt
     #   code-annotations
-python-swiftclient==4.3.0
+python-swiftclient==4.4.0
     # via
     #   -r requirements/edx/base.txt
     #   ora2
@@ -1330,7 +1331,7 @@ requests-oauthlib==1.3.1
     #   social-auth-core
 rfc3986[idna2008]==1.5.0
     # via httpx
-rpds-py==0.10.0
+rpds-py==0.10.2
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
@@ -1448,7 +1449,7 @@ sortedcontainers==2.4.0
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
-soupsieve==2.4.1
+soupsieve==2.5
     # via
     #   -r requirements/edx/base.txt
     #   beautifulsoup4

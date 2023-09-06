@@ -53,6 +53,7 @@ annotated-types==0.5.0
 anyio==3.7.1
     # via
     #   -r requirements/edx/testing.txt
+    #   fastapi
     #   httpcore
     #   starlette
 appdirs==1.4.4
@@ -163,11 +164,11 @@ bridgekeeper==0.9
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-build==0.10.0
+build==1.0.0
     # via
     #   -r requirements/edx/../pip-tools.txt
     #   pip-tools
-celery==5.3.1
+celery==5.3.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -336,7 +337,7 @@ distlib==0.3.7
     # via
     #   -r requirements/edx/testing.txt
     #   virtualenv
-django==3.2.20
+django==3.2.21
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/doc.txt
@@ -457,7 +458,7 @@ django-crum==0.7.9
     #   super-csv
 django-debug-toolbar==4.2.0
     # via -r requirements/edx/development.in
-django-environ==0.10.0
+django-environ==0.11.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -714,7 +715,7 @@ edx-django-release-util==1.3.0
     #   -r requirements/edx/testing.txt
     #   edxval
     #   openedx-blockstore
-edx-django-sites-extensions==4.0.0
+edx-django-sites-extensions==4.0.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -899,7 +900,7 @@ faker==19.3.1
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
-fastapi==0.103.0
+fastapi==0.103.1
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
@@ -948,7 +949,7 @@ gitdb==4.0.10
     # via
     #   -r requirements/edx/doc.txt
     #   gitpython
-gitpython==3.1.32
+gitpython==3.1.34
     # via -r requirements/edx/doc.txt
 glob2==0.7
     # via
@@ -1008,8 +1009,10 @@ import-linter==1.11.1
     # via -r requirements/edx/testing.txt
 importlib-metadata==6.8.0
     # via
+    #   -r requirements/edx/../pip-tools.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
+    #   build
     #   markdown
     #   pytest-randomly
     #   sphinx
@@ -1101,7 +1104,7 @@ jwcrypto==1.5.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   pylti1p3
-kombu==5.3.1
+kombu==5.3.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1270,7 +1273,7 @@ olxcleaner==0.2.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openai==0.27.10
+openai==0.28.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1320,7 +1323,7 @@ optimizely-sdk==4.1.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-ora2==5.2.4
+ora2==5.3.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -1590,7 +1593,7 @@ pysrt==1.1.2
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edxval
-pytest==7.4.0
+pytest==7.4.1
     # via
     #   -r requirements/edx/testing.txt
     #   pylint-pytest
@@ -1643,7 +1646,7 @@ python-slugify==8.0.1
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   code-annotations
-python-swiftclient==4.3.0
+python-swiftclient==4.4.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1757,7 +1760,7 @@ rfc3986[idna2008]==1.5.0
     # via
     #   -r requirements/edx/testing.txt
     #   httpx
-rpds-py==0.10.0
+rpds-py==0.10.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1904,7 +1907,7 @@ sortedcontainers==2.4.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   snowflake-connector-python
-soupsieve==2.4.1
+soupsieve==2.5
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -2239,6 +2242,7 @@ yarl==1.9.2
     #   aiohttp
 zipp==3.16.2
     # via
+    #   -r requirements/edx/../pip-tools.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   importlib-metadata

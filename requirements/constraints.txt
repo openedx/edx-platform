@@ -132,4 +132,4 @@ click==8.1.6
 redis==4.6.0
 
 # holding off ora date config feature
-ora2==5.2.4
+ora2==5.3.0
