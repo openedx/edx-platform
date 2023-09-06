@@ -120,8 +120,11 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
                 'welcomePageRedirectUrl': None,
                 'pipelineUserDetails': self.pipeline_user_details,
             },
-            'registrationFields': {},
+            'registrationFields': {
+                'fields': {},
+            },
             'optionalFields': {
+                'fields': {},
                 'extended_profile': [],
             },
         }
