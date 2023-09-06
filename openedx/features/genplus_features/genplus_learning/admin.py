@@ -1,12 +1,25 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from adminsortable2.admin import SortableInlineAdminMixin
 from openedx.features.genplus_features.genplus_learning.models import *
 
 
+@admin.register(AcademicYear)
+class AcademicYearAdmin(admin.ModelAdmin):
+    search_fields = ('name',)
+    actions = ['mark_as_current', ]
+
+    def mark_as_current(modeladmin, request, queryset):
+        if queryset.count() > 1:
+            messages.add_message(request, messages.ERROR, 'You cannot mark more than one academic year as current.')
+        else:
+            # marking the other academic year as non-active
+            AcademicYear.objects.filter(is_current=True).update(is_current=False)
+            queryset.update(is_current=True)
+            messages.add_message(request, messages.SUCCESS, 'Marked as current.')
+
 @admin.register(YearGroup)
 class YearGroupAdmin(admin.ModelAdmin):
     search_fields = ('name', 'program_name',)
-
 
 @admin.register(ProgramEnrollment)
 class ProgramEnrollmentAdmin(admin.ModelAdmin):

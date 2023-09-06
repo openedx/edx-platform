@@ -8,8 +8,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from lms.djangoapps.badges.models import BadgeClass, BadgeAssertion
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
-from openedx.features.genplus_features.genplus_learning.models import Program, ProgramEnrollment, YearGroup
-from openedx.features.genplus_features.genplus.models import Skill
+from openedx.features.genplus_features.genplus_learning.models import Program, ProgramEnrollment, YearGroup, AcademicYear
 from openedx.features.genplus_features.genplus_learning.constants import ProgramEnrollmentStatuses, ProgramStatuses
 from openedx.features.genplus_features.genplus.api.v1.permissions import IsStudent, IsTeacher, IsStudentOrTeacher
 from openedx.features.genplus_features.common.display_messages import SuccessMessages
@@ -33,6 +32,7 @@ class StudentProgramBadgeView(generics.ListAPIView):
     def get_queryset(self):
         user = self.get_user()
         gen_user = user.gen_user
+        current_academic_year = AcademicYear.get_current_year()
         enrolled_programs = ProgramEnrollment.visible_objects.filter(student=gen_user.student).order_by('created')
 
         enrolled_year_groups = enrolled_programs.values_list(
@@ -41,7 +41,7 @@ class StudentProgramBadgeView(generics.ListAPIView):
         unenrolled_year_groups = YearGroup.objects.exclude(id__in=enrolled_year_groups)
 
         unenrolled_active_programs_slug = Program.objects \
-            .filter(status=ProgramStatuses.ACTIVE, year_group__in=unenrolled_year_groups) \
+            .filter(status=ProgramStatuses.ACTIVE, year_group__in=unenrolled_year_groups, academic_year=current_academic_year) \
             .values_list('slug', flat=True)
 
         enrolled_programs_slug = enrolled_programs.values_list('program__slug', flat=True)

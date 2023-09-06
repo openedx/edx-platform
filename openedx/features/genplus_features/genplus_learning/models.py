@@ -23,6 +23,19 @@ def validate_percent(value):
     if (value is None) or (not 0 <= value <= 100):
         raise ValidationError(_('{value} must be between 0 and 100').format(value=value))
 
+class AcademicYear(models.Model):
+    name = models.CharField(max_length=128, unique=True)
+    is_current = models.BooleanField(default=False)
+
+    @classmethod
+    def get_current_year(cls):
+        return cls.objects.filter(is_current=True).first()
+
+    def save(self, **kwargs):
+        if self.is_current:
+            # marking the other years as non-current
+            AcademicYear.objects.filter(is_current=True).update(is_current=False)
+        super().save(**kwargs)
 
 class YearGroup(models.Model):
     name = models.CharField(max_length=128, unique=True)
@@ -38,6 +51,7 @@ class Program(TimeStampedModel):
     uuid = models.UUIDField(default=uuid.uuid4)
     slug = models.SlugField(max_length=64, unique=True, blank=True)
     year_group = models.ForeignKey(YearGroup, on_delete=models.CASCADE, related_name='programs')
+    academic_year = models.ForeignKey(AcademicYear, on_delete=models.SET_NULL, null=True, blank=True, related_name='programs')
     start_date = models.DateField()
     end_date = models.DateField()
     status = models.CharField(max_length=16, choices=STATUS_CHOICES, default=ProgramStatuses.UNPUBLISHED)
