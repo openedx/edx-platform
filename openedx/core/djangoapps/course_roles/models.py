@@ -25,6 +25,8 @@ class CourseRolesRole(models.Model):
     long_description = models.TextField()
     type = models.CharField(max_length=64, choices=RoleType.choices, default=RoleType.DEFAULT)
     service = models.ForeignKey('CourseRolesService', on_delete=models.DO_NOTHING, null=True)
+    permissions = models.ManyToManyField('CourseRolesPermission', through='CourseRolesRolePermissions')
+    users = models.ManyToManyField(User, through='CourseRolesUserRole')
 
     def __str__(self):
         return self.name
