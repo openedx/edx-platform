@@ -27,7 +27,7 @@ django-storages==1.11.1
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==4.1.8
+edx-enterprise==4.1.9
 
 # 1. django-oauth-toolkit version >=2.0.0 has breaking changes. More details
 #    mentioned on this issue https://github.com/openedx/edx-platform/issues/32884
