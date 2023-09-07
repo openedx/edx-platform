@@ -76,7 +76,7 @@ class CourseRolesUserRole(models.Model):
         unique_together = ('user', 'role', 'course')
 
     def __str__(self):
-        return f"{self.user} - {self.course} - {self.role}"
+        return f"{self.user} - {self.course} - {self.role} - {self.org}"
 
 
 class CourseRolesService(models.Model):
