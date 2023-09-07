@@ -12,7 +12,11 @@ User = get_user_model()
 
 class CourseRolesRole(models.Model):
     """
-    Model for a course role.
+    Model for a course roles role.
+
+    A role is a collection of permissions that can be assigned to a user.
+    The Service field defines for which service UI the role is intended, such as CMS or LMS.
+
     """
     name = models.CharField(max_length=255)
     short_description = models.CharField(max_length=255)
@@ -28,6 +32,8 @@ class CourseRolesRole(models.Model):
 class CourseRolesPermission(models.Model):
     """
     Model for a course roles permission.
+
+    A permission represents what a user can do.
     """
     name = models.CharField(max_length=255, unique=True)
     description = models.CharField(max_length=255)
@@ -39,6 +45,8 @@ class CourseRolesPermission(models.Model):
 class CourseRolesRolePermissions(models.Model):
     """
     Model for a course roles role permission.
+
+    A role permission is a mapping between a role and a permission.
     """
     role = models.ForeignKey('CourseRolesRole', on_delete=models.CASCADE)
     permission = models.ForeignKey('CourseRolesPermission', on_delete=models.CASCADE)
@@ -50,6 +58,9 @@ class CourseRolesRolePermissions(models.Model):
 class CourseRolesUserRole(models.Model):
     """
     Model for a course roles user role.
+
+    A user role is a mapping between a user, a role, a course and an organization,
+    if the course is null then the user role is a global role for the organization.
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     role = models.ForeignKey('CourseRolesRole', on_delete=models.CASCADE)
@@ -71,6 +82,9 @@ class CourseRolesUserRole(models.Model):
 class CourseRolesService(models.Model):
     """
     Model for a course roles service.
+
+    A service is a UI that can be used to assign roles to users.
+    Such as CMS or LMS.
     """
     name = models.CharField(max_length=255, unique=True)
 
