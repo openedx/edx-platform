@@ -185,6 +185,7 @@
 # Juan Fernando Villa <elite.linux@gmail.com>, 2015
 # Juan <juan.marrero@utec.edu.uy>, 2015
 # Juliana Kang <jkang@edx.org>, 2021
+# Julia Peixoto, 2023
 # Lalo Cabrera <laloogcabrera@yahoo.com.mx>, 2014
 # Laura Silva <lingison@edx.org>, 2016-2017
 # 5d3923a435bd1af79454b9836d4c0111_a3a4fae <556e7ad92465a56b545f9e78fb091a63_215518>, 2014
@@ -294,7 +295,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-30 20:42+0000\n"
+"POT-Creation-Date: 2023-08-20 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://app.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -3965,6 +3966,16 @@ msgstr ""
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Good"
 msgstr "Bien"
+
+#. Translators: Replier commented on "your" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "your"
+msgstr "su"
+
+#. Translators: Replier commented on "their" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "their"
+msgstr "su"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #, python-format
@@ -7959,7 +7970,7 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "<{p}><{strong}>{replier_name}</{strong}> commented on "
-"<{strong}>{author_name}'s</{strong}> response to your post "
+"<{strong}>{author_name}</{strong}> response to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
 "<{p}><{strong}>{replier_name}</{strong}> respondió el "
@@ -7974,6 +7985,28 @@ msgid ""
 msgstr ""
 "<{p}><{strong}>{replier_name}</{strong}> respondió a su publicación "
 "<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> posted "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> asked "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+msgid ""
+"Notifications for responses and comments on your posts, and the ones you’re "
+"following, including endorsements to your responses and on your posts."
+msgstr ""
+"Notificaciones de respuestas y comentarios sobre tus publicaciones y las que"
+" sigues, incluidos respaldos a tus respuestas y a tus publicaciones."
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "The notification preference config version is not up to date."
@@ -14960,28 +14993,6 @@ msgstr "¿Tu cliente de correo electrónico separó la URL en dos líneas?"
 msgid "The keys are valid for a limited amount of time. Has the key expired?"
 msgstr "Las claves son válidas por un tiempo limitado. ¿Ha expirado su clave?"
 
-#: lms/templates/library-block-author-preview-header.html
-msgid ""
-"Showing all matching content eligible to be added into {display_name}. Each "
-"student will be assigned {max_count} component drawn randomly from this "
-"list."
-msgid_plural ""
-"Showing all matching content eligible to be added into {display_name}. Each "
-"student will be assigned {max_count} components drawn randomly from this "
-"list."
-msgstr[0] ""
-"Mostrando el contenido elegible para ser añadido a {display_name}. Cada "
-"estudiante accederá a {max_count} componente tomado aleatoriamente de esta "
-"lista."
-msgstr[1] ""
-"Mostrando el contenido elegible para ser añadido a {display_name}. Cada "
-"estudiante accederá a {max_count} componentes tomados aleatoriamente de esta"
-" lista."
-msgstr[2] ""
-"Mostrando el contenido elegible para ser añadido a {display_name}. Cada "
-"estudiante accederá a {max_count} componentes tomados aleatoriamente de esta"
-" lista."
-
 #. Translators:  "External resource" means that this learning module is hosted
 #. on a platform external to the edX LMS
 #: lms/templates/lti.html
@@ -17463,7 +17474,7 @@ msgstr "Inscripción cerrada"
 
 #: lms/templates/courseware/course_about.html
 msgid "Enroll Now"
-msgstr "Incríbase ahora"
+msgstr "Inscríbase ahora"
 
 #: lms/templates/courseware/course_about.html
 msgid "View About Page in studio"
@@ -24113,6 +24124,28 @@ msgstr ""
 "en su buzón de entrada. ¿Aún no encuentra el correo de verificación? Pida "
 "ayuda a través del vínculo siguiente."
 
+#: cms/templates/library-block-author-preview-header.html
+msgid ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} component drawn randomly from this "
+"list."
+msgid_plural ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} components drawn randomly from this "
+"list."
+msgstr[0] ""
+"Mostrando el contenido elegible para ser añadido a {display_name}. Cada "
+"estudiante accederá a {max_count} componente tomado aleatoriamente de esta "
+"lista."
+msgstr[1] ""
+"Mostrando el contenido elegible para ser añadido a {display_name}. Cada "
+"estudiante accederá a {max_count} componentes tomados aleatoriamente de esta"
+" lista."
+msgstr[2] ""
+"Mostrando el contenido elegible para ser añadido a {display_name}. Cada "
+"estudiante accederá a {max_count} componentes tomados aleatoriamente de esta"
+" lista."
+
 #: cms/templates/library.html
 msgid "Content Library"
 msgstr "Librerías de contenido"
@@ -25136,14 +25169,6 @@ msgid "Expand or Collapse"
 msgstr "Expandir o Colapsar"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Access Settings"
-msgstr "Configuraciones de Acceso"
-
-#: cms/templates/studio_xblock_wrapper.html
-msgid "Set Access"
-msgstr "Configuración de Acceso"
-
-#: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"
 msgstr "Copiar al portapapeles"
 
@@ -25511,10 +25536,6 @@ msgstr "Navegación del curso"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Estructura"
-
-#: cms/templates/widgets/header.html
-msgid "Files & Media"
-msgstr "Archivos y medios"
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

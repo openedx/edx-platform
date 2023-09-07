@@ -1451,7 +1451,6 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.course = CourseFactory.create()
         cls.password = "test password"
         seed_permissions_roles(cls.course.id)
 

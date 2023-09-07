@@ -20,15 +20,14 @@ celery>=5.2.2,<6.0.0
 # required for celery>=5.2.0;<5.3.0
 click>=8.0,<9.0
 
-# django-storages version 1.9 drops support for boto storage backend.
-# 1.9 gives an error for details https://github.com/jschneier/django-storages/issues/831
-django-storages==1.9.1
+# django-storages version 1.11.1 is major version upgrade.
+django-storages==1.11.1
 
 
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==4.1.0
+edx-enterprise==4.1.10
 
 # 1. django-oauth-toolkit version >=2.0.0 has breaking changes. More details
 #    mentioned on this issue https://github.com/openedx/edx-platform/issues/32884
@@ -131,6 +130,3 @@ click==8.1.6
 
 # plz upgrade this in separate ticket
 redis==4.6.0
-
-# holding off ora date config feature
-ora2==5.2.4

@@ -17,7 +17,7 @@ from django.utils.translation import override as override_language
 from opaque_keys.edx.locator import CourseLocator
 from submissions import api as sub_api
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
@@ -368,21 +368,26 @@ class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
 
 class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
     """ Test student module manipulations. """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.course = CourseFactory(
+        cls.course = CourseFactory.create(
             name='fake',
             org='course',
             run='id',
         )
         cls.course_key = cls.course.location.course_key  # lint-amnesty, pylint: disable=no-member
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):  # lint-amnesty, pylint: disable=no-member
+            cls.chapter = BlockFactory.create(
+                category='chapter',
+                parent=cls.course,
+                display_name='chapter'
+            )
             cls.parent = BlockFactory(
                 category="library_content",
-                parent=cls.course,
+                parent=cls.chapter,
                 publish_item=True,
             )
             cls.child = BlockFactory(
@@ -392,7 +397,7 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
             )
             cls.unrelated = BlockFactory(
                 category="html",
-                parent=cls.course,
+                parent=cls.chapter,
                 publish_item=True,
             )
             cls.team_enabled_ora = BlockFactory.create(
