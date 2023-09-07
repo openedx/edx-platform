@@ -10,6 +10,7 @@ from django.contrib.admin import autodiscover as django_autodiscover
 from django.urls import include, path, re_path
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import RedirectView
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from edx_api_doc_tools import make_docs_urls
 from edx_django_utils.plugins import get_plugin_url_patterns
 
@@ -1056,3 +1057,12 @@ urlpatterns += [
 urlpatterns += [
     path('api/notifications/', include('openedx.core.djangoapps.notifications.urls')),
 ]
+
+urlpatterns += [
+    # YOUR PATTERNS
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    # Optional UI:
+    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+
+        ]
