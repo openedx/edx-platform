@@ -3518,11 +3518,11 @@ ENABLE_CREDIT_ELIGIBILITY = True
 FEATURES['ENABLE_CREDIT_ELIGIBILITY'] = ENABLE_CREDIT_ELIGIBILITY
 
 ############# Cross-domain requests #################
-
+CORS_ORIGIN_ALLOW_ALL = True
 if FEATURES.get('ENABLE_CORS_HEADERS'):
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = ('https://code-xseries.funix.edu.vn')
-    CORS_ORIGIN_ALLOW_ALL = True
+
     CORS_ALLOW_INSECURE = True
     CORS_ALLOW_HEADERS = corsheaders_default_headers + (
         'use-jwt-cookie',

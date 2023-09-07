@@ -368,12 +368,12 @@ CSRF_COOKIE_SECURE = ENV_TOKENS.get('CSRF_COOKIE_SECURE', False)
 CSRF_TRUSTED_ORIGINS = ENV_TOKENS.get('CSRF_TRUSTED_ORIGINS', [])
 
 ############# CORS headers for cross-domain requests #################
-
+CORS_ORIGIN_ALLOW_ALL = True
 if FEATURES.get('ENABLE_CORS_HEADERS') or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF_COOKIE'):
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = ('https://code-xseries.funix.edu.vn')
 
-    CORS_ORIGIN_ALLOW_ALL = True
+    
     CORS_ALLOW_INSECURE = ENV_TOKENS.get('CORS_ALLOW_INSECURE', True)
     CORS_ALLOW_HEADERS = corsheaders_default_headers + (
         'use-jwt-cookie',
