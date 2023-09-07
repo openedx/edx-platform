@@ -86,7 +86,6 @@ from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core import signing
-
 from django.core.cache import cache
 from django.http import HttpResponse
 from django.utils.crypto import get_random_string
@@ -270,7 +269,7 @@ class SafeCookieData:
         data_to_sign = self._compute_digest(user_id)
 
         self.signature = signing.TimestampSigner(
-            key=None, salt=self.key_salt, algorithm=settings.DEFAULT_HASHING_ALGORITHM
+            salt=self.key_salt, algorithm=settings.DEFAULT_HASHING_ALGORITHM
         ).sign_object(data_to_sign, serializer=signing.JSONSerializer, compress=False)
 
     def verify(self, user_id):
@@ -281,7 +280,7 @@ class SafeCookieData:
         """
         try:
             unsigned_data = signing.TimestampSigner(
-                key=None, salt=self.key_salt, algorithm=settings.DEFAULT_HASHING_ALGORITHM
+                salt=self.key_salt, algorithm=settings.DEFAULT_HASHING_ALGORITHM
             ).unsign_object(self.signature, serializer=signing.JSONSerializer, max_age=settings.SESSION_COOKIE_AGE)
 
             if unsigned_data == self._compute_digest(user_id):
