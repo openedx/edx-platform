@@ -65,7 +65,7 @@ class ProgramAPIViewSet(ProgramViewSet):
 class ClassStudentViewSet(mixins.ListModelMixin,
                           viewsets.GenericViewSet):
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
-    permission_classes = [IsAuthenticated, IsTeacher, IsUserFromSameSchool]
+    permission_classes = [IsAuthenticated, IsTeacher]
     serializer_class = ClassStudentSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['gen_user__user__username']

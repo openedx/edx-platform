@@ -6,6 +6,7 @@ from openedx.features.genplus_features.genplus_learning.models import *
 @admin.register(AcademicYear)
 class AcademicYearAdmin(admin.ModelAdmin):
     search_fields = ('name',)
+    list_display = ('name', 'is_current')
     actions = ['mark_as_current', ]
 
     def mark_as_current(modeladmin, request, queryset):
@@ -58,6 +59,7 @@ class ProgramAdmin(admin.ModelAdmin):
     list_display = (
         'year_group',
         'slug',
+        'academic_year',
         'start_date',
         'end_date',
         'status',

@@ -27,6 +27,9 @@ class AcademicYear(models.Model):
     name = models.CharField(max_length=128, unique=True)
     is_current = models.BooleanField(default=False)
 
+    def __str__(self):
+        return self.name
+
     @classmethod
     def get_current_year(cls):
         return cls.objects.filter(is_current=True).first()
