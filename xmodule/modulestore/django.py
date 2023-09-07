@@ -379,7 +379,11 @@ class XBlockI18nService:
         """
         self.translator = django.utils.translation
         if block:
-            xblock_domain = 'django'
+            if ENABLE_ATLAS_TRANSLATIONS.is_enabled():
+                xblock_domain = 'django'
+            else:
+                xblock_domain = 'text'
+
             selected_language = get_language()
 
             xblock_locale_path = self.get_python_locale_directory(block)
@@ -411,7 +415,7 @@ class XBlockI18nService:
 
         if ENABLE_ATLAS_TRANSLATIONS.is_enabled():
             xblock_module_name = xblock_resource
-            xblock_locale_path = path.join(settings.PLUGINS_TRANSLATIONS_ROOT, xblock_module_name, 'conf/locale')
+            xblock_locale_path = path.join(settings.PLUGINS_TRANSLATIONS_ROOT, xblock_module_name)
         else:
             xblock_locale_dir = 'translations'
             xblock_locale_path = resource_filename(xblock_resource, xblock_locale_dir)
@@ -431,9 +435,8 @@ class XBlockI18nService:
 
         if ENABLE_ATLAS_TRANSLATIONS.is_enabled():
             xblock_module_name = xblock_resource
-            xblock_locale_dir = 'conf/locale/{language}/LC_MESSAGES'.format(language=selected_language)
             translations_dir = settings.XBLOCK_TRANSLATIONS_DIRECTORY
-            xblock_locale_path = path.join(translations_dir, xblock_module_name, xblock_locale_dir, 'text.js')
+            xblock_locale_path = path.join(translations_dir, xblock_module_name, selected_language, 'django.js')
             if path.exists(xblock_locale_path):
                 return xblock_locale_path
 
