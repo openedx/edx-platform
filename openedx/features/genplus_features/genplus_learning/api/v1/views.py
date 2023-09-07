@@ -92,7 +92,7 @@ class ClassStudentViewSet(mixins.ListModelMixin,
 
 class ClassSummaryViewSet(viewsets.ModelViewSet):
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
-    permission_classes = [IsAuthenticated, IsTeacher, IsUserFromSameSchool]
+    permission_classes = [IsAuthenticated, IsTeacher]
     serializer_class = ClassSummarySerializer
     queryset = Class.visible_objects.all()
 
