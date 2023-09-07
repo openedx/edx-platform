@@ -152,7 +152,7 @@ def common_exceptions_400(func):
     """
 
     def wrapped(request, *args, **kwargs):
-        use_json = (request.is_ajax() or
+        use_json = (request.headers.get('x-requested-with') == 'XMLHttpRequest' or
                     request.META.get("HTTP_ACCEPT", "").startswith("application/json"))
         try:
             return func(request, *args, **kwargs)

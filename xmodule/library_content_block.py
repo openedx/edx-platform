@@ -17,7 +17,6 @@ from lazy import lazy
 from lxml import etree
 from lxml.etree import XMLSyntaxError
 from opaque_keys.edx.locator import LibraryLocator
-from pkg_resources import resource_filename
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.completable import XBlockCompletionMode
@@ -27,11 +26,10 @@ from xblock.fields import Integer, List, Scope, String, Boolean
 from xmodule.capa.responsetypes import registry
 from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.studio_editable import StudioEditableBlock
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
-    HTMLSnippet,
     ResourceTemplates,
     shim_xmodule_js,
     STUDENT_VIEW,
@@ -76,7 +74,6 @@ class LibraryContentBlock(
     MakoTemplateBlockBase,
     XmlMixin,
     XModuleToXBlockMixin,
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
     StudioEditableBlock,
@@ -95,19 +92,8 @@ class LibraryContentBlock(
 
     resources_dir = 'assets/library_content'
 
-    preview_view_js = {
-        'js': [],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-
     mako_template = 'widgets/metadata-edit.html'
     studio_js_module_name = "VerticalDescriptor"
-    studio_view_js = {
-        'js': [
-            resource_filename(__name__, 'js/src/vertical/edit.js'),
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
 
     show_in_read_only_mode = True
 
@@ -405,7 +391,7 @@ class LibraryContentBlock(
                 'content': rendered_child.content,
             })
 
-        fragment.add_content(self.runtime.service(self, 'mako').render_template('vert_module.html', {
+        fragment.add_content(self.runtime.service(self, 'mako').render_lms_template('vert_module.html', {
             'items': contents,
             'xblock_context': context,
             'show_bookmark_button': False,
@@ -435,7 +421,7 @@ class LibraryContentBlock(
                 if max_count < 0:
                     max_count = len(self.children)
 
-                fragment.add_content(self.runtime.service(self, 'mako').render_template(
+                fragment.add_content(self.runtime.service(self, 'mako').render_cms_template(
                     "library-block-author-preview-header.html", {
                         'max_count': max_count,
                         'display_name': self.display_name or self.url_name,
@@ -456,9 +442,9 @@ class LibraryContentBlock(
         Return the studio view.
         """
         fragment = Fragment(
-            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
+            self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
-        add_webpack_to_fragment(fragment, 'LibraryContentBlockStudio')
+        add_webpack_js_to_fragment(fragment, 'LibraryContentBlockEditor')
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
 

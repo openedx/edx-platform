@@ -12,7 +12,6 @@ from uuid import uuid4
 
 from django.utils.functional import cached_property
 from lxml import etree
-from pkg_resources import resource_filename
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock
@@ -22,11 +21,10 @@ from xmodule.modulestore.inheritance import UserPartitionList
 from xmodule.progress import Progress
 from xmodule.seq_block import ProctoringFields, SequenceMixin
 from xmodule.studio_editable import StudioEditableBlock
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
-    HTMLSnippet,
     ResourceTemplates,
     shim_xmodule_js,
     STUDENT_VIEW,
@@ -132,7 +130,6 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
     MakoTemplateBlockBase,
     XmlMixin,
     XModuleToXBlockMixin,
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
     StudioEditableBlock,
@@ -158,17 +155,8 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
 
     show_in_read_only_mode = True
 
-    preview_view_js = {
-        'js': [],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-
     mako_template = "widgets/metadata-only-edit.html"
     studio_js_module_name = 'SequenceDescriptor'
-    studio_view_js = {
-        'js': [resource_filename(__name__, 'js/src/sequence/edit.js')],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
 
     @cached_property
     def child_block(self):
@@ -294,7 +282,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         sorted_inactive_contents = sorted(inactive_contents, key=itemgetter('group_name'))
 
         # Use the new template
-        fragment.add_content(self.runtime.service(self, 'mako').render_template('split_test_staff_view.html', {
+        fragment.add_content(self.runtime.service(self, 'mako').render_lms_template('split_test_staff_view.html', {
             'items': sorted_active_contents + sorted_inactive_contents,
         }))
         fragment.add_css('.split-test-child { display: none; }')
@@ -321,7 +309,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
                 fragment, inactive_children, context
             )
 
-        fragment.add_content(self.runtime.service(self, 'mako').render_template('split_test_author_view.html', {
+        fragment.add_content(self.runtime.service(self, 'mako').render_lms_template('split_test_author_view.html', {
             'split_test': self,
             'is_root': is_root,
             'is_configured': self.is_configured,
@@ -360,9 +348,9 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         Return the studio view.
         """
         fragment = Fragment(
-            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
+            self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
-        add_webpack_to_fragment(fragment, 'SplitTestBlockStudio')
+        add_webpack_js_to_fragment(fragment, 'SplitTestBlockEditor')
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
 
@@ -379,7 +367,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
             return self._staff_view(context)
         else:
             child_fragment = self.child.render(STUDENT_VIEW, context)
-            fragment = Fragment(self.runtime.service(self, 'mako').render_template('split_test_student_view.html', {
+            fragment = Fragment(self.runtime.service(self, 'mako').render_lms_template('split_test_student_view.html', {
                 'child_content': child_fragment.content,
                 'child_id': self.child.scope_ids.usage_id,
             }))

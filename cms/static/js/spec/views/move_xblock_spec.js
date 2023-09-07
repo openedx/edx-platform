@@ -12,6 +12,7 @@ import XBlockInfo from 'js/models/xblock_info';
 import Course from 'js/models/course';
 import 'mock-ajax';
 
+// eslint-disable-next-line padded-blocks
 describe('MoveXBlock', function() {
 
     'use strict';
@@ -396,6 +397,7 @@ describe('MoveXBlock', function() {
             expectedData,
             sourceIndex = sourceIndex || 0; // eslint-disable-line no-redeclare
 
+        // eslint-disable-next-line no-multi-assign
         responseData = expectedData = {
             move_source_locator: xblockLocator,
             parent_locator: modal.targetParentXBlockInfo.id

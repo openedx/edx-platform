@@ -27,8 +27,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from .data import CLIPBOARD_PURPOSE, StagedContentFileData, StagedContentStatus
-from .filters import StagingStaticAssetFilter
+from .data import CLIPBOARD_PURPOSE, StagedContentStatus
 from .models import StagedContent, StagedContentFile, UserClipboard
 from .serializers import UserClipboardSerializer, PostToClipboardSerializer
 from .tasks import delete_expired_clipboards
@@ -181,7 +180,6 @@ class ClipboardEndpoint(APIView):
         """
         Helper method for "post to clipboard" API endpoint. This deals with copying static files into the clipboard.
         """
-        files_to_save: list[StagedContentFileData] = []
         for f in static_files:
             source_key = (
                 StaticContent.get_asset_key_from_path(usage_key.context_key, f.url)
@@ -191,7 +189,7 @@ class ClipboardEndpoint(APIView):
             content: bytes | None = f.data
             md5_hash = ""  # Unknown
             if content:
-                md5_hash = hashlib.md5(f.data).hexdigest()
+                md5_hash = hashlib.md5(content).hexdigest()
                 # This asset came from the XBlock's filesystem, e.g. a video block's transcript file
                 source_key = usage_key
             # Check if the asset file exists. It can be absent if an XBlock contains an invalid link.
@@ -201,30 +199,24 @@ class ClipboardEndpoint(APIView):
             else:
                 continue  # Skip this file - we don't need a reference to a non-existent file.
 
-            # Load the data:
-            entry = StagedContentFileData(
-                filename=f.name,
-                data=content,
-                source_key=source_key,
-                md5_hash=md5_hash,
-            )
-            files_to_save.append(entry)
+            # Because we store clipboard files on S3, uploading really large files will be too slow. And it's wasted if
+            # the copy-paste is just happening within a single course. So for files > 10MB, users must copy the files
+            # manually. In the future we can consider removing this or making it configurable or filterable.
+            limit = 10 * 1024 * 1024
+            if content and len(content) > limit:
+                content = None
 
-        # run filters on files_to_save. e.g. remove large files
-        files_to_save = StagingStaticAssetFilter.run_filter(staged_content=staged_content, file_datas=files_to_save)
-
-        for f in files_to_save:
             try:
                 StagedContentFile.objects.create(
                     for_content=staged_content,
-                    filename=f.filename,
+                    filename=f.name,
                     # In some cases (e.g. really large files), we don't store the data here but we still keep track of
                     # the metadata. You can still use the metadata to determine if the file is already present or not,
                     # and then either inform the user or find another way to import the file (e.g. if the file still
                     # exists in the "Files & Uploads" contentstore of the source course, based on source_key_str).
-                    data_file=ContentFile(content=f.data, name=f.filename) if f.data else None,
-                    source_key_str=str(f.source_key) if f.source_key else "",
-                    md5_hash=f.md5_hash or "",
+                    data_file=ContentFile(content=content, name=f.name) if content else None,
+                    source_key_str=str(source_key) if source_key else "",
+                    md5_hash=md5_hash,
                 )
             except Exception:  # pylint: disable=broad-except
-                log.exception(f"Unable to copy static file {f.filename} to clipboard for component {usage_key}")
+                log.exception(f"Unable to copy static file {f.name} to clipboard for component {usage_key}")

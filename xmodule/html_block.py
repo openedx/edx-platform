@@ -8,8 +8,6 @@ import sys
 import textwrap
 from datetime import datetime
 
-from pkg_resources import resource_filename
-
 from django.conf import settings
 from fs.errors import ResourceNotFound
 from lxml import etree
@@ -25,9 +23,8 @@ from xmodule.edxnotes_utils import edxnotes
 from xmodule.html_checker import check_html
 from xmodule.stringify import stringify_children
 from xmodule.util.misc import escape_html_characters
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
 from xmodule.x_module import (
-    HTMLSnippet,
     ResourceTemplates,
     shim_xmodule_js,
     XModuleMixin,
@@ -47,7 +44,7 @@ _ = lambda text: text
 @XBlock.needs("user")
 class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
     XmlMixin, EditingMixin,
-    XModuleToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin,
+    XModuleToXBlockMixin, ResourceTemplates, XModuleMixin,
 ):
     """
     The HTML XBlock mixin.
@@ -93,7 +90,8 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         Return a fragment that contains the html for the student view
         """
         fragment = Fragment(self.get_html())
-        add_webpack_to_fragment(fragment, 'HtmlBlockPreview')
+        add_sass_to_fragment(fragment, 'HtmlBlockDisplay.scss')
+        add_webpack_js_to_fragment(fragment, 'HtmlBlockDisplay')
         shim_xmodule_js(fragment, 'HTMLModule')
         return fragment
 
@@ -136,22 +134,12 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         Return the studio view.
         """
         fragment = Fragment(
-            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
+            self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
-        add_webpack_to_fragment(fragment, 'HtmlBlockStudio')
+        add_sass_to_fragment(fragment, 'HtmlBlockEditor.scss')
+        add_webpack_js_to_fragment(fragment, 'HtmlBlockEditor')
         shim_xmodule_js(fragment, 'HTMLEditingDescriptor')
         return fragment
-
-    preview_view_js = {
-        'js': [
-            resource_filename(__name__, 'js/src/html/display.js'),
-            resource_filename(__name__, 'js/src/javascript_loader.js'),
-            resource_filename(__name__, 'js/src/collapsible.js'),
-            resource_filename(__name__, 'js/src/html/imageModal.js'),
-            resource_filename(__name__, 'js/common_static/js/vendor/draggabilly.js'),
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
 
     uses_xmodule_styles_setup = True
 
@@ -160,13 +148,6 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
     filename_extension = "xml"
     template_dir_name = "html"
     show_in_read_only_mode = True
-
-    studio_view_js = {
-        'js': [
-            resource_filename(__name__, 'js/src/html/edit.js')
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
 
     # VS[compat] TODO (cpennington): Delete this method once all fall 2012 course
     # are being edited in the cms
@@ -482,7 +463,7 @@ class CourseInfoBlock(CourseInfoFields, HtmlBlockMixin):  # lint-amnesty, pylint
                 'visible_updates': course_updates[:3],
                 'hidden_updates': course_updates[3:],
             }
-            return self.runtime.service(self, 'mako').render_template(
+            return self.runtime.service(self, 'mako').render_lms_template(
                 f"{self.TEMPLATE_DIR}/course_updates.html",
                 context,
             )

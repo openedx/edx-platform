@@ -77,7 +77,7 @@
 # Fernando Abramowitz <ferabra@gmail.com>, 2014
 # Francisco Palm <francisco.palm@gmail.com>, 2017
 # gildardo lasso bañol <gildardolasso@hotmail.com>, 2016
-# Jesica Greco, 2022
+# Jesica Greco, 2022-2023
 # 1673e3cf8bd85685e54576636ae7f409, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2017
@@ -182,7 +182,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-06-15 09:23+0000\n"
+"POT-Creation-Date: 2023-08-27 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Jesica Greco, 2023\n"
 "Language-Team: Spanish (Latin America) (http://app.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -255,6 +255,7 @@ msgstr "Borrar"
 #: cms/static/js/views/validation.js
 #: common/static/common/js/components/utils/view_utils.js
 #: lms/static/js/Markdown.Editor.js
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: xmodule/js/src/html/edit.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
@@ -317,7 +318,9 @@ msgstr "Elegir archivo"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: cms/static/js/views/course_info_update.js cms/static/js/views/tabs.js
+#: cms/static/js/views/course_info_update.js
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js cms/static/js/views/tabs.js
 #: lms/static/js/Markdown.Editor.js xmodule/js/src/html/edit.js
 #: common/static/common/templates/discussion/templates.underscore
 #: lms/templates/learner_dashboard/verification_popover.underscore
@@ -2680,11 +2683,12 @@ msgstr "Se inscribió con éxito a los siguientes usuarios:"
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"allowed to enroll once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be allowed to enroll once they register:"
 msgstr ""
-"Se envió el correo electrónico a los siguientes usuarios. Podrán inscribirse"
-" una vez se hayan registrado:"
+"El correo electrónico no se puede enviar a los siguientes usuarios a través "
+"de la inscripción por lotes. Se les permitirá inscribirse una vez que se "
+"registren:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -2694,11 +2698,11 @@ msgstr "Estos usuarios podrán inscribirse una vez que se hayan registrado:"
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"enrolled once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be enrolled once they register:"
 msgstr ""
-"Se envió el correo electrónico a los siguientes usuarios. Estarán inscritos "
-"al curso una vez se hayan registrado:"
+"El correo electrónico no se puede enviar a los siguientes usuarios a través "
+"de la inscripción por lotes. Se inscribirán una vez que se registren:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -3184,6 +3188,10 @@ msgstr ""
 "Los vínculos se generan por demanda y expiran en los siguientes 5 minutos "
 "dado a la naturaleza sensible de la información de calificaciones de "
 "estudiantes."
+
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
+msgid "You have access to the {enterpriseName} dashboard"
+msgstr "Tienes acceso al tablero {enterpriseName}"
 
 #: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 msgid ""
@@ -6414,7 +6422,7 @@ msgstr "Por favor ingrese un número entero no negativo."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "You must have at least one undroppable <%- types %> assignment."
-msgstr ""
+msgstr "Debes tener al menos una actividad no prescindible de <%- types %>."
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
@@ -6579,6 +6587,55 @@ msgstr "{startTag}{requestToken}{endTag}{selector}"
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
 msgstr "¿Está seguro de que quiere borrar esta actualización?"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "Copying"
+msgstr "Copiando"
+
+#: cms/static/js/views/course_outline.js
+msgid "Copy of '{componentDisplayName}'"
+msgstr "Copia de '{componentDisplayName}'"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "Pasting"
+msgstr "Pegando"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "Some errors occurred"
+msgstr "Se produjeron algunos errores"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "The following required files could not be added to the course:"
+msgstr "Los siguientes archivos obligatorios no se pudieron agregar al curso:"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "You may need to update a file(s) manually"
+msgstr "Es posible que deba actualizar un archivo (s) manualmente"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid ""
+"The following files already exist in this course but don't match the version"
+" used by the component you pasted:"
+msgstr ""
+"Los siguientes archivos ya existen en este curso, pero no coinciden con la "
+"versión utilizada por el componente que pegó:"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "New files were added to this course's Files & Uploads"
+msgstr ""
+"Se agregaron nuevos archivos a la sección Archivos y Cargas de este curso"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "The following required files were imported to this course:"
+msgstr "Los siguientes archivos obligatorios no se pudieron agregar al curso:"
 
 #: cms/static/js/views/course_rerun.js
 msgid "Create Re-run"
@@ -7008,19 +7065,11 @@ msgstr "Estructura del curso"
 msgid "Date added"
 msgstr "Fecha de adición"
 
-#: cms/static/js/views/pages/container.js
-msgid "Pasting"
-msgstr ""
-
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
 msgid "Editing access for: {title}"
 msgstr "Editando acceso para: {title}"
-
-#: cms/static/js/views/pages/container.js
-msgid "Copying"
-msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
@@ -7625,6 +7674,7 @@ msgstr "Ayude a traducir a {beta_language}"
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
+#: cms/templates/js/course-outline.underscore
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Actions"
 msgstr "Acciones"
@@ -10792,6 +10842,10 @@ msgid "Configure"
 msgstr "Configurar"
 
 #: cms/templates/js/course-outline.underscore
+msgid "Copy to Clipboard"
+msgstr "Copiar al portapapeles"
+
+#: cms/templates/js/course-outline.underscore
 msgid "Duplicate"
 msgstr "Duplicar"
 
@@ -10837,6 +10891,15 @@ msgid "Subsection is hidden after due date"
 msgstr "La subsección estará oculta después de la fecha límite"
 
 #: cms/templates/js/course-outline.underscore
+#, python-format
+msgid ""
+"This subsection is configured as \\\"%(gradingType)s\\\", which doesn't "
+"exist in the current grading policy."
+msgstr ""
+"Esta subsección está configurada como \\\"%(gradingType)s\\\", que no existe"
+" en la política de calificación actual."
+
+#: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 msgid "You haven't added any content to this course yet."
 msgstr "Todavía no ha añadido ningún contenido a este curso."
@@ -10846,6 +10909,19 @@ msgstr "Todavía no ha añadido ningún contenido a este curso."
 #, python-format
 msgid "Click to add a new %(xblock_type)s"
 msgstr "Haga clic para añadir una nueva %(xblock_type)s"
+
+#: cms/templates/js/course-outline.underscore
+#, python-format
+msgid "Paste %(xblock_type)s"
+msgstr "Pegar %(xblock_type)s"
+
+#: cms/templates/js/course-outline.underscore
+msgid "From:"
+msgstr "De:"
+
+#: cms/templates/js/course-outline.underscore
+msgid "What's in my clipboard?"
+msgstr "¿Qué hay en mi portapapeles?"
 
 #: cms/templates/js/course-settings-learning-fields.underscore
 msgid "Learning Outcome"
@@ -10889,11 +10965,11 @@ msgstr "Ajustes de vídeo del curso"
 
 #: cms/templates/js/course-video-sharing-enable.underscore
 msgid "Video Sharing"
-msgstr ""
+msgstr "Compartir videos"
 
 #: cms/templates/js/course-video-sharing-enable.underscore
 msgid "Learn more"
-msgstr ""
+msgstr "Aprender más"
 
 #: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Transcript Turnaround"
@@ -11003,27 +11079,31 @@ msgstr ""
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Warning: "
-msgstr ""
+msgstr "Advertencia:"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid ""
 "The number of {type} assignments defined here does not match the current "
 "number of {type} assignments in the course:"
 msgstr ""
+"El número de tareas {type} definido aquí no coincide con el número actual de"
+" tareas {type} en el curso:"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "There are no assignments of this type in the course."
-msgstr ""
+msgstr "No hay tareas de este tipo en el curso."
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "{assignment_count} {type} assignment(s) found:"
-msgstr ""
+msgstr "{assignment_count} {type} tarea(s) encontrada(s):"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid ""
 "The number of {type} assignments in the course matches the number defined "
 "here."
 msgstr ""
+"El número de asignaciones {type} en el curso coincide con el número definido"
+" aquí."
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"
@@ -11670,6 +11750,14 @@ msgstr ""
 "contenido a partir de la fecha de liberación siempre que haya publicado la "
 "unidad. Sólo las unidades que están ocultos explícitamente permanecerán "
 "ocultas después de quitar esta opción para %(xblockType)s."
+
+#: cms/templates/js/summary-configuration-editor.underscore
+msgid "Xpert unit summaries"
+msgstr "Resúmenes de unidades de expertos"
+
+#: cms/templates/js/summary-configuration-editor.underscore
+msgid "Enable summaries"
+msgstr "Habilitar resúmenes"
 
 #: cms/templates/js/team-member.underscore
 msgid "Current Role:"

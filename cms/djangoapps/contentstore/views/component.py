@@ -10,6 +10,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseBadRequest
+from django.shortcuts import redirect
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET
 from opaque_keys import InvalidKeyError
@@ -27,17 +28,13 @@ from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from cms.djangoapps.contentstore.toggles import use_new_problem_editor
 from openedx.core.lib.xblock_utils import get_aside_from_xblock, is_xblock_aside
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
-try:
-    # Technically this is a django app plugin, so we should not error if it's not installed:
-    import openedx.core.djangoapps.content_staging.api as content_staging_api
-except ImportError:
-    content_staging_api = None
+from openedx.core.djangoapps.content_staging import api as content_staging_api
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-
-from ..utils import get_lms_link_for_item, get_sibling_urls, reverse_course_url
+from ..toggles import use_new_unit_page
+from ..utils import get_lms_link_for_item, get_sibling_urls, reverse_course_url, get_unit_url
 from ..helpers import get_parent_xblock, is_unit, xblock_type_display_name
-from cms.djangoapps.contentstore.xblock_services.xblock_service import (
+from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
     add_container_page_publishing_info,
     create_xblock_info,
     load_services_for_studio,
@@ -131,7 +128,6 @@ def container_handler(request, usage_key_string):
                 course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
             except ItemNotFoundError:
                 return HttpResponseBadRequest()
-
             component_templates = get_component_templates(course)
             ancestor_xblocks = []
             parent = get_parent_xblock(xblock)
@@ -139,6 +135,9 @@ def container_handler(request, usage_key_string):
 
             is_unit_page = is_unit(xblock)
             unit = xblock if is_unit_page else None
+
+            if is_unit_page and use_new_unit_page(course.id):
+                return redirect(get_unit_url(course.id, unit.location))
 
             is_first = True
             block = xblock
@@ -195,11 +194,7 @@ def container_handler(request, usage_key_string):
                 index += 1
 
             # Get the status of the user's clipboard so they can paste components if they have something to paste
-            if content_staging_api:
-                user_clipboard = content_staging_api.get_user_clipboard_json(request.user.id, request)
-            else:
-                user_clipboard = {"content": None}
-
+            user_clipboard = content_staging_api.get_user_clipboard_json(request.user.id, request)
             return render_to_response('container.html', {
                 'language_code': request.LANGUAGE_CODE,
                 'context_course': course,  # Needed only for display of menus at top of page.

@@ -11,6 +11,7 @@ describe('Course Card View', () => {
     const endDate = 'May 30, 2017';
 
     const setupView = (data, isEnrolled, collectionCourseStatus) => {
+        // eslint-disable-next-line no-undef
         const programData = $.extend({}, data);
         const context = {
             programData,
@@ -155,6 +156,7 @@ describe('Course Card View', () => {
     });
 
     it('should allow enrollment in future runs when the user has an expired enrollment', () => {
+        // eslint-disable-next-line no-undef
         const newRun = $.extend({}, course.course_runs[0]);
         const newRunKey = 'course-v1:foo+bar+baz';
         const advertisedStart = 'Summer';

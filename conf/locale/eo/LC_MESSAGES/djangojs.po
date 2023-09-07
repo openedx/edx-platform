@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-06-25 20:36+0000\n"
-"PO-Revision-Date: 2023-06-25 20:36:15.550879\n"
+"POT-Creation-Date: 2023-09-05 15:59+0000\n"
+"PO-Revision-Date: 2023-09-05 15:59:41.261194\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -110,6 +110,7 @@ msgstr "Délété Ⱡ'σяєм ιρѕυ#"
 #: cms/static/js/views/validation.js
 #: common/static/common/js/components/utils/view_utils.js
 #: lms/static/js/Markdown.Editor.js
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: xmodule/js/src/html/edit.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
@@ -172,7 +173,9 @@ msgstr "Çhöösé Fïlé Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: cms/static/js/views/course_info_update.js cms/static/js/views/tabs.js
+#: cms/static/js/views/course_info_update.js
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js cms/static/js/views/tabs.js
 #: lms/static/js/Markdown.Editor.js xmodule/js/src/html/edit.js
 #: common/static/common/templates/discussion/templates.underscore
 #: lms/templates/learner_dashboard/verification_popover.underscore
@@ -2807,11 +2810,11 @@ msgstr ""
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"allowed to enroll once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be allowed to enroll once they register:"
 msgstr ""
-"Süççéssfüllý sént énröllmént émäïls tö thé föllöwïng üsérs. Théý wïll ßé "
-"ällöwéd tö énröll önçé théý régïstér: Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+"Émäïl çännöt ßé sént tö thé föllöwïng üsérs vïä ßätçh énröllmént. Théý wïll "
+"ßé ällöwéd tö énröll önçé théý régïstér: Ⱡ'σяєм ιρѕυм ∂σ#"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -2823,11 +2826,11 @@ msgstr ""
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"enrolled once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be enrolled once they register:"
 msgstr ""
-"Süççéssfüllý sént énröllmént émäïls tö thé föllöwïng üsérs. Théý wïll ßé "
-"énrölléd önçé théý régïstér: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+"Émäïl çännöt ßé sént tö thé föllöwïng üsérs vïä ßätçh énröllmént. Théý wïll "
+"ßé énrölléd önçé théý régïstér: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -3379,6 +3382,12 @@ msgid ""
 msgstr ""
 "Lïnks äré générätéd ön démänd änd éxpïré wïthïn 5 mïnütés düé tö thé "
 "sénsïtïvé nätüré öf stüdént ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
+msgid "You have access to the {enterpriseName} dashboard"
+msgstr ""
+"Ýöü hävé äççéss tö thé {enterpriseName} däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυ#"
 
 #: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 msgid ""
@@ -7046,6 +7055,62 @@ msgstr ""
 "Àré ýöü süré ýöü wänt tö délété thïs üpdäté? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "Copying"
+msgstr "Çöpýïng Ⱡ'σяєм ιρѕυм #"
+
+#: cms/static/js/views/course_outline.js
+msgid "Copy of '{componentDisplayName}'"
+msgstr "Çöpý öf '{componentDisplayName}' Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "Pasting"
+msgstr "Pästïng Ⱡ'σяєм ιρѕυм #"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "Some errors occurred"
+msgstr "Sömé érrörs öççürréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "The following required files could not be added to the course:"
+msgstr ""
+"Thé föllöwïng réqüïréd fïlés çöüld nöt ßé äddéd tö thé çöürsé: Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "You may need to update a file(s) manually"
+msgstr ""
+"Ýöü mäý nééd tö üpdäté ä fïlé(s) mänüällý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid ""
+"The following files already exist in this course but don't match the version"
+" used by the component you pasted:"
+msgstr ""
+"Thé föllöwïng fïlés älréädý éxïst ïn thïs çöürsé ßüt dön't mätçh thé vérsïön"
+" üséd ßý thé çömpönént ýöü pästéd: Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "New files were added to this course's Files & Uploads"
+msgstr ""
+"Néw fïlés wéré äddéd tö thïs çöürsé's Fïlés & Ûplöäds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "The following required files were imported to this course:"
+msgstr ""
+"Thé föllöwïng réqüïréd fïlés wéré ïmpörtéd tö thïs çöürsé: Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
 #: cms/static/js/views/course_rerun.js
 msgid "Create Re-run"
 msgstr "Çréäté Ré-rün Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
@@ -7533,19 +7598,11 @@ msgstr "Çöürsé Öütlïné Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 msgid "Date added"
 msgstr "Däté äddéd Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
-#: cms/static/js/views/pages/container.js
-msgid "Pasting"
-msgstr "Pästïng Ⱡ'σяєм ιρѕυм #"
-
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
 msgid "Editing access for: {title}"
 msgstr "Édïtïng äççéss för: {title} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: cms/static/js/views/pages/container.js
-msgid "Copying"
-msgstr "Çöpýïng Ⱡ'σяєм ιρѕυм #"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
@@ -8207,6 +8264,7 @@ msgstr "Hélp Tränsläté ïntö {beta_language} Ⱡ'σяєм ιρѕυм ∂σ�
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
+#: cms/templates/js/course-outline.underscore
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Actions"
 msgstr "Àçtïöns Ⱡ'σяєм ιρѕυм #"
@@ -11663,6 +11721,10 @@ msgid "Configure"
 msgstr "Çönfïgüré Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: cms/templates/js/course-outline.underscore
+msgid "Copy to Clipboard"
+msgstr "Çöpý tö Çlïpßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: cms/templates/js/course-outline.underscore
 msgid "Duplicate"
 msgstr "Düplïçäté Ⱡ'σяєм ιρѕυм ∂σł#"
 
@@ -11710,6 +11772,15 @@ msgstr ""
 "Süßséçtïön ïs hïddén äftér düé däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: cms/templates/js/course-outline.underscore
+#, python-format
+msgid ""
+"This subsection is configured as \\\"%(gradingType)s\\\", which doesn't "
+"exist in the current grading policy."
+msgstr ""
+"Thïs süßséçtïön ïs çönfïgüréd äs \\\"%(gradingType)s\\\", whïçh döésn't "
+"éxïst ïn thé çürrént grädïng pölïçý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 msgid "You haven't added any content to this course yet."
 msgstr ""
@@ -11721,6 +11792,19 @@ msgstr ""
 #, python-format
 msgid "Click to add a new %(xblock_type)s"
 msgstr "Çlïçk tö ädd ä néw %(xblock_type)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: cms/templates/js/course-outline.underscore
+#, python-format
+msgid "Paste %(xblock_type)s"
+msgstr "Pästé %(xblock_type)s Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: cms/templates/js/course-outline.underscore
+msgid "From:"
+msgstr "Fröm: Ⱡ'σяєм ιρѕ#"
+
+#: cms/templates/js/course-outline.underscore
+msgid "What's in my clipboard?"
+msgstr "Whät's ïn mý çlïpßöärd? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: cms/templates/js/course-settings-learning-fields.underscore
 msgid "Learning Outcome"
@@ -12616,6 +12700,14 @@ msgstr ""
 "ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
 "ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
 "¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σł#"
+
+#: cms/templates/js/summary-configuration-editor.underscore
+msgid "Xpert unit summaries"
+msgstr "Xpért ünït sümmärïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: cms/templates/js/summary-configuration-editor.underscore
+msgid "Enable summaries"
+msgstr "Énäßlé sümmärïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: cms/templates/js/team-member.underscore
 msgid "Current Role:"

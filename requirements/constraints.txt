@@ -14,34 +14,27 @@
 
 # As it is not clarified what exact breaking changes will be introduced as per
 # the next major release, ensure the installed version is within boundaries.
-# celery>=5.2.2,<6.0.0
-
-# 5.3.0 versions breaking timezone related tests. Adding pin for time being to clear upgrade pipeline. Unpin above
-# after fixing these failures.
-celery<5.3.0
-kombu<5.3.0
+celery>=5.2.2,<6.0.0
 
 
 # required for celery>=5.2.0;<5.3.0
 click>=8.0,<9.0
 
-# django-storages version 1.9 drops support for boto storage backend.
-# 1.9 gives an error for details https://github.com/jschneier/django-storages/issues/831
-django-storages==1.9.1
+# django-storages version 1.11.1 is major version upgrade.
+django-storages==1.11.1
+
 
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.67.5
+edx-enterprise==4.1.10
 
-# oauthlib>3.0.1 causes test failures ( also remove the django-oauth-toolkit constraint when this is fixed )
-oauthlib==3.0.1
+# 1. django-oauth-toolkit version >=2.0.0 has breaking changes. More details
+#    mentioned on this issue https://github.com/openedx/edx-platform/issues/32884
+# 2. Versions from 1.5.0 to 2.0.0 have some migrations related changes.
+#    so we're upgrading minor versions one by one.
+django-oauth-toolkit==1.4.1
 
-# django-auth-toolkit==1.3.3 requires oauthlib>=3.1.0 which is pinned because of test failures
-django-oauth-toolkit<=1.3.2
-
-# Will be updated once we update python-dateutil package
-matplotlib<3.4.0
 
 # constrained in opaque_keys. migration guide here: https://pymongo.readthedocs.io/en/4.0/migrate-to-pymongo4.html
 # Major upgrade will be done in separate ticket.
@@ -109,16 +102,31 @@ urllib3<2.0.0
 # Issue to unpin Sphinx to resolve this constraint: https://github.com/openedx/edx-lint/issues/338
 docutils<0.20
 
-# When we unpinned python3-saml and allowed it to upgrade from 1.9.0
-# to 1.15.0 it fixed a devstack issue around ports being dropped, but
-# introduced an issue around duplicate attributes (for some
-# IdPs). It's not clear which version introduces the second problem.
-#
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/32327
-python3-saml<1.10.0
-
 # greater version has dropped few dependencies. Fix this in other ticket.
 drf-yasg<1.21.6
 
-# incremental upgrade approach. After successfull deploy remove this pin and try latest version.
-djangorestframework<3.14.0
+# Adding pin to avoid any major upgrade
+djangorestframework<3.15.0
+
+# tests failing with greater version. Fix this in separate ticket.
+pillow<10.0.0
+
+# The version of django-stubs we can use depends on which Django release we're using
+# 1.16.0 works with Django 3.2 through 4.1
+django-stubs==1.16.0
+djangorestframework-stubs==3.14.0  # Pinned to match django-stubs. Remove this when we can remove the above pin.
+
+# Our legacy Sass code is incompatible with anything except this ancient libsass version.
+# Here is a ticket to upgrade, but it's of debatable importance given that we are rapidly moving
+# away from legacy LMS/CMS frontends:
+# https://github.com/openedx/edx-platform/issues/31616
+libsass==0.10.0
+
+# incremental upgrade
+django-simple-history==3.3.0
+
+# greater version breaking upgrade builds
+click==8.1.6
+
+# plz upgrade this in separate ticket
+redis==4.6.0

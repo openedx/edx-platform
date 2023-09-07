@@ -35,6 +35,7 @@ class EntitlementForm extends React.Component {
         this.submitForm = this.submitForm.bind(this);
     }
 
+    // eslint-disable-next-line react/sort-comp
     onClose() {
         this.props.closeForm();
     }

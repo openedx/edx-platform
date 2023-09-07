@@ -14,6 +14,7 @@
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
 # 80dca42de6d6f19a9206ebd06d0c9cb9_4216643 <e5580e6e1f445efa0c4f3eb584b99765_116976>, 2013
+# ashed <craysy@gmail.com>, 2023
 # Danil Moskovoy <tenrius@gmail.com>, 2013
 # DariaTkacheva <d.i.tkacheva@gmail.com>, 2014
 # dfxedx <ah532@ya.ru>, 2014
@@ -82,7 +83,7 @@
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
 # 80dca42de6d6f19a9206ebd06d0c9cb9_4216643 <e5580e6e1f445efa0c4f3eb584b99765_116976>, 2013
-# ashed <craysy@gmail.com>, 2022
+# ashed <craysy@gmail.com>, 2022-2023
 # Danil Moskovoy <tenrius@gmail.com>, 2013
 # Dellon Zerus <dellonzerus@gmail.com>, 2020
 # Dmitri Polevoi <polevaiabrest@gmail.com>, 2014
@@ -136,7 +137,7 @@
 # Anastasija Teresenkova <anastasija_te@inbox.lv>, 2020
 # Andrey Bochkarev <abocha@ya.ru>, 2015
 # Andrey Mishchenko <andrey.mishchenko@raccoongang.com>, 2020
-# ashed <craysy@gmail.com>, 2022
+# ashed <craysy@gmail.com>, 2022-2023
 # Dmitri Polevoi <polevaiabrest@gmail.com>, 2014
 # Дмитрий Ошкало <dmitry.oshkalo@gmail.com>, 2015
 # SpaceOyster, 2016
@@ -168,7 +169,7 @@
 # Translators:
 # Alexandr Kosharny <acosarnii@gmail.com>, 2016
 # ovoschee <all.spam.there@gmail.com>, 2014
-# ashed <craysy@gmail.com>, 2022
+# ashed <craysy@gmail.com>, 2022-2023
 # Дмитрий Ошкало <dmitry.oshkalo@gmail.com>, 2015
 # Eric Fischer <efischer@edx.org>, 2016
 # Iaroslav <danwill@ukr.net>, 2015
@@ -192,9 +193,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-06-18 20:42+0000\n"
+"POT-Creation-Date: 2023-08-27 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
-"Last-Translator: ashed <craysy@gmail.com>, 2022\n"
+"Last-Translator: ashed <craysy@gmail.com>, 2022-2023\n"
 "Language-Team: Russian (http://app.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -246,6 +247,7 @@ msgstr "Удалить"
 #: cms/static/js/views/validation.js
 #: common/static/common/js/components/utils/view_utils.js
 #: lms/static/js/Markdown.Editor.js
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: xmodule/js/src/html/edit.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
@@ -308,7 +310,9 @@ msgstr "Выберите файл"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: cms/static/js/views/course_info_update.js cms/static/js/views/tabs.js
+#: cms/static/js/views/course_info_update.js
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js cms/static/js/views/tabs.js
 #: lms/static/js/Markdown.Editor.js xmodule/js/src/html/edit.js
 #: common/static/common/templates/discussion/templates.underscore
 #: lms/templates/learner_dashboard/verification_popover.underscore
@@ -2580,12 +2584,9 @@ msgstr "Следующие пользователи успешно записа�
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"allowed to enroll once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be allowed to enroll once they register:"
 msgstr ""
-"Электронные сообщения о регистрации успешно отправлены следующим "
-"пользователям. Они смогут зарегистрироваться, как только создадут свои "
-"учётные записи:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -2597,12 +2598,9 @@ msgstr ""
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"enrolled once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be enrolled once they register:"
 msgstr ""
-"Электронные сообщения о регистрации успешно отправлены следующим "
-"пользователям. Они будут зарегистрированы, как только создадут свои учётные "
-"записи."
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -3062,6 +3060,10 @@ msgid ""
 msgstr ""
 "Ссылки создаются по требованию и остаются действительными в течение 5 минут "
 "в связи с деликатностью предоставленной слушателями информации."
+
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
+msgid "You have access to the {enterpriseName} dashboard"
+msgstr ""
 
 #: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 msgid ""
@@ -6330,6 +6332,52 @@ msgstr ""
 msgid "Are you sure you want to delete this update?"
 msgstr "Вы уверены, что хотите удалить это обновление?"
 
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "Copying"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+msgid "Copy of '{componentDisplayName}'"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "Pasting"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "Some errors occurred"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "The following required files could not be added to the course:"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "You may need to update a file(s) manually"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid ""
+"The following files already exist in this course but don't match the version"
+" used by the component you pasted:"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "New files were added to this course's Files & Uploads"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "The following required files were imported to this course:"
+msgstr ""
+
 #: cms/static/js/views/course_rerun.js
 msgid "Create Re-run"
 msgstr "Создать перезапуск"
@@ -6742,18 +6790,10 @@ msgstr "Структура курса"
 msgid "Date added"
 msgstr ""
 
-#: cms/static/js/views/pages/container.js
-msgid "Pasting"
-msgstr ""
-
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
 msgid "Editing access for: {title}"
-msgstr ""
-
-#: cms/static/js/views/pages/container.js
-msgid "Copying"
 msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
@@ -7311,6 +7351,7 @@ msgstr "Помощь в переводе {beta_language}"
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
+#: cms/templates/js/course-outline.underscore
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Actions"
 msgstr "Действия"
@@ -10362,6 +10403,10 @@ msgid "Configure"
 msgstr "Настройки"
 
 #: cms/templates/js/course-outline.underscore
+msgid "Copy to Clipboard"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 msgid "Duplicate"
 msgstr "Копировать"
 
@@ -10406,6 +10451,13 @@ msgid "Subsection is hidden after due date"
 msgstr "Подраздел будет скрыт по истечении срока сдачи"
 
 #: cms/templates/js/course-outline.underscore
+#, python-format
+msgid ""
+"This subsection is configured as \\\"%(gradingType)s\\\", which doesn't "
+"exist in the current grading policy."
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 msgid "You haven't added any content to this course yet."
 msgstr "Вы ещё не добавили материалы курса."
@@ -10415,6 +10467,19 @@ msgstr "Вы ещё не добавили материалы курса."
 #, python-format
 msgid "Click to add a new %(xblock_type)s"
 msgstr "Кликните, чтобы добавить новый %(xblock_type)s"
+
+#: cms/templates/js/course-outline.underscore
+#, python-format
+msgid "Paste %(xblock_type)s"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+msgid "From:"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+msgid "What's in my clipboard?"
+msgstr ""
 
 #: cms/templates/js/course-settings-learning-fields.underscore
 msgid "Learning Outcome"
@@ -11215,6 +11280,14 @@ msgstr ""
 " выпуска и публикации блока слушатели смогут просматривать его содержимое. "
 "Только блоки, намеренно помеченные как скрытые, останутся невидимыми, после "
 "того как вы отмените эту опцию для %(xblockType)s."
+
+#: cms/templates/js/summary-configuration-editor.underscore
+msgid "Xpert unit summaries"
+msgstr ""
+
+#: cms/templates/js/summary-configuration-editor.underscore
+msgid "Enable summaries"
+msgstr ""
 
 #: cms/templates/js/team-member.underscore
 msgid "Current Role:"
