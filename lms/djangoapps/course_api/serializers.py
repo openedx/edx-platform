@@ -190,6 +190,7 @@ class CourseKeySerializer(serializers.BaseSerializer):  # pylint:disable=abstrac
     """
     Serializer that takes a CourseKey and serializes it to a string course_id.
     """
+    fields = {}
 
     @monitoring_utils.function_trace('course_key_serializer_to_representation')
     def to_representation(self, instance):
