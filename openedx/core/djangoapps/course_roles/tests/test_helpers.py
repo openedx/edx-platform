@@ -37,7 +37,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
             long_description='test_long_description',
             service=self.service
             )
-        CourseRolesRolePermissions.objects.create(role=self.role, permission=self.permission_1, allowed=True)
+        CourseRolesRolePermissions.objects.create(role=self.role, permission=self.permission_1)
         CourseRolesUserRole.objects.create(
             user=self.user,
             role=self.role,
