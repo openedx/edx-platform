@@ -584,9 +584,9 @@ add_plugins(__name__, ProjectType.CMS, SettingsType.PRODUCTION)
 ############# CORS headers for cross-domain requests #################
 if FEATURES.get('ENABLE_CORS_HEADERS'):
     CORS_ALLOW_CREDENTIALS = True
-    CORS_ORIGIN_WHITELIST = ENV_TOKENS.get('CORS_ORIGIN_WHITELIST', ())
+    CORS_ORIGIN_WHITELIST = ('https://code-xseries.funix.edu.vn')
 
-    CORS_ORIGIN_ALLOW_ALL = ENV_TOKENS.get('CORS_ORIGIN_ALLOW_ALL', True)
+    CORS_ORIGIN_ALLOW_ALL = True
     CORS_ALLOW_INSECURE = ENV_TOKENS.get('CORS_ALLOW_INSECURE', True)
     CORS_ALLOW_HEADERS = corsheaders_default_headers + (
         'use-jwt-cookie',
