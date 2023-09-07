@@ -2,9 +2,6 @@
 Tests for static asset files in Blockstore-based Content Libraries
 """
 
-
-import requests
-
 from openedx.core.djangoapps.content_libraries.tests.base import (
     ContentLibrariesRestApiBlockstoreServiceTest,
     ContentLibrariesRestApiTest,
