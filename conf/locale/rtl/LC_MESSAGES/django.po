@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-08-07 15:37+0000\n"
-"PO-Revision-Date: 2023-08-07 15:37:07.297468\n"
+"POT-Creation-Date: 2023-09-05 15:59+0000\n"
+"PO-Revision-Date: 2023-09-05 15:59:41.440074\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -3594,6 +3594,16 @@ msgstr ""
 msgid "Good"
 msgstr "Ǥøød"
 
+#. Translators: Replier commented on "your" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "your"
+msgstr "ʎønɹ"
+
+#. Translators: Replier commented on "their" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "their"
+msgstr "ʇɥǝᴉɹ"
+
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #, python-format
 msgid ""
@@ -6250,13 +6260,13 @@ msgid "Quotes"
 msgstr "Qnøʇǝs"
 
 #: lms/templates/wiki/includes/editor_widget.html
-#, python-format
+#, python-brace-format
 msgid ""
-"Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for"
-" help."
+"Markdown syntax is allowed. See the {start_link}cheatsheet{end_link} for "
+"help."
 msgstr ""
-"Mɐɹʞdøʍn sʎnʇɐx ᴉs ɐlløʍǝd. Sǝǝ ʇɥǝ %(start_link)sɔɥǝɐʇsɥǝǝʇ%(end_link)s ɟøɹ"
-" ɥǝld."
+"Mɐɹʞdøʍn sʎnʇɐx ᴉs ɐlløʍǝd. Sǝǝ ʇɥǝ {start_link}ɔɥǝɐʇsɥǝǝʇ{end_link} ɟøɹ "
+"ɥǝld."
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
@@ -7293,11 +7303,11 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
-"The Posting availabilty in discussions whether it will be enabled, scheduled"
-" or indefinitely disabled."
+"The Posting availability in discussions whether it will be enabled, "
+"scheduled or indefinitely disabled."
 msgstr ""
-"Ŧɥǝ Ᵽøsʇᴉnƃ ɐʌɐᴉlɐbᴉlʇʎ ᴉn dᴉsɔnssᴉøns ʍɥǝʇɥǝɹ ᴉʇ ʍᴉll bǝ ǝnɐblǝd, sɔɥǝdnlǝd"
-" øɹ ᴉndǝɟᴉnᴉʇǝlʎ dᴉsɐblǝd."
+"Ŧɥǝ Ᵽøsʇᴉnƃ ɐʌɐᴉlɐbᴉlᴉʇʎ ᴉn dᴉsɔnssᴉøns ʍɥǝʇɥǝɹ ᴉʇ ʍᴉll bǝ ǝnɐblǝd, "
+"sɔɥǝdnlǝd øɹ ᴉndǝɟᴉnᴉʇǝlʎ dᴉsɐblǝd."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "The LTI configuration data for this context/provider."
@@ -7482,11 +7492,11 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "<{p}><{strong}>{replier_name}</{strong}> commented on "
-"<{strong}>{author_name}'s</{strong}> response to your post "
+"<{strong}>{author_name}</{strong}> response to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
 "<{p}><{strong}>{replier_name}</{strong}> ɔøɯɯǝnʇǝd øn "
-"<{strong}>{author_name}'s</{strong}> ɹǝsdønsǝ ʇø ʎønɹ døsʇ "
+"<{strong}>{author_name}</{strong}> ɹǝsdønsǝ ʇø ʎønɹ døsʇ "
 "<{strong}>{post_title}</{strong}></{p}>"
 
 #: openedx/core/djangoapps/notifications/base_notification.py
@@ -7497,6 +7507,32 @@ msgid ""
 msgstr ""
 "<{p}><{strong}>{replier_name}</{strong}> ɹǝsdøndǝd ʇø ʎønɹ døsʇ "
 "<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> posted "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{username}</{strong}> døsʇǝd "
+"<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> asked "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{username}</{strong}> ɐsʞǝd "
+"<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+msgid ""
+"Notifications for responses and comments on your posts, and the ones you’re "
+"following, including endorsements to your responses and on your posts."
+msgstr ""
+"Nøʇᴉɟᴉɔɐʇᴉøns ɟøɹ ɹǝsdønsǝs ɐnd ɔøɯɯǝnʇs øn ʎønɹ døsʇs, ɐnd ʇɥǝ ønǝs ʎøn’ɹǝ "
+"ɟølløʍᴉnƃ, ᴉnɔlndᴉnƃ ǝndøɹsǝɯǝnʇs ʇø ʎønɹ ɹǝsdønsǝs ɐnd øn ʎønɹ døsʇs."
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "The notification preference config version is not up to date."
@@ -14250,24 +14286,6 @@ msgstr "Đᴉd ʎønɹ ǝ-ɯɐᴉl ɔlᴉǝnʇ bɹǝɐʞ ʇɥǝ ɄɌŁ ᴉnʇø 
 #: lms/templates/invalid_email_key.html
 msgid "The keys are valid for a limited amount of time. Has the key expired?"
 msgstr "Ŧɥǝ ʞǝʎs ɐɹǝ ʌɐlᴉd ɟøɹ ɐ lᴉɯᴉʇǝd ɐɯønnʇ øɟ ʇᴉɯǝ. Ħɐs ʇɥǝ ʞǝʎ ǝxdᴉɹǝd?"
-
-#: lms/templates/library-block-author-preview-header.html
-msgid ""
-"Showing all matching content eligible to be added into {display_name}. Each "
-"student will be assigned {max_count} component drawn randomly from this "
-"list."
-msgid_plural ""
-"Showing all matching content eligible to be added into {display_name}. Each "
-"student will be assigned {max_count} components drawn randomly from this "
-"list."
-msgstr[0] ""
-"Sɥøʍᴉnƃ ɐll ɯɐʇɔɥᴉnƃ ɔønʇǝnʇ ǝlᴉƃᴉblǝ ʇø bǝ ɐddǝd ᴉnʇø {display_name}. Ɇɐɔɥ "
-"sʇndǝnʇ ʍᴉll bǝ ɐssᴉƃnǝd {max_count} ɔøɯdønǝnʇ dɹɐʍn ɹɐndøɯlʎ ɟɹøɯ ʇɥᴉs "
-"lᴉsʇ."
-msgstr[1] ""
-"Sɥøʍᴉnƃ ɐll ɯɐʇɔɥᴉnƃ ɔønʇǝnʇ ǝlᴉƃᴉblǝ ʇø bǝ ɐddǝd ᴉnʇø {display_name}. Ɇɐɔɥ "
-"sʇndǝnʇ ʍᴉll bǝ ɐssᴉƃnǝd {max_count} ɔøɯdønǝnʇs dɹɐʍn ɹɐndøɯlʎ ɟɹøɯ ʇɥᴉs "
-"lᴉsʇ."
 
 #. Translators:  "External resource" means that this learning module is hosted
 #. on a platform external to the edX LMS
@@ -23177,6 +23195,24 @@ msgstr ""
 "ƗNɃØX. Sʇᴉll ɔɐn'ʇ ɟᴉnd ʇɥǝ ʌǝɹᴉɟᴉɔɐʇᴉøn ǝɯɐᴉl? Ɍǝbnǝsʇ ɥǝld ʌᴉɐ ʇɥǝ lᴉnʞ "
 "bǝløʍ."
 
+#: cms/templates/library-block-author-preview-header.html
+msgid ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} component drawn randomly from this "
+"list."
+msgid_plural ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} components drawn randomly from this "
+"list."
+msgstr[0] ""
+"Sɥøʍᴉnƃ ɐll ɯɐʇɔɥᴉnƃ ɔønʇǝnʇ ǝlᴉƃᴉblǝ ʇø bǝ ɐddǝd ᴉnʇø {display_name}. Ɇɐɔɥ "
+"sʇndǝnʇ ʍᴉll bǝ ɐssᴉƃnǝd {max_count} ɔøɯdønǝnʇ dɹɐʍn ɹɐndøɯlʎ ɟɹøɯ ʇɥᴉs "
+"lᴉsʇ."
+msgstr[1] ""
+"Sɥøʍᴉnƃ ɐll ɯɐʇɔɥᴉnƃ ɔønʇǝnʇ ǝlᴉƃᴉblǝ ʇø bǝ ɐddǝd ᴉnʇø {display_name}. Ɇɐɔɥ "
+"sʇndǝnʇ ʍᴉll bǝ ɐssᴉƃnǝd {max_count} ɔøɯdønǝnʇs dɹɐʍn ɹɐndøɯlʎ ɟɹøɯ ʇɥᴉs "
+"lᴉsʇ."
+
 #: cms/templates/library.html
 msgid "Content Library"
 msgstr "Ȼønʇǝnʇ Łᴉbɹɐɹʎ"
@@ -24162,14 +24198,6 @@ msgid "Expand or Collapse"
 msgstr "Ɇxdɐnd øɹ Ȼøllɐdsǝ"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Access Settings"
-msgstr "Ⱥɔɔǝss Sǝʇʇᴉnƃs"
-
-#: cms/templates/studio_xblock_wrapper.html
-msgid "Set Access"
-msgstr "Sǝʇ Ⱥɔɔǝss"
-
-#: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"
 msgstr "Ȼødʎ ʇø Ȼlᴉdbøɐɹd"
 
@@ -24528,10 +24556,6 @@ msgstr "Ȼønɹsǝ Nɐʌᴉƃɐʇᴉøn"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Ønʇlᴉnǝ"
-
-#: cms/templates/widgets/header.html
-msgid "Files & Media"
-msgstr "Fᴉlǝs & Mǝdᴉɐ"
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

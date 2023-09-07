@@ -38,7 +38,9 @@ from xblock.core import XBlock
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
+from cms.djangoapps.contentstore.toggles import ENABLE_COPY_PASTE_UNITS
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
+from cms.lib.ai_aside_summary_config import AiAsideSummaryConfig
 from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.static_replace import replace_static_urls
 from common.djangoapps.student.auth import (
@@ -143,6 +145,32 @@ def _is_library_component_limit_reached(usage_key):
     return total_children + 1 > settings.MAX_BLOCKS_PER_CONTENT_LIBRARY
 
 
+def _get_block_parent_children(xblock):
+    '''
+    Extract parent ID information from the given xblock and report it in the response
+    Extract child ID information from the given xblock and report it in the response
+
+    Note that no effort is made to look up all settings for this xblock's parent or childrent;
+    the blocks are merely identified. If further informaiton regarding them is required, another
+    call with those blocks as subjects may be made into this handler.
+    '''
+    response = {}
+    if hasattr(xblock, "parent") and xblock.parent:
+        response["parent"] = {
+            "block_type": xblock.parent.block_type,
+            "block_id": xblock.parent.block_id
+        }
+    if hasattr(xblock, "children") and xblock.children:
+        response["children"] = [
+            {
+                "block_type": child.block_type,
+                "block_id": child.block_id
+            }
+            for child in xblock.children
+        ]
+    return response
+
+
 def handle_xblock(request, usage_key_string=None):
     """
     Service method with all business logic for handling xblock requests.
@@ -179,6 +207,9 @@ def handle_xblock(request, usage_key_string=None):
                 # TODO: pass fields to get_block_info and only return those
                 with modulestore().bulk_operations(usage_key.course_key):
                     response = get_block_info(get_xblock(usage_key, request.user))
+                    if "customReadToken" in fields:
+                        parent_children = _get_block_parent_children(get_xblock(usage_key, request.user))
+                        response.update(parent_children)
                 return JsonResponse(response)
             else:
                 return HttpResponse(status=406)
@@ -265,6 +296,7 @@ def handle_xblock(request, usage_key_string=None):
 
 def modify_xblock(usage_key, request):
     request_data = request.json
+    print(f'In modify_xblock with data = {request_data.get("data")}, fields = {request_data.get("fields")}')
     return _save_xblock(
         request.user,
         get_xblock(usage_key, request.user),
@@ -279,6 +311,7 @@ def modify_xblock(usage_key, request):
         prereq_min_completion=request_data.get("prereqMinCompletion"),
         publish=request_data.get("publish"),
         fields=request_data.get("fields"),
+        summary_configuration_enabled=request_data.get("summary_configuration_enabled"),
     )
 
 
@@ -353,6 +386,7 @@ def _save_xblock(  # lint-amnesty, pylint: disable=too-many-statements
     prereq_min_completion=None,
     publish=None,
     fields=None,
+    summary_configuration_enabled=None,
 ):
     """
     Saves xblock w/ its fields. Has special processing for grader_type, publish, and nullout and Nones in metadata.
@@ -528,6 +562,12 @@ def _save_xblock(  # lint-amnesty, pylint: disable=too-many-statements
         # Used by Bok Choy tests and by republishing of staff locks.
         if publish == "make_public":
             modulestore().publish(xblock.location, user.id)
+
+        # If summary_configuration_enabled is not None, use AIAsideSummary to update it.
+        if xblock.category == "vertical" and summary_configuration_enabled is not None:
+            AiAsideSummaryConfig(course.id).set_summary_settings(xblock.location, {
+                'enabled': summary_configuration_enabled
+            })
 
         # Note that children aren't being returned until we have a use case.
         return JsonResponse(result, encoder=EdxJSONEncoder)
@@ -967,6 +1007,7 @@ def get_block_info(
     rewrite_static_links=True,
     include_ancestor_info=False,
     include_publishing_info=False,
+    include_children_predicate=False,
 ):
     """
     metadata, data, id representation of a leaf block fetcher.
@@ -990,6 +1031,7 @@ def get_block_info(
             data=data,
             metadata=own_metadata(xblock),
             include_ancestor_info=include_ancestor_info,
+            include_children_predicate=include_children_predicate
         )
         if include_publishing_info:
             add_container_page_publishing_info(xblock, xblock_info)
@@ -1048,6 +1090,7 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
     user=None,
     course=None,
     is_concise=False,
+    summary_configuration=None,
 ):
     """
     Creates the information needed for client-side XBlockInfo.
@@ -1097,6 +1140,10 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
     should_visit_children = include_child_info and (
         course_outline and not is_xblock_unit or not course_outline
     )
+
+    if summary_configuration is None:
+        summary_configuration = AiAsideSummaryConfig(xblock.location.course_key)
+
     if should_visit_children and xblock.has_children:
         child_info = _create_xblock_child_info(
             xblock,
@@ -1106,6 +1153,7 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             user=user,
             course=course,
             is_concise=is_concise,
+            summary_configuration=summary_configuration,
         )
     else:
         child_info = None
@@ -1346,12 +1394,18 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             else:
                 xblock_info["staff_only_message"] = False
 
+            # If the ENABLE_COPY_PASTE_UNITS feature flag is enabled, we show the newer menu that allows copying/pasting
+            xblock_info["enable_copy_paste_units"] = ENABLE_COPY_PASTE_UNITS.is_enabled()
+
             xblock_info[
                 "has_partition_group_components"
             ] = has_children_visible_to_specific_partition_groups(xblock)
         xblock_info["user_partition_info"] = get_visibility_partition_info(
             xblock, course=course
         )
+
+        if is_xblock_unit and summary_configuration.is_enabled():
+            xblock_info["summary_configuration_enabled"] = summary_configuration.is_summary_enabled(xblock_info['id'])
 
     return xblock_info
 
@@ -1546,6 +1600,7 @@ def _create_xblock_child_info(
     user=None,
     course=None,
     is_concise=False,
+    summary_configuration=None,
 ):
     """
     Returns information about the children of an xblock, as well as about the primary category
@@ -1572,6 +1627,7 @@ def _create_xblock_child_info(
                 user=user,
                 course=course,
                 is_concise=is_concise,
+                summary_configuration=summary_configuration,
             )
             for child in xblock.get_children()
         ]

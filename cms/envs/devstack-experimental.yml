@@ -43,7 +43,6 @@ BLOCKSTORE_API_URL: http://localhost:18250/api/v1
 BLOCKSTORE_PUBLIC_URL_ROOT: http://localhost:18250
 BLOCK_STRUCTURES_SETTINGS:
     COURSE_PUBLISH_TASK_DELAY: 30
-    PRUNING_ACTIVE: false
     TASK_DEFAULT_RETRY_DELAY: 30
     TASK_MAX_RETRIES: 5
 BRANCH_IO_KEY: ''
@@ -54,6 +53,10 @@ BULK_EMAIL_LOG_SENT_EMAILS: false
 CACHES:
     celery:
         BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+        OPTIONS:
+            no_delay: true
+            ignore_exc: true
+            use_pooling: true
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: celery
         LOCATION:
@@ -61,12 +64,20 @@ CACHES:
         TIMEOUT: '7200'
     configuration:
         BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+        OPTIONS:
+            no_delay: true
+            ignore_exc: true
+            use_pooling: true
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: 78f87108afce
         LOCATION:
         - edx.devstack.memcached:11211
     course_structure_cache:
         BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+        OPTIONS:
+            no_delay: true
+            ignore_exc: true
+            use_pooling: true
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: course_structure
         LOCATION:
@@ -74,6 +85,10 @@ CACHES:
         TIMEOUT: '7200'
     default:
         BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+        OPTIONS:
+            ignore_exc: true
+            no_delay: true
+            use_pooling: true
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: default
         LOCATION:
@@ -81,12 +96,20 @@ CACHES:
         VERSION: '1'
     general:
         BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+        OPTIONS:
+            no_delay: true
+            ignore_exc: true
+            use_pooling: true
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: general
         LOCATION:
         - edx.devstack.memcached:11211
     mongo_metadata_inheritance:
         BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+        OPTIONS:
+            no_delay: true
+            ignore_exc: true
+            use_pooling: true
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: mongo_metadata_inheritance
         LOCATION:
@@ -94,6 +117,10 @@ CACHES:
         TIMEOUT: 300
     staticfiles:
         BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+        OPTIONS:
+            no_delay: true
+            ignore_exc: true
+            use_pooling: true
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: 78f87108afce_general
         LOCATION:
@@ -485,17 +512,17 @@ VIDEO_IMAGE_MAX_AGE: 31536000
 VIDEO_IMAGE_SETTINGS:
     DIRECTORY_PREFIX: video-images/
     STORAGE_KWARGS:
-        base_url: /media/
         location: /edx/var/edxapp/media//
     VIDEO_IMAGE_MAX_BYTES: 2097152
     VIDEO_IMAGE_MIN_BYTES: 2048
+    BASE_URL: /media/
 VIDEO_TRANSCRIPTS_MAX_AGE: 31536000
 VIDEO_TRANSCRIPTS_SETTINGS:
     DIRECTORY_PREFIX: video-transcripts/
     STORAGE_KWARGS:
-        base_url: /media/
-        location: /edx/var/edxapp/media//
+        location: edx/var/edxapp/media//
     VIDEO_TRANSCRIPTS_MAX_BYTES: 3145728
+    BASE_URL: /media/
 VIDEO_UPLOAD_PIPELINE:
     BUCKET: ''
     ROOT_PATH: ''

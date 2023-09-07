@@ -157,7 +157,7 @@ class TestLimitConfiguration(unittest.TestCase):
             # middleware is automatically initialized because it's an element of
             # `settings.MIDDLEWARE`).
             try:
-                ConfigureCodeJailMiddleware()
+                ConfigureCodeJailMiddleware(get_response=lambda request: None)
             except MiddlewareNotUsed:
                 pass
 

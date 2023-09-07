@@ -26,7 +26,7 @@ from .events import (
     notification_preference_update_event,
     notification_preferences_viewed_event,
     notification_read_event,
-    notifications_app_all_read_event,
+    notifications_app_all_read_event, notification_tray_opened_event,
 )
 from .models import Notification
 from .serializers import (
@@ -262,6 +262,9 @@ class NotificationListAPIView(generics.ListAPIView):
         expiry_date = datetime.now(UTC) - timedelta(days=settings.NOTIFICATIONS_EXPIRY)
         app_name = self.request.query_params.get('app_name')
 
+        if self.request.query_params.get('tray_opened'):
+            notification_tray_opened_event(self.request.user)
+
         if app_name:
             return Notification.objects.filter(
                 user=self.request.user,
@@ -295,7 +298,8 @@ class NotificationCountView(APIView):
             "count_by_app_name": {
                 (str) app_name: (int) number_of_unseen_notifications,
                 ...
-            }
+            },
+            "notification_expiry_days": 60
         }
         ```
         **Response Error Codes**:
@@ -325,6 +329,7 @@ class NotificationCountView(APIView):
             "show_notifications_tray": show_notifications_tray,
             "count": count_total,
             "count_by_app_name": count_by_app_name_dict,
+            "notification_expiry_days": settings.NOTIFICATIONS_EXPIRY
         })
 
 

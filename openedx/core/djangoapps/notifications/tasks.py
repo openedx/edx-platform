@@ -14,12 +14,12 @@ from pytz import UTC
 
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.events import notification_generated_event
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
     Notification,
     get_course_notification_preference_config_version
 )
-from openedx.core.djangoapps.notifications.events import notification_generated_event
 
 logger = get_task_logger(__name__)
 
@@ -105,18 +105,19 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
             preference.get_web_config(app_name, notification_type) and
             preference.get_app_config(app_name).get('enabled', False)
         ):
-            notification = Notification(
-                user_id=preference.user_id,
-                app_name=app_name,
-                notification_type=notification_type,
-                content_context=context,
-                content_url=content_url,
-                course_id=course_key,
+            notifications.append(
+                Notification(
+                    user_id=preference.user_id,
+                    app_name=app_name,
+                    notification_type=notification_type,
+                    content_context=context,
+                    content_url=content_url,
+                    course_id=course_key,
+                )
             )
-            notifications.append(notification)
-            notification_generated_event(preference.user, notification)
     # send notification to users but use bulk_create
     Notification.objects.bulk_create(notifications)
+    notification_generated_event(user_ids, app_name, notification_type, course_key)
 
 
 def update_user_preference(preference: CourseNotificationPreference, user, course_id):

@@ -381,9 +381,8 @@ class LTIBlock(
         # Add our specific template information (the raw data body)
         context.update({'data': self.data})
         fragment = Fragment(
-            self.runtime.service(self, 'mako').render_template(self.mako_template, context)
+            self.runtime.service(self, 'mako').render_cms_template(self.mako_template, context)
         )
-        add_sass_to_fragment(fragment, 'LTIBlockEditor.scss')
         add_webpack_js_to_fragment(fragment, 'LTIBlockEditor')
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
@@ -498,7 +497,8 @@ class LTIBlock(
         Return the student view.
         """
         fragment = Fragment()
-        fragment.add_content(self.runtime.service(self, 'mako').render_template('lti.html', self.get_context()))
+        fragment.add_content(self.runtime.service(self, 'mako').render_lms_template('lti.html', self.get_context()))
+        add_sass_to_fragment(fragment, 'LTIBlockDisplay.scss')
         add_webpack_js_to_fragment(fragment, 'LTIBlockDisplay')
         shim_xmodule_js(fragment, 'LTI')
         return fragment
@@ -508,7 +508,7 @@ class LTIBlock(
         """
         This is called to get context with new oauth params to iframe.
         """
-        template = self.runtime.service(self, 'mako').render_template('lti_form.html', self.get_context())
+        template = self.runtime.service(self, 'mako').render_lms_template('lti_form.html', self.get_context())
         return Response(template, content_type='text/html')
 
     def get_user_id(self):

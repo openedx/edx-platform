@@ -1635,7 +1635,8 @@ class ForumFormDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTes
         mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
         request = RequestFactory().get("dummy_url")
         request.user = self.student
-        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
+        # so (request.headers.get('x-requested-with') == 'XMLHttpRequest') == True
+        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"
 
         response = views.forum_form_discussion(request, str(self.course.id))
         assert response.status_code == 200
@@ -1723,7 +1724,8 @@ class ForumDiscussionSearchUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreT
         }
         request = RequestFactory().get("dummy_url", data)
         request.user = self.student
-        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
+        # so (request.headers.get('x-requested-with') == 'XMLHttpRequest') == True
+        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"
 
         response = views.forum_form_discussion(request, str(self.course.id))
         assert response.status_code == 200
@@ -1753,7 +1755,8 @@ class SingleThreadUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, 
         mock_request.side_effect = make_mock_request_impl(course=self.course, text=text, thread_id=thread_id)
         request = RequestFactory().get("dummy_url")
         request.user = self.student
-        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
+        # so (request.headers.get('x-requested-with') == 'XMLHttpRequest') == True
+        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"
 
         response = views.single_thread(request, str(self.course.id), "dummy_discussion_id", thread_id)
         assert response.status_code == 200
@@ -1782,7 +1785,8 @@ class UserProfileUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, U
         mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
         request = RequestFactory().get("dummy_url")
         request.user = self.student
-        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
+        # so (request.headers.get('x-requested-with') == 'XMLHttpRequest') == True
+        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"
 
         response = views.user_profile(request, str(self.course.id), str(self.student.id))
         assert response.status_code == 200
@@ -1811,7 +1815,8 @@ class FollowedThreadsUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCas
         mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
         request = RequestFactory().get("dummy_url")
         request.user = self.student
-        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
+        # so (request.headers.get('x-requested-with') == 'XMLHttpRequest') == True
+        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"
 
         response = views.followed_threads(request, str(self.course.id), str(self.student.id))
         assert response.status_code == 200
