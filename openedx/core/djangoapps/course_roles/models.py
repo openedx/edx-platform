@@ -14,16 +14,9 @@ class CourseRolesRole(models.Model):
     """
     Model for a course role.
     """
-    class RoleType(models.TextChoices):
-        """
-        Enum for the role type.
-        """
-        DEFAULT = 'default'
-        CUSTOM = 'custom'
     name = models.CharField(max_length=255)
     short_description = models.CharField(max_length=255)
     long_description = models.TextField()
-    type = models.CharField(max_length=64, choices=RoleType.choices, default=RoleType.DEFAULT)
     service = models.ForeignKey('CourseRolesService', on_delete=models.DO_NOTHING, null=True)
     permissions = models.ManyToManyField('CourseRolesPermission', through='CourseRolesRolePermissions')
     users = models.ManyToManyField(User, through='CourseRolesUserRole')
@@ -49,7 +42,6 @@ class CourseRolesRolePermissions(models.Model):
     """
     role = models.ForeignKey('CourseRolesRole', on_delete=models.CASCADE)
     permission = models.ForeignKey('CourseRolesPermission', on_delete=models.CASCADE)
-    allowed = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.role} - {self.permission}"
