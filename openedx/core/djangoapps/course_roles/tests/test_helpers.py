@@ -44,3 +44,9 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
             course_id=self.course.id,
             org=self.organization
             )
+
+    def test_permission_check_with_correct_course_permission(self):
+        assert permission_check(self.user, self.permission_1.name, self.course.id)
+
+    def test_permission_check_without_course_permission(self):
+        assert not permission_check(self.user, self.permission_2.name, self.course.id)
