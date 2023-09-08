@@ -127,10 +127,19 @@ class ClassListSerializer(serializers.ModelSerializer):
 class ClassSummarySerializer(serializers.ModelSerializer):
     school_name = serializers.CharField(source="school.name")
     program_name = serializers.CharField(source="program.year_group.name", default=None)
+    program_id = serializers.IntegerField(source="program.id", default=None)
+    year_group_id = serializers.IntegerField(source="program.year_group.id", default=None)
 
     class Meta:
         model = Class
-        fields = ('group_id', 'name', 'school_name', 'program_name',)
+        fields = (
+            'group_id',
+            'name',
+            'school_name',
+            'program_name',
+            'program_id',
+            'year_group_id',
+        )
 
 
 class FavoriteClassSerializer(serializers.Serializer):
