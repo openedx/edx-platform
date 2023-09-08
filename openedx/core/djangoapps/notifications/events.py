@@ -62,16 +62,16 @@ def notification_preferences_viewed_event(request, course_id):
         )
 
 
-def notification_generated_event(notification_data):
+def notification_generated_event(user_ids, app_name, notification_type, course_key):
     """
     Emit an event when a notification is generated.
     """
-    context = contexts.course_context_from_course_id(notification_data.get('course_key', ''))
+    context = contexts.course_context_from_course_id(course_key)
     event_data = {
-        'recipients_id': notification_data.get('user_ids', []),
-        'course_id': notification_data.get('course_key', ''),
-        'notification_type': notification_data.get('notification_type', ''),
-        'notification_app': notification_data.get('notification_app', ''),
+        'recipients_id': user_ids,
+        'course_id': str(course_key),
+        'notification_type': notification_type,
+        'notification_app': app_name,
     }
     with tracker.get_tracker().context(NOTIFICATION_GENERATED, context):
         tracker.emit(

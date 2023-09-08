@@ -13,7 +13,6 @@ from openedx_events.learning.signals import (
 )
 
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
-from openedx.core.djangoapps.notifications.events import notification_generated_event
 from openedx.core.djangoapps.notifications.models import CourseNotificationPreference
 
 log = logging.getLogger(__name__)
@@ -59,4 +58,3 @@ def generate_user_notifications(signal, sender, notification_data, metadata, **k
     notification_data = notification_data.__dict__
     notification_data['course_key'] = str(notification_data['course_key'])
     send_notifications.delay(**notification_data)
-    notification_generated_event(notification_data)

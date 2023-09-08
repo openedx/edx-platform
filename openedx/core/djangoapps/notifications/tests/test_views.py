@@ -550,6 +550,16 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
         self.assertEqual(response.data['count'], 0)
         self.assertEqual(response.data['count_by_app_name'], {'discussion': 0})
 
+    def test_get_expiry_days_in_count_view(self):
+        """
+        Tests if "notification_expiry_days" exists in API response
+        """
+        user = UserFactory()
+        self.client.login(username=user.username, password='test')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['notification_expiry_days'], 60)
+
 
 class MarkNotificationsSeenAPIViewTestCase(APITestCase):
     """
