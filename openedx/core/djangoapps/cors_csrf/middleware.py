@@ -45,6 +45,7 @@ CSRF cookie.
 
 import logging
 
+import django
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, MiddlewareNotUsed
 from django.middleware.csrf import CsrfViewMiddleware
@@ -123,9 +124,15 @@ class CsrfCrossDomainCookieMiddleware(MiddlewareMixin):
         # Check whether (a) the CSRF middleware has already set a cookie, and
         # (b) this is a view decorated with `@ensure_cross_domain_csrf_cookie`
         # If so, we can send the cross-domain CSRF cookie.
+
+        if django.VERSION < (4, 2):
+            csrf_cookie_usage = request.META.get('CSRF_COOKIE_USED', False)
+        else:   # django 42 has new cookie name
+            csrf_cookie_usage = request.META.get('CSRF_COOKIE_NEEDS_UPDATE', False)
+
         should_set_cookie = (
             request.META.get('CROSS_DOMAIN_CSRF_COOKIE_USED', False) and
-            request.META.get('CSRF_COOKIE_USED', False) and
+            csrf_cookie_usage and
             request.META.get('CSRF_COOKIE') is not None
         )
 

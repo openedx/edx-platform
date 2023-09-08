@@ -6,6 +6,7 @@ Tests for the CORS CSRF middleware
 from unittest.mock import patch, Mock
 import ddt
 import pytest
+import django
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.core.exceptions import MiddlewareNotUsed, ImproperlyConfigured
@@ -258,7 +259,10 @@ class TestCsrfCrossDomainCookieMiddleware(TestCase):
             del request.META['HTTP_REFERER']
 
         if csrf_cookie_used:
-            request.META['CSRF_COOKIE_USED'] = True
+            if django.VERSION < (4, 2):
+                request.META['CSRF_COOKIE_USED'] = True
+            else:
+                request.META['CSRF_COOKIE_NEEDS_UPDATE'] = True     # django 42 has new cookie name
             request.META['CSRF_COOKIE'] = self.COOKIE_VALUE
 
         if cross_domain_decorator:
