@@ -295,6 +295,46 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         )
         self.assertContains(resp, self.user.username, status_code=status.HTTP_200_OK)
 
+    def test_enroll_with_user_without_permissions_and_email(self):
+        resp = self.client.post(
+            reverse('courseenrollments'),
+            {
+                'course_details': {
+                    'course_id': str(self.course.id)
+                },
+                'user': self.other_user.username,
+                'email': self.user.email
+            },
+            format='json'
+        )
+        assert resp.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_enroll_with_user_as_self_user(self):
+        resp = self.client.post(
+            reverse('courseenrollments'),
+            {
+                'course_details': {
+                    'course_id': str(self.course.id)
+                },
+                'user': self.user.username
+            },
+            format='json'
+        )
+        self.assertContains(resp, self.user.username, status_code=status.HTTP_200_OK)
+
+    def test_enroll_without_user(self):
+        # To check if it takes the request.user.
+        resp = self.client.post(
+            reverse('courseenrollments'),
+            {
+                'course_details': {
+                    'course_id': str(self.course.id)
+                }
+            },
+            format='json'
+        )
+        self.assertContains(resp, self.user.username, status_code=status.HTTP_200_OK)
+
     @ddt.data(
         # Default (no course modes in the database)
         # Expect that users are automatically enrolled as the default
