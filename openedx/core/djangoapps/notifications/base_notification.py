@@ -13,8 +13,8 @@ COURSE_NOTIFICATION_TYPES = {
         'notification_app': 'discussion',
         'name': 'new_comment_on_response',
         'is_core': True,
-        'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on your response to the post '
-                              '<{strong}>{post_title}</{strong}></{p}>'),
+        'content_template': _('{<p>}{<strong>}{replier_name}{</strong>} commented on your response to the post '
+                              '{<strong>}{post_title}{</strong>}{</p>}'),
         'content_context': {
             'post_title': 'Post title',
             'replier_name': 'replier name',
@@ -25,8 +25,8 @@ COURSE_NOTIFICATION_TYPES = {
         'notification_app': 'discussion',
         'name': 'new_comment',
         'is_core': True,
-        'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on <{strong}>{author_name}'
-                              '</{strong}> response to your post <{strong}>{post_title}</{strong}></{p}>'),
+        'content_template': _('{<p>}{<strong>}{replier_name}{</strong>} commented on {<strong>}{author_name}'
+                              '{</strong>} response to your post {<strong>}{post_title}{</strong>}{</p>}'),
         'content_context': {
             'post_title': 'Post title',
             'author_name': 'author name',
@@ -315,6 +315,10 @@ def get_notification_content(notification_type, context):
     html_tags_context = {
         'strong': 'strong',
         'p': 'p',
+        '<strong>': '<strong>',
+        '</strong>': '</strong>',
+        '<p>': '<p>',
+        '</p>': '</p>',
     }
     notification_type = NotificationTypeManager().notification_types.get(notification_type, None)
     if notification_type:
