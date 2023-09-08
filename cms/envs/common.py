@@ -2422,7 +2422,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 ############# CORS headers for cross-domain requests #################
 if FEATURES.get('ENABLE_CORS_HEADERS'):
     CORS_ALLOW_CREDENTIALS = True
-    CORS_ORIGIN_WHITELIST = ('https://code-xseries.funix.edu.vn')
+    CORS_ORIGIN_WHITELIST = ()
 
     CORS_ALLOW_INSECURE = True
     CORS_ALLOW_HEADERS = corsheaders_default_headers + (

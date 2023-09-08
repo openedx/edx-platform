@@ -276,7 +276,7 @@ LEARNER_HOME_MICROFRONTEND_URL = 'http://localhost:1996'
 ###################### Cross-domain requests ######################
 FEATURES['ENABLE_CORS_HEADERS'] = True
 CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_WHITELIST = ('https://code-xseries.funix.edu.vn')
+CORS_ORIGIN_WHITELIST = ()
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_HEADERS = corsheaders_default_headers + (
     'use-jwt-cookie',

@@ -70,7 +70,7 @@
 }
 
 .survey-btn{
-    border-top: 1px solid black;
+    border-top: 1px solid #bfbfbf;
     display: flex;
     padding-top: 20px;
     gap: 10px;
@@ -104,11 +104,13 @@
 
 
 .card-header {
-    background-color: #007BFF;
+    background-color: #171b54;
     color: #fff;
     padding: 30px;
     font-weight: bold;
     text-align: center;
+    line-height:0.8cm;
+    font-size: 18px;
   
 }
 
@@ -117,6 +119,119 @@
     padding: 30px 40px;
     display: flex;
     flex-direction: column;
-    gap:10px
+    gap:2px
+}
+
+
+.survey-btn-item{
+    background: #382efc !important;
+    padding: 10px  25px;
+    border: none;
+    border-radius: 7px;
+    font-size: 16px;
+    text-shadow: none !important;
+}
+
+.survey-btn-item:active{
+    box-shadow: none !important;
+}
+
+.survey-btn-item:focus:not(:disabled){
+    box-shadow: none !important;
+}
+
+.btn-next{
+    background: #9169ff !important;
+}
+
+.btn-back{
+    background: none !important;
+    color : #382efc;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+input[type='radio'] {
+   width: 16px;
+   height: 16px;
+}
+input[type='checkbox']{
+    width: 18px;
+    height: 18px;
+}
+
+input[type='radio']{
+    accent-color: black;
+}
+input[type='checkbox']{
+    accent-color: black;
+}
+
+
+.survey-form label{
+    font-style: normal;
+}
+
+.survey-item-input{
+    display: flex;
+    align-items: center;
+    gap:14px;
+}
+.survey-item-input label {
+   margin-top: 5px;
+}
+
+
+.input-item-text{
+    display: flex;
+    flex-direction: column;
+    gap:20px;
+    padding:10px 0px;
+}
+
+.input-item-select{
+    display: flex;
+    flex-direction: column;
+    gap:20px;
+    padding:10px 0px;
+}
+
+.input-item-select select{
+    padding:5px;
+    border: 1px solid #c8c8c8;
+    border-radius: 4px;
+}
+
+.border-navbar  {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 1000px; 
+    width: 100%; 
+    margin: 0 auto;
+    padding-bottom: 20px;
+}
+.border-navbar-item{
+    border: 3px solid #f2f2f2;
+    width: 100%;
+}
+
+.border-navbar-item:first-child{
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+.border-navbar-item:last-child{
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    
+}
+
+.border-current{
+    border: 3px solid #382efc;
+}
+
+
+.border-current-success{
+    border: 3px solid #30865c;
 }
 

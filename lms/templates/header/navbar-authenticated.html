@@ -28,7 +28,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 
 <div class="nav-links">
   <div class="main">
-    % if show_dashboard_tabs:
+
       <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
         <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}"
              aria-current="${'page' if reverse('dashboard') == request.path else 'false'}">
@@ -43,7 +43,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
           </a>
         </div>
       % endif
-    % endif
+   
     % if show_explore_courses:
       <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
           <a class="tab-nav-link discover-new-link" href="${marketing_link('COURSES')}"
@@ -52,6 +52,17 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
           </a>
       </div>
     % endif
+    <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+      <a class="tab-nav-link discover-new-link" href="/survey-form">
+         Survery Form
+      </a>
+  </div>
+  <script>
+    const surveyLink = document.querySelector('a[href="/survey-form"]');
+    if (window.location.pathname === "/survey-form/" || window.location.pathname === "/survey-form" ) {
+      surveyLink.classList.add("active");
+    }
+  </script>
   </div>
   <div class="secondary">
     % if enable_help_link:
