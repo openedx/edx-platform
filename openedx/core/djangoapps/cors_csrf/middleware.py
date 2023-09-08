@@ -127,7 +127,7 @@ class CsrfCrossDomainCookieMiddleware(MiddlewareMixin):
 
         if django.VERSION < (4, 2):
             csrf_cookie_usage = request.META.get('CSRF_COOKIE_USED', False)
-        else:  # django 42 has new cookie name
+        else:   # django 42 has new cookie name
             csrf_cookie_usage = request.META.get('CSRF_COOKIE_NEEDS_UPDATE', False)
 
         should_set_cookie = (
