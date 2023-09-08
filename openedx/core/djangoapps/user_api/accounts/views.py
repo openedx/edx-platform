@@ -21,6 +21,7 @@ from django.utils.translation import gettext as _
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from openedx.core.lib.api.authentication import BearerAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomerUser, PendingEnterpriseCustomerUser
 from integrated_channels.degreed.models import DegreedLearnerDataTransmissionAudit
@@ -567,7 +568,7 @@ class DeactivateLogoutView(APIView):
     -  Log the user out
     - Create a row in the retirement table for that user
     """
-    authentication_classes = (JwtAuthentication, SessionAuthentication,)
+    authentication_classes = (JwtAuthentication, SessionAuthentication, BearerAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
     def post(self, request):
