@@ -407,6 +407,7 @@ class NotificationListAPIViewTest(APITestCase):
         event_name, event_data = mock_emit.call_args[0]
         self.assertEqual(event_name, 'edx.notifications.tray_opened')
         self.assertEqual(event_data['user_id'], self.user.id)
+        self.assertEqual(event_data['unseen_notifications_count'], 0)
 
     def test_list_notifications_without_authentication(self):
         """
@@ -652,6 +653,7 @@ class NotificationReadAPIViewTestCase(APITestCase):
         self.assertEqual(event_data.get('notification_metadata').get('notification_id'), notification_id)
         self.assertEqual(event_data['notification_app'], 'discussion')
         self.assertEqual(event_data['notification_type'], 'Type A')
+        self.assertEqual(event_data['first_read'], True)
 
     def test_mark_notification_read_with_other_user_notification_id(self):
         # Create a PATCH request to mark notification as read for notification_id: 2 through a different user

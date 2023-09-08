@@ -116,8 +116,12 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
                 )
             )
     # send notification to users but use bulk_create
-    Notification.objects.bulk_create(notifications)
-    notification_generated_event(user_ids, app_name, notification_type, course_key)
+    notifications_generated = Notification.objects.bulk_create(notifications)
+    if notifications_generated:
+        notification_content = notifications_generated[0].content
+        notification_generated_event(
+            user_ids, app_name, notification_type, course_key, content_url, notification_content,
+        )
 
 
 def update_user_preference(preference: CourseNotificationPreference, user, course_id):

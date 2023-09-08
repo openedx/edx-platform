@@ -62,16 +62,22 @@ def notification_preferences_viewed_event(request, course_id):
         )
 
 
-def notification_generated_event(user_ids, app_name, notification_type, course_key):
+def notification_generated_event(user_ids, app_name, notification_type, course_key, content_url, content):
     """
     Emit an event when a notification is generated.
     """
     context = contexts.course_context_from_course_id(course_key)
+    context['user_id'] = 'None'
+    recipients_count = len(user_ids)
     event_data = {
-        'recipients_id': user_ids,
+        'recipients_id': user_ids[:100],
+        'recipients_count': recipients_count,
+        'recipients_truncated': recipients_count > 100,
         'course_id': str(course_key),
         'notification_type': notification_type,
         'notification_app': app_name,
+        'content_url': content_url,
+        'notification_content': content,
     }
     with tracker.get_tracker().context(NOTIFICATION_GENERATED, context):
         tracker.emit(
@@ -85,15 +91,17 @@ def notification_generated_event(user_ids, app_name, notification_type, course_k
         )
 
 
-def notification_read_event(user, notification):
+def notification_read_event(user, notification, first_read=False):
     """
     Emit an event when a notification app is marked read for a user.
     """
     context = contexts.course_context_from_course_id(notification.course_id)
+    event_data = notification_event_context(user, notification.course_id, notification)
+    event_data['first_read'] = first_read
     with tracker.get_tracker().context(NOTIFICATION_READ, context):
         tracker.emit(
             NOTIFICATION_READ,
-            notification_event_context(user, notification.course_id, notification)
+            event_data,
         )
 
 
@@ -131,7 +139,7 @@ def notification_preference_update_event(user, course_id, updated_preference):
         )
 
 
-def notification_tray_opened_event(user):
+def notification_tray_opened_event(user, unseen_notifications_count):
     """
     Emit an event when a notification tray is opened.
     """
@@ -139,5 +147,6 @@ def notification_tray_opened_event(user):
         NOTIFICATION_TRAY_OPENED,
         {
             'user_id': user.id,
+            'unseen_notifications_count': unseen_notifications_count,
         }
     )
