@@ -8,11 +8,11 @@
 
 <%block name="pagetitle">Survey Form</%block>
 
-
 <Link rel='stylesheet' href="../static/survey_form/survey_form.css" />
 
 
-<div>
+
+<div >
    <div>
         <h1 style=" font-size:26px;">Digital Marketing Welcome Flow</h1>
    </div>
@@ -58,6 +58,7 @@
                       <span>${q.question}</span>
                       </div>
                       <div class="card-body">
+                       
                       % if q.config['option'] and 'radio' in q.type :
                           % for index,option in enumerate(q.config['option']) :
                              <div class="survey-item-input">
@@ -113,6 +114,7 @@
                       <span>${item['title']}</span>
                       </div>
                       <div class="card-body">
+                       
                           % for q in item['config'] :
                               % if 'text' in q.type :
                                  <div class="input-item-text" >
@@ -135,34 +137,43 @@
                               </div>
                              %endif
                              % if 'checkbox' in q.type :
+                              <div style="display: flex;
+                              flex-direction: column;
+                              padding: 20px 0px;
+                              gap: 10px;">
+                                <span style="font-weight:bold">${q.question}</span>
                                 % for option in q.config['option'] :
                                 <div class="survey-item-input">
                                     <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+                                  
                                     <input type="${q.type}" name="${q.question}" value="${option}" id="${option}"  />
                                     <label for="${option}">${option}</label>
                                 </div>
                                 % endfor
+                              </div>
                             % endif
                             % if 'radio' in q.type:
+                               <div style="display: flex;
+                               flex-direction: column;
+                               padding: 20px 0px;
+                               gap: 10px;">
+                                <span style="font-weight:bold">${q.question}</span>
                                 % for index,option in enumerate(q.config['option']) :
-                                    <div class="survey-item-input">
+                                <div class="survey-item-input">
                                     <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-                                        <input id="${option}" type=${q.type} name="${q.question}" value="${option}"/>
-                                        <label for="${option}" >${option}</label>
-                                    </div>
-                                % endfor
+                               
+                                    <input id="${option}" type=${q.type} name="${q.question}" value="${option}"/>
+                                    <label for="${option}" >${option}</label>
+                                </div>
+                            % endfor
+                               </div>
                             %endif
-                          % endfor
-                    
-                              
-                          
+                          % endfor       
                       </div>
                   </div>
               </div>
               % endfor   
-
           %endif
-
             <div class="survey-form"  style="display: none;">
                 <div style="display: flex; flex-direction:column; align-items:center; gap:40px; justify-content:center; height:400px; " >
                     <div>
@@ -205,8 +216,9 @@
     const submitButton = document.querySelector('.submitButton');
     const borderNavbar = document.querySelector('.border-navbar')
     const forms = document.querySelectorAll('.survey-form');
+    const textError = document.querySelector('.text-error')
 
-    
+
     for(let i = 0; i< forms.length; i++){
         const newSpan = document.createElement('span')
         newSpan.classList.add('border-navbar-item')
@@ -218,17 +230,102 @@
       }
 
 
+    function validateInput (currentFormIndex){
+        let isRadioChecked = false
+        let isCheckboxChecked = false
+        let isCheckText = false
+
+        if (currentFormIndex === 0){
+            isCheckboxChecked = true
+            isRadioChecked = true
+        }
+
+        const presentForms = forms[currentFormIndex];
+        const presentInput = presentForms.querySelectorAll('input');
+        let inputRadio = []
+        let inputCheckBox = []
+        let inputText = []
+
+        presentInput.forEach((input) => { 
+            if(input.type === 'radio'){
+                inputRadio.push(input)
+            }
+            if (input.type === 'checkbox'){
+                inputCheckBox.push(input)
+            }
+            if(input.type === 'text'){
+                inputText.push(input)
+            }
+        
+        });
+        
+        inputRadio.forEach(input =>{
+            if(input.checked){
+                isRadioChecked = true
+            }
+        })
+       
+        inputCheckBox.forEach(input =>{
+            if(input.checked){
+                isCheckboxChecked = true
+            }
+        })
+
+
+        inputText.forEach(input =>{
+            if(input.value.trim() !== ''){
+                isCheckText = true
+            }
+        })
+
+
+        if (inputRadio.length === 0){
+            isRadioChecked = true
+        }
+        if(inputCheckBox.length === 0){
+            isCheckboxChecked = true
+        }
+        if(inputText.length === 0){
+            isCheckText = true
+        }
+        
+
+
+        return {
+            isRadioChecked ,
+            isCheckboxChecked,
+            isCheckText
+        }
+    }
+
+
     function changeForm(step) {
         const newSpan = document.querySelectorAll('.border-navbar-item')
         for (const span of newSpan) {
             span.classList.remove('border-current');
         }
 
-
-
-        forms[currentFormIndex].style.display = 'none';
-        currentFormIndex += step;
         
+        const {isRadioChecked ,isCheckboxChecked, isCheckText} = validateInput(currentFormIndex)
+      
+
+   
+        if(!isRadioChecked){
+          alert('Fields must not be empty!')
+        }else if (!isCheckboxChecked){
+            alert('Fields must not be empty!')
+        }else if (!isCheckText){
+            alert('Fields must not be empty!')
+        }
+        else {
+
+            forms[currentFormIndex].style.display = 'none';
+            currentFormIndex += step;
+
+        }
+        
+      
+
         if (currentFormIndex < 0) {
             currentFormIndex = 0;
         } else if (currentFormIndex >= forms.length) {
@@ -267,15 +364,20 @@
             nextButton.textContent = "Next";
             nextButton.classList.add('btn-next')
         }
-    }
 
+        
+ 
+    }
 
     backButton.style.display = 'none';
 
-
     if (forms.length <= 1) {
         nextButton.style.display = 'none';
+
     }
+
+
+
 </script>
 
 
