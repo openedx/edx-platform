@@ -86,7 +86,7 @@ class SchoolAdmin(admin.ModelAdmin):
         'enrolled_students'
     )
     search_fields = ('name',)
-    list_filter = ('type',)
+    list_filter = ('type', 'is_active')
     actions = ['sync_registration_group_classes', 'sync_teaching_group_classes']
 
     def get_urls(self):
