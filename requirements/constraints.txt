@@ -122,8 +122,6 @@ djangorestframework-stubs==3.14.0  # Pinned to match django-stubs. Remove this w
 # https://github.com/openedx/edx-platform/issues/31616
 libsass==0.10.0
 
-# incremental upgrade
-django-simple-history==3.3.0
 
 # greater version breaking upgrade builds
 click==8.1.6
