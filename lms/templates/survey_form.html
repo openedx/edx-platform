@@ -298,6 +298,19 @@
         }
     }
 
+    function errorMessage (currentFormIndex){
+        const presentForm = forms[currentFormIndex]
+        const cardBody = presentForm.querySelector('.card-body')
+        const existingError = cardBody.querySelector('.error-message')
+        if(!existingError){
+            const newSpan = document.createElement('span')
+            newSpan.textContent = 'Error: Fields must not be left empty!'
+            newSpan.className = 'error-message'
+            cardBody.insertBefore(newSpan, cardBody.firstChild)
+        }
+    }
+
+
 
     function changeForm(step) {
         const newSpan = document.querySelectorAll('.border-navbar-item')
@@ -311,14 +324,19 @@
 
    
         if(!isRadioChecked){
-          alert('Fields must not be empty!')
+          errorMessage(currentFormIndex)
+            
         }else if (!isCheckboxChecked){
-            alert('Fields must not be empty!')
+            errorMessage(currentFormIndex)
         }else if (!isCheckText){
-            alert('Fields must not be empty!')
+           errorMessage(currentFormIndex)
         }
         else {
+            const errorMessage = document.querySelector('.error-message')
+            if(errorMessage){
 
+                errorMessage.remove()
+            }
             forms[currentFormIndex].style.display = 'none';
             currentFormIndex += step;
 

@@ -235,5 +235,9 @@ input[type='checkbox']{
     border: 3px solid #30865c;
 }
 
-
+.error-message{
+    text-align: center;
+    color : #e96371 ;
+    padding-bottom: 10px;
+}
 
