@@ -298,7 +298,8 @@ class NotificationCountView(APIView):
             "count_by_app_name": {
                 (str) app_name: (int) number_of_unseen_notifications,
                 ...
-            }
+            },
+            "notification_expiry_days": 60
         }
         ```
         **Response Error Codes**:
@@ -328,6 +329,7 @@ class NotificationCountView(APIView):
             "show_notifications_tray": show_notifications_tray,
             "count": count_total,
             "count_by_app_name": count_by_app_name_dict,
+            "notification_expiry_days": settings.NOTIFICATIONS_EXPIRY
         })
 
 
