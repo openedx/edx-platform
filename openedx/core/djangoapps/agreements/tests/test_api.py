@@ -10,7 +10,9 @@ from openedx.core.djangoapps.agreements.api import (
     create_integrity_signature,
     get_integrity_signature,
     get_integrity_signatures_for_course,
-    get_lti_tools_receiving_pii
+    get_pii_receiving_lti_tools,
+    create_lti_pii_signature,
+    get_lti_pii_signature
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
@@ -106,6 +108,62 @@ class TestIntegritySignatureApi(SharedModuleStoreTestCase):
 
 
 @skip_unless_lms
+class TestLTIPIISignatureApi(SharedModuleStoreTestCase):
+    """
+    Tests for the lti pii signature API
+    """
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user = UserFactory()
+        cls.course = CourseFactory()
+        cls.course_id = str(cls.course.id)
+        cls.lti_tools = {"first_lti_tool": "This is the first tool",
+                         "second_lti_tool": "This is the second tool", }
+        LTIPIITool.objects.create(
+            course_key=CourseKey.from_string(cls.course_id),
+            lti_tools=cls.lti_tools,
+            lti_tools_hash=11111,
+        )
+
+    def test_create_lti_pii_signature(self):
+        """
+        Test to check if an lti pii signature is created from a course and its lti tools.
+        """
+        signature = create_lti_pii_signature(self.user.username, self.course_id, self.lti_tools)
+        self._assert_lti_pii_signature(signature)
+
+    def test_create_duplicate_lti_pii_signature(self):
+        """
+        Test that duplicate lti pii signatures cannot be created
+        """
+        print(self.user, self.course, self.course_id, self.lti_tools)
+        with LogCapture(LOGGER_NAME, level=logging.WARNING) as logger:
+            create_lti_pii_signature(self.user.username, self.course_id, self.lti_tools)
+            create_lti_pii_signature(self.user.username, self.course_id, self.lti_tools)
+            data = get_lti_pii_signature(self.user.username, self.course_id)
+            self._assert_lti_pii_signature(data.lti_pii_signature)
+            logger.check((
+                LOGGER_NAME,
+                'WARNING',
+                (
+                    'LTI PII signature already exists for user_id={user_id} and '
+                    'course_id={course_id}'.format(
+                        user_id=self.user.id, course_id=str(self.course_id)
+                    )
+                )
+            ))
+
+    def _assert_lti_pii_signature(self, signature):
+        """
+        Helper function to assert the returned lti pii signature has the correct
+        user and course key
+        """
+        self.assertEqual(signature.user, self.user)
+        self.assertEqual(signature.course_key, self.course.id)
+
+
+@skip_unless_lms
 class TestLTIPIIToolsApi(SharedModuleStoreTestCase):
     """
     Tests for the lti pii tool sharing API. To make sure the list of LTI tools can be retreived from the Model.
@@ -115,24 +173,23 @@ class TestLTIPIIToolsApi(SharedModuleStoreTestCase):
         super().setUpClass()
         cls.course = CourseFactory()
         cls.course_id = str(cls.course.id)
-        cls.course_and_tools = LTIPIITool.objects.create(
+        cls.lti_tools = {"first_lti_tool": "This is the first tool",
+                         "second_lti_tool": "This is the second tool", }
+        LTIPIITool.objects.create(
             course_key=CourseKey.from_string(cls.course_id),
-            lti_tools={"first_lti_tool": "This is the first tool",
-                       "second_lti_tool": "This is the second tool", },
-            lti_tools_hash=112233,
+            lti_tools=cls.lti_tools,
+            lti_tools_hash=11111,
         )
 
-    def test_get_lti_tools_receiving_pii(self):
+    def test_get_pii_receiving_lti_tools(self):
         """
-        Test to get an integrity signature
+        Test to check if a course's lti pii tools can be retrieved.
         """
-        tool_list = get_lti_tools_receiving_pii(self.course_id)
-        #print(tool_list)
+        data = get_pii_receiving_lti_tools(self.course_id)
+        self._assert_ltitools(data.lii_tools_receiving_pii)
 
-        #self._assert_ltitools(tool_list)
-
-    def _assert_ltitools(self, tool_list):
+    def _assert_ltitools(self, list):
         """
-        Helper function to assert the returned list has the correct
+        Helper function to assert the returned list has the correct tools
         """
-        self.assertEqual(self.course_and_tools, tool_list)
+        self.assertEqual(self.lti_tools, list)

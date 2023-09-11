@@ -13,6 +13,7 @@ from openedx.core.djangoapps.agreements.models import LTIPIITool
 from openedx.core.djangoapps.agreements.models import LTIPIISignature
 
 from .data import LTIToolsReceivingPIIData
+from .data import LTIPIISignatureData
 
 log = logging.getLogger(__name__)
 User = get_user_model()
@@ -79,25 +80,50 @@ def create_lti_pii_signature(username, course_id, lti_tools):
     Creates an lti pii tool signature. If the signature already exist, do not create a new one.
     Arguments:
         * course_key (str)
-        * lti_tools (str)
+        * lti_tools (dict)
         * lti_tools_hash (int)
     Returns:
         * True or False depending on if the write was successful
     """
     user = User.objects.get(username=username)
     course_key = CourseKey.from_string(course_id)
-    lti_tools_hash = hash(lti_tools)
+    lti_tools_hash = hash(str(lti_tools))
 
     signature, created = LTIPIISignature.objects.get_or_create(
         user=user,
         course_key=course_key,
         lti_tools=lti_tools,
         lti_tools_hash=lti_tools_hash)
-
+    if not created:
+        log.warning(
+            'LTI PII signature already exists for user_id={user_id} and '
+            'course_id={course_id}'.format(user_id=user.id, course_id=course_id)
+        )
     return signature
 
 
-def get_lti_tools_receiving_pii(course_id):
+def get_lti_pii_signature(username, course_id):
+    """
+    Get the lti pii signature of a user in a course.
+
+    Arguments:
+        * username (str)
+        * course_id (str)
+
+    Returns:
+        * An LTIPIISignature object, or None if one does not exist for the
+          user + course combination.
+    """
+    user = User.objects.get(username=username)
+    course_key = CourseKey.from_string(course_id)
+    try:
+        signature = LTIPIISignature.objects.get(user=user, course_key=course_key)
+        return LTIPIISignatureData(lti_pii_signature=signature)
+    except ObjectDoesNotExist:
+        return None
+
+
+def get_pii_receiving_lti_tools(course_id):
     """
     Get a course's LTI tools that share PII.
 
@@ -109,14 +135,14 @@ def get_lti_tools_receiving_pii(course_id):
     """
 
     course_key = CourseKey.from_string(course_id)
-    course_ltipiitools = LTIPIITool.objects.get(course_key=course_key)
+    course_ltipiitools = LTIPIITool.objects.get(course_key=course_key).lti_tools
 
     return LTIToolsReceivingPIIData(
         lii_tools_receiving_pii=course_ltipiitools,
     )
 
 
-def user_lit_pii_signature_needed(username, course_id):
+def user_lti_pii_signature_needed(username, course_id):
     """
     Determines if a user needs to acknowledge the LTI PII Agreement
 
