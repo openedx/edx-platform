@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-09-05 15:59+0000\n"
-"PO-Revision-Date: 2023-09-05 15:59:41.440074\n"
+"POT-Creation-Date: 2023-09-11 15:05+0000\n"
+"PO-Revision-Date: 2023-09-11 15:05:58.040330\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -3046,6 +3046,14 @@ msgid "Open Response Assessment"
 msgstr "Ødǝn Ɍǝsdønsǝ Ⱥssǝssɯǝnʇ"
 
 #: lms/djangoapps/courseware/courses.py
+msgid ""
+"This Open Response Assessment's due dates are set by your instructor and "
+"can't be shifted."
+msgstr ""
+"Ŧɥᴉs Ødǝn Ɍǝsdønsǝ Ⱥssǝssɯǝnʇ's dnǝ dɐʇǝs ɐɹǝ sǝʇ bʎ ʎønɹ ᴉnsʇɹnɔʇøɹ ɐnd "
+"ɔɐn'ʇ bǝ sɥᴉɟʇǝd."
+
+#: lms/djangoapps/courseware/courses.py
 msgid "Self Assessment"
 msgstr "Sǝlɟ Ⱥssǝssɯǝnʇ"
 
@@ -3060,14 +3068,6 @@ msgstr "Sʇɐɟɟ Ⱥssǝssɯǝnʇ"
 #: lms/djangoapps/courseware/courses.py
 msgid "Submission"
 msgstr "Snbɯᴉssᴉøn"
-
-#: lms/djangoapps/courseware/courses.py
-msgid ""
-"Open Response Assessment due dates are set by your instructor and can't be "
-"shifted."
-msgstr ""
-"Ødǝn Ɍǝsdønsǝ Ⱥssǝssɯǝnʇ dnǝ dɐʇǝs ɐɹǝ sǝʇ bʎ ʎønɹ ᴉnsʇɹnɔʇøɹ ɐnd ɔɐn'ʇ bǝ "
-"sɥᴉɟʇǝd."
 
 #. Translators: 'absolute' is a date such as "Jan 01,
 #. 2020". 'relative' is a fuzzy description of the time until
@@ -16248,10 +16248,6 @@ msgstr "Đøʍnløɐd sʇndǝnʇ ƃɹɐdǝs"
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Print or share your certificate:"
 msgstr "Ᵽɹᴉnʇ øɹ sɥɐɹǝ ʎønɹ ɔǝɹʇᴉɟᴉɔɐʇǝ:"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-msgid "Click the link to see my certificate."
-msgstr "Ȼlᴉɔʞ ʇɥǝ lᴉnʞ ʇø sǝǝ ɯʎ ɔǝɹʇᴉɟᴉɔɐʇǝ."
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
