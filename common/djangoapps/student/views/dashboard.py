@@ -931,7 +931,7 @@ def form_begin_login (request) :
     if check_form == True :
         return redirect('dashboard')
     
-    listQuestion = ListSurveyQuestion.objects.filter(course__isnull=True)
+    listQuestion = ListSurveyQuestion.objects.filter(course__isnull=True, isActive=True)
 
     
     survey_dict = {}  
@@ -1015,7 +1015,7 @@ def survey_form_course (request, course_id) :
     if check_user_form == True :
         return redirect(urlCourse) 
     
-    listQuestion = ListSurveyQuestion.objects.filter(course=course_id)
+    listQuestion = ListSurveyQuestion.objects.filter(course=course_id, isActive=True)
     
     survey_dict = {}  
 

@@ -566,7 +566,12 @@ class PendingNameChangeAdmin(admin.ModelAdmin):
         model = PendingNameChange
         
 class SurveyFormAdmin(admin.ModelAdmin):
-     readonly_fields  = ('user', 'answer_text', 'question')
+    list_display=('user', 'answer_text', 'question' , 'course_id')
+    
+
+class ListQuestionAdmin (admin.ModelAdmin):
+    list_display = ('survey_id', 'course_id', 'question' , 'isActive' )
+    empty_value_display = 'N/A'
 
 
 admin.site.register(UserTestGroup)
@@ -578,7 +583,7 @@ admin.site.register(BulkUnenrollConfiguration, ConfigurationModelAdmin)
 admin.site.register(BulkChangeEnrollmentConfiguration, ConfigurationModelAdmin)
 
 admin.site.register(SurveyForm, SurveyFormAdmin)
-admin.site.register(ListSurveyQuestion)
+admin.site.register(ListSurveyQuestion, ListQuestionAdmin)
 
 
 # We must first un-register the User model since it may also be registered by the auth app.

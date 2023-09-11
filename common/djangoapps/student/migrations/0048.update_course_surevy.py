@@ -16,11 +16,17 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='listSurveyQuestion',
             name='course',
-            field=models.ForeignKey(db_constraint=False,null=True ,on_delete=django.db.models.deletion.CASCADE, to='course_overviews.CourseOverview')
+            field=models.ForeignKey(db_constraint=False,null=True,blank=True ,on_delete=django.db.models.deletion.CASCADE, to='course_overviews.CourseOverview')
         ),
+        migrations.AddField(
+            model_name='listSurveyQuestion',
+            name='isActive' ,
+            field=models.BooleanField(default=False)
+        )
+        ,
         migrations.AddField(
             model_name='surveyForm',
             name='course',
-            field=models.ForeignKey(db_constraint=False,null=True ,on_delete=django.db.models.deletion.CASCADE, to='course_overviews.CourseOverview')
+            field=models.ForeignKey(db_constraint=False,null=True,blank=True ,on_delete=django.db.models.deletion.CASCADE, to='course_overviews.CourseOverview')
         )
     ]

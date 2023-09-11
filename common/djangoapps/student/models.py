@@ -3714,19 +3714,21 @@ class ListSurveyQuestion (models.Model):
     question = models.CharField( max_length=255, null=True)
     type = models.CharField( max_length=255, null=True)
     survey_id = models.IntegerField()
-    config = models.JSONField(null=True)
+    config = models.JSONField(null=True, blank=True )
+    isActive = models.BooleanField(default=False)
     course= models.ForeignKey(
         CourseOverview,
         db_constraint=False,
         on_delete=models.DO_NOTHING,
-        null=True
+        null=True,
+        blank=True
     )
     def __str__(self):
-        return f"{self.question} -  {self.course}"
+        return f"{self.question}"
 class ListSurveyQuestionDAO ():
     @classmethod
     def checkQuestion (self, course_id) :
-        isCheck = ListSurveyQuestion.objects.filter(course=course_id).exists()
+        isCheck = ListSurveyQuestion.objects.filter(course=course_id, isActive=True).exists()
 
         return isCheck
 
@@ -3738,7 +3740,8 @@ class SurveyForm(models.Model):
         CourseOverview,
         db_constraint=False,
         on_delete=models.DO_NOTHING,
-        null=True
+        null=True,
+        blank=True
     )
     def __str__(self):
         return f"{self.user} - Question: {self.question} - Answer: {self.answer_text}  " 
