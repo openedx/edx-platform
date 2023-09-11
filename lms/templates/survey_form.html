@@ -16,8 +16,6 @@
    <div>
         <h1 style=" font-size:26px;">Digital Marketing Welcome Flow</h1>
    </div>
-  
-     
         <div class="border-navbar "  >
             
        </div>
@@ -27,6 +25,9 @@
             <div class="survey-form"  style="display: block;">
                 <div class="title-survey">
                     <h3>Welcome Funix!</h3>
+                    % if display_name :
+                        <h3>${display_name}</h3>
+                    % endif
                     <p> In the next few minutes, you'll take the first steps on your learning journey:</p>
                 </div>
                 <div class="container-survey">

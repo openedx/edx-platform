@@ -3715,29 +3715,46 @@ class ListSurveyQuestion (models.Model):
     type = models.CharField( max_length=255, null=True)
     survey_id = models.IntegerField()
     config = models.JSONField(null=True)
+    course= models.ForeignKey(
+        CourseOverview,
+        db_constraint=False,
+        on_delete=models.DO_NOTHING,
+        null=True
+    )
     def __str__(self):
-        return f"{self.question}"
+        return f"{self.question} -  {self.course}"
+class ListSurveyQuestionDAO ():
+    @classmethod
+    def checkQuestion (self, course_id) :
+        isCheck = ListSurveyQuestion.objects.filter(course=course_id).exists()
 
-
+        return isCheck
 
 class SurveyForm(models.Model):
     question = models.ForeignKey(ListSurveyQuestion, on_delete=models.CASCADE)  
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     answer_text =  models.CharField( max_length=255, null=True)
+    course= models.ForeignKey(
+        CourseOverview,
+        db_constraint=False,
+        on_delete=models.DO_NOTHING,
+        null=True
+    )
     def __str__(self):
         return f"{self.user} - Question: {self.question} - Answer: {self.answer_text}  " 
     
 class SurveyFormDAO () :
     @classmethod
     def checkSuccess (self,user_id):
-        isCheck = SurveyForm.objects.filter(user=user_id).exists()
+        isCheck = SurveyForm.objects.filter(user=user_id, course__isnull=True).exists()
+        return isCheck
         
-        if isCheck :
-            return False
-        else :
-            return True
+    @classmethod
+    def checkCourseSuccess (self,user_id , course_id):
+        isCheck = SurveyForm.objects.filter(user=user_id, course=course_id).exists()
+        return isCheck
     
     @classmethod
-    def create_form(self,user_id, question , answer_text):
+    def create_form(self,user_id, question , answer_text, course_id=None):
         
-        return SurveyForm.objects.create(user_id=user_id, question=question, answer_text=answer_text)
+        return SurveyForm.objects.create(user_id=user_id, question=question, answer_text=answer_text, course_id = course_id)

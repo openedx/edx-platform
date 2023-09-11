@@ -65,7 +65,8 @@ from common.djangoapps.student.models import (
 )
 from common.djangoapps.util.milestones_helpers import get_pre_requisite_courses_not_completed
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from common.djangoapps.student.models import LastHistoryActivateDAO , SurveyFormDAO , ListSurveyQuestion
+from common.djangoapps.student.models import LastHistoryActivateDAO , SurveyFormDAO , ListSurveyQuestion, ListSurveyQuestionDAO
+
 
 
 log = logging.getLogger("edx.student")
@@ -889,7 +890,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     # })
     check_form = SurveyFormDAO.checkSuccess(user_id=user.id)
     
-    if check_form :
+    if check_form == False:
         return redirect('survey_form')
     
     
@@ -926,9 +927,11 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
 def form_begin_login (request) :
     user = request.user
     check_form = SurveyFormDAO.checkSuccess(user_id=user.id)
-    if check_form == False :
+
+    if check_form == True :
         return redirect('dashboard')
-    listQuestion = ListSurveyQuestion.objects.all()
+    
+    listQuestion = ListSurveyQuestion.objects.filter(course__isnull=True)
 
     
     survey_dict = {}  
@@ -954,9 +957,6 @@ def form_begin_login (request) :
             for q in items :
                 if 'title' in q.type :
                     title = q.question
-                    
-                    
-  
             combined_item = {
                 'id': survey_id, 
                 'survey_id': survey_id,
@@ -987,3 +987,91 @@ def form_begin_login (request) :
         
         
     return render_to_response('survey_form.html' , context)
+
+
+
+
+from common.djangoapps.student.views.management import get_resume_btn_data
+    
+@login_required
+@ensure_csrf_cookie
+@add_maintenance_banner
+def survey_form_course (request, course_id) :
+    user = request.user
+    check_question_course  = ListSurveyQuestionDAO.checkQuestion(course_id = course_id)
+    check_user_form = SurveyFormDAO.checkCourseSuccess(user_id = user.id, course_id=course_id)
+    resume_button_urls = get_resume_btn_data(user)['resume_button_url']  
+
+    urlCourse =''
+    display_name = ''
+    for url in resume_button_urls :
+        if url['course_id'] == course_id :
+            urlCourse = url['url']
+            display_name = url['display_name']
+            
+    if check_question_course == False :
+        return redirect(urlCourse)
+    
+    if check_user_form == True :
+        return redirect(urlCourse) 
+    
+    listQuestion = ListSurveyQuestion.objects.filter(course=course_id)
+    
+    survey_dict = {}  
+
+    for item in listQuestion:
+        survey_id = item.survey_id
+        if survey_id not in survey_dict:
+            survey_dict[survey_id] = []
+        survey_dict[survey_id].append(item)
+    
+
+    question = []
+    questions = []
+    result = []
+    
+    for survey_id, items in survey_dict.items():
+        if len(items) == 1:
+
+            question.append(items[0])
+            result.append(items[0])
+        else:
+            title = ''
+            for q in items :
+                if 'title' in q.type :
+                    title = q.question
+            combined_item = {
+                'id': survey_id, 
+                'survey_id': survey_id,
+                "title" : title,
+                'config':  items
+            }
+            questions.append(combined_item)
+            result.append(combined_item)
+
+
+   
+            
+    context = {
+         'question':  question ,
+         'questions' : questions,
+         "course_id" : course_id,
+            'display_name' : display_name
+            
+         
+    }
+    
+    if request.method == 'POST':
+        
+        for q in listQuestion :
+            if 'title' not in q.type:
+                aws = request.POST.getlist(str(q.question))
+                for a in aws:
+                    SurveyFormDAO.create_form(user_id=user.id, question=q , answer_text=a, course_id = course_id)
+         
+        return redirect(urlCourse)
+                            
+        
+    return render_to_response('survey_form.html' , context)
+
+

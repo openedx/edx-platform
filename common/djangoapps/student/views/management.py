@@ -83,7 +83,7 @@ from common.djangoapps.student.signals import USER_EMAIL_CHANGED
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps.student.views.dashboard import get_course_enrollments,get_org_black_and_whitelist_for_site, get_dashboard_course_limit,get_filtered_course_entitlements,get_resume_urls_for_enrollments
 from common.djangoapps.student.helpers import get_resume_urls_for_enrollments
-
+from common.djangoapps.student.models import LastHistoryActivateDAO , SurveyFormDAO , ListSurveyQuestion, ListSurveyQuestionDAO
 
 
 log = logging.getLogger("edx.student")
@@ -970,6 +970,43 @@ def change_email_settings(request):
 from openedx.features.course_experience import course_home_url
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from django.utils.translation import gettext as _
+
+def get_resume_btn_data(user):
+    course_limit = get_dashboard_course_limit() 
+    site_org_whitelist, site_org_blacklist = get_org_black_and_whitelist_for_site()
+    course_enrollments = list(get_course_enrollments(user, site_org_whitelist, site_org_blacklist, course_limit))
+    
+    (course_entitlements) = get_filtered_course_entitlements(
+        user,
+        site_org_whitelist,
+        site_org_blacklist
+    )  
+    resume_button_urls = ['' for entitlement in course_entitlements]
+    for url in get_resume_urls_for_enrollments(user, course_enrollments).values():
+        resume_button_urls.append(url)
+    
+    resume_url = []
+   
+    for dashboard_index, enrollment in enumerate(course_enrollments):
+        course_overview = CourseOverview.get_from_id(enrollment.course_id)
+        course_target = course_home_url(course_overview.id)
+        resume_button_url =''
+        for url in resume_button_urls :
+            if str(enrollment.course_id) in url :
+                resume_button_url = url
+       
+        if resume_button_url == '' :
+            url = course_target 
+        else :
+            url = resume_button_url
+            
+        resume_url.append({"course_id": str(enrollment.course_id),'url':url , "display_name" : course_overview.display_name_with_default})
+    
+    data = {
+        "resume_button_url" : resume_url 
+    }
+    return data
+    
 @api_view(['GET'])
 @login_required
 @ensure_csrf_cookie
@@ -994,23 +1031,38 @@ def get_resume_button_urls(request):
         course_overview = CourseOverview.get_from_id(enrollment.course_id)
         course_target = course_home_url(course_overview.id)
         resume_button_url =''
+        check_form_user = SurveyFormDAO.checkCourseSuccess(user_id=user.id, course_id=enrollment.course_id)
+        check_form_course = ListSurveyQuestionDAO.checkQuestion(course_id=enrollment.course_id)
         for url in resume_button_urls :
             if str(enrollment.course_id) in url :
                 resume_button_url = url
-        
+       
         if resume_button_url == '' :
             textContent = _('View Course')
-            url = course_target
+            if check_form_course == True  :
+                if check_form_user :
+                    url = course_target
+                else :
+                    url = '/survey-form/' + str(enrollment.course_id)
+            else :
+                url = course_target    
         else :
             textContent = _('Resume Course')
-            url = resume_button_url
+            if check_form_course == True  :
+                if check_form_user :
+                    url = resume_button_url
+                else :
+                    url = '/survey-form/' + str(enrollment.course_id)
+            else :
+                url = resume_button_url    
+
+            
         resume_url.append({"course_id": str(enrollment.course_id),'url':url , 'textContent' : textContent , "display_name" : course_overview.display_name_with_default})
-    
- 
-    
     
     data = {
         "resume_button_url" : resume_url 
     }
 
     return JsonResponse(data)
+
+
