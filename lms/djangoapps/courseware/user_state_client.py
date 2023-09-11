@@ -15,7 +15,7 @@ from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.utils import IntegrityError
 from edx_django_utils import monitoring as monitoring_utils
-from courseware.interface import XBlockUserState, XBlockUserStateClient
+from lms.djangoapps.courseware.interface import XBlockUserState, XBlockUserStateClient
 from xblock.fields import Scope
 
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
