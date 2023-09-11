@@ -951,8 +951,9 @@ def skill_reflection_individual_response(skills, likert_questions, nuance_interr
                 question=question_response['question']
                 choices=question_response['choices']
                 response_text = question_response['student_response']['response_text']
+                points = question_response['student_response']['points']
                 response[response_key].append(
-                    {'skill': skill, 'response_text': response_text, 'question': question, 'choices': choices.values()})
+                    {'skill': skill, 'response_text': response_text, 'question': question, 'point': points, 'choices': choices.values()})
 
     process_question_responses(likert_questions, 'intros', 'start_unit_location')
     process_question_responses(likert_questions, 'outros', 'end_unit_location')
