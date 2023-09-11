@@ -17,3 +17,23 @@ class CourseCommonSerializer(serializers.Serializer):
     rerun_link = serializers.CharField()
     run = serializers.CharField()
     url = serializers.CharField()
+
+
+class ProctoringErrorModelSerializer(serializers.Serializer):
+    """
+    Serializer for proctoring error model item.
+    """
+    deprecated = serializers.BooleanField()
+    display_name = serializers.CharField()
+    help = serializers.CharField()
+    hide_on_enabled_publisher = serializers.BooleanField()
+    value = serializers.CharField()
+
+
+class ProctoringErrorListSerializer(serializers.Serializer):
+    """
+    Serializer for proctoring error list.
+    """
+    key = serializers.CharField()
+    message = serializers.CharField()
+    model = ProctoringErrorModelSerializer()
