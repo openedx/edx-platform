@@ -1044,6 +1044,10 @@ def rerun_course(user, source_course_key, org, number, run, fields, background=T
     else:
         rerun_course_task(*args)
 
+    course_module = get_course_and_check_access(destination_course_key, user)
+    metadata = {u'display_name': fields['display_name']}
+    CourseMetadata.update_from_dict(metadata, course_module, user)
+
     return destination_course_key
 
 
