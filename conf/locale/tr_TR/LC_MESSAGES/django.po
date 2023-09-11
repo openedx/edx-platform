@@ -3153,6 +3153,12 @@ msgid "Open Response Assessment"
 msgstr "Açık Yanıt Değerlendirmesi"
 
 #: lms/djangoapps/courseware/courses.py
+msgid ""
+"This Open Response Assessment's due dates are set by your instructor and "
+"can't be shifted."
+msgstr ""
+
+#: lms/djangoapps/courseware/courses.py
 msgid "Self Assessment"
 msgstr "Öz Değerlendirme"
 
@@ -3167,14 +3173,6 @@ msgstr "Personel Değerlendirmesi"
 #: lms/djangoapps/courseware/courses.py
 msgid "Submission"
 msgstr "Gönderim"
-
-#: lms/djangoapps/courseware/courses.py
-msgid ""
-"Open Response Assessment due dates are set by your instructor and can't be "
-"shifted."
-msgstr ""
-"Açık Cevap Değerlendirmesi - ORA son tarihleri eğitmeniniz tarafından "
-"belirlenir ve değiştirilemez. "
 
 #. Translators: 'absolute' is a date such as "Jan 01,
 #. 2020". 'relative' is a fuzzy description of the time until
@@ -6409,13 +6407,11 @@ msgid "Quotes"
 msgstr "Alıntılar"
 
 #: lms/templates/wiki/includes/editor_widget.html
-#, python-format
+#, python-brace-format
 msgid ""
-"Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for"
-" help."
+"Markdown syntax is allowed. See the {start_link}cheatsheet{end_link} for "
+"help."
 msgstr ""
-"Markdown yazımına izin verilmektedir. Yardım için "
-"%(start_link)sipuçları%(end_link)ssayfasına bakın."
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
@@ -7455,8 +7451,8 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
-"The Posting availabilty in discussions whether it will be enabled, scheduled"
-" or indefinitely disabled."
+"The Posting availability in discussions whether it will be enabled, "
+"scheduled or indefinitely disabled."
 msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
@@ -16395,10 +16391,6 @@ msgstr "Öğrenci notlarını indir"
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Print or share your certificate:"
 msgstr "Sertifikanı yazdır veya paylaş:"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-msgid "Click the link to see my certificate."
-msgstr "Sertifikanızı görmek için bağlantıya tıklayın."
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"

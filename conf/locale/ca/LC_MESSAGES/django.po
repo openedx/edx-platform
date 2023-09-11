@@ -2762,6 +2762,12 @@ msgid "Open Response Assessment"
 msgstr ""
 
 #: lms/djangoapps/courseware/courses.py
+msgid ""
+"This Open Response Assessment's due dates are set by your instructor and "
+"can't be shifted."
+msgstr ""
+
+#: lms/djangoapps/courseware/courses.py
 msgid "Self Assessment"
 msgstr ""
 
@@ -2775,12 +2781,6 @@ msgstr ""
 
 #: lms/djangoapps/courseware/courses.py
 msgid "Submission"
-msgstr ""
-
-#: lms/djangoapps/courseware/courses.py
-msgid ""
-"Open Response Assessment due dates are set by your instructor and can't be "
-"shifted."
 msgstr ""
 
 #. Translators: 'absolute' is a date such as "Jan 01,
@@ -5682,10 +5682,10 @@ msgid "Quotes"
 msgstr "Cites"
 
 #: lms/templates/wiki/includes/editor_widget.html
-#, python-format
+#, python-brace-format
 msgid ""
-"Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for"
-" help."
+"Markdown syntax is allowed. See the {start_link}cheatsheet{end_link} for "
+"help."
 msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html
@@ -6636,8 +6636,8 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
-"The Posting availabilty in discussions whether it will be enabled, scheduled"
-" or indefinitely disabled."
+"The Posting availability in discussions whether it will be enabled, "
+"scheduled or indefinitely disabled."
 msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
@@ -14914,10 +14914,6 @@ msgstr "Baixa els graus dels estudiants"
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Print or share your certificate:"
 msgstr "Imprimiu o compartiu el vostre certificat:"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-msgid "Click the link to see my certificate."
-msgstr "Feu clic a l'enllaç per veure el meu certificat."
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
