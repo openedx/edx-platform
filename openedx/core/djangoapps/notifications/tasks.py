@@ -98,6 +98,7 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     )
     preferences = create_notification_pref_if_not_exists(user_ids, list(preferences), course_key)
     notifications = []
+    audience = []
     for preference in preferences:
         preference = update_user_preference(preference, preference.user, course_key)
         if (
@@ -115,9 +116,14 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
                     course_id=course_key,
                 )
             )
+            audience.append(preference.user_id)
     # send notification to users but use bulk_create
-    Notification.objects.bulk_create(notifications)
-    notification_generated_event(user_ids, app_name, notification_type, course_key)
+    notifications_generated = Notification.objects.bulk_create(notifications)
+    if notifications_generated:
+        notification_content = notifications_generated[0].content
+        notification_generated_event(
+            audience, app_name, notification_type, course_key, content_url, notification_content,
+        )
 
 
 def update_user_preference(preference: CourseNotificationPreference, user, course_id):
