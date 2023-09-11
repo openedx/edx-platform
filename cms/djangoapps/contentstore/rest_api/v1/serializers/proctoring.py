@@ -6,6 +6,8 @@ from rest_framework import serializers
 
 from xmodule.course_block import get_available_providers
 
+from .common import ProctoringErrorListSerializer
+
 
 class ProctoredExamSettingsSerializer(serializers.Serializer):
     """ Serializer for edX Staff proctored exam settings. """
@@ -29,26 +31,6 @@ class ProctoredExamConfigurationSerializer(serializers.Serializer):
     proctored_exam_settings = ProctoredExamSettingsSerializer()
     available_proctoring_providers = serializers.ChoiceField(get_available_providers())
     course_start_date = serializers.DateTimeField()
-
-
-class ProctoringErrorModelSerializer(serializers.Serializer):
-    """
-    Serializer for proctoring error model item.
-    """
-    deprecated = serializers.BooleanField()
-    display_name = serializers.CharField()
-    help = serializers.CharField()
-    hide_on_enabled_publisher = serializers.BooleanField()
-    value = serializers.CharField()
-
-
-class ProctoringErrorListSerializer(serializers.Serializer):
-    """
-    Serializer for proctoring error list.
-    """
-    key = serializers.CharField()
-    message = serializers.CharField()
-    model = ProctoringErrorModelSerializer()
 
 
 class ProctoringErrorsSerializer(serializers.Serializer):
