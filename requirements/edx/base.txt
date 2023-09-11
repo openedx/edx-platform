@@ -968,9 +968,8 @@ random2==1.0.1
     # via -r requirements/edx/kernel.in
 recommender-xblock==2.0.1
     # via -r requirements/edx/bundled.in
-redis==4.6.0
+redis==5.0.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   walrus
 referencing==0.30.2
