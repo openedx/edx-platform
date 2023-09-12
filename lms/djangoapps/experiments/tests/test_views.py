@@ -345,4 +345,3 @@ class ExperimentUserMetaDataViewTests(APITestCase, ModuleStoreTestCase):
         response = self.client.get(reverse('api_experiments:user_metadata', args=call_args_with_bogus_course))
         assert response.status_code == 404
         assert response.json()['message'] == 'Provided course is not found'
-
