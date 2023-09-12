@@ -1,5 +1,7 @@
+import functools
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from openedx.features.genplus_features.genplus_assessments.constants import SkillReflectionQuestionType
 from rest_framework import serializers
 
 from openedx.features.genplus_features.genplus.models import Student
@@ -122,3 +124,44 @@ class SkillAssessmentResponseSerializer(serializers.ModelSerializer):
 
     def get_full_name(self, obj):
         return get_user_model().objects.get(pk=obj.user_id).profile.name
+
+
+class SkillReflectionQuestionSerializer(serializers.ModelSerializer):
+    submissions = serializers.SerializerMethodField()
+    skill = serializers.CharField(source='skill.name')
+    program_name = serializers.CharField(source='program.year_group.name')
+    problem_type_name = serializers.SerializerMethodField()
+
+    def get_problem_type_name(self, obj: SkillAssessmentQuestion):
+        return SkillReflectionQuestionType(obj.problem_type).name
+
+    def get_submissions(self, obj: SkillAssessmentQuestion):
+        intro_submissions = obj.submissions.filter(problem_location=obj.start_unit_location).all()
+        outro_submissions = obj.submissions.filter(problem_location=obj.end_unit_location).all()
+        map_response = lambda i: {
+            **i.question_response['student_response'],
+            'username': i.user.username,
+            'name': i.user.profile.name,
+            'sid': i.id
+        }
+
+        def reducer(problem_key):
+            def func(init, sub):
+                return {
+                    **init,
+                    sub['username']: {
+                        problem_key: sub,
+                        'name': sub['name'],
+                        'username': sub['username']
+                    }
+                }
+
+            return func
+
+        reduced = functools.reduce(reducer('intro'), list(map(map_response, intro_submissions)), {})
+        reduced = functools.reduce(reducer('outro'), list(map(map_response, outro_submissions)), reduced)
+        return reduced
+
+    class Meta:
+        model = SkillAssessmentQuestion
+        fields = '__all__'

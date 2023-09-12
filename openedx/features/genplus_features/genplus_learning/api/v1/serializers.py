@@ -93,6 +93,7 @@ class AssessmentUnitSerializer(serializers.ModelSerializer):
 
 class BaseProgramSerializer(serializers.ModelSerializer):
     is_currently_active_program = serializers.SerializerMethodField()
+    program_name = serializers.CharField(source='year_group.program_name')
 
     def get_is_currently_active_program(self, obj):
         gen_user = self.context.get("gen_user")
@@ -111,7 +112,6 @@ class ProgramSerializer(BaseProgramSerializer):
     intro_unit = AssessmentUnitSerializer(many=False, read_only=True)
     outro_unit = AssessmentUnitSerializer(many=False, read_only=True)
     year_group_name = serializers.CharField(source='year_group.name')
-    program_name = serializers.CharField(source='year_group.program_name')
 
     class Meta:
         model = Program
@@ -284,6 +284,7 @@ class ProgramShortSerializer(BaseProgramSerializer):
             'end_date',
             'id',
             'is_currently_active_program',
+            'program_name',
             'slug',
             'staff_browsable',
             'start_date',

@@ -1,35 +1,29 @@
 import json
 import logging
-import copy
 
+import copy
 from django.db.models import Q
-from rest_framework import views, viewsets, status
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import UsageKey, CourseKey
+from rest_framework import views, viewsets, status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from xmodule.modulestore.django import modulestore
 
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
+from openedx.features.genplus_features.genplus.api.v1.permissions import IsTeacher, IsStudentOrTeacher, IsAdmin, \
+    IsUserFromSameSchool
 from openedx.features.genplus_features.genplus.models import Class, Skill
-from openedx.features.genplus_features.genplus_assessments.models import (
-    UserResponse,
-    UserRating,
-    SkillAssessmentQuestion,
-)
-from openedx.features.genplus_features.genplus_learning.models import Unit, Program, ProgramAccessRole
-from openedx.features.genplus_features.genplus.api.v1.permissions import IsTeacher, IsStudentOrTeacher, IsAdmin, IsUserFromSameSchool
-from .serializers import (
-    ClassSerializer,
-    TextAssessmentSerializer,
-    RatingAssessmentSerializer,
-    SkillAssessmentQuestionSerializer
-)
 from openedx.features.genplus_features.genplus_assessments.constants import (
     TOTAL_PROBLEM_SCORE,
     INTRO_RATING_ASSESSMENT_RESPONSE,
     OUTRO_RATING_ASSESSMENT_RESPONSE,
     MAX_SKILLS_SCORE,
     SkillReflectionQuestionType,
+)
+from openedx.features.genplus_features.genplus_assessments.models import (
+    UserResponse,
+    UserRating,
+    SkillAssessmentQuestion,
 )
 from openedx.features.genplus_features.genplus_assessments.utils import (
     build_students_result,
@@ -39,6 +33,14 @@ from openedx.features.genplus_features.genplus_assessments.utils import (
     StudentResponse,
     skill_reflection_response,
     skill_reflection_individual_response,
+)
+from openedx.features.genplus_features.genplus_learning.models import Unit, Program
+from .serializers import (
+    ClassSerializer,
+    TextAssessmentSerializer,
+    RatingAssessmentSerializer,
+    SkillAssessmentQuestionSerializer,
+    SkillReflectionQuestionSerializer,
 )
 
 logger = logging.getLogger(__name__)
@@ -585,3 +587,19 @@ class SkillReflectionIndividualApiView(ProgramFilterMixin):
         )
 
         return Response(response)
+
+
+class SkillReflectionQuestionModelView(viewsets.ModelViewSet):
+    serializer_class = SkillReflectionQuestionSerializer
+    authentication_classes = [SessionAuthenticationCrossDomainCsrf]
+    permission_classes = [IsAuthenticated, IsStudentOrTeacher]
+
+    def get_queryset(self):
+        program_id = self.request.GET.get('program_id')
+        problem_type = self.request.GET.get('problem_type')
+        filter = {}
+        if program_id:
+            filter['program_id'] = program_id
+        if problem_type:
+            filter['problem_type'] = problem_type
+        return SkillAssessmentQuestion.objects.filter(skill__isnull=False, **filter).all()
