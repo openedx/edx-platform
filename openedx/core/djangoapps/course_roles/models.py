@@ -56,8 +56,9 @@ class CourseRolesUserRole(models.Model):
     """
     Model for a course roles user role.
 
-    A user role is a mapping between a user, a role, a course and an organization,
-    if the course is null then the user role is a global role for the organization.
+    A user role is a mapping between a user, a role, a course and an organization.
+    If the course is null, the user role is for the organization.
+    If the course and the organization are null the role is for the instance.
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     role = models.ForeignKey('CourseRolesRole', on_delete=models.CASCADE)
