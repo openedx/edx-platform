@@ -145,7 +145,6 @@ class LibrarySourcedBlock(
         add_webpack_js_to_fragment(fragment, 'LibrarySourcedBlockStudio')
         shim_xmodule_js(fragment, self.studio_js_module_name)
 
-
         return fragment
 
     def author_view(self, context):

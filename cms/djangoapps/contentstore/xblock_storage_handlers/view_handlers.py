@@ -223,7 +223,6 @@ def handle_xblock(request, usage_key_string=None):
             _post_editor_saved_callback(get_xblock(usage_key, request.user))
             return modified_xblock
 
-
     elif request.method in ("PUT", "POST"):
         if "duplicate_source_locator" in request.json:
             parent_usage_key = usage_key_with_run(request.json["parent_locator"])
@@ -384,11 +383,16 @@ def _post_editor_saved_callback(xblock):
         xblock.post_editor_saved()
 
 
+
+
+
+
+
 def _save_xblock(
     user,
     xblock,
     data=None,
-    children_strings=None, # lint-amnesty, pylint: disable=too-many-statements
+    children_strings=None,  # lint-amnesty, pylint: disable=too-many-statements
     metadata=None,
     nullout=None,
     grader_type=None,
@@ -407,130 +411,31 @@ def _save_xblock(
 
     """
     store = modulestore()
-    # Perform all xblock changes within a (single-versioned) transaction
+    course = store.get_course(xblock.location.course_key)  # Define 'course' variable
     with store.bulk_operations(xblock.location.course_key):
-        # Don't allow updating an xblock and discarding changes in a single operation (unsupported by UI).
         if publish == "discard_changes":
-            store.revert_to_published(xblock.location, user.id)
-            # Returning the same sort of result that we do for other save operations. In the future,
-            # we may want to return the full XBlockInfo.
-            return JsonResponse({"id": str(xblock.location)})
+            return _discard_changes(xblock, user, course)
 
         old_metadata = own_metadata(xblock)
         old_content = xblock.get_explicitly_set_fields_by_scope(Scope.content)
 
         if data:
-            # TODO Allow any scope.content fields not just "data" (exactly like the get below this)
             xblock.data = data
         else:
-            data = old_content["data"] if "data" in old_content else None
+            data = old_content.get("data") if "data" in old_content else None
 
         if fields:
-            for field_name in fields:
-                setattr(xblock, field_name, fields[field_name])
+            _update_xblock_fields(xblock, fields)
 
         if children_strings is not None:
-            children = []
-            for child_string in children_strings:
-                children.append(usage_key_with_run(child_string))
+            _update_xblock_children(xblock, children_strings, store, user)
 
-            # if new children have been added, remove them from their old parents
-            new_children = set(children) - set(xblock.children)
-            for new_child in new_children:
-                old_parent_location = store.get_parent_location(new_child)
-                if old_parent_location:
-                    old_parent = store.get_item(old_parent_location)
-                    old_parent.children.remove(new_child)
-                    old_parent = _update_with_callback(old_parent, user)
-                else:
-                    # the Studio UI currently doesn't present orphaned children, so assume this is an error
-                    return JsonResponse(
-                        {
-                            "error": "Invalid data, possibly caused by concurrent authors."
-                        },
-                        400,
-                    )
-
-            # make sure there are no old children that became orphans
-            # In a single-author (no-conflict) scenario, all children in the persisted list on the server should be
-            # present in the updated list.  If there are any children that have been dropped as part of this update,
-            # then that would be an error.
-            #
-            # We can be even more restrictive in a multi-author (conflict), by returning an error whenever
-            # len(old_children) > 0. However, that conflict can still be "merged" if the dropped child had been
-            # re-parented. Hence, the check for the parent in the any statement below.
-            #
-            # Note that this multi-author conflict error should not occur in modulestores (such as Split) that support
-            # atomic write transactions.  In Split, if there was another author who moved one of the "old_children"
-            # into another parent, then that child would have been deleted from this parent on the server. However,
-            # this is error could occur in modulestores (such as Draft) that do not support atomic write-transactions
-            old_children = set(xblock.children) - set(children)
-            if any(
-                store.get_parent_location(old_child) == xblock.location
-                for old_child in old_children
-            ):
-                # since children are moved as part of a single transaction, orphans should not be created
-                return JsonResponse(
-                    {"error": "Invalid data, possibly caused by concurrent authors."},
-                    400,
-                )
-
-            # set the children on the xblock
-            xblock.children = children
-
-        # also commit any metadata which might have been passed along
-        if nullout is not None or metadata is not None:
-            # the postback is not the complete metadata, as there's system metadata which is
-            # not presented to the end-user for editing. So let's use the original (existing_item) and
-            # 'apply' the submitted metadata, so we don't end up deleting system metadata.
-            if nullout is not None:
-                for metadata_key in nullout:
-                    setattr(xblock, metadata_key, None)
-
-            # update existing metadata with submitted metadata (which can be partial)
-            # IMPORTANT NOTE: if the client passed 'null' (None) for a piece of metadata that means 'remove it'. If
-            # the intent is to make it None, use the nullout field
-            if metadata is not None:
-                for metadata_key, value in metadata.items():
-                    field = xblock.fields[metadata_key]
-
-                    if value is None:
-                        field.delete_from(xblock)
-                    else:
-                        try:
-                            value = field.from_json(value)
-                        except ValueError as verr:
-                            reason = _("Invalid data")
-                            if str(verr):
-                                reason = _("Invalid data ({details})").format(
-                                    details=str(verr)
-                                )
-                            return JsonResponse({"error": reason}, 400)
-
-                        field.write_to(xblock, value)
+        _update_xblock_metadata(xblock, metadata, nullout)
 
         validate_and_update_xblock_due_date(xblock)
-        # update the xblock and call any xblock callbacks
         xblock = _update_with_callback(xblock, user, old_metadata, old_content)
 
-        # for static tabs, their containing course also records their display name
-        course = store.get_course(xblock.location.course_key)
-        if xblock.location.block_type == "static_tab":
-            # find the course's reference to this tab and update the name.
-            static_tab = CourseTabList.get_tab_by_slug(
-                course.tabs, xblock.location.name
-            )
-            # only update if changed
-            if static_tab:
-                update_tab = False
-                if static_tab["name"] != xblock.display_name:
-                    static_tab["name"] = xblock.display_name
-                    update_tab = True
-                if static_tab["course_staff_only"] != xblock.course_staff_only:
-                    static_tab["course_staff_only"] = xblock.course_staff_only
-                    update_tab = True
-                if update_tab:
-                    store.update_item(course, user.id)
+        _update_static_tab_name(xblock, store, user)
 
         result = {
             "id": str(xblock.location),
@@ -539,50 +444,213 @@ def _save_xblock(
         }
 
         if grader_type is not None:
-            result.update(
-                CourseGradingModel.update_section_grader_type(xblock, grader_type, user)
-            )
+            result.update(CourseGradingModel.update_section_grader_type(xblock, grader_type, user))
 
-        # Save gating info
-        if xblock.category == "sequential" and course.enable_subsection_gating:
-            if is_prereq is not None:
-                if is_prereq:
-                    gating_api.add_prerequisite(
-                        xblock.location.course_key, xblock.location
-                    )
-                else:
-                    gating_api.remove_prerequisite(xblock.location)
-                result["is_prereq"] = is_prereq
+        _save_gating_info(xblock, course, is_prereq, prereq_usage_key, prereq_min_score, prereq_min_completion)
 
-            if prereq_usage_key is not None:
-                gating_api.set_required_content(
-                    xblock.location.course_key,
-                    xblock.location,
-                    prereq_usage_key,
-                    prereq_min_score,
-                    prereq_min_completion,
-                )
+        _handle_publish_option(xblock, publish, user)
 
-        # If publish is set to 'republish' and this item is not in direct only categories and has previously been
-        # published, then this item should be republished. This is used by staff locking to ensure that changing the
-        # draft value of the staff lock will also update the published version, but only at the unit level.
-        if publish == "republish" and xblock.category not in DIRECT_ONLY_CATEGORIES:
-            if modulestore().has_published_version(xblock):
-                publish = "make_public"
+        _update_summary_configuration(xblock, summary_configuration_enabled)
 
-        # Make public after updating the xblock, in case the caller asked for both an update and a publish.
-        # Used by Bok Choy tests and by republishing of staff locks.
-        if publish == "make_public":
-            modulestore().publish(xblock.location, user.id)
-
-        # If summary_configuration_enabled is not None, use AIAsideSummary to update it.
-        if xblock.category == "vertical" and summary_configuration_enabled is not None:
-            AiAsideSummaryConfig(course.id).set_summary_settings(xblock.location, {
-                'enabled': summary_configuration_enabled
-            })
-
-        # Note that children aren't being returned until we have a use case.
         return JsonResponse(result, encoder=EdxJSONEncoder)
+
+def _discard_changes(xblock, user):
+    """
+    Discards changes made to the xblock and reverts it to the published version.
+
+    Args:
+        xblock: The xblock to discard changes from.
+        user: The user performing the operation.
+
+    Returns:
+        JsonResponse: A JSON response indicating the result.
+    """
+    store.revert_to_published(xblock.location, user.id)
+    return JsonResponse({"id": str(xblock.location)})
+
+def _update_xblock_fields(xblock, fields):
+    """
+    Update the xblock fields with the provided field values.
+
+    Args:
+        xblock: The xblock to update.
+        fields: A dictionary of field names and their values to update.
+    """
+    for field_name, field_value in fields.items():
+        setattr(xblock, field_name, field_value)
+
+def _update_xblock_children(xblock, children_strings, store, user):
+    """
+    Update the children of the xblock based on the provided children_strings.
+
+    Args:
+        xblock: The xblock to update children for.
+        children_strings: A list of strings representing the children.
+        store: The modulestore instance.
+        user: The user performing the operation.
+    """
+    children = [usage_key_with_run(child_string) for child_string in children_strings]
+    _handle_new_children(xblock, children, store, user)
+    _handle_old_children(xblock, children)
+
+def _handle_new_children(xblock, children, store, user):
+    """
+    Handle newly added children for the xblock.
+
+    Args:
+        xblock: The xblock to handle children for.
+        children: A list of children usage keys.
+        store: The modulestore instance.
+        user: The user performing the operation.
+    """
+    new_children = set(children) - set(xblock.children)
+    for new_child in new_children:
+        old_parent_location = store.get_parent_location(new_child)
+        if old_parent_location:
+            old_parent = store.get_item(old_parent_location)
+            old_parent.children.remove(new_child)
+            old_parent = _update_with_callback(old_parent, user)
+        else:
+            return JsonResponse({"error": "Invalid data, possibly caused by concurrent authors."}, 400)
+
+def _handle_old_children(xblock, children):
+    """
+    Handle old children of the xblock.
+
+    Args:
+        xblock: The xblock to handle old children for.
+        children: A list of children usage keys.
+    """
+    old_children = set(xblock.children) - set(children)
+    if any(store.get_parent_location(old_child) == xblock.location for old_child in old_children):
+        return JsonResponse({"error": "Invalid data, possibly caused by concurrent authors."}, 400)
+
+def _update_xblock_metadata(xblock, metadata, nullout):
+    """
+    Update the xblock's metadata.
+
+    Args:
+        xblock: The xblock to update metadata for.
+        metadata: A dictionary of metadata key-value pairs.
+        nullout: A list of metadata keys to set to None.
+    """
+    if nullout is not None or metadata is not None:
+        if nullout is not None:
+            _null_out_metadata(xblock, nullout)
+        if metadata is not None:
+            _update_metadata(xblock, metadata)
+
+def _null_out_metadata(xblock, nullout):
+    """
+    Set specified metadata fields to None.
+
+    Args:
+        xblock: The xblock to update metadata for.
+        nullout: A list of metadata keys to set to None.
+    """
+    for metadata_key in nullout:
+        setattr(xblock, metadata_key, None)
+
+def _update_metadata(xblock, metadata):
+    """
+    Update the xblock's metadata with the provided metadata values.
+
+    Args:
+        xblock: The xblock to update metadata for.
+        metadata: A dictionary of metadata key-value pairs.
+    """
+    for metadata_key, value in metadata.items():
+        field = xblock.fields[metadata_key]
+        if value is None:
+            field.delete_from(xblock)
+        else:
+            try:
+                value = field.from_json(value)
+            except ValueError as verr:
+                reason = _("Invalid data")
+                if str(verr):
+                    reason = _("Invalid data ({details})").format(details=str(verr))
+                return JsonResponse({"error": reason}, 400)
+            field.write_to(xblock, value)
+
+def _update_static_tab_name(store, xblock):
+    """
+    Update the name of a static tab in the course.
+
+    Args:
+        store: The modulestore instance.
+        xblock: The xblock representing the static tab.
+    """
+    if xblock.location.block_type == "static_tab":
+        static_tab = CourseTabList.get_tab_by_slug(store.get_course(xblock.location.course_key).tabs, xblock.location.name)
+        if static_tab:
+            _update_tab_settings(static_tab, xblock, store)
+
+def _update_tab_settings(static_tab, xblock, store):
+    """
+    Update settings of a static tab.
+
+    Args:
+        static_tab: The static tab to update.
+        xblock: The xblock representing the static tab.
+        store: The modulestore instance.
+    """
+    update_tab = False
+    if static_tab["name"] != xblock.display_name:
+        static_tab["name"] = xblock.display_name
+        update_tab = True
+    if static_tab["course_staff_only"] != xblock.course_staff_only:
+        static_tab["course_staff_only"] = xblock.course_staff_only
+        update_tab = True
+    if update_tab:
+        store.update_item(course, user.id)
+
+def _save_gating_info(xblock, course, is_prereq, prereq_usage_key, prereq_min_score, prereq_min_completion):
+    """
+    Save gating information for the xblock.
+
+    Args:
+        xblock: The xblock to save gating information for.
+        course: The course containing the xblock.
+        is_prereq: Whether the xblock is a prerequisite.
+        prereq_usage_key: The usage key of the prerequisite.
+        prereq_min_score: The minimum score required for the prerequisite.
+        prereq_min_completion: The minimum completion required for the prerequisite.
+    """
+    if xblock.category == "sequential" and course.enable_subsection_gating:
+        if is_prereq is not None:
+            if is_prereq:
+                gating_api.add_prerequisite(xblock.location.course_key, xblock.location)
+            else:
+                gating_api.remove_prerequisite(xblock.location)
+
+def _handle_publish_option(xblock, publish, user):
+    """
+    Handle the publish option for the xblock.
+
+    Args:
+        xblock: The xblock to handle publish option for.
+        publish: The publish option.
+        user: The user performing the operation.
+    """
+    if publish == "republish" and xblock.category not in DIRECT_ONLY_CATEGORIES:
+        if modulestore().has_published_version(xblock):
+            publish = "make_public"
+    if publish == "make_public":
+        modulestore().publish(xblock.location, user.id)
+
+def _update_summary_configuration(xblock, summary_configuration_enabled):
+    """
+    Update the ai summary configuration for the xblock.
+
+    Args:
+        xblock: The xblock to update summary configuration for.
+        summary_configuration_enabled: Whether summary configuration is enabled.
+    """
+    if xblock.category == "vertical" and summary_configuration_enabled is not None:
+        AiAsideSummaryConfig(course.id).set_summary_settings(xblock.location, {
+            'enabled': summary_configuration_enabled
+    })
 
 
 @login_required

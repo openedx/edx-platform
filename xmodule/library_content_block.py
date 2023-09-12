@@ -652,10 +652,7 @@ class LibraryContentBlock(
                 validation,
                 StudioValidationMessage(
                     StudioValidationMessage.WARNING,
-                    (
-                        gettext(
-                            'There are no problems in the specified library of type {capa_type}.',
-                    )).format(capa_type= self.capa_type),
+                    (gettext('There are no problems in the specified library of type {capa_type}.')).format(capa_type=self.capa_type),
                     action_class='edit-button',
                     action_label=_("Select another problem type.")
                 )
