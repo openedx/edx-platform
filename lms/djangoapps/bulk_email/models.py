@@ -55,9 +55,9 @@ SEND_TO_STAFF = 'staff'
 SEND_TO_LEARNERS = 'learners'
 SEND_TO_COHORT = 'cohort'
 SEND_TO_TRACK = 'track'
-SEND_TO_INDIVIDUAL_STUDENTS = 'individual-students'
+SEND_TO_INDIVIDUAL_LEARNERS = 'individual-learners'
 EMAIL_TARGET_CHOICES = list(zip(
-    [SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS, SEND_TO_COHORT, SEND_TO_TRACK, SEND_TO_INDIVIDUAL_STUDENTS],
+    [SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS, SEND_TO_COHORT, SEND_TO_TRACK, SEND_TO_INDIVIDUAL_LEARNERS],
     ['Myself', 'Staff and instructors', 'All students', 'Specific cohort', 'Specific course mode', 'Specific list of students']
 ))
 EMAIL_TARGETS = {target[0] for target in EMAIL_TARGET_CHOICES}
@@ -149,7 +149,7 @@ class Target(models.Model):
                     & enrollment_query
                 )
             )
-        elif self.target_type == SEND_TO_INDIVIDUAL_STUDENTS:
+        elif self.target_type == SEND_TO_INDIVIDUAL_LEARNERS:
             return use_read_replica_if_available(
                 User.objects.filter(
                     models.Q(email__in=emails)

@@ -20,9 +20,9 @@ class BulkEmailTargetChoices:
     SEND_TO_LEARNERS = "learners"
     SEND_TO_COHORT = "cohort"
     SEND_TO_TRACK = "track"
-    SEND_TO_INDIVIDUAL_STUDENTS = "individual-students"
+    SEND_TO_INDIVIDUAL_LEARNERS = "individual-learners"
 
-    TARGET_CHOICES = (SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS, SEND_TO_COHORT, SEND_TO_TRACK, SEND_TO_INDIVIDUAL_STUDENTS)
+    TARGET_CHOICES = (SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS, SEND_TO_COHORT, SEND_TO_TRACK, SEND_TO_INDIVIDUAL_LEARNERS)
 
     @classmethod
     def is_valid_target(cls, target):
