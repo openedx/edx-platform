@@ -17,6 +17,7 @@ from django.conf import settings
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
+from freezegun import freeze_time
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore
@@ -480,3 +481,221 @@ class TestGetCourseAssignments(CompletionWaffleTestMixin, ModuleStoreTestCase):
         assignments = get_course_assignments(course.location.context_key, self.user, None)
         assert len(assignments) == 1
         assert not assignments[0].complete
+
+
+@ddt.ddt
+class TestGetCourseAssignmentsORA(CompletionWaffleTestMixin, ModuleStoreTestCase):
+    """ Tests for ora-related behavior in get_course_assignments """
+    TODAY = datetime.datetime(2023, 8, 2, 12, 23, 45, tzinfo=pytz.UTC)
+
+    def setUp(self):
+        super().setUp()
+        self.freezer = freeze_time(self.TODAY)
+        self.freezer.start()
+        self.addCleanup(self.freezer.stop)
+
+    def _date(self, t):
+        """ Helper to easily generate sequential days """
+        return datetime.timedelta(days=t) + self.TODAY
+
+    # pylint: disable=attribute-defined-outside-init
+    def _setup_course(
+        self,
+        course_dates=None,
+        subsection_dates=None,
+        ora_dates=None,
+        date_config_type="manual",
+        additional_rubric_assessments=None
+    ):
+        """
+        Setup a course with one section, subsection, unit, and ORA
+
+        With no arguments, the timeline of due dates is:
+        T  | Date
+        --------
+        -1 | Course Starts
+         0 | Current frozen time
+         1 | Subsection, submission, and self-assessment open
+         2 | submission is due
+         4 | self-assessment is due and peer assessment opens
+         5 | peer assessment is due
+         6 | subsection is due
+        10 | course ends
+        """
+        course_dates = course_dates or (self._date(-1), self._date(10))
+        subsection_dates = subsection_dates or (self._date(1), self._date(6))
+        ora_dates = ora_dates or {
+            'response': (self._date(1), self._date(2)),
+            'self': (self._date(1), self._date(4)),
+            'peer': (self._date(4), self._date(5))
+        }
+
+        self.course = CourseFactory(start=course_dates[0], end=course_dates[1])
+        self.section = BlockFactory(parent=self.course, category='chapter')
+        self.subsection = BlockFactory(
+            parent=self.section,
+            category='sequential',
+            graded=True,
+            start=subsection_dates[0],
+            due=subsection_dates[1],
+        )
+        vertical = BlockFactory(parent=self.subsection, category='vertical')
+
+        rubric_assessments = [
+            {
+                'name': 'peer-assessment',
+                'must_be_graded_by': 3,
+                'must_grade': 5,
+                'start': ora_dates['peer'][0].isoformat(),
+                'due': ora_dates['peer'][1].isoformat(),
+            },
+            {
+                'name': 'self-assessment',
+                'start': ora_dates['self'][0].isoformat(),
+                'due': ora_dates['self'][1].isoformat(),
+            }
+        ]
+        if additional_rubric_assessments:
+            rubric_assessments.extend(additional_rubric_assessments)
+
+        self.openassessment = BlockFactory(
+            parent=vertical,
+            category='openassessment',
+            rubric_assessments=rubric_assessments,
+            submission_start=ora_dates['response'][0].isoformat(),
+            submission_due=ora_dates['response'][1].isoformat(),
+            date_config_type=date_config_type
+        )
+
+        self.course_end = course_dates[1]
+        self.subsection_due = subsection_dates[1]
+        self.submission_due = ora_dates['response'][1]
+        self.peer_due = ora_dates['peer'][1]
+        self.self_due = ora_dates['self'][1]
+
+    def assert_ora_course_assignments(
+        self,
+        assignments,
+        expected_date_submission,
+        expected_date_peer,
+        expected_date_self
+    ):
+        """
+        Helper to assert that
+         - there are four date blocks
+         - The first one is for the subsection and the next three are the ora steps
+         - the steps have the expected due dates
+         """
+        assert len(assignments) == 4
+
+        assert assignments[0].block_key == self.subsection.location
+        assert assignments[1].block_key == self.openassessment.location
+        assert assignments[2].block_key == self.openassessment.location
+        assert assignments[3].block_key == self.openassessment.location
+
+        assert 'Submission' in assignments[1].title
+        assert 'Peer' in assignments[2].title
+        assert 'Self' in assignments[3].title
+
+        assert assignments[1].date == expected_date_submission
+        assert assignments[2].date == expected_date_peer
+        assert assignments[3].date == expected_date_self
+
+    def test_ora_date_config__manual(self):
+        """
+        When manual config is set, the dates for ora setps should be the step
+        due dates
+        """
+        self._setup_course()
+        self.assert_ora_course_assignments(
+            get_course_assignments(self.course.location.context_key, self.user, None),
+            self.submission_due,
+            self.peer_due,
+            self.self_due
+        )
+
+    def test_ora_date_config__subsection(self):
+        """
+        When subsection config is set, the dates for ora steps should all be the subsection due date
+        """
+        self._setup_course(date_config_type='subsection')
+        self.assert_ora_course_assignments(
+            get_course_assignments(self.course.location.context_key, self.user, None),
+            self.subsection_due,
+            self.subsection_due,
+            self.subsection_due,
+        )
+
+    def test_ora_date_config__course_end(self):
+        """
+        When manual config is set, the dates for ora steps should all be the course end date
+        """
+        self._setup_course(date_config_type='course_end')
+        self.assert_ora_course_assignments(
+            get_course_assignments(self.course.location.context_key, self.user, None),
+            self.course_end,
+            self.course_end,
+            self.course_end,
+        )
+
+    def test_course_end_none(self):
+        """
+        If the course has no end date defined and if the ora date config
+        is set to course end, don't include due dates for the ORA assignment in the due dates
+        """
+        self._setup_course(
+            course_dates=(self._date(-1), None),
+            date_config_type='course_end'
+        )
+        assignments = get_course_assignments(self.course.location.context_key, self.user, None)
+        assert len(assignments) == 1
+        assert assignments[0].block_key == self.subsection.location
+
+    def test_subsection_none(self):
+        """
+        If the subsection has no due date defined and if the ora date config
+        is set to subsection, don't include due dates for the ORA assignment in the due dates
+        """
+        self._setup_course(
+            subsection_dates=(self._date(1), None),
+            date_config_type='subsection'
+        )
+        # Add another subsection with a due date, because the first subsection won't show up
+        # without one
+        subsection_2 = BlockFactory(
+            parent=self.section,
+            category='sequential',
+            graded=True,
+            start=self._date(2),
+            due=self._date(3),
+        )
+        assignments = get_course_assignments(self.course.location.context_key, self.user, None)
+        assert len(assignments) == 1
+        assert assignments[0].block_key == subsection_2.location
+
+    @ddt.data('manual', 'subsection', 'course_end')
+    def test_ora_steps_with_no_due_date(self, config_type):
+        additional_assessments = [
+            {
+                'name': 'assessment_that_is_never_due',
+                'some_setting': 'whatever',
+                'another_setting': 'meh',
+            },
+            {
+                'name': 'another_ssessment_that_is_never_due',
+                'favorite_fruit': 'pear',
+                'favorite_color': 'green',
+            }
+        ]
+        self._setup_course(
+            additional_rubric_assessments=additional_assessments,
+            date_config_type=config_type,
+        )
+
+        # There are no dates for these other steps
+        assignments = get_course_assignments(self.course.location.context_key, self.user, None)
+        assert len(assignments) == 4
+        assert assignments[0].block_key == self.subsection.location
+        assert 'Submission' in assignments[1].title
+        assert 'Peer' in assignments[2].title
+        assert 'Self' in assignments[3].title

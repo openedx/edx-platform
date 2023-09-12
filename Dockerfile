@@ -91,9 +91,6 @@ RUN apt-get update && \
     apt-get -y install --no-install-recommends \
         curl \
         libssl-dev \
-        libxml2-dev \
-        libxmlsec1-dev \
-        libxslt1-dev \
         libffi-dev \
         libfreetype6-dev \
         libgeos-dev \

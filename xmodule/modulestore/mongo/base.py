@@ -13,7 +13,6 @@ structure:
 """
 
 
-import copy
 import logging
 import re
 import sys
@@ -29,7 +28,6 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator
 from path import Path as path
 from pytz import UTC
-from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope, ScopeIds
 from xblock.runtime import KvsFieldData
@@ -43,9 +41,8 @@ from xmodule.mako_block import MakoDescriptorSystem
 from xmodule.modulestore import BulkOperationsMixin, ModuleStoreEnum, ModuleStoreWriteBase
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES, ModuleStoreDraftAndPublished
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
-from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError, ReferentialIntegrityError
-from xmodule.modulestore.inheritance import InheritanceKeyValueStore, InheritanceMixin, inherit_metadata
-from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
+from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
+from xmodule.modulestore.inheritance import InheritanceKeyValueStore
 from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
 from xmodule.partitions.partitions_service import PartitionService
@@ -58,10 +55,6 @@ SORT_REVISION_FAVOR_DRAFT = ('_id.revision', pymongo.DESCENDING)
 
 # sort order that returns PUBLISHED items first
 SORT_REVISION_FAVOR_PUBLISHED = ('_id.revision', pymongo.ASCENDING)
-
-BLOCK_TYPES_WITH_CHILDREN = list({
-    name for name, class_ in XBlock.load_classes() if getattr(class_, 'has_children', False)
-})
 
 # Allow us to call _from_deprecated_(son|string) throughout the file
 # pylint: disable=protected-access
@@ -92,21 +85,17 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
     A KeyValueStore that maps keyed data access to one of the 3 data areas
     known to the MongoModuleStore (data, children, and metadata)
     """
-    def __init__(self, data, parent, children, metadata):
+    def __init__(self, data, metadata):
         super().__init__()
         if not isinstance(data, dict):
             self._data = {'data': data}
         else:
             self._data = data
-        self._parent = parent
-        self._children = children
         self._metadata = metadata
 
     def get(self, key):
         if key.scope == Scope.children:
-            return self._children
-        elif key.scope == Scope.parent:
-            return self._parent
+            return []
         elif key.scope == Scope.settings:
             return self._metadata[key.field_name]
         elif key.scope == Scope.content:
@@ -114,28 +103,22 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
         else:
             raise InvalidScopeError(
                 key,
-                (Scope.children, Scope.parent, Scope.settings, Scope.content),
+                (Scope.settings, Scope.content),
             )
 
     def set(self, key, value):
-        if key.scope == Scope.children:
-            self._children = value
-        elif key.scope == Scope.parent:
-            self._parent = value
-        elif key.scope == Scope.settings:
+        if key.scope == Scope.settings:
             self._metadata[key.field_name] = value
         elif key.scope == Scope.content:
             self._data[key.field_name] = value
         else:
             raise InvalidScopeError(
                 key,
-                (Scope.children, Scope.settings, Scope.content),
+                (Scope.settings, Scope.content),
             )
 
     def delete(self, key):
-        if key.scope == Scope.children:
-            self._children = []
-        elif key.scope == Scope.settings:
+        if key.scope == Scope.settings:
             if key.field_name in self._metadata:
                 del self._metadata[key.field_name]
         elif key.scope == Scope.content:
@@ -144,13 +127,11 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
         else:
             raise InvalidScopeError(
                 key,
-                (Scope.children, Scope.settings, Scope.content),
+                (Scope.settings, Scope.content),
             )
 
     def has(self, key):
-        if key.scope in (Scope.children, Scope.parent):
-            return True
-        elif key.scope == Scope.settings:
+        if key.scope == Scope.settings:
             return key.field_name in self._metadata
         elif key.scope == Scope.content:
             return key.field_name in self._data
@@ -159,7 +140,7 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
 
     def __repr__(self):
         return "MongoKeyValueStore{!r}<{!r}, {!r}>".format(
-            (self._data, self._parent, self._children, self._metadata),
+            (self._data, self._metadata),
             self._fields,
             self.inherited_settings
         )
@@ -244,20 +225,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
                 definition = json_data.get('definition', {})
                 metadata = json_data.get('metadata', {})
 
-                children = [
-                    self._convert_reference_to_key(childloc)
-                    for childloc in definition.get('children', [])
-                ]
-
-                parent = None
-                if category not in DETACHED_XBLOCK_TYPES.union(['course']):
-                    # try looking it up just-in-time (but not if we're working with a detached block).
-                    parent = self.modulestore.get_parent_location(
-                        as_published(location),
-                        ModuleStoreEnum.RevisionOption.published_only if location.branch is None
-                        else ModuleStoreEnum.RevisionOption.draft_preferred
-                    )
-
                 data = definition.get('data', {})
                 if isinstance(data, str):
                     data = {'data': data}
@@ -268,18 +235,12 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
                 metadata = self._convert_reference_fields_to_keys(mixed_class, location.course_key, metadata)
                 kvs = MongoKeyValueStore(
                     data,
-                    parent,
-                    children,
                     metadata,
                 )
 
                 field_data = KvsFieldData(kvs)
                 scope_ids = ScopeIds(None, category, location, location)
                 block = self.construct_xblock_from_class(class_, scope_ids, field_data, for_parent=for_parent)
-
-                non_draft_loc = as_published(location)
-                metadata_inheritance_tree = self.modulestore._compute_metadata_inheritance_tree(location.course_key)
-                inherit_metadata(block, metadata_inheritance_tree.get(str(non_draft_loc), {}))
 
                 block._edit_info = json_data.get('edit_info')
 
@@ -641,90 +602,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         else:
             return ParentLocationCache()
 
-    def _compute_metadata_inheritance_tree(self, course_id):
-        '''
-        Find all inheritable fields from all xblocks in the course which may define inheritable data
-        '''
-        # get all collections in the course, this query should not return any leaf nodes
-        course_id = self.fill_in_run(course_id)
-        query = SON([
-            ('_id.tag', 'i4x'),
-            ('_id.org', course_id.org),
-            ('_id.course', course_id.course),
-            ('_id.category', {'$in': BLOCK_TYPES_WITH_CHILDREN})
-        ])
-        # if we're only dealing in the published branch, then only get published containers
-        if self.get_branch_setting() == ModuleStoreEnum.Branch.published_only:
-            query['_id.revision'] = None
-        # we just want the Location, children, and inheritable metadata
-        record_filter = {'_id': 1, 'definition.children': 1}
-
-        # just get the inheritable metadata since that is all we need for the computation
-        # this minimizes both data pushed over the wire
-        for field_name in InheritanceMixin.fields:
-            record_filter[f'metadata.{field_name}'] = 1
-
-        # call out to the DB
-        resultset = self.collection.find(query, record_filter)
-
-        # it's ok to keep these as deprecated strings b/c the overall cache is indexed by course_key and this
-        # is a dictionary relative to that course
-        results_by_url = {}
-        root = None
-
-        # now go through the results and order them by the location url
-        for result in resultset:
-            # manually pick it apart b/c the db has tag and we want as_published revision regardless
-            location = as_published(BlockUsageLocator._from_deprecated_son(result['_id'], course_id.run))
-
-            location_url = str(location)
-            if location_url in results_by_url:
-                # found either draft or live to complement the other revision
-                # FIXME this is wrong. If the child was moved in draft from one parent to the other, it will
-                # show up under both in this logic: https://openedx.atlassian.net/browse/TNL-1075
-                existing_children = results_by_url[location_url].get('definition', {}).get('children', [])
-                additional_children = result.get('definition', {}).get('children', [])
-                total_children = existing_children + additional_children
-                # use set to get rid of duplicates. We don't care about order; so, it shouldn't matter.
-                results_by_url[location_url].setdefault('definition', {})['children'] = set(total_children)
-            else:
-                results_by_url[location_url] = result
-            if location.block_type == 'course':  # pylint: disable=no-member
-                root = location_url
-
-        # now traverse the tree and compute down the inherited metadata
-        metadata_to_inherit = {}
-
-        def _compute_inherited_metadata(url):
-            """
-            Helper method for computing inherited metadata for a specific location url
-            """
-            my_metadata = results_by_url[url].get('metadata', {})
-
-            # go through all the children and recurse, but only if we have
-            # in the result set. Remember results will not contain leaf nodes
-            for child in results_by_url[url].get('definition', {}).get('children', []):
-                if child in results_by_url:
-                    new_child_metadata = copy.deepcopy(my_metadata)
-                    new_child_metadata.update(results_by_url[child].get('metadata', {}))
-                    results_by_url[child]['metadata'] = new_child_metadata
-                    metadata_to_inherit[child] = new_child_metadata
-                    _compute_inherited_metadata(child)
-                else:
-                    # this is likely a leaf node, so let's record what metadata we need to inherit
-                    metadata_to_inherit[child] = my_metadata.copy()
-                # WARNING: 'parent' is not part of inherited metadata, but
-                # we're piggybacking on this recursive traversal to grab
-                # and cache the child's parent, as a performance optimization.
-                # The 'parent' key will be popped out of the dictionary during
-                # CachingDescriptorSystem.load_item
-                metadata_to_inherit[child].setdefault('parent', {})[self.get_branch_setting()] = url
-
-        if root is not None:
-            _compute_inherited_metadata(root)
-
-        return metadata_to_inherit
-
     def _clean_item_data(self, item):
         """
         Renames the '_id' field in item to 'location'
@@ -732,20 +609,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         item['location'] = item['_id']
         del item['_id']
 
-    @autoretry_read()
-    def _query_children_for_cache_children(self, course_key, items):
-        """
-        Generate a pymongo in query for finding the items and return the payloads
-        """
-        # first get non-draft in a round-trip
-        query = {
-            '_id': {'$in': [
-                UsageKey.from_string(item).map_into_course(course_key).to_deprecated_son() for item in items
-            ]}
-        }
-        return list(self.collection.find(query))
-
-    def _cache_children(self, course_key, items, depth=0):
+    def _get_items_data(self, course_key, items):
         """
         Returns a dictionary mapping Location -> item data, populated with json data
         for all descendents of items up to the specified depth.
@@ -757,32 +621,11 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         data = {}
         to_process = list(items)
         course_key = self.fill_in_run(course_key)
-        parent_cache = self._get_parent_cache(self.get_branch_setting())
 
-        while to_process and (depth is None or depth >= 0):
-            children = []
-            for item in to_process:
-                self._clean_item_data(item)
-                item_location = BlockUsageLocator._from_deprecated_son(item['location'], course_key.run)
-                item_children = item.get('definition', {}).get('children', [])
-                children.extend(item_children)
-                for item_child in item_children:
-                    parent_cache.set(item_child, item_location)
-                data[item_location] = item
-
-            if depth == 0:
-                break
-
-            # Load all children by id. See
-            # http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24or
-            # for or-query syntax
-            to_process = []
-            if children:
-                to_process = self._query_children_for_cache_children(course_key, children)
-
-            # If depth is None, then we just recurse until we hit all the descendents
-            if depth is not None:
-                depth -= 1
+        for item in to_process:
+            self._clean_item_data(item)
+            item_location = BlockUsageLocator._from_deprecated_son(item['location'], course_key.run)
+            data[item_location] = item
 
         return data
 
@@ -851,13 +694,13 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         item.course_version = None
         return item
 
-    def _load_items(self, course_key, items, depth=0, using_descriptor_system=None, for_parent=None):
+    def _load_items(self, course_key, items, using_descriptor_system=None, for_parent=None):
         """
         Load a list of xblocks from the data in items, with children cached up
         to specified depth
         """
         course_key = self.fill_in_run(course_key)
-        data_cache = self._cache_children(course_key, items, depth)
+        data_cache = self._get_items_data(course_key, items)
 
         # if we are loading a course object, if we're not prefetching children (depth != 0) then don't
         # bother with the metadata inheritance
@@ -985,7 +828,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         return BlockUsageLocator(course_key, 'course', course_key.run)
 
-    def get_course(self, course_key, depth=0, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
+    def get_course(self, course_key, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Get the course with the given courseid (org/course/run)
         """
@@ -998,7 +841,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         course_key = self.fill_in_run(course_key)
         location = course_key.make_usage_key('course', course_key.run)
         try:
-            return self.get_item(location, depth=depth)
+            return self.get_item(location)
         except ItemNotFoundError:
             return None
 
@@ -1047,7 +890,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         except ItemNotFoundError:
             return False
 
-    def get_item(self, usage_key, depth=0, using_descriptor_system=None, for_parent=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
+    def get_item(self, usage_key, using_descriptor_system=None, for_parent=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Returns an XModuleDescriptor instance for the item at location.
 
@@ -1069,7 +912,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         block = self._load_items(
             usage_key.course_key,
             [item],
-            depth,
             using_descriptor_system=using_descriptor_system,
             for_parent=for_parent,
         )[0]
@@ -1153,8 +995,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             query['metadata.' + key] = value
         for key, value in (content or {}).items():
             query['definition.data.' + key] = value
-        if 'children' in qualifiers:
-            query['definition.children'] = qualifiers.pop('children')
 
         query.update(qualifiers)
         items = self.collection.find(
@@ -1319,25 +1159,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             block_id: a unique identifier for the new item. If not supplied,
                 a new identifier will be generated
         """
-        # attach to parent if given
-        parent = None
-
-        if parent_usage_key is not None:
-            parent = self.get_item(parent_usage_key)
-            kwargs.setdefault('for_parent', parent)
-
-        xblock = self.create_item(user_id, parent_usage_key.course_key, block_type, block_id=block_id, **kwargs)
-
-        if parent is not None and 'detached' not in xblock._class_tags:
-            # Originally added to support entrance exams (settings.FEATURES.get('ENTRANCE_EXAMS'))
-            if kwargs.get('position') is None:
-                parent.children.append(xblock.location)
-            else:
-                parent.children.insert(kwargs.get('position'), xblock.location)
-
-            self.update_item(parent, user_id, child_update=True)  # lint-amnesty, pylint: disable=unexpected-keyword-arg
-
-        return xblock
+        raise NotImplementedError
 
     def import_xblock(self, user_id, course_key, block_type, block_id, fields=None, runtime=None, **kwargs):
         """
@@ -1348,13 +1170,13 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         xblock = self.create_xblock(runtime, course_key, block_type, block_id, fields)
         return self.update_item(xblock, user_id, allow_not_found=True)
 
-    def _get_course_for_item(self, location, depth=0):
+    def _get_course_for_item(self, location):
         '''
         for a given XBlock, return the course that it belongs to
         Also we have to assert that this block maps to only one course item - it'll throw an
         assert if not
         '''
-        return self.get_course(location.course_key, depth)
+        return self.get_course(location.course_key)
 
     def _update_single_item(self, location, update, allow_not_found=False):
         """
@@ -1372,84 +1194,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         )
         if result.matched_count == 0 and result.upserted_id is None:
             raise ItemNotFoundError(location)
-
-    def _update_ancestors(self, location, update):
-        """
-        Recursively applies update to all the ancestors of location
-        """
-        parent = self._get_raw_parent_location(as_published(location), ModuleStoreEnum.RevisionOption.draft_preferred)
-        if parent:
-            self._update_single_item(parent, update)
-            self._update_ancestors(parent, update)
-
-    def update_item(self, xblock, user_id, allow_not_found=False, force=False, isPublish=False,  # lint-amnesty, pylint: disable=arguments-differ
-                    is_publish_root=True):
-        """
-        Update the persisted version of xblock to reflect its current values.
-
-        xblock: which xblock to persist
-        user_id: who made the change (ignored for now by this modulestore)
-        allow_not_found: whether to create a new object if one didn't already exist or give an error
-        force: force is meaningless for this modulestore
-        isPublish: an internal parameter that indicates whether this update is due to a Publish operation, and
-          thus whether the item's published information should be updated.
-        is_publish_root: when publishing, this indicates whether xblock is the root of the publish and should
-          therefore propagate subtree edit info up the tree
-        """
-        course_key = xblock.location.course_key
-
-        try:
-            definition_data = self._serialize_scope(xblock, Scope.content)
-            now = datetime.now(UTC)
-            payload = {
-                'definition.data': definition_data,
-                'metadata': self._serialize_scope(xblock, Scope.settings),
-                'edit_info': {
-                    'edited_on': now,
-                    'edited_by': user_id,
-                    'subtree_edited_on': now,
-                    'subtree_edited_by': user_id,
-                }
-            }
-
-            if isPublish:
-                payload['edit_info']['published_date'] = now
-                payload['edit_info']['published_by'] = user_id
-            elif 'published_date' in getattr(xblock, '_edit_info', {}):
-                payload['edit_info']['published_date'] = xblock._edit_info['published_date']
-                payload['edit_info']['published_by'] = xblock._edit_info['published_by']
-
-            if xblock.has_children:
-                children = self._serialize_scope(xblock, Scope.children)
-                payload.update({'definition.children': children['children']})
-
-                # Remove all old pointers to me, then add my current children back
-                parent_cache = self._get_parent_cache(self.get_branch_setting())
-                parent_cache.delete_by_value(xblock.location)
-                for child in xblock.children:
-                    parent_cache.set(str(child), xblock.location)
-
-            self._update_single_item(xblock.scope_ids.usage_id, payload, allow_not_found=allow_not_found)
-
-            # update subtree edited info for ancestors
-            # don't update the subtree info for descendants of the publish root for efficiency
-            if not isPublish or (isPublish and is_publish_root):
-                ancestor_payload = {
-                    'edit_info.subtree_edited_on': now,
-                    'edit_info.subtree_edited_by': user_id
-                }
-                self._update_ancestors(xblock.scope_ids.usage_id, ancestor_payload)
-
-            # update the edit info of the instantiated xblock
-            xblock._edit_info = payload['edit_info']
-            # fire signal that we've written to DB
-        except ItemNotFoundError:
-            if not allow_not_found:  # lint-amnesty, pylint: disable=no-else-raise
-                raise
-            elif not self.has_course(course_key):
-                raise ItemNotFoundError(course_key)  # lint-amnesty, pylint: disable=raise-missing-from
-
-        return xblock
 
     def _serialize_scope(self, xblock, scope):
         """
@@ -1476,112 +1220,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                     jsonfields[field_name] = field.read_json(xblock)
         return jsonfields
 
-    def _get_non_orphan_parents(self, location, parents, revision):
-        """
-        Extract non orphan parents by traversing the list of possible parents and remove current location
-        from orphan parents to avoid parents calculation overhead next time.
-        """
-        non_orphan_parents = []
-        # get bulk_record once rather than for each iteration
-        bulk_record = self._get_bulk_ops_record(location.course_key)
-
-        for parent in parents:
-            parent_loc = BlockUsageLocator._from_deprecated_son(parent['_id'], location.course_key.run)
-
-            # travel up the tree for orphan validation
-            ancestor_loc = parent_loc
-            while ancestor_loc is not None:
-                current_loc = ancestor_loc
-                ancestor_loc = self._get_raw_parent_location(as_published(current_loc), revision)
-                if ancestor_loc is None:
-                    bulk_record.dirty = True
-                    # The parent is an orphan, so remove all the children including
-                    # the location whose parent we are looking for from orphan parent
-                    self.collection.update_one(
-                        {'_id': parent_loc.to_deprecated_son()},
-                        {'$set': {'definition.children': []}},
-                        upsert=True,
-                    )
-                elif ancestor_loc.block_type == 'course':
-                    # once we reach the top location of the tree and if the location is not an orphan then the
-                    # parent is not an orphan either
-                    non_orphan_parents.append(parent_loc)
-                    break
-
-        return non_orphan_parents
-
-    def _get_raw_parent_location(self, location, revision=ModuleStoreEnum.RevisionOption.published_only):
-        '''
-        Helper for get_parent_location that finds the location that is the parent of this location in this course,
-        but does NOT return a version agnostic location.
-        '''
-        assert location.branch is None
-        assert revision == ModuleStoreEnum.RevisionOption.published_only \
-            or revision == ModuleStoreEnum.RevisionOption.draft_preferred  # lint-amnesty, pylint: disable=consider-using-in
-
-        parent_cache = self._get_parent_cache(self.get_branch_setting())
-        if parent_cache.has(str(location)):
-            return parent_cache.get(str(location))
-
-        # create a query with tag, org, course, and the children field set to the given location
-        query = self._course_key_to_son(location.course_key)
-        query['definition.children'] = str(location)
-
-        # if only looking for the PUBLISHED parent, set the revision in the query to None
-        if revision == ModuleStoreEnum.RevisionOption.published_only:
-            query['_id.revision'] = MongoRevisionKey.published
-
-        def cache_and_return(parent_loc):
-            parent_cache.set(str(location), parent_loc)
-            return parent_loc
-
-        # query the collection, sorting by DRAFT first
-        parents = list(
-            self.collection.find(query, {'_id': True}, sort=[SORT_REVISION_FAVOR_DRAFT])
-        )
-        if len(parents) == 0:
-            # no parents were found
-            return cache_and_return(None)
-
-        if revision == ModuleStoreEnum.RevisionOption.published_only:
-            if len(parents) > 1:
-                non_orphan_parents = self._get_non_orphan_parents(location, parents, revision)
-                if len(non_orphan_parents) == 0:
-                    # no actual parent found
-                    return cache_and_return(None)
-
-                if len(non_orphan_parents) > 1:  # lint-amnesty, pylint: disable=no-else-raise
-                    # should never have multiple PUBLISHED parents
-                    raise ReferentialIntegrityError(
-                        "{} parents claim {}".format(len(parents), location)
-                    )
-                else:
-                    return cache_and_return(non_orphan_parents[0].replace(run=location.course_key.run))
-            else:
-                # return the single PUBLISHED parent
-                return cache_and_return(BlockUsageLocator._from_deprecated_son(parents[0]['_id'],
-                                                                               location.course_key.run))
-        else:
-            # there could be 2 different parents if
-            #   (1) the draft item was moved or
-            #   (2) the parent itself has 2 versions: DRAFT and PUBLISHED
-            #  if there are multiple parents with version PUBLISHED then choose from non-orphan parents
-            all_parents = []
-            published_parents = 0
-            for parent in parents:
-                if parent['_id']['revision'] is None:
-                    published_parents += 1
-                all_parents.append(parent)
-
-            # since we sorted by SORT_REVISION_FAVOR_DRAFT, the 0'th parent is the one we want
-            if published_parents > 1:
-                non_orphan_parents = self._get_non_orphan_parents(location, all_parents, revision)
-                return cache_and_return(non_orphan_parents[0].replace(run=location.course_key.run))
-
-            found_id = all_parents[0]['_id']
-            # don't disclose revision outside modulestore
-            return cache_and_return(BlockUsageLocator._from_deprecated_son(found_id, location.course_key.run))
-
     def get_parent_location(self, location, revision=ModuleStoreEnum.RevisionOption.published_only, **kwargs):
         '''
         Find the location that is the parent of this location in this course.
@@ -1597,9 +1235,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                         preferring DRAFT, if parent(s) exists,
                         else returns None
         '''
-        parent = self._get_raw_parent_location(location, revision)
-        if parent:
-            return parent
         return None
 
     def get_modulestore_type(self, course_key=None):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
@@ -1614,22 +1249,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         Return an array of all of the locations for orphans in the course.
         """
-        course_key = self.fill_in_run(course_key)
-        detached_categories = [name for name, __ in XBlock.load_tagged_classes("detached")]
-        query = self._course_key_to_son(course_key)
-        query['_id.category'] = {'$nin': detached_categories}
-        all_items = self.collection.find(query)
-        all_reachable = set()
-        item_locs = set()
-        for item in all_items:
-            if item['_id']['category'] != 'course':
-                # It would be nice to change this method to return UsageKeys instead of the deprecated string.
-                item_locs.add(
-                    str(as_published(BlockUsageLocator._from_deprecated_son(item['_id'], course_key.run)))
-                )
-            all_reachable = all_reachable.union(item.get('definition', {}).get('children', []))
-        item_locs -= all_reachable
-        return [UsageKey.from_string(item_loc).map_into_course(course_key) for item_loc in item_locs]
+        raise NotImplementedError
 
     def get_courses_for_wiki(self, wiki_slug, **kwargs):
         """
@@ -1653,8 +1273,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         kvs = MongoKeyValueStore(
             definition_data,
-            None,
-            [],
             metadata,
         )
 
@@ -1917,3 +1535,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
     def unpublish(self, location, user_id):
         raise NotImplementedError()
+
+    def update_item(self, xblock, user_id, allow_not_found=False, force=False, isPublish=False,  # lint-amnesty, pylint: disable=arguments-differ
+                    is_publish_root=True):
+        raise NotImplementedError

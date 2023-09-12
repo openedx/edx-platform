@@ -267,7 +267,10 @@ class SafeCookieData:
         SHA256(version '|' session_id '|' user_id '|').
         """
         data_to_sign = self._compute_digest(user_id)
-        self.signature = signing.dumps(data_to_sign, salt=self.key_salt)
+
+        self.signature = signing.TimestampSigner(
+            salt=self.key_salt, algorithm=settings.DEFAULT_HASHING_ALGORITHM
+        ).sign_object(data_to_sign, serializer=signing.JSONSerializer, compress=False)
 
     def verify(self, user_id):
         """
@@ -276,7 +279,10 @@ class SafeCookieData:
         (not expired) and bound to the given user.
         """
         try:
-            unsigned_data = signing.loads(self.signature, salt=self.key_salt, max_age=settings.SESSION_COOKIE_AGE)
+            unsigned_data = signing.TimestampSigner(
+                salt=self.key_salt, algorithm=settings.DEFAULT_HASHING_ALGORITHM
+            ).unsign_object(self.signature, serializer=signing.JSONSerializer, max_age=settings.SESSION_COOKIE_AGE)
+
             if unsigned_data == self._compute_digest(user_id):
                 return True
             log.error("SafeCookieData '%r' is not bound to user '%s'.", str(self), user_id)

@@ -23,6 +23,7 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from simple_history.models import HistoricalRecords
 
+from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.discussion import django_comment_client
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
@@ -843,6 +844,23 @@ class CourseOverview(TimeStampedModel):
         Returns the course from the modulestore.
         """
         return modulestore().get_course(self.id)
+
+    def bind_course_for_student(self, request):
+        """
+        Bind user-specific field data to the Course XBlock.
+
+        By default, the retrieved course XBlock is "unbound" - it means that any field from the `user_info` scope
+        (like `edxnotes_visibility`) returns its default value.
+        """
+        # Delay import until here to avoid circular dependency.
+        from lms.djangoapps.courseware.block_render import get_block_for_descriptor
+        get_block_for_descriptor(
+            request.user,
+            request,
+            self._original_course,
+            FieldDataCache([self._original_course], self._original_course.id, request.user),
+            self._original_course.id,
+        )
 
     @property
     def allow_public_wiki_access(self):
