@@ -19,7 +19,7 @@ class CourseRolesRole(models.Model):
 
     """
     name = models.CharField(max_length=255)
-    service = models.ForeignKey('CourseRolesService', on_delete=models.DO_NOTHING, null=True)
+    services = models.ManyToManyField('CourseRolesService', through='CourseRolesRoleService')
     permissions = models.ManyToManyField('CourseRolesPermission', through='CourseRolesRolePermissions')
     users = models.ManyToManyField(User, through='CourseRolesUserRole')
 
@@ -87,3 +87,16 @@ class CourseRolesService(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class CourseRolesRoleService(models.Model):
+    """
+    Model for a course roles role service.
+
+    A role service is a mapping between a role and a service.
+    """
+    role = models.ForeignKey('CourseRolesRole', on_delete=models.CASCADE)
+    service = models.ForeignKey('CourseRolesService', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.role} - {self.service}"
