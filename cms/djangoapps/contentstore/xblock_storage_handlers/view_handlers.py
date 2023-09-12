@@ -382,12 +382,6 @@ def _post_editor_saved_callback(xblock):
     if callable(getattr(xblock, "post_editor_saved", None)):
         xblock.post_editor_saved()
 
-
-
-
-
-
-
 def _save_xblock(
     user,
     xblock,
@@ -414,7 +408,7 @@ def _save_xblock(
     course = store.get_course(xblock.location.course_key)  # Define 'course' variable
     with store.bulk_operations(xblock.location.course_key):
         if publish == "discard_changes":
-            return _discard_changes(xblock, user, course)
+            return _discard_changes(xblock, user, store)
 
         old_metadata = own_metadata(xblock)
         old_content = xblock.get_explicitly_set_fields_by_scope(Scope.content)
@@ -428,14 +422,60 @@ def _save_xblock(
             _update_xblock_fields(xblock, fields)
 
         if children_strings is not None:
-            _update_xblock_children(xblock, children_strings, store, user)
+            children = []
+            for child_string in children_strings:
+                children.append(usage_key_with_run(child_string))
+
+            # if new children have been added, remove them from their old parents
+            new_children = set(children) - set(xblock.children)
+            for new_child in new_children:
+                old_parent_location = store.get_parent_location(new_child)
+                if old_parent_location:
+                    old_parent = store.get_item(old_parent_location)
+                    old_parent.children.remove(new_child)
+                    old_parent = _update_with_callback(old_parent, user)
+                else:
+                    # the Studio UI currently doesn't present orphaned children, so assume this is an error
+                    return JsonResponse(
+                        {
+                            "error": "Invalid data, possibly caused by concurrent authors."
+                        },
+                        400,
+                    )
+
+            # make sure there are no old children that became orphans
+            # In a single-author (no-conflict) scenario, all children in the persisted list on the server should be
+            # present in the updated list.  If there are any children that have been dropped as part of this update,
+            # then that would be an error.
+            #
+            # We can be even more restrictive in a multi-author (conflict), by returning an error whenever
+            # len(old_children) > 0. However, that conflict can still be "merged" if the dropped child had been
+            # re-parented. Hence, the check for the parent in the any statement below.
+            #
+            # Note that this multi-author conflict error should not occur in modulestores (such as Split) that support
+            # atomic write transactions.  In Split, if there was another author who moved one of the "old_children"
+            # into another parent, then that child would have been deleted from this parent on the server. However,
+            # this is error could occur in modulestores (such as Draft) that do not support atomic write-transactions
+            old_children = set(xblock.children) - set(children)
+            if any(
+                store.get_parent_location(old_child) == xblock.location
+                for old_child in old_children
+            ):
+                # since children are moved as part of a single transaction, orphans should not be created
+                return JsonResponse(
+                    {"error": "Invalid data, possibly caused by concurrent authors."},
+                    400,
+                )
+
+            # set the children on the xblock
+            xblock.children = children
 
         _update_xblock_metadata(xblock, metadata, nullout)
 
         validate_and_update_xblock_due_date(xblock)
         xblock = _update_with_callback(xblock, user, old_metadata, old_content)
-
-        _update_static_tab_name(xblock, store, user)
+        course = store.get_course(xblock.location.course_key)
+        _update_static_tab_name(store, xblock, user)
 
         result = {
             "id": str(xblock.location),
@@ -452,9 +492,10 @@ def _save_xblock(
 
         _update_summary_configuration(xblock, summary_configuration_enabled)
 
+        # Note that children aren't being returned until we have a use case.
         return JsonResponse(result, encoder=EdxJSONEncoder)
 
-def _discard_changes(xblock, user):
+def _discard_changes(xblock, user, store):
     """
     Discards changes made to the xblock and reverts it to the published version.
 
@@ -491,11 +532,12 @@ def _update_xblock_children(xblock, children_strings, store, user):
     """
     children = [usage_key_with_run(child_string) for child_string in children_strings]
     _handle_new_children(xblock, children, store, user)
-    _handle_old_children(xblock, children)
+    _handle_old_children(xblock, children, store)
 
 def _handle_new_children(xblock, children, store, user):
     """
     Handle newly added children for the xblock.
+    If new children have been added, remove them from their old parents.
 
     Args:
         xblock: The xblock to handle children for.
@@ -511,17 +553,31 @@ def _handle_new_children(xblock, children, store, user):
             old_parent.children.remove(new_child)
             old_parent = _update_with_callback(old_parent, user)
         else:
+            #  The Studio UI currently doesn't present orphaned children, so assume this is an error
             return JsonResponse({"error": "Invalid data, possibly caused by concurrent authors."}, 400)
 
-def _handle_old_children(xblock, children):
+def _handle_old_children(xblock, children, store):
     """
-    Handle old children of the xblock.
+    make sure there are no old children that became orphans
+    In a single-author (no-conflict) scenario, all children in the persisted list on the server should be
+    present in the updated list.  If there are any children that have been dropped as part of this update,
+    then that would be an error.
+
+    We can be even more restrictive in a multi-author (conflict), by returning an error whenever
+    len(old_children) > 0. However, that conflict can still be "merged" if the dropped child had been
+    re-parented. Hence, the check for the parent in the any statement below.
+
+    Note that this multi-author conflict error should not occur in modulestores (such as Split) that support
+    atomic write transactions.  In Split, if there was another author who moved one of the "old_children"
+    into another parent, then that child would have been deleted from this parent on the server. However,
+    this is error could occur in modulestores (such as Draft) that do not support atomic write-transactions
 
     Args:
         xblock: The xblock to handle old children for.
         children: A list of children usage keys.
     """
     old_children = set(xblock.children) - set(children)
+    print(old_children)
     if any(store.get_parent_location(old_child) == xblock.location for old_child in old_children):
         return JsonResponse({"error": "Invalid data, possibly caused by concurrent authors."}, 400)
 
@@ -573,7 +629,7 @@ def _update_metadata(xblock, metadata):
                 return JsonResponse({"error": reason}, 400)
             field.write_to(xblock, value)
 
-def _update_static_tab_name(store, xblock):
+def _update_static_tab_name(store, xblock, user):
     """
     Update the name of a static tab in the course.
 
@@ -583,27 +639,17 @@ def _update_static_tab_name(store, xblock):
     """
     if xblock.location.block_type == "static_tab":
         static_tab = CourseTabList.get_tab_by_slug(store.get_course(xblock.location.course_key).tabs, xblock.location.name)
+        # only update if changed
         if static_tab:
-            _update_tab_settings(static_tab, xblock, store)
-
-def _update_tab_settings(static_tab, xblock, store):
-    """
-    Update settings of a static tab.
-
-    Args:
-        static_tab: The static tab to update.
-        xblock: The xblock representing the static tab.
-        store: The modulestore instance.
-    """
-    update_tab = False
-    if static_tab["name"] != xblock.display_name:
-        static_tab["name"] = xblock.display_name
-        update_tab = True
-    if static_tab["course_staff_only"] != xblock.course_staff_only:
-        static_tab["course_staff_only"] = xblock.course_staff_only
-        update_tab = True
-    if update_tab:
-        store.update_item(course, user.id)
+            update_tab = False
+            if static_tab["name"] != xblock.display_name:
+                static_tab["name"] = xblock.display_name
+                update_tab = True
+            if static_tab["course_staff_only"] != xblock.course_staff_only:
+                static_tab["course_staff_only"] = xblock.course_staff_only
+                update_tab = True
+            if update_tab:
+                store.update_item(course, user.id)
 
 def _save_gating_info(xblock, course, is_prereq, prereq_usage_key, prereq_min_score, prereq_min_completion):
     """
@@ -626,28 +672,34 @@ def _save_gating_info(xblock, course, is_prereq, prereq_usage_key, prereq_min_sc
 
 def _handle_publish_option(xblock, publish, user):
     """
-    Handle the publish option for the xblock.
+    If publish is set to 'republish' and this item is not in direct only categories and has previously been
+    published, then this item should be republished. This is used by staff locking to ensure that changing the
+    draft value of the staff lock will also update the published version, but only at the unit level.
 
     Args:
         xblock: The xblock to handle publish option for.
         publish: The publish option.
         user: The user performing the operation.
     """
+
     if publish == "republish" and xblock.category not in DIRECT_ONLY_CATEGORIES:
         if modulestore().has_published_version(xblock):
             publish = "make_public"
+
+    # Make public after updating the xblock, in case the caller asked for both an update and a publish.
+    # Used by Bok Choy tests and by republishing of staff locks.
     if publish == "make_public":
         modulestore().publish(xblock.location, user.id)
 
 def _update_summary_configuration(xblock, summary_configuration_enabled):
     """
-    Update the ai summary configuration for the xblock.
-
+    If summary_configuration_enabled is not None, use AIAsideSummary to update it.
     Args:
         xblock: The xblock to update summary configuration for.
         summary_configuration_enabled: Whether summary configuration is enabled.
     """
     if xblock.category == "vertical" and summary_configuration_enabled is not None:
+        print('Scorecrux')
         AiAsideSummaryConfig(course.id).set_summary_settings(xblock.location, {
             'enabled': summary_configuration_enabled
     })
