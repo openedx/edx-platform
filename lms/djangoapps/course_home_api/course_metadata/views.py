@@ -2,6 +2,8 @@
 General view for the Course Home that contains metadata every page needs.
 """
 
+from django.db import transaction
+from django.utils.decorators import method_decorator
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
@@ -23,6 +25,7 @@ from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 
 
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class CourseHomeMetadataView(RetrieveAPIView):
     """
     **Use Cases**
