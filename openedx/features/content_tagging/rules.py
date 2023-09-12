@@ -55,6 +55,7 @@ def can_change_object_tag_objectid(user: UserType, object_id: str) -> bool:
 
     return has_studio_write_access(user, course_key)
 
+
 @rules.predicate
 def can_change_object_tag_taxonomy(user: UserType, taxonomy: oel_tagging.Taxonomy) -> bool:
     """

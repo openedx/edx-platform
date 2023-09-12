@@ -826,4 +826,3 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
         response = self.client.put(url, {"tags": tag_values}, format="json")
         assert response.status_code == expected_status
         assert not status.is_success(expected_status)  # No success cases here
-
