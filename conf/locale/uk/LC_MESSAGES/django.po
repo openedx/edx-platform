@@ -125,7 +125,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-16 20:42+0000\n"
+"POT-Creation-Date: 2023-08-27 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Danylo Shcherbak <danylo.shcherbak@raccoongang.com>, 2020\n"
 "Language-Team: Ukrainian (https://app.transifex.com/open-edx/teams/6205/uk/)\n"
@@ -147,11 +147,65 @@ msgstr "Блок"
 msgid "Problem"
 msgstr ""
 
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+#: xmodule/video_block/video_handlers.py
+#, python-brace-format
+msgid "The following parameters are required: {missing}."
+msgstr "Наступні параметри э обов'язковими: {missing}."
+
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: xmodule/video_block/video_handlers.py
+msgid ""
+"There is a problem with this transcript file. Try to upload a different "
+"file."
+msgstr ""
+"Виникла проблема з файлом транскрипту. Будь ласка спробуйте завантажити "
+"інший файл."
+
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+#: xmodule/video_block/video_handlers.py
+#, python-brace-format
+msgid "A transcript with the \"{language_code}\" language code already exists."
+msgstr "Транскрипти з кодом мови \"{language_code}\" вже існують."
+
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: xmodule/video_block/video_handlers.py
+msgid "A transcript file is required."
+msgstr "Необхідний файл транскрипту. "
+
 #: cms/djangoapps/contentstore/utils.py
 #: cms/djangoapps/contentstore/views/block.py
 #: cms/djangoapps/contentstore/views/component.py xmodule/html_block.py
 msgid "Text"
 msgstr "Текст"
+
+#. Translators: This is the status for a video that the servers have
+#. successfully processed
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#: openedx/core/djangoapps/content_staging/data.py
+msgid "Ready"
+msgstr ""
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#: lms/djangoapps/instructor/views/api.py
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Name"
+msgstr "Ім'я"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#: xmodule/video_block/video_xfields.py
+msgid "Video ID"
+msgstr "Ідентифікатор відео"
+
+#. Translators: This is listed as the duration for a video that has not
+#. yet reached the point in its processing by the servers where its
+#. duration is determined.
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#: openedx/core/djangoapps/api_admin/models.py
+msgid "Pending"
+msgstr "В очікуванні"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
@@ -182,60 +236,6 @@ msgstr "Додатково"
 #: lms/djangoapps/courseware/tabs.py
 msgid "Entrance Exam"
 msgstr "Вступний іспит"
-
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#: xmodule/video_block/video_handlers.py
-#, python-brace-format
-msgid "The following parameters are required: {missing}."
-msgstr "Наступні параметри э обов'язковими: {missing}."
-
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#: cms/djangoapps/contentstore/views/transcripts_ajax.py
-#: xmodule/video_block/video_handlers.py
-msgid ""
-"There is a problem with this transcript file. Try to upload a different "
-"file."
-msgstr ""
-"Виникла проблема з файлом транскрипту. Будь ласка спробуйте завантажити "
-"інший файл."
-
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#: xmodule/video_block/video_handlers.py
-#, python-brace-format
-msgid "A transcript with the \"{language_code}\" language code already exists."
-msgstr "Транскрипти з кодом мови \"{language_code}\" вже існують."
-
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#: cms/djangoapps/contentstore/views/transcripts_ajax.py
-#: xmodule/video_block/video_handlers.py
-msgid "A transcript file is required."
-msgstr "Необхідний файл транскрипту. "
-
-#. Translators: This is the status for a video that the servers have
-#. successfully processed
-#: cms/djangoapps/contentstore/views/videos.py
-#: openedx/core/djangoapps/content_staging/data.py
-msgid "Ready"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/videos.py
-#: lms/djangoapps/instructor/views/api.py
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "Name"
-msgstr "Ім'я"
-
-#: cms/djangoapps/contentstore/views/videos.py
-#: xmodule/video_block/video_xfields.py
-msgid "Video ID"
-msgstr "Ідентифікатор відео"
-
-#. Translators: This is listed as the duration for a video that has not
-#. yet reached the point in its processing by the servers where its
-#. duration is determined.
-#: cms/djangoapps/contentstore/views/videos.py
-#: openedx/core/djangoapps/api_admin/models.py
-msgid "Pending"
-msgstr "В очікуванні"
 
 #: cms/djangoapps/contentstore/xblock_storage_handlers/create_xblock.py
 #: xmodule/library_content_block.py
@@ -3570,6 +3570,16 @@ msgstr ""
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Good"
 msgstr "Добре"
+
+#. Translators: Replier commented on "your" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "your"
+msgstr ""
+
+#. Translators: Replier commented on "their" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "their"
+msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #, python-format
@@ -7333,7 +7343,7 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "<{p}><{strong}>{replier_name}</{strong}> commented on "
-"<{strong}>{author_name}'s</{strong}> response to your post "
+"<{strong}>{author_name}</{strong}> response to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
 
@@ -7342,6 +7352,26 @@ msgstr ""
 msgid ""
 "<{p}><{strong}>{replier_name}</{strong}> responded to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> posted "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> asked "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+msgid ""
+"Notifications for responses and comments on your posts, and the ones you’re "
+"following, including endorsements to your responses and on your posts."
 msgstr ""
 
 #: openedx/core/djangoapps/notifications/views.py
@@ -8760,7 +8790,7 @@ msgstr ""
 msgid "owner"
 msgstr "власник"
 
-#: openedx/features/content_tagging/models.py
+#: openedx/features/content_tagging/models/base.py
 msgid ""
 "Organization that is related to this taxonomy.If None, then this taxonomy is"
 " related to all organizations."
@@ -12755,6 +12785,10 @@ msgstr ""
 msgid "Change the visibility of tabs in a course."
 msgstr ""
 
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+msgid "The information you entered is incorrect."
+msgstr "Введена інформація неправильна"
+
 #: cms/djangoapps/contentstore/utils.py
 msgid "Deleted Group"
 msgstr "Вилучена група"
@@ -12782,6 +12816,121 @@ msgstr "Копіювання '{0}'"
 #: cms/djangoapps/contentstore/utils.py
 msgid "Invalid prerequisite course key"
 msgstr "Невірний ключ передумовного курсу"
+
+#. Translators: This is the status of an active video upload
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Uploading"
+msgstr "Завантаження"
+
+#. Translators: This is the status for a video that the servers are currently
+#. processing
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "In Progress"
+msgstr "Опрацьовується"
+
+#. Translators: This is the status for a video that is uploaded completely
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Uploaded"
+msgstr "Завантажено"
+
+#. Translators: This is the status for a video that the servers have failed to
+#. process
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Failed"
+msgstr "Не складено"
+
+#. Translators: This is the status for a video that is cancelled during upload
+#. by user
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Cancelled"
+msgstr "Скасовано"
+
+#. Translators: This is the status for a video which has failed
+#. due to being flagged as a duplicate by an external or internal CMS
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Failed Duplicate"
+msgstr "Створення копії невдале"
+
+#. Translators: This is the status for a video which has duplicate token for
+#. youtube
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "YouTube Duplicate"
+msgstr ""
+
+#. Translators: This is the status for a video for which an invalid
+#. processing token was provided in the course settings
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Invalid Token"
+msgstr "Невірний ключ"
+
+#. Translators: This is the status for a video that was included in a course
+#. import
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Imported"
+msgstr "Імпортовано"
+
+#. Translators: This is the status for a video that is in an unknown state
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Unknown"
+msgstr "Невідомий"
+
+#. Translators: This is the status for a video that is having its
+#. transcription in progress on servers
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Transcription in Progress"
+msgstr "Транскрипція в прогресі"
+
+#. Translators: This is the status for a video whose transcription is complete
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Transcript Ready"
+msgstr "Транскрипт готовий"
+
+#. Translators: This is the status for a video whose transcription job was
+#. failed for some languages
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Partial Failure"
+msgstr ""
+
+#. Translators: This is the status for a video whose transcription job has
+#. failed altogether
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Transcript Failed"
+msgstr ""
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "An image file is required."
+msgstr "Необхідний файл зображення."
+
+#. Translators: This is the header for a CSV file column
+#. containing URLs for video encodings for the named profile
+#. (e.g. desktop, mobile high quality, mobile low quality)
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#, python-brace-format
+msgid "{profile_name} URL"
+msgstr "URL посилання на {profile_name}"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Duration"
+msgstr "Тривалість"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Date Added"
+msgstr "Дата додавання"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Status"
+msgstr ""
+
+#. Translators: This is the suggested filename when downloading the URL
+#. listing for videos uploaded through Studio
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#, python-brace-format
+msgid "{course}_video_urls"
+msgstr "{course}_video_urls"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "A non zero positive integer is expected"
+msgstr "Очікується ненульове ціле число"
 
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
@@ -13016,10 +13165,6 @@ msgstr ""
 msgid "Access restricted to: {list_of_groups}"
 msgstr "Обмежено доступ для: {list_of_groups}"
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-msgid "The information you entered is incorrect."
-msgstr "Введена інформація неправильна"
-
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Transcripts are supported only for \"video\" blocks."
 msgstr ""
@@ -13099,121 +13244,6 @@ msgid "You may not remove the last Admin. Add another Admin first."
 msgstr ""
 "Ви не можете видалити останнього Адміністратора з курсу. Додайте спочатку "
 "іншого Адміністратора."
-
-#. Translators: This is the status of an active video upload
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Uploading"
-msgstr "Завантаження"
-
-#. Translators: This is the status for a video that the servers are currently
-#. processing
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "In Progress"
-msgstr "Опрацьовується"
-
-#. Translators: This is the status for a video that is uploaded completely
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Uploaded"
-msgstr "Завантажено"
-
-#. Translators: This is the status for a video that the servers have failed to
-#. process
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Failed"
-msgstr "Не складено"
-
-#. Translators: This is the status for a video that is cancelled during upload
-#. by user
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Cancelled"
-msgstr "Скасовано"
-
-#. Translators: This is the status for a video which has failed
-#. due to being flagged as a duplicate by an external or internal CMS
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Failed Duplicate"
-msgstr "Створення копії невдале"
-
-#. Translators: This is the status for a video which has duplicate token for
-#. youtube
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "YouTube Duplicate"
-msgstr ""
-
-#. Translators: This is the status for a video for which an invalid
-#. processing token was provided in the course settings
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Invalid Token"
-msgstr "Невірний ключ"
-
-#. Translators: This is the status for a video that was included in a course
-#. import
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Imported"
-msgstr "Імпортовано"
-
-#. Translators: This is the status for a video that is in an unknown state
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Unknown"
-msgstr "Невідомий"
-
-#. Translators: This is the status for a video that is having its
-#. transcription in progress on servers
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Transcription in Progress"
-msgstr "Транскрипція в прогресі"
-
-#. Translators: This is the status for a video whose transcription is complete
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Transcript Ready"
-msgstr "Транскрипт готовий"
-
-#. Translators: This is the status for a video whose transcription job was
-#. failed for some languages
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Partial Failure"
-msgstr ""
-
-#. Translators: This is the status for a video whose transcription job has
-#. failed altogether
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Transcript Failed"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "An image file is required."
-msgstr "Необхідний файл зображення."
-
-#. Translators: This is the header for a CSV file column
-#. containing URLs for video encodings for the named profile
-#. (e.g. desktop, mobile high quality, mobile low quality)
-#: cms/djangoapps/contentstore/views/videos.py
-#, python-brace-format
-msgid "{profile_name} URL"
-msgstr "URL посилання на {profile_name}"
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Duration"
-msgstr "Тривалість"
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Date Added"
-msgstr "Дата додавання"
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Status"
-msgstr ""
-
-#. Translators: This is the suggested filename when downloading the URL
-#. listing for videos uploaded through Studio
-#: cms/djangoapps/contentstore/views/videos.py
-#, python-brace-format
-msgid "{course}_video_urls"
-msgstr "{course}_video_urls"
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "A non zero positive integer is expected"
-msgstr "Очікується ненульове ціле число"
 
 #: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
@@ -13978,20 +14008,6 @@ msgstr ""
 #: lms/templates/invalid_email_key.html
 msgid "The keys are valid for a limited amount of time. Has the key expired?"
 msgstr ""
-
-#: lms/templates/library-block-author-preview-header.html
-msgid ""
-"Showing all matching content eligible to be added into {display_name}. Each "
-"student will be assigned {max_count} component drawn randomly from this "
-"list."
-msgid_plural ""
-"Showing all matching content eligible to be added into {display_name}. Each "
-"student will be assigned {max_count} components drawn randomly from this "
-"list."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
 
 #. Translators:  "External resource" means that this learning module is hosted
 #. on a platform external to the edX LMS
@@ -21897,6 +21913,20 @@ msgid ""
 "below."
 msgstr ""
 
+#: cms/templates/library-block-author-preview-header.html
+msgid ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} component drawn randomly from this "
+"list."
+msgid_plural ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} components drawn randomly from this "
+"list."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
 #: cms/templates/library.html
 msgid "Content Library"
 msgstr "Бібліотека контенту"
@@ -22815,14 +22845,6 @@ msgid "Expand or Collapse"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Access Settings"
-msgstr ""
-
-#: cms/templates/studio_xblock_wrapper.html
-msgid "Set Access"
-msgstr ""
-
-#: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"
 msgstr ""
 
@@ -23146,10 +23168,6 @@ msgstr ""
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Структура курсу"
-
-#: cms/templates/widgets/header.html
-msgid "Files & Media"
-msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

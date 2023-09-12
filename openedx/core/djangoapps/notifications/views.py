@@ -26,7 +26,7 @@ from .events import (
     notification_preference_update_event,
     notification_preferences_viewed_event,
     notification_read_event,
-    notifications_app_all_read_event,
+    notifications_app_all_read_event, notification_tray_opened_event,
 )
 from .models import Notification
 from .serializers import (
@@ -262,6 +262,10 @@ class NotificationListAPIView(generics.ListAPIView):
         expiry_date = datetime.now(UTC) - timedelta(days=settings.NOTIFICATIONS_EXPIRY)
         app_name = self.request.query_params.get('app_name')
 
+        if self.request.query_params.get('tray_opened'):
+            unseen_count = Notification.objects.filter(user_id=self.request.user, last_seen__isnull=True).count()
+            notification_tray_opened_event(self.request.user, unseen_count)
+
         if app_name:
             return Notification.objects.filter(
                 user=self.request.user,
@@ -295,7 +299,8 @@ class NotificationCountView(APIView):
             "count_by_app_name": {
                 (str) app_name: (int) number_of_unseen_notifications,
                 ...
-            }
+            },
+            "notification_expiry_days": 60
         }
         ```
         **Response Error Codes**:
@@ -325,6 +330,7 @@ class NotificationCountView(APIView):
             "show_notifications_tray": show_notifications_tray,
             "count": count_total,
             "count_by_app_name": count_by_app_name_dict,
+            "notification_expiry_days": settings.NOTIFICATIONS_EXPIRY
         })
 
 
@@ -395,9 +401,10 @@ class NotificationReadAPIView(APIView):
 
         if notification_id:
             notification = get_object_or_404(Notification, pk=notification_id, user=request.user)
+            first_time_read = notification.last_read is None
             notification.last_read = read_at
             notification.save()
-            notification_read_event(request.user, notification)
+            notification_read_event(request.user, notification, first_time_read)
             return Response({'message': _('Notification marked read.')}, status=status.HTTP_200_OK)
 
         app_name = request.data.get('app_name', '')

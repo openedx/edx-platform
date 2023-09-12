@@ -1,20 +1,24 @@
 """ Contenstore API v1 URLs. """
 
-from django.urls import re_path
 from django.conf import settings
+from django.urls import re_path, path
 
 from openedx.core.constants import COURSE_ID_PATTERN
 
 from .views import (
     CourseDetailsView,
+    CourseTeamView,
     CourseGradingView,
+    CourseRerunView,
     CourseSettingsView,
+    HomePageView,
     ProctoredExamSettingsView,
     ProctoringErrorsView,
     xblock,
     assets,
     videos,
     transcripts,
+    HelpUrlsView,
 )
 
 app_name = 'v1'
@@ -22,6 +26,11 @@ app_name = 'v1'
 VIDEO_ID_PATTERN = r'(?:(?P<edx_video_id>[-\w]+))'
 
 urlpatterns = [
+    path(
+        'home',
+        HomePageView.as_view(),
+        name="home"
+    ),
     re_path(
         fr'^proctored_exam_settings/{COURSE_ID_PATTERN}$',
         ProctoredExamSettingsView.as_view(),
@@ -41,6 +50,11 @@ urlpatterns = [
         fr'^course_details/{COURSE_ID_PATTERN}$',
         CourseDetailsView.as_view(),
         name="course_details"
+    ),
+    re_path(
+        fr'^course_team/{COURSE_ID_PATTERN}$',
+        CourseTeamView.as_view(),
+        name="course_team"
     ),
     re_path(
         fr'^course_grading/{COURSE_ID_PATTERN}$',
@@ -67,8 +81,8 @@ urlpatterns = [
         fr'^videos/encodings/{settings.COURSE_ID_PATTERN}$',
         videos.VideoEncodingsDownloadView.as_view(), name='studio_content_videos_encodings'
     ),
-    re_path(
-        r'^videos/features/$',
+    path(
+        'videos/features/',
         videos.VideoFeaturesView.as_view(), name='studio_content_videos_features'
     ),
     re_path(
@@ -78,5 +92,15 @@ urlpatterns = [
     re_path(
         fr'^video_transcripts/{settings.COURSE_ID_PATTERN}$',
         transcripts.TranscriptView.as_view(), name='studio_content_video_transcripts'
+    ),
+    path(
+        'help_urls',
+        HelpUrlsView.as_view(),
+        name="help_urls"
+    ),
+    re_path(
+        fr'^course_rerun/{COURSE_ID_PATTERN}$',
+        CourseRerunView.as_view(),
+        name="course_rerun"
     ),
 ]

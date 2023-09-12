@@ -88,6 +88,51 @@ def handle_assets(request, course_key_string=None, asset_key_string=None):
     return HttpResponseNotFound()
 
 
+def get_asset_usage_path(request, course_key, asset_key_string):
+    """
+    Get a list of units with ancestors that use given asset.
+    """
+    course_key = CourseKey.from_string(course_key)
+    if not has_course_author_access(request.user, course_key):
+        raise PermissionDenied()
+    asset_location = AssetKey.from_string(asset_key_string) if asset_key_string else None
+    store = modulestore()
+    usage_locations = []
+    static_path = StaticContent.get_static_path_from_location(asset_location)
+    verticals = store.get_items(
+        course_key,
+        qualifiers={
+            'category': 'vertical'
+        },
+    )
+    blocks = []
+
+    for vertical in verticals:
+        blocks.extend(vertical.get_children())
+
+    for block in blocks:
+        is_video_block = getattr(block, 'category', '') == 'video'
+        if is_video_block:
+            handout = getattr(block, 'handout', '')
+            if handout and str(asset_location) in handout:
+                unit = block.get_parent()
+                subsection = unit.get_parent()
+                subsection_display_name = getattr(subsection, 'display_name', '')
+                unit_display_name = getattr(unit, 'display_name', '')
+                xblock_display_name = getattr(block, 'display_name', '')
+                usage_locations.append(f'{subsection_display_name} - {unit_display_name} / {xblock_display_name}')
+        else:
+            data = getattr(block, 'data', '')
+            if static_path in data or str(asset_location) in data:
+                unit = block.get_parent()
+                subsection = unit.get_parent()
+                subsection_display_name = getattr(subsection, 'display_name', '')
+                unit_display_name = getattr(unit, 'display_name', '')
+                xblock_display_name = getattr(block, 'display_name', '')
+                usage_locations.append(f'{subsection_display_name} - {unit_display_name} / {xblock_display_name}')
+    return JsonResponse({'usage_locations': usage_locations})
+
+
 def _get_response_format(request):
     return request.GET.get('format') or request.POST.get('format') or 'html'
 
@@ -352,6 +397,7 @@ def _get_assets_in_json_format(assets, course_key):
     for asset in assets:
         thumbnail_asset_key = _get_thumbnail_asset_key(asset, course_key)
         asset_is_locked = asset.get('locked', False)
+        asset_file_size = asset.get('length', None)
 
         asset_in_json = get_asset_json(
             asset['displayname'],
@@ -361,6 +407,7 @@ def _get_assets_in_json_format(assets, course_key):
             thumbnail_asset_key,
             asset_is_locked,
             course_key,
+            asset_file_size,
         )
 
         assets_in_json_format.append(asset_in_json)
@@ -426,6 +473,7 @@ def _upload_asset(request, course_key):
     # readback the saved content - we need the database timestamp
     readback = contentstore().find(content.location)
     locked = getattr(content, 'locked', False)
+    length = getattr(content, 'length', None)
     return JsonResponse({
         'asset': get_asset_json(
             content.name,
@@ -435,6 +483,7 @@ def _upload_asset(request, course_key):
             content.thumbnail_location,
             locked,
             course_key,
+            length,
         ),
         'msg': _('Upload completed')
     })
@@ -491,12 +540,13 @@ def _get_file_too_large_error_message(filename):
 def _get_file_content_and_path(file_metadata, course_key):
     """returns contents of the uploaded file and path for temporary uploaded file"""
     content_location = StaticContent.compute_location(course_key, file_metadata['filename'])
+    upload_file_size = str(file_metadata['upload_file_size'])
     upload_file = file_metadata['upload_file']
 
     file_can_be_chunked = upload_file.multiple_chunks()
 
     static_content_partial = partial(StaticContent, content_location, file_metadata['filename'],
-                                     file_metadata['mime_type'])
+                                     file_metadata['mime_type'], length=upload_file_size)
 
     if file_can_be_chunked:
         content = static_content_partial(upload_file.chunks())
@@ -599,7 +649,7 @@ def _delete_thumbnail(thumbnail_location, course_key, asset_key):  # lint-amnest
             logging.warning('Could not delete thumbnail: %s', thumbnail_location)
 
 
-def get_asset_json(display_name, content_type, date, location, thumbnail_location, locked, course_key):
+def get_asset_json(display_name, content_type, date, location, thumbnail_location, locked, course_key, file_size=None):
     '''
     Helper method for formatting the asset information to send to client.
     '''
@@ -617,5 +667,6 @@ def get_asset_json(display_name, content_type, date, location, thumbnail_locatio
         'locked': locked,
         'static_full_url': StaticContent.get_canonicalized_asset_path(course_key, portable_url, '', []),
         # needed for Backbone delete/update.
-        'id': str(location)
+        'id': str(location),
+        'file_size': file_size,
     }

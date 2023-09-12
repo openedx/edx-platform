@@ -47,7 +47,7 @@ from lms.djangoapps.gating.api import get_entrance_exam_score, get_entrance_exam
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.agreements.api import get_integrity_signature
-from openedx.core.djangoapps.courseware_api.utils import get_celebrations_dict, get_learning_assistant_launch_url
+from openedx.core.djangoapps.courseware_api.utils import get_celebrations_dict
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
@@ -89,6 +89,7 @@ class CoursewareMeta:
             staff_access=original_user_is_staff,
         )
         self.request.user = self.effective_user
+        self.overview.bind_course_for_student(self.request)
         self.enrollment_object = CourseEnrollment.get_enrollment(self.effective_user, self.course_key,
                                                                  select_related=['celebration', 'user__celebration'])
 
@@ -360,19 +361,11 @@ class CoursewareMeta:
             return enrollment_active and CourseMode.is_eligible_for_certificate(enrollment_mode)
 
     @property
-    def learning_assistant_launch_url(self):
+    def learning_assistant_enabled(self):
         """
-        Returns a URL for the learning assistant LTI launch if applicable, otherwise None
+        Returns a boolean representing whether the requesting user should have access to the Xpert Learning Assistant.
         """
-        if learning_assistant_is_active(self.course_key):
-            lti_url = get_learning_assistant_launch_url(
-                self.effective_user,
-                self.course_key,
-                self.enrollment_object,
-                self.overview,
-            )
-            return lti_url
-        return None
+        return learning_assistant_is_active(self.course_key)
 
 
 class CoursewareInformation(RetrieveAPIView):
@@ -463,7 +456,7 @@ class CoursewareInformation(RetrieveAPIView):
             verified mode. Will update to reverify URL if necessary.
         * linkedin_add_to_profile_url: URL to add the effective user's certificate to a LinkedIn Profile.
         * user_needs_integrity_signature: Whether the user needs to sign the integrity agreement for the course
-        * learning_assistant_launch_url: URL for the LTI launch of a learning assistant
+        * learning_assistant_enabled: Whether the Xpert Learning Assistant is enabled for the requesting user
 
     **Parameters:**
 

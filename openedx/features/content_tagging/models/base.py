@@ -1,7 +1,7 @@
 """
 Content Tagging models
 """
-from typing import List, Union
+from __future__ import annotations
 
 from django.db import models
 from django.db.models import Exists, OuterRef, Q, QuerySet
@@ -49,7 +49,7 @@ class TaxonomyOrg(models.Model):
 
     @classmethod
     def get_relationships(
-        cls, taxonomy: Taxonomy, rel_type: RelType, org_short_name: str = None
+        cls, taxonomy: Taxonomy, rel_type: RelType, org_short_name: str | None = None
     ) -> QuerySet:
         """
         Returns the relationships of the given rel_type and taxonomy where:
@@ -68,7 +68,7 @@ class TaxonomyOrg(models.Model):
     @classmethod
     def get_organizations(
         cls, taxonomy: Taxonomy, rel_type: RelType
-    ) -> List[Organization]:
+    ) -> list[Organization]:
         """
         Returns the list of Organizations which have the given relationship to the taxonomy.
         """
@@ -91,7 +91,7 @@ class ContentObjectTag(ObjectTag):
         proxy = True
 
     @property
-    def object_key(self) -> Union[BlockUsageLocator, LearningContextKey]:
+    def object_key(self) -> BlockUsageLocator | LearningContextKey:
         """
         Returns the object ID parsed as a UsageKey or LearningContextKey.
         Raises InvalidKeyError object_id cannot be parse into one of those key types.
@@ -115,7 +115,7 @@ class ContentTaxonomyMixin:
     def taxonomies_for_org(
         cls,
         queryset: QuerySet,
-        org: Organization = None,
+        org: Organization | None = None,
     ) -> QuerySet:
         """
         Filters the given QuerySet to those ContentTaxonomies which are available for the given organization.

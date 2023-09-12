@@ -4,9 +4,10 @@
 import datetime
 
 from django.conf import settings
-from django.utils.http import urlencode, urlquote_plus
+from django.utils.http import urlencode
+from urllib.parse import quote_plus
 from django.utils.translation import gettext as _
-from django.utils.translation import ungettext
+from django.utils.translation import ngettext
 from django.urls import reverse
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.helpers import enrollment_mode_display
@@ -232,8 +233,8 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                             <%
                               twitter_share_url = u"{url}?{utm_params}".format(url=share_url, utm_params=encoded_utm_parameters['twitter'])
                               default_share_text = _("I'm taking {course_name} online with {twitter_brand}. Check it out!").format(course_name=course_overview.display_name_with_default, twitter_brand=share_settings.get('TWITTER_BRAND', '@edxonline'))
-                              share_text = urlquote_plus(share_settings.get('DASHBOARD_TWITTER_TEXT', default_share_text))
-                              twitter_url = u'https://twitter.com/intent/tweet?text=' + share_text + u'%20' + urlquote_plus(twitter_share_url)
+                              share_text = quote_plus(share_settings.get('DASHBOARD_TWITTER_TEXT', default_share_text))
+                              twitter_url = u'https://twitter.com/intent/tweet?text=' + share_text + u'%20' + quote_plus(twitter_share_url)
                               share_msg = _("Share {course_name} on Twitter").format(course_name=course_overview.display_name_with_default)
                             %>
                             <a

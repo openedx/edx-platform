@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-redeclare
 /* global jest,test,describe,expect */
 import { Button } from '@edx/paragon';
 import BlockBrowserContainer from 'BlockBrowser/components/BlockBrowser/BlockBrowserContainer';
@@ -69,6 +70,7 @@ describe('ProblemBrowser Main component', () => {
                 />
             </Provider>,
         );
+        // eslint-disable-next-line prefer-destructuring
         const instance = component.root.children[0].instance;
         instance.handleToggleDropdown();
         expect(fetchCourseBlocksMock.mock.calls.length).toBe(1);

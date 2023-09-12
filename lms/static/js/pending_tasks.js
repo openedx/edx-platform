@@ -32,6 +32,7 @@
             // with a "task-state" and "in_progress" key and optionally a "message"
             // and a "task_progress.duration" key.
             var something_in_progress = false;
+            // eslint-disable-next-line guard-for-in
             for (task_id in response) {
                 var task_dict = response[task_id];
                 // find the corresponding entry, and update it:
@@ -71,6 +72,7 @@
             this.entries.each(function(idx, element) {
                 var task_id = $(element).data('taskId');
                 var in_progress = $(element).data('inProgress');
+                // eslint-disable-next-line no-constant-condition, no-cond-assign
                 if (in_progress = 'True') {
                     task_ids.push(task_id);
                 }

@@ -56,6 +56,7 @@ from enterprise.constants import (
     ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE,
     ENTERPRISE_FULFILLMENT_OPERATOR_ROLE,
     ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE,
+    ENTERPRISE_SSO_ORCHESTRATOR_OPERATOR_ROLE,
     ENTERPRISE_OPERATOR_ROLE
 )
 
@@ -778,6 +779,15 @@ FEATURES = {
     # .. toggle_tickets: https://openedx.atlassian.net/browse/YONK-513
     'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
 
+    # .. toggle_name: FEATURES['SHOW_REGISTRATION_LINKS']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: Allow registration links. If this is disabled, users will no longer see buttons to the
+    #   the signup page.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2023-03-27
+    'SHOW_REGISTRATION_LINKS': True,
+
     # .. toggle_name: FEATURES['ENABLE_COOKIE_CONSENT']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -1114,6 +1124,11 @@ CACHES = {
         'LOCATION': ['localhost:11211'],
         'TIMEOUT': '86400',  # This data should be long-lived for performance, BundleCache handles invalidation
         'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+        'OPTIONS': {
+            'no_delay': True,
+            'ignore_exc': True,
+            'use_pooling': True,
+        }
     },
     'course_structure_cache': {
         'KEY_PREFIX': 'course_structure',
@@ -1121,6 +1136,11 @@ CACHES = {
         'LOCATION': ['localhost:11211'],
         'TIMEOUT': '7200',
         'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+        'OPTIONS': {
+            'no_delay': True,
+            'ignore_exc': True,
+            'use_pooling': True,
+        }
     },
     'celery': {
         'KEY_PREFIX': 'celery',
@@ -1128,6 +1148,11 @@ CACHES = {
         'LOCATION': ['localhost:11211'],
         'TIMEOUT': '7200',
         'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+        'OPTIONS': {
+            'no_delay': True,
+            'ignore_exc': True,
+            'use_pooling': True,
+        }
     },
     'mongo_metadata_inheritance': {
         'KEY_PREFIX': 'mongo_metadata_inheritance',
@@ -1135,12 +1160,22 @@ CACHES = {
         'LOCATION': ['localhost:11211'],
         'TIMEOUT': 300,
         'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+        'OPTIONS': {
+            'no_delay': True,
+            'ignore_exc': True,
+            'use_pooling': True,
+        }
     },
     'staticfiles': {
         'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'KEY_PREFIX': 'staticfiles_general',
         'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+        'OPTIONS': {
+            'no_delay': True,
+            'ignore_exc': True,
+            'use_pooling': True,
+        }
     },
     'default': {
         'VERSION': '1',
@@ -1148,18 +1183,33 @@ CACHES = {
         'LOCATION': ['localhost:11211'],
         'KEY_PREFIX': 'default',
         'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+        'OPTIONS': {
+            'no_delay': True,
+            'ignore_exc': True,
+            'use_pooling': True,
+        }
     },
     'configuration': {
         'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'KEY_PREFIX': 'configuration',
         'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+        'OPTIONS': {
+            'no_delay': True,
+            'ignore_exc': True,
+            'use_pooling': True,
+        }
     },
     'general': {
         'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'KEY_PREFIX': 'general',
         'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+        'OPTIONS': {
+            'no_delay': True,
+            'ignore_exc': True,
+            'use_pooling': True,
+        }
     },
 }
 
@@ -2844,22 +2894,6 @@ BLOCK_STRUCTURES_SETTINGS = dict(
     #   For more information, check https://github.com/openedx/edx-platform/pull/13388 and
     #   https://github.com/openedx/edx-platform/pull/14571.
     TASK_MAX_RETRIES=5,
-
-    # .. toggle_name: BLOCK_STRUCTURES_SETTINGS['PRUNING_ACTIVE']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: When `True`, only a specified number of versions of block structure
-    #   files are kept for each structure, and the rest are cleaned up. The number of versions that
-    #   are kept can be specified in the `BlockStructureConfiguration`, which can be edited in
-    #   Django Admin. The default number of versions that are kept is `5`.
-    # .. toggle_warning: This toggle will likely be deprecated and removed.
-    # .. toggle_use_cases: temporary
-    # .. toggle_creation_date: 2018-03-22
-    # .. toggle_target_removal_date: 2018-06-22
-    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/14571,
-    #   https://github.com/openedx/edx-platform/pull/17760,
-    #   https://openedx.atlassian.net/browse/DEPR-146
-    PRUNING_ACTIVE=False,
 )
 
 ################################ Bulk Email ###################################
@@ -3286,6 +3320,11 @@ CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
 ######################### Django Rest Framework ########################
 
 REST_FRAMEWORK = {
+    # These default classes add observability around endpoints using defaults, and should
+    # not be used anywhere else.
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'openedx.core.djangolib.default_auth_classes.DefaultSessionAuthentication',
+    ],
     'DEFAULT_PAGINATION_CLASS': 'edx_rest_framework_extensions.paginators.DefaultPagination',
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
@@ -3303,7 +3342,7 @@ REST_FRAMEWORK = {
 
 # .. setting_name: REGISTRATION_VALIDATION_RATELIMIT
 # .. setting_default: 30/7d
-# .. setting_description: Whenver a user tries to register on edx, the data entered during registration
+# .. setting_description: Whenever a user tries to register on edx, the data entered during registration
 #    is validated via RegistrationValidationView.
 #    It's POST endpoint is rate-limited up to 30 requests per IP Address in a week by default.
 #    It was introduced because an attacker can guess or brute force a series of names to enumerate valid users.
@@ -3772,9 +3811,10 @@ VIDEO_IMAGE_SETTINGS = dict(
     # STORAGE_KWARGS=dict(bucket='video-image-bucket'),
     STORAGE_KWARGS=dict(
         location=MEDIA_ROOT,
-        base_url=MEDIA_URL,
     ),
     DIRECTORY_PREFIX='video-images/',
+    BASE_URL=MEDIA_URL,
+
 )
 
 VIDEO_IMAGE_MAX_AGE = 31536000
@@ -3788,9 +3828,9 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
     # STORAGE_KWARGS=dict(bucket='video-transcripts-bucket'),
     STORAGE_KWARGS=dict(
         location=MEDIA_ROOT,
-        base_url=MEDIA_URL,
     ),
     DIRECTORY_PREFIX='video-transcripts/',
+    BASE_URL=MEDIA_URL,
 )
 
 VIDEO_TRANSCRIPTS_MAX_AGE = 31536000
@@ -4587,6 +4627,13 @@ ENTERPRISE_ALL_SERVICE_USERNAMES = [
     'subscriptions_worker'
 ]
 
+# Setting for Open API key and prompts used by edx-enterprise.
+OPENAI_API_KEY = ''
+LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT = ''
+LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT = ''
+LEARNER_PROGRESS_PROMPT_FOR_ACTIVE_CONTRACT = ''
+LEARNER_PROGRESS_PROMPT_FOR_NON_ACTIVE_CONTRACT = ''
+
 
 ############## ENTERPRISE SERVICE LMS CONFIGURATION ##################################
 # The LMS has some features embedded that are related to the Enterprise service, but
@@ -4635,6 +4682,7 @@ SYSTEM_TO_FEATURE_ROLE_MAPPING = {
         ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE,
         ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE,
         ENTERPRISE_FULFILLMENT_OPERATOR_ROLE,
+        ENTERPRISE_SSO_ORCHESTRATOR_OPERATOR_ROLE,
     ],
 }
 

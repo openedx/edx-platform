@@ -2,7 +2,7 @@
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 <%!
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from openedx.core.djangolib.markup import HTML
 from openedx.core.djangolib.js_utils import js_escaped_string
@@ -100,7 +100,7 @@ ${HTML(fragment.foot_html())}
     <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
       ## Utility: Notes
       % if edx_notes_enabled:
-        <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
+        <%include file="/edxnotes/toggle_notes.html" args="course=course, block=block"/>
       % endif
 
       ## Utility: Calc
@@ -111,7 +111,7 @@ ${HTML(fragment.foot_html())}
   % endif
 % else:
   % if edx_notes_enabled:
-    <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
+    <%include file="/edxnotes/toggle_notes.html" args="course=course, block=block"/>
   % endif
 % endif
 

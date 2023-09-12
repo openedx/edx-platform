@@ -10,8 +10,6 @@ this package should be kept small, thin, and stateless.
 """
 from edx_toggles.toggles import WaffleSwitch
 
-default_app_config = 'openedx.core.djangoapps.programs.apps.ProgramsConfig'
-
 PROGRAMS_WAFFLE_SWITCH_NAMESPACE = 'programs'
 
 # This is meant to be enabled until https://openedx.atlassian.net/browse/LEARNER-5573 needs to be resolved

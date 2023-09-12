@@ -19,6 +19,7 @@ from six import unichr
 from six.moves import range
 
 from xmodule.capa.safe_exec import safe_exec, update_hash
+from xmodule.capa.safe_exec.remote_exec import is_codejail_rest_service_enabled
 
 
 class TestSafeExec(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -87,7 +88,11 @@ class TestSafeOrNot(unittest.TestCase):  # lint-amnesty, pylint: disable=missing
         '''
         # Can't test for forbiddenness if CodeJail isn't configured for python.
         if not jail_code.is_configured("python"):
-            pytest.skip()
+
+            # Can't test for forbiddenness if CodeJail rest service isn't enabled.
+            # Remote codejailservice must be running, see https://github.com/eduNEXT/tutor-contrib-codejail/
+            if not is_codejail_rest_service_enabled():
+                pytest.skip(reason="Local or remote codejail has to be configured and enabled to run this test.")
 
         g = {}
         with pytest.raises(SafeExecException) as cm:
@@ -152,7 +157,7 @@ class TestLimitConfiguration(unittest.TestCase):
             # middleware is automatically initialized because it's an element of
             # `settings.MIDDLEWARE`).
             try:
-                ConfigureCodeJailMiddleware()
+                ConfigureCodeJailMiddleware(get_response=lambda request: None)
             except MiddlewareNotUsed:
                 pass
 

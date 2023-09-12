@@ -85,7 +85,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-16 20:42+0000\n"
+"POT-Creation-Date: 2023-08-27 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Swahili (Kenya) (https://app.transifex.com/open-edx/teams/6205/sw_KE/)\n"
@@ -108,11 +108,64 @@ msgstr "Kitengo"
 msgid "Problem"
 msgstr ""
 
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+#: xmodule/video_block/video_handlers.py
+#, python-brace-format
+msgid "The following parameters are required: {missing}."
+msgstr ""
+
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: xmodule/video_block/video_handlers.py
+msgid ""
+"There is a problem with this transcript file. Try to upload a different "
+"file."
+msgstr ""
+
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+#: xmodule/video_block/video_handlers.py
+#, python-brace-format
+msgid "A transcript with the \"{language_code}\" language code already exists."
+msgstr ""
+
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: xmodule/video_block/video_handlers.py
+msgid "A transcript file is required."
+msgstr ""
+
 #: cms/djangoapps/contentstore/utils.py
 #: cms/djangoapps/contentstore/views/block.py
 #: cms/djangoapps/contentstore/views/component.py xmodule/html_block.py
 msgid "Text"
 msgstr "Maandishi"
+
+#. Translators: This is the status for a video that the servers have
+#. successfully processed
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#: openedx/core/djangoapps/content_staging/data.py
+msgid "Ready"
+msgstr ""
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#: lms/djangoapps/instructor/views/api.py
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Name"
+msgstr "Jina"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#: xmodule/video_block/video_xfields.py
+msgid "Video ID"
+msgstr "Kitambulisho cha Video"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This is listed as the duration for a video that has not
+#. yet reached the point in its processing by the servers where its
+#. duration is determined.
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
+msgid "Pending"
+msgstr "Inasubiri huduma"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
@@ -143,59 +196,6 @@ msgstr "Iliyoboreshwa"
 #: lms/djangoapps/courseware/tabs.py cms/templates/settings.html
 msgid "Entrance Exam"
 msgstr "Mtihani wa Kujiunga na masomo"
-
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#: xmodule/video_block/video_handlers.py
-#, python-brace-format
-msgid "The following parameters are required: {missing}."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#: cms/djangoapps/contentstore/views/transcripts_ajax.py
-#: xmodule/video_block/video_handlers.py
-msgid ""
-"There is a problem with this transcript file. Try to upload a different "
-"file."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#: xmodule/video_block/video_handlers.py
-#, python-brace-format
-msgid "A transcript with the \"{language_code}\" language code already exists."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#: cms/djangoapps/contentstore/views/transcripts_ajax.py
-#: xmodule/video_block/video_handlers.py
-msgid "A transcript file is required."
-msgstr ""
-
-#. Translators: This is the status for a video that the servers have
-#. successfully processed
-#: cms/djangoapps/contentstore/views/videos.py
-#: openedx/core/djangoapps/content_staging/data.py
-msgid "Ready"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/videos.py
-#: lms/djangoapps/instructor/views/api.py
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "Name"
-msgstr "Jina"
-
-#: cms/djangoapps/contentstore/views/videos.py
-#: xmodule/video_block/video_xfields.py
-msgid "Video ID"
-msgstr "Kitambulisho cha Video"
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This is listed as the duration for a video that has not
-#. yet reached the point in its processing by the servers where its
-#. duration is determined.
-#: cms/djangoapps/contentstore/views/videos.py
-#: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
-msgid "Pending"
-msgstr "Inasubiri huduma"
 
 #: cms/djangoapps/contentstore/xblock_storage_handlers/create_xblock.py
 #: xmodule/library_content_block.py
@@ -3335,6 +3335,16 @@ msgstr ""
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Good"
 msgstr "Vizuri"
+
+#. Translators: Replier commented on "your" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "your"
+msgstr ""
+
+#. Translators: Replier commented on "their" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "their"
+msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #, python-format
@@ -6882,7 +6892,7 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "<{p}><{strong}>{replier_name}</{strong}> commented on "
-"<{strong}>{author_name}'s</{strong}> response to your post "
+"<{strong}>{author_name}</{strong}> response to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
 
@@ -6891,6 +6901,26 @@ msgstr ""
 msgid ""
 "<{p}><{strong}>{replier_name}</{strong}> responded to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> posted "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> asked "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+msgid ""
+"Notifications for responses and comments on your posts, and the ones you’re "
+"following, including endorsements to your responses and on your posts."
 msgstr ""
 
 #: openedx/core/djangoapps/notifications/views.py
@@ -8249,7 +8279,7 @@ msgstr ""
 msgid "owner"
 msgstr "mmiliki"
 
-#: openedx/features/content_tagging/models.py
+#: openedx/features/content_tagging/models/base.py
 msgid ""
 "Organization that is related to this taxonomy.If None, then this taxonomy is"
 " related to all organizations."
@@ -11869,6 +11899,10 @@ msgstr ""
 msgid "Change the visibility of tabs in a course."
 msgstr ""
 
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+msgid "The information you entered is incorrect."
+msgstr ""
+
 #: cms/djangoapps/contentstore/utils.py cms/templates/visibility_editor.html
 msgid "Deleted Group"
 msgstr "Kundi lililofutwa"
@@ -11895,6 +11929,121 @@ msgstr "Nakala ya '{0}'"
 
 #: cms/djangoapps/contentstore/utils.py
 msgid "Invalid prerequisite course key"
+msgstr ""
+
+#. Translators: This is the status of an active video upload
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Uploading"
+msgstr "Kupakia maudhui"
+
+#. Translators: This is the status for a video that the servers are currently
+#. processing
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "In Progress"
+msgstr "Ina Endelea"
+
+#. Translators: This is the status for a video that is uploaded completely
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Uploaded"
+msgstr "Imepakiwa"
+
+#. Translators: This is the status for a video that the servers have failed to
+#. process
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Failed"
+msgstr "Haikufaulu"
+
+#. Translators: This is the status for a video that is cancelled during upload
+#. by user
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Cancelled"
+msgstr "Imefutwa"
+
+#. Translators: This is the status for a video which has failed
+#. due to being flagged as a duplicate by an external or internal CMS
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Failed Duplicate"
+msgstr "Nakala Iliyofeli"
+
+#. Translators: This is the status for a video which has duplicate token for
+#. youtube
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "YouTube Duplicate"
+msgstr "Nakala ya YouTube"
+
+#. Translators: This is the status for a video for which an invalid
+#. processing token was provided in the course settings
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Invalid Token"
+msgstr "Namba Batili"
+
+#. Translators: This is the status for a video that was included in a course
+#. import
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Imported"
+msgstr "Imepokelewa kutoka nje"
+
+#. Translators: This is the status for a video that is in an unknown state
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Unknown"
+msgstr "Haijulikani"
+
+#. Translators: This is the status for a video that is having its
+#. transcription in progress on servers
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Transcription in Progress"
+msgstr ""
+
+#. Translators: This is the status for a video whose transcription is complete
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Transcript Ready"
+msgstr ""
+
+#. Translators: This is the status for a video whose transcription job was
+#. failed for some languages
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Partial Failure"
+msgstr ""
+
+#. Translators: This is the status for a video whose transcription job has
+#. failed altogether
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Transcript Failed"
+msgstr ""
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "An image file is required."
+msgstr ""
+
+#. Translators: This is the header for a CSV file column
+#. containing URLs for video encodings for the named profile
+#. (e.g. desktop, mobile high quality, mobile low quality)
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#, python-brace-format
+msgid "{profile_name} URL"
+msgstr "{profile_name} URL"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Duration"
+msgstr "Muda"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Date Added"
+msgstr "Tarehe Imewekwa"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Status"
+msgstr ""
+
+#. Translators: This is the suggested filename when downloading the URL
+#. listing for videos uploaded through Studio
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#, python-brace-format
+msgid "{course}_video_urls"
+msgstr "{course}_video_urls"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "A non zero positive integer is expected"
 msgstr ""
 
 #: cms/djangoapps/contentstore/video_utils.py
@@ -12113,10 +12262,6 @@ msgstr ""
 msgid "Access restricted to: {list_of_groups}"
 msgstr "Vile pekee unavyoweza kuvipata ni: {list_of_groups}"
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-msgid "The information you entered is incorrect."
-msgstr ""
-
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Transcripts are supported only for \"video\" blocks."
 msgstr ""
@@ -12193,121 +12338,6 @@ msgstr "Jukumu batili limebainishwa."
 msgid "You may not remove the last Admin. Add another Admin first."
 msgstr ""
 "Waweza usiondoe Msimamizi wa mwisho. Ongeza Msimamizi mwingine kwanza."
-
-#. Translators: This is the status of an active video upload
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Uploading"
-msgstr "Kupakia maudhui"
-
-#. Translators: This is the status for a video that the servers are currently
-#. processing
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "In Progress"
-msgstr "Ina Endelea"
-
-#. Translators: This is the status for a video that is uploaded completely
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Uploaded"
-msgstr "Imepakiwa"
-
-#. Translators: This is the status for a video that the servers have failed to
-#. process
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Failed"
-msgstr "Haikufaulu"
-
-#. Translators: This is the status for a video that is cancelled during upload
-#. by user
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Cancelled"
-msgstr "Imefutwa"
-
-#. Translators: This is the status for a video which has failed
-#. due to being flagged as a duplicate by an external or internal CMS
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Failed Duplicate"
-msgstr "Nakala Iliyofeli"
-
-#. Translators: This is the status for a video which has duplicate token for
-#. youtube
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "YouTube Duplicate"
-msgstr "Nakala ya YouTube"
-
-#. Translators: This is the status for a video for which an invalid
-#. processing token was provided in the course settings
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Invalid Token"
-msgstr "Namba Batili"
-
-#. Translators: This is the status for a video that was included in a course
-#. import
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Imported"
-msgstr "Imepokelewa kutoka nje"
-
-#. Translators: This is the status for a video that is in an unknown state
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Unknown"
-msgstr "Haijulikani"
-
-#. Translators: This is the status for a video that is having its
-#. transcription in progress on servers
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Transcription in Progress"
-msgstr ""
-
-#. Translators: This is the status for a video whose transcription is complete
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Transcript Ready"
-msgstr ""
-
-#. Translators: This is the status for a video whose transcription job was
-#. failed for some languages
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Partial Failure"
-msgstr ""
-
-#. Translators: This is the status for a video whose transcription job has
-#. failed altogether
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Transcript Failed"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "An image file is required."
-msgstr ""
-
-#. Translators: This is the header for a CSV file column
-#. containing URLs for video encodings for the named profile
-#. (e.g. desktop, mobile high quality, mobile low quality)
-#: cms/djangoapps/contentstore/views/videos.py
-#, python-brace-format
-msgid "{profile_name} URL"
-msgstr "{profile_name} URL"
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Duration"
-msgstr "Muda"
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Date Added"
-msgstr "Tarehe Imewekwa"
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Status"
-msgstr ""
-
-#. Translators: This is the suggested filename when downloading the URL
-#. listing for videos uploaded through Studio
-#: cms/djangoapps/contentstore/views/videos.py
-#, python-brace-format
-msgid "{course}_video_urls"
-msgstr "{course}_video_urls"
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "A non zero positive integer is expected"
-msgstr ""
 
 #: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
@@ -13065,24 +13095,6 @@ msgid "The keys are valid for a limited amount of time. Has the key expired?"
 msgstr ""
 "Nywila zinatumika kwa muda maalum. Je nywila zimemaliza muda wa matumizi "
 "yake?"
-
-#: lms/templates/library-block-author-preview-header.html
-msgid ""
-"Showing all matching content eligible to be added into {display_name}. Each "
-"student will be assigned {max_count} component drawn randomly from this "
-"list."
-msgid_plural ""
-"Showing all matching content eligible to be added into {display_name}. Each "
-"student will be assigned {max_count} components drawn randomly from this "
-"list."
-msgstr[0] ""
-"Kuonyesha uwiyano wa liliyomo linalo stahili kuongezwa kwa {display_name}. "
-"Kila mwanafunzi atagawiwa {max_count} kipengele kilicho chotwa kwa "
-"kubahatisha kutoka kwenye orodha."
-msgstr[1] ""
-"Kuonyesha mawiyano yote ya yaliyomo yanayo stahili kuongezwa kwa "
-"{display_name}. Wanafunzi wote watagawiwa {max_count} vipengele "
-"vilivyochotwa kwa kubahatisha kutoka kwenye orodha."
 
 #. Translators:  "External resource" means that this learning module is hosted
 #. on a platform external to the edX LMS
@@ -21360,6 +21372,18 @@ msgid ""
 "below."
 msgstr ""
 
+#: cms/templates/library-block-author-preview-header.html
+msgid ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} component drawn randomly from this "
+"list."
+msgid_plural ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} components drawn randomly from this "
+"list."
+msgstr[0] ""
+msgstr[1] ""
+
 #: cms/templates/library.html
 msgid "Content Library"
 msgstr ""
@@ -22257,14 +22281,6 @@ msgid "Expand or Collapse"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Access Settings"
-msgstr "Mitegesho ya Kuyafikia maudhui"
-
-#: cms/templates/studio_xblock_wrapper.html
-msgid "Set Access"
-msgstr "Tegesha Upatikaji maudhui"
-
-#: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"
 msgstr ""
 
@@ -22601,10 +22617,6 @@ msgstr ""
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Muongozo"
-
-#: cms/templates/widgets/header.html
-msgid "Files & Media"
-msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

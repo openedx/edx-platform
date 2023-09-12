@@ -7,7 +7,7 @@ import waffle
 
 from django.conf import settings
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from lms.djangoapps.edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
 from openedx.core.djangolib.js_utils import js_escaped_string
@@ -308,7 +308,7 @@ ${HTML(fragment.foot_html())}
     <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
       ## Utility: Notes
       % if is_edxnotes_enabled(course, request.user):
-        <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
+        <%include file="/edxnotes/toggle_notes.html" args="course=course, block=course"/>
       % endif
 
       ## Utility: Calc
