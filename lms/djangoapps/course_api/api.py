@@ -100,13 +100,10 @@ def _filter_by_search(course_queryset, search_term):
     )
 
     search_courses_ids = {course['data']['id'] for course in search_courses['results']}
-
+    courses = [course for course in course_queryset if str(course.id) in search_courses_ids]
     return LazySequence(
-        (
-            course for course in course_queryset
-            if str(course.id) in search_courses_ids
-        ),
-        est_len=len(course_queryset)
+        iter(courses),
+        est_len=len(courses)
     )
 
 

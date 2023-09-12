@@ -449,6 +449,29 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
                 assert len(response.data['results']) == (30 if (page < 11) else 3)
                 assert [c['id'] for c in response.data['results']] == ordered_course_ids[((page - 1) * 30):(page * 30)]
 
+    def test_count_item_pagination_with_search_term(self):
+        """
+        Test count items in pagination for api courses list - class CourseListView
+        """
+        # Create 15 new courses, courses have the word "new" in the title
+        _ = [self.create_and_index_course(f"numb_{number}", f"new_{number}") for number in range(15)]
+        response = self.verify_response(params={"search_term": "new"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["pagination"]["count"], 15)
+
+    def test_count_item_pagination_with_search_term_and_filter(self):
+        """
+        Test count items in pagination for api courses list
+        with search_term and filter by organisation -
+        class CourseListView
+        """
+        # Create 25 new courses with two different organisations
+        _ = [self.create_and_index_course("Org_N", f"new_{number}") for number in range(10)]
+        _ = [self.create_and_index_course("Org_X", f"new_{number}") for number in range(15)]
+        response = self.verify_response(params={"org": "Org_X", "search_term": "new"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["pagination"]["count"], 15)
+
 
 class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
     """
