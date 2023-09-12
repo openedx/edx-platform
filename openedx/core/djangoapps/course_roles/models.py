@@ -64,10 +64,10 @@ class CourseRolesUserRole(models.Model):
     course = models.ForeignKey(
         CourseOverview,
         db_constraint=False,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.CASCADE,
         null=True,
     )
-    org = models.ForeignKey(Organization, on_delete=models.DO_NOTHING, null=False)
+    org = models.ForeignKey(Organization, on_delete=models.CASCADE, null=False)
 
     class Meta:
         unique_together = ('user', 'role', 'course')
