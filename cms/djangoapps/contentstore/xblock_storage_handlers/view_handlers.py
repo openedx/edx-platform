@@ -404,25 +404,34 @@ def _save_xblock(
     to default).
 
     """
+    """
+    Saves xblock w/ its fields. Has special processing for grader_type, publish, and nullout and Nones in metadata.
+    nullout means to truly set the field to None whereas nones in metadata mean to unset them (so they revert
+    to default).
+
+    """
     store = modulestore()
-    course = store.get_course(xblock.location.course_key)  # Define 'course' variable
+    # Perform all xblock changes within a (single-versioned) transaction
     with store.bulk_operations(xblock.location.course_key):
+        # Don't allow updating an xblock and discarding changes in a single operation (unsupported by UI).
         if publish == "discard_changes":
-            return _discard_changes(xblock, user, store)
+            store.revert_to_published(xblock.location, user.id)
+            # Returning the same sort of result that we do for other save operations. In the future,
+            # we may want to return the full XBlockInfo.
+            return JsonResponse({"id": str(xblock.location)})
 
         old_metadata = own_metadata(xblock)
         old_content = xblock.get_explicitly_set_fields_by_scope(Scope.content)
 
         if data:
+            # TODO Allow any scope.content fields not just "data" (exactly like the get below this)
             xblock.data = data
         else:
-            data = old_content.get("data") if "data" in old_content else None
+            data = old_content["data"] if "data" in old_content else None
 
         if fields:
             for field_name in fields:
                 setattr(xblock, field_name, fields[field_name])
-
-        print('1')
 
         if children_strings is not None:
             children = []
@@ -473,7 +482,6 @@ def _save_xblock(
             # set the children on the xblock
             xblock.children = children
 
-        print('2')
         # also commit any metadata which might have been passed along
         if nullout is not None or metadata is not None:
             # the postback is not the complete metadata, as there's system metadata which is
@@ -506,9 +514,27 @@ def _save_xblock(
                         field.write_to(xblock, value)
 
         validate_and_update_xblock_due_date(xblock)
+        # update the xblock and call any xblock callbacks
         xblock = _update_with_callback(xblock, user, old_metadata, old_content)
+
+        # for static tabs, their containing course also records their display name
         course = store.get_course(xblock.location.course_key)
-        _update_static_tab_name(store, xblock, user)
+        if xblock.location.block_type == "static_tab":
+            # find the course's reference to this tab and update the name.
+            static_tab = CourseTabList.get_tab_by_slug(
+                course.tabs, xblock.location.name
+            )
+            # only update if changed
+            if static_tab:
+                update_tab = False
+                if static_tab["name"] != xblock.display_name:
+                    static_tab["name"] = xblock.display_name
+                    update_tab = True
+                if static_tab["course_staff_only"] != xblock.course_staff_only:
+                    static_tab["course_staff_only"] = xblock.course_staff_only
+                    update_tab = True
+                if update_tab:
+                    store.update_item(course, user.id)
 
         result = {
             "id": str(xblock.location),
@@ -516,85 +542,13 @@ def _save_xblock(
             "metadata": own_metadata(xblock),
         }
 
-        print('result')
         if grader_type is not None:
-            result.update(CourseGradingModel.update_section_grader_type(xblock, grader_type, user))
+            result.update(
+                CourseGradingModel.update_section_grader_type(xblock, grader_type, user)
+            )
 
-        _save_gating_info(xblock, course, is_prereq, prereq_usage_key, prereq_min_score, prereq_min_completion)
-
-        _handle_publish_option(xblock, publish, user)
-
-        _update_summary_configuration(xblock, summary_configuration_enabled)
-
-        # Note that children aren't being returned until we have a use case.
-        return JsonResponse(result, encoder=EdxJSONEncoder)
-
-def _discard_changes(xblock, user, store):
-    """
-    Discards changes made to the xblock and reverts it to the published version.
-    Returning the same sort of result that we do for other save operations. In the future,
-    we may want to return the full XBlockInfo.
-
-    Args:
-        xblock: The xblock to discard changes from.
-        user: The user performing the operation.
-
-    Returns:
-        JsonResponse: A JSON response indicating the result.
-    """
-    store.revert_to_published(xblock.location, user.id)
-    return JsonResponse({"id": str(xblock.location)})
-
-def _update_xblock_metadata(xblock, metadata, nullout):
-    """
-    Update the xblock's metadata.
-
-    Args:
-        xblock: The xblock to update metadata for.
-        metadata: A dictionary of metadata key-value pairs.
-        nullout: A list of metadata keys to set to None.
-    """
-    if nullout is not None or metadata is not None:
-        if nullout is not None:
-            _null_out_metadata(xblock, nullout)
-        if metadata is not None:
-            _update_metadata(xblock, metadata)
-
-def _update_static_tab_name(store, xblock, user):
-    """
-    Update the name of a static tab in the course.
-
-    Args:
-        store: The modulestore instance.
-        xblock: The xblock representing the static tab.
-    """
-    if xblock.location.block_type == "static_tab":
-        static_tab = CourseTabList.get_tab_by_slug(store.get_course(xblock.location.course_key).tabs, xblock.location.name)
-        # only update if changed
-        if static_tab:
-            update_tab = False
-            if static_tab["name"] != xblock.display_name:
-                static_tab["name"] = xblock.display_name
-                update_tab = True
-            if static_tab["course_staff_only"] != xblock.course_staff_only:
-                static_tab["course_staff_only"] = xblock.course_staff_only
-                update_tab = True
-            if update_tab:
-                store.update_item(course, user.id)
-
-def _save_gating_info(xblock, course, is_prereq, prereq_usage_key, prereq_min_score, prereq_min_completion):
-    """
-    Save gating information for the xblock.
-
-    Args:
-        xblock: The xblock to save gating information for.
-        course: The course containing the xblock.
-        is_prereq: Whether the xblock is a prerequisite.
-        prereq_usage_key: The usage key of the prerequisite.
-        prereq_min_score: The minimum score required for the prerequisite.
-        prereq_min_completion: The minimum completion required for the prerequisite.
-    """
-    if xblock.category == "sequential" and course.enable_subsection_gating:
+        # Save gating info
+        if xblock.category == "sequential" and course.enable_subsection_gating:
             if is_prereq is not None:
                 if is_prereq:
                     gating_api.add_prerequisite(
@@ -613,39 +567,26 @@ def _save_gating_info(xblock, course, is_prereq, prereq_usage_key, prereq_min_sc
                     prereq_min_completion,
                 )
 
-def _handle_publish_option(xblock, publish, user):
-    """
-    If publish is set to 'republish' and this item is not in direct only categories and has previously been
-    published, then this item should be republished. This is used by staff locking to ensure that changing the
-    draft value of the staff lock will also update the published version, but only at the unit level.
+        # If publish is set to 'republish' and this item is not in direct only categories and has previously been
+        # published, then this item should be republished. This is used by staff locking to ensure that changing the
+        # draft value of the staff lock will also update the published version, but only at the unit level.
+        if publish == "republish" and xblock.category not in DIRECT_ONLY_CATEGORIES:
+            if modulestore().has_published_version(xblock):
+                publish = "make_public"
 
-    Args:
-        xblock: The xblock to handle publish option for.
-        publish: The publish option.
-        user: The user performing the operation.
-    """
+        # Make public after updating the xblock, in case the caller asked for both an update and a publish.
+        # Used by Bok Choy tests and by republishing of staff locks.
+        if publish == "make_public":
+            modulestore().publish(xblock.location, user.id)
 
-    if publish == "republish" and xblock.category not in DIRECT_ONLY_CATEGORIES:
-        if modulestore().has_published_version(xblock):
-            publish = "make_public"
+        # If summary_configuration_enabled is not None, use AIAsideSummary to update it.
+        if xblock.category == "vertical" and summary_configuration_enabled is not None:
+            AiAsideSummaryConfig(course.id).set_summary_settings(xblock.location, {
+                'enabled': summary_configuration_enabled
+            })
 
-    # Make public after updating the xblock, in case the caller asked for both an update and a publish.
-    # Used by Bok Choy tests and by republishing of staff locks.
-    if publish == "make_public":
-        modulestore().publish(xblock.location, user.id)
-
-def _update_summary_configuration(xblock, summary_configuration_enabled):
-    """
-    If summary_configuration_enabled is not None, use AIAsideSummary to update it.
-    Args:
-        xblock: The xblock to update summary configuration for.
-        summary_configuration_enabled: Whether summary configuration is enabled.
-    """
-    if xblock.category == "vertical" and summary_configuration_enabled is not None:
-        AiAsideSummaryConfig(course.id).set_summary_settings(xblock.location, {
-            'enabled': summary_configuration_enabled
-    })
-
+        # Note that children aren't being returned until we have a use case.
+        return JsonResponse(result, encoder=EdxJSONEncoder)
 
 @login_required
 @expect_json
