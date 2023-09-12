@@ -404,12 +404,6 @@ def _save_xblock(
     to default).
 
     """
-    """
-    Saves xblock w/ its fields. Has special processing for grader_type, publish, and nullout and Nones in metadata.
-    nullout means to truly set the field to None whereas nones in metadata mean to unset them (so they revert
-    to default).
-
-    """
     store = modulestore()
     # Perform all xblock changes within a (single-versioned) transaction
     with store.bulk_operations(xblock.location.course_key):
