@@ -10,8 +10,8 @@ WAFFLE_FLAG_NAMESPACE = 'course_home'
 # .. toggle_name: course_home.course_home_mfe_progress_tab
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: toggles if the LMS progress tab UI should use the new MFE graphs or
-#   grades prographs from edx-platform.
+# .. toggle_description: toggles if the LMS progress tab UI should use the new Learning MFE graphs or
+#   grades graphs from edx-platform.
 # .. toggle_use_cases: opt_in
 # .. toggle_creation_date: 2021-03-12
 # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/26978
