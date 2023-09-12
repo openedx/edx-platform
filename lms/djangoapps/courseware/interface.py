@@ -63,19 +63,16 @@ class XBlockUserStateClient():
         """
         This error is raised if the service backing this client is currently unavailable.
         """
-        pass
 
     class PermissionDenied(Exception):
         """
         This error is raised if the caller is not allowed to access the requested data.
         """
-        pass
 
     class DoesNotExist(Exception):
         """
         This error is raised if the caller has requested data that does not exist.
         """
-        pass
 
     def get(self, username, block_key, scope=Scope.user_state, fields=None):
         """

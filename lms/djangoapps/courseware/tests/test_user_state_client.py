@@ -714,6 +714,7 @@ class TestDictUserStateClient(UserStateClientTestBase):
         super().setUp()
         self.client = DictUserStateClient()
 
+
 class TestDjangoUserStateClient(UserStateClientTestBase, ModuleStoreTestCase):
     """
     Tests of the DjangoUserStateClient backend.
