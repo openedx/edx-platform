@@ -681,7 +681,7 @@ SUBSCRIPTIONS_TRIAL_LENGTH = 7
 CSRF_TRUSTED_ORIGINS = ['.example.com']
 CSRF_TRUSTED_ORIGINS_WITH_SCHEME = ['https://example.com']
 
-# values are already updated above with default CORS_ORIGIN_WHITELIST values but in
-# case of new version django_cors_headers they will get override.
+# values are already updated above with default CSRF_TRUSTED_ORIGINS values but in
+# case of new django version these values will override.
 if django.VERSION[0] >= 4:  # for greater than django 3.2 use with schemes.
     CSRF_TRUSTED_ORIGINS = CSRF_TRUSTED_ORIGINS_WITH_SCHEME

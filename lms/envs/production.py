@@ -367,6 +367,8 @@ CSRF_COOKIE_SECURE = ENV_TOKENS.get('CSRF_COOKIE_SECURE', False)
 
 # Determines which origins are trusted for unsafe requests eg. POST requests.
 CSRF_TRUSTED_ORIGINS = ENV_TOKENS.get('CSRF_TRUSTED_ORIGINS', [])
+# values are already updated above with default CSRF_TRUSTED_ORIGINS values but in
+# case of new django version these values will override.
 if django.VERSION[0] >= 4:  # for greater than django 3.2 use schemes.
     CSRF_TRUSTED_ORIGINS = ENV_TOKENS.get('CSRF_TRUSTED_ORIGINS_WITH_SCHEME', [])
 
