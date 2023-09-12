@@ -299,7 +299,7 @@ def submit_delete_entrance_exam_state_for_student(request, usage_key, student): 
     return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
 
 
-def submit_bulk_course_email(request, course_key, email_id, schedule=None):
+def submit_bulk_course_email(request, course_key, email_id, schedule=None, emails=[]):
     """
     Request to have bulk email sent as a background task.
 
@@ -324,7 +324,7 @@ def submit_bulk_course_email(request, course_key, email_id, schedule=None):
 
     task_type = InstructorTaskTypes.BULK_COURSE_EMAIL
     task_class = send_bulk_course_email
-    task_input = {'email_id': email_id, 'to_option': targets, "emails": ["student@example.com"]}
+    task_input = {'email_id': email_id, 'to_option': targets, 'emails': emails}
     task_key_stub = str(email_id)
     # create the key value by using MD5 hash:
     task_key = hashlib.md5(task_key_stub.encode('utf-8')).hexdigest()
