@@ -789,7 +789,6 @@ edx-opaque-keys[django]==2.5.0
     #   edx-milestones
     #   edx-organizations
     #   edx-proctoring
-    #   edx-user-state-client
     #   edx-when
     #   lti-consumer-xblock
     #   openedx-events
@@ -848,10 +847,6 @@ edx-toggles==5.1.0
     #   edxval
     #   ora2
 edx-token-utils==0.2.1
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
-edx-user-state-client==1.3.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -2195,7 +2190,6 @@ xblock[django]==1.7.0
     #   done-xblock
     #   edx-completion
     #   edx-sga
-    #   edx-user-state-client
     #   edx-when
     #   lti-consumer-xblock
     #   ora2
