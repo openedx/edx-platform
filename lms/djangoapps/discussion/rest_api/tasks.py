@@ -8,7 +8,7 @@ from opaque_keys.edx.locator import CourseKey
 from lms.djangoapps.courseware.courses import get_course_with_access
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
-from .utils import DiscussionNotificationSender
+from lms.djangoapps.discussion.rest_api.utils import DiscussionNotificationSender
 
 
 User = get_user_model()

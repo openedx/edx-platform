@@ -329,7 +329,7 @@ django-oauth-toolkit==1.4.1
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
-django-object-actions==4.1.0
+django-object-actions==4.2.0
     # via edx-enterprise
 django-pipeline==2.1.0
     # via -r requirements/edx/kernel.in
@@ -570,7 +570,7 @@ event-tracking==2.2.0
     #   -r requirements/edx/kernel.in
     #   edx-proctoring
     #   edx-search
-fastavro==1.8.2
+fastavro==1.8.3
     # via openedx-events
 filelock==3.12.3
     # via snowflake-connector-python
@@ -1074,7 +1074,7 @@ slumber==0.7.1
     #   edx-bulk-grades
     #   edx-enterprise
     #   edx-rest-api-client
-snowflake-connector-python==3.1.1
+snowflake-connector-python==3.2.0
     # via edx-enterprise
 social-auth-app-django==5.0.0
     # via
