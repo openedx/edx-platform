@@ -7,6 +7,7 @@ from typing import Union
 import django.contrib.auth.models
 import openedx_tagging.core.tagging.rules as oel_tagging
 import rules
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from common.djangoapps.student.auth import is_content_creator, has_studio_write_access
@@ -42,7 +43,16 @@ def can_change_object_tag_objectid(user: UserType, object_id: str) -> bool:
     """
     Everyone that has permission to edit the object should be able to tag it.
     """
-    course_key = CourseKey.from_string(object_id)
+    if not object_id:
+        raise ValueError("object_id must be provided")
+    try:
+        usage_key = UsageKey.from_string(object_id)
+        if not usage_key.course_key.is_course:
+            raise ValueError("object_id must be from a block or a course")
+        course_key = usage_key.course_key
+    except InvalidKeyError:
+        course_key = CourseKey.from_string(object_id)
+
     return has_studio_write_access(user, course_key)
 
 @rules.predicate
