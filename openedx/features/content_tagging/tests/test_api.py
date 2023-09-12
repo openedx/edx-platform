@@ -3,6 +3,7 @@ import ddt
 from django.test.testcases import TestCase
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx_tagging.core.tagging.models import ObjectTag, Tag
+from openedx_tagging.core.tagging.rules import ChangeObjectTagPermissionItem
 from organizations.models import Organization
 
 from .. import api
@@ -69,6 +70,12 @@ class TestTaxonomyMixin:
             tags=[self.tag_all_orgs.id],
             object_id=CourseKey.from_string("course-v1:OeX+DemoX+Demo_Course"),
         )[0]
+        self.all_orgs_course_tag_perm = ChangeObjectTagPermissionItem(
+            taxonomy=self.taxonomy_all_orgs,
+            object_id="course-v1:OeX+DemoX+Demo_Course",
+        )
+
+
         self.all_orgs_block_tag = api.tag_content_object(
             taxonomy=self.taxonomy_all_orgs,
             tags=[self.tag_all_orgs.id],
@@ -76,11 +83,21 @@ class TestTaxonomyMixin:
                 "block-v1:Ax+DemoX+Demo_Course+type@vertical+block@abcde"
             ),
         )[0]
+        self.all_orgs_block_tag_perm = ChangeObjectTagPermissionItem(
+            taxonomy=self.taxonomy_all_orgs,
+            object_id="block-v1:Ax+DemoX+Demo_Course+type@vertical+block@abcde",
+        )
+
         self.both_orgs_course_tag = api.tag_content_object(
             taxonomy=self.taxonomy_both_orgs,
             tags=[self.tag_both_orgs.id],
             object_id=CourseKey.from_string("course-v1:Ax+DemoX+Demo_Course"),
         )[0]
+        self.both_orgs_course_tag_perm = ChangeObjectTagPermissionItem(
+            taxonomy=self.taxonomy_both_orgs,
+            object_id="course-v1:Ax+DemoX+Demo_Course",
+        )
+
         self.both_orgs_block_tag = api.tag_content_object(
             taxonomy=self.taxonomy_both_orgs,
             tags=[self.tag_both_orgs.id],
@@ -88,6 +105,11 @@ class TestTaxonomyMixin:
                 "block-v1:OeX+DemoX+Demo_Course+type@video+block@abcde"
             ),
         )[0]
+        self.both_orgs_block_tag_perm = ChangeObjectTagPermissionItem(
+            taxonomy=self.taxonomy_both_orgs,
+            object_id="block-v1:OeX+DemoX+Demo_Course+type@video+block@abcde",
+        )
+
         self.one_org_block_tag = api.tag_content_object(
             taxonomy=self.taxonomy_one_org,
             tags=[self.tag_one_org.id],
@@ -95,11 +117,20 @@ class TestTaxonomyMixin:
                 "block-v1:OeX+DemoX+Demo_Course+type@html+block@abcde"
             ),
         )[0]
+        self.one_org_block_tag_perm = ChangeObjectTagPermissionItem(
+            taxonomy=self.taxonomy_one_org,
+            object_id="block-v1:OeX+DemoX+Demo_Course+type@html+block@abcde",
+        )
+
         self.disabled_course_tag = api.tag_content_object(
             taxonomy=self.taxonomy_disabled,
             tags=[self.tag_disabled.id],
             object_id=CourseKey.from_string("course-v1:Ax+DemoX+Demo_Course"),
         )[0]
+        self.disabled_course_tag_perm = ChangeObjectTagPermissionItem(
+            taxonomy=self.taxonomy_disabled,
+            object_id="course-v1:Ax+DemoX+Demo_Course",
+        )
 
         # Invalid object tags must be manually created
         self.all_orgs_invalid_tag = ObjectTag.objects.create(
@@ -107,15 +138,29 @@ class TestTaxonomyMixin:
             tag=self.tag_all_orgs,
             object_id="course-v1_OpenedX_DemoX_Demo_Course",
         )
+        self.all_orgs_invalid_tag_perm = ChangeObjectTagPermissionItem(
+            taxonomy=self.taxonomy_all_orgs,
+            object_id="course-v1_OpenedX_DemoX_Demo_Course",
+        )
+
         self.one_org_invalid_org_tag = ObjectTag.objects.create(
             taxonomy=self.taxonomy_one_org,
             tag=self.tag_one_org,
             object_id="block-v1_OeX_DemoX_Demo_Course_type_html_block@abcde",
         )
+        self.one_org_invalid_org_tag_perm = ChangeObjectTagPermissionItem(
+            taxonomy=self.taxonomy_one_org,
+            object_id="block-v1_OeX_DemoX_Demo_Course_type_html_block@abcde",
+        )
+
         self.no_orgs_invalid_tag = ObjectTag.objects.create(
             taxonomy=self.taxonomy_no_orgs,
             tag=self.tag_no_orgs,
             object_id=CourseKey.from_string("course-v1:Ax+DemoX+Demo_Course"),
+        )
+        self.no_orgs_invalid_tag_perm = ChangeObjectTagPermissionItem(
+            taxonomy=self.taxonomy_no_orgs,
+            object_id="course-v1:Ax+DemoX+Demo_Course",
         )
 
 
