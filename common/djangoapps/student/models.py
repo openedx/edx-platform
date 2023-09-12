@@ -3710,32 +3710,27 @@ class UserPasswordToggleHistory(TimeStampedModel):
 
 
 
-class ListSurveyQuestion (models.Model):
-    question = models.CharField( max_length=255, null=True)
-    type = models.CharField( max_length=255, null=True)
-    survey_id = models.IntegerField()
-    config = models.JSONField(null=True, blank=True )
-    isActive = models.BooleanField(default=False)
-    course= models.ForeignKey(
-        CourseOverview,
-        db_constraint=False,
-        on_delete=models.DO_NOTHING,
-        null=True,
-        blank=True
-    )
-    def __str__(self):
-        return f"{self.question}"
-class ListSurveyQuestionDAO ():
-    @classmethod
-    def checkQuestion (self, course_id) :
-        isCheck = ListSurveyQuestion.objects.filter(course=course_id, isActive=True).exists()
-
-        return isCheck
-
-class SurveyForm(models.Model):
-    question = models.ForeignKey(ListSurveyQuestion, on_delete=models.CASCADE)  
+class Survey (models.Model):
+    name_survey = models.CharField(max_length=225)
+    created = models.DateTimeField(auto_now_add=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    answer_text =  models.CharField( max_length=255, null=True)
+    
+    def __str__ (self):
+        return f'{self.name_survey}'
+
+
+
+class SurveyQuestion (models.Model):
+    survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
+    question = models.CharField(max_length=225)
+    type = models.CharField( max_length=32, null=True)
+    config = models.JSONField(null=True, blank=True )
+    
+    def __str__(self):
+        return f'{self.question}'
+ 
+   
+class SurveyCourse (models.Model):
     course= models.ForeignKey(
         CourseOverview,
         db_constraint=False,
@@ -3743,21 +3738,85 @@ class SurveyForm(models.Model):
         null=True,
         blank=True
     )
+    survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True, null=True)
+    
     def __str__(self):
-        return f"{self.user} - Question: {self.question} - Answer: {self.answer_text}  " 
-    
-class SurveyFormDAO () :
+        return f'{self.course}'
+class SurveyCourseDAO():
     @classmethod
-    def checkSuccess (self,user_id):
-        isCheck = SurveyForm.objects.filter(user=user_id, course__isnull=True).exists()
-        return isCheck
+    def questionListSurvey (self):
+        surveys = SurveyCourse.objects.filter(course__isnull=True)
+        listQuestion = []
+        for survey in surveys :
+            question = SurveyQuestion.objects.filter(survey=survey.survey_id)
+            for q in question :
+                listQuestion.append(q)
         
-    @classmethod
-    def checkCourseSuccess (self,user_id , course_id):
-        isCheck = SurveyForm.objects.filter(user=user_id, course=course_id).exists()
-        return isCheck
+            
+        return listQuestion
     
     @classmethod
-    def create_form(self,user_id, question , answer_text, course_id=None):
+    def questionListSurveyCourse (self, course_id):
+        surveys = SurveyCourse.objects.filter(course = course_id)
+        listQuestion = []
+        for survey in surveys :
+            question = SurveyQuestion.objects.filter(survey=survey.survey_id)
+            for q in question :
+                listQuestion.append(q)
         
-        return SurveyForm.objects.create(user_id=user_id, question=question, answer_text=answer_text, course_id = course_id)
+        return listQuestion
+        
+
+
+# class ListSurveyQuestion (models.Model):
+#     question = models.CharField( max_length=255, null=True)
+#     type = models.CharField( max_length=255, null=True)
+#     survey_id = models.IntegerField()
+#     config = models.JSONField(null=True, blank=True )
+#     isActive = models.BooleanField(default=False)
+#     course= models.ForeignKey(
+#         CourseOverview,
+#         db_constraint=False,
+#         on_delete=models.DO_NOTHING,
+#         null=True,
+#         blank=True
+#     )
+#     def __str__(self):
+#         return f"{self.question}"
+# class ListSurveyQuestionDAO ():
+#     @classmethod
+#     def checkQuestion (self, course_id) :
+#         isCheck = ListSurveyQuestion.objects.filter(course=course_id, isActive=True).exists()
+
+#         return isCheck
+
+# class SurveyForm(models.Model):
+#     question = models.ForeignKey(ListSurveyQuestion, on_delete=models.CASCADE)  
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     answer_text =  models.CharField( max_length=255, null=True)
+#     course= models.ForeignKey(
+#         CourseOverview,
+#         db_constraint=False,
+#         on_delete=models.DO_NOTHING,
+#         null=True,
+#         blank=True
+#     )
+#     def __str__(self):
+#         return f"{self.user} - Question: {self.question} - Answer: {self.answer_text}  " 
+    
+# class SurveyFormDAO () :
+#     @classmethod
+#     def checkSuccess (self,user_id):
+#         isCheck = SurveyForm.objects.filter(user=user_id, course__isnull=True).exists()
+#         return isCheck
+        
+#     @classmethod
+#     def checkCourseSuccess (self,user_id , course_id):
+#         isCheck = SurveyForm.objects.filter(user=user_id, course=course_id).exists()
+#         return isCheck
+    
+#     @classmethod
+#     def create_form(self,user_id, question , answer_text, course_id=None):
+        
+#         return SurveyForm.objects.create(user_id=user_id, question=question, answer_text=answer_text, course_id = course_id)

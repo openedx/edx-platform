@@ -30,6 +30,7 @@ urlpatterns = [
     ),
     
     path('api/resume-url/', views.get_resume_button_urls, name='get_resume_button_urls') ,
+    
     path('survey-form/', views.form_begin_login, name='survey_form'),
-    path( 'survey-form/<str:course_id>',views.survey_form_course, name='survey_form_course' )
+    path( 'survey-form/<str:course_id>',views.form_begin_login, name='survey_form_course' )
 ]

@@ -14,7 +14,14 @@
 
 <div >
    <div>
-        <h1 style=" font-size:26px;">Digital Marketing Welcome Flow</h1>
+        <h1 style=" font-size:26px;">
+            % if display_name :
+                ${display_name}
+            %else:
+                Funix
+            % endif
+            Welcome Flow
+        </h1>
    </div>
         <div class="border-navbar "  >
             
@@ -25,9 +32,6 @@
             <div class="survey-form"  style="display: block;">
                 <div class="title-survey">
                     <h3>Welcome Funix!</h3>
-                    % if display_name :
-                        <h3>${display_name}</h3>
-                    % endif
                     <p> In the next few minutes, you'll take the first steps on your learning journey:</p>
                 </div>
                 <div class="container-survey">
@@ -51,46 +55,45 @@
                     </div>
                 </div> 
             </div>
-            % if question :
-            % for q in question:
-              <div class="survey-form"  style="display: none;">
-                  <div class="card">
-                      <div class="card-header">
-                      <span>${q.question}</span>
-                      </div>
-                      <div class="card-body">
+
+            % if result_lists:
+                % for survey in result_lists:
+                    <div class="survey-form"  style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <span>${survey['survey_name']}</span>
+                            </div>
                        
-                      % if q.config['option'] and 'radio' in q.type :
-                          % for index,option in enumerate(q.config['option']) :
-                             <div class="survey-item-input">
-                               <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-                                 <input id="${option}" type=${q.type} name="${q.question}" value="${option}"/>
-                                 <label for="${option}" >${option}</label>
-                             </div>
-                          % endfor
-                      % endif
-                  
-                      % if 'checkbox' in q.type:
-                          % for option in q.config['option'] :
-                          <div class="survey-item-input">
-                              <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-                              <input type="${q.type}" name="${q.question}" value="${option}" id="${option}"  />
-                              <label for="${option}">${option}</label>
-                          </div>
-                          % endfor
-                      % endif     
-                    
-                      % if 'text' in q.type :
+                        <div class="card-body">
+                            % for q in survey['questions']:
+                                % if q.type == 'text' :
                                 <div class="input-item-text" >
-                                        <span>
-                                            ${q.question}
-                                        </span>
-                                        <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-                                        <input type='text' name="${q.question}" style="width:100%"/>
+                                    <span>
+                                        ${q.question}
+                                    </span>
+                                    <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+                                    <input type='text' name="${q.question}" style="width:100%"/>
                                 </div>
-                        % endif
-                            % if 'select' in q.type :
-                                  <div class="input-item-select">
+                                % endif
+
+                                % if q.type == 'radio' or q.type == 'checkbox':
+                                    <div style="display: flex;
+                                    flex-direction: column;
+                                    padding: 20px 0px;
+                                    gap: 10px;">
+                                    <span style="font-weight:bold">${q.question}</span>
+                                     % for index,option in enumerate(q.config['option']) :
+                                        <div class="survey-item-input">
+                                        <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+                                            <input id="${option}" type=${q.type} name="${q.question}" value="${option}"/>
+                                            <label for="${option}" >${option}</label>
+                                        </div>
+                                    % endfor
+                                    </div>
+                                % endif 
+
+                                % if q.type == 'select' :
+                                    <div class="input-item-select">
                                         <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
                                         <span>${q.question}</span>
                                         <select name="${q.question}">
@@ -98,83 +101,15 @@
                                                 <option value="${option}">${option}</option>
                                             % endfor
                                         </select>
-                                  </div>
-                            %endif
-                          
-                      </div>
-                  </div>
-              </div>
-             
-              % endfor
-          % endif
-          % if questions :
-               % for item in questions : 
-               <div class="survey-form"  style="display: none;">
-                  <div class="card">
-                      <div class="card-header">
-                      <span>${item['title']}</span>
-                      </div>
-                      <div class="card-body">
-                       
-                          % for q in item['config'] :
-                              % if 'text' in q.type :
-                                 <div class="input-item-text" >
-                                    <span>
-                                        ${q.question}
-                                    </span>
-                                    <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-                                    <input type='text' name="${q.question}" style="width:100%"/>
-                                 </div>
-                              % endif
-                              % if 'select' in q.type :
-                              <div class="input-item-select">
-                                <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-                                <span>${q.question}</span>
-                                <select name="${q.question}">
-                                      % for option in q.config['option']:
-                                          <option value="${option}">${option}</option>
-                                      % endfor
-                                </select>
-                              </div>
-                             %endif
-                             % if 'checkbox' in q.type :
-                              <div style="display: flex;
-                              flex-direction: column;
-                              padding: 20px 0px;
-                              gap: 10px;">
-                                <span style="font-weight:bold">${q.question}</span>
-                                % for option in q.config['option'] :
-                                <div class="survey-item-input">
-                                    <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-                                  
-                                    <input type="${q.type}" name="${q.question}" value="${option}" id="${option}"  />
-                                    <label for="${option}">${option}</label>
-                                </div>
-                                % endfor
-                              </div>
-                            % endif
-                            % if 'radio' in q.type:
-                               <div style="display: flex;
-                               flex-direction: column;
-                               padding: 20px 0px;
-                               gap: 10px;">
-                                <span style="font-weight:bold">${q.question}</span>
-                                % for index,option in enumerate(q.config['option']) :
-                                <div class="survey-item-input">
-                                    <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-                               
-                                    <input id="${option}" type=${q.type} name="${q.question}" value="${option}"/>
-                                    <label for="${option}" >${option}</label>
-                                </div>
+                                    </div>
+                                % endif
                             % endfor
-                               </div>
-                            %endif
-                          % endfor       
-                      </div>
-                  </div>
-              </div>
-              % endfor   
-          %endif
+                        </div>
+                    </div>
+                    </div>
+                % endfor
+            % endif
+
             <div class="survey-form"  style="display: none;">
                 <div style="display: flex; flex-direction:column; align-items:center; gap:40px; justify-content:center; height:400px; " >
                     <div>
@@ -343,7 +278,7 @@
 
         }
         
-      
+
 
         if (currentFormIndex < 0) {
             currentFormIndex = 0;

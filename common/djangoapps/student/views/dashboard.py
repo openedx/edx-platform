@@ -65,7 +65,8 @@ from common.djangoapps.student.models import (
 )
 from common.djangoapps.util.milestones_helpers import get_pre_requisite_courses_not_completed
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from common.djangoapps.student.models import LastHistoryActivateDAO , SurveyFormDAO , ListSurveyQuestion, ListSurveyQuestionDAO
+from common.djangoapps.student.models import LastHistoryActivateDAO , Survey, SurveyCourse, SurveyQuestion , SurveyCourseDAO
+
 
 
 
@@ -888,10 +889,10 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     # context.update({
     #     'resume_button_urls': resume_button_urls
     # })
-    check_form = SurveyFormDAO.checkSuccess(user_id=user.id)
+    # check_form = SurveyFormDAO.checkSuccess(user_id=user.id)
     
-    if check_form == False:
-        return redirect('survey_form')
+    # if check_form == False:
+    #     return redirect('survey_form')
     
     
     dashboard_template = 'dashboard.html'
@@ -920,158 +921,169 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     return response
 
 
+def remove_duplicates(input_list):
+    unique_list = []
+    seen_elements = set()
 
-@login_required
-@ensure_csrf_cookie
-@add_maintenance_banner
-def form_begin_login (request) :
-    user = request.user
-    check_form = SurveyFormDAO.checkSuccess(user_id=user.id)
+    for element in input_list:
+        if element not in seen_elements:
+            unique_list.append(element)
+            seen_elements.add(element)
 
-    if check_form == True :
-        return redirect('dashboard')
-    
-    listQuestion = ListSurveyQuestion.objects.filter(course__isnull=True, isActive=True)
-
-    
-    survey_dict = {}  
-
-    for item in listQuestion:
-        survey_id = item.survey_id
-        if survey_id not in survey_dict:
-            survey_dict[survey_id] = []
-        survey_dict[survey_id].append(item)
-    
-
-    question = []
-    questions = []
-    result = []
-    
-    for survey_id, items in survey_dict.items():
-        if len(items) == 1:
-
-            question.append(items[0])
-            result.append(items[0])
-        else:
-            title = ''
-            for q in items :
-                if 'title' in q.type :
-                    title = q.question
-            combined_item = {
-                'id': survey_id, 
-                'survey_id': survey_id,
-                "title" : title,
-                'config':  items
-            }
-            questions.append(combined_item)
-            result.append(combined_item)
-
-    context = {
-         'question':  question ,
-         'questions' : questions,
-
-         
-    }
-
-    if request.method == 'POST':
-        
-        for q in listQuestion :
-            if 'title' not in q.type:
-                aws = request.POST.getlist(str(q.question))
-                for a in aws:
-                    SurveyFormDAO.create_form(user_id=user.id, question=q , answer_text=a)
-                
-                              
-        return redirect('dashboard')        
-         
-        
-        
-    return render_to_response('survey_form.html' , context)
-
-
-
+    return unique_list
 
 from common.djangoapps.student.views.management import get_resume_btn_data
-    
+
 @login_required
 @ensure_csrf_cookie
 @add_maintenance_banner
-def survey_form_course (request, course_id) :
+def form_begin_login (request, course_id=None) :
     user = request.user
-    check_question_course  = ListSurveyQuestionDAO.checkQuestion(course_id = course_id)
-    check_user_form = SurveyFormDAO.checkCourseSuccess(user_id = user.id, course_id=course_id)
+    # check_form = SurveyFormDAO.checkSuccess(user_id=user.id)
+
+    # if check_form == True :
+    #     return redirect('dashboard')
+    
     resume_button_urls = get_resume_btn_data(user)['resume_button_url']  
 
     urlCourse =''
     display_name = ''
-    for url in resume_button_urls :
-        if url['course_id'] == course_id :
-            urlCourse = url['url']
-            display_name = url['display_name']
-            
-    if check_question_course == False :
-        return redirect(urlCourse)
+    if course_id :
+        listQuestion =  SurveyCourseDAO.questionListSurveyCourse(course_id)
+        for url in resume_button_urls :
+            if url['course_id'] == course_id :
+                urlCourse = url['url']
+                display_name = url['display_name']          
+    else :
+        listQuestion = SurveyCourseDAO.questionListSurvey()
     
-    if check_user_form == True :
-        return redirect(urlCourse) 
-    
-    listQuestion = ListSurveyQuestion.objects.filter(course=course_id, isActive=True)
-    
-    survey_dict = {}  
+    result_lists = []
 
-    for item in listQuestion:
-        survey_id = item.survey_id
-        if survey_id not in survey_dict:
-            survey_dict[survey_id] = []
-        survey_dict[survey_id].append(item)
+    print('=======', display_name)
     
-
-    question = []
-    questions = []
-    result = []
-    
-    for survey_id, items in survey_dict.items():
-        if len(items) == 1:
-
-            question.append(items[0])
-            result.append(items[0])
-        else:
-            title = ''
-            for q in items :
-                if 'title' in q.type :
-                    title = q.question
-            combined_item = {
-                'id': survey_id, 
-                'survey_id': survey_id,
-                "title" : title,
-                'config':  items
+    for question in listQuestion:
+        survey = Survey.objects.filter(id=question.survey_id).first()
+        if survey:
+            survey_dict = {
+                'survey_name': survey.name_survey,
+                'questions': [question]
             }
-            questions.append(combined_item)
-            result.append(combined_item)
+            found = False
+            for result_dict in result_lists:
+                if result_dict['survey_name'] == survey_dict['survey_name']:
+                    result_dict['questions'].append(question)
+                    found = True
+                    break
+            if not found:
+                result_lists.append(survey_dict)
+
+
+        
+    context = {
+       'result_lists' : result_lists,
+       'display_name' : display_name
+    }
+    
+
+    # if request.method == 'POST':
+        
+    #     for q in listQuestion :
+    #         if 'title' not in q.type:
+    #             aws = request.POST.getlist(str(q.question))
+    #             for a in aws:
+    #                 SurveyFormDAO.create_form(user_id=user.id, question=q , answer_text=a)
+                
+                              
+    #     return redirect('dashboard')        
+         
+        
+        
+    return render_to_response('survey_form.html', context  )
+
+
+
+
+# from common.djangoapps.student.views.management import get_resume_btn_data
+    
+# @login_required
+# @ensure_csrf_cookie
+# @add_maintenance_banner
+# def survey_form_course (request, course_id) :
+#     user = request.user
+#     check_question_course  = ListSurveyQuestionDAO.checkQuestion(course_id = course_id)
+#     check_user_form = SurveyFormDAO.checkCourseSuccess(user_id = user.id, course_id=course_id)
+#     resume_button_urls = get_resume_btn_data(user)['resume_button_url']  
+
+#     urlCourse =''
+#     display_name = ''
+#     for url in resume_button_urls :
+#         if url['course_id'] == course_id :
+#             urlCourse = url['url']
+#             display_name = url['display_name']
+            
+#     if check_question_course == False :
+#         return redirect(urlCourse)
+    
+#     if check_user_form == True :
+#         return redirect(urlCourse) 
+    
+#     listQuestion = ListSurveyQuestion.objects.filter(course=course_id, isActive=True)
+    
+#     survey_dict = {}  
+
+#     for item in listQuestion:
+#         survey_id = item.survey_id
+#         if survey_id not in survey_dict:
+#             survey_dict[survey_id] = []
+#         survey_dict[survey_id].append(item)
+    
+
+#     question = []
+#     questions = []
+#     result = []
+    
+#     for survey_id, items in survey_dict.items():
+#         if len(items) == 1:
+
+#             question.append(items[0])
+#             result.append(items[0])
+#         else:
+#             title = ''
+#             for q in items :
+#                 if 'title' in q.type :
+#                     title = q.question
+#             combined_item = {
+#                 'id': survey_id, 
+#                 'survey_id': survey_id,
+#                 "title" : title,
+#                 'config':  items
+#             }
+#             questions.append(combined_item)
+#             result.append(combined_item)
 
 
    
             
-    context = {
-         'question':  question ,
-         'questions' : questions,
-         "course_id" : course_id,
-            'display_name' : display_name
+#     context = {
+#          'question':  question ,
+#          'questions' : questions,
+#          "course_id" : course_id,
+#             'display_name' : display_name
             
          
-    }
+#     }
     
-    if request.method == 'POST':
+#     if request.method == 'POST':
         
-        for q in listQuestion :
-            if 'title' not in q.type:
-                aws = request.POST.getlist(str(q.question))
-                for a in aws:
-                    SurveyFormDAO.create_form(user_id=user.id, question=q , answer_text=a, course_id = course_id)
+#         for q in listQuestion :
+#             if 'title' not in q.type:
+#                 aws = request.POST.getlist(str(q.question))
+#                 for a in aws:
+#                     SurveyFormDAO.create_form(user_id=user.id, question=q , answer_text=a, course_id = course_id)
          
-        return redirect(urlCourse)
+#         return redirect(urlCourse)
                             
         
-    return render_to_response('survey_form.html' , context)
+#     return render_to_response('survey_form.html' , context)
 
 
