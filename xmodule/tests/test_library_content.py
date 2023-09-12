@@ -99,6 +99,7 @@ class LibraryContentGeneralTest(LibraryContentTest):
         )
         assert isinstance(library.source_library_key, expected_locator_type)
 
+
 class TestLibraryContentExportImport(LibraryContentTest):
     """
     Export and import tests for LibraryContentBlock
