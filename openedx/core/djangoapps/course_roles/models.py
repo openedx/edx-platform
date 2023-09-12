@@ -19,8 +19,6 @@ class CourseRolesRole(models.Model):
 
     """
     name = models.CharField(max_length=255)
-    short_description = models.CharField(max_length=255)
-    long_description = models.TextField()
     service = models.ForeignKey('CourseRolesService', on_delete=models.DO_NOTHING, null=True)
     permissions = models.ManyToManyField('CourseRolesPermission', through='CourseRolesRolePermissions')
     users = models.ManyToManyField(User, through='CourseRolesUserRole')
@@ -36,7 +34,6 @@ class CourseRolesPermission(models.Model):
     A permission represents what a user can do.
     """
     name = models.CharField(max_length=255, unique=True)
-    description = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name
