@@ -777,7 +777,7 @@ openedx-filters==1.6.0
     # via
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
-openedx-learning @ git+https://github.com/openedx/openedx-learning@main  # Remove this once openedx-learning is tagged
+openedx-learning @ git+https://github.com/openedx/openedx-learning@main
     # via -r requirements/edx/kernel.in
 openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/kernel.in
