@@ -52,7 +52,7 @@ EXPECTED_PRINT_SETTINGS_COMMAND = [
 EXPECTED_WEBPACK_COMMAND = (
     "NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} "
     "JS_ENV_EXTRA_CONFIG={js_env_extra_config} "
-    "$(npm bin)/webpack --config={webpack_config_path}"
+    "$(npm root)/.bin/webpack --config={webpack_config_path}"
 )
 
 

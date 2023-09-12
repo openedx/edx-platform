@@ -40,14 +40,14 @@ mkdir -p "$vendor_css"
 log "Copying studio-frontend JS & CSS from node_modules into vendor directores..."
 while read -r -d $'\0' src_file ; do
     if [[ "$src_file" = *.css ]] || [[ "$src_file" = *.css.map ]] ; then
-        cp --force "$src_file" "$vendor_css"
+        cp -f "$src_file" "$vendor_css"
     else
-        cp --force "$src_file" "$vendor_js"
+        cp -f "$src_file" "$vendor_js"
     fi
 done < <(find "$node_modules/@edx/studio-frontend/dist" -type f -print0)
 
 log "Copying certain JS modules from node_modules into vendor directory..."
-cp --force \
+cp -f \
     "$node_modules/backbone.paginator/lib/backbone.paginator.js" \
     "$node_modules/backbone/backbone.js" \
     "$node_modules/bootstrap/dist/js/bootstrap.bundle.js" \
@@ -66,8 +66,8 @@ cp --force \
 
 log "Copying certain JS developer modules into vendor directory..."
 if [[ "${NODE_ENV:-production}" = development ]] ; then
-    cp --force "$node_modules/sinon/pkg/sinon.js" "$vendor_js"
-    cp --force "$node_modules/squirejs/src/Squire.js" "$vendor_js"
+    cp -f "$node_modules/sinon/pkg/sinon.js" "$vendor_js"
+    cp -f "$node_modules/squirejs/src/Squire.js" "$vendor_js"
 else
     # TODO: https://github.com/openedx/edx-platform/issues/31768
     # In the old implementation of this scipt (pavelib/assets.py), these two
@@ -77,8 +77,8 @@ else
     # However, in the future, it would be good to only copy them for dev
     # builds. Furthermore, these libraries should not be `npm install`ed
     # into prod builds in the first place.
-    cp --force "$node_modules/sinon/pkg/sinon.js" "$vendor_js" || true      # "|| true" means "tolerate errors"; in this case,
-    cp --force "$node_modules/squirejs/src/Squire.js" "$vendor_js" || true  # that's "tolerate if these files don't exist."
+    cp -f "$node_modules/sinon/pkg/sinon.js" "$vendor_js" || true      # "|| true" means "tolerate errors"; in this case,
+    cp -f "$node_modules/squirejs/src/Squire.js" "$vendor_js" || true  # that's "tolerate if these files don't exist."
 fi
 
 # Done echoing.
@@ -87,4 +87,3 @@ set +x
 log "-------------------------------------------------------------------------------"
 log " Done copying required assets from node_modules."
 log "====================================================================================="
-

@@ -55,7 +55,7 @@ SASS_LOOKUP_DEPENDENCIES = {
 COLLECTSTATIC_LOG_DIR_ARG = 'collect_log_dir'
 
 # Webpack command
-WEBPACK_COMMAND = 'STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} $(npm bin)/webpack {options}'
+WEBPACK_COMMAND = 'STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} $(npm root)/.bin/webpack {options}'
 
 
 def get_sass_directories(system, theme_dir=None):
@@ -680,7 +680,7 @@ def webpack(options):
     )
     sh(
         cmd(
-            '{environment} $(npm bin)/webpack --config={config_path}'.format(
+            '{environment} $(npm root)/.bin/webpack --config={config_path}'.format(
                 environment=environment,
                 config_path=config_path
             )
@@ -700,7 +700,7 @@ def execute_webpack_watch(settings=None):
     static_root_lms, config_path = result
     static_root_cms, = Env.get_django_settings(["STATIC_ROOT"], "cms", settings=settings)
     run_background_process(
-        'STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} $(npm bin)/webpack {options}'.format(
+        'STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} $(npm root)/.bin/webpack {options}'.format(
             options='--watch --config={config_path}'.format(
                 config_path=config_path
             ),
