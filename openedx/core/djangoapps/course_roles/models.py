@@ -15,7 +15,7 @@ class CourseRolesRole(models.Model):
     Model for a course roles role.
 
     A role is a collection of permissions that can be assigned to a user.
-    The Service field defines for which service UI the role is intended, such as CMS or LMS.
+    The services field defines for which service UI the role is intended, such as CMS and/or LMS.
 
     """
     name = models.CharField(max_length=255)
