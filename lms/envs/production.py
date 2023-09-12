@@ -23,6 +23,7 @@ import os
 
 import yaml
 from corsheaders.defaults import default_headers as corsheaders_default_headers
+import django
 from django.core.exceptions import ImproperlyConfigured
 from edx_django_utils.plugins import add_plugins
 from path import Path as path
@@ -366,6 +367,8 @@ CSRF_COOKIE_SECURE = ENV_TOKENS.get('CSRF_COOKIE_SECURE', False)
 
 # Determines which origins are trusted for unsafe requests eg. POST requests.
 CSRF_TRUSTED_ORIGINS = ENV_TOKENS.get('CSRF_TRUSTED_ORIGINS', [])
+if django.VERSION[0] >= 4:  # for greater than django 3.2 use schemes.
+    CSRF_TRUSTED_ORIGINS = ENV_TOKENS.get('CSRF_TRUSTED_ORIGINS_WITH_SCHEME', [])
 
 ############# CORS headers for cross-domain requests #################
 

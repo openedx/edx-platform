@@ -166,6 +166,10 @@ class ExperimentDataViewSetTests(APITestCase, ModuleStoreTestCase):  # lint-amne
         response = self.client.patch(url, data)
         assert response.status_code == 404
 
+    def test_loads_valid_csrf_trusted_origins_list(self):
+        """checking CSRF_TRUSTED_ORIGINS here. in django4.2 they will require schemes"""
+        assert settings.CSRF_TRUSTED_ORIGINS == ['.example.com']
+
 
 def cross_domain_config(func):
     """Decorator for configuring a cross-domain request. """
@@ -341,3 +345,4 @@ class ExperimentUserMetaDataViewTests(APITestCase, ModuleStoreTestCase):
         response = self.client.get(reverse('api_experiments:user_metadata', args=call_args_with_bogus_course))
         assert response.status_code == 404
         assert response.json()['message'] == 'Provided course is not found'
+
