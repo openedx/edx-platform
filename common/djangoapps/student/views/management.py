@@ -83,7 +83,7 @@ from common.djangoapps.student.signals import USER_EMAIL_CHANGED
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps.student.views.dashboard import get_course_enrollments,get_org_black_and_whitelist_for_site, get_dashboard_course_limit,get_filtered_course_entitlements,get_resume_urls_for_enrollments
 from common.djangoapps.student.helpers import get_resume_urls_for_enrollments
-# from common.djangoapps.student.models import LastHistoryActivateDAO , SurveyFormDAO , ListSurveyQuestion, ListSurveyQuestionDAO
+from common.djangoapps.student.models import Survey, SurveyCourseDAO, SurveyCourse, SurveyQuestion
 
 
 log = logging.getLogger("edx.student")
@@ -1031,8 +1031,9 @@ def get_resume_button_urls(request):
         course_overview = CourseOverview.get_from_id(enrollment.course_id)
         course_target = course_home_url(course_overview.id)
         resume_button_url =''
-        # check_form_user = SurveyFormDAO.checkCourseSuccess(user_id=user.id, course_id=enrollment.course_id)
-        # check_form_course = ListSurveyQuestionDAO.checkQuestion(course_id=enrollment.course_id)
+        checkSurveyCourse = SurveyCourseDAO.checkSurveyCourse(course_id=enrollment.course_id)
+        # checkUserSurvey = SurveyCourseDAO.checkUserEnroll(course_id=enrollment.course_id, user_id=user.id)
+        print('========',enrollment )
         for url in resume_button_urls :
             if str(enrollment.course_id) in url :
                 resume_button_url = url
@@ -1040,13 +1041,14 @@ def get_resume_button_urls(request):
         if resume_button_url == '' :
             textContent = _('View Course')
             url = course_target 
-            # if check_form_course == True  :
-            #     if check_form_user :
-            #         url = course_target
-            #     else :
-            #         url = '/survey-form/' + str(enrollment.course_id)
-            # else :
-                # url = course_target    
+            if checkSurveyCourse == True :
+                url = '/survey-form/' + str(enrollment.course_id)
+                # if check_form_user :
+                #     url = course_target
+                # else :
+                #     url = '/survey-form/' + str(enrollment.course_id)
+            else :
+                url = course_target    
         else :
             textContent = _('Resume Course')
             url = resume_button_url    

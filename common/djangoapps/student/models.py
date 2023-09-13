@@ -3766,57 +3766,36 @@ class SurveyCourseDAO():
                 listQuestion.append(q)
         
         return listQuestion
-        
-
-
-# class ListSurveyQuestion (models.Model):
-#     question = models.CharField( max_length=255, null=True)
-#     type = models.CharField( max_length=255, null=True)
-#     survey_id = models.IntegerField()
-#     config = models.JSONField(null=True, blank=True )
-#     isActive = models.BooleanField(default=False)
-#     course= models.ForeignKey(
-#         CourseOverview,
-#         db_constraint=False,
-#         on_delete=models.DO_NOTHING,
-#         null=True,
-#         blank=True
-#     )
-#     def __str__(self):
-#         return f"{self.question}"
-# class ListSurveyQuestionDAO ():
-#     @classmethod
-#     def checkQuestion (self, course_id) :
-#         isCheck = ListSurveyQuestion.objects.filter(course=course_id, isActive=True).exists()
-
-#         return isCheck
-
-# class SurveyForm(models.Model):
-#     question = models.ForeignKey(ListSurveyQuestion, on_delete=models.CASCADE)  
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     answer_text =  models.CharField( max_length=255, null=True)
-#     course= models.ForeignKey(
-#         CourseOverview,
-#         db_constraint=False,
-#         on_delete=models.DO_NOTHING,
-#         null=True,
-#         blank=True
-#     )
-#     def __str__(self):
-#         return f"{self.user} - Question: {self.question} - Answer: {self.answer_text}  " 
     
-# class SurveyFormDAO () :
-#     @classmethod
-#     def checkSuccess (self,user_id):
-#         isCheck = SurveyForm.objects.filter(user=user_id, course__isnull=True).exists()
-#         return isCheck
+    @classmethod
+    def listSurvey (self, course_id):
+        surveyCourse = SurveyCourse.objects.filter(course_id = course_id)
+        listSurvey = []
+        for s in surveyCourse :
+            survey_id = s.survey_id
+            survey = Survey.objects.filter(id=survey_id)
+            listSurvey.append(survey)
         
-#     @classmethod
-#     def checkCourseSuccess (self,user_id , course_id):
-#         isCheck = SurveyForm.objects.filter(user=user_id, course=course_id).exists()
-#         return isCheck
+        results = []
+        for survey in listSurvey :
+            results.append(survey)   
+       
+        return listSurvey
     
-#     @classmethod
-#     def create_form(self,user_id, question , answer_text, course_id=None):
-        
-#         return SurveyForm.objects.create(user_id=user_id, question=question, answer_text=answer_text, course_id = course_id)
+    @classmethod
+    def existSurveyCourse (self, course_id, survey_id):
+        isCheck = SurveyCourse.objects.filter(course=course_id, survey= survey_id).exists()
+        return isCheck
+    
+    @classmethod
+    def addSurveyCourse (self, course_id, survey_id):
+        return SurveyCourse.objects.create(course_id=course_id, survey_id = survey_id)
+    @classmethod
+    def checkSurveyCourse (self, course_id):
+        isCheck = SurveyCourse.objects.filter(course_id=course_id).exists()   
+        return isCheck
+    @classmethod
+    def checkUserEnroll (self, course_id, user_id) :
+        print('=======', course_id, user_id)
+
+
