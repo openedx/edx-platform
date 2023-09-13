@@ -174,6 +174,18 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
             object_id=str(self.course1),
         )
 
+        self.all_org_perms = (
+            self.tax_all_course1,
+            self.tax_all_course2,
+            self.tax_all_xblock1,
+            self.tax_all_xblock2,
+            self.tax_both_course1,
+            self.tax_both_course2,
+            self.tax_both_xblock1,
+            self.tax_both_xblock2,
+        )
+
+
     def _expected_users_have_perm(
         self, perm, obj, learner_perm=False, learner_obj=False, user_org2=True
     ):
@@ -497,44 +509,22 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
         assert not self.learner.has_perm(perm, object_tag)
 
     @ddt.data(
-        ("oel_tagging.add_object_tag", "tax_all_course1"),
-        ("oel_tagging.add_object_tag", "tax_all_course2"),
-        ("oel_tagging.add_object_tag", "tax_all_xblock1"),
-        ("oel_tagging.add_object_tag", "tax_all_xblock2"),
-        ("oel_tagging.add_object_tag", "tax_both_course1"),
-        ("oel_tagging.add_object_tag", "tax_both_course2"),
-        ("oel_tagging.add_object_tag", "tax_both_xblock1"),
-        ("oel_tagging.add_object_tag", "tax_both_xblock2"),
-        ("oel_tagging.change_object_tag", "tax_all_course1"),
-        ("oel_tagging.change_object_tag", "tax_all_course2"),
-        ("oel_tagging.change_object_tag", "tax_all_xblock1"),
-        ("oel_tagging.change_object_tag", "tax_all_xblock2"),
-        ("oel_tagging.change_object_tag", "tax_both_course1"),
-        ("oel_tagging.change_object_tag", "tax_both_course2"),
-        ("oel_tagging.change_object_tag", "tax_both_xblock1"),
-        ("oel_tagging.change_object_tag", "tax_both_xblock2"),
-        ("oel_tagging.delete_object_tag", "tax_all_course1"),
-        ("oel_tagging.delete_object_tag", "tax_all_course2"),
-        ("oel_tagging.delete_object_tag", "tax_all_xblock1"),
-        ("oel_tagging.delete_object_tag", "tax_all_xblock2"),
-        ("oel_tagging.delete_object_tag", "tax_both_course1"),
-        ("oel_tagging.delete_object_tag", "tax_both_course2"),
-        ("oel_tagging.delete_object_tag", "tax_both_xblock1"),
-        ("oel_tagging.delete_object_tag", "tax_both_xblock2"),
+        "oel_tagging.add_object_tag",
+        "oel_tagging.change_object_tag",
+        "oel_tagging.delete_object_tag",
     )
-    @ddt.unpack
-    def test_change_object_tag_all_orgs(self, perm, tag_attr):
+    def test_change_object_tag_all_orgs(self, perm):
         """
         Taxonomy administrators can create/edit an ObjectTag using taxonomies in their org,
         but only on objects they have write access to.
         """
-        perm_item = getattr(self, tag_attr)
-        assert self.superuser.has_perm(perm, perm_item)
-        assert self.staff.has_perm(perm, perm_item)
-        assert self.user_all_orgs.has_perm(perm, perm_item)
-        assert self.user_both_orgs.has_perm(perm, perm_item)
-        assert self.user_org2.has_perm(perm, perm_item) == (tag_attr.endswith("2"))
-        assert not self.learner.has_perm(perm, perm_item)
+        for perm_item in self.all_org_perms:
+            assert self.superuser.has_perm(perm, perm_item)
+            assert self.staff.has_perm(perm, perm_item)
+            assert self.user_all_orgs.has_perm(perm, perm_item)
+            assert self.user_both_orgs.has_perm(perm, perm_item)
+            assert self.user_org2.has_perm(perm, perm_item) == (self.org2.short_name in perm_item.object_id)
+            assert not self.learner.has_perm(perm, perm_item)
 
     @ddt.data(
         ("oel_tagging.add_object_tag", "tax1_course1"),
