@@ -3799,6 +3799,16 @@ msgstr "حدث خطأ أثناء محاولة تحميل الملف. يُرجى 
 msgid "Good"
 msgstr "جيّد"
 
+#. Translators: Replier commented on "your" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "your"
+msgstr ""
+
+#. Translators: Replier commented on "their" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "their"
+msgstr ""
+
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #, python-format
 msgid ""
@@ -7596,7 +7606,7 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "<{p}><{strong}>{replier_name}</{strong}> commented on "
-"<{strong}>{author_name}'s</{strong}> response to your post "
+"<{strong}>{author_name}</{strong}> response to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
 
@@ -7605,6 +7615,26 @@ msgstr ""
 msgid ""
 "<{p}><{strong}>{replier_name}</{strong}> responded to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> posted "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> asked "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+msgid ""
+"Notifications for responses and comments on your posts, and the ones you’re "
+"following, including endorsements to your responses and on your posts."
 msgstr ""
 
 #: openedx/core/djangoapps/notifications/views.py
@@ -14294,34 +14324,6 @@ msgstr "هل قام برنامج البريد الإلكتروني الخاص ب
 #: lms/templates/invalid_email_key.html
 msgid "The keys are valid for a limited amount of time. Has the key expired?"
 msgstr "المفاتيح صالحة لمدّة محدودة فقط. هل انتهت صلاحية المفتاح؟"
-
-#: lms/templates/library-block-author-preview-header.html
-msgid ""
-"Showing all matching content eligible to be added into {display_name}. Each "
-"student will be assigned {max_count} component drawn randomly from this "
-"list."
-msgid_plural ""
-"Showing all matching content eligible to be added into {display_name}. Each "
-"student will be assigned {max_count} components drawn randomly from this "
-"list."
-msgstr[0] ""
-"عرض كامل المحتوى المطابق والذي يمكن إضافته إلى {display_name}. يُعيَّن لكل "
-"طالب {max_count} مركّبات تُختار عشوائيًا من هذه القائمة."
-msgstr[1] ""
-"عرض كامل المحتوى المطابق والذي يمكن إضافته إلى {display_name}. يُعيَّن لكل "
-"طالب {max_count} مركّب يُختار عشوائيًا من هذه القائمة."
-msgstr[2] ""
-"عرض كامل المحتوى المطابق والذي يمكن إضافته إلى {display_name}. يُعيَّن لكل "
-"طالب {max_count} مركّب تُختار عشوائيًا من هذه القائمة."
-msgstr[3] ""
-"عرض كامل المحتوى المطابق والذي يمكن إضافته إلى {display_name}. يُعيَّن لكل "
-"طالب {max_count} مركّبات تُختار عشوائيًا من هذه القائمة."
-msgstr[4] ""
-"عرض كامل المحتوى المطابق والذي يمكن إضافته إلى {display_name}. يُعيَّن لكل "
-"طالب {max_count} مركّبات تُختار عشوائيًا من هذه القائمة."
-msgstr[5] ""
-"عرض كامل المحتوى المطابق والذي يمكن إضافته إلى {display_name}. يُعيَّن لكل "
-"طالب {max_count} مركّبات تُختار عشوائيًا من هذه القائمة."
 
 #. Translators:  "External resource" means that this learning module is hosted
 #. on a platform external to the edX LMS
@@ -23051,6 +23053,22 @@ msgstr ""
 "تجد رسالتنا في صندوق بريدك الوارد. ألم تتمكّن بعد من إيجاد رسالة التأكيد؟ "
 "اطلب المساعدة إذًا عن طريق الرابط أدناه. "
 
+#: cms/templates/library-block-author-preview-header.html
+msgid ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} component drawn randomly from this "
+"list."
+msgid_plural ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} components drawn randomly from this "
+"list."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
+
 #: cms/templates/library.html
 msgid "Content Library"
 msgstr "مكتبة المحتويات"
@@ -24380,10 +24398,6 @@ msgstr "تصفّح المساق"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "المخطّط الكلّي"
-
-#: cms/templates/widgets/header.html
-msgid "Files & Media"
-msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

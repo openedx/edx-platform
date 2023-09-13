@@ -111,13 +111,11 @@ class ItemTest(CourseTestCase):
         self.course_key = self.course.id
         self.usage_key = self.course.location
 
-    def get_item_from_modulestore(self, usage_key, verify_is_draft=False):
+    def get_item_from_modulestore(self, usage_key):
         """
         Get the item referenced by the UsageKey from the modulestore
         """
         item = self.store.get_item(usage_key)
-        if verify_is_draft:
-            self.assertTrue(getattr(item, "is_draft", False))
         return item
 
     def response_usage_key(self, response):
@@ -540,9 +538,8 @@ class GetItemTest(ItemTest):
 class DeleteItem(ItemTest):
     """Tests for '/xblock' DELETE url."""
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_delete_static_page(self, store):
-        course = CourseFactory.create(default_store=store)
+    def test_delete_static_page(self):
+        course = CourseFactory.create()
         # Add static tab
         resp = self.create_xblock(
             category="static_tab", parent_usage_key=course.location
@@ -589,7 +586,7 @@ class TestCreateItem(ItemTest):
             parent_usage_key=vert_usage_key, category="problem", boilerplate=template_id
         )
         prob_usage_key = self.response_usage_key(resp)
-        problem = self.get_item_from_modulestore(prob_usage_key, verify_is_draft=True)
+        problem = self.get_item_from_modulestore(prob_usage_key)
         # check against the template
         template = ProblemBlock.get_template(template_id)
         self.assertEqual(problem.data, template["data"])
@@ -807,9 +804,7 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
         self.html_usage_key = self.response_usage_key(resp)
 
         # Create a second sequential just (testing children of children)
-        self.create_xblock(
-            parent_usage_key=self.chapter_usage_key, category="sequential2"
-        )
+        self.create_xblock(parent_usage_key=self.chapter_usage_key, category='sequential')
 
     def test_duplicate_equality(self):
         """
@@ -976,10 +971,10 @@ class TestMoveItem(ItemTest):
         if not default_store:
             default_store = self.store.default_modulestore.get_modulestore_type()
 
-        self.course = CourseFactory.create(default_store=default_store)
+        course = CourseFactory.create(default_store=default_store)
 
         # Create group configurations
-        self.course.user_partitions = [
+        course.user_partitions = [
             UserPartition(
                 0,
                 "first_partition",
@@ -987,18 +982,18 @@ class TestMoveItem(ItemTest):
                 [Group("0", "alpha"), Group("1", "beta")],
             )
         ]
-        self.store.update_item(self.course, self.user.id)
+        self.store.update_item(course, self.user.id)
 
         # Create a parent chapter
         chap1 = self.create_xblock(
-            parent_usage_key=self.course.location,
+            parent_usage_key=course.location,
             display_name="chapter1",
             category="chapter",
         )
         self.chapter_usage_key = self.response_usage_key(chap1)
 
         chap2 = self.create_xblock(
-            parent_usage_key=self.course.location,
+            parent_usage_key=course.location,
             display_name="chapter2",
             category="chapter",
         )
@@ -1053,6 +1048,8 @@ class TestMoveItem(ItemTest):
         )
         self.split_test_usage_key = self.response_usage_key(resp)
 
+        self.course = self.store.get_item(course.location)
+
     def setup_and_verify_content_experiment(self, partition_id):
         """
         Helper method to set up group configurations to content experiment.
@@ -1060,9 +1057,7 @@ class TestMoveItem(ItemTest):
         Arguments:
             partition_id (int): User partition id.
         """
-        split_test = self.get_item_from_modulestore(
-            self.split_test_usage_key, verify_is_draft=True
-        )
+        split_test = self.get_item_from_modulestore(self.split_test_usage_key)
 
         # Initially, no user_partition_id is set, and the split_test has no children.
         self.assertEqual(split_test.user_partition_id, -1)
@@ -1073,9 +1068,7 @@ class TestMoveItem(ItemTest):
             reverse_usage_url("xblock_handler", self.split_test_usage_key),
             data={"metadata": {"user_partition_id": str(partition_id)}},
         )
-        split_test = self.get_item_from_modulestore(
-            self.split_test_usage_key, verify_is_draft=True
-        )
+        split_test = self.get_item_from_modulestore(self.split_test_usage_key)
         self.assertEqual(split_test.user_partition_id, partition_id)
         self.assertEqual(
             len(split_test.children),
@@ -1141,15 +1134,11 @@ class TestMoveItem(ItemTest):
         self.assertIn(source_usage_key, target_parent.children)
         self.assertNotIn(source_usage_key, source_parent.children)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_move_component(self, store_type):
+    def test_move_component(self):
         """
         Test move component with different xblock types.
-
-        Arguments:
-            store_type (ModuleStoreEnum.Type): Type of modulestore to create test course in.
         """
-        self.setup_course(default_store=store_type)
+        self.setup_course()
         for source_usage_key, target_usage_key in [
             (self.html_usage_key, self.vert2_usage_key),
             (self.vert_usage_key, self.seq2_usage_key),
@@ -1391,9 +1380,7 @@ class TestMoveItem(ItemTest):
             reverse_usage_url("xblock_handler", child_split_test_usage_key),
             data={"metadata": {"user_partition_id": str(0)}},
         )
-        child_split_test = self.get_item_from_modulestore(
-            self.split_test_usage_key, verify_is_draft=True
-        )
+        child_split_test = self.get_item_from_modulestore(self.split_test_usage_key)
 
         # Try to move content experiment further down the level to a child group A nested inside main group A.
         response = self._move_component(
@@ -1469,6 +1456,7 @@ class TestMoveItem(ItemTest):
         """
         group1 = self.course.user_partitions[0].groups[0]
         group2 = self.course.user_partitions[0].groups[1]
+        vert1 = self.store.get_item(self.vert_usage_key)
         vert2 = self.store.get_item(self.vert2_usage_key)
         html = self.store.get_item(self.html_usage_key)
 
@@ -1481,10 +1469,12 @@ class TestMoveItem(ItemTest):
         html.runtime._services["partitions"] = partitions_service  # lint-amnesty, pylint: disable=protected-access
 
         # Set access settings so html will contradict vert2 when moved into that unit
+        vert1.group_access = {self.course.user_partitions[0].id: [group2.id]}
         vert2.group_access = {self.course.user_partitions[0].id: [group1.id]}
         html.group_access = {self.course.user_partitions[0].id: [group2.id]}
-        self.store.update_item(html, self.user.id)
-        self.store.update_item(vert2, self.user.id)
+        vert1 = self.store.update_item(vert1, self.user.id)
+        vert2 = self.store.update_item(vert2, self.user.id)
+        html = self.store.update_item(html, self.user.id)
 
         # Verify that there is no warning when html is in a non contradicting unit
         validation = html.validate()
@@ -1493,7 +1483,7 @@ class TestMoveItem(ItemTest):
         # Now move it and confirm that the html component has been moved into vertical 2
         self.assert_move_item(self.html_usage_key, self.vert2_usage_key)
         html.parent = self.vert2_usage_key
-        self.store.update_item(html, self.user.id)
+        html = self.store.update_item(html, self.user.id)
         validation = html.validate()
         self.assertEqual(len(validation.messages), 1)
         self._verify_validation_message(
@@ -1505,7 +1495,7 @@ class TestMoveItem(ItemTest):
         # Move the html component back and confirm that the warning is gone again
         self.assert_move_item(self.html_usage_key, self.vert_usage_key)
         html.parent = self.vert_usage_key
-        self.store.update_item(html, self.user.id)
+        html = self.store.update_item(html, self.user.id)
         validation = html.validate()
         self.assertEqual(len(validation.messages), 0)
 
@@ -1527,16 +1517,12 @@ class TestMoveItem(ItemTest):
             insert_at,
         )
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_move_and_discard_changes(self, store_type):
+    def test_move_and_discard_changes(self):
         """
         Verifies that discard changes operation brings moved component back to source location and removes the component
         from target location.
-
-        Arguments:
-            store_type (ModuleStoreEnum.Type): Type of modulestore to create test course in.
         """
-        self.setup_course(default_store=store_type)
+        self.setup_course()
 
         old_parent_loc = self.store.get_parent_location(self.html_usage_key)
 
@@ -1594,15 +1580,11 @@ class TestMoveItem(ItemTest):
         self.assertIn(self.html_usage_key, source_parent.children)
         self.assertNotIn(self.html_usage_key, target_parent.children)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_move_item_not_found(self, store_type=ModuleStoreEnum.Type.mongo):
+    def test_move_item_not_found(self):
         """
         Test that an item not found exception raised when an item is not found when getting the item.
-
-        Arguments:
-            store_type (ModuleStoreEnum.Type): Type of modulestore to create test course in.
         """
-        self.setup_course(default_store=store_type)
+        self.setup_course()
 
         data = {
             "move_source_locator": str(
@@ -1752,30 +1734,25 @@ class TestEditItem(TestEditItemSetup):
         self.client.ajax_post(
             self.problem_update_url, data={"metadata": {"rerandomize": "onreset"}}
         )
-        problem = self.get_item_from_modulestore(
-            self.problem_usage_key, verify_is_draft=True
-        )
-        self.assertEqual(problem.rerandomize, "onreset")
+        problem = self.get_item_from_modulestore(self.problem_usage_key)
+        self.assertEqual(problem.rerandomize, 'onreset')
         self.client.ajax_post(
             self.problem_update_url, data={"metadata": {"rerandomize": None}}
         )
-        problem = self.get_item_from_modulestore(
-            self.problem_usage_key, verify_is_draft=True
-        )
-        self.assertEqual(problem.rerandomize, "never")
+        problem = self.get_item_from_modulestore(self.problem_usage_key)
+        self.assertEqual(problem.rerandomize, 'never')
 
     def test_null_field(self):
         """
         Sending null in for a field 'deletes' it
         """
-        problem = self.get_item_from_modulestore(
-            self.problem_usage_key, verify_is_draft=True
-        )
+        problem = self.get_item_from_modulestore(self.problem_usage_key)
         self.assertIsNotNone(problem.markdown)
-        self.client.ajax_post(self.problem_update_url, data={"nullout": ["markdown"]})
-        problem = self.get_item_from_modulestore(
-            self.problem_usage_key, verify_is_draft=True
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={'nullout': ['markdown']}
         )
+        problem = self.get_item_from_modulestore(self.problem_usage_key)
         self.assertIsNone(problem.markdown)
 
     def test_date_fields(self):
@@ -1831,9 +1808,7 @@ class TestEditItem(TestEditItemSetup):
                 }
             },
         )
-        problem = self.get_item_from_modulestore(
-            self.problem_usage_key, verify_is_draft=True
-        )
+        problem = self.get_item_from_modulestore(self.problem_usage_key)
         self.assertEqual(problem.display_name, new_display_name)
         self.assertEqual(problem.max_attempts, new_max_attempts)
 
@@ -2052,9 +2027,7 @@ class TestEditItem(TestEditItemSetup):
             },
         )
         self.assertFalse(self._is_location_published(self.problem_usage_key))
-        draft = self.get_item_from_modulestore(
-            self.problem_usage_key, verify_is_draft=True
-        )
+        draft = self.get_item_from_modulestore(self.problem_usage_key)
         self.assertEqual(draft.display_name, new_display_name)
 
         # Publish the item
@@ -2112,9 +2085,7 @@ class TestEditItem(TestEditItemSetup):
         self.client.ajax_post(
             self.problem_update_url, data={"metadata": {"due": "2077-10-10T04:00Z"}}
         )
-        updated_draft = self.get_item_from_modulestore(
-            self.problem_usage_key, verify_is_draft=True
-        )
+        updated_draft = self.get_item_from_modulestore(self.problem_usage_key)
         self.assertEqual(updated_draft.due, datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
         self.assertIsNone(published.due)
         # Fetch the published version again to make sure the due date is still unset.
@@ -2154,9 +2125,7 @@ class TestEditItem(TestEditItemSetup):
         )
 
         # Both published and draft content should be different
-        draft = self.get_item_from_modulestore(
-            self.problem_usage_key, verify_is_draft=True
-        )
+        draft = self.get_item_from_modulestore(self.problem_usage_key)
         self.assertNotEqual(draft.data, published.data)
 
         # Get problem by 'xblock_handler'
@@ -2174,9 +2143,7 @@ class TestEditItem(TestEditItemSetup):
         self.assertEqual(resp.status_code, 200)
 
         # Both published and draft content should still be different
-        draft = self.get_item_from_modulestore(
-            self.problem_usage_key, verify_is_draft=True
-        )
+        draft = self.get_item_from_modulestore(self.problem_usage_key)
         self.assertNotEqual(draft.data, published.data)
         # Fetch the published version again to make sure the data is correct.
         published = modulestore().get_item(
@@ -2208,18 +2175,6 @@ class TestEditItem(TestEditItemSetup):
         self.assertEqual(resp.status_code, 200)
         self._verify_published_with_no_draft(unit_usage_key)
         self._verify_published_with_no_draft(html_usage_key)
-
-        # Make a draft for the unit and verify that the problem also has a draft
-        resp = self.client.ajax_post(
-            unit_update_url,
-            data={
-                "id": str(unit_usage_key),
-                "metadata": {},
-            },
-        )
-        self.assertEqual(resp.status_code, 200)
-        self._verify_published_with_draft(unit_usage_key)
-        self._verify_published_with_draft(html_usage_key)
 
     def test_field_value_errors(self):
         """
@@ -2346,9 +2301,7 @@ class TestEditSplitModule(ItemTest):
         )
 
         # Verify the partition_id was saved.
-        split_test = self.get_item_from_modulestore(
-            self.split_test_usage_key, verify_is_draft=True
-        )
+        split_test = self.get_item_from_modulestore(self.split_test_usage_key)
         self.assertEqual(partition_id, split_test.user_partition_id)
         return split_test
 
@@ -2356,7 +2309,7 @@ class TestEditSplitModule(ItemTest):
         """
         Verifies the number of children of the split_test instance.
         """
-        split_test = self.get_item_from_modulestore(self.split_test_usage_key, True)
+        split_test = self.get_item_from_modulestore(self.split_test_usage_key)
         self.assertEqual(expected_number, len(split_test.children))
         return split_test
 
@@ -2365,9 +2318,7 @@ class TestEditSplitModule(ItemTest):
         Test that verticals are created for the configuration groups when
         a spit test block is edited.
         """
-        split_test = self.get_item_from_modulestore(
-            self.split_test_usage_key, verify_is_draft=True
-        )
+        split_test = self.get_item_from_modulestore(self.split_test_usage_key)
         # Initially, no user_partition_id is set, and the split_test has no children.
         self.assertEqual(-1, split_test.user_partition_id)
         self.assertEqual(0, len(split_test.children))
@@ -2377,12 +2328,8 @@ class TestEditSplitModule(ItemTest):
 
         # Verify that child verticals have been set to match the groups
         self.assertEqual(2, len(split_test.children))
-        vertical_0 = self.get_item_from_modulestore(
-            split_test.children[0], verify_is_draft=True
-        )
-        vertical_1 = self.get_item_from_modulestore(
-            split_test.children[1], verify_is_draft=True
-        )
+        vertical_0 = self.get_item_from_modulestore(split_test.children[0])
+        vertical_1 = self.get_item_from_modulestore(split_test.children[1])
         self.assertEqual("vertical", vertical_0.category)
         self.assertEqual("vertical", vertical_1.category)
         self.assertEqual(
@@ -2407,9 +2354,7 @@ class TestEditSplitModule(ItemTest):
         """
         Test that concise outline for split test component gives display name as group name.
         """
-        split_test = self.get_item_from_modulestore(
-            self.split_test_usage_key, verify_is_draft=True
-        )
+        split_test = self.get_item_from_modulestore(self.split_test_usage_key)
         # Initially, no user_partition_id is set, and the split_test has no children.
         self.assertEqual(split_test.user_partition_id, -1)
         self.assertEqual(len(split_test.children), 0)
@@ -2451,15 +2396,9 @@ class TestEditSplitModule(ItemTest):
         self.assertEqual(5, len(split_test.children))
         self.assertEqual(initial_vertical_0_location, split_test.children[0])
         self.assertEqual(initial_vertical_1_location, split_test.children[1])
-        vertical_0 = self.get_item_from_modulestore(
-            split_test.children[2], verify_is_draft=True
-        )
-        vertical_1 = self.get_item_from_modulestore(
-            split_test.children[3], verify_is_draft=True
-        )
-        vertical_2 = self.get_item_from_modulestore(
-            split_test.children[4], verify_is_draft=True
-        )
+        vertical_0 = self.get_item_from_modulestore(split_test.children[2])
+        vertical_1 = self.get_item_from_modulestore(split_test.children[3])
+        vertical_2 = self.get_item_from_modulestore(split_test.children[4])
 
         # Verify that the group_id_to child mapping is correct.
         self.assertEqual(3, len(split_test.group_id_to_child))
@@ -3106,39 +3045,25 @@ class TestXBlockInfo(ItemTest):
         json_response = json.loads(resp.content.decode("utf-8"))
         self.validate_course_xblock_info(json_response, course_outline=True)
 
-    @ddt.data(
-        (ModuleStoreEnum.Type.split, 3, 3),
-        (ModuleStoreEnum.Type.mongo, 8, 12),
-    )
-    @ddt.unpack
-    def test_xblock_outline_handler_mongo_calls(
-        self, store_type, chapter_queries, chapter_queries_1
-    ):
-        with self.store.default_store(store_type):
-            course = CourseFactory.create()
-            chapter = BlockFactory.create(
-                parent_location=course.location,
-                category="chapter",
-                display_name="Week 1",
-            )
-            outline_url = reverse_usage_url("xblock_outline_handler", chapter.location)
-            with check_mongo_calls(chapter_queries):
-                self.client.get(outline_url, HTTP_ACCEPT="application/json")
+    def test_xblock_outline_handler_mongo_calls(self):
+        course = CourseFactory.create()
+        chapter = BlockFactory.create(
+            parent_location=course.location, category='chapter', display_name='Week 1'
+        )
+        outline_url = reverse_usage_url('xblock_outline_handler', chapter.location)
+        with check_mongo_calls(3):
+            self.client.get(outline_url, HTTP_ACCEPT='application/json')
 
-            sequential = BlockFactory.create(
-                parent_location=chapter.location,
-                category="sequential",
-                display_name="Sequential 1",
-            )
+        sequential = BlockFactory.create(
+            parent_location=chapter.location, category='sequential', display_name='Sequential 1'
+        )
 
-            BlockFactory.create(
-                parent_location=sequential.location,
-                category="vertical",
-                display_name="Vertical 1",
-            )
-            # calls should be same after adding two new children for split only.
-            with check_mongo_calls(chapter_queries_1):
-                self.client.get(outline_url, HTTP_ACCEPT="application/json")
+        BlockFactory.create(
+            parent_location=sequential.location, category='vertical', display_name='Vertical 1'
+        )
+        # calls should be same after adding two new children for split only.
+        with check_mongo_calls(3):
+            self.client.get(outline_url, HTTP_ACCEPT='application/json')
 
     def test_entrance_exam_chapter_xblock_info(self):
         chapter = BlockFactory.create(
@@ -3264,32 +3189,26 @@ class TestXBlockInfo(ItemTest):
         )
         self.validate_component_xblock_info(xblock_info)
 
-    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
-    def test_validate_start_date(self, store_type):
+    def test_validate_start_date(self):
         """
         Validate if start-date year is less than 1900 reset the date to DEFAULT_START_DATE.
         """
-        with self.store.default_store(store_type):
-            course = CourseFactory.create()
-            chapter = BlockFactory.create(
-                parent_location=course.location,
-                category="chapter",
-                display_name="Week 1",
-            )
+        course = CourseFactory.create()
+        chapter = BlockFactory.create(
+            parent_location=course.location, category='chapter', display_name='Week 1'
+        )
 
-            chapter.start = datetime(year=1899, month=1, day=1, tzinfo=UTC)
+        chapter.start = datetime(year=1899, month=1, day=1, tzinfo=UTC)
 
-            xblock_info = create_xblock_info(
-                chapter,
-                include_child_info=True,
-                include_children_predicate=ALWAYS,
-                include_ancestor_info=True,
-                user=self.user,
-            )
+        xblock_info = create_xblock_info(
+            chapter,
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+            include_ancestor_info=True,
+            user=self.user
+        )
 
-            self.assertEqual(
-                xblock_info["start"], DEFAULT_START_DATE.strftime("%Y-%m-%dT%H:%M:%SZ")
-            )
+        self.assertEqual(xblock_info['start'], DEFAULT_START_DATE.strftime('%Y-%m-%dT%H:%M:%SZ'))
 
     def test_highlights_enabled(self):
         self.course.highlights_enabled_for_messaging = True
@@ -3489,9 +3408,11 @@ class TestSpecialExamXBlockInfo(ItemTest):
             user_id=user_id,
             highlights=["highlight"],
         )
+        # get updated course
+        self.course = self.store.get_item(self.course.location)
         self.course.enable_proctored_exams = True
         self.course.save()
-        self.store.update_item(self.course, self.user.id)
+        self.course = self.store.update_item(self.course, self.user.id)
 
     def test_proctoring_is_enabled_for_course(self):
         course = modulestore().get_item(self.course.location)
@@ -3517,7 +3438,7 @@ class TestSpecialExamXBlockInfo(ItemTest):
             category="sequential",
             display_name="Test Lesson 1",
             user_id=self.user.id,
-            is_proctored_exam=True,
+            is_proctored_enabled=True,
             is_time_limited=True,
             default_time_limit_minutes=100,
             is_onboarding_exam=False,
@@ -3561,7 +3482,7 @@ class TestSpecialExamXBlockInfo(ItemTest):
             category="sequential",
             display_name="Test Lesson 1",
             user_id=self.user.id,
-            is_proctored_exam=False,
+            is_proctored_enabled=False,
             is_time_limited=False,
             is_onboarding_exam=False,
         )
@@ -3589,7 +3510,7 @@ class TestSpecialExamXBlockInfo(ItemTest):
             category="sequential",
             display_name="Test Lesson 1",
             user_id=self.user.id,
-            is_proctored_exam=False,
+            is_proctored_enabled=False,
             is_time_limited=False,
             is_onboarding_exam=False,
         )
@@ -3849,9 +3770,8 @@ class TestXBlockPublishingInfo(ItemTest):
         xblock_info = self._get_xblock_info(empty_chapter.location)
         self._verify_visibility_state(xblock_info, VisibilityState.unscheduled)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_chapter_self_paced_default_start_date(self, store_type):
-        course = CourseFactory.create(default_store=store_type)
+    def test_chapter_self_paced_default_start_date(self):
+        course = CourseFactory.create()
         course.self_paced = True
         self.store.update_item(course, self.user.id)
         chapter = self._create_child(course, "chapter", "Test Chapter")
@@ -3939,29 +3859,15 @@ class TestXBlockPublishingInfo(ItemTest):
         )
 
     def test_partially_released_section(self):
-        chapter = self._create_child(self.course, "chapter", "Test Chapter")
-        released_sequential = self._create_child(
-            chapter, "sequential", "Released Sequential"
-        )
-        self._create_child(
-            released_sequential, "vertical", "Released Unit", publish_item=True
-        )
-        self._create_child(
-            released_sequential, "vertical", "Staff Only Unit", staff_only=True
-        )
+        chapter = self._create_child(self.course, 'chapter', "Test Chapter")
+        released_sequential = self._create_child(chapter, 'sequential', "Released Sequential")
+        self._create_child(released_sequential, 'vertical', "Released Unit", publish_item=True)
+        self._create_child(released_sequential, 'vertical', "Staff Only Unit 1", staff_only=True)
         self._set_release_date(chapter.location, datetime.now(UTC) - timedelta(days=1))
-        published_sequential = self._create_child(
-            chapter, "sequential", "Published Sequential"
-        )
-        self._create_child(
-            published_sequential, "vertical", "Published Unit", publish_item=True
-        )
-        self._create_child(
-            published_sequential, "vertical", "Staff Only Unit", staff_only=True
-        )
-        self._set_release_date(
-            published_sequential.location, datetime.now(UTC) + timedelta(days=1)
-        )
+        published_sequential = self._create_child(chapter, 'sequential', "Published Sequential")
+        self._create_child(published_sequential, 'vertical', "Published Unit", publish_item=True)
+        self._create_child(published_sequential, 'vertical', "Staff Only Unit 2", staff_only=True)
+        self._set_release_date(published_sequential.location, datetime.now(UTC) + timedelta(days=1))
         xblock_info = self._get_xblock_info(chapter.location)
 
         # Verify the state of the released sequential
@@ -4191,8 +4097,7 @@ class TestXBlockPublishingInfo(ItemTest):
             xblock_info, True, path=self.FIRST_UNIT_PATH
         )
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_self_paced_item_visibility_state(self, store_type):
+    def test_self_paced_item_visibility_state(self):
         """
         Test that in self-paced course, item has `live` visibility state.
         Test that when item was initially in `scheduled` state in instructor mode, change course pacing to self-paced,
@@ -4200,7 +4105,7 @@ class TestXBlockPublishingInfo(ItemTest):
         """
 
         # Create course, chapter and setup future release date to make chapter in scheduled state
-        course = CourseFactory.create(default_store=store_type)
+        course = CourseFactory.create()
         chapter = self._create_child(course, "chapter", "Test Chapter")
         self._set_release_date(chapter.location, datetime.now(UTC) + timedelta(days=1))
 

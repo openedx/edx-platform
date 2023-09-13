@@ -48,7 +48,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-08-20 20:42+0000\n"
+"POT-Creation-Date: 2023-08-27 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Catalan (http://app.transifex.com/open-edx/edx-platform/language/ca/)\n"
@@ -10812,6 +10812,14 @@ msgstr ""
 "han publicat la unitat. Només les unitats que estan explícitament amagades "
 "pels aprenents romandran ocultes després d'esborrar aquesta opció per a "
 "%(xblockType)s."
+
+#: cms/templates/js/summary-configuration-editor.underscore
+msgid "Xpert unit summaries"
+msgstr ""
+
+#: cms/templates/js/summary-configuration-editor.underscore
+msgid "Enable summaries"
+msgstr ""
 
 #: cms/templates/js/team-member.underscore
 msgid "Current Role:"

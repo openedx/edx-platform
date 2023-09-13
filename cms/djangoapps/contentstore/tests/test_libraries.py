@@ -1014,28 +1014,3 @@ class TestOverrides(LibraryTestCase):
         self.assertEqual(self.lc_block.source_library_version, duplicate.source_library_version)
         problem2_in_course = store.get_item(duplicate.children[0])
         self.assertEqual(problem2_in_course.display_name, self.original_display_name)
-
-
-class TestIncompatibleModuleStore(LibraryTestCase):
-    """
-    Tests for proper validation errors with an incompatible course modulestore.
-    """
-
-    def setUp(self):
-        super().setUp()
-        # Create a course in an incompatible modulestore.
-        with modulestore().default_store(ModuleStoreEnum.Type.mongo):
-            self.course = CourseFactory.create()
-
-        # Add a LibraryContent block to the course:
-        self.lc_block = self._add_library_content_block(self.course, self.lib_key)
-
-    def test_incompatible_modulestore(self):
-        """
-        Verifies that, if a user is using a modulestore that doesn't support libraries,
-        a validation error will be produced.
-        """
-        validation = self.lc_block.validate()
-        self.assertEqual(validation.summary.type, validation.summary.ERROR)
-        self.assertIn(
-            "This course does not support content libraries.", validation.summary.text)

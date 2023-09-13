@@ -12,7 +12,7 @@ class OpenAssessmentDateTransformer(FilteringTransformerMixin, BlockStructureTra
     """
     BlockTransformer to collect all fields related to dates for openassessment problems.
     """
-    WRITE_VERSION = 1
+    WRITE_VERSION = 2
     READ_VERSION = 1
 
     @classmethod
@@ -37,6 +37,7 @@ class OpenAssessmentDateTransformer(FilteringTransformerMixin, BlockStructureTra
             'graded',
             'format',
             'has_score',
+            'date_config_type',
         )
 
     def transform_block_filters(self, usage_info, block_structure):

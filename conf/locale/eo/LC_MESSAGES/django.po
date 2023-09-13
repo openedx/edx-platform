@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-08-27 20:36+0000\n"
-"PO-Revision-Date: 2023-08-27 20:36:19.015386\n"
+"POT-Creation-Date: 2023-09-05 15:59+0000\n"
+"PO-Revision-Date: 2023-09-05 15:59:41.440074\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -4121,6 +4121,16 @@ msgstr ""
 msgid "Good"
 msgstr "Gööd Ⱡ'σяєм ι#"
 
+#. Translators: Replier commented on "your" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "your"
+msgstr "ýöür Ⱡ'σяєм ι#"
+
+#. Translators: Replier commented on "their" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "their"
+msgstr "théïr Ⱡ'σяєм ιρѕ#"
+
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #, python-format
 msgid ""
@@ -7197,13 +7207,13 @@ msgid "Quotes"
 msgstr "Qüötés Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/wiki/includes/editor_widget.html
-#, python-format
+#, python-brace-format
 msgid ""
-"Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for"
-" help."
+"Markdown syntax is allowed. See the {start_link}cheatsheet{end_link} for "
+"help."
 msgstr ""
-"Märkdöwn sýntäx ïs ällöwéd. Séé thé %(start_link)sçhéätshéét%(end_link)s för"
-" hélp. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Märkdöwn sýntäx ïs ällöwéd. Séé thé {start_link}çhéätshéét{end_link} för "
+"hélp. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
@@ -8417,11 +8427,11 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
-"The Posting availabilty in discussions whether it will be enabled, scheduled"
-" or indefinitely disabled."
+"The Posting availability in discussions whether it will be enabled, "
+"scheduled or indefinitely disabled."
 msgstr ""
-"Thé Pöstïng äväïläßïltý ïn dïsçüssïöns whéthér ït wïll ßé énäßléd, sçhédüléd"
-" ör ïndéfïnïtélý dïsäßléd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+"Thé Pöstïng äväïläßïlïtý ïn dïsçüssïöns whéthér ït wïll ßé énäßléd, "
+"sçhédüléd ör ïndéfïnïtélý dïsäßléd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "The LTI configuration data for this context/provider."
@@ -8645,11 +8655,11 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "<{p}><{strong}>{replier_name}</{strong}> commented on "
-"<{strong}>{author_name}'s</{strong}> response to your post "
+"<{strong}>{author_name}</{strong}> response to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
 "<{p}><{strong}>{replier_name}</{strong}> çömméntéd ön "
-"<{strong}>{author_name}'s</{strong}> réspönsé tö ýöür pöst "
+"<{strong}>{author_name}</{strong}> réspönsé tö ýöür pöst "
 "<{strong}>{post_title}</{strong}></{p}> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
@@ -8662,6 +8672,40 @@ msgstr ""
 "<{p}><{strong}>{replier_name}</{strong}> réspöndéd tö ýöür pöst "
 "<{strong}>{post_title}</{strong}></{p}> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> posted "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{username}</{strong}> pöstéd "
+"<{strong}>{post_title}</{strong}></{p}> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тє#"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> asked "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{username}</{strong}> äskéd "
+"<{strong}>{post_title}</{strong}></{p}> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢т#"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+msgid ""
+"Notifications for responses and comments on your posts, and the ones you’re "
+"following, including endorsements to your responses and on your posts."
+msgstr ""
+"Nötïfïçätïöns för réspönsés änd çömménts ön ýöür pösts, änd thé önés ýöü’ré "
+"föllöwïng, ïnçlüdïng éndörséménts tö ýöür réspönsés änd ön ýöür pösts. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
+"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
+" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι#"
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "The notification preference config version is not up to date."
@@ -28346,10 +28390,6 @@ msgstr "Çöürsé Nävïgätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Öütlïné Ⱡ'σяєм ιρѕυм #"
-
-#: cms/templates/widgets/header.html
-msgid "Files & Media"
-msgstr "Fïlés & Médïä Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"
