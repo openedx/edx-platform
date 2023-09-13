@@ -131,8 +131,8 @@ class IgnoredErrorMiddleware:
 #     This setting is configured of a list of dicts. See setting and toggle annotations for
 #     ``IGNORED_ERRORS[N]['XXX']`` for details of each item in the dict.
 #     If this setting is a non-empty list, all uncaught errors processed will get a ``checked_error_ignored_from``
-#     attribute, whether they are ignored or not. Those errors that are processed and match a 'MODULE_AND_CLASS'
-#     IGNORED_ERRORS[N]['IS_IGNORED'] annotation.
+#     attribute, whether they are ignored or not. See IGNORED_ERRORS[N]['MODULE_AND_CLASS'] annotation
+#     for details of monitoring added if the error is to be ignored.
 # .. setting_warning: We use Django Middleware and a DRF custom error handler to find uncaught errors. Some errors may
 #     slip through the cracks, like ValidationError. Any error where ``checked_error_ignored_from IS NULL`` is
 #     an error that was not processed.
