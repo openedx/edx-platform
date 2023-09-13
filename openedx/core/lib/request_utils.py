@@ -142,11 +142,6 @@ class IgnoredErrorMiddleware:
 # .. setting_description: Required error module and class name that is ignored. For example,
 #     ``rest_framework.exceptions.PermissionDenied``.
 
-# .. setting_name: ignored_ERRORS[N]['MODULE_AND_CLASS']
-# .. setting_default: None
-# .. setting_description: Required error module and class name that is ignored. For example,
-#     ``rest_framework.exceptions.PermissionDenied``.
-
 # .. toggle_name: IGNORED_ERRORS[N]['IS_IGNORED']
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: True
