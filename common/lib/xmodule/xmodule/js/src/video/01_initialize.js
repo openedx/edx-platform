@@ -90,7 +90,7 @@ function(VideoPlayer, i18n, moment, _) {
 
         _youtubeApiDeferred = null,
         _oldOnYouTubeIframeAPIReady;
-        const setupOnYouTubeIframeAPIReadyMaxCalls=3;
+        const setupOnYouTubeIframeAPIReadyMaxCalls=5;
 
     Initialize.prototype = methodsDict;
 
