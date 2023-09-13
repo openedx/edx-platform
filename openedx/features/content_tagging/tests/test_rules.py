@@ -6,7 +6,6 @@ from django.test.testcases import TestCase, override_settings
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from openedx_tagging.core.tagging.models import (
-    ObjectTag,
     Tag,
     UserSystemDefinedTaxonomy,
 )
@@ -122,14 +121,6 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
             object_id=str(self.xblock2),
         )
 
-        # self.both_orgs_course_tag_perm = ChangeObjectTagPermissionItem(
-        #     taxonomy=self.taxonomy_both_orgs,
-        #     object_id=str(self.course2),
-        # )
-        # self.both_orgs_block_tag_perm = ChangeObjectTagPermissionItem(
-        #     taxonomy=self.taxonomy_both_orgs,
-        #     object_id=str(self.xblock1),
-        # )
         self.tax_both_course1 = ChangeObjectTagPermissionItem(
             taxonomy=self.taxonomy_both_orgs,
             object_id=str(self.course1),
