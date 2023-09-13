@@ -12,7 +12,7 @@ from django.test.utils import override_settings
 from edx_django_utils.cache import RequestCache
 
 from openedx.core.lib.request_utils import (
-    ExpectedErrorMiddleware,
+    IgnoredErrorMiddleware,
     _get_expected_error_settings_dict,
     clear_cached_expected_error_settings,
     course_id_from_url,
@@ -139,7 +139,7 @@ class TestGetExpectedErrorSettingsDict(unittest.TestCase):
     @override_settings(IGNORED_ERRORS=[
         {
             'MODULE_AND_CLASS': 'colon.separator.warning:Class',
-            'REASON_EXPECTED': 'Because',
+            'IGNORED': 'Because',
         }
     ])
     def test_get_with_colon_in_class_and_module(self, mock_logger):
@@ -156,11 +156,11 @@ class TestGetExpectedErrorSettingsDict(unittest.TestCase):
     @override_settings(IGNORED_ERRORS=[
         {
             'MODULE_AND_CLASS': 'valid.module.DuplicateClass',
-            'REASON_EXPECTED': 'Because'
+            'IGNORED': 'Because'
         },
         {
             'MODULE_AND_CLASS': 'valid.module.DuplicateClass',
-            'REASON_EXPECTED': 'Because overridden'
+            'IGNORED': 'Because overridden'
         },
     ])
     def test_get_with_duplicate_class_and_module(self, mock_logger):
@@ -172,14 +172,14 @@ class TestGetExpectedErrorSettingsDict(unittest.TestCase):
             'valid.module.DuplicateClass',
         )
         assert 'valid.module.DuplicateClass' in expected_error_settings_dict
-        assert expected_error_settings_dict['valid.module.DuplicateClass']['reason_expected'] == 'Because overridden'
+        assert expected_error_settings_dict['valid.module.DuplicateClass']['ignored'] == 'Because overridden'
 
     @patch('openedx.core.lib.request_utils.log')
     @override_settings(IGNORED_ERRORS=[{'MODULE_AND_CLASS': 'valid.module.and.class.ButMissingReason'}])
     def test_get_with_missing_reason(self, mock_logger):
         expected_error_settings_dict = _get_expected_error_settings_dict()
         mock_logger.error.assert_called_once_with(
-            "Skipping IGNORED_ERRORS[%d] setting. 'REASON_EXPECTED' is required to document why %s is an expected "
+            "Skipping IGNORED_ERRORS[%d] setting. 'IGNORED' is required to document why %s is an expected "
             "error.",
             0, 'valid.module.and.class.ButMissingReason'
         )
@@ -196,7 +196,7 @@ class TestGetExpectedErrorSettingsDict(unittest.TestCase):
 
     @override_settings(IGNORED_ERRORS=[{
         'MODULE_AND_CLASS': 'test.module.TestClass',
-        'REASON_EXPECTED': 'Because'
+        'IGNORED': 'Because'
     }])
     def test_get_with_defaults(self):
         expected_error_settings_dict = _get_expected_error_settings_dict()
@@ -205,7 +205,7 @@ class TestGetExpectedErrorSettingsDict(unittest.TestCase):
                 'is_ignored': True,
                 'log_error': False,
                 'log_stack_trace': False,
-                'reason_expected': 'Because'
+                'ignored': 'Because'
             }
         }
 
@@ -219,9 +219,9 @@ class CustomError2(Exception):
 
 
 @ddt.ddt
-class TestExpectedErrorMiddleware(unittest.TestCase):
+class TestIgnoredErrorMiddleware(unittest.TestCase):
     """
-    Tests for ExpectedErrorMiddleware
+    Tests for IgnoredErrorMiddleware
     """
     def setUp(self):
         super().setUp()
@@ -233,7 +233,7 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
     def test_get_response(self):
         expected_response = Mock()
 
-        middleware = ExpectedErrorMiddleware(lambda _: expected_response)
+        middleware = IgnoredErrorMiddleware(lambda _: expected_response)
         response = middleware(self.mock_request)
 
         assert response == expected_response
@@ -241,7 +241,7 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
     @patch('openedx.core.lib.request_utils.set_custom_attribute')
     @patch('openedx.core.lib.request_utils.log')
     def test_process_exception_no_expected_errors(self, mock_logger, mock_set_custom_attribute):
-        ExpectedErrorMiddleware('mock-response').process_exception(self.mock_request, self.mock_exception)
+        IgnoredErrorMiddleware('mock-response').process_exception(self.mock_request, self.mock_exception)
 
         mock_logger.info.assert_not_called()
         mock_set_custom_attribute.assert_not_called()
@@ -253,43 +253,42 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
         self, expected_errors_setting, mock_logger, mock_set_custom_attribute,
     ):
         with override_settings(IGNORED_ERRORS=expected_errors_setting):
-            ExpectedErrorMiddleware('mock-response').process_exception(self.mock_request, self.mock_exception)
+            IgnoredErrorMiddleware('mock-response').process_exception(self.mock_request, self.mock_exception)
 
         mock_logger.info.assert_not_called()
         mock_set_custom_attribute.assert_not_called()
 
     @override_settings(IGNORED_ERRORS=[{
         'MODULE_AND_CLASS': 'test.module.TestException',
-        'REASON_EXPECTED': 'Because',
+        'IGNORED': 'Because',
     }])
     @patch('openedx.core.lib.request_utils.set_custom_attribute')
     @patch('openedx.core.lib.request_utils.log')
     def test_process_exception_not_matching_expected_errors(self, mock_logger, mock_set_custom_attribute):
-        ExpectedErrorMiddleware('mock-response').process_exception(self.mock_request, self.mock_exception)
+        IgnoredErrorMiddleware('mock-response').process_exception(self.mock_request, self.mock_exception)
 
         mock_logger.info.assert_not_called()
-        mock_set_custom_attribute.assert_called_once_with('checked_error_expected_from', 'middleware')
+        mock_set_custom_attribute.assert_called_once_with('checked_error_ignored_from', 'middleware')
 
     @override_settings(IGNORED_ERRORS=[
         {
             'MODULE_AND_CLASS': 'test.module.TestException',
-            'REASON_EXPECTED': 'Because',
+            'IGNORED': 'Because',
         },
         {
             'MODULE_AND_CLASS': 'openedx.core.lib.tests.test_request_utils.CustomError1',
-            'REASON_EXPECTED': 'Because',
+            'IGNORED': 'Because',
         }
     ])
     @patch('openedx.core.lib.request_utils.set_custom_attribute')
     @patch('openedx.core.lib.request_utils.log')
     def test_process_exception_expected_error_with_defaults(self, mock_logger, mock_set_custom_attribute):
-        ExpectedErrorMiddleware('mock-response').process_exception(self.mock_request, self.mock_exception)
+        IgnoredErrorMiddleware('mock-response').process_exception(self.mock_request, self.mock_exception)
 
         mock_logger.info.assert_not_called()
         mock_set_custom_attribute.assert_has_calls(
             [
-                call('checked_error_expected_from', 'middleware'),
-                call('error_expected', True),
+                call('checked_error_ignored_from', 'middleware'),
                 call('error_ignored_class', 'openedx.core.lib.tests.test_request_utils.CustomError1'),
                 call('error_ignored_message', 'Test failure'),
             ],
@@ -299,11 +298,11 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
     @override_settings(IGNORED_ERRORS=[
         {
             'MODULE_AND_CLASS': 'openedx.core.lib.tests.test_request_utils.CustomError1',
-            'REASON_EXPECTED': 'Because',
+            'IGNORED': 'Because',
         },
         {
             'MODULE_AND_CLASS': 'openedx.core.lib.tests.test_request_utils.CustomError2',
-            'REASON_EXPECTED': 'Because',
+            'IGNORED': 'Because',
         }
     ])
     @patch('openedx.core.lib.request_utils.set_custom_attribute')
@@ -312,18 +311,17 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
         mock_first_exception = self.mock_exception
         mock_second_exception = mock_first_exception if use_same_exception else CustomError2("Oops")
 
-        ExpectedErrorMiddleware('mock-response').process_exception(self.mock_request, mock_first_exception)
-        ExpectedErrorMiddleware('mock-response').process_exception(self.mock_request, mock_second_exception)
+        IgnoredErrorMiddleware('mock-response').process_exception(self.mock_request, mock_first_exception)
+        IgnoredErrorMiddleware('mock-response').process_exception(self.mock_request, mock_second_exception)
 
         expected_calls = [
-            call('checked_error_expected_from', 'middleware'),
-            call('error_expected', True),
+            call('checked_error_ignored_from', 'middleware'),
             call('error_ignored_class', 'openedx.core.lib.tests.test_request_utils.CustomError1'),
             call('error_ignored_message', 'Test failure'),
-            call('checked_error_expected_from', 'middleware'),
+            call('checked_error_ignored_from', 'middleware'),
         ]
         if use_same_exception:
-            expected_calls += [call('checked_error_expected_from', 'multiple')]
+            expected_calls += [call('checked_error_ignored_from', 'multiple')]
         else:
             expected_calls += [
                 call('unexpected_multiple_exceptions', 'openedx.core.lib.tests.test_request_utils.CustomError1'),
@@ -333,15 +331,14 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
 
     @override_settings(IGNORED_ERRORS=[{
         'MODULE_AND_CLASS': 'Exception',
-        'REASON_EXPECTED': 'Because',
+        'IGNORED': 'Because',
     }])
     @patch('openedx.core.lib.request_utils.set_custom_attribute')
     def test_process_exception_with_plain_exception(self, mock_set_custom_attribute):
         mock_exception = Exception("Oops")
-        ExpectedErrorMiddleware('mock-response').process_exception(self.mock_request, mock_exception)
+        IgnoredErrorMiddleware('mock-response').process_exception(self.mock_request, mock_exception)
 
         mock_set_custom_attribute.assert_has_calls([
-            call('error_expected', True),
             call('error_ignored_class', 'Exception'),
             call('error_ignored_message', 'Oops'),
         ])
@@ -365,9 +362,9 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
             'IS_IGNORED': False,
             'LOG_ERROR': log_error,
             'LOG_STACK_TRACE': log_stack_trace,
-            'REASON_EXPECTED': 'Because',
+            'IGNORED': 'Because',
         }]):
-            ExpectedErrorMiddleware('mock-response').process_exception(self.mock_request, self.mock_exception)
+            IgnoredErrorMiddleware('mock-response').process_exception(self.mock_request, self.mock_exception)
 
         if log_error:
             exc_info = self.mock_exception if log_stack_trace else None
@@ -378,8 +375,7 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
             mock_logger.info.assert_not_called()
         mock_set_custom_attribute.assert_has_calls(
             [
-                call('checked_error_expected_from', 'middleware'),
-                call('error_expected', True),
+                call('checked_error_ignored_from', 'middleware'),
             ],
             any_order=True
         )
@@ -390,7 +386,7 @@ class TestExpectedErrorExceptionHandler(unittest.TestCase):
     """
     Tests for expected_error_exception_handler.
 
-    Note: Only smoke tests the handler to not duplicate all testing in TestExpectedErrorMiddleware.
+    Note: Only smoke tests the handler to not duplicate all testing in TestIgnoredErrorMiddleware.
     """
     def setUp(self):
         super().setUp()
@@ -402,7 +398,7 @@ class TestExpectedErrorExceptionHandler(unittest.TestCase):
     @override_settings(IGNORED_ERRORS=[{
         'MODULE_AND_CLASS': 'openedx.core.lib.tests.test_request_utils.CustomError1',
         'LOG_ERROR': True,
-        'REASON_EXPECTED': 'Because',
+        'IGNORED': 'Because',
     }])
     @patch('openedx.core.lib.request_utils.set_custom_attribute')
     @patch('openedx.core.lib.request_utils.log')
@@ -429,8 +425,7 @@ class TestExpectedErrorExceptionHandler(unittest.TestCase):
         )
         mock_set_custom_attribute.assert_has_calls(
             [
-                call('checked_error_expected_from', 'drf'),
-                call('error_expected', True),
+                call('checked_error_ignored_from', 'drf'),
                 call('error_ignored_class', expected_class),
                 call('error_ignored_message', expected_message),
             ],

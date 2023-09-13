@@ -107,9 +107,9 @@ def expected_error_exception_handler(exc, context):
     return response
 
 
-class ExpectedErrorMiddleware:
+class IgnoredErrorMiddleware:
     """
-    Middleware to add logging and monitoring for expected errors.
+    Middleware to add logging and monitoring for ignored errors.
     """
     def __init__(self, get_response):
         self.get_response = get_response
@@ -120,28 +120,70 @@ class ExpectedErrorMiddleware:
 
     def process_exception(self, request, exception):
         """
-        Add logging and monitoring of expected errors.
+        Add logging and monitoring of ignored errors.
         """
         _log_and_monitor_expected_errors(request, exception, 'middleware')
 
 
 # .. setting_name: IGNORED_ERRORS
 # .. setting_default: None
-# .. setting_description: Used to configure logging and monitoring for expected errors.
+# .. setting_description: Used to configure logging and monitoring for ignored errors.
 #     This setting is configured of a list of dicts. See setting and toggle annotations for
 #     ``IGNORED_ERRORS[N]['XXX']`` for details of each item in the dict.
-#     If this setting is a non-empty list, all uncaught errors processed will get a ``checked_error_expected_from``
-#     attribute, whether they are expected or not. Those errors that are processed and match a 'MODULE_AND_CLASS'
-#     (documented elsewhere), will get an ``error_expected`` custom attribute. Unexpected errors would be errors with
-#     ``error_expected IS NULL``. For additional diagnostic information for ignored errors, see the
+#     If this setting is a non-empty list, all uncaught errors processed will get a ``checked_error_ignored_from``
+#     attribute, whether they are ignored or not. Those errors that are processed and match a 'MODULE_AND_CLASS'
+#     IGNORED_ERRORS[N]['IS_IGNORED'] annotation.
 # .. setting_warning: We use Django Middleware and a DRF custom error handler to find uncaught errors. Some errors may
-#     slip through the cracks, like ValidationError. Any error where ``checked_error_expected_from IS NULL`` is
+#     slip through the cracks, like ValidationError. Any error where ``checked_error_ignored_from IS NULL`` is
 #     an error that was not processed.
 
 # .. setting_name: IGNORED_ERRORS[N]['MODULE_AND_CLASS']
 # .. setting_default: None
-# .. setting_description: Required error module and class name that is expected. For example,
+# .. setting_description: Required error module and class name that is ignored. For example,
 #     ``rest_framework.exceptions.PermissionDenied``.
+
+# .. setting_name: ignored_ERRORS[N]['MODULE_AND_CLASS']
+# .. setting_default: None
+# .. setting_description: Required error module and class name that is ignored. For example,
+#     ``rest_framework.exceptions.PermissionDenied``.
+
+# .. toggle_name: ignored_ERRORS[N]['IS_IGNORED']
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: Set this to False if the errors are not ignored by monitoring, but only ignored, like
+#      for temporary problems that may take some time to fix. If True, adds the custom attributes
+#      ``error_ignored_class`` and ``error_ignored_message`` to help diagnose issues with ignored errors, since
+#      this data is not otherwise available. For example of ignoring errors in New Relic, see:
+#      https://docs.newrelic.com/docs/agents/manage-apm-agents/agent-data/manage-errors-apm-collect-ignore-or-mark-expected/#ignore  pylint: disable=line-too-long,useless-suppression
+#      To query for ignored errors, you would use ``error_ignored_class IS NOT NULL``.
+#      Note: This is defaulted to True because it will be easier for us to detect if True is not the correct value, by
+#      seeing that these errors aren't actually ignored.
+# .. toggle_warning: At this time, this toggle does not actually configure the error to be ignored. It is meant to match
+#     the ignored error configuration found elsewhere. When monitoring, no errors should ever have the attribute
+#     ``error_ignored_class``. Only Transactions should have this custom attribute. If found for an error, it means we
+#     are stating an error should be ignored when it is not actually configured as such, or the configuration is not
+#     working.
+# .. toggle_use_cases: opt_out
+# .. toggle_creation_date: 2021-03-11
+
+# .. toggle_name: IGNORED_ERRORS[N]['IS_IGNORED']
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: Set this to False if the errors are not ignored by monitoring, but only ignored, like
+#      for temporary problems that may take some time to fix. If True, adds the custom attributes
+#      ``error_ignored_class`` and ``error_ignored_message`` to help diagnose issues with ignored errors, since
+#      this data is not otherwise available. For example of ignoring errors in New Relic, see:
+#      https://docs.newrelic.com/docs/agents/manage-apm-agents/agent-data/manage-errors-apm-collect-ignore-or-mark-expected/#ignore  pylint: disable=line-too-long,useless-suppression
+#      To query for ignored errors, you would use ``error_ignored_class IS NOT NULL``.
+#      Note: This is defaulted to True because it will be easier for us to detect if True is not the correct value, by
+#      seeing that these errors aren't actually ignored.
+# .. toggle_warning: At this time, this toggle does not actually configure the error to be ignored. It is meant to match
+#     the ignored error configuration found elsewhere. When monitoring, no errors should ever have the attribute
+#     ``error_ignored_class``. Only Transactions should have this custom attribute. If found for an error, it means we
+#     are stating an error should be ignored when it is not actually configured as such, or the configuration is not
+#     working.
+# .. toggle_use_cases: opt_out
+# .. toggle_creation_date: 2021-03-11
 
 # .. toggle_name: IGNORED_ERRORS[N]['LOG_ERROR']
 # .. toggle_implementation: DjangoSetting
@@ -158,7 +200,7 @@ class ExpectedErrorMiddleware:
 # .. toggle_use_cases: opt_in
 # .. toggle_creation_date: 2021-03-11
 
-# .. setting_name: IGNORED_ERRORS[N]['REASON_EXPECTED']
+# .. setting_name: IGNORED_ERRORS[N]['IGNORED']
 # .. setting_default: None
 # .. setting_description: Required string explaining why the error is expected and/or ignored for documentation
 #     purposes.
@@ -177,8 +219,8 @@ def _get_expected_error_settings_dict():
 
     Returns:
          (dict): dict of dicts, mapping module-and-class name to settings for proper handling of expected errors.
-           Keys of the inner dicts use the lowercase version of the related Django Setting (e.g. 'REASON_EXPECTED' =>
-           'reason_expected').
+           Keys of the inner dicts use the lowercase version of the related Django Setting (e.g. 'IGNORED' =>
+           'ignored').
 
     Example return value::
 
@@ -187,7 +229,7 @@ def _get_expected_error_settings_dict():
                 'is_ignored': True,
                 'log_error': True,
                 'log_stack_trace': True,
-                'reason_expected': 'In most cases, signifies a user was trying to do something they cannot do. '
+                'ignored': 'In most cases, signifies a user was trying to do something they cannot do. '
                    'However, an overabundance could indicate a bug, which could be monitored for.'
             }
             ...
@@ -216,7 +258,7 @@ def _get_expected_error_settings_dict():
                 'is_ignored': expected_error.get('IS_IGNORED', True),
                 'log_error': expected_error.get('LOG_ERROR', False),
                 'log_stack_trace': expected_error.get('LOG_STACK_TRACE', False),
-                'reason_expected': expected_error.get('REASON_EXPECTED'),
+                'ignored': expected_error.get('IGNORED'),
             }
 
             # validate configuration
@@ -240,9 +282,9 @@ def _get_expected_error_settings_dict():
                     "multiple times.",
                     index, module_and_class
                 )
-            if not processed_expected_error['reason_expected']:
+            if not processed_expected_error['ignored']:
                 log.error(
-                    "Skipping IGNORED_ERRORS[%d] setting. 'REASON_EXPECTED' is required to document why %s is an "
+                    "Skipping IGNORED_ERRORS[%d] setting. 'IGNORED' is required to document why %s is an "
                     "expected error.",
                     index, module_and_class
                 )
@@ -283,8 +325,8 @@ def _log_and_monitor_expected_errors(request, exception, caller):
     separator = '.' if exception_module else ''
     module_and_class = f'{exception_module}{separator}{exception.__class__.__name__}'
 
-    # Set checked_error_expected_from custom attribute to potentially help find issues where errors are never processed.
-    set_custom_attribute('checked_error_expected_from', caller)
+    # Set checked_error_ignored_from custom attribute to potentially help find issues where errors are never processed.
+    set_custom_attribute('checked_error_ignored_from', caller)
 
     # check if we already added logging/monitoring from a different caller
     request_cache = RequestCache('openedx.core.lib.request_utils')
@@ -293,7 +335,7 @@ def _log_and_monitor_expected_errors(request, exception, caller):
         cached_module_and_class = cached_handled_exception.value
         # exception was already processed by a different caller
         if cached_handled_exception.value == module_and_class:
-            set_custom_attribute('checked_error_expected_from', 'multiple')
+            set_custom_attribute('checked_error_ignored_from', 'multiple')
             return
 
         # We have confirmed using monitoring that it is very rare that middleware and drf handle different uncaught exceptions.
@@ -312,7 +354,6 @@ def _log_and_monitor_expected_errors(request, exception, caller):
         return
 
     exception_message = str(exception)
-    set_custom_attribute('error_expected', True)
 
     expected_error_settings = expected_error_settings_dict[module_and_class]
     if expected_error_settings['is_ignored']:
