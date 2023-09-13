@@ -17,8 +17,8 @@ locations.
   `edx-documentation`_ repository.
 
 .. _edx-platform docs directory: https://github.com/openedx/edx-platform/tree/master/docs
-.. _Developer Documentation Index: https://openedx.atlassian.net/wiki/display/OpenDev/Developer+Documentation
-.. _Open edX Development space: https://openedx.atlassian.net/wiki/spaces/OpenDev/overview
+.. _Developer Documentation Index: https://openedx.atlassian.net/wiki/spaces/DOC/overview
+.. _Open edX Development space: https://openedx.atlassian.net/wiki/spaces/COMM/overview
 .. _Open edX ReadTheDocs: http://docs.edx.org/
 
 .. toctree::
@@ -48,7 +48,7 @@ locations.
          :outline:
          :expand:
 
-   .. grid-item-card:: Referencs
+   .. grid-item-card:: References
       :class-card: sd-shadow-md sd-p-2
       :class-footer: sd-border-0
 

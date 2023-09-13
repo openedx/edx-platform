@@ -10,3 +10,7 @@ class ContentTaggingConfig(AppConfig):
 
     default_auto_field = "django.db.models.BigAutoField"
     name = "openedx.features.content_tagging"
+
+    def ready(self):
+        # Connect signal handlers
+        from . import handlers  # pylint: disable=unused-import

@@ -46,7 +46,7 @@ def on_user_course_unenrollment(enrollment, **kwargs):
         preference = CourseNotificationPreference.objects.get(user__id=user_id, course_id=course_key)
         preference.delete()
     except ObjectDoesNotExist:
-        log.info(f'Notification Preference doesnot exist for {enrollment.user.pii.username} in {course_key}')
+        log.info(f'Notification Preference does not exist for {enrollment.user.pii.username} in {course_key}')
 
 
 @receiver(USER_NOTIFICATION_REQUESTED)

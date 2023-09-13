@@ -63,4 +63,4 @@ class StagedContentFileData:
 class UserClipboardData:
     """ Read-only data model for User Clipboard data (copied OLX) """
     content: StagedContentData = field(validator=validators.instance_of(StagedContentData))
-    source_usage_key: UsageKey = field(validator=validators.instance_of(UsageKey))
+    source_usage_key: UsageKey = field(validator=validators.instance_of(UsageKey))  # type: ignore[type-abstract]

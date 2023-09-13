@@ -56,6 +56,7 @@ from enterprise.constants import (
     ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE,
     ENTERPRISE_FULFILLMENT_OPERATOR_ROLE,
     ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE,
+    ENTERPRISE_SSO_ORCHESTRATOR_OPERATOR_ROLE,
     ENTERPRISE_OPERATOR_ROLE
 )
 
@@ -777,6 +778,15 @@ FEATURES = {
     # .. toggle_creation_date: 2017-04-12
     # .. toggle_tickets: https://openedx.atlassian.net/browse/YONK-513
     'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
+
+    # .. toggle_name: FEATURES['SHOW_REGISTRATION_LINKS']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: Allow registration links. If this is disabled, users will no longer see buttons to the
+    #   the signup page.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2023-03-27
+    'SHOW_REGISTRATION_LINKS': True,
 
     # .. toggle_name: FEATURES['ENABLE_COOKIE_CONSENT']
     # .. toggle_implementation: DjangoSetting
@@ -3804,9 +3814,10 @@ VIDEO_IMAGE_SETTINGS = dict(
     # STORAGE_KWARGS=dict(bucket='video-image-bucket'),
     STORAGE_KWARGS=dict(
         location=MEDIA_ROOT,
-        base_url=MEDIA_URL,
     ),
     DIRECTORY_PREFIX='video-images/',
+    BASE_URL=MEDIA_URL,
+
 )
 
 VIDEO_IMAGE_MAX_AGE = 31536000
@@ -3820,9 +3831,9 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
     # STORAGE_KWARGS=dict(bucket='video-transcripts-bucket'),
     STORAGE_KWARGS=dict(
         location=MEDIA_ROOT,
-        base_url=MEDIA_URL,
     ),
     DIRECTORY_PREFIX='video-transcripts/',
+    BASE_URL=MEDIA_URL,
 )
 
 VIDEO_TRANSCRIPTS_MAX_AGE = 31536000
@@ -4674,6 +4685,7 @@ SYSTEM_TO_FEATURE_ROLE_MAPPING = {
         ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE,
         ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE,
         ENTERPRISE_FULFILLMENT_OPERATOR_ROLE,
+        ENTERPRISE_SSO_ORCHESTRATOR_OPERATOR_ROLE,
     ],
 }
 

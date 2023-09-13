@@ -1008,6 +1008,8 @@ class TestOverrides(LibraryTestCase):
         self.assertEqual(len(duplicate.children), 2)
         self.assertTrue(self.lc_block.source_library_version)
         self.assertEqual(self.lc_block.source_library_version, duplicate.source_library_version)
+        problem2_in_course = store.get_item(duplicate.children[0])
+        self.assertEqual(problem2_in_course.display_name, self.original_display_name)
 
 
 class TestIncompatibleModuleStore(LibraryTestCase):

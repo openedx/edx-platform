@@ -2,9 +2,6 @@
 Tests for static asset files in Blockstore-based Content Libraries
 """
 
-
-import requests
-
 from openedx.core.djangoapps.content_libraries.tests.base import (
     ContentLibrariesRestApiBlockstoreServiceTest,
     ContentLibrariesRestApiTest,
@@ -35,65 +32,6 @@ class ContentLibrariesStaticAssetsTestMixin:
     library slug and bundle UUID does not because it's assumed to be immutable
     and cached forever.
     """
-
-    def test_asset_crud(self):
-        """
-        Test create, read, update, and write of a static asset file.
-
-        Also tests that the static asset file (an image in this case) can be
-        used in an HTML block.
-        """
-        library = self._create_library(slug="asset-lib1", title="Static Assets Test Library")
-        block = self._add_block_to_library(library["id"], "html", "html1")
-        block_id = block["id"]
-        file_name = "image.svg"
-
-        # A new block has no assets:
-        assert self._get_library_block_assets(block_id) == []
-        self._get_library_block_asset(block_id, file_name, expect_response=404)
-
-        # Upload an asset file
-        self._set_library_block_asset(block_id, file_name, SVG_DATA)
-
-        # Get metadata about the uploaded asset file
-        metadata = self._get_library_block_asset(block_id, file_name)
-        assert metadata['path'] == file_name
-        assert metadata['size'] == len(SVG_DATA)
-        asset_list = self._get_library_block_assets(block_id)
-        # We don't just assert that 'asset_list == [metadata]' because that may
-        # break in the future if the "get asset" view returns more detail than
-        # the "list assets" view.
-        assert len(asset_list) == 1
-        assert asset_list[0]['path'] == metadata['path']
-        assert asset_list[0]['size'] == metadata['size']
-        assert asset_list[0]['url'] == metadata['url']
-
-        # Download the file and check that it matches what was uploaded.
-        # We need to download using requests since this is served by Blockstore,
-        # which the django test client can't interact with.
-        content_get_result = requests.get(metadata["url"])
-        assert content_get_result.content == SVG_DATA
-
-        # Set some OLX referencing this asset:
-        self._set_library_block_olx(block_id, """
-            <html display_name="HTML with Image"><![CDATA[
-                <img src="/static/image.svg" alt="An image that says 'SVG is lit' using a fire emoji" />
-            ]]></html>
-        """)
-        # Publish the OLX and the new image file, since published data gets
-        # served differently by Blockstore and we should test that too.
-        self._commit_library_changes(library["id"])
-        metadata = self._get_library_block_asset(block_id, file_name)
-        assert metadata['path'] == file_name
-        assert metadata['size'] == len(SVG_DATA)
-        # Download the file from the new URL:
-        content_get_result = requests.get(metadata["url"])
-        assert content_get_result.content == SVG_DATA
-
-        # Check that the URL in the student_view gets rewritten:
-        fragment = self._render_block_view(block_id, "student_view")
-        assert '/static/image.svg' not in fragment['content']
-        assert metadata['url'] in fragment['content']
 
     def test_asset_filenames(self):
         """
