@@ -2779,7 +2779,7 @@ class TestComponentTemplates(CourseTestCase):
         self._verify_basic_component("video", "Video", "us")
         problem_templates = self.get_templates_of_type("problem")
         problem_no_boilerplate = self.get_template(
-            problem_templates, "Blank Advanced Problem"
+            problem_templates, "Blank Problem"
         )
         self.assertIsNotNone(problem_no_boilerplate)
         self.assertEqual("us", problem_no_boilerplate["support_level"])
