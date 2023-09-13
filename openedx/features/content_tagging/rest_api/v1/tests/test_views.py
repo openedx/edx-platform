@@ -455,7 +455,7 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
     @ddt.unpack
     def test_update_taxonomy_system_defined(self, update_value, expected_status):
         """
-        Test that we can"t update system_defined field
+        Test that we can't update system_defined field
         """
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.st1.pk)
 
@@ -551,7 +551,7 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
     @ddt.unpack
     def test_patch_taxonomy_system_defined(self, update_value, expected_status):
         """
-        Test that we can"t patch system_defined field
+        Test that we can't patch system_defined field
         """
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.st1.pk)
 

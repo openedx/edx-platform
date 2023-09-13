@@ -32,7 +32,6 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
 
     def setUp(self):
         super().setUp()
-
         self.superuser = User.objects.create(
             username="superuser",
             email="superuser@example.com",
