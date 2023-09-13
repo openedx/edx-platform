@@ -42,6 +42,7 @@ from openedx.core.djangoapps.django_comment_common.comment_client.user import Us
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientRequestError
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.lib.api.serializers import CourseKeyField
+from openedx.core.djangoapps.user_api.accounts.serializers import AccountLegacyProfileSerializer
 
 User = get_user_model()
 
@@ -502,6 +503,7 @@ class CommentSerializer(_ContentSerializer):
     child_count = serializers.IntegerField(read_only=True)
     children = serializers.SerializerMethodField(required=False)
     abuse_flagged_any_user = serializers.SerializerMethodField(required=False)
+    profile_image = serializers.SerializerMethodField(read_only=True)
 
     non_updatable_fields = NON_UPDATABLE_COMMENT_FIELDS
 
@@ -583,6 +585,10 @@ class CommentSerializer(_ContentSerializer):
         """
         if _validate_privileged_access(self.context):
             return len(obj.get("abuse_flaggers", [])) > 0
+
+    def get_profile_image(self, obj):
+        request = self.context["request"]
+        return AccountLegacyProfileSerializer.get_profile_image(request.user.profile, request.user, request)
 
     def validate(self, attrs):
         """
