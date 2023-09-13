@@ -14,6 +14,7 @@ WAFFLE_FLAG_NAMESPACE = 'course_home'
 #   Learning MFE graphs. When set to False (default), it utilizes existing grade graph from edx-platform.
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2021-03-12
+# .. toggle_target_removal_date: 2024-01-01
 # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/26978
 COURSE_HOME_MICROFRONTEND_PROGRESS_TAB = CourseWaffleFlag(
     f'{WAFFLE_FLAG_NAMESPACE}.course_home_mfe_progress_tab', __name__
