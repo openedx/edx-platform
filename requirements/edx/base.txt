@@ -481,7 +481,7 @@ edx-drf-extensions==8.9.2
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.1.11
+edx-enterprise==4.1.12
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -755,6 +755,8 @@ olxcleaner==0.2.1
     # via -r requirements/edx/kernel.in
 openai==0.28.0
     # via edx-enterprise
+openedx-atlas==0.5.0
+    # via -r requirements/edx/kernel.in
 openedx-blockstore==1.4.0
     # via -r requirements/edx/kernel.in
 openedx-calc==3.0.1
