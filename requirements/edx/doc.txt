@@ -895,6 +895,8 @@ openai==0.28.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
+openedx-atlas==0.5.0
+    # via -r requirements/edx/base.txt
 openedx-blockstore==1.4.0
     # via -r requirements/edx/base.txt
 openedx-calc==3.0.1
