@@ -3797,15 +3797,17 @@ class SurveyCourseDAO():
     
     @classmethod
     def checkUserEnroll (self, enrollment, user_id) :
-        enrollCourse = enrollment.created 
-        course_id = enrollment.course_id
-        survey = self.surveyCourse(course_id)
-        dateSurveyCourse = survey.created
-        if enrollCourse > dateSurveyCourse :
-            return True
-        else :
-            return False 
-        
+        try:
+            enrollCourse = enrollment.created 
+            course_id = enrollment.course_id
+            survey = self.surveyCourse(course_id)
+            dateSurveyCourse = survey.created
+            if enrollCourse > dateSurveyCourse :
+                return True
+            else :
+                return False 
+        except:
+            return False
 
         
 class SurveyUser(models.Model):
