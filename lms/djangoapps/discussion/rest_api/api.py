@@ -37,6 +37,7 @@ from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from lms.djangoapps.discussion.rest_api.tasks import send_thread_created_notification
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.toggles_utils import reported_content_email_notification_enabled
 from lms.djangoapps.discussion.views import is_privileged_user
@@ -120,7 +121,6 @@ from .serializers import (
     UserStatsSerializer,
     get_context
 )
-from .tasks import send_thread_created_notification
 from .utils import (
     AttributeDict,
     add_stats_for_users_with_no_discussion_content,
