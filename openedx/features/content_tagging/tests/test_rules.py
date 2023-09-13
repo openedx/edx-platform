@@ -51,7 +51,6 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
         )
         add_users(self.staff, CourseCreatorRole(), self.user_all_orgs)
 
-
         # Normal user: grant course creator access to both org1 and org2
         self.user_both_orgs = User.objects.create(
             username="user_both_orgs",
@@ -105,7 +104,6 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
         add_users(self.staff, CourseStaffRole(self.course2), self.user_both_orgs)
         add_users(self.staff, CourseStaffRole(self.course2), self.user_org2)
         add_users(self.staff, CourseStaffRole(self.course2), self.user_org2)
-
 
         self.tax_all_course1 = ChangeObjectTagPermissionItem(
             taxonomy=self.taxonomy_all_orgs,
@@ -168,8 +166,6 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
             object_id=str(self.xblock1),
         )
 
-
-
         self.disabled_course_tag_perm = ChangeObjectTagPermissionItem(
             taxonomy=self.taxonomy_disabled,
             object_id=str(self.course2),
@@ -187,7 +183,6 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
             taxonomy=self.taxonomy_no_orgs,
             object_id=str(self.course1),
         )
-
 
     def _expected_users_have_perm(
         self, perm, obj, learner_perm=False, learner_obj=False, user_org2=True
@@ -584,7 +579,6 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
         perm_item = getattr(self, tag_attr)
         with self.assertRaises(InvalidKeyError):
             assert self.staff.has_perm(perm, perm_item)
-
 
     @ddt.data(
         "all_orgs_course_tag",
