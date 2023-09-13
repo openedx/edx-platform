@@ -99,6 +99,7 @@ rules.set_perm("oel_tagging.change_object_tag", oel_tagging.can_change_object_ta
 rules.set_perm("oel_tagging.delete_object_tag", oel_tagging.can_change_object_tag)
 rules.set_perm("oel_tagging.view_object_tag", rules.always_allow)
 
-# Users can tag objects using tags from any taxonomy that they have permission to view
+# This perms are used in the tagging rest api from openedx_tagging that is exposed in the CMS. They are overridden here
+# to include Organization and objects permissions.
 rules.set_perm("oel_tagging.change_objecttag_taxonomy", can_change_object_tag_taxonomy)
 rules.set_perm("oel_tagging.change_objecttag_objectid", can_change_object_tag_objectid)
