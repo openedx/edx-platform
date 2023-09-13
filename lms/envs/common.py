@@ -3313,6 +3313,9 @@ INSTALLED_APPS = [
     # Notifications
     'openedx.core.djangoapps.notifications',
     'openedx_events',
+
+    # Course Roles
+    'openedx.core.djangoapps.course_roles',
 ]
 
 ######################### CSRF #########################################
