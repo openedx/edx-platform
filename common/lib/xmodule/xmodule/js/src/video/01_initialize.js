@@ -174,14 +174,19 @@ function(VideoPlayer, i18n, moment, _) {
                         throw new Error('Too many OnYouTubeIframeAPIReady retries after TypeError...giving up.');
                     }
 
-                    _oldOnYouTubeIframeAPIReady = window.onYouTubeIframeAPIReady || undefined;
-
-                    window.onYouTubeIframeAPIReady = function() {
-                        window.onYouTubeIframeAPIReady.resolve();
-                    };
-
                     try {
+                        _oldOnYouTubeIframeAPIReady = window.onYouTubeIframeAPIReady || undefined;
+
+                        window.onYouTubeIframeAPIReady = function() {
+                            window.onYouTubeIframeAPIReady.resolve();
+                        };
+
                         window.onYouTubeIframeAPIReady.resolve = _youtubeApiDeferred.resolve;
+                        window.onYouTubeIframeAPIReady.done = _youtubeApiDeferred.done;
+
+                        if (_oldOnYouTubeIframeAPIReady) {
+                            window.onYouTubeIframeAPIReady.done(_oldOnYouTubeIframeAPIReady);
+                        }
                     } catch (e) {
                         console.error('Error while trying to resolve the Deferred object responsible for calling OnYouTubeIframeAPIReady callbacks.');
                         console.error('window.onYouTubeIframeAPIReady is ' + window.onYouTubeIframeAPIReady);
@@ -193,11 +198,7 @@ function(VideoPlayer, i18n, moment, _) {
                             throw e;
                         }
                     }
-                    window.onYouTubeIframeAPIReady.done = _youtubeApiDeferred.done;
 
-                    if (_oldOnYouTubeIframeAPIReady) {
-                        window.onYouTubeIframeAPIReady.done(_oldOnYouTubeIframeAPIReady);
-                    }
                 };
 
                 // If a Deferred object hasn't been created yet, create one now. It will
