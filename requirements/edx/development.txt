@@ -1277,6 +1277,10 @@ openai==0.28.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
+openedx-atlas==0.5.0
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
 openedx-blockstore==1.4.0
     # via
     #   -r requirements/edx/doc.txt
