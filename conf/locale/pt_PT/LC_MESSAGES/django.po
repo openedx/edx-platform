@@ -3787,6 +3787,16 @@ msgstr ""
 msgid "Good"
 msgstr "Bom"
 
+#. Translators: Replier commented on "your" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "your"
+msgstr ""
+
+#. Translators: Replier commented on "their" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "their"
+msgstr ""
+
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #, python-format
 msgid ""
@@ -7769,7 +7779,7 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "<{p}><{strong}>{replier_name}</{strong}> commented on "
-"<{strong}>{author_name}'s</{strong}> response to your post "
+"<{strong}>{author_name}</{strong}> response to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
 
@@ -7778,6 +7788,26 @@ msgstr ""
 msgid ""
 "<{p}><{strong}>{replier_name}</{strong}> responded to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> posted "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> asked "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+msgid ""
+"Notifications for responses and comments on your posts, and the ones you’re "
+"following, including endorsements to your responses and on your posts."
 msgstr ""
 
 #: openedx/core/djangoapps/notifications/views.py
@@ -14691,28 +14721,6 @@ msgstr "O seu cliente de e-mail separou o URL em duas linhas?"
 msgid "The keys are valid for a limited amount of time. Has the key expired?"
 msgstr ""
 "As chaves são válidas por um período de tempo limitado. A chave expirou?"
-
-#: lms/templates/library-block-author-preview-header.html
-msgid ""
-"Showing all matching content eligible to be added into {display_name}. Each "
-"student will be assigned {max_count} component drawn randomly from this "
-"list."
-msgid_plural ""
-"Showing all matching content eligible to be added into {display_name}. Each "
-"student will be assigned {max_count} components drawn randomly from this "
-"list."
-msgstr[0] ""
-"A mostrar todos os conteúdos correspondentes elegíveis para serem "
-"adicionados em {display_name}. A cada estudante será atribuído {max_count} "
-"componente retirado aleatoriamente desta lista."
-msgstr[1] ""
-"A mostrar todos os conteúdos correspondentes elegíveis para serem "
-"adicionados em {display_name}. A cada estudante serão atribuídos {max_count}"
-" componentes retirados aleatoriamente desta lista."
-msgstr[2] ""
-"A mostrar todos os conteúdos correspondentes elegíveis para serem "
-"adicionados em {display_name}. A cada estudante serão atribuídos {max_count}"
-" componentes retirados aleatoriamente desta lista."
 
 #. Translators:  "External resource" means that this learning module is hosted
 #. on a platform external to the edX LMS
@@ -23748,6 +23756,19 @@ msgstr ""
 "verifique nas pastas de Lixo ou de Spam. Ainda não conseguiu encontrar a "
 "nossa mensagem de email? Contacte-nos através do link abaixo."
 
+#: cms/templates/library-block-author-preview-header.html
+msgid ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} component drawn randomly from this "
+"list."
+msgid_plural ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} components drawn randomly from this "
+"list."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: cms/templates/library.html
 msgid "Content Library"
 msgstr "Biblioteca de Conteúdo"
@@ -25132,10 +25153,6 @@ msgstr "Navegação do Curso"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Estrutura Geral"
-
-#: cms/templates/widgets/header.html
-msgid "Files & Media"
-msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

@@ -12,7 +12,7 @@ from opaque_keys.edx.keys import AssetKey
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
 from xmodule.tests.test_transcripts_utils import YoutubeVideoHTMLResponse
@@ -73,7 +73,7 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
     Base class for Studio tests that require a logged in user and a course.
     Also provides helper methods for manipulating and verifying the course.
     """
-    MODULESTORE = TEST_DATA_MONGO_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         """
@@ -123,7 +123,7 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
     SEQUENTIAL = 'vertical_sequential'
     DRAFT_HTML = 'draft_html'
     DRAFT_VIDEO = 'draft_video'
-    LOCKED_ASSET_KEY = AssetKey.from_string('/c4x/edX/toy/asset/sample_static.html')
+    LOCKED_ASSET_KEY = AssetKey.from_string('asset-v1:edX+toy+2012_Fall+type@asset+block@sample_static.html')
 
     def assertCoursesEqual(self, course1_id, course2_id):
         """

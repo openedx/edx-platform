@@ -72,7 +72,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-08-06 20:42+0000\n"
+"POT-Creation-Date: 2023-08-27 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Lithuanian (Lithuania) (https://app.transifex.com/open-edx/teams/6205/lt_LT/)\n"
@@ -3263,6 +3263,16 @@ msgstr ""
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Good"
+msgstr ""
+
+#. Translators: Replier commented on "your" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "your"
+msgstr ""
+
+#. Translators: Replier commented on "their" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "their"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
@@ -6759,7 +6769,7 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "<{p}><{strong}>{replier_name}</{strong}> commented on "
-"<{strong}>{author_name}'s</{strong}> response to your post "
+"<{strong}>{author_name}</{strong}> response to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
 
@@ -6768,6 +6778,26 @@ msgstr ""
 msgid ""
 "<{p}><{strong}>{replier_name}</{strong}> responded to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> posted "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> asked "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+msgid ""
+"Notifications for responses and comments on your posts, and the ones you’re "
+"following, including endorsements to your responses and on your posts."
 msgstr ""
 
 #: openedx/core/djangoapps/notifications/views.py
@@ -12810,32 +12840,6 @@ msgstr "Ar el. pašto klientas padalijo URL nuorodą į dvi eilutes?"
 #: lms/templates/invalid_email_key.html
 msgid "The keys are valid for a limited amount of time. Has the key expired?"
 msgstr "Raktai galioja ribotą laiką. Ar rakto galiojimo laikas baigėsi?"
-
-#: lms/templates/library-block-author-preview-header.html
-msgid ""
-"Showing all matching content eligible to be added into {display_name}. Each "
-"student will be assigned {max_count} component drawn randomly from this "
-"list."
-msgid_plural ""
-"Showing all matching content eligible to be added into {display_name}. Each "
-"student will be assigned {max_count} components drawn randomly from this "
-"list."
-msgstr[0] ""
-"Rodoma visa medžiaga, tinkama dėti į {display_name}. Kiekvienam kurso "
-"dalyviui bus priskirtas {max_count} komponentas, atsitiktinai paimtas iš šio"
-" sąrašo."
-msgstr[1] ""
-"Rodoma visa medžiaga, tinkama dėti į {display_name}. Kiekvienam kurso "
-"dalyviui bus priskirti {max_count} komponentai, atsitiktinai paimti iš šio "
-"sąrašo."
-msgstr[2] ""
-"Rodoma visa medžiaga, tinkama dėti į {display_name}. Kiekvienam kurso "
-"dalyviui bus priskirta {max_count} komponentų, atsitiktinai paimtų iš šio "
-"sąrašo."
-msgstr[3] ""
-"Rodoma visa medžiaga, tinkama dėti į {display_name}. Kiekvienam kurso "
-"dalyviui bus priskirta {max_count} komponentų, atsitiktinai paimtų iš šio "
-"sąrašo."
 
 #. Translators:  "External resource" means that this learning module is hosted
 #. on a platform external to the edX LMS
@@ -21058,6 +21062,20 @@ msgstr ""
 "aplanką. Vis tiek nerandate patvirtinimo laiško? Paprašykite pagalbos per "
 "žemiau esančią nuorodą."
 
+#: cms/templates/library-block-author-preview-header.html
+msgid ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} component drawn randomly from this "
+"list."
+msgid_plural ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} components drawn randomly from this "
+"list."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
 #: cms/templates/library.html
 msgid "Content Library"
 msgstr "Medžiagos biblioteka"
@@ -22348,10 +22366,6 @@ msgstr "Kurso navigacija"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Planas"
-
-#: cms/templates/widgets/header.html
-msgid "Files & Media"
-msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"
