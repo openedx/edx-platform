@@ -5,8 +5,9 @@ Tests for Source from Library XBlock
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
-from xmodule.tests import get_test_system
 from xmodule.x_module import STUDENT_VIEW  # lint-amnesty, pylint: disable=unused-import
+
+from xmodule.tests import prepare_block_runtime
 
 from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
 

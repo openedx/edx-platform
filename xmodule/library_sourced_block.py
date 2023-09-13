@@ -20,7 +20,7 @@ from xblockutils.studio_editable import StudioEditableXBlockMixin
 
 from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.studio_editable import StudioEditableBlock as EditableChildrenMixin
-from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.x_module import (
     STUDENT_VIEW,

@@ -55,7 +55,7 @@ class LibraryContentTest(MixedSplitTestCase):
             max_count=1,
             source_library_id=str(self.library.location.library_key)
         )
-        self.lc_block.runtime._services.update({'library_tools': self.tools})
+        self.lc_block.runtime._services.update({'library_tools': self.tools}) # pylint: disable=protected-access
 
     def _bind_course_block(self, block):
         """
@@ -295,6 +295,12 @@ class LibraryContentBlockTestMixin:
 
         assert self.lc_block.validate()
 
+
+    def _assert_has_only_N_matching_problems(self,result,n):
+        assert result.summary
+        assert StudioValidationMessage.WARNING == result.summary.type
+        assert f'only {n} matching problem' in result.summary.text
+
     def test_validation_of_matching_blocks(self):
         """
         Test that the validation method of LibraryContent blocks can warn
@@ -308,10 +314,8 @@ class LibraryContentBlockTestMixin:
         self.lc_block = self.store.get_item(self.lc_block.location)
         result = self.lc_block.validate()
         assert not result
-        # Validation fails due to at least one warning/message
-        assert result.summary
-        assert StudioValidationMessage.WARNING == result.summary.type
-        assert 'only 4 matching problems' in result.summary.text
+
+        self._assert_has_only_N_matching_problems(result,4)
         assert len(self.lc_block.selected_children()) == 4
 
         # Add some capa problems so we can check problem type validation messages
@@ -340,10 +344,8 @@ class LibraryContentBlockTestMixin:
         self.lc_block = self.store.get_item(self.lc_block.location)
         result = self.lc_block.validate()
         assert not result
-        # Validation fails due to at least one warning/message
-        assert result.summary
-        assert StudioValidationMessage.WARNING == result.summary.type
-        assert 'only 1 matching problem' in result.summary.text
+
+        self._assert_has_only_N_matching_problems(result,1)
         assert len(self.lc_block.selected_children()) == 1
 
         # Missing problem type should always fail validation

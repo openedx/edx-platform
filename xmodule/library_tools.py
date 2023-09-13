@@ -3,6 +3,7 @@ XBlock runtime services for LibraryContentBlock
 """
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
+import hashlib
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import (
@@ -21,19 +22,10 @@ from openedx.core.djangoapps.xblock.api import load_block
 from openedx.core.lib import blockstore_api
 from common.djangoapps.student.auth import has_studio_write_access
 from xmodule.capa_block import ProblemBlock
-from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.tasks import update_children_task, get_import_task_status
-
-from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary
-
-from common.djangoapps.student.auth import has_studio_write_access
-from openedx.core.djangoapps.content_libraries import api as library_api
-from openedx.core.djangoapps.content_libraries.models import ContentLibrary
-from openedx.core.djangoapps.xblock.api import load_block
-from openedx.core.lib import blockstore_api
 
 
 def normalize_key_for_search(library_key):
