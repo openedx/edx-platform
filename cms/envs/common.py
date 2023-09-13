@@ -155,9 +155,6 @@ BLOCK_STRUCTURES_SETTINGS = dict(
 
     # Maximum number of retries per task.
     TASK_MAX_RETRIES=5,
-
-    # Backend storage options
-    PRUNING_ACTIVE=False,
 )
 
 ############################ FEATURE CONFIGURATION #############################
@@ -346,6 +343,9 @@ FEATURES = {
 
     # Allow public account creation
     'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
+
+    # Allow showing the registration links
+    'SHOW_REGISTRATION_LINKS': True,
 
     # Whether or not the dynamic EnrollmentTrackUserPartition should be registered.
     'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': True,
@@ -782,6 +782,13 @@ LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
 ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
 ENTERPRISE_CONSENT_API_URL = LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
+
+# Setting for Open API key and prompts used by edx-enterprise.
+OPENAI_API_KEY = ''
+LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT = ''
+LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT = ''
+LEARNER_PROGRESS_PROMPT_FOR_ACTIVE_CONTRACT = ''
+LEARNER_PROGRESS_PROMPT_FOR_NON_ACTIVE_CONTRACT = ''
 
 # Public domain name of Studio (should be resolvable from the end-user's browser)
 CMS_BASE = 'localhost:18010'
@@ -2500,9 +2507,9 @@ VIDEO_IMAGE_SETTINGS = dict(
     # STORAGE_KWARGS=dict(bucket='video-image-bucket'),
     STORAGE_KWARGS=dict(
         location=MEDIA_ROOT,
-        base_url=MEDIA_URL,
     ),
     DIRECTORY_PREFIX='video-images/',
+    BASE_URL=MEDIA_URL,
 )
 
 VIDEO_IMAGE_MAX_AGE = 31536000
@@ -2515,9 +2522,9 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
     # STORAGE_KWARGS=dict(bucket='video-transcripts-bucket'),
     STORAGE_KWARGS=dict(
         location=MEDIA_ROOT,
-        base_url=MEDIA_URL,
     ),
     DIRECTORY_PREFIX='video-transcripts/',
+    BASE_URL=MEDIA_URL,
 )
 
 VIDEO_TRANSCRIPTS_MAX_AGE = 31536000

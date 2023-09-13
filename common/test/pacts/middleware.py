@@ -18,7 +18,7 @@ class AuthenticationMiddleware(MiddlewareMixin):
     See https://docs.pact.io/faq#how-do-i-test-oauth-or-other-security-headers
     """
     def __init__(self, get_response):
-        super().__init__()
+        super().__init__(get_response)
 
         username = getattr(settings, 'MOCK_USERNAME', 'Mock User')
         self.auth_user = UserFactory.create(username=username)

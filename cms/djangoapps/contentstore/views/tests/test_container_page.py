@@ -9,8 +9,8 @@ from unittest.mock import Mock, patch
 
 from django.http import Http404
 from django.test.client import RequestFactory
-from django.utils import http
 from pytz import UTC
+from urllib.parse import quote
 
 import cms.djangoapps.contentstore.views.component as views
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
@@ -31,29 +31,30 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
 
     def setUp(self):
         super().setUp()
-        self.vertical = self._create_block(self.sequential.location, 'vertical', 'Unit')
-        self.html = self._create_block(self.vertical.location, "html", "HTML")
-        self.child_container = self._create_block(self.vertical.location, 'split_test', 'Split Test')
-        self.child_vertical = self._create_block(self.child_container.location, 'vertical', 'Child Vertical')
-        self.video = self._create_block(self.child_vertical.location, "video", "My Video")
+        self.vertical = self._create_block(self.sequential, 'vertical', 'Unit')
+        self.html = self._create_block(self.vertical, "html", "HTML")
+        self.child_container = self._create_block(self.vertical, 'split_test', 'Split Test')
+        self.child_vertical = self._create_block(self.child_container, 'vertical', 'Child Vertical')
+        self.video = self._create_block(self.child_vertical, "video", "My Video")
         self.store = modulestore()
 
         past = datetime.datetime(1970, 1, 1, tzinfo=UTC)
         future = datetime.datetime.now(UTC) + datetime.timedelta(days=1)
         self.released_private_vertical = self._create_block(
-            parent_location=self.sequential.location, category='vertical', display_name='Released Private Unit',
+            parent=self.sequential, category='vertical', display_name='Released Private Unit',
             start=past)
         self.unreleased_private_vertical = self._create_block(
-            parent_location=self.sequential.location, category='vertical', display_name='Unreleased Private Unit',
+            parent=self.sequential, category='vertical', display_name='Unreleased Private Unit',
             start=future)
         self.released_public_vertical = self._create_block(
-            parent_location=self.sequential.location, category='vertical', display_name='Released Public Unit',
+            parent=self.sequential, category='vertical', display_name='Released Public Unit',
             start=past)
         self.unreleased_public_vertical = self._create_block(
-            parent_location=self.sequential.location, category='vertical', display_name='Unreleased Public Unit',
+            parent=self.sequential, category='vertical', display_name='Unreleased Public Unit',
             start=future)
         self.store.publish(self.unreleased_public_vertical.location, self.user.id)
         self.store.publish(self.released_public_vertical.location, self.user.id)
+        self.store.publish(self.vertical.location, self.user.id)
 
     def test_container_html(self):
         self._test_html_content(
@@ -67,10 +68,10 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
                 '<a href="/course/{course}{subsection_parameters}">Lesson 1</a>'
             ).format(
                 course=re.escape(str(self.course.id)),
-                section_parameters=re.escape('?show={}'.format(http.urlquote(
+                section_parameters=re.escape('?show={}'.format(quote(
                     str(self.chapter.location).encode()
                 ))),
-                subsection_parameters=re.escape('?show={}'.format(http.urlquote(
+                subsection_parameters=re.escape('?show={}'.format(quote(
                     str(self.sequential.location).encode()
                 ))),
             ),
@@ -81,8 +82,8 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         Create the scenario of an xblock with children (non-vertical) on the container page.
         This should create a container page that is a child of another container page.
         """
-        draft_container = self._create_block(self.child_container.location, "wrapper", "Wrapper")
-        self._create_block(draft_container.location, "html", "Child HTML")
+        draft_container = self._create_block(self.child_container, "wrapper", "Wrapper")
+        self._create_block(draft_container, "html", "Child HTML")
 
         def test_container_html(xblock):
             self._test_html_content(
@@ -97,7 +98,7 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
                 ).format(
                     course=re.escape(str(self.course.id)),
                     unit_parameters=re.escape(str(self.vertical.location)),
-                    subsection_parameters=re.escape('?show={}'.format(http.urlquote(
+                    subsection_parameters=re.escape('?show={}'.format(quote(
                         str(self.sequential.location).encode()
                     ))),
                 ),
@@ -177,12 +178,12 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         self.validate_preview_html(self.child_container, self.container_view)
         self.validate_preview_html(self.child_vertical, self.reorderable_child_view)
 
-    def _create_block(self, parent_location, category, display_name, **kwargs):
+    def _create_block(self, parent, category, display_name, **kwargs):
         """
         creates a block in the module store, without publishing it.
         """
         return BlockFactory.create(
-            parent_location=parent_location,
+            parent=parent,
             category=category,
             display_name=display_name,
             publish_item=False,
@@ -194,7 +195,7 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         """
         Verify that a public container rendered as a child of the container page returns the expected HTML.
         """
-        empty_child_container = self._create_block(self.vertical.location, 'split_test', 'Split Test')
+        empty_child_container = self._create_block(self.vertical, 'split_test', 'Split Test 1')
         published_empty_child_container = self.store.publish(empty_child_container.location, self.user.id)
         self.validate_preview_html(published_empty_child_container, self.reorderable_child_view, can_add=False)
 
@@ -202,7 +203,7 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         """
         Verify that a draft container rendered as a child of the container page returns the expected HTML.
         """
-        empty_child_container = self._create_block(self.vertical.location, 'split_test', 'Split Test')
+        empty_child_container = self._create_block(self.vertical, 'split_test', 'Split Test 1')
         self.validate_preview_html(empty_child_container, self.reorderable_child_view, can_add=False)
 
     @patch(

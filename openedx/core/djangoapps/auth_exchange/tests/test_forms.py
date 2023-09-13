@@ -28,7 +28,7 @@ class AccessTokenExchangeFormTest(AccessTokenExchangeTestMixin):
         super().setUp()
         self.request = RequestFactory().post("dummy_url")
         redirect_uri = 'dummy_redirect_url'
-        SessionMiddleware().process_request(self.request)
+        SessionMiddleware(get_response=lambda request: None).process_request(self.request)
         self.request.social_strategy = social_utils.load_strategy(self.request)
         # pylint: disable=no-member
         self.request.backend = social_utils.load_backend(self.request.social_strategy, self.BACKEND, redirect_uri)

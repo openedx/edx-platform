@@ -60,7 +60,7 @@ class ErrorBlock(
         """
         Return a fragment that contains the html for the student view.
         """
-        fragment = Fragment(self.runtime.service(self, 'mako').render_template('module-error.html', {
+        fragment = Fragment(self.runtime.service(self, 'mako').render_lms_template('module-error.html', {
             'staff_access': True,
             'data': self.contents,
             'error': self.error_msg,

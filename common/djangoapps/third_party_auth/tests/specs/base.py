@@ -145,7 +145,7 @@ class HelperMixin:
         middleware.ExceptionMiddleware makes sure the user ends up in the right
         place when they cancel authentication via the provider's UX.
         """
-        exception_middleware = middleware.ExceptionMiddleware()
+        exception_middleware = middleware.ExceptionMiddleware(get_response=lambda request: None)
         request, _ = self.get_request_and_strategy(auth_entry=auth_entry)
         response = exception_middleware.process_exception(
             request, exceptions.AuthCanceled(request.backend))
@@ -730,7 +730,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
 
         # Monkey-patch storage for messaging; pylint: disable=protected-access
         post_request._messages = fallback.FallbackStorage(post_request)
-        middleware.ExceptionMiddleware().process_exception(
+        middleware.ExceptionMiddleware(get_response=lambda request: None).process_exception(
             post_request,
             exceptions.AuthAlreadyAssociated(self.provider.backend_name, 'account is already in use.'))
 

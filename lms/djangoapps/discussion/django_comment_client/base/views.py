@@ -531,7 +531,7 @@ def create_thread(request, course_id, commentable_id):
 
     track_thread_created_event(request, course, thread, follow)
 
-    if request.is_ajax():
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return ajax_content_response(request, course_key, data)
     else:
         return JsonResponse(prepare_content(data, course_key))
@@ -573,7 +573,7 @@ def update_thread(request, course_id, thread_id):
     thread_edited.send(sender=None, user=user, post=thread)
 
     track_thread_edited_event(request, course, thread, None)
-    if request.is_ajax():
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return ajax_content_response(request, course_key, thread.to_dict())
     else:
         return JsonResponse(prepare_content(thread.to_dict(), course_key))
@@ -623,7 +623,7 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
 
     track_comment_created_event(request, course, comment, comment.thread.commentable_id, followed)
 
-    if request.is_ajax():
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return ajax_content_response(request, course_key, comment.to_dict())
     else:
         return JsonResponse(prepare_content(comment.to_dict(), course.id))
@@ -679,7 +679,7 @@ def update_comment(request, course_id, comment_id):
     comment_edited.send(sender=None, user=request.user, post=comment)
 
     track_comment_edited_event(request, course, comment, None)
-    if request.is_ajax():
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return ajax_content_response(request, course_key, comment.to_dict())
     else:
         return JsonResponse(prepare_content(comment.to_dict(), course_key))

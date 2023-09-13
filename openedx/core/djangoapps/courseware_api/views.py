@@ -89,6 +89,7 @@ class CoursewareMeta:
             staff_access=original_user_is_staff,
         )
         self.request.user = self.effective_user
+        self.overview.bind_course_for_student(self.request)
         self.enrollment_object = CourseEnrollment.get_enrollment(self.effective_user, self.course_key,
                                                                  select_related=['celebration', 'user__celebration'])
 

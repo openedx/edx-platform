@@ -23,7 +23,6 @@ from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
 from django_countries import countries
 from edx_django_utils.monitoring import set_custom_attribute
-from edx_toggles.toggles import WaffleFlag
 from openedx_events.learning.data import UserData, UserPersonalData
 from openedx_events.learning.signals import STUDENT_REGISTRATION_COMPLETED
 from openedx_filters.learning.filters import StudentRegistrationRequested
@@ -108,15 +107,6 @@ IS_MARKETABLE = 'is_marketable'
 REGISTER_USER = Signal()
 
 
-# .. toggle_name: registration.enable_failure_logging
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Enable verbose logging of registration failure messages
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2020-04-30
-# .. toggle_target_removal_date: 2020-06-01
-# .. toggle_warning: This temporary feature toggle does not have a target removal date.
-REGISTRATION_FAILURE_LOGGING_FLAG = WaffleFlag('registration.enable_failure_logging', __name__)
 REAL_IP_KEY = 'openedx.core.djangoapps.util.ratelimit.real_ip'
 
 
@@ -601,7 +591,10 @@ class RegistrationView(APIView):
 
         redirect_to, root_url = get_next_url_for_login_page(request, include_host=True)
         redirect_url = get_redirect_url_with_host(root_url, redirect_to)
-        response = self._create_response(request, {}, status_code=200, redirect_url=redirect_url)
+        authenticated_user = {'username': user.username, 'user_id': user.id}
+        response = self._create_response(
+            request, {'authenticated_user': authenticated_user}, status_code=200, redirect_url=redirect_url
+        )
         set_logged_in_cookies(request, response, user)
         if not user.is_active and settings.SHOW_ACCOUNT_ACTIVATION_CTA and not settings.MARKETING_EMAILS_OPT_IN:
             response.set_cookie(
@@ -699,32 +692,12 @@ class RegistrationView(APIView):
         if status_code == 200:
             # keeping this `success` field in for now, as we have outstanding clients expecting this
             response_dict['success'] = True
-        else:
-            self._log_validation_errors(request, response_dict, status_code)
         if redirect_url:
             response_dict['redirect_url'] = redirect_url
         if error_code:
             response_dict['error_code'] = error_code
             set_custom_attribute('register_error_code', error_code)
         return JsonResponse(response_dict, status=status_code)
-
-    def _log_validation_errors(self, request, errors, status_code):
-        if not REGISTRATION_FAILURE_LOGGING_FLAG.is_enabled():
-            return
-
-        try:
-            for field_key, errors in errors.items():  # lint-amnesty, pylint: disable=redefined-argument-from-local
-                for error in errors:
-                    log.info(
-                        'message=registration_failed, status_code=%d, agent="%s", field="%s", error="%s"',
-                        status_code,
-                        request.META.get('HTTP_USER_AGENT', ''),
-                        field_key,
-                        error['user_message']
-                    )
-        except:  # pylint: disable=bare-except
-            log.exception("Failed to log registration validation error")
-            pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 # pylint: disable=line-too-long

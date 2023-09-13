@@ -1,12 +1,13 @@
 """
 Content Tagging APIs
 """
-from typing import Iterator, List, Type, Union
+from __future__ import annotations
+
+from typing import Iterator, List, Type
 
 import openedx_tagging.core.tagging.api as oel_tagging
 from django.db.models import QuerySet
-from opaque_keys.edx.keys import LearningContextKey
-from opaque_keys.edx.locator import BlockUsageLocator
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx_tagging.core.tagging.models import Taxonomy
 from organizations.models import Organization
 
@@ -101,29 +102,25 @@ def get_taxonomies_for_org(
 
 
 def get_content_tags(
-    object_id: str, taxonomy: Taxonomy = None, valid_only=True
+    object_id: str, taxonomy_id: str = None
 ) -> Iterator[ContentObjectTag]:
     """
     Generates a list of content tags for a given object.
 
     Pass taxonomy to limit the returned object_tags to a specific taxonomy.
-
-    Pass valid_only=False when displaying tags to content authors, so they can see invalid tags too.
-    Invalid tags will (probably) be hidden from learners.
     """
     for object_tag in oel_tagging.get_object_tags(
         object_id=object_id,
-        taxonomy=taxonomy,
-        valid_only=valid_only,
+        taxonomy_id=taxonomy_id,
     ):
         yield ContentObjectTag.cast(object_tag)
 
 
 def tag_content_object(
     taxonomy: Taxonomy,
-    tags: List,
-    object_id: Union[BlockUsageLocator, LearningContextKey],
-) -> List[ContentObjectTag]:
+    tags: list,
+    object_id: CourseKey | UsageKey,
+) -> list[ContentObjectTag]:
     """
     This is the main API to use when you want to add/update/delete tags from a content object (e.g. an XBlock or
     course).
@@ -154,4 +151,5 @@ def tag_content_object(
 get_taxonomy = oel_tagging.get_taxonomy
 get_taxonomies = oel_tagging.get_taxonomies
 get_tags = oel_tagging.get_tags
+delete_object_tags = oel_tagging.delete_object_tags
 resync_object_tags = oel_tagging.resync_object_tags

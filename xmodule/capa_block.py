@@ -59,7 +59,7 @@ log = logging.getLogger("edx.courseware")
 
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
-#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
+#  `django.utils.translation.gettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
 # Generate this many different variants of problems with rerandomize=per_student
@@ -356,7 +356,7 @@ class ProblemBlock(
         Return the studio view.
         """
         fragment = Fragment(
-            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
+            self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
         add_sass_to_fragment(fragment, 'ProblemBlockEditor.scss')
         add_webpack_js_to_fragment(fragment, 'ProblemBlockEditor')
@@ -388,7 +388,7 @@ class ProblemBlock(
             'ungraded_response': self.handle_ungraded_response
         }
 
-        _ = self.runtime.service(self, "i18n").ugettext
+        _ = self.runtime.service(self, "i18n").gettext
 
         generic_error_message = _(
             "We're sorry, there was an error with processing your request. "
@@ -661,7 +661,7 @@ class ProblemBlock(
             xqueue=None,
             matlab_api_key=None,
         )
-        _ = capa_system.i18n.ugettext
+        _ = capa_system.i18n.gettext
 
         count = 0
         for user_state in user_state_iterator:
@@ -898,7 +898,7 @@ class ProblemBlock(
         """
         curr_score, total_possible = self.get_display_progress()
 
-        return self.runtime.service(self, 'mako').render_template('problem_ajax.html', {
+        return self.runtime.service(self, 'mako').render_lms_template('problem_ajax.html', {
             'element_id': self.location.html_id(),
             'id': str(self.location),
             'ajax_url': self.ajax_url,
@@ -928,7 +928,7 @@ class ProblemBlock(
         """
         # The logic flow is a little odd so that _('xxx') strings can be found for
         # translation while also running _() just once for each string.
-        _ = self.runtime.service(self, "i18n").ugettext
+        _ = self.runtime.service(self, "i18n").gettext
         submit = _('Submit')
 
         return submit
@@ -941,7 +941,7 @@ class ProblemBlock(
         display the value returned by this function until a response is
         received by the server.
         """
-        _ = self.runtime.service(self, "i18n").ugettext
+        _ = self.runtime.service(self, "i18n").gettext
         return _('Submitting')
 
     def should_enable_submit_button(self):
@@ -1071,7 +1071,7 @@ class ProblemBlock(
             self.set_state_from_lcp()
             self.set_score(self.score_from_lcp(self.lcp))
             # Prepend a scary warning to the student
-            _ = self.runtime.service(self, "i18n").ugettext
+            _ = self.runtime.service(self, "i18n").gettext
             warning_msg = Text(_("Warning: The problem has been reset to its initial state!"))
             warning = HTML('<div class="capa_reset"> <h2>{}</h2>').format(warning_msg)
 
@@ -1130,7 +1130,7 @@ class ProblemBlock(
         demand_hints = self.lcp.tree.xpath("//problem/demandhint/hint")
         hint_index = hint_index % len(demand_hints)
 
-        _ = self.runtime.service(self, "i18n").ugettext
+        _ = self.runtime.service(self, "i18n").gettext
 
         counter = 0
         total_text = ''
@@ -1195,7 +1195,7 @@ class ProblemBlock(
             html = self.handle_problem_html_error(err)
 
         html = self.remove_tags_from_html(html)
-        _ = self.runtime.service(self, "i18n").ugettext
+        _ = self.runtime.service(self, "i18n").gettext
 
         # Enable/Disable Submit button if should_enable_submit_button returns True/False.
         submit_button = self.submit_button_name()
@@ -1247,7 +1247,7 @@ class ProblemBlock(
             'submit_disabled_cta': submit_disabled_ctas[0] if submit_disabled_ctas else None,
         }
 
-        html = self.runtime.service(self, 'mako').render_template('problem.html', context)
+        html = self.runtime.service(self, 'mako').render_lms_template('problem.html', context)
 
         if encapsulate:
             html = HTML('<div id="problem_{id}" class="problem" data-url="{ajax_url}">{html}</div>').format(
@@ -1292,11 +1292,11 @@ class ProblemBlock(
                         break
 
             # Build the notification message based on the notification type and translate it.
-            ungettext = self.runtime.service(self, "i18n").ungettext
-            _ = self.runtime.service(self, "i18n").ugettext
+            ngettext = self.runtime.service(self, "i18n").ngettext
+            _ = self.runtime.service(self, "i18n").gettext
             if answer_notification_type == 'incorrect':
                 if progress is not None:
-                    answer_notification_message = ungettext(
+                    answer_notification_message = ngettext(
                         "Incorrect ({progress} point)",
                         "Incorrect ({progress} points)",
                         progress.frac()[1]
@@ -1305,7 +1305,7 @@ class ProblemBlock(
                     answer_notification_message = _('Incorrect')
             elif answer_notification_type == 'correct':
                 if progress is not None:
-                    answer_notification_message = ungettext(
+                    answer_notification_message = ngettext(
                         "Correct ({progress} point)",
                         "Correct ({progress} points)",
                         progress.frac()[1]
@@ -1314,7 +1314,7 @@ class ProblemBlock(
                     answer_notification_message = _('Correct')
             elif answer_notification_type == 'partially-correct':
                 if progress is not None:
-                    answer_notification_message = ungettext(
+                    answer_notification_message = ngettext(
                         "Partially correct ({progress} point)",
                         "Partially correct ({progress} points)",
                         progress.frac()[1]
@@ -1548,9 +1548,9 @@ class ProblemBlock(
 
         return {
             'answers': new_answers,
-            'correct_status_html': self.runtime.service(self, 'mako').render_template(
+            'correct_status_html': self.runtime.service(self, 'mako').render_lms_template(
                 'status_span.html',
-                {'status': Status('correct', self.runtime.service(self, "i18n").ugettext)}
+                {'status': Status('correct', self.runtime.service(self, "i18n").gettext)}
             )
         }
 
@@ -1690,7 +1690,7 @@ class ProblemBlock(
         if override_time is not False:
             current_time = override_time
 
-        _ = self.runtime.service(self, "i18n").ugettext
+        _ = self.runtime.service(self, "i18n").gettext
 
         # Too late. Cannot submit
         if self.closed():
@@ -1879,25 +1879,25 @@ class ProblemBlock(
         Returns time duration nicely formated, e.g. "3 minutes 4 seconds"
         """
         # Here _ is the N variant ungettext that does pluralization with a 3-arg call
-        ungettext = self.runtime.service(self, "i18n").ungettext
+        ngettext = self.runtime.service(self, "i18n").ngettext
         hours = num_seconds // 3600
         sub_hour = num_seconds % 3600
         minutes = sub_hour // 60
         seconds = sub_hour % 60
         display = ""
         if hours > 0:
-            display += ungettext("{num_hour} hour", "{num_hour} hours", hours).format(num_hour=hours)
+            display += ngettext("{num_hour} hour", "{num_hour} hours", hours).format(num_hour=hours)
         if minutes > 0:
             if display != "":
                 display += " "
             # translators: "minute" refers to a minute of time
-            display += ungettext("{num_minute} minute", "{num_minute} minutes", minutes).format(num_minute=minutes)
+            display += ngettext("{num_minute} minute", "{num_minute} minutes", minutes).format(num_minute=minutes)
         # Taking care to make "0 seconds" instead of "" for 0 time
         if seconds > 0 or (hours == 0 and minutes == 0):
             if display != "":
                 display += " "
             # translators: "second" refers to a second of time
-            display += ungettext("{num_second} second", "{num_second} seconds", seconds).format(num_second=seconds)
+            display += ngettext("{num_second} second", "{num_second} seconds", seconds).format(num_second=seconds)
         return display
 
     def get_submission_metadata_safe(self, answers, correct_map):
@@ -1996,7 +1996,7 @@ class ProblemBlock(
 
         answers = self.make_dict_of_responses(data)
         event_info['answers'] = answers
-        _ = self.runtime.service(self, "i18n").ugettext
+        _ = self.runtime.service(self, "i18n").gettext
 
         # Too late. Cannot submit
         if self.closed() and not self.max_attempts == 0:
@@ -2053,7 +2053,7 @@ class ProblemBlock(
         event_info = {}
         event_info['old_state'] = self.lcp.get_state()
         event_info['problem_id'] = str(self.location)
-        _ = self.runtime.service(self, "i18n").ugettext
+        _ = self.runtime.service(self, "i18n").gettext
 
         if self.closed():
             event_info['failure'] = 'closed'
@@ -2119,7 +2119,7 @@ class ProblemBlock(
         """
         event_info = {'state': self.lcp.get_state(), 'problem_id': str(self.location)}
 
-        _ = self.runtime.service(self, "i18n").ugettext
+        _ = self.runtime.service(self, "i18n").gettext
 
         if not self.lcp.supports_rescoring():
             event_info['failure'] = 'unsupported'

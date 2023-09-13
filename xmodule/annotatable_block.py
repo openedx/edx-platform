@@ -172,7 +172,7 @@ class AnnotatableBlock(
             'content_html': self._render_content()
         }
 
-        return self.runtime.service(self, 'mako').render_template('annotatable.html', context)
+        return self.runtime.service(self, 'mako').render_lms_template('annotatable.html', context)
 
     def student_view(self, context):  # lint-amnesty, pylint: disable=unused-argument
         """
@@ -191,7 +191,7 @@ class AnnotatableBlock(
         Return the studio view.
         """
         fragment = Fragment(
-            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
+            self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
         add_sass_to_fragment(fragment, 'AnnotatableBlockEditor.scss')
         add_webpack_js_to_fragment(fragment, 'AnnotatableBlockEditor')

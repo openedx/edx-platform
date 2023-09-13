@@ -189,14 +189,12 @@ class TestAPITaxonomy(TestTaxonomyMixin, TestCase):
         object_tag_attr,
     ):
         taxonomy_id = getattr(self, taxonomy_attr).id
-        taxonomy = api.get_taxonomy(taxonomy_id)
         object_tag = getattr(self, object_tag_attr)
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(2):
             valid_tags = list(
                 api.get_content_tags(
-                    taxonomy=taxonomy,
+                    taxonomy_id=taxonomy_id,
                     object_id=object_tag.object_id,
-                    valid_only=True,
                 )
             )
         assert len(valid_tags) == 1
@@ -219,14 +217,12 @@ class TestAPITaxonomy(TestTaxonomyMixin, TestCase):
         object_tag_attr,
     ):
         taxonomy_id = getattr(self, taxonomy_attr).id
-        taxonomy = api.get_taxonomy(taxonomy_id)
         object_tag = getattr(self, object_tag_attr)
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(2):
             valid_tags = list(
                 api.get_content_tags(
-                    taxonomy=taxonomy,
+                    taxonomy_id=taxonomy_id,
                     object_id=object_tag.object_id,
-                    valid_only=False,
                 )
             )
         assert len(valid_tags) == 1

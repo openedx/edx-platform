@@ -1,18 +1,15 @@
 """
 Instructor Dashboard Views
 """
-
-
 import datetime
 import logging
-import uuid
 from functools import reduce
-from unittest.mock import patch
 
+import markupsafe
 import pytz
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponseServerError
+from django.http import Http404, HttpResponseRedirect, HttpResponseServerError
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.translation import gettext as _
@@ -25,11 +22,10 @@ from edx_when.api import is_enabled_for_course
 from edx_django_utils.plugins import get_plugins_view_context
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from xblock.field_data import DictFieldData
-from xblock.fields import ScopeIds
+from openedx_filters.learning.filters import InstructorDashboardRenderStarted
 
 from common.djangoapps.course_modes.models import CourseMode, CourseModesArchive
-from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import (
     CourseFinanceAdminRole,
@@ -62,9 +58,6 @@ from openedx.core.djangoapps.plugins.constants import ProjectType
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.courses import get_course_by_id
-from openedx.core.lib.url_utils import quote_slashes
-from openedx.core.lib.xblock_utils import wrap_xblock
-from xmodule.html_block import HtmlBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.tabs import CourseTab  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -268,7 +261,24 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
 
     context.update(context_from_plugins)
 
-    return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)
+    instructor_template = 'instructor/instructor_dashboard_2/instructor_dashboard_2.html'
+
+    try:
+        # .. filter_implemented_name: InstructorDashboardRenderStarted
+        # .. filter_type: org.openedx.learning.instructor.dashboard.render.started.v1
+        context, instructor_template = InstructorDashboardRenderStarted.run_filter(
+            context=context, template_name=instructor_template,
+        )
+    except InstructorDashboardRenderStarted.RenderInvalidDashboard as exc:
+        response = render_to_response(exc.instructor_template, exc.template_context)
+    except InstructorDashboardRenderStarted.RedirectToPage as exc:
+        response = HttpResponseRedirect(exc.redirect_to)
+    except InstructorDashboardRenderStarted.RenderCustomResponse as exc:
+        response = exc.response
+    else:
+        response = render_to_response(instructor_template, context)
+
+    return response
 
 
 ## Section functions starting with _section return a dictionary of section data.
@@ -662,28 +672,29 @@ def _section_send_email(course, access):
     """ Provide data for the corresponding bulk email section """
     course_key = course.id
 
-    # Monkey-patch applicable_aside_types to return no asides for the duration of this render
-    with patch.object(course.runtime, 'applicable_aside_types', null_applicable_aside_types):
-        # This HtmlBlock is only being used to generate a nice text editor.
-        html_block = HtmlBlock(
-            course.runtime,
-            DictFieldData({'data': ''}),
-            ScopeIds(None, None, None, course_key.make_usage_key('html', 'fake'))
-        )
-        fragment = course.runtime.render(html_block, 'studio_view')
-    fragment = wrap_xblock(
-        'LmsRuntime', html_block, 'studio_view', fragment, None,
-        extra_data={"course-id": str(course_key)},
-        usage_id_serializer=lambda usage_id: quote_slashes(str(usage_id)),
-        # Generate a new request_token here at random, because this module isn't connected to any other
-        # xblock rendering.
-        request_token=uuid.uuid1().hex
-    )
+    # Render an HTML editor, using the same template as the HTML XBlock's visual
+    # editor. This basically pretends to be an HTML XBlock so that the XBlock
+    # initialization JS will manage the editor for us. This is a hack, and
+    # should be replace by a proper HTML Editor React component.
+    fake_block_data = {
+        "init": "XBlockToXModuleShim",
+        "usage-id": course_key.make_usage_key('html', 'fake'),
+        "runtime-version": "1",
+        "runtime-class": "LmsRuntime",
+    }
+    email_editor = render_to_string("xblock_wrapper.html", {
+        # This minimal version of the wrapper context is extracted from wrap_xblock():
+        "classes": ["xblock", "xblock-studio_view", "xmodule_edit", "xmodule_HtmlBlock"],
+        "data_attributes": ' '.join(f'data-{markupsafe.escape(key)}="{markupsafe.escape(value)}"'
+                                    for key, value in fake_block_data.items()),
+        "js_init_parameters": {"xmodule-type": "HTMLEditingDescriptor"},
+        "content": render_to_string("widgets/html-edit.html", {"editor": "visual", "data": ""}),
+    })
+
     cohorts = []
     if is_course_cohorted(course_key):
         cohorts = get_course_cohorts(course)
     course_modes = CourseMode.modes_for_course(course_key, include_expired=True, only_selectable=False)
-    email_editor = fragment.content
     section_data = {
         'section_key': 'send_email',
         'section_display_name': _('Email'),

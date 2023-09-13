@@ -1,10 +1,10 @@
 <%page expression_filter="h"/>
-<%! from django.utils.translation import ungettext %>
+<%! from django.utils.translation import ngettext %>
 <div class="wrapper-xblock-message">
     <div class="xblock-message information">
         <p>
             <span class="message-text">
-                ${ungettext(
+                ${ngettext(
                     'Showing all matching content eligible to be added into {display_name}. Each student will be assigned {max_count} component drawn randomly from this list.',
                     'Showing all matching content eligible to be added into {display_name}. Each student will be assigned {max_count} components drawn randomly from this list.',
                     max_count

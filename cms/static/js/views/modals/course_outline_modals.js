@@ -19,7 +19,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         ReleaseDateEditor, DueDateEditor, SelfPacedDueDateEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor,
         StaffLockEditor, UnitAccessEditor, ContentVisibilityEditor, TimedExaminationPreferenceEditor,
         AccessEditor, ShowCorrectnessEditor, HighlightsEditor, HighlightsEnableXBlockModal, HighlightsEnableEditor,
-        DiscussionEditor;
+        DiscussionEditor, SummaryConfigurationEditor;
 
     CourseOutlineXBlockModal = BaseModal.extend({
         events: _.extend({}, BaseModal.prototype.events, {
@@ -1203,6 +1203,42 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         }
     });
 
+    SummaryConfigurationEditor = AbstractEditor.extend({
+        templateName: 'summary-configuration-editor',
+        className: 'summary-configuration',
+
+        afterRender: function() {
+            AbstractEditor.prototype.afterRender.call(this);
+            this.setEnabled(this.isModelEnabled());
+        },
+
+        isModelEnabled: function() {
+          return this.model.get('summary_configuration_enabled');
+        },
+
+        setEnabled: function(value) {
+            this.$('#summary_configuration_enabled').prop('checked', value);
+        },
+
+        isEnabled: function() {
+            return this.$('#summary_configuration_enabled').is(':checked');
+        },
+
+        hasChanges: function() {
+            return this.isModelEnabled() !== this.isEnabled();
+        },
+
+        getRequestData: function() {
+            if (this.hasChanges()) {
+                return {
+                    summary_configuration_enabled: this.isEnabled()
+                };
+            } else {
+                return {};
+            }
+        }
+    });
+
     return {
         getModal: function(type, xblockInfo, options) {
             if (type === 'edit') {
@@ -1228,6 +1264,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             };
             if (xblockInfo.isVertical()) {
                 editors = [StaffLockEditor, UnitAccessEditor, DiscussionEditor];
+                if (typeof xblockInfo.get('summary_configuration_enabled') === 'boolean') {
+                    editors.push(SummaryConfigurationEditor);
+                }
             } else {
                 tabs = [
                     {

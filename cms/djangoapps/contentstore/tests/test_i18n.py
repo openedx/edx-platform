@@ -118,7 +118,6 @@ class TestXBlockI18nService(ModuleStoreTestCase):
             # Check that the old ugettext has been put back into place
             self.assertEqual(i18n_service.ugettext(self.test_language), 'dummy language')
 
-    @mock.patch('django.utils.translation.ugettext', mock.Mock(return_value='XYZ-TEST-LANGUAGE'))
     @mock.patch('django.utils.translation.gettext', mock.Mock(return_value='XYZ-TEST-LANGUAGE'))
     def test_django_translator_in_use_with_empty_block(self):
         """
@@ -127,7 +126,7 @@ class TestXBlockI18nService(ModuleStoreTestCase):
         i18n_service = XBlockI18nService(None)
         self.assertEqual(i18n_service.ugettext(self.test_language), 'XYZ-TEST-LANGUAGE')
 
-    @mock.patch('django.utils.translation.ugettext', mock.Mock(return_value='XYZ-TEST-LANGUAGE'))
+    @mock.patch('django.utils.translation.gettext', mock.Mock(return_value='XYZ-TEST-LANGUAGE'))
     def test_message_catalog_translations(self):
         """
         Test: Message catalog from FakeTranslation should return required translations.
