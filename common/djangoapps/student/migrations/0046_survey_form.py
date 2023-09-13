@@ -47,6 +47,7 @@ class Migration(migrations.Migration):
                 ('question' , models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='student.surveyQuestion')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
                 ('answer_text', models.CharField( max_length=255, null=True)),
+                ('course', models.ForeignKey(db_constraint=False, null=True, blank=True ,on_delete=django.db.models.deletion.CASCADE, to='course_overviews.CourseOverview')),
             ]
         )
     ]

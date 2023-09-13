@@ -593,9 +593,8 @@ def setting_survey_form (request, course_id):
     
     surveys = Survey.objects.all()
 
-    surveyCourse = SurveyCourseDAO.listSurvey(course_id)
+    surveyCourse = SurveyCourseDAO.surveyCourse(course_id)
     
-
     context = {
           'context_course': course,
             'surveys': surveys,
@@ -604,14 +603,10 @@ def setting_survey_form (request, course_id):
     
     if request.method == 'POST':
         survey_id = request.POST.get('survey')
-        isCheck =SurveyCourseDAO.existSurveyCourse(course_id, survey_id)
-        if isCheck :
-            context['error_message'] = 'This is an error message.'
-            return render_to_response('survey_form.html',context)
-        else :
-            SurveyCourseDAO.addSurveyCourse(course_id,survey_id)
-            # url = reverse('survey', args=[course_id])
-            # return redirect(url)
+            
+        SurveyCourseDAO.addSurveyCourse(course_id,survey_id)
+        url = reverse('survey', args=[course_id])
+        return redirect(url)
 
     
     return render_to_response('survey_form.html' ,context)

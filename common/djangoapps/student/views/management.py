@@ -1031,9 +1031,9 @@ def get_resume_button_urls(request):
         course_overview = CourseOverview.get_from_id(enrollment.course_id)
         course_target = course_home_url(course_overview.id)
         resume_button_url =''
-        checkSurveyCourse = SurveyCourseDAO.checkSurveyCourse(course_id=enrollment.course_id)
-        # checkUserSurvey = SurveyCourseDAO.checkUserEnroll(course_id=enrollment.course_id, user_id=user.id)
-        print('========',enrollment )
+        checkSurveyCourse = SurveyCourseDAO.checkSurveyCourse(course_id=enrollment.course_id, user_id=user.id)
+        checkUserSurvey = SurveyCourseDAO.checkUserEnroll(enrollment=enrollment, user_id=user.id)
+        
         for url in resume_button_urls :
             if str(enrollment.course_id) in url :
                 resume_button_url = url
@@ -1041,24 +1041,23 @@ def get_resume_button_urls(request):
         if resume_button_url == '' :
             textContent = _('View Course')
             url = course_target 
-            if checkSurveyCourse == True :
-                url = '/survey-form/' + str(enrollment.course_id)
-                # if check_form_user :
-                #     url = course_target
-                # else :
-                #     url = '/survey-form/' + str(enrollment.course_id)
+            if checkSurveyCourse == False :
+                if checkUserSurvey :
+                    url = '/survey-form/' + str(enrollment.course_id)
+                else :
+                    url = course_target
             else :
                 url = course_target    
         else :
             textContent = _('Resume Course')
-            url = resume_button_url    
-            # if check_form_course == True  :
-            #     if check_form_user :
-            #         url = resume_button_url
-            #     else :
-            #         url = '/survey-form/' + str(enrollment.course_id)
-            # else :
-            #     url = resume_button_url    
+            if checkSurveyCourse == False :
+                if checkUserSurvey :
+                    url = '/survey-form/' + str(enrollment.course_id)
+                else :
+                    url = resume_button_url
+            else :
+                url = resume_button_url     
+ 
 
             
         resume_url.append({"course_id": str(enrollment.course_id),'url':url , 'textContent' : textContent , "display_name" : course_overview.display_name_with_default})

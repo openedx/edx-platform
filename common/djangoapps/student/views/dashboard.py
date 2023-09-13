@@ -65,7 +65,7 @@ from common.djangoapps.student.models import (
 )
 from common.djangoapps.util.milestones_helpers import get_pre_requisite_courses_not_completed
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from common.djangoapps.student.models import LastHistoryActivateDAO , Survey, SurveyCourse, SurveyQuestion , SurveyCourseDAO
+from common.djangoapps.student.models import LastHistoryActivateDAO , Survey, SurveyUserDAO, SurveyQuestion , SurveyCourseDAO
 
 
 
@@ -889,10 +889,10 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     # context.update({
     #     'resume_button_urls': resume_button_urls
     # })
-    # check_form = SurveyFormDAO.checkSuccess(user_id=user.id)
+    check_form = SurveyUserDAO.checkSuccess(user_id=user.id)
     
-    # if check_form == False:
-    #     return redirect('survey_form')
+    if check_form == False:
+        return redirect('survey_form')
     
     
     dashboard_template = 'dashboard.html'
@@ -938,11 +938,8 @@ from common.djangoapps.student.views.management import get_resume_btn_data
 @ensure_csrf_cookie
 @add_maintenance_banner
 def form_begin_login (request, course_id=None) :
-    user = request.user
-    # check_form = SurveyFormDAO.checkSuccess(user_id=user.id)
-
-    # if check_form == True :
-    #     return redirect('dashboard')
+    
+    user = request.user  
     
     resume_button_urls = get_resume_btn_data(user)['resume_button_url']  
 
@@ -957,9 +954,18 @@ def form_begin_login (request, course_id=None) :
     else :
         listQuestion = SurveyCourseDAO.questionListSurvey()
     
+    check_form = SurveyUserDAO.checkSuccess(user_id=user.id)
+    checkSurveyCourse = SurveyCourseDAO.checkSurveyCourse(course_id=course_id, user_id=user.id)
+    
+    if check_form and course_id is None :
+        return redirect('dashboard')
+    if checkSurveyCourse and course_id is not None:
+        return redirect(urlCourse)
+    
+    
+    
     result_lists = []
 
-    print('=======', display_name)
     
     for question in listQuestion:
         survey = Survey.objects.filter(id=question.survey_id).first()
@@ -985,16 +991,19 @@ def form_begin_login (request, course_id=None) :
     }
     
 
-    # if request.method == 'POST':
+    if request.method == 'POST':
         
-    #     for q in listQuestion :
-    #         if 'title' not in q.type:
-    #             aws = request.POST.getlist(str(q.question))
-    #             for a in aws:
-    #                 SurveyFormDAO.create_form(user_id=user.id, question=q , answer_text=a)
+        for q in listQuestion :
+            if 'title' not in q.type:
+                aws = request.POST.getlist(str(q.question))
+                for a in aws:
+                    SurveyUserDAO.create_form(user_id=user.id, question=q , answer_text=a , course_id=course_id)
                 
                               
-    #     return redirect('dashboard')        
+        if urlCourse:
+            return redirect(urlCourse) 
+        else :
+            return redirect('dashboard')      
          
         
         
