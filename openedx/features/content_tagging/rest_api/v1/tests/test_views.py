@@ -626,7 +626,7 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
         response = self.client.delete(url)
         assert response.status_code == expected_status
 
-        # If we were able to delete the taxonomy, check that it"s really gone
+        # If we were able to delete the taxonomy, check that it's really gone
         if status.is_success(expected_status):
             response = self.client.get(url)
             assert response.status_code == status.HTTP_404_NOT_FOUND
