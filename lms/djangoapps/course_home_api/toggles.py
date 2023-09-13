@@ -15,7 +15,7 @@ WAFFLE_FLAG_NAMESPACE = 'course_home'
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2021-03-12
 # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/26978
-COURSE_HOME_MICROFRONTEND_PROGRESS_TAB = CourseWaffleFlag(  # lint-amnesty, pylint: disable=toggle-missing-annotation
+COURSE_HOME_MICROFRONTEND_PROGRESS_TAB = CourseWaffleFlag(
     f'{WAFFLE_FLAG_NAMESPACE}.course_home_mfe_progress_tab', __name__
 )
 
