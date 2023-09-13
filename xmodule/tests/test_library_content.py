@@ -55,7 +55,7 @@ class LibraryContentTest(MixedSplitTestCase):
             max_count=1,
             source_library_id=str(self.library.location.library_key)
         )
-        self.lc_block.runtime._services.update({'library_tools': self.tools}) # pylint: disable=protected-access
+        self.lc_block.runtime._services.update({'library_tools': self.tools})  # pylint: disable=protected-access
 
     def _bind_course_block(self, block):
         """
@@ -295,8 +295,7 @@ class LibraryContentBlockTestMixin:
 
         assert self.lc_block.validate()
 
-
-    def _assert_has_only_N_matching_problems(self,result,n):
+    def _assert_has_only_N_matching_problems(self, result, n):
         assert result.summary
         assert StudioValidationMessage.WARNING == result.summary.type
         assert f'only {n} matching problem' in result.summary.text
@@ -315,7 +314,7 @@ class LibraryContentBlockTestMixin:
         result = self.lc_block.validate()
         assert not result
 
-        self._assert_has_only_N_matching_problems(result,4)
+        self._assert_has_only_N_matching_problems(result, 4)
         assert len(self.lc_block.selected_children()) == 4
 
         # Add some capa problems so we can check problem type validation messages
@@ -345,7 +344,7 @@ class LibraryContentBlockTestMixin:
         result = self.lc_block.validate()
         assert not result
 
-        self._assert_has_only_N_matching_problems(result,1)
+        self._assert_has_only_N_matching_problems(result, 1)
         assert len(self.lc_block.selected_children()) == 1
 
         # Missing problem type should always fail validation
