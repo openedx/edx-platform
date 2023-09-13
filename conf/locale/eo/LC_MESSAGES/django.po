@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-09-05 15:59+0000\n"
-"PO-Revision-Date: 2023-09-05 15:59:41.440074\n"
+"POT-Creation-Date: 2023-09-11 19:52+0000\n"
+"PO-Revision-Date: 2023-09-11 19:52:13.804867\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -3502,6 +3502,14 @@ msgid "Open Response Assessment"
 msgstr "Öpén Réspönsé Àsséssmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/djangoapps/courseware/courses.py
+msgid ""
+"This Open Response Assessment's due dates are set by your instructor and "
+"can't be shifted."
+msgstr ""
+"Thïs Öpén Réspönsé Àsséssmént's düé dätés äré sét ßý ýöür ïnstrüçtör änd "
+"çän't ßé shïftéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/djangoapps/courseware/courses.py
 msgid "Self Assessment"
 msgstr "Sélf Àsséssmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
@@ -3516,14 +3524,6 @@ msgstr "Stäff Àsséssmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 #: lms/djangoapps/courseware/courses.py
 msgid "Submission"
 msgstr "Süßmïssïön Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: lms/djangoapps/courseware/courses.py
-msgid ""
-"Open Response Assessment due dates are set by your instructor and can't be "
-"shifted."
-msgstr ""
-"Öpén Réspönsé Àsséssmént düé dätés äré sét ßý ýöür ïnstrüçtör änd çän't ßé "
-"shïftéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #. Translators: 'absolute' is a date such as "Jan 01,
 #. 2020". 'relative' is a fuzzy description of the time until
@@ -18685,12 +18685,6 @@ msgstr "Döwnlöäd stüdént grädés Ⱡ'σяєм ιρѕυм ∂σłσя ѕι�
 msgid "Print or share your certificate:"
 msgstr ""
 "Prïnt ör shäré ýöür çértïfïçäté: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-msgid "Click the link to see my certificate."
-msgstr ""
-"Çlïçk thé lïnk tö séé mý çértïfïçäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"

@@ -2816,6 +2816,12 @@ msgid "Open Response Assessment"
 msgstr "Erantzun irekiko ebaluazioa"
 
 #: lms/djangoapps/courseware/courses.py
+msgid ""
+"This Open Response Assessment's due dates are set by your instructor and "
+"can't be shifted."
+msgstr ""
+
+#: lms/djangoapps/courseware/courses.py
 msgid "Self Assessment"
 msgstr "Autoebaluazioa"
 
@@ -2830,12 +2836,6 @@ msgstr ""
 #: lms/djangoapps/courseware/courses.py
 msgid "Submission"
 msgstr "Bidalketa"
-
-#: lms/djangoapps/courseware/courses.py
-msgid ""
-"Open Response Assessment due dates are set by your instructor and can't be "
-"shifted."
-msgstr ""
 
 #. Translators: 'absolute' is a date such as "Jan 01,
 #. 2020". 'relative' is a fuzzy description of the time until
@@ -5792,10 +5792,10 @@ msgid "Quotes"
 msgstr "Aipamenak"
 
 #: lms/templates/wiki/includes/editor_widget.html
-#, python-format
+#, python-brace-format
 msgid ""
-"Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for"
-" help."
+"Markdown syntax is allowed. See the {start_link}cheatsheet{end_link} for "
+"help."
 msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html
@@ -6744,8 +6744,8 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
-"The Posting availabilty in discussions whether it will be enabled, scheduled"
-" or indefinitely disabled."
+"The Posting availability in discussions whether it will be enabled, "
+"scheduled or indefinitely disabled."
 msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
@@ -14755,10 +14755,6 @@ msgstr "Jaitsi ikaslearen kalifikazioak"
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Print or share your certificate:"
 msgstr "Inprimatu edo partekatu zure ziurtagiria:"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-msgid "Click the link to see my certificate."
-msgstr "Sakatu estekari nire ziurtagiria ikusteko."
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
