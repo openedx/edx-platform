@@ -1072,11 +1072,13 @@ EXPLICIT_QUEUES = {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
     'openedx.core.djangoapps.programs.tasks.award_course_certificate': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
-    'openassessment.tasks.update_workflows_for_all_blocked_submissions': {
+    'openassessment.workflow_batch_update_api.update_workflows_for_all_blocked_submissions_task': {
         'queue': ORA_WORKFLOW_UPDATE_ROUTING_KEY},
-    'openassessment.tasks.update_workflows_for_ora_block': {
+    'openassessment.workflow_batch_update_api.update_workflows_for_course_task': {
         'queue': ORA_WORKFLOW_UPDATE_ROUTING_KEY},
-    'openassessment.tasks.update_workflows_for_course': {
+    'openassessment.workflow_batch_update_api.update_workflows_for_ora_block_task': {
+        'queue': ORA_WORKFLOW_UPDATE_ROUTING_KEY},
+    'openassessment.workflow_batch_update_api.update_workflow_for_submission_task': {
         'queue': ORA_WORKFLOW_UPDATE_ROUTING_KEY},
 
 }
