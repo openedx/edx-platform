@@ -192,7 +192,7 @@ function(VideoPlayer, i18n, moment, _) {
                         console.error('window.onYouTubeIframeAPIReady is ' + window.onYouTubeIframeAPIReady);
                         console.error(e);
                         if (e instanceof TypeError) {
-                            setupOnYouTubeIframeAPIReady(); // Try again up to defined max calls.
+                            setTimeout(setupOnYouTubeIframeAPIReady, 500); // Try again up to defined max calls.
                         }
                         else {
                             throw e;
