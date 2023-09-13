@@ -84,7 +84,7 @@ and other rich community resources.
 Documentation
 *************
 
-Documentation can be found at https://docs.openedx.org.
+Documentation can be found at https://docs.openedx.org/projects/edx-platform.
 
 
 Getting Help
