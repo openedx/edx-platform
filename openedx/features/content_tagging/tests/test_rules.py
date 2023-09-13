@@ -185,7 +185,6 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
             self.tax_both_xblock2,
         )
 
-
     def _expected_users_have_perm(
         self, perm, obj, learner_perm=False, learner_obj=False, user_org2=True
     ):
