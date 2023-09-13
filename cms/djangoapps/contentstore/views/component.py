@@ -336,7 +336,7 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
                 template_id = "peer-assessment"
             elif category == 'problem':
                 # Override generic "Problem" name to describe this blank template:
-                display_name = _("Blank Advanced Problem")
+                display_name = _("Blank Problem")
             templates_for_category.append(
                 create_template_dict(display_name, category, support_level_without_template, template_id, 'advanced')
             )
