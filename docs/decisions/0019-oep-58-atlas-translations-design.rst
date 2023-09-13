@@ -13,16 +13,15 @@ OEP-58 Translation Management overview
 --------------------------------------
 
 The `Translation Management update OEP-58`_ proposal has been merged with
-the following changes to the way translations are managed in Open edX:
+the following changes to the way translations are managed in the Open edX platform:
 
 - Move Translation Files to the `openedx-translations repo`_
-- Add `Transifex GitHub App <https://github.com/apps/transifex-integration>`_
+- Add the `Transifex GitHub App <https://github.com/apps/transifex-integration>`_
   to openedx Organization
 - Connect the `openedx-translations repo`_ to the
   `openedx-translations project`_
 - Copy Transifex's Translation Memory and Combine Translators
-- Get Translations Back for Deployment/Development and introduce the new
-  `openedx-atlas`_ translation tool.
+- Utilize `openedx-atlas`_ to pull translations for development/deployment.
 
 If you're new to the `Translation Management update OEP-58`_ proposal, please
 review it in addition to the
@@ -61,10 +60,10 @@ JavaScript Translations for XBocks
 ----------------------------------
 
 As of September 2023, there is no centralized method to bundle JavaScript
-translations in XBlocks. Non-XBlock plugins lacks JavaScript translations
+translations in XBlocks. Non-XBlock plugins lack JavaScript translation
 support altogether.
 
-The de-factor stadnard method for bundling JavaScript translations in XBlocks
+The de-facto standard method for bundling JavaScript translations in XBlocks
 is to use ``web_fragment`` and load the translations as part of the XBlock
 frontend static files on every XBlock load.
 
@@ -91,7 +90,7 @@ Decisions
 Proposed Design for edX Platform ``conf/locale`` translations
 -------------------------------------------------------------
 
-Update the ``make pull_translations`` command to use the ``atlas pull``
+Update the ``make pull_translations`` command to use ``atlas pull``
 if the ``OPENEDX_ATLAS_PULL`` environment variable is set.
 
 This has been the standard for all repositories as seen in both
@@ -122,12 +121,8 @@ The next section is a little more intricate and requires more discussion.
 Proposed Design for XBlocks and Plugins
 ---------------------------------------
 
-The proposed design for XBlocks and Plugins is to use the ``atlas pull``
-in a centrally managed way for all XBlocks and Plugins to circumvent the
-the need for managing the translations in each XBlock.
-
-The XBlock translations is already stored in the `openedx-translations repo`_
-and is accessible by the `openedx-atlas`_ command-line.
+Instead of storing translation files for each XBlock and Plugin in their respective repositories,
+we will use `openedx-atlas`_ to pull them from the `openedx-translations repo`_.
 
 
 New ``ENABLE_ATLAS_TRANSLATIONS`` Waffle Switch
@@ -147,42 +142,30 @@ New ``pull_plugins_translations`` command
 
 Introduce new Django commands to the ``edx-platform``:
 
-- ``manage.py lms pull_plugins_translations --list``: This command
-  will list all the XBlocks and Plugins that are installed in the
-  ``edx-platform`` virtual environment regardless of whether its run
-  in Docker, devstack or Native Installation.
-
-  If the command is executed with the ``--list`` flag it will print a
+- ``manage.py lms atlas_pull_plugin_translations --list``: List all XBlocks and
+  Plugins installed in the ``edx-platform`` virtual environment. This will
   list of Python *module names* (as opposed to git repository names) of the
   installed XBlocks and Plugins e.g.::
 
-    $ manage.py lms atlas_pull_plugins_translations --list
+    $ manage.py lms atlas_pull_plugin_translations --list
     drag_and_drop_v2
     done
     eox_tenant
 
   This list doesn't include plugins that are bundled within the
-  ``edx-platform`` repository itself such as the Video XBlock, the ``capa``
-  module and others. The reason for this is that their translations are
-  already included in the ``edx-platform`` translations.
+  ``edx-platform`` repository itself. Translations for bundled plugins 
+  are included in the ``edx-platform`` translation files.
 
-- ``manage.py lms atlas_pull_plugins_translations``: This command
-  will craft and executes the ``atlas pull`` command for the XBlocks and
-  Plugins listed in the previous command. This command is will be added
-  to the ``Makefile`` and can be executed for both development and production
-  deployments.
-
-  This command will run and ``atlas pull`` with the arguments below to pull
-  the translations by module name::
-
+- ``manage.py lms atlas_pull_plugin_translations``: This command
+  will pull translations for installed XBlocks and Plugins by module name::
+  
     $ atlas pull \
         translations/edx-platform-links/drag_and_drop_v2/conf/locale:conf/plugins-locale/drag_and_drop_v2 \
         translations/edx-platform-links/done/conf/locale:conf/plugins-locale/done \
         translations/edx-platform-links/edx_proctoring/conf/locale:conf/plugins-locale/edx_proctoring
 
 
-  It will pull from the `edx-platform-links`_ directory to create the
-  following file tree::
+  Resulting in the following file tree::
 
     $ tree conf/plugins-locale/
     conf/plugins-locale/
@@ -226,55 +209,38 @@ Introduce new Django commands to the ``edx-platform``:
 
 
 
-**Notes:**
-
-- The command above is for demonstration purposes and may not work
-  properly yet.
-- The directory name may change from ``edx-platform-links`` to
-  ``edx-platform-modules`` but this is out of the scope of this proposal and
-  have little to no impact on the rest of the proposal.
 
 Changes to the `openedx-translations repo`_
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The `openedx-translations repo`_ organizes the translations by the
-GitHub repository name. However, once an XBlock is installed the repository
-name is no longer known to the ``edx-platform``. Therefore, we provide two
-ways to fetch the XBlock translations:
-
-- By repo name: e.g. `translations/xblock-drag-and-drop-v2 directory`_.
-- By module name: e.g.
-  `translations/edx-platform-links/drag_and_drop_v2 directory`_.
-
-This update is already implemented in the `openedx-translations repo`_ as of
-`edx-platform-links PR #353`_ which includes the details of the changes.
+The `openedx-translations repo`_ directory structure organizes translation files by
+repository name. ``edx-platform`` has no record of plugin repository names. As of
+`edx-platform-links PR #353`_, it is also possible to use ``atlas`` to pull translations by
+module name.
 
 
 BlockI18nService support for ``atlas`` Python translations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``get_python_locale_directory`` will support two modes:
+``get_python_locale_directory`` will support two modes:
 
-#. When ``ENABLE_ATLAS_TRANSLATIONS`` is disabled, the XBlock translations
-   from the ``pip`` packages will be used such as the
+#. When ``ENABLE_ATLAS_TRANSLATIONS`` is disabled, the XBlock translation files
+   included in the ``pip`` packages will be used. For example, the
    ``lib/python3.8/site-packages/drag_and_drop_v2/translations/ar/LC_MESSAGES/text.po``
    path for the Drag and Drop XBlock.
 
-#. When ``ENABLE_ATLAS_TRANSLATIONS`` is enabled, the atlas translations will
-   be used which is located in the ``edx-platform`` in an the git-ignored
+#. When ``ENABLE_ATLAS_TRANSLATIONS`` is enabled, the translation files pulled by ``atlas``
+   from the `openedx-translations repo`_ will be used. For example, the 
    ``edx-platform/conf/plugins-locale/drag_and_drop_v2/ar/LC_MESSAGES/text.po``
-   path. This file pulled by the ``pull_plugins_translations`` command.
+   path for the Drag and Drop XBlock.
 
 
 XBlockI18nService support for ``atlas`` JavaScript translations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``XBlockI18nService`` will provide a new centralized
-``get_javascript_locale_path`` method to get the JavaScript translations
-``django.js`` file.
-
-This function needs to be used by the XBlocks in an opt-in backward-compatible
-manner.
+A ``get_javascript_locale_path`` method will be added to the ``XBlockI18nService`` to provide XBlocks the
+appropriate path to ``django.js`` translation files. This will allow XBlocks to utilize legacy packaged translations
+or ``atlas`` pulled translations depending on configuration settings.
 
 A new ``i18n_js_namespace`` property is needed for the :ref:`compile-js-command`
 to generate JavaScript translations in a centrally managed manner for all
@@ -318,13 +284,13 @@ be updated to support both the ``XBlockI18nService`` new
            return None
 
 
-New ``compile_plugins_js_translations`` command
+New ``compile_js_plugin_translations`` command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This command will loop over XBlock modules that has the ``i18n_js_namespace``
+This command will loop over XBlock modules that have the ``i18n_js_namespace``
 property and compile the JavaScript translations.
 
-For example if the Drag and Drop XBlock has the ``i18n_js_namespace``
+For example, if the Drag and Drop XBlock has the ``i18n_js_namespace`` property,
 the ``compile_plugins_js_translations`` command will execute the following
 commands::
 
@@ -349,7 +315,7 @@ and ensure that the ``make pull_translations`` command won't corrupt the
 virtual environment.
 
 This is a non-trivial task and appears to add more complexity than necessary
-for not much added benefit.
+due to the fact that XBlocks and plugins won't be used outside the context of ``edx-platform``.
 
 
 Goals
