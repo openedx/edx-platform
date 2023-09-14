@@ -3,6 +3,7 @@ XBlock runtime services for LibraryContentBlock
 """
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
+from django.conf import settings
 import hashlib
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
