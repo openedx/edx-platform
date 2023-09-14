@@ -13,14 +13,13 @@ from organizations.models import Organization
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import skip_unless_cms
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 
 from .. import api
 from ..models import ContentLanguageTaxonomy, TaxonomyOrg
 from ..toggles import CONTENT_TAGGING_AUTO
 
 LANGUAGE_TAXONOMY_ID = -1
-
 
 @skip_unless_cms  # Auto-tagging is only available in the CMS
 @override_waffle_flag(CONTENT_TAGGING_AUTO, active=True)
@@ -29,7 +28,7 @@ class TestAutoTagging(ModuleStoreTestCase):
     Test if the Course and XBlock tags are automatically created
     """
 
-    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def _check_tag(self, object_id: str, taxonomy_id: int, value: str | None):
         """
