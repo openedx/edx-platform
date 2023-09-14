@@ -2,18 +2,25 @@
 
 
 <style>
-    table {
+    #survey-course table {
         font-family: arial, sans-serif;
         border-collapse: collapse;
         width: 100%;
       }
       
-      td, th {
+      #survey-course td {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+
+       #survey-course th {
         border: 1px solid #dddddd;
         text-align: left;
         padding: 8px;
       }
       
+
 </style>
 
  
@@ -48,7 +55,7 @@
       const thead = document.createElement("thead");
       const tbody = document.createElement("tbody");
 
-      // Tạo hàng đầu của bảng
+
       const headerRow = document.createElement("tr");
 
       const headerColumns = ["#", "Student Email"];

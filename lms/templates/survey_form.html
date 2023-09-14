@@ -65,7 +65,9 @@
                             </div>
                        
                         <div class="card-body">
+
                             % for q in survey['questions']:
+
                                 % if q.type == 'text' :
                                 <div class="input-item-text" >
                                     <span>
@@ -108,6 +110,63 @@
                     </div>
                     </div>
                 % endfor
+            % endif
+            % if result_boolean :
+ 
+                        <div class="survey-form"  style="display: none;">
+                            
+                                <div class="card">
+                                    <div class="card-header">
+                                        <span>${result_boolean['questions'][0]}</span>
+                                </div>
+                                <div class="card-body">
+                                    <div style="display: flex;
+                                    flex-direction: column;
+                                    padding: 20px ;
+                                    gap: 10px;">
+                                        <div class="survey-item-input">
+                                            <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+                                                <input id="Yes" name="${result_boolean['questions'][0]}"  type='radio' value="Yes"/>
+                                                <label for="Yes" >Yes</label>
+                                        </div>
+                                        <div class="survey-item-input">
+                                            <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+                                                <input id="No" name="${result_boolean['questions'][0]}" value="No"  type='radio' />
+                                                <label for="No">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+  
+                                </div>
+
+                            <div id="boolean-form" style="display:none;">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <span>${result_boolean['questions'][1]}</span>
+                                    </div>
+                                   <div class="card-body">
+                                        <div style="display: flex;
+                                        flex-direction: column;
+                                        padding: 20px;
+                                        gap: 10px;">
+                                            <div class="survey-item-input">
+                                                <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+                                                    <input id="Yes1" name="${result_boolean['questions'][1]}"  type='radio' value="Yes"/>
+                                                    <label for="Yes1" >Yes</label>
+                                            </div>
+                                            <div class="survey-item-input">
+                                                <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+                                                    <input id="No1" name="${result_boolean['questions'][1]}" value="No"  type='radio' />
+                                                    <label for="No1">No</label>
+                                            </div>
+                                        </div>
+                                   </div>
+                                </div>
+                            </div>
+
+                        </div>
+              
+                   
             % endif
 
             <div class="survey-form"  style="display: none;">
@@ -153,8 +212,27 @@
     const borderNavbar = document.querySelector('.border-navbar')
     const forms = document.querySelectorAll('.survey-form');
     const textError = document.querySelector('.text-error')
+    const inputYes = document.querySelector('#Yes')
+    const inputNo = document.querySelector('#No')
+
+    const booleanForm = document.querySelector('#boolean-form')
+
+    inputYes.addEventListener('change', ()=>{
+        if(inputYes.checked){
+           booleanForm.style.display = 'block'
+        }else {
+            booleanForm.style.display = 'none'
+        }
+    })
 
 
+    inputNo.addEventListener('change', ()=>{
+        if(inputNo.checked){
+            booleanForm.style.display = 'none'
+        }else{
+            booleanForm.style.display = 'yes'
+        }
+    })
     for(let i = 0; i< forms.length; i++){
         const newSpan = document.createElement('span')
         newSpan.classList.add('border-navbar-item')
