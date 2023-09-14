@@ -49,6 +49,10 @@ def register_access_role(cls):
 def strict_role_checking():
     """
     Context manager that temporarily disables role inheritance.
+
+    You may want to use it to check if a user has a base role. For example, if a user has `CourseLimitedStaffRole`,
+    by enclosing `has_role` call with this context manager, you can check it has the `CourseStaffRole` too. This is
+    useful when derived roles have less permissions than their base roles, but users can have both roles at the same.
     """
     OLD_ACCESS_ROLES_INHERITANCE = ACCESS_ROLES_INHERITANCE.copy()
     ACCESS_ROLES_INHERITANCE.clear()
