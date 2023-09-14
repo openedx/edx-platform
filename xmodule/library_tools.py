@@ -221,11 +221,12 @@ class LibraryToolsService:
         """
         List all known libraries.
 
-        Collects V1 libraries along with V2.
+        Collects Only V2 Libaries if the FEATURES[ENABLE_LIBRARY_AUTHORING_MICROFRONTEND] setting is True.
+        Otherwise, return all v1 and v2 libraries.
         Returns tuples of (library key, display_name).
+
         """
         user = User.objects.get(id=self.user_id)
-
         v1_libs = [
             (lib.location.library_key.replace(version_guid=None, branch=None), lib.display_name)
             for lib in self.store.get_library_summaries()
@@ -234,6 +235,8 @@ class LibraryToolsService:
         v2_libs_with_meta = library_api.get_metadata_from_index(v2_query)
         v2_libs = [(lib.key, lib.title) for lib in v2_libs_with_meta]
 
+        if settings.FEATURES.get('ENABLE_LIBRARY_AUTHORING_MICROFRONTEND'):
+            return v2_libs
         return v1_libs + v2_libs
 
     def import_from_blockstore(self, dest_block, blockstore_block_ids):

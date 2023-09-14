@@ -2,7 +2,7 @@
 Tests for library tools service.
 """
 
-from unittest.mock import patch
+from unittest import mock
 
 import ddt
 from bson.objectid import ObjectId
@@ -35,7 +35,8 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         """
         Test listing of libraries.
 
-        Should include either V1 or V2 libraries.
+        Collects Only V2 Libaries if the FEATURES[ENABLE_LIBRARY_AUTHORING_MICROFRONTEND] setting is True.
+        Otherwise, return all v1 and v2 libraries.
         """
         # create V1 library
         _ = LibraryFactory.create(modulestore=self.store)
@@ -45,7 +46,13 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         assert all_libraries
         assert len(all_libraries) == 2
 
-    @patch('xmodule.modulestore.split_mongo.split.SplitMongoModuleStore.get_library_summaries')
+        # enable FEATURES[ENABLE_LIBRARY_AUTHORING_MICROFRONTEND]
+        with mock().patch('settings.FEATURES.get', return_value=True):
+            all_libraries = self.tools.list_available_libraries()
+            assert all_libraries
+            assert len(all_libraries) == 1
+
+    @mock.patch('xmodule.modulestore.split_mongo.split.SplitMongoModuleStore.get_library_summaries')
     def test_list_available_libraries_fetch(self, mock_get_library_summaries):
         """
         Test that library list is compiled using light weight library summary objects.
