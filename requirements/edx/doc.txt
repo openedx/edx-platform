@@ -406,7 +406,6 @@ django-ses==3.5.0
     # via -r requirements/edx/base.txt
 django-simple-history==3.3.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   edx-name-affirmation
