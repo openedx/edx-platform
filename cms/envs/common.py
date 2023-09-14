@@ -2782,6 +2782,5 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'API to edit xblocks and course content in studio',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
-    'PREPROCESSING_HOOKS': ['cms.spectacular.preprocessing_filter_spec'],
-    # OTHER SETTINGS
+    'PREPROCESSING_HOOKS': ['cms.lib.spectacular.content_api_filter'],
 }

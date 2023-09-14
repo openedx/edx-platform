@@ -2,6 +2,7 @@
 Public rest API endpoints for the Studio Content API.
 """
 import logging
+from rest_framework import serializers
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, CreateAPIView
 from django.views.decorators.csrf import csrf_exempt
 from django.http import Http404
@@ -9,45 +10,17 @@ from django.http import Http404
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from common.djangoapps.util.json_request import expect_json_in_class_view
 
-from ....api import course_author_access_required
-
+from cms.djangoapps.contentstore.api import course_author_access_required
 from cms.djangoapps.contentstore.xblock_storage_handlers import view_handlers
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
 
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
-from drf_spectacular.types import OpenApiTypes
-from rest_framework import serializers
+from cms.djangoapps.contentstore.rest_api.v1.serializers import XblockSerializer
+
 
 log = logging.getLogger(__name__)
 toggles = contentstore_toggles
 handle_xblock = view_handlers.handle_xblock
 
-from rest_framework import serializers
-
-class PermissiveSerializer(serializers.Serializer):
-    def to_internal_value(self, data):
-        """
-        Override to_internal_value to avoid removing unexpected fields.
-        """
-        # Validate and transform the expected fields as usual
-        ret = super().to_internal_value(data)
-        # Merge the transformed data with the original data 
-        ret.update(data)
-        return ret
-
-    def validate(self, attrs):
-        """
-        Optionally, you can still validate the expected fields 
-        or even put some rules for unexpected fields if necessary.
-        """
-        return attrs
-
-class XblockSerializer(PermissiveSerializer):
-    id=serializers.CharField(required=False)
-    display_name=serializers.CharField(required=False)
-    category=serializers.CharField(required=False)
-    data=serializers.CharField(required=False)
-    metadata=serializers.DictField(required=False)
 
 @view_auth_classes()
 class XblockView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAPIView):
@@ -57,7 +30,8 @@ class XblockView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAP
     usage_key_string (optional):
     xblock identifier, for example in the form of "block-v1:<course id>+type@<type>+block@<block id>"
     """
-    serializer_class = XblockSerializer
+    # TODO: uncomment next line after XblockSerializer is implemented
+    # serializer_class = XblockSerializer
 
     def dispatch(self, request, *args, **kwargs):
         # TODO: probably want to refactor this to a decorator.
