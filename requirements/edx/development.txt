@@ -735,7 +735,7 @@ edx-django-utils==5.7.0
     #   openedx-blockstore
     #   ora2
     #   super-csv
-edx-drf-extensions==8.9.2
+edx-drf-extensions==8.9.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -761,7 +761,7 @@ edx-event-bus-redis==0.3.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-i18n-tools==1.1.0
+edx-i18n-tools==1.2.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -908,7 +908,7 @@ fastavro==1.8.3
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   openedx-events
-filelock==3.12.3
+filelock==3.12.4
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -948,7 +948,7 @@ gitdb==4.0.10
     # via
     #   -r requirements/edx/doc.txt
     #   gitpython
-gitpython==3.1.35
+gitpython==3.1.36
     # via -r requirements/edx/doc.txt
 glob2==0.7
     # via
@@ -1326,7 +1326,7 @@ optimizely-sdk==4.1.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-ora2==5.3.0
+ora2==5.4.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1630,7 +1630,6 @@ python-dateutil==2.8.2
     #   botocore
     #   celery
     #   edx-ace
-    #   edx-drf-extensions
     #   edx-enterprise
     #   edx-proctoring
     #   faker
@@ -1761,7 +1760,7 @@ rfc3986[idna2008]==1.5.0
     # via
     #   -r requirements/edx/testing.txt
     #   httpx
-rpds-py==0.10.2
+rpds-py==0.10.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1838,7 +1837,6 @@ six==1.16.0
     #   edx-ccx-keys
     #   edx-codejail
     #   edx-django-release-util
-    #   edx-drf-extensions
     #   edx-lint
     #   edx-milestones
     #   edx-rbac
@@ -2073,7 +2071,6 @@ typing-extensions==4.7.1
     #   edx-opaque-keys
     #   faker
     #   fastapi
-    #   filelock
     #   grimp
     #   import-linter
     #   kombu
