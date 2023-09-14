@@ -83,8 +83,8 @@ from common.djangoapps.student.signals import USER_EMAIL_CHANGED
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps.student.views.dashboard import get_course_enrollments,get_org_black_and_whitelist_for_site, get_dashboard_course_limit,get_filtered_course_entitlements,get_resume_urls_for_enrollments
 from common.djangoapps.student.helpers import get_resume_urls_for_enrollments
-from common.djangoapps.student.models import Survey, SurveyCourseDAO, SurveyCourse, SurveyQuestion
-
+from common.djangoapps.student.models import Survey, SurveyCourseDAO, SurveyCourse, SurveyQuestion, SurveyUser
+from django.contrib.auth.models import User 
 
 log = logging.getLogger("edx.student")
 
@@ -1031,19 +1031,21 @@ def get_resume_button_urls(request):
         course_overview = CourseOverview.get_from_id(enrollment.course_id)
         course_target = course_home_url(course_overview.id)
         resume_button_url =''
+        isSurvey = False
         checkSurveyCourse = SurveyCourseDAO.checkSurveyCourse(course_id=enrollment.course_id, user_id=user.id)
         checkUserSurvey = SurveyCourseDAO.checkUserEnroll(enrollment=enrollment, user_id=user.id)
         
         for url in resume_button_urls :
             if str(enrollment.course_id) in url :
                 resume_button_url = url
-       
+
         if resume_button_url == '' :
             textContent = _('View Course')
             url = course_target 
             if checkSurveyCourse == False :
                 if checkUserSurvey :
                     url = '/survey-form/' + str(enrollment.course_id)
+                    isSurvey = True
                 else :
                     url = course_target
             else :
@@ -1053,6 +1055,7 @@ def get_resume_button_urls(request):
             if checkSurveyCourse == False :
                 if checkUserSurvey :
                     url = '/survey-form/' + str(enrollment.course_id)
+                    isSurvey = True
                 else :
                     url = resume_button_url
             else :
@@ -1060,7 +1063,7 @@ def get_resume_button_urls(request):
  
 
             
-        resume_url.append({"course_id": str(enrollment.course_id),'url':url , 'textContent' : textContent , "display_name" : course_overview.display_name_with_default})
+        resume_url.append({"course_id": str(enrollment.course_id),'url':url , 'textContent' : textContent , "display_name" : course_overview.display_name_with_default , 'isSurvey': isSurvey})
     
     data = {
         "resume_button_url" : resume_url 
@@ -1069,3 +1072,33 @@ def get_resume_button_urls(request):
     return JsonResponse(data)
 
 
+@api_view(['GET'])
+@login_required
+@ensure_csrf_cookie
+def list_answer_survey(request, course_id):
+    listUserAnswer = SurveyUser.objects.filter(course_id=course_id)
+    list_answer = []
+    list_question = set()  # Sử dụng set để loại bỏ các câu hỏi trùng lặp
+
+    for answer in listUserAnswer:
+        user = str(answer.user)  
+        question = str(answer.question)  
+        answer_content = answer.answer_text 
+        email = User.objects.filter(id=answer.user_id)[0].email
+
+        user_exists = False
+        for user_data in list_answer:
+            if user_data['user'] == user:
+                user_exists = True
+                user_data['content'].append({'question': question, 'answer': answer_content})
+                break
+
+        if not user_exists:
+            list_answer.append({'user': user, "email" :email , 'content': [{'question': question, 'answer': answer_content}]})
+        
+        list_question.add(question)  # Thêm câu hỏi vào set
+
+    if not list_answer:
+        return JsonResponse({'message': 'Not answer'})
+    else:
+        return JsonResponse({"list_answer": list_answer, 'list_question': list(list_question)})

@@ -46,7 +46,8 @@ from common.djangoapps.student.models import (
     UserTestGroup,
     Survey,
     SurveyCourse,
-    SurveyQuestion
+    SurveyQuestion,
+    SurveyUser
 
 )
 from common.djangoapps.student.roles import REGISTERED_ACCESS_ROLES
@@ -587,6 +588,9 @@ admin.site.register(BulkChangeEnrollmentConfiguration, ConfigurationModelAdmin)
 admin.site.register(Survey)
 admin.site.register(SurveyQuestion)
 admin.site.register(SurveyCourse)
+admin.site.register(SurveyUser)
+
+
 
 
 
