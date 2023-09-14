@@ -178,6 +178,7 @@ def handle_xblock(request, usage_key_string=None):
     the public studio content API.
     """
     if usage_key_string:
+
         usage_key = usage_key_with_run(usage_key_string)
 
         access_check = (
@@ -218,7 +219,9 @@ def handle_xblock(request, usage_key_string=None):
             _delete_item(usage_key, request.user)
             return JsonResponse()
         else:  # Since we have a usage_key, we are updating an existing xblock.
-            return modify_xblock(usage_key, request)
+            modified_xblock = modify_xblock(usage_key, request)
+            _post_editor_saved_callback(get_xblock(usage_key, request.user))
+            return modified_xblock
 
     elif request.method in ("PUT", "POST"):
         if "duplicate_source_locator" in request.json:
@@ -226,7 +229,6 @@ def handle_xblock(request, usage_key_string=None):
             duplicate_source_usage_key = usage_key_with_run(
                 request.json["duplicate_source_locator"]
             )
-
             source_course = duplicate_source_usage_key.course_key
             dest_course = parent_usage_key.course_key
             if not has_studio_write_access(
@@ -253,6 +255,8 @@ def handle_xblock(request, usage_key_string=None):
                 request.user,
                 request.json.get("display_name"),
             )
+            _post_editor_saved_callback(get_xblock(dest_usage_key, request.user))
+
             return JsonResponse(
                 {
                     "locator": str(dest_usage_key),
@@ -296,7 +300,6 @@ def handle_xblock(request, usage_key_string=None):
 
 def modify_xblock(usage_key, request):
     request_data = request.json
-    print(f'In modify_xblock with data = {request_data.get("data")}, fields = {request_data.get("fields")}')
     return _save_xblock(
         request.user,
         get_xblock(usage_key, request.user),
@@ -372,7 +375,15 @@ def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
     return modulestore().update_item(xblock, user.id)
 
 
-def _save_xblock(  # lint-amnesty, pylint: disable=too-many-statements
+def _post_editor_saved_callback(xblock):
+    """
+    Updates the xblock in the modulestore after saving xblock.
+    """
+    if callable(getattr(xblock, "post_editor_saved", None)):
+        xblock.post_editor_saved()
+
+
+def _save_xblock(
     user,
     xblock,
     data=None,
@@ -387,12 +398,11 @@ def _save_xblock(  # lint-amnesty, pylint: disable=too-many-statements
     publish=None,
     fields=None,
     summary_configuration_enabled=None,
-):
+):  # lint-amnesty, pylint: disable=too-many-statements
     """
     Saves xblock w/ its fields. Has special processing for grader_type, publish, and nullout and Nones in metadata.
     nullout means to truly set the field to None whereas nones in metadata mean to unset them (so they revert
     to default).
-
     """
     store = modulestore()
     # Perform all xblock changes within a (single-versioned) transaction

@@ -7,8 +7,7 @@ import json
 import logging
 import random
 from copy import copy
-from gettext import ngettext
-from rest_framework import status
+from gettext import ngettext, gettext
 
 import bleach
 from django.conf import settings
@@ -16,12 +15,14 @@ from django.utils.functional import classproperty
 from lazy import lazy
 from lxml import etree
 from lxml.etree import XMLSyntaxError
-from opaque_keys.edx.locator import LibraryLocator
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
+from rest_framework import status
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
-from xblock.fields import Integer, List, Scope, String, Boolean
+from xblock.fields import Boolean, Integer, List, Scope, String
 
 from xmodule.capa.responsetypes import registry
 from xmodule.mako_block import MakoTemplateBlockBase
@@ -30,13 +31,12 @@ from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
-    ResourceTemplates,
-    shim_xmodule_js,
     STUDENT_VIEW,
+    ResourceTemplates,
     XModuleMixin,
     XModuleToXBlockMixin,
+    shim_xmodule_js,
 )
-
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
@@ -169,9 +169,14 @@ class LibraryContentBlock(
     @property
     def source_library_key(self):
         """
-        Convenience method to get the library ID as a LibraryLocator and not just a string
+        Convenience method to get the library ID as a LibraryLocator and not just a string.
+
+        Supports either library v1 or library v2 locators.
         """
-        return LibraryLocator.from_string(self.source_library_id)
+        try:
+            return LibraryLocator.from_string(self.source_library_id)
+        except InvalidKeyError:
+            return LibraryLocatorV2.from_string(self.source_library_id)
 
     @classmethod
     def make_selection(cls, selected, children, max_count, mode):
@@ -413,8 +418,8 @@ class LibraryContentBlock(
         fragment = Fragment()
         root_xblock = context.get('root_xblock')
         is_root = root_xblock and root_xblock.location == self.location
-
-        if is_root:
+        is_loading = self.tools.is_loading(self.location)
+        if is_root and not is_loading:
             # User has clicked the "View" link. Show a preview of all possible children:
             if self.children:  # pylint: disable=no-member
                 max_count = self.max_count
@@ -428,9 +433,11 @@ class LibraryContentBlock(
                     }))
                 context['can_edit_visibility'] = False
                 context['can_move'] = False
+                context['can_collapse'] = True
                 self.render_children(context, fragment, can_reorder=False, can_add=False)
         # else: When shown on a unit page, don't show any sort of preview -
         # just the status of this block in the validation area.
+        context['is_loading'] = is_loading
 
         # The following JS is used to make the "Update now" button work on the unit page and the container view:
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit.js'))
@@ -444,6 +451,7 @@ class LibraryContentBlock(
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
+        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit_helpers.js'))
         add_webpack_js_to_fragment(fragment, 'LibraryContentBlockEditor')
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
@@ -504,6 +512,30 @@ class LibraryContentBlock(
             return Response("Library Tools unavailable in current runtime.", status=400)
         self.tools.update_children(self, user_perms)
         return Response()
+
+    @XBlock.json_handler
+    def is_v2_library(self, data, suffix=''):  # lint-amnesty, pylint: disable=unused-argument
+        """
+        Check the library version by library_id.
+
+        This is a temporary handler needed for hiding the Problem Type xblock editor field for V2 libraries.
+        """
+        lib_key = data.get('library_key')
+        try:
+            LibraryLocatorV2.from_string(lib_key)
+        except InvalidKeyError:
+            is_v2 = False
+        else:
+            is_v2 = True
+        return {'is_v2': is_v2}
+
+    @XBlock.handler
+    def get_import_task_status(self, request, suffix=''):  # lint-amnesty, pylint: disable=unused-argument
+        """
+        Return task status for update_children_task.
+        """
+        task_status = self.tools.import_task_status(self.location)
+        return Response(json.dumps({'status': task_status}))
 
     # Copy over any overridden settings the course author may have applied to the blocks.
     def _copy_overrides(self, store, user_id, source, dest):
@@ -619,7 +651,8 @@ class LibraryContentBlock(
                 validation,
                 StudioValidationMessage(
                     StudioValidationMessage.WARNING,
-                    _('There are no matching problem types in the specified libraries.'),
+                    (gettext('There are no problems in the specified library of type {capa_type}.'))
+                    .format(capa_type=self.capa_type),
                     action_class='edit-button',
                     action_label=_("Select another problem type.")
                 )
@@ -668,15 +701,23 @@ class LibraryContentBlock(
 
     def editor_saved(self, user, old_metadata, old_content):  # lint-amnesty, pylint: disable=unused-argument
         """
-        If source_library_id or capa_type has been edited, refresh_children automatically.
+        If source_library_id is empty, clear source_library_version and children.
         """
-        old_source_library_id = old_metadata.get('source_library_id', [])
-        if (old_source_library_id != self.source_library_id or
-                old_metadata.get('capa_type', ANY_CAPA_TYPE_VALUE) != self.capa_type):
-            try:
+        if not self.source_library_id:
+            self.children = []  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+            self.source_library_version = ""
+        else:
+            self.source_library_version = str(self.tools.get_library_version(self.source_library_id))
+
+    def post_editor_saved(self):
+        """
+        If xblock has been edited, refresh_children automatically.
+        """
+        try:
+            if self.source_library_id:
                 self.refresh_children()
-            except ValueError:
-                pass  # The validation area will display an error message, no need to do anything now.
+        except ValueError:
+            pass  # The validation area will display an error message, no need to do anything now.
 
     def has_dynamic_children(self):
         """

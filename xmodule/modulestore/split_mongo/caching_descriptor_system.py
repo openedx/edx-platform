@@ -4,6 +4,7 @@ import logging
 import sys
 import weakref
 
+from crum import get_current_user
 from fs.osfs import OSFS
 from lazy import lazy
 from opaque_keys.edx.locator import BlockUsageLocator, DefinitionLocator, LocalId
@@ -74,7 +75,11 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
         self.module_data = module_data
         self.default_class = default_class
         self.local_modules = {}
-        self._services['library_tools'] = LibraryToolsService(modulestore, user_id=None)
+
+        user = get_current_user()
+        user_id = user.id if user else None
+        self._services['library_tools'] = LibraryToolsService(modulestore, user_id=user_id)
+
         # Cache of block field datas, keyed by the XBlock instance (since the ScopeId changes!)
         self.block_field_datas = weakref.WeakKeyDictionary()
 

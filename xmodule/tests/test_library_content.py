@@ -4,15 +4,16 @@ Basic unit tests for LibraryContentBlock
 Higher-level tests are in `cms/djangoapps/contentstore/tests/test_libraries.py`.
 """
 from unittest.mock import MagicMock, Mock, patch
-import ddt
 
+import ddt
 from bson.objectid import ObjectId
 from fs.memoryfs import MemoryFS
 from lxml import etree
+from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
+from rest_framework import status
 from search.search_engine_base import SearchEngine
 from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
-from rest_framework import status
 
 from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE, LibraryContentBlock
 from xmodule.library_tools import LibraryToolsService
@@ -23,6 +24,7 @@ from xmodule.tests import prepare_block_runtime
 from xmodule.validation import StudioValidationMessage
 from xmodule.x_module import AUTHOR_VIEW
 from xmodule.capa_block import ProblemBlock
+from common.djangoapps.student.tests.factories import UserFactory
 
 from .test_course_block import DummySystem as TestImportSystem
 
@@ -36,7 +38,7 @@ class LibraryContentTest(MixedSplitTestCase):
 
     def setUp(self):
         super().setUp()
-
+        self.user_id = UserFactory().id
         self.tools = LibraryToolsService(self.store, self.user_id)
         self.library = LibraryFactory.create(modulestore=self.store)
         self.lib_blocks = [
@@ -53,6 +55,7 @@ class LibraryContentTest(MixedSplitTestCase):
             max_count=1,
             source_library_id=str(self.library.location.library_key)
         )
+        self.lc_block.runtime._services.update({'library_tools': self.tools})  # pylint: disable=protected-access
 
     def _bind_course_block(self, block):
         """
@@ -69,6 +72,32 @@ class LibraryContentTest(MixedSplitTestCase):
             return descriptor
 
         block.runtime.get_block_for_descriptor = get_block
+
+
+@ddt.ddt
+class LibraryContentGeneralTest(LibraryContentTest):
+    """
+    Test the base functionality of the LibraryContentBlock.
+    """
+
+    @ddt.data(
+        ('library-v1:ProblemX+PR0B', LibraryLocator),
+        ('lib:ORG:test-1', LibraryLocatorV2)
+    )
+    @ddt.unpack
+    def test_source_library_key(self, library_key, expected_locator_type):
+        """
+        Test the source_library_key property of the xblock.
+
+        The method should correctly work either with V1 or V2 libraries.
+        """
+        library = self.make_block(
+            "library_content",
+            self.vertical,
+            max_count=1,
+            source_library_id=library_key
+        )
+        assert isinstance(library.source_library_key, expected_locator_type)
 
 
 class TestLibraryContentExportImport(LibraryContentTest):
@@ -236,7 +265,7 @@ class LibraryContentBlockTestMixin:
         self.lc_block.source_library_id = ""
         result = self.lc_block.validate()
         assert not result
-        # Validation fails due to at least one warning/message
+        # Validation fails due to the library not being configured
         assert result.summary
         assert StudioValidationMessage.NOT_CONFIGURED == result.summary.type
 
@@ -244,7 +273,7 @@ class LibraryContentBlockTestMixin:
         self.lc_block.source_library_id = "library-v1:BAD+WOLF"
         result = self.lc_block.validate()
         assert not result
-        # Validation fails due to at least one warning/message
+        # Validation fails due to the library being invalid
         assert result.summary
         assert StudioValidationMessage.ERROR == result.summary.type
         assert 'invalid' in result.summary.text
@@ -253,14 +282,23 @@ class LibraryContentBlockTestMixin:
         self.lc_block.source_library_id = str(self.library.location.library_key)
         result = self.lc_block.validate()
         assert not result
-        # Validation fails due to at least one warning/message
+        # Validation fails due to the library being out of date.
         assert result.summary
         assert StudioValidationMessage.WARNING == result.summary.type
         assert 'out of date' in result.summary.text
 
         # Now if we update the block, all validation should pass:
+        self._bind_course_block(self.lc_block)
+        self.store.update_item(self.lc_block, self.user_id)
         self.lc_block.refresh_children()
+        self.lc_block = self.store.get_item(self.lc_block.location)
+
         assert self.lc_block.validate()
+
+    def _assert_has_only_N_matching_problems(self, result, n):
+        assert result.summary
+        assert StudioValidationMessage.WARNING == result.summary.type
+        assert f'only {n} matching problem' in result.summary.text
 
     def test_validation_of_matching_blocks(self):
         """
@@ -270,57 +308,65 @@ class LibraryContentBlockTestMixin:
         # Set max_count to higher value than exists in library
         self.lc_block.max_count = 50
         # In the normal studio editing process, editor_saved() calls refresh_children at this point
+        self.store.update_item(self.lc_block, self.user_id)
         self.lc_block.refresh_children()
+        self.lc_block = self.store.get_item(self.lc_block.location)
         result = self.lc_block.validate()
         assert not result
-        # Validation fails due to at least one warning/message
-        assert result.summary
-        assert StudioValidationMessage.WARNING == result.summary.type
-        assert 'only 4 matching problems' in result.summary.text
+
+        self._assert_has_only_N_matching_problems(result, 4)
         assert len(self.lc_block.selected_children()) == 4
 
         # Add some capa problems so we can check problem type validation messages
         self.lc_block.max_count = 1
         self._create_capa_problems()
+        self.store.update_item(self.lc_block, self.user_id)
         self.lc_block.refresh_children()
+        self.lc_block = self.store.get_item(self.lc_block.location)
         assert self.lc_block.validate()
         assert len(self.lc_block.selected_children()) == 1
 
         # Existing problem type should pass validation
         self.lc_block.max_count = 1
         self.lc_block.capa_type = 'multiplechoiceresponse'
+        self.store.update_item(self.lc_block, self.user_id)
         self.lc_block.refresh_children()
+        self.lc_block = self.store.get_item(self.lc_block.location)
         assert self.lc_block.validate()
         assert len(self.lc_block.selected_children()) == 1
 
         # ... unless requested more blocks than exists in library
         self.lc_block.max_count = 10
         self.lc_block.capa_type = 'multiplechoiceresponse'
+        self.store.update_item(self.lc_block, self.user_id)
         self.lc_block.refresh_children()
+        self.lc_block = self.store.get_item(self.lc_block.location)
         result = self.lc_block.validate()
         assert not result
-        # Validation fails due to at least one warning/message
-        assert result.summary
-        assert StudioValidationMessage.WARNING == result.summary.type
-        assert 'only 1 matching problem' in result.summary.text
+
+        self._assert_has_only_N_matching_problems(result, 1)
         assert len(self.lc_block.selected_children()) == 1
 
         # Missing problem type should always fail validation
         self.lc_block.max_count = 1
         self.lc_block.capa_type = 'customresponse'
+        self.store.update_item(self.lc_block, self.user_id)
         self.lc_block.refresh_children()
+        self.lc_block = self.store.get_item(self.lc_block.location)
         result = self.lc_block.validate()
         assert not result
         # Validation fails due to at least one warning/message
         assert result.summary
         assert StudioValidationMessage.WARNING == result.summary.type
-        assert 'no matching problem types' in result.summary.text
+        assert 'There are no problems in the specified library of type customresponse' in result.summary.text
         assert len(self.lc_block.selected_children()) == 0
 
         # -1 selects all blocks from the library.
         self.lc_block.max_count = -1
         self.lc_block.capa_type = ANY_CAPA_TYPE_VALUE
+        self.store.update_item(self.lc_block, self.user_id)
         self.lc_block.refresh_children()
+        self.lc_block = self.store.get_item(self.lc_block.location)
         assert self.lc_block.validate()
         assert len(self.lc_block.selected_children()) == len(self.lc_block.children)
 
@@ -332,23 +378,33 @@ class LibraryContentBlockTestMixin:
         assert len(self.lc_block.children) == 0
         # precondition check
         self.lc_block.capa_type = "multiplechoiceresponse"
+        self.store.update_item(self.lc_block, self.user_id)
         self.lc_block.refresh_children()
+        self.lc_block = self.store.get_item(self.lc_block.location)
         assert len(self.lc_block.children) == 1
 
         self.lc_block.capa_type = "optionresponse"
+        self.store.update_item(self.lc_block, self.user_id)
         self.lc_block.refresh_children()
+        self.lc_block = self.store.get_item(self.lc_block.location)
         assert len(self.lc_block.children) == 3
 
         self.lc_block.capa_type = "coderesponse"
+        self.store.update_item(self.lc_block, self.user_id)
         self.lc_block.refresh_children()
+        self.lc_block = self.store.get_item(self.lc_block.location)
         assert len(self.lc_block.children) == 2
 
         self.lc_block.capa_type = "customresponse"
+        self.store.update_item(self.lc_block, self.user_id)
         self.lc_block.refresh_children()
+        self.lc_block = self.store.get_item(self.lc_block.location)
         assert len(self.lc_block.children) == 0
 
         self.lc_block.capa_type = ANY_CAPA_TYPE_VALUE
+        self.store.update_item(self.lc_block, self.user_id)
         self.lc_block.refresh_children()
+        self.lc_block = self.store.get_item(self.lc_block.location)
         assert len(self.lc_block.children) == (len(self.lib_blocks) + 4)
 
     def test_non_editable_settings(self):
@@ -414,6 +470,7 @@ class LibraryContentBlockTestMixin:
         self.lc_block.max_count = max_count
         # Add some capa blocks
         self._create_capa_problems()
+        self.store.update_item(self.lc_block, self.user_id)
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
         # Mock the student view to return an empty dict to be returned as response
@@ -645,6 +702,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         Test the "removed" event emitted when we un-assign blocks previously assigned to a student.
         We go from two blocks assigned, to one because the others have been deleted from the library.
         """
+
         # Start by assigning two blocks to the student:
         self.lc_block.get_child_blocks()  # This line is needed in the test environment or the change has no effect
         self.lc_block.max_count = 2
@@ -654,13 +712,19 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         # Now make sure that one of the assigned blocks will have to be un-assigned.
         # To cause an "invalid" event, we delete all blocks from the content library
         # except for one of the two already assigned to the student:
+
         keep_block_key = initial_blocks_assigned[0].location
         keep_block_lib_usage_key, keep_block_lib_version = self.store.get_block_original_usage(keep_block_key)
         assert keep_block_lib_usage_key is not None
         deleted_block_key = initial_blocks_assigned[1].location
         self.library.children = [keep_block_lib_usage_key]
         self.store.update_item(self.library, self.user_id)
+        self.store.update_item(self.lc_block, self.user_id)
+        old_selected = self.lc_block.selected
         self.lc_block.refresh_children()
+        self.lc_block = self.store.get_item(self.lc_block.location)
+        self.lc_block.selected = old_selected
+        self.lc_block.runtime.publish = self.publisher
 
         # Check that the event says that one block was removed, leaving one block left:
         children = self.lc_block.get_child_blocks()
