@@ -1032,8 +1032,7 @@ def get_resume_button_urls(request):
         course_target = course_home_url(course_overview.id)
         resume_button_url =''
         isSurvey = False
-        checkSurveyCourse = SurveyCourseDAO.checkSurveyCourse(course_id=enrollment.course_id, user_id=user.id)
-        checkUserSurvey = SurveyCourseDAO.checkUserEnroll(enrollment=enrollment, user_id=user.id)
+ 
         
         for url in resume_button_urls :
             if str(enrollment.course_id) in url :
@@ -1041,25 +1040,11 @@ def get_resume_button_urls(request):
 
         if resume_button_url == '' :
             textContent = _('View Course')
-            url = course_target 
-            if checkSurveyCourse == False :
-                if checkUserSurvey :
-                    url = '/survey-form/' + str(enrollment.course_id)
-                    isSurvey = True
-                else :
-                    url = course_target
-            else :
-                url = course_target    
+            url = course_target  
         else :
             textContent = _('Resume Course')
-            if checkSurveyCourse == False :
-                if checkUserSurvey :
-                    url = '/survey-form/' + str(enrollment.course_id)
-                    isSurvey = True
-                else :
-                    url = resume_button_url
-            else :
-                url = resume_button_url     
+            url = resume_button_url  
+   
  
 
             
@@ -1078,7 +1063,7 @@ def get_resume_button_urls(request):
 def list_answer_survey(request, course_id):
     listUserAnswer = SurveyUser.objects.filter(course_id=course_id)
     list_answer = []
-    list_question = set()  # Sử dụng set để loại bỏ các câu hỏi trùng lặp
+    list_question = set()  
 
     for answer in listUserAnswer:
         user = str(answer.user)  
@@ -1096,9 +1081,26 @@ def list_answer_survey(request, course_id):
         if not user_exists:
             list_answer.append({'user': user, "email" :email , 'content': [{'question': question, 'answer': answer_content}]})
         
-        list_question.add(question)  # Thêm câu hỏi vào set
+        list_question.add(question)  
 
     if not list_answer:
         return JsonResponse({'message': 'Not answer'})
     else:
         return JsonResponse({"list_answer": list_answer, 'list_question': list(list_question)})
+    
+    
+@api_view(['GET'])
+@login_required
+@ensure_csrf_cookie
+def check_survey_user_access_course (request, course_id):
+    user = request.user
+    if course_id is None :
+        return JsonResponse({'message' : "Not courseId"})
+
+    enrollment = CourseEnrollment.objects.filter(user_id=user.id, course_id=course_id)
+    
+    checkSurveyCourse = SurveyCourseDAO.checkSurveyCourse(course_id=course_id, user_id=user.id)
+    checkUserSurvey = SurveyCourseDAO.checkUserEnroll(enrollment=enrollment, user_id=user.id)
+
+    
+    return JsonResponse({'checkSurveyCourse' : checkSurveyCourse , "checkUserSurvey" : checkUserSurvey})

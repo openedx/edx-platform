@@ -253,14 +253,9 @@ from common.djangoapps.student.models import CourseEnrollment
                     aElement.className = 'course-target-link enter-course'
                     aElement.setAttribute('data-course-key', course_id)
        
-                    linkImage = e.querySelector('.cover.course-target-link')
-                    linkTitle = e.querySelector('.course-title').querySelector('.course-target-link')
                     data.resume_button_url.forEach(d =>{
                       if (d.course_id === course_id){
-                        if (d.isSurvey === true){
-                          linkImage.href = d.url
-                          linkTitle.href = d.url
-                        }
+                       
                         aElement.href = d.url
                         aElement.textContent = d.textContent
                         const spanElement = document.createElement('span')

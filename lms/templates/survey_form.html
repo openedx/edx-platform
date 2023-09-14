@@ -112,7 +112,7 @@
                 % endfor
             % endif
             % if result_boolean :
-                    %if len(result_boolean['questions']) > 1 :
+                    %if len(result_boolean['questions']) == 2 :
                     <div class="survey-form"  style="display: none;">
                             
                         <div class="card">
@@ -249,29 +249,34 @@
     const inputNo = document.querySelector('#No')
     const booleanForm = document.querySelector('#boolean-form')
 
-    inputYes.addEventListener('change', ()=>{
-        if (!booleanForm){
-            return true
-        }
-        if(inputYes.checked){
-           booleanForm.style.display = 'block'
-        }else {
-            booleanForm.style.display = 'none'
-        }
-    })
+    if (inputYes){
+        inputYes.addEventListener('change', ()=>{
+            if (!booleanForm){
+                return true
+            }
+            if(inputYes.checked){
+               booleanForm.style.display = 'block'
+            }else {
+                booleanForm.style.display = 'none'
+            }
+        })
+    }
+   
 
+    if(inputNo){
+        inputNo.addEventListener('change', ()=>{
+            if (!booleanForm){
+                return true
+            }
+            if(inputNo.checked){
+                booleanForm.style.display = 'none'
+            }else{
+                booleanForm.style.display = 'yes'
+            }
+    
+        })
+    }
 
-    inputNo.addEventListener('change', ()=>{
-        if (!booleanForm){
-            return true
-        }
-        if(inputNo.checked){
-            booleanForm.style.display = 'none'
-        }else{
-            booleanForm.style.display = 'yes'
-        }
-
-    })
     
     for(let i = 0; i< forms.length; i++){
         const newSpan = document.createElement('span')

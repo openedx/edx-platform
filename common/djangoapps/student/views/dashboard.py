@@ -998,9 +998,10 @@ def form_begin_login (request, course_id=None) :
     context = {
        'result_lists' : result_lists,
        'display_name' : display_name,
-       'result_boolean':result_boolean[0]
+      
     }
-    
+    if result_boolean :
+        context["result_boolean"] = result_boolean[0]
 
     if request.method == 'POST':
         
