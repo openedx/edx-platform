@@ -8,9 +8,8 @@ from openedx.core.djangoapps.course_roles.helpers import course_permission_check
 from openedx.core.djangoapps.course_roles.models import (
     CourseRolesPermission,
     CourseRolesRole,
-    CourseRolesRolePermissions,
     CourseRolesService,
-    CourseRolesUserRole
+    CourseRolesUserRole,
 )
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -19,53 +18,61 @@ from xmodule.modulestore.tests.factories import CourseFactory
 class PermissionCheckTestCase(SharedModuleStoreTestCase):
     def setUp(self):
         super().setUp()
-        self.organization = OrganizationFactory(name='test_organization')
-        self.organization_2 = OrganizationFactory(name='test_organization_2')
-        self.course = CourseFactory.create(display_name='test course', run="Testing_course", org=self.organization.name)
-        self.user = UserFactory(username='test_user_1')
-        self.user_2 = UserFactory(username='test_user_2')
-        self.user_3 = UserFactory(username='test_user_3')
-        self.service = CourseRolesService.objects.create(name='test_service')
-        self.permission_1 = CourseRolesPermission.objects.create(
-            name='test_permission_1',
-            description='test_description_1'
-            )
-        self.permission_2 = CourseRolesPermission.objects.create(
-            name='test_permission_2',
-            description='test_description_2'
-            )
-        self.role = CourseRolesRole.objects.create(
-            name='test_role',
-            short_description='test_short_description',
-            long_description='test_long_description',
-            service=self.service
-            )
-        CourseRolesRolePermissions.objects.create(role=self.role, permission=self.permission_1)
+        self.user_1 = UserFactory(username="test_user_1")
+        self.organization_1 = OrganizationFactory(name="test_organization_1")
+        self.organization_2 = OrganizationFactory(name="test_organization_2")
+        self.course_1 = CourseFactory.create(
+            display_name="test course 1", run="Testing_course_1", org=self.organization_1.name
+        )
+        self.course_2 = CourseFactory.create(
+            display_name="test course 2", run="Testing_course_2", org=self.organization_1.name
+        )
+        self.role_1 = CourseRolesRole.objects.create(name="test_role_1")
+        self.service = CourseRolesService.objects.create(name="test_service")
+        self.role_1.services.add(self.service)
+        self.permission_1 = CourseRolesPermission.objects.create(name="test_permission_1")
+        self.role_1.permissions.add(self.permission_1)
+
+    def test_course_permission_check_with_course_level_permission(self):
         CourseRolesUserRole.objects.create(
-            user=self.user,
-            role=self.role,
-            course_id=self.course.id,
-            org=self.organization
-            )
+            user=self.user_1, role=self.role_1, course_id=self.course_1.id, org=self.organization_1
+        )
+        assert course_permission_check(self.user_1, self.permission_1.name, self.course_1.id)
+
+    def test_course_permission_check_without_course_level_permission(self):
+        assert not course_permission_check(self.user_1, self.permission_1.name, self.course_1.id)
+
+    def test_course_permision_check_with_organization_level_permission(self):
+        CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1, org=self.organization_1)
+        assert not course_permission_check(self.user_1, self.permission_1.name, self.course_1.id)
+
+    def test_course_permission_check_with_instance_level_permission(self):
+        CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1)
+        assert not course_permission_check(self.user_1, self.permission_1.name, self.course_1.id)
+
+    def test_course_permission_check_with_permission_in_another_course(self):
         CourseRolesUserRole.objects.create(
-            user=self.user_2,
-            role=self.role,
-            org=self.organization
-            )
+            user=self.user_1, role=self.role_1, course_id=self.course_2.id, org=self.organization_1
+        )
+        assert not course_permission_check(self.user_1, self.permission_1.name, self.course_1.id)
+
+    def test_organization_permission_check_with_organization_level_permission(self):
+        CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1, org=self.organization_1)
+        assert organization_permission_check(self.user_1, self.permission_1.name, self.organization_1.name)
+
+    def test_organization_permission_check_without_organization_level_permission(self):
+        assert not organization_permission_check(self.user_1, self.permission_1.name, self.organization_1.name)
+
+    def test_organization_permission_check_with_course_level_permission(self):
         CourseRolesUserRole.objects.create(
-            user=self.user_3,
-            role=self.role,
-            org=self.organization_2
-            )
+            user=self.user_1, role=self.role_1, course_id=self.course_1.id, org=self.organization_1
+        )
+        assert not organization_permission_check(self.user_1, self.permission_1.name, self.organization_1.name)
 
-    def test_permission_check_with_correct_course_permission(self):
-        assert course_permission_check(self.user, self.permission_1.name, self.course.id)
+    def test_organization_permission_check_with_instance_level_permission(self):
+        CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1)
+        assert not organization_permission_check(self.user_1, self.permission_1.name, self.organization_1.name)
 
-    def test_permission_check_without_course_permission(self):
-        assert not course_permission_check(self.user, self.permission_2.name, self.course.id)
-
-    def test_permission_check_with_correct_organization_permission(self):
-        assert organization_permission_check(self.user_2, self.permission_1.name, self.organization.name)
-
-    def test_permission_check_without_organization_permission(self):
-        assert not organization_permission_check(self.user_3, self.permission_1.name, self.organization.name)
+    def test_organization_permission_check_with_permission_in_another_organization(self):
+        CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1, org=self.organization_2)
+        assert not organization_permission_check(self.user_1, self.permission_1.name, self.organization_1.name)
