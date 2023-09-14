@@ -14,7 +14,7 @@ from cms.djangoapps.contentstore.api import course_author_access_required
 from cms.djangoapps.contentstore.xblock_storage_handlers import view_handlers
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
 
-from cms.djangoapps.contentstore.rest_api.v1.serializers import XblockSerializer
+# from cms.djangoapps.contentstore.rest_api.v1.serializers import XblockSerializer
 
 
 log = logging.getLogger(__name__)
