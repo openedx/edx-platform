@@ -86,6 +86,9 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     """
     Send notifications to the users.
     """
+    add_logs = notification_type in ['new_response', 'new_comment', 'new_comment_on_response']
+    if add_logs:
+        logger.info(f'Temp Logs: Creating Notification Task {notification_type} {course_key} - {user_ids} - Creating')
     course_key = CourseKey.from_string(course_key)
     if not ENABLE_NOTIFICATIONS.is_enabled(course_key):
         return
@@ -120,6 +123,9 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     # send notification to users but use bulk_create
     notifications_generated = Notification.objects.bulk_create(notifications)
     if notifications_generated:
+        if add_logs:
+            logger.info(f'Temp Logs: Creating Notification Task {notification_type} {course_key} - {audience}'
+                        ' - Created')
         notification_content = notifications_generated[0].content
         notification_generated_event(
             audience, app_name, notification_type, course_key, content_url, notification_content,

@@ -2,6 +2,7 @@
 Utils for discussion API.
 """
 from datetime import datetime
+import logging
 from pytz import UTC
 from typing import List, Dict
 
@@ -28,6 +29,9 @@ from openedx.core.djangoapps.django_comment_common.models import (
 from openedx_events.learning.signals import USER_NOTIFICATION_REQUESTED
 from openedx_events.learning.data import UserNotificationData
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
+
+
+log = logging.getLogger(__name__)
 
 
 class AttributeDict(dict):
@@ -374,6 +378,7 @@ def send_response_notifications(thread, course, creator, parent_id=None):
     """
     Send notifications to users who are subscribed to the thread.
     """
+    log.info(f'Temp Logs: Creating Notification {thread.id} - start')
     notification_sender = DiscussionNotificationSender(thread, course, creator, parent_id)
     notification_sender.send_new_comment_notification()
     notification_sender.send_new_response_notification()
@@ -496,6 +501,8 @@ class DiscussionNotificationSender:
         """
         if not self.parent_id and self.creator.id != int(self.thread.user_id):
             self._send_notification([self.thread.user_id], "new_response")
+            log.info(f'Temp Logs: Creating Notification {self.thread.id} - new_response - '
+                     f'created {self.thread.user_id}')
 
     def _response_and_thread_has_same_creator(self) -> bool:
         """
@@ -531,6 +538,8 @@ class DiscussionNotificationSender:
                 "author_name": str(author_name),
             }
             self._send_notification([self.thread.user_id], "new_comment", extra_context=context)
+            log.info(f'Temp Logs: Creating Notification {self.thread.id} - new_comment - '
+                     f'created {self.thread.user_id}')
 
     def send_new_comment_on_response_notification(self):
         """
@@ -543,6 +552,8 @@ class DiscussionNotificationSender:
             self._response_and_thread_has_same_creator()
         ):
             self._send_notification([self.parent_response.user_id], "new_comment_on_response")
+            log.info(f'Temp Logs: Creating Notification {self.thread.id} - new_comment_on_response - created '
+                     f'{self.parent_response.user_id}')
 
     def send_new_thread_created_notification(self):
         """
