@@ -21,6 +21,7 @@ from ..toggles import CONTENT_TAGGING_AUTO
 
 LANGUAGE_TAXONOMY_ID = -1
 
+
 @skip_unless_cms  # Auto-tagging is only available in the CMS
 @override_waffle_flag(CONTENT_TAGGING_AUTO, active=True)
 class TestAutoTagging(ModuleStoreTestCase):
