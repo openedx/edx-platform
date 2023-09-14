@@ -1031,7 +1031,7 @@ def get_resume_button_urls(request):
         course_overview = CourseOverview.get_from_id(enrollment.course_id)
         course_target = course_home_url(course_overview.id)
         resume_button_url =''
-        isSurvey = False
+
  
         
         for url in resume_button_urls :
@@ -1048,7 +1048,7 @@ def get_resume_button_urls(request):
  
 
             
-        resume_url.append({"course_id": str(enrollment.course_id),'url':url , 'textContent' : textContent , "display_name" : course_overview.display_name_with_default , 'isSurvey': isSurvey})
+        resume_url.append({"course_id": str(enrollment.course_id),'url':url , 'textContent' : textContent , "display_name" : course_overview.display_name_with_default  })
     
     data = {
         "resume_button_url" : resume_url 
