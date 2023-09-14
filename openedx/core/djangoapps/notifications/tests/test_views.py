@@ -407,6 +407,7 @@ class NotificationListAPIViewTest(APITestCase):
         event_name, event_data = mock_emit.call_args[0]
         self.assertEqual(event_name, 'edx.notifications.tray_opened')
         self.assertEqual(event_data['user_id'], self.user.id)
+        self.assertEqual(event_data['unseen_notifications_count'], 0)
 
     def test_list_notifications_without_authentication(self):
         """
@@ -550,6 +551,16 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
         self.assertEqual(response.data['count'], 0)
         self.assertEqual(response.data['count_by_app_name'], {'discussion': 0})
 
+    def test_get_expiry_days_in_count_view(self):
+        """
+        Tests if "notification_expiry_days" exists in API response
+        """
+        user = UserFactory()
+        self.client.login(username=user.username, password='test')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['notification_expiry_days'], 60)
+
 
 class MarkNotificationsSeenAPIViewTestCase(APITestCase):
     """
@@ -642,6 +653,7 @@ class NotificationReadAPIViewTestCase(APITestCase):
         self.assertEqual(event_data.get('notification_metadata').get('notification_id'), notification_id)
         self.assertEqual(event_data['notification_app'], 'discussion')
         self.assertEqual(event_data['notification_type'], 'Type A')
+        self.assertEqual(event_data['first_read'], True)
 
     def test_mark_notification_read_with_other_user_notification_id(self):
         # Create a PATCH request to mark notification as read for notification_id: 2 through a different user

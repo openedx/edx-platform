@@ -26,6 +26,8 @@ class HomePageViewTest(CourseTestCase):
     def test_home_page_response(self):
         """Check successful response content"""
         response = self.client.get(self.url)
+        course_id = str(self.course.id)
+
         expected_response = {
             "allow_course_reruns": True,
             "allow_to_create_new_org": False,
@@ -35,14 +37,14 @@ class HomePageViewTest(CourseTestCase):
             "can_create_organizations": True,
             "course_creator_status": "granted",
             "courses": [{
-                "course_key": str(self.course.id),
+                "course_key": course_id,
                 "display_name": self.course.display_name,
-                "lms_link": None,
+                "lms_link": f'//{settings.LMS_BASE}/courses/{course_id}/jump_to/{self.course.location}',
                 "number": self.course.number,
                 "org": self.course.org,
-                "rerun_link": None,
+                "rerun_link": f'/course_rerun/{course_id}',
                 "run": self.course.id.run,
-                "url": None,
+                "url": f'/course/{course_id}',
             }],
             "in_process_course_actions": [],
             "libraries": [],
