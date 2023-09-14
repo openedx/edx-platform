@@ -38,7 +38,7 @@ class XBlockSerializer:
             if path not in [sf.name for sf in self.static_files]:
                 self.static_files.append(StaticFile(name=path, url=asset['url'], data=None))
 
-        if block.scope_ids.usage_id.block_type == 'problem':
+        if block.scope_ids.usage_id.block_type in ['problem', 'vertical']:
             py_lib_zip_file = utils.get_python_lib_zip_if_using(self.olx_str, course_key)
             if py_lib_zip_file:
                 self.static_files.append(py_lib_zip_file)

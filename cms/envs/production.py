@@ -154,7 +154,8 @@ if STATIC_ROOT_BASE:
     WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = STATIC_ROOT / "webpack-stats.json"
     WEBPACK_LOADER['WORKERS']['STATS_FILE'] = STATIC_ROOT / "webpack-worker-stats.json"
 
-EMAIL_FILE_PATH = ENV_TOKENS.get('EMAIL_FILE_PATH', None)
+DATA_DIR = path(ENV_TOKENS.get('DATA_DIR', DATA_DIR))
+EMAIL_FILE_PATH = ENV_TOKENS.get('EMAIL_FILE_PATH', DATA_DIR / "emails" / "studio")
 
 
 # CMS_BASE: Public domain name of Studio (should be resolvable from the end-user's browser)
@@ -188,7 +189,6 @@ ALLOWED_HOSTS = [
 ]
 
 LOG_DIR = ENV_TOKENS.get('LOG_DIR', LOG_DIR)
-DATA_DIR = path(ENV_TOKENS.get('DATA_DIR', DATA_DIR))
 
 CACHES = ENV_TOKENS.get('CACHES', CACHES)
 # Cache used for location mapping -- called many times with the same key/value

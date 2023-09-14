@@ -314,7 +314,11 @@ function(
                         </span>
                     </h3>
                     <div class="${category}-header-actions" style="width: 50%; text-align: right;">
-                        <span class="icon fa fa-spinner fa-pulse fa-spin" aria-hidden="true"></span>
+                        <ul class="actions-list nav-dd ui-right">
+                            <li class="action-item">
+                                <span class="icon fa fa-spinner fa-pulse fa-spin" aria-hidden="true"></span>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             `;
