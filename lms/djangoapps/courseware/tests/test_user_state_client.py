@@ -13,8 +13,8 @@ from django.db import connections
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.user_state_client import (
-    DjangoXBlockUserStateClient, 
-    XBlockUserStateClient, 
+    DjangoXBlockUserStateClient,
+    XBlockUserStateClient,
     XBlockUserState
 )
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
