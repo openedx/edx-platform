@@ -2675,10 +2675,7 @@ class TestComponentTemplates(CourseTestCase):
         XBlockStudioConfiguration.objects.create(
             name="openassessment", enabled=True, support_level="us"
         )
-        # Library Sourced Block and Library Content block has it's own category.
-        XBlockStudioConfiguration.objects.create(
-            name="library_sourced", enabled=True, support_level="fs"
-        )
+        # Library Content block has its own category.
         XBlockStudioConfiguration.objects.create(
             name="library_content", enabled=True, support_level="fs"
         )
