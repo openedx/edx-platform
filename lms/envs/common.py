@@ -3329,7 +3329,7 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
     ),
-    'EXCEPTION_HANDLER': 'openedx.core.lib.request_utils.expected_error_exception_handler',
+    'EXCEPTION_HANDLER': 'openedx.core.lib.request_utils.ignored_error_exception_handler',
     'PAGE_SIZE': 10,
     'URL_FORMAT_OVERRIDE': None,
     'DEFAULT_THROTTLE_RATES': {
