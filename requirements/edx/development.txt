@@ -821,7 +821,7 @@ edx-search==3.6.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-sga==0.22.0
+edx-sga==0.23.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
