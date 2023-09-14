@@ -149,7 +149,7 @@ def _problem_type_filter(store, library, capa_type):
     """ Filters library children by capa type."""
     try:
         search_engine = SearchEngine.get_search_engine(index="library_index")
-    except: # pylint: disable=bare-except
+    except:  # pylint: disable=bare-except
         search_engine = None
     if search_engine:
         filter_clause = {
