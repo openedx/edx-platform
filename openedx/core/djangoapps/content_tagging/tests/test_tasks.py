@@ -69,7 +69,7 @@ class TestAutoTagging(ModuleStoreTestCase):
         self.user_id = self.user.id
 
         self.orgA = Organization.objects.create(name="Organization A", short_name="orgA")
-        self.patcher = patch("openedx.features.content_tagging.tasks.modulestore", return_value=self.store)
+        self.patcher = patch("openedx.core.djangoapps.content_tagging.tasks.modulestore", return_value=self.store)
         self.addCleanup(self.patcher.stop)
         self.patcher.start()
 

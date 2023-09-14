@@ -338,5 +338,5 @@ urlpatterns += [
 
 # Content tagging
 urlpatterns += [
-    path('api/content_tagging/', include(('openedx.features.content_tagging.urls'))),
+    path('api/content_tagging/', include(('openedx.core.djangoapps.content_tagging.urls'))),
 ]
