@@ -123,3 +123,6 @@ libsass==0.10.0
 
 # greater version breaking upgrade builds
 click==8.1.6
+
+# openedx-events 8.6.0 introduces publishing via configuration. Ticket to unpin: https://github.com/edx/edx-arch-experiments/issues/381
+openedx-events<8.6.0               # Open edX Events from Hooks Extension Framework (OEP-50)
