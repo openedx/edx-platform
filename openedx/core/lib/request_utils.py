@@ -316,7 +316,6 @@ def _log_and_monitor_ignored_errors(request, exception, caller):
 
         # We have confirmed using monitoring that it is very rare that middleware and drf handle different uncaught exceptions.
         # We will leave this attribute in place, but it is not worth investing in a workaround.
-        # New Relic now offers its own ignored error functionality, and this functionality may be simplified or removed.
         set_custom_attribute('unexpected_multiple_exceptions', cached_module_and_class)
         log.warning(
             "Unexpected scenario where different exceptions are handled by _log_and_monitor_ignored_errors. "
