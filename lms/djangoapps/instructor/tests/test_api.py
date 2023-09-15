@@ -265,24 +265,24 @@ class TestCommonExceptions400(TestCase):
         assert resp.status_code == 200
 
     def test_user_doesnotexist(self):
-        self.request.is_ajax.return_value = False
+        self.request.accepts("application/json").return_value = False
         resp = view_user_doesnotexist(self.request)
         self.assertContains(resp, "User does not exist", status_code=400)
 
     def test_user_doesnotexist_ajax(self):
-        self.request.is_ajax.return_value = True
+        self.request.accepts("application/json").return_value = True
         resp = view_user_doesnotexist(self.request)
         self.assertContains(resp, "User does not exist", status_code=400)
 
     @ddt.data(True, False)
     def test_alreadyrunningerror(self, is_ajax):
-        self.request.is_ajax.return_value = is_ajax
+        self.request.accepts("application/json").return_value = is_ajax
         resp = view_alreadyrunningerror(self.request)
         self.assertContains(resp, "Requested task is already running", status_code=400)
 
     @ddt.data(True, False)
     def test_alreadyrunningerror_with_unicode(self, is_ajax):
-        self.request.is_ajax.return_value = is_ajax
+        self.request.accepts("application/json").return_value = is_ajax
         resp = view_alreadyrunningerror_unicode(self.request)
         self.assertContains(
             resp,
@@ -295,7 +295,7 @@ class TestCommonExceptions400(TestCase):
         """
         Tests that QueueConnectionError exception is handled in common_exception_400.
         """
-        self.request.is_ajax.return_value = is_ajax
+        self.request.accepts("application/json").return_value = is_ajax
         resp = view_queue_connection_error(self.request)
         self.assertContains(
             resp,

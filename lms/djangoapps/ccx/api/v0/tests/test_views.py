@@ -832,7 +832,7 @@ class CcxDetailTest(CcxRestApiTest):
         base_url = '{}/'.format(self.detail_url.rsplit('/', 1)[0])
         # this url should be the same of the ccx list view
         resolver = resolve(base_url)
-        assert views.CCXListView.__name__ == resolver.func.__name__
+        assert views.CCXListView.__name__ == resolver.func.view_class.__name__
         assert views.CCXListView.__module__ == resolver.func.__module__
         # invalid urls
         for invalid_ccx_id in ('foo', 'ccx-v1:org.0', 'ccx-v1:org.0+course_0'):
@@ -840,11 +840,11 @@ class CcxDetailTest(CcxRestApiTest):
                 resolve(f'{base_url}{invalid_ccx_id}')
         # the following course ID works even if it is not a CCX valid course id (the regex matches course ID strings)
         resolver = resolve('{}{}'.format(base_url, 'ccx-v1:org.0+course_0+Run_0'))
-        assert views.CCXDetailView.__name__ == resolver.func.__name__
+        assert views.CCXDetailView.__name__ == resolver.func.view_class.__name__
         assert views.CCXDetailView.__module__ == resolver.func.__module__
         # and of course a valid ccx course id
         resolver = resolve(f'{base_url}{self.ccx_key_str}')
-        assert views.CCXDetailView.__name__ == resolver.func.__name__
+        assert views.CCXDetailView.__name__ == resolver.func.view_class.__name__
         assert views.CCXDetailView.__module__ == resolver.func.__module__
 
     @ddt.data(

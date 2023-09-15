@@ -20,8 +20,8 @@ celery>=5.2.2,<6.0.0
 # required for celery>=5.2.0;<5.3.0
 click>=8.0,<9.0
 
-# django-storages version 1.10.1 is major upgrade and require multiple settings changes.
-django-storages==1.10.1
+# django-storages version 1.11.1 is major version upgrade.
+django-storages==1.11.1
 
 
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
@@ -86,7 +86,6 @@ social-auth-core==4.3.0
 babel==2.11.0
 social-auth-app-django==5.0.0
 algoliasearch==2.6.3
-django-ipware==4.0.2
 
 # pytz>2022 has major changes which are causing test failures.
 # Pinning this version for now so this could be fixed in a separate PR later on
@@ -122,14 +121,8 @@ djangorestframework-stubs==3.14.0  # Pinned to match django-stubs. Remove this w
 # https://github.com/openedx/edx-platform/issues/31616
 libsass==0.10.0
 
-# incremental upgrade
-django-simple-history==3.3.0
-
 # greater version breaking upgrade builds
 click==8.1.6
 
-# plz upgrade this in separate ticket
-redis==4.6.0
-
-# holding off ora date config feature
-ora2==5.2.4
+# openedx-events 8.6.0 introduces publishing via configuration. Ticket to unpin: https://github.com/edx/edx-arch-experiments/issues/381
+openedx-events<8.6.0               # Open edX Events from Hooks Extension Framework (OEP-50)
