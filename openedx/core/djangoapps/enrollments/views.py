@@ -676,7 +676,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         """
         # Get the User, Course ID, and Mode from the request.
 
-        username = request.data.get('user', request.user.username)
+        username = request.data.get('user')
         course_id = request.data.get('course_details', {}).get('course_id')
 
         if not course_id:
@@ -700,13 +700,31 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         has_api_key_permissions = self.has_api_key_permissions(request)
 
         # Check that the user specified is either the same user, or this is a server-to-server request.
-        if not username:
-            username = request.user.username
-        if username != request.user.username and not has_api_key_permissions \
+        if username and username != request.user.username and not has_api_key_permissions \
                 and not GlobalStaff().has_user(request.user):
             # Return a 404 instead of a 403 (Unauthorized). If one user is looking up
             # other users, do not let them deduce the existence of an enrollment.
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+        # A provided user has priority over a provided email.
+        # Fallback on request user if neither is provided.
+        if not username:
+            email = request.data.get('email')
+            if email:
+                # Only server-to-server or staff users can use the email for the request.
+                if not has_api_key_permissions and not GlobalStaff().has_user(request.user):
+                    return Response(status=status.HTTP_404_NOT_FOUND)
+                try:
+                    username = User.objects.get(email=email).username
+                except ObjectDoesNotExist:
+                    return Response(
+                        status=status.HTTP_406_NOT_ACCEPTABLE,
+                        data={
+                            'message': f'The user with the email address {email} does not exist.'
+                        }
+                    )
+            else:
+                username = request.user.username
 
         if mode not in (CourseMode.AUDIT, CourseMode.HONOR, None) and not has_api_key_permissions \
                 and not GlobalStaff().has_user(request.user):
@@ -911,12 +929,17 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
 
             GET /api/enrollment/v1/enrollments?course_id={course_id}&username={username}
 
+            GET /api/enrollment/v1/enrollments?email={email},{email}
+
         **Query Parameters for GET**
 
             * course_id: Filters the result to course enrollments for the course corresponding to the
               given course ID. The value must be URL encoded. Optional.
 
             * username: List of comma-separated usernames. Filters the result to the course enrollments
+              of the given users. Optional.
+
+            * email: List of comma-separated emails. Filters the result to the course enrollments
               of the given users. Optional.
 
             * page_size: Number of results to return per page. Optional.
@@ -981,9 +1004,12 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
         queryset = CourseEnrollment.objects.all()
         course_id = form.cleaned_data.get('course_id')
         usernames = form.cleaned_data.get('username')
+        emails = form.cleaned_data.get('email')
 
         if course_id:
             queryset = queryset.filter(course_id=course_id)
         if usernames:
             queryset = queryset.filter(user__username__in=usernames)
+        if emails:
+            queryset = queryset.filter(user__email__in=emails)
         return queryset

@@ -237,6 +237,112 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         assert is_active
         assert course_mode == enrollment_mode
 
+    def test_enroll_with_email_staff(self):
+        # Create enrollments with email are allowed if you are staff.
+
+        self.client.logout()
+        AdminFactory.create(username='global_staff', email='global_staff@example.com', password=self.PASSWORD)
+        self.client.login(username="global_staff", password=self.PASSWORD)
+
+        resp = self.client.post(
+            reverse('courseenrollments'),
+            {
+                'course_details': {
+                    'course_id': str(self.course.id)
+                },
+                'email': self.user.email
+            },
+            format='json'
+        )
+        assert resp.status_code == status.HTTP_200_OK
+
+    @patch('openedx.core.djangoapps.enrollments.views.EnrollmentListView.has_api_key_permissions')
+    def test_enroll_with_email_server(self, has_api_key_permissions_mock):
+        # Create enrollments with email are allowed if it is a server-to-server request.
+
+        has_api_key_permissions_mock.return_value = True
+        resp = self.client.post(
+            reverse('courseenrollments'),
+            {
+                'course_details': {
+                    'course_id': str(self.course.id)
+                },
+                'email': self.user.email
+            },
+            format='json'
+        )
+        assert resp.status_code == status.HTTP_200_OK
+
+    def test_enroll_with_email_without_staff(self):
+        # If you are not staff or server request you can't create enrollments with email.
+
+        resp = self.client.post(
+            reverse('courseenrollments'),
+            {
+                'course_details': {
+                    'course_id': str(self.course.id)
+                },
+                'email': self.other_user.email
+            },
+            format='json'
+        )
+        assert resp.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_enroll_with_user_and_email(self):
+        # Creating enrollments the user has priority over the email.
+        resp = self.client.post(
+            reverse('courseenrollments'),
+            {
+                'course_details': {
+                    'course_id': str(self.course.id)
+                },
+                'user': self.user.username,
+                'email': self.other_user.email
+            },
+            format='json'
+        )
+        self.assertContains(resp, self.user.username, status_code=status.HTTP_200_OK)
+
+    def test_enroll_with_user_without_permissions_and_email(self):
+        resp = self.client.post(
+            reverse('courseenrollments'),
+            {
+                'course_details': {
+                    'course_id': str(self.course.id)
+                },
+                'user': self.other_user.username,
+                'email': self.user.email
+            },
+            format='json'
+        )
+        assert resp.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_enroll_with_user_as_self_user(self):
+        resp = self.client.post(
+            reverse('courseenrollments'),
+            {
+                'course_details': {
+                    'course_id': str(self.course.id)
+                },
+                'user': self.user.username
+            },
+            format='json'
+        )
+        self.assertContains(resp, self.user.username, status_code=status.HTTP_200_OK)
+
+    def test_enroll_without_user(self):
+        # To check if it takes the request.user.
+        resp = self.client.post(
+            reverse('courseenrollments'),
+            {
+                'course_details': {
+                    'course_id': str(self.course.id)
+                }
+            },
+            format='json'
+        )
+        self.assertContains(resp, self.user.username, status_code=status.HTTP_200_OK)
+
     @ddt.data(
         # Default (no course modes in the database)
         # Expect that users are automatically enrolled as the default
