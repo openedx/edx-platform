@@ -20,7 +20,6 @@ from openedx.features.genplus_features.genplus_learning.models import (
 
 # TODO: remove this serializer
 class ClassLessonSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = ClassLesson
         fields = ('id', 'display_name', 'lms_url', 'usage_key')
@@ -98,6 +97,7 @@ class RatingAssessmentSerializer(serializers.ModelSerializer):
     def get_full_name(self, obj):
         return get_user_model().objects.get(pk=obj.user_id).profile.name
 
+
 class SkillAssessmentQuestionSerializer(serializers.ModelSerializer):
     skill = serializers.CharField(source='skill.name')
 
@@ -112,6 +112,7 @@ class SkillAssessmentQuestionSerializer(serializers.ModelSerializer):
             'skill',
             'problem_type',
         )
+
 
 class SkillAssessmentResponseSerializer(serializers.ModelSerializer):
     question = SkillAssessmentQuestionSerializer(many=False, read_only=True)
@@ -138,6 +139,8 @@ class SkillReflectionQuestionSerializer(serializers.ModelSerializer):
     def get_submissions(self, obj: SkillAssessmentQuestion):
         intro_submissions = obj.submissions.filter(problem_location=obj.start_unit_location).all()
         outro_submissions = obj.submissions.filter(problem_location=obj.end_unit_location).all()
+        print(intro_submissions)
+        print(outro_submissions)
         map_response = lambda i: {
             **i.question_response['student_response'],
             'username': i.user.username,
@@ -147,14 +150,14 @@ class SkillReflectionQuestionSerializer(serializers.ModelSerializer):
 
         def reducer(problem_key):
             def func(init, sub):
-                return {
-                    **init,
-                    sub['username']: {
-                        problem_key: sub,
-                        'name': sub['name'],
-                        'username': sub['username']
-                    }
-                }
+                d = init.get(sub['username'], {})
+                d.update({
+                    problem_key: sub,
+                    'name': sub['name'],
+                    'username': sub['username']
+                })
+                init.update({sub['username']: d})
+                return init
 
             return func
 
