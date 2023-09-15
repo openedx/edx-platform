@@ -9,9 +9,9 @@ import json
 from unittest.mock import patch
 from urllib.parse import quote
 
-import pytest
 import ddt
 import httpretty
+import pytest
 import pytz
 from django.conf import settings
 from django.core.cache import cache
@@ -20,14 +20,18 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.test import Client
 from django.test.utils import override_settings
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.test import APITestCase
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import AdminFactory, SuperuserFactory, UserFactory
+from common.djangoapps.util.models import RateLimitConfiguration
+from common.djangoapps.util.testing import UrlResetMixin
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
@@ -35,17 +39,16 @@ from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.enrollments import api, data
 from openedx.core.djangoapps.enrollments.errors import CourseEnrollmentError
 from openedx.core.djangoapps.enrollments.views import EnrollmentUserThrottle
+from openedx.core.djangoapps.notifications.handlers import ENABLE_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.models import CourseNotificationPreference
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.models import RetirementState, UserOrgTag, UserRetirementStatus
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.lib.django_test_client_utils import get_absolute_url
 from openedx.features.enterprise_support.tests import FAKE_ENTERPRISE_CUSTOMER
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.roles import CourseStaffRole
-from common.djangoapps.student.tests.factories import AdminFactory, SuperuserFactory, UserFactory
-from common.djangoapps.util.models import RateLimitConfiguration
-from common.djangoapps.util.testing import UrlResetMixin
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 
 
 class EnrollmentTestMixin:
@@ -153,6 +156,7 @@ class EnrollmentTestMixin:
 
 
 @override_settings(EDX_API_KEY="i am a key")
+@override_waffle_flag(ENABLE_NOTIFICATIONS, True)
 @ddt.ddt
 @skip_unless_lms
 class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, EnterpriseServiceMockMixin):
@@ -195,6 +199,10 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             password=self.PASSWORD,
         )
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
+        CourseNotificationPreference.objects.create(
+            user=self.user,
+            course_id=self.course.id,
+        )
 
     @ddt.data(
         # Default (no course modes in the database)
