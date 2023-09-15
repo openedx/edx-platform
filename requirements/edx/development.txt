@@ -1314,7 +1314,7 @@ openedx-filters==1.6.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
-openedx-learning @ git+https://github.com/openedx/openedx-learning@main
+openedx-learning==0.1.6
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
