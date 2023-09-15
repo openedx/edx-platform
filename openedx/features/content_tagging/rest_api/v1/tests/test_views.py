@@ -833,7 +833,6 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
         assert response.status_code == expected_status
         assert not status.is_success(expected_status)  # No success cases here
 
-
     @ddt.data(
         "courseB",
         "xblockB",
