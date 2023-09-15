@@ -777,7 +777,9 @@ openedx-filters==1.6.0
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
 openedx-learning==0.1.6
-    # via -r requirements/edx/kernel.in
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/kernel.in
 openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/kernel.in
 optimizely-sdk==4.1.1
