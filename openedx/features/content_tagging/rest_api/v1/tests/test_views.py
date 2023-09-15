@@ -660,6 +660,12 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
             block_type='problem',
             block_id='block_id'
         )
+        self.courseB = CourseLocator("orgB", "101", "test")
+        self.xblockB = BlockUsageLocator(
+            course_key=self.courseB,
+            block_type='problem',
+            block_id='block_id'
+        )
 
         self.multiple_taxonomy = Taxonomy.objects.create(name="Multiple Taxonomy", allow_multiple=True)
         self.required_taxonomy = Taxonomy.objects.create(name="Required Taxonomy", required=True)
@@ -826,3 +832,21 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
         response = self.client.put(url, {"tags": tag_values}, format="json")
         assert response.status_code == expected_status
         assert not status.is_success(expected_status)  # No success cases here
+
+
+    @ddt.data(
+        "courseB",
+        "xblockB",
+    )
+    def test_tag_unauthorized(self, objectid_attr):
+        """
+        Test that a user without access to courseB can't apply tags to it
+        """
+        self.client.force_authenticate(user=self.userA)
+        object_id = getattr(self, objectid_attr)
+
+        url = OBJECT_TAG_UPDATE_URL.format(object_id=object_id, taxonomy_id=self.tA1.pk)
+
+        response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
