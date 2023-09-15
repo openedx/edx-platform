@@ -9,6 +9,7 @@ from django.urls import path, re_path
 
 from .views import (
     CourseEnrollmentsApiListView,
+    EnrollmentAllowedView,
     EnrollmentCourseDetailView,
     EnrollmentListView,
     EnrollmentUserRolesView,
@@ -29,4 +30,5 @@ urlpatterns = [
             EnrollmentCourseDetailView.as_view(), name='courseenrollmentdetails'),
     path('unenroll/', UnenrollmentView.as_view(), name='unenrollment'),
     path('roles/', EnrollmentUserRolesView.as_view(), name='roles'),
+    path('enrollment_allowed/', EnrollmentAllowedView.as_view(), name='courseenrollmentallowed'),
 ]
