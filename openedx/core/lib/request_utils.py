@@ -140,7 +140,17 @@ class IgnoredErrorMiddleware:
 # .. setting_name: IGNORED_ERRORS[N]['MODULE_AND_CLASS']
 # .. setting_default: None
 # .. setting_description: Required error module and class name that is ignored. For example,
-#     ``rest_framework.exceptions.PermissionDenied``.
+#     ``rest_framework.exceptions.PermissionDenied``. If the current error matches the module and class
+#      defined here, the middleware will add the custom attributes ``error_ignored_class`` and ``error_ignored_message``
+#.     to help diagnose issues with ignored errors, since this data is not otherwise available.
+#      For example of ignoring errors in New Relic, see:
+#      https://docs.newrelic.com/docs/agents/manage-apm-agents/agent-data/manage-errors-apm-collect-ignore-or-mark-expected/#ignore  pylint: disable=line-too-long,useless-suppression
+#      To query for ignored errors, you would use ``error_ignored_class IS NOT NULL``.
+# .. setting_warning: At this time, an error that matches won't actually be ignored. These settings should be set to match
+#     the ignored error configuration found elsewhere, like in New Relic. When monitoring, no errors should ever have the attribute
+#     ``error_ignored_class``. Only Transactions should have this custom attribute. If found for an error, it means we
+#     are stating an error should be ignored when it is not actually configured as such, or the (New Relic) configuration is not
+#     working.
 
 # .. toggle_name: IGNORED_ERRORS[N]['IS_IGNORED']
 # .. toggle_implementation: DjangoSetting
