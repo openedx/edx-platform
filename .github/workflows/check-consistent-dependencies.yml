@@ -1,0 +1,69 @@
+# Rejects PR if requirements files are inconsistent.
+#
+# This will produce a failing check for any PR that does not produce a
+# clean run of `make compile-requirements` on Linux.
+
+name: Consistent Python dependencies
+
+on:
+  pull_request:
+    paths:
+      - 'requirements/**'
+  push:
+    branches:
+      - master
+    paths:
+      - 'requirements/**'
+
+defaults:
+  run:
+    shell: bash # strict bash
+
+jobs:
+  check-requirements:
+    name: Compile requirements
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+      - run: |
+          make compile-requirements
+
+      - name: Fail if compiling requirements caused changes
+        run: |
+          SUMMARY_HELP=$(cat <<'EOMARKDOWN'
+          # Inconsistent Python dependencies
+
+          It appears that the Python dependencies in this PR are inconsistent: A re-run of
+          `make compile-requirements` produced changes. This might mean that your PR would
+          fail to deploy properly in production, or could have inconsistent behavior for
+          developers.
+
+          Please see the requirements README for information on how to resolve this:
+          https://github.com/openedx/edx-platform/blob/master/requirements/README.rst#inconsistent-dependencies
+          EOMARKDOWN
+          )
+
+          make_summary () {
+              echo "$SUMMARY_HELP"
+              echo
+              echo "----"
+              echo
+              echo "Diff follows:"
+              echo
+              echo '```'
+              git diff || true
+              echo '```'
+          }
+
+          git diff --quiet --exit-code || {
+              # Job Summaries are cool, but echo to the job log as well, because
+              # that's where the PR checks will actually link to.
+              make_summary | tee -a $GITHUB_STEP_SUMMARY
+              exit 1
+          }

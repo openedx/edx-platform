@@ -13,6 +13,7 @@ class CourseEntitlementModel extends Backbone.Model {
             expiredAt: null,
             daysUntilExpiration: Number.MAX_VALUE,
         };
+        // eslint-disable-next-line prefer-object-spread
         super(Object.assign({}, defaults, attrs), ...args);
     }
 }

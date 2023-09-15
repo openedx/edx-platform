@@ -6,7 +6,7 @@
 <%namespace file='../main.html' import="login_query"/>
 <%!
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 %>
 
 <ol class="left list-inline nav-global">
@@ -33,7 +33,7 @@ from django.utils.translation import ugettext as _
           <a class="btn" href="/courses">${_("Explore Courses")}</a>
         </li>
       %endif
-      % if static.get_value('ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION')):
+      % if static.get_value('ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION')) and settings.FEATURES.get('SHOW_REGISTRATION_LINKS', True):
         <li class="item nav-global-04">
           <a class="btn btn-neutral btn-register" href="/register${login_query()}">${_("Register")}</a>
         </li>

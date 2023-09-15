@@ -80,6 +80,7 @@
                         maxlength: function($el) {
                             var max = $el.attr('maxlength') || false;
 
+                            // eslint-disable-next-line no-extra-boolean-cast
                             return (!!max) ? max >= $el.val().length : true;
                         }
                     },

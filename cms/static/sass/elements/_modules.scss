@@ -320,7 +320,7 @@
     }
   }
 }
-// New "Paste component" menu, shown on the Unit page to users with a component in their clipboard
+// New "Paste component" menu, shown on the Unit and outline page to users with a component in their clipboard
 .paste-component {
   margin: $baseline ($baseline/2);
 
@@ -450,6 +450,18 @@ $outline-indent-width: $baseline;
 
         @include margin-right($baseline/2);
       }
+    }
+  }
+}
+
+// The "Paste new [Unit/Section/Subsection]" button on the course outline page, visible only when clipboard has the right thing in it
+.outline .paste-component {
+  margin: ($baseline/2) 0; // different margins for the "paste new unit/section/subsection" button on the outline vs. the unit page
+
+  .paste-component-button {
+    // Also there is a smaller font size for this button on the outline vs. the unit page:
+    &.button {
+      font-size: 1.2rem;
     }
   }
 }
@@ -899,6 +911,25 @@ $outline-indent-width: $baseline;
 
     .unit-status {
       @extend %outline-item-status;
+    }
+  }
+}
+
+// The "actions menu" for subsections, sections, and units on the Studio course outline page
+.outline .actions-list.nav-dd .wrapper-nav-sub {
+
+  @include text-align(left); // Undo the 'text-align: right' inherited from the parent
+
+  z-index: 10;  // stay in front of other components on the page.
+
+  .nav-item {
+    a {
+      // Match styling of ".wrapper-header nav .nav-item a" (dropdowns in Studio header)
+      color: $gray-d1;
+
+      &:hover {
+        color: $uxpl-blue-hover-active;
+      }
     }
   }
 }

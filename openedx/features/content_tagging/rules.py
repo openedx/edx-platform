@@ -11,13 +11,13 @@ from .models import TaxonomyOrg
 User = get_user_model()
 
 
-def is_taxonomy_admin(user: User, taxonomy: oel_tagging.Taxonomy = None) -> bool:
+def is_taxonomy_user(user: User, taxonomy: oel_tagging.Taxonomy = None) -> bool:
     """
-    Returns True if the given user is a Taxonomy Admin for the given content taxonomy.
+    Returns True if the given user is a Taxonomy User for the given content taxonomy.
 
-    Global Taxonomy Admins include global staff and superusers, plus course creators who can create courses for any org.
-    Otherwise, a taxonomy must be provided to determine if the user is a org-level course creator for one of the
-    taxonomy's org owners.
+    Taxonomy users include global staff and superusers, plus course creators who can create courses for any org.
+    Otherwise, we need a taxonomy provided to determine if the user is an org-level course creator for one of the
+    orgs allowed to use this taxonomy.
     """
     if oel_tagging.is_taxonomy_admin(user):
         return True
@@ -35,27 +35,48 @@ def is_taxonomy_admin(user: User, taxonomy: oel_tagging.Taxonomy = None) -> bool
     return False
 
 
+def is_taxonomy_admin(user: User) -> bool:
+    """
+    Returns True if the given user is a Taxonomy Admin.
+
+    Taxonomy Admins include global staff and superusers.
+    """
+    return oel_tagging.is_taxonomy_admin(user)
+
+
 @rules.predicate
 def can_view_taxonomy(user: User, taxonomy: oel_tagging.Taxonomy = None) -> bool:
     """
-    Anyone can view an enabled taxonomy,
-    but only taxonomy admins can view a disabled taxonomy.
+    Everyone can potentially view a taxonomy (taxonomy=None). The object permission must be checked
+    to determine if the user can view a specific taxonomy.
+    Only taxonomy admins can view a disabled taxonomy.
     """
-    if taxonomy:
-        taxonomy = taxonomy.cast()
-    return (taxonomy and taxonomy.enabled) or is_taxonomy_admin(user, taxonomy)
+    if not taxonomy:
+        return True
+
+    taxonomy = taxonomy.cast()
+
+    return taxonomy.enabled or is_taxonomy_admin(user)
+
+
+@rules.predicate
+def can_add_taxonomy(user: User) -> bool:
+    """
+    Only taxonomy admins can add taxonomies.
+    """
+    return is_taxonomy_admin(user)
 
 
 @rules.predicate
 def can_change_taxonomy(user: User, taxonomy: oel_tagging.Taxonomy = None) -> bool:
     """
+    Only taxonomy admins can change a taxonomies.
     Even taxonomy admins cannot change system taxonomies.
     """
     if taxonomy:
         taxonomy = taxonomy.cast()
-    return is_taxonomy_admin(user, taxonomy) and (
-        not taxonomy or (taxonomy and not taxonomy.system_defined)
-    )
+
+    return (not taxonomy or (not taxonomy.system_defined)) and is_taxonomy_admin(user)
 
 
 @rules.predicate
@@ -67,7 +88,7 @@ def can_change_taxonomy_tag(user: User, tag: oel_tagging.Tag = None) -> bool:
     taxonomy = tag.taxonomy if tag else None
     if taxonomy:
         taxonomy = taxonomy.cast()
-    return is_taxonomy_admin(user, taxonomy) and (
+    return is_taxonomy_admin(user) and (
         not tag
         or not taxonomy
         or (taxonomy and not taxonomy.allow_free_text and not taxonomy.system_defined)
@@ -77,18 +98,18 @@ def can_change_taxonomy_tag(user: User, tag: oel_tagging.Tag = None) -> bool:
 @rules.predicate
 def can_change_object_tag(user: User, object_tag: oel_tagging.ObjectTag = None) -> bool:
     """
-    Taxonomy admins can create or modify object tags on enabled taxonomies.
+    Taxonomy users can create or modify object tags on enabled taxonomies.
     """
     taxonomy = object_tag.taxonomy if object_tag else None
     if taxonomy:
         taxonomy = taxonomy.cast()
-    return is_taxonomy_admin(user, taxonomy) and (
+    return is_taxonomy_user(user, taxonomy) and (
         not object_tag or not taxonomy or (taxonomy and taxonomy.cast().enabled)
     )
 
 
 # Taxonomy
-rules.set_perm("oel_tagging.add_taxonomy", can_change_taxonomy)
+rules.set_perm("oel_tagging.add_taxonomy", can_add_taxonomy)
 rules.set_perm("oel_tagging.change_taxonomy", can_change_taxonomy)
 rules.set_perm("oel_tagging.delete_taxonomy", can_change_taxonomy)
 rules.set_perm("oel_tagging.view_taxonomy", can_view_taxonomy)

@@ -14,6 +14,7 @@
         beforeEach(function() {
             var runtime = jasmine.createSpyObj('TestRuntime', ['handlerUrl']);
             loadFixtures('sequence.html');
+            // eslint-disable-next-line no-multi-assign
             local.XBlock = window.XBlock = jasmine.createSpyObj('XBlock', ['initializeBlocks']);
             this.sequence = new Sequence($('.xblock-student_view-sequential'), runtime);
         });

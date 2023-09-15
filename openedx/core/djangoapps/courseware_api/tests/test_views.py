@@ -11,13 +11,10 @@ import ddt
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.test import override_settings
 from django.test.client import RequestFactory
 
 from edx_django_utils.cache import TieredCache
 from edx_toggles.toggles.testutils import override_waffle_flag
-from lti_consumer.data import Lti1p3LaunchData
-from lti_consumer.models import LtiConfiguration
 from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -434,109 +431,16 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         assert courseware_data['can_access_proctored_exams'] == result
 
     @override_waffle_flag(COURSEWARE_LEARNING_ASSISTANT, active=False)
-    def test_learning_assistant_launch_url_disabled_waffle_flag(self):
+    def test_learning_assistant_enabled_disabled_waffle_flag(self):
         response = self.client.get(self.url)
-        launch_url = response.json()['learning_assistant_launch_url']
-        assert launch_url is None
+        learning_assistant_enabled = response.json()['learning_assistant_enabled']
+        self.assertFalse(learning_assistant_enabled)
 
     @override_waffle_flag(COURSEWARE_LEARNING_ASSISTANT, active=True)
-    @override_settings(LEARNING_ASSISTANT_CONFIG_ID=None)
-    def test_learning_assistant_launch_no_config(self):
+    def test_learning_assistant_enabled_enabled_waffle_flag(self):
         response = self.client.get(self.url)
-        launch_url = response.json()['learning_assistant_launch_url']
-        assert launch_url is None
-
-    @override_waffle_flag(COURSEWARE_LEARNING_ASSISTANT, active=True)
-    def test_learning_assistant_launch_1p1(self):
-        test_config = LtiConfiguration.objects.create(
-            config_id=1,
-            version='lti_1p1'
-        )
-        with override_settings(LEARNING_ASSISTANT_CONFIG_ID=test_config.id):
-            response = self.client.get(self.url)
-            launch_url = response.json()['learning_assistant_launch_url']
-            assert launch_url is None
-
-    @override_waffle_flag(COURSEWARE_LEARNING_ASSISTANT, active=True)
-    def test_learning_assistant_launch_not_staff_unverified(self):
-        test_config = LtiConfiguration.objects.create(
-            config_id=1,
-            version='lti_1p3'
-        )
-        with override_settings(LEARNING_ASSISTANT_CONFIG_ID=test_config.id):
-            self.user.is_staff = False
-            self.user.save()
-            CourseEnrollment.enroll(self.user, self.course.id, 'audit')
-            response = self.client.get(self.url)
-            launch_url = response.json()['learning_assistant_launch_url']
-            assert launch_url is None
-
-    @ddt.data(
-        'verified',
-        'professional',
-        'masters',
-        'executive-education',
-        'paid-executive-education',
-        'paid-bootcamp'
-    )
-    @mock.patch('openedx.core.djangoapps.courseware_api.utils.get_lti_1p3_launch_start_url')
-    @override_waffle_flag(COURSEWARE_LEARNING_ASSISTANT, active=True)
-    def test_learning_assistant_launch_url(self, enrollment_mode, mock_lti_launch):
-        test_config = LtiConfiguration.objects.create(
-            config_id=1,
-            version='lti_1p3'
-        )
-        with override_settings(LEARNING_ASSISTANT_CONFIG_ID=test_config.id):
-            self.user.is_staff = False
-            self.user.save()
-            CourseEnrollment.enroll(self.user, self.course.id, enrollment_mode)
-
-            expected_url = 'https://testlaunch.org'
-            mock_lti_launch.return_value = expected_url
-
-            response = self.client.get(self.url)
-            launch_url = response.json()['learning_assistant_launch_url']
-            assert launch_url == expected_url
-
-            expected_launch_data = Lti1p3LaunchData(
-                user_id=self.user.id,
-                user_role='student',
-                email=self.user.email,
-                config_id=1,
-                resource_link_id='-'.join(['1', str(self.course.id)]),
-                context_id=str(self.course.id),
-                context_type=['course_offering'],
-                context_title=self.course.display_name
-            )
-            mock_lti_launch.assert_called_with(expected_launch_data)
-
-    @mock.patch('openedx.core.djangoapps.courseware_api.utils.get_lti_1p3_launch_start_url')
-    @override_waffle_flag(COURSEWARE_LEARNING_ASSISTANT, active=True)
-    def test_learning_assistant_launch_url_instructor(self, mock_lti_launch):
-        self.client.login(username='instructor', password='foo')
-        test_config = LtiConfiguration.objects.create(
-            config_id=1,
-            version='lti_1p3'
-        )
-        with override_settings(LEARNING_ASSISTANT_CONFIG_ID=test_config.id):
-            expected_url = 'https://testlaunch.org'
-            mock_lti_launch.return_value = expected_url
-
-            response = self.client.get(self.url)
-            launch_url = response.json()['learning_assistant_launch_url']
-            assert launch_url == expected_url
-
-            expected_launch_data = Lti1p3LaunchData(
-                user_id=self.instructor.id,
-                user_role='instructor',
-                email=self.instructor.email,
-                config_id=1,
-                resource_link_id='-'.join(['1', str(self.course.id)]),
-                context_id=str(self.course.id),
-                context_type=['course_offering'],
-                context_title=self.course.display_name
-            )
-            mock_lti_launch.assert_called_with(expected_launch_data)
+        learning_assistant_enabled = response.json()['learning_assistant_enabled']
+        self.assertTrue(learning_assistant_enabled)
 
 
 @ddt.ddt

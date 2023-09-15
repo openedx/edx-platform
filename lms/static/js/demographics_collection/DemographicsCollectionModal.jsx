@@ -1,5 +1,6 @@
 /* global gettext */
 import React from 'react';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import get from 'lodash/get';
 import Cookies from 'js-cookie';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
@@ -35,8 +36,10 @@ class DemographicsCollectionModal extends React.Component {
             error: false,
             // an error for when a specific demographics question fails to save
             fieldError: false,
+            // eslint-disable-next-line react/no-unused-state
             errorMessage: '',
             loading: true,
+            // eslint-disable-next-line react/no-unused-state
             open: this.props.open,
             selected: {
                 [FIELD_NAMES.CURRENT_WORK]: '',
@@ -83,9 +86,11 @@ class DemographicsCollectionModal extends React.Component {
         document.body.classList.remove('modal-open');
     }
 
+    // eslint-disable-next-line react/sort-comp
     loadOptions(field) {
         const {choices} = get(this.state.options, field, {choices: []});
         if (choices.length) {
+            // eslint-disable-next-line react/no-array-index-key
             return choices.map((choice, i) => <option value={choice.value} key={choice.value + i}>{choice.display_name}</option>);
         }
     }
@@ -110,6 +115,7 @@ class DemographicsCollectionModal extends React.Component {
             await this.jwtTokenService.getJwtToken();
             await fetch(url, options);
         } catch (error) {
+            // eslint-disable-next-line react/no-unused-state
             this.setState({loading: false, fieldError: true, errorMessage: error});
         }
 
@@ -178,6 +184,7 @@ class DemographicsCollectionModal extends React.Component {
             const demographicsOptions = await optionsResponse.json();
             return demographicsOptions;
         } catch (error) {
+            // eslint-disable-next-line react/no-unused-state
             this.setState({loading: false, error: true, errorMessage: error});
         }
     }
@@ -198,6 +205,7 @@ class DemographicsCollectionModal extends React.Component {
             response = await fetch(`${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/${this.props.user}/`, requestOptions);
         } catch (e) {
             // an error other than "no entry found" occured
+            // eslint-disable-next-line react/no-unused-state
             this.setState({loading: false, error: true, errorMessage: e});
         }
         // an entry was not found in demographics, so we need to create one
@@ -234,6 +242,7 @@ class DemographicsCollectionModal extends React.Component {
             const data = await postResponse.json();
             return data;
         } catch (e) {
+            // eslint-disable-next-line react/no-unused-state
             this.setState({loading: false, error: true, errorMessage: e});
         }
     }
@@ -272,6 +281,7 @@ class DemographicsCollectionModal extends React.Component {
                                     <br />
                                     <span aria-hidden="true" className="fa fa-info-circle" />
                                     {/* Need to strip out extra '"' characters in the marketingSiteBaseUrl prop or it tries to setup the href as a relative URL */}
+                                    {/* eslint-disable-next-line react/jsx-no-target-blank */}
                                     <a className="pl-3" target="_blank" rel="noopener" href={`${this.props.marketingSiteBaseUrl}/demographics`.replace(/"/g, '')}>
                                         {gettext('Why does edX collect this information?')}
                                     </a>
@@ -354,6 +364,7 @@ class DemographicsCollectionModal extends React.Component {
                                             {gettext('Have you ever served on active duty in the U.S. Armed Forces, Reserves, or National Guard?')}
                                         </label>
                                         <select
+                                            // eslint-disable-next-line jsx-a11y/no-autofocus
                                             autoFocus
                                             className="form-control"
                                             onChange={this.handleSelectChange}
@@ -381,6 +392,7 @@ class DemographicsCollectionModal extends React.Component {
                                         </label>
                                         <select
                                             className="form-control"
+                                            // eslint-disable-next-line jsx-a11y/no-autofocus
                                             autoFocus
                                             onChange={this.handleSelectChange}
                                             key="self-education"
@@ -501,4 +513,5 @@ class DemographicsCollectionModal extends React.Component {
     }
 }
 
+// eslint-disable-next-line import/prefer-default-export
 export {DemographicsCollectionModal};

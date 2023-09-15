@@ -314,6 +314,7 @@
                 state.HLSVideoSources = extractHLSVideoSources(state);
             }
 
+            // eslint-disable-next-line no-shadow
             function _initializeModules(state, i18n) {
                 var dfd = $.Deferred(),
                     modulesList = $.map(state.modules, function(module) {
@@ -446,6 +447,7 @@
             // function bindTo(methodsDict, obj, context, rewrite)
             // Creates a new function with specific context and assigns it to the provided
             // object.
+            // eslint-disable-next-line no-shadow
             function bindTo(methodsDict, obj, context, rewrite) {
                 $.each(methodsDict, function(name, method) {
                     if (_.isFunction(method)) {

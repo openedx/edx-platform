@@ -15,7 +15,7 @@
 # saeed farzad <security.registered@gmail.com>, 2013
 # Saman Ismael <saman.2791@gmail.com>, 2013
 # Saman Ismael <saman.2791@gmail.com>, 2013
-# SeyedMahdi Saeid <saeid@edspirit.com>, 2022
+# SeyedMahdi Saeid <saeid@edspirit.com>, 2022-2023
 # Siavash Kavousi <siavash.kavousi.sk@gmail.com>, 2016
 # Sina Shirinpour <sshirinpoor@gmail.com>, 2015
 # Somaye Joolaee, 2022
@@ -32,6 +32,7 @@
 # Asghar Feizi <asgharfeizi@yahoo.com>, 2017
 # avvalcode <avvalcode@gmail.com>, 2020
 # Bashir Mahmoudi <bashirmahmoudi@gmail.com>, 2015
+# Diana Huang <dkh@edx.org>, 2023
 # saeed farzad <security.registered@gmail.com>, 2013
 # Emad Rad, 2022
 # Goudarz Jafari <goudarz.jafari@gmail.com>, 2018
@@ -43,7 +44,7 @@
 # Saman Ismael <saman.2791@gmail.com>, 2013
 # Sarina Canelake <sarina@tcril.org>, 2014
 # Sep TP <stparhizi@gmail.com>, 2016
-# SeyedMahdi Saeid <saeid@edspirit.com>, 2022
+# SeyedMahdi Saeid <saeid@edspirit.com>, 2022-2023
 # Siavash Kavousi <siavash.kavousi.sk@gmail.com>, 2016
 # Sina Shirinpour <sshirinpoor@gmail.com>, 2015
 # Somaye Joolaee, 2022
@@ -68,7 +69,7 @@
 # mohsen mirzakhany <mohsenmirzakhany@gmail.com>, 2017
 # mr ash <mrash14@gmail.com>, 2017
 # Sajad Sepehri <sajad.ta@iranacademia.education>, 2021
-# SeyedMahdi Saeid <saeid@edspirit.com>, 2022
+# SeyedMahdi Saeid <saeid@edspirit.com>, 2022-2023
 # Siavash Kavousi <siavash.kavousi.sk@gmail.com>, 2016
 # Sina Shirinpour <sshirinpoor@gmail.com>, 2015
 # Somaye Joolaee, 2022
@@ -80,15 +81,16 @@
 # Translators:
 # MohammadSadegh Mahmoudpour <mahmoudpour.sadegh@gmail.com>, 2016
 # mr ash <mrash14@gmail.com>, 2017
+# SeyedMahdi Saeid <saeid@edspirit.com>, 2023
 # Siavash Kavousi <siavash.kavousi.sk@gmail.com>, 2016
 # Somaye Joolaee, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-09 20:42+0000\n"
+"POT-Creation-Date: 2023-08-27 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
-"Last-Translator: Somaye Joolaee, 2022\n"
+"Last-Translator: SeyedMahdi Saeid <saeid@edspirit.com>, 2023\n"
 "Language-Team: Persian (Iran) (http://app.transifex.com/open-edx/edx-platform/language/fa_IR/)\n"
 "Language: fa_IR\n"
 "MIME-Version: 1.0\n"
@@ -158,6 +160,7 @@ msgstr "حذف"
 #: cms/static/js/views/validation.js
 #: common/static/common/js/components/utils/view_utils.js
 #: lms/static/js/Markdown.Editor.js
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: xmodule/js/src/html/edit.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
@@ -221,6 +224,7 @@ msgstr "انتخاب پرونده"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/course_info_update.js
+#: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js cms/static/js/views/tabs.js
 #: lms/static/js/Markdown.Editor.js xmodule/js/src/html/edit.js
 #: common/static/common/templates/discussion/templates.underscore
@@ -1867,27 +1871,27 @@ msgstr "آیا تا به حال در نیروهای مسلح فعالانه خد
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Select military status"
-msgstr ""
+msgstr "وضعیت سربازی را انتخاب کنید"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Select level of education"
-msgstr ""
+msgstr "سطح تحصیلات را انتخاب کنید"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Select guardian education"
-msgstr ""
+msgstr "تحصیلات سرپرست را انتخاب کنید"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Select current industry"
-msgstr ""
+msgstr "صنعت فعلی را انتخاب کنید"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Select prospective industry"
-msgstr ""
+msgstr "صنعت آینده را انتخاب کنید"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Thank you! You’re helping make edX better for everyone."
-msgstr ""
+msgstr "از یاری شما متشکریم! شما به ما در ایجادسامانه‌ای بهتر یاری رساندید."
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
 msgid "Clear all"
@@ -2506,11 +2510,11 @@ msgstr "ثبت‌نام موفقیت‌آمیز کاربران زیر:"
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"allowed to enroll once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be allowed to enroll once they register:"
 msgstr ""
-"رایانامه‌های ثبت‌نام برای کاربران زیر ارسال شد. به‌محض ثبت‌نام در سیستم مجاز"
-" به ثبت هستند:"
+"ایمیل از طریق ثبت نام دسته ای برای کاربران زیر ارسال نمی شود. آنها پس از ثبت"
+" نام مجاز به شرکت در دوره خواهند بود:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -2520,11 +2524,11 @@ msgstr "این کاربران پس از عضویت ثبت‌نام مجاز به
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"enrolled once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be enrolled once they register:"
 msgstr ""
-"پیام‌های رایانامه‌ای ثبت‌نام برای کاربران زیر با موفقیت ارسال شد. پس از "
-"ثبت‌نام در سامانه، ثبت‌نام انجام می‌شوند:"
+"ایمیل از طریق ثبت نام دسته ای برای کاربران زیر ارسال نمی شود. آنها پس از ثبت"
+" نام مجاز به شرکت در دوره خواهند بود:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -2986,6 +2990,10 @@ msgstr ""
 " در عرض 5 دقیقه منقضی می‌شوند."
 
 #: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
+msgid "You have access to the {enterpriseName} dashboard"
+msgstr "شما به پیشخوان {enterpriseName} دسترسی دارید"
+
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 msgid ""
 "To access the courses available to you through {enterpriseName}, visit the "
 "{enterpriseName} dashboard."
@@ -3063,7 +3071,7 @@ msgstr "پایان می‌یابد {end}"
 
 #: lms/static/js/learner_dashboard/models/program_subscription_model.js
 msgid "${price}/month {currency}"
-msgstr ""
+msgstr "${price}/ماه {currency}"
 
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "You must select a session to access the course."
@@ -3118,11 +3126,11 @@ msgstr ""
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid "View program"
-msgstr ""
+msgstr "مشاهده برنامه"
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid "Enroll in a {programName}'s course"
-msgstr ""
+msgstr "در دوره {programName} ثبت نام کنید"
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid ""
@@ -3130,6 +3138,8 @@ msgid ""
 "enrolled in any courses. Enroll in a remaining course and enjoy verified "
 "access."
 msgstr ""
+"شما یک اشتراک فعال در برنامه {programName} دارید اما در هیچ دوره ای ثبت نام "
+"نکرده اید. در دوره باقی مانده ثبت نام کنید و از دسترسی تأیید شده لذت ببرید."
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid ""
@@ -3137,22 +3147,27 @@ msgid ""
 "your {programName} program subscription. Enroll in a course from the "
 "{i_start}Program Details{i_end} page."
 msgstr ""
+"طبق سوابق ما، شما در هیچ دوره ای که در اشتراک برنامه {programName} خود "
+"گنجانده شده است، ثبت نام نکرده اید. در یک دوره از صفحه {i_start}جزئیات "
+"برنامه{i_end} ثبت نام کنید."
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid "Subscription trial expires in less than 24 hours"
-msgstr ""
+msgstr "دوره آزمایشی اشتراک در کمتر از 24 ساعت منقضی می شود"
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid "Subscription trial expires in {remainingDays} day"
 msgid_plural "Subscription trial expires in {remainingDays} days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "دوره آزمایشی اشتراک {remainingDays} روز دیگر منقضی می‌شود"
+msgstr[1] "دوره آزمایشی اشتراک {remainingDays} روز دیگر منقضی می‌شود"
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid ""
 "Your {programName} trial will expire at {trialEndTime} on {trialEndDate} and"
 " the card on file will be charged {subscriptionPrice}."
 msgstr ""
+"دوره آزمایشی {programName} شما در {trialEndTime} در {trialEndDate} منقضی "
+"می‌شود و هزینه کارت موجود در پرونده {subscriptionPrice} محاسبه می‌شود."
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid ""
@@ -3164,7 +3179,13 @@ msgid_plural ""
 "{trialEndTime} on {trialEndDate} and the card on file will be charged "
 "{subscriptionPrice}."
 msgstr[0] ""
+"دوره آزمایشی {programName} شما در {remainingDays} روز در {trialEndTime} در "
+"{trialEndDate} منقضی می‌شود و هزینه کارت موجود در پرونده {subscriptionPrice}"
+" محاسبه می‌شود."
 msgstr[1] ""
+"دوره آزمایشی {programName} شما در {remainingDays} روز در {trialEndTime} در "
+"{trialEndDate} منقضی می‌شود و هزینه کارت موجود در پرونده {subscriptionPrice}"
+" محاسبه می‌شود."
 
 #: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
 msgid "{type} Progress"
@@ -6153,7 +6174,7 @@ msgstr "لطفا عدد صحیح غیرمنفی وارد نمایید"
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "You must have at least one undroppable <%- types %> assignment."
-msgstr ""
+msgstr "شما باید حداقل یک تخصیص <%- types %> غیرقابل حذف داشته باشید."
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
@@ -6316,6 +6337,54 @@ msgstr "{startTag}{requestToken}{endTag}{selector}"
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
 msgstr "آیا از حذف این روزآمدسازی اطمینان دارید؟"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "Copying"
+msgstr "کپی کردن"
+
+#: cms/static/js/views/course_outline.js
+msgid "Copy of '{componentDisplayName}'"
+msgstr "کپی «{componentDisplayName}»"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "Pasting"
+msgstr "الصاق کردن"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "Some errors occurred"
+msgstr "برخی از خطاها رخ داده است"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "The following required files could not be added to the course:"
+msgstr "فایل های مورد نیاز زیر را نمی توان به دوره اضافه کرد:"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "You may need to update a file(s) manually"
+msgstr "ممکن است لازم باشد فایل(ها) را به صورت دستی به روز کنید"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid ""
+"The following files already exist in this course but don't match the version"
+" used by the component you pasted:"
+msgstr ""
+"فایل‌های زیر از قبل در این دوره وجود دارند، اما با نسخه استفاده شده توسط "
+"مؤلفه‌ای که چسبانده‌اید مطابقت ندارند:"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "New files were added to this course's Files & Uploads"
+msgstr "فایل های جدید به \"فایل ها و آپلودها\"ی این دوره اضافه شد"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "The following required files were imported to this course:"
+msgstr "فایل های مورد نیاز زیر به این دوره وارد شدند:"
 
 #: cms/static/js/views/course_rerun.js
 msgid "Create Re-run"
@@ -6738,45 +6807,11 @@ msgstr "طرح درس دوره آموزشی"
 msgid "Date added"
 msgstr "تاریخ افزودن"
 
-#: cms/static/js/views/pages/container.js
-msgid "Pasting"
-msgstr ""
-
-#: cms/static/js/views/pages/container.js
-msgid "Some errors occurred"
-msgstr ""
-
-#: cms/static/js/views/pages/container.js
-msgid "The following required files could not be added to the course:"
-msgstr ""
-
-#: cms/static/js/views/pages/container.js
-msgid "You may need to update a file(s) manually"
-msgstr ""
-
-#: cms/static/js/views/pages/container.js
-msgid ""
-"The following files already exist in this course but don't match the version"
-" used by the component you pasted:"
-msgstr ""
-
-#: cms/static/js/views/pages/container.js
-msgid "New files were added to this course's Files & Uploads"
-msgstr ""
-
-#: cms/static/js/views/pages/container.js
-msgid "The following required files were imported to this course:"
-msgstr ""
-
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
 msgid "Editing access for: {title}"
 msgstr "ویرایش دسترسی برای : {title}"
-
-#: cms/static/js/views/pages/container.js
-msgid "Copying"
-msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
@@ -7373,6 +7408,7 @@ msgstr "به ترجمه به {beta_language} کمک کنید"
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
+#: cms/templates/js/course-outline.underscore
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Actions"
 msgstr "عملیات"
@@ -8750,7 +8786,7 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
 msgid "Explore new programs"
-msgstr ""
+msgstr "برنامه های جدید را کاوش کنید"
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
@@ -8775,7 +8811,7 @@ msgstr "%(programName)s صفحۀ اصلی."
 #: lms/templates/learner_dashboard/program_card.underscore
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "Subscribed"
-msgstr ""
+msgstr "مشترک شد"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Your {program} Certificate"
@@ -8788,33 +8824,39 @@ msgstr "گواهی که بدست آورده‌اید را برای برنامۀ 
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Trial subscription"
-msgstr ""
+msgstr "اشتراک آزمایشی"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Active subscription"
-msgstr ""
+msgstr "اشتراک فعال"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Inactive subscription"
-msgstr ""
+msgstr "اشتراک غیر فعال"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid ""
 "View your receipts or modify your subscription on the {a_start}Orders and "
 "subscriptions{a_end} page"
 msgstr ""
+"رسیدهای خود را مشاهده کنید یا اشتراک خود را در صفحه {a_start}سفارش‌ها و "
+"اشتراک‌ها {a_end} تغییر دهید."
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid ""
 "Restart your subscription for {subscriptionPrice}. Your payment history is "
 "still available on the {a_start}Orders and subscriptions{a_end} page"
 msgstr ""
+"اشتراک خود را برای {subscriptionPrice} راه اندازی مجدد کنید. سابقه پرداخت "
+"شما همچنان در صفحه {a_start}سفارش‌ها و اشتراک‌ها {a_end} موجود است"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid ""
 "If you had a subscription previously, your payment history is still "
 "available on the {a_start}Orders and subscriptions{a_end} page"
 msgstr ""
+"اگر قبلاً اشتراک داشته‌اید، سابقه پرداخت شما همچنان در صفحه "
+"{a_start}سفارش‌ها و اشتراک‌ها {a_end} موجود است."
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid ""
@@ -8822,6 +8864,8 @@ msgid ""
 "Center{span_start}{icon}{span_end}{a_end} to troubleshoot issues or contact "
 "support"
 msgstr ""
+"به کمک نیاز دارید؟ برای عیب‌یابی مشکلات یا تماس با پشتیبانی، {a_start}مرکز "
+"راهنمایی یادگیرندگان{span_start}{icon}{span_end} {a_end} را بررسی کنید."
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Program Record"
@@ -8869,7 +8913,7 @@ msgstr "تبریک می‌گوییم!"
 msgid ""
 "You have successfully completed all the requirements for the %(title)s "
 "%(type)s."
-msgstr ""
+msgstr "شما تمام الزامات %(title)s %(type)s را با موفقیت تکمیل کردید."
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
@@ -8883,41 +8927,45 @@ msgid ""
 "program. To complete the program, you must earn a verified certificate for "
 "each course."
 msgstr ""
+"پیشرفت خود را از طریق دوره(های) %(count)s در این برنامه پیگیری و برنامه ریزی"
+" کنید. برای تکمیل برنامه، باید گواهی تایید شده برای هر دوره دریافت کنید."
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Manage my subscription"
-msgstr ""
+msgstr "مدیریت اشتراک من"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Restart my subscription"
-msgstr ""
+msgstr "اشتراک من را دوباره راه اندازی کنید"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Start {trialLength}-day free trial"
-msgstr ""
+msgstr "نسخه رایگان روز {trialLength} را شروع کنید"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Trial ends {trialEndDate} at {trialEndTime}"
-msgstr ""
+msgstr "پایان نسخه رایگان {trialEndDate} در {trialEndTime}"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Your next billing date is {currentPeriodEnd}"
-msgstr ""
+msgstr "تاریخ صورتحساب بعدی شما {currentPeriodEnd} است"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "{subscriptionPrice} subscription. Cancel anytime."
-msgstr ""
+msgstr "اشتراک {subscriptionPrice} . هر زمان خواستید لغو کنید."
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "{subscriptionPrice} subscription after trial ends. Cancel anytime."
 msgstr ""
+"اشتراک {subscriptionPrice} پس از پایان دوره آزمایشی. هر زمان خواستید لغو "
+"کنید."
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
@@ -8964,7 +9012,7 @@ msgstr ""
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #, python-format
 msgid "Transform your %(org)s %(type)s into a full master’s degree"
-msgstr ""
+msgstr "%(org)s %(type)s خود را به یک مدرک کارشناسی ارشد کامل تبدیل کنید"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #, python-format
@@ -8973,6 +9021,8 @@ msgid ""
 "towards flexible, rigorous, and affordable masters degrees from the world’s "
 "leading universities."
 msgstr ""
+"تکمیل موفقیت آمیز مدرک %(org)s %(program)s می تواند برای مدارک کارشناسی ارشد"
+" انعطاف پذیر، دقیق و مقرون به صرفه از دانشگاه های پیشرو جهان اعمال شود."
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
 #, python-format
@@ -8981,6 +9031,8 @@ msgid ""
 "To complete the program, you must earn a verified certificate for each "
 "course."
 msgstr ""
+"پیشرفت خود را از طریق دوره های %(count)s در این برنامه پیگیری و برنامه ریزی "
+"کنید. برای تکمیل برنامه، باید گواهی تایید شده برای هر دوره دریافت کنید."
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "{organization}\\'s logo"
@@ -8988,15 +9040,15 @@ msgstr "نشان {organization}\\'"
 
 #: lms/templates/learner_dashboard/program_list_header_view.underscore
 msgid "My programs"
-msgstr ""
+msgstr "برنامه های من"
 
 #: lms/templates/learner_dashboard/subscription_upsell_view.underscore
 msgid "New"
-msgstr ""
+msgstr "جدید"
 
 #: lms/templates/learner_dashboard/subscription_upsell_view.underscore
 msgid "Monthly program subscriptions {emDash} more flexible, more affordable"
-msgstr ""
+msgstr "اشتراک های برنامه ماهانه {emDash} انعطاف پذیرتر، مقرون به صرفه تر است"
 
 #: lms/templates/learner_dashboard/subscription_upsell_view.underscore
 msgid ""
@@ -9005,10 +9057,14 @@ msgid ""
 "start at {minSubscriptionPrice}/month USD per program, after a 7-day full "
 "access free trial. Cancel at any time."
 msgstr ""
+"اکنون برای بسیاری از برنامه های محبوب در دسترس است، قیمت اشتراک ماهانه مقرون"
+" به صرفه می تواند به شما در مدیریت موثرتر بودجه کمک کند. اشتراک‌ها از "
+"{minSubscriptionPrice} / ماه USD برای هر برنامه، پس از یک دوره آزمایشی "
+"رایگان دسترسی کامل 7 روزه شروع می‌شوند. در هر زمان لغو کنید."
 
 #: lms/templates/learner_dashboard/subscription_upsell_view.underscore
 msgid "Explore subscription options"
-msgstr ""
+msgstr "گزینه های اشتراک را کاوش کنید"
 
 #: lms/templates/learner_dashboard/upgrade_message.underscore
 #: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
@@ -9021,15 +9077,15 @@ msgstr "ارتقا به تاییدشده"
 
 #: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
 msgid "Upgrade with a subscription"
-msgstr ""
+msgstr "با اشتراک ارتقا دهید"
 
 #: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
 msgid "Pay {subscriptionPrice} for all courses in this program"
-msgstr ""
+msgstr "برای تمام دوره های این برنامه {subscriptionPrice} پرداخت کنید"
 
 #: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
 msgid "Pay {subscriptionPrice} after {trialLength}-day free trial"
-msgstr ""
+msgstr "پرداخت {subscriptionPrice} پس از استفاده آزمایشی رایگان {trialLength}"
 
 #: lms/templates/student_account/account.underscore
 msgid "New Address"
@@ -10444,7 +10500,7 @@ msgstr "نمایش نام"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Discussions enabled"
-msgstr ""
+msgstr "بحث فعال شد"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Proctoring Settings"
@@ -10453,6 +10509,10 @@ msgstr "تنظیمات حفاظت"
 #: cms/templates/js/course-outline.underscore
 msgid "Configure"
 msgstr "پیکربندی"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Copy to Clipboard"
+msgstr "کپی به کلیپ بورد"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Duplicate"
@@ -10499,6 +10559,15 @@ msgid "Subsection is hidden after due date"
 msgstr "زیربخش پس از تاریخ سررسید پنهان می‌شود"
 
 #: cms/templates/js/course-outline.underscore
+#, python-format
+msgid ""
+"This subsection is configured as \\\"%(gradingType)s\\\", which doesn't "
+"exist in the current grading policy."
+msgstr ""
+"این زیربخش به عنوان \\\"%(gradingType)s\\\" پیکربندی شده است که در خط مشی "
+"درجه بندی فعلی وجود ندارد."
+
+#: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 msgid "You haven't added any content to this course yet."
 msgstr "شما هنوز محتوایی به این دوره آموزشی نیفزوده‌اید."
@@ -10508,6 +10577,19 @@ msgstr "شما هنوز محتوایی به این دوره آموزشی نیف�
 #, python-format
 msgid "Click to add a new %(xblock_type)s"
 msgstr "برای افزودن %(xblock_type)s جدید کلیک کنید"
+
+#: cms/templates/js/course-outline.underscore
+#, python-format
+msgid "Paste %(xblock_type)s"
+msgstr "الصاق %(xblock_type)s"
+
+#: cms/templates/js/course-outline.underscore
+msgid "From:"
+msgstr "از جانب:"
+
+#: cms/templates/js/course-outline.underscore
+msgid "What's in my clipboard?"
+msgstr "در کلیپ بورد من چیست؟"
 
 #: cms/templates/js/course-settings-learning-fields.underscore
 msgid "Learning Outcome"
@@ -10551,11 +10633,11 @@ msgstr "تنظیمات ویدئوی دوره آموزشی"
 
 #: cms/templates/js/course-video-sharing-enable.underscore
 msgid "Video Sharing"
-msgstr ""
+msgstr "اشتراک گذاری ویدیو"
 
 #: cms/templates/js/course-video-sharing-enable.underscore
 msgid "Learn more"
-msgstr ""
+msgstr "اطلاعات بیشتر"
 
 #: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Transcript Turnaround"
@@ -10659,27 +10741,29 @@ msgstr ""
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Warning: "
-msgstr ""
+msgstr "هشدار:"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid ""
 "The number of {type} assignments defined here does not match the current "
 "number of {type} assignments in the course:"
 msgstr ""
+"تعداد تکالیف {type} تعریف شده در اینجا با تعداد فعلی تکالیف {type} در دوره "
+"مطابقت ندارد:"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "There are no assignments of this type in the course."
-msgstr ""
+msgstr "هیچ تکلیفی از این نوع در دوره وجود ندارد."
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "{assignment_count} {type} assignment(s) found:"
-msgstr ""
+msgstr "{assignment_count} {type} تکلیف(های) پیدا شد:"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid ""
 "The number of {type} assignments in the course matches the number defined "
 "here."
-msgstr ""
+msgstr "تعداد تکالیف {type} در دوره با تعداد تعریف شده در اینجا مطابقت دارد."
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"
@@ -10711,11 +10795,12 @@ msgstr "فعالسازی گفتگو"
 
 #: cms/templates/js/discussion-editor.underscore
 msgid "Topics for unpublished units would not be created"
-msgstr ""
+msgstr "موضوعات برای واحدهای منتشر نشده ایجاد نمی شود"
 
 #: cms/templates/js/discussion-editor.underscore
 msgid "Please enable discussions for graded units from course authoring app"
 msgstr ""
+"لطفاً مباحث مربوط به واحدهای درجه بندی شده را از برنامه تالیف دوره فعال کنید"
 
 #: cms/templates/js/due-date-editor.underscore
 msgid "Due Date:"
@@ -11317,6 +11402,14 @@ msgstr ""
 "محتوای آن را پس از گذشت تاریخ انتشار و انتشار در این  واحد مشاهده کنند. پس "
 "از حذف این گزینه برای%(xblockType)sتنها واحدهایی که به وضوح از دید فراگیران "
 "پنهان مانده‌اند، همچنان پنهان خواهند ماند."
+
+#: cms/templates/js/summary-configuration-editor.underscore
+msgid "Xpert unit summaries"
+msgstr "خلاصه واحد Xpert"
+
+#: cms/templates/js/summary-configuration-editor.underscore
+msgid "Enable summaries"
+msgstr "فعال کردن خلاصه ها"
 
 #: cms/templates/js/team-member.underscore
 msgid "Current Role:"

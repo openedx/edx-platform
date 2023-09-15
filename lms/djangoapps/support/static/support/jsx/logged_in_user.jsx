@@ -178,6 +178,7 @@ LoggedInUser.propTypes = {
         course_id: PropTypes.string,
         username: PropTypes.string,
         email: PropTypes.string,
+        // eslint-disable-next-line react/forbid-prop-types
         enrollments: PropTypes.arrayOf(PropTypes.object),
     }).isRequired,
     showWarning: PropTypes.bool.isRequired,

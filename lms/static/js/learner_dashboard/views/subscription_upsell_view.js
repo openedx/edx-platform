@@ -9,6 +9,7 @@ class SubscriptionUpsellView extends Backbone.View {
         const defaults = {
             el: '.js-subscription-upsell',
         };
+        // eslint-disable-next-line prefer-object-spread
         super(Object.assign({}, defaults, options));
     }
 

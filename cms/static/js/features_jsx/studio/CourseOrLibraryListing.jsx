@@ -3,11 +3,16 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-unused-vars
 import ReactDOM from 'react-dom';
 
+// eslint-disable-next-line import/prefer-default-export
 export function CourseOrLibraryListing(props) {
+    // eslint-disable-next-line prefer-destructuring
     const allowReruns = props.allowReruns;
+    // eslint-disable-next-line prefer-destructuring
     const linkClass = props.linkClass;
+    // eslint-disable-next-line prefer-destructuring
     const idBase = props.idBase;
 
     const renderCourseMetadata = (item, i) => (
@@ -84,6 +89,7 @@ export function CourseOrLibraryListing(props) {
 CourseOrLibraryListing.propTypes = {
     allowReruns: PropTypes.bool.isRequired,
     idBase: PropTypes.string.isRequired,
+    // eslint-disable-next-line react/forbid-prop-types
     items: PropTypes.arrayOf(PropTypes.object).isRequired,
     linkClass: PropTypes.string.isRequired,
 };

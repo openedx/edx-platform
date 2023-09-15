@@ -8,7 +8,7 @@
      <symbolicresponse expect="a_b^c + b_x__d" size="30">
        <textline math="1"
          preprocessorClassName="SymbolicMathjaxPreprocessor"
-	 preprocessorSrc="/static/js/capa/symbolic_mathjax_preprocessor.js"/>
+         preprocessorSrc="/static/js/capa/symbolic_mathjax_preprocessor.js"/>
      </symbolicresponse>
 */
 window.SymbolicMathjaxPreprocessor = function() {

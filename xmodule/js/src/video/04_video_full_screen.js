@@ -171,12 +171,12 @@
                     payload: {
                         open: fullscreenOpen
                     }
-                  }, document.referrer
+                }, document.referrer
                 );
             }
         }
 
-    /**
+        /**
      * Event handler to toggle fullscreen mode.
      * @param {jquery Event} event
      */
@@ -193,6 +193,7 @@
                 return;
             }
 
+            // eslint-disable-next-line no-multi-assign
             this.videoFullScreen.fullScreenState = this.isFullScreen = false;
             fullScreenClassNameEl.removeClass('video-fullscreen');
             $(window).scrollTop(this.scrollPos);
@@ -221,6 +222,7 @@
 
             this.videoFullScreen.notifyParent(true);
 
+            // eslint-disable-next-line no-multi-assign
             this.videoFullScreen.fullScreenState = this.isFullScreen = true;
             fullScreenClassNameEl.addClass('video-fullscreen');
             this.videoFullScreen.fullScreenEl

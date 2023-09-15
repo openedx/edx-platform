@@ -91,6 +91,9 @@ class XBlockRuntime(RuntimeShim, Runtime):
     block_field_datas: dict[ScopeIds, FieldData | None]
     # dict of FieldDataCache objects for XBlock with database-based user state
     django_field_data_caches: dict[LearningContextKey, FieldDataCache]
+    # keep track of view name (student_view, studio_view, etc)
+    # currently only used to track if we're in the studio_view (see below under service())
+    view_name: str | None
 
     def __init__(self, system: XBlockRuntimeSystem, user: UserType | None):
         super().__init__(
@@ -114,6 +117,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
             self.user_id = self.user.id
         self.block_field_datas = {}
         self.django_field_data_caches = {}
+        self.view_name = None
 
     def handler_url(self, block, handler_name: str, suffix='', query='', thirdparty=False):
         """
@@ -265,7 +269,13 @@ class XBlockRuntime(RuntimeShim, Runtime):
                 deprecated_anonymous_user_id=deprecated_anonymous_student_id
             )
         elif service_name == "mako":
-            if self.system.student_data_mode == StudentDataMode.Ephemeral:
+            # The mako service has a seperate "preview" engine used for views in CMS that mimic LMS views.
+            # Said engine is only configured for CMS. Therefore, when we are in CMS but not the studio_view,
+            # we want to use the preview engine. The mako service uses a 'lms.main' namespace to indicate
+            # the preview engine, and 'main' otherwise.
+            # For backwards compatibility, we check the student_data_mode (Ephemeral indicates CMS) and the
+            # view_name for 'studio_view.' self.view_name is set by render() below.
+            if self.system.student_data_mode == StudentDataMode.Ephemeral and self.view_name != 'studio_view':
                 return MakoService(namespace_prefix='lms.')
             return MakoService()
         elif service_name == "i18n":
@@ -347,6 +357,9 @@ class XBlockRuntime(RuntimeShim, Runtime):
         # than public_view. They may call any handlers though.
         if (self.user is None or self.user.is_anonymous) and view_name != 'public_view':
             raise PermissionDenied
+
+        # track this so service() can know
+        self.view_name = view_name
 
         # We also need to override this method because some XBlocks in the
         # edx-platform codebase use methods from builtin_assets.py,

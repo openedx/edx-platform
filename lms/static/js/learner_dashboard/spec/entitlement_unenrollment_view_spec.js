@@ -36,10 +36,15 @@ describe('EntitlementUnenrollmentView', () => {
 
     describe('when an unenroll link is clicked', () => {
         it('should reset the modal and set the correct values for header/submit', () => {
+            // eslint-disable-next-line no-undef
             const $link1 = $('#link1');
+            // eslint-disable-next-line no-undef
             const $link2 = $('#link2');
+            // eslint-disable-next-line no-undef
             const $headerTxt = $('.js-entitlement-unenrollment-modal-header-text');
+            // eslint-disable-next-line no-undef
             const $errorTxt = $('.js-entitlement-unenrollment-modal-error-text');
+            // eslint-disable-next-line no-undef
             const $submitBtn = $('.js-entitlement-unenrollment-modal-submit');
 
             $link1.trigger('click');
@@ -66,11 +71,13 @@ describe('EntitlementUnenrollmentView', () => {
 
     describe('when the unenroll submit button is clicked', () => {
         it('should send a DELETE request to the configured apiEndpoint', () => {
+            // eslint-disable-next-line no-undef
             const $submitBtn = $('.js-entitlement-unenrollment-modal-submit');
             const apiEndpoint = '/test/api/endpoint/1';
 
             view.setSubmitData(apiEndpoint);
 
+            // eslint-disable-next-line no-undef
             spyOn($, 'ajax').and.callFake((opts) => {
                 expect(opts.url).toEqual(apiEndpoint);
                 expect(opts.method).toEqual('DELETE');
@@ -78,11 +85,14 @@ describe('EntitlementUnenrollmentView', () => {
             });
 
             $submitBtn.trigger('click');
+            // eslint-disable-next-line no-undef
             expect($.ajax).toHaveBeenCalled();
         });
 
         it('should set an error and disable submit if the apiEndpoint has not been properly set', () => {
+            // eslint-disable-next-line no-undef
             const $errorTxt = $('.js-entitlement-unenrollment-modal-error-text');
+            // eslint-disable-next-line no-undef
             const $submitBtn = $('.js-entitlement-unenrollment-modal-submit');
 
             expect($submitBtn.data()).toEqual({});
@@ -90,8 +100,10 @@ describe('EntitlementUnenrollmentView', () => {
             expect($errorTxt.html()).toEqual('');
             expect($errorTxt.hasClass('entitlement-unenrollment-modal-error-text-visible')).toBe(false);
 
+            // eslint-disable-next-line no-undef
             spyOn($, 'ajax');
             $submitBtn.trigger('click');
+            // eslint-disable-next-line no-undef
             expect($.ajax).not.toHaveBeenCalled();
 
             expect($submitBtn.data()).toEqual({});
@@ -102,11 +114,13 @@ describe('EntitlementUnenrollmentView', () => {
 
         describe('when the unenroll request is complete', () => {
             it('should redirect to the dashboard if the request was successful', () => {
+                // eslint-disable-next-line no-undef
                 const $submitBtn = $('.js-entitlement-unenrollment-modal-submit');
                 const apiEndpoint = '/test/api/endpoint/1';
 
                 view.setSubmitData(apiEndpoint);
 
+                // eslint-disable-next-line no-undef
                 spyOn($, 'ajax').and.callFake((opts) => {
                     expect(opts.url).toEqual(apiEndpoint);
                     expect(opts.method).toEqual('DELETE');
@@ -117,19 +131,23 @@ describe('EntitlementUnenrollmentView', () => {
                         responseJSON: { detail: 'success' },
                     });
                 });
+                // eslint-disable-next-line no-undef
                 spyOn(EntitlementUnenrollmentView, 'redirectTo');
 
                 $submitBtn.trigger('click');
+                // eslint-disable-next-line no-undef
                 expect($.ajax).toHaveBeenCalled();
                 expect(EntitlementUnenrollmentView.redirectTo).toHaveBeenCalledWith(view.dashboardPath);
             });
 
             it('should redirect to the login page if the request failed with an auth error', () => {
+                // eslint-disable-next-line no-undef
                 const $submitBtn = $('.js-entitlement-unenrollment-modal-submit');
                 const apiEndpoint = '/test/api/endpoint/1';
 
                 view.setSubmitData(apiEndpoint);
 
+                // eslint-disable-next-line no-undef
                 spyOn($, 'ajax').and.callFake((opts) => {
                     expect(opts.url).toEqual(apiEndpoint);
                     expect(opts.method).toEqual('DELETE');
@@ -140,9 +158,11 @@ describe('EntitlementUnenrollmentView', () => {
                         responseJSON: { detail: 'Authentication credentials were not provided.' },
                     });
                 });
+                // eslint-disable-next-line no-undef
                 spyOn(EntitlementUnenrollmentView, 'redirectTo');
 
                 $submitBtn.trigger('click');
+                // eslint-disable-next-line no-undef
                 expect($.ajax).toHaveBeenCalled();
                 expect(EntitlementUnenrollmentView.redirectTo).toHaveBeenCalledWith(
                     `${view.signInPath}?next=${encodeURIComponent(view.dashboardPath)}`,
@@ -150,12 +170,15 @@ describe('EntitlementUnenrollmentView', () => {
             });
 
             it('should set an error and disable submit if a non-auth error occurs', () => {
+                // eslint-disable-next-line no-undef
                 const $errorTxt = $('.js-entitlement-unenrollment-modal-error-text');
+                // eslint-disable-next-line no-undef
                 const $submitBtn = $('.js-entitlement-unenrollment-modal-submit');
                 const apiEndpoint = '/test/api/endpoint/1';
 
                 view.setSubmitData(apiEndpoint);
 
+                // eslint-disable-next-line no-undef
                 spyOn($, 'ajax').and.callFake((opts) => {
                     expect(opts.url).toEqual(apiEndpoint);
                     expect(opts.method).toEqual('DELETE');
@@ -166,6 +189,7 @@ describe('EntitlementUnenrollmentView', () => {
                         responseJSON: { detail: 'Bad request.' },
                     });
                 });
+                // eslint-disable-next-line no-undef
                 spyOn(EntitlementUnenrollmentView, 'redirectTo');
 
                 expect($submitBtn.prop('disabled')).toBe(false);
@@ -178,6 +202,7 @@ describe('EntitlementUnenrollmentView', () => {
                 expect($errorTxt.html()).toEqual(view.genericErrorMsg);
                 expect($errorTxt.hasClass('entitlement-unenrollment-modal-error-text-visible')).toBe(true);
 
+                // eslint-disable-next-line no-undef
                 expect($.ajax).toHaveBeenCalled();
                 expect(EntitlementUnenrollmentView.redirectTo).not.toHaveBeenCalled();
             });

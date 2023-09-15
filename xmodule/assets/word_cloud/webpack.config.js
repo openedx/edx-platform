@@ -2,6 +2,7 @@
 
 'use strict';
 
+// eslint-disable-next-line no-var, import/no-extraneous-dependencies
 var path = require('path');
 
 module.exports = {

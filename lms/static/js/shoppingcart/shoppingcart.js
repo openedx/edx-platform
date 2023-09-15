@@ -41,6 +41,7 @@ var edx = edx || {};
             * @param {JQuery selector} params.el - The payment form element.
             * @returns {CartView}
             */
+            // eslint-disable-next-line no-shadow
             initialize: function(params) {
                 this.$el = params.el;
                 _.bindAll(view,

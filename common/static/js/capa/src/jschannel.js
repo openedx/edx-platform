@@ -233,7 +233,9 @@ var Channel = (function() {
         if (origin === '*') {
             // we must check all other origins, sadly.
             for (var k in s_boundChans) {
+                // eslint-disable-next-line no-continue
                 if (!s_boundChans.hasOwnProperty(k)) { continue; }
+                // eslint-disable-next-line no-continue
                 if (k === '*') { continue; }
                 if (typeof s_boundChans[k][scope] === 'object') {
                     exists = hasWin(s_boundChans[k][scope]);
@@ -288,6 +290,7 @@ var Channel = (function() {
         try {
             var m = JSON.parse(e.data);
             if (typeof m !== 'object' || m === null) { throw 'malformed'; }
+        // eslint-disable-next-line no-shadow
         } catch (e) {
             // just ignore any posted messages that do not consist of valid JSON
             return;
@@ -387,6 +390,7 @@ var Channel = (function() {
             var debug = function(m) {
                 if (cfg.debugOutput && window.console && window.console.log) {
                     // try to stringify, if it doesn't work we'll let javascript's built in toString do its magic
+                    // eslint-disable-next-line no-empty
                     try { if (typeof m !== 'string') { m = JSON.stringify(m); } } catch (e) { }
                     console.log('[' + chanId + '] ' + m);
                 }
@@ -415,6 +419,7 @@ var Channel = (function() {
                 // eslint-disable-next-line brace-style
                 if (cfg.origin === '*') { validOrigin = true; }
                 // allow valid domains under http and https.  Also, trim paths off otherwise valid origins.
+                // eslint-disable-next-line no-cond-assign
                 else if ((oMatch = cfg.origin.match(/^https?:\/\/(?:[-a-zA-Z0-9_\.])+(?::\d+)?/)) !== null) {
                     cfg.origin = oMatch[0].toLowerCase();
                     validOrigin = true;
@@ -541,6 +546,7 @@ var Channel = (function() {
                                         if (typeof obj[cp] !== 'object') { obj[cp] = { }; }
                                         obj = obj[cp];
                                     }
+                                    // eslint-disable-next-line no-loop-func
                                     obj[pathItems[pathItems.length - 1]] = (function() {
                                         var cbName = path;
                                         return function(params) {
@@ -569,6 +575,7 @@ var Channel = (function() {
                                 // * if it's an object then we'll look form error and message parameters
                                 else if (typeof e.error === 'string') {
                                     error = e.error;
+                                    // eslint-disable-next-line no-ex-assign
                                     if (!e.message) { message = ''; } else if (typeof e.message === 'string') { message = e.message; } else { e = e.message; } // let the stringify/toString message give us a reasonable verbose error string
                                 }
                             }
@@ -707,6 +714,7 @@ var Channel = (function() {
                     var callbackNames = [];
                     var seen = [];
 
+                    // eslint-disable-next-line no-shadow
                     var pruneFunctions = function(path, obj) {
                         if (seen.indexOf(obj) >= 0) {
                             throw 'params cannot be a recursive data structure';
@@ -715,6 +723,7 @@ var Channel = (function() {
 
                         if (typeof obj === 'object') {
                             for (var k in obj) {
+                                // eslint-disable-next-line no-continue
                                 if (!obj.hasOwnProperty(k)) { continue; }
                                 var np = path + (path.length ? '/' : '') + k;
                                 if (typeof obj[k] === 'function') {

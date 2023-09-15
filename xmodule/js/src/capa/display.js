@@ -328,6 +328,7 @@
                 that.new_queued_items = $(response.html).find('.xqueue');
                 if (that.new_queued_items.length !== that.num_queued_items) {
                     edx.HtmlUtils.setHtml(that.el, edx.HtmlUtils.HTML(response.html)).promise().done(function() {
+                        // eslint-disable-next-line no-void
                         return typeof focusCallback === 'function' ? focusCallback() : void 0;
                     });
                     JavascriptLoader.executeModuleScripts(that.el, function() {
@@ -386,6 +387,7 @@
                     that.bind();
                     that.queueing(focusCallback);
                     that.renderProgressState();
+                    // eslint-disable-next-line no-void
                     return typeof focusCallback === 'function' ? focusCallback() : void 0;
                 });
             } else {
@@ -415,6 +417,7 @@
                     if (setupMethod != null) {
                         results.push(that.inputtypeDisplays[id] = setupMethod(inputtype));
                     } else {
+                        // eslint-disable-next-line no-void
                         results.push(void 0);
                     }
                 }
@@ -760,6 +763,7 @@
                         if (showMethod != null) {
                             results.push(showMethod(inputtype, display, answers, response.correct_status_html));
                         } else {
+                            // eslint-disable-next-line no-void
                             results.push(void 0);
                         }
                     }
@@ -962,6 +966,7 @@
                     if (bindMethod != null) {
                         results.push(bindMethod(inputtype));
                     } else {
+                        // eslint-disable-next-line no-void
                         results.push(void 0);
                     }
                 }
@@ -1310,6 +1315,7 @@
                 that = this;
             hintContainer = this.$('.problem-hint');
             hintIndex = hintContainer.attr('hint_index');
+            // eslint-disable-next-line no-void
             if (hintIndex === void 0) {
                 nextIndex = 0;
             } else {

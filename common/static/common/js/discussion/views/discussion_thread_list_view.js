@@ -305,6 +305,7 @@
                 default:
                 }
                 ref = this.collection.last();
+                // eslint-disable-next-line no-void
                 lastThread = ref ? ref.get('id') : void 0;
                 if (lastThread) {
                     this.once('threads:rendered', function() {
@@ -315,6 +316,7 @@
                 } else {
                     this.once('threads:rendered', function() {
                         var ref1 = $('.forum-nav-thread-link').first();
+                        // eslint-disable-next-line no-void
                         return ref1 ? ref1.focus() : void 0;
                     });
                 }

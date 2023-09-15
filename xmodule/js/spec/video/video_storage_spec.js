@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-shadow-restricted-names
 (function(require, define, undefined) {
     require(
         ['video/00_video_storage.js'],
@@ -52,6 +53,7 @@
                     });
 
                     it('getItem', function() {
+                        // eslint-disable-next-line no-shadow
                         var data = window[namespace],
                             getItem = storage.getItem;
 
@@ -61,6 +63,7 @@
                     });
 
                     it('removeItem', function() {
+                        // eslint-disable-next-line no-shadow
                         var data = window[namespace],
                             removeItem = storage.removeItem;
 

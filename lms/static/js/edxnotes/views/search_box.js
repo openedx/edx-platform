@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-shadow-restricted-names
 (function(define, undefined) {
     'use strict';
 
@@ -124,6 +125,7 @@
                 if (jXHR.responseText) {
                     try {
                         message = $.parseJSON(jXHR.responseText).error;
+                    // eslint-disable-next-line no-empty
                     } catch (error) { }
                 }
 

@@ -31,8 +31,6 @@ mailsnake                           # MailChimp API; used for two management com
 newrelic                            # New Relic agent for performance monitoring
 optimizely-sdk                      # Optimizely provides A/B testing and other features, used by edx.org
 
-## Plugins used on edx.org
-skill-tagging                       # Library to support tagging of skills on edx.org in unit/video xblocks via forms
 
 ## XBLOCKS
 crowdsourcehinter-xblock

@@ -34,6 +34,7 @@ describe('Formula Equation Preview', function() {
     var formulaEquationPreview = window.formulaEquationPreview;
     beforeEach(function() {
         // Simulate an environment conducive to a FormulaEquationInput
+        // eslint-disable-next-line no-multi-assign, no-multi-str
         var $fixture = this.$fixture = $('\
 <section class="problems-wrapper" data-url="THE_URL">\
   <section class="formulaequationinput">\
@@ -50,6 +51,7 @@ describe('Formula Equation Preview', function() {
 </section>');
 
         // Modify $ for the test to search the fixture.
+        // eslint-disable-next-line no-multi-assign
         var old$find = this.old$find = $.find;
         $.find = function() {
             // Given the default context, swap it out for the fixture.
@@ -68,6 +70,7 @@ describe('Formula Equation Preview', function() {
         };
 
         // Catch the AJAX requests
+        // eslint-disable-next-line no-multi-assign
         var ajaxTimes = this.ajaxTimes = [];
         this.oldProblem = window.Problem;
 

@@ -1,5 +1,4 @@
 /* globals gettext */
-/* eslint-disable react/no-danger */
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
@@ -36,6 +35,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
         window.location.href = this.props.mktgRootLink;
     }
 
+    // eslint-disable-next-line react/sort-comp
     deleteAccount() {
         return this.setState(
             { passwordSubmitted: true },
@@ -167,6 +167,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
                                                 <span>{bodyDeletion} </span>
                                                 <span>{bodyDeletion2}</span>
                                             </p>
+                                            {/* eslint-disable-next-line react/no-danger */}
                                             <p dangerouslySetInnerHTML={{ __html: loseAccessText }} />
                                         </div>
                                     </div>

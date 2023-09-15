@@ -1951,6 +1951,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         The implementation tries to detect which, if any changes, actually need to be saved and thus won't version
         the definition, structure, nor course if they didn't change.
         """
+
         partitioned_fields = self.partition_xblock_fields_by_scope(block)
         definition_locator = getattr(block, "definition_locator", None)
         if definition_locator is None and not allow_not_found:
@@ -3287,7 +3288,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         Create the proper runtime for this course
         """
         services = self.services
-        services["partitions"] = PartitionService(course_entry.course_key)
+        # Only the CourseBlock can have user partitions. Therefore, creating the PartitionService with the library key
+        # instead of the course key does not work. The XBlock validation in Studio fails with the following message:
+        # "This component's access settings refer to deleted or invalid group configurations.".
+        if not isinstance(course_entry.course_key, LibraryLocator):
+            services["partitions"] = PartitionService(course_entry.course_key)
 
         return CachingDescriptorSystem(
             modulestore=self,

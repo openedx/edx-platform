@@ -110,7 +110,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-16 20:42+0000\n"
+"POT-Creation-Date: 2023-08-27 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2018,2020-2021,2023\n"
 "Language-Team: Turkish (Turkey) (http://app.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
@@ -183,6 +183,7 @@ msgstr "Sil"
 #: cms/static/js/views/validation.js
 #: common/static/common/js/components/utils/view_utils.js
 #: lms/static/js/Markdown.Editor.js
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: xmodule/js/src/html/edit.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
@@ -246,6 +247,7 @@ msgstr "Dosya Seç"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/course_info_update.js
+#: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js cms/static/js/views/tabs.js
 #: lms/static/js/Markdown.Editor.js xmodule/js/src/html/edit.js
 #: common/static/common/templates/discussion/templates.underscore
@@ -2539,11 +2541,9 @@ msgstr "Aşağıdaki kullanıcılar başarıyla kaydedildi:"
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"allowed to enroll once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be allowed to enroll once they register:"
 msgstr ""
-"Aşağıdaki kullanıcılara kayıt e-postaları başarıyla gönderildi. Kayıt "
-"bilgilerini girdikten sonra sonra kayıt yapmalarına izin verilecek:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -2555,11 +2555,9 @@ msgstr ""
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"enrolled once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be enrolled once they register:"
 msgstr ""
-"Aşağıdaki kullanıcılara kayıt e-postaları başarıyla gönderildi. Kayıt "
-"bilgilerini girdikten sonra sonra kayıtları yapılacaktır:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -3030,6 +3028,10 @@ msgid ""
 msgstr ""
 "Bağlantılar talep geldiğinde oluşturulur ve öğrenci bilgilerinin hassas "
 "durumu nedeniyle 5 dakika içinde zaman aşımına uğrar."
+
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
+msgid "You have access to the {enterpriseName} dashboard"
+msgstr ""
 
 #: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 msgid ""
@@ -6382,6 +6384,52 @@ msgstr ""
 msgid "Are you sure you want to delete this update?"
 msgstr "Bu güncellemeyi silmek istediğinize emin misiniz?"
 
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "Copying"
+msgstr "Kopyalıyor"
+
+#: cms/static/js/views/course_outline.js
+msgid "Copy of '{componentDisplayName}'"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "Pasting"
+msgstr "Yapıştırıyor"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "Some errors occurred"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "The following required files could not be added to the course:"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "You may need to update a file(s) manually"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid ""
+"The following files already exist in this course but don't match the version"
+" used by the component you pasted:"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "New files were added to this course's Files & Uploads"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "The following required files were imported to this course:"
+msgstr ""
+
 #: cms/static/js/views/course_rerun.js
 msgid "Create Re-run"
 msgstr "Yeniden Çalıştırma Oluştur"
@@ -6807,45 +6855,11 @@ msgstr "Ders Taslağı"
 msgid "Date added"
 msgstr "Tarih eklendi"
 
-#: cms/static/js/views/pages/container.js
-msgid "Pasting"
-msgstr "Yapıştırıyor"
-
-#: cms/static/js/views/pages/container.js
-msgid "Some errors occurred"
-msgstr ""
-
-#: cms/static/js/views/pages/container.js
-msgid "The following required files could not be added to the course:"
-msgstr ""
-
-#: cms/static/js/views/pages/container.js
-msgid "You may need to update a file(s) manually"
-msgstr ""
-
-#: cms/static/js/views/pages/container.js
-msgid ""
-"The following files already exist in this course but don't match the version"
-" used by the component you pasted:"
-msgstr ""
-
-#: cms/static/js/views/pages/container.js
-msgid "New files were added to this course's Files & Uploads"
-msgstr ""
-
-#: cms/static/js/views/pages/container.js
-msgid "The following required files were imported to this course:"
-msgstr ""
-
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
 msgid "Editing access for: {title}"
 msgstr "{title} için erişim düzenleniyor"
-
-#: cms/static/js/views/pages/container.js
-msgid "Copying"
-msgstr "Kopyalıyor"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
@@ -7437,6 +7451,7 @@ msgstr "{beta_language} dili çevirilerine yardım et"
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
+#: cms/templates/js/course-outline.underscore
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Actions"
 msgstr "Eylemler"
@@ -10518,6 +10533,10 @@ msgid "Configure"
 msgstr "Yapılandırma"
 
 #: cms/templates/js/course-outline.underscore
+msgid "Copy to Clipboard"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 msgid "Duplicate"
 msgstr "Kopyasını Çıkar"
 
@@ -10562,6 +10581,13 @@ msgid "Subsection is hidden after due date"
 msgstr "Altbölüm şu tarihten sonra gizlenecek"
 
 #: cms/templates/js/course-outline.underscore
+#, python-format
+msgid ""
+"This subsection is configured as \\\"%(gradingType)s\\\", which doesn't "
+"exist in the current grading policy."
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 msgid "You haven't added any content to this course yet."
 msgstr "Henüz bir ders içeriği eklenmedi."
@@ -10571,6 +10597,19 @@ msgstr "Henüz bir ders içeriği eklenmedi."
 #, python-format
 msgid "Click to add a new %(xblock_type)s"
 msgstr "Yeni bir %(xblock_type)s eklemek için tıklayınız"
+
+#: cms/templates/js/course-outline.underscore
+#, python-format
+msgid "Paste %(xblock_type)s"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+msgid "From:"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+msgid "What's in my clipboard?"
+msgstr ""
 
 #: cms/templates/js/course-settings-learning-fields.underscore
 msgid "Learning Outcome"
@@ -11378,6 +11417,14 @@ msgstr ""
 " tarihi geçtikten ve üniteyi yayımladıktan sonra öğrenciler bu içeriği "
 "görebilecek. Sadece öğrencilerden açıkça gizlenen üniteler %(xblockType)s "
 "için bu seçenek kaldırıldıktan sonra görünmez kalacak."
+
+#: cms/templates/js/summary-configuration-editor.underscore
+msgid "Xpert unit summaries"
+msgstr ""
+
+#: cms/templates/js/summary-configuration-editor.underscore
+msgid "Enable summaries"
+msgstr ""
 
 #: cms/templates/js/team-member.underscore
 msgid "Current Role:"

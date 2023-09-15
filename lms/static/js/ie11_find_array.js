@@ -16,6 +16,7 @@ if (!Array.prototype.find) {
             o = Object(this);
 
             // 2. Let len be ? ToLength(? Get(O, "length")).
+            // eslint-disable-next-line no-bitwise
             len = o.length >>> 0;
 
             // 3. If IsCallable(predicate) is false, throw a TypeError exception.

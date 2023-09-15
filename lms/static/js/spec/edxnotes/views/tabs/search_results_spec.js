@@ -214,6 +214,7 @@ define([
         it('will not render header and footer if there are no notes', function() {
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this),
+                // eslint-disable-next-line no-shadow
                 notes = {
                     count: 0,
                     current_page: 1,
@@ -232,6 +233,7 @@ define([
         it('can go to a page number', function() {
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this),
+                // eslint-disable-next-line no-shadow
                 notes = Helpers.createNotesData(
                     {
                         numNotesToCreate: 10,

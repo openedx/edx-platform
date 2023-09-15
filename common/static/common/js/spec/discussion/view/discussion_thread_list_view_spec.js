@@ -263,6 +263,7 @@
                 return _.each([
                     {
                         val: '',
+                        // eslint-disable-next-line no-void
                         expectedGroupId: void 0
                     }, {
                         val: '1',

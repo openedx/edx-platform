@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 
+// eslint-disable-next-line no-unused-vars
 function LoggedOutUser({ platformName, loginQuery, supportEmail }) {
     return (
         <div>

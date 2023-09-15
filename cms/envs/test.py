@@ -95,8 +95,6 @@ STATICFILES_DIRS += [
 STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
 STATIC_URL = "/static/"
 
-BLOCK_STRUCTURES_SETTINGS['PRUNING_ACTIVE'] = True
-
 # Update module store settings per defaults for tests
 update_module_store_settings(
     MODULESTORE,
@@ -305,9 +303,9 @@ VIDEO_IMAGE_SETTINGS = dict(
     VIDEO_IMAGE_MIN_BYTES=2 * 1024,       # 2 KB
     STORAGE_KWARGS=dict(
         location=MEDIA_ROOT,
-        base_url=MEDIA_URL,
     ),
     DIRECTORY_PREFIX='video-images/',
+    BASE_URL=MEDIA_URL,
 )
 VIDEO_IMAGE_DEFAULT_FILENAME = 'default_video_image.png'
 

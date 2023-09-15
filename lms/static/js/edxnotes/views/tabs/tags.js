@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-shadow-restricted-names
 (function(define, undefined) {
     'use strict';
 
@@ -94,6 +95,7 @@
 
                     _.each(sortedTagNames, function(tagName) {
                         noteGroup = notesByTag[tagName];
+                        // eslint-disable-next-line no-shadow
                         var tagTitle = interpolate_text(
                             '{tagName} ({numberOfNotesWithTag})',
                             {tagName: tagName, numberOfNotesWithTag: noteGroup.length}

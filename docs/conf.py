@@ -153,7 +153,7 @@ html_theme_options = {
         These works by
             <a
                 xmlns:cc="https://creativecommons.org/ns#"
-                href="https://openedx.org"
+                href="https://axim.org/"
                 property="cc:attributionName"
                 rel="cc:attributionURL"
             >Axim Collaborative, Inc</a>

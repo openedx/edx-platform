@@ -30,6 +30,7 @@ class MultiselectDropdown extends React.Component {
         document.removeEventListener('keydown', this.handleKeydown, false);
     }
 
+    // eslint-disable-next-line react/sort-comp
     findOption(data) {
         return this.props.options.find((o) => o.value == data || o.display_name == data);
     }
@@ -45,6 +46,7 @@ class MultiselectDropdown extends React.Component {
     }
 
     handleButtonClick(e) {
+        // eslint-disable-next-line react/no-access-state-in-setstate
         this.setState({open: !this.state.open});
     }
 
@@ -93,6 +95,7 @@ class MultiselectDropdown extends React.Component {
 
     renderUnselect() {
         return this.props.selected.length > 0 && (
+            // eslint-disable-next-line react/button-has-type
             <button id="unselect-button" disabled={this.props.disabled} aria-label="Clear all selected" onClick={this.handleRemoveAllClick}>{gettext('Clear all')}</button>
         );
     }
@@ -105,7 +108,9 @@ class MultiselectDropdown extends React.Component {
         const options = this.props.options.map((option, index) => {
             const checked = this.props.selected.includes(option.value);
             return (
+                // eslint-disable-next-line react/no-array-index-key
                 <div key={index} id={`${option.value}-option-container`} className="option-container">
+                    {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
                     <label className="option-label">
                         <input id={`${option.value}-option-checkbox`} className="option-checkbox" type="checkbox" value={option.value} checked={checked} onChange={this.handleOptionClick} />
                         <span className="pl-2">{option.display_name}</span>
@@ -141,6 +146,7 @@ class MultiselectDropdown extends React.Component {
             >
                 <label id="multiselect-dropdown-label" htmlFor="multiselect-dropdown">{this.props.label}</label>
                 <div className="form-control d-flex">
+                    {/* eslint-disable-next-line react/button-has-type */}
                     <button className="multiselect-dropdown-button" disabled={this.props.disabled} id="multiselect-dropdown-button" ref={this.setButtonRef} aria-haspopup="true" aria-expanded={this.state.open} aria-labelledby="multiselect-dropdown-label multiselect-dropdown-button" onClick={this.handleButtonClick}>
                         {this.renderSelected()}
                     </button>
@@ -154,12 +160,17 @@ class MultiselectDropdown extends React.Component {
     }
 }
 
+// eslint-disable-next-line import/prefer-default-export
 export {MultiselectDropdown};
 
 MultiselectDropdown.propTypes = {
+    // eslint-disable-next-line react/require-default-props
     label: PropTypes.string,
+    // eslint-disable-next-line react/require-default-props
     emptyLabel: PropTypes.string,
+    // eslint-disable-next-line react/forbid-prop-types
     options: PropTypes.array.isRequired,
+    // eslint-disable-next-line react/forbid-prop-types
     selected: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
 };

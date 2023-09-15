@@ -74,8 +74,10 @@
 
             getEnterpriseFromUrl: function(url) {
                 var regex;
+                // eslint-disable-next-line prefer-regex-literals
                 regex = RegExp('/enterprise/.*/course/.*/enroll');
                 if (typeof url !== 'string' || !regex.test(url)) {
+                    // eslint-disable-next-line no-void
                     return void 0;
                 }
                 return url.split('/')[2];

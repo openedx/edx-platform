@@ -18,6 +18,7 @@ class ProgramCardView extends Backbone.View {
                 };
             },
         };
+        // eslint-disable-next-line prefer-object-spread
         super(Object.assign({}, defaults, options));
     }
 
@@ -38,6 +39,7 @@ class ProgramCardView extends Backbone.View {
 
     render() {
         const orgList = this.model.get('authoring_organizations').map(org => gettext(org.key));
+        // eslint-disable-next-line no-undef
         const data = $.extend(
             this.model.toJSON(),
             this.getProgramProgress(),

@@ -1,5 +1,6 @@
 import * as Time from 'time.js';
 
+// eslint-disable-next-line no-shadow-restricted-names
 (function(undefined) {
     'use strict';
 

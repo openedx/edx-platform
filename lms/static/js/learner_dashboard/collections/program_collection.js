@@ -6,6 +6,7 @@ class ProgramCollection extends Backbone.Collection {
         const defaults = {
             model: Program,
         };
+        // eslint-disable-next-line prefer-object-spread
         super(models, Object.assign({}, defaults, options));
     }
 }

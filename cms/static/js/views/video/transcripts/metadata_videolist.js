@@ -223,8 +223,10 @@ define(
                 }
 
                 if (this.$extraVideosBar.hasClass('is-visible')) {
+                    // eslint-disable-next-line prefer-spread
                     this.closeExtraVideosBar.apply(this, arguments);
                 } else {
+                    // eslint-disable-next-line prefer-spread
                     this.openExtraVideosBar.apply(this, arguments);
                 }
             },

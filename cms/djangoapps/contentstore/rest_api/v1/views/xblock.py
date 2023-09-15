@@ -1,4 +1,6 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+"""
+Public rest API endpoints for the Studio Content API.
+"""
 import logging
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, CreateAPIView
 from django.views.decorators.csrf import csrf_exempt
@@ -20,7 +22,7 @@ handle_xblock = view_handlers.handle_xblock
 @view_auth_classes()
 class XblockView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAPIView):
     """
-    public rest API endpoint for the Studio Content API.
+    Public rest API endpoints for the Studio Content API.
     course_key: required argument, needed to authorize course authors.
     usage_key_string (optional):
     xblock identifier, for example in the form of "block-v1:<course id>+type@<type>+block@<block id>"

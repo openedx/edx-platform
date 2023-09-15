@@ -38,6 +38,7 @@ function($, _, Backbone, gettext, IframeUtils, TemplateUtils, ViewUtils) {
             if (!Math.trunc) {
                 Math.trunc = function(v) {
                     v = +v; // eslint-disable-line no-param-reassign
+                    // eslint-disable-next-line no-mixed-operators, no-nested-ternary
                     return (v - v % 1) || (!isFinite(v) || v === 0 ? v : v < 0 ? -0 : 0);
                 };
             }
@@ -45,7 +46,7 @@ function($, _, Backbone, gettext, IframeUtils, TemplateUtils, ViewUtils) {
 
             var _this = this;
             // xss-lint: disable=javascript-jquery-insertion
-            this.render = _.wrap(this.render, function(render, options) {
+            this.render = _.wrap(this.render, function(render, options) { // eslint-disable-line no-shadow
                 _this.beforeRender();
                 render(options);
                 _this.afterRender();

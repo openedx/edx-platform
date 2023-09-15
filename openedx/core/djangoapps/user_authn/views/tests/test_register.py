@@ -20,7 +20,6 @@ from social_django.models import Partial, UserSocialAuth
 from testfixtures import LogCapture
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
 
-from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangoapps.user_api.accounts import (
@@ -49,7 +48,6 @@ from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (
 from openedx.core.djangoapps.user_api.tests.test_constants import SORTED_COUNTRIES
 from openedx.core.djangoapps.user_api.tests.test_helpers import TestCaseForm
 from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
-from openedx.core.djangoapps.user_authn.views.register import REGISTRATION_FAILURE_LOGGING_FLAG
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.api import test_utils
 from common.djangoapps.student.helpers import authenticate_new_user
@@ -293,39 +291,6 @@ class RegistrationViewValidationErrorTest(
             {
                 "name": [{"user_message": 'Enter a valid name'}],
                 "error_code": "validation-error"
-            }
-        )
-
-    @override_waffle_flag(REGISTRATION_FAILURE_LOGGING_FLAG, True)
-    def test_registration_failure_logging(self):
-        # Register a user
-        response = self.client.post(self.url, {
-            "email": self.EMAIL,
-            "name": self.NAME,
-            "username": self.USERNAME,
-            "password": self.PASSWORD,
-            "honor_code": "true",
-        })
-        self.assertHttpOK(response)
-
-        # Try to create a second user with the same email address
-        response = self.client.post(self.url, {
-            "email": self.EMAIL,
-            "name": "Someone Else",
-            "username": "someone_else",
-            "password": self.PASSWORD,
-            "honor_code": "true",
-        })
-
-        assert response.status_code == 409
-        response_json = json.loads(response.content.decode('utf-8'))
-        self.assertDictEqual(
-            response_json,
-            {
-                "email": [{
-                    "user_message": AUTHN_EMAIL_CONFLICT_MSG,
-                }],
-                "error_code": "duplicate-email"
             }
         )
 
@@ -2273,6 +2238,12 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
             HTTP_ACCEPT='*/*',
         )
         self._assert_redirect_url(response, expected_redirect)
+        assert response.status_code == 200
+
+        # Check that authenticated user details are also returned in
+        # the response for successful registration
+        decoded_response = json.loads(response.content.decode('utf-8'))
+        assert decoded_response['authenticated_user'] == {'username': self.USERNAME, 'user_id': 1}
 
     @mock.patch('openedx.core.djangoapps.user_authn.views.register._record_is_marketable_attribute')
     def test_logs_for_error_when_setting_is_marketable_attribute(self, set_is_marketable_attr):

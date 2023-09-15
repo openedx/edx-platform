@@ -1,9 +1,9 @@
 """
 Common utility functions useful throughout the contentstore
 """
-
-from collections import defaultdict
+import configparser
 import logging
+from collections import defaultdict
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from uuid import uuid4
@@ -13,6 +13,7 @@ from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils import translation
 from django.utils.translation import gettext as _
+from help_tokens.core import HelpUrlExpert
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocator
@@ -23,10 +24,11 @@ from pytz import UTC
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.toggles import exam_setting_view_enabled
+from common.djangoapps.course_action_state.models import CourseRerunUIStateManager
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.student import auth
-from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
+from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access, STUDIO_EDIT_ROLES
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
@@ -58,6 +60,7 @@ from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from cms.djangoapps.contentstore.toggles import (
+    split_library_view_on_dashboard,
     use_new_advanced_settings_page,
     use_new_course_outline_page,
     use_new_export_page,
@@ -67,12 +70,13 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_home_page,
     use_new_import_page,
     use_new_schedule_details_page,
+    use_new_text_editor,
     use_new_unit_page,
     use_new_updates_page,
+    use_new_video_editor,
     use_new_video_uploads_page,
     use_new_custom_pages,
 )
-from cms.djangoapps.contentstore.toggles import use_new_text_editor, use_new_video_editor
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
@@ -1323,6 +1327,35 @@ def get_course_settings(request, course_key, course_block):
     return settings_context
 
 
+def get_course_team(auth_user, course_key, user_perms):
+    """
+    Utils is used to get context of all CMS users who are editors for the specified course.
+    It is used for both DRF and django views.
+    """
+
+    from cms.djangoapps.contentstore.views.user import user_with_role
+
+    course_block = modulestore().get_course(course_key)
+    instructors = set(CourseInstructorRole(course_key).users_with_role())
+    # the page only lists staff and assumes they're a superset of instructors. Do a union to ensure.
+    staff = set(CourseStaffRole(course_key).users_with_role()).union(instructors)
+
+    formatted_users = []
+    for user in instructors:
+        formatted_users.append(user_with_role(user, 'instructor'))
+    for user in staff - instructors:
+        formatted_users.append(user_with_role(user, 'staff'))
+
+    course_team_context = {
+        'context_course': course_block,
+        'show_transfer_ownership_hint': auth_user in instructors and len(instructors) == 1,
+        'users': formatted_users,
+        'allow_actions': bool(user_perms & STUDIO_EDIT_ROLES),
+    }
+
+    return course_team_context
+
+
 def get_course_grading(course_key):
     """
     Utils is used to get context of course grading.
@@ -1343,6 +1376,121 @@ def get_course_grading(course_key):
     }
 
     return grading_context
+
+
+def get_help_urls():
+    """
+    Utils is used to get help tokens urls.
+    """
+    ini = HelpUrlExpert.the_one()
+    ini.config = configparser.ConfigParser()
+    ini.config.read(ini.ini_file_name)
+    tokens = list(ini.config['pages'].keys())
+    help_tokens = {token: HelpUrlExpert.the_one().url_for_token(token) for token in tokens}
+    return help_tokens
+
+
+def get_home_context(request):
+    """
+    Utils is used to get context of course grading.
+    It is used for both DRF and django views.
+    """
+
+    from cms.djangoapps.contentstore.views.course import (
+        get_allowed_organizations,
+        get_allowed_organizations_for_libraries,
+        get_courses_accessible_to_user,
+        user_can_create_organizations,
+        _accessible_libraries_iter,
+        _get_course_creator_status,
+        _format_library_for_view,
+        _process_courses_list,
+        ENABLE_GLOBAL_STAFF_OPTIMIZATION,
+    )
+    from cms.djangoapps.contentstore.views.library import (
+        LIBRARY_AUTHORING_MICROFRONTEND_URL,
+        LIBRARIES_ENABLED,
+        should_redirect_to_library_authoring_mfe,
+        user_can_create_library,
+    )
+
+    optimization_enabled = GlobalStaff().has_user(request.user) and ENABLE_GLOBAL_STAFF_OPTIMIZATION.is_enabled()
+
+    org = request.GET.get('org', '') if optimization_enabled else None
+    courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
+    user = request.user
+    libraries = []
+    if not split_library_view_on_dashboard() and LIBRARIES_ENABLED:
+        libraries = _accessible_libraries_iter(request.user)
+
+    def format_in_process_course_view(uca):
+        """
+        Return a dict of the data which the view requires for each unsucceeded course
+        """
+        return {
+            'display_name': uca.display_name,
+            'course_key': str(uca.course_key),
+            'org': uca.course_key.org,
+            'number': uca.course_key.course,
+            'run': uca.course_key.run,
+            'is_failed': uca.state == CourseRerunUIStateManager.State.FAILED,
+            'is_in_progress': uca.state == CourseRerunUIStateManager.State.IN_PROGRESS,
+            'dismiss_link': reverse_course_url(
+                'course_notifications_handler',
+                uca.course_key,
+                kwargs={
+                    'action_state_id': uca.id,
+                },
+            ) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
+        }
+
+    split_archived = settings.FEATURES.get('ENABLE_SEPARATE_ARCHIVED_COURSES', False)
+    active_courses, archived_courses = _process_courses_list(courses_iter, in_process_course_actions, split_archived)
+    in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
+
+    home_context = {
+        'courses': active_courses,
+        'split_studio_home': split_library_view_on_dashboard(),
+        'archived_courses': archived_courses,
+        'in_process_course_actions': in_process_course_actions,
+        'libraries_enabled': LIBRARIES_ENABLED,
+        'redirect_to_library_authoring_mfe': should_redirect_to_library_authoring_mfe(),
+        'library_authoring_mfe_url': LIBRARY_AUTHORING_MICROFRONTEND_URL,
+        'libraries': [_format_library_for_view(lib, request) for lib in libraries],
+        'show_new_library_button': user_can_create_library(user) and not should_redirect_to_library_authoring_mfe(),
+        'user': user,
+        'request_course_creator_url': reverse('request_course_creator'),
+        'course_creator_status': _get_course_creator_status(user),
+        'rerun_creator_status': GlobalStaff().has_user(user),
+        'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
+        'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
+        'optimization_enabled': optimization_enabled,
+        'active_tab': 'courses',
+        'allowed_organizations': get_allowed_organizations(user),
+        'allowed_organizations_for_libraries': get_allowed_organizations_for_libraries(user),
+        'can_create_organizations': user_can_create_organizations(user),
+    }
+
+    return home_context
+
+
+def get_course_rerun_context(course_key, course_block, user):
+    """
+    Utils is used to get context of course rerun.
+    It is used for both DRF and django views.
+    """
+
+    from cms.djangoapps.contentstore.views.course import _get_course_creator_status
+
+    course_rerun_context = {
+        'source_course_key': course_key,
+        'display_name': course_block.display_name,
+        'user': user,
+        'course_creator_status': _get_course_creator_status(user),
+        'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False)
+    }
+
+    return course_rerun_context
 
 
 class StudioPermissionsService:

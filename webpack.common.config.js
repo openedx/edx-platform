@@ -24,8 +24,8 @@ var defineFooter = new RegExp('(' + defineCallFooter.source + ')|('
                              + defineDirectFooter.source + ')|('
                              + defineFancyFooter.source + ')', 'm');
 
-var staticRootLms = process.env.STATIC_ROOT_LMS || "./test_root/staticfiles";
-var staticRootCms = process.env.STATIC_ROOT_CMS || (staticRootLms + "/studio");
+var staticRootLms = process.env.STATIC_ROOT_LMS || './test_root/staticfiles';
+var staticRootCms = process.env.STATIC_ROOT_CMS || (staticRootLms + '/studio');
 
 var workerConfig = function() {
     try {
@@ -33,6 +33,7 @@ var workerConfig = function() {
             webworker: {
                 target: 'webworker',
                 context: __dirname,
+                // eslint-disable-next-line global-require
                 entry: require('../workers.json'),
                 output: {
                     filename: '[name].js',
@@ -76,7 +77,6 @@ module.exports = Merge.smart({
             // Studio
             Import: './cms/static/js/features/import/factories/import.js',
             CourseOrLibraryListing: './cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx',
-            LibrarySourcedBlockPicker: './xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx', // eslint-disable-line max-len
             'js/factories/textbooks': './cms/static/js/factories/textbooks.js',
             'js/factories/container': './cms/static/js/factories/container.js',
             'js/factories/context_course': './cms/static/js/factories/context_course.js',
@@ -132,7 +132,7 @@ module.exports = Merge.smart({
         },
 
         plugins: [
-            new webpack.ProgressPlugin(),  // report progress during compilation
+            new webpack.ProgressPlugin(), // report progress during compilation
             new webpack.NoEmitOnErrorsPlugin(),
             new webpack.NamedModulesPlugin(),
             new BundleTracker({
@@ -309,7 +309,7 @@ module.exports = Merge.smart({
                     test: /xblock\/runtime.v1/,
                     loader: 'exports-loader?window.XBlock!imports-loader?XBlock=xblock/core,this=>window'
                 },
-                /*******************************************************************************************************
+                /** *****************************************************************************************************
                 /* BUILT-IN XBLOCK ASSETS WITH GLOBAL DEFINITIONS:
                  *
                  * The monstrous list of globally-namespace modules below is the result of a JS build refactoring.
@@ -426,7 +426,7 @@ module.exports = Merge.smart({
                 },
                 /*
                  * END BUILT-IN XBLOCK ASSETS WITH GLOBAL DEFINITIONS
-                 ******************************************************************************************************/
+                 ***************************************************************************************************** */
                 {
                     test: /codemirror/,
                     loader: 'exports-loader?window.CodeMirror'
@@ -499,6 +499,7 @@ module.exports = Merge.smart({
                 // https://github.com/webpack/webpack/issues/304#issuecomment-272150177
                 // (I've tried every other suggestion solution on that page, this
                 // was the only one that worked.)
+                // eslint-disable-next-line no-path-concat
                 sinon: __dirname + '/node_modules/sinon/pkg/sinon.js',
                 hls: 'hls.js/dist/hls.js'
             },

@@ -148,20 +148,16 @@ def get_courses_completion_status(username, course_run_ids):
                       exc
                       )
         return [], True
-    # Yes, This is course_credentials_data. The key is named status but
-    # it contains all the courses data from credentials.
     log.info("Course completion status response for user [%s] for course_run_ids [%s] is [%s]",
              username,
              course_run_ids,
              course_completion_response)
+    # Yes, This is course_credentials_data. The key is named status but
+    # it contains all the courses data from credentials.
     course_credentials_data = course_completion_response.get('status', [])
     if course_credentials_data is not None:
         filtered_records = [course_data['course_run']['key'] for course_data in course_credentials_data if
                             course_data['course_run']['key'] in course_run_ids and
                             course_data['status'] == settings.CREDENTIALS_COURSE_COMPLETION_STATE]
-        log.info("Filtered course completion status response for user [%s] for course_run_ids [%s] is [%s]",
-                 username,
-                 course_run_ids,
-                 filtered_records)
         return filtered_records, False
     return [], False

@@ -6,6 +6,7 @@
     // Note that when the optimizer executes this code, window will not be defined.
     if (window) {
         var defineDependency = function(globalName, name, noShim) {
+            // eslint-disable-next-line no-shadow
             var getGlobalValue = function(name) {
                     var globalNamePath = name.split('.'),
                         result = window,

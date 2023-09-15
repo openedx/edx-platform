@@ -20,12 +20,14 @@ const exGrades = [
 ];
 
 class GradeTable extends React.Component {
+    // eslint-disable-next-line no-useless-constructor
     constructor(props) {
         super(props);
     }
 
     getTableGroup(type, groupIndex) {
         const {grades} = this.props;
+        // eslint-disable-next-line array-callback-return
         const groupData = grades.filter(value => {
             if (value.assignment_type === type) {
                 return value;
@@ -38,6 +40,7 @@ class GradeTable extends React.Component {
         }, index) => {
             const label = multipleAssignments ? `${assignment_type} ${index + 1}` : assignment_type;
             return (
+                // eslint-disable-next-line react/no-array-index-key
                 <tr key={index}>
                     <td>{label}</td>
                     <td>{passing_grade}/{total_possible}</td>
@@ -74,7 +77,9 @@ class GradeTable extends React.Component {
 }
 
 GradeTable.propTypes = {
+    // eslint-disable-next-line react/forbid-prop-types
     assignmentTypes: PropTypes.array.isRequired,
+    // eslint-disable-next-line react/forbid-prop-types
     grades: PropTypes.array.isRequired,
     passingGrade: PropTypes.number.isRequired,
     percentGrade: PropTypes.number.isRequired

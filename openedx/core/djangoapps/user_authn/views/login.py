@@ -469,7 +469,7 @@ def enterprise_selection_page(request, user, next_url):
 
     response = get_enterprise_learner_data_from_api(user)
     if response and len(response) > 1:
-        redirect_url = reverse('enterprise_select_active') + '/?success_url=' + next_url
+        redirect_url = reverse('enterprise_select_active') + '/?success_url=' + urllib.parse.quote(next_url)
 
         # Check to see if next url has an enterprise in it. In this case if user is associated with
         # that enterprise, activate that enterprise and bypass the selection page.

@@ -77,6 +77,7 @@
                     this.volumeSlider.slider('destroy');
                     this.state.el.find('iframe').removeAttr('tabindex');
                     this.a11y.destroy();
+                    // eslint-disable-next-line no-multi-assign
                     this.cookie = this.a11y = null;
                     this.closeMenu();
 
@@ -343,6 +344,7 @@
                     var KEY = $.ui.keyCode,
                         keyCode = event.keyCode;
 
+                    // eslint-disable-next-line default-case
                     switch (keyCode) {
                     case KEY.UP:
                     // Shift + Arrows keyboard shortcut might be used by
@@ -392,6 +394,7 @@
                     var KEY = $.ui.keyCode,
                         keyCode = event.keyCode;
 
+                    // eslint-disable-next-line default-case
                     switch (keyCode) {
                     case KEY.ENTER:
                     case KEY.SPACE:

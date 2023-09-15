@@ -135,6 +135,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
                 sectionsData[1].fields[2]
             ];
             _.each(dropdownFields, function(field) {
+                // eslint-disable-next-line no-shadow
                 var view = field.view;
                 FieldViewsSpecHelpers.verifyDropDownField(view, {
                     title: view.options.title,

@@ -220,19 +220,6 @@ class NotificationPreferenceSyncManagerTest(ModuleStoreTestCase):
         preference_non_editable = preferences[self.default_app_name]['non_editable'].get('core', [])
         assert preference_non_editable == []
 
-    def test_notification_type_info_updates(self):
-        """
-        Preference info updates when default info is update
-        """
-        current_config_version = get_course_notification_preference_config_version()
-        new_info = "NEW INFO"
-        base_notification.COURSE_NOTIFICATION_TYPES[self.default_type_name]['info'] = new_info
-        self._set_notification_config_version(current_config_version + 1)
-        new_config = CourseNotificationPreference.get_updated_user_course_preferences(self.user, self.course.id)
-        preferences = new_config.notification_preference_config
-        notification_type = preferences[self.default_app_name]['notification_types'][self.default_type_name]
-        assert notification_type['info'] == new_info
-
     def test_notification_type_in_core(self):
         """
         Tests addition/removal of core in notification type
@@ -266,7 +253,7 @@ class NotificationPreferenceValidationTest(ModuleStoreTestCase):
         notification_apps = base_notification.COURSE_NOTIFICATION_APPS
         assert "" not in notification_apps.keys()
         for app_data in notification_apps.values():
-            assert isinstance(app_data['core_info'], str)
+            assert 'core_info' in app_data.keys()
             assert isinstance(app_data['non_editable'], list)
             for key in bool_keys:
                 assert isinstance(app_data[key], bool)
@@ -276,7 +263,7 @@ class NotificationPreferenceValidationTest(ModuleStoreTestCase):
         Tests if COURSE_NOTIFICATION_TYPES constant has all required keys with valid
         data type for core notification type
         """
-        str_keys = ['notification_app', 'name', 'info', 'email_template']
+        str_keys = ['notification_app', 'name', 'email_template']
         notification_types = base_notification.COURSE_NOTIFICATION_TYPES
         assert "" not in notification_types.keys()
         for notification_type in notification_types.values():

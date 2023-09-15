@@ -14,15 +14,21 @@ click==8.1.6
     #   nltk
 codejail-includes==1.0.0
     # via -r requirements/edx-sandbox/py38.in
+contourpy==1.1.0
+    # via matplotlib
 cryptography==38.0.4
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
 cycler==0.11.0
     # via matplotlib
-joblib==1.3.1
+fonttools==4.42.1
+    # via matplotlib
+importlib-resources==6.0.1
+    # via matplotlib
+joblib==1.3.2
     # via nltk
-kiwisolver==1.4.4
+kiwisolver==1.4.5
     # via matplotlib
 lxml==4.9.3
     # via
@@ -32,10 +38,8 @@ markupsafe==2.1.3
     # via
     #   chem
     #   openedx-calc
-matplotlib==3.3.4
-    # via
-    #   -c requirements/edx-sandbox/../constraints.txt
-    #   -r requirements/edx-sandbox/py38.in
+matplotlib==3.7.2
+    # via -r requirements/edx-sandbox/py38.in
 mpmath==1.3.0
     # via sympy
 networkx==3.1
@@ -47,18 +51,21 @@ nltk==3.8.1
 numpy==1.22.4
     # via
     #   chem
+    #   contourpy
     #   matplotlib
     #   openedx-calc
     #   scipy
 openedx-calc==3.0.1
     # via -r requirements/edx-sandbox/py38.in
+packaging==23.1
+    # via matplotlib
 pillow==9.5.0
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   matplotlib
 pycparser==2.21
     # via cffi
-pyparsing==3.1.0
+pyparsing==3.0.9
     # via
     #   -r requirements/edx-sandbox/py38.in
     #   chem
@@ -68,7 +75,7 @@ python-dateutil==2.8.2
     # via matplotlib
 random2==1.0.1
     # via -r requirements/edx-sandbox/py38.in
-regex==2023.6.3
+regex==2023.8.8
     # via nltk
 scipy==1.7.3
     # via
@@ -85,5 +92,7 @@ sympy==1.12
     # via
     #   -r requirements/edx-sandbox/py38.in
     #   openedx-calc
-tqdm==4.65.0
+tqdm==4.66.1
     # via nltk
+zipp==3.16.2
+    # via importlib-resources

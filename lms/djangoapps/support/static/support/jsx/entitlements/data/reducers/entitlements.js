@@ -1,5 +1,6 @@
 import { entitlementActions } from '../constants/actionTypes';
 
+// eslint-disable-next-line default-param-last
 const entitlements = (state = [], action) => {
     switch (action.type) {
     case entitlementActions.fetch.SUCCESS:

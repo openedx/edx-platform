@@ -23,6 +23,7 @@ class CourseEntitlementView extends Backbone.View {
                 'click .popover-dismiss': 'hideDialog',
             },
         };
+        // eslint-disable-next-line prefer-object-spread
         super(Object.assign({}, defaults, options));
     }
 
@@ -51,16 +52,23 @@ class CourseEntitlementView extends Backbone.View {
 
         // Grab elements from the parent card that work with this view
         this.$parentEl = options.$parentEl; // Containing course card (must be a backbone view root el)
+        // eslint-disable-next-line no-undef
         this.$enterCourseBtn = $(options.enterCourseBtn); // Button link to course home page
+        // eslint-disable-next-line no-undef
         this.$courseCardMessages = $(options.courseCardMessages); // Additional session messages
+        // eslint-disable-next-line no-undef
         this.$courseTitleLink = $(options.courseTitleLink); // Title link to course home page
+        // eslint-disable-next-line no-undef
         this.$courseImageLink = $(options.courseImageLink); // Image link to course home page
+        // eslint-disable-next-line no-undef
         this.$policyMsg = $(options.policyMsg); // Message for policy information
 
         // Bind action elements with associated events to objects outside this view
         this.$dateDisplayField = this.$parentEl ? this.$parentEl.find(options.dateDisplayField)
+            // eslint-disable-next-line no-undef
             : $(options.dateDisplayField); // Displays current session dates
         this.$triggerOpenBtn = this.$parentEl ? this.$parentEl.find(options.triggerOpenBtn)
+            // eslint-disable-next-line no-undef
             : $(options.triggerOpenBtn); // Opens/closes session selection view
         this.$triggerOpenBtn.on('click', this.toggleSessionSelectionPanel.bind(this));
 
@@ -77,14 +85,17 @@ class CourseEntitlementView extends Backbone.View {
 
     postRender() {
     // Close any visible popovers on click-away
+        // eslint-disable-next-line no-undef
         $(document).on('click', (e) => {
             if (this.$('.popover:visible').length
+          // eslint-disable-next-line no-undef
           && !($(e.target).closest('.enroll-btn-initial, .popover').length)) {
                 this.hideDialog(this.$('.enroll-btn-initial'));
             }
         });
 
         // Initialize focus to cancel button on popover load
+        // eslint-disable-next-line no-undef
         $(document).on('shown.bs.popover', () => {
             this.$('.final-confirmation-btn:first').focus();
         });
@@ -110,6 +121,7 @@ class CourseEntitlementView extends Backbone.View {
             HtmlUtils.HTML('<span class="fa fa-spinner fa-spin" aria-hidden="true"></span>'),
         );
 
+        // eslint-disable-next-line no-undef
         $.ajax({
             type: isLeavingSession ? 'DELETE' : 'POST',
             url: this.enrollUrl,
@@ -330,6 +342,7 @@ class CourseEntitlementView extends Backbone.View {
 
     removeDialog(el) {
     /* Removes the Bootstrap v4 dialog modal from the update session enrollment button. */
+        // eslint-disable-next-line no-undef
         const $el = el instanceof jQuery ? el : this.$('.enroll-btn-initial');
         if (this.$('popover').length) {
             $el.popover('dispose');
@@ -338,6 +351,7 @@ class CourseEntitlementView extends Backbone.View {
 
     hideDialog(el, returnFocus) {
     /* Hides the modal if it is visible without removing it from the DOM. */
+        // eslint-disable-next-line no-undef
         const $el = el instanceof jQuery ? el : this.$('.enroll-btn-initial');
         if (this.$('.popover:visible').length) {
             $el.popover('hide');
@@ -350,7 +364,9 @@ class CourseEntitlementView extends Backbone.View {
     handleVerificationPopoverA11y(e) {
     /* Ensure that the second step verification popover is treated as an a11y compliant dialog */
         let $nextButton;
+        // eslint-disable-next-line no-undef
         const $verificationOption = $(e.target);
+        // eslint-disable-next-line no-undef
         const openButton = $(e.target).closest('.course-entitlement-selection-container')
             .find('.enroll-btn-initial');
         if (e.key === 'Tab') {

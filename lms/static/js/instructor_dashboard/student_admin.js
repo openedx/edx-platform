@@ -674,6 +674,7 @@
             this.$request_err_ee.empty();
             this.$request_response_error_all.empty();
             return function() {
+                // eslint-disable-next-line no-void
                 return cb != null ? cb.apply(this, arguments) : void 0;
             };
         };

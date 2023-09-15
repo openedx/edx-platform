@@ -49,6 +49,7 @@ const parseEntitlementData = (entitlements, ecommerceUrl, openReissueForm) => en
     const {
         expiredAt, created, modified, orderNumber, enrollmentCourseRun,
     } = entitlement;
+    // eslint-disable-next-line prefer-object-spread
     return Object.assign({}, entitlement, {
         expiredAt: expiredAt ? moment(expiredAt).format('lll') : '',
         createdAt: moment(created).format('lll'),
@@ -66,6 +67,7 @@ const parseEntitlementData = (entitlements, ecommerceUrl, openReissueForm) => en
     });
 });
 
+// eslint-disable-next-line react/function-component-definition
 const EntitlementSupportTable = props => (
     <Table
         data={parseEntitlementData(props.entitlements, props.ecommerceUrl, props.openReissueForm)}

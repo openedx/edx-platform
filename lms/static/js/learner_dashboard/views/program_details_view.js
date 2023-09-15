@@ -7,10 +7,12 @@ import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 import CollectionListView from './collection_list_view';
 import CourseCardCollection from '../collections/course_card_collection';
 import CourseCardView from './course_card_view';
+// eslint-disable-next-line import/no-named-as-default, import/no-named-as-default-member
 import HeaderView from './program_header_view';
 import SidebarView from './program_details_sidebar_view';
 import AlertListView from './program_alert_list_view';
 
+// eslint-disable-next-line import/no-named-as-default, import/no-named-as-default-member
 import SubscriptionModel from '../models/program_subscription_model';
 
 import launchIcon from '../../../images/launch-icon.svg';
@@ -28,6 +30,7 @@ class ProgramDetailsView extends Backbone.View {
                 'click .js-subscription-cta': 'trackSubscriptionCTA',
             },
         };
+        // eslint-disable-next-line prefer-object-spread
         super(Object.assign({}, defaults, options));
     }
 
@@ -66,6 +69,7 @@ class ProgramDetailsView extends Backbone.View {
 
         this.render();
 
+        // eslint-disable-next-line no-undef
         const $courseUpsellButton = $('#program_dashboard_course_upsell_all_button');
         trackECommerceEvents.trackUpsellClick($courseUpsellButton, 'program_dashboard_program', {
             linkType: 'button',
@@ -107,6 +111,7 @@ class ProgramDetailsView extends Backbone.View {
             launchIcon,
             restartIcon,
         };
+        // eslint-disable-next-line no-undef
         data = $.extend(
             data,
             this.programModel.toJSON(),
@@ -140,6 +145,7 @@ class ProgramDetailsView extends Backbone.View {
                 el: '.js-course-list-remaining',
                 childView: CourseCardView,
                 collection: this.remainingCourseCollection,
+                // eslint-disable-next-line no-undef
                 context: $.extend(this.options, { collectionCourseStatus: 'remaining' }),
             }).render();
         }
@@ -149,6 +155,7 @@ class ProgramDetailsView extends Backbone.View {
                 el: '.js-course-list-completed',
                 childView: CourseCardView,
                 collection: this.completedCourseCollection,
+                // eslint-disable-next-line no-undef
                 context: $.extend(this.options, { collectionCourseStatus: 'completed' }),
             }).render();
         }
@@ -159,6 +166,7 @@ class ProgramDetailsView extends Backbone.View {
                 el: '.js-course-list-in-progress',
                 childView: CourseCardView,
                 collection: this.inProgressCourseCollection,
+                // eslint-disable-next-line no-undef
                 context: $.extend(
                     this.options,
                     { enrolled: gettext('Enrolled'), collectionCourseStatus: 'in_progress' },
@@ -179,8 +187,10 @@ class ProgramDetailsView extends Backbone.View {
             urls: this.options.urls,
         });
         let hasIframe = false;
+        // eslint-disable-next-line no-undef
         $('#live-tab').click(() => {
             if (!hasIframe) {
+                // eslint-disable-next-line no-undef
                 $('#live').html(HtmlUtils.HTML(this.options.live_fragment.iframe).toString());
                 hasIframe = true;
             }
@@ -194,8 +204,8 @@ class ProgramDetailsView extends Backbone.View {
         ];
         const isSomeCoursePurchasable = courseCollections.some((collection) => (
             collection.some((course) => (
-                course.get('upgrade_url') &&
-                !(course.get('expired') === true)
+                course.get('upgrade_url')
+                && !(course.get('expired') === true)
             ))
         ));
         const programPurchasedWithoutSubscription = (
@@ -224,8 +234,8 @@ class ProgramDetailsView extends Backbone.View {
                 });
             }
             if (
-                this.subscriptionModel.get('remainingDays') <= 7 &&
-                this.subscriptionModel.get('hasActiveTrial')
+                this.subscriptionModel.get('remainingDays') <= 7
+                && this.subscriptionModel.get('hasActiveTrial')
             ) {
                 alerts.trialEndingAlerts.push({
                     title: this.programModel.get('title'),
@@ -251,7 +261,7 @@ class ProgramDetailsView extends Backbone.View {
         if (state === 'active') {
             window.analytics.track(
                 'edx.bi.user.subscription.program-detail-page.manage.clicked',
-                this.subscriptionEventParams
+                this.subscriptionEventParams,
             );
         } else {
             const isNewSubscription = state !== 'inactive';
@@ -262,7 +272,7 @@ class ProgramDetailsView extends Backbone.View {
                     is_new_subscription: isNewSubscription,
                     is_trial_eligible: isNewSubscription,
                     ...this.subscriptionEventParams,
-                }
+                },
             );
         }
     }
@@ -271,7 +281,7 @@ class ProgramDetailsView extends Backbone.View {
         if (this.options.isSubscriptionEligible) {
             window.analytics.track(
                 'edx.bi.user.subscription.program-detail-page.viewed',
-                this.subscriptionEventParams
+                this.subscriptionEventParams,
             );
         }
     }

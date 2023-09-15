@@ -379,6 +379,7 @@
                 var count;
                 count = 0;
                 this.get('comments').each(function(comment) {
+                    // eslint-disable-next-line no-return-assign
                     return count += comment.getCommentsCount() + 1;
                 });
                 return count;

@@ -15,6 +15,7 @@ class SidebarView extends Backbone.View {
                 'click .js-subscription-upsell-cta ': 'trackSubscriptionUpsellCTA',
             },
         };
+        // eslint-disable-next-line prefer-object-spread
         super(Object.assign({}, defaults, options));
     }
 
@@ -42,7 +43,7 @@ class SidebarView extends Backbone.View {
 
     trackSubscriptionUpsellCTA() {
         window.analytics.track(
-            'edx.bi.user.subscription.program-dashboard.upsell.clicked'
+            'edx.bi.user.subscription.program-dashboard.upsell.clicked',
         );
     }
 }

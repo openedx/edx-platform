@@ -1,136 +1,136 @@
 module.exports = {
-    "entry": {
-        "AboutBlockDisplay": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/html/display.js",
-            "./xmodule/js/src/javascript_loader.js",
-            "./xmodule/js/src/collapsible.js",
-            "./xmodule/js/src/html/imageModal.js",
-            "./xmodule/js/common_static/js/vendor/draggabilly.js"
+    entry: {
+        AboutBlockDisplay: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/html/display.js',
+            './xmodule/js/src/javascript_loader.js',
+            './xmodule/js/src/collapsible.js',
+            './xmodule/js/src/html/imageModal.js',
+            './xmodule/js/common_static/js/vendor/draggabilly.js'
         ],
-        "AboutBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/html/edit.js"
+        AboutBlockEditor: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/html/edit.js'
         ],
-        "AnnotatableBlockDisplay": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/html/display.js",
-            "./xmodule/js/src/annotatable/display.js",
-            "./xmodule/js/src/javascript_loader.js",
-            "./xmodule/js/src/collapsible.js"
+        AnnotatableBlockDisplay: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/html/display.js',
+            './xmodule/js/src/annotatable/display.js',
+            './xmodule/js/src/javascript_loader.js',
+            './xmodule/js/src/collapsible.js'
         ],
-        "AnnotatableBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/raw/edit/xml.js"
+        AnnotatableBlockEditor: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/raw/edit/xml.js'
         ],
-        "ConditionalBlockDisplay": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/conditional/display.js",
-            "./xmodule/js/src/javascript_loader.js",
-            "./xmodule/js/src/collapsible.js"
+        ConditionalBlockDisplay: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/conditional/display.js',
+            './xmodule/js/src/javascript_loader.js',
+            './xmodule/js/src/collapsible.js'
         ],
-        "ConditionalBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/sequence/edit.js"
+        ConditionalBlockEditor: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/sequence/edit.js'
         ],
-        "CourseInfoBlockDisplay": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/html/display.js",
-            "./xmodule/js/src/javascript_loader.js",
-            "./xmodule/js/src/collapsible.js",
-            "./xmodule/js/src/html/imageModal.js",
-            "./xmodule/js/common_static/js/vendor/draggabilly.js"
+        CourseInfoBlockDisplay: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/html/display.js',
+            './xmodule/js/src/javascript_loader.js',
+            './xmodule/js/src/collapsible.js',
+            './xmodule/js/src/html/imageModal.js',
+            './xmodule/js/common_static/js/vendor/draggabilly.js'
         ],
-        "CourseInfoBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/html/edit.js"
+        CourseInfoBlockEditor: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/html/edit.js'
         ],
-        "CustomTagBlockDisplay": "./xmodule/js/src/xmodule.js",
-        "CustomTagBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/raw/edit/xml.js"
+        CustomTagBlockDisplay: './xmodule/js/src/xmodule.js',
+        CustomTagBlockEditor: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/raw/edit/xml.js'
         ],
-        "HtmlBlockDisplay": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/html/display.js",
-            "./xmodule/js/src/javascript_loader.js",
-            "./xmodule/js/src/collapsible.js",
-            "./xmodule/js/src/html/imageModal.js",
-            "./xmodule/js/common_static/js/vendor/draggabilly.js"
+        HtmlBlockDisplay: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/html/display.js',
+            './xmodule/js/src/javascript_loader.js',
+            './xmodule/js/src/collapsible.js',
+            './xmodule/js/src/html/imageModal.js',
+            './xmodule/js/common_static/js/vendor/draggabilly.js'
         ],
-        "HtmlBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/html/edit.js"
+        HtmlBlockEditor: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/html/edit.js'
         ],
-        "LTIBlockDisplay": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/lti/lti.js"
+        LTIBlockDisplay: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/lti/lti.js'
         ],
-        "LTIBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/raw/edit/metadata-only.js"
+        LTIBlockEditor: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/raw/edit/metadata-only.js'
         ],
-        "LibraryContentBlockDisplay": "./xmodule/js/src/xmodule.js",
-        "LibraryContentBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/vertical/edit.js"
+        LibraryContentBlockDisplay: './xmodule/js/src/xmodule.js',
+        LibraryContentBlockEditor: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/vertical/edit.js'
         ],
-        "PollBlockDisplay": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/javascript_loader.js",
-            "./xmodule/js/src/poll/poll.js",
-            "./xmodule/js/src/poll/poll_main.js"
+        PollBlockDisplay: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/javascript_loader.js',
+            './xmodule/js/src/poll/poll.js',
+            './xmodule/js/src/poll/poll_main.js'
         ],
-        "PollBlockEditor": "./xmodule/js/src/xmodule.js",
-        "ProblemBlockDisplay": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/javascript_loader.js",
-            "./xmodule/js/src/capa/display.js",
-            "./xmodule/js/src/collapsible.js",
-            "./xmodule/js/src/capa/imageinput.js",
-            "./xmodule/js/src/capa/schematic.js"
+        PollBlockEditor: './xmodule/js/src/xmodule.js',
+        ProblemBlockDisplay: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/javascript_loader.js',
+            './xmodule/js/src/capa/display.js',
+            './xmodule/js/src/collapsible.js',
+            './xmodule/js/src/capa/imageinput.js',
+            './xmodule/js/src/capa/schematic.js'
         ],
-        "ProblemBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/problem/edit.js"
+        ProblemBlockEditor: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/problem/edit.js'
         ],
-        "SequenceBlockDisplay": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/sequence/display.js"
+        SequenceBlockDisplay: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/sequence/display.js'
         ],
-        "SequenceBlockEditor": "./xmodule/js/src/xmodule.js",
-        "SplitTestBlockDisplay": "./xmodule/js/src/xmodule.js",
-        "SplitTestBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/sequence/edit.js"
+        SequenceBlockEditor: './xmodule/js/src/xmodule.js',
+        SplitTestBlockDisplay: './xmodule/js/src/xmodule.js',
+        SplitTestBlockEditor: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/sequence/edit.js'
         ],
-        "StaticTabBlockDisplay": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/html/display.js",
-            "./xmodule/js/src/javascript_loader.js",
-            "./xmodule/js/src/collapsible.js",
-            "./xmodule/js/src/html/imageModal.js",
-            "./xmodule/js/common_static/js/vendor/draggabilly.js"
+        StaticTabBlockDisplay: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/html/display.js',
+            './xmodule/js/src/javascript_loader.js',
+            './xmodule/js/src/collapsible.js',
+            './xmodule/js/src/html/imageModal.js',
+            './xmodule/js/common_static/js/vendor/draggabilly.js'
         ],
-        "StaticTabBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/html/edit.js"
+        StaticTabBlockEditor: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/html/edit.js'
         ],
-        "VideoBlockDisplay": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/video/10_main.js"
+        VideoBlockDisplay: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/video/10_main.js'
         ],
-        "VideoBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/tabs/tabs-aggregator.js"
+        VideoBlockEditor: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/tabs/tabs-aggregator.js'
         ],
-        "WordCloudBlockDisplay": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/assets/word_cloud/src/js/word_cloud.js"
+        WordCloudBlockDisplay: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/assets/word_cloud/src/js/word_cloud.js'
         ],
-        "WordCloudBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/raw/edit/metadata-only.js"
+        WordCloudBlockEditor: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/raw/edit/metadata-only.js'
         ]
     }
 };
