@@ -31,7 +31,7 @@ def course_enrollment_post_save(signal, sender, enrollment, metadata, **kwargs):
                 course_id=enrollment.course.course_key
             )
         except IntegrityError:
-            log.info(f'CourseNotificationPreference already exists for user {enrollment.user} '
+            log.info(f'CourseNotificationPreference already exists for user {enrollment.user.id} '
                      f'and course {enrollment.course.course_key}')
 
 
