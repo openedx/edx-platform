@@ -91,11 +91,11 @@ class CourseEnrollmentListViewTest(ModuleStoreTestCase):
     def test_course_enrollment_api_permission(self):
         """
         Calls api without login.
-        Check is 403 is returned
+        Check is 401 is returned
         """
         url = reverse('enrollment-list')
         response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
@@ -241,7 +241,7 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         Test get user notification preference without login.
         """
         response = self.client.get(self.path)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     @mock.patch("eventtracking.tracker.emit")
     def test_get_user_notification_preference(self, mock_emit):
@@ -411,13 +411,13 @@ class NotificationListAPIViewTest(APITestCase):
 
     def test_list_notifications_without_authentication(self):
         """
-        Test that the view returns 403 if the user is not authenticated.
+        Test that the view returns 401 if the user is not authenticated.
         """
         # Make a request to the view without authenticating.
         response = self.client.get(self.url)
 
         # Assert that the response is unauthorized.
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_list_notifications_with_expiry_date(self):
         """
@@ -533,10 +533,10 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
 
     def test_get_unseen_notifications_count_for_unauthenticated_user(self):
         """
-        Test that the endpoint returns 403 for an unauthenticated user.
+        Test that the endpoint returns 401 for an unauthenticated user.
         """
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_unseen_notifications_count_for_user_with_no_notifications(self):
         """
