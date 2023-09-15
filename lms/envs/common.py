@@ -5351,6 +5351,10 @@ EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
 #    EVENT_BUS_TOPIC_PREFIX setting.
 EVENT_BUS_PRODUCER_CONFIG = {
     'org.openedx.learning.certificate.created.v1': [
-        {'topic': 'learning-certificate-lifecycle', 'event_key_field': 'certificate.course.course_key', 'enabled': True},
+        {'topic': 'learning-certificate-lifecycle', 'event_key_field': 'certificate.course.course_key',
+         'enabled': False},
     ],
+    'org.openedx.learning.xblock.skill.verified.v1': [
+        {'topic': 'learning-xblock-skill-verified', 'event_key_field': 'xblock_info.usage_key', 'enabled': False},
+    ]
 }
