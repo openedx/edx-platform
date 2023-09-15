@@ -15,6 +15,7 @@ from common.djangoapps.student.models import CourseEnrollment  # pylint: disable
 from common.djangoapps.student.tests.factories import UserFactory  # pylint: disable=unused-import
 from lms.djangoapps.mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
 from lms.djangoapps.mobile_api.utils import API_V1, API_V05
+from lms.djangoapps.course_api.blocks.tests.test_views import TestBlocksInCourseView
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
 from xmodule.html_block import CourseInfoBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
@@ -255,3 +256,49 @@ class TestCourseGoalsUserActivityAPI(MobileAPITestCase, SharedModuleStoreTestCas
             'For this mobile request, user activity is not enabled for this user {} and course {}'.format(
                 str(self.user.id), str(self.course.id))
         )
+
+
+@ddt.ddt
+class TestBlocksInfoInCourseView(TestBlocksInCourseView):  # lint-amnesty, pylint: disable=test-inherits-tests
+    """
+        Test class for BlocksInfoInCourseView
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.url = reverse('blocks_info_in_course', kwargs={
+            'api_version': 'v3',
+        })
+
+    @patch('lms.djangoapps.mobile_api.course_info.views.certificate_downloadable_status')
+    def test_additional_info_response(self, mock_certificate_downloadable_status):
+        certificate_url = 'https://test_certificate_url'
+        mock_certificate_downloadable_status.return_value = {
+            'is_downloadable': True,
+            'download_url': certificate_url,
+        }
+
+        expected_image_urls = {
+            'image':
+                {
+                    'large': '/asset-v1:edX+toy+2012_Fall+type@asset+block@just_a_test.jpg',
+                    'raw': '/asset-v1:edX+toy+2012_Fall+type@asset+block@just_a_test.jpg',
+                    'small': '/asset-v1:edX+toy+2012_Fall+type@asset+block@just_a_test.jpg'
+                }
+        }
+
+        response = self.verify_response(url=self.url)
+
+        assert response.status_code == 200
+        assert response.data['id'] == str(self.course.id)
+        assert response.data['name'] == self.course.display_name
+        assert response.data['number'] == self.course.display_number_with_default
+        assert response.data['org'] == self.course.display_org_with_default
+        assert response.data['start'] == self.course.start
+        assert response.data['start_display'] == 'July 17, 2015'
+        assert response.data['start_type'] == 'timestamp'
+        assert response.data['end'] == self.course.end
+        assert response.data['media'] == expected_image_urls
+        assert response.data['certificate'] == {'url': certificate_url}
+        assert response.data['is_self_paced'] is False
+        mock_certificate_downloadable_status.assert_called_once()
