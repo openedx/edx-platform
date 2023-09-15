@@ -68,7 +68,7 @@ class CourseRolesUserRole(models.Model):
         on_delete=models.CASCADE,
         null=True,
     )
-    org = models.ForeignKey(Organization, on_delete=models.CASCADE, null=False)
+    org = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
 
     class Meta:
         unique_together = ('user', 'role', 'course')
