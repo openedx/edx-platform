@@ -145,10 +145,18 @@ FEATURES['LICENSING'] = True
 XBLOCK_SETTINGS.update({'VideoBlock': {'licensing_enabled': True}})
 
 ################################ SEARCH INDEX ################################
-FEATURES['ENABLE_COURSEWARE_INDEX'] = False
+FEATURES['ENABLE_COURSEWARE_INDEX'] = True
 FEATURES['ENABLE_LIBRARY_INDEX'] = False
 FEATURES['ENABLE_CONTENT_LIBRARY_INDEX'] = False
 SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
+
+ELASTIC_SEARCH_CONFIG = [
+    {
+        'use_ssl': False,
+        'host': 'edx.devstack.elasticsearch710',
+        'port': 9200
+    }
+]
 
 ################################ COURSE DISCUSSIONS ###########################
 FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
