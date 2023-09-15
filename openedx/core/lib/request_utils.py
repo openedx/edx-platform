@@ -152,25 +152,6 @@ class IgnoredErrorMiddleware:
 #     are stating an error should be ignored when it is not actually configured as such, or the (New Relic) configuration is not
 #     working.
 
-# .. toggle_name: IGNORED_ERRORS[N]['IS_IGNORED']
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: True
-# .. toggle_description: Set this to False if the errors are not ignored by monitoring, but only ignored, like
-#      for temporary problems that may take some time to fix. If True, adds the custom attributes
-#      ``error_ignored_class`` and ``error_ignored_message`` to help diagnose issues with ignored errors, since
-#      this data is not otherwise available. For example of ignoring errors in New Relic, see:
-#      https://docs.newrelic.com/docs/agents/manage-apm-agents/agent-data/manage-errors-apm-collect-ignore-or-mark-expected/#ignore  pylint: disable=line-too-long,useless-suppression
-#      To query for ignored errors, you would use ``error_ignored_class IS NOT NULL``.
-#      Note: This is defaulted to True because it will be easier for us to detect if True is not the correct value, by
-#      seeing that these errors aren't actually ignored.
-# .. toggle_warning: At this time, this toggle does not actually configure the error to be ignored. It is meant to match
-#     the ignored error configuration found elsewhere. When monitoring, no errors should ever have the attribute
-#     ``error_ignored_class``. Only Transactions should have this custom attribute. If found for an error, it means we
-#     are stating an error should be ignored when it is not actually configured as such, or the configuration is not
-#     working.
-# .. toggle_use_cases: opt_out
-# .. toggle_creation_date: 2021-03-11
-
 # .. toggle_name: IGNORED_ERRORS[N]['LOG_ERROR']
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
@@ -212,7 +193,6 @@ def _get_ignored_error_settings_dict():
 
         {
             'rest_framework.exceptions:PermissionDenied': {
-                'is_ignored': True,
                 'log_error': True,
                 'log_stack_trace': True,
                 'reason_ignored': 'In most cases, signifies a user was trying to do something they cannot do. '
@@ -241,7 +221,6 @@ def _get_ignored_error_settings_dict():
         for index, ignored_error in enumerate(ignored_errors):
             module_and_class = ignored_error.get('MODULE_AND_CLASS')
             processed_ignored_error = {
-                'is_ignored': ignored_error.get('IS_IGNORED', True),
                 'log_error': ignored_error.get('LOG_ERROR', False),
                 'log_stack_trace': ignored_error.get('LOG_STACK_TRACE', False),
                 'reason_ignored': ignored_error.get('REASON_IGNORED'),
@@ -340,12 +319,12 @@ def _log_and_monitor_ignored_errors(request, exception, caller):
 
     exception_message = str(exception)
 
+    # Additional error details are needed for ignored errors, because they are otherwise
+    # not available by our monitoring system, because they have been ignored.
+    set_custom_attribute('error_ignored_class', module_and_class)
+    set_custom_attribute('error_ignored_message', exception_message)
+
     ignored_error_settings = ignored_error_settings_dict[module_and_class]
-    if ignored_error_settings['is_ignored']:
-        # Additional error details are needed for ignored errors, because they are otherwise
-        # not available by our monitoring system, because they have been ignored.
-        set_custom_attribute('error_ignored_class', module_and_class)
-        set_custom_attribute('error_ignored_message', exception_message)
 
     if ignored_error_settings['log_error']:
         exc_info = exception if ignored_error_settings['log_stack_trace'] else None
