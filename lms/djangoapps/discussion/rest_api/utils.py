@@ -9,12 +9,17 @@ from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.paginator import Paginator
 from django.db.models.functions import Length
+from django.utils.translation import gettext_lazy as _
 
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
+from openedx.core.djangoapps.course_groups.models import CourseCohortsSettings, CourseUserGroup
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, PostingRestriction
+from openedx.core.djangoapps.discussions.utils import get_divided_discussions
 from openedx.core.djangoapps.django_comment_common.models import (
     Role,
+    CourseDiscussionSettings,
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_MODERATOR,
     FORUM_ROLE_GROUP_MODERATOR,
@@ -375,6 +380,15 @@ def send_response_notifications(thread, course, creator, parent_id=None):
     notification_sender.send_new_comment_on_response_notification()
 
 
+def is_discussion_cohorted(course_key_str):
+    """
+    Returns if the discussion is divided by cohorts
+    """
+    cohort_settings = CourseCohortsSettings.objects.get(course_id=course_key_str)
+    discussion_settings = CourseDiscussionSettings.objects.get(course_id=course_key_str)
+    return cohort_settings.is_cohorted and discussion_settings.always_divide_inline_discussions
+
+
 class DiscussionNotificationSender:
     """
     Class to send notifications to users who are subscribed to the thread.
@@ -422,6 +436,59 @@ class DiscussionNotificationSender:
 
         return self.parent_response
 
+    def _create_cohort_course_audience(self):
+        """
+        Creates audience based on user cohort and role
+        """
+        course_key_str = str(self.course.id)
+        discussion_cohorted = is_discussion_cohorted(course_key_str)
+
+        # Retrieves cohort divided discussion
+        discussion_settings = CourseDiscussionSettings.objects.get(course_id=course_key_str)
+        divided_course_wide_discussions, divided_inline_discussions = get_divided_discussions(
+            self.course,
+            discussion_settings
+        )
+
+        # Checks if post has any cohort assigned
+        group_id = self.thread.attributes['group_id']
+        if group_id is not None:
+            group_id = int(group_id)
+
+        # Course wide topics
+        topic_id = self.thread.attributes['commentable_id']
+        all_topics = divided_inline_discussions + divided_course_wide_discussions
+        topic_divided = topic_id in all_topics or discussion_settings.always_divide_inline_discussions
+
+        user_ids = []
+        if discussion_cohorted and topic_divided and group_id is not None:
+            users_in_cohort = CourseUserGroup.objects.filter(
+                course_id=course_key_str, id=group_id
+            ).values_list('users__id', flat=True)
+            user_ids.extend(users_in_cohort)
+
+            privileged_roles = [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
+            privileged_users = Role.objects.filter(
+                name__in=privileged_roles,
+                course_id=course_key_str
+            ).values_list('users__id', flat=True)
+            user_ids.extend(privileged_users)
+
+            staff_users = CourseStaffRole(self.course.id).users_with_role().values_list('id', flat=True)
+            user_ids.extend(staff_users)
+
+            admin_users = CourseInstructorRole(self.course.id).users_with_role().values_list('id', flat=True)
+            user_ids.extend(admin_users)
+        else:
+            user_ids = CourseEnrollment.objects.filter(
+                course__id=course_key_str, is_active=True
+            ).values_list('user__id', flat=True)
+
+        unique_user_ids = list(set(user_ids))
+        if self.creator.id in unique_user_ids:
+            unique_user_ids.remove(self.creator.id)
+        return unique_user_ids
+
     def send_new_response_notification(self):
         """
         Send notification to users who are subscribed to the main thread/post i.e.
@@ -436,19 +503,32 @@ class DiscussionNotificationSender:
         """
         return int(self.parent_response.user_id) == int(self.thread.user_id)
 
+    def _response_and_comment_has_same_creator(self):
+        return int(self.parent_response.attributes['user_id']) == self.creator.id
+
     def send_new_comment_notification(self):
         """
         Send notification to parent thread creator i.e. comment on the response.
         """
-        #
         if (
             self.parent_response and
             self.creator.id != int(self.thread.user_id)
         ):
             # use your if author of response is same as author of post.
-            author_name = "your" if self._response_and_thread_has_same_creator() else self.parent_response.username
+            # use 'their' if comment author is also response author.
+            author_name = (
+                # Translators: Replier commented on "your" response to your post
+                _("your")
+                if self._response_and_thread_has_same_creator()
+                else (
+                    # Translators: Replier commented on "their" response to your post
+                    _("their")
+                    if self._response_and_comment_has_same_creator()
+                    else f"{self.parent_response.username}'s"
+                )
+            )
             context = {
-                "author_name": author_name,
+                "author_name": str(author_name),
             }
             self._send_notification([self.thread.user_id], "new_comment", extra_context=context)
 
@@ -463,6 +543,26 @@ class DiscussionNotificationSender:
             self._response_and_thread_has_same_creator()
         ):
             self._send_notification([self.parent_response.user_id], "new_comment_on_response")
+
+    def send_new_thread_created_notification(self):
+        """
+        Send notification based on notification_type
+        """
+        thread_type = self.thread.attributes['thread_type']
+        notification_type = (
+            "new_question_post"
+            if thread_type == "question"
+            else ("new_discussion_post" if thread_type == "discussion" else "")
+        )
+        if notification_type not in ['new_discussion_post', 'new_question_post']:
+            raise ValueError(f'Invalid notification type {notification_type}')
+
+        user_ids = self._create_cohort_course_audience()
+        context = {
+            'username': self.creator.username,
+            'post_title': self.thread.title
+        }
+        self._send_notification(user_ids, notification_type, context)
 
 
 def is_posting_allowed(posting_restrictions: str, blackout_schedules: List):

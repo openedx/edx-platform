@@ -4,6 +4,8 @@ Course API Views
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from django.conf import settings
+from django.db import transaction
+from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from edx_django_utils.cache import TieredCache
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -89,6 +91,7 @@ class CoursewareMeta:
             staff_access=original_user_is_staff,
         )
         self.request.user = self.effective_user
+        self.overview.bind_course_for_student(self.request)
         self.enrollment_object = CourseEnrollment.get_enrollment(self.effective_user, self.course_key,
                                                                  select_related=['celebration', 'user__celebration'])
 
@@ -367,6 +370,7 @@ class CoursewareMeta:
         return learning_assistant_is_active(self.course_key)
 
 
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class CoursewareInformation(RetrieveAPIView):
     """
     **Use Cases**
