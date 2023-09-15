@@ -179,7 +179,7 @@ class TestGetExpectedErrorSettingsDict(unittest.TestCase):
     def test_get_with_missing_reason(self, mock_logger):
         ignored_error_settings_dict = _get_ignored_error_settings_dict()
         mock_logger.error.assert_called_once_with(
-            "Skipping IGNORED_ERRORS[%d] setting. 'REASON_IGNORED' is required to document why %s is an expected "
+            "Skipping IGNORED_ERRORS[%d] setting. 'REASON_IGNORED' is required to document why %s is an ignored "
             "error.",
             0, 'valid.module.and.class.ButMissingReason'
         )
@@ -202,7 +202,6 @@ class TestGetExpectedErrorSettingsDict(unittest.TestCase):
         ignored_error_settings_dict = _get_ignored_error_settings_dict()
         assert ignored_error_settings_dict == {
             'test.module.TestClass': {
-                'is_ignored': True,
                 'log_error': False,
                 'log_stack_trace': False,
                 'reason_ignored': 'Because'
@@ -359,7 +358,6 @@ class TestIgnoredErrorMiddleware(unittest.TestCase):
 
         with override_settings(IGNORED_ERRORS=[{
             'MODULE_AND_CLASS': expected_class,
-            'IS_IGNORED': False,
             'LOG_ERROR': log_error,
             'LOG_STACK_TRACE': log_stack_trace,
             'REASON_IGNORED': 'Because',
