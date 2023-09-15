@@ -12,7 +12,9 @@ directly in the requirements directory.)
 
 .. _OEP-18: https://github.com/openedx/open-edx-proposals/blob/master/oeps/oep-0018-bp-python-dependencies.rst
 
-While the ``*.in`` files are intended to be updated manually, the updating the ``*.txt`` files should only be manipulated using Makefile targets in a Linux environment (to match our build and deploy systems). Developers on Mac should prefer to use the GitHub workflows or run Make targets from inside devstack's lms-shell or another Linux environment.
+While the ``*.in`` files are intended to be updated manually, the ``*.txt`` files should only be manipulated using Makefile targets in a Linux environment (to match our build and deploy systems). For developers on Mac, this can be achieved by using the GitHub workflows or by running Make targets from inside devstack's lms-shell or another Linux environment.
+
+If you don't have write permissions to openedx/edx-platform, you'll need to run these workflows on a fork.
 
 Workflows and Makefile targets
 ******************************
@@ -20,7 +22,7 @@ Workflows and Makefile targets
 Add a dependency
 ================
 
-To add a Python dependencies, specify it in the appropriate ``requirements/edx/*.in`` file, push that up to a branch, and then use the `compile-python-requirements.yml workflow <https://github.com/openedx/edx-platform/actions/workflows/compile-python-requirements.yml>`_ to run ``make compile-requirements`` against your branch. This will ensure the lockfiles are updated with any transitive dependencies and will ping you on a PR for updating your branch.
+To add a Python dependency, specify it in the appropriate ``requirements/edx/*.in`` file, push that up to a branch, and then use the `compile-python-requirements.yml workflow <https://github.com/openedx/edx-platform/actions/workflows/compile-python-requirements.yml>`_ to run ``make compile-requirements`` against your branch. This will ensure the lockfiles are updated with any transitive dependencies and will ping you on a PR for updating your branch.
 
 Upgrade just one dependency
 ===========================
