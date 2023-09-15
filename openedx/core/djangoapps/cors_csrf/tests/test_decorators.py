@@ -27,4 +27,4 @@ class TestEnsureCsrfCookieCrossDomain(TestCase):
         assert response_meta['CROSS_DOMAIN_CSRF_COOKIE_USED'] is True
         # In Django 3.2, it's CSRF_COOKIE_USED; as of 4.0 it's CSRF_COOKIE_NEEDS_UPDATE.
         # After upgrade to Django 4.2, delete the first clause.
-        assert response_meta.get('CSRF_COOKIE_USED', response.meta.get('CSRF_COOKIE_NEEDS_UPDATE')) is True
+        assert response_meta.get('CSRF_COOKIE_USED', response_meta.get('CSRF_COOKIE_NEEDS_UPDATE')) is True
