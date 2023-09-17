@@ -32,6 +32,7 @@
 # Ola Kleniewska <anyzeklove@gmail.com>, 2016
 # Piotr Jańczuk <piotr.janczuk@gmail.com>, 2015
 # Radek <d.exax@hotmail.com>, 2015
+# Robert Zieliński, 2023
 # Sebastian <foobarbaz@gazeta.pl>, 2014
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
 # Dyfeomorfizm <ximixd@gmail.com>, 2014

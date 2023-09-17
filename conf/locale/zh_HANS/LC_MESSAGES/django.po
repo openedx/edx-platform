@@ -3133,6 +3133,12 @@ msgid "Open Response Assessment"
 msgstr "开放式答题评分"
 
 #: lms/djangoapps/courseware/courses.py
+msgid ""
+"This Open Response Assessment's due dates are set by your instructor and "
+"can't be shifted."
+msgstr ""
+
+#: lms/djangoapps/courseware/courses.py
 msgid "Self Assessment"
 msgstr "自我评分"
 
@@ -3147,12 +3153,6 @@ msgstr "工作人员评分"
 #: lms/djangoapps/courseware/courses.py
 msgid "Submission"
 msgstr "提交"
-
-#: lms/djangoapps/courseware/courses.py
-msgid ""
-"Open Response Assessment due dates are set by your instructor and can't be "
-"shifted."
-msgstr "开放式题目测试评估截止日期由您的讲师设置，不能更改。"
 
 #. Translators: 'absolute' is a date such as "Jan 01,
 #. 2020". 'relative' is a fuzzy description of the time until
@@ -6105,11 +6105,11 @@ msgid "Quotes"
 msgstr "引言"
 
 #: lms/templates/wiki/includes/editor_widget.html
-#, python-format
+#, python-brace-format
 msgid ""
-"Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for"
-" help."
-msgstr "此处允许使用MarkDown语法。请参阅%(start_link)s快捷键管理%(end_link)s并寻求帮助。"
+"Markdown syntax is allowed. See the {start_link}cheatsheet{end_link} for "
+"help."
+msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
@@ -7067,8 +7067,8 @@ msgstr "如果禁用，相关学习环境/课程中的讨论将被禁用。"
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
-"The Posting availabilty in discussions whether it will be enabled, scheduled"
-" or indefinitely disabled."
+"The Posting availability in discussions whether it will be enabled, "
+"scheduled or indefinitely disabled."
 msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
@@ -15121,10 +15121,6 @@ msgstr "下载学生评分"
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Print or share your certificate:"
 msgstr "打印或分享您的证书："
-
-#: lms/templates/certificates/_accomplishment-banner.html
-msgid "Click the link to see my certificate."
-msgstr "点击链接查看我的证书。"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"

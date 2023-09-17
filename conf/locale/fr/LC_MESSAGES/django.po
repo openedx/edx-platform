@@ -3420,6 +3420,12 @@ msgid "Open Response Assessment"
 msgstr "Évaluation par les pairs"
 
 #: lms/djangoapps/courseware/courses.py
+msgid ""
+"This Open Response Assessment's due dates are set by your instructor and "
+"can't be shifted."
+msgstr ""
+
+#: lms/djangoapps/courseware/courses.py
 msgid "Self Assessment"
 msgstr "Auto-évaluation"
 
@@ -3434,14 +3440,6 @@ msgstr "Evaluation par l'équipe pédagogique"
 #: lms/djangoapps/courseware/courses.py
 msgid "Submission"
 msgstr "Soumission"
-
-#: lms/djangoapps/courseware/courses.py
-msgid ""
-"Open Response Assessment due dates are set by your instructor and can't be "
-"shifted."
-msgstr ""
-"Les dates limites de Open Response Assessment sont prescrits par votre "
-"instructeur et ne peuvent pas être modifiés."
 
 #. Translators: 'absolute' is a date such as "Jan 01,
 #. 2020". 'relative' is a fuzzy description of the time until
@@ -6721,13 +6719,11 @@ msgid "Quotes"
 msgstr "Citations"
 
 #: lms/templates/wiki/includes/editor_widget.html
-#, python-format
+#, python-brace-format
 msgid ""
-"Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for"
-" help."
+"Markdown syntax is allowed. See the {start_link}cheatsheet{end_link} for "
+"help."
 msgstr ""
-"La syntaxe Markdown est autorisée. Lisez l' "
-"%(start_link)santiséche%(end_link)s pour avoir de l'aide."
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
@@ -7783,8 +7779,8 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
-"The Posting availabilty in discussions whether it will be enabled, scheduled"
-" or indefinitely disabled."
+"The Posting availability in discussions whether it will be enabled, "
+"scheduled or indefinitely disabled."
 msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
@@ -17006,10 +17002,6 @@ msgstr "Télécharger les notes des étudiants"
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Print or share your certificate:"
 msgstr "Imprimer ou partager votre certificat:"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-msgid "Click the link to see my certificate."
-msgstr "Cliquer sur le lien pour voir mon certificat."
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
