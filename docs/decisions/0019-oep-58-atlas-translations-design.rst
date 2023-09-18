@@ -25,8 +25,9 @@ the following changes to the way translations are managed in the Open edX platfo
   the new `openedx-translations Transifex project`_
 - Utilize `openedx-atlas`_ to pull translations for development/deployment.
 
-If you're new to the `Translation Management update OEP-58`_ proposal, please
-review it in addition to the
+If you're new to the `OEP-58`_ proposal, please
+review the `OEP-58 Specifications`_ in addition to the
+Key Metrics and Expected Results section in the
 `Approach Memo and Technical Discovery - Translations Infrastructure Implementation`_
 document before continuing.
 
@@ -328,6 +329,7 @@ be tackled in the future as part of the
    ``edx-val``. This will be tackled later on as part of the `OEP-58`_
    proposal.
 
+.. _OEP-58 Specifications: https://open-edx-proposals.readthedocs.io/en/latest/architectural-decisions/oep-0058-arch-translations-management.html#specification
 .. _Translation Management update OEP-58: https://open-edx-proposals.readthedocs.io/en/latest/architectural-decisions/oep-0058-arch-translations-management.html#specification
 .. _OEP-58: https://open-edx-proposals.readthedocs.io/en/latest/architectural-decisions/oep-0058-arch-translations-management.html#specification
 .. _openedx-atlas: https://github.com/openedx/openedx-atlas
