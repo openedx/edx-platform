@@ -418,7 +418,7 @@ class LibraryContentBlock(
         fragment = Fragment()
         root_xblock = context.get('root_xblock')
         is_root = root_xblock and root_xblock.location == self.location
-        is_loading = self.tools.is_loading(self.location)
+        is_loading = self.tools.import_task_is_in_progress(self.location)
         if is_root and not is_loading:
             # User has clicked the "View" link. Show a preview of all possible children:
             if self.children:  # pylint: disable=no-member

@@ -16,7 +16,6 @@ from opaque_keys.edx.locator import (
 )
 from search.search_engine_base import SearchEngine
 from xblock.fields import Scope
-from user_tasks.models import UserTaskStatus
 
 from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.xblock.api import load_block
@@ -25,7 +24,7 @@ from common.djangoapps.student.auth import has_studio_write_access
 from xmodule.capa_block import ProblemBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.tasks import update_children_task, get_import_task_status
+from openedx.core.djangoapps.content_libraries.tasks import update_children_task, get_import_task_is_in_progress
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary
 
 
@@ -44,7 +43,7 @@ class LibraryToolsService:
         self.store = modulestore
         self.user_id = user_id
 
-    def _get_library(self, library_key, is_v2_lib):
+    def _get_library(self, library_key):
         """
         Helper method to get either V1 or V2 library.
 
@@ -56,7 +55,9 @@ class LibraryToolsService:
 
         Returns None on error.
         """
-        if is_v2_lib:
+
+
+        if isinstance(library_key, LibraryLocatorV2):
             try:
                 return library_api.get_library(library_key)
             except ContentLibrary.DoesNotExist:
@@ -88,10 +89,10 @@ class LibraryToolsService:
         else:
             is_v2_lib = isinstance(lib_key, LibraryLocatorV2)
 
-        library = self._get_library(lib_key, is_v2_lib)
+        library = self._get_library(lib_key)
 
         if library:
-            if is_v2_lib:
+            if isinstance(lib_key, LibraryLocatorV2):
                 return library.version
             # We need to know the library's version so ensure it's set in library.location.library_key.version_guid
             assert library.location.library_key.version_guid is not None
@@ -153,7 +154,7 @@ class LibraryToolsService:
 
     def _filter_child(self, usage_key, capa_type):
         """
-        Filters children by CAPA problem type, if configured
+        Return the "capa_type" if the block is a problem, otherwise return None.
         """
         if usage_key.block_type != "problem":
             return False
@@ -194,29 +195,19 @@ class LibraryToolsService:
         if version and not is_v2_lib:
             library_key = library_key.replace(branch=ModuleStoreEnum.BranchName.library, version_guid=version)
 
-        library = self._get_library(library_key, is_v2_lib)
+        library = self._get_library(library_key)
 
         if library is None:
             raise ValueError(f"Requested library {library_key} not found.")
         if user_perms and not user_perms.can_read(library_key):
             raise PermissionDenied()
-
-        if not is_v2_lib:
-            if user_perms and not user_perms.can_read(library_key):
-                raise PermissionDenied()
         update_children_task.delay(self.user_id, str(dest_block.location), version)
 
-    def import_task_status(self, location):
+    def import_task_is_in_progress(self, location):
         """
         Return task status for update_children_task.
         """
-        return get_import_task_status(location)
-
-    def is_loading(self, location):
-        """
-        Return True if status is IN_PROGRESS.
-        """
-        return self.import_task_status(location) == UserTaskStatus.IN_PROGRESS
+        return get_import_task_is_in_progress(location)
 
     def list_available_libraries(self):
         """

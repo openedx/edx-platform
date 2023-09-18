@@ -990,23 +990,28 @@ class TestOverrides(LibraryTestCase):
         # Refresh our reference to the library
         self.library = store.get_library(self.lib_key)
 
-        # Refresh our reference to the block
-        self.lc_block = self._refresh_children(self.lc_block)
-        self.problem_in_course = store.get_item(self.problem_in_course.location)
-
         # The library has changed...
         self.assertEqual(len(self.library.children), 2)
 
-        # and the block has changed too.
-        self.assertEqual(len(self.lc_block.children), 2)
+        # But the block hasn't.
+        self.assertEqual(len(self.lc_block.children), 1)
+        self.assertEqual(self.problem_in_course.location, self.lc_block.children[0])
+        self.assertEqual(self.problem_in_course.display_name, self.original_display_name)
 
         # Duplicate self.lc_block:
         duplicate = store.get_item(
             duplicate_block(self.course.location, self.lc_block.location, self.user)
         )
         # The duplicate should have identical children to the original:
-        self.assertEqual(len(duplicate.children), 2)
+        self.assertEqual(len(duplicate.children), 1)
         self.assertTrue(self.lc_block.source_library_version)
         self.assertEqual(self.lc_block.source_library_version, duplicate.source_library_version)
         problem2_in_course = store.get_item(duplicate.children[0])
-        self.assertEqual(problem2_in_course.display_name, self.problem.display_name)
+        self.assertEqual(problem2_in_course.display_name, self.original_display_name)
+
+        # Refresh our reference to the block
+        self.lc_block = self._refresh_children(self.lc_block)
+        self.problem_in_course = store.get_item(self.problem_in_course.location)
+
+        # and the block has changed too.
+        self.assertEqual(len(self.lc_block.children), 2)
