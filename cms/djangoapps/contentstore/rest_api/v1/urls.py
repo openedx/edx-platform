@@ -19,4 +19,14 @@ urlpatterns = [
         views.CourseGradingView.as_view(),
         name="course_grading"
     ),
+    re_path(
+        fr'^course_settings/{COURSE_ID_PATTERN}$',
+        views.CourseSettingsView.as_view(),
+        name="course_settings"
+    ),
+    re_path(
+        fr'^course_details/{COURSE_ID_PATTERN}$',
+        views.CourseDetailsView.as_view(),
+        name="course_details"
+    ),
 ]
