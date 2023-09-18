@@ -2777,23 +2777,78 @@ DISCUSSIONS_INCONTEXT_LEARNMORE_URL = ''
 # .. setting_default: {}
 # .. setting_description: Dictionary of event_types mapped to lists of dictionaries containing topic related configuration.
 #    Each topic configuration dictionary contains
-#    * a topic/stream name called `topic` where the event will be pushed to.
-#    * a flag called `enabled` denoting whether the event will be published to the topic.
+#    * `topic`: the topic where the event will be pushed to.
+#    * `enabled`: a toggle denoting whether the event will be published to the topic. These should be annotated
+#       according to
+#       https://edx.readthedocs.io/projects/edx-toggles/en/latest/how_to/documenting_new_feature_toggles.html
 #    * `event_key_field` which is a period-delimited string path to event data field to use as event key.
 #    Note: The topic names should not include environment prefix as it will be dynamically added based on
 #    EVENT_BUS_TOPIC_PREFIX setting.
 EVENT_BUS_PRODUCER_CONFIG = {
     'org.openedx.content_authoring.course.catalog_info.changed.v1': [
-        {'topic': 'course-catalog-info-changed', 'event_key_field': 'catalog_info.course_key', 'enabled': False},
+        {'topic': 'course-catalog-info-changed',
+         'event_key_field': 'catalog_info.course_key',
+        # .. toggle_name: ENABLE_SEND_COURSE_CATALOG_INFO_CHANGED_EVENTS_OVER_BUS
+        # .. toggle_implementation: DjangoSetting
+        # .. toggle_default: False
+        # .. toggle_description: if enabled, will publish COURSE_CATALOG_INFO_CHANGED events to the event bus on the
+        #   course-catalog-info-changed topics
+        # .. toggle_warning: The default may be changed in a later release. See
+        #   https://github.com/openedx/openedx-events/issues/265
+        # .. toggle_use_cases: opt_in
+        # .. toggle_creation_date: 2023-09-18
+         'enabled': False},
     ],
     'org.openedx.content_authoring.xblock.published.v1': [
-        {'topic': 'content-authoring-xblock-lifecycle', 'event_key_field': 'xblock_info.usage_key', 'enabled': False},
+        {'topic': 'content-authoring-xblock-lifecycle',
+         'event_key_field': 'xblock_info.usage_key',
+        # .. toggle_name: ENABLE_SEND_XBLOCK_PUBLISHED_EVENTS_OVER_BUS
+        # .. toggle_implementation: DjangoSetting
+        # .. toggle_default: False
+        # .. toggle_description: Enables sending XBLOCK_PUBLISHED events over the event bus.
+        # .. toggle_use_cases: opt_in
+        # .. toggle_creation_date: 2023-09-18
+        # .. toggle_warning: For consistency in user experience, keep the value in sync with the other
+        #   ENABLE_SEND_XBLOCK_* settings in the LMS and CMS.
+        #   The default may be changed in a later release. See
+        #   https://github.com/openedx/openedx-events/issues/265
+        # .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/31813',
+        #   https://github.com/openedx/openedx-events/issues/210
+         'enabled': False},
     ],
     'org.openedx.content_authoring.xblock.deleted.v1': [
-        {'topic': 'content-authoring-xblock-lifecycle', 'event_key_field': 'xblock_info.usage_key', 'enabled': False},
+        {'topic': 'content-authoring-xblock-lifecycle',
+         'event_key_field': 'xblock_info.usage_key',
+         # .. toggle_name: ENABLE_SEND_XBLOCK_DELETED_EVENTS_OVER_BUS
+         # .. toggle_implementation: DjangoSetting
+         # .. toggle_default: False
+         # .. toggle_description: Enables sending XBLOCK_DELETED events over the event bus.
+         # .. toggle_use_cases: opt_in
+         # .. toggle_creation_date: 2023-09-18
+         # .. toggle_warning: For consistency in user experience, keep the value in sync with the other
+         #   ENABLE_SEND_XBLOCK_* settings in the LMS and CMS.
+         #   The default may be changed in a later release. See
+         #   https://github.com/openedx/openedx-events/issues/265
+         # .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/31813',
+         #   https://github.com/openedx/openedx-events/issues/210
+         'enabled': False},
     ],
     'org.openedx.content_authoring.xblock.duplicated.v1': [
-        {'topic': 'content-authoring-xblock-lifecycle', 'event_key_field': 'xblock_info.usage_key', 'enabled': False},
+        {'topic': 'content-authoring-xblock-lifecycle',
+         'event_key_field': 'xblock_info.usage_key',
+         # .. toggle_name: ENABLE_SEND_XBLOCK_DUPLICATED_EVENTS_OVER_BUS
+         # .. toggle_implementation: DjangoSetting
+         # .. toggle_default: False
+         # .. toggle_description: Enables sending XBLOCK_DUPLICATED events over the event bus.
+         # .. toggle_use_cases: opt_in
+         # .. toggle_creation_date: 2023-09-18
+         # .. toggle_warning: For consistency in user experience, keep the value in sync with the other
+         #   ENABLE_SEND_XBLOCK_* settings in the LMS and CMS.
+         #   The default may be changed in a later release. See
+         #   https://github.com/openedx/openedx-events/issues/265
+         # .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/31813',
+         #   https://github.com/openedx/openedx-events/issues/210
+         'enabled': False},
     ],
 }
 #### django-simple-history##

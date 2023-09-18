@@ -5388,21 +5388,51 @@ EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
 # .. setting_default: {}
 # .. setting_description: Dictionary of event_types mapped to lists of dictionaries containing topic related configuration.
 #    Each topic configuration dictionary contains
-#    * a topic/stream name called `topic` where the event will be pushed to.
-#    * a flag called `enabled` denoting whether the event will be published to the topic.
+#    * `topic`: the topic where the event will be pushed to.
+#    * `enabled`: a toggle denoting whether the event will be published to the topic. These should be annotated
+#       according to
+#       https://edx.readthedocs.io/projects/edx-toggles/en/latest/how_to/documenting_new_feature_toggles.html
 #    * `event_key_field` which is a period-delimited string path to event data field to use as event key.
 #    Note: The topic names should not include environment prefix as it will be dynamically added based on
 #    EVENT_BUS_TOPIC_PREFIX setting.
 EVENT_BUS_PRODUCER_CONFIG = {
     'org.openedx.learning.certificate.created.v1': [
         {'topic': 'learning-certificate-lifecycle', 'event_key_field': 'certificate.course.course_key',
+         # .. toggle_name: ENABLE_SEND_LEARNING_CERTIFICATE_CREATED_EVENTS_OVER_BUS
+         # .. toggle_implementation: DjangoSetting
+         # .. toggle_default: False
+         # .. toggle_description: Enables sending learning-certificate-created events over the event bus.
+         # .. toggle_use_cases: opt_in
+         # .. toggle_creation_date: 2023-09-18
+         # .. toggle_warning: The default may be changed in a later release. See
+         #   https://github.com/openedx/openedx-events/issues/265
+         # .. toggle_tickets: https://github.com/openedx/openedx-events/issues/210
          'enabled': False},
     ],
     'org.openedx.learning.xblock.skill.verified.v1': [
-        {'topic': 'learning-xblock-skill-verified', 'event_key_field': 'xblock_info.usage_key', 'enabled': False},
+        {'topic': 'learning-xblock-skill-verified', 'event_key_field': 'xblock_info.usage_key',
+         # .. toggle_name: ENABLE_SEND_XBLOCK_SKILL_VERIFIED_EVENTS_OVER_BUS
+         # .. toggle_implementation: DjangoSetting
+         # .. toggle_default: False
+         # .. toggle_description: Enables sending xblock_skill_verified events over the event bus.
+         # .. toggle_use_cases: opt_in
+         # .. toggle_creation_date: 2023-09-18
+         # .. toggle_warning: The default may be changed in a later release. See
+         #   https://github.com/openedx/openedx-events/issues/265
+         # .. toggle_tickets: https://github.com/openedx/openedx-events/issues/210
+         'enabled': False},
     ],
     'org.openedx.learning.course.unenrollment.completed.v1': [
         {'topic': 'course-unenrollment-lifecycle', 'event_key_field': 'enrollment.course.course_key',
+         # .. toggle_name: ENABLE_SEND_COURSE_UNENROLLMENT_COMPLETED_EVENTS_OVER_BUS
+         # .. toggle_implementation: DjangoSetting
+         # .. toggle_default: False
+         # .. toggle_description: Enables sending COURSE_UNENROLLMENT_COMPLETED events over the event bus.
+         # .. toggle_use_cases: opt_in
+         # .. toggle_creation_date: 2023-09-18
+         # .. toggle_warning: The default may be changed in a later release. See
+         #   https://github.com/openedx/openedx-events/issues/265
+         # .. toggle_tickets: https://github.com/openedx/openedx-events/issues/210
          'enabled': False},
     ]
 }
