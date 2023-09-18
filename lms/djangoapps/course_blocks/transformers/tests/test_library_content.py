@@ -5,7 +5,6 @@ Tests for ContentLibraryTransformer.
 from unittest import mock
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
-from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 
 from ...api import get_course_blocks
@@ -41,7 +40,6 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
         self.course_hierarchy = self.get_course_hierarchy()
         self.blocks = self.build_course(self.course_hierarchy)
         self.course = self.blocks['course']
-        clear_course_from_cache(self.course.id)
 
         # Enroll user in course.
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, is_active=True)
@@ -122,7 +120,6 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
         )
         assert len(list(raw_block_structure.get_block_keys())) == len(self.blocks)
 
-        clear_course_from_cache(self.course.id)
         trans_block_structure = get_course_blocks(
             self.user,
             self.course.location,
@@ -146,7 +143,6 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
         selected_child = 'html1' if vertical2_selected else 'html2'
 
         # Check course structure again.
-        clear_course_from_cache(self.course.id)
         for i in range(5):
             trans_block_structure = get_course_blocks(
                 self.user,
@@ -175,7 +171,6 @@ class ContentLibraryOrderTransformerTestCase(CourseStructureTestCase):
         self.course_hierarchy = self.get_course_hierarchy()
         self.blocks = self.build_course(self.course_hierarchy)
         self.course = self.blocks['course']
-        clear_course_from_cache(self.course.id)
 
         # Enroll user in course.
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, is_active=True)
