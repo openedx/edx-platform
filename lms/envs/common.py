@@ -5400,6 +5400,10 @@ EVENT_BUS_PRODUCER_CONFIG = {
     ],
     'org.openedx.learning.xblock.skill.verified.v1': [
         {'topic': 'learning-xblock-skill-verified', 'event_key_field': 'xblock_info.usage_key', 'enabled': False},
+    ],
+    'org.openedx.learning.course.unenrollment.completed.v1': [
+        {'topic': 'course-unenrollment-lifecycle', 'event_key_field': 'enrollment.course.course_key',
+         'enabled': False},
     ]
 }
 #### django-simple-history##
