@@ -5,8 +5,13 @@ URLs for course_info API
 
 from django.conf import settings
 from django.urls import path, re_path
+from .views import (
+    CourseHandoutsList,
+    CourseUpdatesList,
+    CourseGoalsRecordUserActivity,
+    CourseInfoDetailView,
+)
 
-from .views import CourseHandoutsList, CourseUpdatesList, CourseGoalsRecordUserActivity
 
 urlpatterns = [
     re_path(
@@ -18,6 +23,11 @@ urlpatterns = [
         fr'^{settings.COURSE_ID_PATTERN}/updates$',
         CourseUpdatesList.as_view(),
         name='course-updates-list'
+    ),
+    re_path(
+        fr'^{settings.COURSE_KEY_PATTERN}/info$',
+        CourseInfoDetailView.as_view(),
+        name="course-info-detail"
     ),
     path('record_user_activity', CourseGoalsRecordUserActivity.as_view(), name='record_user_activity'),
 ]

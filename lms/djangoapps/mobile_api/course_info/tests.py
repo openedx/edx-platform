@@ -9,13 +9,18 @@ from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
+from rest_framework.request import Request
 from rest_framework.test import APIClient  # pylint: disable=unused-import
 
 from common.djangoapps.student.models import CourseEnrollment  # pylint: disable=unused-import
 from common.djangoapps.student.tests.factories import UserFactory  # pylint: disable=unused-import
 from lms.djangoapps.mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
 from lms.djangoapps.mobile_api.utils import API_V1, API_V05
+from lms.djangoapps.course_api.tests.test_views import CourseDetailViewTestCase
+from lms.djangoapps.course_api.tests.test_serializers import TestCourseDetailSerializer
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from .serializers import CourseInfoDetailSerializer
 from xmodule.html_block import CourseInfoBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -255,3 +260,59 @@ class TestCourseGoalsUserActivityAPI(MobileAPITestCase, SharedModuleStoreTestCas
             'For this mobile request, user activity is not enabled for this user {} and course {}'.format(
                 str(self.user.id), str(self.course.id))
         )
+
+
+class CourseInfoDetailViewTestCase(CourseDetailViewTestCase):  # lint-amnesty, pylint: disable=test-inherits-tests
+    """
+        Test responses returned from CourseInfoDetailView.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.url = reverse('course-info-detail', kwargs={
+            'course_key_string': cls.course.id,
+            'api_version': 'v3'
+        })
+        cls.hidden_url = reverse('course-info-detail', kwargs={
+            'course_key_string': cls.hidden_course.id,
+            'api_version': 'v3'
+        })
+        cls.nonexistent_url = reverse('course-info-detail', kwargs={
+            'course_key_string': 'edX/nope/Fall_2014',
+            'api_version': 'v3'
+        })
+
+
+class TestCourseInfoDetailSerializer(TestCourseDetailSerializer):  # lint-amnesty, pylint: disable=test-inherits-tests
+    """
+        Test CourseInfoDetailSerializer by rerunning all the tests
+        in TestCourseDetailSerializer, but with the
+        CourseInfoDetailSerializer serializer class.
+    """
+
+    serializer_class = CourseInfoDetailSerializer
+
+    def setUp(self):
+        super().setUp()
+        # by default, we do not have enrolled users
+        self.expected_data['is_enrolled'] = False
+
+    @patch('lms.djangoapps.mobile_api.course_info.serializers.CourseEnrollment.is_enrolled', return_value=True)
+    def test_is_enrolled_field_true(self, mock_is_enrolled):
+        course = self.create_course()
+        result = self._get_result(course)
+        assert result['is_enrolled'] is True
+        mock_is_enrolled.assert_called_once()
+
+    def test_is_enrolled_field_anonymous_user(self):
+        course = self.create_course()
+        result = self._get_anonymous_result(course)
+        self.assertNotIn('is_enrolled', result)
+
+    def _get_anonymous_request(self):
+        return Request(self.request_factory.get('/'))
+
+    def _get_anonymous_result(self, course):
+        course_overview = CourseOverview.get_from_id(course.id)
+        return self.serializer_class(course_overview, context={'request': self._get_anonymous_request()}).data

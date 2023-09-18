@@ -14,8 +14,11 @@ from rest_framework.views import APIView
 from common.djangoapps.static_replace import make_static_urls_absolute
 from lms.djangoapps.courseware.courses import get_course_info_section_block
 from lms.djangoapps.course_goals.models import UserActivity
+from lms.djangoapps.course_api.views import CourseDetailView
+from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.lib.xblock_utils import get_course_update_items
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
+from .serializers import CourseInfoDetailSerializer
 from ..decorators import mobile_course_access, mobile_view
 
 User = get_user_model()
@@ -166,3 +169,102 @@ class CourseGoalsRecordUserActivity(APIView):
         # Populate user activity for tracking progress towards a user's course goals
         UserActivity.record_user_activity(user, course_key)
         return Response(status=(200))
+
+
+@view_auth_classes(is_authenticated=False)
+class CourseInfoDetailView(CourseDetailView):
+    """
+        **Use Cases**
+
+            Request details for a course
+
+        **Example Requests**
+
+            GET /api/mobile/v3/course_info/{course_key}/info
+
+        **Response Values**
+
+            Body consists of the following fields:
+
+            * effort: A textual description of the weekly hours of effort expected
+                in the course.
+            * end: Date the course ends, in ISO 8601 notation
+            * enrollment_end: Date enrollment ends, in ISO 8601 notation
+            * enrollment_start: Date enrollment begins, in ISO 8601 notation
+            * id: A unique identifier of the course; a serialized representation
+                of the opaque key identifying the course.
+            * media: An object that contains named media items.  Included here:
+                * course_image: An image to show for the course.  Represented
+                  as an object with the following fields:
+                    * uri: The location of the image
+            * name: Name of the course
+            * number: Catalog number of the course
+            * org: Name of the organization that owns the course
+            * overview: A possibly verbose HTML textual description of the course.
+                Note: this field is only included in the Course Detail view, not
+                the Course List view.
+            * short_description: A textual description of the course
+            * start: Date the course begins, in ISO 8601 notation
+            * start_display: Readably formatted start of the course
+            * start_type: Hint describing how `start_display` is set. One of:
+                * `"string"`: manually set by the course author
+                * `"timestamp"`: generated from the `start` timestamp
+                * `"empty"`: no start date is specified
+            * pacing: Course pacing. Possible values: instructor, self
+            * certificate_available_date (optional): Date the certificate will be available,
+                in ISO 8601 notation if the `certificates.auto_certificate_generation`
+                waffle switch is enabled
+            * is_enrolled: (bool) Optional field. This field is not available for an anonymous user.
+                Indicates if the user is enrolled in the course
+
+            Deprecated fields:
+
+            * blocks_url: Used to fetch the course blocks
+            * course_id: Course key (use 'id' instead)
+
+        **Parameters:**
+
+            username (optional):
+                The username of the specified user for whom the course data
+                is being accessed. The username is not only required if the API is
+                requested by an Anonymous user.
+
+        **Returns**
+
+            * 200 on success with above fields.
+            * 400 if an invalid parameter was sent or the username was not provided
+              for an authenticated request.
+            * 401 unauthorized
+            * 403 if a user who does not have permission to masquerade as
+              another user specifies a username other than their own.
+            * 404 if the course is not available or cannot be seen.
+
+            Example response:
+
+                {
+                    "blocks_url": "/api/courses/v1/blocks/?course_id=edX%2Fexample%2F2012_Fall",
+                    "media": {
+                        "course_image": {
+                            "uri": "/c4x/edX/example/asset/just_a_test.jpg",
+                            "name": "Course Image"
+                        }
+                    },
+                    "description": "An example course.",
+                    "end": "2015-09-19T18:00:00Z",
+                    "enrollment_end": "2015-07-15T00:00:00Z",
+                    "enrollment_start": "2015-06-15T00:00:00Z",
+                    "course_id": "edX/example/2012_Fall",
+                    "name": "Example Course",
+                    "number": "example",
+                    "org": "edX",
+                    "overview: "<p>A verbose description of the course.</p>"
+                    "start": "2015-07-17T12:00:00Z",
+                    "start_display": "July 17, 2015",
+                    "start_type": "timestamp",
+                    "pacing": "instructor",
+                    "certificate_available_date": "2015-08-14T00:00:00Z",
+                    "is_enrolled": true
+                }
+        """
+
+    serializer_class = CourseInfoDetailSerializer
