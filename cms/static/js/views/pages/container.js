@@ -293,13 +293,29 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     }));
                 }
                 if (newFiles.length) {
-                    notices.push(() => new NotificationView.Confirmation({
-                        title: gettext("New files were added to this course's Files & Uploads"),
+                    notices.push(() => new NotificationView.Info({
+                        title: gettext("New file(s) added to Files & Uploads."),
                         message: (
                             gettext("The following required files were imported to this course:") +
                             " "  + newFiles.join(", ")
                         ),
-                        closeIcon: true,
+                        actions: {
+                            primary: {
+                                text: gettext('View files'),
+                                click: function(notification) {
+                                    const section = document.querySelector('[data-course-assets]');
+                                    const assetsUrl = $(section).attr('data-course-assets');
+                                    window.location.href = assetsUrl;
+                                    return;
+                                }
+                            },
+                            secondary: {
+                                text: gettext('Dismiss'),
+                                click: function(notification) {
+                                    return notification.hide();
+                                }
+                            }
+                        }
                     }));
                 }
                 if (notices.length) {
