@@ -19,8 +19,10 @@ the following changes to the way translations are managed in the Open edX platfo
 - Add the `Transifex GitHub App <https://github.com/apps/transifex-integration>`_
   to openedx Organization
 - Connect the `openedx-translations repo`_ to the
-  `openedx-translations project`_
-- Copy Transifex's Translation Memory and Combine Translators
+  `openedx-translations Transifex project`_
+- Copy `Transifex Translation Memory`_ into from the both of the
+  `edx-platform Transifex project`_ and the `xblocks Transifex project`_ into
+  the new `openedx-translations Transifex project`_
 - Utilize `openedx-atlas`_ to pull translations for development/deployment.
 
 If you're new to the `Translation Management update OEP-58`_ proposal, please
@@ -28,26 +30,30 @@ review it in addition to the
 `Approach Memo and Technical Discovery - Translations Infrastructure Implementation`_
 document before continuing.
 
-Current Architecture/Implementation for XBlocks and Plugins
------------------------------------------------------------
-As of now the Open edX XBlocks and Plugins are installed via ``pip`` with
-their translations embedded within the Python package.
+Pre-OEP-58 Architecture/Implementation for XBlocks and Plugins
+--------------------------------------------------------------
 
-Bundling translations helps to ensure its always available. However, it also
-means that in order to update translations, a full opensource contribution
-process needs to happen. Somtimes the process takes a full month to
-complete such as in the example below:
+Before `OEP-58`_, Open edX XBlocks and Open edX plugins had the following:
 
-- `Added French (Canada) and Japanese - xblock-drag-and-drop-v2 #220`_
+ - Translations live in the GitHub repository.
+ - Translations are packaged with the rest of the code when published to pypi
 
+Pros:
+
+ - Translations are always available after installation.
+
+Cons:
+
+ - This can mean a complex integration with Transifex
+ - This can mean a lengthy manual PR review process up to a month such as in
+   the following example:
+   `Added French (Canada) and Japanese - xblock-drag-and-drop-v2 #220`_
 
 XBlockI18nService
 -----------------
 
-Once the translations are bundled and the XBlock/Plugin is installed the
-XBlockI18nService will be able to find the Python translations and use load
-them via the ``__init__`` method of the `XBlockI18nService`_ which finds
-the ``text.mo`` files and make it available to the ``edx-platform``
+The `XBlockI18nService`_ loads translations for installed XBlocks via its
+``__init__`` method. XBlock translations are only used during the
 during the execution of the XBlock.
 
 The `XBlockI18nService implementation pull request`_ (2016) introduced the
@@ -80,9 +86,9 @@ as:
 - `XBlock compiled JavaScript text.js translations`_
 - `XBlock main JavaScript file`_
 
-This design has it's trade-offs but it's been widely adopted and out of the
-scope of this proposal. Therefore, we'll improve on the existing design to
-load the ``atlas`` JavaScript translations instead of the bundled ones.
+`OEP-58`_ does not change this structure, it just makes the necessary changes
+to pull translations from the `openedx-translations repo`_ via ``atlas``
+instead of having them live in the XBlock repository itself.
 
 Decisions
 =========
@@ -90,39 +96,17 @@ Decisions
 Proposed Design for edX Platform ``conf/locale`` translations
 -------------------------------------------------------------
 
-Update the ``make pull_translations`` command to use ``atlas pull``
-if the ``OPENEDX_ATLAS_PULL`` environment variable is set.
-
-This has been the standard for all repositories as seen in both
+We're going to use ``atlas`` in ``make pull_translations`` like we do in
 `course-discovery atlas integration`_ and
 `frontend-app-learning atlas integration`_.
-
-The updated `edx-platform pull_translations`_ would look like the following::
-
-  pull_translations:
-    git clean -fdX conf/locale
-    ifeq ($(OPENEDX_ATLAS_PULL),)
-      find conf/locale -type d -mindepth 1 -maxdepth 1 -exec rm -rf {} +  # Remove stale translation files
-      atlas pull $(ATLAS_PULL_ARGS) translations/edx-platform/conf/locale:conf/locale
-    else
-      i18n_tool transifex pull
-    endif
-    # The commands below are simplified for demonistration purposes
-    i18n_tool generate --verbose 1
-    i18n_tool validate --verbose
-    paver i18n_compilejs
-
-
-This mostly is a non-controversial change that has been done in other repos
-already.
-
-The next section is a little more intricate and requires more discussion.
 
 Proposed Design for XBlocks and Plugins
 ---------------------------------------
 
-Instead of storing translation files for each XBlock and Plugin in their respective repositories,
-we will use `openedx-atlas`_ to pull them from the `openedx-translations repo`_.
+Instead of storing translation files for each XBlock and Plugin in their
+respective repositories,
+we will use `openedx-atlas`_ to pull them from the
+`openedx-translations repo`_.
 
 
 New ``ENABLE_ATLAS_TRANSLATIONS`` Waffle Switch
@@ -153,70 +137,59 @@ Introduce new Django commands to the ``edx-platform``:
     eox_tenant
 
   This list doesn't include plugins that are bundled within the
-  ``edx-platform`` repository itself. Translations for bundled plugins 
+  ``edx-platform`` repository itself. Translations for bundled plugins
   are included in the ``edx-platform`` translation files.
 
 - ``manage.py lms atlas_pull_plugin_translations``: This command
   will pull translations for installed XBlocks and Plugins by module name::
-  
-    $ atlas pull \
-        translations/edx-platform-links/drag_and_drop_v2/conf/locale:conf/plugins-locale/drag_and_drop_v2 \
-        translations/edx-platform-links/done/conf/locale:conf/plugins-locale/done \
-        translations/edx-platform-links/edx_proctoring/conf/locale:conf/plugins-locale/edx_proctoring
 
+    $ atlas pull --expand-glob \
+        'translations/*/drag_and_drop_v2/conf/locale:conf/plugins-locale/drag_and_drop_v2' \
+        'translations/*/done/conf/locale:conf/plugins-locale/done' \
+        'translations/*/edx_proctoring/conf/locale:conf/plugins-locale/edx_proctoring'
 
   Resulting in the following file tree::
 
     $ tree conf/plugins-locale/
     conf/plugins-locale/
     ├── done
-    │  ├── ar
-    │  │  └── LC_MESSAGES
-    │  │      └── django.po
-    │  ├── de
-    │  │  └── LC_MESSAGES
-    │  │      └── django.po
-    │  ├── en
-    │  │  └── LC_MESSAGES
-    │  │      └── django.po
-    │  └── fr_CA
-    │      └── LC_MESSAGES
-    │          └── django.po
+    │   ├── ar
+    │   │   └── LC_MESSAGES
+    │   │       └── django.po
+    │   ├── de
+    │   │   └── LC_MESSAGES
+    │   │       └── django.po
+    │   ├── en
+    │   │   └── LC_MESSAGES
+    │   │       └── django.po
+    │   └── fr_CA
+    │       └── LC_MESSAGES
+    │           └── django.po
     ├── drag_and_drop_v2
-    │  ├── ar
-    │  │  └── LC_MESSAGES
-    │  │      └── django.po
-    │  ├── en
-    │  │  └── LC_MESSAGES
-    │  │      └── django.po
-    │  └── fr_CA
-    │      └── LC_MESSAGES
-    │          └── django.po
+    │   ├── ar
+    │   │   └── LC_MESSAGES
+    │   │       └── django.po
+    │   ├── en
+    │   │   └── LC_MESSAGES
+    │   │       └── django.po
+    │   └── fr_CA
+    │       └── LC_MESSAGES
+    │           └── django.po
     └── edx_proctoring
         ├── ar
-        │  └── LC_MESSAGES
-        │      └── djangojs.po
+        │   └── LC_MESSAGES
+        │       └── djangojs.po
         ├── de
-        │  └── LC_MESSAGES
-        │      └── djangojs.po
+        │   └── LC_MESSAGES
+        │       └── djangojs.po
         ├── en
-        │  └── LC_MESSAGES
-        │      ├── djangojs.po
-        │      └── django.po
+        │   └── LC_MESSAGES
+        │       ├── djangojs.po
+        │       └── django.po
         └── fr_CA
             └── LC_MESSAGES
-                └── djangojs.po
-
-
-
-
-Changes to the `openedx-translations repo`_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The `openedx-translations repo`_ directory structure organizes translation files by
-repository name. ``edx-platform`` has no record of plugin repository names. As of
-`edx-platform-links PR #353`_, it is also possible to use ``atlas`` to pull translations by
-module name.
+                ├── djangojs.po
+                └── django.po
 
 
 BlockI18nService support for ``atlas`` Python translations
@@ -230,25 +203,44 @@ BlockI18nService support for ``atlas`` Python translations
    path for the Drag and Drop XBlock.
 
 #. When ``ENABLE_ATLAS_TRANSLATIONS`` is enabled, the translation files pulled by ``atlas``
-   from the `openedx-translations repo`_ will be used. For example, the 
+   from the `openedx-translations repo`_ will be used. For example, the
    ``edx-platform/conf/plugins-locale/drag_and_drop_v2/ar/LC_MESSAGES/text.po``
    path for the Drag and Drop XBlock.
+
+
+New ``compile_plugins_js_translations`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+An ``XBlock.i18n_js_namespace`` property will be added for
+the ``compile_plugins_js_translations`` to generate JavaScript translations
+in a centrally managed manner for installed XBlocks.
+
+A ``compile_plugins_js_translations`` command will loop over XBlock
+modules that has the ``i18n_js_namespace``
+property set and compile the JavaScript translations via the `compilejsi18n`_
+command.
+
+For example if the Drag and Drop XBlock has
+``i18n_js_namespace = 'DragAndDropI18N'``, the
+``compile_plugins_js_translations`` command will execute the following
+commands::
+
+  i18n_tool generate -v  # Generate the .mo files
+  python manage.py compilejsi18n --namespace DragAndDropI18N --output conf/plugins-locale/drag_and_drop_v2/js/
 
 
 XBlockI18nService support for ``atlas`` JavaScript translations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A ``get_javascript_locale_path`` method will be added to the ``XBlockI18nService`` to provide XBlocks the
-appropriate path to ``django.js`` translation files. This will allow XBlocks to utilize legacy packaged translations
-or ``atlas`` pulled translations depending on configuration settings.
+A ``get_javascript_locale_path`` method will be added to the
+``XBlockI18nService`` to provide XBlocks the
+appropriate path to ``django.js`` translation files. This method
+will allow XBlocks to utilize legacy packaged translations
+or ``atlas``.
 
-A new ``i18n_js_namespace`` property is needed for the :ref:`compile-js-command`
+A ``i18n_js_namespace`` property will be added
 to generate JavaScript translations in a centrally managed manner for all
 XBlocks as described in the :ref:`js-translations` section.
-
-The ``i18n_js_namespace`` property will eliminate the need to hardcode the
-namespace the `XBlock Makefile compile_translations rule`_.
-
 
 For example, the `Drag and Drop XBlock get_static_i18n_js_url`_ will need to
 be updated to support both the ``XBlockI18nService`` new
@@ -284,23 +276,8 @@ be updated to support both the ``XBlockI18nService`` new
            return None
 
 
-New ``compile_js_plugin_translations`` command
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-This command will loop over XBlock modules that have the ``i18n_js_namespace``
-property and compile the JavaScript translations.
-
-For example, if the Drag and Drop XBlock has the ``i18n_js_namespace`` property,
-the ``compile_plugins_js_translations`` command will execute the following
-commands::
-
-  i18n_tool generate -v  # Generate the .mo files
-  python manage.py compilejsi18n --namespace DragAndDropI18N --output conf/plugins-locale/drag_and_drop_v2/js/
-
-
 Dismissed Proposals
 ===================
-
 
 XBlocks and plugins have their own "atlas pull" command
 -------------------------------------------------------
@@ -315,7 +292,8 @@ and ensure that the ``make pull_translations`` command won't corrupt the
 virtual environment.
 
 This is a non-trivial task and appears to add more complexity than necessary
-due to the fact that XBlocks and plugins won't be used outside the context of ``edx-platform``.
+due to the fact that XBlocks and plugins won't be used outside the
+context of ``edx-platform``.
 
 
 Goals
@@ -325,10 +303,8 @@ Goals
 #. Allow Tutor and other advanced uses to craft their own ``atlas pull``
    commands by making the the plugins list available via Django commands.
 #. Allow ``atlas pull`` to use the Python module names instead of the
-   repository name of XBlocks and Plugins. This is already done in the
-   `openedx-translations repo`_ via the
-   ``extract-translation-source-files.yml``_ as described in the
-   `edx-platform translations links`_ document.
+   repository name of XBlocks and Plugins which is supported via the
+   `atlas pull --expand-glob`_ option.
 
 .. _non-goals:
 
@@ -357,11 +333,10 @@ be tackled in the future as part of the
 .. _openedx-atlas: https://github.com/openedx/openedx-atlas
 .. _openedx-translations repo: https://github.com/openedx/openedx-translations
 .. _extract-translation-source-files.yml: https://github.com/openedx/openedx-translations/blob/2566e0c9a30d033e5dd8d05d4c12601c8e37b4ef/.github/workflows/extract-translation-source-files.yml#L36-L43
-.. _openedx-translations project: https://app.transifex.com/open-edx/openedx-translations/dashboard/
+.. _openedx-translations Transifex project: https://app.transifex.com/open-edx/openedx-translations/dashboard/
 
 .. _Approach Memo and Technical Discovery - Translations Infrastructure Implementation: https://docs.google.com/document/d/11dFBCnbdHiCEdZp3pZeHdeH8m7Glla-XbIin7cnIOzU/edit
 .. _Added French (Canada) and Japanese - xblock-drag-and-drop-v2 #220: https://github.com/openedx/xblock-drag-and-drop-v2/pull/220
-.. _edx-platform translations links: https://github.com/openedx/openedx-translations/tree/main/translations/edx-platform-links
 .. _XBlockI18nService: https://github.com/openedx/edx-platform/blob/6e28ba329e0a5354d7264ea834861bf0cae4ceb3/xmodule/modulestore/django.py#L359-L395
 .. _XBlockI18nService implementation pull request: https://github.com/openedx/edx-platform/pull/11575/files#diff-0bbcc6c13d9bfc9d88fbe2fdf4fd97f6066a7a0f0bfffb82bc942378b7cf33e0R248
 
@@ -383,7 +358,10 @@ https://github.com/Zeit-Labs/xblock-drag-and-drop-v2/blob/b8ab1ecd9168ab1dba21f9
 .. _XBlock main JavaScript file: https://github.com/openedx/xblock-drag-and-drop-v2/blob/b8ab1ecd9168ab1dba21f994ee4bfedb6a57d11f/drag_and_drop_v2/public/js/drag_and_drop.js#L6
 
 
-.. _edx-platform-links PR #353: https://github.com/openedx/openedx-translations/pull/353
 .. _translations/xblock-drag-and-drop-v2 directory: https://github.com/openedx/openedx-translations/tree/8a01424fd8f42e9e76aed34e235c82ab654cdfc5/translations/xblock-drag-and-drop-v2
-.. _translations/edx-platform-links/drag_and_drop_v2 directory: https://github.com/openedx/openedx-translations/blob/8a01424fd8f42e9e76aed34e235c82ab654cdfc5/translations/edx-platform-links/drag_and_drop_v2
-.. _edx-platform-links: https://github.com/openedx/openedx-translations/tree/8a01424fd8f42e9e76aed34e235c82ab654cdfc5/translations/edx-platform-links
+.. _atlas pull --expand-glob: https://github.com/openedx/openedx-atlas/blob/main/docs/decisions/0001-support-glob-pattern.rst
+
+.. _compilejsi18n: https://django-statici18n.readthedocs.io/en/latest/commands.html#compilejsi18n
+.. _Transifex Translation Memory: https://help.transifex.com/en/articles/6224636-introduction-to-translation-memory
+.. _edx-platform Transifex project: https://www.transifex.com/open-edx/edx-platform/
+.. _xblocks Transifex project: https://www.transifex.com/open-edx/xblocks/
