@@ -115,6 +115,63 @@
 
     ],
     [
+        {
+            "email": "student1@example.com"
+        },
+        [
+            {
+                "course_id": "course-v1:e+d+X",
+                "is_active": true,
+                "mode": "honor",
+                "user": "student1",
+                "created": "2018-01-01T00:00:01Z"
+            }
+        ]
+    ],
+    [
+        {
+            "email": "student1@example.com,student2@example.com"
+        },
+        [
+            {
+                "course_id": "course-v1:e+d+X",
+                "is_active": true,
+                "mode": "honor",
+                "user": "student1",
+                "created": "2018-01-01T00:00:01Z"
+            },
+            {
+                "course_id": "course-v1:e+d+X",
+                "is_active": true,
+                "mode": "honor",
+                "user": "student2",
+                "created": "2018-01-01T00:00:01Z"
+            },
+            {
+                "course_id": "course-v1:x+y+Z",
+                "is_active": true,
+                "mode": "honor",
+                "user": "student2",
+                "created": "2018-01-01T00:00:01Z"
+            }
+        ]
+    ],
+    [
+        {
+            "email": "student2@example.com",
+            "course_id": "course-v1:e+d+X"
+        },
+        [
+            {
+                "course_id": "course-v1:e+d+X",
+                "is_active": true,
+                "mode": "honor",
+                "user": "student2",
+                "created": "2018-01-01T00:00:01Z"
+            }
+        ]
+    ],
+    [
         null,
         [
             {
