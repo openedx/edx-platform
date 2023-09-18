@@ -11,6 +11,7 @@ from django.core.exceptions import (  # lint-amnesty, pylint: disable=wrong-impo
     ObjectDoesNotExist,
     ValidationError
 )
+from django.db import IntegrityError    # lint-amnesty, pylint: disable=wrong-import-order
 from django.utils.decorators import method_decorator  # lint-amnesty, pylint: disable=wrong-import-order
 from edx_rest_framework_extensions.auth.jwt.authentication import \
     JwtAuthentication  # lint-amnesty, pylint: disable=wrong-import-order
@@ -26,7 +27,7 @@ from rest_framework.views import APIView  # lint-amnesty, pylint: disable=wrong-
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.auth import user_has_role
-from common.djangoapps.student.models import CourseEnrollment, User
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed, User
 from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
 from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
@@ -41,7 +42,10 @@ from openedx.core.djangoapps.enrollments.errors import (
 )
 from openedx.core.djangoapps.enrollments.forms import CourseEnrollmentsApiListForm
 from openedx.core.djangoapps.enrollments.paginators import CourseEnrollmentsApiListPagination
-from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentsApiListSerializer
+from openedx.core.djangoapps.enrollments.serializers import (
+    CourseEnrollmentAllowedSerializer,
+    CourseEnrollmentsApiListSerializer
+)
 from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
@@ -676,7 +680,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         """
         # Get the User, Course ID, and Mode from the request.
 
-        username = request.data.get('user', request.user.username)
+        username = request.data.get('user')
         course_id = request.data.get('course_details', {}).get('course_id')
 
         if not course_id:
@@ -700,13 +704,31 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         has_api_key_permissions = self.has_api_key_permissions(request)
 
         # Check that the user specified is either the same user, or this is a server-to-server request.
-        if not username:
-            username = request.user.username
-        if username != request.user.username and not has_api_key_permissions \
+        if username and username != request.user.username and not has_api_key_permissions \
                 and not GlobalStaff().has_user(request.user):
             # Return a 404 instead of a 403 (Unauthorized). If one user is looking up
             # other users, do not let them deduce the existence of an enrollment.
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+        # A provided user has priority over a provided email.
+        # Fallback on request user if neither is provided.
+        if not username:
+            email = request.data.get('email')
+            if email:
+                # Only server-to-server or staff users can use the email for the request.
+                if not has_api_key_permissions and not GlobalStaff().has_user(request.user):
+                    return Response(status=status.HTTP_404_NOT_FOUND)
+                try:
+                    username = User.objects.get(email=email).username
+                except ObjectDoesNotExist:
+                    return Response(
+                        status=status.HTTP_406_NOT_ACCEPTABLE,
+                        data={
+                            'message': f'The user with the email address {email} does not exist.'
+                        }
+                    )
+            else:
+                username = request.user.username
 
         if mode not in (CourseMode.AUDIT, CourseMode.HONOR, None) and not has_api_key_permissions \
                 and not GlobalStaff().has_user(request.user):
@@ -911,12 +933,17 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
 
             GET /api/enrollment/v1/enrollments?course_id={course_id}&username={username}
 
+            GET /api/enrollment/v1/enrollments?email={email},{email}
+
         **Query Parameters for GET**
 
             * course_id: Filters the result to course enrollments for the course corresponding to the
               given course ID. The value must be URL encoded. Optional.
 
             * username: List of comma-separated usernames. Filters the result to the course enrollments
+              of the given users. Optional.
+
+            * email: List of comma-separated emails. Filters the result to the course enrollments
               of the given users. Optional.
 
             * page_size: Number of results to return per page. Optional.
@@ -981,9 +1008,174 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
         queryset = CourseEnrollment.objects.all()
         course_id = form.cleaned_data.get('course_id')
         usernames = form.cleaned_data.get('username')
+        emails = form.cleaned_data.get('email')
 
         if course_id:
             queryset = queryset.filter(course_id=course_id)
         if usernames:
             queryset = queryset.filter(user__username__in=usernames)
+        if emails:
+            queryset = queryset.filter(user__email__in=emails)
         return queryset
+
+
+class EnrollmentAllowedView(APIView):
+    """
+    A view that allows the retrieval and creation of enrollment allowed for a given user email and course id.
+    """
+    authentication_classes = (
+        JwtAuthentication,
+    )
+    permission_classes = (permissions.IsAdminUser,)
+    throttle_classes = (EnrollmentUserThrottle,)
+    serializer_class = CourseEnrollmentAllowedSerializer
+
+    def get(self, request):
+        """
+        Returns the enrollments allowed for a given user email.
+
+        **Example Requests**
+
+        GET /api/enrollment/v1/enrollment_allowed?email=user@example.com
+
+        **Parameters**
+
+        - `email` (optional, string, _query_params_) - defaults to the calling user if not provided.
+
+        **Responses**
+        - 200: Success.
+        - 403: Forbidden, you need to be staff.
+        """
+        user_email = request.query_params.get('email')
+        if not user_email:
+            user_email = request.user.email
+
+        enrollments_allowed = CourseEnrollmentAllowed.objects.filter(email=user_email) or []
+        serialized_enrollments_allowed = [
+            CourseEnrollmentAllowedSerializer(enrollment).data for enrollment in enrollments_allowed
+        ]
+
+        return Response(
+            status=status.HTTP_200_OK,
+            data=serialized_enrollments_allowed
+        )
+
+    def post(self, request):
+        """
+        Creates an enrollment allowed for a given user email and course id.
+
+        **Example Request**
+
+        POST /api/enrollment/v1/enrollment_allowed
+
+        Example request data:
+        ```
+        {
+            "email": "user@example.com",
+            "course_id": "course-v1:edX+DemoX+Demo_Course",
+            "auto_enroll": true
+        }
+        ```
+
+        **Parameters**
+
+        - `email` (**required**, string, _body_)
+
+        - `course_id` (**required**, string, _body_)
+
+        - `auto_enroll` (optional, bool: default=false, _body_)
+
+        **Responses**
+        - 200: Success, enrollment allowed found.
+        - 400: Bad request, missing data.
+        - 403: Forbidden, you need to be staff.
+        - 409: Conflict, enrollment allowed already exists.
+        """
+        is_bad_request_response, email, course_id = self.check_required_data(request)
+        auto_enroll = request.data.get('auto_enroll', False)
+        if is_bad_request_response:
+            return is_bad_request_response
+
+        try:
+            enrollment_allowed = CourseEnrollmentAllowed.objects.create(
+                email=email,
+                course_id=course_id,
+                auto_enroll=auto_enroll
+            )
+        except IntegrityError:
+            return Response(
+                status=status.HTTP_409_CONFLICT,
+                data={
+                    'message': f'An enrollment allowed with email {email} and course {course_id} already exists.'
+                }
+            )
+
+        serializer = CourseEnrollmentAllowedSerializer(enrollment_allowed)
+        return Response(
+            status=status.HTTP_201_CREATED,
+            data=serializer.data
+        )
+
+    def delete(self, request):
+        """
+        Deletes an enrollment allowed for a given user email and course id.
+
+        **Example Request**
+
+        DELETE /api/enrollment/v1/enrollment_allowed
+
+        Example request data:
+        ```
+        {
+            "email": "user@example.com",
+            "course_id": "course-v1:edX+DemoX+Demo_Course"
+        }
+        ```
+
+        **Parameters**
+
+        - `email` (**required**, string, _body_)
+
+        - `course_id` (**required**, string, _body_)
+
+        **Responses**
+        - 204: Enrollment allowed deleted.
+        - 400: Bad request, missing data.
+        - 403: Forbidden, you need to be staff.
+        - 404: Not found, the course enrollment allowed doesn't exists.
+        """
+        is_bad_request_response, email, course_id = self.check_required_data(request)
+        if is_bad_request_response:
+            return is_bad_request_response
+
+        try:
+            CourseEnrollmentAllowed.objects.get(
+                email=email,
+                course_id=course_id
+            ).delete()
+            return Response(
+                status=status.HTTP_204_NO_CONTENT,
+            )
+        except ObjectDoesNotExist:
+            return Response(
+                status=status.HTTP_404_NOT_FOUND,
+                data={
+                    'message': f"An enrollment allowed with email {email} and course {course_id} doesn't exists."
+                }
+            )
+
+    def check_required_data(self, request):
+        """
+        Check if the request has email and course_id.
+        """
+        email = request.data.get('email')
+        course_id = request.data.get('course_id')
+        if not email or not course_id:
+            is_bad_request = Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data={
+                    "message": "Please provide a value for 'email' and 'course_id' in the request data."
+                })
+        else:
+            is_bad_request = None
+        return (is_bad_request, email, course_id)

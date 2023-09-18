@@ -748,7 +748,7 @@ edx-drf-extensions==8.9.2
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.1.13
+edx-enterprise==4.1.14
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -820,7 +820,7 @@ edx-search==3.6.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-sga==0.22.0
+edx-sga==0.23.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1298,8 +1298,9 @@ openedx-django-wiki==2.0.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openedx-events==8.6.0
+openedx-events==8.5.0
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-event-bus-kafka
