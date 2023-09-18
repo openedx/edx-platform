@@ -1015,7 +1015,7 @@ def get_resume_button_urls(request):
     user = request.user
     course_limit = get_dashboard_course_limit() 
     site_org_whitelist, site_org_blacklist = get_org_black_and_whitelist_for_site()
-    course_enrollments = list(get_course_enrollments(user, site_org_whitelist, site_org_blacklist, course_limit))
+    course_enrollments = list(get_course_enrollments(user, site_org_whitelist, site_org_blacklist))
     
     (course_entitlements) = get_filtered_course_entitlements(
         user,
