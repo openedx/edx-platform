@@ -163,4 +163,4 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
         options = {dependent_option: 1, depending_on_option: False, 'courses': ['some/course/key']}
         with self.assertRaisesMessage(CommandError, expected_error_message):
             self.command.handle(**options)
-
+            
