@@ -487,7 +487,6 @@ class VideoBlock(
             'transcript_download_format': transcript_download_format,
             'transcript_download_formats_list': self.fields['transcript_download_format'].values,  # lint-amnesty, pylint: disable=unsubscriptable-object
         }
-
         if self.is_public_sharing_enabled():
             public_video_url = self.get_public_video_url()
             template_context['public_sharing_enabled'] = True
@@ -517,9 +516,12 @@ class VideoBlock(
         """
         Is public sharing enabled for this video?
         """
-
-        # Video share feature must be enabled for sharing settings to take effect
-        feature_enabled = PUBLIC_VIDEO_SHARE.is_enabled(self.location.course_key)
+        try:
+            # Video share feature must be enabled for sharing settings to take effect
+            feature_enabled = PUBLIC_VIDEO_SHARE.is_enabled(self.location.course_key)
+        except Exception as err:  # pylint: disable=broad-except
+            log.exception(f"Error retrieving course for course ID: {self.location.course_key}")
+            return False
         if not feature_enabled:
             return False
 
