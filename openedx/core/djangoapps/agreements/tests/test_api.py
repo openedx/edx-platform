@@ -120,6 +120,9 @@ class TestLTIPIISignatureApi(SharedModuleStoreTestCase):
         cls.course_id = str(cls.course.id)
         cls.lti_tools = {"first_lti_tool": "This is the first tool",
                          "second_lti_tool": "This is the second tool", }
+        cls.lti_tools_2 = {"first_lti_tool": "This is the first lti tool",
+                           "second_lti_tool": "This is the second tool",
+                           "third_lti_tool": "This is the third tool", }
         LTIPIITool.objects.create(
             course_key=CourseKey.from_string(cls.course_id),
             lti_tools=cls.lti_tools,
@@ -133,26 +136,16 @@ class TestLTIPIISignatureApi(SharedModuleStoreTestCase):
         signature = create_lti_pii_signature(self.user.username, self.course_id, self.lti_tools)
         self._assert_lti_pii_signature(signature)
 
-    def test_create_duplicate_lti_pii_signature(self):
+    def test_create_multiple_lti_pii_signature(self):
         """
-        Test that duplicate lti pii signatures cannot be created
+        Test that lti pii signatures are either created or updated
         """
-        print(self.user, self.course, self.course_id, self.lti_tools)
-        with LogCapture(LOGGER_NAME, level=logging.WARNING) as logger:
-            create_lti_pii_signature(self.user.username, self.course_id, self.lti_tools)
-            create_lti_pii_signature(self.user.username, self.course_id, self.lti_tools)
-            data = get_lti_pii_signature(self.user.username, self.course_id)
-            self._assert_lti_pii_signature(data.lti_pii_signature)
-            logger.check((
-                LOGGER_NAME,
-                'WARNING',
-                (
-                    'LTI PII signature already exists for user_id={user_id} and '
-                    'course_id={course_id}'.format(
-                        user_id=self.user.id, course_id=str(self.course_id)
-                    )
-                )
-            ))
+
+        create_lti_pii_signature(self.user.username, self.course_id, self.lti_tools)  # first signature
+        s1 = get_lti_pii_signature(self.user.username, self.course_id)  # retrieve the database entry
+        create_lti_pii_signature(self.user.username, self.course_id, self.lti_tools_2)  # signature with updated lti pii tools
+        s2 = get_lti_pii_signature(self.user.username, self.course_id)  # retrieve the updated database entry
+        self.assertTrue(s1 != s2)  # the signatue retrieved from the database should be the updated version
 
     def _assert_lti_pii_signature(self, signature):
         """

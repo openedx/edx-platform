@@ -1,5 +1,4 @@
 import attr
-from openedx.core.djangoapps.agreements.models import LTIPIISignature
 
 
 @attr.s(frozen=True, auto_attribs=True)
@@ -15,4 +14,7 @@ class LTIPIISignatureData:
     """
     Class that stores an lti pii signature
     """
-    lti_pii_signature: LTIPIISignature
+    user: str
+    course_id: str
+    lti_tools: str
+    lti_tools_hash: str
