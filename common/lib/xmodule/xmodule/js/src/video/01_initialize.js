@@ -174,11 +174,27 @@ function(VideoPlayer, i18n, moment, _) {
                         throw new Error('Too many OnYouTubeIframeAPIReady retries after TypeError...giving up.');
                     }
 
+                    handleYTAPIErr = function(ytapierr) {
+                        console.error('Error while trying to resolve the Deferred object responsible for calling OnYouTubeIframeAPIReady callbacks.');
+                        console.debug('window.onYouTubeIframeAPIReady is ' + window.onYouTubeIframeAPIReady);
+                        console.error(ytapierr);
+                        if (ytapierr instanceof TypeError) { // expecting TypeError: window.onYouTubeIframeAPIReady.resolve is not a function
+                            setTimeout(setupOnYouTubeIframeAPIReady, 500); // Try again up to defined max calls.
+                        }
+                        else {
+                            throw ytapierr;
+                        }
+                    };
+
                     try {
                         _oldOnYouTubeIframeAPIReady = window.onYouTubeIframeAPIReady || undefined;
 
                         window.onYouTubeIframeAPIReady = function() {
-                            window.onYouTubeIframeAPIReady.resolve();
+                            try {  // this additional inner try/catch shouldn't really be needed but it's here just in case.
+                                window.onYouTubeIframeAPIReady.resolve();
+                            } catch (ytapiresolveerr) {
+                                handleYTAPIErr(ytapiresolveerr);
+                            }
                         };
 
                         window.onYouTubeIframeAPIReady.resolve = _youtubeApiDeferred.resolve;
@@ -187,16 +203,8 @@ function(VideoPlayer, i18n, moment, _) {
                         if (_oldOnYouTubeIframeAPIReady) {
                             window.onYouTubeIframeAPIReady.done(_oldOnYouTubeIframeAPIReady);
                         }
-                    } catch (e) {
-                        console.error('Error while trying to resolve the Deferred object responsible for calling OnYouTubeIframeAPIReady callbacks.');
-                        console.error('window.onYouTubeIframeAPIReady is ' + window.onYouTubeIframeAPIReady);
-                        console.error(e);
-                        if (e instanceof TypeError) {
-                            setTimeout(setupOnYouTubeIframeAPIReady, 500); // Try again up to defined max calls.
-                        }
-                        else {
-                            throw e;
-                        }
+                    } catch (ytapierr) {
+                        handleYTAPIErr(ytapierr);
                     }
 
                 };
