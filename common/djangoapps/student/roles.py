@@ -7,6 +7,7 @@ adding users, removing users, and listing members
 import logging
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
+from contextlib import contextmanager
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from opaque_keys.edx.django.models import CourseKeyField
@@ -42,6 +43,17 @@ def register_access_role(cls):
         ACCESS_ROLES_INHERITANCE.setdefault(base_role, set()).add(cls.ROLE)
 
     return cls
+
+
+@contextmanager
+def strict_role_checking():
+    """
+    Context manager that temporarily disables role inheritance.
+    """
+    OLD_ACCESS_ROLES_INHERITANCE = ACCESS_ROLES_INHERITANCE.copy()
+    ACCESS_ROLES_INHERITANCE.clear()
+    yield
+    ACCESS_ROLES_INHERITANCE.update(OLD_ACCESS_ROLES_INHERITANCE)
 
 
 class BulkRoleCache:  # lint-amnesty, pylint: disable=missing-class-docstring
