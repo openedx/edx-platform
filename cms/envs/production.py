@@ -14,7 +14,6 @@ import warnings
 import yaml
 
 from corsheaders.defaults import default_headers as corsheaders_default_headers
-import django
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse_lazy
 from edx_django_utils.plugins import add_plugins
@@ -591,13 +590,6 @@ derive_settings(__name__)
 # This is at the bottom because it is going to load more settings after base settings are loaded
 
 add_plugins(__name__, ProjectType.CMS, SettingsType.PRODUCTION)
-
-# Determines which origins are trusted for unsafe requests eg. POST requests.
-CSRF_TRUSTED_ORIGINS = ENV_TOKENS.get('CSRF_TRUSTED_ORIGINS', [])
-# values are already updated above with default CSRF_TRUSTED_ORIGINS values but in
-# case of new django version these values will override.
-if django.VERSION[0] >= 4:  # for greater than django 3.2 use schemes.
-    CSRF_TRUSTED_ORIGINS = ENV_TOKENS.get('CSRF_TRUSTED_ORIGINS_WITH_SCHEME', [])
 
 ############# CORS headers for cross-domain requests #################
 if FEATURES.get('ENABLE_CORS_HEADERS'):
