@@ -100,6 +100,10 @@ jobs:
           sudo pip install "django~=${{ matrix.django-version }}.0"
         fi
 
+    - name: list installed package versions
+      run: |
+        sudo pip freeze
+
     - name: Run Tests
       env:
         LMS_CFG: lms/envs/minimal.yml
