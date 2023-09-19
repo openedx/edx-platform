@@ -121,7 +121,6 @@ from ..utils import (
     update_course_discussions_settings,
 )
 from .component import ADVANCED_COMPONENT_TYPES
-from .library import LIBRARIES_ENABLED
 
 log = logging.getLogger(__name__)
 User = get_user_model()

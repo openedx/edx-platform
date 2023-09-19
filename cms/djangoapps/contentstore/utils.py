@@ -1389,6 +1389,7 @@ def get_help_urls():
     help_tokens = {token: HelpUrlExpert.the_one().url_for_token(token) for token in tokens}
     return help_tokens
 
+
 def get_response_format(request):
     return request.GET.get('format') or request.POST.get('format') or 'html'
 
