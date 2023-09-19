@@ -164,27 +164,8 @@ function(VideoPlayer, i18n, moment, _) {
                 // so that it resolves our Deferred object, which will call all of the
                 // OnYouTubeIframeAPIReady callbacks.
                 //
-                let setupOnYouTubeIframeAPIReadyCallsCount = 0;
 
                 let setupOnYouTubeIframeAPIReady = function() {
-
-                    setupOnYouTubeIframeAPIReadyCallsCount++;
-
-                    if (setupOnYouTubeIframeAPIReadyCallsCount > setupOnYouTubeIframeAPIReadyMaxCalls) {
-                        throw new Error('Too many OnYouTubeIframeAPIReady retries after TypeError...giving up.');
-                    }
-
-                    handleYTAPIErr = function(ytapierr) {
-                        console.error('Error while trying to resolve the Deferred object responsible for calling OnYouTubeIframeAPIReady callbacks.');
-                        console.debug('window.onYouTubeIframeAPIReady is ' + window.onYouTubeIframeAPIReady);
-                        console.error(ytapierr);
-                        if (ytapierr instanceof TypeError) { // expecting TypeError: window.onYouTubeIframeAPIReady.resolve is not a function
-                            setTimeout(setupOnYouTubeIframeAPIReady, 500); // Try again up to defined max calls.
-                        }
-                        else {
-                            throw ytapierr;
-                        }
-                    };
 
                     // If this global function is already defined, we store it first, and make
                     // sure that it gets executed when our Deferred object is resolved.
@@ -196,9 +177,6 @@ function(VideoPlayer, i18n, moment, _) {
 
                     window.onYouTubeIframeAPIReady.resolve = _youtubeApiDeferred.resolve;
                     window.onYouTubeIframeAPIReady.done = _youtubeApiDeferred.done;
-                    _youtubeApiDeferred.catch(function(err) {
-                        handleYTAPIErr(err);
-                    });
 
                     if (_oldOnYouTubeIframeAPIReady) {
                         window.onYouTubeIframeAPIReady.done(_oldOnYouTubeIframeAPIReady);
