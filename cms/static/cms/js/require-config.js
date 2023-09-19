@@ -353,6 +353,11 @@
             'jquery_extend_patch': {
                 deps: ['jquery']
             }
+        },
+        config: {
+          text: {
+            useXhr: () => true
+          }
         }
     });
 }).call(this, require, define);

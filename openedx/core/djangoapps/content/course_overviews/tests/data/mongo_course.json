@@ -1,0 +1,67 @@
+{
+    "_id": {
+        "tag": "i4x",
+        "org": "org.0",
+        "course": "course_0",
+        "category": "course",
+        "name": "Run_0",
+        "revision": null
+    },
+    "definition": {
+        "children": [],
+        "data": {
+        "wiki_slug": "course_0"
+        }
+    },
+    "edit_info": {
+        "edited_on": {
+        "$date": "2023-03-29T14:01:07.038Z"
+        },
+        "edited_by": -3,
+        "subtree_edited_on": {
+        "$date": "2023-03-29T14:01:07.038Z"
+        },
+        "subtree_edited_by": -3
+    },
+    "metadata": {
+        "display_name": "Run 0",
+        "discussion_topics": {
+        "General": {
+            "id": "i4x-org_0-course_0-course-Run_0"
+        }
+        },
+        "tabs": [
+        {
+            "type": "courseware",
+            "name": "Course",
+            "course_staff_only": false
+        },
+        {
+            "type": "progress",
+            "name": "Progress",
+            "course_staff_only": false
+        },
+        {
+            "type": "dates",
+            "name": "Dates",
+            "course_staff_only": false
+        },
+        {
+            "type": "discussion",
+            "name": "Discussion",
+            "course_staff_only": false
+        },
+        {
+            "type": "wiki",
+            "name": "Wiki",
+            "course_staff_only": false,
+            "is_hidden": true
+        },
+        {
+            "type": "textbooks",
+            "name": "Textbooks",
+            "course_staff_only": false
+        }
+        ]
+    }
+}

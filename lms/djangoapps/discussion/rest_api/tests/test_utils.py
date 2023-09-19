@@ -13,7 +13,7 @@ import unittest
 from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
 from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
 from lms.djangoapps.discussion.rest_api.tests.utils import CommentsServiceMockMixin, ThreadMock
-from openedx.core.djangoapps.discussions.models import PostingRestriction
+from openedx.core.djangoapps.discussions.models import PostingRestriction, DiscussionsConfiguration
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -43,6 +43,9 @@ class DiscussionAPIUtilsTestCase(ModuleStoreTestCase):
         self.course = CourseFactory.create()
         self.course.discussion_blackouts = [datetime.now(UTC) - timedelta(days=3),
                                             datetime.now(UTC) + timedelta(days=3)]
+        configuration = DiscussionsConfiguration.get(self.course.id)
+        configuration.posting_restrictions = PostingRestriction.SCHEDULED
+        configuration.save()
         self.student_role = RoleFactory(name='Student', course_id=self.course.id)
         self.moderator_role = RoleFactory(name='Moderator', course_id=self.course.id)
         self.community_ta_role = RoleFactory(name='Community TA', course_id=self.course.id)
@@ -240,7 +243,7 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
         expected_context = {
             'replier_name': self.user_3.username,
             'post_title': self.thread.title,
-            'author_name': 'dummy',
+            'author_name': 'dummy\'s',
             'course_name': self.course.display_name,
         }
         self.assertDictEqual(args_comment.context, expected_context)
@@ -309,6 +312,36 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
             _get_mfe_url(self.course.id, self.thread.id)
         )
         self.assertEqual(args_comment.app_name, 'discussion')
+
+
+class TestSendCommentNotification(ForumsEnableMixin, CommentsServiceMockMixin, ModuleStoreTestCase):
+    """
+    Test case to send new_comment notification
+    """
+    def setUp(self):
+        super().setUp()
+        httpretty.reset()
+        httpretty.enable()
+
+        self.course = CourseFactory.create()
+        self.user_1 = UserFactory.create()
+        self.user_2 = UserFactory.create()
+
+    def test_new_comment_notification(self):
+        handler = Mock()
+        USER_NOTIFICATION_REQUESTED.connect(handler)
+
+        thread = ThreadMock(thread_id=1, creator=self.user_1, title='test thread')
+        response = ThreadMock(thread_id=2, creator=self.user_2, title='test response')
+        self.register_get_comment_response({
+            'id': response.id,
+            'thread_id': 'abc',
+            'user_id': response.user_id
+        })
+        send_response_notifications(thread, self.course, self.user_2, parent_id=response.id)
+        handler.assert_called_once()
+        context = handler.call_args[1]['notification_data'].context
+        self.assertEqual(context['author_name'], 'their')
 
 
 @ddt.ddt
