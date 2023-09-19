@@ -56,7 +56,6 @@ class LibraryToolsService:
         Returns None on error.
         """
 
-
         if isinstance(library_key, LibraryLocatorV2):
             try:
                 return library_api.get_library(library_key)

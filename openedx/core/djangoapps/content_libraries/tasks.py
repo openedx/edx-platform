@@ -66,9 +66,6 @@ def import_blocks_from_course(import_task_id, course_key_str):
         )
 
 
-
-
-
 def normalize_key_for_search(library_key):
     """ Normalizes library key for use with search indexing """
     return library_key.replace(version_guid=None, branch=None)
