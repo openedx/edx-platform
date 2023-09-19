@@ -1791,6 +1791,9 @@ INSTALLED_APPS = [
 
     # Blockstore
     'blockstore.apps.bundles',
+
+    # alternative swagger generator for studio content API
+    'drf_spectacular',
 ]
 
 
@@ -2771,3 +2774,13 @@ DISCUSSIONS_INCONTEXT_LEARNMORE_URL = ''
 #### django-simple-history##
 # disable indexing on date field its coming django-simple-history.
 SIMPLE_HISTORY_DATE_INDEX = False
+
+REST_FRAMEWORK['DEFAULT_SCHEMA_CLASS'] = 'drf_spectacular.openapi.AutoSchema'
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Studio Content API',
+    'DESCRIPTION': 'API to edit xblocks and course content in studio',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'PREPROCESSING_HOOKS': ['cms.lib.spectacular.content_api_filter'],
+}
