@@ -2,9 +2,14 @@
 Default Authentication classes that are ONLY meant to be used by
 DEFAULT_AUTHENTICATION_CLASSES for observability purposes.
 """
+from django.conf import settings
+
+from drf_spectacular.extensions import OpenApiAuthenticationExtension
+from drf_spectacular.plumbing import build_bearer_security_scheme_object
+from rest_framework.authentication import SessionAuthentication
+
 from edx_django_utils.monitoring import set_custom_attribute
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from rest_framework.authentication import SessionAuthentication
 
 
 class DefaultSessionAuthentication(SessionAuthentication):
@@ -53,3 +58,31 @@ class DefaultJwtAuthentication(JwtAuthentication):
         # includes a jwt_auth_result custom attribute, so we do not need to
         # reimplement that observability in this class.
         return super().authenticate(request)
+
+class JWTScheme(OpenApiAuthenticationExtension):
+    target_class = 'edx_rest_framework_extensions.auth.jwt.authentication.JwtAuthentication'
+    name = 'JWTAuth'
+    match_subclasses = True
+    priority = -1
+
+    def get_security_definition(self, auto_schema):
+        return build_bearer_security_scheme_object(
+            header_name='Authorization',
+            token_prefix="JWT ",
+        )
+
+
+class SessionScheme(OpenApiAuthenticationExtension):
+    target_class = 'openedx.core.djangolib.defaul_auth_classes.DefaultSessionAuthentication'
+    target_class = 'rest_framework.authentication.SessionAuthentication'
+    name = 'SessionAuth'
+    match_subclasses = True
+    priority = -1
+
+    def get_security_definition(self, auto_schema):
+        return {
+            'type': 'apiKey',
+            'in': 'cookie',
+            'name': settings.SESSION_COOKIE_NAME,
+        }
+
