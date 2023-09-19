@@ -13,3 +13,4 @@ from .proctoring import (
     ProctoringErrorsSerializer
 )
 from .settings import CourseSettingsSerializer
+from .xblock import XblockSerializer

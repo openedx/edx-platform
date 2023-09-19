@@ -2,9 +2,10 @@
 Public rest API endpoints for the CMS API.
 """
 import logging
+from rest_framework import serializers
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, CreateAPIView
 from django.views.decorators.csrf import csrf_exempt
-from django.http import Http404
+from django.http import Http404, HttpResponseBadRequest
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from common.djangoapps.util.json_request import expect_json_in_class_view
@@ -13,7 +14,7 @@ from cms.djangoapps.contentstore.api import course_author_access_required
 from cms.djangoapps.contentstore.xblock_storage_handlers import view_handlers
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
 
-# from cms.djangoapps.contentstore.rest_api.v1.serializers import XblockSerializer
+from cms.djangoapps.contentstore.rest_api.v1.serializers import XblockSerializer
 
 
 log = logging.getLogger(__name__)
@@ -29,8 +30,7 @@ class XblockView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAP
     usage_key_string (optional):
     xblock identifier, for example in the form of "block-v1:<course id>+type@<type>+block@<block id>"
     """
-    # TODO: uncomment next line after XblockSerializer is implemented
-    # serializer_class = XblockSerializer
+    serializer_class = XblockSerializer
 
     def dispatch(self, request, *args, **kwargs):
         # TODO: probably want to refactor this to a decorator.
@@ -52,11 +52,13 @@ class XblockView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAP
     @course_author_access_required
     @expect_json_in_class_view
     def update(self, request, course_key, usage_key_string=None):
+        # self._validate(request)
         return handle_xblock(request, usage_key_string)
 
     @course_author_access_required
     @expect_json_in_class_view
     def partial_update(self, request, course_key, usage_key_string=None):
+        # self._validate(request)
         return handle_xblock(request, usage_key_string)
 
     @course_author_access_required
@@ -68,4 +70,13 @@ class XblockView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAP
     @course_author_access_required
     @expect_json_in_class_view
     def create(self, request, course_key, usage_key_string=None):
+        try:
+            self._validate(request)
+        except serializers.ValidationError as e:
+            return HttpResponseBadRequest(reason=e)
+
         return handle_xblock(request, usage_key_string)
+
+    def _validate(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
