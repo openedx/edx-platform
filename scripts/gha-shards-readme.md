@@ -18,7 +18,7 @@ with django settings for each module and paths for submodules to test for exampl
 ```
 The `common` and `openedx` modules are tested with both `lms` and `cms` settings; that's why there are shards with the same `openedx`
 submodules but with different Django settings.
-For more details on sharding strategy please refer to this section on [sharding](https://openedx.atlassian.net/wiki/spaces/AT/pages/3235971586/edx-platfrom+unit+tests+migration+from+Jenkins+to+Github+Actions#Motivation-for-sharding-manually)
+For more details on sharding strategy please refer to this section on [sharding](https://openedx.atlassian.net/wiki/spaces/PLAT/pages/3869376544/edx-platform+unit+tests+migration+from+Jenkins+to+Github+Actions#Motivation-for-sharding-manually)
 
 #### Unit tests count check is failing
 There's a check in place that makes sure that all the unit tests under edx-platform modules are specified in `unit-test-shards.json`
