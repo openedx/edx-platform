@@ -271,8 +271,8 @@ class LibraryUpdateChildrenTask(UserTask):  # pylint: disable=abstract-method
         return f'Import of {key}'
 
 
-@set_code_owner_attribute
 @shared_task(base=LibraryUpdateChildrenTask, bind=True)
+@set_code_owner_attribute
 def update_children_task(self, user_id, dest_block_key, version=None):
     """
     Update xBlock's children.
