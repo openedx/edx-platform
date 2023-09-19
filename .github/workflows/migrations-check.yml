@@ -97,7 +97,7 @@ jobs:
       run: |
         make dev-requirements
         if [[ "${{ matrix.django-version }}" != "pinned" ]]; then
-          sudo pip install "django~=${{ matrix.django-version }}.0"
+          sudo pip install "django~=${{ matrix.django-version }}.2"
           sudo pip check # fail if this test-reqs/Django combination is broken
         fi
 
