@@ -5,6 +5,7 @@ Tests for the Course Home Course Metadata API in the Course Home API
 import ddt
 import json
 import mock
+from django.db import transaction
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from unittest.mock import patch
@@ -86,7 +87,9 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
 
     def test_get_unknown_course(self):
         url = reverse('course-home:course-metadata', args=['course-v1:unknown+course+2T2020'])
-        response = self.client.get(url)
+        # Django TestCase wraps every test in a transaction, so we must specifically wrap this when we expect an error
+        with transaction.atomic():
+            response = self.client.get(url)
         assert response.status_code == 404
 
     def _assert_course_access_response(self, response, expect_course_access, expected_error_code):
