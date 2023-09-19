@@ -344,6 +344,6 @@ urlpatterns += [
 
 # studio-content-api specific API docs (using drf-spectacular and openapi-v3)
 urlpatterns += [
-    re_path('^content-api/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    re_path('^content-api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    re_path('^cms-api/ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    re_path('^cms-api/schema/', SpectacularAPIView.as_view(), name='schema'),
 ]

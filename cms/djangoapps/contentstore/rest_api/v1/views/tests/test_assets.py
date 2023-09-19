@@ -1,7 +1,7 @@
 
 
 """
-Tests for the xblock view of the Studio Content API. This tests only the view itself,
+Tests for the xblock view of the CMS API. This tests only the view itself,
 not the underlying Xblock service.
 It checks that the assets_handler method of the Xblock service is called with the expected parameters.
 """

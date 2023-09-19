@@ -1,5 +1,5 @@
 """
-Public rest API endpoints for the Studio Content API.
+Public rest API endpoints for the CMS API.
 """
 import logging
 from rest_framework import serializers
@@ -25,7 +25,7 @@ handle_xblock = view_handlers.handle_xblock
 @view_auth_classes()
 class XblockView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAPIView):
     """
-    Public rest API endpoints for the Studio Content API.
+    Public rest API endpoints for the CMS API.
     course_key: required argument, needed to authorize course authors.
     usage_key_string (optional):
     xblock identifier, for example in the form of "block-v1:<course id>+type@<type>+block@<block id>"
