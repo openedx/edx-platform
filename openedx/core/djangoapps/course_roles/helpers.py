@@ -43,5 +43,6 @@ def organization_permissions_list_check(user, permission_names, organization_nam
     """
     Check if a user has all of the given permissions in an organization.
     """
-    return all(organization_permission_check(user, permission_name, organization_name)
-               for permission_name in permission_names)
+    return all(
+        organization_permission_check(user, permission_name, organization_name) for permission_name in permission_names
+    )

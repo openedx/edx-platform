@@ -8,13 +8,13 @@ from openedx.core.djangoapps.course_roles.helpers import (
     course_permissions_list_check,
     course_permission_check,
     organization_permissions_list_check,
-    organization_permission_check
+    organization_permission_check,
 )
 from openedx.core.djangoapps.course_roles.models import (
     CourseRolesPermission,
     CourseRolesRole,
     CourseRolesService,
-    CourseRolesUserRole
+    CourseRolesUserRole,
 )
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -24,6 +24,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
     """
     Tests of the permission check functions in course_roles.helpers module
     """
+
     def setUp(self):
         super().setUp()
         self.user_1 = UserFactory(username="test_user_1")
