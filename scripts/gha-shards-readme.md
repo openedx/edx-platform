@@ -27,7 +27,7 @@ against the entire codebase the check will fail.
 You'd have to update the `unit-test-shards.json` file manually to fix this.
 
 ##### How to fix
-- If you've added a new django app to the codebase, and you want to add it to the unit tests you need to add it to the `unit-test-shards.json`, details on where (in which shard) to place your Django app please refer to the [sharding](https://openedx.atlassian.net/wiki/spaces/AT/pages/3235971586/edx-platfrom+unit+tests+migration+from+Jenkins+to+Github+Actions#Where-should-I-place-my-new-Django-app) section in this document.
+- If you've added a new django app to the codebase, and you want to add it to the unit tests you need to add it to the `unit-test-shards.json`, details on where (in which shard) to place your Django app please refer to the [sharding](https://openedx.atlassian.net/wiki/spaces/PLAT/pages/3869376544/edx-platform+unit+tests+migration+from+Jenkins+to+Github+Actions#Where-should-I-place-my-new-Django-app%3A) section in this document.
 - If you haven't added any new django app to the codebase, you can debug / verify this by collecting unit tests against a submodule by running `pytest` for example:
 ```
 pytest --collect-only --ds=cms.envs.test cms/
