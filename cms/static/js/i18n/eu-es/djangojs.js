@@ -1159,7 +1159,6 @@
     "This is the list of chosen %s. You may remove some by selecting them in the box below and then clicking the \"Remove\" arrow between the two boxes.": "Hau da aukeratutako %s zerrenda. Hauetako zenbait ezaba ditzakezu azpiko kutxan hautatu eta bi kutxen artean dagoen \"Ezabatu\" gezian klik eginez.",
     "This is the name of the group": "Hau taldearen izena da",
     "This learner is currently sharing a limited profile.": "Ikasle hau une honetan profil mugatua partekatzen ari da.",
-    "This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.": "Zure zerbitzarearen edo zure interneteko konexioaren arazo batengatik gertatuko zen hau agian. Saiatu orria freskatzen eta ziurtatu on-line zaudela.",
     "This post could not be closed. Refresh the page and try again.": "Mezu hau ezin da itxi. Freskatu orria eta saiatu berri",
     "This post could not be flagged for abuse. Refresh the page and try again.": "Mezu hau ezin da iraintzat markatu. Freskatu orria eta saiatu berri",
     "This post could not be unflagged for abuse. Refresh the page and try again.": "Mezu hau ezin da iraintzat desmarkatu. Freskatu orria eta saiatu berri",

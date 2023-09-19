@@ -63,7 +63,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-08-27 20:42+0000\n"
+"POT-Creation-Date: 2023-09-17 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Myagmarjav Enkhbileg <miigaa.lucky@gmail.com>, 2018\n"
 "Language-Team: Mongolian (http://app.transifex.com/open-edx/edx-platform/language/mn/)\n"
@@ -73,14 +73,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.8.0\n"
-
-#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
-#: cms/static/js/views/video_transcripts.js
-#: xmodule/assets/library_source_block/public/js/library_source_block.js
-msgid ""
-"This may be happening because of an error with our server or your internet "
-"connection. Try refreshing the page or making sure you are online."
-msgstr ""
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -93,7 +85,6 @@ msgstr ""
 #: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/tabs.js
 #: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
 #: lms/static/js/views/fields.js
-#: xmodule/assets/library_source_block/public/js/library_source_block.js
 msgid "Saving"
 msgstr "Хадгалж байна"
 
@@ -3747,18 +3738,6 @@ msgstr "Профайл"
 msgid "Updating with latest library content"
 msgstr "Сангийн агуулгыг сүүлийн хувилбараар шинэчилж байна. "
 
-#: xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
-msgid "Loading..."
-msgstr ""
-
-#: xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
-msgid "Selected blocks"
-msgstr ""
-
-#: xmodule/assets/library_source_block/public/js/library_source_block.js
-msgid "Unable to update settings"
-msgstr ""
-
 #: xmodule/assets/split_test/public/js/split_test_author_view.js
 #: xmodule/js/public/js/split_test_author_view.js
 msgid "Creating missing groups"
@@ -5360,6 +5339,13 @@ msgstr ""
 msgid "Turn off transcripts"
 msgstr ""
 
+#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
+#: cms/static/js/views/video_transcripts.js
+msgid ""
+"This may be happening because of an error with our server or your internet "
+"connection. Try refreshing the page or making sure you are online."
+msgstr ""
+
 #: cms/static/cms/js/main.js
 msgid "Studio's having trouble saving your work"
 msgstr "Хадгалах явцад асуудал үүслээ. "
@@ -5903,12 +5889,22 @@ msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
-msgid "New files were added to this course's Files & Uploads"
+msgid "New file(s) added to Files & Uploads."
 msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
 msgid "The following required files were imported to this course:"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "View files"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "Dismiss"
 msgstr ""
 
 #: cms/static/js/views/course_rerun.js
