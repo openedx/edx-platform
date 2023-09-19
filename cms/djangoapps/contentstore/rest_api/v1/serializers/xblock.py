@@ -2,6 +2,7 @@
 API Serializers for xblocks
 """
 
+
 # TODO: implement and use serializer
 # from rest_framework import serializers
 

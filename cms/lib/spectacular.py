@@ -1,5 +1,6 @@
 """ Helper functions for drf-spectacular """
 
+
 def cms_api_filter(endpoints):
     """
     At the moment, we are only enabling drf-spectacular for the CMS API.
