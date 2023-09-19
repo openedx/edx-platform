@@ -99,7 +99,7 @@ jobs:
         # This is from the LMS dir on purpose since we don't need anything different for the CMS yet.
         STUDIO_CFG: lms/envs/minimal.yml
       run: |
-          echo "Running the LMS migrations."
-          ./manage.py lms migrate
-          echo "Running the CMS migrations."
-          ./manage.py cms migrate
+        echo "Running the LMS migrations."
+        ./manage.py lms migrate
+        echo "Running the CMS migrations."
+        ./manage.py cms migrate
