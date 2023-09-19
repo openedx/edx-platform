@@ -270,7 +270,7 @@ class LibraryUpdateChildrenTask(UserTask):  # pylint: disable=abstract-method
         key = arguments_dict['dest_block_key']
         return f'Import of {key}'
 
-
+@set_code_owner_attribute
 @shared_task(base=LibraryUpdateChildrenTask, bind=True)
 def update_children_task(self, user_id, dest_block_key, version=None):
     """
