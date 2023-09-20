@@ -1,5 +1,5 @@
 """
-Public rest API endpoints for the Studio Content API.
+Public rest API endpoints for the CMS API.
 """
 import logging
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, CreateAPIView
@@ -9,10 +9,12 @@ from django.http import Http404
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from common.djangoapps.util.json_request import expect_json_in_class_view
 
-from ....api import course_author_access_required
-
+from cms.djangoapps.contentstore.api import course_author_access_required
 from cms.djangoapps.contentstore.xblock_storage_handlers import view_handlers
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
+
+# from cms.djangoapps.contentstore.rest_api.v1.serializers import XblockSerializer
+
 
 log = logging.getLogger(__name__)
 toggles = contentstore_toggles
@@ -22,11 +24,13 @@ handle_xblock = view_handlers.handle_xblock
 @view_auth_classes()
 class XblockView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAPIView):
     """
-    Public rest API endpoints for the Studio Content API.
+    Public rest API endpoints for the CMS API.
     course_key: required argument, needed to authorize course authors.
     usage_key_string (optional):
     xblock identifier, for example in the form of "block-v1:<course id>+type@<type>+block@<block id>"
     """
+    # TODO: uncomment next line after XblockSerializer is implemented
+    # serializer_class = XblockSerializer
 
     def dispatch(self, request, *args, **kwargs):
         # TODO: probably want to refactor this to a decorator.

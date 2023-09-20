@@ -1,5 +1,5 @@
 """
-Public rest API endpoints for the Studio Content API video assets.
+Public rest API endpoints for the CMS API video assets.
 """
 import logging
 from rest_framework.generics import (
@@ -29,7 +29,7 @@ toggles = contentstore_toggles
 @view_auth_classes()
 class TranscriptView(DeveloperErrorViewMixin, CreateAPIView, RetrieveAPIView, DestroyAPIView):
     """
-    public rest API endpoints for the Studio Content API video transcripts.
+    public rest API endpoints for the CMS API video transcripts.
     course_key: required argument, needed to authorize course authors and identify the video.
     edx_video_id: optional query parameter, needed to identify the transcript.
     language_code: optional query parameter, needed to identify the transcript.
