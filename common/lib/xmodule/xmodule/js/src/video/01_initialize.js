@@ -164,49 +164,23 @@ function(VideoPlayer, i18n, moment, _) {
                 // so that it resolves our Deferred object, which will call all of the
                 // OnYouTubeIframeAPIReady callbacks.
                 //
-                // If this global function is already defined, we store it first, and make
-                // sure that it gets executed when our Deferred object is resolved.
-                let setupOnYouTubeIframeAPIReadyCallsCount = 0;
 
-                setupOnYouTubeIframeAPIReady = function() {
-                    setupOnYouTubeIframeAPIReadyCallsCount++;
-                    if (setupOnYouTubeIframeAPIReadyCallsCount > setupOnYouTubeIframeAPIReadyMaxCalls) {
-                        throw new Error('Too many OnYouTubeIframeAPIReady retries after TypeError...giving up.');
+                let setupOnYouTubeIframeAPIReady = function() {
+
+                    // If this global function is already defined, we store it first, and make
+                    // sure that it gets executed when our Deferred object is resolved.
+                    _oldOnYouTubeIframeAPIReady = window.onYouTubeIframeAPIReady || undefined;
+
+                    window.onYouTubeIframeAPIReady = function() {
+                        _youtubeApiDeferred.resolve();
                     }
 
-                    handleYTAPIErr = function(ytapierr) {
-                        console.error('Error while trying to resolve the Deferred object responsible for calling OnYouTubeIframeAPIReady callbacks.');
-                        console.debug('window.onYouTubeIframeAPIReady is ' + window.onYouTubeIframeAPIReady);
-                        console.error(ytapierr);
-                        if (ytapierr instanceof TypeError) { // expecting TypeError: window.onYouTubeIframeAPIReady.resolve is not a function
-                            setTimeout(setupOnYouTubeIframeAPIReady, 500); // Try again up to defined max calls.
-                        }
-                        else {
-                            throw ytapierr;
-                        }
-                    };
+                    window.onYouTubeIframeAPIReady.resolve = _youtubeApiDeferred.resolve;
+                    window.onYouTubeIframeAPIReady.done = _youtubeApiDeferred.done;
 
-                    try {
-                        _oldOnYouTubeIframeAPIReady = window.onYouTubeIframeAPIReady || undefined;
-
-                        window.onYouTubeIframeAPIReady = function() {
-                            try {  // this additional inner try/catch shouldn't really be needed but it's here just in case.
-                                window.onYouTubeIframeAPIReady.resolve();
-                            } catch (ytapiresolveerr) {
-                                handleYTAPIErr(ytapiresolveerr);
-                            }
-                        };
-
-                        window.onYouTubeIframeAPIReady.resolve = _youtubeApiDeferred.resolve;
-                        window.onYouTubeIframeAPIReady.done = _youtubeApiDeferred.done;
-
-                        if (_oldOnYouTubeIframeAPIReady) {
-                            window.onYouTubeIframeAPIReady.done(_oldOnYouTubeIframeAPIReady);
-                        }
-                    } catch (ytapierr) {
-                        handleYTAPIErr(ytapierr);
+                    if (_oldOnYouTubeIframeAPIReady) {
+                        window.onYouTubeIframeAPIReady.done(_oldOnYouTubeIframeAPIReady);
                     }
-
                 };
 
                 // If a Deferred object hasn't been created yet, create one now. It will
@@ -230,6 +204,7 @@ function(VideoPlayer, i18n, moment, _) {
                     window.YT.ready(onYTApiReady);
                 });
             }
+
         } else {
             video = VideoPlayer(state);
 
