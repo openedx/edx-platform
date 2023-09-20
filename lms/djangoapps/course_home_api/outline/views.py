@@ -303,9 +303,20 @@ class OutlineTabView(RetrieveAPIView):
             )
             available_seq_ids = {str(usage_key) for usage_key in user_course_outline.sequences}
 
+            available_section_ids = {str(section.usage_key) for section in user_course_outline.sections}
+
+            # course_blocks is a reference to the root of the course,
+            # so we go through the chapters (sections) and keep only those
+            # which are part of the outline.
+            course_blocks['children'] = [
+                chapter_data
+                for chapter_data in course_blocks.get('children', [])
+                if chapter_data['id'] in available_section_ids
+            ]
+
             # course_blocks is a reference to the root of the course, so we go
             # through the chapters (sections) to look for sequences to remove.
-            for chapter_data in course_blocks.get('children', []):
+            for chapter_data in course_blocks['children']:
                 chapter_data['children'] = [
                     seq_data
                     for seq_data in chapter_data['children']
