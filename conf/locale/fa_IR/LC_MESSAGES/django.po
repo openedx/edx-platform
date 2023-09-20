@@ -134,7 +134,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-08-13 20:42+0000\n"
+"POT-Creation-Date: 2023-09-03 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Somaye Joolaee, 2022\n"
 "Language-Team: Persian (Iran) (https://app.transifex.com/open-edx/teams/6205/fa_IR/)\n"
@@ -235,8 +235,8 @@ msgid "Video"
 msgstr "ویدیو"
 
 #: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr "مساله پیشرفته خالی"
+msgid "Blank Problem"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -340,8 +340,8 @@ msgstr "تحصیلات حرفه‌ای"
 #: common/djangoapps/course_modes/models.py xmodule/annotatable_block.py
 #: xmodule/capa_block.py xmodule/conditional_block.py
 #: xmodule/discussion_block.py xmodule/html_block.py
-#: xmodule/library_content_block.py xmodule/library_sourced_block.py
-#: xmodule/lti_block.py xmodule/split_test_block.py xmodule/unit_block.py
+#: xmodule/library_content_block.py xmodule/lti_block.py
+#: xmodule/split_test_block.py xmodule/unit_block.py
 #: xmodule/word_cloud_block.py xmodule/x_module.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
@@ -3120,6 +3120,12 @@ msgid "Open Response Assessment"
 msgstr "سنجش باز پاسخ"
 
 #: lms/djangoapps/courseware/courses.py
+msgid ""
+"This Open Response Assessment's due dates are set by your instructor and "
+"can't be shifted."
+msgstr ""
+
+#: lms/djangoapps/courseware/courses.py
 msgid "Self Assessment"
 msgstr "خودآزمایی"
 
@@ -3134,13 +3140,6 @@ msgstr "ارزیابی کارکنان"
 #: lms/djangoapps/courseware/courses.py
 msgid "Submission"
 msgstr "تأکید"
-
-#: lms/djangoapps/courseware/courses.py
-msgid ""
-"Open Response Assessment due dates are set by your instructor and can't be "
-"shifted."
-msgstr ""
-"تاریخ تأیید ارزیابی پاسخ باز توسط مربی شما تعیین می شود و قابل تغییر نیست."
 
 #. Translators: 'absolute' is a date such as "Jan 01,
 #. 2020". 'relative' is a fuzzy description of the time until
@@ -5865,7 +5864,6 @@ msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
 #: openedx/core/djangoapps/user_api/admin.py
-#: xmodule/templates/library-sourced-block-studio-view.html
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/videos_index_pagination.html
@@ -6325,13 +6323,11 @@ msgid "Quotes"
 msgstr "نقل‌قول‌ها"
 
 #: lms/templates/wiki/includes/editor_widget.html
-#, python-format
+#, python-brace-format
 msgid ""
-"Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for"
-" help."
+"Markdown syntax is allowed. See the {start_link}cheatsheet{end_link} for "
+"help."
 msgstr ""
-"به کار بردن Markdown syntax مجاز است. برای راهنمایی %(start_link)sبرگه‌های "
-"آماده%(end_link)s را بببنید"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
@@ -7367,11 +7363,9 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
-"The Posting availabilty in discussions whether it will be enabled, scheduled"
-" or indefinitely disabled."
+"The Posting availability in discussions whether it will be enabled, "
+"scheduled or indefinitely disabled."
 msgstr ""
-"در دسترس بودن ارسال در بحث فعال، برنامه ریزی شده یا به طور نامحدود غیرفعال "
-"می شود."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "The LTI configuration data for this context/provider."
@@ -9418,8 +9412,7 @@ msgstr "داده های XML برای یادداشت"
 #: xmodule/annotatable_block.py xmodule/capa_block.py
 #: xmodule/conditional_block.py xmodule/discussion_block.py
 #: xmodule/html_block.py xmodule/library_content_block.py
-#: xmodule/library_root_xblock.py xmodule/library_sourced_block.py
-#: xmodule/poll_block.py xmodule/unit_block.py
+#: xmodule/library_root_xblock.py xmodule/poll_block.py xmodule/unit_block.py
 #: xmodule/video_block/video_xfields.py xmodule/word_cloud_block.py
 #: xmodule/x_module.py
 msgid "The display name for this component."
@@ -11664,35 +11657,6 @@ msgstr "نام نمایشی کتابخانه"
 msgid "Enter the names of the advanced components to use in your library."
 msgstr "نام مولفه‌های پیشرفته را برای استفاده در کتابخانه خود وارد کنید."
 
-#: xmodule/library_sourced_block.py
-msgid "Library Blocks List"
-msgstr "فهرست بلوک‌های کتابخانه"
-
-#: xmodule/library_sourced_block.py
-msgid "Enter the IDs of the library XBlocks that you wish to use."
-msgstr "شناسه‌های XBlocks کتابخانه‌ای را وارد کنید که مایلید استفاده کنید."
-
-#: xmodule/library_sourced_block.py
-#, python-brace-format
-msgid "A maximum of {0} components may be added."
-msgstr "ممکن است بیشینه {0} مؤلفه اضافه شود."
-
-#: xmodule/library_sourced_block.py
-msgid ""
-"No XBlock has been configured for this component. Use the editor to select "
-"the target blocks."
-msgstr ""
-"هیچ XBlock برای این مؤلفه پیکربندی نشده‌است. برای انتخاب بلوک‌های هدف از "
-"ویرایشگر استفاده کنید."
-
-#: xmodule/library_sourced_block.py
-msgid "Open Editor"
-msgstr "گشودن ویرایشگر"
-
-#: xmodule/library_sourced_block.py
-msgid "Importing Library Block failed - are the IDs valid and readable?"
-msgstr "ورود بلوک کتابخانه موفق نبود- آیا شناسه‌ها معتبر و قابل‌خواندن هستند؟"
-
 #: xmodule/lti_block.py
 msgid ""
 "The display name for this component. Analytics reports may also use the "
@@ -12400,10 +12364,6 @@ msgstr ""
 #: xmodule/tabs.py
 msgid "External Discussion"
 msgstr "گفتگوی خارجی"
-
-#: xmodule/templates/library-sourced-block-studio-view.html
-msgid "Save and Import"
-msgstr "ذخیره و ورود"
 
 #: xmodule/vertical_block.py
 msgid "Enable in-context discussions for the Unit"
@@ -16334,10 +16294,6 @@ msgstr "بارگذاری نمرات یادگیرنده"
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Print or share your certificate:"
 msgstr "تهیه نسخه چاپی یا  اشتراک‌گذاری گواهی‌نامه:"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-msgid "Click the link to see my certificate."
-msgstr "روی پیوند کلیک کنید تا گواهی‌نامه مرا ببینید."
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
