@@ -425,9 +425,9 @@ class S3Boto3TestCase(TestCase):
         obj = storage.bucket.Object.return_value
         obj.upload_fileobj.assert_called_with(
             content,
-            ExtraArgs= self.order_dict({
-            'ContentType': 'text/plain',
-        }),
+            ExtraArgs=self.order_dict({
+                'ContentType': 'text/plain',
+            }),
             Config=storage._transfer_config
         )
 
