@@ -129,3 +129,8 @@ openedx-events<8.6.0               # Open edX Events from Hooks Extension Framew
 
 # pinning this version to avoid updates while the library is being developed
 openedx-learning==0.1.6
+
+# lti-consumer-xblock 9.6.2 contains a breaking change that makes
+# existing custom parameter configurations unusable. 
+# https://github.com/openedx/xblock-lti-consumer/issues/410 has been opened to track a fix
+lti-consumer-xblock==9.6.1
