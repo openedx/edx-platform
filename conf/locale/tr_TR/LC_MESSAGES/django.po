@@ -132,7 +132,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-08-20 20:42+0000\n"
+"POT-Creation-Date: 2023-09-10 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2021\n"
 "Language-Team: Turkish (Turkey) (https://app.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -234,8 +234,8 @@ msgid "Video"
 msgstr "Video"
 
 #: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr "Boş Gelişmiş Problem"
+msgid "Blank Problem"
+msgstr "Boş Problem"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -340,8 +340,8 @@ msgstr "Profesyonel Eğitim"
 #: common/djangoapps/course_modes/models.py xmodule/annotatable_block.py
 #: xmodule/capa_block.py xmodule/conditional_block.py
 #: xmodule/discussion_block.py xmodule/html_block.py
-#: xmodule/library_content_block.py xmodule/library_sourced_block.py
-#: xmodule/lti_block.py xmodule/split_test_block.py xmodule/unit_block.py
+#: xmodule/library_content_block.py xmodule/lti_block.py
+#: xmodule/split_test_block.py xmodule/unit_block.py
 #: xmodule/word_cloud_block.py xmodule/x_module.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
@@ -3153,6 +3153,14 @@ msgid "Open Response Assessment"
 msgstr "Açık Yanıt Değerlendirmesi"
 
 #: lms/djangoapps/courseware/courses.py
+msgid ""
+"This Open Response Assessment's due dates are set by your instructor and "
+"can't be shifted."
+msgstr ""
+"Bu ORA - Açık Cevap Değerlendirmesinin son tarihleri eğitmeniniz tarafından "
+"belirlenir ve değiştirilemez. "
+
+#: lms/djangoapps/courseware/courses.py
 msgid "Self Assessment"
 msgstr "Öz Değerlendirme"
 
@@ -3167,14 +3175,6 @@ msgstr "Personel Değerlendirmesi"
 #: lms/djangoapps/courseware/courses.py
 msgid "Submission"
 msgstr "Gönderim"
-
-#: lms/djangoapps/courseware/courses.py
-msgid ""
-"Open Response Assessment due dates are set by your instructor and can't be "
-"shifted."
-msgstr ""
-"Açık Cevap Değerlendirmesi - ORA son tarihleri eğitmeniniz tarafından "
-"belirlenir ve değiştirilemez. "
 
 #. Translators: 'absolute' is a date such as "Jan 01,
 #. 2020". 'relative' is a fuzzy description of the time until
@@ -3431,7 +3431,7 @@ msgstr "Açık Yanıt Değerlendirmesi Ayarları"
 
 #: lms/djangoapps/courseware/plugins.py
 msgid "Course level settings for Open Response Assessment."
-msgstr ""
+msgstr "Açık Cevap Değerlendirmesi için ders seviyesi ayarları."
 
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
 #: openedx/features/course_experience/__init__.py xmodule/tabs.py
@@ -3710,12 +3710,12 @@ msgstr "İyi"
 #. Translators: Replier commented on "your" response to your post
 #: lms/djangoapps/discussion/rest_api/utils.py
 msgid "your"
-msgstr ""
+msgstr "size"
 
 #. Translators: Replier commented on "their" response to your post
 #: lms/djangoapps/discussion/rest_api/utils.py
 msgid "their"
-msgstr ""
+msgstr "onlara"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #, python-format
@@ -5943,7 +5943,6 @@ msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
 #: openedx/core/djangoapps/user_api/admin.py
-#: xmodule/templates/library-sourced-block-studio-view.html
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/videos_index_pagination.html
@@ -6409,13 +6408,11 @@ msgid "Quotes"
 msgstr "Alıntılar"
 
 #: lms/templates/wiki/includes/editor_widget.html
-#, python-format
+#, python-brace-format
 msgid ""
-"Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for"
-" help."
+"Markdown syntax is allowed. See the {start_link}cheatsheet{end_link} for "
+"help."
 msgstr ""
-"Markdown yazımına izin verilmektedir. Yardım için "
-"%(start_link)sipuçları%(end_link)ssayfasına bakın."
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
@@ -7455,8 +7452,8 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
-"The Posting availabilty in discussions whether it will be enabled, scheduled"
-" or indefinitely disabled."
+"The Posting availability in discussions whether it will be enabled, "
+"scheduled or indefinitely disabled."
 msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
@@ -7652,6 +7649,8 @@ msgid ""
 "<{p}><{strong}>{replier_name}</{strong}> responded to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> gönderinize cevap yazdı "
+"<{strong}>{post_title}</{strong}></{p}>"
 
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
@@ -7659,6 +7658,8 @@ msgid ""
 "<{p}><{strong}>{username}</{strong}> posted "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
+"<{p}><{strong}>{username}</{strong}> gönderdi "
+"<{strong}>{post_title}</{strong}></{p}>"
 
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
@@ -7666,6 +7667,8 @@ msgid ""
 "<{p}><{strong}>{username}</{strong}> asked "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
+"<{p}><{strong}>{username}</{strong}> sordu "
+"<{strong}>{post_title}</{strong}></{p}>"
 
 #: openedx/core/djangoapps/notifications/base_notification.py
 msgid ""
@@ -7679,23 +7682,23 @@ msgstr ""
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "Invalid app name."
-msgstr ""
+msgstr "Geçersiz uygulama adı."
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "Notifications marked as seen."
-msgstr ""
+msgstr "Bildirimler görüldü olarak işaretlendi."
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "Notification marked read."
-msgstr ""
+msgstr "Bildirim okundu olarak işaretlendi."
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "Notifications marked read."
-msgstr ""
+msgstr "Bildirimler okundu olarak işaretlendi."
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "Invalid app_name or notification_id."
-msgstr ""
+msgstr "Geçersiz uyg_adı ya da bildirim_id."
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid ""
@@ -9516,8 +9519,7 @@ msgstr "Bilgi notu için XML verisi"
 #: xmodule/annotatable_block.py xmodule/capa_block.py
 #: xmodule/conditional_block.py xmodule/discussion_block.py
 #: xmodule/html_block.py xmodule/library_content_block.py
-#: xmodule/library_root_xblock.py xmodule/library_sourced_block.py
-#: xmodule/poll_block.py xmodule/unit_block.py
+#: xmodule/library_root_xblock.py xmodule/poll_block.py xmodule/unit_block.py
 #: xmodule/video_block/video_xfields.py xmodule/word_cloud_block.py
 #: xmodule/x_module.py
 msgid "The display name for this component."
@@ -11768,36 +11770,6 @@ msgstr "Kütüphane Görünen Adı"
 msgid "Enter the names of the advanced components to use in your library."
 msgstr "Kütüphanenizde kullanmak için gelişmiş bileşenlerin adlarını girin."
 
-#: xmodule/library_sourced_block.py
-msgid "Library Blocks List"
-msgstr "Kütüphane XBlock Listesi"
-
-#: xmodule/library_sourced_block.py
-msgid "Enter the IDs of the library XBlocks that you wish to use."
-msgstr "Kullanmak istediğiniz kütüphane XBlock'ının kimliğini girin."
-
-#: xmodule/library_sourced_block.py
-#, python-brace-format
-msgid "A maximum of {0} components may be added."
-msgstr "En fazla {0} bileşen eklenebilir."
-
-#: xmodule/library_sourced_block.py
-msgid ""
-"No XBlock has been configured for this component. Use the editor to select "
-"the target blocks."
-msgstr ""
-"Bu bileşen için herhangi bir XBlock yapılandırılmamış. Hedef block seçmek "
-"için editörü kullanın."
-
-#: xmodule/library_sourced_block.py
-msgid "Open Editor"
-msgstr "Açık Düzenleyici"
-
-#: xmodule/library_sourced_block.py
-msgid "Importing Library Block failed - are the IDs valid and readable?"
-msgstr ""
-"Kütüphane Block içe aktarımı başarısız - ID'ler geçerli ve okunabilir mi?"
-
 #: xmodule/lti_block.py
 msgid ""
 "The display name for this component. Analytics reports may also use the "
@@ -12508,10 +12480,6 @@ msgstr "Bu içerik deneyinin içerik görünürlüğünü etkileyen sorunları v
 #: xmodule/tabs.py
 msgid "External Discussion"
 msgstr "Harici Tartışma"
-
-#: xmodule/templates/library-sourced-block-studio-view.html
-msgid "Save and Import"
-msgstr "Kaydet ve İçe Aktar"
 
 #: xmodule/vertical_block.py
 msgid "Enable in-context discussions for the Unit"
@@ -16397,10 +16365,6 @@ msgid "Print or share your certificate:"
 msgstr "Sertifikanı yazdır veya paylaş:"
 
 #: lms/templates/certificates/_accomplishment-banner.html
-msgid "Click the link to see my certificate."
-msgstr "Sertifikanızı görmek için bağlantıya tıklayın."
-
-#: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
 msgstr "Facebook'ta paylaş"
 
@@ -19433,7 +19397,7 @@ msgstr "Personel Ekle"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Limited Staff"
-msgstr ""
+msgstr "Sınırlı Personel"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -19442,10 +19406,15 @@ msgid ""
 "grades and access all course data. Limited Staff don't have access to your "
 "course in Studio. You can only give course team roles to enrolled users."
 msgstr ""
+"Sınırlı Personel rolüne sahip ders ekibi üyeleri dersiniz, yönetmenize "
+"yardımcı olur. Sınırlı Personel, öğrencilerin kaydını yapabilir ve "
+"kayıtlarını kaldırabilir, ayrıca notlarını değiştirebilir ve tüm ders "
+"verilerine erişebilir. Sınırlı Personelin Studio'daki dersinize erişimi "
+"yoktur. Ders ekibi rollerini yalnızca kayıtlı kullanıcılara verebilirsiniz."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Limited Staff"
-msgstr ""
+msgstr "Sınırlı Personel Ekle"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Admin"
