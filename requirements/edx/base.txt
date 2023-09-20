@@ -557,7 +557,7 @@ edx-when==2.4.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-proctoring
-edxval==2.4.2
+edxval==2.4.3
     # via -r requirements/edx/kernel.in
 elasticsearch==7.13.4
     # via

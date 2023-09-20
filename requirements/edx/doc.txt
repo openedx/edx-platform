@@ -636,7 +636,7 @@ edx-when==2.4.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring
-edxval==2.4.2
+edxval==2.4.3
     # via -r requirements/edx/base.txt
 elasticsearch==7.13.4
     # via
@@ -1027,7 +1027,7 @@ pycryptodomex==3.19.0
     #   lti-consumer-xblock
     #   pyjwkest
     #   snowflake-connector-python
-pydata-sphinx-theme==0.14.0
+pydata-sphinx-theme==0.14.1
     # via sphinx-book-theme
 pygments==2.16.1
     # via

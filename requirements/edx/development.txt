@@ -860,7 +860,7 @@ edx-when==2.4.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-proctoring
-edxval==2.4.2
+edxval==2.4.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1486,7 +1486,7 @@ pydantic-core==2.6.3
     # via
     #   -r requirements/edx/testing.txt
     #   pydantic
-pydata-sphinx-theme==0.14.0
+pydata-sphinx-theme==0.14.1
     # via
     #   -r requirements/edx/doc.txt
     #   sphinx-book-theme
@@ -2062,7 +2062,7 @@ types-pyyaml==6.0.12.11
     # via
     #   django-stubs
     #   djangorestframework-stubs
-types-requests==2.31.0.2
+types-requests==2.31.0.3
     # via djangorestframework-stubs
 types-urllib3==1.26.25.14
     # via types-requests
