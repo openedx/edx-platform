@@ -407,7 +407,6 @@ class S3Boto3TestCase(TestCase):
 
         self.assertEqual(S3Boto3Storage, storage.__class__)
 
-    @override_settings(AWS_S3_USE_THREADS=False)
     def test_storage_without_global_default_acl_setting(self):
         """
         In 1.9.1 package provides the default-acl=`public-read`.
