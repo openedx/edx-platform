@@ -428,7 +428,7 @@ class S3Boto3TestCase(TestCase):
             ExtraArgs=self.order_dict({
                 'ContentType': 'text/plain',
             }),
-            Config=storage._transfer_config
+            Config=storage._transfer_config  # pylint: disable=protected-access
         )
 
     @override_settings(AWS_DEFAULT_ACL='public-read')
@@ -463,7 +463,7 @@ class S3Boto3TestCase(TestCase):
         obj.upload_fileobj.assert_called_with(
             content,
             ExtraArgs=self.order_dict(ExtraArgs),
-            Config=storage._transfer_config
+            Config=storage._transfer_config  # pylint: disable=protected-access
         )
 
     @ddt.data('public-read', 'private')
@@ -487,5 +487,5 @@ class S3Boto3TestCase(TestCase):
                 ExtraArgs=self.order_dict({
                     'ContentType': 'text/plain',
                 }),
-                Config=storage._transfer_config
+                Config=storage._transfer_config  # pylint: disable=protected-access
             )
