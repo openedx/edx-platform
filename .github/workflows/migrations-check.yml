@@ -103,3 +103,19 @@ jobs:
         ./manage.py lms migrate
         echo "Running the CMS migrations."
         ./manage.py cms migrate
+  
+  # This job aggregates test results. It's the required check for branch protection.
+  # https://github.com/marketplace/actions/alls-green#why
+  # https://github.com/orgs/community/discussions/33579
+  success:
+    name: Migrations checks successful
+    if: always()
+    needs:
+      - check_migrations
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decide whether the needed jobs succeeded or failed
+        # uses: re-actors/alls-green@v1.2.1
+        uses: re-actors/alls-green@13b4244b312e8a314951e03958a2f91519a6a3c9
+        with:
+          jobs: ${{ toJSON(needs) }}
