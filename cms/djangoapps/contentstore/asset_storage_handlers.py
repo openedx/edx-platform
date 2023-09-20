@@ -575,7 +575,7 @@ def _get_thumbnail_asset_key(asset, course_key):
 
 
 # TODO: this method needs improvement. These view decorators should be at the top in an actual view method,
-#  but this is just a method called by the asset_handler. The asset_handler used by the public studio content API
+#  but this is just a method called by the asset_handler. The asset_handler used by the public CMS API
 # just ignores all of this stuff.
 @require_http_methods(('DELETE', 'POST', 'PUT'))
 @login_required
