@@ -140,6 +140,6 @@ class LTIPIISignatureView(AuthenticatedAPIView):
         /api/agreements/v1/lti_pii_signature/{course_id}
         """
         username = request.user.username
-        signature = create_lti_pii_signature(username, course_id, lti_tools)
+        #signature = create_lti_pii_signature(username, course_id, lti_tools)
         #serializer = IntegritySignatureSerializer(signature)
         #return Response(serializer.data)
