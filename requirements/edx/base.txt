@@ -357,7 +357,7 @@ django-statici18n==2.4.0
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
     #   xblock-drag-and-drop-v2
-django-storages==1.11.1
+django-storages==1.12.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -486,7 +486,7 @@ edx-drf-extensions==8.10.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.1.15
+edx-enterprise==4.2.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -545,6 +545,7 @@ edx-toggles==5.1.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-completion
+    #   edx-enterprise
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
     #   edx-name-affirmation
@@ -557,7 +558,7 @@ edx-when==2.4.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-proctoring
-edxval==2.4.2
+edxval==2.4.3
     # via -r requirements/edx/kernel.in
 elasticsearch==7.13.4
     # via
@@ -615,7 +616,7 @@ idna==3.4
     #   yarl
 importlib-metadata==6.8.0
     # via markdown
-importlib-resources==6.0.1
+importlib-resources==6.1.0
     # via
     #   jsonschema
     #   jsonschema-specifications
@@ -652,7 +653,7 @@ jsonfield==3.1.0
     #   edx-submissions
     #   lti-consumer-xblock
     #   ora2
-jsonschema==4.19.0
+jsonschema==4.19.1
     # via
     #   drf-spectacular
     #   optimizely-sdk
@@ -679,8 +680,10 @@ libsass==0.10.0
     #   -r requirements/edx/paver.txt
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==9.6.2
-    # via -r requirements/edx/kernel.in
+lti-consumer-xblock==9.6.1
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/kernel.in
 lxml==4.9.3
     # via
     #   -r requirements/edx/kernel.in
