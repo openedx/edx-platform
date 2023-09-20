@@ -1,5 +1,5 @@
 """
-Public data structures for this app. 
+Public data structures for this app.
 """
 import attr
 
