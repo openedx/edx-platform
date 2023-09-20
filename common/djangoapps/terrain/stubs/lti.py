@@ -78,7 +78,9 @@ class StubLtiHandler(StubHttpRequestHandler):
                         'callback_url': self.post_dict.get('lis_outcome_service_url').replace('https', 'http'),
                         'sourcedId': self.post_dict.get('lis_result_sourcedid')
                     }
-                host = os.environ.get('BOK_CHOY_HOSTNAME', self.server.server_address[0])
+                # remove bok-choy    
+                # host = os.environ.get('BOK_CHOY_HOSTNAME', self.server.server_address[0])
+                host = os.environ.get(self.server.server_address[0])
                 submit_url = f'//{host}:{self.server.server_address[1]}'
                 content = self._create_content(status_message, submit_url)
                 self.send_response(200, content)
@@ -296,7 +298,9 @@ class StubLtiHandler(StubHttpRequestHandler):
 
         """
         client_secret = str(self.server.config.get('client_secret', self.DEFAULT_CLIENT_SECRET))
-        host = os.environ.get('BOK_CHOY_HOSTNAME', '127.0.0.1')
+        # remove bok-choy
+        # host = os.environ.get('BOK_CHOY_HOSTNAME', '127.0.0.1')
+        host = os.environ.get('127.0.0.1')
         port = self.server.server_address[1]
         lti_base = self.DEFAULT_LTI_ADDRESS.format(host=host, port=port)
         lti_endpoint = self.server.config.get('lti_endpoint', self.DEFAULT_LTI_ENDPOINT)
