@@ -73,7 +73,7 @@ class XblockView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAP
         try:
             self._validate(request)
         except serializers.ValidationError as e:
-            return HttpResponseBadRequest(reason=e)
+            return HttpResponseBadRequest(reason=e.detail)
 
         return handle_xblock(request, usage_key_string)
 
