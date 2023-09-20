@@ -2,12 +2,15 @@
 API Serializers for xblocks
 """
 from rest_framework import serializers
+from .common import StrictSerializer
 
-class XblockSerializer(serializers.Serializer):
+class XblockSerializer(StrictSerializer):
     """
-    Serializer for xblocks.
+    Strict Serializer for xblocks.
+    Validates top-level field types and that no extra fields are passed in.
     This is an incomplete list of fields currently, designed so that the CMS API demo works.
-    I added additional fields to this that were easily discoverable.
+
+    Optional fields that were easy to discover were added.
     """
     id=serializers.CharField(required=False)
     parent_locator=serializers.CharField(required=False, allow_null=True)
@@ -47,19 +50,3 @@ class XblockSerializer(serializers.Serializer):
     ancestor_has_staff_lock=serializers.BooleanField(required=False, allow_null=True)
     user_partition_info=serializers.DictField(required=False, allow_null=True)
     summary_configuration_enabled=serializers.JSONField(required=False, allow_null=True)
-
-    def to_internal_value(self, data):
-        """
-        raise validation error if there are any unexpected fields.
-        """
-        # Transform and validate the expected fields
-        ret = super().to_internal_value(data)
-
-        # Check for unexpected fields
-        extra_fields = set(data.keys()) - set(self.fields.keys())
-        if extra_fields:
-            raise serializers.ValidationError(
-                {field: ["This field is not expected."] for field in extra_fields}
-            )
-
-        return ret

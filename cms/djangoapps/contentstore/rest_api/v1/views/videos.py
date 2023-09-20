@@ -2,15 +2,18 @@
 Public rest API endpoints for the CMS API video assets.
 """
 import logging
+from rest_framework import serializers
 from rest_framework.generics import (
     CreateAPIView,
     RetrieveAPIView,
     DestroyAPIView
 )
+from rest_framework.parsers import (MultiPartParser, FormParser)
 from django.views.decorators.csrf import csrf_exempt
-from django.http import Http404
+from django.http import Http404, HttpResponseBadRequest
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+from openedx.core.lib.api.parsers import TypedFileUploadParser
 from common.djangoapps.util.json_request import expect_json_in_class_view
 
 from ....api import course_author_access_required
@@ -22,7 +25,9 @@ from cms.djangoapps.contentstore.video_storage_handlers import (
     enabled_video_features,
     handle_generate_video_upload_link
 )
+from cms.djangoapps.contentstore.rest_api.v1.serializers import VideoUploadSerializer, VideoImageSerializer
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
+
 
 log = logging.getLogger(__name__)
 toggles = contentstore_toggles
@@ -35,6 +40,7 @@ class VideosView(DeveloperErrorViewMixin, CreateAPIView, RetrieveAPIView, Destro
     course_key: required argument, needed to authorize course authors and identify the video.
     video_id: required argument, needed to identify the video.
     """
+    serializer_class = VideoUploadSerializer
 
     def dispatch(self, request, *args, **kwargs):
         # TODO: probably want to refactor this to a decorator.
@@ -51,7 +57,9 @@ class VideosView(DeveloperErrorViewMixin, CreateAPIView, RetrieveAPIView, Destro
     @course_author_access_required
     @expect_json_in_class_view
     def create(self, request, course_key):  # pylint: disable=arguments-differ
-        return handle_videos(request, course_key.html_id())
+        """Deprecated. Use the upload_link endpoint instead."""
+        callback = lambda: handle_videos(request, course_key.html_id())
+        return _run_if_valid(request, context=self, callback=callback)
 
     @course_author_access_required
     def retrieve(self, request, course_key, edx_video_id=None):  # pylint: disable=arguments-differ
@@ -70,6 +78,8 @@ class VideoImagesView(DeveloperErrorViewMixin, CreateAPIView):
     course_key: required argument, needed to authorize course authors and identify the video.
     video_id: required argument, needed to identify the video.
     """
+    serializer_class = VideoImageSerializer
+    parser_classes = (MultiPartParser, FormParser, TypedFileUploadParser)
 
     def dispatch(self, request, *args, **kwargs):
         # TODO: probably want to refactor this to a decorator.
@@ -140,6 +150,7 @@ class UploadLinkView(DeveloperErrorViewMixin, CreateAPIView):
     """
     public rest API endpoint providing a list of enabled video features.
     """
+    serializer_class = VideoUploadSerializer
 
     def dispatch(self, request, *args, **kwargs):
         # TODO: probably want to refactor this to a decorator.
@@ -156,4 +167,23 @@ class UploadLinkView(DeveloperErrorViewMixin, CreateAPIView):
     @course_author_access_required
     @expect_json_in_class_view
     def create(self, request, course_key):  # pylint: disable=arguments-differ
-        return handle_generate_video_upload_link(request, course_key.html_id())
+        callback = lambda: handle_videos(request, course_key.html_id())
+        return _run_if_valid(request, context=self, callback=callback)
+
+
+def _validate(request, context=None):
+    """ Validate request data using the serializer in the context."""
+    serializer = context.get_serializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+
+
+def _run_if_valid(request, context=None, callback=None):
+    """
+    First, run a validation using the serializer in the context on the request data.
+    If this succeeds, run the callback, else, return a 400 response.
+    """
+    try:
+        _validate(request, context)
+        return callback()
+    except serializers.ValidationError as e:
+        return HttpResponseBadRequest(reason=e.detail)
