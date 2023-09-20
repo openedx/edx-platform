@@ -378,6 +378,15 @@ class S3Boto3TestCase(TestCase):
         self.storage = S3Boto3Storage()
         self.storage._connections.connection = MagicMock()  # pylint: disable=protected-access
 
+    def order_dict(self, dictionary):
+        """
+        sorting dict key:values for tests cases.
+        """
+        sorted_key_values = sorted(dictionary.items())
+        dictionary.clear()
+        dictionary.update(sorted_key_values)
+        return dictionary
+
     def test_video_backend(self):
         self.assertEqual(
             S3Boto3Storage,
@@ -398,6 +407,7 @@ class S3Boto3TestCase(TestCase):
 
         self.assertEqual(S3Boto3Storage, storage.__class__)
 
+    @override_settings(AWS_S3_USE_THREADS=False)
     def test_storage_without_global_default_acl_setting(self):
         """
         In 1.9.1 package provides the default-acl=`public-read`.
@@ -416,9 +426,10 @@ class S3Boto3TestCase(TestCase):
         obj = storage.bucket.Object.return_value
         obj.upload_fileobj.assert_called_with(
             content,
-            ExtraArgs={
-                'ContentType': 'text/plain',
-            }
+            ExtraArgs= self.order_dict({
+            'ContentType': 'text/plain',
+        }),
+            Config=storage._transfer_config
         )
 
     @override_settings(AWS_DEFAULT_ACL='public-read')
@@ -452,7 +463,8 @@ class S3Boto3TestCase(TestCase):
 
         obj.upload_fileobj.assert_called_with(
             content,
-            ExtraArgs=ExtraArgs
+            ExtraArgs=self.order_dict(ExtraArgs),
+            Config=storage._transfer_config
         )
 
     @ddt.data('public-read', 'private')
@@ -473,7 +485,8 @@ class S3Boto3TestCase(TestCase):
             obj = storage.bucket.Object.return_value
             obj.upload_fileobj.assert_called_with(
                 content,
-                ExtraArgs={
+                ExtraArgs=self.order_dict({
                     'ContentType': 'text/plain',
-                }
+                }),
+                Config=storage._transfer_config
             )
