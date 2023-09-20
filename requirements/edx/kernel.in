@@ -58,6 +58,7 @@ django-user-tasks
 django-waffle
 django-webpack-loader               # Used to wire webpack bundles into the django asset pipeline
 djangorestframework
+drf-spectacular
 edx-ace
 edx-api-doc-tools
 edx-auth-backends                   # Allow Studio to use LMS SSO

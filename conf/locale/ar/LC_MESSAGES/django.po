@@ -259,7 +259,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-08-20 20:42+0000\n"
+"POT-Creation-Date: 2023-09-10 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: NELC Open edX Translation <openedx@elc.edu.sa>, 2020\n"
 "Language-Team: Arabic (https://app.transifex.com/open-edx/teams/6205/ar/)\n"
@@ -360,8 +360,8 @@ msgid "Video"
 msgstr "فيديو"
 
 #: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr "مسألة متقدِّمة فارغة"
+msgid "Blank Problem"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -465,8 +465,8 @@ msgstr "التعليم المهني"
 #: common/djangoapps/course_modes/models.py xmodule/annotatable_block.py
 #: xmodule/capa_block.py xmodule/conditional_block.py
 #: xmodule/discussion_block.py xmodule/html_block.py
-#: xmodule/library_content_block.py xmodule/library_sourced_block.py
-#: xmodule/lti_block.py xmodule/split_test_block.py xmodule/unit_block.py
+#: xmodule/library_content_block.py xmodule/lti_block.py
+#: xmodule/split_test_block.py xmodule/unit_block.py
 #: xmodule/word_cloud_block.py xmodule/x_module.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
@@ -3271,6 +3271,12 @@ msgid "Open Response Assessment"
 msgstr "تقييم الردود المفتوحة"
 
 #: lms/djangoapps/courseware/courses.py
+msgid ""
+"This Open Response Assessment's due dates are set by your instructor and "
+"can't be shifted."
+msgstr ""
+
+#: lms/djangoapps/courseware/courses.py
 msgid "Self Assessment"
 msgstr "التقييم الذاتي"
 
@@ -3285,13 +3291,6 @@ msgstr "تقييم طاقم المساق"
 #: lms/djangoapps/courseware/courses.py
 msgid "Submission"
 msgstr "إرسال"
-
-#: lms/djangoapps/courseware/courses.py
-msgid ""
-"Open Response Assessment due dates are set by your instructor and can't be "
-"shifted."
-msgstr ""
-"تم تحديد تواريخ انتهاء تقييم الإجابات المفتوحة من معلّمك ولايمكن تغييرها."
 
 #. Translators: 'absolute' is a date such as "Jan 01,
 #. 2020". 'relative' is a fuzzy description of the time until
@@ -5955,7 +5954,6 @@ msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
 #: openedx/core/djangoapps/user_api/admin.py
-#: xmodule/templates/library-sourced-block-studio-view.html
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/videos_index_pagination.html
@@ -6409,13 +6407,11 @@ msgid "Quotes"
 msgstr "اقتباسات"
 
 #: lms/templates/wiki/includes/editor_widget.html
-#, python-format
+#, python-brace-format
 msgid ""
-"Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for"
-" help."
+"Markdown syntax is allowed. See the {start_link}cheatsheet{end_link} for "
+"help."
 msgstr ""
-"يسمح بناء الجملة Markdown. راجع %(start_link)s ورقة الغش %(end_link)s  "
-"للحصول على المساعدة."
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
@@ -7429,8 +7425,8 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
-"The Posting availabilty in discussions whether it will be enabled, scheduled"
-" or indefinitely disabled."
+"The Posting availability in discussions whether it will be enabled, "
+"scheduled or indefinitely disabled."
 msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
@@ -9428,8 +9424,7 @@ msgstr "بيانات ’XML‘ للملاحظات التوضيحية"
 #: xmodule/annotatable_block.py xmodule/capa_block.py
 #: xmodule/conditional_block.py xmodule/discussion_block.py
 #: xmodule/html_block.py xmodule/library_content_block.py
-#: xmodule/library_root_xblock.py xmodule/library_sourced_block.py
-#: xmodule/poll_block.py xmodule/unit_block.py
+#: xmodule/library_root_xblock.py xmodule/poll_block.py xmodule/unit_block.py
 #: xmodule/video_block/video_xfields.py xmodule/word_cloud_block.py
 #: xmodule/x_module.py
 msgid "The display name for this component."
@@ -11639,34 +11634,6 @@ msgstr "اسم المكتبة المعروض"
 msgid "Enter the names of the advanced components to use in your library."
 msgstr "يُرجى إدخال أسماء المكوِّنات المتقدّمة التي ستُستخدم في مكتبتك."
 
-#: xmodule/library_sourced_block.py
-msgid "Library Blocks List"
-msgstr "قائمة كتل المكتبة"
-
-#: xmodule/library_sourced_block.py
-msgid "Enter the IDs of the library XBlocks that you wish to use."
-msgstr "أدخل معرّفات كتل المكتبة المجهولة التي ترغب في استخدامها."
-
-#: xmodule/library_sourced_block.py
-#, python-brace-format
-msgid "A maximum of {0} components may be added."
-msgstr "يمكن إضافة عددًا لا يتجاوز {0} من العناصر"
-
-#: xmodule/library_sourced_block.py
-msgid ""
-"No XBlock has been configured for this component. Use the editor to select "
-"the target blocks."
-msgstr ""
-"لم يتم تشكيل كتل معينة لهذا العنصر. استخدم المحرر لتحديد الكتل المستهدفة."
-
-#: xmodule/library_sourced_block.py
-msgid "Open Editor"
-msgstr "فتح المحرّر"
-
-#: xmodule/library_sourced_block.py
-msgid "Importing Library Block failed - are the IDs valid and readable?"
-msgstr "فشل استيراد كتلة المكتبة - هل المعرفات صحيحة ويمكن قراءتها؟"
-
 #: xmodule/lti_block.py
 msgid ""
 "The display name for this component. Analytics reports may also use the "
@@ -12357,10 +12324,6 @@ msgstr "هناك مشاكل في تجربة المحتوى هذه، تؤثّر �
 #: xmodule/tabs.py
 msgid "External Discussion"
 msgstr "مناقشة خارجية"
-
-#: xmodule/templates/library-sourced-block-studio-view.html
-msgid "Save and Import"
-msgstr "حفظ واستيراد"
 
 #: xmodule/vertical_block.py
 msgid "Enable in-context discussions for the Unit"
@@ -16268,10 +16231,6 @@ msgstr "تنزيل درجات الطلاب"
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Print or share your certificate:"
 msgstr "اطبع أو شارك شهادتك:"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-msgid "Click the link to see my certificate."
-msgstr "انقر على الرابط لمشاهدة شهادتي"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
