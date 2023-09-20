@@ -19,7 +19,7 @@ from organizations.exceptions import InvalidOrganizationException
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, parse_json
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_library_url
 from cms.djangoapps.course_creators.views import add_user_with_status_granted as grant_course_creator_status
-from common.djangoapps.student.roles import LibraryUserRole, CourseStaffRole
+from common.djangoapps.student.roles import LibraryUserRole, CourseStaffRole, CourseInstructorRole
 from xmodule.modulestore.tests.factories import LibraryFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from cms.djangoapps.course_creators.models import CourseCreator
 
@@ -99,6 +99,14 @@ class UnitTestLibraries(CourseTestCase):
         _, nostaff_user = self.create_non_staff_authed_user_client()
         with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             auth.add_users(self.user, CourseStaffRole(self.course.id), nostaff_user)
+            self.assertEqual(user_can_create_library(nostaff_user), True)
+
+    # When creator groups are enabled, course instructor members can create libraries
+    @mock.patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", True)
+    def test_library_creator_status_with_course_instructor_role_for_enabled_creator_group_setting(self):
+        _, nostaff_user = self.create_non_staff_authed_user_client()
+        with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
+            auth.add_users(self.user, CourseInstructorRole(self.course.id), nostaff_user)
             self.assertEqual(user_can_create_library(nostaff_user), True)
 
     @ddt.data(
@@ -480,9 +488,14 @@ class UnitTestLibraries(CourseTestCase):
                             # Assert that the method returned the expected value
                             self.assertEqual(organizations, [])
                         with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
-                            organizations = get_allowed_organizations_for_libraries(self.user)
-                            # Assert that the method returned the expected value
-                            self.assertEqual(organizations, ['org1', 'org2'])
+                            # Assert that correct org values are returned based on course creator state
+                            for course_creator_state in CourseCreator.STATES:
+                                course_creator.state = course_creator_state
+                                organizations = get_allowed_organizations_for_libraries(self.user)
+                                if course_creator_state != CourseCreator.GRANTED:
+                                    self.assertEqual(organizations, [])
+                                else:
+                                    self.assertEqual(organizations, ['org1', 'org2'])
                     with mock.patch.dict(
                         'django.conf.settings.FEATURES',
                         {"ENABLE_ORGANIZATION_STAFF_ACCESS_FOR_CONTENT_LIBRARIES": True}
