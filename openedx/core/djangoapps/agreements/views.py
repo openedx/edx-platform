@@ -16,7 +16,6 @@ from common.djangoapps.student.roles import CourseStaffRole
 from openedx.core.djangoapps.agreements.api import (
     create_integrity_signature,
     get_integrity_signature,
-    create_lti_pii_signature,
 )
 from openedx.core.djangoapps.agreements.serializers import IntegritySignatureSerializer
 
