@@ -2,10 +2,9 @@
 Public rest API endpoints for the CMS API.
 """
 import logging
-from rest_framework import serializers
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, CreateAPIView
 from django.views.decorators.csrf import csrf_exempt
-from django.http import Http404, HttpResponseBadRequest
+from django.http import Http404
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from common.djangoapps.util.json_request import expect_json_in_class_view

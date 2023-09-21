@@ -2,7 +2,6 @@
 Public rest API endpoints for the CMS API video assets.
 """
 import logging
-from rest_framework import serializers
 from rest_framework.generics import (
     CreateAPIView,
     RetrieveAPIView,
@@ -10,7 +9,7 @@ from rest_framework.generics import (
 )
 from rest_framework.parsers import (MultiPartParser, FormParser)
 from django.views.decorators.csrf import csrf_exempt
-from django.http import Http404, HttpResponseBadRequest
+from django.http import Http404
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from openedx.core.lib.api.parsers import TypedFileUploadParser
@@ -22,8 +21,7 @@ from cms.djangoapps.contentstore.video_storage_handlers import (
     handle_videos,
     get_video_encodings_download,
     handle_video_images,
-    enabled_video_features,
-    handle_generate_video_upload_link
+    enabled_video_features
 )
 from cms.djangoapps.contentstore.rest_api.v1.serializers import VideoUploadSerializer, VideoImageSerializer
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
