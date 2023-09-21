@@ -41,6 +41,21 @@ define(["js/models/settings/course_grader"], CourseGrader =>
                 expect(errors.min_count).toBe('Please enter an integer greater than 0.');
                 expect(errors.drop_count).toBe('Please enter non-negative integer.');
             });
+
+            it("gives validation error if drop_count is not less than min_count", function() {
+                const model = new CourseGrader();
+                const type = 'Homework'
+                let errors = model.validate({min_count: 3, drop_count: 2, type: type}, {validate:true});
+                expect(errors).toBeUndefined();
+
+                errors = model.validate({min_count: 3, drop_count: 3, type: type}, {validate:true});
+                expect(errors.min_count).toBeUndefined();
+                expect(errors.drop_count).toBe('You must have at least one undroppable Homework assignment.');
+
+                errors = model.validate({min_count: 3, drop_count: 4, type: type}, {validate:true});
+                expect(errors.min_count).toBeUndefined();
+                expect(errors.drop_count).toBe('You must have at least one undroppable Homework assignment.');
+            });
         })
     )
 );

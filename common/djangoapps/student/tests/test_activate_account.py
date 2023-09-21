@@ -1,7 +1,5 @@
 """Tests for account activation"""
 
-
-import unittest
 import urllib.parse
 from datetime import datetime
 from unittest.mock import patch
@@ -16,13 +14,14 @@ from django.utils.http import urlencode
 from common.djangoapps.student.models import Registration
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerUserFactory
 
 FEATURES_WITH_AUTHN_MFE_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_AUTHN_MFE_ENABLED['ENABLE_AUTHN_MICROFRONTEND'] = True
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestActivateAccount(TestCase):
     """Tests for account creation"""
 

@@ -7,7 +7,7 @@ import logging
 
 from celery import shared_task
 from celery_utils.logged_task import LoggedTask
-
+from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
 
 from . import api
@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task(base=LoggedTask)
+@set_code_owner_attribute
 def import_blocks_from_course(import_task_id, course_key_str):
     """
     A Celery task to import blocks from a course through modulestore.

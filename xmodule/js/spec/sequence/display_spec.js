@@ -14,6 +14,7 @@
         beforeEach(function() {
             var runtime = jasmine.createSpyObj('TestRuntime', ['handlerUrl']);
             loadFixtures('sequence.html');
+            // eslint-disable-next-line no-multi-assign
             local.XBlock = window.XBlock = jasmine.createSpyObj('XBlock', ['initializeBlocks']);
             this.sequence = new Sequence($('.xblock-student_view-sequential'), runtime);
         });
@@ -79,11 +80,11 @@
                 beforeEach(function() {
                     expect(
                         this.sequence.$('.nav-item[data-index=0]').children('.check-circle').first()
-                        .hasClass('is-hidden')
+                            .hasClass('is-hidden')
                     ).toBe(true);
                     expect(
                         this.sequence.$('.nav-item[data-index=1]').children('.check-circle').first()
-                        .hasClass('is-hidden')
+                            .hasClass('is-hidden')
                     ).toBe(true);
                 });
 
@@ -91,7 +92,7 @@
                     expect($.postWithPrefix).toHaveBeenCalled();
                     expect(
                         this.sequence.$('.nav-item[data-index=1]').children('.check-circle').first()
-                        .hasClass('is-hidden')
+                            .hasClass('is-hidden')
                     ).toBe(true);
                 });
 
@@ -104,7 +105,7 @@
                     this.sequence.update_completion(1);
                     expect(
                         this.sequence.$('.nav-item[data-index=0]').children('.check-circle').first()
-                        .hasClass('is-hidden')
+                            .hasClass('is-hidden')
                     ).toBe(false);
                 });
 
@@ -117,7 +118,7 @@
                     this.sequence.update_completion(1);
                     expect(
                         this.sequence.$('.nav-item[data-index=0]').children('.check-circle').first()
-                        .hasClass('is-hidden')
+                            .hasClass('is-hidden')
                     ).toBe(true);
                 });
             });

@@ -1,5 +1,7 @@
+// eslint-disable-next-line no-shadow-restricted-names
 (function(define, undefined) {
     'use strict';
+
     define([
         'jquery',
         'underscore',
@@ -49,7 +51,7 @@
                 this.search();
             },
 
-        /**
+            /**
          * Prepares server response to appropriate structure.
          * @param  {Object} data The response form the server.
          * @return {Array}
@@ -63,7 +65,7 @@
                 return [this.collection, this.searchQuery];
             },
 
-        /**
+            /**
          * Returns search text.
          * @return {String}
          */
@@ -71,7 +73,7 @@
                 return this.$el.find('#search-notes-input').val();
             },
 
-        /**
+            /**
          * Starts search if form is not disabled.
          * @return {Boolean} Indicates if search is started or not.
          */
@@ -88,9 +90,9 @@
                 this.options.beforeSearchStart(this.searchQuery);
                 this.disableForm();
                 this.sendRequest(this.searchQuery)
-                .done(this.onSuccess)
-                .fail(this.onError)
-                .complete(this.onComplete);
+                    .done(this.onSuccess)
+                    .fail(this.onError)
+                    .complete(this.onComplete);
 
                 return true;
             },
@@ -123,6 +125,7 @@
                 if (jXHR.responseText) {
                     try {
                         message = $.parseJSON(jXHR.responseText).error;
+                    // eslint-disable-next-line no-empty
                     } catch (error) { }
                 }
 
@@ -147,7 +150,7 @@
                 this.$('button[type=submit]').addClass('is-disabled');
             },
 
-        /**
+            /**
          * Sends a request with appropriate configurations.
          * @param  {String} text Search query.
          * @return {jQuery.Deferred}

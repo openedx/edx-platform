@@ -3,15 +3,12 @@ These are tests for disabling and enabling student accounts, and for making sure
 that students with disabled accounts are unable to access the courseware.
 """
 
-
-import unittest
-
-from django.conf import settings
 from django.test import Client, TestCase
 from django.urls import reverse
 
 from common.djangoapps.student.models import UserStanding
 from common.djangoapps.student.tests.factories import UserFactory, UserStandingFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 class UserStandingTest(TestCase):
@@ -60,14 +57,14 @@ class UserStandingTest(TestCase):
         # since it's only possible to disable accounts from lms, we're going
         # to skip tests for cms
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     def test_can_access_manage_account_page(self):
         response = self.admin_client.get(reverse('manage_user_standing'), {
             'user': self.admin,
         })
         assert response.status_code == 200
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     def test_disable_account(self):
         assert UserStanding.objects.filter(user=self.good_user).count() == 0
         response = self.admin_client.post(reverse('disable_account_ajax'), {  # lint-amnesty, pylint: disable=unused-variable
@@ -80,7 +77,7 @@ class UserStandingTest(TestCase):
         response = self.bad_user_client.get(self.some_url)
         assert response.status_code == 403
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     def test_reenable_account(self):
         response = self.admin_client.post(reverse('disable_account_ajax'), {  # lint-amnesty, pylint: disable=unused-variable
             'username': self.bad_user.username,
@@ -88,14 +85,14 @@ class UserStandingTest(TestCase):
         })
         assert UserStanding.objects.get(user=self.bad_user).account_status == UserStanding.ACCOUNT_ENABLED
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     def test_non_staff_cant_access_disable_view(self):
         response = self.non_staff_client.get(reverse('manage_user_standing'), {
             'user': self.non_staff,
         })
         assert response.status_code == 404
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     def test_non_staff_cant_disable_account(self):
         response = self.non_staff_client.post(reverse('disable_account_ajax'), {
             'username': self.good_user.username,

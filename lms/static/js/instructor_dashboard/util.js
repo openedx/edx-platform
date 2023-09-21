@@ -2,6 +2,7 @@
 
 (function() {
     'use strict';
+
     var IntervalManager, KeywordValidator,
         createEmailContentTable, createEmailMessageViews,
         findAndAssert, pWrapper, plantInterval, plantTimeout,
@@ -56,7 +57,7 @@
             {
                 id: 'task_type',
                 field: 'task_type',
-        /*
+                /*
         Translators: a "Task" is a background process such as grading students or sending email
         */
 
@@ -65,7 +66,7 @@
             }, {
                 id: 'task_input',
                 field: 'task_input',
-        /*
+                /*
         Translators: a "Task" is a background process such as grading students or sending email
         */
 
@@ -74,7 +75,7 @@
             }, {
                 id: 'task_id',
                 field: 'task_id',
-        /*
+                /*
         Translators: a "Task" is a background process such as grading students or sending email
         */
 
@@ -83,7 +84,7 @@
             }, {
                 id: 'requester',
                 field: 'requester',
-        /*
+                /*
         Translators: a "Requester" is a username that requested a task such as sending email
         */
 
@@ -92,7 +93,7 @@
             }, {
                 id: 'created',
                 field: 'created',
-        /*
+                /*
         Translators: A timestamp of when a task (eg, sending email) was submitted appears after this
         */
 
@@ -101,7 +102,7 @@
             }, {
                 id: 'duration_sec',
                 field: 'duration_sec',
-        /*
+                /*
         Translators: The length of a task (eg, sending email) in seconds appears this
         */
 
@@ -110,7 +111,7 @@
             }, {
                 id: 'task_state',
                 field: 'task_state',
-        /*
+                /*
         Translators: The state (eg, "In progress") of a task (eg, sending email) appears after this.
         */
 
@@ -119,7 +120,7 @@
             }, {
                 id: 'status',
                 field: 'status',
-        /*
+                /*
         Translators: a "Task" is a background process such as grading students or sending email
         */
 
@@ -128,7 +129,7 @@
             }, {
                 id: 'task_message',
                 field: 'task_message',
-        /*
+                /*
         Translators: a "Task" is a background process such as grading students or sending email
         */
 
@@ -147,14 +148,14 @@
     subjectFormatter = function(row, cell, value) {
         var subjectText;
         if (value === null) {
-            return gettext('An error occurred retrieving your email. Please try again later, and contact technical support if the problem persists.');  // eslint-disable-line max-len
+            return gettext('An error occurred retrieving your email. Please try again later, and contact technical support if the problem persists.'); // eslint-disable-line max-len
         }
         subjectText = $('<span>').text(value.subject).html();
         return edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML(
             '<p><a href="#email_message_'), value.id, edx.HtmlUtils.HTML(
-                '" id="email_message_'), value.id, edx.HtmlUtils.HTML('_trig">'),
-                subjectText, edx.HtmlUtils.HTML('</a></p>')
-            );
+            '" id="email_message_'), value.id, edx.HtmlUtils.HTML('_trig">'),
+        subjectText, edx.HtmlUtils.HTML('</a></p>')
+        );
     };
 
     pWrapper = function(value) {
@@ -449,7 +450,7 @@
     }).call(this);
 
     this.ReportDownloads = (function() {
-      /* Report Downloads -- links expire quickly, so we refresh every 5 mins
+        /* Report Downloads -- links expire quickly, so we refresh every 5 mins
       */
 
         function ReportDownloads($section) {
@@ -505,8 +506,8 @@
                     formatter: function(row, cell, value, columnDef, dataContext) {
                         return edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML(
                             '<a rel="noopener" target="_blank" href="'), dataContext.url,
-                            edx.HtmlUtils.HTML('">'), dataContext.name,
-                            edx.HtmlUtils.HTML('</a>'));
+                        edx.HtmlUtils.HTML('">'), dataContext.name,
+                        edx.HtmlUtils.HTML('</a>'));
                     }
                 }
             ];

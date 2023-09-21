@@ -9,7 +9,7 @@ from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.cache_utils import request_cached
-from openedx.features.course_experience import RELATIVE_DATES_FLAG
+from openedx.features.course_experience import RELATIVE_DATES_DISABLE_RESET_FLAG, RELATIVE_DATES_FLAG
 from common.djangoapps.student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -154,6 +154,14 @@ def dates_banner_should_display(course_key, user):
     """
     if not RELATIVE_DATES_FLAG.is_enabled(course_key):
         return False, False
+
+    if RELATIVE_DATES_DISABLE_RESET_FLAG.is_enabled(course_key):
+        # The `missed_deadlines` value is ignored by `reset_course_deadlines` views. Instead, they check the value of
+        # `missed_gated_content` to determine if learners can reset the deadlines by themselves.
+        # We could have added this logic directly to `reset_self_paced_schedule`, but this function is used in other
+        # places (e.g., when an enrollment mode is changed). We want this flag to affect only the use case when
+        # learners try to reset their deadlines.
+        return False, True
 
     course_overview = CourseOverview.objects.get(id=str(course_key))
 

@@ -15,7 +15,7 @@ define([
     'js/certificates/spec/custom_matchers'
 ],
 function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, CertificateEditorView,
-         Notification, AjaxHelpers, TemplateHelpers, ViewHelpers, ValidationHelpers, CustomMatchers) {
+    Notification, AjaxHelpers, TemplateHelpers, ViewHelpers, ValidationHelpers, CustomMatchers) {
     'use strict';
 
     var MAX_SIGNATORIES_LIMIT = 10;

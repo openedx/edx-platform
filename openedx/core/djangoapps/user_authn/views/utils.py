@@ -53,6 +53,7 @@ def third_party_auth_context(request, redirect_to, tpa_hint=None):
                 "iconClass": enabled.icon_class or None,
                 "iconImage": enabled.icon_image.url if enabled.icon_image else None,
                 "skipHintedLogin": enabled.skip_hinted_login_dialog,
+                "skipRegistrationForm": enabled.skip_registration_form,
                 "loginUrl": pipeline.get_login_url(
                     enabled.provider_id,
                     pipeline.AUTH_ENTRY_LOGIN,

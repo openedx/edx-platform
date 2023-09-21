@@ -910,7 +910,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         config = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]
 
         # Default to the S3 backend for backward compatibility
-        storage_class = config.get("STORAGE_CLASS", "storages.backends.s3boto.S3BotoStorage")
+        storage_class = config.get("STORAGE_CLASS", "storages.backends.s3boto3.S3Boto3Storage")
         storage_kwargs = config.get("STORAGE_KWARGS", {})
 
         # Map old settings to the parameters expected by the storage backend
@@ -919,7 +919,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         if "AWS_SECRET_KEY" in config:
             storage_kwargs["secret_key"] = config["AWS_SECRET_KEY"]
         if "S3_BUCKET" in config:
-            storage_kwargs["bucket"] = config["S3_BUCKET"]
+            storage_kwargs["bucket_name"] = config["S3_BUCKET"]
             storage_kwargs["querystring_expire"] = self.IMAGE_LINK_DURATION
 
         return get_storage(storage_class, **storage_kwargs)

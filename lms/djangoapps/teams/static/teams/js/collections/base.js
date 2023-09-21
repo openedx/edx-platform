@@ -1,6 +1,7 @@
 /* globals _ */
 (function(define) {
     'use strict';
+
     define(['edx-ui-toolkit/js/pagination/paging-collection'],
         function(PagingCollection) {
             var BaseCollection = PagingCollection.extend({

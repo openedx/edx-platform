@@ -6,7 +6,7 @@ from unittest.mock import patch
 import ddt
 from django.conf import settings
 
-from common.test.utils import MockS3BotoMixin
+from common.test.utils import MockS3Boto3Mixin
 from lms.djangoapps.verify_student.tests import TestVerificationBase
 from lms.djangoapps.verify_student.tests.test_models import FAKE_SETTINGS, mock_software_secure_post_unavailable
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
@@ -16,7 +16,7 @@ LOGGER_NAME = 'lms.djangoapps.verify_student.tasks'
 
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @ddt.ddt
-class TestPhotoVerificationTasks(TestVerificationBase, MockS3BotoMixin, ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class TestPhotoVerificationTasks(TestVerificationBase, MockS3Boto3Mixin, ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     @mock.patch('lms.djangoapps.verify_student.tasks.log')
     def test_logs_for_retry_until_failure(self, mock_log):

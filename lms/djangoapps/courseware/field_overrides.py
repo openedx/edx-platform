@@ -9,7 +9,7 @@ base on membership of a student in a cohort, or similar.  The use of an
 extensible, modular architecture allows for overrides being done in ways not
 envisioned by the authors.
 
-Currently, this module is used in the `module_render` module in this same
+Currently, this module is used in the `block_render` module in this same
 package and is used to wrap the `authored_data` when constructing an
 `LmsFieldData`.  This means overrides will be in effect for all scopes covered
 by `authored_data`, e.g. course content and settings stored in Mongo.

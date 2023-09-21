@@ -1,5 +1,6 @@
 define(['Markdown.Editor'], function(MarkdownEditor) {
     'use strict';
+
     describe('Markdown.Editor', function() {
         var editor = new MarkdownEditor();
 

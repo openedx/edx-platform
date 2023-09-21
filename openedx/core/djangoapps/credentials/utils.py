@@ -1,13 +1,18 @@
 """Helper functions for working with Credentials."""
+import logging
+from urllib.parse import urljoin
+
 import requests
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from edx_rest_api_client.auth import SuppliedJwtAuth
 
-from django.conf import settings
-
-from openedx.core.djangoapps.credentials.config import USE_LEARNER_RECORD_MFE
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.lib.edx_api_utils import get_api_data
+
+log = logging.getLogger(__name__)
+User = get_user_model()
 
 
 def get_credentials_records_url(program_uuid=None):
@@ -18,27 +23,16 @@ def get_credentials_records_url(program_uuid=None):
     Arguments:
         program_uuid (str): Optional program uuid to link for a program records URL
     """
-    base_url = settings.CREDENTIALS_PUBLIC_SERVICE_URL
-    learner_record_mfe_base_url = settings.LEARNER_RECORD_MICROFRONTEND_URL
-    use_learner_record_mfe = USE_LEARNER_RECORD_MFE.is_enabled() and learner_record_mfe_base_url
-
-    if not base_url and not use_learner_record_mfe:
+    base_url = CredentialsApiConfig.current().public_records_url
+    if base_url is None:
         return None
 
-    # If we have a program uuid we build a link to the appropriate Program Record page in Credentials (or the Learner
-    # Record MFE)
     if program_uuid:
-        # Credentials expects the UUID without dashes so we strip them here
-        stripped_program_uuid = program_uuid.replace('-', '')
-        if use_learner_record_mfe:
-            return f"{learner_record_mfe_base_url}/{stripped_program_uuid}/"
-        return f"{base_url}/records/programs/{stripped_program_uuid}/"
-    else:
-        # Otherwise, build a link to the appropriate Learner Record index page
-        if use_learner_record_mfe:
-            return f"{learner_record_mfe_base_url}/"
-        else:
-            return f"{base_url}/records/"
+        # Credentials expects Program UUIDs without dashes so we remove them here
+        stripped_program_uuid = program_uuid.replace("-", "")
+        return urljoin(base_url, f"programs/{stripped_program_uuid}")
+
+    return base_url
 
 
 def get_credentials_api_client(user):
@@ -114,3 +108,56 @@ def get_credentials(user, program_uuid=None, credential_type=None):
         querystring=querystring,
         cache_key=cache_key
     )
+
+
+def get_courses_completion_status(username, course_run_ids):
+    """
+    Given the username and course run ids, checks for course completion status
+    Arguments:
+        username (User): Username of the user whose credentials are being requested.
+        course_run_ids(List): list of course run ids for which we need to check the completion status
+    Returns:
+        list of course_run_ids for which user has completed the course
+        Boolean: True if an exception occurred while calling the api, False otherwise
+    """
+    credential_configuration = CredentialsApiConfig.current()
+    if not credential_configuration.enabled:
+        log.warning('%s configuration is disabled.', credential_configuration.API_NAME)
+        return [], False
+
+    completion_status_url = (f'{settings.CREDENTIALS_INTERNAL_SERVICE_URL}/api'
+                             '/credentials/v1/learner_cert_status/')
+    try:
+        api_client = get_credentials_api_client(
+            User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME)
+        )
+        api_response = api_client.post(
+            completion_status_url,
+            json={
+                'username': username,
+                'course_runs': course_run_ids,
+            }
+        )
+        api_response.raise_for_status()
+        course_completion_response = api_response.json()
+    except Exception as exc:  # pylint: disable=broad-except
+        log.exception("An unexpected error occurred while reqeusting course completion statuses "
+                      "for user [%s] for course_run_ids [%s] with exc [%s]:",
+                      username,
+                      course_run_ids,
+                      exc
+                      )
+        return [], True
+    log.info("Course completion status response for user [%s] for course_run_ids [%s] is [%s]",
+             username,
+             course_run_ids,
+             course_completion_response)
+    # Yes, This is course_credentials_data. The key is named status but
+    # it contains all the courses data from credentials.
+    course_credentials_data = course_completion_response.get('status', [])
+    if course_credentials_data is not None:
+        filtered_records = [course_data['course_run']['key'] for course_data in course_credentials_data if
+                            course_data['course_run']['key'] in course_run_ids and
+                            course_data['status'] == settings.CREDENTIALS_COURSE_COMPLETION_STATE]
+        return filtered_records, False
+    return [], False

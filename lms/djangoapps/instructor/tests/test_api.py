@@ -14,7 +14,7 @@ import dateutil
 import ddt
 import pytest
 import pytz
-from boto.exception import BotoServerError
+from botocore.exceptions import ClientError
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core import mail
@@ -35,7 +35,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -265,24 +265,24 @@ class TestCommonExceptions400(TestCase):
         assert resp.status_code == 200
 
     def test_user_doesnotexist(self):
-        self.request.is_ajax.return_value = False
+        self.request.accepts("application/json").return_value = False
         resp = view_user_doesnotexist(self.request)
         self.assertContains(resp, "User does not exist", status_code=400)
 
     def test_user_doesnotexist_ajax(self):
-        self.request.is_ajax.return_value = True
+        self.request.accepts("application/json").return_value = True
         resp = view_user_doesnotexist(self.request)
         self.assertContains(resp, "User does not exist", status_code=400)
 
     @ddt.data(True, False)
     def test_alreadyrunningerror(self, is_ajax):
-        self.request.is_ajax.return_value = is_ajax
+        self.request.accepts("application/json").return_value = is_ajax
         resp = view_alreadyrunningerror(self.request)
         self.assertContains(resp, "Requested task is already running", status_code=400)
 
     @ddt.data(True, False)
     def test_alreadyrunningerror_with_unicode(self, is_ajax):
-        self.request.is_ajax.return_value = is_ajax
+        self.request.accepts("application/json").return_value = is_ajax
         resp = view_alreadyrunningerror_unicode(self.request)
         self.assertContains(
             resp,
@@ -295,7 +295,7 @@ class TestCommonExceptions400(TestCase):
         """
         Tests that QueueConnectionError exception is handled in common_exception_400.
         """
-        self.request.is_ajax.return_value = is_ajax
+        self.request.accepts("application/json").return_value = is_ajax
         resp = view_queue_connection_error(self.request)
         self.assertContains(
             resp,
@@ -360,14 +360,14 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
     def setUpClass(cls):
         super().setUpClass()
         cls.course = CourseFactory.create()
-        cls.chapter = ItemFactory.create(
+        cls.chapter = BlockFactory.create(
             parent=cls.course,
             category='chapter',
             display_name="Chapter",
             publish_item=True,
             start=datetime.datetime(2018, 3, 10, tzinfo=UTC),
         )
-        cls.sequential = ItemFactory.create(
+        cls.sequential = BlockFactory.create(
             parent=cls.chapter,
             category='sequential',
             display_name="Lesson",
@@ -375,14 +375,14 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             start=datetime.datetime(2018, 3, 10, tzinfo=UTC),
             metadata={'graded': True, 'format': 'Homework'},
         )
-        cls.vertical = ItemFactory.create(
+        cls.vertical = BlockFactory.create(
             parent=cls.sequential,
             category='vertical',
             display_name='Subsection',
             publish_item=True,
             start=datetime.datetime(2018, 3, 10, tzinfo=UTC),
         )
-        cls.problem = ItemFactory.create(
+        cls.problem = BlockFactory.create(
             category="problem",
             parent=cls.vertical,
             display_name="A Problem Block",
@@ -590,6 +590,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
 
 
 @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
+@ddt.ddt
 class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test Bulk account creation and enrollment from csv file
@@ -641,32 +642,15 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         )
 
     @patch('lms.djangoapps.instructor.views.api.log.info')
-    def test_account_creation_and_enrollment_with_csv(self, info_log):
+    @ddt.data(
+        b"test_student@example.com,test_student_1,tester1,USA",  # Typical use case.
+        b"\ntest_student@example.com,test_student_1,tester1,USA\n\n",  # Blank lines.
+        b"\xef\xbb\xbftest_student@example.com,test_student_1,tester1,USA",  # Unicode signature (BOM).
+    )
+    def test_account_creation_and_enrollment_with_csv(self, csv_content, info_log):
         """
         Happy path test to create a single new user
         """
-        csv_content = b"test_student@example.com,test_student_1,tester1,USA"
-        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
-        response = self.client.post(self.url, {'students_list': uploaded_file, 'email-students': True})
-        assert response.status_code == 200
-        data = json.loads(response.content.decode('utf-8'))
-        assert len(data['row_errors']) == 0
-        assert len(data['warnings']) == 0
-        assert len(data['general_errors']) == 0
-
-        manual_enrollments = ManualEnrollmentAudit.objects.all()
-        assert manual_enrollments.count() == 1
-        assert manual_enrollments[0].state_transition == UNENROLLED_TO_ENROLLED
-
-        # test the log for email that's send to new created user.
-        info_log.assert_called_with('email sent to new created user at %s', 'test_student@example.com')
-
-    @patch('lms.djangoapps.instructor.views.api.log.info')
-    def test_account_creation_and_enrollment_with_csv_with_blank_lines(self, info_log):
-        """
-        Happy path test to create a single new user
-        """
-        csv_content = b"\ntest_student@example.com,test_student_1,tester1,USA\n\n"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file, 'email-students': True})
         assert response.status_code == 200
@@ -2742,14 +2726,18 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
     @patch('lms.djangoapps.instructor_task.models.logger.error')
     @patch.dict(settings.GRADES_DOWNLOAD, {'STORAGE_TYPE': 's3', 'ROOT_PATH': 'tmp/edx-s3/grades'})
     @ddt.data('list_report_downloads', 'instructor_api_v1:list_report_downloads')
-    def test_list_report_downloads_error(self, endpoint, mock_error):
+    def test_list_report_downloads_error_boto(self, endpoint, mock_error):
         """
         Tests the Rate-Limit exceeded is handled and does not raise 500 error.
         """
-        ex_status = 503
-        ex_reason = 'Slow Down'
         url = reverse(endpoint, kwargs={'course_id': str(self.course.id)})
-        with patch('storages.backends.s3boto.S3BotoStorage.listdir', side_effect=BotoServerError(ex_status, ex_reason)):
+        error_response = {'Error': {'Code': 503, 'Message': 'error found'}}
+        operation_name = 'test'
+
+        with patch(
+            'storages.backends.s3boto3.S3Boto3Storage.listdir',
+            side_effect=ClientError(error_response, operation_name)
+        ):
             if endpoint in INSTRUCTOR_GET_ENDPOINTS:
                 response = self.client.get(url)
             else:
@@ -2757,8 +2745,41 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         mock_error.assert_called_with(
             'Fetching files failed for course: %s, status: %s, reason: %s',
             self.course.id,
-            ex_status,
-            ex_reason,
+            error_response.get('Error'),
+            error_response.get('Error').get('Message')
+        )
+
+        res_json = json.loads(response.content.decode('utf-8'))
+        assert res_json == {'downloads': []}
+
+    @patch('lms.djangoapps.instructor_task.models.logger.error')
+    @patch(
+        'lms.djangoapps.instructor_task.models.DJANGO_STORE_STORAGE_CLASS',
+        'storages.backends.s3boto3.S3Boto3Storage'
+    )
+    @patch.dict(settings.GRADES_DOWNLOAD, {'STORAGE_TYPE': 's3', 'ROOT_PATH': 'tmp/edx-s3/grades'})
+    @ddt.data('list_report_downloads', 'instructor_api_v1:list_report_downloads')
+    def test_list_report_downloads_error_boto3(self, endpoint, mock_error):
+        """
+        Tests the Rate-Limit exceeded is handled and does not raise 500 error.
+        """
+        error_response = {'Error': {'Code': 503, 'Message': 'error found'}}
+        operation_name = 'test'
+        url = reverse(endpoint, kwargs={'course_id': str(self.course.id)})
+        with patch(
+            'storages.backends.s3boto3.S3Boto3Storage.listdir',
+            side_effect=ClientError(error_response, operation_name)
+        ):
+            if endpoint in INSTRUCTOR_GET_ENDPOINTS:
+                response = self.client.get(url)
+            else:
+                response = self.client.post(url, {})
+
+        mock_error.assert_called_with(
+            'Fetching files failed for course: %s, status: %s, reason: %s',
+            self.course.id,
+            error_response.get('Error'),
+            error_response.get('Error').get('Message')
         )
 
         res_json = json.loads(response.content.decode('utf-8'))
@@ -3105,27 +3126,27 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
         cls.course_with_invalid_ee = CourseFactory.create(entrance_exam_id='invalid_exam')
 
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):
-            cls.entrance_exam = ItemFactory.create(
+            cls.entrance_exam = BlockFactory.create(
                 parent=cls.course,
                 category='chapter',
                 display_name='Entrance exam'
             )
-            subsection = ItemFactory.create(
+            subsection = BlockFactory.create(
                 parent=cls.entrance_exam,
                 category='sequential',
                 display_name='Subsection 1'
             )
-            vertical = ItemFactory.create(
+            vertical = BlockFactory.create(
                 parent=subsection,
                 category='vertical',
                 display_name='Vertical 1'
             )
-            cls.ee_problem_1 = ItemFactory.create(
+            cls.ee_problem_1 = BlockFactory.create(
                 parent=vertical,
                 category="problem",
                 display_name="Exam Problem - Problem 1"
             )
-            cls.ee_problem_2 = ItemFactory.create(
+            cls.ee_problem_2 = BlockFactory.create(
                 parent=vertical,
                 category="problem",
                 display_name="Exam Problem - Problem 2"
@@ -3938,15 +3959,15 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         cls.due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
 
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):
-            cls.week1 = ItemFactory.create(due=cls.due)
-            cls.week2 = ItemFactory.create(due=cls.due)
-            cls.week3 = ItemFactory.create()  # No due date
+            cls.week1 = BlockFactory.create(due=cls.due)
+            cls.week2 = BlockFactory.create(due=cls.due)
+            cls.week3 = BlockFactory.create()  # No due date
             cls.course.children = [
                 str(cls.week1.location),
                 str(cls.week2.location),
                 str(cls.week3.location)
             ]
-            cls.homework = ItemFactory.create(
+            cls.homework = BlockFactory.create(
                 parent_location=cls.week1.location,
                 due=cls.due
             )
@@ -4120,15 +4141,15 @@ class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestC
         self.due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
 
         with self.store.bulk_operations(self.course.id, emit_signals=False):
-            self.week1 = ItemFactory.create(due=self.due)
-            self.week2 = ItemFactory.create(due=self.due)
-            self.week3 = ItemFactory.create()  # No due date
+            self.week1 = BlockFactory.create(due=self.due)
+            self.week2 = BlockFactory.create(due=self.due)
+            self.week3 = BlockFactory.create()  # No due date
             self.course.children = [
                 self.week1.location,
                 self.week2.location,
                 self.week3.location
             ]
-            self.homework = ItemFactory.create(
+            self.homework = BlockFactory.create(
                 parent_location=self.week1.location,
                 due=self.due
             )
@@ -4348,7 +4369,7 @@ class TestBulkCohorting(SharedModuleStoreTestCase):
         """
         # this temporary file will be removed in `self.tearDown()`
         __, file_name = tempfile.mkstemp(suffix=suffix, dir=self.tempdir)
-        with open(file_name, 'w') as file_pointer:
+        with open(file_name, 'w', encoding='utf-8-sig') as file_pointer:
             file_pointer.write(csv_data)
         with open(file_name) as file_pointer:
             url = reverse('add_users_to_cohorts', kwargs={'course_id': str(self.course.id)})

@@ -1,11 +1,8 @@
 """Tests for disabling rate limiting. """
 
-
-import unittest
 from unittest import mock
 
 import pytest
-from django.conf import settings
 from django.core.cache import cache
 from django.test import TestCase
 from rest_framework.exceptions import Throttled
@@ -14,6 +11,7 @@ from rest_framework.views import APIView
 
 from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
 from common.djangoapps.util.models import RateLimitConfiguration
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 class FakeThrottle(BaseThrottle):
@@ -28,7 +26,7 @@ class FakeApiView(APIView):
     throttle_classes = [FakeThrottle]
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class DisableRateLimitTest(TestCase):
     """Check that we can disable rate limiting for perf testing. """
 

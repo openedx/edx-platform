@@ -16,7 +16,7 @@ from django.utils.timezone import now
 from testfixtures import LogCapture
 
 from common.djangoapps.student.tests.factories import UserFactory
-from common.test.utils import MockS3BotoMixin
+from common.test.utils import MockS3Boto3Mixin
 from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 from lms.djangoapps.verify_student.tests.test_models import FAKE_SETTINGS, mock_software_secure_post
 
@@ -25,7 +25,7 @@ LOGGER_NAME = 'lms.djangoapps.verify_student.management.commands.send_verificati
 
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
-class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
+class TestSendVerificationExpiryEmail(MockS3Boto3Mixin, TestCase):
     """ Tests for django admin command `send_verification_expiry_email` in the verify_student module """
 
     def setUp(self):

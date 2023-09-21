@@ -36,21 +36,29 @@ define(['underscore'], function(_) {
     var FIELDS_DATA = {
         country: {
             options: FIELD_OPTIONS
-        }, gender: {
+        },
+        gender: {
             options: FIELD_OPTIONS
-        }, language: {
+        },
+        language: {
             options: FIELD_OPTIONS
-        }, beta_language: {
+        },
+        beta_language: {
             options: []
-        }, level_of_education: {
+        },
+        level_of_education: {
             options: FIELD_OPTIONS
-        }, password: {
+        },
+        password: {
             url: '/password_reset'
-        }, year_of_birth: {
+        },
+        year_of_birth: {
             options: FIELD_OPTIONS
-        }, preferred_language: {
+        },
+        preferred_language: {
             options: FIELD_OPTIONS
-        }, time_zone: {
+        },
+        time_zone: {
             options: FIELD_OPTIONS
         }
     };
@@ -99,7 +107,7 @@ define(['underscore'], function(_) {
         email: 'student@edx.org',
         level_of_education: null,
         gender: null,
-        year_of_birth: '3',    // Note: test birth year range is a string from 0-3
+        year_of_birth: '3', // Note: test birth year range is a string from 0-3
         requires_parental_consent: false,
         country: '1',
         language: 'en-US',

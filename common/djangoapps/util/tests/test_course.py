@@ -44,7 +44,7 @@ class TestCourseSharingLinks(ModuleStoreTestCase):
             enable_mktg_site(Boolean): A feature flag to decide activation of marketing site.
 
         Keyword Arguments:
-            use_overview: indicates whether course overview or course descriptor should get
+            use_overview: indicates whether course overview or course block should get
             past to get_link_for_about_page.
 
         Returns course sharing url.
@@ -115,10 +115,10 @@ class TestCourseSharingLinks(ModuleStoreTestCase):
         ),
     )
     @ddt.unpack
-    def test_sharing_link_with_course_descriptor(self, enable_social_sharing, expected_course_sharing_link):
+    def test_sharing_link_with_course_block(self, enable_social_sharing, expected_course_sharing_link):
         """
         Verify the method gives correct course sharing url on passing
-        course descriptor as a parameter.
+        course block as a parameter.
         """
         actual_course_sharing_link = self.get_course_sharing_link(
             enable_social_sharing=enable_social_sharing,

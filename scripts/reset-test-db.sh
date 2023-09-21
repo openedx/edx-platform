@@ -62,23 +62,23 @@ calculate_migrations() {
     output_file="common/test/db_cache/bok_choy_${db}_migrations.yaml"
     # Redirect stdout to /dev/null because the script will print
     # out all migrations to both stdout and the output file.
-    ./manage.py lms --settings $SETTINGS show_unapplied_migrations --database $db --output_file $output_file 1>/dev/null
+    ./manage.py lms --settings "$SETTINGS" show_unapplied_migrations --database "$db" --output_file "$output_file" 1>/dev/null
 }
 
 run_migrations() {
     echo "Running the lms migrations on the $db bok_choy DB."
-    ./manage.py lms --settings $SETTINGS migrate --database $db --traceback --noinput
+    ./manage.py lms --settings "$SETTINGS" migrate --database "$db" --traceback --noinput
     echo "Running the cms migrations on the $db bok_choy DB."
-    ./manage.py cms --settings $SETTINGS migrate --database $db --traceback --noinput
+    ./manage.py cms --settings "$SETTINGS" migrate --database "$db" --traceback --noinput
 }
 
 load_cache_into_db() {
     echo "Loading the schema from the filesystem into the $db MySQL DB."
-    mysql $MYSQL_HOST -u root "${databases["$db"]}" < $DB_CACHE_DIR/bok_choy_schema_$db.sql
+    mysql "$MYSQL_HOST" -u root "${databases["$db"]}" < "$DB_CACHE_DIR/bok_choy_schema_$db.sql"
     echo "Loading the fixture data from the filesystem into the $db MySQL DB."
-    ./manage.py lms --settings $SETTINGS loaddata --database $db $DB_CACHE_DIR/bok_choy_data_$db.json
+    ./manage.py lms --settings "$SETTINGS" loaddata --database "$db" "$DB_CACHE_DIR/bok_choy_data_$db.json"
     echo "Loading the migration data from the filesystem into the $db MySQL DB."
-    mysql $MYSQL_HOST -u root "${databases["$db"]}" < $DB_CACHE_DIR/bok_choy_migrations_data_$db.sql
+    mysql "$MYSQL_HOST" -u root "${databases["$db"]}" < "$DB_CACHE_DIR/bok_choy_migrations_data_$db.sql"
 }
 
 rebuild_cache_for_db() {
@@ -87,13 +87,13 @@ rebuild_cache_for_db() {
 
     # Dump the schema and data to the cache
     echo "Using the dumpdata command to save the $db fixture data to the filesystem."
-    ./manage.py lms --settings $SETTINGS dumpdata --database $db > $DB_CACHE_DIR/bok_choy_data_$db.json --exclude=api_admin.Catalog
+    ./manage.py lms --settings "$SETTINGS" dumpdata --database "$db" > "$DB_CACHE_DIR/bok_choy_data_$db.json" --exclude=api_admin.Catalog
     echo "Saving the schema of the $db bok_choy DB to the filesystem."
-    mysqldump $MYSQL_HOST -u root --no-data --skip-comments --skip-dump-date "${databases[$db]}" > $DB_CACHE_DIR/bok_choy_schema_$db.sql
+    mysqldump "$MYSQL_HOST" -u root --no-data --skip-comments --skip-dump-date "${databases[$db]}" > "$DB_CACHE_DIR/bok_choy_schema_$db.sql"
 
     # dump_data does not dump the django_migrations table so we do it separately.
     echo "Saving the django_migrations table of the $db bok_choy DB to the filesystem."
-    mysqldump $MYSQL_HOST -u root --no-create-info --skip-comments --skip-dump-date "${databases["$db"]}" django_migrations > $DB_CACHE_DIR/bok_choy_migrations_data_$db.sql
+    mysqldump $MYSQL_HOST -u root --no-create-info --skip-comments --skip-dump-date "${databases["$db"]}" django_migrations > "$DB_CACHE_DIR/bok_choy_migrations_data_$db.sql"
 }
 
 for db in "${database_order[@]}"; do
@@ -107,7 +107,7 @@ for db in "${database_order[@]}"; do
         # or a jenkins worker environment) that already ran tests on another commit that had
         # different migrations that created, dropped, or altered tables.
         echo "Issuing a reset_db command to the $db bok_choy MySQL database."
-        ./manage.py lms --settings $SETTINGS reset_db --traceback --router $db
+        ./manage.py lms --settings "$SETTINGS" reset_db --traceback --router "$db"
     fi
 
     if ! [[ $CALCULATE_MIGRATIONS ]]; then

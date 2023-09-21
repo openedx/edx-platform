@@ -11,7 +11,6 @@ from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.seq_block import SequenceMixin
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
-    HTMLSnippet,
     ResourceTemplates,
     STUDENT_VIEW,
     XModuleMixin,
@@ -26,7 +25,6 @@ class RandomizeBlock(
     MakoTemplateBlockBase,
     XmlMixin,
     XModuleToXBlockMixin,
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
 ):
@@ -42,14 +40,14 @@ class RandomizeBlock(
 
     User notes:
 
-      - If you're randomizing amongst graded modules, each of them MUST be worth the same
+      - If you're randomizing amongst graded blocks, each of them MUST be worth the same
         number of points.  Otherwise, the earth will be overrun by monsters from the
         deeps.  You have been warned.
 
     Technical notes:
       - There is more dark magic in this code than I'd like.  The whole varying-children +
         grading interaction is a tangle between super and subclasses of descriptors and
-        modules.
+        blocks.
 """
     choice = Integer(help="Which random child was chosen", scope=Scope.user_state)
 
@@ -71,8 +69,8 @@ class RandomizeBlock(
         if self.choice is None:
             # choose one based on the system seed, or randomly if that's not available
             if num_choices > 0:
-                if self.system.seed is not None:
-                    self.choice = self.system.seed % num_choices
+                if self.runtime.seed is not None:
+                    self.choice = self.runtime.seed % num_choices
                 else:
                     self.choice = random.randrange(0, num_choices)
 
@@ -85,7 +83,7 @@ class RandomizeBlock(
 
         return child
 
-    def get_child_descriptors(self):
+    def get_child_blocks(self):
         """
         For grading--return just the chosen child.
         """
@@ -99,7 +97,7 @@ class RandomizeBlock(
         The student view.
         """
         if self.child is None:
-            # raise error instead?  In fact, could complain on descriptor load...
+            # raise error instead?  In fact, could complain on block load...
             return Fragment(content="<div>Nothing to randomize between</div>")
 
         return self.child.render(STUDENT_VIEW, context)
@@ -120,6 +118,6 @@ class RandomizeBlock(
     def has_dynamic_children(self):
         """
         Grading needs to know that only one of the children is actually "real".  This
-        makes it use module.get_child_descriptors().
+        makes it use block.get_child_blocks().
         """
         return True

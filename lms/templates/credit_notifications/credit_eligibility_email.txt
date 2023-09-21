@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils.translation import gettext as _ %>
 % if full_name is not UNDEFINED and full_name is not None:
 ${_(u"Hi {name},").format(name=full_name)}
 % else:

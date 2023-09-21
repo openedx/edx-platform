@@ -8,6 +8,7 @@ define([ // jshint ignore:line
 ],
 function($, _, gettext, ViewUtils, StringUtils, HtmlUtils) {
     'use strict';
+
     return function(maintenanceViewURL) {
         var showError;
         // Reset values
@@ -54,30 +55,29 @@ function($, _, gettext, ViewUtils, StringUtils, HtmlUtils) {
                 dataType: 'json',
                 data: data
             })
-            .done(function(response) {
-                if (response.error) {
-                    showError('#course-id-container', response.msg);
-                } else {
-                    if (response.msg) {
-                        showError('#result-error', response.msg);
+                .done(function(response) {
+                    if (response.error) {
+                        showError('#course-id-container', response.msg);
                     } else {
-                        attrs = $.extend({}, response, {StringUtils: StringUtils});
-                        forcePublishedTemplate = HtmlUtils.template(
-                            $('#force-published-course-response-tpl').text()
-                        );
-                        HtmlUtils.setHtml($('#result-container'), forcePublishedTemplate(attrs));
+                        if (response.msg) {
+                            showError('#result-error', response.msg);
+                        } else {
+                            attrs = $.extend({}, response, {StringUtils: StringUtils});
+                            forcePublishedTemplate = HtmlUtils.template(
+                                $('#force-published-course-response-tpl').text()
+                            );
+                            HtmlUtils.setHtml($('#result-container'), forcePublishedTemplate(attrs));
+                        }
                     }
-                }
-            })
-            .fail(function() {
+                })
+                .fail(function() {
                 // response.responseText here because it would show some strange output, it may output Traceback
                 // sometimes if unexpected issue arises. Better to show just internal error when getting 500 error.
-                showError('#result-error', gettext('Internal Server Error.'));
-            })
-            .always(function() {
-                deferred.resolve();
-            });
+                    showError('#result-error', gettext('Internal Server Error.'));
+                })
+                .always(function() {
+                    deferred.resolve();
+                });
         });
     };
 });
-

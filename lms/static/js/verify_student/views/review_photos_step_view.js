@@ -94,7 +94,7 @@ var edx = edx || {};
 
             $link.attr('aria-expanded', !expanded);
             $title.toggleClass('is-expanded')
-                  .find('.expandable-area').slideToggle();
+                .find('.expandable-area').slideToggle();
         },
 
         setSubmitButtonEnabled: function(isEnabled) {

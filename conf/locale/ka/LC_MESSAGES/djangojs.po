@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/).
-# Copyright (C) 2022 EdX
+# edX community translations have been downloaded from Georgian (http://app.transifex.com/open-edx/edx-platform/language/ka/).
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -14,8 +14,8 @@
 # Simon Janashia <sjanashia@aat.ge>, 2019
 # Tamta Tchumburidze <tamtatioon@gmail.com>, 2016
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/).
-# Copyright (C) 2022 EdX
+# edX community translations have been downloaded from Georgian (http://app.transifex.com/open-edx/edx-platform/language/ka/).
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -24,18 +24,18 @@
 # Lasha Kokilashvili, 2017-2018
 # Salome Gegeshidze <geges0@bp.com>, 2016
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Georgian (https://www.transifex.com/open-edx/teams/6205/ka/).
-# Copyright (C) 2022 EdX
+# edX community translations have been downloaded from Georgian (https://app.transifex.com/open-edx/teams/6205/ka/).
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2022.
+# EdX Team <info@edx.org>, 2023.
 #
 # Translators:
 # Giorgi Goderdzishvili <biggeorgian@gmail.com>, 2019
 # Nino Asatiani <niasatiani110@gmail.com>, 2019
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/)
-# Copyright (C) 2022 edX
+# edX community translations have been downloaded from Georgian (http://app.transifex.com/open-edx/edx-platform/language/ka/)
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -44,8 +44,8 @@
 # ketevan Kokhreidze <k.kokhreidze@gmail.com>, 2016
 # Lasha Kokilashvili, 2018
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/)
-# Copyright (C) 2022 edX
+# edX community translations have been downloaded from Georgian (http://app.transifex.com/open-edx/edx-platform/language/ka/)
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -56,24 +56,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-12-18 20:42+0000\n"
+"POT-Creation-Date: 2023-09-17 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Lasha Kokilashvili, 2018\n"
-"Language-Team: Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/)\n"
+"Language-Team: Georgian (http://app.transifex.com/open-edx/edx-platform/language/ka/)\n"
 "Language: ka\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
 "Generated-By: Babel 2.8.0\n"
-
-#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
-#: cms/static/js/views/video_transcripts.js
-#: xmodule/assets/library_source_block/public/js/library_source_block.js
-msgid ""
-"This may be happening because of an error with our server or your internet "
-"connection. Try refreshing the page or making sure you are online."
-msgstr ""
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -86,7 +78,6 @@ msgstr ""
 #: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/tabs.js
 #: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
 #: lms/static/js/views/fields.js
-#: xmodule/assets/library_source_block/public/js/library_source_block.js
 msgid "Saving"
 msgstr "შენახვა"
 
@@ -110,6 +101,7 @@ msgstr "წაშლა"
 #: cms/static/js/views/validation.js
 #: common/static/common/js/components/utils/view_utils.js
 #: lms/static/js/Markdown.Editor.js
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: xmodule/js/src/html/edit.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
@@ -168,7 +160,9 @@ msgstr "ფაილის არჩევა"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: cms/static/js/views/course_info_update.js cms/static/js/views/tabs.js
+#: cms/static/js/views/course_info_update.js
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js cms/static/js/views/tabs.js
 #: lms/static/js/Markdown.Editor.js xmodule/js/src/html/edit.js
 #: common/static/common/templates/discussion/templates.underscore
 #: lms/templates/learner_dashboard/verification_popover.underscore
@@ -1706,25 +1700,27 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What is the highest level of education that you have achieved so far?"
+msgid "Select military status"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid ""
-"What is the highest level of education that any of your parents or guardians"
-" have achieved?"
+msgid "Select level of education"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select employment status"
+msgid "Select guardian education"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you currently work in?"
+msgid "Select current industry"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you want to work in?"
+msgid "Select prospective industry"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Thank you! You’re helping make edX better for everyone."
 msgstr ""
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
@@ -2329,11 +2325,9 @@ msgstr "წარმატებით ჩაირიცხნენ შემ�
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"allowed to enroll once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be allowed to enroll once they register:"
 msgstr ""
-"წარმატებით გაეგზავნათ ჩარიცხვის შეტყობინებები შემდეგ მომხმარებლებს. მათ "
-"დარეგისტრირებისთანავე ჩარიცხვის ნებართვა მიეცემათ:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -2343,11 +2337,9 @@ msgstr "ამ მომხმარებლებს დარეგისტ�
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"enrolled once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be enrolled once they register:"
 msgstr ""
-"ჩარიცხვასთან შეტყობინებები წარმატებით გაეგზავნათ შემდეგ მომხმარებლებს. ისინი"
-" დარეგისტრირებისთანავე ჩაირიცხებიან:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -2806,6 +2798,10 @@ msgstr ""
 " ხდება მოთხოვნით და ვადა 5 წუთში ეწურება.  "
 
 #: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
+msgid "You have access to the {enterpriseName} dashboard"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 msgid ""
 "To access the courses available to you through {enterpriseName}, visit the "
 "{enterpriseName} dashboard."
@@ -2875,6 +2871,10 @@ msgstr ""
 msgid "Ends {end}"
 msgstr ""
 
+#: lms/static/js/learner_dashboard/models/program_subscription_model.js
+msgid "${price}/month {currency}"
+msgstr ""
+
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "You must select a session to access the course."
 msgstr ""
@@ -2923,6 +2923,56 @@ msgid ""
 "Are you sure you want to unenroll from {courseName} ({courseNumber})? You "
 "will be refunded the amount you paid."
 msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid "View program"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid "Enroll in a {programName}'s course"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid ""
+"You have an active subscription to the {programName} program but are not "
+"enrolled in any courses. Enroll in a remaining course and enjoy verified "
+"access."
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid ""
+"According to our records, you are not enrolled in any courses included in "
+"your {programName} program subscription. Enroll in a course from the "
+"{i_start}Program Details{i_end} page."
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid "Subscription trial expires in less than 24 hours"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid "Subscription trial expires in {remainingDays} day"
+msgid_plural "Subscription trial expires in {remainingDays} days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid ""
+"Your {programName} trial will expire at {trialEndTime} on {trialEndDate} and"
+" the card on file will be charged {subscriptionPrice}."
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid ""
+"Your {programName} trial will expire in {remainingDays} day at "
+"{trialEndTime} on {trialEndDate} and the card on file will be charged "
+"{subscriptionPrice}."
+msgid_plural ""
+"Your {programName} trial will expire in {remainingDays} days at "
+"{trialEndTime} on {trialEndDate} and the card on file will be charged "
+"{subscriptionPrice}."
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
 msgid "{type} Progress"
@@ -3801,18 +3851,6 @@ msgstr ""
 #: xmodule/js/public/js/library_content_edit.js
 msgid "Updating with latest library content"
 msgstr "ბიბლიოთეკის უახლესი შინაარსით განახლება"
-
-#: xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
-msgid "Loading..."
-msgstr ""
-
-#: xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
-msgid "Selected blocks"
-msgstr ""
-
-#: xmodule/assets/library_source_block/public/js/library_source_block.js
-msgid "Unable to update settings"
-msgstr ""
 
 #: xmodule/assets/split_test/public/js/split_test_author_view.js
 #: xmodule/js/public/js/split_test_author_view.js
@@ -5417,6 +5455,13 @@ msgstr ""
 msgid "Turn off transcripts"
 msgstr ""
 
+#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
+#: cms/static/js/views/video_transcripts.js
+msgid ""
+"This may be happening because of an error with our server or your internet "
+"connection. Try refreshing the page or making sure you are online."
+msgstr ""
+
 #: cms/static/cms/js/main.js
 msgid "Studio's having trouble saving your work"
 msgstr ""
@@ -5775,7 +5820,7 @@ msgid "Please enter non-negative integer."
 msgstr "გთხოვთ, შეიყვანოთ დადებითი მთელი რიცხვი."
 
 #: cms/static/js/models/settings/course_grader.js
-msgid "Cannot drop more <%- types %> assignments than are assigned."
+msgid "You must have at least one undroppable <%- types %> assignment."
 msgstr ""
 
 #: cms/static/js/models/settings/course_grading_policy.js
@@ -5933,6 +5978,62 @@ msgstr ""
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
 msgstr "დარწმუნებული ხართ, რომ განახლების წაშლა გსურთ?"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "Copying"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+msgid "Copy of '{componentDisplayName}'"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "Pasting"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "Some errors occurred"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "The following required files could not be added to the course:"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "You may need to update a file(s) manually"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid ""
+"The following files already exist in this course but don't match the version"
+" used by the component you pasted:"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "New file(s) added to Files & Uploads."
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "The following required files were imported to this course:"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "View files"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "Dismiss"
+msgstr ""
 
 #: cms/static/js/views/course_rerun.js
 msgid "Create Re-run"
@@ -6892,6 +6993,7 @@ msgstr ""
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
+#: cms/templates/js/course-outline.underscore
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Actions"
 msgstr "მოქმედებები"
@@ -8150,6 +8252,7 @@ msgstr "მოქმედი"
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
 #: lms/templates/learner_dashboard/upgrade_message.underscore
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
 msgid "Certificate Status:"
 msgstr ""
 
@@ -8250,8 +8353,8 @@ msgstr ""
 "საინტერესო საგნებში"
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
-msgid "Explore New Programs"
-msgstr "გადახედეთ ახალ პროგრამებს"
+msgid "Explore new programs"
+msgstr ""
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
@@ -8273,6 +8376,11 @@ msgstr ""
 msgid "%(programName)s Home Page."
 msgstr "%(programName)s საწყისი გვერდი."
 
+#: lms/templates/learner_dashboard/program_card.underscore
+#: lms/templates/learner_dashboard/program_header_view.underscore
+msgid "Subscribed"
+msgstr ""
+
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Your {program} Certificate"
 msgstr ""
@@ -8280,6 +8388,43 @@ msgstr ""
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 #, python-format
 msgid "Open the certificate you earned for the %(title)s program."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Trial subscription"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Active subscription"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Inactive subscription"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid ""
+"View your receipts or modify your subscription on the {a_start}Orders and "
+"subscriptions{a_end} page"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid ""
+"Restart your subscription for {subscriptionPrice}. Your payment history is "
+"still available on the {a_start}Orders and subscriptions{a_end} page"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid ""
+"If you had a subscription previously, your payment history is still "
+"available on the {a_start}Orders and subscriptions{a_end} page"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid ""
+"Need help? Check out the {a_start}Learner Help "
+"Center{span_start}{icon}{span_end}{a_end} to troubleshoot issues or contact "
+"support"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
@@ -8320,7 +8465,58 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
+#, python-format
+msgid ""
+"You have successfully completed all the requirements for the %(title)s "
+"%(type)s."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Your Program Journey"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#, python-format
+msgid ""
+"Track and plan your progress through the %(count)s course(s) in this "
+"program. To complete the program, you must earn a verified certificate for "
+"each course."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Manage my subscription"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Restart my subscription"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Start {trialLength}-day free trial"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Trial ends {trialEndDate} at {trialEndTime}"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Your next billing date is {currentPeriodEnd}"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "{subscriptionPrice} subscription. Cancel anytime."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "{subscriptionPrice} subscription after trial ends. Cancel anytime."
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
@@ -8364,16 +8560,74 @@ msgid ""
 "Complete courses on your schedule to ensure you stand out in your field!"
 msgstr ""
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#, python-format
+msgid "Transform your %(org)s %(type)s into a full master’s degree"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#, python-format
+msgid ""
+"Successful completion of %(org)s %(program)s credential can be applied "
+"towards flexible, rigorous, and affordable masters degrees from the world’s "
+"leading universities."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_view.underscore
+#, python-format
+msgid ""
+"Track and plan your progress through the %(count)s courses in this program. "
+"To complete the program, you must earn a verified certificate for each "
+"course."
+msgstr ""
+
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "{organization}\\'s logo"
 msgstr "{organization} ლოგო"
 
+#: lms/templates/learner_dashboard/program_list_header_view.underscore
+msgid "My programs"
+msgstr ""
+
+#: lms/templates/learner_dashboard/subscription_upsell_view.underscore
+msgid "New"
+msgstr ""
+
+#: lms/templates/learner_dashboard/subscription_upsell_view.underscore
+msgid "Monthly program subscriptions {emDash} more flexible, more affordable"
+msgstr ""
+
+#: lms/templates/learner_dashboard/subscription_upsell_view.underscore
+msgid ""
+"Now available for many popular programs, affordable monthly subscription "
+"pricing can help you manage your budget more effectively. Subscriptions "
+"start at {minSubscriptionPrice}/month USD per program, after a 7-day full "
+"access free trial. Cancel at any time."
+msgstr ""
+
+#: lms/templates/learner_dashboard/subscription_upsell_view.underscore
+msgid "Explore subscription options"
+msgstr ""
+
 #: lms/templates/learner_dashboard/upgrade_message.underscore
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
 msgid "Needs verified certificate "
 msgstr ""
 
 #: lms/templates/learner_dashboard/upgrade_message.underscore
 msgid "Upgrade to Verified"
+msgstr ""
+
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
+msgid "Upgrade with a subscription"
+msgstr ""
+
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
+msgid "Pay {subscriptionPrice} for all courses in this program"
+msgstr ""
+
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
+msgid "Pay {subscriptionPrice} after {trialLength}-day free trial"
 msgstr ""
 
 #: lms/templates/student_account/account.underscore
@@ -9748,12 +10002,20 @@ msgid "Display Name"
 msgstr "სახელი"
 
 #: cms/templates/js/course-outline.underscore
+msgid "Discussions enabled"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 msgid "Proctoring Settings"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Configure"
 msgstr "კონფიგურაცია"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Copy to Clipboard"
+msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Duplicate"
@@ -9800,6 +10062,13 @@ msgid "Subsection is hidden after due date"
 msgstr "ქვეთავი დამალულია დათქმული თარიღის შემდეგ"
 
 #: cms/templates/js/course-outline.underscore
+#, python-format
+msgid ""
+"This subsection is configured as \\\"%(gradingType)s\\\", which doesn't "
+"exist in the current grading policy."
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 msgid "You haven't added any content to this course yet."
 msgstr "ამ კურსისთვის მასალები ჯერ არ დაგიმატებიათ."
@@ -9809,6 +10078,19 @@ msgstr "ამ კურსისთვის მასალები ჯერ
 #, python-format
 msgid "Click to add a new %(xblock_type)s"
 msgstr "დააწკაპუნეთ ახალი %(xblock_type)s-ის დასამატებლად"
+
+#: cms/templates/js/course-outline.underscore
+#, python-format
+msgid "Paste %(xblock_type)s"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+msgid "From:"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+msgid "What's in my clipboard?"
+msgstr ""
 
 #: cms/templates/js/course-settings-learning-fields.underscore
 msgid "Learning Outcome"
@@ -9845,6 +10127,14 @@ msgstr ""
 
 #: cms/templates/js/course-video-settings.underscore
 msgid "Course Video Settings"
+msgstr ""
+
+#: cms/templates/js/course-video-sharing-enable.underscore
+msgid "Video Sharing"
+msgstr ""
+
+#: cms/templates/js/course-video-sharing-enable.underscore
+msgid "Learn more"
 msgstr ""
 
 #: cms/templates/js/course-video-transcript-preferences.underscore
@@ -9950,6 +10240,30 @@ msgstr ""
 "ამ ტიპის დავალებების რაოდენობა, რომელთა შედეგებიც უგულვებელყოფილი იქნება. "
 "პირველ რიგში გაიცხრილება ყველაზე ცუდი შედეგები."
 
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Warning: "
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments defined here does not match the current "
+"number of {type} assignments in the course:"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "There are no assignments of this type in the course."
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "{assignment_count} {type} assignment(s) found:"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments in the course matches the number defined "
+"here."
+msgstr ""
+
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"
 msgstr "კურსის მასალები"
@@ -9975,6 +10289,14 @@ msgstr "პოსტი"
 
 #: cms/templates/js/discussion-editor.underscore
 msgid "Enable discussion"
+msgstr ""
+
+#: cms/templates/js/discussion-editor.underscore
+msgid "Topics for unpublished units would not be created"
+msgstr ""
+
+#: cms/templates/js/discussion-editor.underscore
+msgid "Please enable discussions for graded units from course authoring app"
 msgstr ""
 
 #: cms/templates/js/due-date-editor.underscore
@@ -10409,12 +10731,6 @@ msgstr ""
 
 #: cms/templates/js/self-paced-due-date-editor.underscore
 msgid ""
-"The maximum number of weeks this subsection can be due in is 18 weeks from "
-"the learner enrollment date."
-msgstr ""
-
-#: cms/templates/js/self-paced-due-date-editor.underscore
-msgid ""
 "The minimum number of weeks this subsection can be due in is 1 week from the"
 " learner enrollment date."
 msgstr ""
@@ -10563,6 +10879,14 @@ msgstr ""
 "დადგომის შემდეგ ისინი შეძლებენ მის შინაარსთან წვდომას. მას შემდეგ, რაც თქვენ"
 " გააუქმებთ ამ შესაძლებლობას %(xblockType)s-სთვის, უხილავად დარჩებიან მხოლოდ "
 "ის ბლოკები, რომლებიც მანამდე მსმენელებისგან სპეციალურად იყო დამალული."
+
+#: cms/templates/js/summary-configuration-editor.underscore
+msgid "Xpert unit summaries"
+msgstr ""
+
+#: cms/templates/js/summary-configuration-editor.underscore
+msgid "Enable summaries"
+msgstr ""
 
 #: cms/templates/js/team-member.underscore
 msgid "Current Role:"

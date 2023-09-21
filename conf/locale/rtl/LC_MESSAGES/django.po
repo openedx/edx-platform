@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-01-04 19:13+0000\n"
-"PO-Revision-Date: 2023-01-04 19:13:57.533935\n"
+"POT-Creation-Date: 2023-09-20 12:47+0000\n"
+"PO-Revision-Date: 2023-09-20 12:47:19.650590\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -49,11 +49,78 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.8.0\n"
 
-#: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/helpers.py
+#: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
+#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
+msgid "Unit"
+msgstr "Ʉnᴉʇ"
+
+#: cms/djangoapps/contentstore/helpers.py
 #: cms/djangoapps/contentstore/views/component.py
-#: cms/djangoapps/contentstore/views/item.py xmodule/html_block.py
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Problem"
+msgstr "Ᵽɹøblǝɯ"
+
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+#: xmodule/video_block/video_handlers.py
+#, python-brace-format
+msgid "The following parameters are required: {missing}."
+msgstr "Ŧɥǝ ɟølløʍᴉnƃ dɐɹɐɯǝʇǝɹs ɐɹǝ ɹǝbnᴉɹǝd: {missing}."
+
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: xmodule/video_block/video_handlers.py
+msgid ""
+"There is a problem with this transcript file. Try to upload a different "
+"file."
+msgstr ""
+"Ŧɥǝɹǝ ᴉs ɐ dɹøblǝɯ ʍᴉʇɥ ʇɥᴉs ʇɹɐnsɔɹᴉdʇ ɟᴉlǝ. Ŧɹʎ ʇø ndløɐd ɐ dᴉɟɟǝɹǝnʇ "
+"ɟᴉlǝ."
+
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+#: xmodule/video_block/video_handlers.py
+#, python-brace-format
+msgid "A transcript with the \"{language_code}\" language code already exists."
+msgstr "Ⱥ ʇɹɐnsɔɹᴉdʇ ʍᴉʇɥ ʇɥǝ \"{language_code}\" lɐnƃnɐƃǝ ɔødǝ ɐlɹǝɐdʎ ǝxᴉsʇs."
+
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: xmodule/video_block/video_handlers.py
+msgid "A transcript file is required."
+msgstr "Ⱥ ʇɹɐnsɔɹᴉdʇ ɟᴉlǝ ᴉs ɹǝbnᴉɹǝd."
+
+#: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/views/block.py
+#: cms/djangoapps/contentstore/views/component.py xmodule/html_block.py
 msgid "Text"
 msgstr "Ŧǝxʇ"
+
+#. Translators: This is the status for a video that the servers have
+#. successfully processed
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#: openedx/core/djangoapps/content_staging/data.py
+msgid "Ready"
+msgstr "Ɍǝɐdʎ"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#: lms/djangoapps/instructor/views/api.py
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Name"
+msgstr "Nɐɯǝ"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#: xmodule/video_block/video_xfields.py
+msgid "Video ID"
+msgstr "Vᴉdǝø ƗĐ"
+
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This is listed as the duration for a video that has not
+#. yet reached the point in its processing by the servers where its
+#. duration is determined.
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
+msgid "Pending"
+msgstr "Ᵽǝndᴉnƃ"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
@@ -69,14 +136,13 @@ msgstr "Đᴉsɔnssᴉøn"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: openedx/core/djangoapps/content_libraries/constants.py
-msgid "Problem"
-msgstr "Ᵽɹøblǝɯ"
-
-#: cms/djangoapps/contentstore/views/component.py
-#: openedx/core/djangoapps/content_libraries/constants.py
 #: lms/templates/video.html
 msgid "Video"
 msgstr "Vᴉdǝø"
+
+#: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
+msgid "Blank Problem"
+msgstr "Ƀlɐnʞ Ᵽɹøblǝɯ"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -88,64 +154,21 @@ msgstr "Ⱥdʌɐnɔǝd"
 msgid "Entrance Exam"
 msgstr "Ɇnʇɹɐnɔǝ Ɇxɐɯ"
 
-#: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
-#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
-msgid "Unit"
-msgstr "Ʉnᴉʇ"
-
-#: cms/djangoapps/contentstore/views/helpers.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/create_xblock.py
 #: xmodule/library_content_block.py
 msgid "Empty"
 msgstr "Ɇɯdʇʎ"
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#: xmodule/video_block/video_handlers.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#: openedx/core/djangoapps/xblock/rest_api/views.py
+msgid "Invalid data"
+msgstr "Ɨnʌɐlᴉd dɐʇɐ"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#: openedx/core/djangoapps/xblock/rest_api/views.py
 #, python-brace-format
-msgid "The following parameters are required: {missing}."
-msgstr "Ŧɥǝ ɟølløʍᴉnƃ dɐɹɐɯǝʇǝɹs ɐɹǝ ɹǝbnᴉɹǝd: {missing}."
-
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#: cms/djangoapps/contentstore/views/transcripts_ajax.py
-#: xmodule/video_block/video_handlers.py
-msgid ""
-"There is a problem with this transcript file. Try to upload a different "
-"file."
-msgstr ""
-"Ŧɥǝɹǝ ᴉs ɐ dɹøblǝɯ ʍᴉʇɥ ʇɥᴉs ʇɹɐnsɔɹᴉdʇ ɟᴉlǝ. Ŧɹʎ ʇø ndløɐd ɐ dᴉɟɟǝɹǝnʇ "
-"ɟᴉlǝ."
-
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#: xmodule/video_block/video_handlers.py
-#, python-brace-format
-msgid "A transcript with the \"{language_code}\" language code already exists."
-msgstr "Ⱥ ʇɹɐnsɔɹᴉdʇ ʍᴉʇɥ ʇɥǝ \"{language_code}\" lɐnƃnɐƃǝ ɔødǝ ɐlɹǝɐdʎ ǝxᴉsʇs."
-
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#: cms/djangoapps/contentstore/views/transcripts_ajax.py
-#: xmodule/video_block/video_handlers.py
-msgid "A transcript file is required."
-msgstr "Ⱥ ʇɹɐnsɔɹᴉdʇ ɟᴉlǝ ᴉs ɹǝbnᴉɹǝd."
-
-#: cms/djangoapps/contentstore/views/videos.py
-#: lms/djangoapps/instructor/views/api.py
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "Name"
-msgstr "Nɐɯǝ"
-
-#: cms/djangoapps/contentstore/views/videos.py
-#: xmodule/video_block/video_xfields.py
-msgid "Video ID"
-msgstr "Vᴉdǝø ƗĐ"
-
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: This is listed as the duration for a video that has not
-#. yet reached the point in its processing by the servers where its
-#. duration is determined.
-#: cms/djangoapps/contentstore/views/videos.py
-#: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
-msgid "Pending"
-msgstr "Ᵽǝndᴉnƃ"
+msgid "Invalid data ({details})"
+msgstr "Ɨnʌɐlᴉd dɐʇɐ ({details})"
 
 #: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
 msgid "Django site admin"
@@ -224,8 +247,8 @@ msgstr "Ᵽɹøɟǝssᴉønɐl Ɇd"
 #: common/djangoapps/course_modes/models.py xmodule/annotatable_block.py
 #: xmodule/capa_block.py xmodule/conditional_block.py
 #: xmodule/discussion_block.py xmodule/html_block.py
-#: xmodule/library_content_block.py xmodule/library_sourced_block.py
-#: xmodule/lti_block.py xmodule/split_test_block.py xmodule/unit_block.py
+#: xmodule/library_content_block.py xmodule/lti_block.py
+#: xmodule/split_test_block.py xmodule/unit_block.py
 #: xmodule/word_cloud_block.py xmodule/x_module.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
@@ -251,6 +274,20 @@ msgstr ""
 "ǝnɹøllɯǝnʇ ɔløsǝs ɟøɹ ʇɥǝ ɔønɹsǝ."
 
 #: common/djangoapps/course_modes/models.py
+msgid "Lock upgrade deadline date"
+msgstr "Łøɔʞ ndƃɹɐdǝ dǝɐdlᴉnǝ dɐʇǝ"
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: Set to True to lock in the explicitly defined upgrade deadline "
+"date. Set to False if there is no upgrade deadline or to use the default "
+"upgrade deadline."
+msgstr ""
+"ØⱣŦƗØNȺŁ: Sǝʇ ʇø Ŧɹnǝ ʇø løɔʞ ᴉn ʇɥǝ ǝxdlᴉɔᴉʇlʎ dǝɟᴉnǝd ndƃɹɐdǝ dǝɐdlᴉnǝ "
+"dɐʇǝ. Sǝʇ ʇø Fɐlsǝ ᴉɟ ʇɥǝɹǝ ᴉs nø ndƃɹɐdǝ dǝɐdlᴉnǝ øɹ ʇø nsǝ ʇɥǝ dǝɟɐnlʇ "
+"ndƃɹɐdǝ dǝɐdlᴉnǝ."
+
+#: common/djangoapps/course_modes/models.py
 msgid ""
 "OPTIONAL: This is the SKU (stock keeping unit) of this mode in the external "
 "ecommerce service.  Leave this blank if the course has not yet been migrated"
@@ -259,6 +296,26 @@ msgstr ""
 "ØⱣŦƗØNȺŁ: Ŧɥᴉs ᴉs ʇɥǝ SꝀɄ (sʇøɔʞ ʞǝǝdᴉnƃ nnᴉʇ) øɟ ʇɥᴉs ɯødǝ ᴉn ʇɥǝ ǝxʇǝɹnɐl "
 "ǝɔøɯɯǝɹɔǝ sǝɹʌᴉɔǝ.  Łǝɐʌǝ ʇɥᴉs blɐnʞ ᴉɟ ʇɥǝ ɔønɹsǝ ɥɐs nøʇ ʎǝʇ bǝǝn ɯᴉƃɹɐʇǝd"
 " ʇø ʇɥǝ ǝɔøɯɯǝɹɔǝ sǝɹʌᴉɔǝ."
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: This is the Android SKU registered on play store for this mode of "
+"the course. Leave this blank if the course has not yet been migrated to the "
+"ecommerce service."
+msgstr ""
+"ØⱣŦƗØNȺŁ: Ŧɥᴉs ᴉs ʇɥǝ Ⱥndɹøᴉd SꝀɄ ɹǝƃᴉsʇǝɹǝd øn dlɐʎ sʇøɹǝ ɟøɹ ʇɥᴉs ɯødǝ øɟ "
+"ʇɥǝ ɔønɹsǝ. Łǝɐʌǝ ʇɥᴉs blɐnʞ ᴉɟ ʇɥǝ ɔønɹsǝ ɥɐs nøʇ ʎǝʇ bǝǝn ɯᴉƃɹɐʇǝd ʇø ʇɥǝ "
+"ǝɔøɯɯǝɹɔǝ sǝɹʌᴉɔǝ."
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: This is the iOS SKU registered on app store for this mode of the "
+"course.  Leave this blank if the course has not yet been migrated to the "
+"ecommerce service."
+msgstr ""
+"ØⱣŦƗØNȺŁ: Ŧɥᴉs ᴉs ʇɥǝ ᴉØS SꝀɄ ɹǝƃᴉsʇǝɹǝd øn ɐdd sʇøɹǝ ɟøɹ ʇɥᴉs ɯødǝ øɟ ʇɥǝ "
+"ɔønɹsǝ.  Łǝɐʌǝ ʇɥᴉs blɐnʞ ᴉɟ ʇɥǝ ɔønɹsǝ ɥɐs nøʇ ʎǝʇ bǝǝn ɯᴉƃɹɐʇǝd ʇø ʇɥǝ "
+"ǝɔøɯɯǝɹɔǝ sǝɹʌᴉɔǝ."
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -298,7 +355,6 @@ msgstr "{currency_symbol}{price}"
 #. Translators: This refers to the cost of the course. In this case, the
 #. course costs nothing so it is free.
 #: common/djangoapps/course_modes/models.py
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
 #: lms/templates/course_modes/track_selection.html
 msgid "Free"
 msgstr "Fɹǝǝ"
@@ -2168,8 +2224,8 @@ msgid "Cookie Policy"
 msgstr "Ȼøøʞᴉǝ Ᵽølᴉɔʎ"
 
 #: lms/djangoapps/branding/api.py
-msgid "Do Not Sell My Personal Data"
-msgstr "Đø Nøʇ Sǝll Mʎ Ᵽǝɹsønɐl Đɐʇɐ"
+msgid "Your Privacy Choices"
+msgstr "Ɏønɹ Ᵽɹᴉʌɐɔʎ Ȼɥøᴉɔǝs"
 
 #: lms/djangoapps/branding/api.py
 msgid "Trademark Policy"
@@ -2990,6 +3046,14 @@ msgid "Open Response Assessment"
 msgstr "Ødǝn Ɍǝsdønsǝ Ⱥssǝssɯǝnʇ"
 
 #: lms/djangoapps/courseware/courses.py
+msgid ""
+"This Open Response Assessment's due dates are set by your instructor and "
+"can't be shifted."
+msgstr ""
+"Ŧɥᴉs Ødǝn Ɍǝsdønsǝ Ⱥssǝssɯǝnʇ's dnǝ dɐʇǝs ɐɹǝ sǝʇ bʎ ʎønɹ ᴉnsʇɹnɔʇøɹ ɐnd "
+"ɔɐn'ʇ bǝ sɥᴉɟʇǝd."
+
+#: lms/djangoapps/courseware/courses.py
 msgid "Self Assessment"
 msgstr "Sǝlɟ Ⱥssǝssɯǝnʇ"
 
@@ -3004,14 +3068,6 @@ msgstr "Sʇɐɟɟ Ⱥssǝssɯǝnʇ"
 #: lms/djangoapps/courseware/courses.py
 msgid "Submission"
 msgstr "Snbɯᴉssᴉøn"
-
-#: lms/djangoapps/courseware/courses.py
-msgid ""
-"Open Response Assessment due dates are set by your instructor and can't be "
-"shifted."
-msgstr ""
-"Ødǝn Ɍǝsdønsǝ Ⱥssǝssɯǝnʇ dnǝ dɐʇǝs ɐɹǝ sǝʇ bʎ ʎønɹ ᴉnsʇɹnɔʇøɹ ɐnd ɔɐn'ʇ bǝ "
-"sɥᴉɟʇǝd."
 
 #. Translators: 'absolute' is a date such as "Jan 01,
 #. 2020". 'relative' is a fuzzy description of the time until
@@ -3257,6 +3313,14 @@ msgstr "Ȼnsʇøɯ dɐƃǝs"
 #: lms/djangoapps/courseware/plugins.py
 msgid "Provide additional course content and resources with custom pages"
 msgstr "Ᵽɹøʌᴉdǝ ɐddᴉʇᴉønɐl ɔønɹsǝ ɔønʇǝnʇ ɐnd ɹǝsønɹɔǝs ʍᴉʇɥ ɔnsʇøɯ dɐƃǝs"
+
+#: lms/djangoapps/courseware/plugins.py
+msgid "Open Response Assessment Settings"
+msgstr "Ødǝn Ɍǝsdønsǝ Ⱥssǝssɯǝnʇ Sǝʇʇᴉnƃs"
+
+#: lms/djangoapps/courseware/plugins.py
+msgid "Course level settings for Open Response Assessment."
+msgstr "Ȼønɹsǝ lǝʌǝl sǝʇʇᴉnƃs ɟøɹ Ødǝn Ɍǝsdønsǝ Ⱥssǝssɯǝnʇ."
 
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
 #: openedx/features/course_experience/__init__.py xmodule/tabs.py
@@ -3529,6 +3593,16 @@ msgstr ""
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Good"
 msgstr "Ǥøød"
+
+#. Translators: Replier commented on "your" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "your"
+msgstr "ʎønɹ"
+
+#. Translators: Replier commented on "their" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "their"
+msgstr "ʇɥǝᴉɹ"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #, python-format
@@ -3864,10 +3938,6 @@ msgstr "Łɐnƃnɐƃǝ"
 #: lms/djangoapps/instructor/views/api.py
 msgid "Location"
 msgstr "Łøɔɐʇᴉøn"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Birth Year"
-msgstr "Ƀᴉɹʇɥ Ɏǝɐɹ"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This label appears above a dropdown menu used to select
@@ -4802,16 +4872,16 @@ msgstr ""
 "Ŧɥᴉs ɔøɯdønǝnʇ's ɐɔɔǝss sǝʇʇᴉnƃs ɔønʇɹɐdᴉɔʇ ᴉʇs dɐɹǝnʇ's ɐɔɔǝss sǝʇʇᴉnƃs."
 
 #: lms/djangoapps/lms_xblock/mixin.py
-msgid "Whether to display this module in the table of contents"
-msgstr "Wɥǝʇɥǝɹ ʇø dᴉsdlɐʎ ʇɥᴉs ɯødnlǝ ᴉn ʇɥǝ ʇɐblǝ øɟ ɔønʇǝnʇs"
+msgid "Whether to display this block in the table of contents"
+msgstr "Wɥǝʇɥǝɹ ʇø dᴉsdlɐʎ ʇɥᴉs bløɔʞ ᴉn ʇɥǝ ʇɐblǝ øɟ ɔønʇǝnʇs"
 
 #. Translators: "TOC" stands for "Table of Contents"
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
-"What format this module is in (used for deciding which grader to apply, and "
+"What format this block is in (used for deciding which grader to apply, and "
 "what to show in the TOC)"
 msgstr ""
-"Wɥɐʇ ɟøɹɯɐʇ ʇɥᴉs ɯødnlǝ ᴉs ᴉn (nsǝd ɟøɹ dǝɔᴉdᴉnƃ ʍɥᴉɔɥ ƃɹɐdǝɹ ʇø ɐddlʎ, ɐnd "
+"Wɥɐʇ ɟøɹɯɐʇ ʇɥᴉs bløɔʞ ᴉs ᴉn (nsǝd ɟøɹ dǝɔᴉdᴉnƃ ʍɥᴉɔɥ ƃɹɐdǝɹ ʇø ɐddlʎ, ɐnd "
 "ʍɥɐʇ ʇø sɥøʍ ᴉn ʇɥǝ ŦØȻ)"
 
 #: lms/djangoapps/lms_xblock/mixin.py
@@ -5729,7 +5799,6 @@ msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
 #: openedx/core/djangoapps/user_api/admin.py
-#: xmodule/templates/library-sourced-block-studio-view.html
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/videos_index_pagination.html
@@ -5741,58 +5810,10 @@ msgid "Allow"
 msgstr "Ⱥlløʍ"
 
 #: lms/templates/oauth2_provider/authorize.html
+#: openedx/core/djangoapps/content_staging/data.py
 #: lms/templates/ccx/schedule.html
 msgid "Error"
 msgstr "Ɇɹɹøɹ"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Check out this course on edx"
-msgstr "Ȼɥǝɔʞ ønʇ ʇɥᴉs ɔønɹsǝ øn ǝdx"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Enroll now"
-msgstr "Ɇnɹøll nøʍ"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-#: lms/templates/courseware/course_about.html
-#: lms/templates/dashboard/_dashboard_course_resume.html
-msgid "View Course"
-msgstr "Vᴉǝʍ Ȼønɹsǝ"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Estimated 6 weeks"
-msgstr "Ɇsʇᴉɯɐʇǝd 6 ʍǝǝʞs"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "4-6 hours per week"
-msgstr "4-6 ɥønɹs dǝɹ ʍǝǝʞ"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Self-paced"
-msgstr "Sǝlɟ-dɐɔǝd"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Progress at your own speed"
-msgstr "Ᵽɹøƃɹǝss ɐʇ ʎønɹ øʍn sdǝǝd"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Optional upgrade available"
-msgstr "Ødʇᴉønɐl ndƃɹɐdǝ ɐʌɐᴉlɐblǝ"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.txt
-#, python-format
-msgid "Check out this course on %(platform_name)s."
-msgstr "Ȼɥǝɔʞ ønʇ ʇɥᴉs ɔønɹsǝ øn %(platform_name)s."
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.txt
-#, python-format
-msgid "This email message was automatically sent by %(lms_url)s "
-msgstr "Ŧɥᴉs ǝɯɐᴉl ɯǝssɐƃǝ ʍɐs ɐnʇøɯɐʇᴉɔɐllʎ sǝnʇ bʎ %(lms_url)s "
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/subject.txt
-#, python-format
-msgid "%(display_name)s"
-msgstr "%(display_name)s"
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 msgid "ID Verification Approved"
@@ -6238,13 +6259,13 @@ msgid "Quotes"
 msgstr "Qnøʇǝs"
 
 #: lms/templates/wiki/includes/editor_widget.html
-#, python-format
+#, python-brace-format
 msgid ""
-"Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for"
-" help."
+"Markdown syntax is allowed. See the {start_link}cheatsheet{end_link} for "
+"help."
 msgstr ""
-"Mɐɹʞdøʍn sʎnʇɐx ᴉs ɐlløʍǝd. Sǝǝ ʇɥǝ %(start_link)sɔɥǝɐʇsɥǝǝʇ%(end_link)s ɟøɹ"
-" ɥǝld."
+"Mɐɹʞdøʍn sʎnʇɐx ᴉs ɐlløʍǝd. Sǝǝ ʇɥǝ {start_link}ɔɥǝɐʇsɥǝǝʇ{end_link} ɟøɹ "
+"ɥǝld."
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
@@ -6949,6 +6970,43 @@ msgstr "Wǝ ɔønld nøʇ ɟᴉnd ɐ nsǝɹ ʍᴉʇɥ ʇɥɐʇ ǝɯɐᴉl ɐddɹ
 msgid "This user already has access to this library."
 msgstr "Ŧɥᴉs nsǝɹ ɐlɹǝɐdʎ ɥɐs ɐɔɔǝss ʇø ʇɥᴉs lᴉbɹɐɹʎ."
 
+#: openedx/core/djangoapps/content_staging/data.py
+#: cms/templates/certificates.html cms/templates/container.html
+#: cms/templates/course_outline.html cms/templates/group_configurations.html
+#: cms/templates/library.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
+#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Loading"
+msgstr "Łøɐdᴉnƃ"
+
+#: openedx/core/djangoapps/content_staging/data.py
+msgid "Expired"
+msgstr "Ɇxdᴉɹǝd"
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Staged Content"
+msgstr "Sʇɐƃǝd Ȼønʇǝnʇ"
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid ""
+"\n"
+"            What type of content is staged. Only OLX content is supported, and\n"
+"            this field must be the same as the root tag of the OLX.\n"
+"            e.g. \"video\" if a video is staged, or \"vertical\" for a unit.\n"
+"        "
+msgstr ""
+"\n"
+"            Wɥɐʇ ʇʎdǝ øɟ ɔønʇǝnʇ ᴉs sʇɐƃǝd. Ønlʎ ØŁX ɔønʇǝnʇ ᴉs snddøɹʇǝd, ɐnd\n"
+"            ʇɥᴉs ɟᴉǝld ɯnsʇ bǝ ʇɥǝ sɐɯǝ ɐs ʇɥǝ ɹøøʇ ʇɐƃ øɟ ʇɥǝ ØŁX.\n"
+"            ǝ.ƃ. \"ʌᴉdǝø\" ᴉɟ ɐ ʌᴉdǝø ᴉs sʇɐƃǝd, øɹ \"ʌǝɹʇᴉɔɐl\" ɟøɹ ɐ nnᴉʇ.\n"
+"        "
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Original usage key/ID of the thing that is in the clipboard."
+msgstr "Øɹᴉƃᴉnɐl nsɐƃǝ ʞǝʎ/ƗĐ øɟ ʇɥǝ ʇɥᴉnƃ ʇɥɐʇ ᴉs ᴉn ʇɥǝ ɔlᴉdbøɐɹd."
+
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
 "List of domains that are allowed to make cross-domain requests to this site."
@@ -7243,6 +7301,14 @@ msgstr ""
 "bǝ dᴉsɐblǝd."
 
 #: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"The Posting availability in discussions whether it will be enabled, "
+"scheduled or indefinitely disabled."
+msgstr ""
+"Ŧɥǝ Ᵽøsʇᴉnƃ ɐʌɐᴉlɐbᴉlᴉʇʎ ᴉn dᴉsɔnssᴉøns ʍɥǝʇɥǝɹ ᴉʇ ʍᴉll bǝ ǝnɐblǝd, "
+"sɔɥǝdnlǝd øɹ ᴉndǝɟᴉnᴉʇǝlʎ dᴉsɐblǝd."
+
+#: openedx/core/djangoapps/discussions/models.py
 msgid "The LTI configuration data for this context/provider."
 msgstr "Ŧɥǝ ŁŦƗ ɔønɟᴉƃnɹɐʇᴉøn dɐʇɐ ɟøɹ ʇɥᴉs ɔønʇǝxʇ/dɹøʌᴉdǝɹ."
 
@@ -7411,6 +7477,85 @@ msgstr "Ƀlɐɔʞlᴉsʇ {country} ɟøɹ {course}"
 #: openedx/core/djangoapps/learner_pathway/apps.py
 msgid "Learner Pathways"
 msgstr "Łǝɐɹnǝɹ Ᵽɐʇɥʍɐʎs"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> commented on your response to the "
+"post <{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> ɔøɯɯǝnʇǝd øn ʎønɹ ɹǝsdønsǝ ʇø ʇɥǝ "
+"døsʇ <{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> commented on "
+"<{strong}>{author_name}</{strong}> response to your post "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> ɔøɯɯǝnʇǝd øn "
+"<{strong}>{author_name}</{strong}> ɹǝsdønsǝ ʇø ʎønɹ døsʇ "
+"<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> responded to your post "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> ɹǝsdøndǝd ʇø ʎønɹ døsʇ "
+"<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> posted "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{username}</{strong}> døsʇǝd "
+"<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> asked "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{username}</{strong}> ɐsʞǝd "
+"<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+msgid ""
+"Notifications for responses and comments on your posts, and the ones you’re "
+"following, including endorsements to your responses and on your posts."
+msgstr ""
+"Nøʇᴉɟᴉɔɐʇᴉøns ɟøɹ ɹǝsdønsǝs ɐnd ɔøɯɯǝnʇs øn ʎønɹ døsʇs, ɐnd ʇɥǝ ønǝs ʎøn’ɹǝ "
+"ɟølløʍᴉnƃ, ᴉnɔlndᴉnƃ ǝndøɹsǝɯǝnʇs ʇø ʎønɹ ɹǝsdønsǝs ɐnd øn ʎønɹ døsʇs."
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "The notification preference config version is not up to date."
+msgstr "Ŧɥǝ nøʇᴉɟᴉɔɐʇᴉøn dɹǝɟǝɹǝnɔǝ ɔønɟᴉƃ ʌǝɹsᴉøn ᴉs nøʇ nd ʇø dɐʇǝ."
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Invalid app name."
+msgstr "Ɨnʌɐlᴉd ɐdd nɐɯǝ."
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Notifications marked as seen."
+msgstr "Nøʇᴉɟᴉɔɐʇᴉøns ɯɐɹʞǝd ɐs sǝǝn."
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Notification marked read."
+msgstr "Nøʇᴉɟᴉɔɐʇᴉøn ɯɐɹʞǝd ɹǝɐd."
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Notifications marked read."
+msgstr "Nøʇᴉɟᴉɔɐʇᴉøns ɯɐɹʞǝd ɹǝɐd."
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Invalid app_name or notification_id."
+msgstr "Ɨnʌɐlᴉd ɐdd_nɐɯǝ øɹ nøʇᴉɟᴉɔɐʇᴉøn_ᴉd."
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid ""
@@ -8198,9 +8343,18 @@ msgid "Success"
 msgstr "Snɔɔǝss"
 
 #: openedx/core/djangoapps/user_api/admin.py
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Ⱥɔʇᴉøns"
+
+#: openedx/core/djangoapps/user_api/models.py
+msgid ""
+"Comma separated file that have username and user_email of the users that "
+"needs to be retired"
+msgstr ""
+"Ȼøɯɯɐ sǝdɐɹɐʇǝd ɟᴉlǝ ʇɥɐʇ ɥɐʌǝ nsǝɹnɐɯǝ ɐnd nsǝɹ_ǝɯɐᴉl øɟ ʇɥǝ nsǝɹs ʇɥɐʇ "
+"nǝǝds ʇø bǝ ɹǝʇᴉɹǝd"
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -8864,6 +9018,18 @@ msgstr ""
 "Ɏøn ɥɐʌǝ snɔɔǝssɟnllʎ sɥᴉɟʇǝd ʎønɹ ɔønɹsǝ sɔɥǝdnlǝ ɐnd ʎønɹ ɔɐlǝndɐɹ ᴉs nd "
 "ʇø dɐʇǝ."
 
+#: openedx/features/content_tagging/models/base.py wiki/models/article.py
+msgid "owner"
+msgstr "øʍnǝɹ"
+
+#: openedx/features/content_tagging/models/base.py
+msgid ""
+"Organization that is related to this taxonomy.If None, then this taxonomy is"
+" related to all organizations."
+msgstr ""
+"Øɹƃɐnᴉzɐʇᴉøn ʇɥɐʇ ᴉs ɹǝlɐʇǝd ʇø ʇɥᴉs ʇɐxønøɯʎ.Ɨɟ Nønǝ, ʇɥǝn ʇɥᴉs ʇɐxønøɯʎ ᴉs"
+" ɹǝlɐʇǝd ʇø ɐll øɹƃɐnᴉzɐʇᴉøns."
+
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
 #: lms/templates/support/feature_based_enrollments.html
@@ -9189,8 +9355,7 @@ msgstr "XMŁ dɐʇɐ ɟøɹ ʇɥǝ ɐnnøʇɐʇᴉøn"
 #: xmodule/annotatable_block.py xmodule/capa_block.py
 #: xmodule/conditional_block.py xmodule/discussion_block.py
 #: xmodule/html_block.py xmodule/library_content_block.py
-#: xmodule/library_root_xblock.py xmodule/library_sourced_block.py
-#: xmodule/poll_block.py xmodule/unit_block.py
+#: xmodule/library_root_xblock.py xmodule/poll_block.py xmodule/unit_block.py
 #: xmodule/video_block/video_xfields.py xmodule/word_cloud_block.py
 #: xmodule/x_module.py
 msgid "The display name for this component."
@@ -9636,10 +9801,6 @@ msgstr "Ȼødǝɾɐᴉl ȺⱣƗ Sǝɹʌᴉɔǝ ᴉnʌɐlᴉd ɹǝsdønsǝ."
 #: xmodule/capa/safe_exec/remote_exec.py
 msgid "Invalid JSON response received from codejail api service."
 msgstr "Ɨnʌɐlᴉd ɈSØN ɹǝsdønsǝ ɹǝɔǝᴉʌǝd ɟɹøɯ ɔødǝɾɐᴉl ɐdᴉ sǝɹʌᴉɔǝ."
-
-#: xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr "Ƀlɐnʞ Ⱥdʌɐnɔǝd Ᵽɹøblǝɯ"
 
 #: xmodule/capa_block.py
 msgid "Number of attempts taken by the student on this problem"
@@ -10174,8 +10335,8 @@ msgid "Date that enrollment for this class is closed"
 msgstr "Đɐʇǝ ʇɥɐʇ ǝnɹøllɯǝnʇ ɟøɹ ʇɥᴉs ɔlɐss ᴉs ɔløsǝd"
 
 #: xmodule/course_block.py
-msgid "Start time when this module is visible"
-msgstr "Sʇɐɹʇ ʇᴉɯǝ ʍɥǝn ʇɥᴉs ɯødnlǝ ᴉs ʌᴉsᴉblǝ"
+msgid "Start time when this block is visible"
+msgstr "Sʇɐɹʇ ʇᴉɯǝ ʍɥǝn ʇɥᴉs bløɔʞ ᴉs ʌᴉsᴉblǝ"
 
 #: xmodule/course_block.py
 msgid "Date that this class ends"
@@ -10842,8 +11003,8 @@ msgid "Entrance Exam ID"
 msgstr "Ɇnʇɹɐnɔǝ Ɇxɐɯ ƗĐ"
 
 #: xmodule/course_block.py
-msgid "Content module identifier (location) of entrance exam."
-msgstr "Ȼønʇǝnʇ ɯødnlǝ ᴉdǝnʇᴉɟᴉǝɹ (løɔɐʇᴉøn) øɟ ǝnʇɹɐnɔǝ ǝxɐɯ."
+msgid "Content block identifier (location) of entrance exam."
+msgstr "Ȼønʇǝnʇ bløɔʞ ᴉdǝnʇᴉɟᴉǝɹ (løɔɐʇᴉøn) øɟ ǝnʇɹɐnɔǝ ǝxɐɯ."
 
 #: xmodule/course_block.py
 msgid "Social Media Sharing URL"
@@ -11035,6 +11196,32 @@ msgstr ""
 "'dnblᴉɔ' (ɐlløʍ ɐɔɔǝss ʇø bøʇɥ ønʇlᴉnǝ ɐnd ɔønɹsǝ ɔønʇǝnʇ)."
 
 #: xmodule/course_block.py
+msgid "Video Sharing Options"
+msgstr "Vᴉdǝø Sɥɐɹᴉnƃ Ødʇᴉøns"
+
+#: xmodule/course_block.py
+msgid ""
+"Specify the video sharing options for the course. This can be set to one of "
+"three values: 'all-on', 'all-off' and 'per-video'. with 'per-video' as the "
+"default."
+msgstr ""
+"Sdǝɔᴉɟʎ ʇɥǝ ʌᴉdǝø sɥɐɹᴉnƃ ødʇᴉøns ɟøɹ ʇɥǝ ɔønɹsǝ. Ŧɥᴉs ɔɐn bǝ sǝʇ ʇø ønǝ øɟ "
+"ʇɥɹǝǝ ʌɐlnǝs: 'ɐll-øn', 'ɐll-øɟɟ' ɐnd 'dǝɹ-ʌᴉdǝø'. ʍᴉʇɥ 'dǝɹ-ʌᴉdǝø' ɐs ʇɥǝ "
+"dǝɟɐnlʇ."
+
+#: xmodule/course_block.py
+msgid "Force Flexible Grading for Peer ORAs"
+msgstr "Føɹɔǝ Flǝxᴉblǝ Ǥɹɐdᴉnƃ ɟøɹ Ᵽǝǝɹ ØɌȺs"
+
+#: xmodule/course_block.py
+msgid ""
+"Setting this flag will force on the flexible grading option for all peer-"
+"graded ORAs in this course."
+msgstr ""
+"Sǝʇʇᴉnƃ ʇɥᴉs ɟlɐƃ ʍᴉll ɟøɹɔǝ øn ʇɥǝ ɟlǝxᴉblǝ ƃɹɐdᴉnƃ ødʇᴉøn ɟøɹ ɐll dǝǝɹ-"
+"ƃɹɐdǝd ØɌȺs ᴉn ʇɥᴉs ɔønɹsǝ."
+
+#: xmodule/course_block.py
 msgid "Course Instructor"
 msgstr "Ȼønɹsǝ Ɨnsʇɹnɔʇøɹ"
 
@@ -11198,8 +11385,8 @@ msgstr ""
 " ɥᴉddǝn ᴉn ŁMS."
 
 #: xmodule/html_block.py
-msgid "Html contents to display for this module"
-msgstr "Ħʇɯl ɔønʇǝnʇs ʇø dᴉsdlɐʎ ɟøɹ ʇɥᴉs ɯødnlǝ"
+msgid "Html contents to display for this block"
+msgstr "Ħʇɯl ɔønʇǝnʇs ʇø dᴉsdlɐʎ ɟøɹ ʇɥᴉs bløɔʞ"
 
 #: xmodule/html_block.py
 msgid "Source code for LaTeX documents. This feature is not well-supported."
@@ -11276,8 +11463,12 @@ msgid "Count"
 msgstr "Ȼønnʇ"
 
 #: xmodule/library_content_block.py
-msgid "Enter the number of components to display to each student."
-msgstr "Ɇnʇǝɹ ʇɥǝ nnɯbǝɹ øɟ ɔøɯdønǝnʇs ʇø dᴉsdlɐʎ ʇø ǝɐɔɥ sʇndǝnʇ."
+msgid ""
+"Enter the number of components to display to each student. Set it to -1 to "
+"display all components."
+msgstr ""
+"Ɇnʇǝɹ ʇɥǝ nnɯbǝɹ øɟ ɔøɯdønǝnʇs ʇø dᴉsdlɐʎ ʇø ǝɐɔɥ sʇndǝnʇ. Sǝʇ ᴉʇ ʇø -1 ʇø "
+"dᴉsdlɐʎ ɐll ɔøɯdønǝnʇs."
 
 #: xmodule/library_content_block.py
 msgid "Problem Type"
@@ -11375,35 +11566,6 @@ msgstr "Łᴉbɹɐɹʎ Đᴉsdlɐʎ Nɐɯǝ"
 #: xmodule/library_root_xblock.py
 msgid "Enter the names of the advanced components to use in your library."
 msgstr "Ɇnʇǝɹ ʇɥǝ nɐɯǝs øɟ ʇɥǝ ɐdʌɐnɔǝd ɔøɯdønǝnʇs ʇø nsǝ ᴉn ʎønɹ lᴉbɹɐɹʎ."
-
-#: xmodule/library_sourced_block.py
-msgid "Library Blocks List"
-msgstr "Łᴉbɹɐɹʎ Ƀløɔʞs Łᴉsʇ"
-
-#: xmodule/library_sourced_block.py
-msgid "Enter the IDs of the library XBlocks that you wish to use."
-msgstr "Ɇnʇǝɹ ʇɥǝ ƗĐs øɟ ʇɥǝ lᴉbɹɐɹʎ XɃløɔʞs ʇɥɐʇ ʎøn ʍᴉsɥ ʇø nsǝ."
-
-#: xmodule/library_sourced_block.py
-#, python-brace-format
-msgid "A maximum of {0} components may be added."
-msgstr "Ⱥ ɯɐxᴉɯnɯ øɟ {0} ɔøɯdønǝnʇs ɯɐʎ bǝ ɐddǝd."
-
-#: xmodule/library_sourced_block.py
-msgid ""
-"No XBlock has been configured for this component. Use the editor to select "
-"the target blocks."
-msgstr ""
-"Nø XɃløɔʞ ɥɐs bǝǝn ɔønɟᴉƃnɹǝd ɟøɹ ʇɥᴉs ɔøɯdønǝnʇ. Ʉsǝ ʇɥǝ ǝdᴉʇøɹ ʇø sǝlǝɔʇ "
-"ʇɥǝ ʇɐɹƃǝʇ bløɔʞs."
-
-#: xmodule/library_sourced_block.py
-msgid "Open Editor"
-msgstr "Ødǝn Ɇdᴉʇøɹ"
-
-#: xmodule/library_sourced_block.py
-msgid "Importing Library Block failed - are the IDs valid and readable?"
-msgstr "Ɨɯdøɹʇᴉnƃ Łᴉbɹɐɹʎ Ƀløɔʞ ɟɐᴉlǝd - ɐɹǝ ʇɥǝ ƗĐs ʌɐlᴉd ɐnd ɹǝɐdɐblǝ?"
 
 #: xmodule/lti_block.py
 msgid ""
@@ -11840,24 +12002,24 @@ msgstr ""
 " sɥøʍ øɹ ɥᴉdǝ ʇɥǝᴉɹ nøʇǝs ᴉn ʇɥǝ ɔønɹsǝʍɐɹǝ."
 
 #: xmodule/modulestore/inheritance.py
-msgid "Tag this module as part of an Entrance Exam section"
-msgstr "Ŧɐƃ ʇɥᴉs ɯødnlǝ ɐs dɐɹʇ øɟ ɐn Ɇnʇɹɐnɔǝ Ɇxɐɯ sǝɔʇᴉøn"
+msgid "Tag this block as part of an Entrance Exam section"
+msgstr "Ŧɐƃ ʇɥᴉs bløɔʞ ɐs dɐɹʇ øɟ ɐn Ɇnʇɹɐnɔǝ Ɇxɐɯ sǝɔʇᴉøn"
 
 #: xmodule/modulestore/inheritance.py
 msgid ""
-"Enter true or false. If true, answer submissions for problem modules will be"
-" considered in the Entrance Exam scoring/gating algorithm."
+"Enter true or false. If true, answer submissions for problem blocks will be "
+"considered in the Entrance Exam scoring/gating algorithm."
 msgstr ""
-"Ɇnʇǝɹ ʇɹnǝ øɹ ɟɐlsǝ. Ɨɟ ʇɹnǝ, ɐnsʍǝɹ snbɯᴉssᴉøns ɟøɹ dɹøblǝɯ ɯødnlǝs ʍᴉll bǝ"
-" ɔønsᴉdǝɹǝd ᴉn ʇɥǝ Ɇnʇɹɐnɔǝ Ɇxɐɯ sɔøɹᴉnƃ/ƃɐʇᴉnƃ ɐlƃøɹᴉʇɥɯ."
+"Ɇnʇǝɹ ʇɹnǝ øɹ ɟɐlsǝ. Ɨɟ ʇɹnǝ, ɐnsʍǝɹ snbɯᴉssᴉøns ɟøɹ dɹøblǝɯ bløɔʞs ʍᴉll bǝ "
+"ɔønsᴉdǝɹǝd ᴉn ʇɥǝ Ɇnʇɹɐnɔǝ Ɇxɐɯ sɔøɹᴉnƃ/ƃɐʇᴉnƃ ɐlƃøɹᴉʇɥɯ."
 
 #: xmodule/modulestore/xml_importer.py
 msgid "Error while reading {}. Check file for XML errors."
 msgstr "Ɇɹɹøɹ ʍɥᴉlǝ ɹǝɐdᴉnƃ {}. Ȼɥǝɔʞ ɟᴉlǝ ɟøɹ XMŁ ǝɹɹøɹs."
 
 #: xmodule/modulestore/xml_importer.py
-msgid "Failed to import module: {} at location: {}"
-msgstr "Fɐᴉlǝd ʇø ᴉɯdøɹʇ ɯødnlǝ: {} ɐʇ løɔɐʇᴉøn: {}"
+msgid "Failed to import block: {} at location: {}"
+msgstr "Fɐᴉlǝd ʇø ᴉɯdøɹʇ bløɔʞ: {} ɐʇ løɔɐʇᴉøn: {}"
 
 #: xmodule/partitions/enrollment_track_partition_generator.py
 #: cms/templates/group_configurations.html
@@ -12050,8 +12212,8 @@ msgid "Group Configuration"
 msgstr "Ǥɹønd Ȼønɟᴉƃnɹɐʇᴉøn"
 
 #: xmodule/split_test_block.py
-msgid "Which child module students in a particular group_id should see"
-msgstr "Wɥᴉɔɥ ɔɥᴉld ɯødnlǝ sʇndǝnʇs ᴉn ɐ dɐɹʇᴉɔnlɐɹ ƃɹønd_ᴉd sɥønld sǝǝ"
+msgid "Which child block students in a particular group_id should see"
+msgstr "Wɥᴉɔɥ ɔɥᴉld bløɔʞ sʇndǝnʇs ᴉn ɐ dɐɹʇᴉɔnlɐɹ ƃɹønd_ᴉd sɥønld sǝǝ"
 
 #: xmodule/split_test_block.py
 #, python-brace-format
@@ -12108,10 +12270,6 @@ msgstr "Ŧɥᴉs ɔønʇǝnʇ ǝxdǝɹᴉɯǝnʇ ɥɐs ᴉssnǝs ʇɥɐʇ ɐɟɟ
 msgid "External Discussion"
 msgstr "Ɇxʇǝɹnɐl Đᴉsɔnssᴉøn"
 
-#: xmodule/templates/library-sourced-block-studio-view.html
-msgid "Save and Import"
-msgstr "Sɐʌǝ ɐnd Ɨɯdøɹʇ"
-
 #: xmodule/vertical_block.py
 msgid "Enable in-context discussions for the Unit"
 msgstr "Ɇnɐblǝ ᴉn-ɔønʇǝxʇ dᴉsɔnssᴉøns ɟøɹ ʇɥǝ Ʉnᴉʇ"
@@ -12119,6 +12277,42 @@ msgstr "Ɇnɐblǝ ᴉn-ɔønʇǝxʇ dᴉsɔnssᴉøns ɟøɹ ʇɥǝ Ʉnᴉʇ"
 #: xmodule/vertical_block.py
 msgid "Add discussion for the Unit."
 msgstr "Ⱥdd dᴉsɔnssᴉøn ɟøɹ ʇɥǝ Ʉnᴉʇ."
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {social_account_handle} from {organization_name}.\n"
+"\n"
+msgstr ""
+"Ħǝɹǝ's ɐ ɟnn ɔlᴉd ɟɹøɯ ɐ ɔlɐss Ɨ'ɯ ʇɐʞᴉnƃ øn {social_account_handle} ɟɹøɯ {organization_name}.\n"
+"\n"
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {social_account_handle}.\n"
+"\n"
+msgstr ""
+"Ħǝɹǝ's ɐ ɟnn ɔlᴉd ɟɹøɯ ɐ ɔlɐss Ɨ'ɯ ʇɐʞᴉnƃ øn {social_account_handle}.\n"
+"\n"
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking from {organization_name}.\n"
+"\n"
+msgstr ""
+"Ħǝɹǝ's ɐ ɟnn ɔlᴉd ɟɹøɯ ɐ ɔlɐss Ɨ'ɯ ʇɐʞᴉnƃ ɟɹøɯ {organization_name}.\n"
+"\n"
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {platform_name}.\n"
+"\n"
+msgstr ""
+"Ħǝɹǝ's ɐ ɟnn ɔlᴉd ɟɹøɯ ɐ ɔlɐss Ɨ'ɯ ʇɐʞᴉnƃ øn {platform_name}.\n"
+"\n"
 
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
@@ -12559,6 +12753,17 @@ msgstr "Ⱥll ɔønɹsǝ ønʇlᴉnǝ ɹǝƃǝnǝɹɐʇᴉøns snɔɔǝssɟnllʎ 
 msgid "Regenerate *all* course outlines"
 msgstr "Ɍǝƃǝnǝɹɐʇǝ *ɐll* ɔønɹsǝ ønʇlᴉnǝs"
 
+#: cms/djangoapps/contentstore/asset_storage_handlers.py
+msgid "Upload completed"
+msgstr "Ʉdløɐd ɔøɯdlǝʇǝd"
+
+#: cms/djangoapps/contentstore/asset_storage_handlers.py
+#, python-brace-format
+msgid ""
+"File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
+msgstr ""
+"Fᴉlǝ {filename} ǝxɔǝǝds ɯɐxᴉɯnɯ sᴉzǝ øɟ {maximum_size_in_megabytes} MɃ."
+
 #: cms/djangoapps/contentstore/course_group_config.py
 msgid ""
 "The groups in this configuration can be mapped to cohorts in the Instructor "
@@ -12729,6 +12934,19 @@ msgstr "Ƀɐd ɔønɹsǝ løɔɐʇᴉøn dɹøʌᴉdǝd"
 msgid "Missing branch on fresh clone"
 msgstr "Mᴉssᴉnƃ bɹɐnɔɥ øn ɟɹǝsɥ ɔlønǝ"
 
+#: cms/djangoapps/contentstore/helpers.py
+msgid "Vertical"
+msgstr "Vǝɹʇᴉɔɐl"
+
+#: cms/djangoapps/contentstore/helpers.py cms/templates/course_outline.html
+#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
+msgid "Section"
+msgstr "Sǝɔʇᴉøn"
+
+#: cms/djangoapps/contentstore/helpers.py lms/templates/ccx/schedule.html
+msgid "Subsection"
+msgstr "Snbsǝɔʇᴉøn"
+
 #: cms/djangoapps/contentstore/management/commands/git_export.py
 msgid ""
 "Take the specified course and attempt to export it to a git repository\n"
@@ -12801,6 +13019,10 @@ msgstr "Ŧɹnǝ ʇø ɥᴉdǝ ʇɥǝ ʇɐb, ɐnd Fɐlsǝ ʇø sɥøʍ ᴉʇ."
 msgid "Change the visibility of tabs in a course."
 msgstr "Ȼɥɐnƃǝ ʇɥǝ ʌᴉsᴉbᴉlᴉʇʎ øɟ ʇɐbs ᴉn ɐ ɔønɹsǝ."
 
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+msgid "The information you entered is incorrect."
+msgstr "Ŧɥǝ ᴉnɟøɹɯɐʇᴉøn ʎøn ǝnʇǝɹǝd ᴉs ᴉnɔøɹɹǝɔʇ."
+
 #: cms/djangoapps/contentstore/utils.py cms/templates/visibility_editor.html
 msgid "Deleted Group"
 msgstr "Đǝlǝʇǝd Ǥɹønd"
@@ -12812,6 +13034,139 @@ msgstr "Đǝlǝʇǝd Ǥɹønd"
 #, python-brace-format
 msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}, {current_group}"
+
+#: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "Duplicate of {0}"
+msgstr "Đndlᴉɔɐʇǝ øɟ {0}"
+
+#: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "Duplicate of '{0}'"
+msgstr "Đndlᴉɔɐʇǝ øɟ '{0}'"
+
+#: cms/djangoapps/contentstore/utils.py
+msgid "Invalid prerequisite course key"
+msgstr "Ɨnʌɐlᴉd dɹǝɹǝbnᴉsᴉʇǝ ɔønɹsǝ ʞǝʎ"
+
+#. #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
+#. Translators: This is the status of an active video upload
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#: cms/templates/import.html
+msgid "Uploading"
+msgstr "Ʉdløɐdᴉnƃ"
+
+#. Translators: This is the status for a video that the servers are currently
+#. processing
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "In Progress"
+msgstr "Ɨn Ᵽɹøƃɹǝss"
+
+#. Translators: This is the status for a video that is uploaded completely
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Uploaded"
+msgstr "Ʉdløɐdǝd"
+
+#. Translators: This is the status for a video that the servers have failed to
+#. process
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Failed"
+msgstr "Fɐᴉlǝd"
+
+#. Translators: This is the status for a video that is cancelled during upload
+#. by user
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Cancelled"
+msgstr "Ȼɐnɔǝllǝd"
+
+#. Translators: This is the status for a video which has failed
+#. due to being flagged as a duplicate by an external or internal CMS
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Failed Duplicate"
+msgstr "Fɐᴉlǝd Đndlᴉɔɐʇǝ"
+
+#. Translators: This is the status for a video which has duplicate token for
+#. youtube
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "YouTube Duplicate"
+msgstr "ɎønŦnbǝ Đndlᴉɔɐʇǝ"
+
+#. Translators: This is the status for a video for which an invalid
+#. processing token was provided in the course settings
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Invalid Token"
+msgstr "Ɨnʌɐlᴉd Ŧøʞǝn"
+
+#. Translators: This is the status for a video that was included in a course
+#. import
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Imported"
+msgstr "Ɨɯdøɹʇǝd"
+
+#. Translators: This is the status for a video that is in an unknown state
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Unknown"
+msgstr "Ʉnʞnøʍn"
+
+#. Translators: This is the status for a video that is having its
+#. transcription in progress on servers
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Transcription in Progress"
+msgstr "Ŧɹɐnsɔɹᴉdʇᴉøn ᴉn Ᵽɹøƃɹǝss"
+
+#. Translators: This is the status for a video whose transcription is complete
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Transcript Ready"
+msgstr "Ŧɹɐnsɔɹᴉdʇ Ɍǝɐdʎ"
+
+#. Translators: This is the status for a video whose transcription job was
+#. failed for some languages
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Partial Failure"
+msgstr "Ᵽɐɹʇᴉɐl Fɐᴉlnɹǝ"
+
+#. Translators: This is the status for a video whose transcription job has
+#. failed altogether
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Transcript Failed"
+msgstr "Ŧɹɐnsɔɹᴉdʇ Fɐᴉlǝd"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "An image file is required."
+msgstr "Ⱥn ᴉɯɐƃǝ ɟᴉlǝ ᴉs ɹǝbnᴉɹǝd."
+
+#. Translators: This is the header for a CSV file column
+#. containing URLs for video encodings for the named profile
+#. (e.g. desktop, mobile high quality, mobile low quality)
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#, python-brace-format
+msgid "{profile_name} URL"
+msgstr "{profile_name} ɄɌŁ"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Duration"
+msgstr "Đnɹɐʇᴉøn"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Date Added"
+msgstr "Đɐʇǝ Ⱥddǝd"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Status"
+msgstr "Sʇɐʇns"
+
+#. Translators: This is the suggested filename when downloading the URL
+#. listing for videos uploaded through Studio
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#, python-brace-format
+msgid "{course}_video_urls"
+msgstr "{course}_ʌᴉdǝø_nɹls"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "A non zero positive integer is expected"
+msgstr "Ⱥ nøn zǝɹø døsᴉʇᴉʌǝ ᴉnʇǝƃǝɹ ᴉs ǝxdǝɔʇǝd"
 
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
@@ -12870,17 +13225,6 @@ msgstr ""
 "Ŧɥǝ ᴉɯɐƃǝ ɟᴉlǝ nɐɯǝ ɔɐn ønlʎ ɔønʇɐᴉn lǝʇʇǝɹs, nnɯbǝɹs, ɥʎdɥǝns (-), ɐnd "
 "nndǝɹsɔøɹǝs (_)."
 
-#: cms/djangoapps/contentstore/views/assets.py
-msgid "Upload completed"
-msgstr "Ʉdløɐd ɔøɯdlǝʇǝd"
-
-#: cms/djangoapps/contentstore/views/assets.py
-#, python-brace-format
-msgid ""
-"File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
-msgstr ""
-"Fᴉlǝ {filename} ǝxɔǝǝds ɯɐxᴉɯnɯ sᴉzǝ øɟ {maximum_size_in_megabytes} MɃ."
-
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "must have name of the certificate"
 msgstr "ɯnsʇ ɥɐʌǝ nɐɯǝ øɟ ʇɥǝ ɔǝɹʇᴉɟᴉɔɐʇǝ"
@@ -12907,6 +13251,10 @@ msgstr "Ødǝn Ɍǝsdønsǝ"
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Library Content"
 msgstr "Łᴉbɹɐɹʎ Ȼønʇǝnʇ"
+
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Drag and Drop"
+msgstr "Đɹɐƃ ɐnd Đɹød"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
@@ -12976,10 +13324,6 @@ msgstr ""
 " ᴉʇ ʇø ʇɥǝ sʎsʇǝɯ"
 
 #: cms/djangoapps/contentstore/views/course.py
-msgid "Invalid prerequisite course key"
-msgstr "Ɨnʌɐlᴉd dɹǝɹǝbnᴉsᴉʇǝ ɔønɹsǝ ʞǝʎ"
-
-#: cms/djangoapps/contentstore/views/course.py
 msgid "An error occurred while trying to save your tabs"
 msgstr "Ⱥn ǝɹɹøɹ øɔɔnɹɹǝd ʍɥᴉlǝ ʇɹʎᴉnƃ ʇø sɐʌǝ ʎønɹ ʇɐbs"
 
@@ -13007,21 +13351,6 @@ msgstr "Ȼøɯdlǝʇǝd Ȼønɹsǝ Ɇnʇɹɐnɔǝ Ɇxɐɯ"
 msgid "Course successfully exported to git repository"
 msgstr "Ȼønɹsǝ snɔɔǝssɟnllʎ ǝxdøɹʇǝd ʇø ƃᴉʇ ɹǝdøsᴉʇøɹʎ"
 
-#: cms/djangoapps/contentstore/views/helpers.py
-msgid "Vertical"
-msgstr "Vǝɹʇᴉɔɐl"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: cms/templates/course_outline.html lms/templates/ccx/schedule.html
-#: lms/templates/seq_block.html
-msgid "Section"
-msgstr "Sǝɔʇᴉøn"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: lms/templates/ccx/schedule.html
-msgid "Subsection"
-msgstr "Snbsǝɔʇᴉøn"
-
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "Some chunks missed during file upload. Please try again"
 msgstr "Søɯǝ ɔɥnnʞs ɯᴉssǝd dnɹᴉnƃ ɟᴉlǝ ndløɐd. Ᵽlǝɐsǝ ʇɹʎ ɐƃɐᴉn"
@@ -13029,89 +13358,6 @@ msgstr "Søɯǝ ɔɥnnʞs ɯᴉssǝd dnɹᴉnƃ ɟᴉlǝ ndløɐd. Ᵽlǝɐsǝ �
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "File upload failed. Please try again"
 msgstr "Fᴉlǝ ndløɐd ɟɐᴉlǝd. Ᵽlǝɐsǝ ʇɹʎ ɐƃɐᴉn"
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "Libraries cannot have more than {limit} components"
-msgstr "Łᴉbɹɐɹᴉǝs ɔɐnnøʇ ɥɐʌǝ ɯøɹǝ ʇɥɐn {limit} ɔøɯdønǝnʇs"
-
-#: cms/djangoapps/contentstore/views/item.py
-msgid "Invalid data"
-msgstr "Ɨnʌɐlᴉd dɐʇɐ"
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "Invalid data ({details})"
-msgstr "Ɨnʌɐlᴉd dɐʇɐ ({details})"
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "You can not move {source_type} into {target_parent_type}."
-msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ {source_type} ᴉnʇø {target_parent_type}."
-
-#: cms/djangoapps/contentstore/views/item.py
-msgid "Item is already present in target location."
-msgstr "Ɨʇǝɯ ᴉs ɐlɹǝɐdʎ dɹǝsǝnʇ ᴉn ʇɐɹƃǝʇ løɔɐʇᴉøn."
-
-#: cms/djangoapps/contentstore/views/item.py
-msgid "You can not move an item into itself."
-msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ ɐn ᴉʇǝɯ ᴉnʇø ᴉʇsǝlɟ."
-
-#: cms/djangoapps/contentstore/views/item.py
-msgid "You can not move an item into it's child."
-msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ ɐn ᴉʇǝɯ ᴉnʇø ᴉʇ's ɔɥᴉld."
-
-#: cms/djangoapps/contentstore/views/item.py
-msgid "You can not move an item directly into content experiment."
-msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ ɐn ᴉʇǝɯ dᴉɹǝɔʇlʎ ᴉnʇø ɔønʇǝnʇ ǝxdǝɹᴉɯǝnʇ."
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "{source_usage_key} not found in {parent_usage_key}."
-msgstr "{source_usage_key} nøʇ ɟønnd ᴉn {parent_usage_key}."
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid ""
-"You can not move {source_usage_key} at an invalid index ({target_index})."
-msgstr ""
-"Ɏøn ɔɐn nøʇ ɯøʌǝ {source_usage_key} ɐʇ ɐn ᴉnʌɐlᴉd ᴉndǝx ({target_index})."
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "You must provide target_index ({target_index}) as an integer."
-msgstr "Ɏøn ɯnsʇ dɹøʌᴉdǝ ʇɐɹƃǝʇ_ᴉndǝx ({target_index}) ɐs ɐn ᴉnʇǝƃǝɹ."
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "Duplicate of {0}"
-msgstr "Đndlᴉɔɐʇǝ øɟ {0}"
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "Duplicate of '{0}'"
-msgstr "Đndlᴉɔɐʇǝ øɟ '{0}'"
-
-#. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
-#. in many languages. This is used to avoid Transifex's misinterpreting of
-#. '% o'. The percent sign is also translatable as a standalone string.
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid ""
-"Students must score {score}{pct_sign} or higher to access course materials."
-msgstr ""
-"Sʇndǝnʇs ɯnsʇ sɔøɹǝ {score}{pct_sign} øɹ ɥᴉƃɥǝɹ ʇø ɐɔɔǝss ɔønɹsǝ ɯɐʇǝɹᴉɐls."
-
-#. Translators: This is the percent sign. It will be used to represent
-#. a percent value out of 100, e.g. "58%" means "58/100".
-#: cms/djangoapps/contentstore/views/item.py
-msgid "%"
-msgstr "%"
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "{section_or_subsection} \"{display_name}\""
-msgstr "{section_or_subsection} \"{display_name}\""
 
 #: cms/djangoapps/contentstore/views/library.py
 msgid ""
@@ -13157,13 +13403,9 @@ msgstr "'{organization_key}' ᴉs nøʇ ɐ ʌɐlᴉd øɹƃɐnᴉzɐʇᴉøn ᴉ
 msgid "Access restricted to: {list_of_groups}"
 msgstr "Ⱥɔɔǝss ɹǝsʇɹᴉɔʇǝd ʇø: {list_of_groups}"
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-msgid "The information you entered is incorrect."
-msgstr "Ŧɥǝ ᴉnɟøɹɯɐʇᴉøn ʎøn ǝnʇǝɹǝd ᴉs ᴉnɔøɹɹǝɔʇ."
-
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-msgid "Transcripts are supported only for \"video\" modules."
-msgstr "Ŧɹɐnsɔɹᴉdʇs ɐɹǝ snddøɹʇǝd ønlʎ ɟøɹ \"ʌᴉdǝø\" ɯødnlǝs."
+msgid "Transcripts are supported only for \"video\" blocks."
+msgstr "Ŧɹɐnsɔɹᴉdʇs ɐɹǝ snddøɹʇǝd ønlʎ ɟøɹ \"ʌᴉdǝø\" bløɔʞs."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Cannot find item by locator."
@@ -13239,127 +13481,74 @@ msgstr "Ɨnʌɐlᴉd `ɹølǝ` sdǝɔᴉɟᴉǝd."
 msgid "You may not remove the last Admin. Add another Admin first."
 msgstr "Ɏøn ɯɐʎ nøʇ ɹǝɯøʌǝ ʇɥǝ lɐsʇ Ⱥdɯᴉn. Ⱥdd ɐnøʇɥǝɹ Ⱥdɯᴉn ɟᴉɹsʇ."
 
-#. #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
-#. Translators: This is the status of an active video upload
-#: cms/djangoapps/contentstore/views/videos.py cms/templates/import.html
-msgid "Uploading"
-msgstr "Ʉdløɐdᴉnƃ"
-
-#. Translators: This is the status for a video that the servers are currently
-#. processing
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "In Progress"
-msgstr "Ɨn Ᵽɹøƃɹǝss"
-
-#. Translators: This is the status for a video that the servers have
-#. successfully processed
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Ready"
-msgstr "Ɍǝɐdʎ"
-
-#. Translators: This is the status for a video that is uploaded completely
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Uploaded"
-msgstr "Ʉdløɐdǝd"
-
-#. Translators: This is the status for a video that the servers have failed to
-#. process
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Failed"
-msgstr "Fɐᴉlǝd"
-
-#. Translators: This is the status for a video that is cancelled during upload
-#. by user
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Cancelled"
-msgstr "Ȼɐnɔǝllǝd"
-
-#. Translators: This is the status for a video which has failed
-#. due to being flagged as a duplicate by an external or internal CMS
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Failed Duplicate"
-msgstr "Fɐᴉlǝd Đndlᴉɔɐʇǝ"
-
-#. Translators: This is the status for a video which has duplicate token for
-#. youtube
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "YouTube Duplicate"
-msgstr "ɎønŦnbǝ Đndlᴉɔɐʇǝ"
-
-#. Translators: This is the status for a video for which an invalid
-#. processing token was provided in the course settings
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Invalid Token"
-msgstr "Ɨnʌɐlᴉd Ŧøʞǝn"
-
-#. Translators: This is the status for a video that was included in a course
-#. import
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Imported"
-msgstr "Ɨɯdøɹʇǝd"
-
-#. Translators: This is the status for a video that is in an unknown state
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Unknown"
-msgstr "Ʉnʞnøʍn"
-
-#. Translators: This is the status for a video that is having its
-#. transcription in progress on servers
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Transcription in Progress"
-msgstr "Ŧɹɐnsɔɹᴉdʇᴉøn ᴉn Ᵽɹøƃɹǝss"
-
-#. Translators: This is the status for a video whose transcription is complete
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Transcript Ready"
-msgstr "Ŧɹɐnsɔɹᴉdʇ Ɍǝɐdʎ"
-
-#. Translators: This is the status for a video whose transcription job was
-#. failed for some languages
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Partial Failure"
-msgstr "Ᵽɐɹʇᴉɐl Fɐᴉlnɹǝ"
-
-#. Translators: This is the status for a video whose transcription job has
-#. failed altogether
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Transcript Failed"
-msgstr "Ŧɹɐnsɔɹᴉdʇ Fɐᴉlǝd"
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "An image file is required."
-msgstr "Ⱥn ᴉɯɐƃǝ ɟᴉlǝ ᴉs ɹǝbnᴉɹǝd."
-
-#. Translators: This is the header for a CSV file column
-#. containing URLs for video encodings for the named profile
-#. (e.g. desktop, mobile high quality, mobile low quality)
-#: cms/djangoapps/contentstore/views/videos.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
-msgid "{profile_name} URL"
-msgstr "{profile_name} ɄɌŁ"
+msgid "Libraries cannot have more than {limit} components"
+msgstr "Łᴉbɹɐɹᴉǝs ɔɐnnøʇ ɥɐʌǝ ɯøɹǝ ʇɥɐn {limit} ɔøɯdønǝnʇs"
 
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Duration"
-msgstr "Đnɹɐʇᴉøn"
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "There was a problem pasting your component."
+msgstr "Ŧɥǝɹǝ ʍɐs ɐ dɹøblǝɯ dɐsʇᴉnƃ ʎønɹ ɔøɯdønǝnʇ."
 
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Date Added"
-msgstr "Đɐʇǝ Ⱥddǝd"
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "Your clipboard is empty or invalid."
+msgstr "Ɏønɹ ɔlᴉdbøɐɹd ᴉs ǝɯdʇʎ øɹ ᴉnʌɐlᴉd."
 
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Status"
-msgstr "Sʇɐʇns"
-
-#. Translators: This is the suggested filename when downloading the URL
-#. listing for videos uploaded through Studio
-#: cms/djangoapps/contentstore/views/videos.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
-msgid "{course}_video_urls"
-msgstr "{course}_ʌᴉdǝø_nɹls"
+msgid "You can not move {source_type} into {target_parent_type}."
+msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ {source_type} ᴉnʇø {target_parent_type}."
 
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "A non zero positive integer is expected"
-msgstr "Ⱥ nøn zǝɹø døsᴉʇᴉʌǝ ᴉnʇǝƃǝɹ ᴉs ǝxdǝɔʇǝd"
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "Item is already present in target location."
+msgstr "Ɨʇǝɯ ᴉs ɐlɹǝɐdʎ dɹǝsǝnʇ ᴉn ʇɐɹƃǝʇ løɔɐʇᴉøn."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "You can not move an item into itself."
+msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ ɐn ᴉʇǝɯ ᴉnʇø ᴉʇsǝlɟ."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "You can not move an item into it's child."
+msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ ɐn ᴉʇǝɯ ᴉnʇø ᴉʇ's ɔɥᴉld."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "You can not move an item directly into content experiment."
+msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ ɐn ᴉʇǝɯ dᴉɹǝɔʇlʎ ᴉnʇø ɔønʇǝnʇ ǝxdǝɹᴉɯǝnʇ."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "{source_usage_key} not found in {parent_usage_key}."
+msgstr "{source_usage_key} nøʇ ɟønnd ᴉn {parent_usage_key}."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid ""
+"You can not move {source_usage_key} at an invalid index ({target_index})."
+msgstr ""
+"Ɏøn ɔɐn nøʇ ɯøʌǝ {source_usage_key} ɐʇ ɐn ᴉnʌɐlᴉd ᴉndǝx ({target_index})."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "You must provide target_index ({target_index}) as an integer."
+msgstr "Ɏøn ɯnsʇ dɹøʌᴉdǝ ʇɐɹƃǝʇ_ᴉndǝx ({target_index}) ɐs ɐn ᴉnʇǝƃǝɹ."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid ""
+"Students must score {score}{pct_sign} or higher to access course materials."
+msgstr ""
+"Sʇndǝnʇs ɯnsʇ sɔøɹǝ {score}{pct_sign} øɹ ɥᴉƃɥǝɹ ʇø ɐɔɔǝss ɔønɹsǝ ɯɐʇǝɹᴉɐls."
+
+#. Translators: This is the percent sign. It will be used to represent
+#. a percent value out of 100, e.g. "58%" means "58/100".
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "%"
+msgstr "%"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "{section_or_subsection} \"{display_name}\""
+msgstr "{section_or_subsection} \"{display_name}\""
 
 #: cms/djangoapps/course_creators/models.py
 msgid "unrequested"
@@ -13517,16 +13706,6 @@ msgstr "Ȼønʇǝnʇ"
 #: wiki/templates/wiki/settings.html
 msgid "Settings"
 msgstr "Sǝʇʇᴉnƃs"
-
-#: cms/templates/certificates.html cms/templates/container.html
-#: cms/templates/course_outline.html cms/templates/group_configurations.html
-#: cms/templates/library.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
-#: lms/templates/edxnotes/edxnotes.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Loading"
-msgstr "Łøɐdᴉnƃ"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: lms/templates/support/feature_based_enrollments.html
@@ -14073,24 +14252,6 @@ msgstr "Đᴉd ʎønɹ ǝ-ɯɐᴉl ɔlᴉǝnʇ bɹǝɐʞ ʇɥǝ ɄɌŁ ᴉnʇø 
 msgid "The keys are valid for a limited amount of time. Has the key expired?"
 msgstr "Ŧɥǝ ʞǝʎs ɐɹǝ ʌɐlᴉd ɟøɹ ɐ lᴉɯᴉʇǝd ɐɯønnʇ øɟ ʇᴉɯǝ. Ħɐs ʇɥǝ ʞǝʎ ǝxdᴉɹǝd?"
 
-#: lms/templates/library-block-author-preview-header.html
-msgid ""
-"Showing all matching content eligible to be added into {display_name}. Each "
-"student will be assigned {max_count} component drawn randomly from this "
-"list."
-msgid_plural ""
-"Showing all matching content eligible to be added into {display_name}. Each "
-"student will be assigned {max_count} components drawn randomly from this "
-"list."
-msgstr[0] ""
-"Sɥøʍᴉnƃ ɐll ɯɐʇɔɥᴉnƃ ɔønʇǝnʇ ǝlᴉƃᴉblǝ ʇø bǝ ɐddǝd ᴉnʇø {display_name}. Ɇɐɔɥ "
-"sʇndǝnʇ ʍᴉll bǝ ɐssᴉƃnǝd {max_count} ɔøɯdønǝnʇ dɹɐʍn ɹɐndøɯlʎ ɟɹøɯ ʇɥᴉs "
-"lᴉsʇ."
-msgstr[1] ""
-"Sɥøʍᴉnƃ ɐll ɯɐʇɔɥᴉnƃ ɔønʇǝnʇ ǝlᴉƃᴉblǝ ʇø bǝ ɐddǝd ᴉnʇø {display_name}. Ɇɐɔɥ "
-"sʇndǝnʇ ʍᴉll bǝ ɐssᴉƃnǝd {max_count} ɔøɯdønǝnʇs dɹɐʍn ɹɐndøɯlʎ ɟɹøɯ ʇɥᴉs "
-"lᴉsʇ."
-
 #. Translators:  "External resource" means that this learning module is hosted
 #. on a platform external to the edX LMS
 #: lms/templates/lti.html
@@ -14307,6 +14468,25 @@ msgstr "Ɇ-ɯɐᴉl"
 #, python-format
 msgid "Return To %s"
 msgstr "Ɍǝʇnɹn Ŧø %s"
+
+#: lms/templates/public_video.html
+msgid "Learn more about this course"
+msgstr "Łǝɐɹn ɯøɹǝ ɐbønʇ ʇɥᴉs ɔønɹsǝ"
+
+#: lms/templates/public_video.html
+msgid "Go to course"
+msgstr "Ǥø ʇø ɔønɹsǝ"
+
+#: lms/templates/public_video.html
+msgid "Enroll in this course"
+msgstr "Ɇnɹøll ᴉn ʇɥᴉs ɔønɹsǝ"
+
+#: lms/templates/courseware/courseware-chromeless.html
+#: lms/templates/courseware/courseware.html
+#: lms/templates/public_video_share_embed.html
+#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
+msgid "{course_number} Courseware"
+msgstr "{course_number} Ȼønɹsǝʍɐɹǝ"
 
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
@@ -14555,6 +14735,18 @@ msgstr "Ᵽɹǝʌᴉøns dɐƃǝ"
 msgid "Next page"
 msgstr "Nǝxʇ dɐƃǝ"
 
+#: lms/templates/studio_render_children_view.html
+msgid "Paste Component"
+msgstr "Ᵽɐsʇǝ Ȼøɯdønǝnʇ"
+
+#: lms/templates/studio_render_children_view.html
+msgid "From:"
+msgstr "Fɹøɯ:"
+
+#: lms/templates/studio_render_children_view.html
+msgid "What's in my clipboard?"
+msgstr "Wɥɐʇ's ᴉn ɯʎ ɔlᴉdbøɐɹd?"
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr "Ŧɹɐɔʞᴉnƃ Łøƃ"
@@ -14681,6 +14873,18 @@ msgstr "Đøʍnløɐds ɐnd ʇɹɐnsɔɹᴉdʇs"
 #: lms/templates/video.html
 msgid "Download video file"
 msgstr "Đøʍnløɐd ʌᴉdǝø ɟᴉlǝ"
+
+#: lms/templates/video.html
+msgid "Share this video"
+msgstr "Sɥɐɹǝ ʇɥᴉs ʌᴉdǝø"
+
+#: lms/templates/video.html
+msgid "Share on {site}"
+msgstr "Sɥɐɹǝ øn {site}"
+
+#: lms/templates/video.html
+msgid "Copy"
+msgstr "Ȼødʎ"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -16011,10 +16215,6 @@ msgid "Print or share your certificate:"
 msgstr "Ᵽɹᴉnʇ øɹ sɥɐɹǝ ʎønɹ ɔǝɹʇᴉɟᴉɔɐʇǝ:"
 
 #: lms/templates/certificates/_accomplishment-banner.html
-msgid "Click the link to see my certificate."
-msgstr "Ȼlᴉɔʞ ʇɥǝ lᴉnʞ ʇø sǝǝ ɯʎ ɔǝɹʇᴉɟᴉɔɐʇǝ."
-
-#: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
 msgstr "Ᵽøsʇ øn Fɐɔǝbøøʞ"
 
@@ -16453,6 +16653,11 @@ msgid "You are enrolled in this course"
 msgstr "Ɏøn ɐɹǝ ǝnɹøllǝd ᴉn ʇɥᴉs ɔønɹsǝ"
 
 #: lms/templates/courseware/course_about.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
+msgid "View Course"
+msgstr "Vᴉǝʍ Ȼønɹsǝ"
+
+#: lms/templates/courseware/course_about.html
 msgid "Enrollment in this course is by invitation only"
 msgstr "Ɇnɹøllɯǝnʇ ᴉn ʇɥᴉs ɔønɹsǝ ᴉs bʎ ᴉnʌᴉʇɐʇᴉøn ønlʎ"
 
@@ -16567,12 +16772,6 @@ msgstr "Łᴉsʇ øɟ Ȼønɹsǝs"
 #: lms/templates/courseware/courses.html
 msgid "Refine Your Search"
 msgstr "Ɍǝɟᴉnǝ Ɏønɹ Sǝɐɹɔɥ"
-
-#: lms/templates/courseware/courseware-chromeless.html
-#: lms/templates/courseware/courseware.html
-#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
-msgid "{course_number} Courseware"
-msgstr "{course_number} Ȼønɹsǝʍɐɹǝ"
 
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
@@ -18081,10 +18280,6 @@ msgid "Register for free"
 msgstr "Ɍǝƃᴉsʇǝɹ ɟøɹ ɟɹǝǝ"
 
 #: lms/templates/header/user_dropdown.html
-msgid "Resume your last course"
-msgstr "Ɍǝsnɯǝ ʎønɹ lɐsʇ ɔønɹsǝ"
-
-#: lms/templates/header/user_dropdown.html
 msgid "Profile"
 msgstr "Ᵽɹøɟᴉlǝ"
 
@@ -19027,6 +19222,26 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Staff"
 msgstr "Ⱥdd Sʇɐɟɟ"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Limited Staff"
+msgstr "Łᴉɯᴉʇǝd Sʇɐɟɟ"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"Course team members with the Limited Staff role help you manage your course."
+" Limited Staff can enroll and unenroll learners, as well as modify their "
+"grades and access all course data. Limited Staff don't have access to your "
+"course in Studio. You can only give course team roles to enrolled users."
+msgstr ""
+"Ȼønɹsǝ ʇǝɐɯ ɯǝɯbǝɹs ʍᴉʇɥ ʇɥǝ Łᴉɯᴉʇǝd Sʇɐɟɟ ɹølǝ ɥǝld ʎøn ɯɐnɐƃǝ ʎønɹ ɔønɹsǝ."
+" Łᴉɯᴉʇǝd Sʇɐɟɟ ɔɐn ǝnɹøll ɐnd nnǝnɹøll lǝɐɹnǝɹs, ɐs ʍǝll ɐs ɯødᴉɟʎ ʇɥǝᴉɹ "
+"ƃɹɐdǝs ɐnd ɐɔɔǝss ɐll ɔønɹsǝ dɐʇɐ. Łᴉɯᴉʇǝd Sʇɐɟɟ døn'ʇ ɥɐʌǝ ɐɔɔǝss ʇø ʎønɹ "
+"ɔønɹsǝ ᴉn Sʇndᴉø. Ɏøn ɔɐn ønlʎ ƃᴉʌǝ ɔønɹsǝ ʇǝɐɯ ɹølǝs ʇø ǝnɹøllǝd nsǝɹs."
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Add Limited Staff"
+msgstr "Ⱥdd Łᴉɯᴉʇǝd Sʇɐɟɟ"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Admin"
@@ -21045,10 +21260,10 @@ msgstr "Łøɔɐʇᴉøn ƗĐ"
 #: cms/templates/container.html
 msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
-"\"/jump_to_id/<location ID>\" as the URL value."
+"{unit_link} as the URL value."
 msgstr ""
 "Ŧø ɔɹǝɐʇǝ ɐ lᴉnʞ ʇø ʇɥᴉs nnᴉʇ ɟɹøɯ ɐn ĦŦMŁ ɔøɯdønǝnʇ ᴉn ʇɥᴉs ɔønɹsǝ, ǝnʇǝɹ "
-"\"/ɾnɯd_ʇø_ᴉd/<location ID>\" ɐs ʇɥǝ ɄɌŁ ʌɐlnǝ."
+"{unit_link} ɐs ʇɥǝ ɄɌŁ ʌɐlnǝ."
 
 #: cms/templates/course-create-rerun.html
 msgid "Create a Course Rerun of:"
@@ -21101,11 +21316,6 @@ msgstr ""
 msgid "Organization"
 msgstr "Øɹƃɐnᴉzɐʇᴉøn"
 
-#. Translators: This is an example for the name of the organization sponsoring
-#. a course, seen when filling out the form to create a new course. The
-#. organization name cannot contain spaces.
-#. Translators: "e.g. UniversityX or OrganizationX" is a placeholder displayed
-#. when user put no data into this field.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 msgid "e.g. UniversityX or OrganizationX"
 msgstr "ǝ.ƃ. ɄnᴉʌǝɹsᴉʇʎX øɹ ØɹƃɐnᴉzɐʇᴉønX"
@@ -21238,6 +21448,24 @@ msgstr ""
 "snɹǝ ʇø ɹǝʌᴉǝʍ ɐnd ɹǝsǝʇ ɐll dɐʇǝs, ᴉnɔlndᴉnƃ ʇɥǝ Ȼønɹsǝ Sʇɐɹʇ Đɐʇǝ; sǝʇ nd "
 "ʇɥǝ ɔønɹsǝ ʇǝɐɯ; ɹǝʌᴉǝʍ ɔønɹsǝ nddɐʇǝs ɐnd øʇɥǝɹ ɐssǝʇs ɟøɹ dɐʇǝd ɯɐʇǝɹᴉɐl; "
 "ɐnd sǝǝd ʇɥǝ dᴉsɔnssᴉøns ɐnd ʍᴉʞᴉ."
+
+#: cms/templates/course_outline.html
+msgid ""
+"This course run is using an upgraded version of edx discussion forum. In "
+"order to display the discussions sidebar, discussions xBlocks will no longer"
+" be visible to learners."
+msgstr ""
+"Ŧɥᴉs ɔønɹsǝ ɹnn ᴉs nsᴉnƃ ɐn ndƃɹɐdǝd ʌǝɹsᴉøn øɟ ǝdx dᴉsɔnssᴉøn ɟøɹnɯ. Ɨn "
+"øɹdǝɹ ʇø dᴉsdlɐʎ ʇɥǝ dᴉsɔnssᴉøns sᴉdǝbɐɹ, dᴉsɔnssᴉøns xɃløɔʞs ʍᴉll nø lønƃǝɹ"
+" bǝ ʌᴉsᴉblǝ ʇø lǝɐɹnǝɹs."
+
+#: cms/templates/course_outline.html
+msgid " Learn more"
+msgstr " Łǝɐɹn ɯøɹǝ"
+
+#: cms/templates/course_outline.html
+msgid "Share feedback"
+msgstr "Sɥɐɹǝ ɟǝǝdbɐɔʞ"
 
 #: cms/templates/course_outline.html
 #: cms/templates/widgets/deprecated-course-key-warning.html
@@ -22928,6 +23156,24 @@ msgstr ""
 "ƗNɃØX. Sʇᴉll ɔɐn'ʇ ɟᴉnd ʇɥǝ ʌǝɹᴉɟᴉɔɐʇᴉøn ǝɯɐᴉl? Ɍǝbnǝsʇ ɥǝld ʌᴉɐ ʇɥǝ lᴉnʞ "
 "bǝløʍ."
 
+#: cms/templates/library-block-author-preview-header.html
+msgid ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} component drawn randomly from this "
+"list."
+msgid_plural ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} components drawn randomly from this "
+"list."
+msgstr[0] ""
+"Sɥøʍᴉnƃ ɐll ɯɐʇɔɥᴉnƃ ɔønʇǝnʇ ǝlᴉƃᴉblǝ ʇø bǝ ɐddǝd ᴉnʇø {display_name}. Ɇɐɔɥ "
+"sʇndǝnʇ ʍᴉll bǝ ɐssᴉƃnǝd {max_count} ɔøɯdønǝnʇ dɹɐʍn ɹɐndøɯlʎ ɟɹøɯ ʇɥᴉs "
+"lᴉsʇ."
+msgstr[1] ""
+"Sɥøʍᴉnƃ ɐll ɯɐʇɔɥᴉnƃ ɔønʇǝnʇ ǝlᴉƃᴉblǝ ʇø bǝ ɐddǝd ᴉnʇø {display_name}. Ɇɐɔɥ "
+"sʇndǝnʇ ʍᴉll bǝ ɐssᴉƃnǝd {max_count} ɔøɯdønǝnʇs dɹɐʍn ɹɐndøɯlʎ ɟɹøɯ ʇɥᴉs "
+"lᴉsʇ."
+
 #: cms/templates/library.html
 msgid "Content Library"
 msgstr "Ȼønʇǝnʇ Łᴉbɹɐɹʎ"
@@ -23913,12 +24159,12 @@ msgid "Expand or Collapse"
 msgstr "Ɇxdɐnd øɹ Ȼøllɐdsǝ"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Access Settings"
-msgstr "Ⱥɔɔǝss Sǝʇʇᴉnƃs"
+msgid "Copy to Clipboard"
+msgstr "Ȼødʎ ʇø Ȼlᴉdbøɐɹd"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Set Access"
-msgstr "Sǝʇ Ⱥɔɔǝss"
+msgid "Manage Access"
+msgstr "Mɐnɐƃǝ Ⱥɔɔǝss"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
@@ -24621,10 +24867,6 @@ msgstr "ɯødᴉɟᴉǝd"
 #: wiki/models/article.py
 msgid "Article properties last modified"
 msgstr "Ⱥɹʇᴉɔlǝ dɹødǝɹʇᴉǝs lɐsʇ ɯødᴉɟᴉǝd"
-
-#: wiki/models/article.py
-msgid "owner"
-msgstr "øʍnǝɹ"
 
 #: wiki/models/article.py
 msgid ""

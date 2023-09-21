@@ -29,10 +29,10 @@ class ScoreBase(metaclass=abc.ABCMeta):
         """
         Fields common to all scores include:
 
-            :param graded: Whether or not this module is graded
+            :param graded: Whether or not this block is graded
             :type graded: bool
 
-            :param first_attempted: When the module was first attempted, or None
+            :param first_attempted: When the block was first attempted, or None
             :type first_attempted: datetime|None
         """
         self.graded = graded

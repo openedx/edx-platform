@@ -164,21 +164,25 @@ class ModuleStoreSettingsMigration(TestCase):
 
     def test_convert_into_mixed(self):
         old_setting = self.OLD_CONFIG
-        new_mixed_setting, new_default_store_setting = self.assertMigrated(old_setting)
+        with pytest.warns(DeprecationWarning, match="Direct access to a modulestore is deprecated"):
+            new_mixed_setting, new_default_store_setting = self.assertMigrated(old_setting)
         self.assertStoreValuesEqual(new_default_store_setting, old_setting["default"])
         assert new_default_store_setting['ENGINE'] == old_setting['default']['ENGINE']
         assert not self.is_split_configured(new_mixed_setting)
 
     def test_convert_from_old_mongo_to_draft_store(self):
         old_setting = self.OLD_CONFIG_WITH_DIRECT_MONGO
-        new_mixed_setting, new_default_store_setting = self.assertMigrated(old_setting)
+        with pytest.warns(DeprecationWarning, match="MongoModuleStore is deprecated"):
+            new_mixed_setting, new_default_store_setting = self.assertMigrated(old_setting)
         self.assertStoreValuesEqual(new_default_store_setting, old_setting["default"])
         assert new_default_store_setting['ENGINE'] == 'xmodule.modulestore.mongo.draft.DraftModuleStore'
         assert self.is_split_configured(new_mixed_setting)
 
     def test_convert_from_dict_to_list(self):
         old_mixed_setting = self.OLD_MIXED_CONFIG_WITH_DICT
-        new_mixed_setting, new_default_store_setting = self.assertMigrated(old_mixed_setting)
+        with pytest.warns(DeprecationWarning,
+                          match="Using a dict for the Stores option in the MixedModuleStore is deprecated"):
+            new_mixed_setting, new_default_store_setting = self.assertMigrated(old_mixed_setting)
         assert new_default_store_setting['ENGINE'] == 'the_default_store'
         assert self.is_split_configured(new_mixed_setting)
 

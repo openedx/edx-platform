@@ -13,7 +13,7 @@ from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements
 from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.djangoapps.credit.signals import on_course_publish
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class TestTaskExecution(ModuleStoreTestCase):
@@ -35,9 +35,10 @@ class TestTaskExecution(ModuleStoreTestCase):
         super().setUp()
 
         self.course = CourseFactory.create(start=datetime(2015, 3, 1))
-        self.section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
-        self.subsection = ItemFactory.create(parent=self.section, category='sequential', display_name='Test Subsection')
-        self.vertical = ItemFactory.create(parent=self.subsection, category='vertical', display_name='Test Unit')
+        self.section = BlockFactory.create(parent=self.course, category='chapter', display_name='Test Section')
+        self.subsection = BlockFactory.create(
+            parent=self.section, category='sequential', display_name='Test Subsection')
+        self.vertical = BlockFactory.create(parent=self.subsection, category='vertical', display_name='Test Unit')
 
     def test_task_adding_requirements_invalid_course(self):
         """
@@ -182,7 +183,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         """
 
         self.add_credit_course(self.course.id)
-        subsection = ItemFactory.create(parent=self.section, category='sequential', display_name='Dummy Subsection')
+        subsection = BlockFactory.create(parent=self.section, category='sequential', display_name='Dummy Subsection')
         create_exam(
             course_id=str(self.course.id),
             content_id=str(subsection.location),

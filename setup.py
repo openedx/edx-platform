@@ -22,7 +22,6 @@ XBLOCKS = [
     "image = xmodule.template_block:TranslateCustomTagBlock",
     "library = xmodule.library_root_xblock:LibraryRoot",
     "library_content = xmodule.library_content_block:LibraryContentBlock",
-    "library_sourced = xmodule.library_sourced_block:LibrarySourcedBlock",
     "lti = xmodule.lti_block:LTIBlock",
     "poll_question = xmodule.poll_block:PollBlock",
     "problem = xmodule.capa_block:ProblemBlock",
@@ -53,6 +52,7 @@ setup(
     # be reorganized to be a more conventional Python tree.
     packages=[
         "cms",
+        "common",
         "lms",
         "openedx",
         "xmodule",
@@ -93,6 +93,7 @@ setup(
             "wiki = lms.djangoapps.course_wiki.plugins.course_app:WikiCourseApp",
             "custom_pages = lms.djangoapps.courseware.plugins:CustomPagesCourseApp",
             "live = openedx.core.djangoapps.course_live.plugins:LiveCourseApp",
+            "ora_settings = lms.djangoapps.courseware.plugins:ORASettingsApp",
         ],
         "openedx.course_tool": [
             "calendar_sync_toggle = openedx.features.calendar_sync.plugins:CalendarSyncToggleTool",
@@ -157,6 +158,7 @@ setup(
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
             "course_live = openedx.core.djangoapps.course_live.apps:CourseLiveConfig",
             "content_libraries = openedx.core.djangoapps.content_libraries.apps:ContentLibrariesConfig",
+            "content_staging = openedx.core.djangoapps.content_staging.apps:ContentStagingAppConfig",
             # Importing an LMS app into the Studio process is not a good
             # practice. We're ignoring this for Discussions here because its
             # placement in LMS is a historical artifact. The eventual goal is to

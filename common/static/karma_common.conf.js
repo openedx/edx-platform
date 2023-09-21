@@ -2,8 +2,11 @@
 // Docs and troubleshooting tips in common/static/common/js/karma.common.conf.js
 
 /* eslint-env node */
+
 'use strict';
+
 var path = require('path');
+
 var configModule = require(path.join(__dirname, '../../common/static/common/js/karma.common.conf.js'));
 
 var options = {

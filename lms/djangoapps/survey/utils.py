@@ -21,20 +21,20 @@ class SurveyRequiredAccessError(AccessError):
         super().__init__(error_code, developer_message, user_message)
 
 
-def is_survey_required_for_course(course_descriptor):
+def is_survey_required_for_course(course_block):
     """
     Returns whether a Survey is required for this course
     """
 
     # Check to see that the survey is required in the CourseBlock.
-    if not getattr(course_descriptor, 'course_survey_required', False):
+    if not getattr(course_block, 'course_survey_required', False):
         return SurveyRequiredAccessError()
 
     # Check that the specified Survey for the course exists.
-    return SurveyForm.get(course_descriptor.course_survey_name, throw_if_not_found=False)
+    return SurveyForm.get(course_block.course_survey_name, throw_if_not_found=False)
 
 
-def check_survey_required_and_unanswered(user, course_descriptor):
+def check_survey_required_and_unanswered(user, course_block):
     """
     Checks whether a user is required to answer the survey and has yet to do so.
 
@@ -42,7 +42,7 @@ def check_survey_required_and_unanswered(user, course_descriptor):
         AccessResponse: Either ACCESS_GRANTED or SurveyRequiredAccessError.
     """
 
-    if not is_survey_required_for_course(course_descriptor):
+    if not is_survey_required_for_course(course_block):
         return ACCESS_GRANTED
 
     # anonymous users do not need to answer the survey
@@ -50,12 +50,12 @@ def check_survey_required_and_unanswered(user, course_descriptor):
         return ACCESS_GRANTED
 
     # course staff do not need to answer survey
-    has_staff_access = has_access(user, 'staff', course_descriptor)
+    has_staff_access = has_access(user, 'staff', course_block)
     if has_staff_access:
         return ACCESS_GRANTED
 
     # survey is required and it exists, let's see if user has answered the survey
-    survey = SurveyForm.get(course_descriptor.course_survey_name)
+    survey = SurveyForm.get(course_block.course_survey_name)
     answered_survey = SurveyAnswer.do_survey_answers_exist(survey, user)
     if answered_survey:
         return ACCESS_GRANTED

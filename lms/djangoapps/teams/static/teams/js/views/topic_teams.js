@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define([
         'jquery',
         'underscore',
@@ -19,12 +20,12 @@
         // 3. create a new team
         // Be careful to start each link with the appropriate start indicator
         // (e.g. {browse_span_start} for #1) and finish it with {span_end}.
-        var actionMessage = interpolate_text(  // eslint-disable-line no-undef
+        var actionMessage = interpolate_text( // eslint-disable-line no-undef
             _.escape(gettext(
-                '{browse_span_start}Browse teams in other ' +
-                'topics{span_end} or {search_span_start}search teams{span_end} ' +
-                'in this topic. If you still can\'t find a team to join, ' +
-                '{create_span_start}create a new team in this topic{span_end}.'
+                '{browse_span_start}Browse teams in other '
+                + 'topics{span_end} or {search_span_start}search teams{span_end} '
+                + 'in this topic. If you still can\'t find a team to join, '
+                + '{create_span_start}create a new team in this topic{span_end}.'
             )),
             {
                 browse_span_start: '<a class="browse-teams" href="">',
@@ -77,7 +78,6 @@
                 return deferred.promise();
             },
 
-
             showActions: function() {
                 HtmlUtils.append(
                     this.$el,
@@ -115,9 +115,9 @@
             showCreateTeamForm: function(event) {
                 event.preventDefault();
                 Backbone.history.navigate(
-                        'topics/' + this.model.id + '/create-team',
-                        {trigger: true}
-                    );
+                    'topics/' + this.model.id + '/create-team',
+                    {trigger: true}
+                );
             },
 
             createHeaderView: function() {

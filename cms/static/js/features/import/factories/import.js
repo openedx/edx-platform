@@ -116,7 +116,7 @@ define([
                                         Import.reset();
                                         onComplete();
 
-                                        alert(gettext('Your import has failed.') + '\n\n' + errMsg);  // eslint-disable-line max-len, no-alert
+                                        alert(gettext('Your import has failed.') + '\n\n' + errMsg); // eslint-disable-line max-len, no-alert
                                     }
                                 }
                             });
@@ -124,11 +124,12 @@ define([
                     } else {
                         // Can't fix this lint error without major structural changes, which I'm not comfortable
                         // doing given this file's test coverage
-                        data.files = [];  // eslint-disable-line no-param-reassign
+                        data.files = []; // eslint-disable-line no-param-reassign
                     }
                 },
 
                 progressall: function(e, data) {
+                    // eslint-disable-next-line no-mixed-operators
                     var percentInt = data.loaded / data.total * 100,
                         percentVal = parseInt(percentInt, 10) + '%',
                         doneAt;

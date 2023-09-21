@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 from xmodule.modulestore.django import modulestore
 
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
+from cms.djangoapps.contentstore.api.views.utils import get_bool_param
 from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, verify_course_exists, view_auth_classes
 from ..serializers import CourseAdvancedSettingsSerializer
@@ -39,8 +40,13 @@ class AdvancedCourseSettingsView(DeveloperErrorViewMixin, APIView):
             apidocs.string_parameter("course_id", apidocs.ParameterLocation.PATH, description="Course ID"),
             apidocs.string_parameter(
                 "filter_fields",
-                apidocs.ParameterLocation.PATH,
+                apidocs.ParameterLocation.QUERY,
                 description="Comma separated list of fields to filter",
+            ),
+            apidocs.string_parameter(
+                "fetch_all",
+                apidocs.ParameterLocation.QUERY,
+                description="Specifies whether to fetch all settings or only enabled ones",
             ),
         ],
         responses={
@@ -112,7 +118,13 @@ class AdvancedCourseSettingsView(DeveloperErrorViewMixin, APIView):
         if not has_studio_read_access(request.user, course_key):
             self.permission_denied(request)
         course_block = modulestore().get_course(course_key)
-        return Response(CourseMetadata.fetch_all(
+        fetch_all = get_bool_param(request, 'fetch_all', True)
+        if fetch_all:
+            return Response(CourseMetadata.fetch_all(
+                course_block,
+                filter_fields=filter_query_data.cleaned_data['filter_fields'],
+            ))
+        return Response(CourseMetadata.fetch(
             course_block,
             filter_fields=filter_query_data.cleaned_data['filter_fields'],
         ))

@@ -77,15 +77,15 @@ var edx = edx || {},
                         .children('.group-heading')
                         .removeClass('active')
                         .find('.icon')
-                            .addClass('fa-caret-right')
-                            .removeClass('fa-caret-down');
+                        .addClass('fa-caret-right')
+                        .removeClass('fa-caret-down');
 
                     $toggle
                         .next('.chapter-content-container')
                         .removeClass('is-open')
                         .find('.chapter-menu').not(menu)
-                            .removeClass('is-open')
-                            .slideUp();
+                        .removeClass('is-open')
+                        .slideUp();
                 });
             },
 
@@ -108,14 +108,14 @@ var edx = edx || {},
                     .children('.group-heading')
                     .addClass('active')
                     .find('.icon')
-                        .removeClass('fa-caret-right')
-                        .addClass('fa-caret-down');
+                    .removeClass('fa-caret-right')
+                    .addClass('fa-caret-down');
 
                 $sectionEl
                     .addClass('is-open')
                     .find('.chapter-menu')
-                        .addClass('is-open')
-                        .slideDown();
+                    .addClass('is-open')
+                    .slideDown();
             }
         };
 

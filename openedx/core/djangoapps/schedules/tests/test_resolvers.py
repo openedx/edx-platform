@@ -15,7 +15,7 @@ from django.test.utils import override_settings
 from edx_toggles.toggles.testutils import override_waffle_switch
 from testfixtures import LogCapture
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -144,7 +144,7 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
         super().setUp()
         self.course = CourseFactory.create(highlights_enabled_for_messaging=True)
         with self.store.bulk_operations(self.course.id):
-            ItemFactory.create(parent=self.course, category='chapter', highlights=['good stuff'])
+            BlockFactory.create(parent=self.course, category='chapter', highlights=['good stuff'])
 
     def create_resolver(self):
         """
@@ -244,10 +244,10 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
         )
 
         with self.store.bulk_operations(self.course.id):
-            ItemFactory.create(parent=self.course, category='chapter', highlights=['good stuff 1'])
-            ItemFactory.create(parent=self.course, category='chapter', highlights=['good stuff 2'])
-            ItemFactory.create(parent=self.course, category='chapter', highlights=['good stuff 3'])
-            ItemFactory.create(parent=self.course, category='chapter', highlights=['good stuff 4'])
+            BlockFactory.create(parent=self.course, category='chapter', highlights=['good stuff 1'])
+            BlockFactory.create(parent=self.course, category='chapter', highlights=['good stuff 2'])
+            BlockFactory.create(parent=self.course, category='chapter', highlights=['good stuff 3'])
+            BlockFactory.create(parent=self.course, category='chapter', highlights=['good stuff 4'])
 
     def create_resolver(self, user_start_date_offset=8):
         """
@@ -274,7 +274,7 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
     def test_schedule_context(self):
         resolver = self.create_resolver()
         # using this to make sure the select_related stays intact
-        with self.assertNumQueries(38):
+        with self.assertNumQueries(30):
             sc = resolver.get_schedules()
             schedules = list(sc)
         apple_logo_url = 'http://email-media.s3.amazonaws.com/edX/2021/store_apple_229x78.jpg'

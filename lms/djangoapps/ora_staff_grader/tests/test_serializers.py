@@ -718,6 +718,13 @@ class TestStaffAssessSerializer(TestCase):
         ],
     }
 
+    grade_data_no_selected_option = {
+        "overallFeedback": "was pretty good",
+        "criteria": [
+            {"name": "firstCriterion", "selectedOption": None},
+        ],
+    }
+
     submission_uuid = "foo"
 
     def test_staff_assess_serializer(self):
@@ -752,6 +759,21 @@ class TestStaffAssessSerializer(TestCase):
             },
             "criterion_feedback": {},
             "overall_feedback": "",
+            "submission_uuid": self.submission_uuid,
+            "assess_type": "full-grade",
+        }
+
+        assert serializer.data == expected_value
+
+    def test_staff_assess_no_selected_option(self):
+        """When selected option is None, it should be ignored"""
+        context = {"submission_uuid": self.submission_uuid}
+        serializer = StaffAssessSerializer(self.grade_data_no_selected_option, context=context)
+
+        expected_value = {
+            "options_selected": {},
+            "criterion_feedback": {},
+            "overall_feedback": "was pretty good",
             "submission_uuid": self.submission_uuid,
             "assess_type": "full-grade",
         }

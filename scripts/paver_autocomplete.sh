@@ -1,3 +1,9 @@
+# shellcheck disable=all
+# ^ Paver in edx-platform is on the way out
+#   (https://github.com/openedx/edx-platform/issues/31798)
+#   so we're not going to bother fixing these shellcheck
+#   violations.
+
 # Courtesy of Gregory Nicholas
 
 _subcommand_opts()
@@ -56,16 +62,6 @@ _paver()
 
     if [[ -n $subcmd ]]
     then
-        case $subcmd in
-            test_system)
-
-                _test_system_args
-                if [[ -n $COMPREPLY ]]
-                then
-                    return 0
-                fi
-                ;;
-        esac
 
         if [[ ${#COMP_WORDS[*]} == 3 ]]
         then
@@ -86,22 +82,6 @@ _paver()
     then
         COMPREPLY=( $(compgen -W "${cmds}" -- "$cur") )
     fi
-}
-
-_test_system_args()
-{
-        local cur prev
-        cur="${COMP_WORDS[COMP_CWORD]}"
-        prev="${COMP_WORDS[COMP_CWORD - 1]}"
-
-        case "$prev" in
-            -s|--system)
-                COMPREPLY=( $(compgen -W "lms cms" -- "$cur") )
-                return 0
-                ;;
-            *)
-                ;;
-        esac
 }
 
 # Assign the auto-completion function for our command.

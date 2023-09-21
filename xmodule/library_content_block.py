@@ -17,7 +17,6 @@ from lazy import lazy
 from lxml import etree
 from lxml.etree import XMLSyntaxError
 from opaque_keys.edx.locator import LibraryLocator
-from pkg_resources import resource_string
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.completable import XBlockCompletionMode
@@ -27,11 +26,10 @@ from xblock.fields import Integer, List, Scope, String, Boolean
 from xmodule.capa.responsetypes import registry
 from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.studio_editable import StudioEditableBlock
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
-    HTMLSnippet,
     ResourceTemplates,
     shim_xmodule_js,
     STUDENT_VIEW,
@@ -76,7 +74,6 @@ class LibraryContentBlock(
     MakoTemplateBlockBase,
     XmlMixin,
     XModuleToXBlockMixin,
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
     StudioEditableBlock,
@@ -95,25 +92,8 @@ class LibraryContentBlock(
 
     resources_dir = 'assets/library_content'
 
-    preview_view_js = {
-        'js': [],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    preview_view_css = {
-        'scss': [],
-    }
-
     mako_template = 'widgets/metadata-edit.html'
     studio_js_module_name = "VerticalDescriptor"
-    studio_view_js = {
-        'js': [
-            resource_string(__name__, 'js/src/vertical/edit.js'),
-        ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    studio_view_css = {
-        'scss': [],
-    }
 
     show_in_read_only_mode = True
 
@@ -160,7 +140,7 @@ class LibraryContentBlock(
     )
     max_count = Integer(
         display_name=_("Count"),
-        help=_("Enter the number of components to display to each student."),
+        help=_("Enter the number of components to display to each student. Set it to -1 to display all components."),
         default=1,
         scope=Scope.settings,
     )
@@ -337,7 +317,11 @@ class LibraryContentBlock(
         actual BlockUsageLocators, it is necessary to use self.children,
         because the block_ids alone do not specify the block type.
         """
-        block_keys = self.make_selection(self.selected, self.children, self.max_count, "random")  # pylint: disable=no-member
+        max_count = self.max_count
+        if max_count < 0:
+            max_count = len(self.children)
+
+        block_keys = self.make_selection(self.selected, self.children, max_count, "random")  # pylint: disable=no-member
 
         # Publish events for analytics purposes:
         lib_tools = self.runtime.service(self, 'library_tools')
@@ -399,15 +383,15 @@ class LibraryContentBlock(
                 # 500-response.
                 logger.error('Skipping display for child block that is None')
                 continue
-            for displayable in child.displayable_items():
-                rendered_child = displayable.render(STUDENT_VIEW, child_context)
-                fragment.add_fragment_resources(rendered_child)
-                contents.append({
-                    'id': str(displayable.location),
-                    'content': rendered_child.content,
-                })
 
-        fragment.add_content(self.runtime.service(self, 'mako').render_template('vert_module.html', {
+            rendered_child = child.render(STUDENT_VIEW, child_context)
+            fragment.add_fragment_resources(rendered_child)
+            contents.append({
+                'id': str(child.location),
+                'content': rendered_child.content,
+            })
+
+        fragment.add_content(self.runtime.service(self, 'mako').render_lms_template('vert_module.html', {
             'items': contents,
             'xblock_context': context,
             'show_bookmark_button': False,
@@ -433,9 +417,13 @@ class LibraryContentBlock(
         if is_root:
             # User has clicked the "View" link. Show a preview of all possible children:
             if self.children:  # pylint: disable=no-member
-                fragment.add_content(self.runtime.service(self, 'mako').render_template(
+                max_count = self.max_count
+                if max_count < 0:
+                    max_count = len(self.children)
+
+                fragment.add_content(self.runtime.service(self, 'mako').render_cms_template(
                     "library-block-author-preview-header.html", {
-                        'max_count': self.max_count,
+                        'max_count': max_count,
                         'display_name': self.display_name or self.url_name,
                     }))
                 context['can_edit_visibility'] = False
@@ -454,13 +442,13 @@ class LibraryContentBlock(
         Return the studio view.
         """
         fragment = Fragment(
-            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
+            self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
-        add_webpack_to_fragment(fragment, 'LibraryContentBlockStudio')
+        add_webpack_js_to_fragment(fragment, 'LibraryContentBlockEditor')
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
 
-    def get_child_descriptors(self):
+    def get_child_blocks(self):
         """
         Return only the subset of our children relevant to the current student.
         """
@@ -693,7 +681,7 @@ class LibraryContentBlock(
     def has_dynamic_children(self):
         """
         Inform the runtime that our children vary per-user.
-        See get_child_descriptors() above
+        See get_child_blocks() above
         """
         return True
 
@@ -706,7 +694,7 @@ class LibraryContentBlock(
         This overwrites the get_content_titles method included in x_module by default.
         """
         titles = []
-        for child in self.get_child_descriptors():
+        for child in self.get_child_blocks():
             titles.extend(child.get_content_titles())
         return titles
 
@@ -726,10 +714,7 @@ class LibraryContentBlock(
                 if system.error_tracker is not None:
                     system.error_tracker(msg)
 
-        definition = {
-            attr_name: json.loads(attr_value)
-            for attr_name, attr_value in xml_object.attrib.items()
-        }
+        definition = dict(xml_object.attrib.items())
         return definition, children
 
     def definition_to_xml(self, resource_fs):

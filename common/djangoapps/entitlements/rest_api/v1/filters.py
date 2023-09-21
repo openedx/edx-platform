@@ -40,7 +40,9 @@ class CourseEntitlementFilter(filters.FilterSet):
 
     uuid = UUIDListFilter()
     user = filters.CharFilter(field_name='user__username')
+    course_uuid = UUIDListFilter(field_name='course_uuid')
+    expired_at__isnull = filters.BooleanFilter(field_name='expired_at', lookup_expr='isnull')
 
     class Meta:
         model = CourseEntitlement
-        fields = ('uuid', 'user')
+        fields = ('uuid', 'user', 'course_uuid')

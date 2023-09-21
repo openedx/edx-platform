@@ -5,21 +5,35 @@ Django Admin page for SurveyReport.
 
 from django.contrib import admin
 from .models import SurveyReport
+from .api import send_report_to_external_api
 
 
 class SurveyReportAdmin(admin.ModelAdmin):
     """
     Admin to manage survey reports.
     """
+    change_list_template = "survey_report/change_list.html"
+
     readonly_fields = (
         'courses_offered', 'learners', 'registered_learners',
         'enrollments', 'generated_certificates', 'extra_data',
-        'created_at'
+        'created_at', 'state',
     )
 
     list_display = (
-        'id', 'summary', 'created_at'
+        'id', 'summary', 'created_at', 'state'
     )
+
+    actions = ['send_report']
+
+    @admin.action(description='Send report to external API')
+    def send_report(self, request, queryset):
+        """
+        Add custom actions to send the reports to the external API.
+        """
+        selected_reports = queryset.values_list('id', flat=True)
+        for report_id in selected_reports:
+            send_report_to_external_api(report_id=report_id)
 
     def summary(self, obj) -> str:
         """

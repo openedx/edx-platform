@@ -1,4 +1,4 @@
 export const formTypes = {
-  REISSUE: 'reissue',
-  CREATE: 'create',
+    REISSUE: 'reissue',
+    CREATE: 'create',
 };

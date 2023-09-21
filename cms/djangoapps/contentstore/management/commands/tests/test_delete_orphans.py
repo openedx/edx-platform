@@ -42,7 +42,7 @@ class TestDeleteOrphan(TestOrphanBase):
 
         call_command('delete_orphans', str(course.id), '--commit')
 
-        # make sure this module wasn't deleted
+        # make sure this block wasn't deleted
         self.assertTrue(self.store.has_item(course.id.make_usage_key('html', 'multi_parent_html')))
 
         # and make sure that these were

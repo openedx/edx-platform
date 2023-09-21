@@ -1,5 +1,7 @@
+// eslint-disable-next-line no-shadow-restricted-names
 (function(undefined) {
     'use strict';
+
     describe('VideoPlayer Events Bumper plugin', function() {
         var Logger = window.Logger;
         var state, oldOTBD;

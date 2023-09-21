@@ -2,7 +2,7 @@
 Course certificates are created for a student and an offering of a course (a course run).
 """
 
-
+from datetime import timezone
 import json
 import logging
 import os
@@ -224,8 +224,6 @@ class GeneratedCertificate(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course_id = CourseKeyField(max_length=255, blank=True, default=None)
     verify_uuid = models.CharField(max_length=32, blank=True, default='', db_index=True)
-    download_uuid = models.CharField(max_length=32, blank=True, default='')
-    download_url = models.CharField(max_length=128, blank=True, default='')
     grade = models.CharField(max_length=5, blank=True, default='')
     key = models.CharField(max_length=32, blank=True, default='')
     distinction = models.BooleanField(default=False)
@@ -234,6 +232,11 @@ class GeneratedCertificate(models.Model):
     name = models.CharField(blank=True, max_length=255)
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
+
+    # These fields have been kept around even though they are not used.
+    # See lms/djangoapps/certificates/docs/decisions/008-certificate-model-remnants.rst for the ADR.
+    download_uuid = models.CharField(max_length=32, blank=True, default='')
+    download_url = models.CharField(max_length=128, blank=True, default='')
     error_reason = models.CharField(max_length=512, blank=True, default='')
 
     # This is necessary because CMS does not install the certificates app, but it
@@ -400,6 +403,7 @@ class GeneratedCertificate(models.Model):
 
         # .. event_implemented_name: CERTIFICATE_REVOKED
         CERTIFICATE_REVOKED.send_event(
+            time=self.modified_date.astimezone(timezone.utc),
             certificate=CertificateData(
                 user=UserData(
                     pii=UserPersonalData(
@@ -470,6 +474,9 @@ class GeneratedCertificate(models.Model):
         Credentials IDA.
         """
         super().save(*args, **kwargs)
+
+        timestamp = self.modified_date.astimezone(timezone.utc)
+
         COURSE_CERT_CHANGED.send_robust(
             sender=self.__class__,
             user=self.user,
@@ -480,6 +487,7 @@ class GeneratedCertificate(models.Model):
 
         # .. event_implemented_name: CERTIFICATE_CHANGED
         CERTIFICATE_CHANGED.send_event(
+            time=timestamp,
             certificate=CertificateData(
                 user=UserData(
                     pii=UserPersonalData(
@@ -512,6 +520,7 @@ class GeneratedCertificate(models.Model):
 
             # .. event_implemented_name: CERTIFICATE_CREATED
             CERTIFICATE_CREATED.send_event(
+                time=timestamp,
                 certificate=CertificateData(
                     user=UserData(
                         pii=UserPersonalData(

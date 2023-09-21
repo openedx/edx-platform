@@ -7,7 +7,7 @@ from django.core.management import CommandError, call_command
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 
 class TestFixNotFound(ModuleStoreTestCase):
@@ -23,17 +23,9 @@ class TestFixNotFound(ModuleStoreTestCase):
         with self.assertRaisesRegex(CommandError, msg):
             call_command('fix_not_found')
 
-    def test_fix_not_found_non_split(self):
-        """
-        The management command doesn't work on non split courses
-        """
-        course = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
-        with self.assertRaisesRegex(CommandError, "The owning modulestore does not support this command."):
-            call_command("fix_not_found", str(course.id))
-
     def test_fix_not_found(self):
         course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
-        ItemFactory.create(category='chapter', parent_location=course.location)
+        BlockFactory.create(category='chapter', parent_location=course.location)
 
         # get course again in order to update its children list
         course = self.store.get_course(course.id)

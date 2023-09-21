@@ -1,6 +1,6 @@
 <%page expression_filter="h"/>
 <%inherit file="accomplishment-base.html" />
-<%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils.translation import gettext as _ %>
 
 % if user.is_authenticated and user.id == int(accomplishment_user_id):
 <%include file="_accomplishment-banner.html" />

@@ -473,14 +473,13 @@ class VideoStudioViewHandlers:
             `POST`:
                 Upload srt file. Check possibility of generation of proper sjson files.
                 For now, it works only for self.transcripts, not for `en`.
-                Do not update self.transcripts, as fields are updated on save in Studio.
             `GET:
                 Return filename from storage. SRT format is sent back on success. Filename should be in GET dict.
 
         We raise all exceptions right in Studio:
             NotFoundError:
                 Video or asset was deleted from module/contentstore, but request came later.
-                Seems impossible to be raised. module_render.py catches NotFoundErrors from here.
+                Seems impossible to be raised. block_render.py catches NotFoundErrors from here.
 
             /translation POST:
                 TypeError:
@@ -529,6 +528,7 @@ class VideoStudioViewHandlers:
                             'edx_video_id': edx_video_id,
                             'language_code': new_language_code
                         }
+                        self.transcripts[new_language_code] = f'{edx_video_id}-{new_language_code}.srt'
                         response = Response(json.dumps(payload), status=201)
                     except (TranscriptsGenerationException, UnicodeDecodeError):
                         response = Response(

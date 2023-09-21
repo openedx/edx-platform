@@ -5,6 +5,7 @@ if (!Array.prototype.find) {
     Object.defineProperty(Array.prototype, 'find', { // eslint-disable-line no-extend-native
         value: function(predicate) {
             'use strict';
+
             var o, len, thisArg, k, kValue;
 
             // 1. Let O be ? ToObject(this value).
@@ -15,6 +16,7 @@ if (!Array.prototype.find) {
             o = Object(this);
 
             // 2. Let len be ? ToLength(? Get(O, "length")).
+            // eslint-disable-next-line no-bitwise
             len = o.length >>> 0;
 
             // 3. If IsCallable(predicate) is false, throw a TypeError exception.

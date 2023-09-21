@@ -2,13 +2,11 @@
 Tests for `remove_social_auth_users` management command
 """
 
-
 import sys
-import unittest
 from contextlib import contextmanager
 from uuid import uuid4
-import pytest
 
+import pytest
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -20,12 +18,13 @@ from common.djangoapps.student.models import User
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.third_party_auth.management.commands import remove_social_auth_users
 from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 FEATURES_WITH_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_ENABLED['ENABLE_ENROLLMENT_RESET'] = True
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestRemoveSocialAuthUsersCommand(TestCase):
     """
     Test django management command

@@ -19,9 +19,9 @@
 
             mouseDown: function(event) {
                 if (this.mousePressed === false) {
-            // So that the browser does not perform a default drag.
-            // If we don't do this, each drag operation will
-            // potentially cause the highlghting of the dragged element.
+                    // So that the browser does not perform a default drag.
+                    // If we don't do this, each drag operation will
+                    // potentially cause the highlghting of the dragged element.
                     event.preventDefault();
                     event.stopPropagation();
 
@@ -29,8 +29,8 @@
                         return;
                     }
 
-            // If this draggable is just being dragged out of the
-            // container, we must perform some additional tasks.
+                    // If this draggable is just being dragged out of the
+                    // container, we must perform some additional tasks.
                     if (this.inContainer === true) {
                         if ((this.isReusable === true) && (this.isOriginal === true)) {
                             this.makeDraggableCopy(function(draggableCopy) {
@@ -82,7 +82,7 @@
                         if (this.isOriginal === true) {
                             this.state.numDraggablesInSlider -= 1;
                         }
-                // SR: global "screen reader" object in accessibility_tools.js
+                        // SR: global "screen reader" object in accessibility_tools.js
                         window.SR.readText(gettext('dragging out of slider'));
                     } else {
                         window.SR.readText(gettext('dragging'));
@@ -117,12 +117,12 @@
 
             mouseMove: function(event) {
                 if (this.mousePressed === true) {
-            // Because we have also attached a 'mousemove' event to the
-            // 'document' (that will do the same thing), let's tell the
-            // browser not to bubble up this event. The attached event
-            // on the 'document' will only be triggered when the mouse
-            // pointer leaves the draggable while it is in the middle
-            // of a drag operation (user moves the mouse very quickly).
+                    // Because we have also attached a 'mousemove' event to the
+                    // 'document' (that will do the same thing), let's tell the
+                    // browser not to bubble up this event. The attached event
+                    // on the 'document' will only be triggered when the mouse
+                    // pointer leaves the draggable while it is in the middle
+                    // of a drag operation (user moves the mouse very quickly).
                     event.stopPropagation();
 
                     this.iconEl.css({

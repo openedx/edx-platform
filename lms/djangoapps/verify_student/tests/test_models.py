@@ -14,7 +14,7 @@ from django.utils.timezone import now
 from freezegun import freeze_time
 
 from common.djangoapps.student.tests.factories import UserFactory
-from common.test.utils import MockS3BotoMixin
+from common.test.utils import MockS3Boto3Mixin
 from lms.djangoapps.verify_student.models import (
     ManualVerification,
     PhotoVerification,
@@ -94,7 +94,7 @@ def mock_software_secure_post_unavailable(url, headers=None, data=None, **kwargs
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
 @ddt.ddt
-class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class TestPhotoVerification(TestVerificationBase, MockS3Boto3Mixin, ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def test_state_transitions(self):
         """

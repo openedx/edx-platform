@@ -112,6 +112,18 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
             self.consumer
         )
 
+    @patch('lms.djangoapps.courseware.views.views.render_xblock')
+    @patch('lms.djangoapps.lti_provider.views.authenticate_lti_user')
+    def test_render_xblock_params(self, _authenticate, render):
+        """
+        Verifies that the LTI renders an XBlock without:
+        1. Checking the enrollment.
+        2. Displaying staff debug info.
+        """
+        request = build_launch_request()
+        views.lti_launch(request, str(COURSE_KEY), str(USAGE_KEY))
+        render.assert_called_with(request, str(USAGE_KEY), check_if_enrolled=False, disable_staff_debug_info=True)
+
     @patch('lms.djangoapps.lti_provider.views.render_courseware')
     @patch('lms.djangoapps.lti_provider.views.store_outcome_parameters')
     @patch('lms.djangoapps.lti_provider.views.authenticate_lti_user')

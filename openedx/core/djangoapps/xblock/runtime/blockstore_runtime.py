@@ -14,13 +14,13 @@ from xblock.fields import ScopeIds
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
 from openedx.core.djangoapps.xblock.runtime.runtime import XBlockRuntime
 from openedx.core.djangoapps.xblock.runtime.olx_parsing import parse_xblock_include, BundleFormatException
-from openedx.core.djangoapps.xblock.runtime.serializer import serialize_xblock
 from openedx.core.djangolib.blockstore_cache import (
     BundleCache,
     get_bundle_file_data_with_cache,
     get_bundle_file_metadata_with_cache,
 )
 from openedx.core.lib import blockstore_api
+from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_blockstore
 
 log = logging.getLogger(__name__)
 
@@ -33,14 +33,12 @@ class BlockstoreXBlockRuntime(XBlockRuntime):
     def parse_xml_file(self, fileobj, id_generator=None):
         raise NotImplementedError("Use parse_olx_file() instead")
 
-    def get_block(self, usage_id, for_parent=None, block_type_overrides=None):  # pylint: disable=arguments-differ
+    def get_block(self, usage_id, for_parent=None):
         """
         Create an XBlock instance in this runtime.
 
         Args:
             usage_key(OpaqueKey): identifier used to find the XBlock class and data.
-            block_type_overrides(dict): optional dict of block types to override in returned block metadata:
-                {'from_block_type': 'to_block_type'}
         """
         def_id = self.id_reader.get_definition_id(usage_id)
         if def_id is None:
@@ -49,8 +47,6 @@ class BlockstoreXBlockRuntime(XBlockRuntime):
             raise TypeError("This runtime can only load blocks stored in Blockstore bundles.")
         try:
             block_type = self.id_reader.get_block_type(def_id)
-            if block_type_overrides and block_type in block_type_overrides:
-                block_type = block_type_overrides[block_type]
         except NoSuchDefinition:
             raise NoSuchUsage(repr(usage_id))  # lint-amnesty, pylint: disable=raise-missing-from
         keys = ScopeIds(self.user_id, block_type, def_id, usage_id)
@@ -137,7 +133,9 @@ class BlockstoreXBlockRuntime(XBlockRuntime):
             if not learning_context.can_edit_block(self.user, block.scope_ids.usage_id):
                 log.warning("User %s does not have permission to edit %s", self.user.username, block.scope_ids.usage_id)
                 raise RuntimeError("You do not have permission to edit this XBlock")
-        olx_str, static_files = serialize_xblock(block)
+        serialized = serialize_modulestore_block_for_blockstore(block)
+        olx_str = serialized.olx_str
+        static_files = serialized.static_files
         # Write the OLX file to the bundle:
         draft_uuid = blockstore_api.get_or_create_bundle_draft(
             definition_key.bundle_uuid, definition_key.draft_name

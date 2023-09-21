@@ -7,6 +7,7 @@ import datetime
 import hashlib
 import json
 import unicodedata
+import urllib.parse
 from unittest.mock import Mock, patch
 
 import ddt
@@ -312,6 +313,9 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
             HTTP_ACCEPT='*/*',
         )
 
+        if not is_activated:
+            next_url = urllib.parse.quote(next_url)
+
         self._assert_response(response, success=True)
         self._assert_redirect_url(response, settings.LMS_ROOT_URL + expected_redirect + next_url)
 
@@ -337,7 +341,6 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
 
     def test_login_fail_no_user_exists(self):
         nonexistent_email = 'not_a_user@edx.org'
-        # pylint: disable=too-many-function-args
         email_hash = hashlib.shake_128(nonexistent_email.encode('utf-8')).hexdigest(16)
         response, mock_audit_log = self._login_response(
             nonexistent_email,
@@ -442,7 +445,6 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
         the system does *not* send account activation email notification to the user.
         """
         nonexistent_email = 'incorrect@email.com'
-        # pylint: disable=too-many-function-args
         email_hash = hashlib.shake_128(nonexistent_email.encode('utf-8')).hexdigest(16)
         self.user.is_active = False
         self.user.save()
@@ -454,7 +456,6 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
 
     def test_login_unicode_email(self):
         unicode_email = self.user_email + chr(40960)
-        # pylint: disable=too-many-function-args
         email_hash = hashlib.shake_128(unicode_email.encode('utf-8')).hexdigest(16)
         response, mock_audit_log = self._login_response(
             unicode_email,

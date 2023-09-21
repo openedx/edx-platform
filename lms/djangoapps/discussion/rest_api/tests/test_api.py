@@ -25,7 +25,7 @@ from rest_framework.exceptions import PermissionDenied
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.partitions.partitions import Group, UserPartition
 
 from common.djangoapps.student.tests.factories import (
@@ -71,7 +71,8 @@ from lms.djangoapps.discussion.rest_api.tests.utils import (
 )
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
-from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider, \
+    PostingRestriction
 from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course_task
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
@@ -151,6 +152,9 @@ def _set_course_discussion_blackout(course, user_id):
         datetime.now(UTC) - timedelta(days=3),
         datetime.now(UTC) + timedelta(days=3)
     ]
+    configuration = DiscussionsConfiguration.get(course.id)
+    configuration.posting_restrictions = PostingRestriction.SCHEDULED
+    configuration.save()
     modulestore().update_item(course, user_id)
 
 
@@ -190,6 +194,7 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
     def test_basic(self):
         assert get_course(self.request, self.course.id) == {
             'id': str(self.course.id),
+            'is_posting_enabled': True,
             'blackouts': [],
             'thread_list_url': 'http://testserver/api/discussion/v1/threads/?course_id=course-v1%3Ax%2By%2Bz',
             'following_thread_list_url':
@@ -319,7 +324,7 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
         """
         Build a discussion xblock in self.course.
         """
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=self.course.location,
             category="discussion",
             discussion_id=topic_id,
@@ -505,8 +510,8 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
         Test that only topics that a user has access to are returned. The
         ways in which a user may not have access are:
 
-        * Module is visible to staff only
-        * Module is accessible only to a group the user is not in
+        * Block is visible to staff only
+        * Block is accessible only to a group the user is not in
 
         Also, there is a case that ensures that a category with no accessible
         subcategories does not appear in the result.
@@ -1405,6 +1410,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "resp_skip": ["70"],
                 "resp_limit": ["14"],
                 "with_responses": ["True"],
+                "reverse_order": ["False"],
             }
         )
 
@@ -1471,6 +1477,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "anonymous": False,
                 "anonymous_to_peers": False,
                 "last_edit": None,
+                "edit_by_label": None,
             },
             {
                 "id": "test_comment_2",
@@ -1497,6 +1504,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "anonymous": True,
                 "anonymous_to_peers": False,
                 "last_edit": None,
+                "edit_by_label": None,
             },
         ]
         actual_comments = self.get_comment_list(
@@ -1887,7 +1895,8 @@ class CreateThreadTest(
             'body': 'Test body',
             'url': '',
             'user_forums_roles': [FORUM_ROLE_STUDENT],
-            'user_course_roles': []
+            'user_course_roles': [],
+            'from_mfe_sidebar': False,
         }
 
     def test_basic_in_blackout_period(self):
@@ -1974,6 +1983,7 @@ class CreateThreadTest(
                 "url": "",
                 "user_forums_roles": [FORUM_ROLE_STUDENT, FORUM_ROLE_MODERATOR],
                 "user_course_roles": [],
+                "from_mfe_sidebar": False,
             }
         )
 
@@ -2006,7 +2016,8 @@ class CreateThreadTest(
             'body': 'Test body',
             'url': '',
             'user_forums_roles': [FORUM_ROLE_STUDENT],
-            'user_course_roles': []
+            'user_course_roles': [],
+            'from_mfe_sidebar': False,
         }
 
     @ddt.data(
@@ -2228,6 +2239,7 @@ class CreateCommentTest(
             "anonymous": False,
             "anonymous_to_peers": False,
             "last_edit": None,
+            "edit_by_label": None,
         }
         assert actual == expected
         expected_url = (
@@ -2235,13 +2247,16 @@ class CreateCommentTest(
             "/api/v1/threads/test_thread/comments"
         )
         assert urlparse(httpretty.last_request().path).path == expected_url  # lint-amnesty, pylint: disable=no-member
-        assert parsed_body(httpretty.last_request()) == {
+
+        data = httpretty.latest_requests()
+        assert parsed_body(data[len(data) - 2]) == {
             'course_id': [str(self.course.id)],
             'body': ['Test body'],
             'user_id': [str(self.user.id)],
             'anonymous': ['False'],
             'anonymous_to_peers': ['False'],
         }
+
         expected_event_name = (
             "edx.forum.comment.created" if parent_id else
             "edx.forum.response.created"
@@ -2256,6 +2271,7 @@ class CreateCommentTest(
             "url": "",
             "user_forums_roles": [FORUM_ROLE_STUDENT],
             "user_course_roles": [],
+            "from_mfe_sidebar": False,
         }
         if parent_id:
             expected_event_data["response"] = {"id": parent_id}
@@ -2323,6 +2339,7 @@ class CreateCommentTest(
             "anonymous": False,
             "anonymous_to_peers": False,
             "last_edit": None,
+            "edit_by_label": None,
         }
         assert actual == expected
         expected_url = (
@@ -2330,7 +2347,8 @@ class CreateCommentTest(
             "/api/v1/threads/test_thread/comments"
         )
         assert urlparse(httpretty.last_request().path).path == expected_url  # pylint: disable=no-member
-        assert parsed_body(httpretty.last_request()) == {
+        data = httpretty.latest_requests()
+        assert parsed_body(data[len(data) - 2]) == {
             "course_id": [str(self.course.id)],
             "body": ["Test body"],
             "user_id": [str(self.user.id)],
@@ -2352,6 +2370,7 @@ class CreateCommentTest(
             "url": "",
             "user_forums_roles": [FORUM_ROLE_STUDENT, FORUM_ROLE_MODERATOR],
             "user_course_roles": [],
+            "from_mfe_sidebar": False,
         }
         if parent_id:
             expected_event_data["response"] = {"id": parent_id}
@@ -3148,6 +3167,7 @@ class UpdateCommentTest(
             "child_count": 0,
             "can_delete": True,
             "last_edit": None,
+            "edit_by_label": None,
         }
         assert actual == expected
         assert parsed_body(httpretty.last_request()) == {
@@ -4014,20 +4034,20 @@ class CourseTopicsV2Test(ModuleStoreTestCase):
         self.course = CourseFactory.create(
             discussion_topics={f"Course Wide Topic {idx}": {"id": f'course-wide-topic-{idx}'} for idx in range(10)}
         )
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             parent_location=self.course.location,
             category='chapter',
             display_name="Week 1",
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
-        self.sequential = ItemFactory.create(
+        self.sequential = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name="Lesson 1",
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
         self.verticals = [
-            ItemFactory.create(
+            BlockFactory.create(
                 parent_location=self.sequential.location,
                 category='vertical',
                 display_name=f'vertical-{idx}',
@@ -4035,7 +4055,7 @@ class CourseTopicsV2Test(ModuleStoreTestCase):
             )
             for idx in range(10)
         ]
-        staff_only_unit = ItemFactory.create(
+        staff_only_unit = BlockFactory.create(
             parent_location=self.sequential.location,
             category='vertical',
             display_name='staff-vertical-1',

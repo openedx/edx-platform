@@ -39,6 +39,7 @@
             <article class="content-primary" role="main">
                 <div class=course-status"">
                     <div class="status-highlights-enabled"></div>
+                    <div class="status-video-sharing-enabled"></div>
                 </div>
                 <div class="wrapper-dnd">
                     <article class="outline outline-course" data-locator="mock-course" data-course-key="slashes:MockCourse">

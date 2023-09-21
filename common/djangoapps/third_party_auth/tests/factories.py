@@ -7,7 +7,9 @@ from factory import SubFactory
 from factory.django import DjangoModelFactory
 from faker import Factory as FakerFactory
 
-from common.djangoapps.third_party_auth.models import SAMLConfiguration, SAMLProviderConfig
+from common.djangoapps.third_party_auth.models import (
+    OAuth2ProviderConfig, SAMLConfiguration, SAMLProviderConfig
+)
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 
 FAKER = FakerFactory.create()
@@ -40,3 +42,16 @@ class SAMLProviderConfigFactory(DjangoModelFactory):
 
     entity_id = factory.LazyAttribute(lambda x: FAKER.uri())
     metadata_source = factory.LazyAttribute(lambda x: FAKER.uri())
+
+
+class OAuth2ProviderConfigFactory(DjangoModelFactory):
+    """
+    Factory for OAuth2ProviderConfig model in third_party_auth app.
+    """
+    class Meta:
+        model = OAuth2ProviderConfig
+
+    site = SubFactory(SiteFactory)
+    enabled = True
+    slug = factory.LazyAttribute(lambda x: FAKER.slug())
+    name = factory.LazyAttribute(lambda x: FAKER.company())

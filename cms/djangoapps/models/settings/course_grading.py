@@ -25,21 +25,21 @@ class CourseGradingModel:
     """
     # Within this class, allow access to protected members of client classes.
     # This comes up when accessing kvs data and caches during kvs saves and modulestore writes.
-    def __init__(self, course_descriptor):
+    def __init__(self, course):
         self.graders = [
-            CourseGradingModel.jsonize_grader(i, grader) for i, grader in enumerate(course_descriptor.raw_grader)
+            CourseGradingModel.jsonize_grader(i, grader) for i, grader in enumerate(course.raw_grader)
         ]  # weights transformed to ints [0..100]
-        self.grade_cutoffs = course_descriptor.grade_cutoffs
-        self.grace_period = CourseGradingModel.convert_set_grace_period(course_descriptor)
-        self.minimum_grade_credit = course_descriptor.minimum_grade_credit
+        self.grade_cutoffs = course.grade_cutoffs
+        self.grace_period = CourseGradingModel.convert_set_grace_period(course)
+        self.minimum_grade_credit = course.minimum_grade_credit
 
     @classmethod
     def fetch(cls, course_key):
         """
         Fetch the course grading policy for the given course from persistence and return a CourseGradingModel.
         """
-        descriptor = modulestore().get_course(course_key)
-        model = cls(descriptor)
+        course = modulestore().get_course(course_key)
+        model = cls(course)
         return model
 
     @staticmethod
@@ -48,10 +48,10 @@ class CourseGradingModel:
         Fetch the course's nth grader
         Returns an empty dict if there's no such grader.
         """
-        descriptor = modulestore().get_course(course_key)
+        course = modulestore().get_course(course_key)
         index = int(index)
-        if len(descriptor.raw_grader) > index:
-            return CourseGradingModel.jsonize_grader(index, descriptor.raw_grader[index])
+        if len(course.raw_grader) > index:
+            return CourseGradingModel.jsonize_grader(index, course.raw_grader[index])
 
         # return empty model
         else:
@@ -69,27 +69,27 @@ class CourseGradingModel:
         Decode the json into CourseGradingModel and save any changes. Returns the modified model.
         Probably not the usual path for updates as it's too coarse grained.
         """
-        descriptor = modulestore().get_course(course_key)
-        previous_grading_policy_hash = str(hash_grading_policy(descriptor.grading_policy))
+        course = modulestore().get_course(course_key)
+        previous_grading_policy_hash = str(hash_grading_policy(course.grading_policy))
 
         graders_parsed = [CourseGradingModel.parse_grader(jsonele) for jsonele in jsondict['graders']]
         fire_signal = CourseGradingModel.must_fire_grading_event_and_signal(
             course_key,
             graders_parsed,
-            descriptor,
+            course,
             jsondict
         )
-        descriptor.raw_grader = graders_parsed
-        descriptor.grade_cutoffs = jsondict['grade_cutoffs']
+        course.raw_grader = graders_parsed
+        course.grade_cutoffs = jsondict['grade_cutoffs']
 
-        modulestore().update_item(descriptor, user.id)
+        modulestore().update_item(course, user.id)
 
         CourseGradingModel.update_grace_period_from_json(course_key, jsondict['grace_period'], user)
 
         CourseGradingModel.update_minimum_grade_credit_from_json(course_key, jsondict['minimum_grade_credit'], user)
 
-        descriptor = modulestore().get_course(course_key)
-        new_grading_policy_hash = str(hash_grading_policy(descriptor.grading_policy))
+        course = modulestore().get_course(course_key)
+        new_grading_policy_hash = str(hash_grading_policy(course.grading_policy))
         log.info(
             "Updated course grading policy for course %s from %s to %s. fire_signal = %s",
             str(course_key),
@@ -153,28 +153,28 @@ class CourseGradingModel:
         Create or update the grader of the given type (string key) for the given course. Returns the modified
         grader which is a full model on the client but not on the server (just a dict)
         """
-        descriptor = modulestore().get_course(course_key)
-        previous_grading_policy_hash = str(hash_grading_policy(descriptor.grading_policy))
+        course = modulestore().get_course(course_key)
+        previous_grading_policy_hash = str(hash_grading_policy(course.grading_policy))
 
         # parse removes the id; so, grab it before parse
-        index = int(grader.get('id', len(descriptor.raw_grader)))
+        index = int(grader.get('id', len(course.raw_grader)))
         grader = CourseGradingModel.parse_grader(grader)
 
         fire_signal = True
-        if index < len(descriptor.raw_grader):
+        if index < len(course.raw_grader):
             fire_signal = CourseGradingModel.must_fire_grading_event_and_signal_single_grader(
                 course_key,
                 grader,
-                descriptor.raw_grader[index]
+                course.raw_grader[index]
             )
-            descriptor.raw_grader[index] = grader
+            course.raw_grader[index] = grader
         else:
-            descriptor.raw_grader.append(grader)
+            course.raw_grader.append(grader)
 
-        modulestore().update_item(descriptor, user.id)
+        modulestore().update_item(course, user.id)
 
-        descriptor = modulestore().get_course(course_key)
-        new_grading_policy_hash = str(hash_grading_policy(descriptor.grading_policy))
+        course = modulestore().get_course(course_key)
+        new_grading_policy_hash = str(hash_grading_policy(course.grading_policy))
         log.info(
             "Updated grader for course %s. Grading policy has changed from %s to %s. fire_signal = %s",
             str(course_key),
@@ -185,7 +185,7 @@ class CourseGradingModel:
         if fire_signal:
             _grading_event_and_signal(course_key, user.id)
 
-        return CourseGradingModel.jsonize_grader(index, descriptor.raw_grader[index])
+        return CourseGradingModel.jsonize_grader(index, course.raw_grader[index])
 
     @staticmethod
     def update_cutoffs_from_json(course_key, cutoffs, user):
@@ -193,10 +193,10 @@ class CourseGradingModel:
         Create or update the grade cutoffs for the given course. Returns sent in cutoffs (ie., no extra
         db fetch).
         """
-        descriptor = modulestore().get_course(course_key)
-        descriptor.grade_cutoffs = cutoffs
+        course = modulestore().get_course(course_key)
+        course.grade_cutoffs = cutoffs
 
-        modulestore().update_item(descriptor, user.id)
+        modulestore().update_item(course, user.id)
         _grading_event_and_signal(course_key, user.id)
         return cutoffs
 
@@ -207,7 +207,7 @@ class CourseGradingModel:
         grace_period entry in an enclosing dict. It is also safe to call this method with a value of
         None for graceperiodjson.
         """
-        descriptor = modulestore().get_course(course_key)
+        course = modulestore().get_course(course_key)
 
         # Before a graceperiod has ever been created, it will be None (once it has been
         # created, it cannot be set back to None).
@@ -216,9 +216,9 @@ class CourseGradingModel:
                 graceperiodjson = graceperiodjson['grace_period']
 
             grace_timedelta = timedelta(**graceperiodjson)
-            descriptor.graceperiod = grace_timedelta
+            course.graceperiod = grace_timedelta
 
-            modulestore().update_item(descriptor, user.id)
+            modulestore().update_item(course, user.id)
 
     @staticmethod
     def update_minimum_grade_credit_from_json(course_key, minimum_grade_credit, user):
@@ -230,29 +230,29 @@ class CourseGradingModel:
             user(User): The user object
 
         """
-        descriptor = modulestore().get_course(course_key)
+        course = modulestore().get_course(course_key)
 
         # 'minimum_grade_credit' cannot be set to None
         if minimum_grade_credit is not None:
             minimum_grade_credit = minimum_grade_credit  # lint-amnesty, pylint: disable=self-assigning-variable
 
-            descriptor.minimum_grade_credit = minimum_grade_credit
-            modulestore().update_item(descriptor, user.id)
+            course.minimum_grade_credit = minimum_grade_credit
+            modulestore().update_item(course, user.id)
 
     @staticmethod
     def delete_grader(course_key, index, user):
         """
         Delete the grader of the given type from the given course.
         """
-        descriptor = modulestore().get_course(course_key)
+        course = modulestore().get_course(course_key)
 
         index = int(index)
-        if index < len(descriptor.raw_grader):
-            del descriptor.raw_grader[index]
+        if index < len(course.raw_grader):
+            del course.raw_grader[index]
             # force propagation to definition
-            descriptor.raw_grader = descriptor.raw_grader
+            course.raw_grader = course.raw_grader
 
-        modulestore().update_item(descriptor, user.id)
+        modulestore().update_item(course, user.id)
         _grading_event_and_signal(course_key, user.id)
 
     @staticmethod
@@ -260,37 +260,37 @@ class CourseGradingModel:
         """
         Delete the course's grace period.
         """
-        descriptor = modulestore().get_course(course_key)
+        course = modulestore().get_course(course_key)
 
-        del descriptor.graceperiod
+        del course.graceperiod
 
-        modulestore().update_item(descriptor, user.id)
+        modulestore().update_item(course, user.id)
 
     @staticmethod
     def get_section_grader_type(location):
-        descriptor = modulestore().get_item(location)
+        block = modulestore().get_item(location)
         return {
-            "graderType": descriptor.format if descriptor.format is not None else 'notgraded',
+            "graderType": block.format if block.format is not None else 'notgraded',
             "location": str(location),
         }
 
     @staticmethod
-    def update_section_grader_type(descriptor, grader_type, user):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def update_section_grader_type(block, grader_type, user):  # lint-amnesty, pylint: disable=missing-function-docstring
         if grader_type is not None and grader_type != 'notgraded':
-            descriptor.format = grader_type
-            descriptor.graded = True
+            block.format = grader_type
+            block.graded = True
         else:
-            del descriptor.format
-            del descriptor.graded
+            del block.format
+            del block.graded
 
-        modulestore().update_item(descriptor, user.id)
-        _grading_event_and_signal(descriptor.location.course_key, user.id)
+        modulestore().update_item(block, user.id)
+        _grading_event_and_signal(block.location.course_key, user.id)
         return {'graderType': grader_type}
 
     @staticmethod
-    def convert_set_grace_period(descriptor):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def convert_set_grace_period(course):  # lint-amnesty, pylint: disable=missing-function-docstring
         # 5 hours 59 minutes 59 seconds => converted to iso format
-        rawgrace = descriptor.graceperiod
+        rawgrace = course.graceperiod
         if rawgrace:
             hours_from_days = rawgrace.days * 24
             seconds = rawgrace.seconds

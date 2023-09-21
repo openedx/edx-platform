@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from openedx.core.djangoapps.schedules.content_highlights import (
     course_has_highlights_from_store,
@@ -36,7 +36,7 @@ class TestContentHighlights(ModuleStoreTestCase):  # lint-amnesty, pylint: disab
         CourseEnrollment.enroll(self.user, self.course_key)
 
     def _create_chapter(self, **kwargs):
-        ItemFactory.create(
+        BlockFactory.create(
             parent=self.course,
             category='chapter',
             **kwargs
@@ -161,9 +161,9 @@ class TestContentHighlights(ModuleStoreTestCase):  # lint-amnesty, pylint: disab
         with pytest.raises(CourseUpdateDoesNotExist):
             get_next_section_highlights(self.user, self.course_key, two_days_ago, six_days.date())
 
-    @patch('lms.djangoapps.courseware.module_render.get_module_for_descriptor')
-    def test_get_highlights_without_module(self, mock_get_module):
-        mock_get_module.return_value = None
+    @patch('lms.djangoapps.courseware.block_render.get_block_for_descriptor')
+    def test_get_highlights_without_block(self, mock_get_block):
+        mock_get_block.return_value = None
 
         with self.store.bulk_operations(self.course_key):
             self._create_chapter(highlights=['Test highlight'])

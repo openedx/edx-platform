@@ -2,12 +2,11 @@
 Tests for experimentation views
 """
 
-
-import unittest
 from unittest.mock import patch
 
 import six.moves.urllib.parse
 from datetime import timedelta
+import django
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
 from django.test.utils import override_settings
@@ -20,6 +19,7 @@ from lms.djangoapps.course_blocks.transformers.tests.helpers import ModuleStoreT
 from lms.djangoapps.experiments.factories import ExperimentDataFactory, ExperimentKeyValueFactory
 from lms.djangoapps.experiments.models import ExperimentData  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.experiments.serializers import ExperimentDataSerializer
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 CROSS_DOMAIN_REFERER = 'https://ecommerce.edx.org'
@@ -167,6 +167,13 @@ class ExperimentDataViewSetTests(APITestCase, ModuleStoreTestCase):  # lint-amne
         response = self.client.patch(url, data)
         assert response.status_code == 404
 
+    def test_loads_valid_csrf_trusted_origins_list(self):
+        """checking CSRF_TRUSTED_ORIGINS here. in django4.2 they will require schemes"""
+        if django.VERSION[0] < 4:  # for greater than django 3.2 use schemes.
+            assert settings.CSRF_TRUSTED_ORIGINS == ['.example.com']
+        else:
+            assert settings.CSRF_TRUSTED_ORIGINS == ['https://*.example.com']
+
 
 def cross_domain_config(func):
     """Decorator for configuring a cross-domain request. """
@@ -189,7 +196,7 @@ def cross_domain_config(func):
     )
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class ExperimentCrossDomainTests(APITestCase):
     """Tests for handling cross-domain requests"""
 

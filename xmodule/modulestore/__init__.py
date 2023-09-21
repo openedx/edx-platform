@@ -784,7 +784,7 @@ class ModuleStoreRead(ModuleStoreAssetBase, metaclass=ABCMeta):
         usage_key: A :class:`.UsageKey` subclass instance
 
         depth (int): An argument that some module stores may use to prefetch
-            descendents of the queried modules for more efficient results later
+            descendents of the queried blocks for more efficient results later
             in the request. The depth is counted in the number of calls to
             get_children() to cache. None indicates to cache all descendents
         """
@@ -922,7 +922,7 @@ class ModuleStoreRead(ModuleStoreAssetBase, metaclass=ABCMeta):
     def get_course(self, course_id, depth=0, **kwargs):
         '''
         Look for a specific course by its id (:class:`CourseKey`).
-        Returns the course descriptor, or None if not found.
+        Returns the course block, or None if not found.
         '''
         pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
@@ -1271,7 +1271,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         result = defaultdict(dict)
         if fields is None:
             return result
-        classes = XBlock.load_class(category)
+        classes = XBlock.load_class(category, default=self.default_class)
         cls = self.mixologist.mix(classes)
         for field_name, value in fields.items():
             field = getattr(cls, field_name)
@@ -1283,11 +1283,11 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         Creates any necessary other things for the course as a side effect and doesn't return
         anything useful. The real subclass should call this before it returns the course.
         """
-        # clone a default 'about' overview module as well
+        # clone a default 'about' overview block as well
         about_location = self.make_course_key(org, course, run).make_usage_key('about', 'overview')
 
-        about_descriptor = XBlock.load_class('about')
-        overview_template = about_descriptor.get_template('overview.yaml')
+        about_block = XBlock.load_class('about')
+        overview_template = about_block.get_template('overview.yaml')
         self.create_item(
             user_id,
             about_location.course_key,
@@ -1386,10 +1386,3 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         """
         if self.signal_handler:
             self.signal_handler.send("item_deleted", usage_key=usage_key, user_id=user_id)
-
-
-def only_xmodules(identifier, entry_points):
-    """Only use entry_points that are supplied by the xmodule package"""
-    from_xmodule = [entry_point for entry_point in entry_points if entry_point.dist.key == 'xmodule']
-
-    return default_select(identifier, from_xmodule)

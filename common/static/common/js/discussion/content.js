@@ -200,15 +200,15 @@
                 user = DiscussionUtil.getUser();
                 flaggers = this.get('abuse_flaggers');
                 return user && (
-                    (__indexOf.call(flaggers, user.id) >= 0) ||
-                    (DiscussionUtil.isPrivilegedUser(user.id) && flaggers.length > 0)
+                    (__indexOf.call(flaggers, user.id) >= 0)
+                    || (DiscussionUtil.isPrivilegedUser(user.id) && flaggers.length > 0)
                 );
             };
 
             Content.prototype.incrementVote = function(increment) {
                 var newVotes;
                 newVotes = _.clone(this.get('votes'));
-                newVotes.up_count = newVotes.up_count + increment;
+                newVotes.up_count += increment;
                 return this.set('votes', newVotes);
             };
 
@@ -379,6 +379,7 @@
                 var count;
                 count = 0;
                 this.get('comments').each(function(comment) {
+                    // eslint-disable-next-line no-return-assign
                     return count += comment.getCommentsCount() + 1;
                 });
                 return count;
@@ -388,10 +389,10 @@
                 var user_id;
                 user_id = window.user.get('id');
                 return user_id && (
-                    DiscussionUtil.isPrivilegedUser(user_id) ||
-                    (
-                        this.get('thread').get('thread_type') === 'question' &&
-                        this.get('thread').get('user_id') === user_id
+                    DiscussionUtil.isPrivilegedUser(user_id)
+                    || (
+                        this.get('thread').get('thread_type') === 'question'
+                        && this.get('thread').get('user_id') === user_id
                     )
                 );
             };

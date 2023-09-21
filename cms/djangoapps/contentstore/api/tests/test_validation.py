@@ -10,7 +10,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory
@@ -57,11 +57,11 @@ class CourseValidationViewTest(SharedModuleStoreTestCase, APITestCase):
             fields=dict(data="<ol><li><h2>Date</h2>Hello world!</li></ol>"),
         )
 
-        section = ItemFactory.create(
+        section = BlockFactory.create(
             parent_location=course.location,
             category="chapter",
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=section.location,
             category="sequential",
         )

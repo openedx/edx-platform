@@ -5,10 +5,6 @@ of email feature flag, and that the view is conditionally available when
 Course Auth is turned on.
 """
 
-
-import unittest
-
-from django.conf import settings
 from django.urls import reverse
 
 # This import is for an lms djangoapp.
@@ -16,11 +12,12 @@ from django.urls import reverse
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models import BulkEmailFlag, CourseAuthorization
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestStudentDashboardEmailView(SharedModuleStoreTestCase):
     """
     Check for email view displayed with flag

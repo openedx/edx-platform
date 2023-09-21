@@ -8,7 +8,7 @@ from django.test import RequestFactory
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import CourseUserType, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from ..plugins import CourseBookmarksTool
 
@@ -29,9 +29,9 @@ class TestCourseBookmarksTool(SharedModuleStoreTestCase):
                 cls.course = CourseFactory.create()
                 with cls.store.bulk_operations(cls.course.id):
                     # Create a basic course structure
-                    chapter = ItemFactory.create(category='chapter', parent_location=cls.course.location)
-                    section = ItemFactory.create(category='sequential', parent_location=chapter.location)
-                    ItemFactory.create(category='vertical', parent_location=section.location)
+                    chapter = BlockFactory.create(category='chapter', parent_location=cls.course.location)
+                    section = BlockFactory.create(category='sequential', parent_location=chapter.location)
+                    BlockFactory.create(category='vertical', parent_location=section.location)
 
     @ddt.data(
         [CourseUserType.ANONYMOUS, False],

@@ -49,6 +49,11 @@ LMS_ROOT_URL = f'http://{LMS_BASE}'
 FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
 FRONTEND_REGISTER_URL = LMS_ROOT_URL + '/register'
+
+################################## Video Pipeline Settings #########################
+
+FEATURES['ENABLE_VIDEO_UPLOAD_PIPELINE'] = True
+
 ########################### PIPELINE #################################
 
 # Skip packaging and optimization in development
@@ -99,7 +104,6 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.request.RequestPanel',
     'debug_toolbar.panels.sql.SQLPanel',
     'debug_toolbar.panels.signals.SignalsPanel',
-    'debug_toolbar.panels.logging.LoggingPanel',
     'debug_toolbar.panels.profiling.ProfilingPanel',
     'debug_toolbar.panels.history.HistoryPanel',
 )
@@ -141,10 +145,18 @@ FEATURES['LICENSING'] = True
 XBLOCK_SETTINGS.update({'VideoBlock': {'licensing_enabled': True}})
 
 ################################ SEARCH INDEX ################################
-FEATURES['ENABLE_COURSEWARE_INDEX'] = False
+FEATURES['ENABLE_COURSEWARE_INDEX'] = True
 FEATURES['ENABLE_LIBRARY_INDEX'] = False
 FEATURES['ENABLE_CONTENT_LIBRARY_INDEX'] = False
 SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
+
+ELASTIC_SEARCH_CONFIG = [
+    {
+        'use_ssl': False,
+        'host': 'edx.devstack.elasticsearch710',
+        'port': 9200
+    }
+]
 
 ################################ COURSE DISCUSSIONS ###########################
 FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
@@ -156,7 +168,10 @@ CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
 FEATURES['CERTIFICATES_HTML_VIEW'] = True
 
 ########################## AUTHOR PERMISSION #######################
-FEATURES['ENABLE_CREATOR_GROUP'] = False
+FEATURES['ENABLE_CREATOR_GROUP'] = True
+
+########################## Library creation organizations restriction #######################
+FEATURES['ENABLE_ORGANIZATION_STAFF_ACCESS_FOR_CONTENT_LIBRARIES'] = True
 
 ################### FRONTEND APPLICATION PUBLISHER URL ###################
 FEATURES['FRONTEND_APP_PUBLISHER_URL'] = 'http://localhost:18400'
@@ -193,21 +208,6 @@ JWT_AUTH.update({
         '48BUI5VcVtUWIPqzRK_LDSlZYh9D0YFL0ZTxIrlb6Tn3Xz7pYvpIAeYuQv3_H5p8tbz7Fb8r63c1828wXPITVTv8f7oxx5W3lFFgpFAyYMmROC'
         '4Ee9qG5T38LFe8_oAuFCEntimWxN9F3P-FJQy43TL7wG54WodgiM0EgzkeLr5K6cDnyckWjTuZbWI-4ffcTgTZsL_Kq1owa_J2ngEfxMCObnzG'
         'y5ZLcTUomo4rZLjghVpq6KZxfS6I1Vz79ZsMVUWEdXOYePCKKsrQG20ogQEkmTf9FT_SouC6jPcHLXw"}]}'
-    ),
-
-    # TODO Remove this once CMS redirects to LMS for Login
-    'JWT_PRIVATE_SIGNING_JWK': (
-        '{"e": "AQAB", "d": "RQ6k4NpRU3RB2lhwCbQ452W86bMMQiPsa7EJiFJUg-qBJthN0FMNQVbArtrCQ0xA1BdnQHThFiUnHcXfsTZUwmwvTu'
-        'iqEGR_MI6aI7h5D8vRj_5x-pxOz-0MCB8TY8dcuK9FkljmgtYvV9flVzCk_uUb3ZJIBVyIW8En7n7nV7JXpS9zey1yVLld2AbRG6W5--Pgqr9J'
-        'CI5-bLdc2otCLuen2sKyuUDHO5NIj30qGTaKUL-OW_PgVmxrwKwccF3w5uGNEvMQ-IcicosCOvzBwdIm1uhdm9rnHU1-fXz8VLRHNhGVv7z6mo'
-        'ghjNI0_u4smhUkEsYeshPv7RQEWTdkOQ", "n": "smKFSYowG6nNUAdeqH1jQQnH1PmIHphzBmwJ5vRf1vu48BUI5VcVtUWIPqzRK_LDSlZYh'
-        '9D0YFL0ZTxIrlb6Tn3Xz7pYvpIAeYuQv3_H5p8tbz7Fb8r63c1828wXPITVTv8f7oxx5W3lFFgpFAyYMmROC4Ee9qG5T38LFe8_oAuFCEntimW'
-        'xN9F3P-FJQy43TL7wG54WodgiM0EgzkeLr5K6cDnyckWjTuZbWI-4ffcTgTZsL_Kq1owa_J2ngEfxMCObnzGy5ZLcTUomo4rZLjghVpq6KZxfS'
-        '6I1Vz79ZsMVUWEdXOYePCKKsrQG20ogQEkmTf9FT_SouC6jPcHLXw", "q": "7KWj7l-ZkfCElyfvwsl7kiosvi-ppOO7Imsv90cribf88Dex'
-        'cO67xdMPesjM9Nh5X209IT-TzbsOtVTXSQyEsy42NY72WETnd1_nAGLAmfxGdo8VV4ZDnRsA8N8POnWjRDwYlVBUEEeuT_MtMWzwIKU94bzkWV'
-        'nHCY5vbhBYLeM", "p": "wPkfnjavNV1Hqb5Qqj2crBS9HQS6GDQIZ7WF9hlBb2ofDNe2K2dunddFqCOdvLXr7ydRcK51ZwSeHjcjgD1aJkHA'
-        '9i1zqyboxgd0uAbxVDo6ohnlVqYLtap2tXXcavKm4C9MTpob_rk6FBfEuq4uSsuxFvCER4yG3CYBBa4gZVU", "kid": "devstack_key", "'
-        'kty": "RSA"}'
     ),
 })
 
@@ -301,10 +301,23 @@ CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:18150'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 
 #################### Event bus backend ########################
-EVENT_BUS_PRODUCER = 'edx_event_bus_kafka.create_producer'
-EVENT_BUS_KAFKA_SCHEMA_REGISTRY_URL = 'http://edx.devstack.schema-registry:8081'
-EVENT_BUS_KAFKA_BOOTSTRAP_SERVERS = 'edx.devstack.kafka:29092'
+# .. toggle_name: FEATURES['ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS']
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Temporary configuration which enables sending xblock events over the event bus.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2023-02-21
+# .. toggle_warning: For consistency in user experience, keep the value in sync with the setting of the same name
+#   in the LMS and CMS.
+# .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/31813'
+FEATURES['ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS'] = True
+FEATURES['ENABLE_SEND_ENROLLMENT_EVENTS_OVER_BUS'] = True
+EVENT_BUS_PRODUCER = 'edx_event_bus_redis.create_producer'
+EVENT_BUS_REDIS_CONNECTION_URL = 'redis://:password@edx.devstack.redis:6379/'
 EVENT_BUS_TOPIC_PREFIX = 'dev'
+EVENT_BUS_CONSUMER = 'edx_event_bus_redis.RedisEventConsumer'
+EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC = 'course-authoring-xblock-lifecycle'
+EVENT_BUS_ENROLLMENT_LIFECYCLE_TOPIC = 'course-authoring-enrollment-lifecycle'
 
 ################# New settings must go ABOVE this line #################
 ########################################################################

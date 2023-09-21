@@ -47,7 +47,7 @@ class DarkLangConfig(ConfigurationModel):
     @property
     def beta_languages_list(self):
         """
-        ``released_languages`` as a list of language codes.
+        ``beta_languages`` as a list of language codes.
 
         Example: ['it', 'de-at', 'es', 'pt-br']
         """

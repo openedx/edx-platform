@@ -2,6 +2,7 @@ define([
     'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/views/notes_factory'
 ], function($, _, Annotator, NotesFactory) {
     'use strict';
+
     describe('EdxNotes Scroll Plugin', function() {
         var annotators, highlights;
 

@@ -6,15 +6,18 @@ The ``xmodule`` folder contains a variety of old-yet-important functionality cor
 * the ModuleStore, edx-platform's "Version 1" learning content storage backend;
 * an XBlock Runtime implementation for ModuleStore-backed content;
 * the "partitions" framework for differentiated XBlock content;
-* implementations for the "stuctural" XBlocks: ``course``, ``chapter``, and ``sequential``; and
-* the implementations of several different content-level XBlocks, such as ``problem`` and ``html``.
+* implementations for the "stuctural" XBlocks: ``course``, ``chapter``, and ``sequential``;
+* the implementations of several different built-in content-level XBlocks, such as ``problem`` and ``html``; and
+* `assets for those built-in XBlocks`_.
+
+.. _assets for those built-in XBlocks: https://github.com/openedx/edx-platform/tree/master/xmodule/assets#readme
 
 Historical Context
 ******************
 
 "XModule" was the original content framework for edx-platform, which gives the folder its current name.
 XModules rendered specific course run content types to users for both authoring and learning.
-For instance, there was an XModule for Videos, another for HTML snippets, and another for Sequences. 
+For instance, there was an XModule for Videos, another for HTML snippets, and another for Sequences.
 
 XModule was succeeded in ~2013 by the "XBlock" framework, which served the same purpose, but put additional focus into flexibility and modularity.
 XBlock allows new content types to be created by anyone, completely external the edx-platform repository.
@@ -47,7 +50,7 @@ To help with this direction, please **do not add new functionality to this direc
 
 .. _Blockstore: https://github.com/openedx/blockstore/
 .. _edx-platform XBlock runtime: https://github.com/openedx/edx-platform/tree/master/openedx/core/djangoapps/xblock
-.. _openedx-learning: https://github.com/openedx/openedx-learning 
+.. _openedx-learning: https://github.com/openedx/openedx-learning
 .. _xblock-drag-and-drop-v2: https://github.com/openedx/xblock-drag-and-drop-v2
 .. _the forums: https://discuss.openedx.org
 

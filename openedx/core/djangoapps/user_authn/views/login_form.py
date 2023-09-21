@@ -12,7 +12,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
-from ratelimit.decorators import ratelimit
+from django_ratelimit.decorators import ratelimit
 
 from common.djangoapps import third_party_auth
 from common.djangoapps.edxmako.shortcuts import render_to_response
@@ -258,6 +258,7 @@ def login_and_registration_form(request, initial_mode="login"):
             'password_reset_form_desc': json.loads(form_descriptions['password_reset']),
             'account_creation_allowed': configuration_helpers.get_value(
                 'ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION', True)),
+            'register_links_allowed': settings.FEATURES.get('SHOW_REGISTRATION_LINKS', True),
             'is_account_recovery_feature_enabled': is_secondary_email_feature_enabled(),
             'enterprise_slug_login_url': get_enterprise_slug_login_url(),
             'is_enterprise_enable': enterprise_enabled(),

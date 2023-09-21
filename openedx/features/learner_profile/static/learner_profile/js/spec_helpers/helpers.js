@@ -150,8 +150,8 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     var expectPage = function(learnerProfileView, pageData) {
         var $badgeListContainer = $('#tabpanel-accomplishments');
         var index = $badgeListContainer.find('span.search-count').text().trim();
-        expect(index).toBe('Showing ' + (pageData.start + 1) + '-' + (pageData.start + pageData.results.length) +
-            ' out of ' + pageData.count + ' total');
+        expect(index).toBe('Showing ' + (pageData.start + 1) + '-' + (pageData.start + pageData.results.length)
+            + ' out of ' + pageData.count + ' total');
         expect($badgeListContainer.find('.current-page').text()).toBe('' + pageData.current_page);
         _.each(pageData.results, function(badge) {
             expect($('.badge-display:contains(' + badge.badge_class.display_name + ')').length).toBe(1);
@@ -161,8 +161,8 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     var expectBadgeLoadingErrorIsRendered = function() {
         var errorMessage = $('.badge-set-display').text();
         expect(errorMessage).toBe(
-            'Your request could not be completed. Reload the page and try again. If the issue persists, click the ' +
-            'Help tab to report the problem.'
+            'Your request could not be completed. Reload the page and try again. If the issue persists, click the '
+            + 'Help tab to report the problem.'
         );
     };
 

@@ -44,10 +44,10 @@ _split = _split || (function(undef) {
             return nativeSplit.call(str, separator, limit);
         }
         var output = [],
-            flags = (separator.ignoreCase ? 'i' : '') +
-                    (separator.multiline ? 'm' : '') +
-                    (separator.extended ? 'x' : '') + // Proposed for ES6
-                    (separator.sticky ? 'y' : ''), // Firefox 3+
+            flags = (separator.ignoreCase ? 'i' : '')
+                    + (separator.multiline ? 'm' : '')
+                    + (separator.extended ? 'x' : '') // Proposed for ES6
+                    + (separator.sticky ? 'y' : ''), // Firefox 3+
             lastLastIndex = 0,
             // Make `global` and avoid `lastIndex` issues by working with a copy
             separator = new RegExp(separator.source, flags + 'g'),
@@ -64,9 +64,12 @@ _split = _split || (function(undef) {
          * If negative number: 4294967296 - Math.floor(Math.abs(limit))
          * If other: Type-convert, then use the above rules
          */
-        limit = limit === undef ?
-            -1 >>> 0 : // Math.pow(2, 32) - 1
-            limit >>> 0; // ToUint32(limit)
+        limit = limit === undef
+            // eslint-disable-next-line no-bitwise
+            ? -1 >>> 0 // Math.pow(2, 32) - 1
+            // eslint-disable-next-line no-bitwise
+            : limit >>> 0; // ToUint32(limit)
+        // eslint-disable-next-line no-cond-assign
         while (match = separator.exec(str)) {
             // `separator.lastIndex` is not reliable cross-browser
             lastIndex = match.index + match[0].length;
@@ -75,6 +78,7 @@ _split = _split || (function(undef) {
                 // Fix browsers whose `exec` methods don't consistently return `undefined` for
                 // nonparticipating capturing groups
                 if (!compliantExecNpcg && match.length > 1) {
+                    // eslint-disable-next-line no-loop-func
                     match[0].replace(separator2, function() {
                         for (var i = 1; i < arguments.length - 2; i++) {
                             if (arguments[i] === undef) {
@@ -107,10 +111,10 @@ _split = _split || (function(undef) {
     };
 
     // For convenience
+    // eslint-disable-next-line no-extend-native
     String.prototype.split = function(separator, limit) {
         return self(this, separator, limit);
     };
 
     return self;
 }());
-

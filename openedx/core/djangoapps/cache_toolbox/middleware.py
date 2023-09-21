@@ -52,6 +52,14 @@ However, this has two main disadvantages:
    compounded by most projects wishing to avoid expiring session data as long
    as possible (in addition to storing sessions in persistent stores).
 
+Dependency with SafeSessionMiddleware
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+CacheBackedAuthenticationMiddleware middleware logs out the user if the
+session hash is changed due to password change. It flushes the session
+and mark cookies for deletion in request which are then deleted in the
+process_response of SafeSessionMiddleware.
+
 Usage
 ~~~~~
 
@@ -88,7 +96,7 @@ from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pyli
 from django.utils.crypto import constant_time_compare
 from django.utils.deprecation import MiddlewareMixin
 
-from openedx.core.djangoapps.safe_sessions.middleware import SafeSessionMiddleware
+from openedx.core.djangoapps.safe_sessions.middleware import SafeSessionMiddleware, _mark_cookie_for_deletion
 
 from .model import cache_model
 
@@ -138,3 +146,4 @@ class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware, MiddlewareMi
                 # change. Log the user out.
                 request.session.flush()
                 request.user = AnonymousUser()
+                _mark_cookie_for_deletion(request)

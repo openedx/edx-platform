@@ -10,7 +10,7 @@ from openedx.core.djangoapps.content.learning_sequences.api import get_course_ou
 from openedx.core.djangoapps.content.learning_sequences.data import CourseOutlineData, ExamData, VisibilityData
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..outlines import get_outline_from_modulestore
 
@@ -135,18 +135,18 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
     def test_multiple_sections(self):
         """Make sure sequences go into the right places."""
         with self.store.bulk_operations(self.course_key):
-            section_1 = ItemFactory.create(
+            section_1 = BlockFactory.create(
                 parent=self.draft_course,
                 category='chapter',
                 display_name="Section 1 - Three Sequences",
             )
-            ItemFactory.create(
+            BlockFactory.create(
                 parent=self.draft_course,
                 category='chapter',
                 display_name="Section 2 - Empty",
             )
             for i in range(3):
-                ItemFactory.create(
+                BlockFactory.create(
                     parent=section_1,
                     category='sequential',
                     display_name=f"Seq_1_{i}",
@@ -163,23 +163,23 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
 
     def test_duplicate_children(self):
         with self.store.bulk_operations(self.course_key):
-            section_1 = ItemFactory.create(
+            section_1 = BlockFactory.create(
                 parent=self.draft_course,
                 category='chapter',
                 display_name="Section",
             )
-            seq = ItemFactory.create(
+            seq = BlockFactory.create(
                 parent=section_1,
                 category='sequential',
                 display_name="standard_seq"
             )
-            section_2 = ItemFactory.create(
+            section_2 = BlockFactory.create(
                 parent=self.draft_course,
                 category='chapter',
                 display_name="Section 2",
                 children=[seq.location]
             )
-            section_3 = ItemFactory.create(
+            section_3 = BlockFactory.create(
                 parent=self.draft_course,
                 category='chapter',
                 display_name="Section 3",
@@ -214,42 +214,42 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
         """
         # Course -> Section -> Unit (No Sequence)
         with self.store.bulk_operations(self.course_key):
-            section_1 = ItemFactory.create(
+            section_1 = BlockFactory.create(
                 parent=self.draft_course,
                 category='chapter',
                 display_name="Section",
             )
             # This Unit should be skipped
-            ItemFactory.create(
+            BlockFactory.create(
                 parent=section_1,
                 category='vertical',
                 display_name="u1"
             )
-            ItemFactory.create(
+            BlockFactory.create(
                 parent=section_1,
                 category='sequential',
                 display_name="standard_seq"
             )
-            ItemFactory.create(
+            BlockFactory.create(
                 parent=section_1,
                 category='sequential',
                 display_name="pset_seq"
             )
-            ItemFactory.create(
+            BlockFactory.create(
                 parent=section_1,
                 category='sequential',
                 display_name="video_seq"
             )
 
             # This should work fine
-            section_2 = ItemFactory.create(
+            section_2 = BlockFactory.create(
                 parent=self.draft_course,
                 category='chapter',
                 display_name="Section 2",
             )
 
             # Second error message here
-            ItemFactory.create(
+            BlockFactory.create(
                 parent=section_2,
                 category='vertical',
                 display_name="u2"
@@ -277,12 +277,12 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
         """
         # Course -> Sequence (No Section)
         with self.store.bulk_operations(self.course_key):
-            seq = ItemFactory.create(
+            seq = BlockFactory.create(
                 parent=self.draft_course,
                 category='sequential',
                 display_name="Sequence",
             )
-            ItemFactory.create(
+            BlockFactory.create(
                 parent=seq,
                 category='vertical',
                 display_name="Unit",
@@ -301,12 +301,12 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
         When display_names are empty, it should fallback on url_names.
         """
         with self.store.bulk_operations(self.course_key):
-            section = ItemFactory.create(
+            section = BlockFactory.create(
                 parent=self.draft_course,
                 category='chapter',
                 display_name=None,
             )
-            sequence = ItemFactory.create(
+            sequence = BlockFactory.create(
                 parent=section,
                 category='sequential',
                 display_name=None,
@@ -324,7 +324,7 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
         seen by any student.
         """
         with self.store.bulk_operations(self.course_key):
-            section = ItemFactory.create(
+            section = BlockFactory.create(
                 parent=self.draft_course,
                 category='chapter',
                 display_name='Ch 1',
@@ -334,7 +334,7 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
                     51: [],
                 }
             )
-            ItemFactory.create(
+            BlockFactory.create(
                 parent=section,
                 category='sequential',
                 display_name='Seq 1',
@@ -353,14 +353,14 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
     def test_bubbled_up_user_partition_groups_no_children(self):
         """Testing empty case to make sure bubble-up code doesn't break."""
         with self.store.bulk_operations(self.course_key):
-            section = ItemFactory.create(
+            section = BlockFactory.create(
                 parent=self.draft_course,
                 category='chapter',
                 display_name='Ch 0',
             )
 
             # Bubble up with no children (nothing happens)
-            ItemFactory.create(
+            BlockFactory.create(
                 parent=section,
                 category='sequential',
                 display_name='Seq 0',
@@ -374,20 +374,20 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
     def test_bubbled_up_user_partition_groups_one_child(self):
         """Group settings should bubble up from Unit to Seq. if only one unit"""
         with self.store.bulk_operations(self.course_key):
-            section = ItemFactory.create(
+            section = BlockFactory.create(
                 parent=self.draft_course,
                 category='chapter',
                 display_name='Ch 0',
             )
 
             # Bubble up with 1 child (grabs the setting from child)
-            seq_1 = ItemFactory.create(
+            seq_1 = BlockFactory.create(
                 parent=section,
                 category='sequential',
                 display_name='Seq 1',
                 group_access={}
             )
-            ItemFactory.create(
+            BlockFactory.create(
                 parent=seq_1,
                 category='vertical',
                 display_name='Single Vertical',
@@ -405,27 +405,27 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
     def test_bubbled_up_user_partition_groups_multiple_children(self):
         """If all Units have the same group_access, bubble up to Sequence."""
         with self.store.bulk_operations(self.course_key):
-            section = ItemFactory.create(
+            section = BlockFactory.create(
                 parent=self.draft_course,
                 category='chapter',
                 display_name='Ch 0',
             )
 
             # Bubble up with n children, all matching for one group
-            seq_n = ItemFactory.create(
+            seq_n = BlockFactory.create(
                 parent=section,
                 category='sequential',
                 display_name='Seq N',
                 group_access={}
             )
             for i in range(4):
-                ItemFactory.create(
+                BlockFactory.create(
                     parent=seq_n,
                     category='vertical',
                     display_name=f'vertical {i}',
                     group_access={50: [3, 4], 51: [i]}  # Only 50 should get bubbled up
                 )
-            ItemFactory.create(
+            BlockFactory.create(
                 parent=seq_n,
                 category='vertical',
                 display_name='vertical 5',
@@ -440,20 +440,20 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
     def test_not_bubbled_up(self):
         """Don't bubble up from Unit if Seq has a conflicting group_access."""
         with self.store.bulk_operations(self.course_key):
-            section = ItemFactory.create(
+            section = BlockFactory.create(
                 parent=self.draft_course,
                 category='chapter',
                 display_name='Ch 0',
             )
 
             # Bubble up with 1 child (grabs the setting from child)
-            seq_1 = ItemFactory.create(
+            seq_1 = BlockFactory.create(
                 parent=section,
                 category='sequential',
                 display_name='Seq 1',
                 group_access={50: [3, 4]}
             )
-            ItemFactory.create(
+            BlockFactory.create(
                 parent=seq_1,
                 category='vertical',
                 display_name='Single Vertical',
@@ -493,12 +493,12 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
         over."
         """
         with self.store.bulk_operations(self.course_key):
-            section = ItemFactory.create(
+            section = BlockFactory.create(
                 parent=self.draft_course,
                 category='chapter',
                 display_name="Generated Section",
             )
-            sequence = ItemFactory.create(
+            sequence = BlockFactory.create(
                 parent=section,
                 category='sequential',
                 **kwargs,
@@ -526,17 +526,17 @@ class OutlineFromModuleStoreTaskTestCase(ModuleStoreTestCase):
             run=course_key.run,
             default_store=ModuleStoreEnum.Type.split,
         )
-        section = ItemFactory.create(
+        section = BlockFactory.create(
             parent_location=course.location,
             category="chapter",
             display_name="First Section"
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=section.location,
             category="sequential",
             display_name="First Sequence"
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=section.location,
             category="sequential",
             display_name="Second Sequence"

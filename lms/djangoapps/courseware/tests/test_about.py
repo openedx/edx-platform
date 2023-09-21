@@ -22,7 +22,7 @@ from xmodule.course_block import (
     COURSE_VISIBILITY_PUBLIC_OUTLINE,
 )
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.modulestore.tests.utils import TEST_DATA_DIR
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
@@ -397,7 +397,7 @@ class AboutSidebarHTMLTestCase(SharedModuleStoreTestCase):
     def test_html_sidebar_enabled(self, itemfactory_display_name, itemfactory_data, waffle_switch_value):
         with override_waffle_switch(ENABLE_COURSE_ABOUT_SIDEBAR_HTML, active=waffle_switch_value):
             if itemfactory_display_name:
-                ItemFactory.create(
+                BlockFactory.create(
                     category="about",
                     parent_location=self.course.location,
                     display_name=itemfactory_display_name,

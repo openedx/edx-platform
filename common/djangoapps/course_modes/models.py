@@ -35,6 +35,8 @@ Mode = namedtuple('Mode',
                       'expiration_datetime',
                       'description',
                       'sku',
+                      'android_sku',
+                      'ios_sku',
                       'bulk_sku',
                   ])
 
@@ -87,7 +89,14 @@ class CourseMode(models.Model):
     # The system prefers to set this automatically based on default settings. But
     # if the field is set manually we want a way to indicate that so we don't
     # overwrite the manual setting of the field.
-    expiration_datetime_is_explicit = models.BooleanField(default=False)
+    expiration_datetime_is_explicit = models.BooleanField(
+        default=False,
+        verbose_name=_("Lock upgrade deadline date"),
+        help_text=_(
+            "OPTIONAL: Set to True to lock in the explicitly defined upgrade deadline date. "
+            "Set to False if there is no upgrade deadline or to use the default upgrade deadline."
+        )
+    )
 
     # DEPRECATED: the `expiration_date` field has been replaced by `expiration_datetime`
     expiration_date = models.DateField(default=None, null=True, blank=True)
@@ -110,6 +119,30 @@ class CourseMode(models.Model):
         verbose_name="SKU",
         help_text=_(
             "OPTIONAL: This is the SKU (stock keeping unit) of this mode in the external ecommerce service.  "
+            "Leave this blank if the course has not yet been migrated to the ecommerce service."
+        )
+    )
+
+    # Optional Android SKU for integration with mobile and the ecommerce service
+    android_sku = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name="Android SKU",
+        help_text=_(
+            "OPTIONAL: This is the Android SKU registered on play store for this mode of the course. "
+            "Leave this blank if the course has not yet been migrated to the ecommerce service."
+        )
+    )
+
+    # Optional iOS SKU for integration with mobile and the ecommerce service
+    ios_sku = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name="iOS SKU",
+        help_text=_(
+            "OPTIONAL: This is the iOS SKU registered on app store for this mode of the course.  "
             "Leave this blank if the course has not yet been migrated to the ecommerce service."
         )
     )
@@ -150,6 +183,8 @@ class CourseMode(models.Model):
         settings.COURSE_MODE_DEFAULTS['expiration_datetime'],
         settings.COURSE_MODE_DEFAULTS['description'],
         settings.COURSE_MODE_DEFAULTS['sku'],
+        settings.COURSE_MODE_DEFAULTS['android_sku'],
+        settings.COURSE_MODE_DEFAULTS['ios_sku'],
         settings.COURSE_MODE_DEFAULTS['bulk_sku'],
     )
     DEFAULT_MODE_SLUG = settings.COURSE_MODE_DEFAULTS['slug']
@@ -817,6 +852,8 @@ class CourseMode(models.Model):
             self.expiration_datetime,
             self.description,
             self.sku,
+            self.android_sku,
+            self.ios_sku,
             self.bulk_sku
         )
 

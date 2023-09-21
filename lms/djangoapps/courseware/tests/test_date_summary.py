@@ -14,7 +14,7 @@ from freezegun import freeze_time
 from pytz import utc
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -132,8 +132,8 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         now = datetime.now(utc)
         assignment_title_html = ['<a href=', '</a>']
         with self.store.bulk_operations(course.id):
-            section = ItemFactory.create(category='chapter', parent_location=course.location)
-            ItemFactory.create(
+            section = BlockFactory.create(category='chapter', parent_location=course.location)
+            BlockFactory.create(
                 category='sequential',
                 display_name='Released',
                 parent_location=section.location,
@@ -142,7 +142,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                 graded=True,
                 format='Homework',
             )
-            ItemFactory.create(
+            BlockFactory.create(
                 category='sequential',
                 display_name='Not released',
                 parent_location=section.location,
@@ -151,7 +151,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                 graded=True,
                 format='Homework',
             )
-            ItemFactory.create(
+            BlockFactory.create(
                 category='sequential',
                 display_name='Third nearest assignment',
                 parent_location=section.location,
@@ -160,7 +160,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                 graded=True,
                 format='Exam',
             )
-            ItemFactory.create(
+            BlockFactory.create(
                 category='sequential',
                 display_name='Past due date',
                 parent_location=section.location,
@@ -169,7 +169,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                 graded=True,
                 format='Exam',
             )
-            ItemFactory.create(
+            BlockFactory.create(
                 category='sequential',
                 display_name='Not returned since we do not get non-graded subsections',
                 parent_location=section.location,
@@ -177,7 +177,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                 due=now - timedelta(days=7),
                 graded=False,
             )
-            ItemFactory.create(
+            BlockFactory.create(
                 category='sequential',
                 display_name='No start date',
                 parent_location=section.location,
@@ -186,7 +186,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                 graded=True,
                 format='Speech',
             )
-            ItemFactory.create(
+            BlockFactory.create(
                 category='sequential',
                 # Setting display name to None should set the assignment title to 'Assignment'
                 display_name=None,
@@ -196,7 +196,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                 graded=True,
                 format=None,
             )
-            dummy_subsection = ItemFactory.create(category='sequential', graded=True, due=now + timedelta(days=11))
+            dummy_subsection = BlockFactory.create(category='sequential', graded=True, due=now + timedelta(days=11))
 
         # We are deleting this subsection right after creating it because we need to pass in a real
         # location object (dummy_subsection.location), but do not want this to exist inside of the modulestore
@@ -320,20 +320,20 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
         now = datetime.now(utc)
 
-        chapter = ItemFactory.create(
+        chapter = BlockFactory.create(
             parent=course,
             category="chapter",
             graded=True,
         )
-        section = ItemFactory.create(
+        section = BlockFactory.create(
             parent=chapter,
             category="sequential",
         )
-        vertical = ItemFactory.create(
+        vertical = BlockFactory.create(
             parent=section,
             category="vertical",
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent=vertical,
             category="openassessment",
             rubric_assessments=rubric_assessments,

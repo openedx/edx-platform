@@ -17,7 +17,7 @@ from common.djangoapps.student import views as student_views
 from common.djangoapps.util import views as util_views
 from lms.djangoapps.branding import views as branding_views
 from lms.djangoapps.courseware.masquerade import MasqueradeView
-from lms.djangoapps.courseware.module_render import (
+from lms.djangoapps.courseware.block_render import (
     handle_xblock_callback,
     handle_xblock_callback_noauth,
     xblock_view,
@@ -54,6 +54,7 @@ from openedx.features.enterprise_support.api import enterprise_enabled
 RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
 RENDER_XBLOCK_NAME = 'render_xblock'
 RENDER_VIDEO_XBLOCK_NAME = 'render_public_video_xblock'
+RENDER_VIDEO_XBLOCK_EMBED_NAME = 'render_public_video_xblock_embed'
 COURSE_PROGRESS_NAME = 'progress'
 
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
@@ -163,7 +164,7 @@ urlpatterns = [
                              namespace='catalog')),
 
     # Update session view
-    path('lang_pref/session_language', lang_pref_views.update_session_language, name='session_language'),
+    path('lang_pref/update_language', lang_pref_views.update_language, name='update_language'),
 
     # Multiple course modes and identity verification
     path(
@@ -198,6 +199,12 @@ urlpatterns = [
     # Learner Home
     path('api/learner_home/', include('lms.djangoapps.learner_home.urls', namespace='learner_home')),
 
+    # Learner Recommendations
+    path(
+        'api/learner_recommendations/',
+        include('lms.djangoapps.learner_recommendations.urls', namespace='learner_recommendations')
+    ),
+
     path(
         'api/experiments/',
         include(
@@ -207,10 +214,12 @@ urlpatterns = [
     ),
     path('api/discounts/', include(('openedx.features.discounts.urls', 'openedx.features.discounts'),
                                    namespace='api_discounts')),
-    path('403', handler403),
-    path('404', handler404),
-    path('429', handler429),
-    path('500', handler500),
+
+    # Provide URLs where we can see the rendered error pages without having to force an error.
+    path('403', handler403, name='render_403'),
+    path('404', handler404, name='render_404'),
+    path('429', handler429, name='render_429'),
+    path('500', handler500, name='render_500'),
 ]
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
@@ -320,10 +329,16 @@ urlpatterns += [
         name=RENDER_XBLOCK_NAME,
     ),
     re_path(
+        fr'^videos/embed/{settings.USAGE_KEY_PATTERN}$',
+        courseware_views.PublicVideoXBlockEmbedView.as_view(),
+        name=RENDER_VIDEO_XBLOCK_EMBED_NAME,
+    ),
+    re_path(
         fr'^videos/{settings.USAGE_KEY_PATTERN}$',
-        courseware_views.render_public_video_xblock,
+        courseware_views.PublicVideoXBlockView.as_view(),
         name=RENDER_VIDEO_XBLOCK_NAME,
     ),
+
 
     # xblock Resource URL
     re_path(
@@ -658,6 +673,12 @@ urlpatterns += [
     path(
         'u/',
         include('openedx.features.learner_profile.urls'),
+    ),
+
+    # Survey Report
+    re_path(
+        fr'^survey_report/',
+        include('openedx.features.survey_report.urls'),
     ),
 ]
 
@@ -1010,12 +1031,6 @@ if getattr(settings, 'PROVIDER_STATES_URL', None):
         )
     ]
 
-# save_for_later API urls
-if settings.ENABLE_SAVE_FOR_LATER:
-    urlpatterns += [
-        path('', include('lms.djangoapps.save_for_later.urls')),
-    ]
-
 # Enhanced Staff Grader (ESG) URLs
 urlpatterns += [
     path('api/ora_staff_grader/', include('lms.djangoapps.ora_staff_grader.urls', 'ora-staff-grader')),
@@ -1029,4 +1044,8 @@ urlpatterns += [
 # MFE API urls
 urlpatterns += [
     path('api/mfe_config/v1', include(('lms.djangoapps.mfe_config_api.urls', 'lms.djangoapps.mfe_config_api'), namespace='mfe_config_api'))
+]
+
+urlpatterns += [
+    path('api/notifications/', include('openedx.core.djangoapps.notifications.urls')),
 ]

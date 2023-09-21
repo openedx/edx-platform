@@ -12,4 +12,3 @@
         return AnimationUtil;
     }).call(this);
 }).call(this);
-

@@ -13,14 +13,14 @@ from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactor
 from openedx.core.lib.teams_config import TeamsConfig
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class ContentGroupTestCase(ModuleStoreTestCase):
     """
-    Sets up discussion modules visible to content groups 'Alpha' and
-    'Beta', as well as a module visible to all students.  Creates a
+    Sets up discussion blocks visible to content groups 'Alpha' and
+    'Beta', as well as a block visible to all students.  Creates a
     staff user, users with access to Alpha/Beta (by way of cohorts),
     and a non-cohorted user with no special access.
     """
@@ -99,21 +99,21 @@ class ContentGroupTestCase(ModuleStoreTestCase):
             partition_id=self.course.user_partitions[0].id,
             group_id=self.course.user_partitions[0].groups[1].id
         )
-        self.alpha_module = ItemFactory.create(
+        self.alpha_block = BlockFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id='alpha_group_discussion',
             discussion_target='Visible to Alpha',
             group_access={self.course.user_partitions[0].id: [self.course.user_partitions[0].groups[0].id]}
         )
-        self.beta_module = ItemFactory.create(
+        self.beta_block = BlockFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id='beta_group_discussion',
             discussion_target='Visible to Beta',
             group_access={self.course.user_partitions[0].id: [self.course.user_partitions[0].groups[1].id]}
         )
-        self.global_module = ItemFactory.create(
+        self.global_block = BlockFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id='global_group_discussion',
@@ -172,14 +172,14 @@ class TestConditionalContent(ModuleStoreTestCase):
                 }]
             }
         )
-        chapter = ItemFactory.create(parent_location=self.course.location,
-                                     display_name='Chapter')
+        chapter = BlockFactory.create(parent_location=self.course.location,
+                                      display_name='Chapter')
 
         # add a sequence to the course to which the problems can be added
-        self.problem_section = ItemFactory.create(parent_location=chapter.location,
-                                                  category='sequential',
-                                                  metadata={'graded': True, 'format': 'Homework'},
-                                                  display_name=self.TEST_SECTION_NAME)
+        self.problem_section = BlockFactory.create(parent_location=chapter.location,
+                                                   category='sequential',
+                                                   metadata={'graded': True, 'format': 'Homework'},
+                                                   display_name=self.TEST_SECTION_NAME)
 
         # Create users and partition them
         self.student_a = UserFactory.create(username='student_a', email='student_a@example.com')
@@ -201,7 +201,7 @@ class TestConditionalContent(ModuleStoreTestCase):
         )
 
         # Create a vertical to contain our split test
-        problem_vertical = ItemFactory.create(
+        problem_vertical = BlockFactory.create(
             parent_location=self.problem_section.location,
             category='vertical',
             display_name='Problem Unit'
@@ -210,20 +210,20 @@ class TestConditionalContent(ModuleStoreTestCase):
         # Create the split test and child vertical containers
         vertical_a_url = self.course.id.make_usage_key('vertical', 'split_test_vertical_a')
         vertical_b_url = self.course.id.make_usage_key('vertical', 'split_test_vertical_b')
-        self.split_test = ItemFactory.create(
+        self.split_test = BlockFactory.create(
             parent_location=problem_vertical.location,
             category='split_test',
             display_name='Split Test',
             user_partition_id=self.partition.id,
             group_id_to_child={str(index): url for index, url in enumerate([vertical_a_url, vertical_b_url])}
         )
-        self.vertical_a = ItemFactory.create(
+        self.vertical_a = BlockFactory.create(
             parent_location=self.split_test.location,
             category='vertical',
             display_name='Group A problem container',
             location=vertical_a_url
         )
-        self.vertical_b = ItemFactory.create(
+        self.vertical_b = BlockFactory.create(
             parent_location=self.split_test.location,
             category='vertical',
             display_name='Group B problem container',

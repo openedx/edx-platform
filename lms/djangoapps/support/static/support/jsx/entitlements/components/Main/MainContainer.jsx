@@ -5,20 +5,19 @@ import { openCreationForm } from '../../data/actions/form';
 
 import Main from './Main.jsx';
 
-
 const mapStateToProps = state => ({
-  errorMessage: state.error,
-  isFormOpen: state.form.isOpen,
+    errorMessage: state.error,
+    isFormOpen: state.form.isOpen,
 });
 
 const mapDispatchToProps = dispatch => ({
-  dismissErrorMessage: () => dispatch(dismissError()),
-  openCreationForm: () => dispatch(openCreationForm()),
+    dismissErrorMessage: () => dispatch(dismissError()),
+    openCreationForm: () => dispatch(openCreationForm()),
 });
 
 const MainContainer = connect(
-  mapStateToProps,
-  mapDispatchToProps,
+    mapStateToProps,
+    mapDispatchToProps,
 )(Main);
 
 export default MainContainer;

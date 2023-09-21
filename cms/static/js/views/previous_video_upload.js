@@ -4,7 +4,7 @@ define(
         'js/views/video_status', 'common/js/components/utils/view_utils', 'edx-ui-toolkit/js/utils/html-utils',
         'text!templates/previous-video-upload.underscore'],
     function(_, gettext, DateUtils, BaseView, PromptView, NotificationView, VideoThumbnailView, VideoTranscriptsView,
-            VideoStatusView, ViewUtils, HtmlUtils, previousVideoUploadTemplate) {
+        VideoStatusView, ViewUtils, HtmlUtils, previousVideoUploadTemplate) {
         'use strict';
 
         var PreviousVideoUploadView = BaseView.extend({
@@ -74,7 +74,7 @@ define(
 
                 ViewUtils.confirmThenRunOperation(
                     gettext('Are you sure you want to remove this video from the list?'),
-                    gettext('Removing a video from this list does not affect course content. Any content that uses a previously uploaded video ID continues to display in the course.'),  // eslint-disable-line max-len
+                    gettext('Removing a video from this list does not affect course content. Any content that uses a previously uploaded video ID continues to display in the course.'), // eslint-disable-line max-len
                     gettext('Remove'),
                     function() {
                         ViewUtils.runOperationShowingMessage(

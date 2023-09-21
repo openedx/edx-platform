@@ -2,13 +2,10 @@
 Tests for third_party_auth utility functions.
 """
 
-
-import unittest
 from unittest import mock
 from unittest.mock import MagicMock
 
 import ddt
-from django.conf import settings
 from lxml import etree
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -22,6 +19,7 @@ from common.djangoapps.third_party_auth.utils import (
     user_exists,
     convert_saml_slug_provider_id,
 )
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.features.enterprise_support.tests.factories import (
     EnterpriseCustomerIdentityProviderFactory,
     EnterpriseCustomerUserFactory,
@@ -29,7 +27,7 @@ from openedx.features.enterprise_support.tests.factories import (
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestUtils(TestCase):
     """
     Test the utility functions.

@@ -3,21 +3,29 @@
 import ddt
 from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from rest_framework import status
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.user_tours.handlers import init_user_tour
-from lms.djangoapps.user_tours.models import UserTour
+from lms.djangoapps.user_tours.models import UserTour, UserDiscussionsTours
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 
 User = get_user_model()
 
 
+def build_jwt_headers(user):
+    """ Helper function for creating headers for the JWT authentication. """
+    token = create_jwt_for_user(user)
+    headers = {'HTTP_AUTHORIZATION': f'JWT {token}'}
+    return headers
+
+
 @ddt.ddt
 class TestUserTourView(TestCase):
     """ Tests for the v1 User Tour views. """
+
     def setUp(self):
         """ Test set up. """
         super().setUp()
@@ -30,15 +38,9 @@ class TestUserTourView(TestCase):
         self.staff_user = UserFactory(is_staff=True)
         self.new_user_tour = self.staff_user.tour
 
-    def build_jwt_headers(self, user):
-        """ Helper function for creating headers for the JWT authentication. """
-        token = create_jwt_for_user(user)
-        headers = {'HTTP_AUTHORIZATION': f'JWT {token}'}
-        return headers
-
     def send_request(self, jwt_user, request_user, method, data=None):
         """ Helper function to call API. """
-        headers = self.build_jwt_headers(jwt_user)
+        headers = build_jwt_headers(jwt_user)
         url = reverse('user-tours', args=[request_user.username])
         if method == 'GET':
             return self.client.get(url, **headers)
@@ -142,7 +144,74 @@ class TestUserTourView(TestCase):
 
     def test_put_not_supported(self):
         """ Test PUT request returns method not supported. """
-        headers = self.build_jwt_headers(self.staff_user)
+        headers = build_jwt_headers(self.staff_user)
         url = reverse('user-tours', args=[self.staff_user.username])
         response = self.client.put(url, data={}, content_type='application/json', **headers)
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
+
+@override_settings(AVAILABLE_DISCUSSION_TOURS=['not_responded_filter'])
+class UserDiscussionsToursViewTestCase(TestCase):
+    """
+    Tests for the UserDiscussionsToursView view.
+    """
+    def setUp(self):
+        # Create a user and a tour for testing
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpass'
+        )
+        # create a UserDiscussionsTour for the user
+        self.tour = UserDiscussionsTours.objects.create(
+            tour_name='Test Tour',
+            show_tour=False,
+            user=self.user
+        )
+        self.url = reverse('discussion-tours')
+
+    def test_get_tours(self):
+        """
+        Test GET request for a user's discussion tours.
+        """
+        # create a header with our user's credentials
+        headers = build_jwt_headers(self.user)
+        # Send a GET request to the view
+        response = self.client.get(self.url, **headers)
+        # Check that the response status code is correct
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Check that the returned data is correct
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['tour_name'], 'Test Tour')
+        self.assertFalse(response.data[0]['show_tour'])
+
+        self.assertEqual(response.data[1]['tour_name'], 'not_responded_filter')
+        self.assertTrue(response.data[1]['show_tour'])
+
+    def test_get_tours_unauthenticated(self):
+        """
+        Test that an unauthenticated user cannot access the discussion tours endpoint.
+        """
+        # Send a GET request to the view without logging in
+        response = self.client.get(self.url)
+
+        # Check that the response status code is correct
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_update_tour(self):
+        """
+        Test that a user can update their discussion tour status.
+        """
+        headers = build_jwt_headers(self.user)
+
+        # Send a PUT request to the view with the updated tour data
+        updated_data = {'show_tour': False}
+        url = reverse('discussion-tours', args=[self.tour.id])
+        response = self.client.put(url, updated_data, content_type='application/json', **headers)
+
+        # Check that the response status code is correct
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Check that the tour was updated in the database
+        updated_tour = UserDiscussionsTours.objects.get(id=self.tour.id)
+        self.assertEqual(updated_tour.show_tour, False)

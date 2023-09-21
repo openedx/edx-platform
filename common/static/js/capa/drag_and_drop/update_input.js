@@ -29,6 +29,7 @@
             } else {
                 (function(c1) {
                     while (c1 < state.targets.length) {
+                        // eslint-disable-next-line no-loop-func
                         (function(c2) {
                             while (c2 < state.targets[c1].draggableList.length) {
                                 tempObj = {};
@@ -64,8 +65,8 @@
             }
         }
 
-    // Check if input has an answer from server. If yes, then position
-    // all draggables according to answer.
+        // Check if input has an answer from server. If yes, then position
+        // all draggables according to answer.
         function check(state) {
             var inputElVal;
 
@@ -109,7 +110,7 @@
 
             baseDraggableId = Object.keys(chain)[0];
 
-        // This is a hack. For now we will work with depths 1 and 3.
+            // This is a hack. For now we will work with depths 1 and 3.
             if (depth === 1) {
                 baseTargetId = chain[baseDraggableId];
 
@@ -129,11 +130,14 @@
 
             checkBaseDraggable();
 
+            // eslint-disable-next-line no-useless-return
             return;
 
             function checkBaseDraggable() {
+                // eslint-disable-next-line no-cond-assign
                 if ((baseDraggable = getById(state, 'draggables', baseDraggableId, null, false, baseTargetId)) === null) {
                     createBaseDraggableOnTarget(state, baseDraggableId, baseTargetId, true, function() {
+                        // eslint-disable-next-line no-cond-assign
                         if ((baseDraggable = getById(state, 'draggables', baseDraggableId, null, false, baseTargetId)) === null) {
                             console.log('ERROR: Could not successfully create a base draggable on a base target.');
                         } else {
@@ -158,6 +162,7 @@
             }
 
             function checklayeredDraggable() {
+                // eslint-disable-next-line no-cond-assign
                 if ((layeredDraggable = getById(state, 'draggables', layeredDraggableId, null, false, layeredTargetId, baseDraggableId, baseTargetId)) === null) {
                     layeredDraggable = getById(state, 'draggables', layeredDraggableId);
                     layeredTarget = null;
@@ -185,25 +190,27 @@
         function createBaseDraggableOnTarget(state, draggableId, targetId, reportError, funcCallback) {
             var draggable, target;
 
+            // eslint-disable-next-line no-cond-assign
             if ((draggable = getById(state, 'draggables', draggableId)) === null) {
                 if (reportError !== false) {
                     console.log(
-                    'ERROR: In answer there exists a ' +
-                    'draggable ID "' + draggableId + '". No ' +
-                    'draggable with this ID could be found.'
-                );
+                        'ERROR: In answer there exists a '
+                    + 'draggable ID "' + draggableId + '". No '
+                    + 'draggable with this ID could be found.'
+                    );
                 }
 
                 return false;
             }
 
+            // eslint-disable-next-line no-cond-assign
             if ((target = getById(state, 'targets', targetId)) === null) {
                 if (reportError !== false) {
                     console.log(
-                    'ERROR: In answer there exists a target ' +
-                    'ID "' + targetId + '". No target with this ' +
-                    'ID could be found.'
-                );
+                        'ERROR: In answer there exists a target '
+                    + 'ID "' + targetId + '". No target with this '
+                    + 'ID could be found.'
+                    );
                 }
 
                 return false;
@@ -221,16 +228,19 @@
                 while (c1 < answer.length) {
                     for (draggableId in answer[c1]) {
                         if (answer[c1].hasOwnProperty(draggableId) === false) {
+                            // eslint-disable-next-line no-continue
                             continue;
                         }
 
+                        // eslint-disable-next-line no-cond-assign
                         if ((draggable = getById(state, 'draggables', draggableId)) === null) {
                             console.log(
-                            'ERROR: In answer there exists a ' +
-                            'draggable ID "' + draggableId + '". No ' +
-                            'draggable with this ID could be found.'
-                        );
+                                'ERROR: In answer there exists a '
+                            + 'draggable ID "' + draggableId + '". No '
+                            + 'draggable with this ID could be found.'
+                            );
 
+                            // eslint-disable-next-line no-continue
                             continue;
                         }
 
@@ -277,7 +287,7 @@
                 return;
             }
 
-        // For now we support only one case.
+            // For now we support only one case.
             if ((minDepth < 1) || (maxDepth > 3)) {
                 return;
             }
@@ -313,21 +323,21 @@
                     if (type === 'draggables') {
                         if ((targetId !== undefined) && (inContainer === false) && (baseDraggableId !== undefined) && (baseTargetId !== undefined)) {
                             if (
-                            (state[type][c1].id === id) &&
-                            (state[type][c1].inContainer === false) &&
-                            (state[type][c1].onTarget.id === targetId) &&
-                            (state[type][c1].onTarget.type === 'on_drag') &&
-                            (state[type][c1].onTarget.draggableObj.id === baseDraggableId) &&
-                            (state[type][c1].onTarget.draggableObj.onTarget.id === baseTargetId)
-                        ) {
+                                (state[type][c1].id === id)
+                            && (state[type][c1].inContainer === false)
+                            && (state[type][c1].onTarget.id === targetId)
+                            && (state[type][c1].onTarget.type === 'on_drag')
+                            && (state[type][c1].onTarget.draggableObj.id === baseDraggableId)
+                            && (state[type][c1].onTarget.draggableObj.onTarget.id === baseTargetId)
+                            ) {
                                 return state[type][c1];
                             }
                         } else if ((targetId !== undefined) && (inContainer === false)) {
                             if (
-                            (state[type][c1].id === id) &&
-                            (state[type][c1].inContainer === false) &&
-                            (state[type][c1].onTarget.id === targetId)
-                        ) {
+                                (state[type][c1].id === id)
+                            && (state[type][c1].inContainer === false)
+                            && (state[type][c1].onTarget.id === targetId)
+                            ) {
                                 return state[type][c1];
                             }
                         } else {

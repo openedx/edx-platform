@@ -11,7 +11,6 @@ import re
 import uuid
 
 import markupsafe
-import webpack_loader.utils
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -29,7 +28,6 @@ from xblock.scorable import ScorableXBlockMixin
 from common.djangoapps import static_replace
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from xmodule.seq_block import SequenceBlock  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.util.xmodule_django import add_webpack_to_fragment  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.vertical_block import VerticalBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import (  # lint-amnesty, pylint: disable=wrong-import-order
     PREVIEW_VIEWS,
@@ -116,6 +114,9 @@ def wrap_xblock(
     if view == STUDENT_VIEW and getattr(block, 'HIDDEN', False):
         css_classes.append('is-hidden')
 
+    # TODO: This special case will be removed when we update the SCSS under
+    #       xmodule/assets to use the standard XBlock CSS classes.
+    #       See https://github.com/openedx/edx-platform/issues/32617.
     if getattr(block, 'uses_xmodule_styles_setup', False):
         if view in PREVIEW_VIEWS:
             # The block is acting as an XModule
@@ -225,11 +226,11 @@ def wrap_xblock_aside(
     return wrap_fragment(frag, render_to_string('xblock_wrapper.html', template_context))
 
 
-def grade_histogram(module_id):
+def grade_histogram(block_id):
     '''
     Print out a histogram of grades on a given problem in staff member debug info.
 
-    Warning: If a student has just looked at an xmodule and not attempted
+    Warning: If a student has just looked at an xblock and not attempted
     it, their grade is None. Since there will always be at least one such student
     this function almost always returns [].
     '''
@@ -242,8 +243,8 @@ def grade_histogram(module_id):
         FROM courseware_studentmodule
         WHERE courseware_studentmodule.module_id=%s
         GROUP BY courseware_studentmodule.grade"""
-    # Passing module_id this way prevents sql-injection.
-    cursor.execute(query, [str(module_id)])
+    # Passing block_id this way prevents sql-injection.
+    cursor.execute(query, [str(block_id)])
 
     grades = list(cursor.fetchall())
     grades.sort(key=lambda x: x[0])  # Add ORDER BY to sql query?
@@ -262,13 +263,13 @@ def sanitize_html_id(html_id):
 
 def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context):  # pylint: disable=unused-argument
     """
-    Updates the supplied module with a new get_html function that wraps
+    Updates the supplied block with a new get_html function that wraps
     the output of the old get_html function with additional information
     for admin users only, including a histogram of student answers, the
-    definition of the xmodule, and a link to view the module in Studio
+    definition of the xblock, and a link to view the block in Studio
     if it is a Studio edited, mongo stored course.
 
-    Does nothing if module is a SequenceBlock.
+    Does nothing if block is a SequenceBlock.
     """
     if context and context.get('hide_staff_markup', False):
         # If hide_staff_markup is passed, don't add the markup
@@ -307,7 +308,7 @@ def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context)
     source_file = block.source_file  # source used to generate the problem XML, eg latex or word
 
     # Useful to indicate to staff if problem has been released or not.
-    # TODO (ichuang): use _has_access_descriptor.can_load in lms.courseware.access,
+    # TODO (ichuang): use _has_access_block.can_load in lms.courseware.access,
     # instead of now>mstart comparison here.
     now = datetime.datetime.now(UTC)
     is_released = "unknown"
@@ -444,16 +445,22 @@ def xblock_resource_pkg(block):
     openassessment.xblock.openassessmentblock.OpenAssessmentBlock, the value
     returned is 'openassessment.xblock'.
 
-    XModules are special cased because they're local to this repo and they
-    actually don't share their resource files when compiled out as part of the
-    XBlock asset pipeline. This only covers XBlocks and XModules using the
-    XBlock-style of asset specification. If they use the XModule bundling part
-    of the asset pipeline (xmodule_assets), their assets are compiled through an
-    entirely separate mechanism and put into lms-modules.js/css.
+    Built-in edx-platform XBlocks (defined under ./xmodule/) are special cases.
+    They currently use two different mechanisms to load assets:
+    1. The `builtin_assets` utilities, which let the blocks add JS and CSS
+       compiled completely outside of the XBlock pipeline. Used by HtmlBlock,
+       ProblemBlock, and most other built-in blocks currently. Handling for these
+       assets does not interact with this function.
+    2. The (preferred) standard XBlock runtime resource loading system, used by
+       LibraryContentBlock. Handling for these assets *does* interact with this
+       function.
+
+    We hope to migrate to (2) eventually, tracked by:
+    https://github.com/openedx/edx-platform/issues/32618.
     """
-    # XModules are a special case because they map to different dirs for
-    # sub-modules.
     module_name = block.__module__
+    # Special handling for case (2) of the built-in XBlocks because they map to different
+    # dirs for sub-modules.
     if module_name.startswith('xmodule.'):
         return module_name
 

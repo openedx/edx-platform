@@ -126,8 +126,8 @@ var edx = edx || {};
             $stepEl = $('#current-step-container');
             if (!$stepEl.length) {
                 $stepEl = edx.HtmlUtils.append(
-                  $(this.el),
-                  edx.HtmlUtils.HTML('<div id="current-step-container"></div>').toString()
+                    $(this.el),
+                    edx.HtmlUtils.HTML('<div id="current-step-container"></div>').toString()
                 );
             }
 

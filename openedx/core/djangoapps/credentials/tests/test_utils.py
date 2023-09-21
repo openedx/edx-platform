@@ -2,17 +2,21 @@
 import uuid
 from unittest import mock
 
-from django.test import override_settings
-from edx_toggles.toggles.testutils import override_waffle_switch
+from django.conf import settings
+from requests import Response
+from requests.exceptions import HTTPError
 
-from openedx.core.djangoapps.credentials.config import USE_LEARNER_RECORD_MFE
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.tests import factories
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
-from openedx.core.djangoapps.credentials.utils import get_credentials, get_credentials_records_url
+from openedx.core.djangoapps.credentials.utils import (
+    get_courses_completion_status,
+    get_credentials,
+    get_credentials_records_url
+)
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
-from common.djangoapps.student.tests.factories import UserFactory
 
 UTILS_MODULE = 'openedx.core.djangoapps.credentials.utils'
 
@@ -93,69 +97,40 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
         }
         assert kwargs['querystring'] == querystring
 
-    @override_settings(LEARNER_RECORD_MICROFRONTEND_URL=None)
-    @override_settings(CREDENTIALS_PUBLIC_SERVICE_URL="http://foo")
     def test_get_credentials_records_url(self):
         """
-        A test that verifies the functionality of the `get_credentials_records_url`. 
+        A test that verifies the functionality of the `get_credentials_records_url`.
         """
         result = get_credentials_records_url()
-        assert result == "http://foo/records/"
+        assert result == "https://credentials.example.com/records/"
 
         result = get_credentials_records_url("abcdefgh-ijkl-mnop-qrst-uvwxyz123456")
-        assert result == "http://foo/records/programs/abcdefghijklmnopqrstuvwxyz123456/"
+        assert result == "https://credentials.example.com/records/programs/abcdefghijklmnopqrstuvwxyz123456"
 
-    @override_settings(LEARNER_RECORD_MICROFRONTEND_URL="http://blah")
-    @override_settings(CREDENTIALS_PUBLIC_SERVICE_URL="http://foo")
-    @override_waffle_switch(USE_LEARNER_RECORD_MFE, False)
-    def test_get_credentials_records_mfe_url_waffle_disabled(self):
+    @mock.patch('requests.Response.raise_for_status')
+    @mock.patch('requests.Response.json')
+    @mock.patch(UTILS_MODULE + '.get_credentials_api_client')
+    def test_get_courses_completion_status(self, mock_get_api_client, mock_json, mock_raise):
         """
-        A test that verifies the results of the `get_credentials_records_url` function when the
-        LEARNER_RECORD_MICROFRONTEND_URL setting exists but the USE_LEARNER_RECORD_MFE waffle flag is disabled.
+        Test to verify the functionality of get_courses_completion_status
         """
-        result = get_credentials_records_url()
-        assert result == "http://foo/records/"
+        UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)
+        course_statuses = factories.UserCredentialsCourseRunStatus.create_batch(3)
+        response_data = [course_status['course_run']['key'] for course_status in course_statuses]
+        mock_raise.return_value = None
+        mock_json.return_value = {'lms_user_id': self.user.id,
+                                  'status': course_statuses,
+                                  'username': self.user.username}
+        mock_get_api_client.return_value.post.return_value = Response()
+        course_run_keys = [course_status['course_run']['key'] for course_status in course_statuses]
+        api_response, is_exception = get_courses_completion_status(self.user.id, course_run_keys)
+        assert api_response == response_data
+        assert is_exception is False
 
-        result = get_credentials_records_url("abcdefgh-ijkl-mnop-qrst-uvwxyz123456")
-        assert result == "http://foo/records/programs/abcdefghijklmnopqrstuvwxyz123456/"
-
-    @override_settings(LEARNER_RECORD_MICROFRONTEND_URL="http://blah")
-    @override_settings(CREDENTIALS_PUBLIC_SERVICE_URL="http://foo")
-    @override_waffle_switch(USE_LEARNER_RECORD_MFE, True)
-    def test_get_credentials_records_mfe_url_waffle_enabled(self):
-        """
-        A test that verifies the results of the `get_credentials_records_url` function when the
-        LEARNER_RECORD_MICROFRONTEND_URL setting exists but the USE_LEARNER_RECORD_MFE waffle flag is enabled.
-        """
-        result = get_credentials_records_url()
-        assert result == "http://blah/"
-
-        result = get_credentials_records_url("abcdefgh-ijkl-mnop-qrst-uvwxyz123456")
-        assert result == "http://blah/abcdefghijklmnopqrstuvwxyz123456/"
-
-    @override_settings(CREDENTIALS_PUBLIC_SERVICE_URL=None)
-    @override_settings(LEARNER_RECORD_MICROFRONTEND_URL=None)
-    def test_get_credentials_records_url_expect_none(self):
-        """
-        A test that verifieis the results of the `get_credentials_records_url` function when the system is configured
-        to use neither the Credentials IDA or the Learner Record MFE.
-        """
-        result = get_credentials_records_url()
-        assert result is None
-
-        result = get_credentials_records_url("abcdefgh-ijkl-mnop-qrst-uvwxyz123456")
-        assert result is None
-
-    @override_settings(LEARNER_RECORD_MICROFRONTEND_URL="http://blah")
-    @override_settings(CREDENTIALS_PUBLIC_SERVICE_URL=None)
-    @override_waffle_switch(USE_LEARNER_RECORD_MFE, True)
-    def test_get_credentials_records_url_only_mfe_configured(self):
-        """
-        A test that verifieis the results of the `get_credentials_records_url` function when the system is configured
-        to use only the Learner Record MFE.
-        """
-        result = get_credentials_records_url()
-        assert result == "http://blah/"
-
-        result = get_credentials_records_url("abcdefgh-ijkl-mnop-qrst-uvwxyz123456")
-        assert result == "http://blah/abcdefghijklmnopqrstuvwxyz123456/"
+    @mock.patch('requests.Response.raise_for_status')
+    def test_get_courses_completion_status_api_error(self, mock_raise):
+        mock_raise.return_value = HTTPError('An Error occured')
+        UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)
+        api_response, is_exception = get_courses_completion_status(self.user.id, ['fake1', 'fake2', 'fake3'])
+        assert api_response == []
+        assert is_exception is True

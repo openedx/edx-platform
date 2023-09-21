@@ -1,26 +1,22 @@
 """Word cloud integration tests using mongo modulestore."""
 
 
+import pytest
+
 import json
 from operator import itemgetter
 
+# noinspection PyUnresolvedReferences
+from xmodule.tests.helpers import override_descriptor_system  # pylint: disable=unused-import
 from xmodule.x_module import STUDENT_VIEW
 
 from .helpers import BaseTestXmodule
 
 
+@pytest.mark.usefixtures("override_descriptor_system")
 class TestWordCloud(BaseTestXmodule):
     """Integration test for Word Cloud Block."""
     CATEGORY = "word_cloud"
-
-    def _get_resource_url(self, item):
-        """
-        Creates a resource URL for a given asset that is compatible with this old XModule testing stuff.
-        """
-        display_name = self.item_descriptor.display_name.replace(' ', '_')
-        return "resource/i4x://{}/{}/word_cloud/{}/{}".format(
-            self.course.id.org, self.course.id.course, display_name, item
-        )
 
     def _get_users_state(self):
         """Return current state for each user:
@@ -222,13 +218,13 @@ class TestWordCloud(BaseTestXmodule):
         """
         Make sure that all parameters extracted correctly from xml.
         """
-        fragment = self.runtime.render(self.item_descriptor, STUDENT_VIEW)
+        fragment = self.runtime.render(self.block, STUDENT_VIEW)
         expected_context = {
-            'ajax_url': self.item_descriptor.ajax_url,
-            'display_name': self.item_descriptor.display_name,
-            'instructions': self.item_descriptor.instructions,
-            'element_class': self.item_descriptor.location.block_type,
-            'element_id': self.item_descriptor.location.html_id(),
+            'ajax_url': self.block.ajax_url,
+            'display_name': self.block.display_name,
+            'instructions': self.block.instructions,
+            'element_class': self.block.location.block_type,
+            'element_id': self.block.location.html_id(),
             'num_inputs': 5,  # default value
             'submitted': False,  # default value,
         }

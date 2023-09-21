@@ -1,4 +1,4 @@
-"""Module annotatable tests"""
+"""Annotatable block tests"""
 
 
 import unittest

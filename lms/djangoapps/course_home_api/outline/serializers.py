@@ -109,6 +109,16 @@ class ResumeCourseSerializer(serializers.Serializer):
     url = serializers.URLField()
 
 
+class OutlineTabCourseAccessRedirectSerializer(serializers.Serializer):
+    """
+    Serializer for a Course Access Redirect response from the outline tab
+    """
+    url = serializers.URLField()
+    error_code = serializers.CharField(source='access_error.error_code')
+    developer_message = serializers.CharField(source='access_error.developer_message')
+    user_message = serializers.CharField(source='access_error.user_message')
+
+
 class OutlineTabSerializer(DatesBannerSerializer, VerifiedModeSerializer):
     """
     Serializer for the Outline Tab

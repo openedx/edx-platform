@@ -17,8 +17,8 @@ from django.utils.translation import override as override_language
 from opaque_keys.edx.locator import CourseLocator
 from submissions import api as sub_api
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
 from common.djangoapps.student.roles import CourseCcxCoachRole
@@ -368,34 +368,39 @@ class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
 
 class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
     """ Test student module manipulations. """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.course = CourseFactory(
+        cls.course = CourseFactory.create(
             name='fake',
             org='course',
             run='id',
         )
         cls.course_key = cls.course.location.course_key  # lint-amnesty, pylint: disable=no-member
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):  # lint-amnesty, pylint: disable=no-member
-            cls.parent = ItemFactory(
-                category="library_content",
+            cls.chapter = BlockFactory.create(
+                category='chapter',
                 parent=cls.course,
+                display_name='chapter'
+            )
+            cls.parent = BlockFactory(
+                category="library_content",
+                parent=cls.chapter,
                 publish_item=True,
             )
-            cls.child = ItemFactory(
+            cls.child = BlockFactory(
                 category="html",
                 parent=cls.parent,
                 publish_item=True,
             )
-            cls.unrelated = ItemFactory(
+            cls.unrelated = BlockFactory(
                 category="html",
-                parent=cls.course,
+                parent=cls.chapter,
                 publish_item=True,
             )
-            cls.team_enabled_ora = ItemFactory.create(
+            cls.team_enabled_ora = BlockFactory.create(
                 parent=cls.parent,
                 category="openassessment",
                 teams_enabled=True,
@@ -712,18 +717,18 @@ class TestStudentModuleGrading(SharedModuleStoreTestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.course = CourseFactory.create()
-        cls.chapter = ItemFactory.create(
+        cls.chapter = BlockFactory.create(
             parent=cls.course,
             category="chapter",
             display_name="Test Chapter"
         )
-        cls.sequence = ItemFactory.create(
+        cls.sequence = BlockFactory.create(
             parent=cls.chapter,
             category='sequential',
             display_name="Test Sequential 1",
             graded=True
         )
-        cls.vertical = ItemFactory.create(
+        cls.vertical = BlockFactory.create(
             parent=cls.sequence,
             category='vertical',
             display_name='Test Vertical 1'
@@ -733,7 +738,7 @@ class TestStudentModuleGrading(SharedModuleStoreTestCase):
             choices=[False, False, True, False],
             choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
         )
-        cls.problem = ItemFactory.create(
+        cls.problem = BlockFactory.create(
             parent=cls.vertical,
             category="problem",
             display_name="Test Problem",

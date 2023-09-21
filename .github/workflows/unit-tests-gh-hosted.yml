@@ -17,23 +17,24 @@ jobs:
         python-version: [ '3.8' ]
         django-version:
           - "pinned"
-        shard_name: [
-            "lms-1",
-            "lms-2",
-            "lms-3",
-            "lms-4",
-            "lms-5",
-            "lms-6",
-            "openedx-1",
-            "openedx-2",
-            "openedx-3",
-            "openedx-4",
-            "cms-1",
-            "cms-2",
-            "common-1",
-            "common-2",
-            "common-3",
-        ]
+        # When updating the shards, remember to make the same changes in
+        # .github/workflows/unit-tests.yml
+        shard_name:
+          - "lms-1"
+          - "lms-2"
+          - "lms-3"
+          - "lms-4"
+          - "lms-5"
+          - "lms-6"
+          - "openedx-1"
+          - "openedx-2"
+          - "openedx-3"
+          - "openedx-4"
+          - "cms-1"
+          - "cms-2"
+          - "common-1"
+          - "common-2"
+          - "xmodule-1"
     name: gh-hosted-python-${{ matrix.python-version }},django-${{ matrix.django-version }},${{ matrix.shard_name }}
     steps:
       - uses: actions/checkout@v2
@@ -47,7 +48,7 @@ jobs:
           mongodb-version: 4.4
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -58,7 +59,7 @@ jobs:
 
       - name: Cache pip dependencies
         id: cache-dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.pip-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/testing.txt') }}
@@ -92,7 +93,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install libxmlsec1-dev
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -103,7 +104,7 @@ jobs:
 
       - name: Cache pip dependencies
         id: cache-dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.pip-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/testing.txt') }}

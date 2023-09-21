@@ -40,22 +40,22 @@ describe('Tests for accessibility_tools.js', function() {
             expect($('#submit')).toHaveAttr('tabindex', '2');
         });
 
-    // for some reason, toBeFocused tests don't pass with js-test-tool
-    // (they do when run locally on browsers), so we're skipping them temporarily
+        // for some reason, toBeFocused tests don't pass with js-test-tool
+        // (they do when run locally on browsers), so we're skipping them temporarily
         xit('shifts focus to close-modal button', function() {
             expect($('#close-modal')).toBeFocused();
         });
 
-    // for some reason, toBeFocused tests don't pass with js-test-tool
-    // (they do when run locally on browsers), so we're skipping them temporarily
+        // for some reason, toBeFocused tests don't pass with js-test-tool
+        // (they do when run locally on browsers), so we're skipping them temporarily
         xit('tab on last element in modal returns to the close-modal button', function() {
             $('#submit').focus();
             pressTabOnLastElt($('#close-modal'), $('#submit'));
             expect($('#close-modal')).toBeFocused();
         });
 
-    // for some reason, toBeFocused tests don't pass with js-test-tool
-    // (they do when run locally on browsers), so we're skipping them temporarily
+        // for some reason, toBeFocused tests don't pass with js-test-tool
+        // (they do when run locally on browsers), so we're skipping them temporarily
         xit('shift-tab on close-modal element in modal returns to the last element in modal', function() {
             $('#close-modal').focus();
             pressShiftTabOnFirstElt($('#close-modal'), $('#submit'));
@@ -84,8 +84,8 @@ describe('Tests for accessibility_tools.js', function() {
                 expect($('#modalId')).toHaveAttr('aria-hidden', 'true');
             });
 
-      // for some reason, toBeFocused tests don't pass with js-test-tool
-      // (they do when run locally on browsers), so we're skipping them temporarily
+            // for some reason, toBeFocused tests don't pass with js-test-tool
+            // (they do when run locally on browsers), so we're skipping them temporarily
             xit('returns focus to focusedElementBeforeModal', function() {
                 expect(focusedElementBeforeModal).toBeFocused();
             });

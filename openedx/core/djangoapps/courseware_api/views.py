@@ -4,6 +4,8 @@ Course API Views
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from django.conf import settings
+from django.db import transaction
+from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from edx_django_utils.cache import TieredCache
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -40,8 +42,8 @@ from lms.djangoapps.courseware.masquerade import (
     is_masquerading_as_non_audit_enrollment,
 )
 from lms.djangoapps.courseware.models import LastSeenCoursewareTimezone
-from lms.djangoapps.courseware.module_render import get_module_by_usage_id
-from lms.djangoapps.courseware.toggles import course_exit_page_is_active
+from lms.djangoapps.courseware.block_render import get_block_by_usage_id
+from lms.djangoapps.courseware.toggles import course_exit_page_is_active, learning_assistant_is_active
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.gating.api import get_entrance_exam_score, get_entrance_exam_usage_key
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -89,6 +91,7 @@ class CoursewareMeta:
             staff_access=original_user_is_staff,
         )
         self.request.user = self.effective_user
+        self.overview.bind_course_for_student(self.request)
         self.enrollment_object = CourseEnrollment.get_enrollment(self.effective_user, self.course_key,
                                                                  select_related=['celebration', 'user__celebration'])
 
@@ -359,7 +362,15 @@ class CoursewareMeta:
             enrollment_active = self.enrollment['is_active']
             return enrollment_active and CourseMode.is_eligible_for_certificate(enrollment_mode)
 
+    @property
+    def learning_assistant_enabled(self):
+        """
+        Returns a boolean representing whether the requesting user should have access to the Xpert Learning Assistant.
+        """
+        return learning_assistant_is_active(self.course_key)
 
+
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class CoursewareInformation(RetrieveAPIView):
     """
     **Use Cases**
@@ -448,6 +459,7 @@ class CoursewareInformation(RetrieveAPIView):
             verified mode. Will update to reverify URL if necessary.
         * linkedin_add_to_profile_url: URL to add the effective user's certificate to a LinkedIn Profile.
         * user_needs_integrity_signature: Whether the user needs to sign the integrity agreement for the course
+        * learning_assistant_enabled: Whether the Xpert Learning Assistant is enabled for the requesting user
 
     **Parameters:**
 
@@ -584,7 +596,7 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
             reset_masquerade_data=True,
         )
 
-        sequence, _ = get_module_by_usage_id(
+        sequence, _ = get_block_by_usage_id(
             self.request,
             str(usage_key.course_key),
             str(usage_key),

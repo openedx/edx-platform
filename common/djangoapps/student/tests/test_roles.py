@@ -4,7 +4,6 @@ Tests of student.roles
 
 
 import ddt
-import six
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 
@@ -12,7 +11,12 @@ from common.djangoapps.student.roles import (
     CourseBetaTesterRole,
     CourseInstructorRole,
     CourseRole,
+    CourseLimitedStaffRole,
     CourseStaffRole,
+    CourseFinanceAdminRole,
+    CourseSalesAdminRole,
+    LibraryUserRole,
+    CourseDataResearcherRole,
     GlobalStaff,
     OrgContentCreatorRole,
     OrgInstructorRole,
@@ -70,7 +74,7 @@ class RolesTestCase(TestCase):
             f'Student has premature access to {self.course_key}'
         CourseStaffRole(self.course_key).add_users(self.student)
         assert CourseStaffRole(self.course_key).has_user(self.student), \
-            f"Student doesn't have access to {six.text_type(self.course_key)}"
+            f"Student doesn't have access to {str(self.course_key)}"
 
         # remove access and confirm
         CourseStaffRole(self.course_key).remove_users(self.student)
@@ -85,7 +89,7 @@ class RolesTestCase(TestCase):
             f'Student has premature access to {self.course_key.org}'
         OrgStaffRole(self.course_key.org).add_users(self.student)
         assert OrgStaffRole(self.course_key.org).has_user(self.student), \
-            f"Student doesn't have access to {six.text_type(self.course_key.org)}"
+            f"Student doesn't have access to {str(self.course_key.org)}"
 
         # remove access and confirm
         OrgStaffRole(self.course_key.org).remove_users(self.student)
@@ -101,16 +105,16 @@ class RolesTestCase(TestCase):
         OrgInstructorRole(self.course_key.org).add_users(self.student)
         CourseInstructorRole(self.course_key).add_users(self.student)
         assert OrgInstructorRole(self.course_key.org).has_user(self.student), \
-            f"Student doesn't have access to {six.text_type(self.course_key.org)}"
+            f"Student doesn't have access to {str(self.course_key.org)}"
         assert CourseInstructorRole(self.course_key).has_user(self.student), \
-            f"Student doesn't have access to {six.text_type(self.course_key)}"
+            f"Student doesn't have access to {str(self.course_key)}"
 
         # remove access and confirm
         OrgInstructorRole(self.course_key.org).remove_users(self.student)
         assert not OrgInstructorRole(self.course_key.org).has_user(self.student), \
             f'Student still has access to {self.course_key.org}'
         assert CourseInstructorRole(self.course_key).has_user(self.student), \
-            f"Student doesn't have access to {six.text_type(self.course_key)}"
+            f"Student doesn't have access to {str(self.course_key)}"
 
         # ok now keep org role and get rid of course one
         OrgInstructorRole(self.course_key.org).add_users(self.student)
@@ -118,7 +122,7 @@ class RolesTestCase(TestCase):
         assert OrgInstructorRole(self.course_key.org).has_user(self.student), \
             f'Student lost has access to {self.course_key.org}'
         assert not CourseInstructorRole(self.course_key).has_user(self.student), \
-            f"Student doesn't have access to {six.text_type(self.course_key)}"
+            f"Student doesn't have access to {str(self.course_key)}"
 
     def test_get_user_for_role(self):
         """
@@ -162,8 +166,13 @@ class RoleCacheTestCase(TestCase):  # lint-amnesty, pylint: disable=missing-clas
 
     ROLES = (
         (CourseStaffRole(IN_KEY), ('staff', IN_KEY, 'edX')),
+        (CourseLimitedStaffRole(IN_KEY), ('limited_staff', IN_KEY, 'edX')),
         (CourseInstructorRole(IN_KEY), ('instructor', IN_KEY, 'edX')),
         (OrgStaffRole(IN_KEY.org), ('staff', None, 'edX')),
+        (CourseFinanceAdminRole(IN_KEY), ('finance_admin', IN_KEY, 'edX')),
+        (CourseSalesAdminRole(IN_KEY), ('sales_admin', IN_KEY, 'edX')),
+        (LibraryUserRole(IN_KEY), ('library_user', IN_KEY, 'edX')),
+        (CourseDataResearcherRole(IN_KEY), ('data_researcher', IN_KEY, 'edX')),
         (OrgInstructorRole(IN_KEY.org), ('instructor', None, 'edX')),
         (CourseBetaTesterRole(IN_KEY), ('beta_testers', IN_KEY, 'edX')),
     )
@@ -183,7 +192,13 @@ class RoleCacheTestCase(TestCase):  # lint-amnesty, pylint: disable=missing-clas
             if other_role == role:
                 continue
 
-            assert not cache.has_role(*other_target)
+            role_base_id = getattr(role, "BASE_ROLE", None)
+            other_role_id = getattr(other_role, "ROLE", None)
+
+            if other_role_id and role_base_id == other_role_id:
+                assert cache.has_role(*other_target)
+            else:
+                assert not cache.has_role(*other_target)
 
     @ddt.data(*ROLES)
     @ddt.unpack

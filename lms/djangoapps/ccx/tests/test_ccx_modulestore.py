@@ -11,7 +11,7 @@ import pytz
 from ccx_keys.locator import CCXLocator
 from six.moves import zip_longest
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from lms.djangoapps.ccx.models import CustomCourseForEdX
@@ -28,18 +28,18 @@ class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):
         due = datetime.datetime(2010, 7, 7, 0, 0, tzinfo=pytz.UTC)
         # Create a course outline
         cls.chapters = chapters = [
-            ItemFactory.create(start=start, parent=cls.course) for _ in range(2)
+            BlockFactory.create(start=start, parent=cls.course) for _ in range(2)
         ]
         cls.sequentials = sequentials = [
-            ItemFactory.create(parent=c) for _ in range(2) for c in chapters
+            BlockFactory.create(parent=c) for _ in range(2) for c in chapters
         ]
         cls.verticals = verticals = [
-            ItemFactory.create(
+            BlockFactory.create(
                 due=due, parent=s, graded=True, format='Homework'
             ) for _ in range(2) for s in sequentials
         ]
         cls.blocks = [
-            ItemFactory.create(parent=v, category='html') for _ in range(2) for v in verticals
+            BlockFactory.create(parent=v, category='html') for _ in range(2) for v in verticals
         ]
 
     @classmethod

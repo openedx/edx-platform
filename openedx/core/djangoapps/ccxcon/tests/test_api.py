@@ -10,7 +10,7 @@ import pytz
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from openedx.core.djangoapps.ccxcon import api as ccxconapi
 from common.djangoapps.student.tests.factories import AdminFactory
@@ -51,16 +51,16 @@ class APIsTestCase(SharedModuleStoreTestCase):
         )
 
         cls.chapters = [
-            ItemFactory.create(start=start, parent=course) for _ in range(2)
+            BlockFactory.create(start=start, parent=course) for _ in range(2)
         ]
         cls.sequentials = flatten([
             [
-                ItemFactory.create(parent=chapter) for _ in range(2)
+                BlockFactory.create(parent=chapter) for _ in range(2)
             ] for chapter in cls.chapters
         ])
         cls.verticals = flatten([
             [
-                ItemFactory.create(
+                BlockFactory.create(
                     start=start, due=due, parent=sequential, graded=True, format='Homework', category='vertical'
                 ) for _ in range(2)
             ] for sequential in cls.sequentials
@@ -71,7 +71,7 @@ class APIsTestCase(SharedModuleStoreTestCase):
         with cls.store.bulk_operations(course.id, emit_signals=False):
             blocks = flatten([  # pylint: disable=unused-variable
                 [
-                    ItemFactory.create(parent=vertical) for _ in range(2)
+                    BlockFactory.create(parent=vertical) for _ in range(2)
                 ] for vertical in cls.verticals
             ])
 

@@ -11,7 +11,7 @@ from ccx_keys.locator import CCXLocator
 from django.test.utils import override_settings
 from edx_django_utils.cache import RequestCache
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.student.tests.factories import AdminFactory
 from lms.djangoapps.ccx.models import CustomCourseForEdX
@@ -43,16 +43,16 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
         # Create a course outline
         start = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=pytz.UTC)
         due = datetime.datetime(2010, 7, 7, 0, 0, tzinfo=pytz.UTC)
-        chapters = [ItemFactory.create(start=start, parent=cls.course)
+        chapters = [BlockFactory.create(start=start, parent=cls.course)
                     for _ in range(2)]
         sequentials = flatten([
-            [ItemFactory.create(parent=chapter) for _ in range(2)]
+            [BlockFactory.create(parent=chapter) for _ in range(2)]
             for chapter in chapters])
         verticals = flatten([
-            [ItemFactory.create(due=due, parent=sequential) for _ in range(2)]
+            [BlockFactory.create(due=due, parent=sequential) for _ in range(2)]
             for sequential in sequentials])
         blocks = flatten([  # pylint: disable=unused-variable
-            [ItemFactory.create(parent=vertical) for _ in range(2)]
+            [BlockFactory.create(parent=vertical) for _ in range(2)]
             for vertical in verticals])
 
     def setUp(self):

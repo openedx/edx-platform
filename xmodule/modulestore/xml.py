@@ -7,13 +7,13 @@ import json
 import logging
 import os
 import re
+import warnings
 import sys
 from collections import defaultdict
 from contextlib import contextmanager
 from importlib import import_module
 
 from fs.osfs import OSFS
-from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator
@@ -37,7 +37,7 @@ from xmodule.x_module import (  # lint-amnesty, pylint: disable=unused-import
 )
 
 from .exceptions import ItemNotFoundError
-from .inheritance import InheritanceKeyValueStore, compute_inherited_metadata, inheriting_field_data
+from .inheritance import compute_inherited_metadata, inheriting_field_data
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False, remove_blank_text=True)
 
@@ -49,12 +49,12 @@ log = logging.getLogger(__name__)
 class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
     def __init__(self, xmlstore, course_id, course_dir,  # lint-amnesty, pylint: disable=too-many-statements
                  error_tracker,
-                 load_error_modules=True, target_course_id=None, **kwargs):
+                 load_error_blocks=True, target_course_id=None, **kwargs):
         """
         A class that handles loading from xml.  Does some munging to ensure that
         all elements have unique slugs.
 
-        xmlstore: the XMLModuleStore to store the loaded modules in
+        xmlstore: the XMLModuleStore to store the loaded blocks in
         """
         self.unnamed = defaultdict(int)  # category -> num of new url_names for that category
         self.used_names = defaultdict(set)  # category -> set of used url_names
@@ -62,7 +62,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
         # Adding the course_id as passed in for later reference rather than
         # having to recombine the org/course/url_name
         self.course_id = course_id
-        self.load_error_modules = load_error_modules
+        self.load_error_blocks = load_error_blocks
         self.modulestore = xmlstore
 
         def process_xml(xml):  # lint-amnesty, pylint: disable=too-many-statements
@@ -107,7 +107,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
                             and re.search('[0-9a-fA-F]{12}$', url_name))
 
                 def fallback_name(orig_name=None):
-                    """Return the fallback name for this module.  This is a function instead of a variable
+                    """Return the fallback name for this block.  This is a function instead of a variable
                     because we want it to be lazy."""
                     if looks_like_fallback(orig_name):
                         # We're about to re-hash, in case something changed, so get rid of the tag_ and hash
@@ -125,17 +125,17 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
 
                     if tag in need_uniq_names:
                         error_tracker("PROBLEM: no name of any kind specified for {tag}.  Student "
-                                      "state will not be properly tracked for this module.  Problem xml:"
+                                      "state will not be properly tracked for this block.  Problem xml:"
                                       " '{xml}...'".format(tag=tag, xml=xml[:100]))
                     else:
                         # TODO (vshnayder): We may want to enable this once course repos are cleaned up.
                         # (or we may want to give up on the requirement for non-state-relevant issues...)
-                        # error_tracker("WARNING: no name specified for module. xml='{0}...'".format(xml[:100]))
+                        # error_tracker("WARNING: no name specified for block. xml='{0}...'".format(xml[:100]))
                         pass
 
                 # Make sure everything is unique
                 if url_name in self.used_names[tag]:
-                    # Always complain about modules that store state.  If it
+                    # Always complain about blocks that store state.  If it
                     # doesn't store state, don't complain about things that are
                     # hashed.
                     if tag in need_uniq_names:
@@ -160,17 +160,17 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
             try:
                 xml_data = etree.fromstring(xml)
                 make_name_unique(xml_data)
-                descriptor = self.xblock_from_node(
+                block = self.xblock_from_node(
                     xml_data,
                     None,  # parent_id
                     id_manager,
                 )
             except Exception as err:  # pylint: disable=broad-except
-                if not self.load_error_modules:
+                if not self.load_error_blocks:
                     raise
 
                 # Didn't load properly.  Fall back on loading as an error
-                # descriptor.  This should never error due to formatting.
+                # block.  This should never error due to formatting.
 
                 msg = "Error loading from xml. %s"
                 log.warning(
@@ -186,34 +186,34 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
 
                 self.error_tracker(msg)
                 err_msg = msg + "\n" + exc_info_to_str(sys.exc_info())
-                descriptor = ErrorBlock.from_xml(
+                block = ErrorBlock.from_xml(
                     xml,
                     self,
                     id_manager,
                     err_msg
                 )
 
-            descriptor.data_dir = course_dir
+            block.data_dir = course_dir
 
-            if descriptor.scope_ids.usage_id in xmlstore.modules[course_id]:
+            if block.scope_ids.usage_id in xmlstore.modules[course_id]:
                 # keep the parent pointer if any but allow everything else to overwrite
-                other_copy = xmlstore.modules[course_id][descriptor.scope_ids.usage_id]
-                descriptor.parent = other_copy.parent
-                if descriptor != other_copy:
-                    log.warning("%s has more than one definition", descriptor.scope_ids.usage_id)
-            xmlstore.modules[course_id][descriptor.scope_ids.usage_id] = descriptor
+                other_copy = xmlstore.modules[course_id][block.scope_ids.usage_id]
+                block.parent = other_copy.parent
+                if block != other_copy:
+                    log.warning("%s has more than one definition", block.scope_ids.usage_id)
+            xmlstore.modules[course_id][block.scope_ids.usage_id] = block
 
-            if descriptor.has_children:
-                for child in descriptor.get_children():
+            if block.has_children:
+                for child in block.get_children():
                     # parent is alphabetically least
-                    if child.parent is None or child.parent > descriptor.scope_ids.usage_id:
-                        child.parent = descriptor.location
+                    if child.parent is None or child.parent > block.scope_ids.usage_id:
+                        child.parent = block.location
                         child.save()
 
-            # After setting up the descriptor, save any changes that we have
-            # made to attributes on the descriptor to the underlying KeyValueStore.
-            descriptor.save()
-            return descriptor
+            # After setting up the block, save any changes that we have
+            # made to attributes on the block to the underlying KeyValueStore.
+            block.save()
+            return block
 
         render_template = lambda template, context: ''
 
@@ -238,6 +238,24 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
             id_reader=id_manager,
             **kwargs
         )
+
+    # pylint: disable=keyword-arg-before-vararg
+    def construct_xblock_from_class(self, cls, scope_ids, field_data=None, *args, **kwargs):
+        """
+        Construct a new xblock of type cls, mixing in the mixins
+        defined for this application.
+        """
+        if field_data:
+            # Currently, *some* XBlocks (those with XmlMixin) use XmlMixin.parse_xml() which instantiates
+            # its own key value store for field data. That is something which should be left to the runtime, for
+            # consistent behavior across all XBlocks, not controlled by individual XBlock implementations.
+            # We cannot just ignore field_data here though, because parse_xml may have pre-loaded data into it that we
+            # would otherwise lose.
+            warnings.warn(
+                'XBlocks should not instantiate their own field_data store during parse_xml()',
+                DeprecationWarning, stacklevel=2,
+            )
+        return super().construct_xblock_from_class(cls, scope_ids, field_data, *args, **kwargs)
 
     # id_generator is ignored, because each ImportSystem is already local to
     # a course, and has it's own id_generator already in place
@@ -304,7 +322,7 @@ class XMLModuleStore(ModuleStoreReadBase):
 
     def __init__(
             self, data_dir, default_class=None, source_dirs=None, course_ids=None,
-            load_error_modules=True, i18n_service=None, fs_service=None, user_service=None,
+            load_error_blocks=True, i18n_service=None, fs_service=None, user_service=None,
             signal_handler=None, target_course_id=None, **kwargs   # pylint: disable=unused-argument
     ):
         """
@@ -313,7 +331,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         Args:
             data_dir (str): path to data directory containing the course directories
 
-            default_class (str): dot-separated string defining the default descriptor
+            default_class (str): dot-separated string defining the default block
                 class to use if none is specified in entry_points
 
             source_dirs or course_ids (list of str): If specified, the list of source_dirs or course_ids to load.
@@ -329,7 +347,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         if course_ids is not None:
             course_ids = [CourseKey.from_string(course_id) for course_id in course_ids]
 
-        self.load_error_modules = load_error_modules
+        self.load_error_blocks = load_error_blocks
 
         if default_class is None:
             self.default_class = None
@@ -376,9 +394,9 @@ class XMLModuleStore(ModuleStoreReadBase):
         # So, make a tracker to track load-time errors, then put in the right
         # place after the course loads and we have its location
         errorlog = make_error_tracker()
-        course_descriptor = None
+        course_block = None
         try:
-            course_descriptor = self.load_course(course_dir, course_ids, errorlog.tracker, target_course_id)
+            course_block = self.load_course(course_dir, course_ids, errorlog.tracker, target_course_id)
         except Exception as exc:  # pylint: disable=broad-except
             msg = f'Course import {target_course_id}: ERROR: Failed to load courselike "{course_dir}": {str(exc)}'
             log.exception(msg)
@@ -387,15 +405,15 @@ class XMLModuleStore(ModuleStoreReadBase):
             monitor_import_failure(target_course_id, 'Updating', exception=exc)
             raise exc
         finally:
-            if course_descriptor is None:
+            if course_block is None:
                 pass
-            elif isinstance(course_descriptor, ErrorBlock):
+            elif isinstance(course_block, ErrorBlock):
                 # Didn't load course.  Instead, save the errors elsewhere.
                 self.errored_courses[course_dir] = errorlog
             else:
-                self.courses[course_dir] = course_descriptor
-                course_descriptor.parent = None
-                course_id = self.id_from_descriptor(course_descriptor)
+                self.courses[course_dir] = course_block
+                course_block.parent = None
+                course_id = self.id_from_block(course_block)
                 self._course_errors[course_id] = errorlog
 
     def __str__(self):
@@ -407,11 +425,11 @@ class XMLModuleStore(ModuleStoreReadBase):
         )
 
     @staticmethod
-    def id_from_descriptor(descriptor):
+    def id_from_block(block):
         """
-        Grab the course ID from the descriptor
+        Grab the course ID from the block
         """
-        return descriptor.id
+        return block.id
 
     def load_policy(self, policy_path, tracker):
         """
@@ -486,7 +504,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                 # VS[compat] : 'name' is deprecated, but support it for now...
                 if course_data.get('name'):
                     url_name = BlockUsageLocator.clean(course_data.get('name'))
-                    tracker("'name' is deprecated for module xml.  Please use "
+                    tracker("'name' is deprecated for block xml.  Please use "
                             "display_name and url_name.")
                 else:
                     url_name = None
@@ -519,7 +537,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                 course_id=course_id,
                 course_dir=course_dir,
                 error_tracker=tracker,
-                load_error_modules=self.load_error_modules,
+                load_error_blocks=self.load_error_blocks,
                 get_policy=get_policy,
                 mixins=self.xblock_mixins,
                 default_class=self.default_class,
@@ -527,30 +545,30 @@ class XMLModuleStore(ModuleStoreReadBase):
                 services=services,
                 target_course_id=target_course_id,
             )
-            course_descriptor = system.process_xml(etree.tostring(course_data, encoding='unicode'))
+            course_block = system.process_xml(etree.tostring(course_data, encoding='unicode'))
             # If we fail to load the course, then skip the rest of the loading steps
-            if isinstance(course_descriptor, ErrorBlock):
-                return course_descriptor
+            if isinstance(course_block, ErrorBlock):
+                return course_block
 
-            self.content_importers(system, course_descriptor, course_dir, url_name)
+            self.content_importers(system, course_block, course_dir, url_name)
 
             log.info(f'Course import {target_course_id}: Done with courselike import from {course_dir}')
-            return course_descriptor
+            return course_block
 
-    def content_importers(self, system, course_descriptor, course_dir, url_name):
+    def content_importers(self, system, course_block, course_dir, url_name):
         """
         Load all extra non-course content, and calculate metadata inheritance.
         """
-        # NOTE: The descriptors end up loading somewhat bottom up, which
+        # NOTE: The blocks end up loading somewhat bottom up, which
         # breaks metadata inheritance via get_children().  Instead
         # (actually, in addition to, for now), we do a final inheritance pass
-        # after we have the course descriptor.
-        compute_inherited_metadata(course_descriptor)
+        # after we have the course block.
+        compute_inherited_metadata(course_block)
 
         # now import all pieces of course_info which is expected to be stored
         # in <content_dir>/info or <content_dir>/info/<url_name>
         self.load_extra_content(
-            system, course_descriptor, 'course_info',
+            system, course_block, 'course_info',
             self.data_dir / course_dir / 'info',
             course_dir, url_name
         )
@@ -558,19 +576,19 @@ class XMLModuleStore(ModuleStoreReadBase):
         # now import all static tabs which are expected to be stored in
         # in <content_dir>/tabs or <content_dir>/tabs/<url_name>
         self.load_extra_content(
-            system, course_descriptor, 'static_tab',
+            system, course_block, 'static_tab',
             self.data_dir / course_dir / 'tabs',
             course_dir, url_name
         )
 
         self.load_extra_content(
-            system, course_descriptor, 'custom_tag_template',
+            system, course_block, 'custom_tag_template',
             self.data_dir / course_dir / 'custom_tags',
             course_dir, url_name
         )
 
         self.load_extra_content(
-            system, course_descriptor, 'about',
+            system, course_block, 'about',
             self.data_dir / course_dir / 'about',
             course_dir, url_name
         )
@@ -587,14 +605,14 @@ class XMLModuleStore(ModuleStoreReadBase):
         # always used, preventing duplicate keys.
         return CourseKey.from_string('/'.join([org, course, url_name]))
 
-    def load_extra_content(self, system, course_descriptor, category, base_dir, course_dir, url_name):  # lint-amnesty, pylint: disable=missing-function-docstring
-        self._load_extra_content(system, course_descriptor, category, base_dir, course_dir)
+    def load_extra_content(self, system, course_block, category, base_dir, course_dir, url_name):  # lint-amnesty, pylint: disable=missing-function-docstring
+        self._load_extra_content(system, course_block, category, base_dir, course_dir)
 
         # then look in a override folder based on the course run
         if os.path.isdir(base_dir / url_name):
-            self._load_extra_content(system, course_descriptor, category, base_dir / url_name, course_dir)
+            self._load_extra_content(system, course_block, category, base_dir / url_name, course_dir)
 
-    def _import_field_content(self, course_descriptor, category, file_path):
+    def _import_field_content(self, course_block, category, file_path):
         """
         Import field data content for field other than 'data' or 'metadata' form json file and
         return field data content as dictionary
@@ -606,7 +624,7 @@ class XMLModuleStore(ModuleStoreReadBase):
             dirname, field, file_suffix = file_path.split('/')[-1].split('.')
             if file_suffix == 'json' and field not in DEFAULT_CONTENT_FIELDS:
                 slug = os.path.splitext(os.path.basename(dirname))[0]
-                location = course_descriptor.scope_ids.usage_id.replace(category=category, name=slug)
+                location = course_block.scope_ids.usage_id.replace(category=category, name=slug)
                 with open(file_path) as field_content_file:
                     field_data = json.load(field_content_file)
                     data_content = {field: field_data}
@@ -618,7 +636,7 @@ class XMLModuleStore(ModuleStoreReadBase):
 
         return slug, location, data_content
 
-    def _load_extra_content(self, system, course_descriptor, category, content_path, course_dir):
+    def _load_extra_content(self, system, course_block, category, content_path, course_dir):
         """
         Import fields data content from files
         """
@@ -633,37 +651,37 @@ class XMLModuleStore(ModuleStoreReadBase):
                 try:
                     if filepath.find('.json') != -1:
                         # json file with json data content
-                        slug, loc, data_content = self._import_field_content(course_descriptor, category, filepath)
+                        slug, loc, data_content = self._import_field_content(course_block, category, filepath)
                         if data_content is None:
                             continue
                         else:
                             try:
                                 # get and update data field in xblock runtime
-                                module = system.load_item(loc)
+                                block = system.get_block(loc)
                                 for key, value in data_content.items():
-                                    setattr(module, key, value)
-                                module.save()
+                                    setattr(block, key, value)
+                                block.save()
                             except ItemNotFoundError:
-                                module = None
+                                block = None
                                 data_content['location'] = loc
                                 data_content['category'] = category
                     else:
                         slug = os.path.splitext(os.path.basename(filepath))[0]
-                        loc = course_descriptor.scope_ids.usage_id.replace(category=category, name=slug)
+                        loc = course_block.scope_ids.usage_id.replace(category=category, name=slug)
                         # html file with html data content
                         html = f.read()
                         try:
-                            module = system.load_item(loc)
-                            module.data = html
-                            module.save()
+                            block = system.get_block(loc)
+                            block.data = html
+                            block.save()
                         except ItemNotFoundError:
-                            module = None
+                            block = None
                             data_content = {'data': html, 'location': loc, 'category': category}
 
-                    if module is None:
-                        module = system.construct_xblock(
+                    if block is None:
+                        block = system.construct_xblock(
                             category,
-                            # We're loading a descriptor, so student_id is meaningless
+                            # We're loading a block, so student_id is meaningless
                             # We also don't have separate notions of definition and usage ids yet,
                             # so we use the location for both
                             ScopeIds(None, category, loc, loc),
@@ -673,14 +691,14 @@ class XMLModuleStore(ModuleStoreReadBase):
                         # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)  # lint-amnesty, pylint: disable=line-too-long
                         # from the course policy
                         if category == "static_tab":
-                            tab = CourseTabList.get_tab_by_slug(tab_list=course_descriptor.tabs, url_slug=slug)
+                            tab = CourseTabList.get_tab_by_slug(tab_list=course_block.tabs, url_slug=slug)
                             if tab:
-                                module.display_name = tab.name
-                                module.course_staff_only = tab.course_staff_only
-                        module.data_dir = course_dir
-                        module.save()
+                                block.display_name = tab.name
+                                block.course_staff_only = tab.course_staff_only
+                        block.data_dir = course_dir
+                        block.save()
 
-                        self.modules[course_descriptor.id][module.scope_ids.usage_id] = module
+                        self.modules[course_block.id][block.scope_ids.usage_id] = block
                 except Exception as exc:  # pylint: disable=broad-except
                     logging.exception("Failed to load %s. Skipping... \
                             Exception: %s", filepath, str(exc))
@@ -702,7 +720,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         If no object is found at that location, raises
             xmodule.modulestore.exceptions.ItemNotFoundError
 
-        usage_key: a UsageKey that matches the module we are looking for.
+        usage_key: a UsageKey that matches the block we are looking for.
         """
         try:
             return self.modules[usage_key.course_key][usage_key]
@@ -712,7 +730,7 @@ class XMLModuleStore(ModuleStoreReadBase):
     def get_items(self, course_id, settings=None, content=None, revision=None, qualifiers=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Returns:
-            list of XModuleDescriptor instances for the matching items within the course with
+            list of XBlock instances for the matching items within the course with
             the given course_id
 
         NOTE: don't use this to look for courses
@@ -737,32 +755,32 @@ class XMLModuleStore(ModuleStoreReadBase):
         if revision == ModuleStoreEnum.RevisionOption.draft_only:
             return []
 
-        items = []
+        blocks = []
 
         qualifiers = qualifiers.copy() if qualifiers else {}  # copy the qualifiers (destructively manipulated here)
         category = qualifiers.pop('category', None)
         name = qualifiers.pop('name', None)
 
-        def _block_matches_all(mod_loc, module):
-            if category and mod_loc.category != category:
+        def _block_matches_all(block_loc, block):
+            if category and block_loc.category != category:
                 return False
             if name:
                 if isinstance(name, list):
                     # Support for passing a list as the name qualifier
-                    if mod_loc.name not in name:
+                    if block_loc.name not in name:
                         return False
-                elif mod_loc.name != name:
+                elif block_loc.name != name:
                     return False
             return all(
-                self._block_matches(module, fields or {})
+                self._block_matches(block, fields or {})
                 for fields in [settings, content, qualifiers]
             )
 
-        for mod_loc, module in self.modules[course_id].items():
-            if _block_matches_all(mod_loc, module):
-                items.append(module)
+        for block_loc, block in self.modules[course_id].items():
+            if _block_matches_all(block_loc, block):
+                blocks.append(block)
 
-        return items
+        return blocks
 
     def make_course_key(self, org, course, run):
         """
@@ -782,7 +800,7 @@ class XMLModuleStore(ModuleStoreReadBase):
 
     def get_courses(self, **kwargs):
         """
-        Returns a list of course descriptors.  If there were errors on loading,
+        Returns a list of course blocks.  If there were errors on loading,
         some of these may be ErrorBlock instead.
         """
         return list(self.courses.values())
@@ -899,27 +917,11 @@ class LibraryXMLModuleStore(XMLModuleStore):
         """
         return LibraryLocator(org=org, library=library)
 
-    @staticmethod
-    def patch_descriptor_kvs(library_descriptor):
-        """
-        Metadata inheritance can be done purely through XBlocks, but in the import phase
-        a root block with an InheritanceKeyValueStore is assumed to be at the top of the hierarchy.
-        This should change in the future, but as XBlocks don't have this KVS, we have to patch it
-        here manually.
-        """
-        init_dict = {key: getattr(library_descriptor, key) for key in library_descriptor.fields.keys()}
-        # if set, invalidate '_unwrapped_field_data' so it will be reset
-        # the next time it will be called
-        lazy.invalidate(library_descriptor, '_unwrapped_field_data')
-        # pylint: disable=protected-access
-        library_descriptor._field_data = inheriting_field_data(InheritanceKeyValueStore(init_dict))
-
-    def content_importers(self, system, course_descriptor, course_dir, url_name):
+    def content_importers(self, system, course_block, course_dir, url_name):
         """
         Handle Metadata inheritance for Libraries.
         """
-        self.patch_descriptor_kvs(course_descriptor)
-        compute_inherited_metadata(course_descriptor)
+        compute_inherited_metadata(course_block)
 
     def get_library(self, library_id, depth=0, **kwargs):  # pylint: disable=unused-argument
         """
@@ -932,11 +934,11 @@ class LibraryXMLModuleStore(XMLModuleStore):
         return None
 
     @staticmethod
-    def id_from_descriptor(descriptor):
+    def id_from_block(block):
         """
-        Get the Library Key from the Library descriptor.
+        Get the Library Key from the Library block.
         """
-        return descriptor.location.library_key
+        return block.location.library_key
 
     def get_orphans(self, course_key, **kwargs):
         """

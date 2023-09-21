@@ -825,6 +825,8 @@ def get_instructors(course_run, marketing_root_url):
     """
     Get course instructors.
     """
+    if course_run is None:
+        raise ValueError("missing course_run")
     instructors = []
     staff = course_run.get('staff', [])
     for instructor in staff:

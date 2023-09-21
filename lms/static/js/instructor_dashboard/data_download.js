@@ -2,6 +2,7 @@
 
 (function() {
     'use strict';
+
     var DataDownload, DataDownloadCertificate, PendingInstructorTasks, ReportDownloads, statusAjaxError;
 
     statusAjaxError = function() {

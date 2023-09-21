@@ -2,10 +2,9 @@
 Tests for the Unit XBlock
 """
 
-import re
 import unittest
-from xml.dom import minidom
 from unittest.mock import patch
+from xml.etree import ElementTree
 
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
@@ -74,14 +73,9 @@ class UnitBlockTests(XmlTest, unittest.TestCase):
         """
         assert XBlockCompletionMode.get_mode(UnitBlock) == XBlockCompletionMode.AGGREGATOR
 
-    def assertXmlEqual(self, xml_str_a, xml_str_b):
-        """
-        Assert that the given XML strings are equal,
-        ignoring attribute order and some whitespace variations.
-        """
-        def clean(xml_str):
-            # Collapse repeated whitespace:
-            xml_str = re.sub(r'(\s)\s+', r'\1', xml_str)
-            xml_bytes = xml_str.encode('utf8')
-            return minidom.parseString(xml_bytes).toprettyxml()
-        assert clean(xml_str_a) == clean(xml_str_b)
+    def assertXmlEqual(self, xml_str_a: str, xml_str_b: str) -> bool:
+        """ Assert that the given XML strings are equal, ignoring attribute order and some whitespace variations. """
+        self.assertEqual(
+            ElementTree.canonicalize(xml_str_a, strip_text=True),
+            ElementTree.canonicalize(xml_str_b, strip_text=True),
+        )

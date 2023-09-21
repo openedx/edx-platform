@@ -1,7 +1,7 @@
 """
 Tests for Blocks Views
 """
-
+import ddt
 
 from datetime import datetime
 from unittest import mock
@@ -16,8 +16,12 @@ from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseDataResearcherRole
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from openedx.core.djangoapps.discussions.models import (
+    DiscussionsConfiguration,
+    Provider,
+)
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import ToyCourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import BlockFactory, ToyCourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .helpers import deserialize_usage_key
 
@@ -398,6 +402,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         self.verify_response_with_requested_fields(response)
 
 
+@ddt.ddt
 class TestBlocksInCourseView(TestBlocksView, CompletionWaffleTestMixin):  # pylint: disable=test-inherits-tests
     """
     Test class for BlocksInCourseView
@@ -491,6 +496,37 @@ class TestBlocksInCourseView(TestBlocksView, CompletionWaffleTestMixin):  # pyli
         })
         for block_id in self.non_orphaned_block_usage_keys:
             assert response.data['blocks'][block_id].get('completion')
+
+    @ddt.data(
+        False,
+        True,
+    )
+    def test_filter_discussion_xblocks(self, is_openedx_provider):
+        """
+        Tests if discussion xblocks are hidden for openedx provider
+        """
+        def blocks_has_discussion_xblock(blocks):
+            for key, value in blocks.items():
+                if value.get('type') == 'discussion':
+                    return True
+            return False
+
+        BlockFactory.create(
+            parent_location=self.course.location,
+            category="discussion",
+            discussion_id='topic_id',
+            discussion_category='category',
+            discussion_target='subcategory',
+        )
+        if is_openedx_provider:
+            DiscussionsConfiguration.objects.create(context_key=self.course_key, provider_type=Provider.OPEN_EDX)
+        response = self.client.get(self.url, self.query_params)
+
+        has_discussion_xblock = blocks_has_discussion_xblock(response.data.get('blocks', {}))
+        if is_openedx_provider:
+            assert not has_discussion_xblock
+        else:
+            assert has_discussion_xblock
 
 
 class TestBlockMetadataView(SharedModuleStoreTestCase):  # pylint: disable=test-inherits-tests

@@ -10,7 +10,7 @@ from cms.djangoapps.contentstore.utils import reverse_course_url
 from cms.djangoapps.contentstore.views import tabs
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.tabs import CourseTabList  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import STUDENT_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -28,7 +28,7 @@ class TabsPageTests(CourseTestCase):
         self.url = reverse_course_url('tabs_handler', self.course.id)
 
         # add a static tab to the course, for code coverage
-        self.test_tab = ItemFactory.create(
+        self.test_tab = BlockFactory.create(
             parent_location=self.course.location,
             category="static_tab",
             display_name="Static_1"

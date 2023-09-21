@@ -2,7 +2,7 @@
 Actions manager for transcripts ajax calls.
 +++++++++++++++++++++++++++++++++++++++++++
 
-Module do not support rollback (pressing "Cancel" button in Studio)
+Blocks do not support rollback (pressing "Cancel" button in Studio)
 All user changes are saved immediately.
 """
 
@@ -21,7 +21,7 @@ from edxval.api import create_external_video, create_or_update_video_transcript
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 
-from cms.djangoapps.contentstore.views.videos import TranscriptProvider
+from cms.djangoapps.contentstore.video_storage_handlers import TranscriptProvider
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.util.json_request import JsonResponse
 from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
@@ -71,7 +71,7 @@ def link_video_to_component(video_component, user):
     Links a VAL video to the video component.
 
     Arguments:
-        video_component: video descriptor item.
+        video_component: video block.
         user: A requesting user.
 
     Returns:
@@ -134,7 +134,7 @@ def validate_video_block(request, locator):
         locator: video locator.
 
     Returns:
-        A tuple containing error(or None) and video descriptor(i.e. if validation succeeds).
+        A tuple containing error(or None) and video block(i.e. if validation succeeds).
 
     Raises:
         PermissionDenied: if requesting user does not have access to author the video component.
@@ -143,7 +143,7 @@ def validate_video_block(request, locator):
     try:
         item = _get_item(request, {'locator': locator})
         if item.category != 'video':
-            error = _('Transcripts are supported only for "video" modules.')
+            error = _('Transcripts are supported only for "video" blocks.')
     except (InvalidKeyError, ItemNotFoundError):
         error = _('Cannot find item by locator.')
 
@@ -189,7 +189,7 @@ def validate_transcript_upload_data(request):
 @login_required
 def upload_transcripts(request):
     """
-    Upload transcripts for current module.
+    Upload transcripts for current block.
 
     returns: response dict::
 
@@ -231,6 +231,8 @@ def upload_transcripts(request):
                 file_data=ContentFile(sjson_subs),
             )
 
+            video.transcripts['en'] = f"{edx_video_id}-en.srt"
+            video.save_with_metadata(request.user)
             if transcript_created is None:
                 response = JsonResponse({'status': 'Invalid Video ID'}, status=400)
 
@@ -455,7 +457,7 @@ def _validate_transcripts_data(request):
         raise TranscriptsRequestValidationException(_("Can't find item by locator."))  # lint-amnesty, pylint: disable=raise-missing-from
 
     if item.category != 'video':
-        raise TranscriptsRequestValidationException(_('Transcripts are supported only for "video" modules.'))
+        raise TranscriptsRequestValidationException(_('Transcripts are supported only for "video" blocks.'))
 
     # parse data form request.GET.['data']['video'] to useful format
     videos = {'youtube': '', 'html5': {}}

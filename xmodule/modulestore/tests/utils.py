@@ -2,13 +2,12 @@
 Helper classes and methods for running modulestore tests without Django.
 """
 import os
-from contextlib import contextmanager
+from contextlib import contextmanager, ExitStack
 from importlib import import_module
 from shutil import rmtree
 from tempfile import mkdtemp
 from uuid import uuid4
 
-from contextlib2 import ExitStack
 from path import Path as path
 
 from xmodule.contentstore.mongo import MongoContentStore
@@ -19,7 +18,7 @@ from xmodule.modulestore.mongo.base import ModuleStoreEnum
 from xmodule.modulestore.mongo.draft import DraftModuleStore
 from xmodule.modulestore.split_mongo.split_draft import DraftVersioningModuleStore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_ONLY_SPLIT_MODULESTORE_DRAFT_PREFERRED
-from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.modulestore.tests.factories import BlockFactory
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.tests import DATA_DIR
@@ -109,7 +108,7 @@ class MixedSplitTestCase(ModuleStoreTestCase):
         """
         extra = {"publish_item": False, "user_id": self.user_id}
         extra.update(kwargs)
-        return ItemFactory.create(
+        return BlockFactory.create(
             category=category,
             parent=parent_block,
             parent_location=parent_block.location,
@@ -135,7 +134,7 @@ class ProceduralCourseTestMixin:
 
             xblock_type = stack[0]
             for _ in range(branching):
-                child = ItemFactory.create(
+                child = BlockFactory.create(
                     category=xblock_type,
                     parent=parent,
                     user_id=user_id

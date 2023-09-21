@@ -13,13 +13,13 @@ from lxml import etree
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xblock.fields import Boolean, Scope
-from openedx_filters.learning.filters import VerticalBlockChildRenderStarted
+from openedx_filters.learning.filters import VerticalBlockChildRenderStarted, VerticalBlockRenderCompleted
 from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.progress import Progress
 from xmodule.seq_block import SequenceFields
 from xmodule.studio_editable import StudioEditableBlock
 from xmodule.util.misc import is_xblock_an_assignment
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW, XModuleFields
 from xmodule.xml_block import XmlMixin
 
@@ -72,7 +72,7 @@ class VerticalBlock(
 
     show_in_read_only_mode = True
 
-    def _student_or_public_view(self, context, view):
+    def _student_or_public_view(self, context, view):  # lint-amnesty, pylint: disable=too-many-statements
         """
         Renders the requested view type of the block in the LMS.
         """
@@ -95,7 +95,7 @@ class VerticalBlock(
                     'edx-platform.username'
                 )
 
-        child_blocks = self.get_display_items()  # lint-amnesty, pylint: disable=no-member
+        child_blocks = self.get_children()  # lint-amnesty, pylint: disable=no-member
 
         child_blocks_to_complete_on_view = set()
         completion_service = self.runtime.service(self, 'completion')
@@ -117,11 +117,15 @@ class VerticalBlock(
                     'mark-completed-on-view-after-delay': complete_on_view_delay
                 }
 
-            # .. filter_implemented_name: VerticalBlockChildRenderStarted
-            # .. filter_type: org.openedx.learning.vertical_block_child.render.started.v1
-            child, child_block_context = VerticalBlockChildRenderStarted.run_filter(
-                block=child, context=child_block_context
-            )
+            try:
+                # .. filter_implemented_name: VerticalBlockChildRenderStarted
+                # .. filter_type: org.openedx.learning.vertical_block_child.render.started.v1
+                child, child_block_context = VerticalBlockChildRenderStarted.run_filter(
+                    block=child, context=child_block_context
+                )
+            except VerticalBlockChildRenderStarted.PreventChildBlockRender as exc:
+                log.info("Skipping %s from vertical block. Reason: %s", child, exc.message)
+                continue
 
             rendered_child = child.render(view, child_block_context)
             fragment.add_fragment_resources(rendered_child)
@@ -157,10 +161,21 @@ class VerticalBlock(
                     child_context['username'], str(self.location)),  # pylint: disable=no-member
             })
 
-        fragment.add_content(self.runtime.service(self, 'mako').render_template('vert_module.html', fragment_context))
+        mako_service = self.runtime.service(self, 'mako')
+        fragment.add_content(mako_service.render_lms_template('vert_module.html', fragment_context))
 
-        add_webpack_to_fragment(fragment, 'VerticalStudentView')
+        add_webpack_js_to_fragment(fragment, 'VerticalStudentView')
         fragment.initialize_js('VerticalStudentView')
+
+        try:
+            # .. filter_implemented_name: VerticalBlockRenderCompleted
+            # .. filter_type: org.openedx.learning.vertical_block.render.completed.v1
+            _, fragment, context, view = VerticalBlockRenderCompleted.run_filter(
+                block=self, fragment=fragment, context=context, view=view
+            )
+        except VerticalBlockRenderCompleted.PreventVerticalBlockRender as exc:
+            log.info("VerticalBlock rendering stopped. Reason: %s", exc.message)
+            fragment.content = exc.message
 
         return fragment
 
@@ -269,7 +284,7 @@ class VerticalBlock(
 
     def index_dictionary(self):
         """
-        Return dictionary prepared with module content and type for indexing.
+        Return dictionary prepared with block content and type for indexing.
         """
         # return key/value fields in a Python dict object
         # values may be numeric / string or dict

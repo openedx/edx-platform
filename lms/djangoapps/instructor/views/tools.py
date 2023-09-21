@@ -11,7 +11,6 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.http import HttpResponseBadRequest
 from django.utils.translation import gettext as _
 from edx_when import api
-from opaque_keys.edx.keys import UsageKey
 from pytz import UTC
 
 from common.djangoapps.student.models import CourseEnrollment, get_user_by_username_or_email
@@ -96,9 +95,8 @@ def parse_datetime(datestr):
 
 def find_unit(course, url):
     """
-    Finds the unit (block, module, whatever the terminology is) with the given
-    url in the course tree and returns the unit.  Raises DashboardError if no
-    unit is found.
+    Finds the unit/block with the given url in the course tree and returns the unit.
+    Raises DashboardError if no unit is found.
     """
     def find(node, url):
         """
@@ -215,9 +213,9 @@ def set_due_date_extension(course, unit, student, due_date, actor=None, reason='
         api.get_dates_for_course(course.id, user=student, use_cached=False)
 
 
-def dump_module_extensions(course, unit):
+def dump_block_extensions(course, unit):
     """
-    Dumps data about students with due date extensions for a particular module,
+    Dumps data about students with due date extensions for a particular block,
     specified by 'url', in a particular course.
     """
     header = [_("Username"), _("Full Name"), _("Extended Due Date")]
@@ -260,11 +258,15 @@ def dump_student_extensions(course, student):
         "data": data}
 
 
-def add_block_ids(payload):
-    """
-    rather than manually parsing block_ids from module_ids on the client, pass the block_ids explicitly in the payload
-    """
-    if 'data' in payload:
-        for ele in payload['data']:
-            if 'module_id' in ele:
-                ele['block_id'] = UsageKey.from_string(ele['module_id']).block_id
+def keep_field_private(query_features, field_name):
+    '''
+    Utility to remove a field from a list of field names requested of a report
+    Keeps the specified field_name private (excluded from report)
+    '''
+    if (query_features is None) or (field_name is None):
+        raise DashboardError("Missing private field specification")
+
+    try:
+        query_features.remove(field_name)
+    except ValueError:
+        pass

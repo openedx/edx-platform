@@ -2,10 +2,8 @@
 Tests for Blockstore-based Content Libraries
 """
 from uuid import UUID
-from unittest.mock import patch
-from urllib.parse import urlparse, parse_qsl
+from unittest.mock import Mock, patch
 
-import json
 import ddt
 from django.conf import settings
 from django.contrib.auth.models import Group
@@ -13,10 +11,17 @@ from django.test.client import Client
 from django.test.utils import override_settings
 from organizations.models import Organization
 from rest_framework.test import APITestCase
-from web_fragments.fragment import Fragment
-from webob import Response
-from xblock.core import XBlock
 
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
+from openedx_events.content_authoring.data import ContentLibraryData, LibraryBlockData
+from openedx_events.content_authoring.signals import (
+    CONTENT_LIBRARY_CREATED,
+    CONTENT_LIBRARY_DELETED,
+    CONTENT_LIBRARY_UPDATED,
+    LIBRARY_BLOCK_CREATED,
+    LIBRARY_BLOCK_DELETED,
+    LIBRARY_BLOCK_UPDATED,
+)
 from openedx.core.djangoapps.content_libraries.libraries_index import LibraryBlockIndexer, ContentLibraryIndexer
 from openedx.core.djangoapps.content_libraries.tests.base import (
     ContentLibrariesRestApiBlockstoreServiceTest,
@@ -26,7 +31,6 @@ from openedx.core.djangoapps.content_libraries.tests.base import (
     URL_BLOCK_RENDER_VIEW,
     URL_BLOCK_GET_HANDLER_URL,
     URL_BLOCK_XBLOCK_HANDLER,
-    URL_LIB_BLOCK_OLX,
 )
 from openedx.core.djangoapps.content_libraries.constants import VIDEO, COMPLEX, PROBLEM, CC_4_BY, ALL_RIGHTS_RESERVED
 from openedx.core.djangolib.blockstore_cache import cache
@@ -309,7 +313,7 @@ class ContentLibrariesTestMixin:
         block_data = self._add_block_to_library(lib_id, "problem", "problem1")
         self.assertDictContainsEntries(block_data, {
             "id": "lb:CL-TEST:testlib1:problem:problem1",
-            "display_name": "Blank Advanced Problem",
+            "display_name": "Blank Problem",
             "block_type": "problem",
             "has_unpublished_changes": True,
         })
@@ -491,7 +495,7 @@ class ContentLibrariesTestMixin:
             assert len(self._get_library_blocks(lib['id'], {'text_search': 'Foo', 'block_type': 'video'})) == 0
             assert len(self._get_library_blocks(lib['id'], {'text_search': 'Baz', 'block_type': 'video'})) == 1
             assert len(self._get_library_blocks(lib['id'], {'text_search': 'Baz', 'block_type': ['video', 'html']})) ==\
-                   2
+                2
             assert len(self._get_library_blocks(lib['id'], {'block_type': 'video'})) == 1
             assert len(self._get_library_blocks(lib['id'], {'block_type': 'problem'})) == 3
             assert len(self._get_library_blocks(lib['id'], {'block_type': 'squirrel'})) == 0
@@ -543,8 +547,8 @@ class ContentLibrariesTestMixin:
 
         # Check the resulting OLX of the unit:
         assert self._get_library_block_olx(unit_block['id']) ==\
-               '<unit xblock-family="xblock.v1">\n  <xblock-include definition="html/html1"/>\n' \
-               '  <xblock-include definition="problem/problem1"/>\n</unit>\n'
+            '<unit xblock-family="xblock.v1">\n  <xblock-include definition="html/html1"/>\n' \
+            '  <xblock-include definition="problem/problem1"/>\n</unit>\n'
 
         # The unit can see and render its children:
         fragment = self._render_block_view(unit_block["id"], "student_view")
@@ -938,6 +942,295 @@ class ContentLibrariesTestMixin:
         else:
             assert len(types) > 1
 
+    def test_content_library_create_event(self):
+        """
+        Check that CONTENT_LIBRARY_CREATED event is sent when a content library is created.
+        """
+        event_receiver = Mock()
+        CONTENT_LIBRARY_CREATED.connect(event_receiver)
+        lib = self._create_library(slug="test_lib_event_create", title="Event Test Library", description="Testing event in library")  # lint-amnesty, pylint: disable=line-too-long
+        library_key = LibraryLocatorV2.from_string(lib['id'])
+
+        event_receiver.assert_called_once()
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_LIBRARY_CREATED,
+                "sender": None,
+                "content_library": ContentLibraryData(
+                    library_key=library_key,
+                    update_blocks=False,
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
+
+    def test_content_library_update_event(self):
+        """
+        Check that CONTENT_LIBRARY_UPDATED event is sent when a content library is updated.
+        """
+        event_receiver = Mock()
+        CONTENT_LIBRARY_UPDATED.connect(event_receiver)
+        lib = self._create_library(slug="test_lib_event_update", title="Event Test Library", description="Testing event in library")  # lint-amnesty, pylint: disable=line-too-long
+
+        lib2 = self._update_library(lib["id"], title="New Title")
+        library_key = LibraryLocatorV2.from_string(lib2['id'])
+
+        event_receiver.assert_called_once()
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_LIBRARY_UPDATED,
+                "sender": None,
+                "content_library": ContentLibraryData(
+                    library_key=library_key,
+                    update_blocks=False,
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
+
+    def test_content_library_delete_event(self):
+        """
+        Check that CONTENT_LIBRARY_DELETED event is sent when a content library is deleted.
+        """
+        event_receiver = Mock()
+        CONTENT_LIBRARY_DELETED.connect(event_receiver)
+        lib = self._create_library(slug="test_lib_event_delete", title="Event Test Library", description="Testing event in library")  # lint-amnesty, pylint: disable=line-too-long
+        library_key = LibraryLocatorV2.from_string(lib['id'])
+
+        self._delete_library(lib["id"])
+
+        event_receiver.assert_called_once()
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_LIBRARY_DELETED,
+                "sender": None,
+                "content_library": ContentLibraryData(
+                    library_key=library_key,
+                    update_blocks=False,
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
+
+    def test_library_block_create_event(self):
+        """
+        Check that LIBRARY_BLOCK_CREATED event is sent when a library block is created.
+        """
+        event_receiver = Mock()
+        LIBRARY_BLOCK_CREATED.connect(event_receiver)
+        lib = self._create_library(slug="test_lib_block_event_create", title="Event Test Library", description="Testing event in library")  # lint-amnesty, pylint: disable=line-too-long
+        lib_id = lib["id"]
+        self._add_block_to_library(lib_id, "problem", "problem1")
+
+        library_key = LibraryLocatorV2.from_string(lib_id)
+        usage_key = LibraryUsageLocatorV2(
+            lib_key=library_key,
+            block_type="problem",
+            usage_id="problem1"
+        )
+
+        event_receiver.assert_called_once()
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_BLOCK_CREATED,
+                "sender": None,
+                "library_block": LibraryBlockData(
+                    library_key=library_key,
+                    usage_key=usage_key
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
+
+    def test_library_block_olx_update_event(self):
+        """
+        Check that LIBRARY_BLOCK_CREATED event is sent when the OLX source is updated.
+        """
+        event_receiver = Mock()
+        LIBRARY_BLOCK_UPDATED.connect(event_receiver)
+        lib = self._create_library(slug="test_lib_block_event_olx_update", title="Event Test Library", description="Testing event in library")  # lint-amnesty, pylint: disable=line-too-long
+        lib_id = lib["id"]
+
+        library_key = LibraryLocatorV2.from_string(lib_id)
+
+        block = self._add_block_to_library(lib_id, "problem", "problem1")
+        block_id = block["id"]
+        usage_key = LibraryUsageLocatorV2(
+            lib_key=library_key,
+            block_type="problem",
+            usage_id="problem1"
+        )
+
+        new_olx = """
+        <problem display_name="New Multi Choice Question" max_attempts="5">
+            <multiplechoiceresponse>
+                <p>This is a normal capa problem with unicode 🔥. It has "maximum attempts" set to **5**.</p>
+                <label>Blockstore is designed to store.</label>
+                <choicegroup type="MultipleChoice">
+                    <choice correct="false">XBlock metadata only</choice>
+                    <choice correct="true">XBlock data/metadata and associated static asset files</choice>
+                    <choice correct="false">Static asset files for XBlocks and courseware</choice>
+                    <choice correct="false">XModule metadata only</choice>
+                </choicegroup>
+            </multiplechoiceresponse>
+        </problem>
+        """.strip()
+
+        self._set_library_block_olx(block_id, new_olx)
+
+        event_receiver.assert_called_once()
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_BLOCK_UPDATED,
+                "sender": None,
+                "library_block": LibraryBlockData(
+                    library_key=library_key,
+                    usage_key=usage_key
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
+
+    def test_library_block_child_update_event(self):
+        """
+        Check that LIBRARY_BLOCK_CREATED event is sent when a child is created.
+        """
+        event_receiver = Mock()
+        LIBRARY_BLOCK_UPDATED.connect(event_receiver)
+        lib = self._create_library(slug="test_lib_block_event_child_update", title="Event Test Library", description="Testing event in library")  # lint-amnesty, pylint: disable=line-too-long
+        lib_id = lib["id"]
+
+        library_key = LibraryLocatorV2.from_string(lib_id)
+
+        parent_block = self._add_block_to_library(lib_id, "unit", "u1")
+        parent_block_id = parent_block["id"]
+
+        self._add_block_to_library(lib["id"], "problem", "problem1", parent_block=parent_block_id)
+
+        usage_key = LibraryUsageLocatorV2(
+            lib_key=library_key,
+            block_type="problem",
+            usage_id="problem1"
+        )
+
+        event_receiver.assert_called_once()
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_BLOCK_UPDATED,
+                "sender": None,
+                "library_block": LibraryBlockData(
+                    library_key=library_key,
+                    usage_key=usage_key
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
+
+    def test_library_block_add_asset_update_event(self):
+        """
+        Check that LIBRARY_BLOCK_CREATED event is sent when a static asset is uploaded associated with the XBlock.
+        """
+        event_receiver = Mock()
+        LIBRARY_BLOCK_UPDATED.connect(event_receiver)
+        lib = self._create_library(slug="test_lib_block_event_add_asset_update", title="Event Test Library", description="Testing event in library")  # lint-amnesty, pylint: disable=line-too-long
+        lib_id = lib["id"]
+
+        library_key = LibraryLocatorV2.from_string(lib_id)
+
+        block = self._add_block_to_library(lib_id, "unit", "u1")
+        block_id = block["id"]
+        self._set_library_block_asset(block_id, "test.txt", b"data")
+
+        usage_key = LibraryUsageLocatorV2(
+            lib_key=library_key,
+            block_type="unit",
+            usage_id="u1"
+        )
+
+        event_receiver.assert_called_once()
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_BLOCK_UPDATED,
+                "sender": None,
+                "library_block": LibraryBlockData(
+                    library_key=library_key,
+                    usage_key=usage_key
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
+
+    def test_library_block_del_asset_update_event(self):
+        """
+        Check that LIBRARY_BLOCK_CREATED event is sent when a static asset is removed from XBlock.
+        """
+        event_receiver = Mock()
+        LIBRARY_BLOCK_UPDATED.connect(event_receiver)
+        lib = self._create_library(slug="test_lib_block_event_del_asset_update", title="Event Test Library", description="Testing event in library")  # lint-amnesty, pylint: disable=line-too-long
+        lib_id = lib["id"]
+
+        library_key = LibraryLocatorV2.from_string(lib_id)
+
+        block = self._add_block_to_library(lib_id, "unit", "u1")
+        block_id = block["id"]
+        self._set_library_block_asset(block_id, "test.txt", b"data")
+
+        self._delete_library_block_asset(block_id, 'text.txt')
+
+        usage_key = LibraryUsageLocatorV2(
+            lib_key=library_key,
+            block_type="unit",
+            usage_id="u1"
+        )
+
+        event_receiver.assert_called()
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_BLOCK_UPDATED,
+                "sender": None,
+                "library_block": LibraryBlockData(
+                    library_key=library_key,
+                    usage_key=usage_key
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
+
+    def test_library_block_delete_event(self):
+        """
+        Check that LIBRARY_BLOCK_DELETED event is sent when a content library is deleted.
+        """
+        event_receiver = Mock()
+        LIBRARY_BLOCK_DELETED.connect(event_receiver)
+        lib = self._create_library(slug="test_lib_block_event_delete", title="Event Test Library", description="Testing event in library")  # lint-amnesty, pylint: disable=line-too-long
+
+        lib_id = lib["id"]
+        library_key = LibraryLocatorV2.from_string(lib_id)
+
+        block = self._add_block_to_library(lib_id, "problem", "problem1")
+        block_id = block['id']
+
+        usage_key = LibraryUsageLocatorV2(
+            lib_key=library_key,
+            block_type="problem",
+            usage_id="problem1"
+        )
+
+        self._delete_library_block(block_id)
+
+        event_receiver.assert_called()
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_BLOCK_DELETED,
+                "sender": None,
+                "library_block": LibraryBlockData(
+                    library_key=library_key,
+                    usage_key=usage_key
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
+
 
 @elasticsearch_test
 class ContentLibrariesBlockstoreServiceTest(
@@ -999,183 +1292,3 @@ class ContentLibraryXBlockValidationTest(APITestCase):
         self.assertEqual(response.json(), {
             'detail': f"XBlock {valid_not_found_key} does not exist, or you don't have permission to view it.",
         })
-
-
-class AltBlock(XBlock):
-    """Class for testing LabXchange XBlock type overrides."""
-    @XBlock.handler
-    def student_view_user_state(self, request, suffix=""):
-        """
-        Returns a JSON response for testing.
-        """
-        view_state = {
-            "id": str(self.location),
-            "block_type": str(self.location.block_type),
-            "override_type": str(self.__class__),
-        }
-        return Response(
-            json.dumps(view_state),
-            content_type='application/json',
-            charset='UTF-8',
-        )
-
-    def student_view(self, context=None):
-        """
-        Returns an HTML fragment for testing.
-        """
-        return Fragment(f"<div data-usage='{self.location}' data-block-type='{self.location.block_type}'>"
-                        "<div class='AltBlock-wrapper'/></div>")
-
-
-@ddt.ddt
-class ContentLibrariesXBlockTypeOverrideTestMixin:
-    """
-    Tests for Blockstore-based Content Libraries XBlock API,
-    where the expected XBlock type returned is overridden in the request.
-    """
-    BLOCK_DATA = (
-        ('block-wo-override', {}, 'video'),
-        ('block-w-override', {'lx_block_types': '1'}, 'alt-block'),
-    )
-
-    def setUp(self):
-        super().setUp()
-        if settings.ENABLE_ELASTICSEARCH_FOR_TESTS:
-            ContentLibraryIndexer.remove_all_items()
-            LibraryBlockIndexer.remove_all_items()
-
-        self.olx = """
-        <video display_name="Test Block Type Overrides"
-            youtube_id_1_0="rE42zZ-3wNo"
-            transcripts="{&quot;en&quot;: &quot;transcript.srt&quot;}" />
-        """.strip()
-
-    def create_block(self, slug, block_type='video'):
-        """
-        Add a new library containing a block, using the given slug to keep them unique.
-        """
-        lib = self._create_library(slug=slug, title='Test Block Type Overrides', library_type=COMPLEX)
-        block = self._add_block_to_library(lib['id'], block_type, slug)
-        self._set_library_block_olx(block['id'], self.olx)
-        self._commit_library_changes(lib['id'])
-        return block['id']
-
-    @ddt.data(*BLOCK_DATA)
-    @ddt.unpack
-    @patch("openedx.core.djangoapps.xblock.rest_api.views.LX_BLOCK_TYPES_OVERRIDE", {'video': 'alt-block'})
-    @XBlock.register_temp_plugin(AltBlock, 'alt-block')
-    def test_block_type_metadata(self, slug, api_args, expected_type):
-        """
-        Check that the metadata API returns the overridden block type.
-        """
-        block_key = self.create_block(f"metadata-{slug}")
-        response = self.client.get(
-            URL_BLOCK_METADATA_URL.format(block_key=block_key),
-            api_args,
-        )
-        assert response.data['block_id'] == str(block_key)
-        assert response.data['block_type'] == expected_type
-        assert response.data['display_name'] == 'Test Block Type Overrides'
-
-    @ddt.data(*BLOCK_DATA)
-    @ddt.unpack
-    @patch("openedx.core.djangoapps.xblock.rest_api.views.LX_BLOCK_TYPES_OVERRIDE", {'video': 'alt-block'})
-    @XBlock.register_temp_plugin(AltBlock, 'alt-block')
-    def test_block_type_olx(self, slug, api_args, expected_type):
-        """
-        Check that the OLX API is unchanged when overriding the block type.
-        """
-        block_key = self.create_block(f"olx-{slug}")
-        response = self.client.get(
-            URL_LIB_BLOCK_OLX.format(block_key=block_key),
-            api_args,
-        )
-        assert response.data['olx'] == self.olx
-
-    @ddt.data(*BLOCK_DATA)
-    @ddt.unpack
-    @patch("openedx.core.djangoapps.xblock.rest_api.views.LX_BLOCK_TYPES_OVERRIDE", {'video': 'alt-block'})
-    @XBlock.register_temp_plugin(AltBlock, 'alt-block')
-    def test_block_type_render(self, slug, api_args, expected_type):
-        """
-        Check that the rendered block HTML uses the overridden block type.
-        """
-        block_key = self.create_block(f"render-{slug}")
-        response = self.client.get(
-            URL_BLOCK_RENDER_VIEW.format(block_key=block_key, view_name='student_view'),
-            api_args,
-        )
-        assert response.data['block_id'] == str(block_key)
-        assert response.data['block_type'] == expected_type
-        assert response.data['display_name'] == 'Test Block Type Overrides'
-        assert f"data-usage='{block_key}'" in response.data['content']
-        assert f"data-block-type='{expected_type}'" in response.data['content']
-        if expected_type == 'video':
-            assert 'class="video-wrapper"' in response.data['content']
-        else:
-            assert "class='AltBlock-wrapper'" in response.data['content']
-
-    @ddt.data(*BLOCK_DATA)
-    @ddt.unpack
-    @patch("openedx.core.djangoapps.xblock.rest_api.views.LX_BLOCK_TYPES_OVERRIDE", {'video': 'alt-block'})
-    @XBlock.register_temp_plugin(AltBlock, 'alt-block')
-    def test_block_type_handler(self, slug, api_args, expected_type):
-        # Check that the handler_url contains the block type override params
-        block_key = self.create_block(f"handler-{slug}")
-        response = self.client.get(
-            URL_BLOCK_GET_HANDLER_URL.format(block_key=block_key, handler_name='student_view_user_state'),
-            api_args,
-        )
-        handler_url = response.data['handler_url']
-        parsed_url = urlparse(handler_url)
-        parsed_qs = dict(parse_qsl(parsed_url.query))
-        assert parsed_qs == api_args
-
-        # Ensure the invoked handler hits the expected Block
-        if expected_type == 'video':
-            expected_response = {
-                'all_sources': [],
-                'duration': None,
-                'encoded_videos': {
-                    'youtube': {
-                        'file_size': 0,
-                        'url': 'https://www.youtube.com/watch?v=rE42zZ-3wNo',
-                    }
-                },
-                'only_on_web': False,
-                'saved_video_position': 0.0,
-                'speed': None,
-                'transcripts': {},
-            }
-        else:
-            expected_response = {
-                "id": f'lb:CL-TEST:handler-{slug}:video:handler-{slug}',
-                "block_type": 'video',
-                "override_type": "<class 'xblock.internal.AltBlockWithMixins'>",
-            }
-        response = self.client.post(handler_url).json()
-        # Can't match the Transcripts download URL exactly, but we can check that it's there and roughly correct
-        if 'transcripts' in response:
-            assert f"lb:CL-TEST:handler-{slug}:video:handler-{slug}" in response['transcripts']['en']
-            del response['transcripts']['en']
-        assert response == expected_response
-
-
-@elasticsearch_test
-class ContentLibrariesXBlockTypeOverrideBlockstoreServiceTest(
-    ContentLibrariesXBlockTypeOverrideTestMixin,
-    ContentLibrariesRestApiBlockstoreServiceTest,
-):
-    """
-    Tests for the Content Libraries XBlock API type override using the standalone Blockstore service.
-    """
-
-
-@elasticsearch_test
-class ContentLibrariesXBlockTypeOverrideTest(
-    ContentLibrariesXBlockTypeOverrideTestMixin,
-    ContentLibrariesRestApiTest,
-):
-    """
-    Tests for the Content Libraries XBlock API type override using the installed Blockstore app.
-   """

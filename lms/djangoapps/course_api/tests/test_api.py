@@ -18,7 +18,7 @@ from rest_framework.test import APIRequestFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import ItemFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import BlockFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..api import (
     UNKNOWN_BLOCK_DISPLAY_NAME, course_detail, get_due_dates, list_courses, get_course_members, get_course_run_url,
@@ -107,7 +107,8 @@ class CourseListTestMixin(CourseApiTestMixin):
                        specified_user,
                        org=None,
                        filter_=None,
-                       permissions=None):
+                       permissions=None,
+                       course_keys=None):
         """
         Call the list_courses api endpoint to get information about
         `specified_user` on behalf of `requesting_user`.
@@ -121,6 +122,7 @@ class CourseListTestMixin(CourseApiTestMixin):
                 org=org,
                 filter_=filter_,
                 permissions=permissions,
+                course_keys=course_keys,
             )
 
     def verify_courses(self, courses):
@@ -244,6 +246,39 @@ class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase)
 
         self.assertEqual({c.id for c in filtered_courses}, {self.course.id})
 
+    def test_filter_by_keys(self):
+        """
+        Verify that courses are filtered by the provided course keys.
+        """
+
+        # Create alternative courses to be included in the `course_keys` filter.
+        alternative_course_1 = self.create_course(course='alternative-course-1')
+        alternative_course_2 = self.create_course(course='alternative-course-2')
+
+        # No filtering.
+        unfiltered_expected_courses = [
+            self.course,
+            alternative_course_1,
+            alternative_course_2,
+        ]
+        unfiltered_courses = self._make_api_call(self.honor_user, self.honor_user)
+        assert {course.id for course in unfiltered_courses} == {course.id for course in unfiltered_expected_courses}
+
+        # With filtering.
+        filtered_expected_courses = [
+            alternative_course_1,
+            alternative_course_2,
+        ]
+        filtered_courses = self._make_api_call(
+            self.honor_user,
+            self.honor_user,
+            course_keys={
+                alternative_course_1.id,
+                alternative_course_2.id
+            }
+        )
+        assert {course.id for course in filtered_courses} == {course.id for course in filtered_expected_courses}
+
 
 class TestGetCourseListExtras(CourseListTestMixin, ModuleStoreTestCase):
     """
@@ -287,7 +322,7 @@ class TestGetCourseDates(CourseDetailTestMixin, SharedModuleStoreTestCase):
         cls.yesterday = cls.today - timedelta(days=1)
         cls.tomorrow = cls.today + timedelta(days=1)
 
-        cls.section_1 = ItemFactory.create(
+        cls.section_1 = BlockFactory.create(
             category='chapter',
             start=cls.yesterday,
             due=cls.tomorrow,
@@ -295,7 +330,7 @@ class TestGetCourseDates(CourseDetailTestMixin, SharedModuleStoreTestCase):
             display_name='section 1'
         )
 
-        cls.subsection_1 = ItemFactory.create(
+        cls.subsection_1 = BlockFactory.create(
             category='sequential',
             parent=cls.section_1,
             display_name='subsection 1'

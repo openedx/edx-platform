@@ -3,6 +3,7 @@ define([
     'js/edxnotes/views/tabs_list'
 ], function($, TemplateHelpers, TabsCollection, TabsListView) {
     'use strict';
+
     describe('EdxNotes TabsListView', function() {
         beforeEach(function() {
             TemplateHelpers.installTemplate('templates/edxnotes/tab-item');

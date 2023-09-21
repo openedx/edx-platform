@@ -13,6 +13,7 @@ define([
 ],
 function(_, gettext, BaseView, ViewUtils, NotificationView, certificateWebPreviewTemplate, HtmlUtils) {
     'use strict';
+
     var CertificateWebPreview = BaseView.extend({
         el: $('.preview-certificate'),
         events: {

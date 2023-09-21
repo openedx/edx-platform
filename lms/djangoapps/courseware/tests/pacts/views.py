@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreIsolationMixin
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 
 class ProviderState(ModuleStoreIsolationMixin):
@@ -37,12 +37,12 @@ class ProviderState(ModuleStoreIsolationMixin):
             modulestore=self.store
         )
 
-        section = ItemFactory.create(
+        section = BlockFactory.create(
             parent_location=demo_course.location,
             category="chapter",
         )
 
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=section.location,
             category="sequential",
             display_name="basic_questions",

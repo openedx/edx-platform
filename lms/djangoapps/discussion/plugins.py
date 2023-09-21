@@ -9,6 +9,7 @@ from django.utils.translation import gettext_noop
 
 
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.discussions.url_helpers import get_discussions_mfe_url
 from xmodule.tabs import TabFragmentViewMixin
 
@@ -34,6 +35,8 @@ class DiscussionTab(TabFragmentViewMixin, EnrolledTab):
 
     @classmethod
     def is_enabled(cls, course, user=None):
+        if not DiscussionsConfiguration.is_enabled(context_key=course.id):
+            return False
         if not super().is_enabled(course, user):
             return False
         # Disable the regular discussion tab if LTI-based external Discussion forum is enabled

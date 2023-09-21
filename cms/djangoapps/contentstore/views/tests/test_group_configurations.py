@@ -20,7 +20,7 @@ from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITIO
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.validation import StudioValidation, StudioValidationMessage  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -54,12 +54,12 @@ class HelperMethods:
         Assign Group Configuration to the experiment if cid is provided.
         Assigns a problem to the first group in the split test if group_id and cid_for_problem is provided.
         """
-        sequential = ItemFactory.create(
+        sequential = BlockFactory.create(
             category='sequential',
             parent_location=self.course.location,
             display_name=f'Test Subsection {name_suffix}'
         )
-        vertical = ItemFactory.create(
+        vertical = BlockFactory.create(
             category='vertical',
             parent_location=sequential.location,
             display_name=f'Test Unit {name_suffix}'
@@ -67,26 +67,26 @@ class HelperMethods:
         c0_url = self.course.id.make_usage_key("vertical", f"split_test_cond0_{name_suffix}")
         c1_url = self.course.id.make_usage_key("vertical", f"split_test_cond1_{name_suffix}")
         c2_url = self.course.id.make_usage_key("vertical", f"split_test_cond2_{name_suffix}")
-        split_test = ItemFactory.create(
+        split_test = BlockFactory.create(
             category='split_test',
             parent_location=vertical.location,
             user_partition_id=cid,
             display_name=f"Test Content Experiment {name_suffix}{special_characters}",
             group_id_to_child={"0": c0_url, "1": c1_url, "2": c2_url}
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=split_test.location,
             category="vertical",
             display_name="Condition 0 vertical",
             location=c0_url,
         )
-        c1_vertical = ItemFactory.create(
+        c1_vertical = BlockFactory.create(
             parent_location=split_test.location,
             category="vertical",
             display_name="Condition 1 vertical",
             location=c1_url,
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=split_test.location,
             category="vertical",
             display_name="Condition 2 vertical",
@@ -95,7 +95,7 @@ class HelperMethods:
 
         problem = None
         if group_id and cid_for_problem:
-            problem = ItemFactory.create(
+            problem = BlockFactory.create(
                 category='problem',
                 parent_location=c1_vertical.location,
                 display_name="Test Problem"
@@ -123,20 +123,20 @@ class HelperMethods:
         """
         vertical_parent_location = self.course.location
         if not orphan:
-            subsection = ItemFactory.create(
+            subsection = BlockFactory.create(
                 category='sequential',
                 parent_location=self.course.location,
                 display_name=f"Test Subsection {name_suffix}"
             )
             vertical_parent_location = subsection.location
 
-        vertical = ItemFactory.create(
+        vertical = BlockFactory.create(
             category='vertical',
             parent_location=vertical_parent_location,
             display_name=f"Test Unit {name_suffix}"
         )
 
-        problem = ItemFactory.create(
+        problem = BlockFactory.create(
             category='problem',
             parent_location=vertical.location,
             display_name=f"Test Problem {name_suffix}{special_characters}"

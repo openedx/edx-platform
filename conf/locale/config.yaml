@@ -35,7 +35,7 @@ locales:
     # - et_EE  # Estonian (Estonia)
     - eu_ES  # Basque (Spain)
     # - fa  # Persian
-    # - fa_IR  # Persian (Iran)
+    - fa_IR  # Persian (Iran)
     # - fi_FI  # Finnish (Finland)
     # - fil  # Filipino
     - fr  # French
@@ -98,8 +98,6 @@ dummy_locales:
 
 # Directories we don't search for strings.
 ignore_dirs:
-    - common/static/xmodule/modules
-    - common/static/xmodule/descriptors
     # Directories with no user-facing code.
     - '*/migrations'
     - '*/envs'

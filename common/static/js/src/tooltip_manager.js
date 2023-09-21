@@ -1,5 +1,6 @@
 (function() {
     'use strict';
+
     var TooltipManager = function(element) {
         this.element = $(element);
         // If tooltip container already exist, use it.

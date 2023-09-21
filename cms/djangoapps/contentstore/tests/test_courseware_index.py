@@ -35,7 +35,7 @@ from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: di
     TEST_DATA_SPLIT_MODULESTORE,
     SharedModuleStoreTestCase,
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, LibraryFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 
 COURSE_CHILD_STRUCTURE = {
@@ -50,7 +50,7 @@ def create_children(store, parent, category, load_factor):
     """ create load_factor children within the given parent; recursively call to insert children when appropriate """
     created_count = 0
     for child_index in range(load_factor):
-        child_object = ItemFactory.create(
+        child_object = BlockFactory.create(
             parent_location=parent.location,
             category=category,
             display_name=f"{category} {child_index} {time.clock()}",  # lint-amnesty, pylint: disable=no-member
@@ -152,7 +152,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
             display_name="Search Index Test Course"
         )
 
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             parent_location=self.course.location,
             category='chapter',
             display_name="Week 1",
@@ -160,7 +160,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
             publish_item=True,
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
-        self.sequential = ItemFactory.create(
+        self.sequential = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name="Lesson 1",
@@ -168,7 +168,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
             publish_item=True,
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
-        self.vertical = ItemFactory.create(
+        self.vertical = BlockFactory.create(
             parent_location=self.sequential.location,
             category='vertical',
             display_name='Subsection 1',
@@ -177,7 +177,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
             start=datetime(2015, 4, 1, tzinfo=UTC),
         )
         # unspecified start - should inherit from container
-        self.html_unit = ItemFactory.create(
+        self.html_unit = BlockFactory.create(
             parent_location=self.vertical.location,
             category="html",
             display_name="Html Content",
@@ -206,7 +206,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
 
     def _test_indexing_course(self, store):
         """ indexing course tests """
-        # Only published modules should be in the index
+        # Only published blocks should be in the index
         added_to_index = self.reindex_course(store)  # This reindex may not be necessary (it may already be indexed)
         self.assertEqual(added_to_index, 3)
         response = self.search()
@@ -227,7 +227,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         self.assertEqual(response["total"], 4)
 
         # Now add a new unit to the existing vertical
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=self.vertical.location,
             category="html",
             display_name="Some other content",
@@ -316,7 +316,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         self.assertEqual(indexed_count, 4)
 
         # Add a new sequential
-        sequential2 = ItemFactory.create(
+        sequential2 = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name='Section 2',
@@ -326,14 +326,14 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         )
 
         # add a new vertical
-        vertical2 = ItemFactory.create(
+        vertical2 = BlockFactory.create(
             parent_location=sequential2.location,
             category='vertical',
             display_name='Subsection 2',
             modulestore=store,
             publish_item=True,
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=vertical2.location,
             category="html",
             display_name="Some other content",
@@ -426,7 +426,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
 
     def _test_course_location_null(self, store):
         """ Test that course location information is added to index """
-        sequential2 = ItemFactory.create(
+        sequential2 = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name=None,
@@ -435,14 +435,14 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
         # add a new vertical
-        vertical2 = ItemFactory.create(
+        vertical2 = BlockFactory.create(
             parent_location=sequential2.location,
             category='vertical',
             display_name='Subsection 2',
             modulestore=store,
             publish_item=True,
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=vertical2.location,
             category="html",
             display_name="Find Me",
@@ -600,21 +600,21 @@ class TestTaskExecution(SharedModuleStoreTestCase):
         SignalHandler.library_updated.disconnect(listen_for_library_update)
         cls.course = CourseFactory.create(start=datetime(2015, 3, 1, tzinfo=UTC))
 
-        cls.chapter = ItemFactory.create(
+        cls.chapter = BlockFactory.create(
             parent_location=cls.course.location,
             category='chapter',
             display_name="Week 1",
             publish_item=True,
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
-        cls.sequential = ItemFactory.create(
+        cls.sequential = BlockFactory.create(
             parent_location=cls.chapter.location,
             category='sequential',
             display_name="Lesson 1",
             publish_item=True,
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
-        cls.vertical = ItemFactory.create(
+        cls.vertical = BlockFactory.create(
             parent_location=cls.sequential.location,
             category='vertical',
             display_name='Subsection 1',
@@ -622,7 +622,7 @@ class TestTaskExecution(SharedModuleStoreTestCase):
             start=datetime(2015, 4, 1, tzinfo=UTC),
         )
         # unspecified start - should inherit from container
-        cls.html_unit = ItemFactory.create(
+        cls.html_unit = BlockFactory.create(
             parent_location=cls.vertical.location,
             category="html",
             display_name="Html Content",
@@ -631,14 +631,14 @@ class TestTaskExecution(SharedModuleStoreTestCase):
 
         cls.library = LibraryFactory.create()
 
-        cls.library_block1 = ItemFactory.create(
+        cls.library_block1 = BlockFactory.create(
             parent_location=cls.library.location,
             category="html",
             display_name="Html Content",
             publish_item=False,
         )
 
-        cls.library_block2 = ItemFactory.create(
+        cls.library_block2 = BlockFactory.create(
             parent_location=cls.library.location,
             category="html",
             display_name="Html Content 2",
@@ -719,7 +719,7 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
         """
         self.library = LibraryFactory.create(modulestore=store)
 
-        self.html_unit1 = ItemFactory.create(
+        self.html_unit1 = BlockFactory.create(
             parent_location=self.library.location,
             category="html",
             display_name="Html Content",
@@ -727,7 +727,7 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
             publish_item=False,
         )
 
-        self.html_unit2 = ItemFactory.create(
+        self.html_unit2 = BlockFactory.create(
             parent_location=self.library.location,
             category="html",
             display_name="Html Content 2",
@@ -768,7 +768,7 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
 
         # updating a library item causes immediate reindexing
         data = "Some data"
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=self.library.location,
             category="html",
             display_name="Html Content 3",
@@ -868,7 +868,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         """
         Set up course with html content in it.
         """
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             parent_location=self.course.location,
             category='chapter',
             display_name="Week 1",
@@ -877,7 +877,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
 
-        self.sequential = ItemFactory.create(
+        self.sequential = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name="Lesson 1",
@@ -886,7 +886,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
 
-        self.sequential2 = ItemFactory.create(
+        self.sequential2 = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name="Lesson 2",
@@ -895,7 +895,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
 
-        self.vertical = ItemFactory.create(
+        self.vertical = BlockFactory.create(
             parent_location=self.sequential.location,
             category='vertical',
             display_name='Subsection 1',
@@ -904,7 +904,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
             start=datetime(2015, 4, 1, tzinfo=UTC),
         )
 
-        self.vertical2 = ItemFactory.create(
+        self.vertical2 = BlockFactory.create(
             parent_location=self.sequential.location,
             category='vertical',
             display_name='Subsection 2',
@@ -913,7 +913,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
             start=datetime(2015, 4, 1, tzinfo=UTC),
         )
 
-        self.vertical3 = ItemFactory.create(
+        self.vertical3 = BlockFactory.create(
             parent_location=self.sequential2.location,
             category='vertical',
             display_name='Subsection 3',
@@ -923,7 +923,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         )
 
         # unspecified start - should inherit from container
-        self.html_unit1 = ItemFactory.create(
+        self.html_unit1 = BlockFactory.create(
             parent_location=self.vertical.location,
             category="html",
             display_name="Html Content 1",
@@ -932,7 +932,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         )
         self.html_unit1.parent = self.vertical
 
-        self.html_unit2 = ItemFactory.create(
+        self.html_unit2 = BlockFactory.create(
             parent_location=self.vertical2.location,
             category="html",
             display_name="Html Content 2",
@@ -941,7 +941,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         )
         self.html_unit2.parent = self.vertical2
 
-        self.html_unit3 = ItemFactory.create(
+        self.html_unit3 = BlockFactory.create(
             parent_location=self.vertical2.location,
             category="html",
             display_name="Html Content 3",
@@ -958,7 +958,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         c1_url = self.course.id.make_usage_key("vertical", "condition_1_vertical")
         c2_url = self.course.id.make_usage_key("vertical", "condition_2_vertical")
 
-        self.split_test_unit = ItemFactory.create(
+        self.split_test_unit = BlockFactory.create(
             parent_location=self.vertical3.location,
             category='split_test',
             user_partition_id=0,
@@ -966,7 +966,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
             group_id_to_child={"2": c0_url, "3": c1_url, "4": c2_url}
         )
 
-        self.condition_0_vertical = ItemFactory.create(
+        self.condition_0_vertical = BlockFactory.create(
             parent_location=self.split_test_unit.location,
             category="vertical",
             display_name="Group ID 2",
@@ -974,7 +974,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         )
         self.condition_0_vertical.parent = self.vertical3
 
-        self.condition_1_vertical = ItemFactory.create(
+        self.condition_1_vertical = BlockFactory.create(
             parent_location=self.split_test_unit.location,
             category="vertical",
             display_name="Group ID 3",
@@ -982,7 +982,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         )
         self.condition_1_vertical.parent = self.vertical3
 
-        self.condition_2_vertical = ItemFactory.create(
+        self.condition_2_vertical = BlockFactory.create(
             parent_location=self.split_test_unit.location,
             category="vertical",
             display_name="Group ID 4",
@@ -990,7 +990,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         )
         self.condition_2_vertical.parent = self.vertical3
 
-        self.html_unit4 = ItemFactory.create(
+        self.html_unit4 = BlockFactory.create(
             parent_location=self.condition_0_vertical.location,
             category="html",
             display_name="Split A",
@@ -998,7 +998,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         )
         self.html_unit4.parent = self.condition_0_vertical
 
-        self.html_unit5 = ItemFactory.create(
+        self.html_unit5 = BlockFactory.create(
             parent_location=self.condition_1_vertical.location,
             category="html",
             display_name="Split B",
@@ -1006,7 +1006,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         )
         self.html_unit5.parent = self.condition_1_vertical
 
-        self.html_unit6 = ItemFactory.create(
+        self.html_unit6 = BlockFactory.create(
             parent_location=self.condition_2_vertical.location,
             category="html",
             display_name="Split C",
@@ -1164,7 +1164,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         Indexing course with content groups added test.
         """
 
-        # Only published modules should be in the index
+        # Only published blocks should be in the index
         added_to_index = self.reindex_course(self.store)
         self.assertEqual(added_to_index, 16)
         response = self.searcher.search(field_dictionary={"course": str(self.course.id)})

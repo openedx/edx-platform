@@ -116,8 +116,8 @@ class ScheduledBulkEmailInstructorTaskTests(InstructorTaskCourseTestCase):
         assert expected_task_args == actual_task_args
         self._verify_log_messages(expected_messages, log)
 
-    @patch("lms.djangoapps.instructor_task.api_helper._get_xmodule_instance_args", side_effect=Exception("boom!"))
-    def test_create_scheduled_instructor_task_expect_failure(self, mock_get_xmodule_instance_args):
+    @patch("lms.djangoapps.instructor_task.api_helper._get_xblock_instance_args", side_effect=Exception("boom!"))
+    def test_create_scheduled_instructor_task_expect_failure(self, mock_get_xblock_instance_args):
         """
         A test to verify that we will mark a task as `FAILED` if a failure occurs during the creation of the task
         schedule.

@@ -1,5 +1,7 @@
+// eslint-disable-next-line no-shadow-restricted-names
 (function(define, undefined) {
     'use strict';
+
     define([
         'gettext', 'underscore', 'js/edxnotes/views/note_group', 'js/edxnotes/views/tab_panel',
         'js/edxnotes/views/tab_view', 'edx-ui-toolkit/js/utils/html-utils'
@@ -21,6 +23,7 @@
                                 sectionView;
                             if (sectionInfo) {
                                 sectionView = chapterView.addChild(sectionInfo);
+                                // eslint-disable-next-line no-shadow
                                 _.each(sectionInfo.children, function(location) {
                                     var notes = courseStructure.units[location];
                                     if (notes) {

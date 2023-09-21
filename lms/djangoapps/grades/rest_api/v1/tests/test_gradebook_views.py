@@ -8,6 +8,7 @@ from collections import OrderedDict, namedtuple
 from contextlib import contextmanager
 from datetime import datetime
 from unittest.mock import MagicMock, patch
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 
 import ddt
 import pytest
@@ -19,7 +20,7 @@ from pytz import UTC
 from rest_framework import status
 from rest_framework.test import APITestCase
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.roles import (
@@ -80,54 +81,54 @@ class CourseGradingViewTest(SharedModuleStoreTestCase, APITestCase):
         course.grade_cutoffs = {
             "Pass": 0.5,
         }
-        cls.section = ItemFactory.create(
+        cls.section = BlockFactory.create(
             parent_location=course.location,
             category="chapter",
         )
-        cls.subsection1 = ItemFactory.create(
+        cls.subsection1 = BlockFactory.create(
             parent_location=cls.section.location,
             category="sequential",
         )
-        unit1 = ItemFactory.create(
+        unit1 = BlockFactory.create(
             parent_location=cls.subsection1.location,
             category="vertical",
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=unit1.location,
             category="video",
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=unit1.location,
             category="problem",
         )
 
-        cls.subsection2 = ItemFactory.create(
+        cls.subsection2 = BlockFactory.create(
             parent_location=cls.section.location,
             category="sequential",
         )
-        unit2 = ItemFactory.create(
+        unit2 = BlockFactory.create(
             parent_location=cls.subsection2.location,
             category="vertical",
         )
-        unit3 = ItemFactory.create(
+        unit3 = BlockFactory.create(
             parent_location=cls.subsection2.location,
             category="vertical",
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=unit3.location,
             category="video",
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=unit3.location,
             category="video",
         )
-        cls.homework = ItemFactory.create(
+        cls.homework = BlockFactory.create(
             parent_location=cls.section.location,
             category="sequential",
             graded=True,
             format='Homework',
         )
-        cls.midterm = ItemFactory.create(
+        cls.midterm = BlockFactory.create(
             parent_location=cls.section.location,
             category="sequential",
             graded=True,
@@ -296,19 +297,19 @@ class GradebookViewTestBase(GradeViewTestMixin, APITestCase):
         cls.course_key = cls.course.id
         cls.course_overview = CourseOverviewFactory.create(id=cls.course.id)
 
-        cls.chapter_1 = ItemFactory.create(
+        cls.chapter_1 = BlockFactory.create(
             category='chapter',
             parent_location=cls.course.location,
             display_name="Chapter 1",
         )
-        cls.chapter_2 = ItemFactory.create(
+        cls.chapter_2 = BlockFactory.create(
             category='chapter',
             parent_location=cls.course.location,
             display_name="Chapter 2",
         )
         cls.subsections = {
             cls.chapter_1.location: [
-                ItemFactory.create(
+                BlockFactory.create(
                     category='sequential',
                     parent_location=cls.chapter_1.location,
                     due=datetime(2017, 12, 18, 11, 30, 00),
@@ -316,7 +317,7 @@ class GradebookViewTestBase(GradeViewTestMixin, APITestCase):
                     format='Homework',
                     graded=True,
                 ),
-                ItemFactory.create(
+                BlockFactory.create(
                     category='sequential',
                     parent_location=cls.chapter_1.location,
                     due=datetime(2017, 12, 18, 11, 30, 00),
@@ -326,7 +327,7 @@ class GradebookViewTestBase(GradeViewTestMixin, APITestCase):
                 ),
             ],
             cls.chapter_2.location: [
-                ItemFactory.create(
+                BlockFactory.create(
                     category='sequential',
                     parent_location=cls.chapter_2.location,
                     due=datetime(2017, 12, 18, 11, 30, 00),
@@ -334,7 +335,7 @@ class GradebookViewTestBase(GradeViewTestMixin, APITestCase):
                     format='Homework',
                     graded=True,
                 ),
-                ItemFactory.create(
+                BlockFactory.create(
                     category='sequential',
                     parent_location=cls.chapter_2.location,
                     due=datetime(2017, 12, 18, 11, 30, 00),
@@ -347,7 +348,7 @@ class GradebookViewTestBase(GradeViewTestMixin, APITestCase):
 
         # Data about graded subsections visible to staff only
         # should not be exposed via the gradebook API
-        cls.hidden_subsection = ItemFactory.create(
+        cls.hidden_subsection = BlockFactory.create(
             parent_location=cls.chapter_1.location,
             category='sequential',
             graded=True,
@@ -779,6 +780,7 @@ class GradebookViewTest(GradebookViewTestBase):
                     OrderedDict([
                         ('user_id', self.program_masters_student.id),
                         ('username', self.program_masters_student.username),
+                        ('full_name', self.program_masters_student.profile.name),
                         ('email', self.program_masters_student.email),
                         ('external_user_key', 'program_user_key_0'),
                         ('percent', 0.75),
@@ -827,6 +829,7 @@ class GradebookViewTest(GradebookViewTestBase):
                     OrderedDict([
                         ('user_id', self.program_masters_student.id),
                         ('username', self.program_masters_student.username),
+                        ('full_name', self.program_masters_student.profile.name),
                         ('email', self.program_masters_student.email),
                         ('external_user_key', 'program_user_key_0'),
                         ('percent', 0.75),
@@ -913,6 +916,7 @@ class GradebookViewTest(GradebookViewTestBase):
                     OrderedDict([
                         ('user_id', self.program_masters_student.id),
                         ('username', self.program_masters_student.username),
+                        ('full_name', self.program_masters_student.profile.name),
                         ('email', self.program_masters_student.email),
                         ('external_user_key', 'program_user_key_0'),
                         ('percent', 0.75),
@@ -1461,6 +1465,47 @@ class GradebookViewTest(GradebookViewTestBase):
                 self.program_masters_student.username,
             ]
         )
+
+    def test_full_name__full_course(self):
+        """ Test that masters students have full_name and that no one else in the course does. """
+        self.login_course_staff()
+        with override_waffle_flag(self.waffle_flag, active=True):
+            with self._mock_all_course_grade_reads():
+                response = self.client.get(self.get_url(course_key=self.course.id))
+
+        assert status.HTTP_200_OK == response.status_code
+        response_data = dict(response.data)
+        assert response_data['next'] is None
+
+        usernames = set()
+        masters_students = set()
+        for row in response_data['results']:
+            username = row['username']
+            usernames.add(username)
+            enrollment = CourseEnrollment.objects.get(user__username=username, course_id=self.course.id)
+            if enrollment.mode == CourseMode.MASTERS:
+                masters_students.add(username)
+                assert 'full_name' in row
+                assert row['full_name'] == enrollment.user.profile.name
+            else:
+                assert 'full_name' not in row
+        assert self.program_masters_student.username in masters_students
+        assert self.program_masters_student.username in usernames
+
+    def test_full_name__single_student(self):
+        """ Test that a request for a masters student includes a full name """
+        self.login_course_staff()
+        with override_waffle_flag(self.waffle_flag, active=True):
+            with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
+                mock_grade.return_value = self.mock_course_grade(self.student, passed=True, percent=0.85)
+                response = self.client.get(self.get_url(
+                    course_key=self.course.id,
+                    username=self.program_masters_student.username
+                ))
+
+        assert status.HTTP_200_OK == response.status_code
+        response_data = dict(response.data)
+        assert response_data['full_name'] == self.program_masters_student.profile.name
 
 
 @ddt.ddt
@@ -2175,7 +2220,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_get_override_for_unreleased_block(self):
         self.login_course_staff()
-        unreleased_subsection = ItemFactory.create(
+        unreleased_subsection = BlockFactory.create(
             parent_location=self.chapter_1.location,
             category='sequential',
             graded=True,

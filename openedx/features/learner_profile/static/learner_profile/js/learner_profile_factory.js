@@ -1,4 +1,4 @@
-(function (define){
+(function(define) {
     'use strict';
 
     define([
@@ -19,10 +19,10 @@
         'js/student_account/views/account_settings_fields',
         'js/views/message_banner',
         'string_utils'
-    ], function (gettext, $, _, Backbone, Logger, StringUtils, PagingCollection, AccountSettingsModel,
+    ], function(gettext, $, _, Backbone, Logger, StringUtils, PagingCollection, AccountSettingsModel,
         AccountPreferencesModel, FieldsView, LearnerProfileFieldsView, LearnerProfileView, BadgeModel,
-        BadgeListContainer, AccountSettingsFieldViews, MessageBannerView){
-        return function (options) {
+        BadgeListContainer, AccountSettingsFieldViews, MessageBannerView) {
+        return function(options) {
             var $learnerProfileElement = $('.wrapper-profile');
 
             var accountSettingsModel = new AccountSettingsModel(
@@ -122,7 +122,7 @@
                     helpMessage: '',
                     userLanguage: accountSettingsModel.get('language'),
                     userTimezone: accountPreferencesModel.get('time_zone'),
-                    dateFormat: 'MMMM YYYY'  // not localized, but hopefully ok.
+                    dateFormat: 'MMMM YYYY' // not localized, but hopefully ok.
                 }),
 
                 new FieldsView.DropdownFieldView({
@@ -208,7 +208,7 @@
                 platformName: options.platform_name
             });
 
-            getProfileVisibility = function (){
+            getProfileVisibility = function() {
                 if (options.has_preferences_access) {
                     return accountPreferencesModel.get('account_privacy');
                 } else {
@@ -216,7 +216,7 @@
                 }
             };
 
-            showLearnerProfileView = function (){
+            showLearnerProfileView = function() {
                 // Record that the profile page was viewed
                 Logger.log('edx.user.settings.viewed', {
                     page: 'profile',

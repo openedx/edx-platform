@@ -7,26 +7,27 @@ define([
     $, _, TemplateHelpers, AjaxHelpers, Logger, TabsCollection, SearchResultsView, Helpers
 ) {
     'use strict';
+
     describe('EdxNotes SearchResultsView', function() {
         var notes = [
-            {
-                created: 'December 11, 2014 at 11:12AM',
-                updated: 'December 11, 2014 at 11:12AM',
-                text: 'Third added model',
-                quote: 'Should be listed first'
-            },
-            {
-                created: 'December 11, 2014 at 11:11AM',
-                updated: 'December 11, 2014 at 11:11AM',
-                text: 'Second added model',
-                quote: 'Should be listed second'
-            },
-            {
-                created: 'December 11, 2014 at 11:10AM',
-                updated: 'December 11, 2014 at 11:10AM',
-                text: 'First added model',
-                quote: 'Should be listed third'
-            }
+                {
+                    created: 'December 11, 2014 at 11:12AM',
+                    updated: 'December 11, 2014 at 11:12AM',
+                    text: 'Third added model',
+                    quote: 'Should be listed first'
+                },
+                {
+                    created: 'December 11, 2014 at 11:11AM',
+                    updated: 'December 11, 2014 at 11:11AM',
+                    text: 'Second added model',
+                    quote: 'Should be listed second'
+                },
+                {
+                    created: 'December 11, 2014 at 11:10AM',
+                    updated: 'December 11, 2014 at 11:10AM',
+                    text: 'First added model',
+                    quote: 'Should be listed third'
+                }
             ],
             responseJson = {
                 count: 3,
@@ -213,6 +214,7 @@ define([
         it('will not render header and footer if there are no notes', function() {
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this),
+                // eslint-disable-next-line no-shadow
                 notes = {
                     count: 0,
                     current_page: 1,
@@ -231,6 +233,7 @@ define([
         it('can go to a page number', function() {
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this),
+                // eslint-disable-next-line no-shadow
                 notes = Helpers.createNotesData(
                     {
                         numNotesToCreate: 10,

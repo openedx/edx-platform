@@ -1,6 +1,7 @@
 # .coveragerc for edx-platform
 [run]
-data_file = reports/${TEST_SUITE}.coverage
+branch=true
+data_file = reports/.coverage
 source =
     cms
     common/djangoapps

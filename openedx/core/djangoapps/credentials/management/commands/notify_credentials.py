@@ -1,19 +1,14 @@
 """
-A few places in the LMS want to notify the Credentials service when certain events
-happen (like certificates being awarded or grades changing). To do this, they
-listen for a signal. Sometimes we want to rebuild the data on these apps
-regardless of an actual change in the database, either to recover from a bug or
-to bootstrap a new feature we're rolling out for the first time.
+A few places in the LMS want to notify the Credentials service when certain events happen (like certificates being
+awarded or grades changing). To do this, they listen for a signal. Sometimes we want to rebuild the data on these apps
+regardless of an actual change in the database, either to recover from a bug or to bootstrap a new feature we're
+rolling out for the first time.
 
-This management command will manually trigger the receivers we care about.
-(We don't want to trigger all receivers for these signals, since these are busy
-signals.)
+This management command will manually trigger the receivers we care about. (We don't want to trigger all receivers
+for these signals, since these are busy signals.)
 """
-
-
 import logging
 import shlex
-import sys  # lint-amnesty, pylint: disable=unused-import
 
 from datetime import datetime, timedelta
 import dateutil.parser
@@ -137,6 +132,11 @@ class Command(BaseCommand):
             nargs='+',
             help='Run the command for the given user or list of users',
         )
+        parser.add_argument(
+            '--revoke_program_certs',
+            action='store_true',
+            help="If true, system will check if any program certificates need to be revoked from learners"
+        )
 
     def get_args_from_database(self):
         """ Returns an options dictionary from the current NotifyCredentialsConfig model. """
@@ -159,17 +159,12 @@ class Command(BaseCommand):
             options['start_date'] = options['end_date'] - timedelta(hours=4)
 
         log.info(
-            "notify_credentials starting, dry-run=%s, site=%s, delay=%d seconds, page_size=%d, "
-            "from=%s, to=%s, notify_programs=%s, user_ids=%s, execution=%s",
-            options['dry_run'],
-            options['site'],
-            options['delay'],
-            options['page_size'],
-            options['start_date'] if options['start_date'] else 'NA',
-            options['end_date'] if options['end_date'] else 'NA',
-            options['notify_programs'],
-            options['user_ids'],
-            'auto' if options['auto'] else 'manual',
+            f"notify_credentials starting, dry-run={options['dry_run']}, site={options['site']}, "
+            f"delay={options['delay']} seconds, page_size={options['page_size']}, "
+            f"from={options['start_date'] if options['start_date'] else 'NA'}, "
+            f"to={options['end_date'] if options['end_date'] else 'NA'}, notify_programs={options['notify_programs']}, "
+            f"user_ids={options['user_ids']}, execution={'auto' if options['auto'] else 'manual'}, "
+            f"revoke_program_certs={options['revoke_program_certs']}"
         )
 
         program_course_run_keys = self._get_course_run_keys_for_programs(options["program_uuids"])

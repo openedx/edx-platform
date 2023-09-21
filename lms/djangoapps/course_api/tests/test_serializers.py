@@ -2,9 +2,8 @@
 Test data created by CourseSerializer and CourseDetailSerializer
 """
 
-
 from datetime import datetime
-from unittest import TestCase
+from unittest import TestCase, mock
 
 import ddt
 from opaque_keys.edx.locator import CourseLocator
@@ -12,9 +11,10 @@ from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 from xblock.core import XBlock
 from xmodule.course_block import DEFAULT_START_DATE
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_ONLY_SPLIT_MODULESTORE_DRAFT_PREFERRED, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
 
+from lms.djangoapps.certificates.api import can_show_certificate_available_date_field
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.models.course_details import CourseDetails
 
@@ -31,7 +31,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
     maxDiff = 5000  # long enough to show mismatched dicts, in case of error
     serializer_class = CourseSerializer
 
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_ONLY_SPLIT_MODULESTORE_DRAFT_PREFERRED
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
@@ -40,10 +40,10 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
         self.honor_user = self.create_user('honor', is_staff=False)
         self.request_factory = APIRequestFactory()
 
-        course_id = 'edX/toy/2012_Fall'
-        banner_image_uri = '/c4x/edX/toy/asset/images_course_image.jpg'
+        course_id = 'course-v1:edX+toy+2012_Fall'
+        banner_image_uri = '/asset-v1:edX+toy+2012_Fall+type@asset+block@images_course_image.jpg'
         banner_image_absolute_uri = 'http://testserver' + banner_image_uri
-        image_path = '/c4x/edX/toy/asset/just_a_test.jpg'
+        image_path = '/asset-v1:edX+toy+2012_Fall+type@asset+block@just_a_test.jpg'
         image_url = 'http://testserver' + image_path
         self.expected_data = {
             'id': course_id,
@@ -54,19 +54,15 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
             'media': {
                 'banner_image': {
                     'uri': banner_image_uri,
-                    'uri_absolute': banner_image_absolute_uri,
+                    'uri_absolute': banner_image_absolute_uri
                 },
-                'course_image': {
-                    'uri': image_path,
-                },
-                'course_video': {
-                    'uri': 'http://www.youtube.com/watch?v=test_youtube_id',
-                },
+                'course_image': {'uri': image_path},
+                'course_video': {'uri': 'http://www.youtube.com/watch?v=test_youtube_id'},
                 'image': {
                     'raw': image_url,
                     'small': image_url,
-                    'large': image_url,
-                },
+                    'large': image_url
+                }
             },
             'start': '2015-07-17T12:00:00Z',
             'start_type': 'timestamp',
@@ -74,11 +70,11 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
             'end': '2015-09-19T18:00:00Z',
             'enrollment_start': '2015-06-15T00:00:00Z',
             'enrollment_end': '2015-07-15T00:00:00Z',
-            'blocks_url': 'http://testserver/api/courses/v2/blocks/?course_id=edX%2Ftoy%2F2012_Fall',
+            'blocks_url': 'http://testserver/api/courses/v2/blocks/?course_id=course-v1%3AedX%2Btoy%2B2012_Fall',
             'effort': '6 hours',
             'pacing': 'instructor',
             'mobile_available': True,
-            'hidden': True,  # because it's an old mongo course
+            'hidden': False,
             'invitation_only': False,
 
             # 'course_id' is a deprecated field, please use 'id' instead.
@@ -125,14 +121,14 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
             advertised_start='The Ides of March'
         )
         result = self._get_result(course)
-        assert result['course_id'] == 'edX/custom/2012_Fall'
+        assert result['course_id'] == 'course-v1:edX+custom+2012_Fall'
         assert result['start_type'] == 'string'
         assert result['start_display'] == 'The Ides of March'
 
     def test_empty_start(self):
         course = self.create_course(start=DEFAULT_START_DATE, course='custom')
         result = self._get_result(course)
-        assert result['course_id'] == 'edX/custom/2012_Fall'
+        assert result['course_id'] == 'course-v1:edX+custom+2012_Fall'
         assert result['start_type'] == 'empty'
         assert result['start_display'] is None
 
@@ -162,9 +158,35 @@ class TestCourseDetailSerializer(TestCourseSerializer):  # lint-amnesty, pylint:
         super().setUp()
 
         # update the expected_data to include the 'overview' data.
-        about_descriptor = XBlock.load_class('about')
-        overview_template = about_descriptor.get_template('overview.yaml')
+        about_block = XBlock.load_class('about')
+        overview_template = about_block.get_template('overview.yaml')
         self.expected_data['overview'] = overview_template.get('data')
+
+    # override test case
+    @mock.patch(
+        "lms.djangoapps.certificates.api.can_show_certificate_available_date_field",
+        mock.Mock(return_value=[True, False])
+    )
+    def test_basic(self):
+        """
+        Overridden from Test CourseDetailSerializer to
+        test certificate_available_date according to waffle
+        switch `certificates.auto_certificate_generation`
+        from CourseDetailSerializer serializer class.
+        """
+        course = self.create_course()
+        CourseDetails.update_about_video(course, 'test_youtube_id', self.staff_user.id)
+        course_overview = CourseOverview.get_from_id(course.id)
+        with check_mongo_calls(self.expected_mongo_calls):
+            result = self._get_result(course)
+        if can_show_certificate_available_date_field(course_overview):
+            self.expected_data['certificate_available_date'] = '2015-08-14T00:00:00Z'
+            result['certificate_available_date'] = (
+                result['certificate_available_date'].strftime('%Y-%m-%dT%H:%M:%SZ')
+                if isinstance(result['certificate_available_date'], datetime)
+                else None
+            )
+        self.assertDictEqual(result, self.expected_data)
 
 
 class TestCourseKeySerializer(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring

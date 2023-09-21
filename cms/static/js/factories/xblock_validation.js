@@ -1,7 +1,7 @@
-
 import * as XBlockValidationView from 'js/views/xblock_validation';
 import * as XBlockValidationModel from 'js/models/xblock_validation';
 
+// eslint-disable-next-line no-unused-expressions
 'use strict';
 export default function XBlockValidationFactory(validationMessages, hasEditingUrl, isRoot, isUnit, validationEle) {
     var model, response;
@@ -17,6 +17,6 @@ export default function XBlockValidationFactory(validationMessages, hasEditingUr
     if (!model.get('empty')) {
         new XBlockValidationView({el: validationEle, model: model, root: isRoot}).render();
     }
-};
+}
 
-export {XBlockValidationFactory}
+export {XBlockValidationFactory};

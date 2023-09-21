@@ -16,7 +16,7 @@ from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.instructor.access import allow_access
 from lms.djangoapps.instructor.services import InstructorService
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 
 
@@ -30,12 +30,12 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         super().setUpClass()
         cls.email = 'escalation@test.com'
         cls.course = CourseFactory.create(proctoring_escalation_email=cls.email)
-        cls.section = ItemFactory.create(parent=cls.course, category='chapter')
-        cls.subsection = ItemFactory.create(parent=cls.section, category='sequential')
-        cls.unit = ItemFactory.create(parent=cls.subsection, category='vertical')
-        cls.problem = ItemFactory.create(parent=cls.unit, category='problem')
-        cls.unit_2 = ItemFactory.create(parent=cls.subsection, category='vertical')
-        cls.problem_2 = ItemFactory.create(parent=cls.unit_2, category='problem')
+        cls.section = BlockFactory.create(parent=cls.course, category='chapter')
+        cls.subsection = BlockFactory.create(parent=cls.section, category='sequential')
+        cls.unit = BlockFactory.create(parent=cls.subsection, category='vertical')
+        cls.problem = BlockFactory.create(parent=cls.unit, category='problem')
+        cls.unit_2 = BlockFactory.create(parent=cls.subsection, category='vertical')
+        cls.problem_2 = BlockFactory.create(parent=cls.unit_2, category='problem')
         cls.complete_error_prefix = ('Error occurred while attempting to complete student attempt for '
                                      'user {user} for content_id {content_id}. ')
 
@@ -128,16 +128,16 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         """
         # Section, subsection, and unit are all aggregators and not completable so should
         # not be submitted.
-        section = ItemFactory.create(parent=self.course, category='chapter')
-        subsection = ItemFactory.create(parent=section, category='sequential')
-        unit = ItemFactory.create(parent=subsection, category='vertical')
+        section = BlockFactory.create(parent=self.course, category='chapter')
+        subsection = BlockFactory.create(parent=section, category='sequential')
+        unit = BlockFactory.create(parent=subsection, category='vertical')
 
         # should both be submitted
-        video = ItemFactory.create(parent=unit, category='video')
-        problem = ItemFactory.create(parent=unit, category='problem')
+        video = BlockFactory.create(parent=unit, category='video')
+        problem = BlockFactory.create(parent=unit, category='problem')
 
         # Not a completable block
-        ItemFactory.create(parent=unit, category='discussion')
+        BlockFactory.create(parent=unit, category='discussion')
 
         with override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, True):
             self.service.complete_student_attempt(self.student.username, str(subsection.location))
@@ -167,25 +167,25 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
             ]
         )
         course = CourseFactory.create(user_partitions=[partition])
-        section = ItemFactory.create(parent=course, category='chapter')
-        subsection = ItemFactory.create(parent=section, category='sequential')
+        section = BlockFactory.create(parent=course, category='chapter')
+        subsection = BlockFactory.create(parent=section, category='sequential')
 
         c0_url = course.id.make_usage_key('vertical', 'split_test_cond0')
         c1_url = course.id.make_usage_key('vertical', 'split_test_cond1')
-        split_test = ItemFactory.create(
+        split_test = BlockFactory.create(
             parent=subsection,
             category='split_test',
             user_partition_id=0,
             group_id_to_child={'0': c0_url, '1': c1_url},
         )
 
-        cond0vert = ItemFactory.create(parent=split_test, category='vertical', location=c0_url)
-        ItemFactory.create(parent=cond0vert, category='video')
-        ItemFactory.create(parent=cond0vert, category='problem')
+        cond0vert = BlockFactory.create(parent=split_test, category='vertical', location=c0_url)
+        BlockFactory.create(parent=cond0vert, category='video')
+        BlockFactory.create(parent=cond0vert, category='problem')
 
-        cond1vert = ItemFactory.create(parent=split_test, category='vertical', location=c1_url)
-        ItemFactory.create(parent=cond1vert, category='video')
-        ItemFactory.create(parent=cond1vert, category='html')
+        cond1vert = BlockFactory.create(parent=split_test, category='vertical', location=c1_url)
+        BlockFactory.create(parent=cond1vert, category='video')
+        BlockFactory.create(parent=cond1vert, category='html')
 
         with override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, True):
             self.service.complete_student_attempt(self.student.username, str(subsection.location))
@@ -233,14 +233,14 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
     @mock.patch('lms.djangoapps.instructor.tasks.log.error')
     def test_complete_student_attempt_failed_module(self, mock_logger):
         """
-        Assert complete_student_attempt with failed get_module raises error and returns None
+        Assert complete_student_attempt with failed get_block raises error and returns None
         """
         username = self.student.username
-        with mock.patch('lms.djangoapps.instructor.tasks.get_module_for_descriptor', return_value=None):
+        with mock.patch('lms.djangoapps.instructor.tasks.get_block_for_descriptor', return_value=None):
             self.service.complete_student_attempt(username, str(self.course.location))
         mock_logger.assert_called_once_with(
             self.complete_error_prefix.format(user=username, content_id=self.course.location) +
-            'Module unable to be created from descriptor!'
+            'Block unable to be created from descriptor!'
         )
 
     def test_is_user_staff(self):

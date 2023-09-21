@@ -22,6 +22,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, py
 
 from .api import get_block_metadata, get_blocks
 from .forms import BlockListGetForm
+from .utils import filter_discussion_xblocks_from_response
 
 
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
@@ -311,6 +312,7 @@ class BlocksInCourseView(BlocksView):
             raise ValidationError(f"'{str(course_key_string)}' is not a valid course key.")  # lint-amnesty, pylint: disable=raise-missing-from
         response = super().list(request, course_usage_key,
                                 hide_access_denials=hide_access_denials)
+        response = filter_discussion_xblocks_from_response(response, course_key)
 
         # Record user activity for tracking progress towards a user's course goals (for mobile app)
         UserActivity.record_user_activity(request.user, course_key, request=request, only_if_mobile_app=True)

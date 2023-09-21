@@ -12,7 +12,7 @@ from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData, OverrideModulestoreFieldData
 from openedx.core.djangoapps.discussions.utils import get_accessible_discussion_xblocks
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @override_settings(
@@ -54,13 +54,13 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
         overrides are correctly applied for both blocks.
         """
         course = CourseFactory.create(**course_kwargs)
-        section = ItemFactory.create(parent=course, due=self.now)
+        section = BlockFactory.create(parent=course, due=self.now)
         inject_field_overrides((course, section), course, self.user)
         return (course, section)
 
     def create_discussion_xblocks(self, parent):  # lint-amnesty, pylint: disable=missing-function-docstring
         # Create a released discussion xblock
-        ItemFactory.create(
+        BlockFactory.create(
             parent=parent,
             category='discussion',
             display_name='released',
@@ -68,7 +68,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
         )
 
         # Create a scheduled discussion xblock
-        ItemFactory.create(
+        BlockFactory.create(
             parent=parent,
             category='discussion',
             display_name='scheduled',

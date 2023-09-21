@@ -1,5 +1,7 @@
+// eslint-disable-next-line no-shadow-restricted-names
 (function(define, undefined) {
     'use strict';
+
     define([
         'gettext', 'underscore', 'backbone', 'edx-ui-toolkit/js/utils/html-utils'
     ], function(gettext, _, Backbone, HtmlUtils) {
@@ -61,7 +63,7 @@
                         template: '<h4 class="course-subtitle"><%- displayName %></h4>',
                         className: 'note-section'
                     }
-            );
+                );
                 this.children.push(section);
                 return section;
             },

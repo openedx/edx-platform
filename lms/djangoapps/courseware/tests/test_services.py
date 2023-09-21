@@ -12,7 +12,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.services import UserStateService
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
@@ -28,22 +28,22 @@ class TestUserStateService(ModuleStoreTestCase):
         super().setUp()
         self.user = UserFactory.create()
         self.course = CourseFactory.create()
-        chapter = ItemFactory.create(
+        chapter = BlockFactory.create(
             category='chapter',
             parent=self.course,
             display_name='Test Chapter'
         )
-        sequential = ItemFactory.create(
+        sequential = BlockFactory.create(
             category='sequential',
             parent=chapter,
             display_name='Test Sequential'
         )
-        vertical = ItemFactory.create(
+        vertical = BlockFactory.create(
             category='vertical',
             parent=sequential,
             display_name='Test Vertical'
         )
-        self.problem = ItemFactory.create(
+        self.problem = BlockFactory.create(
             category='problem',
             parent=vertical,
             display_name='Test Problem'

@@ -1,5 +1,6 @@
 describe('CSS3 workarounds', function() {
     'use strict';
+
     var pointerEventsNone = window.pointerEventsNone;
     describe('pointer-events', function() {
         beforeEach(function() {

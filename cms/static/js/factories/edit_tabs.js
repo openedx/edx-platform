@@ -6,6 +6,7 @@ import 'cms/js/main';
 import 'xblock/cms.runtime.v1';
 import 'xmodule/js/src/xmodule'; // Force the XBlockToXModuleShim to load for Static Tabs
 
+// eslint-disable-next-line no-unused-expressions
 'use strict';
 export default function EditTabsFactory(courseLocation, explicitUrl) {
     xmoduleLoader.done(function() {
@@ -21,6 +22,6 @@ export default function EditTabsFactory(courseLocation, explicitUrl) {
             mast: $('.wrapper-mast')
         });
     });
-};
+}
 
-export {EditTabsFactory}
+export {EditTabsFactory};

@@ -1,7 +1,7 @@
 """
 URLs for Enhanced Staff Grader (ESG) backend-for-frontend (BFF)
 """
-from django.conf.urls import include
+from django.urls import include
 from django.urls import path
 
 

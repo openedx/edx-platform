@@ -1,5 +1,6 @@
 (function() {
     'use strict';
+
     describe('VideoAutoAdvance', function() {
         var state, oldOTBD;
         beforeEach(function() {

@@ -6,13 +6,11 @@ from string import Template
 from xblock.core import XBlock
 
 from lxml import etree
-from pkg_resources import resource_string
 from web_fragments.fragment import Fragment
 from xmodule.editing_block import EditingMixin
 from xmodule.raw_block import RawMixin
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
 from xmodule.x_module import (
-    HTMLSnippet,
     ResourceTemplates,
     shim_xmodule_js,
     XModuleMixin,
@@ -28,7 +26,6 @@ class CustomTagTemplateBlock(  # pylint: disable=abstract-method
     XmlMixin,
     EditingMixin,
     XModuleToXBlockMixin,
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
 ):
@@ -42,7 +39,7 @@ class CustomTagTemplateBlock(  # pylint: disable=abstract-method
 @XBlock.needs('mako')
 class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
     """
-    This module supports tags of the form
+    This block supports tags of the form
     <customtag option="val" option2="val2" impl="tagname"/>
 
     In this case, $tagname should refer to a file in data/custom_tags, which
@@ -65,29 +62,15 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
     resources_dir = None
     template_dir_name = 'customtag'
 
-    preview_view_js = {
-        'js': [],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    preview_view_css = {
-        'scss': [],
-    }
-    studio_view_js = {
-        'js': [resource_string(__name__, 'js/src/raw/edit/xml.js')],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    studio_view_css = {
-        'scss': [resource_string(__name__, 'css/codemirror/codemirror.scss')],
-    }
-
     def studio_view(self, _context):
         """
         Return the studio view.
         """
         fragment = Fragment(
-            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
+            self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
-        add_webpack_to_fragment(fragment, 'CustomTagBlockStudio')
+        add_sass_to_fragment(fragment, 'CustomTagBlockEditor.scss')
+        add_webpack_js_to_fragment(fragment, 'CustomTagBlockEditor')
         shim_xmodule_js(fragment, 'XMLEditingDescriptor')
         return fragment
 
@@ -111,14 +94,14 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
         # cdodge: look up the template as a module
         template_loc = self.location.replace(category='custom_tag_template', name=template_name)
 
-        template_block = system.load_item(template_loc)
+        template_block = system.get_block(template_loc)
         template_block_data = template_block.data
         template = Template(template_block_data)
         return template.safe_substitute(params)
 
     @property
     def rendered_html(self):
-        return self.render_template(self.system, self.data)
+        return self.render_template(self.runtime, self.data)
 
     def student_view(self, _context):
         """

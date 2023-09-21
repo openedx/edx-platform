@@ -1,5 +1,7 @@
+// eslint-disable-next-line no-shadow-restricted-names
 (function(define, undefined) {
     'use strict';
+
     define([
         'jquery', 'js/edxnotes/collections/notes', 'js/edxnotes/views/notes_page'
     ], function($, NotesCollection, NotesPageView) {
@@ -15,13 +17,13 @@
      */
         return function(params) {
             var collection = new NotesCollection(
-            params.notes,
+                params.notes,
                 {
                     url: params.notesEndpoint,
                     perPage: params.pageSize,
                     parse: true
                 }
-        );
+            );
 
             return new NotesPageView({
                 el: $('.wrapper-student-notes').get(0),

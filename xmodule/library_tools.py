@@ -125,9 +125,9 @@ class LibraryToolsService:
         if usage_key.block_type != "problem":
             return False
 
-        descriptor = self.store.get_item(usage_key, depth=0)
-        assert isinstance(descriptor, ProblemBlock)
-        return capa_type in descriptor.problem_types
+        block = self.store.get_item(usage_key, depth=0)
+        assert isinstance(block, ProblemBlock)
+        return capa_type in block.problem_types
 
     def can_use_library_content(self, block):
         """
@@ -196,7 +196,7 @@ class LibraryToolsService:
         content library) into modulestore, as a new child of dest_block.
         Any existing children of dest_block are replaced.
 
-        This is only used by LibrarySourcedBlock. It should verify first that
+        This is only used by LibraryContentBlock. It should verify first that
         the number of block IDs is reasonable.
         """
         dest_key = dest_block.scope_ids.usage_id
@@ -216,7 +216,7 @@ class LibraryToolsService:
             raise PermissionDenied()
 
         # Read the source block; this will also confirm that user has permission to read it.
-        # (This could be slow and use lots of memory, except for the fact that LibrarySourcedBlock which calls this
+        # (This could be slow and use lots of memory, except for the fact that LibraryContentBlock which calls this
         # should be limiting the number of blocks to a reasonable limit. We load them all now instead of one at a
         # time in order to raise any errors before we start actually copying blocks over.)
         orig_blocks = [load_block(UsageKey.from_string(key), user) for key in blockstore_block_ids]

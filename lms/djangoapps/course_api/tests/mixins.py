@@ -25,6 +25,7 @@ class CourseApiFactoryMixin:
             end=end,
             enrollment_start=datetime(2015, 6, 15, 0, 0, 0),
             enrollment_end=datetime(2015, 7, 15, 0, 0, 0),
+            certificate_available_date=datetime(2015, 8, 14, 0, 0, 0),
             emit_signals=True,
             **kwargs
         )

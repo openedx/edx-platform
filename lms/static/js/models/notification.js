@@ -43,4 +43,3 @@
 
     this.NotificationModel = NotificationModel;
 }).call(this, Backbone);
-

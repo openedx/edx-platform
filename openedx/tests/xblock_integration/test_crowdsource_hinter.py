@@ -9,7 +9,7 @@ import simplejson as json
 from django.conf import settings
 from django.urls import reverse
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
@@ -39,16 +39,16 @@ class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             display_name='CrowdsourceHinter_Test_Course'
         )
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):
-            cls.chapter = ItemFactory.create(
+            cls.chapter = BlockFactory.create(
                 parent=cls.course, display_name='Overview'
             )
-            cls.section = ItemFactory.create(
+            cls.section = BlockFactory.create(
                 parent=cls.chapter, display_name='Welcome'
             )
-            cls.unit = ItemFactory.create(
+            cls.unit = BlockFactory.create(
                 parent=cls.section, display_name='New Unit'
             )
-            cls.xblock = ItemFactory.create(
+            cls.xblock = BlockFactory.create(
                 parent=cls.unit,
                 category='crowdsourcehinter',
                 display_name='crowdsourcehinter'

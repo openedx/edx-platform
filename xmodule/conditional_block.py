@@ -9,7 +9,6 @@ import logging
 from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.locator import BlockUsageLocator
-from pkg_resources import resource_string
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import ReferenceList, Scope, String
@@ -19,11 +18,10 @@ from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.seq_block import SequenceMixin
 from xmodule.studio_editable import StudioEditableBlock
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
-    HTMLSnippet,
     ResourceTemplates,
     shim_xmodule_js,
     STUDENT_VIEW,
@@ -44,7 +42,6 @@ class ConditionalBlock(
     MakoTemplateBlockBase,
     XmlMixin,
     XModuleToXBlockMixin,
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
     StudioEditableBlock,
@@ -60,18 +57,18 @@ class ConditionalBlock(
         </conditional>
 
         <conditional> tag attributes:
-            sources - location id of required modules, separated by ';'
+            sources - location id of required blocks, separated by ';'
 
-            submitted - map to `is_submitted` module method.
+            submitted - map to `is_submitted` block method.
             (pressing RESET button makes this function to return False.)
 
-            attempted - map to `is_attempted` module method
-            correct - map to `is_correct` module method
-            poll_answer - map to `poll_answer` module attribute
-            voted - map to `voted` module attribute
+            attempted - map to `is_attempted` block method
+            correct - map to `is_correct` block method
+            poll_answer - map to `poll_answer` block attribute
+            voted - map to `voted` block attribute
 
         <show> tag attributes:
-            sources - location id of required modules, separated by ';'
+            sources - location id of required blocks, separated by ';'
 
         You can add you own rules for <conditional> tag, like
         "completed", "attempted" etc. To do that yo must extend
@@ -83,7 +80,7 @@ class ConditionalBlock(
                 ...
             </conditional>
 
-        And my_property/my_method will be called for required modules.
+        And my_property/my_method will be called for required blocks.
 
     """
 
@@ -146,31 +143,12 @@ class ConditionalBlock(
 
     show_in_read_only_mode = True
 
-    preview_view_js = {
-        'js': [
-            resource_string(__name__, 'js/src/conditional/display.js'),
-            resource_string(__name__, 'js/src/javascript_loader.js'),
-            resource_string(__name__, 'js/src/collapsible.js'),
-        ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    preview_view_css = {
-        'scss': [],
-    }
-
     mako_template = 'widgets/metadata-edit.html'
     studio_js_module_name = 'SequenceDescriptor'
-    studio_view_js = {
-        'js': [resource_string(__name__, 'js/src/sequence/edit.js')],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    studio_view_css = {
-        'scss': [],
-    }
 
     # Map
     # key: <tag attribute in xml>
-    # value: <name of module attribute>
+    # value: <name of block attribute>
     conditions_map = {
         'poll_answer': 'poll_answer',  # poll_question attr
 
@@ -210,20 +188,20 @@ class ConditionalBlock(
         attr_name = self.conditions_map[self.conditional_attr]
 
         if self.conditional_value and self.get_required_blocks:
-            for module in self.get_required_blocks:
-                if not hasattr(module, attr_name):
+            for block in self.get_required_blocks:
+                if not hasattr(block, attr_name):
                     # We don't throw an exception here because it is possible for
-                    # the descriptor of a required module to have a property but
-                    # for the resulting module to be a (flavor of) ErrorBlock.
+                    # the required block to have a property but
+                    # for the resulting block to be a (flavor of) ErrorBlock.
                     # So just log and return false.
-                    if module is not None:
-                        # We do not want to log when module is None, and it is when requester
-                        # does not have access to the requested required module.
+                    if block is not None:
+                        # We do not want to log when block is None, and it is when requester
+                        # does not have access to the requested required block.
                         log.warning('Error in conditional block: \
-                            required module {module} has no {module_attr}'.format(module=module, module_attr=attr_name))
+                            required module {block} has no {block_attr}'.format(block=block, block_attr=attr_name))
                     return False
 
-                attr = getattr(module, attr_name)
+                attr = getattr(block, attr_name)
                 if callable(attr):
                     attr = attr()
 
@@ -239,13 +217,13 @@ class ConditionalBlock(
         """
         fragment = Fragment()
         fragment.add_content(self.get_html())
-        add_webpack_to_fragment(fragment, 'ConditionalBlockPreview')
+        add_webpack_js_to_fragment(fragment, 'ConditionalBlockDisplay')
         shim_xmodule_js(fragment, 'Conditional')
         return fragment
 
     def get_html(self):
-        required_html_ids = [descriptor.location.html_id() for descriptor in self.get_required_blocks]
-        return self.runtime.service(self, 'mako').render_template('conditional_ajax.html', {
+        required_html_ids = [block.location.html_id() for block in self.get_required_blocks]
+        return self.runtime.service(self, 'mako').render_lms_template('conditional_ajax.html', {
             'element_id': self.location.html_id(),
             'ajax_url': self.ajax_url,
             'depends': ';'.join(required_html_ids)
@@ -271,23 +249,23 @@ class ConditionalBlock(
         Return the studio view.
         """
         fragment = Fragment(
-            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
+            self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
-        add_webpack_to_fragment(fragment, 'ConditionalBlockStudio')
+        add_webpack_js_to_fragment(fragment, 'ConditionalBlockEditor')
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
 
     def handle_ajax(self, _dispatch, _data):
-        """This is called by courseware.moduleodule_render, to handle
+        """This is called by courseware.block_render, to handle
         an AJAX call.
         """
         if not self.is_condition_satisfied():
             context = {'module': self,
                        'message': self.conditional_message}
-            html = self.runtime.service(self, 'mako').render_template('conditional_block.html', context)
+            html = self.runtime.service(self, 'mako').render_lms_template('conditional_block.html', context)
             return json.dumps({'fragments': [{'content': html}], 'message': bool(self.conditional_message)})
 
-        fragments = [child.render(STUDENT_VIEW).to_dict() for child in self.get_display_items()]
+        fragments = [child.render(STUDENT_VIEW).to_dict() for child in self.get_children()]
 
         return json.dumps({'fragments': fragments})
 
@@ -298,7 +276,7 @@ class ConditionalBlock(
         class_priority = ['video', 'problem']
 
         child_classes = [
-            child_descriptor.get_icon_class() for child_descriptor in self.get_children()
+            child_block.get_icon_class() for child_block in self.get_children()
         ]
         for c in class_priority:
             if c in child_classes:
@@ -317,23 +295,25 @@ class ConditionalBlock(
         """
         Returns a list of bound XBlocks instances upon which XBlock depends.
         """
-        return [self.system.get_module(descriptor) for descriptor in self.get_required_module_descriptors()]
+        return [
+            self.runtime.get_block_for_descriptor(block) for block in self.get_required_block_descriptors()
+        ]
 
-    def get_required_module_descriptors(self):
+    def get_required_block_descriptors(self):
         """
         Returns a list of unbound XBlocks instances upon which this XBlock depends.
         """
-        descriptors = []
+        blocks = []
         for location in self.sources_list:
             try:
-                descriptor = self.system.load_item(location)
-                descriptors.append(descriptor)
+                block = self.runtime.get_block(location)
+                blocks.append(block)
             except ItemNotFoundError:
                 msg = "Invalid module by location."
                 log.exception(msg)
-                self.system.error_tracker(msg)
+                self.runtime.error_tracker(msg)
 
-        return descriptors
+        return blocks
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -355,8 +335,8 @@ class ConditionalBlock(
                     show_tag_list.append(location)
             else:
                 try:
-                    descriptor = system.process_xml(etree.tostring(child, encoding='unicode'))
-                    children.append(descriptor.scope_ids.usage_id)
+                    block = system.process_xml(etree.tostring(child, encoding='unicode'))
+                    children.append(block.scope_ids.usage_id)
                 except:  # lint-amnesty, pylint: disable=bare-except
                     msg = "Unable to load child when parsing Conditional."
                     log.exception(msg)

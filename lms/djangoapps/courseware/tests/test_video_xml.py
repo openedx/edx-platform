@@ -9,7 +9,7 @@ You can search for usages of this in the cms and lms tests for examples.
 You use this so that it will do things like point the modulestore
 setting to mongo, flush the contentstore before and after, load the
 templates, etc.
-You can then use the CourseFactory and XModuleItemFactory as defined in
+You can then use the CourseFactory and BlockFactory as defined in
 xmodule/modulestore/tests/factories.py to create the
 course, section, subsection, unit, etc.
 """
@@ -24,6 +24,21 @@ SOURCE_XML = """
     youtube="0.75:jNCf2gIqpeE,1.0:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg"
     sub="a_sub_file.srt.sjson"
     download_video="true"
+    start_time="3603.0" end_time="3610.0"
+    >
+        <source src="example.mp4"/>
+        <source src="example.webm"/>
+        <transcript language="uk" src="ukrainian_translation.srt" />
+    </video>
+"""
+
+PUBLIC_SOURCE_XML = """
+    <video show_captions="true"
+    display_name="A Name"
+    youtube="0.75:jNCf2gIqpeE,1.0:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg"
+    sub="a_sub_file.srt.sjson"
+    download_video="true"
+    public_access="true"
     start_time="3603.0" end_time="3610.0"
     >
         <source src="example.mp4"/>

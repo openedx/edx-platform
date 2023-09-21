@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define(['jquery', 'underscore', 'backbone', 'edx-ui-toolkit/js/utils/html-utils'],
         function($, _, Backbone, HtmlUtils) {
             return Backbone.View.extend({

@@ -3,12 +3,11 @@
 <%namespace name='static' file='/static_content.html'/>
 <%def name="online_help_token()"><% return "courseware" %></%def>
 <%!
-import six
 import waffle
 
 from django.conf import settings
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from lms.djangoapps.edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
 from openedx.core.djangolib.js_utils import js_escaped_string
@@ -224,13 +223,13 @@ ${HTML(fragment.foot_html())}
                             % endif
                             % if chapter:
                                 <span class="nav-item nav-item-chapter" data-course-position="${course.position}" data-chapter-position="${chapter.position}">
-                                    <a href="${course_url}#${six.text_type(chapter.location)}">${chapter.display_name_with_default}</a>
+                                    <a href="${course_url}#${str(chapter.location)}">${chapter.display_name_with_default}</a>
                                 </span>
                                 <span class="icon fa fa-angle-right" aria-hidden="true"></span>
                             % endif
                             % if section:
                                 <span class="nav-item nav-item-section">
-                                    <a href="${course_url}#${six.text_type(section.location)}">${section.display_name_with_default}</a>
+                                    <a href="${course_url}#${str(section.location)}">${section.display_name_with_default}</a>
                                 </span>
                                 <span class="icon fa fa-angle-right" aria-hidden="true"></span>
                             % endif
@@ -309,7 +308,7 @@ ${HTML(fragment.foot_html())}
     <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
       ## Utility: Notes
       % if is_edxnotes_enabled(course, request.user):
-        <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
+        <%include file="/edxnotes/toggle_notes.html" args="course=course, block=course"/>
       % endif
 
       ## Utility: Calc

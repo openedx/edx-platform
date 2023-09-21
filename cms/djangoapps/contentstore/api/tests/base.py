@@ -6,7 +6,7 @@ Base test case for the course API views.
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory
@@ -40,44 +40,44 @@ class BaseCourseViewTest(SharedModuleStoreTestCase, APITestCase):
         course.self_paced = True
         cls.store.update_item(course, cls.staff.id)
 
-        cls.section = ItemFactory.create(
+        cls.section = BlockFactory.create(
             parent_location=course.location,
             category="chapter",
         )
-        cls.subsection1 = ItemFactory.create(
+        cls.subsection1 = BlockFactory.create(
             parent_location=cls.section.location,
             category="sequential",
         )
-        unit1 = ItemFactory.create(
+        unit1 = BlockFactory.create(
             parent_location=cls.subsection1.location,
             category="vertical",
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=unit1.location,
             category="video",
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=unit1.location,
             category="problem",
         )
 
-        cls.subsection2 = ItemFactory.create(
+        cls.subsection2 = BlockFactory.create(
             parent_location=cls.section.location,
             category="sequential",
         )
-        unit2 = ItemFactory.create(
+        unit2 = BlockFactory.create(
             parent_location=cls.subsection2.location,
             category="vertical",
         )
-        unit3 = ItemFactory.create(
+        unit3 = BlockFactory.create(
             parent_location=cls.subsection2.location,
             category="vertical",
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=unit3.location,
             category="video",
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=unit3.location,
             category="video",
         )

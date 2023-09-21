@@ -15,6 +15,7 @@ var edx = edx || {};
             ariaExpandedState = ($dropdownButton.attr('aria-expanded') === 'true'),
             menuItems = $dropdown.find('a');
 
+        // eslint-disable-next-line no-shadow
         var catchKeyPress = function(object, event) {
             // get currently focused item
             var $focusedItem = $(':focus');
@@ -29,11 +30,12 @@ var edx = edx || {};
             if (event.which === 32 || event.which === 27) {
                 $dropdownButton.click();
                 event.preventDefault();
+            // eslint-disable-next-line brace-style
             }
 
             // if up arrow key pressed or shift+tab
             else if (event.which === 38 || (event.which === 9 && event.shiftKey)) {
-              // if first item go to last
+                // if first item go to last
                 if (focusedItemIndex === 0 || focusedItemIndex === -1) {
                     menuItems.last().focus();
                 } else {
@@ -41,11 +43,12 @@ var edx = edx || {};
                     menuItems.get(itemToFocusIndex).focus();
                 }
                 event.preventDefault();
+            // eslint-disable-next-line brace-style
             }
 
             // if down arrow key pressed or tab key
             else if (event.which === 40 || event.which === 9) {
-              // if last item go to first
+                // if last item go to first
                 if (focusedItemIndex === menuItems.length - 1 || focusedItemIndex === -1) {
                     menuItems.first().focus();
                 } else {
@@ -78,9 +81,9 @@ var edx = edx || {};
 
     edx.dashboard.dropdown.bindToggleButtons = function(selector) {
         $(selector).bind(
-        'click',
-        edx.dashboard.dropdown.toggleCourseActionsDropdownMenu
-      );
+            'click',
+            edx.dashboard.dropdown.toggleCourseActionsDropdownMenu
+        );
     };
 
     $(document).ready(function() {

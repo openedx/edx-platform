@@ -3,6 +3,8 @@ Views for user API
 """
 
 
+import logging
+
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -25,7 +27,7 @@ from lms.djangoapps.courseware.access import is_mobile_available_for_user
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
 from lms.djangoapps.courseware.courses import get_current_child
 from lms.djangoapps.courseware.model_data import FieldDataCache
-from lms.djangoapps.courseware.module_render import get_module_for_descriptor
+from lms.djangoapps.courseware.block_render import get_block_for_descriptor
 from lms.djangoapps.courseware.views.index import save_positions_recursively_up
 from lms.djangoapps.mobile_api.models import MobileConfig
 from lms.djangoapps.mobile_api.utils import API_V1, API_V05, API_V2
@@ -36,6 +38,8 @@ from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, py
 from .. import errors
 from ..decorators import mobile_course_access, mobile_view
 from .serializers import CourseEnrollmentSerializer, CourseEnrollmentSerializerv05, UserSerializer
+
+log = logging.getLogger(__name__)
 
 
 @mobile_view(is_user=True)
@@ -134,16 +138,16 @@ class UserCourseStatus(views.APIView):
             with transaction.atomic():
                 return super().dispatch(request, *args, **kwargs)
 
-    def _last_visited_module_path(self, request, course):
+    def _last_visited_block_path(self, request, course):
         """
-        Returns the path from the last module visited by the current user in the given course up to
+        Returns the path from the last block visited by the current user in the given course up to
         the course block. If there is no such visit, the first item deep enough down the course
         tree is used.
         """
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        field_data_cache = FieldDataCache.cache_for_block_descendents(
             course.id, request.user, course, depth=2)
 
-        course_block = get_module_for_descriptor(
+        course_block = get_block_for_descriptor(
             request.user, request, course, field_data_cache, course.id, course=course
         )
 
@@ -162,8 +166,8 @@ class UserCourseStatus(views.APIView):
         """
         Returns the course status
         """
-        path = self._last_visited_module_path(request, course)
-        path_ids = [str(module.location) for module in path]
+        path = self._last_visited_block_path(request, course)
+        path_ids = [str(block.location) for block in path]
         return Response({
             "last_visited_module_id": path_ids[0],
             "last_visited_module_path": path_ids,
@@ -173,14 +177,15 @@ class UserCourseStatus(views.APIView):
         """
         Saves the module id if the found modification_date is less recent than the passed modification date
         """
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        field_data_cache = FieldDataCache.cache_for_block_descendents(
             course.id, request.user, course, depth=2)
         try:
-            module_descriptor = modulestore().get_item(module_key)
+            descriptor = modulestore().get_item(module_key)
         except ItemNotFoundError:
+            log.error(f"{errors.ERROR_INVALID_MODULE_ID} %s", module_key)
             return Response(errors.ERROR_INVALID_MODULE_ID, status=400)
-        module = get_module_for_descriptor(
-            request.user, request, module_descriptor, field_data_cache, course.id, course=course
+        block = get_block_for_descriptor(
+            request.user, request, descriptor, field_data_cache, course.id, course=course
         )
 
         if modification_date:
@@ -195,7 +200,7 @@ class UserCourseStatus(views.APIView):
                 # old modification date so skip update
                 return self._get_course_info(request, course)
 
-        save_positions_recursively_up(request.user, request, field_data_cache, module, course=course)
+        save_positions_recursively_up(request.user, request, field_data_cache, block, course=course)
         return self._get_course_info(request, course)
 
     @mobile_course_access(depth=2)
@@ -228,12 +233,14 @@ class UserCourseStatus(views.APIView):
         if modification_date_string:
             modification_date = dateparse.parse_datetime(modification_date_string)
             if not modification_date or not modification_date.tzinfo:
+                log.error(f"{errors.ERROR_INVALID_MODIFICATION_DATE} %s", modification_date_string)
                 return Response(errors.ERROR_INVALID_MODIFICATION_DATE, status=400)
 
         if module_id:
             try:
                 module_key = UsageKey.from_string(module_id)
             except InvalidKeyError:
+                log.error(f"{errors.ERROR_INVALID_MODULE_ID} %s", module_id)
                 return Response(errors.ERROR_INVALID_MODULE_ID, status=400)
 
             return self._update_last_visited_module_id(request, course, module_key, modification_date)

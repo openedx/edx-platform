@@ -10,7 +10,7 @@ from bson.objectid import ObjectId
 from opaque_keys.edx.locator import LibraryLocator
 
 from xmodule.modulestore.exceptions import DuplicateCourseError
-from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import BlockFactory, LibraryFactory, check_mongo_calls
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 
 
@@ -80,14 +80,14 @@ class TestLibraries(MixedSplitTestCase):
         library = LibraryFactory.create(modulestore=self.store)
 
         # In the library, create a vertical block with a child:
-        vert_block = ItemFactory.create(
+        vert_block = BlockFactory.create(
             category="vertical",
             parent_location=library.location,
             user_id=self.user_id,
             publish_item=False,
             modulestore=self.store,
         )
-        child_block = ItemFactory.create(
+        child_block = BlockFactory.create(
             category="html",
             parent_location=vert_block.location,
             user_id=self.user_id,
@@ -103,7 +103,7 @@ class TestLibraries(MixedSplitTestCase):
         """
         library = LibraryFactory.create(modulestore=self.store)
 
-        block = ItemFactory.create(
+        block = BlockFactory.create(
             category="html",
             parent_location=library.location,
             user_id=self.user_id,
@@ -128,7 +128,7 @@ class TestLibraries(MixedSplitTestCase):
         """
         library = LibraryFactory.create(modulestore=self.store)
         lib_key = library.location.library_key
-        block = ItemFactory.create(
+        block = BlockFactory.create(
             category="html",
             parent_location=library.location,
             user_id=self.user_id,
@@ -191,7 +191,7 @@ class TestLibraries(MixedSplitTestCase):
 
     def test_xblock_in_lib_have_published_version_returns_false(self):
         library = LibraryFactory.create(modulestore=self.store)
-        block = ItemFactory.create(
+        block = BlockFactory.create(
             category="html",
             parent_location=library.location,
             user_id=self.user_id,

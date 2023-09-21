@@ -64,5 +64,7 @@ xmodule/js/spec/problem/edit_spec_hint.js
 xmodule/js/spec/problem/edit_spec.js
 xmodule/js/spec/tabs/edit.js
 
+xmodule/js/public/js
+xmodule/assets/*/public/js
 
 !**/.eslintrc.js

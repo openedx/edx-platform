@@ -18,6 +18,7 @@ from collections import OrderedDict
 from uuid import uuid4
 
 import openid.oidutil
+import django
 from django.utils.translation import gettext_lazy
 from edx_django_utils.plugins import add_plugins
 from path import Path as path
@@ -327,8 +328,6 @@ FILE_UPLOAD_HANDLERS = [
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 ]
 
-BLOCK_STRUCTURES_SETTINGS['PRUNING_ACTIVE'] = True
-
 ########################### Server Ports ###################################
 
 # These ports are carefully chosen so that if the browser needs to
@@ -635,13 +634,6 @@ RESET_PASSWORD_API_RATELIMIT = '2/m'
 
 CORS_ORIGIN_WHITELIST = ['https://sandbox.edx.org']
 
-# enable /api/v1/save/course/ api for testing
-ENABLE_SAVE_FOR_LATER = True
-
-# rate limit for /api/v1/save/course/ api
-SAVE_FOR_LATER_IP_RATE_LIMIT = '5/d'
-SAVE_FOR_LATER_EMAIL_RATE_LIMIT = '5/m'
-
 #################### Network configuration ####################
 # Tests are not behind any proxies
 CLOSEST_CLIENT_IP_FROM_HEADERS = []
@@ -674,3 +666,22 @@ MFE_CONFIG_OVERRIDES = {
 
 ############## Settings for survey report ##############
 SURVEY_REPORT_EXTRA_DATA = {}
+SURVEY_REPORT_ENDPOINT = "https://example.com/survey_report"
+ANONYMOUS_SURVEY_REPORT = False
+
+######################## Subscriptions API SETTINGS ########################
+SUBSCRIPTIONS_ROOT_URL = "http://localhost:18750"
+SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
+
+SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL = None
+SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscribe/"
+SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL = None
+SUBSCRIPTIONS_MINIMUM_PRICE = '$39'
+SUBSCRIPTIONS_TRIAL_LENGTH = 7
+CSRF_TRUSTED_ORIGINS = ['.example.com']
+CSRF_TRUSTED_ORIGINS_WITH_SCHEME = ['https://*.example.com']
+
+# values are already updated above with default CSRF_TRUSTED_ORIGINS values but in
+# case of new django version these values will override.
+if django.VERSION[0] >= 4:  # for greater than django 3.2 use with schemes.
+    CSRF_TRUSTED_ORIGINS = CSRF_TRUSTED_ORIGINS_WITH_SCHEME

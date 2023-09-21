@@ -7,6 +7,7 @@ define([
     'text!templates/paging-header.underscore'
 ], function(_, Backbone, gettext, HtmlUtils, StringUtils, pagingHeaderTemplate) {
     'use strict';
+
     var PagingHeader = Backbone.View.extend({
         events: {
             'click .next-page-link': 'nextPage',
@@ -32,11 +33,11 @@ define([
 
             HtmlUtils.setHtml(this.$el, HtmlUtils.template(pagingHeaderTemplate)({messageHtml: messageHtml}));
             this.$('.previous-page-link')
-                    .toggleClass('is-disabled', currentPage === 1)
-                    .attr('aria-disabled', currentPage === 1);
+                .toggleClass('is-disabled', currentPage === 1)
+                .attr('aria-disabled', currentPage === 1);
             this.$('.next-page-link')
-                    .toggleClass('is-disabled', isNextDisabled)
-                    .attr('aria-disabled', isNextDisabled);
+                .toggleClass('is-disabled', isNextDisabled)
+                .attr('aria-disabled', isNextDisabled);
 
             return this;
         },
@@ -47,24 +48,24 @@ define([
 
             if (this.view.collection.assetType) {
                 if (this.view.collection.sortDirection === 'asc') {
-                        // Translators: sample result:
-                        // "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added ascending"
-                    message = gettext('Showing {currentItemRange} out of {totalItemsCount}, filtered by {assetType}, sorted by {sortName} ascending');  // eslint-disable-line max-len
+                    // Translators: sample result:
+                    // "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added ascending"
+                    message = gettext('Showing {currentItemRange} out of {totalItemsCount}, filtered by {assetType}, sorted by {sortName} ascending'); // eslint-disable-line max-len
                 } else {
-                        // Translators: sample result:
-                        // "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added descending"
-                    message = gettext('Showing {currentItemRange} out of {totalItemsCount}, filtered by {assetType}, sorted by {sortName} descending');  // eslint-disable-line max-len
+                    // Translators: sample result:
+                    // "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added descending"
+                    message = gettext('Showing {currentItemRange} out of {totalItemsCount}, filtered by {assetType}, sorted by {sortName} descending'); // eslint-disable-line max-len
                 }
                 assetType = this.filterNameLabel();
             } else {
                 if (this.view.collection.sortDirection === 'asc') {
-                        // Translators: sample result:
-                        // "Showing 0-9 out of 25 total, sorted by Date Added ascending"
-                    message = gettext('Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} ascending');  // eslint-disable-line max-len
+                    // Translators: sample result:
+                    // "Showing 0-9 out of 25 total, sorted by Date Added ascending"
+                    message = gettext('Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} ascending'); // eslint-disable-line max-len
                 } else {
-                        // Translators: sample result:
-                        // "Showing 0-9 out of 25 total, sorted by Date Added descending"
-                    message = gettext('Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} descending');  // eslint-disable-line max-len
+                    // Translators: sample result:
+                    // "Showing 0-9 out of 25 total, sorted by Date Added descending"
+                    message = gettext('Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} descending'); // eslint-disable-line max-len
                 }
             }
 
@@ -94,7 +95,7 @@ define([
             var totalItemsLabel,
                 htmlMessage = HtmlUtils.HTML('<span class="count-total">{totalItemsLabel}</span>');
 
-                // Translators: turns into "25 total" to be used in other sentences, e.g. "Showing 0-9 out of 25 total".
+            // Translators: turns into "25 total" to be used in other sentences, e.g. "Showing 0-9 out of 25 total".
             totalItemsLabel = StringUtils.interpolate(gettext('{totalItems} total'), {
                 totalItems: this.view.collection.getTotalRecords()
             });

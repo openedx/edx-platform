@@ -17,7 +17,7 @@ from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_SPLIT_MODULESTORE,
     SharedModuleStoreTestCase
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
 DATA_DIR = settings.COMMON_TEST_DATA_ROOT
@@ -63,7 +63,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
             end=TEST_COURSE_END,
         )
 
-        cls.discussion = ItemFactory.create(
+        cls.discussion = BlockFactory.create(
             category='discussion', parent_location=cls.course.location
         )
 

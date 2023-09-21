@@ -57,6 +57,8 @@ class BulkUsersRetirementView(APIView):
                 user_to_retire = User.objects.get(username=username)
                 with transaction.atomic():
                     create_retirement_request_and_deactivate_account(user_to_retire)
+                log.info(f'The user "{username}" has been added to the retirement pipeline \
+                         by "{request.user}"')
 
             except User.DoesNotExist:
                 log.exception(f'The user "{username}" does not exist.')

@@ -6,6 +6,8 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from edx_toggles.toggles import WaffleFlag
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
+from openedx_filters.exceptions import OpenEdxFilterException
+from openedx_filters.learning.filters import CourseHomeUrlCreationStarted
 
 
 # Namespace for course experience waffle flags.
@@ -49,6 +51,16 @@ COURSE_ENABLE_UNENROLLED_ACCESS_FLAG = CourseWaffleFlag(  # lint-amnesty, pylint
 #   needs to be set. Currently it can be set through the publisher app.
 # .. toggle_tickets: https://openedx.atlassian.net/browse/AA-27
 RELATIVE_DATES_FLAG = CourseWaffleFlag(f'{WAFFLE_FLAG_NAMESPACE}.relative_dates', __name__)  # lint-amnesty, pylint: disable=toggle-missing-annotation
+
+# .. toggle_name: course_experience.relative_dates_disable_reset
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Waffle flag to disable resetting deadlines by learners in self-paced courses. The 'Dates' tab
+#   will no longer show a banner about missed deadlines. The deadlines banner will also be hidden on unit pages.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2023-04-27
+# .. toggle_warning: For this toggle to have an effect, the RELATIVE_DATES_FLAG toggle must be enabled, too.
+RELATIVE_DATES_DISABLE_RESET_FLAG = CourseWaffleFlag(f'{WAFFLE_FLAG_NAMESPACE}.relative_dates_disable_reset', __name__)
 
 # .. toggle_name: course_experience.calendar_sync
 # .. toggle_implementation: CourseWaffleFlag
@@ -95,4 +107,14 @@ def course_home_url(course_key):
         course_key (CourseKey): The course key for which the home url is being requested.
     """
     from .url_helpers import get_learning_mfe_home_url
-    return get_learning_mfe_home_url(course_key, url_fragment='home')
+    home_url = get_learning_mfe_home_url(course_key, url_fragment='home')
+    try:
+        # .. filter_implemented_name: CourseHomeUrlCreationStarted
+        # .. filter_type: org.openedx.learning.course.homepage.url.creation.started.v1
+        course_key, home_url = CourseHomeUrlCreationStarted.run_filter(
+            course_key=course_key, course_home_url=home_url
+        )
+    except OpenEdxFilterException as exc:
+        pass
+
+    return home_url

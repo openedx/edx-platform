@@ -68,6 +68,24 @@
       width: 49%;
 
       @include text-align(right);
+
+      // On components, if the copy/paste feature flag is enabled, we put the actions into a dropdown menu.
+      .wrapper-nav-sub {
+        @include text-align(left); // Undo the 'text-align: right' inherited from the parent
+
+        z-index: 10; // Stay in front of things like the video xblock or the "add component" buttons
+
+        .nav-item {
+          a {
+            // Match styling of ".wrapper-header nav .nav-item a" (dropdowns in Studio header)
+            color: $gray-d1;
+
+            &:hover {
+              color: $uxpl-blue-hover-active;
+            }
+          }
+        }
+      }
     }
   }
 
@@ -441,6 +459,10 @@
       code::before,
       code::after {
         @include display-left-to-right();
+      }
+
+      blockquote {
+        margin: $baseline*2;
       }
     }
 

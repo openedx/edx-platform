@@ -49,7 +49,7 @@ from lms.djangoapps.courseware.date_summary import (
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, CourseRunNotFound
 from lms.djangoapps.courseware.masquerade import check_content_start_date_for_masquerade_user
 from lms.djangoapps.courseware.model_data import FieldDataCache
-from lms.djangoapps.courseware.module_render import get_module
+from lms.djangoapps.courseware.block_render import get_block
 from lms.djangoapps.survey.utils import SurveyRequiredAccessError, check_survey_required_and_unanswered
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.enrollments.api import get_course_enrollment_details
@@ -76,7 +76,7 @@ _Assignment = namedtuple(
 
 def get_course(course_id, depth=0):
     """
-    Given a course id, return the corresponding course descriptor.
+    Given a course id, return the corresponding course block.
 
     If the course does not exist, raises a CourseRunNotFound. This is appropriate
     for internal use.
@@ -92,9 +92,9 @@ def get_course(course_id, depth=0):
 
 def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):  # lint-amnesty, pylint: disable=line-too-long
     """
-    Given a course_key, look up the corresponding course descriptor,
+    Given a course_key, look up the corresponding course block,
     check that the user has the access to perform the specified action
-    on the course, and return the descriptor.
+    on the course, and return the block.
 
     Raises a 404 if the course_key is invalid, or the user doesn't have access.
 
@@ -370,22 +370,22 @@ def get_course_about_section(request, course, section_key):
 
             # Use an empty cache
             field_data_cache = FieldDataCache([], course.id, request.user)
-            about_module = get_module(
+            about_block = get_block(
                 request.user,
                 request,
                 loc,
                 field_data_cache,
                 log_if_not_found=False,
-                wrap_xmodule_display=False,
+                wrap_xblock_display=False,
                 static_asset_path=course.static_asset_path,
                 course=course
             )
 
             html = ''
 
-            if about_module is not None:
+            if about_block is not None:
                 try:
-                    html = about_module.render(STUDENT_VIEW).content
+                    html = about_block.render(STUDENT_VIEW).content
                 except Exception:  # pylint: disable=broad-except
                     html = render_to_string('courseware/error-message.html', None)
                     log.exception(
@@ -406,14 +406,14 @@ def get_course_about_section(request, course, section_key):
 
 def get_course_info_usage_key(course, section_key):
     """
-    Returns the usage key for the specified section's course info module.
+    Returns the usage key for the specified section's course info block.
     """
     return course.id.make_usage_key('course_info', section_key)
 
 
-def get_course_info_section_module(request, user, course, section_key):
+def get_course_info_section_block(request, user, course, section_key):
     """
-    This returns the course info module for a given section_key.
+    This returns the course info block for a given section_key.
 
     Valid keys:
     - handouts
@@ -426,13 +426,13 @@ def get_course_info_section_module(request, user, course, section_key):
     # Use an empty cache
     field_data_cache = FieldDataCache([], course.id, user)
 
-    return get_module(
+    return get_block(
         user,
         request,
         usage_key,
         field_data_cache,
         log_if_not_found=False,
-        wrap_xmodule_display=False,
+        wrap_xblock_display=False,
         static_asset_path=course.static_asset_path,
         course=course
     )
@@ -449,12 +449,12 @@ def get_course_info_section(request, user, course, section_key):
     - updates
     - guest_updates
     """
-    info_module = get_course_info_section_module(request, user, course, section_key)
+    info_block = get_course_info_section_block(request, user, course, section_key)
 
     html = ''
-    if info_module is not None:
+    if info_block is not None:
         try:
-            html = info_module.render(STUDENT_VIEW).content.strip()
+            html = info_block.render(STUDENT_VIEW).content.strip()
         except Exception:  # pylint: disable=broad-except
             html = render_to_string('courseware/error-message.html', None)
             log.exception(
@@ -629,76 +629,139 @@ def get_course_assignments(course_key, user, include_access=False):  # lint-amne
                     subsection_key, title, url, due, contains_gated_content,
                     complete, past_due, assignment_type, None, first_component_block_id
                 ))
-
-            # Load all dates for ORA blocks as separate assignments
-            descendents = block_data.get_children(subsection_key)
-            while descendents:
-                descendent = descendents.pop()
-                descendents.extend(block_data.get_children(descendent))
-                if block_data.get_xblock_field(descendent, 'category', None) == 'openassessment':
-                    graded = block_data.get_xblock_field(descendent, 'graded', False)
-                    has_score = block_data.get_xblock_field(descendent, 'has_score', False)
-                    weight = block_data.get_xblock_field(descendent, 'weight', 1)
-                    if not (graded and has_score and (weight is None or weight > 0)):
-                        continue
-
-                    all_assessments = [{
-                        'name': 'submission',
-                        'due': block_data.get_xblock_field(descendent, 'submission_due'),
-                        'start': block_data.get_xblock_field(descendent, 'submission_start'),
-                        'required': True
-                    }]
-
-                    valid_assessments = block_data.get_xblock_field(descendent, 'valid_assessments')
-                    if valid_assessments:
-                        all_assessments.extend(valid_assessments)
-
-                    assignment_type = block_data.get_xblock_field(descendent, 'format', None)
-                    complete = is_block_structure_complete_for_assignments(block_data, descendent)
-
-                    block_title = block_data.get_xblock_field(descendent, 'title', _('Open Response Assessment'))
-
-                    for assessment in all_assessments:
-                        due = parse_date(assessment.get('due')).replace(tzinfo=pytz.UTC) if assessment.get('due') else None  # lint-amnesty, pylint: disable=line-too-long
-                        if due is None:
-                            continue
-
-                        assessment_name = assessment.get('name')
-                        if assessment_name is None:
-                            continue
-
-                        if assessment_name == 'self-assessment':
-                            assessment_type = _("Self Assessment")
-                        elif assessment_name == 'peer-assessment':
-                            assessment_type = _("Peer Assessment")
-                        elif assessment_name == 'staff-assessment':
-                            assessment_type = _("Staff Assessment")
-                        elif assessment_name == 'submission':
-                            assessment_type = _("Submission")
-                        else:
-                            assessment_type = assessment_name
-                        title = f"{block_title} ({assessment_type})"
-                        url = ''
-                        start = parse_date(assessment.get('start')).replace(tzinfo=pytz.UTC) if assessment.get('start') else None  # lint-amnesty, pylint: disable=line-too-long
-                        assignment_released = not start or start < now
-                        if assignment_released:
-                            url = reverse('jump_to', args=[course_key, descendent])
-
-                        past_due = not complete and due and due < now
-                        first_component_block_id = str(descendent)
-                        assignments.append(_Assignment(
-                            descendent,
-                            title,
-                            url,
-                            due,
-                            False,
-                            complete,
-                            past_due,
-                            assignment_type,
-                            _("Open Response Assessment due dates are set by your instructor and can't be shifted."),
-                            first_component_block_id,
-                        ))
+            assignments.extend(get_ora_blocks_as_assignments(block_data, subsection_key))
     return assignments
+
+
+def get_ora_blocks_as_assignments(block_data, subsection_key):
+    """
+    Given a subsection key, navigate through descendents and find open response assessments.
+    For each graded ORA, return a list of "Assignment" tuples that map to the individual steps
+    of the ORA
+    """
+    ora_assignments = []
+    descendents = block_data.get_children(subsection_key)
+    while descendents:
+        descendent = descendents.pop()
+        descendents.extend(block_data.get_children(descendent))
+        if block_data.get_xblock_field(descendent, 'category', None) == 'openassessment':
+            ora_assignments.extend(get_ora_as_assignments(block_data, descendent))
+    return ora_assignments
+
+
+def get_ora_as_assignments(block_data, ora_block):
+    """
+    Given an individual ORA, return the list of individual ORA steps as Assignment tuples
+    """
+    graded = block_data.get_xblock_field(ora_block, 'graded', False)
+    has_score = block_data.get_xblock_field(ora_block, 'has_score', False)
+    weight = block_data.get_xblock_field(ora_block, 'weight', 1)
+
+    if not (graded and has_score and (weight is None or weight > 0)):
+        return []
+
+    complete = is_block_structure_complete_for_assignments(block_data, ora_block)
+
+    # Put all ora 'steps' (response, peer, self, etc) into a single list in a common format
+    all_assessments = [{
+        'name': 'submission',
+        'due': block_data.get_xblock_field(ora_block, 'submission_due'),
+        'start': block_data.get_xblock_field(ora_block, 'submission_start'),
+        'required': True
+    }]
+    valid_assessments = block_data.get_xblock_field(ora_block, 'valid_assessments')
+    if valid_assessments:
+        all_assessments.extend(valid_assessments)
+
+    # Loop through all steps and construct Assignment tuples from them
+    assignments = []
+    for assessment in all_assessments:
+        assignment = _ora_assessment_to_assignment(
+            block_data,
+            ora_block,
+            complete,
+            assessment
+        )
+        if assignment is not None:
+            assignments.append(assignment)
+    return assignments
+
+
+def _ora_assessment_to_assignment(
+    block_data,
+    ora_block,
+    complete,
+    assessment
+):
+    """
+    Create an assignment from an ORA assessment dict
+    """
+    date_config_type = block_data.get_xblock_field(ora_block, 'date_config_type', 'manual')
+    assignment_type = block_data.get_xblock_field(ora_block, 'format', None)
+    block_title = block_data.get_xblock_field(ora_block, 'title', _('Open Response Assessment'))
+    course_key = block_data.root_block_usage_key
+
+    # Steps with no "due" date, like staff or training, should not show up here
+    assessment_step_due = assessment.get('start')
+    if assessment_step_due is None:
+        return None
+
+    if date_config_type == 'subsection':
+        assessment_start = block_data.get_xblock_field(ora_block, 'start')
+        assessment_due = block_data.get_xblock_field(ora_block, 'due')
+        extra_info = None
+    elif date_config_type == 'course_end':
+        assessment_start = None
+        assessment_due = block_data.get_xblock_field(course_key, 'end')
+        extra_info = None
+    else:
+        assessment_start, assessment_due = None, None
+        if assessment.get('start'):
+            assessment_start = parse_date(assessment.get('start')).replace(tzinfo=pytz.UTC)
+        if assessment.get('due'):
+            assessment_due = parse_date(assessment.get('due')).replace(tzinfo=pytz.UTC)
+        extra_info = _(
+            "This Open Response Assessment's due dates are set by your instructor and can't be shifted."
+        )
+
+    if assessment_due is None:
+        return None
+
+    assessment_name = assessment.get('name')
+    if assessment_name is None:
+        return None
+
+    if assessment_name == 'self-assessment':
+        assessment_type = _("Self Assessment")
+    elif assessment_name == 'peer-assessment':
+        assessment_type = _("Peer Assessment")
+    elif assessment_name == 'staff-assessment':
+        assessment_type = _("Staff Assessment")
+    elif assessment_name == 'submission':
+        assessment_type = _("Submission")
+    else:
+        assessment_type = assessment_name
+    title = f"{block_title} ({assessment_type})"
+    url = ''
+    now = datetime.now(pytz.UTC)
+    assignment_released = not assessment_start or assessment_start < now
+    if assignment_released:
+        url = reverse('jump_to', args=[course_key, ora_block])
+
+    past_due = not complete and assessment_due and assessment_due < now
+    first_component_block_id = str(ora_block)
+    return _Assignment(
+        ora_block,
+        title,
+        url,
+        assessment_due,
+        False,
+        complete,
+        past_due,
+        assignment_type,
+        extra_info,
+        first_component_block_id,
+    )
 
 
 def get_first_component_of_block(block_key, block_data):
@@ -731,7 +794,7 @@ def get_course_syllabus_section(course, section_key):
 
     if section_key in ['syllabus', 'guest_syllabus']:
         try:
-            filesys = course.system.resources_fs
+            filesys = course.runtime.resources_fs
             # first look for a run-specific version
             dirs = [path("syllabus") / course.url_name, path("syllabus")]
             filepath = find_file(filesys, dirs, section_key + ".html")
@@ -753,7 +816,7 @@ def get_course_syllabus_section(course, section_key):
 
 
 @function_trace('get_courses')
-def get_courses(user, org=None, filter_=None, permissions=None, active_only=False):
+def get_courses(user, org=None, filter_=None, permissions=None, active_only=False, course_keys=None):
     """
     Return a LazySequence of courses available, optionally filtered by org code
     (case-insensitive) or a set of permissions to be satisfied for the specified
@@ -763,7 +826,8 @@ def get_courses(user, org=None, filter_=None, permissions=None, active_only=Fals
     courses = branding.get_visible_courses(
         org=org,
         filter_=filter_,
-        active_only=active_only
+        active_only=active_only,
+        course_keys=course_keys
     ).prefetch_related(
         'modes',
     ).select_related(
@@ -857,32 +921,32 @@ def get_problems_in_section(section):
     """
     This returns a dict having problems in a section.
     Returning dict has problem location as keys and problem
-    descriptor as values.
+    block as values.
     """
 
-    problem_descriptors = defaultdict()
+    problem_blocks = defaultdict()
     if not isinstance(section, UsageKey):
         section_key = UsageKey.from_string(section)
     else:
         section_key = section
     # it will be a Mongo performance boost, if you pass in a depth=3 argument here
     # as it will optimize round trips to the database to fetch all children for the current node
-    section_descriptor = modulestore().get_item(section_key, depth=3)
+    section_block = modulestore().get_item(section_key, depth=3)
 
     # iterate over section, sub-section, vertical
-    for subsection in section_descriptor.get_children():
+    for subsection in section_block.get_children():
         for vertical in subsection.get_children():
             for component in vertical.get_children():
                 if component.location.block_type == 'problem' and getattr(component, 'has_score', False):
-                    problem_descriptors[str(component.location)] = component
+                    problem_blocks[str(component.location)] = component
 
-    return problem_descriptors
+    return problem_blocks
 
 
-def get_current_child(xmodule, min_depth=None, requested_child=None):
+def get_current_child(xblock, min_depth=None, requested_child=None):
     """
-    Get the xmodule.position's display item of an xmodule that has a position and
-    children.  If xmodule has no position or is out of bounds, return the first
+    Get the xblock.position's display item of an xblock that has a position and
+    children.  If xblock has no position or is out of bounds, return the first
     child with children of min_depth.
 
     For example, if chapter_one has no position set, with two child sections,
@@ -905,14 +969,14 @@ def get_current_child(xmodule, min_depth=None, requested_child=None):
         else:
             return children[0]
 
-    def _get_default_child_module(child_modules):
-        """Returns the first child of xmodule, subject to min_depth."""
+    def _get_default_child_block(child_blocks):
+        """Returns the first child of xblock, subject to min_depth."""
         if min_depth is None or min_depth <= 0:
-            return _get_child(child_modules)
+            return _get_child(child_blocks)
         else:
             content_children = [
-                child for child in child_modules
-                if child.has_children_at_depth(min_depth - 1) and child.get_display_items()
+                child for child in child_blocks
+                if child.has_children_at_depth(min_depth - 1) and child.get_children()
             ]
             return _get_child(content_children) if content_children else None
 
@@ -921,21 +985,21 @@ def get_current_child(xmodule, min_depth=None, requested_child=None):
     try:
         # In python 3, hasattr() catches AttributeErrors only then returns False.
         # All other exceptions bubble up the call stack.
-        has_position = hasattr(xmodule, 'position')  # This conditions returns AssertionError from xblock.fields lib.
+        has_position = hasattr(xblock, 'position')  # This conditions returns AssertionError from xblock.fields lib.
     except AssertionError:
         return child
 
     if has_position:
-        children = xmodule.get_display_items()
+        children = xblock.get_children()
         if len(children) > 0:
-            if xmodule.position is not None and not requested_child:
-                pos = int(xmodule.position) - 1  # position is 1-indexed
+            if xblock.position is not None and not requested_child:
+                pos = int(xblock.position) - 1  # position is 1-indexed
                 if 0 <= pos < len(children):
                     child = children[pos]
                     if min_depth is not None and (min_depth > 0 and not child.has_children_at_depth(min_depth - 1)):
                         child = None
             if child is None:
-                child = _get_default_child_module(children)
+                child = _get_default_child_block(children)
 
     return child
 

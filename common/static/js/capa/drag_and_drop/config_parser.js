@@ -39,11 +39,11 @@
                     if (processDraggable(state, draggable) !== true) {
                         state.config.foundErrors = true;
 
-                    // Exit immediately from .every() call.
+                        // Exit immediately from .every() call.
                         return false;
                     }
 
-                // Continue to next .every() call.
+                    // Continue to next .every() call.
                     return true;
                 });
             } else {
@@ -75,11 +75,11 @@
                     if (processTarget(state, target) !== true) {
                         state.config.foundErrors = true;
 
-                    // Exit immediately from .every() call.
+                        // Exit immediately from .every() call.
                         return false;
                     }
 
-                // Continue to next .every() call.
+                    // Continue to next .every() call.
                     return true;
                 });
             } else {
@@ -151,24 +151,24 @@
 
         function processDraggable(state, obj) {
             if (
-            (attrIsString(obj, 'id') === false) ||
-            (attrIsString(obj, 'icon') === false) ||
-            (attrIsString(obj, 'label') === false) ||
+                (attrIsString(obj, 'id') === false)
+            || (attrIsString(obj, 'icon') === false)
+            || (attrIsString(obj, 'label') === false)
 
-            (attrIsBoolean(obj, 'can_reuse', false) === false) ||
+            || (attrIsBoolean(obj, 'can_reuse', false) === false)
 
-            (obj.hasOwnProperty('target_fields') === false)
-        ) {
+            || (obj.hasOwnProperty('target_fields') === false)
+            ) {
                 return false;
             }
 
-        // Check that all targets in the 'target_fields' property are proper target objects.
-        // We will be testing the return value from .every() call (it can be 'true' or 'false').
+            // Check that all targets in the 'target_fields' property are proper target objects.
+            // We will be testing the return value from .every() call (it can be 'true' or 'false').
             if (obj.target_fields.every(
-            function(targetObj) {
-                return processTarget(state, targetObj, false);
-            }
-        ) === false) {
+                function(targetObj) {
+                    return processTarget(state, targetObj, false);
+                }
+            ) === false) {
                 return false;
             }
 
@@ -177,23 +177,23 @@
             return true;
         }
 
-    // We need 'pushToState' parameter in order to simply test an object for the fact that it is a
-    // proper target (without pushing it to the 'state' object). When
-    //
-    //     pushToState === false
-    //
-    // the object being tested is not going to be pushed to 'state'. The function will onyl return
-    // 'true' or 'false.
+        // We need 'pushToState' parameter in order to simply test an object for the fact that it is a
+        // proper target (without pushing it to the 'state' object). When
+        //
+        //     pushToState === false
+        //
+        // the object being tested is not going to be pushed to 'state'. The function will onyl return
+        // 'true' or 'false.
         function processTarget(state, obj, pushToState) {
             if (
-            (attrIsString(obj, 'id') === false) ||
+                (attrIsString(obj, 'id') === false)
 
-            (attrIsInteger(obj, 'w') === false) ||
-            (attrIsInteger(obj, 'h') === false) ||
+            || (attrIsInteger(obj, 'w') === false)
+            || (attrIsInteger(obj, 'h') === false)
 
-            (attrIsInteger(obj, 'x') === false) ||
-            (attrIsInteger(obj, 'y') === false)
-        ) {
+            || (attrIsInteger(obj, 'x') === false)
+            || (attrIsInteger(obj, 'y') === false)
+            ) {
                 return false;
             }
 

@@ -6,7 +6,7 @@ Tests for tasks.
 import ddt
 
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.factories import ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import BlockFactory, check_mongo_calls
 
 from ..models import XBlockCache
 from ..tasks import _calculate_course_xblocks_data, _update_xblocks_cache
@@ -164,7 +164,7 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
         """
         Test that the xblocks data is persisted correctly with display_name=None.
         """
-        block_with_display_name_none = ItemFactory.create(
+        block_with_display_name_none = BlockFactory.create(
             parent=self.sequential_2,
             category='vertical', display_name=None
         )

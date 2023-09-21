@@ -21,13 +21,13 @@ log = logging.getLogger(__name__)
 
 def all_templates():
     """
-    Returns all templates for enabled modules, grouped by descriptor type
+    Returns all templates for enabled modules, grouped by block type
     """
     # TODO use memcache to memoize w/ expiration
     templates = defaultdict(list)
-    for category, descriptor in XBlock.load_classes():
-        if not hasattr(descriptor, 'templates'):
+    for category, block in XBlock.load_classes():
+        if not hasattr(block, 'templates'):
             continue
-        templates[category] = descriptor.templates()
+        templates[category] = block.templates()
 
     return templates

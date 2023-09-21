@@ -54,7 +54,7 @@ class TestXMLModuleStore(TestCase):
             DATA_DIR,
             source_dirs=['toy'],
             xblock_mixins=(XModuleMixin,),
-            load_error_modules=False)
+            load_error_blocks=False)
 
         # Look up the errors during load. There should be none.
         errors = modulestore.get_course_errors(CourseKey.from_string("edX/toy/2012_Fall"))
@@ -152,10 +152,10 @@ class TestModuleStoreIgnore(TestXMLModuleStore):  # lint-amnesty, pylint: disabl
 
     @patch("xmodule.modulestore.xml.glob.glob", side_effect=glob_tildes_at_end)
     def test_tilde_files_ignored(self, _fake_glob):
-        modulestore = XMLModuleStore(DATA_DIR, source_dirs=['course_ignore'], load_error_modules=False)
+        modulestore = XMLModuleStore(DATA_DIR, source_dirs=['course_ignore'], load_error_blocks=False)
         about_location = CourseKey.from_string('edX/course_ignore/2014_Fall').make_usage_key(
             'about', 'index',
         )
-        about_module = modulestore.get_item(about_location)
-        assert 'GREEN' in about_module.data
-        assert 'RED' not in about_module.data
+        about_block = modulestore.get_item(about_location)
+        assert 'GREEN' in about_block.data
+        assert 'RED' not in about_block.data

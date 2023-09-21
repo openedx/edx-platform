@@ -60,7 +60,7 @@ class LibraryRoot(XBlock):
 
     def render_children(self, context, fragment, can_reorder=False, can_add=False):  # pylint: disable=unused-argument
         """
-        Renders the children of the module with HTML appropriate for Studio. Reordering is not supported.
+        Renders the children of the block with HTML appropriate for Studio. Reordering is not supported.
         """
         contents = []
 
@@ -104,7 +104,8 @@ class LibraryRoot(XBlock):
             })
 
         fragment.add_content(
-            self.runtime.service(self, 'mako').render_template("studio_render_paged_children_view.html", {
+            # For historic reasons, this template is in the LMS folder, and some external code may depend on that.
+            self.runtime.service(self, 'mako').render_lms_template("studio_render_paged_children_view.html", {
                 'items': contents,
                 'xblock_context': context,
                 'can_add': can_add,

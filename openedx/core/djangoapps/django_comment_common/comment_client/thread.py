@@ -151,6 +151,7 @@ class Thread(models.Model):
             'mark_as_read': kwargs.get('mark_as_read', True),
             'resp_skip': kwargs.get('response_skip'),
             'resp_limit': kwargs.get('response_limit'),
+            'reverse_order': kwargs.get('reverse_order', False),
         }
         request_params = utils.strip_none(request_params)
 

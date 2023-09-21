@@ -340,14 +340,14 @@ class XBlockFieldBase(models.Model):
 
 class XModuleUserStateSummaryField(XBlockFieldBase):  # lint-amnesty, pylint: disable=model-no-explicit-unicode
     """
-    Stores data set in the Scope.user_state_summary scope by an xmodule field
+    Stores data set in the Scope.user_state_summary scope by an xblock field
     """
 
     class Meta:
         app_label = "courseware"
         unique_together = (('usage_id', 'field_name'),)
 
-    # The definition id for the module
+    # The definition id for the block
     usage_id = UsageKeyField(max_length=255, db_index=True)
 
 
@@ -360,7 +360,7 @@ class XModuleStudentPrefsField(XBlockFieldBase):  # lint-amnesty, pylint: disabl
         app_label = "courseware"
         unique_together = (('student', 'module_type', 'field_name'),)
 
-    # The type of the module for these preferences
+    # The type of the block for these preferences
     module_type = BlockTypeKeyField(max_length=64, db_index=True)
 
     student = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)

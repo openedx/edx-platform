@@ -1,7 +1,6 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
-import datetime
-
 import copy
+import datetime
 import json
 import logging
 import os
@@ -113,16 +112,15 @@ class XmlMixin:
     xml_attributes = Dict(help="Map of unhandled xml attributes, used only for storage between import and export",
                           default={}, scope=Scope.settings)
 
-    # The attributes will be removed from the definition xml passed
-    # to definition_from_xml, and from the xml returned by definition_to_xml
-
-    # Note -- url_name isn't in this list because it's handled specially on
-    # import and export.
-
     metadata_to_strip = ('data_dir',
                          'tabs', 'grading_policy',
                          'discussion_blackouts',
-                         # VS[compat] -- remove the below attrs once everything is in the CMS
+                         # VS[compat]
+                         # These attributes should have been removed from here once all 2012-fall courses imported into
+                         # the CMS and "inline" OLX format deprecated. But, it never got deprecated. Moreover, it's
+                         # widely used to this date. So, we still have to strip them. Also, removing of "filename"
+                         # changes OLX returned by `/api/olx-export/v1/xblock/{block_id}/`, which indicates that some
+                         # places in the platform rely on it.
                          'course', 'org', 'url_name', 'filename',
                          # Used for storing xml attributes between import and export, for roundtrips
                          'xml_attributes')
@@ -153,7 +151,7 @@ class XmlMixin:
     @classmethod
     def definition_from_xml(cls, xml_object, system):
         """
-        Return the definition to be passed to the newly created descriptor
+        Return the definition to be passed to the newly created block
         during from_xml
 
         xml_object: An etree Element
@@ -200,7 +198,7 @@ class XmlMixin:
     @classmethod
     def load_definition(cls, xml_object, system, def_id, id_generator):
         """
-        Load a descriptor definition from the specified xml_object.
+        Load a block from the specified xml_object.
         Subclasses should not need to override this except in special
         cases (e.g. html block)
 
@@ -211,8 +209,9 @@ class XmlMixin:
             id_generator: used to generate the usage_id
         """
 
-        # VS[compat] -- the filename attr should go away once everything is
-        # converted.  (note: make sure html files still work once this goes away)
+        # VS[compat]
+        # The filename attr should have been removed once all 2012-fall courses imported into the CMS and "inline" OLX
+        # format deprecated. This never happened, and `filename` is still used, so we have too keep both formats.
         filename = xml_object.get('filename')
         if filename is None:
             definition_xml = copy.deepcopy(xml_object)
@@ -222,10 +221,9 @@ class XmlMixin:
             filepath = cls._format_filepath(xml_object.tag, filename)
 
             # VS[compat]
-            # TODO (cpennington): If the file doesn't exist at the right path,
-            # give the class a chance to fix it up. The file will be written out
-            # again in the correct format.  This should go away once the CMS is
-            # online and has imported all current (fall 2012) courses from xml
+            # If the file doesn't exist at the right path, give the class a chance to fix it up. The file will be
+            # written out again in the correct format. This should have gone away once the CMS became online and had
+            # imported all 2012-fall courses from XML.
             if not system.resources_fs.exists(filepath) and hasattr(cls, 'backcompat_paths'):
                 candidates = cls.backcompat_paths(filepath)
                 for candidate in candidates:
@@ -287,7 +285,7 @@ class XmlMixin:
                 metadata[attr] = value
 
     @classmethod
-    def parse_xml(cls, node, runtime, _keys, id_generator):
+    def parse_xml(cls, node, runtime, keys, id_generator):  # pylint: disable=too-many-statements
         """
         Use `node` to construct a new block.
 
@@ -296,8 +294,8 @@ class XmlMixin:
 
             runtime (:class:`.Runtime`): The runtime to use while parsing.
 
-            _keys (:class:`.ScopeIds`): The keys identifying where this block
-                will store its data. Not used by this implementation.
+            keys (:class:`.ScopeIds`): The keys identifying where this block
+                will store its data.
 
             id_generator (:class:`.IdGenerator`): An object that will allow the
                 runtime to generate correct definition and usage ids for
@@ -306,26 +304,36 @@ class XmlMixin:
         Returns (XBlock): The newly parsed XBlock
 
         """
-        url_name = node.get('url_name')
-        def_id = id_generator.create_definition(node.tag, url_name)
-        usage_id = id_generator.create_usage(def_id)
+        from xmodule.modulestore.xml import ImportSystem  # done here to avoid circular import
+        if id_generator is None:
+            id_generator = runtime.id_generator
+        if keys is None:
+            # Passing keys=None is against the XBlock API but some platform tests do it.
+            def_id = id_generator.create_definition(node.tag, node.get('url_name'))
+            keys = ScopeIds(None, node.tag, def_id, id_generator.create_usage(def_id))
         aside_children = []
 
-        # VS[compat] -- detect new-style each-in-a-file mode
+        # VS[compat]
+        # In 2012, when the platform didn't have CMS, and all courses were handwritten XML files, problem tags
+        # contained XML problem descriptions withing themselves. Later, when Studio has been created, and "pointer" tags
+        # became the preferred problem format, edX has to add this compatibility code to 1) support both pre- and
+        # post-Studio course formats simulteneously, and 2) be able to migrate 2012-fall courses to Studio. Old style
+        # support supposed to be removed, but the deprecation process have never been initiated, so this
+        # compatibility must stay, probably forever.
         if is_pointer_tag(node):
             # new style:
             # read the actual definition file--named using url_name.replace(':','/')
-            definition_xml, filepath = cls.load_definition_xml(node, runtime, def_id)
-            aside_children = runtime.parse_asides(definition_xml, def_id, usage_id, id_generator)
+            definition_xml, filepath = cls.load_definition_xml(node, runtime, keys.def_id)
+            aside_children = runtime.parse_asides(definition_xml, keys.def_id, keys.usage_id, id_generator)
         else:
             filepath = None
             definition_xml = node
 
         # Note: removes metadata.
-        definition, children = cls.load_definition(definition_xml, runtime, def_id, id_generator)
+        definition, children = cls.load_definition(definition_xml, runtime, keys.def_id, id_generator)
 
-        # VS[compat] -- make Ike's github preview links work in both old and
-        # new file layouts
+        # VS[compat]
+        # Make Ike's github preview links work in both old and new file layouts.
         if is_pointer_tag(node):
             # new style -- contents actually at filepath
             definition['filename'] = [filepath, filepath]
@@ -347,23 +355,31 @@ class XmlMixin:
             aside_children.extend(definition_aside_children)
 
         # Set/override any metadata specified by policy
-        cls.apply_policy(metadata, runtime.get_policy(usage_id))
+        cls.apply_policy(metadata, runtime.get_policy(keys.usage_id))
 
-        field_data = {}
-        field_data.update(metadata)
-        field_data.update(definition)
-        field_data['children'] = children
-
+        field_data = {**metadata, **definition, "children": children}
         field_data['xml_attributes']['filename'] = definition.get('filename', ['', None])  # for git link
-        kvs = InheritanceKeyValueStore(initial_values=field_data)
-        field_data = KvsFieldData(kvs)
+        if "filename" in field_data:
+            del field_data["filename"]  # filename should only be in xml_attributes.
 
-        xblock = runtime.construct_xblock_from_class(
-            cls,
-            # We're loading a descriptor, so student_id is meaningless
-            ScopeIds(None, node.tag, def_id, usage_id),
-            field_data,
-        )
+        if isinstance(runtime, ImportSystem):
+            # we shouldn't be instantiating our own field data instance here, but there are complex inter-depenencies
+            # between this mixin and ImportSystem that currently seem to require it for proper metadata inheritance.
+            kvs = InheritanceKeyValueStore(initial_values=field_data)
+            field_data = KvsFieldData(kvs)
+            xblock = runtime.construct_xblock_from_class(cls, keys, field_data)
+        else:
+            # The "normal" / new way to set field data:
+            xblock = runtime.construct_xblock_from_class(cls, keys)
+            for (key, value_jsonish) in field_data.items():
+                if key in cls.fields:
+                    setattr(xblock, key, cls.fields[key].from_json(value_jsonish))
+                elif key == 'children':
+                    xblock.children = value_jsonish
+                else:
+                    log.warning(
+                        "Imported %s XBlock does not have field %s found in XML.", xblock.scope_ids.block_type, key,
+                    )
 
         if aside_children:
             asides_tags = [x.tag for x in aside_children]
@@ -400,7 +416,7 @@ class XmlMixin:
         return f'{category}/{name}.{cls.filename_extension}'
 
     def export_to_file(self):
-        """If this returns True, write the definition of this descriptor to a separate
+        """If this returns True, write the definition of this block to a separate
         file.
 
         NOTE: Do not override this without a good reason.  It is here
@@ -439,7 +455,7 @@ class XmlMixin:
             if (attr not in self.metadata_to_strip
                     and attr not in self.metadata_to_export_to_policy
                     and attr not in not_to_clean_fields):
-                val = serialize_field(self._field_data.get(self, attr))
+                val = serialize_field(self.fields[attr].to_json(getattr(self, attr)))
                 try:
                     xml_object.set(attr, val)
                 except Exception:  # lint-amnesty, pylint: disable=broad-except

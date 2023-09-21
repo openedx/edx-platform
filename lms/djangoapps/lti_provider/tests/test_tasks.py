@@ -97,8 +97,8 @@ class SendCompositeOutcomeTest(BaseOutcomeTest):
 
     def setUp(self):
         super().setUp()
-        self.descriptor = MagicMock()
-        self.descriptor.location = BlockUsageLocator(
+        self.block = MagicMock()
+        self.block.location = BlockUsageLocator(
             course_key=self.course_key,
             block_type='problem',
             block_id='problem',
@@ -108,7 +108,7 @@ class SendCompositeOutcomeTest(BaseOutcomeTest):
             'lms.djangoapps.lti_provider.tasks.CourseGradeFactory.read', self.course_grade
         )
         self.module_store = MagicMock()
-        self.module_store.get_item = MagicMock(return_value=self.descriptor)
+        self.module_store.get_item = MagicMock(return_value=self.block)
         self.check_result_mock = self.setup_patch(
             'lms.djangoapps.lti_provider.tasks.modulestore',
             self.module_store
@@ -121,7 +121,7 @@ class SendCompositeOutcomeTest(BaseOutcomeTest):
     )
     @ddt.unpack
     def test_outcome_with_score_score(self, earned, possible, expected):
-        self.course_grade.score_for_module = MagicMock(return_value=(earned, possible))
+        self.course_grade.score_for_block = MagicMock(return_value=(earned, possible))
         tasks.send_composite_outcome(
             self.user.id, str(self.course_key), self.assignment.id, 1
         )

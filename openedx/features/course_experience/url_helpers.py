@@ -120,6 +120,7 @@ def _get_new_courseware_url(
         course_key=course_key,
         sequence_key=sequence_key,
         unit_key=unit_key,
+        params=request.GET if request and request.GET else None,
     )
 
 

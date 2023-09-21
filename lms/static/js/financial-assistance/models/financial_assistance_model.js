@@ -3,6 +3,7 @@
  */
 (function(define) {
     'use strict';
+
     define(['backbone'], function(Backbone) {
         var FinancialAssistance = Backbone.Model.extend({
             initialize: function(options) {

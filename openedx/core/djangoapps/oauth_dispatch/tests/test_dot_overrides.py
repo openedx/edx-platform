@@ -4,15 +4,14 @@ Test of custom django-oauth-toolkit behavior
 
 # pylint: disable=protected-access
 
-
 import datetime
-import unittest
 
 from django.conf import settings
 from django.test import RequestFactory, TestCase
 from django.utils import timezone
 
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 # oauth_dispatch is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
@@ -24,7 +23,7 @@ if settings.ROOT_URLCONF == 'lms.urls':
     from .constants import DUMMY_REDIRECT_URL
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class AuthenticateTestCase(TestCase):
     """
     Test that users can authenticate with either username or email
@@ -48,7 +47,7 @@ class AuthenticateTestCase(TestCase):
         assert self.user == user
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class CustomValidationTestCase(TestCase):
     """
     Test custom user validation works.
@@ -77,7 +76,7 @@ class CustomValidationTestCase(TestCase):
         assert self.validator.validate_user('darkhelmet', '12345', client=None, request=request)
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class CustomAuthorizationViewTestCase(TestCase):
     """
     Test custom authorization view works.

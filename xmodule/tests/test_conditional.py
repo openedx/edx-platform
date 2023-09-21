@@ -16,7 +16,7 @@ from xblock.fields import ScopeIds
 from xmodule.conditional_block import ConditionalBlock
 from xmodule.error_block import ErrorBlock
 from xmodule.modulestore.xml import CourseLocationManager, ImportSystem, XMLModuleStore
-from xmodule.tests import DATA_DIR, get_test_descriptor_system, get_test_system
+from xmodule.tests import DATA_DIR, get_test_system, prepare_block_runtime
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests.xml import factories as xml
 from xmodule.validation import StudioValidationMessage
@@ -29,19 +29,20 @@ COURSE = 'conditional'      # name of directory with course data
 class DummySystem(ImportSystem):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
 
     @patch('xmodule.modulestore.xml.OSFS', lambda directory: MemoryFS())
-    def __init__(self, load_error_modules):
+    def __init__(self, load_error_blocks):
 
-        xmlstore = XMLModuleStore("data_dir", source_dirs=[], load_error_modules=load_error_modules)
+        xmlstore = XMLModuleStore("data_dir", source_dirs=[], load_error_blocks=load_error_blocks)
 
         super().__init__(
             xmlstore=xmlstore,
             course_id=CourseKey.from_string('/'.join([ORG, COURSE, 'test_run'])),
             course_dir='test_dir',
             error_tracker=Mock(),
-            load_error_modules=load_error_modules,
+            load_error_blocks=load_error_blocks,
         )
 
-    def render_template(self, template, context):  # lint-amnesty, pylint: disable=method-hidden
+    @property
+    def render_template(self):  # lint-amnesty, pylint: disable=method-hidden
         raise Exception("Shouldn't be called")
 
 
@@ -58,44 +59,41 @@ class ConditionalFactory:
     to allow for testing.
     """
     @staticmethod
-    def create(system, source_is_error_module=False, source_visible_to_staff_only=False):
+    def create(system, source_is_error_block=False, source_visible_to_staff_only=False):
         """
-        return a dict of modules: the conditional with a single source and a single child.
-        Keys are 'cond_module', 'source_module', and 'child_module'.
+        return a dict of blocks: the conditional with a single source and a single child.
+        Keys are 'cond_block', 'source_block', and 'child_block'.
 
-        if the source_is_error_module flag is set, create a real ErrorBlock for the source.
+        if the source_is_error_block flag is set, create a real ErrorBlock for the source.
         """
-        descriptor_system = get_test_descriptor_system()
 
-        # construct source descriptor and module:
+        # construct source block and module:
         source_location = BlockUsageLocator(CourseLocator("edX", "conditional_test", "test_run", deprecated=True),
                                             "problem", "SampleProblem", deprecated=True)
-        if source_is_error_module:
-            # Make an error descriptor and module
-            source_descriptor = ErrorBlock.from_xml(
+        if source_is_error_block:
+            # Make an error block
+            source_block = ErrorBlock.from_xml(
                 'some random xml data',
                 system,
                 id_generator=CourseLocationManager(source_location.course_key),
                 error_msg='random error message'
             )
         else:
-            source_descriptor = Mock(name='source_descriptor')
-            source_descriptor.location = source_location
+            source_block = Mock(name='source_block')
+            source_block.location = source_location
 
-        source_descriptor.visible_to_staff_only = source_visible_to_staff_only
-        source_descriptor.runtime = descriptor_system
-        source_descriptor.render = lambda view, context=None: descriptor_system.render(source_descriptor, view, context)
+        source_block.visible_to_staff_only = source_visible_to_staff_only
+        source_block.runtime = system
+        source_block.render = lambda view, context=None: system.render(source_block, view, context)
 
-        # construct other descriptors:
-        child_descriptor = Mock(name='child_descriptor')
-        child_descriptor.visible_to_staff_only = False
-        child_descriptor._xmodule.student_view.return_value = Fragment(content='<p>This is a secret</p>')  # lint-amnesty, pylint: disable=protected-access
-        child_descriptor.student_view = child_descriptor._xmodule.student_view  # lint-amnesty, pylint: disable=protected-access
-        child_descriptor.displayable_items.return_value = [child_descriptor]
-        child_descriptor.runtime = descriptor_system
-        child_descriptor.xmodule_runtime = get_test_system()
-        child_descriptor.render = lambda view, context=None: descriptor_system.render(child_descriptor, view, context)
-        child_descriptor.location = source_location.replace(category='html', name='child')
+        # construct other blocks:
+        child_block = Mock(name='child_block')
+        child_block.visible_to_staff_only = False
+        child_block._xmodule.student_view.return_value = Fragment(content='<p>This is a secret</p>')  # lint-amnesty, pylint: disable=protected-access
+        child_block.student_view = child_block._xmodule.student_view  # lint-amnesty, pylint: disable=protected-access
+        child_block.runtime = system
+        child_block.render = lambda view, context=None: system.render(child_block, view, context)
+        child_block.location = source_location.replace(category='html', name='child')
 
         def visible_to_nonstaff_users(desc):
             """
@@ -106,13 +104,11 @@ class ConditionalFactory:
         def load_item(usage_id, for_parent=None):  # pylint: disable=unused-argument
             """Test-only implementation of load_item that simply returns static xblocks."""
             return {
-                child_descriptor.location: child_descriptor,
-                source_location: source_descriptor
+                child_block.location: child_block,
+                source_location: source_block
             }.get(usage_id)
 
-        descriptor_system.load_item = load_item
-
-        system.descriptor_runtime = descriptor_system
+        system.load_item = load_item
 
         # construct conditional block:
         cond_location = BlockUsageLocator(CourseLocator("edX", "conditional_test", "test_run", deprecated=True),
@@ -122,24 +118,23 @@ class ConditionalFactory:
             'conditional_attr': 'attempted',
             'conditional_value': 'true',
             'xml_attributes': {'attempted': 'true'},
-            'children': [child_descriptor.location],
+            'children': [child_block.location],
         })
 
-        cond_descriptor = ConditionalBlock(
-            descriptor_system,
+        cond_block = ConditionalBlock(
+            system,
             field_data,
             ScopeIds(None, None, cond_location, cond_location)
         )
-        cond_descriptor.xmodule_runtime = system
-        system.get_module = lambda desc: desc if visible_to_nonstaff_users(desc) else None
-        cond_descriptor.get_required_blocks = [
-            system.get_module(source_descriptor),
+        system.get_block_for_descriptor = lambda desc: desc if visible_to_nonstaff_users(desc) else None
+        cond_block.get_required_blocks = [
+            system.get_block_for_descriptor(source_block),
         ]
 
         # return dict:
-        return {'cond_module': cond_descriptor,
-                'source_module': source_descriptor,
-                'child_module': child_descriptor}
+        return {'cond_block': cond_block,
+                'source_block': source_block,
+                'child_block': child_block}
 
 
 class ConditionalBlockBasicTest(unittest.TestCase):
@@ -154,38 +149,38 @@ class ConditionalBlockBasicTest(unittest.TestCase):
 
     def test_icon_class(self):
         '''verify that get_icon_class works independent of condition satisfaction'''
-        modules = ConditionalFactory.create(self.test_system)
+        blocks = ConditionalFactory.create(self.test_system)
         for attempted in ["false", "true"]:
             for icon_class in ['other', 'problem', 'video']:
-                modules['source_module'].is_attempted = attempted
-                modules['child_module'].get_icon_class = lambda: icon_class  # lint-amnesty, pylint: disable=cell-var-from-loop
-                assert modules['cond_module'].get_icon_class() == icon_class
+                blocks['source_block'].is_attempted = attempted
+                blocks['child_block'].get_icon_class = lambda: icon_class  # lint-amnesty, pylint: disable=cell-var-from-loop
+                assert blocks['cond_block'].get_icon_class() == icon_class
 
     def test_get_html(self):
-        modules = ConditionalFactory.create(self.test_system)
+        blocks = ConditionalFactory.create(self.test_system)
         # because get_test_system returns the repr of the context dict passed to render_template,
         # we reverse it here
-        html = modules['cond_module'].render(STUDENT_VIEW).content
-        mako_service = modules['cond_module'].xmodule_runtime.service(modules['cond_module'], 'mako')
-        expected = mako_service.render_template('conditional_ajax.html', {
-            'ajax_url': modules['cond_module'].ajax_url,
+        html = blocks['cond_block'].render(STUDENT_VIEW).content
+        mako_service = blocks['cond_block'].runtime.service(blocks['cond_block'], 'mako')
+        expected = mako_service.render_lms_template('conditional_ajax.html', {
+            'ajax_url': blocks['cond_block'].ajax_url,
             'element_id': 'i4x-edX-conditional_test-conditional-SampleConditional',
             'depends': 'i4x-edX-conditional_test-problem-SampleProblem',
         })
         assert expected == html
 
     def test_handle_ajax(self):
-        modules = ConditionalFactory.create(self.test_system)
-        modules['cond_module'].save()
-        modules['source_module'].is_attempted = "false"
-        ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
+        blocks = ConditionalFactory.create(self.test_system)
+        blocks['cond_block'].save()
+        blocks['source_block'].is_attempted = "false"
+        ajax = json.loads(blocks['cond_block'].handle_ajax('', ''))
         fragments = ajax['fragments']
         assert not any(('This is a secret' in item['content']) for item in fragments)
 
         # now change state of the capa problem to make it completed
-        modules['source_module'].is_attempted = "true"
-        ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
-        modules['cond_module'].save()
+        blocks['source_block'].is_attempted = "true"
+        ajax = json.loads(blocks['cond_block'].handle_ajax('', ''))
+        blocks['cond_block'].save()
         fragments = ajax['fragments']
         assert any(('This is a secret' in item['content']) for item in fragments)
 
@@ -194,24 +189,24 @@ class ConditionalBlockBasicTest(unittest.TestCase):
         Check that handle_ajax works properly if the source is really an ErrorBlock,
         and that the condition is not satisfied.
         '''
-        modules = ConditionalFactory.create(self.test_system, source_is_error_module=True)
-        modules['cond_module'].save()
-        ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
+        blocks = ConditionalFactory.create(self.test_system, source_is_error_block=True)
+        blocks['cond_block'].save()
+        ajax = json.loads(blocks['cond_block'].handle_ajax('', ''))
         fragments = ajax['fragments']
         assert not any(('This is a secret' in item['content']) for item in fragments)
 
     @patch('xmodule.conditional_block.log')
-    def test_conditional_with_staff_only_source_module(self, mock_log):
-        modules = ConditionalFactory.create(
+    def test_conditional_with_staff_only_source_block(self, mock_log):
+        blocks = ConditionalFactory.create(
             self.test_system,
             source_visible_to_staff_only=True,
         )
-        cond_module = modules['cond_module']
-        cond_module.save()
-        cond_module.is_attempted = "false"
-        cond_module.handle_ajax('', '')
+        cond_block = blocks['cond_block']
+        cond_block.save()
+        cond_block.is_attempted = "false"
+        cond_block.handle_ajax('', '')
         assert not mock_log.warn.called
-        assert None in cond_module.get_required_blocks
+        assert None in cond_block.get_required_blocks
 
 
 class ConditionalBlockXmlTest(unittest.TestCase):
@@ -221,17 +216,22 @@ class ConditionalBlockXmlTest(unittest.TestCase):
 
     def setUp(self):
         super().setUp()
-        self.test_system = get_test_system()
+
+        def add_block_as_child_node(block, node):
+            child = etree.SubElement(node, "unknown")
+            block.add_xml_to_node(child)
+        self.test_system = get_test_system(add_get_block_overrides=True)
+        self.test_system.add_block_as_child_node = add_block_as_child_node
         self.modulestore = XMLModuleStore(DATA_DIR, source_dirs=['conditional_and_poll'])
         courses = self.modulestore.get_courses()
         assert len(courses) == 1
         self.course = courses[0]
 
-    def get_module_for_location(self, location):
-        descriptor = self.modulestore.get_item(location, depth=None)
-        return self.test_system.get_module(descriptor)
+    def get_block_for_location(self, location):
+        block = self.modulestore.get_item(location, depth=None)
+        return self.test_system.get_block_for_descriptor(block)
 
-    @patch('xmodule.x_module.descriptor_global_local_resource_url')
+    @patch('xmodule.x_module.block_global_local_resource_url')
     @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': False})
     def test_conditional_block(self, _):
         """Make sure that conditional block works"""
@@ -240,10 +240,10 @@ class ConditionalBlockXmlTest(unittest.TestCase):
         location = BlockUsageLocator(CourseLocator("HarvardX", "ER22x", "2013_Spring", deprecated=True),
                                      "conditional", "condone", deprecated=True)
 
-        module = self.get_module_for_location(location)
-        html = module.render(STUDENT_VIEW).content
-        mako_service = module.xmodule_runtime.service(module, 'mako')
-        html_expect = mako_service.render_template(
+        block = self.get_block_for_location(location)
+        html = block.render(STUDENT_VIEW).content
+        mako_service = block.runtime.service(block, 'mako')
+        html_expect = mako_service.render_lms_template(
             'conditional_ajax.html',
             {
                 # Test ajax url is just usage-id / handler_name
@@ -254,17 +254,17 @@ class ConditionalBlockXmlTest(unittest.TestCase):
         )
         assert html == html_expect
 
-        ajax = json.loads(module.handle_ajax('', ''))
+        ajax = json.loads(block.handle_ajax('', ''))
         fragments = ajax['fragments']
         assert not any(('This is a secret' in item['content']) for item in fragments)
 
         # Now change state of the capa problem to make it completed
-        inner_module = self.get_module_for_location(location.replace(category="problem", name='choiceprob'))
-        inner_module.attempts = 1
+        inner_block = self.get_block_for_location(location.replace(category="problem", name='choiceprob'))
+        inner_block.attempts = 1
         # Save our modifications to the underlying KeyValueStore so they can be persisted
-        inner_module.save()
+        inner_block.save()
 
-        ajax = json.loads(module.handle_ajax('', ''))
+        ajax = json.loads(block.handle_ajax('', ''))
         fragments = ajax['fragments']
         assert any(('This is a secret' in item['content']) for item in fragments)
 
@@ -324,15 +324,15 @@ class ConditionalBlockXmlTest(unittest.TestCase):
         assert definition == expected_definition
 
     def test_presence_attributes_in_xml_attributes(self):
-        modules = ConditionalFactory.create(self.test_system)
-        modules['cond_module'].save()
-        modules['cond_module'].definition_to_xml(Mock())
+        blocks = ConditionalFactory.create(self.test_system)
+        blocks['cond_block'].save()
+        blocks['cond_block'].definition_to_xml(Mock())
         expected_xml_attributes = {
             'attempted': 'true',
             'message': 'You must complete {link} before you can access this unit.',
             'sources': ''
         }
-        self.assertDictEqual(modules['cond_module'].xml_attributes, expected_xml_attributes)
+        self.assertDictEqual(blocks['cond_block'].xml_attributes, expected_xml_attributes)
 
 
 class ConditionalBlockStudioTest(XModuleXmlImportTest):
@@ -356,12 +356,9 @@ class ConditionalBlockStudioTest(XModuleXmlImportTest):
         self.sequence = self.course.get_children()[0]
         self.conditional = self.sequence.get_children()[0]
 
-        self.module_system = get_test_system()
-        self.module_system.descriptor_runtime = self.course._runtime  # pylint: disable=protected-access
-
         user = Mock(username='ma', email='ma@edx.org', is_staff=False, is_active=True)
+        self.conditional.runtime = prepare_block_runtime(self.course.runtime)
         self.conditional.bind_for_student(
-            self.module_system,
             user.id
         )
 
@@ -381,11 +378,11 @@ class ConditionalBlockStudioTest(XModuleXmlImportTest):
             }
 
         context = create_studio_context(self.conditional, False)
-        html = self.module_system.render(self.conditional, AUTHOR_VIEW, context).content
+        html = self.course.runtime.render(self.conditional, AUTHOR_VIEW, context).content
         assert 'This is a secret HTML' in html
 
         context = create_studio_context(self.sequence, True)
-        html = self.module_system.render(self.conditional, AUTHOR_VIEW, context).content
+        html = self.course.runtime.render(self.conditional, AUTHOR_VIEW, context).content
         assert 'This is a secret HTML' not in html
 
     def test_non_editable_settings(self):

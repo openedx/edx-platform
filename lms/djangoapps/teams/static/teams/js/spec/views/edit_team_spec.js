@@ -9,6 +9,7 @@ define([
     'teams/js/spec_helpers/team_spec_helpers'
 ], function($, _, Backbone, AjaxHelpers, PageHelpers, TeamEditView, TeamModel, TeamSpecHelpers) {
     'use strict';
+
     var assertFormRendersCorrectly,
         assertTeamCreateUpdateInfo,
         assertValidationMessagesWhenFieldsEmpty,
@@ -210,9 +211,9 @@ define([
 
             if (errorCode < 500) {
                 AjaxHelpers.respondWithError(
-                        requests,
-                        errorCode,
-                        {user_message: 'User message', developer_message: 'Developer message'}
+                    requests,
+                    errorCode,
+                    {user_message: 'User message', developer_message: 'Developer message'}
                 );
                 expect(teamEditView.$('.wrapper-msg .copy').text().trim()).toBe('User message');
             } else {

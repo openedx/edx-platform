@@ -135,7 +135,7 @@
             goHome: function() {
                 HtmlUtils.append(this.$('.forum-content').empty(), HtmlUtils.template(discussionHomeTemplate)({}));
                 this.$('.forum-nav-thread-list a').removeClass('is-active').find('.sr')
-                  .remove();
+                    .remove();
                 this.setupForumDigestSettings(window.user.get('id'));
             },
             setupForumDigestSettings: function(userId) {
@@ -208,8 +208,8 @@
                         this.selectedTopicIndex -= 1;
                         if (this.isBrowseMenuVisible()) {
                             $prev = $('.forum-nav-browse-menu-item:visible')
-                            .eq(this.selectedTopicIndex).find('.forum-nav-browse-title')
-                            .eq(0);
+                                .eq(this.selectedTopicIndex).find('.forum-nav-browse-title')
+                                .eq(0);
                             this.filterEnabled = false;
                             $curOption.removeClass('is-focused');
                             $prev.addClass('is-focused');
@@ -296,11 +296,11 @@
                 $parentSubMenus.each(function(i, el) {
                     crumbs.push(
                         $(el).siblings('.forum-nav-browse-title')
-                        .first()
-                        .contents()
-                        .last()
-                        .text()
-                        .trim()
+                            .first()
+                            .contents()
+                            .last()
+                            .text()
+                            .trim()
                     );
                 });
 

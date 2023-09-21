@@ -24,7 +24,12 @@ def get_course_overview_or_none(course_id):
         return CourseOverview.get_from_id(course_id)
     except CourseOverview.DoesNotExist:
         log.warning(f"Course overview does not exist for {course_id}")
-        return None
+    except Exception as ex:  # pylint: disable=broad-except
+        # NOTE - Included because some cases (e.g. deleted courses) can throw other
+        # types of errors due to with the cache (see APER-2171 and AU-1000).
+        log.exception(f"Unhandled exception getting course overview for {course_id}: {ex}")
+
+    return None
 
 
 def get_course_overview_or_404(course_id):

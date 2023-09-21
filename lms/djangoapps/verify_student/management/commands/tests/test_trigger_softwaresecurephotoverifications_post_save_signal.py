@@ -10,7 +10,7 @@ from django.core.management import call_command
 from freezegun import freeze_time
 from unittest.mock import call, patch, ANY  # lint-amnesty, pylint: disable=wrong-import-order
 
-from common.test.utils import MockS3BotoMixin
+from common.test.utils import MockS3Boto3Mixin
 from lms.djangoapps.verify_student.tests import TestVerificationBase
 from lms.djangoapps.verify_student.tests.test_models import (
     FAKE_SETTINGS,
@@ -22,7 +22,7 @@ from lms.djangoapps.verify_student.tests.test_models import (
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
 @patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
-class TestTriggerSoftwareSecurePhotoVerificationsPostSaveSignal(MockS3BotoMixin, TestVerificationBase):
+class TestTriggerSoftwareSecurePhotoVerificationsPostSaveSignal(MockS3Boto3Mixin, TestVerificationBase):
     """
     Tests for django admin command `trigger_softwaresecurephotoverifications_post_save_signal`
     in the verify_student module

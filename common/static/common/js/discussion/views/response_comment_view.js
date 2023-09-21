@@ -1,6 +1,7 @@
 /* globals DiscussionContentView, DiscussionUtil, ResponseCommentEditView, ResponseCommentShowView */
 (function() {
     'use strict';
+
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
             for (var key in parent) {
@@ -101,6 +102,7 @@
                 if (!this.model.can('can_delete')) {
                     return;
                 }
+                // eslint-disable-next-line no-alert
                 if (!confirm(gettext('Are you sure you want to delete this comment?'))) {
                     return;
                 }

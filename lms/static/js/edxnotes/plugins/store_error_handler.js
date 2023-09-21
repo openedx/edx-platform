@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-shadow-restricted-names
 (function(define, undefined) {
     'use strict';
 
@@ -10,7 +11,7 @@
         Annotator.Plugin.Store.prototype._onError = function(xhr) {
             var serverResponse;
 
-        // Try to parse json
+            // Try to parse json
             if (xhr.responseText) {
                 try {
                     serverResponse = JSON.parse(xhr.responseText);
@@ -19,15 +20,14 @@
                 }
             }
 
-        // if response includes an error message it will take precedence
+            // if response includes an error message it will take precedence
             if (serverResponse && serverResponse.error_msg) {
                 Annotator.showNotification(serverResponse.error_msg, Annotator.Notification.ERROR);
                 return console.error(Annotator._t('API request failed:') + (" '" + xhr.status + "'"));
             }
 
-        // Delegate to original error handler
+            // Delegate to original error handler
             originalErrorHandler(xhr);
         };
     });
 }).call(this, define || RequireJS.define);
-

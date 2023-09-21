@@ -8,12 +8,15 @@ from urllib.parse import urlencode
 
 import ddt
 from django.urls import reverse
-from xmodule.modulestore.tests.factories import ItemFactory
+from edx_toggles.toggles.testutils import override_waffle_flag
+from xmodule.modulestore.tests.factories import BlockFactory
 from xmodule.tabs import CourseTabList
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.toggles import ENABLE_NEW_STUDIO_CUSTOM_PAGES
 
 
+@override_waffle_flag(ENABLE_NEW_STUDIO_CUSTOM_PAGES, active=True)
 @ddt.ddt
 class TabsAPITests(CourseTestCase):
     """
@@ -43,7 +46,7 @@ class TabsAPITests(CourseTestCase):
         )
 
         # add a static tab to the course, for code coverage
-        self.test_tab = ItemFactory.create(
+        self.test_tab = BlockFactory.create(
             parent_location=self.course.location,
             category="static_tab",
             display_name="Static_1",

@@ -10,7 +10,7 @@ import pytz
 from django.urls import reverse
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.student.tests.factories import BetaTesterFactory
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
@@ -117,16 +117,16 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         super().setUp()
 
         self.course = CourseFactory.create(number='999', display_name='Robot_Super_Course')
-        self.courseware_chapter = ItemFactory.create(display_name='courseware')
-        self.overview_chapter = ItemFactory.create(
+        self.courseware_chapter = BlockFactory.create(display_name='courseware')
+        self.overview_chapter = BlockFactory.create(
             parent_location=self.course.location,
             display_name='Super Overview'
         )
-        self.welcome_section = ItemFactory.create(
+        self.welcome_section = BlockFactory.create(
             parent_location=self.overview_chapter.location,
             display_name='Super Welcome'
         )
-        self.welcome_unit = ItemFactory.create(
+        self.welcome_unit = BlockFactory.create(
             parent_location=self.welcome_section.location,
             display_name='Super Unit'
         )
@@ -134,19 +134,19 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
 
         self.test_course = CourseFactory.create(org=self.course.id.org)
         self.other_org_course = CourseFactory.create(org='Other_Org_Course')
-        self.sub_courseware_chapter = ItemFactory.create(
+        self.sub_courseware_chapter = BlockFactory.create(
             parent_location=self.test_course.location,
             display_name='courseware'
         )
-        self.sub_overview_chapter = ItemFactory.create(
+        self.sub_overview_chapter = BlockFactory.create(
             parent_location=self.sub_courseware_chapter.location,
             display_name='Overview'
         )
-        self.sub_welcome_section = ItemFactory.create(
+        self.sub_welcome_section = BlockFactory.create(
             parent_location=self.sub_overview_chapter.location,
             display_name='Welcome'
         )
-        self.sub_welcome_unit = ItemFactory.create(
+        self.sub_welcome_unit = BlockFactory.create(
             parent_location=self.sub_welcome_section.location,
             display_name='New Unit'
         )
@@ -423,7 +423,7 @@ class TestBetatesterAccess(ModuleStoreTestCase, CourseAccessTestMixin):
         tomorrow = now + datetime.timedelta(days=1)
 
         self.course = CourseFactory(days_early_for_beta=2, start=tomorrow)
-        self.content = ItemFactory(parent=self.course)
+        self.content = BlockFactory(parent=self.course)
 
         self.normal_student = UserFactory()
         self.beta_tester = BetaTesterFactory(course_key=self.course.id)  # lint-amnesty, pylint: disable=no-member

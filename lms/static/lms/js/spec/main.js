@@ -29,7 +29,7 @@
             'jquery.cookie': 'xmodule_js/common_static/js/vendor/jquery.cookie',
             'jquery.qtip': 'xmodule_js/common_static/js/vendor/jquery.qtip.min',
             'jquery.fileupload': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload',
-            'jquery.iframe-transport': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport',  // eslint-disable-line max-len
+            'jquery.iframe-transport': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport', // eslint-disable-line max-len
             'jquery.inputnumber': 'xmodule_js/common_static/js/vendor/html5-input-polyfills/number-polyfill',
             'jquery.immediateDescendents': 'xmodule_js/common_static/js/src/jquery.immediateDescendents',
             'jquery.simulate': 'xmodule_js/common_static/js/vendor/jquery.simulate',
@@ -56,7 +56,7 @@
             'squire': 'common/js/vendor/Squire',
             'jasmine-imagediff': 'xmodule_js/common_static/js/vendor/jasmine-imagediff',
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
-            mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML&delayStartupUntil=configured',  // eslint-disable-line max-len
+            mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML&delayStartupUntil=configured', // eslint-disable-line max-len
             'youtube': '//www.youtube.com/player_api?noext',
             'js/src/ajax_prefix': 'xmodule_js/common_static/js/src/ajax_prefix',
             'js/instructor_dashboard/student_admin': 'js/instructor_dashboard/student_admin',
@@ -288,7 +288,7 @@
                 deps: ['jquery', 'underscore', 'slick.core', 'slick.grid'],
                 init: function() {
                     // Set global variables that the util code is expecting to be defined
-                    require([  // eslint-disable-line global-require
+                    require([ // eslint-disable-line global-require
                         'edx-ui-toolkit/js/utils/html-utils',
                         'edx-ui-toolkit/js/utils/string-utils'
                     ], function(HtmlUtils, StringUtils) {
@@ -311,7 +311,7 @@
                 deps: ['jquery', 'underscore'],
                 init: function() {
                     // Set global variables that the util code is expecting to be defined
-                    require([  // eslint-disable-line global-require
+                    require([ // eslint-disable-line global-require
                         'edx-ui-toolkit/js/utils/html-utils',
                         'edx-ui-toolkit/js/utils/string-utils'
                     ], function(HtmlUtils, StringUtils) {
@@ -395,7 +395,7 @@
                 deps: ['jquery', 'underscore', 'underscore.string', 'backbone', 'gettext'],
                 init: function() {
                     // Set global variables that the payment code is expecting to be defined
-                    require([  // eslint-disable-line global-require
+                    require([ // eslint-disable-line global-require
                         'underscore',
                         'underscore.string',
                         'edx-ui-toolkit/js/utils/html-utils',
@@ -529,7 +529,7 @@
                 exports: 'DiscussionUtil',
                 init: function() {
                     // Set global variables that the discussion code is expecting to be defined
-                    require(  // eslint-disable-line global-require
+                    require( // eslint-disable-line global-require
                         [
                             'backbone',
                             'URI',
@@ -832,6 +832,6 @@
     // spec files one by one, otherwise some end up getting nested under others.
     window.requireSerial(specHelpers.concat(testFiles), function() {
         // start test run, once Require.js is done
-        window.__karma__.start();  // eslint-disable-line no-underscore-dangle
+        window.__karma__.start(); // eslint-disable-line no-underscore-dangle
     });
 }).call(this, requirejs);

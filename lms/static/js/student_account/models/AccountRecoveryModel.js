@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define(['jquery', 'backbone'],
         function($, Backbone) {
             return Backbone.Model.extend({
@@ -19,7 +20,7 @@
                         'X-CSRFToken': $.cookie('csrftoken')
                     };
 
-                // Only expects an email address.
+                    // Only expects an email address.
                     $.ajax({
                         url: model.urlRoot,
                         type: model.ajaxType,

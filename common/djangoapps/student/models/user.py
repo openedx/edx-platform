@@ -19,7 +19,7 @@ import uuid  # lint-amnesty, pylint: disable=wrong-import-order
 from datetime import datetime, timedelta  # lint-amnesty, pylint: disable=wrong-import-order
 from functools import total_ordering  # lint-amnesty, pylint: disable=wrong-import-order
 from importlib import import_module  # lint-amnesty, pylint: disable=wrong-import-order
-from urllib.parse import unquote, urlencode
+from urllib.parse import urlencode
 
 from .course_enrollment import (
     ALLOWEDTOENROLL_TO_ENROLLED,
@@ -49,6 +49,7 @@ from django.utils.translation import gettext_noop
 from django_countries.fields import CountryField
 from edx_django_utils import monitoring
 from edx_django_utils.cache import RequestCache
+from eventtracking import tracker
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, LearningContextKeyField
 from pytz import UTC, timezone
@@ -68,6 +69,9 @@ AUDIT_LOG = logging.getLogger("audit")
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore  # pylint: disable=invalid-name
 
 IS_MARKETABLE = 'is_marketable'
+
+USER_LOGGED_IN_EVENT_NAME = 'edx.user.login'
+USER_LOGGED_OUT_EVENT_NAME = 'edx.user.logout'
 
 
 class AnonymousUserId(models.Model):
@@ -155,7 +159,7 @@ def anonymous_id_for_user(user, course_id):
         hasher.update(str(user.id).encode('utf8'))
         if course_id:
             hasher.update(str(course_id).encode('utf-8'))
-        anonymous_user_id = hasher.hexdigest(16)  # pylint: disable=too-many-function-args
+        anonymous_user_id = hasher.hexdigest(16)
 
         try:
             AnonymousUserId.objects.create(
@@ -372,21 +376,6 @@ def get_potentially_retired_user_by_username_and_hash(username, hashed_username)
 
     locally_hashed_usernames.append(username)
     return User.objects.get(username__in=locally_hashed_usernames)
-
-
-def is_personalized_recommendation_for_user(course_id):
-    """
-    Returns the personalized recommendation value from the cookie.
-    """
-    request = crum.get_current_request()
-    recommended_courses = \
-        request.COOKIES.get(settings.PERSONALIZED_RECOMMENDATION_COOKIE_NAME, None) if request else None
-
-    if recommended_courses:
-        recommended_courses = json.loads(unquote(recommended_courses))
-        if course_id in recommended_courses['course_keys']:
-            return recommended_courses['is_personalized_recommendation']
-    return None
 
 
 class UserStanding(models.Model):
@@ -1245,6 +1234,13 @@ def create_comments_service_user(user):  # lint-amnesty, pylint: disable=missing
 @receiver(user_logged_in)
 def log_successful_login(sender, request, user, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """Handler to log when logins have occurred successfully."""
+    tracker.emit(
+        USER_LOGGED_IN_EVENT_NAME,
+        {
+            'user_id': getattr(user, 'id', None) if user else None,
+            'event_type': "login",
+        }
+    )
     if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
         AUDIT_LOG.info(f"Login success - user.id: {user.id}")
     else:
@@ -1255,6 +1251,13 @@ def log_successful_login(sender, request, user, **kwargs):  # lint-amnesty, pyli
 def log_successful_logout(sender, request, user, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """Handler to log when logouts have occurred successfully."""
     if hasattr(request, 'user'):
+        tracker.emit(
+            USER_LOGGED_OUT_EVENT_NAME,
+            {
+                'user_id': getattr(user, 'id', None) if user else None,
+                'event_type': "logout",
+            }
+        )
         if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
             AUDIT_LOG.info(f'Logout - user.id: {request.user.id}')  # pylint: disable=logging-format-interpolation
         else:

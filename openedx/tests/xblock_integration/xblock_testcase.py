@@ -52,7 +52,7 @@ from xblock.plugin import Plugin
 
 import xmodule.services
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 
@@ -240,17 +240,17 @@ class XBlockScenarioTestCaseMixin:
         cls.xblocks = {}
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):
             for chapter_config in cls.test_configuration:
-                chapter = ItemFactory.create(
+                chapter = BlockFactory.create(
                     parent_location=cls.course.location,
                     display_name="ch_" + chapter_config['urlname'],
                     category='chapter'
                 )
-                section = ItemFactory.create(
+                section = BlockFactory.create(
                     parent=chapter,
                     display_name="sec_" + chapter_config['urlname'],
                     category='sequential'
                 )
-                unit = ItemFactory.create(
+                unit = BlockFactory.create(
                     parent=section,
                     display_name='unit_' + chapter_config['urlname'],
                     category='vertical'
@@ -264,7 +264,7 @@ class XBlockScenarioTestCaseMixin:
                     )
 
                 for xblock_config in chapter_config['xblocks']:
-                    xblock = ItemFactory.create(
+                    xblock = BlockFactory.create(
                         parent=unit,
                         category=xblock_config['blocktype'],
                         display_name=xblock_config['urlname'],

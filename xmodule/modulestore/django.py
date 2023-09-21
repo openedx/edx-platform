@@ -176,11 +176,11 @@ class SignalHandler:
 
     # If you add a new signal, please don't forget to add it to the _mapping
     # as well.
-    pre_publish = SwitchedSignal("pre_publish", providing_args=["course_key"])
-    course_published = SwitchedSignal("course_published", providing_args=["course_key"])
-    course_deleted = SwitchedSignal("course_deleted", providing_args=["course_key"])
-    library_updated = SwitchedSignal("library_updated", providing_args=["library_key"])
-    item_deleted = SwitchedSignal("item_deleted", providing_args=["usage_key", "user_id"])
+    pre_publish = SwitchedSignal("pre_publish")
+    course_published = SwitchedSignal("course_published")
+    course_deleted = SwitchedSignal("course_deleted")
+    library_updated = SwitchedSignal("library_updated")
+    item_deleted = SwitchedSignal("item_deleted")
 
     _mapping = {
         signal.name: signal
@@ -308,7 +308,7 @@ def create_modulestore_instance(
         xblock_field_data_wrappers=xblock_field_data_wrappers,
         disabled_xblock_types=fetch_disabled_xblock_types,
         doc_store_config=doc_store_config,
-        i18n_service=i18n_service or ModuleI18nService,
+        i18n_service=i18n_service or XBlockI18nService,
         fs_service=fs_service or xblock.reference.plugins.FSService(),
         user_service=user_service or xb_user_service,
         signal_handler=signal_handler or SignalHandler(class_),
@@ -356,7 +356,7 @@ def clear_existing_modulestores():
     _MIXED_MODULESTORE = None
 
 
-class ModuleI18nService:
+class XBlockI18nService:
     """
     Implement the XBlock runtime "i18n" service.
 

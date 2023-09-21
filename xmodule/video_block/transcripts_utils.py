@@ -182,12 +182,13 @@ def get_transcript_link_from_youtube(youtube_id):
     try:
         youtube_html = requests.get(f"{youtube_url_base}{youtube_id}")
         caption_re = settings.YOUTUBE['TRANSCRIPTS']['CAPTION_TRACKS_REGEX']
+        allowed_language_codes = settings.YOUTUBE['TRANSCRIPTS']['ALLOWED_LANGUAGE_CODES']
         caption_matched = re.search(caption_re, youtube_html.content.decode("utf-8"))
         if caption_matched:
             caption_tracks = json.loads(f'[{caption_matched.group("caption_tracks")}]')
             for caption in caption_tracks:
-                if "languageCode" in caption.keys() and caption["languageCode"] == "en":
-                    return caption["baseUrl"]
+                if "languageCode" in caption.keys() and caption["languageCode"] in allowed_language_codes:
+                    return caption.get("baseUrl")
         return None
     except ConnectionError:
         return None
@@ -202,7 +203,7 @@ def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_
 
     Returns (status, transcripts): bool, dict.
     """
-    _ = i18n.ugettext
+    _ = i18n.gettext
 
     utf8_parser = etree.XMLParser(encoding='utf-8')
 
@@ -241,13 +242,13 @@ def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_
     return {'start': sub_starts, 'end': sub_ends, 'text': sub_texts}
 
 
-def download_youtube_subs(youtube_id, video_descriptor, settings):  # lint-amnesty, pylint: disable=redefined-outer-name
+def download_youtube_subs(youtube_id, video_block, settings):  # lint-amnesty, pylint: disable=redefined-outer-name
     """
     Download transcripts from Youtube.
 
     Args:
         youtube_id: str, actual youtube_id of the video.
-        video_descriptor: video descriptor instance.
+        video_block: video block instance.
 
     We save transcripts for 1.0 speed, as for other speed conversion is done on front-end.
 
@@ -257,8 +258,8 @@ def download_youtube_subs(youtube_id, video_descriptor, settings):  # lint-amnes
     Raises:
         GetTranscriptsFromYouTubeException, if fails.
     """
-    i18n = video_descriptor.runtime.service(video_descriptor, "i18n")
-    _ = i18n.ugettext
+    i18n = video_block.runtime.service(video_block, "i18n")
+    _ = i18n.gettext
 
     subs = get_transcripts_from_youtube(youtube_id, settings, i18n)
     return json.dumps(subs, indent=2)
@@ -272,7 +273,7 @@ def remove_subs_from_store(subs_id, item, lang='en'):
     Transcript.delete_asset(item.location, filename)
 
 
-def generate_subs_from_source(speed_subs, subs_type, subs_filedata, item, language='en'):
+def generate_subs_from_source(speed_subs, subs_type, subs_filedata, block, language='en'):
     """Generate transcripts from source files (like SubRip format, etc.)
     and save them to assets for `item` module.
     We expect, that speed of source subs equal to 1
@@ -280,11 +281,11 @@ def generate_subs_from_source(speed_subs, subs_type, subs_filedata, item, langua
     :param speed_subs: dictionary {speed: sub_id, ...}
     :param subs_type: type of source subs: "srt", ...
     :param subs_filedata:unicode, content of source subs.
-    :param item: module object.
+    :param block: course or block.
     :param language: str, language of translation of transcripts
     :returns: True, if all subs are generated and saved successfully.
     """
-    _ = item.runtime.service(item, "i18n").ugettext
+    _ = block.runtime.service(block, "i18n").gettext
     if subs_type.lower() != 'srt':
         raise TranscriptsGenerationException(_("We support only SubRip (*.srt) transcripts format."))
     try:
@@ -315,7 +316,7 @@ def generate_subs_from_source(speed_subs, subs_type, subs_filedata, item, langua
         save_subs_to_store(
             generate_subs(speed, 1, subs),
             subs_id,
-            item,
+            block,
             language
         )
 
@@ -433,7 +434,7 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
         (To avoid confusing situation if you attempt to correct a translation by uploading
         a new version of the SRT file with same name).
     """
-    _ = item.runtime.service(item, "i18n").ugettext
+    _ = item.runtime.service(item, "i18n").gettext
 
     # # 1.
     # html5_ids = get_html5_ids(item.html5_sources)
@@ -514,16 +515,14 @@ def subs_filename(subs_id, lang='en'):
         return f'{lang}_subs_{subs_id}.srt.sjson'
 
 
-def generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, lang):
+def generate_sjson_for_all_speeds(block, user_filename, result_subs_dict, lang):
     """
     Generates sjson from srt for given lang.
-
-    `item` is module object.
     """
-    _ = item.runtime.service(item, "i18n").ugettext
+    _ = block.runtime.service(block, "i18n").gettext
 
     try:
-        srt_transcripts = contentstore().find(Transcript.asset_location(item.location, user_filename))
+        srt_transcripts = contentstore().find(Transcript.asset_location(block.location, user_filename))
     except NotFoundError as ex:
         raise TranscriptException(_("{exception_message}: Can't find uploaded transcripts: {user_filename}").format(  # lint-amnesty, pylint: disable=raise-missing-from
             exception_message=str(ex),
@@ -531,19 +530,19 @@ def generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, lang):
         ))
 
     if not lang:
-        lang = item.transcript_language
+        lang = block.transcript_language
 
     # Used utf-8-sig encoding type instead of utf-8 to remove BOM(Byte Order Mark), e.g. U+FEFF
     generate_subs_from_source(
         result_subs_dict,
         os.path.splitext(user_filename)[1][1:],
         srt_transcripts.data.decode('utf-8-sig'),
-        item,
+        block,
         lang
     )
 
 
-def get_or_create_sjson(item, transcripts):
+def get_or_create_sjson(block, transcripts):
     """
     Get sjson if already exists, otherwise generate it.
 
@@ -556,17 +555,15 @@ def get_or_create_sjson(item, transcripts):
     Raises:
         TranscriptException: when srt subtitles do not exist,
         and exceptions from generate_subs_from_source.
-
-    `item` is module object.
     """
-    user_filename = transcripts[item.transcript_language]
+    user_filename = transcripts[block.transcript_language]
     user_subs_id = os.path.splitext(user_filename)[0]
     source_subs_id, result_subs_dict = user_subs_id, {1.0: user_subs_id}
     try:
-        sjson_transcript = Transcript.asset(item.location, source_subs_id, item.transcript_language).data
+        sjson_transcript = Transcript.asset(block.location, source_subs_id, block.transcript_language).data
     except NotFoundError:  # generating sjson from srt
-        generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, item.transcript_language)
-    sjson_transcript = Transcript.asset(item.location, source_subs_id, item.transcript_language).data
+        generate_sjson_for_all_speeds(block, user_filename, result_subs_dict, block.transcript_language)
+        sjson_transcript = Transcript.asset(block.location, source_subs_id, block.transcript_language).data
     return sjson_transcript
 
 
@@ -749,7 +746,7 @@ class Transcript:
         """
         Get asset from contentstore, asset location is built from subs_id and lang.
 
-        `location` is module location.
+        `location` is block location.
         """
         # HACK Warning! this is temporary and will be removed once edx-val take over the
         # transcript module and contentstore will only function as fallback until all the
@@ -771,7 +768,7 @@ class Transcript:
     @staticmethod
     def asset_location(location, filename):
         """
-        Return asset location. `location` is module location.
+        Return asset location. `location` is block location.
         """
         # If user transcript filename is empty, raise `TranscriptException` to avoid `InvalidKeyError`.
         if not filename:
@@ -965,7 +962,7 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
     Get video transcript from content store.
 
     Arguments:
-        video (Video Descriptor): Video descriptor
+        video (Video block): Video block
         language (unicode): transcript language
         output_format (unicode): transcript output format
         transcripts_info (dict): transcript info for a video
@@ -1093,7 +1090,7 @@ def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=No
     Get video transcript from edx-val or content store.
 
     Arguments:
-        video (Video Descriptor): Video Descriptor
+        video (Video block): Video block
         lang (unicode): transcript language
         output_format (unicode): transcript output format
         youtube_id (unicode): youtube video id

@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define(['teams/js/collections/base', 'teams/js/models/team', 'gettext', 'underscore'],
         function(BaseCollection, TeamModel, gettext, _) {
             var TeamCollection = BaseCollection.extend({

@@ -70,7 +70,7 @@ def config_course_cohorts_legacy(
 ):
     """
     Given a course with no discussion set up, add the discussions and set
-    the cohort config on the course descriptor.
+    the cohort config on the course block.
 
     Since cohort settings are now stored in models.CourseCohortSettings,
     this is only used for testing data migration from the CourseBlock

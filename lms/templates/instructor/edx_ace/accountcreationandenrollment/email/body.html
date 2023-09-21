@@ -7,9 +7,10 @@
     <tr>
         <td>
             <h1>
-                {% filter force_escape %}
+                {% autoescape off %}
+                {# xss-lint: disable=django-blocktrans-missing-escape-filter #}
                 {% blocktrans %}Welcome to {{ course_name }}{% endblocktrans %}
-                {% endfilter %}
+                {% endautoescape %}
             </h1>
 
             <p style="color: rgba(0,0,0,.75);">

@@ -26,7 +26,8 @@ from ..entrance_exam import (
     remove_entrance_exam_milestone_reference,
     update_entrance_exam
 )
-from ..helpers import GRADER_TYPES, create_xblock
+from cms.djangoapps.contentstore.helpers import GRADER_TYPES
+from cms.djangoapps.contentstore.xblock_storage_handlers.create_xblock import create_xblock
 
 
 @patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})
@@ -34,6 +35,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
     """
     Base test class for create, save, and delete
     """
+
     def setUp(self):
         """
         Shared scaffolding for individual test runs
@@ -105,7 +107,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         resp = self.client.get(self.exam_url)
         self.assertEqual(resp.status_code, 200)
 
-        # Reload the test course now that the exam module has been added
+        # Reload the test course now that the exam block has been added
         self.course = modulestore().get_course(self.course.id)
         metadata = CourseMetadata.fetch_all(self.course)
         self.assertTrue(metadata['entrance_exam_enabled'])
@@ -128,10 +130,10 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         resp = self.client.get(self.exam_url)
         self.assertEqual(resp.status_code, 200)
 
-        # Reload the test course now that the exam module has been added
+        # Reload the test course now that the exam block has been added
         self.course = modulestore().get_course(self.course.id)
 
-        # Add a new child sequential to the exam module
+        # Add a new child sequential to the exam block
         # Confirm that the grader type is 'Entrance Exam'
         chapter_locator_string = json.loads(resp.content.decode('utf-8')).get('locator')
         # chapter_locator = UsageKey.from_string(chapter_locator_string)
@@ -194,7 +196,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         self.assertEqual(len(paths[milestone_key]), 0)
 
         # Re-adding an entrance exam to the course should fix the missing link
-        # It wipes out any old entrance exam artifacts and inserts a new exam course chapter/module
+        # It wipes out any old entrance exam artifacts and inserts a new exam course chapter/block
         resp = self.client.post(self.exam_url, {}, http_accept='application/json')
         self.assertEqual(resp.status_code, 201)
         resp = self.client.get(self.exam_url)

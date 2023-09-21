@@ -74,7 +74,7 @@ define([
                     'Used in {count} location', 'Used in {count} locations',
                     count
                 ),
-                    {count: count}
+                {count: count}
                 );
             }
         }

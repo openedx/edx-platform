@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define([
         'jquery',
         'underscore',
@@ -32,9 +33,14 @@
             optionalStr: gettext('(optional)'),
             submitButton: '',
             isEnterpriseEnable: false,
+            showRegisterLinks: true,
 
             initialize: function(data) {
                 this.model = data.model;
+                this.showRegisterLinks = (
+                    typeof data.showRegisterLinks !== 'undefined'
+                ) ? data.showRegisterLinks : this.showRegisterLinks;
+
                 this.preRender(data);
 
                 this.tpl = $(this.tpl).html();
@@ -64,7 +70,7 @@
                             HtmlUtils: HtmlUtils
                         })
                     )
-                )
+                );
                 this.postRender();
 
                 return this;
@@ -97,6 +103,7 @@
                         supplementalText: data[i].supplementalText || '',
                         supplementalLink: data[i].supplementalLink || '',
                         loginIssueSupportLink: data[i].loginIssueSupportLink || '',
+                        showRegisterLinks: this.showRegisterLinks,
                         isEnterpriseEnable: this.isEnterpriseEnable
                     })));
                 }
@@ -163,8 +170,8 @@
                     $label = $form.find('label[for=' + $el.attr('id') + ']');
                     key = $el.attr('name') || false;
 
-                        // Due to a bug in firefox, whitespaces in email type field are not removed.
-                        // TODO: Remove this code once firefox bug is resolved.
+                    // Due to a bug in firefox, whitespaces in email type field are not removed.
+                    // TODO: Remove this code once firefox bug is resolved.
                     if (key === 'email') {
                         $el.val($el.val().trim());
                     }
@@ -236,10 +243,10 @@
             saveError: function(error) {
                 this.errors = [
                     StringUtils.interpolate(
-                            '<li>{error}</li>', {
-                                error: error.responseText
-                            }
-                        )
+                        '<li>{error}</li>', {
+                            error: error.responseText
+                        }
+                    )
                 ];
                 this.renderErrors(this.defaultFormErrorsTitle, this.errors);
                 this.scrollToFormFeedback();

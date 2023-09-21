@@ -3,6 +3,7 @@
  */
 (function(define) {
     'use strict';
+
     define(['jquery', 'jquery.cookie'], function($) {
         var ShoppingCartInterface = {
             urls: {

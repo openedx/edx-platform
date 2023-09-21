@@ -4,6 +4,7 @@ define([
 ],
 function($, _, gettext, BasePage, GroupConfigurationsListView, PartitionGroupListView) {
     'use strict';
+
     var GroupConfigurationsPage = BasePage.extend({
         initialize: function(options) {
             var currentScheme,
@@ -73,8 +74,8 @@ function($, _, gettext, BasePage, GroupConfigurationsListView, PartitionGroupLis
         },
 
         onBeforeUnload: function() {
-            var dirty = this.areAnyConfigurationsDirty() ||
-                (this.experimentsEnabled && this.experimentGroupConfigurations.find(function(configuration) {
+            var dirty = this.areAnyConfigurationsDirty()
+                || (this.experimentsEnabled && this.experimentGroupConfigurations.find(function(configuration) {
                     return configuration.isDirty();
                 }));
 

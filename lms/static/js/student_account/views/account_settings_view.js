@@ -1,5 +1,7 @@
+// eslint-disable-next-line no-shadow-restricted-names
 (function(define, undefined) {
     'use strict';
+
     define([
         'gettext',
         'jquery',
@@ -59,7 +61,7 @@
 
                 if (!_.isEmpty(view.options.betaLanguage) && $.cookie('old-pref-lang')) {
                     betaLangMessage = HtmlUtils.interpolateHtml(
-                        gettext('You have set your language to {beta_language}, which is currently not fully translated. You can help us translate this language fully by joining the Transifex community and adding translations from English for learners that speak {beta_language}.'),  // eslint-disable-line max-len
+                        gettext('You have set your language to {beta_language}, which is currently not fully translated. You can help us translate this language fully by joining the Transifex community and adding translations from English for learners that speak {beta_language}.'), // eslint-disable-line max-len
                         {
                             beta_language: view.options.betaLanguage.name
                         }

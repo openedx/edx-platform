@@ -1,25 +1,28 @@
 """
 Views that implement a RESTful API for interacting with XBlocks.
-
-Note that these views are only for interacting with existing blocks. Other
-Studio APIs cover use cases like adding/deleting/editing blocks.
 """
 
+from common.djangoapps.util.json_request import JsonResponse
 from corsheaders.signals import check_request_enabled
 from django.contrib.auth import get_user_model
+from django.db.transaction import atomic
 from django.http import Http404
+from django.utils.translation import gettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import permissions
 from rest_framework.decorators import api_view, permission_classes  # lint-amnesty, pylint: disable=unused-import
 from rest_framework.exceptions import PermissionDenied, AuthenticationFailed, NotFound
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from xblock.django.request import DjangoWebobRequest, webob_to_django_response
+from xblock.fields import Scope
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.lib.api.view_utils import view_auth_classes
 from ..api import (
+    get_block_display_name,
     get_block_metadata,
     get_handler_url as _get_handler_url,
     load_block,
@@ -29,28 +32,7 @@ from ..utils import validate_secure_token_for_xblock_handler
 
 User = get_user_model()
 
-LX_BLOCK_TYPES_OVERRIDE = {
-    'problem': 'lx_question',
-    'video': 'lx_video',
-    'html': 'lx_html',
-}
-
-
 invalid_not_found_fmt = "XBlock {usage_key} does not exist, or you don't have permission to view it."
-
-
-def _block_type_overrides(request_args):
-    """
-    If the request contains the argument `lx_block_types=1`, then
-    returns a dict of LabXchange block types, which override the default block types.
-
-    Otherwise, returns None.
-
-    FYI: This is a temporary change, added to assist LabXchange with the transition to using their custom runtime.
-    """
-    if request_args.get('lx_block_types'):
-        return LX_BLOCK_TYPES_OVERRIDE
-    return None
 
 
 @api_view(['GET'])
@@ -64,15 +46,13 @@ def block_metadata(request, usage_key_str):
 
     * "include": a comma-separated list of keys to include.
       Valid keys are "index_dictionary" and "student_view_data".
-    * "lx_block_types": optional boolean; set to use the LabXchange XBlock classes to load the requested block.
-      The block ID and OLX remain unchanged; they will use the original block type.
     """
     try:
         usage_key = UsageKey.from_string(usage_key_str)
     except InvalidKeyError as e:
         raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
 
-    block = load_block(usage_key, request.user, block_type_overrides=_block_type_overrides(request.GET))
+    block = load_block(usage_key, request.user)
     includes = request.GET.get("include", "").split(",")
     metadata_dict = get_block_metadata(block, includes=includes)
     if 'children' in metadata_dict:
@@ -88,17 +68,13 @@ def block_metadata(request, usage_key_str):
 def render_block_view(request, usage_key_str, view_name):
     """
     Get the HTML, JS, and CSS needed to render the given XBlock.
-
-    Accepts the following query parameters:
-    * "lx_block_types": optional boolean; set to use the LabXchange XBlock classes to load the requested block.
-      The block ID and OLX remain unchanged; they will use the original block type.
     """
     try:
         usage_key = UsageKey.from_string(usage_key_str)
     except InvalidKeyError as e:
         raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
 
-    block = load_block(usage_key, request.user, block_type_overrides=_block_type_overrides(request.GET))
+    block = load_block(usage_key, request.user)
     fragment = _render_block_view(block, view_name, request.user)
     response_data = get_block_metadata(block)
     response_data.update(fragment.to_dict())
@@ -113,17 +89,13 @@ def get_handler_url(request, usage_key_str, handler_name):
     the given XBlock handler.
 
     The URL will expire but is guaranteed to be valid for a minimum of 2 days.
-
-    The following query parameters will be appended to the returned handler_url:
-    * "lx_block_types": optional boolean; set to use the LabXchange XBlock classes to load the requested block.
-      The block ID and OLX remain unchanged; they will use the original block type.
     """
     try:
         usage_key = UsageKey.from_string(usage_key_str)
     except InvalidKeyError as e:
         raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
 
-    handler_url = _get_handler_url(usage_key, handler_name, request.user, request.GET)
+    handler_url = _get_handler_url(usage_key, handler_name, request.user)
     return Response({"handler_url": handler_url})
 
 
@@ -140,11 +112,6 @@ def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, 
     This endpoint has a unique authentication scheme that involves a temporary
     auth token included in the URL (see below). As a result it can be exempt
     from CSRF, session auth, and JWT/OAuth.
-
-    Accepts the following query parameters (in addition to those passed to the handler):
-
-    * "lx_block_types": optional boolean; set to use the LabXchange XBlock classes to load the requested block.
-      The block ID and OLX remain unchanged; they will use the original block type.
     """
     try:
         usage_key = UsageKey.from_string(usage_key_str)
@@ -185,7 +152,7 @@ def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, 
         raise AuthenticationFailed("Invalid user ID format.")
 
     request_webob = DjangoWebobRequest(request)  # Convert from django request to the webob format that XBlocks expect
-    block = load_block(usage_key, user, block_type_overrides=_block_type_overrides(request.GET))
+    block = load_block(usage_key, user)
     # Run the handler, and save any resulting XBlock field value changes:
     response_webob = block.handle(handler_name, request_webob, suffix)
     response = webob_to_django_response(response_webob)
@@ -204,3 +171,86 @@ def cors_allow_xblock_handler(sender, request, **kwargs):  # lint-amnesty, pylin
 
 
 check_request_enabled.connect(cors_allow_xblock_handler)
+
+
+@view_auth_classes()
+class BlockFieldsView(APIView):
+    """
+    View to get/edit the field values of an XBlock as JSON (in the v2 runtime)
+
+    This class mimics the functionality of xblock_handler in block.py (for v1 xblocks), but for v2 xblocks.
+    However, it only implements the exact subset of functionality needed to support the v2 editors (from
+    the frontend-lib-content-components project). As such, it only supports GET and POST, and only the
+    POSTing of data/metadata fields.
+    """
+
+    @atomic
+    def get(self, request, usage_key_str):
+        """
+        retrieves the xblock, returning display_name, data, and metadata
+        """
+        try:
+            usage_key = UsageKey.from_string(usage_key_str)
+        except InvalidKeyError as e:
+            raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
+
+        block = load_block(usage_key, request.user)
+        block_dict = {
+            "display_name": get_block_display_name(block),  # potentially duplicated from metadata
+            "data": block.data,
+            "metadata": block.get_explicitly_set_fields_by_scope(Scope.settings),
+        }
+        return Response(block_dict)
+
+    @atomic
+    def post(self, request, usage_key_str):
+        """
+        edits the xblock, saving changes to data and metadata only (display_name included in metadata)
+        """
+        try:
+            usage_key = UsageKey.from_string(usage_key_str)
+        except InvalidKeyError as e:
+            raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
+
+        user = request.user
+        block = load_block(usage_key, user)
+        data = request.data.get("data")
+        metadata = request.data.get("metadata")
+
+        old_metadata = block.get_explicitly_set_fields_by_scope(Scope.settings)
+        old_content = block.get_explicitly_set_fields_by_scope(Scope.content)
+
+        block.data = data
+
+        # update existing metadata with submitted metadata (which can be partial)
+        # IMPORTANT NOTE: if the client passed 'null' (None) for a piece of metadata that means 'remove it'.
+        if metadata is not None:
+            for metadata_key, value in metadata.items():
+                field = block.fields[metadata_key]
+
+                if value is None:
+                    field.delete_from(block)
+                else:
+                    try:
+                        value = field.from_json(value)
+                    except ValueError as verr:
+                        reason = _("Invalid data")
+                        if str(verr):
+                            reason = _("Invalid data ({details})").format(
+                                details=str(verr)
+                            )
+                        return JsonResponse({"error": reason}, 400)
+
+                    field.write_to(block, value)
+
+        if callable(getattr(block, "editor_saved", None)):
+            block.editor_saved(user, old_metadata, old_content)
+
+        # Save after the callback so any changes made in the callback will get persisted.
+        block.save()
+
+        return Response({
+            "id": str(block.location),
+            "data": data,
+            "metadata": block.get_explicitly_set_fields_by_scope(Scope.settings),
+        })

@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from django.test import TestCase
 from openedx.core.djangolib.blockstore_cache import BundleCache
-from openedx.core.djangoapps.content_libraries.tests.base import (
+from openedx.core.lib.blockstore_api.tests.base import (
     BlockstoreAppTestMixin,
     requires_blockstore,
     requires_blockstore_app,

@@ -15,8 +15,8 @@ from django.template import TemplateDoesNotExist
 from django.utils.safestring import mark_safe
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.defaults import permission_denied
+from django_ratelimit.exceptions import Ratelimited
 from mako.exceptions import TopLevelLookupException
-from ratelimit.exceptions import Ratelimited
 
 from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 from common.djangoapps.util.cache import cache_if_anonymous
@@ -106,7 +106,7 @@ def render_403(request, exception=None):
 
 
 @fix_crum_request
-def render_404(request, exception):  # lint-amnesty, pylint: disable=unused-argument
+def render_404(request, exception=None):  # lint-amnesty, pylint: disable=unused-argument
     request.view_name = '404'
     return HttpResponseNotFound(render_to_string('static_templates/404.html', {}, request=request))
 

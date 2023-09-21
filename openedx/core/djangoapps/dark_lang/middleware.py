@@ -10,7 +10,6 @@ the SessionMiddleware.
 
 
 from django.conf import settings
-from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.utils.translation.trans_real import parse_accept_lang_header
 from django.utils.deprecation import MiddlewareMixin
 
@@ -76,7 +75,7 @@ class DarkLangMiddleware(MiddlewareMixin):
     @property
     def beta_langs(self):
         """
-        Current list of released languages
+        Current list of beta languages
         """
         language_options = DarkLangConfig.current().beta_languages_list
         if settings.LANGUAGE_CODE not in language_options:
@@ -123,7 +122,7 @@ class DarkLangMiddleware(MiddlewareMixin):
 
     def _clean_accept_headers(self, request):
         """
-        Remove any language that is not either in ``self.released_langs`` or
+        Remove any language that is not either in ``self.released_langs`` or ``self.beta_langs`` (if enabled) or
         a territory of one of those languages.
         """
         accept = request.META.get('HTTP_ACCEPT_LANGUAGE', None)
@@ -155,6 +154,5 @@ class DarkLangMiddleware(MiddlewareMixin):
         if not preview_lang:
             return
 
-        # Set the session key to the requested preview lang
-        request.session[LANGUAGE_SESSION_KEY] = preview_lang
+        # Set the response language_cookie to the requested preview lang
         set_language_cookie(request, response, preview_lang)

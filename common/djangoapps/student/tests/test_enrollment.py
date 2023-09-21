@@ -2,8 +2,6 @@
 Tests for student enrollment.
 """
 
-
-import unittest
 from unittest.mock import patch
 
 import ddt
@@ -12,7 +10,7 @@ from django.conf import settings
 from django.urls import reverse
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -26,11 +24,12 @@ from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRol
 from common.djangoapps.student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin):
     """
     Test student enrollment, especially with different course modes.
@@ -78,10 +77,10 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
         """
         Helper function to create a proctored exam for a given course
         """
-        chapter = ItemFactory.create(
+        chapter = BlockFactory.create(
             parent=course, category='chapter', display_name='Test Section', publish_item=True
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent=chapter, category='sequential', display_name='Test Proctored Exam',
             graded=True, is_time_limited=True, default_time_limit_minutes=10,
             is_proctored_enabled=True, publish_item=True

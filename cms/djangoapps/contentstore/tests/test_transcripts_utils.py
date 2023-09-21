@@ -21,7 +21,7 @@ from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: 
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.video_block import transcripts_utils  # lint-amnesty, pylint: disable=wrong-import-order
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
@@ -725,8 +725,8 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         self.sjson_mime_type = transcripts_utils.Transcript.mime_types[transcripts_utils.Transcript.SJSON]
 
         self.user = UserFactory.create()
-        self.vertical = ItemFactory.create(category='vertical', parent_location=self.course.location)
-        self.video = ItemFactory.create(
+        self.vertical = BlockFactory.create(category='vertical', parent_location=self.course.location)
+        self.video = BlockFactory.create(
             category='video',
             parent_location=self.vertical.location,
             edx_video_id='1234-5678-90'
@@ -741,7 +741,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
             transcripts = {language: filename}
 
         html5_sources = html5_sources or []
-        self.video = ItemFactory.create(
+        self.video = BlockFactory.create(
             category='video',
             parent_location=self.vertical.location,
             sub=subs_id,

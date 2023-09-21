@@ -1,6 +1,8 @@
 # pylint: skip-file
 import json
 import logging
+
+import re
 from typing import Set
 
 import regex
@@ -70,12 +72,15 @@ def strip_blank(dic):
     """
     Returns a dictionary stripped of any 'blank' (empty) keys
     """
+
     def _is_blank(v):
         """
         Determines if the provided value contains no information
         """
         return isinstance(v, str) and len(v.strip()) == 0
+
     return {k: v for k, v in dic.items() if not _is_blank(v)}
+
 
 # TODO should we be checking if d1 and d2 have the same keys with different values?
 
@@ -794,6 +799,7 @@ def prepare_content(
     # Replace the content body with a sanitized version
     if 'body' in content:
         content['body'] = sanitize_body(content['body'])
+        content['body'] = convert_html_to_markdown(content['body'])
 
     if content.get("endorsement"):
         endorsement = content["endorsement"]
@@ -1040,3 +1046,54 @@ def sanitize_body(body):
     # This will remove the Markdown style links with data: URLs, and turn them
     # into empty links.
     return regex.sub(r'\]\(data:[^)]+\)', ']()', body)
+
+
+def convert_html_to_markdown(text):
+    """
+    Convert HTML to Markdown
+    """
+    text = convert_img_to_markdown(text)
+    text = convert_a_to_markdown(text)
+    text = convert_p_to_markdown(text)
+    return text
+
+
+def convert_a_to_markdown(text):
+    """
+    Convert <a> tags to Markdown format
+    """
+    def replace_link(match):
+        url = match.group(1)
+        if not url.startswith('http://') and not url.startswith('https://'):
+            url = 'https://' + url
+        title = match.group(3)
+        return f"[{title}]({url})"
+
+    # Use a regular expression to match each <a> tag and call replace_link on each match
+    # return re.sub(r'<a.*?href="(.*?)".*?title="(.*?)".*?</a>|<a.*?href="(.*?)".*?</a>', replace_link, text)
+    regex_exp = r'<a(?: [^>]+)? href="([^"]+)"(?: [^>]+)?(?: title="([^"]+)")?(?: [^>]+)?>(.*?)</a>'
+    return re.sub(regex_exp, replace_link, text)
+
+
+def convert_img_to_markdown(text):
+    """
+    Convert <img> tags to Markdown format
+    """
+    def replace_image(match):
+        url = match.group(1)
+        if not url.startswith('http://') and not url.startswith('https://'):
+            url = 'https://' + url
+        alt_text = match.group(2) or ''
+        title = match.group(3) or ''
+        return f"![{alt_text}]({url} \"{title}\")"
+
+    # Use a regular expression to match each <img> tag and call replace_image on each match
+    # pylint: disable=line-too-long
+    regex_exp = r'<img(?: [^>]+)? src="([^"]+)"(?: [^>]+)?(?: alt="([^"]+)")?(?: [^>]+)?(?: title="([^"]+)")?(?: [^>]+)?/>'
+
+    return re.sub(regex_exp, replace_image, text)
+
+
+def convert_p_to_markdown(text):
+    # Use a regular expression to match each <p> tag and replace it with a Markdown paragraph
+    return re.sub(r'<p(?: [^>]+)?>(.*?)</p>', r'\n\n\1\n\n', text)

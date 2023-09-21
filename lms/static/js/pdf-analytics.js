@@ -15,7 +15,7 @@ $(function() {
     // log every page render
         var page = PDFViewerApplication.page;
         var old_page = event.originalEvent.previousPageNumber;
-    // pagechange is called many times per viewing.
+        // pagechange is called many times per viewing.
         if (old_page !== page || first_page) {
             first_page = false;
             if ((event.timeStamp - scroll.timeStamp) < 50) {
@@ -83,6 +83,7 @@ $(window).bind('find findhighlightallchange findagain findcasesensitivitychange'
         message.status = $('#findMsg').text();
         message.page = PDFViewerApplication.page;
         var event_name = 'search';
+        // eslint-disable-next-line default-case
         switch (event.type) {
         case 'find':
             event_name += '.executed';

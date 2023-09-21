@@ -9,7 +9,7 @@ from .error import *
 from .export_git import *
 from .helpers import *
 from .import_export import *
-from .item import *
+from .block import *
 from .library import *
 from .preview import *
 from .public import *

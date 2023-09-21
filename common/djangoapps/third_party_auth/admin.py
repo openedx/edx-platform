@@ -14,6 +14,7 @@ from django.utils.translation import gettext_lazy as _
 from .models import (
     _PSA_OAUTH2_BACKENDS,
     _PSA_SAML_BACKENDS,
+    AppleMigrationUserIdInfo,
     LTIProviderConfig,
     OAuth2ProviderConfig,
     SAMLConfiguration,
@@ -196,3 +197,10 @@ class LTIProviderConfigAdmin(KeyedConfigurationModelAdmin):
         )
 
 admin.site.register(LTIProviderConfig, LTIProviderConfigAdmin)
+
+
+class AppleMigrationUserIdInfoAdmin(admin.ModelAdmin):
+    """ Django Admin class for AppleMigrationUserIdInfo """
+
+
+admin.site.register(AppleMigrationUserIdInfo, AppleMigrationUserIdInfoAdmin)

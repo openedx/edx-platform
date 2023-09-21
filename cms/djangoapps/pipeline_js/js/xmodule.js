@@ -18,11 +18,16 @@ define(
         window._ = _;
 
         $script(
-            'https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js' +
-            '?config=TeX-MML-AM_SVG&delayStartupUntil=configured',
+            'https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js'
+            + '?config=TeX-MML-AM_SVG&delayStartupUntil=configured',
             'mathjax',
             function() {
                 window.MathJax.Hub.Config({
+                    styles: {
+                        '.MathJax_SVG>svg': {'max-width': '100%'},
+                        // This is to resolve for people who use center mathjax with tables
+                        'table>tbody>tr>td>.MathJax_SVG>svg': {'max-width': 'inherit'},
+                    },
                     tex2jax: {
                         inlineMath: [
                             ['\\(', '\\)'],
@@ -32,7 +37,10 @@ define(
                             ['\\[', '\\]'],
                             ['[mathjax]', '[/mathjax]']
                         ]
-                    }
+                    },
+                    CommonHTML: {linebreaks: {automatic: true}},
+                    SVG: {linebreaks: {automatic: true}},
+                    'HTML-CSS': {linebreaks: {automatic: true}},
                 });
 
                 // In order to eliminate all flashing during interactive
@@ -42,6 +50,33 @@ define(
                 // the fast preview setting as shown in the context menu.
                 window.MathJax.Hub.processSectionDelay = 0;
                 window.MathJax.Hub.Configured();
+
+                window.addEventListener('resize', MJrenderer);
+
+                let t = -1;
+                // eslint-disable-next-line prefer-const
+                let delay = 1000;
+                let oldWidth = document.documentElement.scrollWidth;
+                function MJrenderer() {
+                    // don't rerender if the window is the same size as before
+                    if (t >= 0) {
+                        window.clearTimeout(t);
+                    }
+                    if (oldWidth !== document.documentElement.scrollWidth) {
+                        t = window.setTimeout(function() {
+                            oldWidth = document.documentElement.scrollWidth;
+                            MathJax.Hub.Queue(
+                                ['Rerender', MathJax.Hub],
+                                [() => $('.MathJax_SVG>svg').toArray().forEach(el => {
+                                    if ($(el).width() === 0) {
+                                        $(el).css('max-width', 'inherit');
+                                    }
+                                })]
+                            );
+                            t = -1;
+                        }, delay);
+                    }
+                }
             }
         );
         window.CodeMirror = CodeMirror;
@@ -55,7 +90,7 @@ define(
          * The module should be used until we'll use RequireJS for XModules.
          * @param {Array} modules A list of urls.
          * @return {jQuery Promise}
-         **/
+         * */
         function requireQueue(modules) {
             var deferred = $.Deferred();
             function loadScript(queue) {

@@ -26,4 +26,3 @@ describe('JSInput', function() {
         expect($jsinputContainers.length).toEqual($inputFields.length);
     });
 });
-

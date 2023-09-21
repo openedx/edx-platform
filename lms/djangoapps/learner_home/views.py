@@ -343,7 +343,7 @@ def get_course_programs(user, course_enrollments, site):
     Get programs related to the courses the user is enrolled in.
 
     Returns: {
-        <course_id>: {
+        str(<course_id>): {
             "programs": [list of programs]
         }
     }

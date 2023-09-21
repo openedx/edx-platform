@@ -11,9 +11,9 @@ from rest_framework.response import Response
 
 from common.djangoapps.student.auth import has_studio_read_access
 from openedx.core.lib.api.view_utils import view_auth_classes
+from xmodule.modulestore.django import modulestore
 
-from . import adapters
-from .block_serializer import XBlockSerializer
+from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_blockstore
 
 
 @api_view(['GET'])
@@ -47,8 +47,8 @@ def get_block_olx(request, usage_key_str):
         if block_key in serialized_blocks:
             return
 
-        block = adapters.get_block(block_key)
-        serialized_blocks[block_key] = XBlockSerializer(block)
+        block = modulestore().get_item(block_key)
+        serialized_blocks[block_key] = serialize_modulestore_block_for_blockstore(block)
 
         if block.has_children:
             for child_id in block.children:
@@ -102,8 +102,8 @@ def get_block_exportfs_file(request, usage_key_str, path):
     if not has_studio_read_access(request.user, course_key):
         raise PermissionDenied("You must be a member of the course team in Studio to export OLX using this API.")
 
-    block = adapters.get_block(usage_key)
-    serialized = XBlockSerializer(block)
+    block = modulestore().get_item(usage_key)
+    serialized = serialize_modulestore_block_for_blockstore(block)
     static_file = None
     for f in serialized.static_files:
         if f.name == path:

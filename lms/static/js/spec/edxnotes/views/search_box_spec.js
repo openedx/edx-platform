@@ -8,6 +8,7 @@ define([
     'js/spec/edxnotes/helpers'
 ], function($, _, AjaxHelpers, HtmlUtils, SearchBoxView, NotesCollection, Helpers) {
     'use strict';
+
     describe('EdxNotes SearchBoxView', function() {
         var getSearchBox, submitForm, assertBoxIsEnabled, assertBoxIsDisabled, searchResponse;
 
