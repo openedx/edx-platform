@@ -200,6 +200,7 @@
   "openedx-4": {
     "settings": "cms.envs.test",
     "paths": [
+      "openedx/core/djangoapps/content_tagging/",
       "openedx/core/djangoapps/geoinfo/",
       "openedx/core/djangoapps/header_control/",
       "openedx/core/djangoapps/heartbeat/",
