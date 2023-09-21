@@ -19,6 +19,8 @@ import ddt
 import pytest
 
 from openedx.core.djangoapps.course_apps.toggles import EXAMS_IDA
+from openedx.core.djangoapps.course_groups.models import CourseCohortsSettings, CourseUserGroupPartitionGroup
+from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from common.djangoapps.course_modes.models import CourseMode
@@ -1715,6 +1717,190 @@ class EnrollmentTrackPartitionGroupsTestCase(OutlineProcessorTestCase):  # lint-
             processor.load_data(full_outline)
             removed_usage_keys = processor.usage_keys_to_remove(full_outline)
             assert len(removed_usage_keys) == expected_values_dict[learner_to_verify.username]
+
+
+@ddt.ddt
+class CohortPartitionGroupsTestCase(OutlineProcessorTestCase):
+    """Tests for cohort partitions outline processor that affects outlines"""
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.visibility = VisibilityData(
+            hide_from_toc=False,
+            visible_to_staff_only=False
+        )
+
+    def _create_and_enroll_learner(self, username, is_staff=False):
+        """
+        Helper function to create the learner based on the username,
+        then enroll the learner into the test course with VERIFIED
+        mode.
+        Returns the created learner
+        """
+        learner = UserFactory.create(
+            username=username, email='{}@example.com'.format(username), is_staff=is_staff
+        )
+        learner.courseenrollment_set.create(course_id=self.course_key, is_active=True, mode=CourseMode.VERIFIED)
+        return learner
+
+    def _setup_course_outline_with_sections(
+        self,
+        course_sections,
+        course_start_date=datetime(2021, 3, 26, tzinfo=timezone.utc)
+    ):
+        """
+        Helper function to update the course outline under test with
+        the course sections passed in.
+        Returns the newly constructed course outline
+        """
+        set_dates_for_course(
+            self.course_key,
+            [
+                (
+                    self.course_key.make_usage_key('course', 'course'),
+                    {'start': course_start_date}
+                )
+            ]
+        )
+
+        new_outline = CourseOutlineData(
+            course_key=self.course_key,
+            title="Cohort User Partition Test Course",
+            published_at=course_start_date,
+            published_version="8ebece4b69dd593d82fe2023",
+            sections=course_sections,
+            self_paced=False,
+            days_early_for_beta=None,
+            entrance_exam_id=None,
+            course_visibility=CourseVisibility.PRIVATE,
+        )
+
+        replace_course_outline(new_outline)
+
+        return new_outline
+
+    @ddt.data(
+        (
+            None,
+            None,
+            ['student1', 'student2'],
+            {'student1': 1, 'student2': 1}
+        ),
+        (
+            set([1001]),
+            None,
+            ['student1', 'student2'],
+            {'student1': 1, 'student2': 0}
+        ),
+        (
+            set([1002]),
+            None,
+            ['student1', 'student2'],
+            {'student1': 0, 'student2': 1}
+        ),
+        (
+            set([1001, 1002]),
+            None,
+            ['student1', 'student2'],
+            {'student1': 1, 'student2': 1}
+        ),
+        (
+            None,
+            set([1001]),
+            ['student1', 'student2'],
+            {'student1': 1, 'student2': 0}
+        ),
+        (
+            None,
+            set([1002]),
+            ['student1', 'student2'],
+            {'student1': 0, 'student2': 1}
+        ),
+        (
+            None,
+            set([1001, 1002]),
+            ['student1', 'student2'],
+            {'student1': 1, 'student2': 1}
+        ),
+    )
+    @ddt.unpack
+    def test_cohort_partition_on_outline(
+        self,
+        section_visible_groups,
+        sequence_visible_groups,
+        learners,
+        expected_values_dict
+    ):
+
+        section_user_partition_groups = None
+        sequence_user_partition_groups = None
+        if section_visible_groups:
+            section_user_partition_groups = {
+                1000: frozenset(section_visible_groups)
+            }
+        if sequence_visible_groups:
+            sequence_user_partition_groups = {
+                1000: frozenset(sequence_visible_groups)
+            }
+
+        CourseCohortsSettings.objects.create(course_id=self.course_key, is_cohorted=True)
+
+        # Enroll students in the course
+        learners_to_verify = []
+        for username in learners:
+            learners_to_verify.append(
+                self._create_and_enroll_learner(username)
+            )
+
+        # Create cohorts and corresponding GroupPartitions
+        cohort_1 = CohortFactory(
+            course_id=self.course_key,
+            name='Test Cohort 1',
+            users=[learners_to_verify[0]]
+        )
+
+        CourseUserGroupPartitionGroup(
+            course_user_group=cohort_1,
+            partition_id=1000,
+            group_id=1001
+        ).save()
+
+        cohort_2 = CohortFactory(
+            course_id=self.course_key,
+            name='Test Cohort 2',
+            users=[learners_to_verify[1]]
+        )
+
+        CourseUserGroupPartitionGroup(
+            course_user_group=cohort_2,
+            partition_id=1000,
+            group_id=1002
+        ).save()
+
+        self._setup_course_outline_with_sections(
+            [
+                CourseSectionData(
+                    usage_key=self.course_key.make_usage_key('chapter', '0'),
+                    title="Section 0",
+                    user_partition_groups=section_user_partition_groups,
+                    sequences=[
+                        CourseLearningSequenceData(
+                            usage_key=self.course_key.make_usage_key('subsection', '0'),
+                            title='Subsection 0',
+                            visibility=self.visibility,
+                            user_partition_groups=sequence_user_partition_groups,
+                        ),
+                    ]
+                )
+            ]
+        )
+
+        check_date = datetime(2021, 3, 27, tzinfo=timezone.utc)
+
+        for learner_to_verify in learners_to_verify:
+            learner_details = get_user_course_outline_details(self.course_key, learner_to_verify, check_date)
+            assert len(learner_details.outline.accessible_sequences) == expected_values_dict[learner_to_verify.username]
 
 
 class ContentErrorTestCase(CacheIsolationTestCase):

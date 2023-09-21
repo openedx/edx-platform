@@ -313,7 +313,7 @@ class ContentLibrariesTestMixin:
         block_data = self._add_block_to_library(lib_id, "problem", "problem1")
         self.assertDictContainsEntries(block_data, {
             "id": "lb:CL-TEST:testlib1:problem:problem1",
-            "display_name": "Blank Advanced Problem",
+            "display_name": "Blank Problem",
             "block_type": "problem",
             "has_unpublished_changes": True,
         })

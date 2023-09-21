@@ -4,13 +4,15 @@ Handlers for notifications
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.dispatch import receiver
 from openedx_events.learning.signals import (
     COURSE_ENROLLMENT_CREATED,
     COURSE_UNENROLLMENT_COMPLETED,
     USER_NOTIFICATION_REQUESTED
 )
+from django.db.models.signals import post_save
+import traceback
 
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.models import CourseNotificationPreference
@@ -26,12 +28,13 @@ def course_enrollment_post_save(signal, sender, enrollment, metadata, **kwargs):
     """
     if ENABLE_NOTIFICATIONS.is_enabled(enrollment.course.course_key):
         try:
-            CourseNotificationPreference.objects.create(
-                user_id=enrollment.user.id,
-                course_id=enrollment.course.course_key
-            )
+            with transaction.atomic():
+                CourseNotificationPreference.objects.create(
+                    user_id=enrollment.user.id,
+                    course_id=enrollment.course.course_key
+                )
         except IntegrityError:
-            log.info(f'CourseNotificationPreference already exists for user {enrollment.user} '
+            log.info(f'CourseNotificationPreference already exists for user {enrollment.user.id} '
                      f'and course {enrollment.course.course_key}')
 
 
@@ -58,3 +61,16 @@ def generate_user_notifications(signal, sender, notification_data, metadata, **k
     notification_data = notification_data.__dict__
     notification_data['course_key'] = str(notification_data['course_key'])
     send_notifications.delay(**notification_data)
+
+
+@receiver(post_save, sender=CourseNotificationPreference)
+def notification_post_save(signal, sender, instance, created, **kwargs):
+    """
+    Watches for post_save signal for update on the CourseNotificationPreference table.
+    Generate a log with traceback if CourseNotificationPreference is updated
+    """
+    if not created:
+        # Get the stack trace
+        stack_trace = traceback.format_stack()
+        # Log the update along with the stack trace
+        log.info(f"{sender.__name__} (ID: {instance.pk}) was updated. Update induced by:\n{stack_trace}")

@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-08-27 20:36+0000\n"
-"PO-Revision-Date: 2023-08-27 20:36:19.015386\n"
+"POT-Creation-Date: 2023-09-20 12:47+0000\n"
+"PO-Revision-Date: 2023-09-20 12:47:19.650590\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -141,8 +141,8 @@ msgid "Video"
 msgstr "Vᴉdǝø"
 
 #: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr "Ƀlɐnʞ Ⱥdʌɐnɔǝd Ᵽɹøblǝɯ"
+msgid "Blank Problem"
+msgstr "Ƀlɐnʞ Ᵽɹøblǝɯ"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -247,8 +247,8 @@ msgstr "Ᵽɹøɟǝssᴉønɐl Ɇd"
 #: common/djangoapps/course_modes/models.py xmodule/annotatable_block.py
 #: xmodule/capa_block.py xmodule/conditional_block.py
 #: xmodule/discussion_block.py xmodule/html_block.py
-#: xmodule/library_content_block.py xmodule/library_sourced_block.py
-#: xmodule/lti_block.py xmodule/split_test_block.py xmodule/unit_block.py
+#: xmodule/library_content_block.py xmodule/lti_block.py
+#: xmodule/split_test_block.py xmodule/unit_block.py
 #: xmodule/word_cloud_block.py xmodule/x_module.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
@@ -3046,6 +3046,14 @@ msgid "Open Response Assessment"
 msgstr "Ødǝn Ɍǝsdønsǝ Ⱥssǝssɯǝnʇ"
 
 #: lms/djangoapps/courseware/courses.py
+msgid ""
+"This Open Response Assessment's due dates are set by your instructor and "
+"can't be shifted."
+msgstr ""
+"Ŧɥᴉs Ødǝn Ɍǝsdønsǝ Ⱥssǝssɯǝnʇ's dnǝ dɐʇǝs ɐɹǝ sǝʇ bʎ ʎønɹ ᴉnsʇɹnɔʇøɹ ɐnd "
+"ɔɐn'ʇ bǝ sɥᴉɟʇǝd."
+
+#: lms/djangoapps/courseware/courses.py
 msgid "Self Assessment"
 msgstr "Sǝlɟ Ⱥssǝssɯǝnʇ"
 
@@ -3060,14 +3068,6 @@ msgstr "Sʇɐɟɟ Ⱥssǝssɯǝnʇ"
 #: lms/djangoapps/courseware/courses.py
 msgid "Submission"
 msgstr "Snbɯᴉssᴉøn"
-
-#: lms/djangoapps/courseware/courses.py
-msgid ""
-"Open Response Assessment due dates are set by your instructor and can't be "
-"shifted."
-msgstr ""
-"Ødǝn Ɍǝsdønsǝ Ⱥssǝssɯǝnʇ dnǝ dɐʇǝs ɐɹǝ sǝʇ bʎ ʎønɹ ᴉnsʇɹnɔʇøɹ ɐnd ɔɐn'ʇ bǝ "
-"sɥᴉɟʇǝd."
 
 #. Translators: 'absolute' is a date such as "Jan 01,
 #. 2020". 'relative' is a fuzzy description of the time until
@@ -3593,6 +3593,16 @@ msgstr ""
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Good"
 msgstr "Ǥøød"
+
+#. Translators: Replier commented on "your" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "your"
+msgstr "ʎønɹ"
+
+#. Translators: Replier commented on "their" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "their"
+msgstr "ʇɥǝᴉɹ"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #, python-format
@@ -5789,7 +5799,6 @@ msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
 #: openedx/core/djangoapps/user_api/admin.py
-#: xmodule/templates/library-sourced-block-studio-view.html
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/videos_index_pagination.html
@@ -6250,13 +6259,13 @@ msgid "Quotes"
 msgstr "Qnøʇǝs"
 
 #: lms/templates/wiki/includes/editor_widget.html
-#, python-format
+#, python-brace-format
 msgid ""
-"Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for"
-" help."
+"Markdown syntax is allowed. See the {start_link}cheatsheet{end_link} for "
+"help."
 msgstr ""
-"Mɐɹʞdøʍn sʎnʇɐx ᴉs ɐlløʍǝd. Sǝǝ ʇɥǝ %(start_link)sɔɥǝɐʇsɥǝǝʇ%(end_link)s ɟøɹ"
-" ɥǝld."
+"Mɐɹʞdøʍn sʎnʇɐx ᴉs ɐlløʍǝd. Sǝǝ ʇɥǝ {start_link}ɔɥǝɐʇsɥǝǝʇ{end_link} ɟøɹ "
+"ɥǝld."
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
@@ -7293,11 +7302,11 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
-"The Posting availabilty in discussions whether it will be enabled, scheduled"
-" or indefinitely disabled."
+"The Posting availability in discussions whether it will be enabled, "
+"scheduled or indefinitely disabled."
 msgstr ""
-"Ŧɥǝ Ᵽøsʇᴉnƃ ɐʌɐᴉlɐbᴉlʇʎ ᴉn dᴉsɔnssᴉøns ʍɥǝʇɥǝɹ ᴉʇ ʍᴉll bǝ ǝnɐblǝd, sɔɥǝdnlǝd"
-" øɹ ᴉndǝɟᴉnᴉʇǝlʎ dᴉsɐblǝd."
+"Ŧɥǝ Ᵽøsʇᴉnƃ ɐʌɐᴉlɐbᴉlᴉʇʎ ᴉn dᴉsɔnssᴉøns ʍɥǝʇɥǝɹ ᴉʇ ʍᴉll bǝ ǝnɐblǝd, "
+"sɔɥǝdnlǝd øɹ ᴉndǝɟᴉnᴉʇǝlʎ dᴉsɐblǝd."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "The LTI configuration data for this context/provider."
@@ -7482,11 +7491,11 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "<{p}><{strong}>{replier_name}</{strong}> commented on "
-"<{strong}>{author_name}'s</{strong}> response to your post "
+"<{strong}>{author_name}</{strong}> response to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
 "<{p}><{strong}>{replier_name}</{strong}> ɔøɯɯǝnʇǝd øn "
-"<{strong}>{author_name}'s</{strong}> ɹǝsdønsǝ ʇø ʎønɹ døsʇ "
+"<{strong}>{author_name}</{strong}> ɹǝsdønsǝ ʇø ʎønɹ døsʇ "
 "<{strong}>{post_title}</{strong}></{p}>"
 
 #: openedx/core/djangoapps/notifications/base_notification.py
@@ -7497,6 +7506,32 @@ msgid ""
 msgstr ""
 "<{p}><{strong}>{replier_name}</{strong}> ɹǝsdøndǝd ʇø ʎønɹ døsʇ "
 "<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> posted "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{username}</{strong}> døsʇǝd "
+"<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> asked "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{username}</{strong}> ɐsʞǝd "
+"<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+msgid ""
+"Notifications for responses and comments on your posts, and the ones you’re "
+"following, including endorsements to your responses and on your posts."
+msgstr ""
+"Nøʇᴉɟᴉɔɐʇᴉøns ɟøɹ ɹǝsdønsǝs ɐnd ɔøɯɯǝnʇs øn ʎønɹ døsʇs, ɐnd ʇɥǝ ønǝs ʎøn’ɹǝ "
+"ɟølløʍᴉnƃ, ᴉnɔlndᴉnƃ ǝndøɹsǝɯǝnʇs ʇø ʎønɹ ɹǝsdønsǝs ɐnd øn ʎønɹ døsʇs."
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "The notification preference config version is not up to date."
@@ -9320,8 +9355,7 @@ msgstr "XMŁ dɐʇɐ ɟøɹ ʇɥǝ ɐnnøʇɐʇᴉøn"
 #: xmodule/annotatable_block.py xmodule/capa_block.py
 #: xmodule/conditional_block.py xmodule/discussion_block.py
 #: xmodule/html_block.py xmodule/library_content_block.py
-#: xmodule/library_root_xblock.py xmodule/library_sourced_block.py
-#: xmodule/poll_block.py xmodule/unit_block.py
+#: xmodule/library_root_xblock.py xmodule/poll_block.py xmodule/unit_block.py
 #: xmodule/video_block/video_xfields.py xmodule/word_cloud_block.py
 #: xmodule/x_module.py
 msgid "The display name for this component."
@@ -11533,35 +11567,6 @@ msgstr "Łᴉbɹɐɹʎ Đᴉsdlɐʎ Nɐɯǝ"
 msgid "Enter the names of the advanced components to use in your library."
 msgstr "Ɇnʇǝɹ ʇɥǝ nɐɯǝs øɟ ʇɥǝ ɐdʌɐnɔǝd ɔøɯdønǝnʇs ʇø nsǝ ᴉn ʎønɹ lᴉbɹɐɹʎ."
 
-#: xmodule/library_sourced_block.py
-msgid "Library Blocks List"
-msgstr "Łᴉbɹɐɹʎ Ƀløɔʞs Łᴉsʇ"
-
-#: xmodule/library_sourced_block.py
-msgid "Enter the IDs of the library XBlocks that you wish to use."
-msgstr "Ɇnʇǝɹ ʇɥǝ ƗĐs øɟ ʇɥǝ lᴉbɹɐɹʎ XɃløɔʞs ʇɥɐʇ ʎøn ʍᴉsɥ ʇø nsǝ."
-
-#: xmodule/library_sourced_block.py
-#, python-brace-format
-msgid "A maximum of {0} components may be added."
-msgstr "Ⱥ ɯɐxᴉɯnɯ øɟ {0} ɔøɯdønǝnʇs ɯɐʎ bǝ ɐddǝd."
-
-#: xmodule/library_sourced_block.py
-msgid ""
-"No XBlock has been configured for this component. Use the editor to select "
-"the target blocks."
-msgstr ""
-"Nø XɃløɔʞ ɥɐs bǝǝn ɔønɟᴉƃnɹǝd ɟøɹ ʇɥᴉs ɔøɯdønǝnʇ. Ʉsǝ ʇɥǝ ǝdᴉʇøɹ ʇø sǝlǝɔʇ "
-"ʇɥǝ ʇɐɹƃǝʇ bløɔʞs."
-
-#: xmodule/library_sourced_block.py
-msgid "Open Editor"
-msgstr "Ødǝn Ɇdᴉʇøɹ"
-
-#: xmodule/library_sourced_block.py
-msgid "Importing Library Block failed - are the IDs valid and readable?"
-msgstr "Ɨɯdøɹʇᴉnƃ Łᴉbɹɐɹʎ Ƀløɔʞ ɟɐᴉlǝd - ɐɹǝ ʇɥǝ ƗĐs ʌɐlᴉd ɐnd ɹǝɐdɐblǝ?"
-
 #: xmodule/lti_block.py
 msgid ""
 "The display name for this component. Analytics reports may also use the "
@@ -12264,10 +12269,6 @@ msgstr "Ŧɥᴉs ɔønʇǝnʇ ǝxdǝɹᴉɯǝnʇ ɥɐs ᴉssnǝs ʇɥɐʇ ɐɟɟ
 #: xmodule/tabs.py
 msgid "External Discussion"
 msgstr "Ɇxʇǝɹnɐl Đᴉsɔnssᴉøn"
-
-#: xmodule/templates/library-sourced-block-studio-view.html
-msgid "Save and Import"
-msgstr "Sɐʌǝ ɐnd Ɨɯdøɹʇ"
 
 #: xmodule/vertical_block.py
 msgid "Enable in-context discussions for the Unit"
@@ -16212,10 +16213,6 @@ msgstr "Đøʍnløɐd sʇndǝnʇ ƃɹɐdǝs"
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Print or share your certificate:"
 msgstr "Ᵽɹᴉnʇ øɹ sɥɐɹǝ ʎønɹ ɔǝɹʇᴉɟᴉɔɐʇǝ:"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-msgid "Click the link to see my certificate."
-msgstr "Ȼlᴉɔʞ ʇɥǝ lᴉnʞ ʇø sǝǝ ɯʎ ɔǝɹʇᴉɟᴉɔɐʇǝ."
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
@@ -24520,10 +24517,6 @@ msgstr "Ȼønɹsǝ Nɐʌᴉƃɐʇᴉøn"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Ønʇlᴉnǝ"
-
-#: cms/templates/widgets/header.html
-msgid "Files & Media"
-msgstr "Fᴉlǝs & Mǝdᴉɐ"
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"
