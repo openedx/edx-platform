@@ -1791,6 +1791,9 @@ INSTALLED_APPS = [
 
     # Blockstore
     'blockstore.apps.bundles',
+
+    # alternative swagger generator for CMS API
+    'drf_spectacular',
 ]
 
 
@@ -2771,3 +2774,16 @@ DISCUSSIONS_INCONTEXT_LEARNMORE_URL = ''
 #### django-simple-history##
 # disable indexing on date field its coming django-simple-history.
 SIMPLE_HISTORY_DATE_INDEX = False
+
+# This affects the CMS API swagger docs but not the legacy swagger docs under /api-docs/.
+REST_FRAMEWORK['DEFAULT_SCHEMA_CLASS'] = 'drf_spectacular.openapi.AutoSchema'
+
+# These fields override the spectacular settings default values.
+# Any fields not included here will use the default values.
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'CMS API',
+    'DESCRIPTION': 'Experimental API to edit xblocks and course content. Danger: Do not use on running courses!',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'PREPROCESSING_HOOKS': ['cms.lib.spectacular.cms_api_filter'],  # restrict spectacular to CMS API endpoints
+}

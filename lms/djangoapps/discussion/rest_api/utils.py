@@ -13,6 +13,7 @@ from django.utils.translation import gettext_lazy as _
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
+from lms.djangoapps.discussion.django_comment_client.permissions import get_team
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from openedx.core.djangoapps.course_groups.models import CourseCohortsSettings, CourseUserGroup
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, PostingRestriction
@@ -370,16 +371,6 @@ def get_archived_topics(filtered_topic_ids: List[str], topics: List[Dict[str, st
     return archived_topics
 
 
-def send_response_notifications(thread, course, creator, parent_id=None):
-    """
-    Send notifications to users who are subscribed to the thread.
-    """
-    notification_sender = DiscussionNotificationSender(thread, course, creator, parent_id)
-    notification_sender.send_new_comment_notification()
-    notification_sender.send_new_response_notification()
-    notification_sender.send_new_comment_on_response_notification()
-
-
 def is_discussion_cohorted(course_key_str):
     """
     Returns if the discussion is divided by cohorts
@@ -460,8 +451,13 @@ class DiscussionNotificationSender:
         all_topics = divided_inline_discussions + divided_course_wide_discussions
         topic_divided = topic_id in all_topics or discussion_settings.always_divide_inline_discussions
 
+        # Team object from topic id
+        team = get_team(topic_id)
+
         user_ids = []
-        if discussion_cohorted and topic_divided and group_id is not None:
+        if team:
+            user_ids = team.users.all().values_list('id', flat=True)
+        elif discussion_cohorted and topic_divided and group_id is not None:
             users_in_cohort = CourseUserGroup.objects.filter(
                 course_id=course_key_str, id=group_id
             ).values_list('users__id', flat=True)

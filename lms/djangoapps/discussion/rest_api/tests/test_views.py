@@ -1360,10 +1360,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         super().setUp()
         self.url = reverse("thread-list")
 
-    @mock.patch(
-        'lms.djangoapps.discussion.rest_api.tasks.send_thread_created_notification.apply_async'
-    )
-    def test_basic(self, mock_notification_task):
+    def test_basic(self):
         self.register_get_user_response(self.user)
         cs_thread = make_minimal_cs_thread({
             "id": "test_thread",
@@ -1384,7 +1381,6 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             content_type="application/json"
         )
         assert response.status_code == 200
-        mock_notification_task.assert_called_once()
         response_data = json.loads(response.content.decode('utf-8'))
         assert response_data == self.expected_thread_data({
             "read": True,
