@@ -223,7 +223,7 @@ class ConditionalBlock(
 
     def get_html(self):
         required_html_ids = [block.location.html_id() for block in self.get_required_blocks]
-        return self.runtime.service(self, 'mako').render_template('conditional_ajax.html', {
+        return self.runtime.service(self, 'mako').render_lms_template('conditional_ajax.html', {
             'element_id': self.location.html_id(),
             'ajax_url': self.ajax_url,
             'depends': ';'.join(required_html_ids)
@@ -249,7 +249,7 @@ class ConditionalBlock(
         Return the studio view.
         """
         fragment = Fragment(
-            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
+            self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
         add_webpack_js_to_fragment(fragment, 'ConditionalBlockEditor')
         shim_xmodule_js(fragment, self.studio_js_module_name)
@@ -262,7 +262,7 @@ class ConditionalBlock(
         if not self.is_condition_satisfied():
             context = {'module': self,
                        'message': self.conditional_message}
-            html = self.runtime.service(self, 'mako').render_template('conditional_block.html', context)
+            html = self.runtime.service(self, 'mako').render_lms_template('conditional_block.html', context)
             return json.dumps({'fragments': [{'content': html}], 'message': bool(self.conditional_message)})
 
         fragments = [child.render(STUDENT_VIEW).to_dict() for child in self.get_children()]

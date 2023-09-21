@@ -11,6 +11,7 @@ from openedx.core.djangoapps.notifications.models import (
     Notification,
     get_notification_channels
 )
+from .base_notification import COURSE_NOTIFICATION_APPS, COURSE_NOTIFICATION_TYPES
 
 
 class CourseOverviewSerializer(serializers.ModelSerializer):
@@ -45,6 +46,22 @@ class UserCourseNotificationPreferenceSerializer(serializers.ModelSerializer):
         fields = ('id', 'course_name', 'course_id', 'notification_preference_config',)
         read_only_fields = ('id', 'course_name', 'course_id',)
         write_only_fields = ('notification_preference_config',)
+
+    def to_representation(self, instance):
+        """
+        Override to_representation to add info of all notification types
+        """
+        value = super().to_representation(instance)
+        config = value['notification_preference_config']
+        for notification_app, app_prefs in config.items():
+            notification_types = app_prefs.get('notification_types', {})
+            for notification_type, type_prefs in notification_types.items():
+                if notification_type == "core":
+                    type_info = COURSE_NOTIFICATION_APPS.get(notification_app, {}).get('core_info', '')
+                else:
+                    type_info = COURSE_NOTIFICATION_TYPES.get(notification_type, {}).get('info', '')
+                type_prefs['info'] = type_info
+        return value
 
     def get_course_name(self, obj):
         """

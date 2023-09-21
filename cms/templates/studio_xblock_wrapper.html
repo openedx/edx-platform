@@ -94,88 +94,45 @@ block_is_unit = is_unit(xblock)
                                     <span class="action-button-text">${_("Edit")}</span>
                                 </button>
                             </li>
-                            % if can_edit_visibility and not enable_copy_paste:
-                                <li class="action-item action-visibility">
-                                    <button data-tooltip="${_("Access Settings")}" class="btn-default access-button action-button">
-                                        <span class="icon fa fa-gear" aria-hidden="true"></span>
-                                        <span class="sr">${_("Set Access")}</span>
-                                    </button>
-                                </li>
-                            % endif
-                            % if can_add and not enable_copy_paste:
-                                <li class="action-item action-duplicate">
-                                    <button data-tooltip="${_("Duplicate")}" class="btn-default duplicate-button action-button">
-                                    <span class="icon fa fa-copy" aria-hidden="true"></span>
-                                    <span class="sr">${_("Duplicate")}</span>
-                                    </button>
-                                </li>
-                            % endif
-                            % if can_move and not enable_copy_paste:
-                                <li class="action-item action-move">
-                                    <button data-tooltip="${_("Move")}" class="btn-default move-button action-button">
-                                        <span class="stack-move-icon fa-stack fa-lg ">
-                                            <span class="fa fa-file-o fa-stack-2x fa-fw" aria-hidden="true"></span>
-                                            <span class="fa fa-arrow-right fa-stack-1x fa-fw" aria-hidden="true"></span>
-                                        </span>
-                                        <span class="sr">${_("Move")}</span>
-                                    </button>
-                                </li>
-                            % endif
                         % endif
-                        % if can_add and not enable_copy_paste:
-                            <!-- If we can add, we can delete. -->
-                            <li class="action-item action-delete">
-                                <button data-tooltip="${_("Delete")}" class="btn-default delete-button action-button">
-                                    <span class="icon fa fa-trash-o" aria-hidden="true"></span>
-                                    <span class="sr">${_("Delete")}</span>
-                                </button>
-                            </li>
-                        % endif
-                        % if enable_copy_paste:
-                            <!--
-                                If the "copy/paste" feature flag is enabled, all the actions besides "Edit" appear in a
-                                menu. We use .nav-dd on the parent element and .nav-item on this button to get the same
-                                dropdown menu appearance and behavior as in Studio's various other nav bars.
-                            -->
-                            <li class="action-item action-actions-menu nav-item">
-                                <button data-tooltip="${_("Actions")}" class="btn-default show-actions-menu-button action-button">
-                                    <span class="icon fa fa-ellipsis-v" aria-hidden="true"></span>
-                                    <span class="sr">${_("Actions")}</span>
-                                </button>
-                                <div class="wrapper wrapper-nav-sub" style="right: -10px; top: 45px;">
-                                    <div class="nav-sub">
-                                      <ul>
-                                        % if not show_inline:
-                                            <li class="nav-item">
-                                                <a class="copy-button" href="#" role="button">${_("Copy to Clipboard")}</a>
-                                            </li>
-                                            % if can_add:
-                                                <li class="nav-item">
-                                                    <a class="duplicate-button" href="#" role="button">${_("Duplicate")}</a>
-                                                </li>
-                                            % endif
-                                            % if can_move:
-                                                <li class="nav-item">
-                                                    <a class="move-button" href="#" role="button">${_("Move")}</a>
-                                                </li>
-                                            % endif
-                                            % if can_edit_visibility:
-                                                <li class="nav-item">
-                                                    <a class="access-button" href="#" role="button">${_("Manage Access")}</a>
-                                                </li>
-                                            % endif
-                                        % endif
+                        <li class="action-item action-actions-menu nav-item">
+                            <button data-tooltip="${_("Actions")}" class="btn-default show-actions-menu-button action-button">
+                                <span class="icon fa fa-ellipsis-v" aria-hidden="true"></span>
+                                <span class="sr">${_("Actions")}</span>
+                            </button>
+                            <div class="wrapper wrapper-nav-sub" style="right: -10px; top: 45px;">
+                                <div class="nav-sub">
+                                  <ul>
+                                    % if not show_inline:
+                                        <li class="nav-item">
+                                            <a class="copy-button" href="#" role="button">${_("Copy to Clipboard")}</a>
+                                        </li>
                                         % if can_add:
-                                            <!-- If we can add, we can delete. -->
                                             <li class="nav-item">
-                                                <a class="delete-button" href="#" role="button">${_("Delete")}</a>
+                                                <a class="duplicate-button" href="#" role="button">${_("Duplicate")}</a>
                                             </li>
                                         % endif
-                                    </ul>
-                                    </div>
-                                  </div>
-                            </li>
-                        % endif
+                                        % if can_move:
+                                            <li class="nav-item">
+                                                <a class="move-button" href="#" role="button">${_("Move")}</a>
+                                            </li>
+                                        % endif
+                                        % if can_edit_visibility:
+                                            <li class="nav-item">
+                                                <a class="access-button" href="#" role="button">${_("Manage Access")}</a>
+                                            </li>
+                                        % endif
+                                    % endif
+                                    % if can_add:
+                                        <!-- If we can add, we can delete. -->
+                                        <li class="nav-item">
+                                            <a class="delete-button" href="#" role="button">${_("Delete")}</a>
+                                        </li>
+                                    % endif
+                                </ul>
+                                </div>
+                            </div>
+                        </li>
                         % if is_reorderable:
                             <li class="action-item action-drag">
                                 <span data-tooltip="${_('Drag to reorder')}" class="drag-handle action"></span>

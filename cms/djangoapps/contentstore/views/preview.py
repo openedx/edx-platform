@@ -27,7 +27,7 @@ from xmodule.util.sandboxing import SandboxService
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, XModuleMixin
 from cms.djangoapps.xblock_config.models import StudioConfig
-from cms.djangoapps.contentstore.toggles import individualize_anonymous_user_id, ENABLE_COPY_PASTE_FEATURE
+from cms.djangoapps.contentstore.toggles import individualize_anonymous_user_id
 from cms.lib.xblock.field_data import CmsFieldData
 from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.static_replace.wrapper import replace_urls_wrapper
@@ -301,8 +301,6 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
         can_edit = context.get('can_edit', True)
         # Is this a course or a library?
         is_course = xblock.scope_ids.usage_id.context_key.is_course
-        # Copy-paste is a new feature; while we are beta-testing it, only beta users with the Waffle flag enabled see it
-        enable_copy_paste = can_edit and is_course and ENABLE_COPY_PASTE_FEATURE.is_enabled()
         template_context = {
             'xblock_context': context,
             'xblock': xblock,
@@ -311,7 +309,6 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'is_root': is_root,
             'is_reorderable': is_reorderable,
             'can_edit': can_edit,
-            'enable_copy_paste': enable_copy_paste,
             'can_edit_visibility': context.get('can_edit_visibility', is_course),
             'selected_groups_label': selected_groups_label,
             'can_add': context.get('can_add', True),

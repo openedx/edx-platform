@@ -134,7 +134,7 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         Return the studio view.
         """
         fragment = Fragment(
-            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
+            self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
         add_sass_to_fragment(fragment, 'HtmlBlockEditor.scss')
         add_webpack_js_to_fragment(fragment, 'HtmlBlockEditor')
@@ -463,7 +463,7 @@ class CourseInfoBlock(CourseInfoFields, HtmlBlockMixin):  # lint-amnesty, pylint
                 'visible_updates': course_updates[:3],
                 'hidden_updates': course_updates[3:],
             }
-            return self.runtime.service(self, 'mako').render_template(
+            return self.runtime.service(self, 'mako').render_lms_template(
                 f"{self.TEMPLATE_DIR}/course_updates.html",
                 context,
             )

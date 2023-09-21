@@ -226,6 +226,11 @@
             'hls': {
                 exports: 'Hls'
             }
+        },
+        config: {
+          text: {
+            useXhr: () => true
+          }
         }
     });
 }).call(this, require || RequireJS.require, define || RequireJS.define);

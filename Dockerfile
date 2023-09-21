@@ -54,9 +54,13 @@ RUN apt-get update && \
         python3-venv \
         python3.8 \
         python3.8-minimal \
+        # python3-dev: required for building mysqlclient python package version 2.2.0
+        python3-dev \
         libpython3.8 \
         libpython3.8-stdlib \
         libmysqlclient21 \
+        # libmysqlclient-dev: required for building mysqlclient python package version 2.2.0
+        libmysqlclient-dev \
         pkg-config \
         libssl1.1 \
         libxmlsec1-openssl \
@@ -86,13 +90,7 @@ FROM minimal-system as builder-production
 RUN apt-get update && \
     apt-get -y install --no-install-recommends \
         curl \
-        pkg-config \
-        libmysqlclient-dev \
         libssl-dev \
-        libxml2-dev \
-        libxmlsec1-dev \
-        libxslt1-dev \
-        python3-dev \
         libffi-dev \
         libfreetype6-dev \
         libgeos-dev \
@@ -149,10 +147,11 @@ COPY . .
 # Install Python requirements again in order to capture local projects
 RUN pip install -e .
 
-USER app
-
 # Production target
 FROM base as production
+
+USER app
+
 ENV EDX_PLATFORM_SETTINGS='docker-production'
 ENV SERVICE_VARIANT "${SERVICE_VARIANT}"
 ENV SERVICE_PORT "${SERVICE_PORT}"
@@ -169,9 +168,15 @@ CMD gunicorn \
 # Development target
 FROM base as development
 
-COPY --from=builder-development /edx/app/edxapp/venvs/edxapp /edx/app/edxapp/venvs/edxapp
+RUN apt-get update && \
+    apt-get -y install --no-install-recommends \
+        # wget is used in Makefile for common_constraints.txt
+        wget \
+    && \
+    apt-get clean all && \
+    rm -rf /var/lib/apt/*
 
-USER root
+COPY --from=builder-development /edx/app/edxapp/venvs/edxapp /edx/app/edxapp/venvs/edxapp
 
 RUN ln -s "$(pwd)/lms/envs/devstack-experimental.yml" "$LMS_CFG"
 RUN ln -s "$(pwd)/cms/envs/devstack-experimental.yml" "$CMS_CFG"

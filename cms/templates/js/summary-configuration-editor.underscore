@@ -1,0 +1,11 @@
+<form>
+<h3 class="modal-section-title">
+    <%- gettext('Xpert unit summaries') %>
+</h3>
+<div class="modal-section-content summary-configuration">
+    <label class="label">
+        <input type="checkbox" id="summary_configuration_enabled" name="summary_configuration_enabled" class="input input-checkbox" />
+        <%- gettext('Enable summaries') %>
+     </label>
+</div>
+</form>

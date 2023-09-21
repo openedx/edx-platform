@@ -21,8 +21,8 @@ class CountryMiddlewareTests(TestCase):
     """
     def setUp(self):
         super().setUp()
-        self.country_middleware = CountryMiddleware()
-        self.session_middleware = SessionMiddleware()
+        self.country_middleware = CountryMiddleware(get_response=lambda request: None)
+        self.session_middleware = SessionMiddleware(get_response=lambda request: None)
         self.authenticated_user = UserFactory.create()
         self.anonymous_user = AnonymousUserFactory.create()
         self.request_factory = RequestFactory()

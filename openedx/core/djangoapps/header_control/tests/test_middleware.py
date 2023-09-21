@@ -12,7 +12,7 @@ class TestHeaderControlMiddlewareProcessResponse(TestCase):
     """Test the `header_control` middleware. """
     def setUp(self):
         super().setUp()
-        self.middleware = HeaderControlMiddleware()
+        self.middleware = HeaderControlMiddleware(get_response=lambda request: None)
 
     def test_doesnt_barf_if_not_modifying_anything(self):
         fake_request = HttpRequest()

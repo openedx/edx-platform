@@ -72,7 +72,7 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
         )
 
         # Process it through the Middleware to ensure the language is available as expected.
-        assert DarkLangMiddleware().process_request(request) is None
+        assert DarkLangMiddleware(get_response=lambda request: None).process_request(request) is None
         return request
 
     def assertAcceptEquals(self, value, request):

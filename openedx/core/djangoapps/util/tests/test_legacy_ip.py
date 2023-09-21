@@ -46,5 +46,5 @@ class TestClientIP(TestCase):
         assert legacy_ip.get_legacy_ip(self.request) == expected
 
         # Check that it still works after the XFF middleware has done its dirty work
-        XForwardedForMiddleware().process_request(self.request)
+        XForwardedForMiddleware(get_response=lambda request: None).process_request(self.request)
         assert legacy_ip.get_legacy_ip(self.request) == expected
