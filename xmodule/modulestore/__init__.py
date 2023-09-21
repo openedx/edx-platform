@@ -1271,7 +1271,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         result = defaultdict(dict)
         if fields is None:
             return result
-        classes = XBlock.load_class(category)
+        classes = XBlock.load_class(category, default=self.default_class)
         cls = self.mixologist.mix(classes)
         for field_name, value in fields.items():
             field = getattr(cls, field_name)

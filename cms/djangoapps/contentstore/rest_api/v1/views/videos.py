@@ -1,5 +1,5 @@
 """
-Public rest API endpoints for the Studio Content API video assets.
+Public rest API endpoints for the CMS API video assets.
 """
 import logging
 from rest_framework.generics import (
@@ -31,7 +31,7 @@ toggles = contentstore_toggles
 @view_auth_classes()
 class VideosView(DeveloperErrorViewMixin, CreateAPIView, RetrieveAPIView, DestroyAPIView):
     """
-    public rest API endpoints for the Studio Content API video assets.
+    public rest API endpoints for the CMS API video assets.
     course_key: required argument, needed to authorize course authors and identify the video.
     video_id: required argument, needed to identify the video.
     """

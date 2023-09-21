@@ -91,11 +91,11 @@ class CourseEnrollmentListViewTest(ModuleStoreTestCase):
     def test_course_enrollment_api_permission(self):
         """
         Calls api without login.
-        Check is 403 is returned
+        Check is 401 is returned
         """
         url = reverse('enrollment-list')
         response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
@@ -241,7 +241,7 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         Test get user notification preference without login.
         """
         response = self.client.get(self.path)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     @mock.patch("eventtracking.tracker.emit")
     def test_get_user_notification_preference(self, mock_emit):
@@ -391,15 +391,33 @@ class NotificationListAPIViewTest(APITestCase):
             '<p><strong>test_user</strong> responded to your post <strong>This is a test post.</strong></p>'
         )
 
+    @mock.patch("eventtracking.tracker.emit")
+    def test_list_notifications_with_tray_opened_param(self, mock_emit):
+        """
+        Test event emission with tray_opened param is provided.
+        """
+        self.client.login(username=self.user.username, password='test')
+
+        # Make a request to the view with the tray_opened query parameter set to True.
+        response = self.client.get(self.url + "?tray_opened=True")
+
+        # Assert that the response is successful.
+        self.assertEqual(response.status_code, 200)
+
+        event_name, event_data = mock_emit.call_args[0]
+        self.assertEqual(event_name, 'edx.notifications.tray_opened')
+        self.assertEqual(event_data['user_id'], self.user.id)
+        self.assertEqual(event_data['unseen_notifications_count'], 0)
+
     def test_list_notifications_without_authentication(self):
         """
-        Test that the view returns 403 if the user is not authenticated.
+        Test that the view returns 401 if the user is not authenticated.
         """
         # Make a request to the view without authenticating.
         response = self.client.get(self.url)
 
         # Assert that the response is unauthorized.
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_list_notifications_with_expiry_date(self):
         """
@@ -515,10 +533,10 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
 
     def test_get_unseen_notifications_count_for_unauthenticated_user(self):
         """
-        Test that the endpoint returns 403 for an unauthenticated user.
+        Test that the endpoint returns 401 for an unauthenticated user.
         """
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_unseen_notifications_count_for_user_with_no_notifications(self):
         """
@@ -532,6 +550,16 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 0)
         self.assertEqual(response.data['count_by_app_name'], {'discussion': 0})
+
+    def test_get_expiry_days_in_count_view(self):
+        """
+        Tests if "notification_expiry_days" exists in API response
+        """
+        user = UserFactory()
+        self.client.login(username=user.username, password='test')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['notification_expiry_days'], 60)
 
 
 class MarkNotificationsSeenAPIViewTestCase(APITestCase):
@@ -621,10 +649,11 @@ class NotificationReadAPIViewTestCase(APITestCase):
         notifications = Notification.objects.filter(user=self.user, id=notification_id, last_read__isnull=False)
         self.assertEqual(notifications.count(), 1)
         event_name, event_data = mock_emit.call_args[0]
-        self.assertEqual(event_name, 'edx.notification.read')
+        self.assertEqual(event_name, 'edx.notifications.read')
         self.assertEqual(event_data.get('notification_metadata').get('notification_id'), notification_id)
         self.assertEqual(event_data['notification_app'], 'discussion')
         self.assertEqual(event_data['notification_type'], 'Type A')
+        self.assertEqual(event_data['first_read'], True)
 
     def test_mark_notification_read_with_other_user_notification_id(self):
         # Create a PATCH request to mark notification as read for notification_id: 2 through a different user

@@ -1,5 +1,5 @@
 """
-Public rest API endpoints for the Studio Content API Assets.
+Public rest API endpoints for the CMS API Assets.
 """
 import logging
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, CreateAPIView
@@ -21,7 +21,7 @@ toggles = contentstore_toggles
 @view_auth_classes()
 class AssetsView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAPIView):
     """
-    public rest API endpoints for the Studio Content API Assets.
+    public rest API endpoints for the CMS API Assets.
     course_key: required argument, needed to authorize course authors and identify the asset.
     asset_key_string: required argument, needed to identify the asset.
     """

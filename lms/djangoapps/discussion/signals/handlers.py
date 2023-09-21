@@ -12,6 +12,7 @@ from opaque_keys.edx.locator import LibraryLocator
 from xmodule.modulestore.django import SignalHandler
 
 from lms.djangoapps.discussion import tasks
+from lms.djangoapps.discussion.rest_api.tasks import send_response_notifications, send_thread_created_notification
 from openedx.core.djangoapps.django_comment_common import signals
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_current_site
@@ -133,3 +134,26 @@ def send_message(comment, site):  # lint-amnesty, pylint: disable=missing-functi
 def send_message_for_reported_content(user, post, site, sender):  # lint-amnesty, pylint: disable=missing-function-docstring
     context = create_message_context_for_reported_content(user, post, site, sender)
     tasks.send_ace_message_for_reported_content.apply_async(args=[context], countdown=120)
+
+
+@receiver(signals.thread_created)
+def create_thread_created_notification(*args, **kwargs):
+    """
+    Creates a notification when new thread is created
+    """
+    user = kwargs['user']
+    post = kwargs['post']
+    send_thread_created_notification.apply_async(args=[post.id, post.attributes['course_id'], user.id])
+
+
+@receiver(signals.comment_created)
+def create_comment_created_notification(*args, **kwargs):
+    """
+    Creates a notification when new response or comment is created
+    """
+    user = kwargs['user']
+    comment = kwargs['post']
+    thread_id = comment.attributes['thread_id']
+    parent_id = comment.attributes['parent_id']
+    course_key_str = comment.attributes['course_id']
+    send_response_notifications.apply_async(args=[thread_id, course_key_str, user.id, parent_id])

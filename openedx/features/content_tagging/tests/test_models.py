@@ -12,7 +12,6 @@ from openedx_tagging.core.tagging.api import create_taxonomy
 from ..models import (
     ContentLanguageTaxonomy,
     ContentAuthorTaxonomy,
-    ContentOrganizationTaxonomy,
 )
 
 
@@ -29,9 +28,6 @@ class TestSystemDefinedModels(TestCase):
         (ContentAuthorTaxonomy, "taxonomy"),  # Invalid object key
         (ContentAuthorTaxonomy, "tag"),  # Invalid external_id, User don't exits
         (ContentAuthorTaxonomy, "object"),  # Invalid object key
-        (ContentOrganizationTaxonomy, "taxonomy"),  # Invalid object key
-        (ContentOrganizationTaxonomy, "tag"),  # Invalid external_id, Organization don't exits
-        (ContentOrganizationTaxonomy, "object"),  # Invalid object key
     )
     @ddt.unpack
     def test_validations(

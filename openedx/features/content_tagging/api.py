@@ -1,12 +1,13 @@
 """
 Content Tagging APIs
 """
-from typing import Iterator, List, Type, Union
+from __future__ import annotations
+
+from typing import Iterator, List, Type
 
 import openedx_tagging.core.tagging.api as oel_tagging
 from django.db.models import QuerySet
-from opaque_keys.edx.keys import LearningContextKey
-from opaque_keys.edx.locator import BlockUsageLocator
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx_tagging.core.tagging.models import Taxonomy
 from organizations.models import Organization
 
@@ -117,9 +118,9 @@ def get_content_tags(
 
 def tag_content_object(
     taxonomy: Taxonomy,
-    tags: List,
-    object_id: Union[BlockUsageLocator, LearningContextKey],
-) -> List[ContentObjectTag]:
+    tags: list,
+    object_id: CourseKey | UsageKey,
+) -> list[ContentObjectTag]:
     """
     This is the main API to use when you want to add/update/delete tags from a content object (e.g. an XBlock or
     course).
@@ -150,4 +151,5 @@ def tag_content_object(
 get_taxonomy = oel_tagging.get_taxonomy
 get_taxonomies = oel_tagging.get_taxonomies
 get_tags = oel_tagging.get_tags
+delete_object_tags = oel_tagging.delete_object_tags
 resync_object_tags = oel_tagging.resync_object_tags
