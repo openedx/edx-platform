@@ -560,7 +560,7 @@ edx-drf-extensions==8.10.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.1.15
+edx-enterprise==4.2.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -624,6 +624,7 @@ edx-toggles==5.1.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-completion
+    #   edx-enterprise
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
     #   edx-name-affirmation
@@ -636,7 +637,7 @@ edx-when==2.4.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring
-edxval==2.4.2
+edxval==2.4.3
     # via -r requirements/edx/base.txt
 elasticsearch==7.13.4
     # via
@@ -713,7 +714,7 @@ importlib-metadata==6.8.0
     #   -r requirements/edx/base.txt
     #   markdown
     #   sphinx
-importlib-resources==6.0.1
+importlib-resources==6.1.0
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
@@ -765,7 +766,7 @@ jsonfield==3.1.0
     #   edx-submissions
     #   lti-consumer-xblock
     #   ora2
-jsonschema==4.19.0
+jsonschema==4.19.1
     # via
     #   -r requirements/edx/base.txt
     #   drf-spectacular
@@ -1027,7 +1028,7 @@ pycryptodomex==3.19.0
     #   lti-consumer-xblock
     #   pyjwkest
     #   snowflake-connector-python
-pydata-sphinx-theme==0.14.0
+pydata-sphinx-theme==0.14.1
     # via sphinx-book-theme
 pygments==2.16.1
     # via

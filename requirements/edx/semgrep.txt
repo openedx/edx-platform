@@ -40,11 +40,11 @@ glom==22.1.0
     # via semgrep
 idna==3.4
     # via requests
-importlib-resources==6.0.1
+importlib-resources==6.1.0
     # via
     #   jsonschema
     #   jsonschema-specifications
-jsonschema==4.19.0
+jsonschema==4.19.1
     # via semgrep
 jsonschema-specifications==2023.7.1
     # via jsonschema
