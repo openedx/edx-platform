@@ -13,7 +13,7 @@ from organizations.models import Organization
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import skip_unless_cms
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 
 from .. import api
 from ..models import ContentLanguageTaxonomy, TaxonomyOrg
@@ -29,7 +29,7 @@ class TestAutoTagging(ModuleStoreTestCase):
     Test if the Course and XBlock tags are automatically created
     """
 
-    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def _check_tag(self, object_id: str, taxonomy_id: int, value: str | None):
         """
@@ -69,7 +69,7 @@ class TestAutoTagging(ModuleStoreTestCase):
         self.user_id = self.user.id
 
         self.orgA = Organization.objects.create(name="Organization A", short_name="orgA")
-        self.patcher = patch("openedx.features.content_tagging.tasks.modulestore", return_value=self.store)
+        self.patcher = patch("openedx.core.djangoapps.content_tagging.tasks.modulestore", return_value=self.store)
         self.addCleanup(self.patcher.stop)
         self.patcher.start()
 

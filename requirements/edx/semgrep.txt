@@ -15,7 +15,7 @@ boltons==21.0.0
     #   face
     #   glom
     #   semgrep
-bracex==2.3.post1
+bracex==2.4
     # via wcmatch
 certifi==2023.7.22
     # via requests
@@ -40,11 +40,11 @@ glom==22.1.0
     # via semgrep
 idna==3.4
     # via requests
-importlib-resources==6.0.1
+importlib-resources==6.1.0
     # via
     #   jsonschema
     #   jsonschema-specifications
-jsonschema==4.19.0
+jsonschema==4.19.1
     # via semgrep
 jsonschema-specifications==2023.7.1
     # via jsonschema
@@ -68,9 +68,9 @@ referencing==0.30.2
     #   jsonschema-specifications
 requests==2.31.0
     # via semgrep
-rich==13.5.2
+rich==13.5.3
     # via semgrep
-rpds-py==0.10.0
+rpds-py==0.10.3
     # via
     #   jsonschema
     #   referencing
@@ -78,11 +78,11 @@ ruamel-yaml==0.17.32
     # via semgrep
 ruamel-yaml-clib==0.2.7
     # via ruamel-yaml
-semgrep==1.38.0
+semgrep==1.41.0
     # via -r requirements/edx/semgrep.in
 tomli==2.0.1
     # via semgrep
-typing-extensions==4.7.1
+typing-extensions==4.8.0
     # via
     #   rich
     #   semgrep
@@ -95,5 +95,5 @@ urllib3==1.26.16
     #   semgrep
 wcmatch==8.5
     # via semgrep
-zipp==3.16.2
+zipp==3.17.0
     # via importlib-resources
