@@ -936,8 +936,6 @@ class VideoBlockStudentViewDataTestCase(unittest.TestCase):
 @patch.object(settings, 'CONTENTSTORE', create=True, new={
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'DOC_STORE_CONFIG': {
-        # remove bok-choy
-        # 'host': 'edx.devstack.mongo' if 'BOK_CHOY_HOSTNAME' in os.environ else 'localhost',
         'host': 'localhost',
         'db': 'test_xcontent_%s' % uuid4().hex,
     },

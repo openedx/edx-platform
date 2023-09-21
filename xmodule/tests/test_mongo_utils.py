@@ -28,8 +28,6 @@ class MongoUtilsTests(TestCase):
         """
         Test that read_preference parameter gets converted to a valid pymongo read preference.
         """
-        # remove bok-choy
-        # host = 'edx.devstack.mongo' if 'BOK_CHOY_HOSTNAME' in os.environ else 'localhost'
         host = 'localhost'
         db = 'test_read_preference_%s' % uuid4().hex
         # Support for read_preference given in constant name form (ie. PRIMARY, SECONDARY_PREFERRED)

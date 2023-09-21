@@ -281,16 +281,6 @@ function getBaseConfig(config, useRequireJs) {
         'framework:custom': ['factory', initFrameworks]
     };
 
-// remove bok-choy
-    // if (process.env.hasOwnProperty('BOK_CHOY_HOSTNAME')) {
-    //     hostname = process.env.BOK_CHOY_HOSTNAME;
-    //     if (hostname === 'edx.devstack.lms') {
-    //         port = 19876;
-    //     } else {
-    //         port = 19877;
-    //     }
-    // }
-
     initFrameworks.$inject = ['config.files'];
 
     return {

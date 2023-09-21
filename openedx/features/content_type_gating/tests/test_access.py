@@ -228,8 +228,6 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):  # pyli
                 graded=False,
             )
             cls.graded_score_weight_blocks[(graded, has_score, weight)] = block
-        # remove bok-choy
-        # host = os.environ.get('BOK_CHOY_HOSTNAME', '127.0.0.1')
         host = os.environ.get('127.0.0.1')
         metadata_lti_xblock = {
             'lti_id': 'correct_lti_id',
