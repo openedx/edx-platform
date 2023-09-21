@@ -7,7 +7,7 @@ from .common import StrictSerializer
 
 class TranscriptSerializer(StrictSerializer):
     """
-    Strict Serializer for video imgage files.
+    Strict Serializer for video transcripts.
     """
     file=serializers.FileField()
     edx_video_id=serializers.CharField()

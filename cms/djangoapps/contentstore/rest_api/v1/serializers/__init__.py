@@ -16,3 +16,4 @@ from .settings import CourseSettingsSerializer
 from .xblock import XblockSerializer
 from .videos import VideoUploadSerializer, VideoImageSerializer
 from .transcripts import TranscriptSerializer
+from .assets import AssetSerializer

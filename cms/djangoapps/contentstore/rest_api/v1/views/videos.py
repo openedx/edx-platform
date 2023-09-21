@@ -27,6 +27,7 @@ from cms.djangoapps.contentstore.video_storage_handlers import (
 )
 from cms.djangoapps.contentstore.rest_api.v1.serializers import VideoUploadSerializer, VideoImageSerializer
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
+from .utils import run_if_valid
 
 
 log = logging.getLogger(__name__)
@@ -59,7 +60,7 @@ class VideosView(DeveloperErrorViewMixin, CreateAPIView, RetrieveAPIView, Destro
     def create(self, request, course_key):  # pylint: disable=arguments-differ
         """Deprecated. Use the upload_link endpoint instead."""
         callback = lambda: handle_videos(request, course_key.html_id())
-        return _run_if_valid(request, context=self, callback=callback)
+        return run_if_valid(request, context=self, callback=callback)
 
     @course_author_access_required
     def retrieve(self, request, course_key, edx_video_id=None):  # pylint: disable=arguments-differ
@@ -97,7 +98,7 @@ class VideoImagesView(DeveloperErrorViewMixin, CreateAPIView):
     @expect_json_in_class_view
     def create(self, request, course_key, edx_video_id=None):  # pylint: disable=arguments-differ
         callback = lambda: handle_video_images(request, course_key.html_id(), edx_video_id)
-        return _run_if_valid(request, context=self, callback=callback)
+        return run_if_valid(request, context=self, callback=callback)
 
 
 @view_auth_classes()
@@ -169,22 +170,4 @@ class UploadLinkView(DeveloperErrorViewMixin, CreateAPIView):
     @expect_json_in_class_view
     def create(self, request, course_key):  # pylint: disable=arguments-differ
         callback = lambda: handle_videos(request, course_key.html_id())
-        return _run_if_valid(request, context=self, callback=callback)
-
-
-def _validate(request, context=None):
-    """ Validate request data using the serializer in the context."""
-    serializer = context.get_serializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-
-
-def _run_if_valid(request, context=None, callback=None):
-    """
-    First, run a validation using the serializer in the context on the request data.
-    If this succeeds, run the callback, else, return a 400 response.
-    """
-    try:
-        _validate(request, context)
-        return callback()
-    except serializers.ValidationError as e:
-        return HttpResponseBadRequest(reason=e.detail)
+        return run_if_valid(request, context=self, callback=callback)

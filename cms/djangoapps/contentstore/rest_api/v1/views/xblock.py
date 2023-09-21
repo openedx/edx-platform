@@ -15,6 +15,7 @@ from cms.djangoapps.contentstore.xblock_storage_handlers import view_handlers
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
 
 from cms.djangoapps.contentstore.rest_api.v1.serializers import XblockSerializer
+from .utils import run_if_valid
 
 
 log = logging.getLogger(__name__)
@@ -70,13 +71,5 @@ class XblockView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAP
     @course_author_access_required
     @expect_json_in_class_view
     def create(self, request, course_key, usage_key_string=None):
-        try:
-            self._validate(request)
-        except serializers.ValidationError as e:
-            return HttpResponseBadRequest(reason=e.detail)
-
-        return handle_xblock(request, usage_key_string)
-
-    def _validate(self, request):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        callback = lambda: handle_xblock(request, usage_key_string)
+        return run_if_valid(request, context=self, callback=callback)

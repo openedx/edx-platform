@@ -14,6 +14,12 @@ from ....api import course_author_access_required
 from cms.djangoapps.contentstore.asset_storage_handlers import handle_assets
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
 
+from cms.djangoapps.contentstore.rest_api.v1.serializers import AssetSerializer
+from .utils import run_if_valid
+
+from rest_framework.parsers import (MultiPartParser, FormParser)
+from openedx.core.lib.api.parsers import TypedFileUploadParser
+
 log = logging.getLogger(__name__)
 toggles = contentstore_toggles
 
@@ -25,6 +31,9 @@ class AssetsView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAP
     course_key: required argument, needed to authorize course authors and identify the asset.
     asset_key_string: required argument, needed to identify the asset.
     """
+    serializer_class = AssetSerializer
+    parser_classes = (MultiPartParser, FormParser, TypedFileUploadParser)
+
 
     def dispatch(self, request, *args, **kwargs):
         # TODO: probably want to refactor this to a decorator.
@@ -45,12 +54,14 @@ class AssetsView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAP
     @csrf_exempt
     @course_author_access_required
     def create(self, request, course_key):  # pylint: disable=arguments-differ
-        return handle_assets(request, course_key.html_id())
+        callback = lambda: handle_assets(request, course_key.html_id())
+        return run_if_valid(request, context=self, callback=callback)
 
     @course_author_access_required
     @expect_json_in_class_view
     def update(self, request, course_key, asset_key_string):  # pylint: disable=arguments-differ
-        return handle_assets(request, course_key.html_id(), asset_key_string)
+        callback = lambda: handle_assets(request, course_key.html_id(), asset_key_string)
+        return run_if_valid(request, context=self, callback=callback)
 
     @course_author_access_required
     @expect_json_in_class_view
