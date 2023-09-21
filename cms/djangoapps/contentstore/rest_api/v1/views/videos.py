@@ -96,7 +96,8 @@ class VideoImagesView(DeveloperErrorViewMixin, CreateAPIView):
     @course_author_access_required
     @expect_json_in_class_view
     def create(self, request, course_key, edx_video_id=None):  # pylint: disable=arguments-differ
-        return handle_video_images(request, course_key.html_id(), edx_video_id)
+        callback = lambda: handle_video_images(request, course_key.html_id(), edx_video_id)
+        return _run_if_valid(request, context=self, callback=callback)
 
 
 @view_auth_classes()
