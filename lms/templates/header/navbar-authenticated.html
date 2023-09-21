@@ -8,6 +8,8 @@
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_enabled, released_languages
+
 %>
 
 <%
@@ -26,9 +28,42 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
     help_link = doc_link
 %>
 
+<style>
+
+  
+  .select-header {
+    
+  }
+  
+  .options {
+    display: none;
+    position: absolute;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: #fff;
+  }
+  
+  .option {
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    gap:5px
+  }
+  
+  .option:hover {
+    background-color: #f0f0f0;
+  }
+  .show{
+    display: block;
+    
+  }
+
+</style>
+
+
 <div class="nav-links">
   <div class="main">
-    % if show_dashboard_tabs:
+
       <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
         <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}"
              aria-current="${'page' if reverse('dashboard') == request.path else 'false'}">
@@ -43,22 +78,97 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
           </a>
         </div>
       % endif
-    % endif
+   
     % if show_explore_courses:
       <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
           <a class="tab-nav-link discover-new-link" href="${marketing_link('COURSES')}"
              aria-current="${'page' if '/courses' in request.path else 'false'}">
-             Explore Course
+             Explore Courses
           </a>
       </div>
     % endif
+   
   </div>
-  <div class="secondary">
-    % if enable_help_link:
-      <div class="mobile-nav-item hidden-mobile nav-item">
-        <a class="help-link" href="${help_link}" rel="noopener" target="_blank">${_("Help")}</a>
+  <div class="secondary" style="display:flex;">
+    <div style="display:flex">
+        % if enable_help_link:
+        <div class="mobile-nav-item hidden-mobile nav-item">
+          <a class="help-link" href="${help_link}" rel="noopener" target="_blank">${_("Help")}</a>
+        </div>
+      % endif
+
+       % if header_language_selector_is_enabled():
+        <div >
+        <% languages = released_languages() %>
+        % if len(languages) > 1:
+            <form action="/i18n/setlang/" method="post" class="settings-language-form" id="language-settings-form">
+                <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+                % if user.is_authenticated:
+                    <input title="preference api" type="hidden" class="url-endpoint" value="${reverse('preferences_api', kwargs={'username': user.username})}" data-user-is-authenticated="true">
+                % else:
+                    <input title="session update url" type="hidden" class="url-endpoint" value="${reverse('session_language')}" data-user-is-authenticated="false">
+                % endif
+                 <div class="custom-select">
+                  <div class="select-header">
+                    
+                    % if LANGUAGE_CODE :
+                      <div>
+                          <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55.2 38.4" style="width:24px;" xml:space="preserve"><style type="text/css">.st0{fill:#DA251D;} .st1{fill:#FFFF00;}</style><g><path class="st0" d="M3.01,0h49.17c1.66,0.01,3.01,1.37,3.01,3.03v32.33c0,1.66-1.35,3.02-3.01,3.03H3.01 C1.35,38.39,0,37.03,0,35.37V3.03C0,1.37,1.35,0.01,3.01,0L3.01,0z"/><path class="st1" d="M27.6,11.52l-2.37,7.3l4.87,1.58L27.6,11.52L27.6,11.52z M27.6,11.52L27.6,11.52L27.6,11.52L27.6,11.52z"/><path class="st1" d="M27.6,11.52l2.37,7.3l-4.87,1.58L27.6,11.52L27.6,11.52z M27.6,11.52L27.6,11.52L27.6,11.52L27.6,11.52z"/><path class="st1" d="M34.9,16.83h-7.68v5.12L34.9,16.83L34.9,16.83z M34.9,16.83L34.9,16.83L34.9,16.83L34.9,16.83z"/><path class="st1" d="M34.9,16.83l-6.21,4.51l-3.01-4.14L34.9,16.83L34.9,16.83z M34.9,16.83L34.9,16.83L34.9,16.83L34.9,16.83z"/><path class="st1" d="M32.11,25.41l-2.37-7.3l-4.87,1.58L32.11,25.41L32.11,25.41z M32.11,25.41L32.11,25.41L32.11,25.41 L32.11,25.41z"/><path class="st1" d="M32.11,25.41L25.9,20.9l3.01-4.14L32.11,25.41L32.11,25.41z M32.11,25.41L32.11,25.41L32.11,25.41L32.11,25.41 z"/><path class="st1" d="M20.3,16.83h7.68v5.12L20.3,16.83L20.3,16.83z M20.3,16.83L20.3,16.83L20.3,16.83L20.3,16.83z"/><path class="st1" d="M20.3,16.83l6.21,4.51l3.01-4.14L20.3,16.83L20.3,16.83z M20.3,16.83L20.3,16.83L20.3,16.83L20.3,16.83z"/><path class="st1" d="M23.09,25.41l2.37-7.3l4.87,1.58L23.09,25.41L23.09,25.41z M23.09,25.41L23.09,25.41L23.09,25.41L23.09,25.41z"/><path class="st1" d="M23.09,25.41l6.21-4.51l-3.01-4.14L23.09,25.41L23.09,25.41z M23.09,25.41L23.09,25.41L23.09,25.41 L23.09,25.41z"/></g></svg>
+                    <span  id="selected-option">${LANGUAGE_CODE}</span>
+                      </div>
+                    % endif
+                
+                  </div>
+                  <div class="options">
+                      % for language in languages :
+                      <div class="option" id='${language[0]}' data-language="${language[0]}">
+                        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55.2 38.4" style="width:24px;" xml:space="preserve"><style type="text/css">.st0{fill:#DA251D;} .st1{fill:#FFFF00;}</style><g><path class="st0" d="M3.01,0h49.17c1.66,0.01,3.01,1.37,3.01,3.03v32.33c0,1.66-1.35,3.02-3.01,3.03H3.01 C1.35,38.39,0,37.03,0,35.37V3.03C0,1.37,1.35,0.01,3.01,0L3.01,0z"/><path class="st1" d="M27.6,11.52l-2.37,7.3l4.87,1.58L27.6,11.52L27.6,11.52z M27.6,11.52L27.6,11.52L27.6,11.52L27.6,11.52z"/><path class="st1" d="M27.6,11.52l2.37,7.3l-4.87,1.58L27.6,11.52L27.6,11.52z M27.6,11.52L27.6,11.52L27.6,11.52L27.6,11.52z"/><path class="st1" d="M34.9,16.83h-7.68v5.12L34.9,16.83L34.9,16.83z M34.9,16.83L34.9,16.83L34.9,16.83L34.9,16.83z"/><path class="st1" d="M34.9,16.83l-6.21,4.51l-3.01-4.14L34.9,16.83L34.9,16.83z M34.9,16.83L34.9,16.83L34.9,16.83L34.9,16.83z"/><path class="st1" d="M32.11,25.41l-2.37-7.3l-4.87,1.58L32.11,25.41L32.11,25.41z M32.11,25.41L32.11,25.41L32.11,25.41 L32.11,25.41z"/><path class="st1" d="M32.11,25.41L25.9,20.9l3.01-4.14L32.11,25.41L32.11,25.41z M32.11,25.41L32.11,25.41L32.11,25.41L32.11,25.41 z"/><path class="st1" d="M20.3,16.83h7.68v5.12L20.3,16.83L20.3,16.83z M20.3,16.83L20.3,16.83L20.3,16.83L20.3,16.83z"/><path class="st1" d="M20.3,16.83l6.21,4.51l3.01-4.14L20.3,16.83L20.3,16.83z M20.3,16.83L20.3,16.83L20.3,16.83L20.3,16.83z"/><path class="st1" d="M23.09,25.41l2.37-7.3l4.87,1.58L23.09,25.41L23.09,25.41z M23.09,25.41L23.09,25.41L23.09,25.41L23.09,25.41z"/><path class="st1" d="M23.09,25.41l6.21-4.51l-3.01-4.14L23.09,25.41L23.09,25.41z M23.09,25.41L23.09,25.41L23.09,25.41 L23.09,25.41z"/></g></svg>
+                        ${language[0]}
+                      </div>
+                      % endfor
+                  </div> 
+                </div> 
+
+            </form>
+        % endif
+  
       </div>
-    % endif
+      % endif
+    </div>
+
     <%include file="user_dropdown.html"/>
+
   </div>
 </div>
+
+<script>
+  const selectHeader = document.querySelector('.select-header');
+  const options = document.querySelector('.options');
+  const selectedOption = document.querySelector('#selected-option');
+  const selectedLanguageInput = document.querySelector('#selected-language');
+  
+
+
+  function setSessionCookie(cookieName, cookieValue) {
+
+    document.cookie = cookieName + "=" + cookieValue + ";path=/";
+  }
+
+  selectHeader.addEventListener('click', () => {
+    options.classList.toggle('show');
+  });
+  
+  options.addEventListener('click', (e) => {
+      const value = e.target.getAttribute('data-language')
+      selectedOption.textContent = value;
+      options.classList.remove('show');
+      setSessionCookie('openedx-language-preference', value)
+      location.reload();
+  });
+  
+  document.addEventListener('click', (e) => {
+    if (!selectHeader.contains(e.target)) {
+      options.classList.remove('show');
+    }
+  });
+</script>
