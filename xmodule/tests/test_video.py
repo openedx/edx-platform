@@ -15,7 +15,6 @@ the course, section, subsection, unit, etc.
 
 import datetime
 import json
-import os
 import shutil
 import unittest
 from tempfile import mkdtemp

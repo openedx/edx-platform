@@ -3,7 +3,6 @@ Tests for methods defined in mongo_utils.py
 """
 
 
-import os
 from unittest import TestCase
 from uuid import uuid4
 

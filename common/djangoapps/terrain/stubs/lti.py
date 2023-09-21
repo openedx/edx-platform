@@ -78,7 +78,7 @@ class StubLtiHandler(StubHttpRequestHandler):
                         'callback_url': self.post_dict.get('lis_outcome_service_url').replace('https', 'http'),
                         'sourcedId': self.post_dict.get('lis_result_sourcedid')
                     }
-                # remove bok-choy    
+                # remove bok-choy
                 # host = os.environ.get('BOK_CHOY_HOSTNAME', self.server.server_address[0])
                 host = os.environ.get(self.server.server_address[0])
                 submit_url = f'//{host}:{self.server.server_address[1]}'
