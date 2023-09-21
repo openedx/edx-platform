@@ -17,7 +17,7 @@ jobs:
           - "3.8"
         django-version:
           - "pinned"
-          #- "4.0"
+          - "4.2"
         # When updating the shards, remember to make the same changes in
         # .github/workflows/unit-tests-gh-hosted.yml
         shard_name:
