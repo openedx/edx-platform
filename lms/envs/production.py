@@ -470,10 +470,6 @@ AWS_STORAGE_BUCKET_NAME = AUTH_TOKENS.get('AWS_STORAGE_BUCKET_NAME', 'edxuploads
 AWS_QUERYSTRING_AUTH = AUTH_TOKENS.get('AWS_QUERYSTRING_AUTH', True)
 AWS_S3_CUSTOM_DOMAIN = AUTH_TOKENS.get('AWS_S3_CUSTOM_DOMAIN', 'edxuploads.s3.amazonaws.com')
 
-# this feature introduced in django-storages=1.13.2
-# for details https://github.com/openedx/edx-platform/pull/33301
-AWS_S3_USE_THREADS = False
-
 if AUTH_TOKENS.get('DEFAULT_FILE_STORAGE'):
     DEFAULT_FILE_STORAGE = AUTH_TOKENS.get('DEFAULT_FILE_STORAGE')
 elif AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
