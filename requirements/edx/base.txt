@@ -325,7 +325,7 @@ django-multi-email-field==0.7.0
     # via edx-enterprise
 django-mysql==4.11.0
     # via -r requirements/edx/kernel.in
-django-oauth-toolkit==1.5.0
+django-oauth-toolkit==1.6.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -1062,7 +1062,6 @@ six==1.16.0
     #   chem
     #   codejail-includes
     #   crowdsourcehinter-xblock
-    #   django-oauth-toolkit
     #   edx-ace
     #   edx-auth-backends
     #   edx-ccx-keys
