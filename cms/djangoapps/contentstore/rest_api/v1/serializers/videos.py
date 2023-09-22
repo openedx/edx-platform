@@ -8,7 +8,7 @@ from .common import StrictSerializer
 class FileSpecSerializer(StrictSerializer):
     """ Strict Serializer for file specs """
     file_name = serializers.CharField()
-    content_type = serializers.ChoiceField(choices = ['video/mp4', 'video/webm', 'video/ogg'])
+    content_type = serializers.ChoiceField(choices=['video/mp4', 'video/webm', 'video/ogg'])
 
 
 class VideoUploadSerializer(StrictSerializer):
@@ -18,7 +18,7 @@ class VideoUploadSerializer(StrictSerializer):
     and generating a video placeholder without performing an actual upload.
     """
     files = serializers.ListField(
-        child = FileSpecSerializer()
+        child=FileSpecSerializer()
     )
 
 
