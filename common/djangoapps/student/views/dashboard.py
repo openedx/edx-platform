@@ -65,7 +65,10 @@ from common.djangoapps.student.models import (
 )
 from common.djangoapps.util.milestones_helpers import get_pre_requisite_courses_not_completed
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from common.djangoapps.student.models import LastHistoryActivateDAO
+from common.djangoapps.student.models import LastHistoryActivateDAO , Survey, SurveyUserDAO, SurveyQuestion , SurveyCourseDAO
+
+
+
 
 log = logging.getLogger("edx.student")
 
@@ -886,8 +889,12 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     # context.update({
     #     'resume_button_urls': resume_button_urls
     # })
+    check_form = SurveyUserDAO.checkSuccess(user_id=user.id)
     
-   
+    if check_form == False:
+        return redirect('survey_form')
+    
+    
     dashboard_template = 'dashboard.html'
     try:
         # .. filter_implemented_name: DashboardRenderStarted
@@ -912,3 +919,106 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         )
 
     return response
+
+
+def remove_duplicates(input_list):
+    unique_list = []
+    seen_elements = set()
+
+    for element in input_list:
+        if element not in seen_elements:
+            unique_list.append(element)
+            seen_elements.add(element)
+
+    return unique_list
+
+from common.djangoapps.student.views.management import get_resume_btn_data
+
+@login_required
+@ensure_csrf_cookie
+@add_maintenance_banner
+def form_begin_login (request, course_id=None) :
+    
+    user = request.user  
+    
+    resume_button_urls = get_resume_btn_data(user)['resume_button_url']  
+
+    urlCourse =''
+    display_name = ''
+    if course_id :
+        listQuestion =  SurveyCourseDAO.questionListSurveyCourse(course_id)
+        for url in resume_button_urls :
+            if url['course_id'] == course_id :
+                urlCourse = url['url']
+                display_name = url['display_name']          
+    else :
+        listQuestion = SurveyCourseDAO.questionListSurvey()
+    
+    check_form = SurveyUserDAO.checkSuccess(user_id=user.id)
+    checkSurveyCourse = SurveyCourseDAO.checkSurveyCourse(course_id=course_id, user_id=user.id)
+    
+    if check_form and course_id is None :
+        return redirect('dashboard')
+    if checkSurveyCourse and course_id is not None:
+        return redirect(urlCourse)
+    
+    
+    result_lists = []
+    result_boolean = []  
+
+    for question in listQuestion:
+        survey = Survey.objects.filter(id=question.survey_id).first()
+        
+        if survey:
+            survey_dict = {
+                'survey_name': survey.name_survey,
+                'questions': [question]
+            }
+            
+            if question.type == 'boolean':
+                found = False
+                for result_dict in result_boolean:
+                    if result_dict['survey_name'] == survey_dict['survey_name']:
+                        result_dict['questions'].append(question)
+                        found = True
+                        break
+                if not found:
+                    result_boolean.append(survey_dict)
+            else:
+                found = False
+                for result_dict in result_lists:
+                    if result_dict['survey_name'] == survey_dict['survey_name']:
+                        result_dict['questions'].append(question)
+                        found = True
+                        break
+                if not found:
+                    result_lists.append(survey_dict)
+
+
+    context = {
+       'result_lists' : result_lists,
+       'display_name' : display_name,
+      
+    }
+    if result_boolean :
+        context["result_boolean"] = result_boolean[0]
+
+    if request.method == 'POST':
+        
+        for q in listQuestion :
+            if 'title' not in q.type:
+                aws = request.POST.getlist(str(q.question))
+                for a in aws:
+                    SurveyUserDAO.create_form(user_id=user.id, question=q , answer_text=a , course_id=course_id)
+                
+                              
+        if urlCourse:
+            return redirect(urlCourse) 
+        else :
+            return redirect('dashboard')      
+         
+        
+        
+    return render_to_response('survey_form.html', context  )
+
+

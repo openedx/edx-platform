@@ -1455,3 +1455,32 @@ class UsernameReplacementView(APIView):
                 new_username,
             )
         return True
+
+
+# request api info user (accessToken)
+
+from rest_framework.decorators import api_view
+from oauth2_provider.models import AccessToken
+from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
+from common.djangoapps.student.models import UserProfile
+
+
+@api_view(['POST'])
+def get_user_info(request):
+    try:
+        token = request.data.get('token')
+        user = AccessToken.objects.filter(token=token).first()
+
+        if user:
+            try:
+                user_info = User.objects.get(id=user.user_id)
+                user_profile = UserProfile.objects.get(user_id=user.user_id)
+                
+                return Response({'username': user_info.username , 'email' : user_info.email , 'name': user_profile.name})
+            except ObjectDoesNotExist:
+                return Response({'message': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({'message': 'Access token not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

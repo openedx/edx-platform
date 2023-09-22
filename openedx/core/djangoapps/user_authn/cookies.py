@@ -24,7 +24,7 @@ from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewi
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from common.djangoapps.util.json_request import JsonResponse
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
-
+from oauth2_provider.models import AccessToken
 
 log = logging.getLogger(__name__)
 
@@ -86,7 +86,7 @@ def delete_logged_in_cookies(response):
             path='/',
             domain=settings.LMS_BASE
         )
-
+    response.set_cookie('accessToken' , None , domain='.funix.edu.vn', httponly=False, secure=True  )
     return response
 
 
@@ -166,8 +166,12 @@ def set_logged_in_cookies(request, response, user):
         _set_deprecated_user_info_cookie(response, request, user, cookie_settings_subdomain)
         _create_and_set_jwt_cookies(response, request, cookie_settings_subdomain, user=user)
         CREATE_LOGON_COOKIE.send(sender=None, user=user, response=response)
+        
+        accessToken = AccessToken.objects.filter(user_id=request.user.id).first()
+        response.set_cookie('accessToken' , accessToken , domain='.funix.edu.vn', httponly=False, secure=True  )
 
     return response
+
 
 
 def get_response_with_refreshed_jwt_cookies(request, user):
@@ -212,6 +216,7 @@ def _set_deprecated_user_info_cookie(response, request, user, cookie_settings):
     }
     """
     user_info = _get_user_info_cookie_data(request, user)
+
     response.set_cookie(
         settings.EDXMKTG_USER_INFO_COOKIE_NAME,
         json.dumps(user_info),

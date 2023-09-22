@@ -3707,3 +3707,133 @@ class UserPasswordToggleHistory(TimeStampedModel):
 
     def __str__(self):
         return self.comment
+
+
+
+class Survey (models.Model):
+    name_survey = models.CharField(max_length=225)
+    created = models.DateTimeField(auto_now_add=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    
+    def __str__ (self):
+        return f'{self.name_survey}'
+
+
+
+class SurveyQuestion (models.Model):
+    survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
+    question = models.CharField(max_length=225)
+    type = models.CharField( max_length=32, null=True)
+    config = models.JSONField(null=True, blank=True )
+    
+    def __str__(self):
+        return f'{self.question}'
+ 
+   
+class SurveyCourse (models.Model):
+    course= models.ForeignKey(
+        CourseOverview,
+        db_constraint=False,
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True
+    )
+    survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True, null=True)
+    
+    def __str__(self):
+        return f'{self.course}'
+class SurveyCourseDAO():
+    @classmethod
+    def questionListSurvey (self):
+        surveys = SurveyCourse.objects.filter(course__isnull=True)
+        listQuestion = []
+        for survey in surveys :
+            question = SurveyQuestion.objects.filter(survey=survey.survey_id)
+            for q in question :
+                listQuestion.append(q)
+        
+            
+        return listQuestion
+    
+    @classmethod
+    def questionListSurveyCourse (self, course_id):
+        surveys = SurveyCourse.objects.filter(course = course_id)
+        listQuestion = []
+        for survey in surveys :
+            question = SurveyQuestion.objects.filter(survey=survey.survey_id)
+            for q in question :
+                listQuestion.append(q)
+        
+        return listQuestion
+    
+    @classmethod
+    def surveyCourse (self, course_id):
+        try:
+            surveyCourse = SurveyCourse.objects.filter(course_id = course_id)[0]
+            return surveyCourse
+        except:
+            return None
+    
+    @classmethod
+    def existSurveyCourse (self, course_id, survey_id):
+        isCheck = SurveyCourse.objects.filter(course=course_id, survey= survey_id).exists()
+        return isCheck
+    
+    @classmethod
+    def addSurveyCourse (self, course_id, survey_id):
+        SurveyCourse.objects.filter(course_id=course_id).delete()
+        if survey_id == '':
+            return True
+        return SurveyCourse.objects.create(course_id=course_id, survey_id = survey_id)
+    
+    @classmethod
+    def checkSurveyCourse (self, course_id, user_id):
+       try:
+            isCheck = SurveyUser.objects.filter(course_id=course_id, user_id=user_id).exists()   
+            return isCheck
+       except:
+           return None
+    
+    @classmethod
+    def checkUserEnroll (self, enrollment, user_id) :
+        try:
+            
+            for course in enrollment :
+                enrollCourse = course.created 
+                course_id = course.course_id
+                survey = self.surveyCourse(course_id)
+                dateSurveyCourse = survey.created
+                if enrollCourse > dateSurveyCourse :
+                    return True
+                else :
+                    return False 
+        except:
+            return False
+
+        
+class SurveyUser(models.Model):
+    question = models.ForeignKey(SurveyQuestion, on_delete=models.CASCADE)  
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    answer_text =  models.CharField( max_length=255, null=True)
+    course= models.ForeignKey(
+        CourseOverview,
+        db_constraint=False,
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True
+    )
+    def __str__(self):
+        return f"{self.user} - Question: {self.question} - Answer: {self.answer_text}  " 
+    
+class SurveyUserDAO () :
+    
+    @classmethod
+    def checkSuccess (self,user_id):
+        isCheck = SurveyUser.objects.filter(user=user_id, course__isnull=True).exists()
+        return isCheck
+    
+    @classmethod
+    def create_form(self,user_id, question , answer_text, course_id=None):
+        
+        return SurveyUser.objects.create(user_id=user_id, question=question, answer_text=answer_text, course_id = course_id)

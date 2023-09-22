@@ -43,7 +43,12 @@ from common.djangoapps.student.models import (
     UserAttribute,
     UserCelebration,
     UserProfile,
-    UserTestGroup
+    UserTestGroup,
+    Survey,
+    SurveyCourse,
+    SurveyQuestion,
+    SurveyUser
+
 )
 from common.djangoapps.student.roles import REGISTERED_ACCESS_ROLES
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -562,6 +567,14 @@ class PendingNameChangeAdmin(admin.ModelAdmin):
 
     class Meta:
         model = PendingNameChange
+        
+# class SurveyFormAdmin(admin.ModelAdmin):
+#     list_display=('user', 'answer_text', 'question' , 'course_id')
+    
+
+# class ListQuestionAdmin (admin.ModelAdmin):
+#     list_display = ('survey_id', 'course_id', 'question' , 'isActive' )
+#     empty_value_display = 'N/A'
 
 
 admin.site.register(UserTestGroup)
@@ -571,6 +584,14 @@ admin.site.register(DashboardConfiguration, ConfigurationModelAdmin)
 admin.site.register(RegistrationCookieConfiguration, ConfigurationModelAdmin)
 admin.site.register(BulkUnenrollConfiguration, ConfigurationModelAdmin)
 admin.site.register(BulkChangeEnrollmentConfiguration, ConfigurationModelAdmin)
+
+admin.site.register(Survey)
+admin.site.register(SurveyQuestion)
+admin.site.register(SurveyCourse)
+admin.site.register(SurveyUser)
+
+
+
 
 
 # We must first un-register the User model since it may also be registered by the auth app.

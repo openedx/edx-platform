@@ -248,7 +248,8 @@ if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
         certificate_activation_handler,
         signatory_detail_handler,
         certificates_detail_handler,
-        certificates_list_handler
+        certificates_list_handler,
+        setting_survey_form
     )
 
     urlpatterns += [
@@ -260,7 +261,8 @@ if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
         re_path(fr'^certificates/{settings.COURSE_KEY_PATTERN}/(?P<certificate_id>\d+)?$',
                 certificates_detail_handler, name='certificates_detail_handler'),
         re_path(fr'^certificates/{settings.COURSE_KEY_PATTERN}$',
-                certificates_list_handler, name='certificates_list_handler')
+                certificates_list_handler, name='certificates_list_handler') ,
+        path('survey/<str:course_id>',setting_survey_form, name='survey' )
     ]
 
 # Maintenance Dashboard

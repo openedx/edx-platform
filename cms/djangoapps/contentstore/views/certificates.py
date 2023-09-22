@@ -572,3 +572,41 @@ def signatory_detail_handler(request, course_key_string, certificate_id, signato
                 signatory_id=signatory_id
             )
             return JsonResponse(status=204)
+
+from common.djangoapps.student.models import Survey, SurveyQuestion, SurveyCourse ,SurveyCourseDAO
+from django.shortcuts import redirect
+from django.urls import reverse
+
+@login_required
+@ensure_csrf_cookie
+def setting_survey_form (request, course_id):
+    course_key = CourseKey.from_string(course_id)
+   
+    try:
+        course = _get_course_and_check_access(course_key, request.user)
+    except PermissionDenied:
+        msg = _('PermissionDenied: Failed in authenticating {user}').format(user=request.user)
+        return JsonResponse({"error": msg}, status=403)
+    
+    if course is None :
+        return JsonResponse( status=403)
+    
+    surveys = Survey.objects.all()
+
+    surveyCourse = SurveyCourseDAO.surveyCourse(course_id)
+    
+    context = {
+          'context_course': course,
+            'surveys': surveys,
+            'surveyCourse': surveyCourse,
+    }
+    
+    if request.method == 'POST':
+        survey_id = request.POST.get('survey')
+            
+        SurveyCourseDAO.addSurveyCourse(course_id,survey_id)
+        url = reverse('survey', args=[course_id])
+        return redirect(url)
+
+    
+    return render_to_response('survey_form.html' ,context)

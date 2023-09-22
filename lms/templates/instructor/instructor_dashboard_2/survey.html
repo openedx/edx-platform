@@ -1,0 +1,105 @@
+<%page args="section_data" expression_filter="h"/>
+
+
+<style>
+    #survey-course table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+      }
+      
+      #survey-course td {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+
+       #survey-course th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+      
+
+</style>
+
+ 
+<div data-course-id="${ section_data['course_id']}" id="survey-course">
+      
+  
+</div>
+
+<script>
+    const surveyElement = document.getElementById('survey-course')
+    const course_id = surveyElement.getAttribute('data-course-id')
+
+
+
+    const fetchData = async()=>{
+        try {
+          let res = await fetch('/api/survey-answer/'+ course_id)
+          res = await res.json()
+          console.log(res)
+          return res
+        }
+        catch (error) {
+          console.log('error', error)
+        }
+      }
+   
+    const viewAnswerSurvey = async () => {
+      const data = await fetchData(); 
+      const surveyCourseElement = document.getElementById("survey-course");
+
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      const tbody = document.createElement("tbody");
+
+
+      const headerRow = document.createElement("tr");
+
+      const headerColumns = ["#", "Student Email"];
+      const listQuestion = data.list_question
+      headerColumns.push(...listQuestion);
+
+      for (const columnTitle of headerColumns) {
+          const th = document.createElement("th");
+          th.textContent = columnTitle;
+          headerRow.appendChild(th);
+      }
+
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+      const listAnswer = data.list_answer
+      for (let i = 0; i < listAnswer.length; i++) {
+          const rowData = listAnswer[i];
+         const row = document.createElement("tr");
+
+        for (const columnTitle of headerColumns) {
+            const cell = document.createElement("td");
+            
+            if (columnTitle === '#'){
+              cell.textContent = i +1 
+            }else if (columnTitle === 'Student Email'){
+              cell.textContent = rowData.email
+            }
+            rowData.content.forEach(a =>{
+              if (a.question === columnTitle){
+                cell.textContent = a.answer
+              }
+            })
+            row.appendChild(cell);
+        }
+
+        tbody.appendChild(row);
+        }
+
+        table.appendChild(tbody);
+
+        surveyCourseElement.innerHTML = "";
+        surveyCourseElement.appendChild(table);
+}
+
+
+viewAnswerSurvey();
+</script>

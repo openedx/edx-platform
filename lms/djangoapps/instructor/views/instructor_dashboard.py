@@ -242,6 +242,18 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
 
     certificate_invalidations = CertificateInvalidation.get_certificate_invalidations(course_key)
 
+    survey_instructor = {
+        'section_key': 'survey',
+        'section_display_name' : 'Survey',
+        'access' : {
+            'admin' : True, 'instructor': True, 
+            'finance_admin': False, 'sales_admin': False, 
+            'staff': True, 'forum_admin': False, 'data_researcher': True 
+        },
+        'course_id' : course_key
+    }
+    sections.append(survey_instructor)
+
     context = {
         'course': course,
         'studio_url': get_studio_url(course, 'course'),

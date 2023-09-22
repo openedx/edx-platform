@@ -17,7 +17,7 @@ from .accounts.views import (
     DeactivateLogoutView,
     LMSAccountRetirementView,
     NameChangeView,
-    UsernameReplacementView, CancelAccountRetirementStatusView
+    UsernameReplacementView, CancelAccountRetirementStatusView , get_user_info
 )
 from . import views as user_api_views
 from .models import UserPreference
@@ -219,4 +219,6 @@ urlpatterns = [
     # Moved from user_api/legacy_urls.py
     path('v1/preferences/time_zones/', user_api_views.CountryTimeZoneListView.as_view(),
          ),
+    
+    path('v1/user-info' ,  get_user_info, name='user-info')
 ]
