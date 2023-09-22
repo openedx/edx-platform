@@ -21,7 +21,7 @@ celery>=5.2.2,<6.0.0
 click>=8.0,<9.0
 
 # each version upgrade need release notes review.
-django-storages==1.12.3
+django-storages==1.14
 
 
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
