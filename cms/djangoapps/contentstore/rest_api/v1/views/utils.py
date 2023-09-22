@@ -6,11 +6,11 @@ from django.http import HttpResponseBadRequest
 def _validate(request, context=None):
     """
     Validates the request data using the context's associated serializer.
-    
+
     Args:
     - request: the incoming request object.
     - context: the current view object with a `serializer_class` attribute.
-    
+
     Raises:
     - serializers.ValidationError: if the request data is invalid.
     """

@@ -19,8 +19,8 @@ from cms.djangoapps.contentstore.tests.test_utils import AuthorizeStaffTestCase
 
 
 ASSET_KEY_STRING = "asset-v1:dede+aba+weagi+type@asset+block@_0e37192a-42c4-441e-a3e1-8e40ec304e2e.jpg"
-mock_image = MagicMock(file=File)
-mock_image.name="test.jpg"
+mock_image = MagicMock(file = File)
+mock_image.name = "test.jpg"
 
 
 class AssetsViewTestCase(AuthorizeStaffTestCase):
@@ -42,7 +42,7 @@ class AssetsViewTestCase(AuthorizeStaffTestCase):
         """
         return {"course_id": self.get_course_key_string(), "usage_key_string": ASSET_KEY_STRING}
 
-    def get_url(self, _course_id=None):
+    def get_url(self, _course_id = None):
         return reverse(
             "cms.djangoapps.contentstore:v1:studio_content_assets",
             kwargs=self.get_url_params(),

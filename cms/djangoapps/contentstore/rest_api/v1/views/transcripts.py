@@ -39,7 +39,7 @@ class TranscriptView(DeveloperErrorViewMixin, CreateAPIView, RetrieveAPIView, De
     edx_video_id: optional query parameter, needed to identify the transcript.
     language_code: optional query parameter, needed to identify the transcript.
     """
-    serializer_class=TranscriptSerializer
+    serializer_class = TranscriptSerializer
     parser_classes = (MultiPartParser, FormParser, TypedFileUploadParser)
 
     def dispatch(self, request, *args, **kwargs):
