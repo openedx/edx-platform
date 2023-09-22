@@ -77,13 +77,13 @@ boto==2.39.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
-boto3==1.28.52
+boto3==1.28.53
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.31.52
+botocore==1.31.53
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -323,7 +323,7 @@ django-multi-email-field==0.7.0
     # via edx-enterprise
 django-mysql==4.11.0
     # via -r requirements/edx/kernel.in
-django-oauth-toolkit==1.5.0
+django-oauth-toolkit==1.6.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -480,7 +480,7 @@ edx-drf-extensions==8.10.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.1.15
+edx-enterprise==4.3.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -539,6 +539,7 @@ edx-toggles==5.1.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-completion
+    #   edx-enterprise
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
     #   edx-name-affirmation
@@ -1055,7 +1056,6 @@ six==1.16.0
     #   chem
     #   codejail-includes
     #   crowdsourcehinter-xblock
-    #   django-oauth-toolkit
     #   edx-ace
     #   edx-auth-backends
     #   edx-ccx-keys
