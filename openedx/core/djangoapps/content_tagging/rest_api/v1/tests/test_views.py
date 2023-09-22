@@ -738,7 +738,6 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
             assert len(response.data) == len(tag_values)
             assert set(t["value"] for t in response.data) == set(tag_values)
 
-
     @ddt.data(
         # Can't add invalid tags to a object using a closed taxonomy
         (None, "tA1", ["invalid"], status.HTTP_403_FORBIDDEN),
