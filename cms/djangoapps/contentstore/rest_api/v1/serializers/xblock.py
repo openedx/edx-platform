@@ -19,7 +19,6 @@ class XblockSerializer(StrictSerializer):
     data = serializers.CharField(required = False, allow_null = True)
     metadata = serializers.DictField(required = False, allow_null = True)
     has_changes = serializers.BooleanField(required = False, allow_null = True)
-    publish = serializers.CharField(required = False, allow_null = True)   # this takes one of several string values
     children = serializers.ListField(required = False, allow_null = True)
     fields = serializers.DictField(required = False, allow_null = True)
     has_children = serializers.BooleanField(required = False, allow_null = True)
@@ -35,7 +34,9 @@ class XblockSerializer(StrictSerializer):
     nullout = serializers.JSONField(required = False, allow_null = True)
     graderType = serializers.JSONField(required = False, allow_null = True)
     visibility_state = serializers.CharField(required = False, allow_null = True)
-    has_explicit_staff_lock = serializers.BooleanField(required = False, allow_null = True)
+    has_explicit_staff_lock = serializers.BooleanField(
+        required = False, allow_null = True
+    )
     start = serializers.CharField(required = False, allow_null = True)
     graded = serializers.BooleanField(required = False, allow_null = True)
     due_date = serializers.CharField(required = False, allow_null = True)
@@ -56,7 +57,11 @@ class XblockSerializer(StrictSerializer):
     prereqUsageKey = serializers.CharField(required = False, allow_null = True)
     prereqMinScore = serializers.IntegerField(required = False, allow_null = True)
     prereqMinCompletion = serializers.IntegerField(required = False, allow_null = True)
-    publish = serializers.ChoiceField(required = False, allow_null = True, choices = ['make_public', 'republish', 'discard_changes'])
+    publish = serializers.ChoiceField(
+        required = False,
+        allow_null = True,
+        choices = ['make_public', 'republish', 'discard_changes']
+    )
     duplicate_source_locator = serializers.CharField(required = False, allow_null = True)
     move_source_locator = serializers.CharField(required = False, allow_null = True)
     target_index = serializers.IntegerField(required = False, allow_null = True)
