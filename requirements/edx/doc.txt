@@ -103,16 +103,14 @@ boto==2.39.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-boto3==1.7.0
+boto3==1.28.52
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.10.84
+botocore==1.31.52
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   boto3
     #   s3transfer
@@ -312,7 +310,7 @@ django-classy-tags==4.1.0
     # via
     #   -r requirements/edx/base.txt
     #   django-sekizai
-django-config-models==2.5.0
+django-config-models==2.5.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -420,7 +418,7 @@ django-statici18n==2.4.0
     #   -r requirements/edx/base.txt
     #   lti-consumer-xblock
     #   xblock-drag-and-drop-v2
-django-storages==1.14
+django-storages==1.12.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -470,8 +468,6 @@ djangorestframework-xml==2.0.0
 docutils==0.19
     # via
     #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.txt
-    #   botocore
     #   pydata-sphinx-theme
     #   sphinx
     #   sphinx-mdinclude
@@ -564,7 +560,7 @@ edx-enterprise==4.1.15
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-edx-event-bus-kafka==5.4.0
+edx-event-bus-kafka==5.5.0
     # via -r requirements/edx/base.txt
 edx-event-bus-redis==0.3.1
     # via -r requirements/edx/base.txt
@@ -576,7 +572,7 @@ edx-milestones==0.5.0
     # via -r requirements/edx/base.txt
 edx-name-affirmation==2.3.6
     # via -r requirements/edx/base.txt
-edx-opaque-keys[django]==2.5.0
+edx-opaque-keys[django]==2.5.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-bulk-grades
@@ -636,7 +632,7 @@ edx-when==2.4.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring
-edxval==2.4.2
+edxval==2.4.3
     # via -r requirements/edx/base.txt
 elasticsearch==7.13.4
     # via
@@ -685,7 +681,7 @@ geoip2==4.7.0
     # via -r requirements/edx/base.txt
 gitdb==4.0.10
     # via gitpython
-gitpython==3.1.36
+gitpython==3.1.37
     # via -r requirements/edx/doc.in
 glob2==0.7
     # via -r requirements/edx/base.txt
@@ -713,7 +709,7 @@ importlib-metadata==6.8.0
     #   -r requirements/edx/base.txt
     #   markdown
     #   sphinx
-importlib-resources==6.0.1
+importlib-resources==6.1.0
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
@@ -743,7 +739,7 @@ jinja2==3.1.2
     #   code-annotations
     #   coreschema
     #   sphinx
-jmespath==0.10.0
+jmespath==1.0.1
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -765,7 +761,7 @@ jsonfield==3.1.0
     #   edx-submissions
     #   lti-consumer-xblock
     #   ora2
-jsonschema==4.19.0
+jsonschema==4.19.1
     # via
     #   -r requirements/edx/base.txt
     #   drf-spectacular
@@ -915,7 +911,7 @@ openedx-django-pyfs==3.4.0
     #   xblock
 openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
-openedx-django-wiki==2.0.1
+openedx-django-wiki==2.0.3
     # via -r requirements/edx/base.txt
 openedx-events==8.5.0
     # via
@@ -1027,7 +1023,7 @@ pycryptodomex==3.19.0
     #   lti-consumer-xblock
     #   pyjwkest
     #   snowflake-connector-python
-pydata-sphinx-theme==0.14.0
+pydata-sphinx-theme==0.14.1
     # via sphinx-book-theme
 pygments==2.16.1
     # via
@@ -1221,7 +1217,7 @@ rules==3.3
     #   edx-enterprise
     #   edx-proctoring
     #   openedx-learning
-s3transfer==0.1.13
+s3transfer==0.6.2
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -1424,6 +1420,7 @@ urllib3==1.26.16
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
+    #   botocore
     #   elasticsearch
     #   py2neo
     #   requests
