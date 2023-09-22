@@ -50,6 +50,7 @@ class AssessmentReportPDFView(TemplateView):
     pdfkit_options = None
     template_path = 'genplus_assessments/assessment-report.html'
     header_template_path = 'genplus_assessments/assessment-header.html'
+    cover_template_path = 'genplus_assessments/cover.html'
     stylesheet_path = 'static/genplus_assessments/assets/css/main.css'
     static_images_path = 'static/genplus_assessments/assets/images'
 
@@ -116,6 +117,13 @@ class AssessmentReportPDFView(TemplateView):
             kwargs['configuration'] = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_bin)
 
         try:
+            if self.cover_template_path:
+                with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as cover_html:
+                    kwargs['cover'] = cover_html.name
+                    rendered_html = render_to_string(self.cover_template_path, {}).encode('utf-8')
+                    cover_html.write(rendered_html)
+                    cover_html.flush()
+
             if self.stylesheet_path:
                 filename = join(script_dir, self.stylesheet_path)
                 print("filename", filename)
@@ -142,6 +150,8 @@ class AssessmentReportPDFView(TemplateView):
                 os.remove(options['header-html'])
             if self.stylesheet_path:
                 os.remove(options['user-style-sheet'])
+            if self.cover_template_path:
+                os.remove(kwargs['cover'])
 
     def get_pdfkit_options(self):
         """
