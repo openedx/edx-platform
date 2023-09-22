@@ -12,7 +12,7 @@ class XblockSerializer(StrictSerializer):
 
     Optional fields that were easy to discover were added.
     """
-    id=serializers.CharField(required=False)
+    id=serializers.CharField(required=False, allow_null=True)
     parent_locator=serializers.CharField(required=False, allow_null=True)
     display_name=serializers.CharField(required=False, allow_null=True)
     category=serializers.CharField(required=False, allow_null=True)
