@@ -4,14 +4,22 @@ API Serializers for xblocks
 from rest_framework import serializers
 from .common import StrictSerializer
 
+# The XblockSerializer is designed to be scalable and generic. As such, its structure
+# should remain as general as possible. Avoid indiscriminately adding fields to it,
+# especially those that are xblock-specific. In the future, we aim to develop a solution
+# that can generate serializer fields dynamically based on the xblock definitions.
 
 class XblockSerializer(StrictSerializer):
     """
-    Strict Serializer for xblocks.
-    Validates top-level field types and that no extra fields are passed in.
-    This is an incomplete list of fields currently, designed so that the CMS API demo works.
+    A serializer for xblocks that enforces strict validation.
 
-    Optional fields that were easy to discover were added.
+    The serializer ensures:
+    1. All top-level fields have the expected data types.
+    2. No unexpected fields are passed in.
+
+    Note: The current list of fields is not exhaustive. It is primarily designed 
+    to support the CMS API demo. While optional fields have been added, they were 
+    chosen based on ease of discovery, not comprehensiveness.
     """
     id = serializers.CharField(required=False, allow_null=True)
     parent_locator = serializers.CharField(required=False, allow_null=True)
