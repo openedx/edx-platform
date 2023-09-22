@@ -153,8 +153,6 @@ cffi==1.15.1
 chardet==5.2.0
     # via
     #   -r requirements/edx/base.txt
-    #   -r requirements/edx/coverage.txt
-    #   diff-cover
     #   pysrt
 charset-normalizer==2.0.12
     # via
@@ -254,8 +252,6 @@ deprecated==1.2.14
     # via
     #   -r requirements/edx/base.txt
     #   jwcrypto
-diff-cover==7.7.0
-    # via -r requirements/edx/coverage.txt
 dill==0.3.7
     # via pylint
 distlib==0.3.7
@@ -806,10 +802,8 @@ itypes==1.2.0
 jinja2==3.1.2
     # via
     #   -r requirements/edx/base.txt
-    #   -r requirements/edx/coverage.txt
     #   code-annotations
     #   coreschema
-    #   diff-cover
 jmespath==0.10.0
     # via
     #   -r requirements/edx/base.txt
@@ -909,7 +903,6 @@ markey==0.8
 markupsafe==2.1.3
     # via
     #   -r requirements/edx/base.txt
-    #   -r requirements/edx/coverage.txt
     #   chem
     #   jinja2
     #   mako
@@ -1069,8 +1062,6 @@ platformdirs==3.8.1
     #   virtualenv
 pluggy==1.3.0
     # via
-    #   -r requirements/edx/coverage.txt
-    #   diff-cover
     #   pytest
     #   tox
 polib==1.2.0
@@ -1122,8 +1113,6 @@ pydantic-core==2.6.3
 pygments==2.16.1
     # via
     #   -r requirements/edx/base.txt
-    #   -r requirements/edx/coverage.txt
-    #   diff-cover
     #   py2neo
 pyjwkest==1.4.2
     # via
