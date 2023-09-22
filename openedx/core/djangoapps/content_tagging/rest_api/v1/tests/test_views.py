@@ -735,8 +735,9 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
 
         assert response.status_code == expected_status
         if status.is_success(expected_status):
-            assert len(response.data.get("results")) == len(tag_values)
-            assert set(t["value"] for t in response.data["results"]) == set(tag_values)
+            assert len(response.data) == len(tag_values)
+            assert set(t["value"] for t in response.data) == set(tag_values)
+
 
     @ddt.data(
         # Can't add invalid tags to a object using a closed taxonomy
@@ -803,8 +804,8 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
 
         assert response.status_code == expected_status
         if status.is_success(expected_status):
-            assert len(response.data.get("results")) == len(tag_values)
-            assert set(t["value"] for t in response.data["results"]) == set(tag_values)
+            assert len(response.data) == len(tag_values)
+            assert set(t["value"] for t in response.data) == set(tag_values)
 
     @ddt.data(
         # Can't add invalid tags to a object using a closed taxonomy
