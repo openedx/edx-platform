@@ -143,7 +143,7 @@ class IgnoredErrorMiddleware:
 #     ``rest_framework.exceptions.PermissionDenied``. If the current error matches the module and class
 #      defined here, the middleware will add the custom attributes ``error_ignored_class`` and ``error_ignored_message``
 #.     to help diagnose issues with ignored errors, since this data is not otherwise available.
-#      For example of ignoring errors in New Relic, see:
+#      For an example of ignoring errors in New Relic, see:
 #      https://docs.newrelic.com/docs/agents/manage-apm-agents/agent-data/manage-errors-apm-collect-ignore-or-mark-expected/#ignore  pylint: disable=line-too-long,useless-suppression
 #      To query for ignored errors, you would use ``error_ignored_class IS NOT NULL``.
 # .. setting_warning: At this time, an error that matches won't actually be ignored. These settings should be set to match
@@ -174,7 +174,7 @@ class IgnoredErrorMiddleware:
 
 
 # Warning: do not access this directly, but instead use _get_ignored_error_settings_dict.
-# EXPECTED ERRORS Django setting is processed and stored as a dict keyed by ERROR_MODULE_AND_CLASS.
+# IGNORED_ERRORS Django setting is processed and stored as a dict keyed by ERROR_MODULE_AND_CLASS.
 _IGNORED_ERROR_SETTINGS_DICT = None
 
 
