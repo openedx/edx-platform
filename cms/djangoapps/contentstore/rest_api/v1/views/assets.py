@@ -17,7 +17,7 @@ import cms.djangoapps.contentstore.toggles as contentstore_toggles
 from cms.djangoapps.contentstore.rest_api.v1.serializers import AssetSerializer
 from .utils import run_if_valid
 
-from rest_framework.parsers import (MultiPartParser, FormParser)
+from rest_framework.parsers import (MultiPartParser, FormParser, JSONParser)
 from openedx.core.lib.api.parsers import TypedFileUploadParser
 
 log = logging.getLogger(__name__)
@@ -32,8 +32,7 @@ class AssetsView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAP
     asset_key_string: required argument, needed to identify the asset.
     """
     serializer_class = AssetSerializer
-    parser_classes = (MultiPartParser, FormParser, TypedFileUploadParser)
-
+    parser_classes = (JSONParser, MultiPartParser, FormParser, TypedFileUploadParser)
 
     def dispatch(self, request, *args, **kwargs):
         # TODO: probably want to refactor this to a decorator.
