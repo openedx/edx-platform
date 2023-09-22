@@ -4,6 +4,7 @@ API Serializers for xblocks
 from rest_framework import serializers
 from .common import StrictSerializer
 
+
 class XblockSerializer(StrictSerializer):
     """
     Strict Serializer for xblocks.

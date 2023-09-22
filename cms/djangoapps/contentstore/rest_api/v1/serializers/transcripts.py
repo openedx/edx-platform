@@ -11,5 +11,5 @@ class TranscriptSerializer(StrictSerializer):
     """
     file = serializers.FileField()
     edx_video_id = serializers.CharField()
-    language_code = serializers.CharField(required = False, allow_null = True)
-    new_language_code = serializers.CharField(required = False, allow_null = True)
+    language_code = serializers.CharField(required=False, allow_null=True)
+    new_language_code = serializers.CharField(required=False, allow_null=True)
