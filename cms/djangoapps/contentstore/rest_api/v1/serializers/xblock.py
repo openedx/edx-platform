@@ -9,6 +9,7 @@ from .common import StrictSerializer
 # especially those that are xblock-specific. In the future, we aim to develop a solution
 # that can generate serializer fields dynamically based on the xblock definitions.
 
+
 class XblockSerializer(StrictSerializer):
     """
     A serializer for xblocks that enforces strict validation.
@@ -17,8 +18,8 @@ class XblockSerializer(StrictSerializer):
     1. All top-level fields have the expected data types.
     2. No unexpected fields are passed in.
 
-    Note: The current list of fields is not exhaustive. It is primarily designed 
-    to support the CMS API demo. While optional fields have been added, they were 
+    Note: The current list of fields is not exhaustive. It is primarily designed
+    to support the CMS API demo. While optional fields have been added, they were
     chosen based on ease of discovery, not comprehensiveness.
     """
     id = serializers.CharField(required=False, allow_null=True)
