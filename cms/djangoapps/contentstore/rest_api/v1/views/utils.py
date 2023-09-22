@@ -4,6 +4,7 @@ Utilities for the REST API views.
 from functools import wraps
 from django.http import HttpResponseBadRequest
 
+
 def validate_request_with_serializer(view_func):
     """
     A decorator to validate request data using the view's serializer.
