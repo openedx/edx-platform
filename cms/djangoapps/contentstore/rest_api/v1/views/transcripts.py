@@ -25,7 +25,7 @@ from cms.djangoapps.contentstore.rest_api.v1.serializers import TranscriptSerial
 from rest_framework.parsers import (MultiPartParser, FormParser)
 from openedx.core.lib.api.parsers import TypedFileUploadParser
 
-from .utils import run_if_valid
+from .utils import validate_request_with_serializer
 
 log = logging.getLogger(__name__)
 toggles = contentstore_toggles
@@ -50,9 +50,9 @@ class TranscriptView(DeveloperErrorViewMixin, CreateAPIView, RetrieveAPIView, De
     @csrf_exempt
     @course_author_access_required
     @expect_json_in_class_view
+    @validate_request_with_serializer
     def create(self, request, course_key_string):  # pylint: disable=arguments-differ
-        callback = lambda: upload_transcript(request)
-        return run_if_valid(request, context=self, callback=callback)
+        return upload_transcript(request)
 
     @course_author_access_required
     def retrieve(self, request, course_key_string):  # pylint: disable=arguments-differ

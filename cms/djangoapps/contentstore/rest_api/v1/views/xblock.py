@@ -14,7 +14,7 @@ from cms.djangoapps.contentstore.xblock_storage_handlers import view_handlers
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
 
 from cms.djangoapps.contentstore.rest_api.v1.serializers import XblockSerializer
-from .utils import run_if_valid
+from .utils import validate_request_with_serializer
 
 
 log = logging.getLogger(__name__)
@@ -51,14 +51,14 @@ class XblockView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAP
 
     @course_author_access_required
     @expect_json_in_class_view
+    @validate_request_with_serializer
     def update(self, request, course_key, usage_key_string=None):
-        # self._validate(request)
         return handle_xblock(request, usage_key_string)
 
     @course_author_access_required
     @expect_json_in_class_view
+    @validate_request_with_serializer
     def partial_update(self, request, course_key, usage_key_string=None):
-        # self._validate(request)
         return handle_xblock(request, usage_key_string)
 
     @course_author_access_required
@@ -69,6 +69,6 @@ class XblockView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAP
     @csrf_exempt
     @course_author_access_required
     @expect_json_in_class_view
+    @validate_request_with_serializer
     def create(self, request, course_key, usage_key_string=None):
-        callback = lambda: handle_xblock(request, usage_key_string)
-        return run_if_valid(request, context=self, callback=callback)
+        return handle_xblock(request, usage_key_string)

@@ -15,8 +15,7 @@ from cms.djangoapps.contentstore.asset_storage_handlers import handle_assets
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
 
 from cms.djangoapps.contentstore.rest_api.v1.serializers import AssetSerializer
-from .utils import run_if_valid
-
+from .utils import validate_request_with_serializer
 from rest_framework.parsers import (MultiPartParser, FormParser, JSONParser)
 from openedx.core.lib.api.parsers import TypedFileUploadParser
 
@@ -52,15 +51,15 @@ class AssetsView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAP
 
     @csrf_exempt
     @course_author_access_required
+    @validate_request_with_serializer
     def create(self, request, course_key):  # pylint: disable=arguments-differ
-        callback = lambda: handle_assets(request, course_key.html_id())
-        return run_if_valid(request, context=self, callback=callback)
+        return handle_assets(request, course_key.html_id())
 
     @course_author_access_required
     @expect_json_in_class_view
+    @validate_request_with_serializer
     def update(self, request, course_key, asset_key_string):  # pylint: disable=arguments-differ
-        callback = lambda: handle_assets(request, course_key.html_id(), asset_key_string)
-        return run_if_valid(request, context=self, callback=callback)
+        return handle_assets(request, course_key.html_id(), asset_key_string)
 
     @course_author_access_required
     @expect_json_in_class_view

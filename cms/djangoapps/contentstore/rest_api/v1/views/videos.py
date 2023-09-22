@@ -25,7 +25,7 @@ from cms.djangoapps.contentstore.video_storage_handlers import (
 )
 from cms.djangoapps.contentstore.rest_api.v1.serializers import VideoUploadSerializer, VideoImageSerializer
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
-from .utils import run_if_valid
+from .utils import validate_request_with_serializer
 
 
 log = logging.getLogger(__name__)
@@ -55,10 +55,10 @@ class VideosView(DeveloperErrorViewMixin, CreateAPIView, RetrieveAPIView, Destro
     @csrf_exempt
     @course_author_access_required
     @expect_json_in_class_view
+    @validate_request_with_serializer
     def create(self, request, course_key):  # pylint: disable=arguments-differ
         """Deprecated. Use the upload_link endpoint instead."""
-        callback = lambda: handle_videos(request, course_key.html_id())
-        return run_if_valid(request, context=self, callback=callback)
+        return handle_videos(request, course_key.html_id())
 
     @course_author_access_required
     def retrieve(self, request, course_key, edx_video_id=None):  # pylint: disable=arguments-differ
@@ -94,9 +94,9 @@ class VideoImagesView(DeveloperErrorViewMixin, CreateAPIView):
     @csrf_exempt
     @course_author_access_required
     @expect_json_in_class_view
+    @validate_request_with_serializer
     def create(self, request, course_key, edx_video_id=None):  # pylint: disable=arguments-differ
-        callback = lambda: handle_video_images(request, course_key.html_id(), edx_video_id)
-        return run_if_valid(request, context=self, callback=callback)
+        return handle_video_images(request, course_key.html_id(), edx_video_id)
 
 
 @view_auth_classes()
@@ -166,6 +166,6 @@ class UploadLinkView(DeveloperErrorViewMixin, CreateAPIView):
     @csrf_exempt
     @course_author_access_required
     @expect_json_in_class_view
+    @validate_request_with_serializer
     def create(self, request, course_key):  # pylint: disable=arguments-differ
-        callback = lambda: handle_videos(request, course_key.html_id())
-        return run_if_valid(request, context=self, callback=callback)
+        return handle_videos(request, course_key.html_id())
