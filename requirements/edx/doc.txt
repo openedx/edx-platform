@@ -103,14 +103,16 @@ boto==2.39.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-boto3==1.28.52
+boto3==1.7.0
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.31.52
+botocore==1.10.84
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   boto3
     #   s3transfer
@@ -384,7 +386,7 @@ django-multi-email-field==0.7.0
     #   edx-enterprise
 django-mysql==4.11.0
     # via -r requirements/edx/base.txt
-django-oauth-toolkit==1.5.0
+django-oauth-toolkit==1.6.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -468,6 +470,8 @@ djangorestframework-xml==2.0.0
 docutils==0.19
     # via
     #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/base.txt
+    #   botocore
     #   pydata-sphinx-theme
     #   sphinx
     #   sphinx-mdinclude
@@ -556,7 +560,7 @@ edx-drf-extensions==8.10.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.1.15
+edx-enterprise==4.3.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -620,6 +624,7 @@ edx-toggles==5.1.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-completion
+    #   edx-enterprise
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
     #   edx-name-affirmation
@@ -739,7 +744,7 @@ jinja2==3.1.2
     #   code-annotations
     #   coreschema
     #   sphinx
-jmespath==1.0.1
+jmespath==0.10.0
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -1217,7 +1222,7 @@ rules==3.3
     #   edx-enterprise
     #   edx-proctoring
     #   openedx-learning
-s3transfer==0.6.2
+s3transfer==0.1.13
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -1251,7 +1256,6 @@ six==1.16.0
     #   chem
     #   codejail-includes
     #   crowdsourcehinter-xblock
-    #   django-oauth-toolkit
     #   edx-ace
     #   edx-auth-backends
     #   edx-ccx-keys
@@ -1420,7 +1424,6 @@ urllib3==1.26.16
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-    #   botocore
     #   elasticsearch
     #   py2neo
     #   requests
