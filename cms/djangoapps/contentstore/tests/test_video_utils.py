@@ -445,7 +445,7 @@ class S3Boto3TestCase(TestCase):
         name = 'test_storage_save.txt'
         content = ContentFile('new content')
         storage = S3Boto3Storage(**{'bucket_name': 'test', 'default_acl': default_acl})
-        storage._connections.connection = MagicMock()  # pylint: disable=protected-access
+        storage._connections.connection = mock.MagicMock()  # pylint: disable=protected-access
 
         storage.save(name, content)
         storage.bucket.Object.assert_called_once_with(name)
@@ -476,7 +476,7 @@ class S3Boto3TestCase(TestCase):
             content = ContentFile('new content')
 
             storage = S3Boto3Storage(**{'bucket_name': 'test', 'default_acl': None})
-            storage._connections.connection = MagicMock()   # pylint: disable=protected-access
+            storage._connections.connection = mock.MagicMock()   # pylint: disable=protected-access
 
             storage.save(name, content)
             storage.bucket.Object.assert_called_once_with(name)
