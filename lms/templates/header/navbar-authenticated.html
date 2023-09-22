@@ -31,32 +31,37 @@ from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_en
 <style>
 
   
-  .select-header {
-    
-  }
+  .custom-select {
+    cursor: pointer;
+   
+}
+
+.select-selected {
   
-  .options {
+    display: flex;
+}
+
+.select-options {
     display: none;
     position: absolute;
+  
+    background-color: #fff;
     border: 1px solid #ccc;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    background: #fff;
-  }
-  
-  .option {
+    border-radius: 0 0 4px 4px;
+    z-index: 99;
+}
+
+.select-option {
     padding: 10px;
-    cursor: pointer;
     display: flex;
-    gap:5px
-  }
-  
-  .option:hover {
-    background-color: #f0f0f0;
-  }
-  .show{
-    display: block;
-    
-  }
+    align-items: center;
+    cursor: pointer;
+}
+
+.select-option:hover {
+    background-color: #f1f1f1;
+}
+
 
 </style>
 
@@ -108,27 +113,35 @@ from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_en
                 % else:
                     <input title="session update url" type="hidden" class="url-endpoint" value="${reverse('session_language')}" data-user-is-authenticated="false">
                 % endif
-                 <div class="custom-select">
-                  <div class="select-header">
-                    
-                    % if LANGUAGE_CODE :
-                      <div>
-                          <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55.2 38.4" style="width:24px;" xml:space="preserve"><style type="text/css">.st0{fill:#DA251D;} .st1{fill:#FFFF00;}</style><g><path class="st0" d="M3.01,0h49.17c1.66,0.01,3.01,1.37,3.01,3.03v32.33c0,1.66-1.35,3.02-3.01,3.03H3.01 C1.35,38.39,0,37.03,0,35.37V3.03C0,1.37,1.35,0.01,3.01,0L3.01,0z"/><path class="st1" d="M27.6,11.52l-2.37,7.3l4.87,1.58L27.6,11.52L27.6,11.52z M27.6,11.52L27.6,11.52L27.6,11.52L27.6,11.52z"/><path class="st1" d="M27.6,11.52l2.37,7.3l-4.87,1.58L27.6,11.52L27.6,11.52z M27.6,11.52L27.6,11.52L27.6,11.52L27.6,11.52z"/><path class="st1" d="M34.9,16.83h-7.68v5.12L34.9,16.83L34.9,16.83z M34.9,16.83L34.9,16.83L34.9,16.83L34.9,16.83z"/><path class="st1" d="M34.9,16.83l-6.21,4.51l-3.01-4.14L34.9,16.83L34.9,16.83z M34.9,16.83L34.9,16.83L34.9,16.83L34.9,16.83z"/><path class="st1" d="M32.11,25.41l-2.37-7.3l-4.87,1.58L32.11,25.41L32.11,25.41z M32.11,25.41L32.11,25.41L32.11,25.41 L32.11,25.41z"/><path class="st1" d="M32.11,25.41L25.9,20.9l3.01-4.14L32.11,25.41L32.11,25.41z M32.11,25.41L32.11,25.41L32.11,25.41L32.11,25.41 z"/><path class="st1" d="M20.3,16.83h7.68v5.12L20.3,16.83L20.3,16.83z M20.3,16.83L20.3,16.83L20.3,16.83L20.3,16.83z"/><path class="st1" d="M20.3,16.83l6.21,4.51l3.01-4.14L20.3,16.83L20.3,16.83z M20.3,16.83L20.3,16.83L20.3,16.83L20.3,16.83z"/><path class="st1" d="M23.09,25.41l2.37-7.3l4.87,1.58L23.09,25.41L23.09,25.41z M23.09,25.41L23.09,25.41L23.09,25.41L23.09,25.41z"/><path class="st1" d="M23.09,25.41l6.21-4.51l-3.01-4.14L23.09,25.41L23.09,25.41z M23.09,25.41L23.09,25.41L23.09,25.41 L23.09,25.41z"/></g></svg>
-                    <span  id="selected-option">${LANGUAGE_CODE}</span>
+              
+                <div class="custom-select">
+                  <div class="select-selected">
+                    % if LANGUAGE_CODE : 
+                      %if LANGUAGE_CODE  == 'vi' :
+                      <div class="selected-svg">
+                        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55.2 38.4" style="width:24px" xml:space="preserve"><style type="text/css">.st01{fill:#DA251D;} .st11{fill:#FFFF00;}</style><g><path class="st01" d="M3.01,0h49.17c1.66,0.01,3.01,1.37,3.01,3.03v32.33c0,1.66-1.35,3.02-3.01,3.03H3.01 C1.35,38.39,0,37.03,0,35.37V3.03C0,1.37,1.35,0.01,3.01,0L3.01,0z"/><path class="st11" d="M27.6,11.52l-2.37,7.3l4.87,1.58L27.6,11.52L27.6,11.52z M27.6,11.52L27.6,11.52L27.6,11.52L27.6,11.52z"/><path class="st11" d="M27.6,11.52l2.37,7.3l-4.87,1.58L27.6,11.52L27.6,11.52z M27.6,11.52L27.6,11.52L27.6,11.52L27.6,11.52z"/><path class="st11" d="M34.9,16.83h-7.68v5.12L34.9,16.83L34.9,16.83z M34.9,16.83L34.9,16.83L34.9,16.83L34.9,16.83z"/><path class="st11" d="M34.9,16.83l-6.21,4.51l-3.01-4.14L34.9,16.83L34.9,16.83z M34.9,16.83L34.9,16.83L34.9,16.83L34.9,16.83z"/><path class="st11" d="M32.11,25.41l-2.37-7.3l-4.87,1.58L32.11,25.41L32.11,25.41z M32.11,25.41L32.11,25.41L32.11,25.41 L32.11,25.41z"/><path class="st11" d="M32.11,25.41L25.9,20.9l3.01-4.14L32.11,25.41L32.11,25.41z M32.11,25.41L32.11,25.41L32.11,25.41L32.11,25.41 z"/><path class="st11" d="M20.3,16.83h7.68v5.12L20.3,16.83L20.3,16.83z M20.3,16.83L20.3,16.83L20.3,16.83L20.3,16.83z"/><path class="st11" d="M20.3,16.83l6.21,4.51l3.01-4.14L20.3,16.83L20.3,16.83z M20.3,16.83L20.3,16.83L20.3,16.83L20.3,16.83z"/><path class="st11" d="M23.09,25.41l2.37-7.3l4.87,1.58L23.09,25.41L23.09,25.41z M23.09,25.41L23.09,25.41L23.09,25.41L23.09,25.41z"/><path class="st11" d="M23.09,25.41l6.21-4.51l-3.01-4.14L23.09,25.41L23.09,25.41z M23.09,25.41L23.09,25.41L23.09,25.41 L23.09,25.41z"/></g></svg>
                       </div>
+                          VN
+                      %endif
+                      % if LANGUAGE_CODE == 'en':
+                      <div class="selected-svg">
+                        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55.2 38.4" style="width:24px" xml:space="preserve"><style type="text/css">.st0{fill:#FEFEFE;} .st1{fill:#C8102E;} .st2{fill:#012169;}</style><g><path class="st0" d="M2.87,38.4h49.46c1.59-0.09,2.87-1.42,2.87-3.03V3.03c0-1.66-1.35-3.02-3.01-3.03H3.01 C1.35,0.01,0,1.37,0,3.03v32.33C0,36.98,1.28,38.31,2.87,38.4L2.87,38.4z"/><polygon class="st1" points="23.74,23.03 23.74,38.4 31.42,38.4 31.42,23.03 55.2,23.03 55.2,15.35 31.42,15.35 31.42,0 23.74,0 23.74,15.35 0,15.35 0,23.03 23.74,23.03"/><path class="st2" d="M33.98,12.43V0h18.23c1.26,0.02,2.34,0.81,2.78,1.92L33.98,12.43L33.98,12.43z"/><path class="st2" d="M33.98,25.97V38.4h18.35c1.21-0.07,2.23-0.85,2.66-1.92L33.98,25.97L33.98,25.97z"/><path class="st2" d="M21.18,25.97V38.4H2.87c-1.21-0.07-2.24-0.85-2.66-1.94L21.18,25.97L21.18,25.97z"/><path class="st2" d="M21.18,12.43V0H2.99C1.73,0.02,0.64,0.82,0.21,1.94L21.18,12.43L21.18,12.43z"/><polygon class="st2" points="0,12.8 7.65,12.8 0,8.97 0,12.8"/><polygon class="st2" points="55.2,12.8 47.51,12.8 55.2,8.95 55.2,12.8"/><polygon class="st2" points="55.2,25.6 47.51,25.6 55.2,29.45 55.2,25.6"/><polygon class="st2" points="0,25.6 7.65,25.6 0,29.43 0,25.6"/><polygon class="st1" points="55.2,3.25 36.15,12.8 40.41,12.8 55.2,5.4 55.2,3.25"/><polygon class="st1" points="19.01,25.6 14.75,25.6 0,32.98 0,35.13 19.05,25.6 19.01,25.6"/><polygon class="st1" points="10.52,12.81 14.78,12.81 0,5.41 0,7.55 10.52,12.81"/><polygon class="st1" points="44.63,25.59 40.37,25.59 55.2,33.02 55.2,30.88 44.63,25.59"/></g></svg>
+                      </div>
+                          EN
+                      % endif
                     % endif
-                
+                    
                   </div>
-                  <div class="options">
-                      % for language in languages :
-                      <div class="option" id='${language[0]}' data-language="${language[0]}">
-                        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55.2 38.4" style="width:24px;" xml:space="preserve"><style type="text/css">.st0{fill:#DA251D;} .st1{fill:#FFFF00;}</style><g><path class="st0" d="M3.01,0h49.17c1.66,0.01,3.01,1.37,3.01,3.03v32.33c0,1.66-1.35,3.02-3.01,3.03H3.01 C1.35,38.39,0,37.03,0,35.37V3.03C0,1.37,1.35,0.01,3.01,0L3.01,0z"/><path class="st1" d="M27.6,11.52l-2.37,7.3l4.87,1.58L27.6,11.52L27.6,11.52z M27.6,11.52L27.6,11.52L27.6,11.52L27.6,11.52z"/><path class="st1" d="M27.6,11.52l2.37,7.3l-4.87,1.58L27.6,11.52L27.6,11.52z M27.6,11.52L27.6,11.52L27.6,11.52L27.6,11.52z"/><path class="st1" d="M34.9,16.83h-7.68v5.12L34.9,16.83L34.9,16.83z M34.9,16.83L34.9,16.83L34.9,16.83L34.9,16.83z"/><path class="st1" d="M34.9,16.83l-6.21,4.51l-3.01-4.14L34.9,16.83L34.9,16.83z M34.9,16.83L34.9,16.83L34.9,16.83L34.9,16.83z"/><path class="st1" d="M32.11,25.41l-2.37-7.3l-4.87,1.58L32.11,25.41L32.11,25.41z M32.11,25.41L32.11,25.41L32.11,25.41 L32.11,25.41z"/><path class="st1" d="M32.11,25.41L25.9,20.9l3.01-4.14L32.11,25.41L32.11,25.41z M32.11,25.41L32.11,25.41L32.11,25.41L32.11,25.41 z"/><path class="st1" d="M20.3,16.83h7.68v5.12L20.3,16.83L20.3,16.83z M20.3,16.83L20.3,16.83L20.3,16.83L20.3,16.83z"/><path class="st1" d="M20.3,16.83l6.21,4.51l3.01-4.14L20.3,16.83L20.3,16.83z M20.3,16.83L20.3,16.83L20.3,16.83L20.3,16.83z"/><path class="st1" d="M23.09,25.41l2.37-7.3l4.87,1.58L23.09,25.41L23.09,25.41z M23.09,25.41L23.09,25.41L23.09,25.41L23.09,25.41z"/><path class="st1" d="M23.09,25.41l6.21-4.51l-3.01-4.14L23.09,25.41L23.09,25.41z M23.09,25.41L23.09,25.41L23.09,25.41 L23.09,25.41z"/></g></svg>
-                        ${language[0]}
+                  <div class="select-options">
+                      <div class="select-option" data-value="vi">
+                        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55.2 38.4" style="width:24px" xml:space="preserve"><style type="text/css">.st01{fill:#DA251D;} .st11{fill:#FFFF00;}</style><g><path class="st01" d="M3.01,0h49.17c1.66,0.01,3.01,1.37,3.01,3.03v32.33c0,1.66-1.35,3.02-3.01,3.03H3.01 C1.35,38.39,0,37.03,0,35.37V3.03C0,1.37,1.35,0.01,3.01,0L3.01,0z"/><path class="st11" d="M27.6,11.52l-2.37,7.3l4.87,1.58L27.6,11.52L27.6,11.52z M27.6,11.52L27.6,11.52L27.6,11.52L27.6,11.52z"/><path class="st11" d="M27.6,11.52l2.37,7.3l-4.87,1.58L27.6,11.52L27.6,11.52z M27.6,11.52L27.6,11.52L27.6,11.52L27.6,11.52z"/><path class="st11" d="M34.9,16.83h-7.68v5.12L34.9,16.83L34.9,16.83z M34.9,16.83L34.9,16.83L34.9,16.83L34.9,16.83z"/><path class="st11" d="M34.9,16.83l-6.21,4.51l-3.01-4.14L34.9,16.83L34.9,16.83z M34.9,16.83L34.9,16.83L34.9,16.83L34.9,16.83z"/><path class="st11" d="M32.11,25.41l-2.37-7.3l-4.87,1.58L32.11,25.41L32.11,25.41z M32.11,25.41L32.11,25.41L32.11,25.41 L32.11,25.41z"/><path class="st11" d="M32.11,25.41L25.9,20.9l3.01-4.14L32.11,25.41L32.11,25.41z M32.11,25.41L32.11,25.41L32.11,25.41L32.11,25.41 z"/><path class="st11" d="M20.3,16.83h7.68v5.12L20.3,16.83L20.3,16.83z M20.3,16.83L20.3,16.83L20.3,16.83L20.3,16.83z"/><path class="st11" d="M20.3,16.83l6.21,4.51l3.01-4.14L20.3,16.83L20.3,16.83z M20.3,16.83L20.3,16.83L20.3,16.83L20.3,16.83z"/><path class="st11" d="M23.09,25.41l2.37-7.3l4.87,1.58L23.09,25.41L23.09,25.41z M23.09,25.41L23.09,25.41L23.09,25.41L23.09,25.41z"/><path class="st11" d="M23.09,25.41l6.21-4.51l-3.01-4.14L23.09,25.41L23.09,25.41z M23.09,25.41L23.09,25.41L23.09,25.41 L23.09,25.41z"/></g></svg>
+                          <span>VN</span>
                       </div>
-                      % endfor
-                  </div> 
-                </div> 
-
+                      <div class="select-option" data-value="en">
+                        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55.2 38.4" style="width:24px" xml:space="preserve"><style type="text/css">.st0{fill:#FEFEFE;} .st1{fill:#C8102E;} .st2{fill:#012169;}</style><g><path class="st0" d="M2.87,38.4h49.46c1.59-0.09,2.87-1.42,2.87-3.03V3.03c0-1.66-1.35-3.02-3.01-3.03H3.01 C1.35,0.01,0,1.37,0,3.03v32.33C0,36.98,1.28,38.31,2.87,38.4L2.87,38.4z"/><polygon class="st1" points="23.74,23.03 23.74,38.4 31.42,38.4 31.42,23.03 55.2,23.03 55.2,15.35 31.42,15.35 31.42,0 23.74,0 23.74,15.35 0,15.35 0,23.03 23.74,23.03"/><path class="st2" d="M33.98,12.43V0h18.23c1.26,0.02,2.34,0.81,2.78,1.92L33.98,12.43L33.98,12.43z"/><path class="st2" d="M33.98,25.97V38.4h18.35c1.21-0.07,2.23-0.85,2.66-1.92L33.98,25.97L33.98,25.97z"/><path class="st2" d="M21.18,25.97V38.4H2.87c-1.21-0.07-2.24-0.85-2.66-1.94L21.18,25.97L21.18,25.97z"/><path class="st2" d="M21.18,12.43V0H2.99C1.73,0.02,0.64,0.82,0.21,1.94L21.18,12.43L21.18,12.43z"/><polygon class="st2" points="0,12.8 7.65,12.8 0,8.97 0,12.8"/><polygon class="st2" points="55.2,12.8 47.51,12.8 55.2,8.95 55.2,12.8"/><polygon class="st2" points="55.2,25.6 47.51,25.6 55.2,29.45 55.2,25.6"/><polygon class="st2" points="0,25.6 7.65,25.6 0,29.43 0,25.6"/><polygon class="st1" points="55.2,3.25 36.15,12.8 40.41,12.8 55.2,5.4 55.2,3.25"/><polygon class="st1" points="19.01,25.6 14.75,25.6 0,32.98 0,35.13 19.05,25.6 19.01,25.6"/><polygon class="st1" points="10.52,12.81 14.78,12.81 0,5.41 0,7.55 10.52,12.81"/><polygon class="st1" points="44.63,25.59 40.37,25.59 55.2,33.02 55.2,30.88 44.63,25.59"/></g></svg>
+                          <span>EN</span>
+                      </div>
+                  </div>
             </form>
         % endif
   
@@ -141,34 +154,48 @@ from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_en
   </div>
 </div>
 
+
 <script>
-  const selectHeader = document.querySelector('.select-header');
-  const options = document.querySelector('.options');
-  const selectedOption = document.querySelector('#selected-option');
-  const selectedLanguageInput = document.querySelector('#selected-language');
-  
-
-
-  function setSessionCookie(cookieName, cookieValue) {
+  const select = document.querySelector(".custom-select");
+      const selected = select.querySelector(".select-selected");
+      const selectedSvg = selected.querySelector(".selected-svg");
+      const options = select.querySelector(".select-options");
+      const optionItems = select.querySelectorAll(".select-option");
+      
+    function setSessionCookie(cookieName, cookieValue) {
 
     document.cookie = cookieName + "=" + cookieValue + ";path=/";
   }
+  
+  function closeOptions() {
+    options.style.display = "none";
+}
 
-  selectHeader.addEventListener('click', () => {
-    options.classList.toggle('show');
-  });
-  
-  options.addEventListener('click', (e) => {
-      const value = e.target.getAttribute('data-language')
-      selectedOption.textContent = value;
-      options.classList.remove('show');
-      setSessionCookie('openedx-language-preference', value)
-      location.reload();
-  });
-  
-  document.addEventListener('click', (e) => {
-    if (!selectHeader.contains(e.target)) {
-      options.classList.remove('show');
+  selected.addEventListener("click", () => {
+    if (options.style.display === "block") {
+        closeOptions();
+    } else {
+        options.style.display = "block";
     }
-  });
+});
+      
+      optionItems.forEach((option) => {
+          option.addEventListener("click", () => {
+            selected.innerHTML= ''
+              const selectedValue = option.getAttribute("data-value");
+              const selectedText = option.querySelector("span").textContent;
+              selectedSvg.innerHTML = option.querySelector("svg").outerHTML;
+              selected.appendChild(selectedSvg);
+              selected.appendChild(document.createTextNode(selectedText));
+              options.style.display = "none";
+              setSessionCookie('openedx-language-preference', selectedValue)
+              location.reload();
+          });
+      });
+ document.addEventListener("click", (event) => {
+        if (!select.contains(event.target)) {
+            closeOptions();
+        }
+    });
+
 </script>
