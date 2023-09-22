@@ -17,3 +17,36 @@ class CourseCommonSerializer(serializers.Serializer):
     rerun_link = serializers.CharField()
     run = serializers.CharField()
     url = serializers.CharField()
+
+
+class StrictSerializer(serializers.Serializer):
+    """
+    Serializers that validates strong parameters, i.e. that no extra fields are passed in.
+    The serializer inheriting from this may throw a ValidationError and can be called in a try/catch
+    block that will return a 400 response on ValidationError.
+    """
+    def to_internal_value(self, data):
+        """
+        raise validation error if there are any unexpected fields.
+        """
+        # Transform and validate the expected fields
+        ret = super().to_internal_value(data)
+
+        # Get the list of valid fields from the serializer
+        valid_fields = set(self.fields.keys())
+
+        # Check for unexpected fields
+        extra_fields = set(data.keys()) - valid_fields
+        if extra_fields:
+            # Check if these unexpected fields are due to nested serializers
+            for field_name in list(extra_fields):
+                if isinstance(self.fields.get(field_name), serializers.BaseSerializer):
+                    extra_fields.remove(field_name)
+
+            # If there are still unexpected fields left, raise an error
+            if extra_fields:
+                raise serializers.ValidationError(
+                    {field: ["This field is not expected."] for field in extra_fields}
+                )
+
+        return ret
