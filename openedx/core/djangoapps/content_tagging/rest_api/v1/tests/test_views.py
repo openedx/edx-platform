@@ -17,8 +17,8 @@ from rest_framework.test import APITestCase
 
 from common.djangoapps.student.auth import add_users, update_org_role
 from common.djangoapps.student.roles import CourseStaffRole, OrgContentCreatorRole
+from openedx.core.djangoapps.content_tagging.models import TaxonomyOrg
 from openedx.core.djangolib.testing.utils import skip_unless_cms
-from openedx.features.content_tagging.models import TaxonomyOrg
 
 User = get_user_model()
 
