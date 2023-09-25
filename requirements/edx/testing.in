@@ -18,7 +18,6 @@
 -r coverage.txt           # Utilities for calculating test coverage
 
 beautifulsoup4            # Library for extracting data from HTML and XML files
-bok-choy                  # Framework for browser automation tests, based on selenium
 code-annotations          # Perform code annotation checking, such as for PII annotations
 cssselect                 # Used to extract HTML fragments via CSS selectors in 2 test cases and pyquery
 ddt                       # Run a test case multiple times with different input; used in many, many of our tests
