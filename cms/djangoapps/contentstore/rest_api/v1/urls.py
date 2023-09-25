@@ -74,7 +74,7 @@ urlpatterns = [
         videos.VideosView.as_view(), name='studio_content_videos_uploads'
     ),
     re_path(
-        fr'^videos/images/{settings.COURSE_ID_PATTERN}/{VIDEO_ID_PATTERN}?$',
+        fr'^videos/images/{settings.COURSE_ID_PATTERN}/{VIDEO_ID_PATTERN}$',
         videos.VideoImagesView.as_view(), name='studio_content_videos_images'
     ),
     re_path(

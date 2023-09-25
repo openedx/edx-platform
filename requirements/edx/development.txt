@@ -145,17 +145,15 @@ boto==2.39.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-boto3==1.7.0
+boto3==1.28.53
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.10.84
+botocore==1.31.53
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   boto3
@@ -431,7 +429,7 @@ django-classy-tags==4.1.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   django-sekizai
-django-config-models==2.5.0
+django-config-models==2.5.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -524,7 +522,7 @@ django-mysql==4.11.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-django-oauth-toolkit==1.5.0
+django-oauth-toolkit==1.6.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -571,7 +569,7 @@ django-statici18n==2.4.0
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
     #   xblock-drag-and-drop-v2
-django-storages==1.13.2
+django-storages==1.14
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -640,8 +638,6 @@ docutils==0.19
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
-    #   botocore
     #   pydata-sphinx-theme
     #   sphinx
     #   sphinx-mdinclude
@@ -759,7 +755,7 @@ edx-enterprise==4.3.1
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-event-bus-kafka==5.4.0
+edx-event-bus-kafka==5.5.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -782,7 +778,7 @@ edx-name-affirmation==2.3.6
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-opaque-keys[django]==2.5.0
+edx-opaque-keys[django]==2.5.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -950,7 +946,7 @@ gitdb==4.0.10
     # via
     #   -r requirements/edx/doc.txt
     #   gitpython
-gitpython==3.1.36
+gitpython==3.1.37
     # via -r requirements/edx/doc.txt
 glob2==0.7
     # via
@@ -1064,7 +1060,7 @@ jinja2==3.1.2
     #   coreschema
     #   diff-cover
     #   sphinx
-jmespath==0.10.0
+jmespath==1.0.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1305,7 +1301,7 @@ openedx-django-require==2.1.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openedx-django-wiki==2.0.1
+openedx-django-wiki==2.0.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1792,7 +1788,7 @@ rules==3.3
     #   edx-enterprise
     #   edx-proctoring
     #   openedx-learning
-s3transfer==0.1.13
+s3transfer==0.6.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1841,7 +1837,6 @@ six==1.16.0
     #   chem
     #   codejail-includes
     #   crowdsourcehinter-xblock
-    #   django-oauth-toolkit
     #   edx-ace
     #   edx-auth-backends
     #   edx-ccx-keys
@@ -2118,6 +2113,7 @@ urllib3==1.26.16
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
+    #   botocore
     #   elasticsearch
     #   pact-python
     #   py2neo
