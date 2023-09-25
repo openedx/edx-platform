@@ -112,7 +112,7 @@ class AuthenticateLtiUserTest(TestCase):
         lti_user.edx_user_id = self.edx_user_id
         with patch('lms.djangoapps.lti_provider.users.create_lti_user', return_value=lti_user) as create_user:
             users.authenticate_lti_user(self.request, self.lti_user_id, self.lti_consumer)
-            create_user.assert_called_with(self.lti_user_id, self.lti_consumer)
+            create_user.assert_called_with(self.lti_user_id, self.lti_consumer, "")
             switch_user.assert_called_with(self.request, lti_user, self.lti_consumer)
 
     def test_authentication_with_authenticated_user(self, create_user, switch_user):
@@ -140,6 +140,18 @@ class AuthenticateLtiUserTest(TestCase):
         assert not create_user.called
         switch_user.assert_called_with(self.request, lti_user, self.lti_consumer)
 
+    def test_auto_linking_of_users_using_lis_person_contact_email_primary(self, create_user, switch_user):
+        request = RequestFactory().post("/", {"lis_person_contact_email_primary": self.old_user.email})
+        request.user = self.old_user
+
+        users.authenticate_lti_user(request, self.lti_user_id, self.lti_consumer)
+        create_user.assert_called_with(self.lti_user_id, self.lti_consumer, "")
+
+        self.lti_consumer.auto_link_users_using_email = True
+        self.lti_consumer.save()
+        users.authenticate_lti_user(request, self.lti_user_id, self.lti_consumer)
+        create_user.assert_called_with(self.lti_user_id, self.lti_consumer, self.old_user.email)
+
 
 class CreateLtiUserTest(TestCase):
     """
@@ -154,16 +166,17 @@ class CreateLtiUserTest(TestCase):
             consumer_secret='TestSecret'
         )
         self.lti_consumer.save()
+        self.existing_user = UserFactory.create()
 
     def test_create_lti_user_creates_auth_user_model(self):
         users.create_lti_user('lti_user_id', self.lti_consumer)
-        assert User.objects.count() == 1
+        assert User.objects.count() == 2
 
     @patch('uuid.uuid4', return_value='random_uuid')
     @patch('lms.djangoapps.lti_provider.users.generate_random_edx_username', return_value='edx_id')
     def test_create_lti_user_creates_correct_user(self, uuid_mock, _username_mock):
         users.create_lti_user('lti_user_id', self.lti_consumer)
-        assert User.objects.count() == 1
+        assert User.objects.count() == 2
         user = User.objects.get(username='edx_id')
         assert user.email == 'edx_id@lti.example.com'
         uuid_mock.assert_called_with()
@@ -173,9 +186,14 @@ class CreateLtiUserTest(TestCase):
         User(username='edx_id').save()
         users.create_lti_user('lti_user_id', self.lti_consumer)
         assert username_mock.call_count == 2
-        assert User.objects.count() == 2
+        assert User.objects.count() == 3
         user = User.objects.get(username='new_edx_id')
         assert user.email == 'new_edx_id@lti.example.com'
+
+    def test_existing_user_is_linked(self):
+        lti_user = users.create_lti_user('lti_user_id', self.lti_consumer, self.existing_user.email)
+        assert lti_user.lti_consumer == self.lti_consumer
+        assert lti_user.edx_user == self.existing_user
 
 
 class LtiBackendTest(TestCase):
