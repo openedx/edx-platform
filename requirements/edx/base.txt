@@ -406,7 +406,7 @@ drf-jwt==1.19.2
     # via edx-drf-extensions
 drf-nested-routers==0.93.4
     # via openedx-blockstore
-drf-spectacular==0.26.4
+drf-spectacular==0.26.5
     # via -r requirements/edx/kernel.in
 drf-yasg==1.21.5
     # via
@@ -599,7 +599,7 @@ html5lib==1.1
     # via
     #   -r requirements/edx/kernel.in
     #   ora2
-icalendar==5.0.8
+icalendar==5.0.9
     # via -r requirements/edx/kernel.in
 idna==3.4
     # via
