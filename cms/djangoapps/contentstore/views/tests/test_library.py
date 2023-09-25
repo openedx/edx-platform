@@ -480,9 +480,14 @@ class UnitTestLibraries(CourseTestCase):
                             # Assert that the method returned the expected value
                             self.assertEqual(organizations, [])
                         with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
-                            organizations = get_allowed_organizations_for_libraries(self.user)
-                            # Assert that the method returned the expected value
-                            self.assertEqual(organizations, ['org1', 'org2'])
+                            # Assert that correct org values are returned based on course creator state
+                            for course_creator_state in CourseCreator.STATES:
+                                course_creator.state = course_creator_state
+                                organizations = get_allowed_organizations_for_libraries(self.user)
+                                if course_creator_state != CourseCreator.GRANTED:
+                                    self.assertEqual(organizations, [])
+                                else:
+                                    self.assertEqual(organizations, ['org1', 'org2'])
                     with mock.patch.dict(
                         'django.conf.settings.FEATURES',
                         {"ENABLE_ORGANIZATION_STAFF_ACCESS_FOR_CONTENT_LIBRARIES": True}
