@@ -568,6 +568,9 @@ class DeactivateLogoutView(APIView):
     -  Log the user out
     - Create a row in the retirement table for that user
     """
+    # BearerAuthentication is added here to support account deletion
+    # from the mobile app until it moves to JWT Auth.
+    # See mobile roadmap issue https://github.com/openedx/edx-platform/issues/33307.
     authentication_classes = (JwtAuthentication, SessionAuthentication, BearerAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
