@@ -183,7 +183,7 @@ class Attribute(object):
         return val
 
 
-class InputTypeBase(object):
+class InputTypeBase:
     """
     Abstract base class for input types.
     """
@@ -397,6 +397,31 @@ class InputTypeBase(object):
         """
         return internal_answer
 
+#-----------------------------------------------------------------------------
+
+
+@registry.register
+class RemovedInput(InputTypeBase):
+    """
+    InputType that exists only to preserve scores for removed InputTypes.
+
+    ProblemBlocks automatically get a max score based on the number of Inputs.
+    So to preserve grading properties, we should still register the same number
+    Inputs in a problem, even if we've removed the Input because it wasn't
+    useful enough to maintain. So this is a bare shell of an InputType intended
+    to be a catch-all for these forgotten-and-removed pieces.
+
+    When you need to remove another InputType, add its tag to the list of tags
+    here.
+
+    Current List of Remove InputTypes:
+    
+    MatlabInput:
+     <matlabinput rows="10" cols="80" tabsize="4">
+        Initial Text
+     </matlabinput>
+    """
+    tags = ['matlabinput']  # Add more tags here
 
 #-----------------------------------------------------------------------------
 
@@ -823,205 +848,6 @@ class CodeInput(InputTypeBase):
             ),
             'code_mirror_exit_message': _('Press ESC then TAB or click outside of the code editor to exit')
         }
-
-
-#-----------------------------------------------------------------------------
-
-
-@registry.register
-class MatlabInput(CodeInput):
-    """
-    InputType for handling Matlab code input
-
-    Example:
-     <matlabinput rows="10" cols="80" tabsize="4">
-        Initial Text
-     </matlabinput>
-    """
-    template = "matlabinput.html"
-    tags = ['matlabinput']
-
-    def setup(self):
-        """
-        Handle matlab-specific parsing
-        """
-        _ = self.capa_system.i18n.gettext
-
-        submitted_msg = _("Submitted. As soon as a response is returned, "
-                          "this message will be replaced by that feedback.")
-        self.submitted_msg = submitted_msg
-
-        self.setup_code_response_rendering()
-
-        xml = self.xml
-
-        self.plot_payload = xml.findtext('./plot_payload')
-        # Check if problem has been queued
-        self.queuename = 'matlab'
-        self.queue_msg = ''
-        # this is only set if we don't have a graded response
-        # the graded response takes precedence
-        if 'queue_msg' in self.input_state and self.status in ['queued', 'incomplete', 'unsubmitted']:
-            self.queue_msg = sanitize_html(self.input_state['queue_msg'])
-
-        if 'queuestate' in self.input_state and self.input_state['queuestate'] == 'queued':
-            self.status = 'queued'
-            self.queue_len = 1
-            self.msg = self.submitted_msg
-            # Handle situation if no response from xqueue arrived during specified time.
-            if ('queuetime' not in self.input_state or
-                    time.time() - self.input_state['queuetime'] > XQUEUE_TIMEOUT):
-                self.queue_len = 0
-                self.status = 'unsubmitted'
-                self.msg = _(
-                    'No response from Xqueue within {xqueue_timeout} seconds. Aborted.'
-                ).format(xqueue_timeout=XQUEUE_TIMEOUT)
-
-    def handle_ajax(self, dispatch, data):
-        """
-        Handle AJAX calls directed to this input
-
-        Args:
-            - dispatch (str) - indicates how we want this ajax call to be handled
-            - data (dict) - dictionary of key-value pairs that contain useful data
-        Returns:
-            dict - 'success' - whether or not we successfully queued this submission
-                 - 'message' - message to be rendered in case of error
-        """
-
-        if dispatch == 'plot':
-            return self._plot_data(data)
-        return {}
-
-    def ungraded_response(self, queue_msg, queuekey):
-        """
-        Handle the response from the XQueue
-        Stores the response in the input_state so it can be rendered later
-
-        Args:
-            - queue_msg (str) - message returned from the queue. The message to be rendered
-            - queuekey (str) - a key passed to the queue. Will be matched up to verify that this is the response we're waiting for  # lint-amnesty, pylint: disable=line-too-long
-
-        Returns:
-            nothing
-        """
-        # check the queuekey against the saved queuekey
-        if('queuestate' in self.input_state and self.input_state['queuestate'] == 'queued'
-                and self.input_state['queuekey'] == queuekey):
-            msg = self._parse_data(queue_msg)
-            # save the queue message so that it can be rendered later
-            self.input_state['queue_msg'] = msg
-            self.input_state['queuestate'] = None
-            self.input_state['queuekey'] = None
-
-    def button_enabled(self):
-        """ Return whether or not we want the 'Test Code' button visible
-
-        Right now, we only want this button to show up when a problem has not been
-        checked.
-        """
-        if self.status in ['correct', 'incorrect', 'partially-correct']:
-            return False
-        else:
-            return True
-
-    def _extra_context(self):
-        """ Set up additional context variables"""
-
-        _ = self.capa_system.i18n.gettext
-
-        queue_msg = self.queue_msg
-        if len(self.queue_msg) > 0:  # An empty string cannot be parsed as XML but is okay to include in the template.
-            try:
-                etree.XML(HTML('<div>{0}</div>').format(HTML(self.queue_msg)))
-            except etree.XMLSyntaxError:
-                try:
-                    html5lib.parseFragment(self.queue_msg, treebuilder='lxml', namespaceHTMLElements=False)[0]
-                except (IndexError, ValueError):
-                    # If neither can parse queue_msg, it contains invalid xml.
-                    queue_msg = HTML("<span>{0}</span>").format(_("Error running code."))
-
-        extra_context = {
-            'queue_len': str(self.queue_len),
-            'queue_msg': queue_msg,
-            'button_enabled': self.button_enabled(),
-            'matlab_editor_js': '{static_url}js/vendor/CodeMirror/octave.js'.format(
-                static_url=self.capa_system.STATIC_URL),
-            'msg': sanitize_html(self.msg)  # sanitize msg before rendering into template
-        }
-        return extra_context
-
-    def _parse_data(self, queue_msg):
-        """
-        Parses the message out of the queue message
-        Args:
-            queue_msg (str) - a JSON encoded string
-        Returns:
-            returns the value for the the key 'msg' in queue_msg
-        """
-        try:
-            result = json.loads(queue_msg)
-        except (TypeError, ValueError):
-            log.error("External message should be a JSON serialized dict."
-                      " Received queue_msg = %s", queue_msg)
-            raise
-        msg = result['msg']
-        return msg
-
-    def _plot_data(self, data):
-        """
-        AJAX handler for the plot button
-        Args:
-            get (dict) - should have key 'submission' which contains the student submission
-        Returns:
-            dict - 'success' - whether or not we successfully queued this submission
-                 - 'message' - message to be rendered in case of error
-        """
-        _ = self.capa_system.i18n.gettext
-        # only send data if xqueue exists
-        if self.capa_system.xqueue is None:
-            return {'success': False, 'message': _('Cannot connect to the queue')}
-
-        # pull relevant info out of get
-        response = data['submission']
-
-        # construct xqueue headers
-        qinterface = self.capa_system.xqueue.interface
-        qtime = datetime.utcnow().strftime(xqueue_interface.dateformat)
-        callback_url = self.capa_system.xqueue.construct_callback('ungraded_response')
-        anonymous_student_id = self.capa_system.anonymous_student_id
-        # TODO: Why is this using self.capa_system.seed when we have self.seed???
-        queuekey = xqueue_interface.make_hashkey(str(self.capa_system.seed) + qtime +
-                                                 anonymous_student_id +
-                                                 self.input_id)
-        xheader = xqueue_interface.make_xheader(
-            lms_callback_url=callback_url,
-            lms_key=queuekey,
-            queue_name=self.queuename)
-
-        # construct xqueue body
-        student_info = {
-            'anonymous_student_id': anonymous_student_id,
-            'submission_time': qtime
-        }
-        contents = {
-            'grader_payload': self.plot_payload,
-            'student_info': json.dumps(student_info),
-            'student_response': response,
-            'token': getattr(self.capa_system, 'matlab_api_key', None),
-            'endpoint_version': "2",
-            'requestor_id': anonymous_student_id,
-        }
-
-        (error, msg) = qinterface.send_to_queue(header=xheader,
-                                                body=json.dumps(contents))
-        # save the input state if successful
-        if error == 0:
-            self.input_state['queuekey'] = queuekey
-            self.input_state['queuestate'] = 'queued'
-            self.input_state['queuetime'] = time.time()
-
-        return {'success': error == 0, 'message': msg}
 
 
 #-----------------------------------------------------------------------------

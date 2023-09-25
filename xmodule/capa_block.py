@@ -295,15 +295,6 @@ class ProblemBlock(
         default=False,
         scope=Scope.settings
     )
-    matlab_api_key = String(
-        display_name=_("Matlab API key"),
-        help=_("Enter the API key provided by MathWorks for accessing the MATLAB Hosted Service. "
-               "This key is granted for exclusive use by this course for the specified duration. "
-               "Please do not share the API key with other courses and notify MathWorks immediately "
-               "if you believe the key is exposed or compromised. To obtain a key for your course, "
-               "or to report an issue, please contact moocsupport@mathworks.com"),
-        scope=Scope.settings
-    )
 
     def bind_for_student(self, *args, **kwargs):  # lint-amnesty, pylint: disable=signature-differs
         super().bind_for_student(*args, **kwargs)
@@ -597,7 +588,6 @@ class ProblemBlock(
             resources_fs=self.runtime.resources_fs,
             seed=None,
             xqueue=None,
-            matlab_api_key=None,
         )
         try:
             lcp = LoncapaProblem(
@@ -659,7 +649,6 @@ class ProblemBlock(
             resources_fs=self.runtime.resources_fs,
             seed=1,
             xqueue=None,
-            matlab_api_key=None,
         )
         _ = capa_system.i18n.gettext
 
@@ -808,7 +797,6 @@ class ProblemBlock(
             resources_fs=self.runtime.resources_fs,
             seed=seed,  # Why do we do this if we have self.seed?
             xqueue=None if is_studio else XQueueService(self),
-            matlab_api_key=self.matlab_api_key
         )
 
         return LoncapaProblem(
