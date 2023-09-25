@@ -20,7 +20,7 @@ jobs:
         # because we have global constraint of Django<4.2 
         django-version: ["pinned", "4.2"]
         mongo-version: ["4"]
-        mysql-version: ["8"]
+        mysql-version: ["5.7", "8"]
         # excluding mysql5.7 with Django 4.2 since Django 4.2 has 
         # dropped support for MySQL<8
         exclude:
