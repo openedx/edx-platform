@@ -145,14 +145,14 @@ boto==2.39.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-boto3==1.28.53
+boto3==1.28.54
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.31.53
+botocore==1.31.54
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -655,7 +655,7 @@ drf-nested-routers==0.93.4
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   openedx-blockstore
-drf-spectacular==0.26.4
+drf-spectacular==0.26.5
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -984,7 +984,7 @@ httpx==0.23.3
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
-icalendar==5.0.8
+icalendar==5.0.9
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1002,7 +1002,7 @@ imagesize==1.4.1
     # via
     #   -r requirements/edx/doc.txt
     #   sphinx
-import-linter==1.11.1
+import-linter==1.12.0
     # via -r requirements/edx/testing.txt
 importlib-metadata==6.8.0
     # via
@@ -1239,7 +1239,7 @@ mysqlclient==2.2.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   openedx-blockstore
-newrelic==9.0.0
+newrelic==9.1.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1475,11 +1475,11 @@ pycryptodomex==3.19.0
     #   lti-consumer-xblock
     #   pyjwkest
     #   snowflake-connector-python
-pydantic==2.3.0
+pydantic==2.4.0
     # via
     #   -r requirements/edx/testing.txt
     #   fastapi
-pydantic-core==2.6.3
+pydantic-core==2.10.0
     # via
     #   -r requirements/edx/testing.txt
     #   pydantic
@@ -2054,11 +2054,11 @@ tqdm==4.66.1
     #   openai
 types-pytz==2023.3.1.1
     # via django-stubs
-types-pyyaml==6.0.12.11
+types-pyyaml==6.0.12.12
     # via
     #   django-stubs
     #   djangorestframework-stubs
-types-requests==2.31.0.3
+types-requests==2.31.0.5
     # via djangorestframework-stubs
 types-urllib3==1.26.25.14
     # via types-requests
