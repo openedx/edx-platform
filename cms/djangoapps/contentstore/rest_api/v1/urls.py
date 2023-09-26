@@ -23,7 +23,7 @@ from .views import (
 
 app_name = 'v1'
 
-VIDEO_ID_PATTERN = r'(?:(?P<edx_video_id>[-\w]+))'
+VIDEO_ID_PATTERN = r'(?P<edx_video_id>[-\w]+)'
 
 urlpatterns = [
     path(
@@ -74,8 +74,12 @@ urlpatterns = [
 
     # CMS API
     re_path(
-        fr'^file_assets/{settings.COURSE_ID_PATTERN}/{settings.ASSET_KEY_PATTERN}?$',
-        assets.AssetsView.as_view(), name='cms_api_assets'
+        fr'^file_assets/{settings.COURSE_ID_PATTERN}$',
+        assets.AssetsReadPostView.as_view(), name='cms_api_create_read_assets'
+    ),
+    re_path(
+        fr'^file_assets/{settings.COURSE_ID_PATTERN}/{settings.ASSET_KEY_PATTERN}$',
+        assets.AssetsView.as_view(), name='cms_api_update_delete_assets'
     ),
     re_path(
         fr'^videos/encodings/{settings.COURSE_ID_PATTERN}$',
@@ -92,10 +96,6 @@ urlpatterns = [
     re_path(
         fr'^videos/uploads/{settings.COURSE_ID_PATTERN}/{VIDEO_ID_PATTERN}?$',
         videos.VideosView.as_view(), name='cms_api_videos_uploads'
-    ),
-    re_path(
-        fr'^videos/upload_link/{settings.COURSE_ID_PATTERN}$',
-        videos.UploadLinkView.as_view(), name='cms_api_videos_upload_link'
     ),
     re_path(
         fr'^video_transcripts/{settings.COURSE_ID_PATTERN}$',
