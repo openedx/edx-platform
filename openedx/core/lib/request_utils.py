@@ -155,7 +155,7 @@ class IgnoredErrorMiddleware:
 # .. toggle_name: IGNORED_ERRORS[N]['LOG_ERROR']
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
-# .. toggle_description: If True, the error will be logged with a message like: "Expected error ...".
+# .. toggle_description: If True, the error will be logged with a message like: "Ignored error ...".
 # .. toggle_use_cases: opt_in
 # .. toggle_creation_date: 2021-03-11
 
@@ -169,7 +169,7 @@ class IgnoredErrorMiddleware:
 
 # .. setting_name: IGNORED_ERRORS[N]['REASON_IGNORED']
 # .. setting_default: None
-# .. setting_description: Required string explaining why the error is expected and/or ignored for documentation
+# .. setting_description: Required string explaining why the error is ignored for documentation
 #     purposes.
 
 
@@ -305,10 +305,10 @@ def _log_and_monitor_ignored_errors(request, exception, caller):
 
         # We have confirmed using monitoring that it is very rare that middleware and drf handle different uncaught exceptions.
         # We will leave this attribute in place, but it is not worth investing in a workaround.
-        set_custom_attribute('unexpected_multiple_exceptions', cached_module_and_class)
+        set_custom_attribute('multiple_exceptions', cached_module_and_class)
         log.warning(
-            "Unexpected scenario where different exceptions are handled by _log_and_monitor_ignored_errors. "
-            "See 'unexpected_multiple_exceptions' custom attribute. Skipping exception for %s.",
+            "scenario where different exceptions are handled by _log_and_monitor_ignored_errors. "
+            "See 'multiple_exceptions' custom attribute. Skipping exception for %s.",
             module_and_class,
         )
         return
@@ -330,7 +330,7 @@ def _log_and_monitor_ignored_errors(request, exception, caller):
         exc_info = exception if ignored_error_settings['log_stack_trace'] else None
         request_path = getattr(request, 'path', 'request-path-unknown')
         log.info(
-            'Expected error %s: %s: seen for path %s',
+            'Ignored error %s: %s: seen for path %s',
             module_and_class,
             exception_message,
             request_path,
