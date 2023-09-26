@@ -269,7 +269,7 @@ class SafeCookieData:
         data_to_sign = self._compute_digest(user_id)
 
         self.signature = signing.TimestampSigner(
-            salt=self.key_salt, algorithm=settings.DEFAULT_HASHING_ALGORITHM
+            salt=self.key_salt, algorithm=settings.SAFE_SESSIONS_MAC_ALGO
         ).sign_object(data_to_sign, serializer=signing.JSONSerializer, compress=False)
 
     def verify(self, user_id):
@@ -280,7 +280,7 @@ class SafeCookieData:
         """
         try:
             unsigned_data = signing.TimestampSigner(
-                salt=self.key_salt, algorithm=settings.DEFAULT_HASHING_ALGORITHM
+                salt=self.key_salt, algorithm=settings.SAFE_SESSIONS_MAC_ALGO
             ).unsign_object(self.signature, serializer=signing.JSONSerializer, max_age=settings.SESSION_COOKIE_AGE)
 
             if unsigned_data == self._compute_digest(user_id):

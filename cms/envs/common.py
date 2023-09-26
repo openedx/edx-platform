@@ -1087,6 +1087,9 @@ DATABASES = {
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 DEFAULT_HASHING_ALGORITHM = 'sha1'
 
+# default algorithm for SafeSessionMiddleware
+SAFE_SESSIONS_MAC_ALGO = 'sha1'
+
 #################### Python sandbox ############################################
 
 CODE_JAIL = {
