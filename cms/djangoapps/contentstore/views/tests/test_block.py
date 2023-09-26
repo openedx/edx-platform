@@ -2675,10 +2675,7 @@ class TestComponentTemplates(CourseTestCase):
         XBlockStudioConfiguration.objects.create(
             name="openassessment", enabled=True, support_level="us"
         )
-        # Library Sourced Block and Library Content block has it's own category.
-        XBlockStudioConfiguration.objects.create(
-            name="library_sourced", enabled=True, support_level="fs"
-        )
+        # Library Content block has its own category.
         XBlockStudioConfiguration.objects.create(
             name="library_content", enabled=True, support_level="fs"
         )
@@ -2779,7 +2776,7 @@ class TestComponentTemplates(CourseTestCase):
         self._verify_basic_component("video", "Video", "us")
         problem_templates = self.get_templates_of_type("problem")
         problem_no_boilerplate = self.get_template(
-            problem_templates, "Blank Advanced Problem"
+            problem_templates, "Blank Problem"
         )
         self.assertIsNotNone(problem_no_boilerplate)
         self.assertEqual("us", problem_no_boilerplate["support_level"])

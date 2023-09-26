@@ -21,13 +21,16 @@ from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     GeneratedCertificate
 )
-from lms.djangoapps.certificates.signals import listen_for_certificate_created_event
+from lms.djangoapps.certificates.signals import (
+    listen_for_certificate_created_event,
+    listen_for_certificate_revoked_event
+)
 from lms.djangoapps.certificates.tests.factories import CertificateAllowlistFactory, GeneratedCertificateFactory
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx_events.data import EventsMetadata
-from openedx_events.learning.signals import CERTIFICATE_CREATED
+from openedx_events.learning.signals import CERTIFICATE_CREATED, CERTIFICATE_REVOKED
 from openedx_events.learning.data import CourseData, UserData, UserPersonalData, CertificateData
 
 
@@ -458,22 +461,9 @@ class CertificateEventBusTests(ModuleStoreTestCase):
             mode='verified',
         )
 
-    @override_settings(SEND_CERTIFICATE_CREATED_SIGNAL=False)
-    @mock.patch('lms.djangoapps.certificates.signals.get_producer', autospec=True)
-    def test_event_disabled(self, mock_producer):
+    def _create_event_data(self, event_type, certificate_status):
         """
-        Test to verify that we do not push `CERTIFICATE_CREATED` events to the event bus if the
-        `SEND_CERTIFICATE_CREATED_SIGNAL` setting is disabled.
-        """
-        listen_for_certificate_created_event(None, CERTIFICATE_CREATED)
-        mock_producer.assert_not_called()
-
-    @override_settings(SEND_CERTIFICATE_CREATED_SIGNAL=True)
-    @mock.patch('lms.djangoapps.certificates.signals.get_producer', autospec=True)
-    def test_event_enabled(self, mock_producer):
-        """
-        Test to verify that we push `CERTIFICATE_CREATED` events to the event bus if the
-        `SEND_CERTIFICATE_CREATED_SIGNAL` setting is enabled.
+        Utility function to create test data for unit tests.
         """
         expected_course_data = CourseData(course_key=self.course.id)
         expected_user_data = UserData(
@@ -490,12 +480,12 @@ class CertificateEventBusTests(ModuleStoreTestCase):
             course=expected_course_data,
             mode='verified',
             grade='',
-            current_status='downloadable',
+            current_status=certificate_status,
             download_url='',
             name='',
         )
-        event_metadata = EventsMetadata(
-            event_type=CERTIFICATE_CREATED.event_type,
+        expected_event_metadata = EventsMetadata(
+            event_type=event_type.event_type,
             id=uuid4(),
             minorversion=0,
             source='openedx/lms/web',
@@ -503,15 +493,59 @@ class CertificateEventBusTests(ModuleStoreTestCase):
             time=datetime.now(timezone.utc)
         )
 
-        event_kwargs = {
+        return {
             'certificate': expected_certificate_data,
-            'metadata': event_metadata
+            'metadata': expected_event_metadata,
         }
 
-        listen_for_certificate_created_event(None, CERTIFICATE_CREATED, **event_kwargs)
+    @override_settings(SEND_CERTIFICATE_CREATED_SIGNAL=False)
+    @mock.patch('lms.djangoapps.certificates.signals.get_producer', autospec=True)
+    def test_certificate_created_event_disabled(self, mock_producer):
+        """
+        Test to verify that we do not publish `CERTIFICATE_CREATED` events to the event bus if the
+        `SEND_CERTIFICATE_CREATED_SIGNAL` setting is disabled.
+        """
+        listen_for_certificate_created_event(None, CERTIFICATE_CREATED)
+        mock_producer.assert_not_called()
+
+    @override_settings(SEND_CERTIFICATE_REVOKED_SIGNAL=False)
+    @mock.patch('lms.djangoapps.certificates.signals.get_producer', autospec=True)
+    def test_certificate_revoked_event_disabled(self, mock_producer):
+        """
+        Test to verify that we do not publish `CERTIFICATE_REVOKED` events to the event bus if the
+        `SEND_CERTIFICATE_REVOKED_SIGNAL` setting is disabled.
+        """
+        listen_for_certificate_created_event(None, CERTIFICATE_REVOKED)
+        mock_producer.assert_not_called()
+
+    @override_settings(SEND_CERTIFICATE_CREATED_SIGNAL=True)
+    @mock.patch('lms.djangoapps.certificates.signals.get_producer', autospec=True)
+    def test_certificate_created_event_enabled(self, mock_producer):
+        """
+        Test to verify that we push `CERTIFICATE_CREATED` events to the event bus if the
+        `SEND_CERTIFICATE_CREATED_SIGNAL` setting is enabled.
+        """
+        event_data = self._create_event_data(CERTIFICATE_CREATED, CertificateStatuses.downloadable)
+        listen_for_certificate_created_event(None, CERTIFICATE_CREATED, **event_data)
         # verify that the data sent to the event bus matches what we expect
         data = mock_producer.return_value.send.call_args.kwargs
         assert data['signal'].event_type == CERTIFICATE_CREATED.event_type
-        assert data['event_data']['certificate'] == expected_certificate_data
+        assert data['event_data']['certificate'] == event_data['certificate']
+        assert data['topic'] == 'learning-certificate-lifecycle'
+        assert data['event_key_field'] == 'certificate.course.course_key'
+
+    @override_settings(SEND_CERTIFICATE_REVOKED_SIGNAL=True)
+    @mock.patch('lms.djangoapps.certificates.signals.get_producer', autospec=True)
+    def test_certificate_revoked_event_enabled(self, mock_producer):
+        """
+        Test to verify that we push `CERTIFICATE_REVOKED` events to the event bus if the
+        `SEND_CERTIFICATE_REVOKED_SIGNAL` setting is enabled.
+        """
+        event_data = self._create_event_data(CERTIFICATE_REVOKED, CertificateStatuses.notpassing)
+        listen_for_certificate_revoked_event(None, CERTIFICATE_REVOKED, **event_data)
+        # verify that the data sent to the event bus matches what we expect
+        data = mock_producer.return_value.send.call_args.kwargs
+        assert data['signal'].event_type == CERTIFICATE_REVOKED.event_type
+        assert data['event_data']['certificate'] == event_data['certificate']
         assert data['topic'] == 'learning-certificate-lifecycle'
         assert data['event_key_field'] == 'certificate.course.course_key'

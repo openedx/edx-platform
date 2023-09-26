@@ -168,7 +168,7 @@ class ProblemBlock(
         scope=Scope.settings,
         # it'd be nice to have a useful default but it screws up other things; so,
         # use display_name_with_default for those
-        default=_("Blank Advanced Problem")
+        default=_("Blank Problem")
     )
     attempts = Integer(
         help=_("Number of attempts taken by the student on this problem"),

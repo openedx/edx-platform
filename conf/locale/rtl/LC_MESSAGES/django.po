@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-09-05 15:59+0000\n"
-"PO-Revision-Date: 2023-09-05 15:59:41.440074\n"
+"POT-Creation-Date: 2023-09-24 20:36+0000\n"
+"PO-Revision-Date: 2023-09-24 20:36:20.303017\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -141,8 +141,8 @@ msgid "Video"
 msgstr "Vᴉdǝø"
 
 #: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr "Ƀlɐnʞ Ⱥdʌɐnɔǝd Ᵽɹøblǝɯ"
+msgid "Blank Problem"
+msgstr "Ƀlɐnʞ Ᵽɹøblǝɯ"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -247,8 +247,8 @@ msgstr "Ᵽɹøɟǝssᴉønɐl Ɇd"
 #: common/djangoapps/course_modes/models.py xmodule/annotatable_block.py
 #: xmodule/capa_block.py xmodule/conditional_block.py
 #: xmodule/discussion_block.py xmodule/html_block.py
-#: xmodule/library_content_block.py xmodule/library_sourced_block.py
-#: xmodule/lti_block.py xmodule/split_test_block.py xmodule/unit_block.py
+#: xmodule/library_content_block.py xmodule/lti_block.py
+#: xmodule/split_test_block.py xmodule/unit_block.py
 #: xmodule/word_cloud_block.py xmodule/x_module.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
@@ -3046,6 +3046,14 @@ msgid "Open Response Assessment"
 msgstr "Ødǝn Ɍǝsdønsǝ Ⱥssǝssɯǝnʇ"
 
 #: lms/djangoapps/courseware/courses.py
+msgid ""
+"This Open Response Assessment's due dates are set by your instructor and "
+"can't be shifted."
+msgstr ""
+"Ŧɥᴉs Ødǝn Ɍǝsdønsǝ Ⱥssǝssɯǝnʇ's dnǝ dɐʇǝs ɐɹǝ sǝʇ bʎ ʎønɹ ᴉnsʇɹnɔʇøɹ ɐnd "
+"ɔɐn'ʇ bǝ sɥᴉɟʇǝd."
+
+#: lms/djangoapps/courseware/courses.py
 msgid "Self Assessment"
 msgstr "Sǝlɟ Ⱥssǝssɯǝnʇ"
 
@@ -3060,14 +3068,6 @@ msgstr "Sʇɐɟɟ Ⱥssǝssɯǝnʇ"
 #: lms/djangoapps/courseware/courses.py
 msgid "Submission"
 msgstr "Snbɯᴉssᴉøn"
-
-#: lms/djangoapps/courseware/courses.py
-msgid ""
-"Open Response Assessment due dates are set by your instructor and can't be "
-"shifted."
-msgstr ""
-"Ødǝn Ɍǝsdønsǝ Ⱥssǝssɯǝnʇ dnǝ dɐʇǝs ɐɹǝ sǝʇ bʎ ʎønɹ ᴉnsʇɹnɔʇøɹ ɐnd ɔɐn'ʇ bǝ "
-"sɥᴉɟʇǝd."
 
 #. Translators: 'absolute' is a date such as "Jan 01,
 #. 2020". 'relative' is a fuzzy description of the time until
@@ -5799,7 +5799,6 @@ msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
 #: openedx/core/djangoapps/user_api/admin.py
-#: xmodule/templates/library-sourced-block-studio-view.html
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/videos_index_pagination.html
@@ -7007,6 +7006,19 @@ msgstr ""
 #: openedx/core/djangoapps/content_staging/models.py
 msgid "Original usage key/ID of the thing that is in the clipboard."
 msgstr "Øɹᴉƃᴉnɐl nsɐƃǝ ʞǝʎ/ƗĐ øɟ ʇɥǝ ʇɥᴉnƃ ʇɥɐʇ ᴉs ᴉn ʇɥǝ ɔlᴉdbøɐɹd."
+
+#: openedx/core/djangoapps/content_tagging/models/base.py
+#: wiki/models/article.py
+msgid "owner"
+msgstr "øʍnǝɹ"
+
+#: openedx/core/djangoapps/content_tagging/models/base.py
+msgid ""
+"Organization that is related to this taxonomy.If None, then this taxonomy is"
+" related to all organizations."
+msgstr ""
+"Øɹƃɐnᴉzɐʇᴉøn ʇɥɐʇ ᴉs ɹǝlɐʇǝd ʇø ʇɥᴉs ʇɐxønøɯʎ.Ɨɟ Nønǝ, ʇɥǝn ʇɥᴉs ʇɐxønøɯʎ ᴉs"
+" ɹǝlɐʇǝd ʇø ɐll øɹƃɐnᴉzɐʇᴉøns."
 
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
@@ -9019,18 +9031,6 @@ msgstr ""
 "Ɏøn ɥɐʌǝ snɔɔǝssɟnllʎ sɥᴉɟʇǝd ʎønɹ ɔønɹsǝ sɔɥǝdnlǝ ɐnd ʎønɹ ɔɐlǝndɐɹ ᴉs nd "
 "ʇø dɐʇǝ."
 
-#: openedx/features/content_tagging/models/base.py wiki/models/article.py
-msgid "owner"
-msgstr "øʍnǝɹ"
-
-#: openedx/features/content_tagging/models/base.py
-msgid ""
-"Organization that is related to this taxonomy.If None, then this taxonomy is"
-" related to all organizations."
-msgstr ""
-"Øɹƃɐnᴉzɐʇᴉøn ʇɥɐʇ ᴉs ɹǝlɐʇǝd ʇø ʇɥᴉs ʇɐxønøɯʎ.Ɨɟ Nønǝ, ʇɥǝn ʇɥᴉs ʇɐxønøɯʎ ᴉs"
-" ɹǝlɐʇǝd ʇø ɐll øɹƃɐnᴉzɐʇᴉøns."
-
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
 #: lms/templates/support/feature_based_enrollments.html
@@ -9356,8 +9356,7 @@ msgstr "XMŁ dɐʇɐ ɟøɹ ʇɥǝ ɐnnøʇɐʇᴉøn"
 #: xmodule/annotatable_block.py xmodule/capa_block.py
 #: xmodule/conditional_block.py xmodule/discussion_block.py
 #: xmodule/html_block.py xmodule/library_content_block.py
-#: xmodule/library_root_xblock.py xmodule/library_sourced_block.py
-#: xmodule/poll_block.py xmodule/unit_block.py
+#: xmodule/library_root_xblock.py xmodule/poll_block.py xmodule/unit_block.py
 #: xmodule/video_block/video_xfields.py xmodule/word_cloud_block.py
 #: xmodule/x_module.py
 msgid "The display name for this component."
@@ -11569,35 +11568,6 @@ msgstr "Łᴉbɹɐɹʎ Đᴉsdlɐʎ Nɐɯǝ"
 msgid "Enter the names of the advanced components to use in your library."
 msgstr "Ɇnʇǝɹ ʇɥǝ nɐɯǝs øɟ ʇɥǝ ɐdʌɐnɔǝd ɔøɯdønǝnʇs ʇø nsǝ ᴉn ʎønɹ lᴉbɹɐɹʎ."
 
-#: xmodule/library_sourced_block.py
-msgid "Library Blocks List"
-msgstr "Łᴉbɹɐɹʎ Ƀløɔʞs Łᴉsʇ"
-
-#: xmodule/library_sourced_block.py
-msgid "Enter the IDs of the library XBlocks that you wish to use."
-msgstr "Ɇnʇǝɹ ʇɥǝ ƗĐs øɟ ʇɥǝ lᴉbɹɐɹʎ XɃløɔʞs ʇɥɐʇ ʎøn ʍᴉsɥ ʇø nsǝ."
-
-#: xmodule/library_sourced_block.py
-#, python-brace-format
-msgid "A maximum of {0} components may be added."
-msgstr "Ⱥ ɯɐxᴉɯnɯ øɟ {0} ɔøɯdønǝnʇs ɯɐʎ bǝ ɐddǝd."
-
-#: xmodule/library_sourced_block.py
-msgid ""
-"No XBlock has been configured for this component. Use the editor to select "
-"the target blocks."
-msgstr ""
-"Nø XɃløɔʞ ɥɐs bǝǝn ɔønɟᴉƃnɹǝd ɟøɹ ʇɥᴉs ɔøɯdønǝnʇ. Ʉsǝ ʇɥǝ ǝdᴉʇøɹ ʇø sǝlǝɔʇ "
-"ʇɥǝ ʇɐɹƃǝʇ bløɔʞs."
-
-#: xmodule/library_sourced_block.py
-msgid "Open Editor"
-msgstr "Ødǝn Ɇdᴉʇøɹ"
-
-#: xmodule/library_sourced_block.py
-msgid "Importing Library Block failed - are the IDs valid and readable?"
-msgstr "Ɨɯdøɹʇᴉnƃ Łᴉbɹɐɹʎ Ƀløɔʞ ɟɐᴉlǝd - ɐɹǝ ʇɥǝ ƗĐs ʌɐlᴉd ɐnd ɹǝɐdɐblǝ?"
-
 #: xmodule/lti_block.py
 msgid ""
 "The display name for this component. Analytics reports may also use the "
@@ -12300,10 +12270,6 @@ msgstr "Ŧɥᴉs ɔønʇǝnʇ ǝxdǝɹᴉɯǝnʇ ɥɐs ᴉssnǝs ʇɥɐʇ ɐɟɟ
 #: xmodule/tabs.py
 msgid "External Discussion"
 msgstr "Ɇxʇǝɹnɐl Đᴉsɔnssᴉøn"
-
-#: xmodule/templates/library-sourced-block-studio-view.html
-msgid "Save and Import"
-msgstr "Sɐʌǝ ɐnd Ɨɯdøɹʇ"
 
 #: xmodule/vertical_block.py
 msgid "Enable in-context discussions for the Unit"
@@ -16248,10 +16214,6 @@ msgstr "Đøʍnløɐd sʇndǝnʇ ƃɹɐdǝs"
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Print or share your certificate:"
 msgstr "Ᵽɹᴉnʇ øɹ sɥɐɹǝ ʎønɹ ɔǝɹʇᴉɟᴉɔɐʇǝ:"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-msgid "Click the link to see my certificate."
-msgstr "Ȼlᴉɔʞ ʇɥǝ lᴉnʞ ʇø sǝǝ ɯʎ ɔǝɹʇᴉɟᴉɔɐʇǝ."
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"

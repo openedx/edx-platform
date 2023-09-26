@@ -403,7 +403,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-08-27 20:43+0000\n"
+"POT-Creation-Date: 2023-09-17 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
 "Language-Team: Chinese (China) (https://app.transifex.com/open-edx/teams/6205/zh_CN/)\n"
@@ -504,8 +504,8 @@ msgid "Video"
 msgstr "视频"
 
 #: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr "空白进阶问题"
+msgid "Blank Problem"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -607,8 +607,8 @@ msgstr "专业教育"
 #: common/djangoapps/course_modes/models.py xmodule/annotatable_block.py
 #: xmodule/capa_block.py xmodule/conditional_block.py
 #: xmodule/discussion_block.py xmodule/html_block.py
-#: xmodule/library_content_block.py xmodule/library_sourced_block.py
-#: xmodule/lti_block.py xmodule/split_test_block.py xmodule/unit_block.py
+#: xmodule/library_content_block.py xmodule/lti_block.py
+#: xmodule/split_test_block.py xmodule/unit_block.py
 #: xmodule/word_cloud_block.py xmodule/x_module.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
@@ -3133,6 +3133,12 @@ msgid "Open Response Assessment"
 msgstr "开放式答题评分"
 
 #: lms/djangoapps/courseware/courses.py
+msgid ""
+"This Open Response Assessment's due dates are set by your instructor and "
+"can't be shifted."
+msgstr ""
+
+#: lms/djangoapps/courseware/courses.py
 msgid "Self Assessment"
 msgstr "自我评分"
 
@@ -3147,12 +3153,6 @@ msgstr "工作人员评分"
 #: lms/djangoapps/courseware/courses.py
 msgid "Submission"
 msgstr "提交"
-
-#: lms/djangoapps/courseware/courses.py
-msgid ""
-"Open Response Assessment due dates are set by your instructor and can't be "
-"shifted."
-msgstr "开放式题目测试评估截止日期由您的讲师设置，不能更改。"
 
 #. Translators: 'absolute' is a date such as "Jan 01,
 #. 2020". 'relative' is a fuzzy description of the time until
@@ -5668,7 +5668,6 @@ msgstr "请点击“允许”按钮为以上应用进行授权。若您不希望
 
 #: lms/templates/oauth2_provider/authorize.html
 #: openedx/core/djangoapps/user_api/admin.py
-#: xmodule/templates/library-sourced-block-studio-view.html
 msgid "Cancel"
 msgstr "取消"
 
@@ -6105,11 +6104,11 @@ msgid "Quotes"
 msgstr "引言"
 
 #: lms/templates/wiki/includes/editor_widget.html
-#, python-format
+#, python-brace-format
 msgid ""
-"Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for"
-" help."
-msgstr "此处允许使用MarkDown语法。请参阅%(start_link)s快捷键管理%(end_link)s并寻求帮助。"
+"Markdown syntax is allowed. See the {start_link}cheatsheet{end_link} for "
+"help."
+msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
@@ -7067,8 +7066,8 @@ msgstr "如果禁用，相关学习环境/课程中的讨论将被禁用。"
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
-"The Posting availabilty in discussions whether it will be enabled, scheduled"
-" or indefinitely disabled."
+"The Posting availability in discussions whether it will be enabled, "
+"scheduled or indefinitely disabled."
 msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
@@ -8929,8 +8928,7 @@ msgstr "用于批注的XML数据"
 #: xmodule/annotatable_block.py xmodule/capa_block.py
 #: xmodule/conditional_block.py xmodule/discussion_block.py
 #: xmodule/html_block.py xmodule/library_content_block.py
-#: xmodule/library_root_xblock.py xmodule/library_sourced_block.py
-#: xmodule/poll_block.py xmodule/unit_block.py
+#: xmodule/library_root_xblock.py xmodule/poll_block.py xmodule/unit_block.py
 #: xmodule/video_block/video_xfields.py xmodule/word_cloud_block.py
 #: xmodule/x_module.py
 msgid "The display name for this component."
@@ -10931,33 +10929,6 @@ msgstr "知识库显示名称"
 msgid "Enter the names of the advanced components to use in your library."
 msgstr "输入在您的知识库中使用的高级组件的名字。"
 
-#: xmodule/library_sourced_block.py
-msgid "Library Blocks List"
-msgstr "库块列表"
-
-#: xmodule/library_sourced_block.py
-msgid "Enter the IDs of the library XBlocks that you wish to use."
-msgstr "输入您要使用的库 XBlock 的 ID。"
-
-#: xmodule/library_sourced_block.py
-#, python-brace-format
-msgid "A maximum of {0} components may be added."
-msgstr "最多可以添加 {0} 个组件。"
-
-#: xmodule/library_sourced_block.py
-msgid ""
-"No XBlock has been configured for this component. Use the editor to select "
-"the target blocks."
-msgstr "尚未为此组件配置 XBlock。使用编辑器选择目标块。"
-
-#: xmodule/library_sourced_block.py
-msgid "Open Editor"
-msgstr "打开编辑器"
-
-#: xmodule/library_sourced_block.py
-msgid "Importing Library Block failed - are the IDs valid and readable?"
-msgstr "导入库块失败 - ID 是否有效且可读？"
-
 #: xmodule/lti_block.py
 msgid ""
 "The display name for this component. Analytics reports may also use the "
@@ -11566,10 +11537,6 @@ msgstr "该内容实验可能影响内容可见性。"
 #: xmodule/tabs.py
 msgid "External Discussion"
 msgstr "外部讨论"
-
-#: xmodule/templates/library-sourced-block-studio-view.html
-msgid "Save and Import"
-msgstr "保存并导入"
 
 #: xmodule/vertical_block.py
 msgid "Enable in-context discussions for the Unit"
@@ -15121,10 +15088,6 @@ msgstr "下载学生评分"
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Print or share your certificate:"
 msgstr "打印或分享您的证书："
-
-#: lms/templates/certificates/_accomplishment-banner.html
-msgid "Click the link to see my certificate."
-msgstr "点击链接查看我的证书。"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"

@@ -102,6 +102,7 @@ REQ_FILES = \
 	requirements/edx/testing \
 	requirements/edx/development \
 	requirements/edx/assets \
+	requirements/edx/semgrep \
 	scripts/xblock/requirements
 
 define COMMON_CONSTRAINTS_TEMP_COMMENT
@@ -111,7 +112,7 @@ endef
 COMMON_CONSTRAINTS_TXT=requirements/common_constraints.txt
 .PHONY: $(COMMON_CONSTRAINTS_TXT)
 $(COMMON_CONSTRAINTS_TXT):
-	wget -O "$(@)" https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt || touch "$(@)"
+	wget -O "$(@)" https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
 	printf "$(COMMON_CONSTRAINTS_TEMP_COMMENT)" | cat - $(@) > temp && mv temp $(@)
 
 compile-requirements: export CUSTOM_COMPILE_COMMAND=make upgrade
