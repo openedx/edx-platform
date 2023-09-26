@@ -91,14 +91,14 @@ def get_user_permissions(user, course_key, org=None):
         "manage_adv_settings",
         "view_course_settings",
         "manage_all_users"
-        ]
+    ]
     STAFF_ROLE_PERMISSIONS = [
         "edit_content",
         "manage_course_settings",
         "manage_adv_settings",
         "view_course_settings",
         "manage_users_except_admin_and_staff"
-        ]
+    ]
     if org is None:
         org = course_key.org
         course_key = course_key.for_branch(None)
