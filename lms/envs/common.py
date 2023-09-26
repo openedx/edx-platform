@@ -1734,8 +1734,8 @@ DATABASES = {
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+# This will be overridden through LMS config
 DEFAULT_HASHING_ALGORITHM = 'sha1'
-
 #################### Python sandbox ############################################
 
 CODE_JAIL = {
