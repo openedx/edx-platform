@@ -1119,7 +1119,6 @@ lazy==1.6
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   acid-xblock
-    #   bok-choy
     #   lti-consumer-xblock
     #   ora2
     #   xblock
@@ -2114,7 +2113,6 @@ urllib3==1.26.16
     #   pact-python
     #   py2neo
     #   requests
-    #   selenium
     #   snowflake-connector-python
 user-util==1.0.0
     # via
