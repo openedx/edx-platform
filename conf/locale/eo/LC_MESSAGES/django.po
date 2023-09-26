@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-09-20 12:47+0000\n"
-"PO-Revision-Date: 2023-09-20 12:47:19.650590\n"
+"POT-Creation-Date: 2023-09-24 20:36+0000\n"
+"PO-Revision-Date: 2023-09-24 20:36:20.303017\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -8051,6 +8051,19 @@ msgstr ""
 "Örïgïnäl üsägé kéý/ÌD öf thé thïng thät ïs ïn thé çlïpßöärd. Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
+#: openedx/core/djangoapps/content_tagging/models/base.py
+#: wiki/models/article.py
+msgid "owner"
+msgstr "öwnér Ⱡ'σяєм ιρѕ#"
+
+#: openedx/core/djangoapps/content_tagging/models/base.py
+msgid ""
+"Organization that is related to this taxonomy.If None, then this taxonomy is"
+" related to all organizations."
+msgstr ""
+"Örgänïzätïön thät ïs rélätéd tö thïs täxönömý.Ìf Nöné, thén thïs täxönömý ïs"
+" rélätéd tö äll örgänïzätïöns. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
 "List of domains that are allowed to make cross-domain requests to this site."
@@ -10426,18 +10439,6 @@ msgid ""
 msgstr ""
 "Ýöü hävé süççéssfüllý shïftéd ýöür çöürsé sçhédülé änd ýöür çäléndär ïs üp "
 "tö däté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: openedx/features/content_tagging/models/base.py wiki/models/article.py
-msgid "owner"
-msgstr "öwnér Ⱡ'σяєм ιρѕ#"
-
-#: openedx/features/content_tagging/models/base.py
-msgid ""
-"Organization that is related to this taxonomy.If None, then this taxonomy is"
-" related to all organizations."
-msgstr ""
-"Örgänïzätïön thät ïs rélätéd tö thïs täxönömý.Ìf Nöné, thén thïs täxönömý ïs"
-" rélätéd tö äll örgänïzätïöns. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py

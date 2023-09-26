@@ -77,16 +77,14 @@ boto==2.39.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
-boto3==1.7.0
+boto3==1.28.53
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.10.84
+botocore==1.31.53
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   boto3
     #   s3transfer
@@ -259,7 +257,7 @@ django-celery-results==2.5.1
     # via -r requirements/edx/kernel.in
 django-classy-tags==4.1.0
     # via django-sekizai
-django-config-models==2.5.0
+django-config-models==2.5.1
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
@@ -325,7 +323,7 @@ django-multi-email-field==0.7.0
     # via edx-enterprise
 django-mysql==4.11.0
     # via -r requirements/edx/kernel.in
-django-oauth-toolkit==1.6.2
+django-oauth-toolkit==1.7.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -357,7 +355,7 @@ django-statici18n==2.4.0
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
     #   xblock-drag-and-drop-v2
-django-storages==1.13.2
+django-storages==1.14
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -402,10 +400,6 @@ djangorestframework==3.14.0
     #   super-csv
 djangorestframework-xml==2.0.0
     # via edx-enterprise
-docutils==0.19
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   botocore
 done-xblock==2.1.0
     # via -r requirements/edx/bundled.in
 drf-jwt==1.19.2
@@ -486,11 +480,11 @@ edx-drf-extensions==8.10.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.3.1
+edx-enterprise==4.3.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
-edx-event-bus-kafka==5.4.0
+edx-event-bus-kafka==5.5.0
     # via -r requirements/edx/kernel.in
 edx-event-bus-redis==0.3.1
     # via -r requirements/edx/kernel.in
@@ -500,7 +494,7 @@ edx-milestones==0.5.0
     # via -r requirements/edx/kernel.in
 edx-name-affirmation==2.3.6
     # via -r requirements/edx/kernel.in
-edx-opaque-keys[django]==2.5.0
+edx-opaque-keys[django]==2.5.1
     # via
     #   -r requirements/edx/kernel.in
     #   -r requirements/edx/paver.txt
@@ -636,7 +630,7 @@ jinja2==3.1.2
     # via
     #   code-annotations
     #   coreschema
-jmespath==0.10.0
+jmespath==1.0.1
     # via
     #   boto3
     #   botocore
@@ -1034,7 +1028,7 @@ rules==3.3
     #   edx-enterprise
     #   edx-proctoring
     #   openedx-learning
-s3transfer==0.1.13
+s3transfer==0.6.2
     # via boto3
 sailthru-client==2.2.3
     # via edx-ace
@@ -1169,6 +1163,7 @@ urllib3==1.26.16
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/paver.txt
+    #   botocore
     #   elasticsearch
     #   py2neo
     #   requests
