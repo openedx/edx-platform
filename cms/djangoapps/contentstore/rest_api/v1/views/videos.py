@@ -33,11 +33,40 @@ toggles = contentstore_toggles
 
 
 @view_auth_classes()
-class VideosView(DeveloperErrorViewMixin, CreateAPIView, RetrieveAPIView, DestroyAPIView):
+class VideosUploadsView(DeveloperErrorViewMixin, RetrieveAPIView, DestroyAPIView):
     """
     public rest API endpoints for the CMS API video assets.
     course_key: required argument, needed to authorize course authors and identify the video.
     video_id: required argument, needed to identify the video.
+    """
+    serializer_class = VideoUploadSerializer
+
+    def dispatch(self, request, *args, **kwargs):
+        # TODO: probably want to refactor this to a decorator.
+        """
+        The dispatch method of a View class handles HTTP requests in general
+        and calls other methods to handle specific HTTP methods.
+        We use this to raise a 404 if the content api is disabled.
+        """
+        if not toggles.use_studio_content_api():
+            raise Http404
+        return super().dispatch(request, *args, **kwargs)
+
+    @course_author_access_required
+    def retrieve(self, request, course_key, edx_video_id=None):  # pylint: disable=arguments-differ
+        return handle_videos(request, course_key.html_id(), edx_video_id)
+
+    @course_author_access_required
+    @expect_json_in_class_view
+    def destroy(self, request, course_key, edx_video_id):  # pylint: disable=arguments-differ
+        return handle_videos(request, course_key.html_id(), edx_video_id)
+
+
+@view_auth_classes()
+class VideosCreateUploadView(DeveloperErrorViewMixin, CreateAPIView):
+    """
+    public rest API endpoints for the CMS API video assets.
+    course_key: required argument, needed to authorize course authors and identify the video.
     """
     serializer_class = VideoUploadSerializer
 
@@ -57,17 +86,7 @@ class VideosView(DeveloperErrorViewMixin, CreateAPIView, RetrieveAPIView, Destro
     @expect_json_in_class_view
     @validate_request_with_serializer
     def create(self, request, course_key):  # pylint: disable=arguments-differ
-        """Deprecated. Use the upload_link endpoint instead."""
         return handle_videos(request, course_key.html_id())
-
-    @course_author_access_required
-    def retrieve(self, request, course_key, edx_video_id=None):  # pylint: disable=arguments-differ
-        return handle_videos(request, course_key.html_id(), edx_video_id)
-
-    @course_author_access_required
-    @expect_json_in_class_view
-    def destroy(self, request, course_key, edx_video_id):  # pylint: disable=arguments-differ
-        return handle_videos(request, course_key.html_id(), edx_video_id)
 
 
 @view_auth_classes()

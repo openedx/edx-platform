@@ -10,5 +10,5 @@ from .home import HomePageView
 from .settings import CourseSettingsView
 from .xblock import XblockView, XblockCreateView
 from .assets import AssetsCreateRetrieveView, AssetsUpdateDestroyView
-from .videos import VideosView, VideoImagesView, VideoEncodingsDownloadView, VideoFeaturesView
+from .videos import VideosUploadsView, VideosCreateUploadView, VideoImagesView, VideoEncodingsDownloadView, VideoFeaturesView
 from .help_urls import HelpUrlsView

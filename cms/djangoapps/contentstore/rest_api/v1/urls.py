@@ -74,7 +74,7 @@ urlpatterns = [
 
     # CMS API
     re_path(
-        fr'^file_assets/{settings.COURSE_ID_PATTERN}$',
+        fr'^file_assets/{settings.COURSE_ID_PATTERN}/$',
         assets.AssetsCreateRetrieveView.as_view(), name='cms_api_create_retrieve_assets'
     ),
     re_path(
@@ -94,15 +94,19 @@ urlpatterns = [
         videos.VideoImagesView.as_view(), name='cms_api_videos_images'
     ),
     re_path(
-        fr'^videos/uploads/{settings.COURSE_ID_PATTERN}/{VIDEO_ID_PATTERN}?$',
-        videos.VideosView.as_view(), name='cms_api_videos_uploads'
+        fr'^videos/uploads/{settings.COURSE_ID_PATTERN}/$',
+        videos.VideosCreateUploadView.as_view(), name='cms_api_create_videos_upload'
+    ),
+    re_path(
+        fr'^videos/uploads/{settings.COURSE_ID_PATTERN}/{VIDEO_ID_PATTERN}$',
+        videos.VideosUploadsView.as_view(), name='cms_api_videos_uploads'
     ),
     re_path(
         fr'^video_transcripts/{settings.COURSE_ID_PATTERN}$',
         transcripts.TranscriptView.as_view(), name='cms_api_video_transcripts'
     ),
     re_path(
-        fr'^xblock/{settings.COURSE_ID_PATTERN}$',
+        fr'^xblock/{settings.COURSE_ID_PATTERN}/$',
         xblock.XblockCreateView.as_view(), name='cms_api_create_xblock'
     ),
     re_path(
