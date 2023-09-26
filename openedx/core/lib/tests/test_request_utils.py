@@ -102,7 +102,7 @@ class RequestUtilTestCase(unittest.TestCase):
         assert course_id.run == run
 
 
-class TestGetExpectedErrorSettingsDict(unittest.TestCase):
+class TestGetIgnoredErrorSettingsDict(unittest.TestCase):
     """
     Tests for processing issues in _get_ignored_error_settings_dict()
 
@@ -323,7 +323,7 @@ class TestIgnoredErrorMiddleware(unittest.TestCase):
             expected_calls += [call('checked_error_ignored_from', 'multiple')]
         else:
             expected_calls += [
-                call('unexpected_multiple_exceptions', 'openedx.core.lib.tests.test_request_utils.CustomError1'),
+                call('multiple_exceptions', 'openedx.core.lib.tests.test_request_utils.CustomError1'),
             ]
         mock_set_custom_attribute.assert_has_calls(expected_calls)
         assert mock_set_custom_attribute.call_count == len(expected_calls)
@@ -367,7 +367,7 @@ class TestIgnoredErrorMiddleware(unittest.TestCase):
         if log_error:
             exc_info = self.mock_exception if log_stack_trace else None
             mock_logger.info.assert_called_once_with(
-                'Expected error %s: %s: seen for path %s', expected_class, expected_message, '/test', exc_info=exc_info
+                'Ignored error %s: %s: seen for path %s', expected_class, expected_message, '/test', exc_info=exc_info
             )
         else:
             mock_logger.info.assert_not_called()
@@ -380,7 +380,7 @@ class TestIgnoredErrorMiddleware(unittest.TestCase):
 
 
 @ddt.ddt
-class TestExpectedErrorExceptionHandler(unittest.TestCase):
+class TestIgnoredErrorExceptionHandler(unittest.TestCase):
     """
     Tests for ignored_error_exception_handler.
 
@@ -415,7 +415,7 @@ class TestExpectedErrorExceptionHandler(unittest.TestCase):
         expected_class = 'openedx.core.lib.tests.test_request_utils.CustomError1'
         expected_message = 'Test failure'
         mock_logger.info.assert_called_once_with(
-            'Expected error %s: %s: seen for path %s',
+            'Ignored error %s: %s: seen for path %s',
             expected_class,
             expected_message,
             expected_request_path,
