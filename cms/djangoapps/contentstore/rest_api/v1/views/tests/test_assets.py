@@ -44,7 +44,7 @@ class AssetsViewTestCase(AuthorizeStaffTestCase):
 
     def get_url(self, _course_id=None):
         return reverse(
-            "cms.djangoapps.contentstore:v1:studio_content_assets",
+            "cms.djangoapps.contentstore:v1:cms_api_assets",
             kwargs=self.get_url_params(),
         )
 

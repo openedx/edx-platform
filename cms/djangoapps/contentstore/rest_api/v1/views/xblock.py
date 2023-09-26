@@ -23,7 +23,7 @@ handle_xblock = view_handlers.handle_xblock
 
 
 @view_auth_classes()
-class XblockView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAPIView):
+class XblockView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView):
     """
     Public rest API endpoints for the CMS API.
     course_key: required argument, needed to authorize course authors.
@@ -65,6 +65,28 @@ class XblockView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAP
     @expect_json_in_class_view
     def destroy(self, request, course_key, usage_key_string=None):
         return handle_xblock(request, usage_key_string)
+
+
+@view_auth_classes()
+class XblockPostView(DeveloperErrorViewMixin, CreateAPIView):
+    """
+    Public rest API endpoints for the CMS API.
+    course_key: required argument, needed to authorize course authors.
+    usage_key_string (optional):
+    xblock identifier, for example in the form of "block-v1:<course id>+type@<type>+block@<block id>"
+    """
+    serializer_class = XblockSerializer
+
+    def dispatch(self, request, *args, **kwargs):
+        # TODO: probably want to refactor this to a decorator.
+        """
+        The dispatch method of a View class handles HTTP requests in general
+        and calls other methods to handle specific HTTP methods.
+        We use this to raise a 404 if the content api is disabled.
+        """
+        if not toggles.use_studio_content_api():
+            raise Http404
+        return super().dispatch(request, *args, **kwargs)
 
     @csrf_exempt
     @course_author_access_required
