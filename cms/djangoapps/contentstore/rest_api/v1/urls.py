@@ -75,11 +75,11 @@ urlpatterns = [
     # CMS API
     re_path(
         fr'^file_assets/{settings.COURSE_ID_PATTERN}$',
-        assets.AssetsReadPostView.as_view(), name='cms_api_create_read_assets'
+        assets.AssetsCreateRetrieveView.as_view(), name='cms_api_create_retrieve_assets'
     ),
     re_path(
         fr'^file_assets/{settings.COURSE_ID_PATTERN}/{settings.ASSET_KEY_PATTERN}$',
-        assets.AssetsView.as_view(), name='cms_api_update_delete_assets'
+        assets.AssetsUpdateDestroyView.as_view(), name='cms_api_update_destroy_assets'
     ),
     re_path(
         fr'^videos/encodings/{settings.COURSE_ID_PATTERN}$',
@@ -103,7 +103,7 @@ urlpatterns = [
     ),
     re_path(
         fr'^xblock/{settings.COURSE_ID_PATTERN}$',
-        xblock.XblockPostView.as_view(), name='cms_api_post_xblock'
+        xblock.XblockCreateView.as_view(), name='cms_api_create_xblock'
     ),
     re_path(
         fr'^xblock/{settings.COURSE_ID_PATTERN}/{settings.USAGE_KEY_PATTERN}$',

@@ -68,7 +68,7 @@ class XblockView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView):
 
 
 @view_auth_classes()
-class XblockPostView(DeveloperErrorViewMixin, CreateAPIView):
+class XblockCreateView(DeveloperErrorViewMixin, CreateAPIView):
     """
     Public rest API endpoints for the CMS API.
     course_key: required argument, needed to authorize course authors.

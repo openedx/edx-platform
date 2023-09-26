@@ -24,7 +24,7 @@ toggles = contentstore_toggles
 
 
 @view_auth_classes()
-class AssetsReadPostView(DeveloperErrorViewMixin, CreateAPIView, RetrieveAPIView):
+class AssetsCreateRetrieveView(DeveloperErrorViewMixin, CreateAPIView, RetrieveAPIView):
     """
     public rest API endpoints for the CMS API Assets.
     course_key: required argument, needed to authorize course authors and identify the asset.
@@ -57,7 +57,7 @@ class AssetsReadPostView(DeveloperErrorViewMixin, CreateAPIView, RetrieveAPIView
 
 
 @view_auth_classes()
-class AssetsView(DeveloperErrorViewMixin, UpdateAPIView, DestroyAPIView):
+class AssetsUpdateDestroyView(DeveloperErrorViewMixin, UpdateAPIView, DestroyAPIView):
     """
     public rest API endpoints for the CMS API Assets.
     course_key: required argument, needed to authorize course authors and identify the asset.
