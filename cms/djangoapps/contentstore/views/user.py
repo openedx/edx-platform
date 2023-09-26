@@ -133,7 +133,7 @@ def _course_team_user(request, course_key, email):
             #       below will never be true.
             #       Remove the .has_user call when course roles are implemented.
             if (role(course_key).has_user(user) or
-               course_permission_check(user, course_key, MANAGE_ALL_USERS_PERMISSION)):
+               course_permission_check(user, MANAGE_ALL_USERS_PERMISSION, course_key)):
                 msg["role"] = role.ROLE
                 break
         return JsonResponse(msg)
@@ -177,7 +177,7 @@ def _course_team_user(request, course_key, email):
         #       below will never return true.
         #       Remove the .has_user() call below when course roles are implemented.
         elif (role.has_user(user, check_user_activation=False) or
-              course_permission_check(user, course_key, MANAGE_ALL_USERS_PERMISSION)):  # pylint: disable=no-value-for-parameter
+              course_permission_check(user, MANAGE_ALL_USERS_PERMISSION, course_key)):  # pylint: disable=no-value-for-parameter
             # Remove the user from this old role:
             old_roles.add(role)
 

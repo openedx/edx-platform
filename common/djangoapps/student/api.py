@@ -140,5 +140,5 @@ def is_user_staff_or_instructor_in_course(user, course_key):
         GlobalStaff().has_user(user) or
         CourseStaffRole(course_key).has_user(user) or
         CourseInstructorRole(course_key).has_user(user) or
-        course_permission_check(user, course_key, MANAGE_STUDENTS_PERMISSION)
+        course_permission_check(user, MANAGE_STUDENTS_PERMISSION, course_key)
     )
