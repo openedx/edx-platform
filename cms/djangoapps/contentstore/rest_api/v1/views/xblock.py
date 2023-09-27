@@ -88,6 +88,7 @@ class XblockCreateView(DeveloperErrorViewMixin, CreateAPIView):
             raise Http404
         return super().dispatch(request, *args, **kwargs)
 
+    # pylint: disable=arguments-differ
     @csrf_exempt
     @course_author_access_required
     @expect_json_in_class_view
