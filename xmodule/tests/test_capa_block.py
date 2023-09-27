@@ -19,7 +19,7 @@ import webob
 from codejail.safe_exec import SafeExecException
 from django.test import override_settings
 from django.utils.encoding import smart_str
-from edx_user_state_client.interface import XBlockUserState
+from lms.djangoapps.courseware.user_state_client import XBlockUserState
 from lxml import etree
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC

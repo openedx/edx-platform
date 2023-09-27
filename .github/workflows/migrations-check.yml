@@ -15,8 +15,17 @@ jobs:
       matrix:
         os: [ ubuntu-20.04 ]
         python-version: [ 3.8 ]
+        # 'pinned' is used to install the latest patch version of Django
+        # within the global constraint i.e. Django==3.2.21 in current case
+        # because we have global constraint of Django<4.2 
+        django-version: ["pinned", "4.2"]
         mongo-version: ["4"]
         mysql-version: ["5.7", "8"]
+        # excluding mysql5.7 with Django 4.2 since Django 4.2 has 
+        # dropped support for MySQL<8
+        exclude:
+          - django-version: "4.2"
+            mysql-version: "5.7"
     services:
       mongo:
         image: mongo:${{ matrix.mongo-version }}
@@ -92,6 +101,14 @@ jobs:
     - name: Install Python dependencies
       run: |
         make dev-requirements
+        if [[ "${{ matrix.django-version }}" != "pinned" ]]; then
+          pip install "django~=${{ matrix.django-version }}.0"
+          pip check # fail if this test-reqs/Django combination is broken
+        fi
+
+    - name: list installed package versions
+      run: |
+        sudo pip freeze
 
     - name: Run Tests
       env:
@@ -103,3 +120,19 @@ jobs:
         ./manage.py lms migrate
         echo "Running the CMS migrations."
         ./manage.py cms migrate
+  
+  # This job aggregates test results. It's the required check for branch protection.
+  # https://github.com/marketplace/actions/alls-green#why
+  # https://github.com/orgs/community/discussions/33579
+  success:
+    name: Migrations checks successful
+    if: always()
+    needs:
+      - check_migrations
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decide whether the needed jobs succeeded or failed
+        # uses: re-actors/alls-green@v1.2.1
+        uses: re-actors/alls-green@13b4244b312e8a314951e03958a2f91519a6a3c9
+        with:
+          jobs: ${{ toJSON(needs) }}
