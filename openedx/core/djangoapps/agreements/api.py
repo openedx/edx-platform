@@ -86,28 +86,29 @@ def create_lti_pii_signature(username, course_id, lti_tools):
     Returns:
         * An LTIPIISignature, or None if a signature already exists.
     """
-    user = User.objects.get(username=username)
     course_key = CourseKey.from_string(course_id)
     lti_tools_hash = hash(str(lti_tools))
 
     # if user and course exists, update, otherwise create a new signature
     try:
+        user = User.objects.get(username=username)
         LTIPIISignature.objects.get(user=user, course_key=course_key)
-    except ObjectDoesNotExist:
-        #create
+    except User.DoesNotExist:
+        return None
+    except LTIPIISignature.DoesNotExist:
         signature = LTIPIISignature.objects.create(
             user=user,
             course_key=course_key,
             lti_tools=lti_tools,
             lti_tools_hash=lti_tools_hash)
-        return signature
     else:
         signature = LTIPIISignature.objects.update(
             user=user,
             course_key=course_key,
             lti_tools=lti_tools,
             lti_tools_hash=lti_tools_hash)
-        return signature
+
+    return signature
 
 
 def get_lti_pii_signature(username, course_id):
@@ -126,7 +127,7 @@ def get_lti_pii_signature(username, course_id):
     try:
         user = User.objects.get(username=username)
         signature = LTIPIISignature.objects.get(user=user, course_key=course_key)
-    except ObjectDoesNotExist:
+    except (User.DoesNotExist, LTIPIISignature.DoesNotExist):
         return None
     else:
         return LTIPIISignatureData(user=signature.user, course_id=str(signature.course_key),
@@ -147,11 +148,10 @@ def get_pii_receiving_lti_tools(course_id):
     course_key = CourseKey.from_string(course_id)
     try:
         course_ltipiitools = LTIPIITool.objects.get(course_key=course_key).lti_tools
-        return LTIToolsReceivingPIIData(
-            lii_tools_receiving_pii=course_ltipiitools,
-        )
-    except ObjectDoesNotExist:
+    except LTIPIITool.DoesNotExist:
         return None
+
+    return LTIToolsReceivingPIIData(lii_tools_receiving_pii=course_ltipiitools,)
 
 
 def user_lti_pii_signature_needed(username, course_id):
@@ -165,18 +165,15 @@ def user_lti_pii_signature_needed(username, course_id):
         * True if the user needs to sign a new acknowledgement.
         * False if the acknowledgements are up to date.
     """
-    if _course_has_lti_pii_tools(course_id):
-        if _user_lti_pii_signature_exists(username, course_id):
-            if _user_needs_signature_update(username, course_id):
-                # up to date
-                return False
-            else:
-                # lti pii signature needs to be updated
-                return True
-        else:
-            # write a new lti pii signature
-            return True
+    course_has_lti_pii_tools = _course_has_lti_pii_tools(course_id)
+    signature_exists = _user_lti_pii_signature_exists(username, course_id)
+    signature_out_of_date = _user_signature_out_of_date(course_id)
+
+    if course_has_lti_pii_tools and (not signature_exists) or (course_has_lti_pii_tools and signature_exists and signature_out_of_date):
+        # write a new signature, or update an existing signature
+        return True
     else:
+        # course does not have lti pii tools, or signatue is up to date
         return False
 
 
@@ -193,8 +190,8 @@ def _course_has_lti_pii_tools(course_id):
     """
     course_key = CourseKey.from_string(course_id)
     try:
-        LTIPIITool.objects.get(course_key)
-    except ObjectDoesNotExist:
+        LTIPIITool.objects.get(course_key=course_key)
+    except LTIPIITool.DoesNotExist:
         # no entry in the database
         return False
     else:
@@ -218,13 +215,13 @@ def _user_lti_pii_signature_exists(username, course_id):
     try:
         user = User.objects.get(username=username)
         LTIPIISignature.objects.get(user=user, course_key=course_key)
-    except ObjectDoesNotExist:
-        return None
+    except (User.DoesNotExist, LTIPIISignature.DoesNotExist):
+        return False
     else:
         return True  # signature exist
 
 
-def _user_needs_signature_update(username, course_id):
+def _user_signature_out_of_date(username, course_id):
     """
         Determines if a user's existing lti pii signature is out-of-date for a given course.
 
@@ -242,11 +239,12 @@ def _user_needs_signature_update(username, course_id):
         user = User.objects.get(username=username)
         user_lti_pii_signature_hash = LTIPIISignature.objects.get(course_key=course_key, user=user).lti_tools_hash
         course_lti_pii_tools_hash = LTIPIITool.objects.get(course_key=course_key).lti_tools_hash
-    except ObjectDoesNotExist:
-        return None
+    except (User.DoesNotExist, LTIPIISignature.DoesNotExist, LTIPIITool.DoesNotExist):
+        return False
     else:
         if user_lti_pii_signature_hash == course_lti_pii_tools_hash:
             # Hashes are equal, therefore update is not need
             return False
         else:
+            # Out of date signature, so update is needed
             return True
