@@ -305,10 +305,10 @@ def _log_and_monitor_ignored_errors(request, exception, caller):
 
         # We have confirmed using monitoring that it is very rare that middleware and drf handle different uncaught exceptions.
         # We will leave this attribute in place, but it is not worth investing in a workaround.
-        set_custom_attribute('multiple_exceptions', cached_module_and_class)
+        set_custom_attribute('unexpected_multiple_exceptions', cached_module_and_class)
         log.warning(
-            "scenario where different exceptions are handled by _log_and_monitor_ignored_errors. "
-            "See 'multiple_exceptions' custom attribute. Skipping exception for %s.",
+            "Unexpected scenario where different exceptions are handled by _log_and_monitor_ignored_errors. "
+            "See 'unexpected_multiple_exceptions' custom attribute. Skipping exception for %s.",
             module_and_class,
         )
         return
