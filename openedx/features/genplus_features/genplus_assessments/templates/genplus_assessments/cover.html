@@ -1,9 +1,59 @@
+## mako
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
 </head>
 <body>
-<h1>Cover Page</h1>
+  <div class="cover-wrapper">
+    <header class="header">
+      <img src="${ images_dir }/header.png" alt="Meta-skills Programme">
+      <div class="header-text">
+        <p class="student-subtitle">Student class - Shool Name</p>
+        <strong class="student-name">Full Name</strong>
+      </div>
+      <img src="${ images_dir }/header-vector.png" alt="Meta-skills Programme">
+    </header>
+    <div class="intro">
+      <p>'Meta-skills are essential 'learning to learn' abilities. They're not just about specific subjects; they include things like taking initiative, bouncing back from challenges, thinking critically, and being able to adapt. These skills help you do well in a world that's always changing. They let you handle problems, communicate well, and keep growing. When you being to master meta-skills, you have versatile tools that can help you succeed in school, your future job, and your personal goals.</p>
+      <p>Your learning portfolio is a record of all the Gen+ courses you completed, the booster badges you earned, and your personal reflections. It's a way to show what you've achieved – something worth celebrating and being proud of!</p>
+    </div>
+    <div class="cover-content">
+      <section class="booster-badges">
+        <h2 class="heading-default">Achieved Course Badges</h2>
+        <ul class="completion-badges">
+          % for unit in student_data.get('units'):
+          <li>
+            <div class="image-frame">
+              <img src="${unit.get('unit_image_url')}" alt="${unit.get('display_name')}">
+              % if unit.get('is_complete'):
+              <img class="completed" src="${static.url('genplus_assessments/assets/images/check.png')}" alt="Completed">
+              % endif
+            </div>
+            <span class="text">${unit.get('display_name')}</span>
+          </li>
+        % endfor
+        </ul>
+      </section>
+      % if student_data.get('booster_badges'):
+      <section class="booster-badges">
+        <h2 class="heading-default">Awarded Booster Badges</h2>
+        <ul class="badges">
+          % for badge in student_data.get('booster_badges'):
+            <li>
+              <img src="${ badge.get('image_url') }" alt="">
+              <span class="date">${ badge.get('created').strftime('%d/%m/%Y') }</span>
+            </li>
+          % endfor
+        </ul>
+      </section>
+      % else :
+      <section class="booster-badges">
+        <h2 class="heading-default">Awarded Booster Badges</h2>
+        <img class="group-image" src="${ images_dir }/group.png" alt="No Awarded Booster Badge">
+      </section>
+      % endif
+    </div>
+  </div>
 </body>
 </html>

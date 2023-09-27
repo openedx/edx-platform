@@ -6,64 +6,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <title>Assessment Report</title>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=2.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <title>Assessment Report</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="${static.url('genplus_assessments/assets/css/main.css')}">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
   <div class="wrapper">
     <div class="content">
       <div class="container">
-        <div class="intro">
-          <p>You are making excellent progress towards becoming a Gen+ leader – well done! This report shows just how much you have learned and all the growth you have made. You’re ready to keep using these skills in learning, life and work!</p>
-        </div>
-        <div class="unit-completion">
-          <h3>Units completed so far</h3>
-          <ul class="completion-badges">
-            % for unit in student_data.get('units'):
-              % if unit.get('is_complete'):
-                <li class="active">
-              % else:
-                <li>
-              % endif
-                <div class="image-frame">
-                  <img src="${unit.get('unit_image_url')}" alt="${unit.get('display_name')}">
-                  % if unit.get('is_complete'):
-                  <img class="completed" src="${static.url('genplus_assessments/assets/images/check.png')}" alt="Completed">
-                  % endif
-                </div>
-                <span class="text">${unit.get('display_name')}</span>
-              </li>
-            % endfor
-          </ul>
-        </div>
-        % if student_data.get('booster_badges'):
-        <section class="booster-badges">
-          <h2>Booster badges</h2>
-          <ul class="badges">
-            % for badge in student_data.get('booster_badges'):
-              <li>
-                <img src="${ badge.get('image_url') }" alt="">
-                <span class="date">${ badge.get('created').strftime('%d/%m/%Y') }</span>
-              </li>
-            % endfor
-          </ul>
+        <section class="skills-reflection">
+          <h2 class="heading-default">Skills Reflection</h2>
+          <p>In each unit, you had questions about your skills, how confident you felt, and if you thought you improved. The two graphs below show your answers.
+          </p>
+          <ol>
+            <li>
+              <p><strong>Skills Progress Graph: </strong> This graph compares your starting answers in each unit with your answers at the end. It helps you see how you've progressed. The questions asked about your confidence in certain skills, like how comfortable you are using different tools to communicate. If there's a skill you still don't feel very sure about, it could be something to focus on and get better at.</p>
+              <div><canvas id="likertChart" style="height: 300px;"></canvas></div>
+            </li>
+            <li>
+              <p><strong>Skills Improvement Graph: </strong> The second graph shows how you did throughout the whole course. It's about how much you think you've improved in a skill after learning more about it. Learning to honestly see your progress is important because it lets you find areas where you can improve and also celebrate the areas where you've made great progress.</p>
+              <div><canvas id="nuanceChart" style="height: 200px;"></canvas></div>
+            </li>
+          </ol>
         </section>
-        % endif
         <section class="skills-assessment">
-          <div class="assessment-intro">
-            <h2>Report Questionnaire Colour Key</h2>
-            <div class="year-info start">
-              <img src="${static.url('genplus_assessments/assets/images/start.png')}" width="32" alt="" />
-              Questions to be filled in at the <strong>start of the year</strong>.
-            </div>
-            <div class="year-info end">
-              <img src="${static.url('genplus_assessments/assets/images/end.png')}" width="32" alt="" />
-              Questions to be filled in at the <strong>end of the year</strong>.
-            </div>
-          </div>
           % for program_skill_assessment in student_data.get('skills_assessment'):
             % for question_id, question in program_skill_assessment.items():
               % if question.get('assessment_type') == 'genz_rating_assessment':
@@ -146,35 +119,6 @@
             % endfor
           % endfor
         </section>
-        <section>
-          <div class="unit-completion">
-            <h3>Units completed so far</h3>
-            <ul class="completion-badges">
-              % for unit in student_data.get('units'):
-                % if unit.get('is_complete'):
-                  <li class="active">
-                % else:
-                  <li>
-                % endif
-                  <div class="image-frame">
-                    <img src="${unit.get('unit_image_url')}" alt="${unit.get('display_name')}">
-                    % if unit.get('is_complete'):
-                    <img class="completed" src="${static.url('genplus_assessments/assets/images/check.png')}" alt="Completed">
-                    % endif
-                  </div>
-                  <span class="text">${unit.get('display_name')}</span>
-                </li>
-              % endfor
-            </ul>
-          </div>
-          <div>
-            <p>In each unit, pupils complete a series of questions to assess their knowledge and
-              understanding of the skills being taught. They are also asked to reflect on their own
-              learning. A selection of their reflections are highlighted below.</p>
-          </div>
-        </section>
-        <hr />
-
         % for unit in student_data.get('units'):
           % if unit.get('reflections'):
             <div class="section-wrapper">
@@ -202,20 +146,6 @@
             </div>
           % endif
         % endfor
-
-        % if student_data.get('booster_badges'):
-        <section class="booster-badges">
-          <h2>Booster badges</h2>
-          <ul class="badges">
-            % for badge in student_data.get('booster_badges'):
-              <li>
-                <img src="${ badge.get('image_url') }" alt="">
-                <span class="date">${ badge.get('created').strftime('%d/%m/%Y') }</span>
-              </li>
-            % endfor
-          </ul>
-        </section>
-        % endif
         % if student_data.get('teacher_feedbacks'):
         <section class="teacher-feedbacks">
           <div class="section-wrapper">
@@ -247,5 +177,197 @@
       </div>
     </div>
   </div>
+  <script type="text/javascript">
+    Function.prototype.bind = Function.prototype.bind || function (thisp) {
+      var fn = this;
+      return function () {
+        return fn.apply(thisp, arguments);
+      };
+    };
+    const likertCTX = document.getElementById('likertChart');
+    const likertLabels = [
+        "Not confident at all",
+        "Not confident",
+        "Confident",
+        "Very confident"
+    ];
+    const likertChart = new Chart(likertCTX, {
+      type: 'bar',
+      data: {
+        labels: [
+          "Communication",
+          "Organisation",
+          "Resilience"
+        ],
+        datasets: [
+          {
+              label: "Start of the course",
+              data: [ -2, -2, -1 ],
+              backgroundColor: "#ed207c"
+          },
+          {
+              label: "End of the course",
+              data: [ 2, 2, 1 ],
+              backgroundColor: "#5863f8"
+          }
+        ]
+      },
+      options: {
+        indexAxis: 'y',
+        elements: {
+          bar: {
+            inflateAmount: 0,
+          },
+        },
+        plugins: {
+          title: {
+            display: false,
+          },
+          legend: {
+            position: 'bottom',
+            labels: {
+              usePointStyle: true,
+              boxWidth: 8,
+              boxHeight: 8,
+              color: '#000',
+              font: {
+                size: 12,
+                family: 'Readex Pro',
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            grid: {
+              color: 'transparent',
+              borderColor: '#000',
+            },
+            ticks: {
+              font: {
+                size: 13,
+                weight: 300,
+                family: 'IBM Plex Sans, Readex Pro',
+              },
+              stepSize: 1,
+              color: '#000',
+              callback: (value) => {
+                if (value < 0) return likertLabels[value + 2];
+                if (value > 0) return likertLabels[value + 1];
+                return '';
+              },
+            },
+            min: -2,
+            max: 2,
+          },
+          y: {
+            grid: {
+              color: 'transparent',
+              borderColor: '#000',
+            },
+            ticks: {
+              font: {
+                size: 12,
+                weight: 300,
+                family: 'IBM Plex Sans, Readex Pro',
+              },
+              color: '#000',
+            },
+          },
+        },
+      },
+    });
+
+    const nuanceCTX = document.getElementById('nuanceChart');
+    const xLabels = [
+        {
+            text: "",
+            points: 0
+        },
+        {
+            text: "Very Uncomfortable",
+            points: 1
+        },
+        {
+            text: "Uncomfortable",
+            points: 2
+        },
+        {
+            text: "Comfortable",
+            points: 3
+        },
+        {
+            text: "Very Comfortable",
+            points: 4
+        }
+    ];
+    const nuanceChart = new Chart(nuanceCTX, {
+      type: 'bar',
+      data: {
+          labels: [
+              "Communication",
+              "Organisation",
+              "Resilience"
+          ],
+          datasets: [
+              {
+                  label: "Nuanced Interrogration",
+                  data: [ 1, 4, 3 ],
+                  backgroundColor: "#5863f8"
+              }
+          ]
+      },
+      options: {
+        indexAxis: 'y',
+        elements: {
+          bar: {
+            inflateAmount: 0,
+          },
+        },
+        plugins: {
+          title: {
+            display: false,
+          },
+          legend: {
+            display: false,
+          },
+        },
+        scales: {
+          x: {
+            grid: {
+              color: 'transparent',
+              borderColor: '#000',
+            },
+            ticks: {
+              font: {
+                size: 13,
+                weight: 300,
+                family: 'IBM Plex Sans, Readex Pro',
+              },
+              stepSize: 1,
+              color: '#000',
+              callback: (_, index) => xLabels[index].text,
+            },
+            min: 0,
+            max: 4,
+          },
+          y: {
+            grid: {
+              color: 'transparent',
+              borderColor: '#000',
+            },
+            ticks: {
+              font: {
+                size: 12,
+                weight: 300,
+                family: 'IBM Plex Sans, Readex Pro',
+              },
+              color: '#000',
+            },
+          },
+        },
+      },
+    });
+  </script>
 </body>
 </html>

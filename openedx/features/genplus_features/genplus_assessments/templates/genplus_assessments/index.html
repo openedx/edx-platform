@@ -1,16 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <title>Gen+ Report</title>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../static/genplus_assessments/assets/css/main.css">
-  <title>Gen+ Report</title>
 </head>
 <body>
   <div class="wrapper">
     <header class="header">
+      <img src="../../static/genplus_assessments/assets/images/header.png" alt="Meta-skills Programme">
+      <div class="header-text">
+        <p class="student-subtitle">Student class and School Name</p>
+        <strong class="student-name">Student Name</strong>
+      </div>
+      <img src="../../static/genplus_assessments/assets/images/header-vector.png" alt="Meta-skills Programme">
+    </header>
+    <header class="header small">
+      <img src="../../static/genplus_assessments/assets/images/header.png" alt="Meta-skills Programme">
+    </header>
+
+    <!-- <header class="header">
       <div class="container">
         <div class="profile-image">
           <div class="profile-frame">
@@ -43,30 +58,15 @@
           <img class="logo" src="../../static/genplus_assessments/assets/images/logo.png" alt="GenPlus logo" >
         </div>
       </div>
-    </header>
+    </header> -->
     <div class="content">
       <div class="intro">
-        <p>You are making excellent progress towards becoming a Gen+ leader – well done! This report shows just how much you have learned and all the growth you have made. You’re ready to keep using these skills in learning, life and work!</p>
+        <p>'Meta-skills are essential 'learning to learn' abilities. They're not just about specific subjects; they include things like taking initiative, bouncing back from challenges, thinking critically, and being able to adapt. These skills help you do well in a world that's always changing. They let you handle problems, communicate well, and keep growing. When you being to master meta-skills, you have versatile tools that can help you succeed in school, your future job, and your personal goals.</p>
+        <p>Your learning portfolio is a record of all the Gen+ courses you completed, the booster badges you earned, and your personal reflections. It's a way to show what you've achieved – something worth celebrating and being proud of!</p>
       </div>
       <div class="container">
-        <div class="section-wrapper">
-          <section class="section">
-            <div class="heading">
-              <div class="image-frame">
-                <img src="../../static/genplus_assessments/assets/images/Question.svg" alt="Question">
-              </div>
-              <div class="text-block">
-                <span class="subtitle">End of Year Self Evaluation</span>
-                <h2>Skills Assessment</h2>
-              </div>
-            </div>
-            <div class="content">
-              <p>Ximustio ritatur? Dolluptas restium facea cum fugitatiis molore velesed maximus modignis nusapis magnam voloresto eiur alitium voluptatibus rem. Ciis volorei ciuntia earchiciis expliqui cus et volo to expe volorupta sinum enis ipicips aectiam inus voluptis dolupta sitatium quamendi dolesent.</p>
-            </div>
-          </section>
-        </div>
-        <div class="unit-completion">
-          <h3>Units completed so far</h3>
+        <section class="unit-completion">
+          <h2 class="heading-default">Achieved Course Badges</h2>
           <ul class="completion-badges">
             <li class="active">
               <div class="image-frame">
@@ -107,9 +107,9 @@
               <span class="text">resilience</span>
             </li>
           </ul>
-        </div>
+        </section>
         <section class="booster-badges">
-          <h2>Booster badges</h2>
+          <h2 class="heading-default">Booster badges</h2>
           <ul class="badges">
             <li>
               <img src="../../static/genplus_assessments/assets/images/unit-complete.svg" alt="">
@@ -133,9 +133,40 @@
             </li>
           </ul>
         </section>
+        <div class="skills-reflection">
+          <h2 class="heading-default">Skills Reflection</h2>
+          <p>In each unit, you had questions about your skills, how confident you felt, and if you thought you improved. The two graphs below show your answers.
+          </p>
+          <ol>
+            <li>
+              <p><strong>Skills Progress Graph: </strong> This graph compares your starting answers in each unit with your answers at the end. It helps you see how you've progressed. The questions asked about your confidence in certain skills, like how comfortable you are using different tools to communicate. If there's a skill you still don't feel very sure about, it could be something to focus on and get better at.</p>
+              <div><canvas id="likertChart"></canvas></div>
+            </li>
+            <li>
+              <p><strong>Skills Improvement Graph: </strong> The second graph shows how you did throughout the whole course. It's about how much you think you've improved in a skill after learning more about it. Learning to honestly see your progress is important because it lets you find areas where you can improve and also celebrate the areas where you've made great progress.</p>
+              <div><canvas id=""></canvas></div>
+            </li>
+          </ol>
+        </div>
+        <div class="section-wrapper">
+          <section class="section">
+            <div class="heading">
+              <div class="image-frame">
+                <img src="../../static/genplus_assessments/assets/images/Question.svg" alt="Question">
+              </div>
+              <div class="text-block">
+                <span class="subtitle">End of Year Self Evaluation</span>
+                <h2>Skills Assessment</h2>
+              </div>
+            </div>
+            <div class="content">
+              <p>Ximustio ritatur? Dolluptas restium facea cum fugitatiis molore velesed maximus modignis nusapis magnam voloresto eiur alitium voluptatibus rem. Ciis volorei ciuntia earchiciis expliqui cus et volo to expe volorupta sinum enis ipicips aectiam inus voluptis dolupta sitatium quamendi dolesent.</p>
+            </div>
+          </section>
+        </div>
         <section class="skills-assessment">
           <div class="assessment-intro">
-            <h2>Report Questionnaire Colour Key</h2>
+            <h2 class="heading-default">Report Questionnaire Colour Key</h2>
             <div class="year-info start">
               <img src="../../static/genplus_assessments/assets/images/start.png" width="32" alt="" />
               Questions to be filled in at the <strong>start of the year</strong>.
@@ -479,5 +510,7 @@ on what people are saying to you. You can become better at listening with time a
       </div>
     </div>
   </div>
+  <script src="../../static/genplus_assessments/assets/js/chart.min.js"></script>
+  <script src="../../static/genplus_assessments/assets/js/main.js"></script>
 </body>
 </html>

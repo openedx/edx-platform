@@ -13,10 +13,23 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   color: $text-color;
-  font-size: 1rem;
+  font-size: 14px;
   line-height: 1.3;
   margin: .75in;
   padding-top: .5rem;
+}
+
+.cover-wrapper {
+  padding: 0;
+}
+
+.cover-content {
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: $heading-font;
+  font-weight: normal;
 }
 
 hr {
@@ -29,9 +42,9 @@ img {
 }
 
 canvas {
-  page-break-inside: avoid;
-  max-width: 80%;
-  margin: 0 auto 1rem;
+  display: block;
+  width: 800px;
+  margin: 0 auto 2rem;
 }
 
 blockquote {
@@ -51,8 +64,8 @@ blockquote {
   }
 }
 
-.intro {
-  padding: 0 4rem;
+.heading-default {
+  color: $pink;
 }
 
 .container {
@@ -70,8 +83,22 @@ blockquote {
 .header {
   position: relative;
   z-index: 1;
-  margin-bottom: 4rem;
-  page-break-inside: avoid;
+  margin-bottom: 1rem;
+  text-align: center;
+
+  &.small {
+    text-align: right;
+    margin-top: 0;
+
+    img {
+      width: 300px;
+      height: auto;
+     }
+  }
+
+  .student-name {
+    font-size: 2rem;
+  }
 
   .container {
 
@@ -437,16 +464,12 @@ blockquote {
   }
 }
 
-.sadas { background: #000; }
-
 .unit-completion {
   @include clearfix;
 
-  h3 {
+  h2 {
     color: $pink;
-    float: left;
     margin-right: 1rem;
-    width: 14%;
   }
 }
 
@@ -454,10 +477,9 @@ blockquote {
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: .6rem;
+  font-size: .9rem;
   text-align: center;
   text-transform: uppercase;
-  overflow: hidden;
   @include clearfix;
 
   .image-frame {
@@ -482,8 +504,9 @@ blockquote {
   }
 
   li {
-    float: left;
-    margin-right: .5rem;
+    display: inline-block;
+    vertical-align: top;
+    margin: .25rem;
 
     img {
       opacity: .5;
@@ -561,17 +584,21 @@ blockquote {
   h2,
   h3 {
     color: $pink;
-    float: left;
-    margin-right: 1rem;
-    width: 14%;
+  }
+
+  .group-image {
+    width: 70%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
   }
 
   .badges {
     margin: 0;
     padding: 0;
     list-style: none;
-    overflow: hidden;
     font-size: .8rem;
+    text-align: center;
 
     .date {
       display: block;
@@ -579,8 +606,9 @@ blockquote {
 
     li {
       text-align: center;
-      float: left;
       margin: 0 1rem 2rem;
+      display: inline-block;
+      vertical-align: top;
 
       img {
         max-width: 6rem;
@@ -606,4 +634,16 @@ blockquote {
 
 .list-unstyled {
   list-style: none;
+}
+
+.skills-reflection {
+  page-break-after: always;
+
+  .heading {
+    color: $pink;
+  }
+}
+
+.teacher-feedbacks {
+  page-break-before: always;
 }

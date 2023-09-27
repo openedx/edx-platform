@@ -50,6 +50,7 @@ class AssessmentReportPDFView(TemplateView):
     pdfkit_options = None
     template_path = 'genplus_assessments/assessment-report.html'
     header_template_path = 'genplus_assessments/assessment-header.html'
+    footer_template_path = 'genplus_assessments/footer.html'
     cover_template_path = 'genplus_assessments/cover.html'
     stylesheet_path = 'static/genplus_assessments/assets/css/main.css'
     static_images_path = 'static/genplus_assessments/assets/images'
@@ -118,9 +119,11 @@ class AssessmentReportPDFView(TemplateView):
 
         try:
             if self.cover_template_path:
+                absolute_image_dir_path = join(script_dir, self.static_images_path)
                 with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as cover_html:
                     kwargs['cover'] = cover_html.name
-                    rendered_html = render_to_string(self.cover_template_path, {}).encode('utf-8')
+                    context['images_dir'] = absolute_image_dir_path
+                    rendered_html = render_to_string(self.cover_template_path, context).encode('utf-8')
                     cover_html.write(rendered_html)
                     cover_html.flush()
 
@@ -142,6 +145,13 @@ class AssessmentReportPDFView(TemplateView):
                     header_html.write(rendered_html)
                     header_html.flush()
 
+            if self.footer_template_path:
+                with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as footer_html:
+                    options['footer-html'] = footer_html.name
+                    rendered_html = render_to_string(self.footer_template_path, context).encode('utf-8')
+                    footer_html.write(rendered_html)
+                    footer_html.flush()
+
             pdf = pdfkit.from_string(html, False, options, **kwargs)
             return pdf
         finally:
@@ -152,6 +162,8 @@ class AssessmentReportPDFView(TemplateView):
                 os.remove(options['user-style-sheet'])
             if self.cover_template_path:
                 os.remove(kwargs['cover'])
+            if self.footer_template_path:
+                os.remove(options['footer-html'])
 
     def get_pdfkit_options(self):
         """
@@ -166,12 +178,13 @@ class AssessmentReportPDFView(TemplateView):
             'encoding': 'UTF-8',
             "enable-local-file-access": "",
             "enable-javascript": "",
-            'margin-top': '2.3in',
+            'margin-top': '1in',
             'margin-right': '0in',
-            'margin-bottom': '1in',
+            'margin-bottom': '0.7in',
             'margin-left': '0in',
             'no-outline': None,
-            'header-spacing': '10',
+            'header-spacing': '5',
+            'javascript-delay': '500'
         }
 
     def get_filename(self, user_id):

@@ -807,7 +807,7 @@ def get_user_assessment_result(user, raw_data, program):
     if program.outro_unit:
         assessments.extend(get_assessment_problem_data(program.outro_unit.id, user))
     # prepare dictionary for every particular assessment problem in a course
-    for assessment in assessments:
+    for assessment in filter(lambda a: hasattr(a, 'problem_id'), assessments):
         usage_key = UsageKey.from_string(assessment.get('id'))
         assessment_xblock = store.get_item(usage_key)
         problem_id = str(assessment_xblock.problem_id)
