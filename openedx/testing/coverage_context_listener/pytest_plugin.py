@@ -4,6 +4,7 @@ A pytest plugin that reports test contexts to coverage running in another proces
 
 import pytest
 
+
 class RemoteContextPlugin:
     """
     Pytest plugin for reporting pytests contexts to coverage running in another process
@@ -20,6 +21,7 @@ class RemoteContextPlugin:
 
     def pytest_runtest_call(self, item):
         self.doit(item, "call")
+
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_configure(config):
