@@ -323,7 +323,7 @@ class TestIgnoredErrorMiddleware(unittest.TestCase):
             expected_calls += [call('checked_error_ignored_from', 'multiple')]
         else:
             expected_calls += [
-                call('multiple_exceptions', 'openedx.core.lib.tests.test_request_utils.CustomError1'),
+                call('unexpected_multiple_exceptions', 'openedx.core.lib.tests.test_request_utils.CustomError1'),
             ]
         mock_set_custom_attribute.assert_has_calls(expected_calls)
         assert mock_set_custom_attribute.call_count == len(expected_calls)
