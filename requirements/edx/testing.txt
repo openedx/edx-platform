@@ -104,8 +104,6 @@ bleach[css]==6.0.0
     #   ora2
     #   xblock-drag-and-drop-v2
     #   xblock-poll
-bok-choy==2.0.2
-    # via -r requirements/edx/testing.in
 boto==2.39.0
     # via
     #   -c requirements/edx/../constraints.txt
@@ -856,7 +854,6 @@ lazy==1.6
     # via
     #   -r requirements/edx/base.txt
     #   acid-xblock
-    #   bok-choy
     #   lti-consumer-xblock
     #   ora2
     #   xblock
@@ -1373,10 +1370,6 @@ scipy==1.7.3
     #   -r requirements/edx/base.txt
     #   chem
     #   openedx-calc
-selenium==3.141.0
-    # via
-    #   -r requirements/edx/testing.in
-    #   bok-choy
 semantic-version==2.10.0
     # via
     #   -r requirements/edx/base.txt
@@ -1568,7 +1561,6 @@ urllib3==1.26.16
     #   pact-python
     #   py2neo
     #   requests
-    #   selenium
     #   snowflake-connector-python
 user-util==1.0.0
     # via -r requirements/edx/base.txt

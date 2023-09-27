@@ -3,9 +3,9 @@ A pytest plugin that reports test contexts to coverage running in another proces
 """
 
 import pytest
-import requests
+# import requests
 
-from pavelib.utils.envs import Env
+# from pavelib.utils.envs import Env
 
 
 class RemoteContextPlugin:
@@ -25,16 +25,17 @@ class RemoteContextPlugin:
     def pytest_runtest_call(self, item):
         self.doit(item, "call")
 
-    def doit(self, item, when):  # lint-amnesty, pylint: disable=missing-function-docstring
-        if self.active:
-            for cfg in Env.BOK_CHOY_SERVERS.values():
-                result = requests.post(
-                    'http://{host}:{port}/coverage_context/update_context'.format(**cfg),
-                    {
-                        'context': f"{item.nodeid}|{when}",
-                    }
-                )
-                assert result.status_code == 204
+    # commented for testing
+    # def doit(self, item, when):  # lint-amnesty, pylint: disable=missing-function-docstring
+    #     if self.active:
+    #         for cfg in Env.BOK_CHOY_SERVERS.values():
+    #             result = requests.post(
+    #                 'http://{host}:{port}/coverage_context/update_context'.format(**cfg),
+    #                 {
+    #                     'context': f"{item.nodeid}|{when}",
+    #                 }
+    #             )
+    #             assert result.status_code == 204
 
 
 @pytest.hookimpl(tryfirst=True)
