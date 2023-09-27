@@ -167,9 +167,10 @@ def user_lti_pii_signature_needed(username, course_id):
     """
     course_has_lti_pii_tools = _course_has_lti_pii_tools(course_id)
     signature_exists = _user_lti_pii_signature_exists(username, course_id)
-    signature_out_of_date = _user_signature_out_of_date(course_id)
+    signature_out_of_date = _user_signature_out_of_date(username, course_id)
 
-    if course_has_lti_pii_tools and (not signature_exists) or (course_has_lti_pii_tools and signature_exists and signature_out_of_date):
+    if (course_has_lti_pii_tools and (not signature_exists) or 
+        (course_has_lti_pii_tools and signature_exists and signature_out_of_date)):
         # write a new signature, or update an existing signature
         return True
     else:
