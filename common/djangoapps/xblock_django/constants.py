@@ -26,3 +26,11 @@ ATTR_KEY_USER_IS_STAFF = 'edx-platform.user_is_staff'
 ATTR_KEY_USER_PREFERENCES = 'edx-platform.user_preferences'
 # The user's role in the course ('staff', 'instructor', or 'student').
 ATTR_KEY_USER_ROLE = 'edx-platform.user_role'
+# Whether the user has the manage content permission
+ATTR_KEY_USER_HAS_MANAGE_CONTENT = 'edx-platform.user_has_manage_content'
+# Whether the user has the manage grades permission
+ATTR_KEY_USER_HAS_MANAGE_GRADES = 'edx-platform.user_has_manage_grades'
+# Whether the user has the access data downloads permission
+ATTR_KEY_USER_HAS_ACCESS_DATA_DOWNLOADS = 'edx-platform.user_has_access_data_downloads'
+# Whether the user has the view all content permission
+ATTR_KEY_USER_HAS_VIEW_ALL_CONTENT = 'edx-platform.user_has_view_all_content'

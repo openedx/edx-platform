@@ -21,7 +21,7 @@ from openedx.core.djangoapps.django_comment_common.comment_client.thread import 
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_MODERATOR
 )
-
+from openedx.core.djangoapps.course_roles import course_permission_check
 
 def _is_author(cc_content, context):
     """
@@ -159,6 +159,8 @@ class IsStaffOrCourseTeamOrEnrolled(permissions.BasePermission):
             GlobalStaff().has_user(request.user) or
             CourseStaffRole(course_key).has_user(request.user) or
             CourseInstructorRole(course_key).has_user(request.user) or
+            course_permission_check(request.user, "moderate_discussion_forums", course_key) or
+            course_permission_check(request.user, "moderate_discussion_forums_for_a_cohort", course_key) or
             CourseEnrollment.is_enrolled(request.user, course_key) or
             has_discussion_privileges(request.user, course_key)
         )

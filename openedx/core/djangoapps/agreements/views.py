@@ -18,7 +18,7 @@ from openedx.core.djangoapps.agreements.api import (
     get_integrity_signature,
 )
 from openedx.core.djangoapps.agreements.serializers import IntegritySignatureSerializer
-
+from openedx.core.djangoapps.course_roles import course_permission_check
 
 def is_user_course_or_global_staff(user, course_id):
     """
@@ -26,7 +26,11 @@ def is_user_course_or_global_staff(user, course_id):
     or is global staff.
     """
 
-    return user.is_staff or auth.user_has_role(user, CourseStaffRole(CourseKey.from_string(course_id)))
+    return (
+        user.is_staff 
+        or auth.user_has_role(user, CourseStaffRole(CourseKey.from_string(course_id)))
+        or course_permission_check(user, "manage_students", course_id)
+    )
 
 
 class AuthenticatedAPIView(APIView):

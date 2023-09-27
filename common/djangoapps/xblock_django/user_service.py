@@ -58,6 +58,10 @@ class DjangoXBlockUserService(UserService):
         self._anonymous_user_id = kwargs.get('anonymous_user_id', None)
         self._deprecated_anonymous_user_id = kwargs.get('deprecated_anonymous_user_id', None)
         self._request_country_code = kwargs.get('request_country_code', None)
+        self._user_has_manage_content = kwargs.get('user_has_manaege_content', False)
+        self._user_has_manage_grades = kwargs.get('user_has_manage_grades', False)
+        self._user_has_access_data_downloads = kwargs.get('user_has_access_data_downloads', False)
+        self._user_has_view_all_content = kwargs.get('user_has_view_all_content', False)
 
     def get_current_user(self):
         """
@@ -138,6 +142,10 @@ class DjangoXBlockUserService(UserService):
                 for pref in USER_PREFERENCES_WHITE_LIST
                 if pref in user_preferences
             }
+            xblock_user.opt_attrs[ATTR_KEY_USER_HAS_MANAGE_CONTENT] = self._user_has_manage_content
+            xblock_user.opt_attrs[ATTR_KEY_USER_HAS_MANAGE_GRADES] = self._user_has_manage_grades
+            xblock_user.opt_attrs[ATTR_KEY_USER_HAS_ACCESS_DATA_DOWNLOADS] = self._user_has_access_data_downloads
+            xblock_user.opt_attrs[ATTR_KEY_USER_HAS_VIEW_ALL_CONTENT] = self._user_has_view_all_content
         else:
             xblock_user.opt_attrs[ATTR_KEY_IS_AUTHENTICATED] = False
             xblock_user.opt_attrs[ATTR_KEY_REQUEST_COUNTRY_CODE] = self._request_country_code

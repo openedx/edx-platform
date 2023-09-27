@@ -60,6 +60,7 @@ from openedx.features.enterprise_support.api import (
     EnterpriseApiServiceClient,
     enterprise_enabled
 )
+from openedx.core.djangoapps.course_roles import course_permission_check
 
 log = logging.getLogger(__name__)
 REQUIRED_ATTRIBUTES = {
@@ -667,7 +668,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         filtered_data = []
         for enrollment in enrollment_data:
             course_key = CourseKey.from_string(enrollment["course_details"]["course_id"])
-            if user_has_role(request.user, CourseStaffRole(course_key)):
+            if user_has_role(request.user, CourseStaffRole(course_key)) or course_permission_check(request.user, "manage_users_except_admin_and_staff", course_key):
                 filtered_data.append(enrollment)
         return Response(filtered_data)
 

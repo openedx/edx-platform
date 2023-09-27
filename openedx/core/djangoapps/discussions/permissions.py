@@ -7,6 +7,7 @@ from rest_framework.permissions import BasePermission
 from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff, CourseInstructorRole
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from openedx.core.lib.api.view_utils import validate_course_key
+from openedx.core.djangoapps.course_roles import course_permission_check
 
 DEFAULT_MESSAGE = "You're not authorized to perform this operation."
 PERMISSION_MESSAGES = {
@@ -33,6 +34,7 @@ class IsStaffOrCourseTeam(BasePermission):
         return (
             CourseInstructorRole(course_key).has_user(request.user) or
             CourseStaffRole(course_key).has_user(request.user) or
+            course_permission_check(request.user, "moderate_discussion_forums", course_key) or 
             has_discussion_privileges(request.user, course_key)
         )
 

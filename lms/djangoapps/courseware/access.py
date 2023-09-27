@@ -65,6 +65,8 @@ from xmodule.course_block import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_CA
 from xmodule.error_block import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError  # lint-amnesty, pylint: disable=wrong-import-order
 
+from openedx.core.djangoapps.course_roles.helpers import course_permission_check
+
 log = logging.getLogger(__name__)
 
 
@@ -83,7 +85,7 @@ def has_ccx_coach_role(user, course_key):
         ccx_id = course_key.ccx
         role = CourseCcxCoachRole(course_key)
 
-        if role.has_user(user):
+        if role.has_user(user) or course_permission_check(user, "manage_students", ccx_id):
             list_ccx = CustomCourseForEdX.objects.filter(
                 course_id=course_key.to_course_locator(),
                 coach=user
@@ -880,6 +882,8 @@ def is_mobile_available_for_user(user, block):
     """
     return (
         auth.user_has_role(user, CourseBetaTesterRole(block.id))
+        or course_permission_check(user, "view_only_published_live_content", block.id)
+        or course_permission_check(user, "view_all_published_content", block.id)
         or _has_staff_access_to_block(user, block, block.id)
         or _is_block_mobile_available(block)
     )

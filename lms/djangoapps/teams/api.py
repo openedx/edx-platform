@@ -18,6 +18,7 @@ from lms.djangoapps.discussion.django_comment_client.utils import has_discussion
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.lib.teams_config import TeamsetType
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.djangoapps.course_roles import course_permission_check
 
 logger = logging.getLogger(__name__)
 
@@ -143,6 +144,8 @@ def has_course_staff_privileges(user, course_key):
     if CourseStaffRole(course_key).has_user(user):
         return True
     if CourseInstructorRole(course_key).has_user(user):
+        return True
+    if course_permission_check(user, "manage_students", course_key):
         return True
     return False
 
