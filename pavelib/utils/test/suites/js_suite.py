@@ -25,7 +25,7 @@ class JsTestSuite(TestSuite):
         self.opts = kwargs
 
         suite = args[0]
-        self.subsuites = self._default_subsuites if suite == 'all' else [JsTestSubSuite(*args, **kwargs)]
+        # self.subsuites = self._default_subsuites if suite == 'all' else [JsTestSubSuite(*args, **kwargs)]
 
     def __enter__(self):
         super().__enter__()
@@ -39,12 +39,12 @@ class JsTestSuite(TestSuite):
         if self.mode == 'run' and not self.run_under_coverage:
             test_utils.clean_dir(self.report_dir)
 
-    @property
-    def _default_subsuites(self):
-        """
-        Returns all JS test suites
-        """
-        return [JsTestSubSuite(test_id, **self.opts) for test_id in Env.JS_TEST_ID_KEYS if test_id != 'jest-snapshot']
+    # @property
+    # def _default_subsuites(self):
+    #     """
+    #     Returns all JS test suites
+    #     """
+    #     return [JsTestSubSuite(test_id, **self.opts) for test_id in Env.JS_TEST_ID_KEYS if test_id != 'jest-snapshot']
 
 
 # class JsTestSubSuite(TestSuite):
