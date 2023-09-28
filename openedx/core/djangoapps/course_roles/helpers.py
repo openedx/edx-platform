@@ -1,6 +1,8 @@
 """
 Helpers for the course roles app.
 """
+from django.contrib.auth.models import AnonymousUser
+
 from openedx.core.djangoapps.course_roles.models import CourseRolesUserRole
 from openedx.core.lib.cache_utils import request_cached
 
@@ -10,6 +12,8 @@ def course_permission_check(user, permission_name, course_id):
     """
     Check if a user has a permission in a course.
     """
+    if isinstance(user, AnonymousUser):
+        return False
     return CourseRolesUserRole.objects.filter(
         user=user,
         role__permissions__name=permission_name,
@@ -30,6 +34,8 @@ def organization_permission_check(user, permission_name, organization_name):
     """
     Check if a user has a permission in an organization.
     """
+    if isinstance(user, AnonymousUser):
+        return False
     return CourseRolesUserRole.objects.filter(
         user=user,
         role__permissions__name=permission_name,
