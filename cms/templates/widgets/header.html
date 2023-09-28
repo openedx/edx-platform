@@ -56,7 +56,6 @@
                 certificates_url = reverse('certificates_list_handler', kwargs={'course_key_string': str(course_key)})
             checklists_url = reverse('checklists_handler', kwargs={'course_key_string': str(course_key)})
             pages_and_resources_mfe_enabled = ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND.is_enabled(context_course.id)
-            studio_home_mfe_enabled = toggles.use_new_home_page()
             course_outline_mfe_enabled = toggles.use_new_course_outline_page(context_course.id)
             updates_mfe_enabled = toggles.use_new_updates_page(context_course.id)
             files_uploads_mfe_enabled = toggles.use_new_files_uploads_page(context_course.id)
@@ -245,7 +244,7 @@
                   % endif
                   % if export_mfe_enabled:
                   <li class="nav-item nav-course-tools-import">
-                    <a href="${get_export_url(course_key)}">${_("Import")}</a>
+                    <a href="${get_export_url(course_key)}">${_("Export")}</a>
                   </li>
                   % endif
                   % if toggles.EXPORT_GIT.is_enabled() and context_course.giturl:
