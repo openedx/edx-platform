@@ -176,8 +176,8 @@ def _course_team_user(request, course_key, email):
         # TODO: course roles: If the course roles feature flag is disabled the course_permission_check call
         #       below will never return true.
         #       Remove the .has_user() call below when course roles are implemented.
-        elif (role.has_user(user, check_user_activation=False) or
-              course_permission_check(user, MANAGE_ALL_USERS_PERMISSION, course_key)):  # pylint: disable=no-value-for-parameter
+        elif (role.has_user(user, check_user_activation=False) or  # pylint: disable=no-value-for-parameter
+              course_permission_check(user, MANAGE_ALL_USERS_PERMISSION, course_key)):
             # Remove the user from this old role:
             old_roles.add(role)
 

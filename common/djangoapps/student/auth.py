@@ -136,7 +136,8 @@ def get_user_permissions(user, course_key, org=None):
     # TODO: course roles: If the course roles feature flag is disabled the the organization_permissions_list_check call
     #       and course_permissions_list_check call below will never return true.
     #       Remove the OrgStaffRole has_user call and the user_has_role call when course roles are implemented.
-    if (OrgStaffRole(org=org).has_user(user) or (course_key and user_has_role(user, CourseStaffRole(course_key)))) or (
+    if (OrgStaffRole(org=org).has_user(user) or  # pylint: disable=too-many-boolean-expressions
+        (course_key and user_has_role(user, CourseStaffRole(course_key)))) or (
         organization_permissions_list_check(user, STAFF_ROLE_PERMISSIONS, org)
         or (course_key and course_permissions_list_check(user, STAFF_ROLE_PERMISSIONS, course_key))
     ):
