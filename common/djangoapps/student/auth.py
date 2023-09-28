@@ -26,9 +26,9 @@ from common.djangoapps.student.roles import (
     OrgStaffRole
 )
 from openedx.core.djangoapps.course_roles.helpers import (
-    course_permission_check,
     course_permissions_list_check,
-    organization_permission_check,
+    course_or_organization_permission_check,
+    course_or_organization_permission_list_check,
     organization_permissions_list_check
 )
 
@@ -133,25 +133,23 @@ def get_user_permissions(user, course_key, org=None):
     if course_key and user_has_role(user, CourseLimitedStaffRole(course_key)):
         return STUDIO_NO_PERMISSIONS
     # Staff have all permissions except EDIT_ROLES:
-    # TODO: course roles: If the course roles feature flag is disabled the the organization_permissions_list_check call
-    #       and course_permissions_list_check call below will never return true.
+    # TODO: course roles: If the course roles feature flag is disabled the
+    #       course_or_organization_permissions_list_check call below will never return true.
     #       Remove the OrgStaffRole has_user call and the user_has_role call when course roles are implemented.
-    if (OrgStaffRole(org=org).has_user(user) or  # pylint: disable=too-many-boolean-expressions
+    if (OrgStaffRole(org=org).has_user(user) or
         (course_key and user_has_role(user, CourseStaffRole(course_key)))) or (
-        organization_permissions_list_check(user, STAFF_ROLE_PERMISSIONS, org)
-        or (course_key and course_permissions_list_check(user, STAFF_ROLE_PERMISSIONS, course_key))
+        course_or_organization_permission_list_check(user, STAFF_ROLE_PERMISSIONS, course_key, org)
     ):
         return STUDIO_VIEW_USERS | STUDIO_EDIT_CONTENT | STUDIO_VIEW_CONTENT
     # Otherwise, for libraries, users can view only:
     LIBRARY_USER_ROLE_PERMISSION = "view_library"
     if course_key and isinstance(course_key, LibraryLocator):
-        # TODO: course roles: If the course roles feature flag is disabled the organization_permission_check call
-        #       below and the course_permission_check call will never return true.
+        # TODO: course roles: If the course roles feature flag is disabled the course_or_organization_permission_check
+        #       call below will never return true.
         #       Remove the OrgLibraryUserRole has_user call and the user_has_role call
         #       when course roles are implemented.
         if (OrgLibraryUserRole(org=org).has_user(user) or user_has_role(user, LibraryUserRole(course_key))) or (
-            organization_permission_check(user, LIBRARY_USER_ROLE_PERMISSION, org)
-            or (course_key and course_permission_check(user, LIBRARY_USER_ROLE_PERMISSION, course_key))
+            course_or_organization_permission_check(user, LIBRARY_USER_ROLE_PERMISSION, course_key, org)
         ):
             return STUDIO_VIEW_USERS | STUDIO_VIEW_CONTENT
     return STUDIO_NO_PERMISSIONS
