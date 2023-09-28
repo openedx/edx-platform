@@ -13,4 +13,10 @@ class LtiConsumerAdmin(admin.ModelAdmin):
     search_fields = ('consumer_name', 'consumer_key', 'instance_guid')
     list_display = ('id', 'consumer_name', 'consumer_key', 'instance_guid')
 
+    def get_readonly_fields(self, request, obj=None):
+        if obj and obj.pk:
+            return ("auto_link_users_using_email",)
+        return super().get_readonly_fields(request, obj)
+
+
 admin.site.register(LtiConsumer, LtiConsumerAdmin)
