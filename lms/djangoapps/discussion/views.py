@@ -69,6 +69,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
 from openedx.core.djangoapps.django_comment_common.utils import ThreadContext
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
+from openedx.core.djangoapps.course_roles import course_permission_check
 
 User = get_user_model()
 log = logging.getLogger("edx.discussions")
@@ -810,7 +811,11 @@ class DiscussionBoardFragmentView(EdxFragmentView):
         course_key = CourseKey.from_string(course_id)
         # Force using the legacy view if a user profile is requested or the URL contains a specific topic or thread
         force_legacy_view = (profile_page_context or thread_id or discussion_id)
-        is_educator_or_staff = is_course_staff(course_key, request.user) or GlobalStaff().has_user(request.user)
+        is_educator_or_staff = (
+            is_course_staff(course_key, request.user) or 
+            GlobalStaff().has_user(request.user) or 
+            course_permission_check(request.user, "manage_discussion_moderators", course_key)
+        )
         try:
             base_context = _create_base_discussion_view_context(request, course_key)
             # Note:

@@ -9,6 +9,7 @@ from lms.djangoapps.program_enrollments.api import is_course_staff_enrollment
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 
 from .constants import CourseRunProgressStatuses
+from openedx.core.djangoapps.course_roles import course_permission_check
 
 # pylint: disable=abstract-method
 
@@ -104,7 +105,7 @@ class ProgramCourseEnrollmentSerializer(serializers.Serializer):
         return str(obj.program_enrollment.curriculum_uuid)
 
     def get_course_staff(self, obj):
-        return is_course_staff_enrollment(obj)
+        return is_course_staff_enrollment(obj) or course_permission_check(program_course_enrollment.program_enrollment.user, "manage_students", program_course_enrollment.course_key)
 
 
 class ProgramCourseEnrollmentRequestSerializer(serializers.Serializer, InvalidStatusMixin):

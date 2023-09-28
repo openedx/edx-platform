@@ -63,6 +63,7 @@ from openedx.features.enterprise_support.api import (
     enterprise_customer_from_session_or_learner_data,
     get_enterprise_learner_data_from_db,
 )
+from openedx.core.djangoapps.course_roles import course_permission_check, organization_permission_check
 
 logger = logging.getLogger(__name__)
 
@@ -330,7 +331,10 @@ def check_course_access(user, course_enrollments):
             "user_has_staff_access": any(
                 administrative_accesses_to_course_for_user(
                     user, course_enrollment.course_id
-                )
+                ) or 
+                course_permission_check(user, "view_all_content", course_enrollment.course_id) or
+                organization_permission_check(user, "view_all_content", course_enrollment.org.__name__)
+
             ),
         }
 

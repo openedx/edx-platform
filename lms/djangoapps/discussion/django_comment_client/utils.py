@@ -131,6 +131,8 @@ def has_discussion_privileges(user, course_id):
     for user_ids in roles.values():
         if user.id in user_ids:
             return True
+    if course_permission_check(user.id, "moderate_discussion_forums", course_id) or course_permission_check(user.id, "moderate_discussion_forums_for_a_cohort", course_id):
+        return True
     return False
 
 

@@ -65,7 +65,7 @@ from xmodule.course_block import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_CA
 from xmodule.error_block import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError  # lint-amnesty, pylint: disable=wrong-import-order
 
-from openedx.core.djangoapps.course_roles.helpers import course_permission_check
+from openedx.core.djangoapps.course_roles.helpers import course_permission_check, organization_permission_check
 
 log = logging.getLogger(__name__)
 
@@ -175,8 +175,9 @@ def has_staff_access_to_preview_mode(user, course_key):
     A user can access a course in preview mode only if User has staff access to course.
     """
     has_admin_access_to_course = any(administrative_accesses_to_course_for_user(user, course_key))
+    permission_granted = course_permission_check(user, "view_all_content", course_key) or organization_permission_check(user, "view_all_content", course_key.org.__name__)
 
-    return has_admin_access_to_course or is_masquerading_as_student(user, course_key)
+    return has_admin_access_to_course or is_masquerading_as_student(user, course_key) or permission_granted
 
 
 def _can_view_courseware_with_prerequisites(user, course):
