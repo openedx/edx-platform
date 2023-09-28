@@ -17,7 +17,7 @@ jobs:
           - "3.8"
         django-version:
           - "pinned"
-          #- "4.0"
+          - "4.2"
         # When updating the shards, remember to make the same changes in
         # .github/workflows/unit-tests-gh-hosted.yml
         shard_name:
@@ -81,7 +81,7 @@ jobs:
   # https://github.com/marketplace/actions/alls-green#why
   # https://github.com/orgs/community/discussions/33579
   success:
-    name: Tests successful
+    name: Unit tests successful
     if: (github.repository == 'edx/edx-platform-private') || (github.repository == 'openedx/edx-platform' && (startsWith(github.base_ref, 'open-release') == false))
     needs:
       - run-tests

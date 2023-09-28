@@ -3,6 +3,8 @@
 
 import json
 from unittest import mock
+
+import django
 from django.http import HttpResponse
 from django.test import TestCase
 
@@ -25,4 +27,7 @@ class TestEnsureCsrfCookieCrossDomain(TestCase):
         response = wrapped_view(request)
         response_meta = json.loads(response.content.decode('utf-8'))
         assert response_meta['CROSS_DOMAIN_CSRF_COOKIE_USED'] is True
-        assert response_meta['CSRF_COOKIE_USED'] is True
+        if django.VERSION < (4, 0):
+            assert response_meta['CSRF_COOKIE_USED'] is True
+        else:
+            assert response_meta['CSRF_COOKIE_NEEDS_UPDATE'] is True

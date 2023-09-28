@@ -11,7 +11,7 @@ from openedx_events.event_bus import get_producer
 from common.djangoapps.course_modes import api as modes_api
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.signals import ENROLLMENT_TRACK_UPDATED
-from lms.djangoapps.certificates.config import SEND_CERTIFICATE_CREATED_SIGNAL
+from lms.djangoapps.certificates.config import SEND_CERTIFICATE_CREATED_SIGNAL, SEND_CERTIFICATE_REVOKED_SIGNAL
 from lms.djangoapps.certificates.generation_handler import (
     CertificateGenerationNotAllowed,
     generate_allowlist_certificate_task,
@@ -32,7 +32,7 @@ from openedx.core.djangoapps.signals.signals import (
     COURSE_GRADE_NOW_PASSED,
     LEARNER_NOW_VERIFIED
 )
-from openedx_events.learning.signals import CERTIFICATE_CREATED
+from openedx_events.learning.signals import CERTIFICATE_CREATED, CERTIFICATE_REVOKED
 
 log = logging.getLogger(__name__)
 
@@ -162,13 +162,28 @@ def _listen_for_enrollment_mode_change(sender, user, course_key, mode, **kwargs)
 
 
 @receiver(CERTIFICATE_CREATED)
-def listen_for_certificate_created_event(sender, signal, **kwargs):
+def listen_for_certificate_created_event(sender, signal, **kwargs):  # pylint: disable=unused-argument
     """
     Publish `CERTIFICATE_CREATED` events to the event bus.
     """
     if SEND_CERTIFICATE_CREATED_SIGNAL.is_enabled():
         get_producer().send(
             signal=CERTIFICATE_CREATED,
+            topic='learning-certificate-lifecycle',
+            event_key_field='certificate.course.course_key',
+            event_data={'certificate': kwargs['certificate']},
+            event_metadata=kwargs['metadata']
+        )
+
+
+@receiver(CERTIFICATE_REVOKED)
+def listen_for_certificate_revoked_event(sender, signal, **kwargs):  # pylint: disable=unused-argument
+    """
+    Publish `CERTIFICATE_REVOKED` events to the event bus.
+    """
+    if SEND_CERTIFICATE_REVOKED_SIGNAL.is_enabled():
+        get_producer().send(
+            signal=CERTIFICATE_REVOKED,
             topic='learning-certificate-lifecycle',
             event_key_field='certificate.course.course_key',
             event_data={'certificate': kwargs['certificate']},

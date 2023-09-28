@@ -91,9 +91,6 @@ RUN apt-get update && \
     apt-get -y install --no-install-recommends \
         curl \
         libssl-dev \
-        libxml2-dev \
-        libxmlsec1-dev \
-        libxslt1-dev \
         libffi-dev \
         libfreetype6-dev \
         libgeos-dev \
@@ -150,10 +147,11 @@ COPY . .
 # Install Python requirements again in order to capture local projects
 RUN pip install -e .
 
-USER app
-
 # Production target
 FROM base as production
+
+USER app
+
 ENV EDX_PLATFORM_SETTINGS='docker-production'
 ENV SERVICE_VARIANT "${SERVICE_VARIANT}"
 ENV SERVICE_PORT "${SERVICE_PORT}"
@@ -170,9 +168,15 @@ CMD gunicorn \
 # Development target
 FROM base as development
 
-COPY --from=builder-development /edx/app/edxapp/venvs/edxapp /edx/app/edxapp/venvs/edxapp
+RUN apt-get update && \
+    apt-get -y install --no-install-recommends \
+        # wget is used in Makefile for common_constraints.txt
+        wget \
+    && \
+    apt-get clean all && \
+    rm -rf /var/lib/apt/*
 
-USER root
+COPY --from=builder-development /edx/app/edxapp/venvs/edxapp /edx/app/edxapp/venvs/edxapp
 
 RUN ln -s "$(pwd)/lms/envs/devstack-experimental.yml" "$LMS_CFG"
 RUN ln -s "$(pwd)/cms/envs/devstack-experimental.yml" "$CMS_CFG"

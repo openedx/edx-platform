@@ -154,7 +154,8 @@ if STATIC_ROOT_BASE:
     WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = STATIC_ROOT / "webpack-stats.json"
     WEBPACK_LOADER['WORKERS']['STATS_FILE'] = STATIC_ROOT / "webpack-worker-stats.json"
 
-EMAIL_FILE_PATH = ENV_TOKENS.get('EMAIL_FILE_PATH', None)
+DATA_DIR = path(ENV_TOKENS.get('DATA_DIR', DATA_DIR))
+EMAIL_FILE_PATH = ENV_TOKENS.get('EMAIL_FILE_PATH', DATA_DIR / "emails" / "studio")
 
 
 # CMS_BASE: Public domain name of Studio (should be resolvable from the end-user's browser)
@@ -166,6 +167,14 @@ ENTERPRISE_API_URL = ENV_TOKENS.get('ENTERPRISE_API_URL', LMS_INTERNAL_ROOT_URL 
 ENTERPRISE_CONSENT_API_URL = ENV_TOKENS.get('ENTERPRISE_CONSENT_API_URL', LMS_INTERNAL_ROOT_URL + '/consent/api/v1/')
 # Note that FEATURES['PREVIEW_LMS_BASE'] gets read in from the environment file.
 
+OPENAI_API_KEY = ENV_TOKENS.get('OPENAI_API_KEY', '')
+LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT = ENV_TOKENS.get('LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT', '')
+LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT = ENV_TOKENS.get(
+    'LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT',
+    ''
+)
+LEARNER_PROGRESS_PROMPT_FOR_ACTIVE_CONTRACT = ENV_TOKENS.get('LEARNER_PROGRESS_PROMPT_FOR_ACTIVE_CONTRACT', '')
+LEARNER_PROGRESS_PROMPT_FOR_NON_ACTIVE_CONTRACT = ENV_TOKENS.get('LEARNER_PROGRESS_PROMPT_FOR_NON_ACTIVE_CONTRACT', '')
 
 # List of logout URIs for each IDA that the learner should be logged out of when they logout of
 # Studio. Only applies to IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
@@ -180,7 +189,6 @@ ALLOWED_HOSTS = [
 ]
 
 LOG_DIR = ENV_TOKENS.get('LOG_DIR', LOG_DIR)
-DATA_DIR = path(ENV_TOKENS.get('DATA_DIR', DATA_DIR))
 
 CACHES = ENV_TOKENS.get('CACHES', CACHES)
 # Cache used for location mapping -- called many times with the same key/value

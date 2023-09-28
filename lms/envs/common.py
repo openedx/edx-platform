@@ -56,6 +56,7 @@ from enterprise.constants import (
     ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE,
     ENTERPRISE_FULFILLMENT_OPERATOR_ROLE,
     ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE,
+    ENTERPRISE_SSO_ORCHESTRATOR_OPERATOR_ROLE,
     ENTERPRISE_OPERATOR_ROLE
 )
 
@@ -777,6 +778,15 @@ FEATURES = {
     # .. toggle_creation_date: 2017-04-12
     # .. toggle_tickets: https://openedx.atlassian.net/browse/YONK-513
     'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
+
+    # .. toggle_name: FEATURES['SHOW_REGISTRATION_LINKS']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: Allow registration links. If this is disabled, users will no longer see buttons to the
+    #   the signup page.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2023-03-27
+    'SHOW_REGISTRATION_LINKS': True,
 
     # .. toggle_name: FEATURES['ENABLE_COOKIE_CONSENT']
     # .. toggle_implementation: DjangoSetting
@@ -3220,7 +3230,7 @@ INSTALLED_APPS = [
 
     # Tagging
     'openedx_tagging.core.tagging.apps.TaggingConfig',
-    'openedx.features.content_tagging',
+    'openedx.core.djangoapps.content_tagging',
 
     # Features
     'openedx.features.calendar_sync',
@@ -3303,6 +3313,7 @@ CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
 # end users
 CSRF_COOKIE_SECURE = False
 CSRF_TRUSTED_ORIGINS = []
+CSRF_TRUSTED_ORIGINS_WITH_SCHEME = []
 CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ''
 CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
 
@@ -3760,6 +3771,7 @@ PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG = {
 }
 
 ############################ ORA 2 ############################################
+ORA_WORKFLOW_UPDATE_ROUTING_KEY = "edx.lms.core.ora_workflow_update"
 
 # By default, don't use a file prefix
 ORA2_FILE_PREFIX = None
@@ -3800,9 +3812,10 @@ VIDEO_IMAGE_SETTINGS = dict(
     # STORAGE_KWARGS=dict(bucket='video-image-bucket'),
     STORAGE_KWARGS=dict(
         location=MEDIA_ROOT,
-        base_url=MEDIA_URL,
     ),
     DIRECTORY_PREFIX='video-images/',
+    BASE_URL=MEDIA_URL,
+
 )
 
 VIDEO_IMAGE_MAX_AGE = 31536000
@@ -3816,9 +3829,9 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
     # STORAGE_KWARGS=dict(bucket='video-transcripts-bucket'),
     STORAGE_KWARGS=dict(
         location=MEDIA_ROOT,
-        base_url=MEDIA_URL,
     ),
     DIRECTORY_PREFIX='video-transcripts/',
+    BASE_URL=MEDIA_URL,
 )
 
 VIDEO_TRANSCRIPTS_MAX_AGE = 31536000
@@ -4615,6 +4628,13 @@ ENTERPRISE_ALL_SERVICE_USERNAMES = [
     'subscriptions_worker'
 ]
 
+# Setting for Open API key and prompts used by edx-enterprise.
+OPENAI_API_KEY = ''
+LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT = ''
+LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT = ''
+LEARNER_PROGRESS_PROMPT_FOR_ACTIVE_CONTRACT = ''
+LEARNER_PROGRESS_PROMPT_FOR_NON_ACTIVE_CONTRACT = ''
+
 
 ############## ENTERPRISE SERVICE LMS CONFIGURATION ##################################
 # The LMS has some features embedded that are related to the Enterprise service, but
@@ -4663,6 +4683,7 @@ SYSTEM_TO_FEATURE_ROLE_MAPPING = {
         ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE,
         ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE,
         ENTERPRISE_FULFILLMENT_OPERATOR_ROLE,
+        ENTERPRISE_SSO_ORCHESTRATOR_OPERATOR_ROLE,
     ],
 }
 

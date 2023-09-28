@@ -6,6 +6,7 @@ from unittest.mock import patch
 
 import six.moves.urllib.parse
 from datetime import timedelta
+import django
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
 from django.test.utils import override_settings
@@ -165,6 +166,13 @@ class ExperimentDataViewSetTests(APITestCase, ModuleStoreTestCase):  # lint-amne
         self.client.login(username=other_user.username, password=UserFactory._DEFAULT_PASSWORD)  # lint-amnesty, pylint: disable=protected-access
         response = self.client.patch(url, data)
         assert response.status_code == 404
+
+    def test_loads_valid_csrf_trusted_origins_list(self):
+        """checking CSRF_TRUSTED_ORIGINS here. in django4.2 they will require schemes"""
+        if django.VERSION[0] < 4:  # for greater than django 3.2 use schemes.
+            assert settings.CSRF_TRUSTED_ORIGINS == ['.example.com']
+        else:
+            assert settings.CSRF_TRUSTED_ORIGINS == ['https://*.example.com']
 
 
 def cross_domain_config(func):

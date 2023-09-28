@@ -2,8 +2,6 @@ name: Javascript tests
 
 on:
   pull_request:
-    branches:
-      - master
   push:
     branches:
       - master
