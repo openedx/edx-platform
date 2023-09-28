@@ -112,7 +112,7 @@ class AuthenticateLtiUserTest(TestCase):
         lti_user.edx_user_id = self.edx_user_id
         with patch('lms.djangoapps.lti_provider.users.create_lti_user', return_value=lti_user) as create_user:
             users.authenticate_lti_user(self.request, self.lti_user_id, self.lti_consumer)
-            create_user.assert_called_with(self.lti_user_id, self.lti_consumer, "")
+            create_user.assert_called_with(self.lti_user_id, self.lti_consumer)
             switch_user.assert_called_with(self.request, lti_user, self.lti_consumer)
 
     def test_authentication_with_authenticated_user(self, create_user, switch_user):
@@ -145,7 +145,7 @@ class AuthenticateLtiUserTest(TestCase):
         request.user = self.old_user
 
         users.authenticate_lti_user(request, self.lti_user_id, self.lti_consumer)
-        create_user.assert_called_with(self.lti_user_id, self.lti_consumer, "")
+        create_user.assert_called_with(self.lti_user_id, self.lti_consumer)
 
         self.lti_consumer.auto_link_users_using_email = True
         self.lti_consumer.save()
