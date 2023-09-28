@@ -45,7 +45,7 @@ def handle_exam_reset(sender, signal, **kwargs):
         student = User.objects.get(id=user_data.id)
     except ObjectDoesNotExist:
         log.error(
-            'Error occurred while attempting to reset student attempt. for user_id '
+            'Error occurred while attempting to reset student attempt for user_id '
             f'{user_data.id} for content_id {content_id}. '
             'User does not exist!'
         )
@@ -71,7 +71,7 @@ def handle_exam_reset(sender, signal, **kwargs):
         )
     except (StudentModule.DoesNotExist, enrollment.sub_api.SubmissionError):
         err_msg = (
-            'Error occurred while attempting to reset student attempts for user_id '
+            'Error occurred while attempting to reset module state for user_id '
             f'{student.id} for content_id {content_id}.'
         )
         log.error(err_msg)
