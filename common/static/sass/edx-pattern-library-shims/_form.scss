@@ -1,0 +1,27 @@
+/*
+  This file mirror UXPL Form field styles
+*/
+
+@import 'lms/theme/variables';
+
+.post-type-label {
+  @include margin-right($baseline);
+
+  display: inline-block;
+  line-height: 100%;
+}
+
+.field-label {
+  .post-options & {
+    display: inline-block;
+  }
+
+  .field-input:checked + .field-input-label {
+    color: theme-color("primary");
+  }
+}
+
+.input-radio,
+.input-checkbox {
+  @include margin-right($baseline / 2);
+}

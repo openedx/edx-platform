@@ -1,0 +1,34 @@
+<%!
+from django.utils.translation import gettext as _
+%>
+<%page args="course_date" expression_filter="h"/>
+## The date-summary-container div must stay here because it is used in our
+## mobile app javascript code as a selector.
+<div class="date-summary-container">
+    <div class="date-summary date-summary-${course_date.css_class}">
+        <div class="left-column">
+            <span class="icon fa fa-calendar" aria-hidden="true"></span>
+        </div>
+        <div class="right-column">
+            % if course_date.date:
+                <p class="hd hd-6 date localized-datetime" data-format="shortDate" data-datetime="${course_date.date}" data-timezone="${user_timezone}" data-language="${user_language}"></p>
+            % endif
+            % if course_date.title_html:
+                <div class="hd hd-6 heading">${course_date.title_html}</div>
+            % elif course_date.title:
+                <div class="hd hd-6 heading">${course_date.title}</div>
+            % endif
+            % if course_date.description:
+                <p class="description">${course_date.description}</p>
+            % endif
+            % if course_date.extra_info:
+                <div class="extra-info">${course_date.extra_info}</div>
+            % endif
+            % if course_date.link and course_date.link_text:
+                <div class="date-summary-link">
+                    <a id="course_home_dates" href="${course_date.link}">${course_date.link_text}</a>
+                </div>
+            % endif
+        </div>
+    </div>
+</div>

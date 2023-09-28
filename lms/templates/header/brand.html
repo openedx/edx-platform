@@ -1,0 +1,37 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%namespace name='static' file='/static_content.html'/>
+
+<%!
+from django.urls import reverse
+from django.utils.translation import gettext as _
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
+# App that handles subdomain specific branding
+from lms.djangoapps.branding import api as branding_api
+%>
+
+<h1 class="hd logo-header navbar-brand">
+  <div class="logo">
+    <a class="navbar-brand" href="${branding_api.get_home_url()}" itemprop="url">
+      <img class="logo-image" src="${static.url("images/logo.png")}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}" itemprop="logo" />
+    </a>
+  </div>
+  % if course and not disable_courseware_header:
+    <div class="course-header">
+      <span class="provider">${course.display_org_with_default}:</span>
+      <span class="course-number">${course.display_number_with_default}</span>
+      <span class="course-name">${course.display_name_with_default}</span>
+    </div>
+  % endif
+</h1>
+% if enable_enterprise_sidebar:
+  <div class="enterprise-tagline">
+    <% tagline = configuration_helpers.get_value('ENTERPRISE_TAGLINE', settings.ENTERPRISE_TAGLINE) %>
+    % if tagline:
+      ${tagline}
+    % endif
+  </div>
+% endif

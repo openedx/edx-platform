@@ -1,0 +1,30 @@
+<div class="wrapper-other-login">
+
+    <h1 class="section-title">
+        <span class="text">
+            <%- gettext("Register with Institution/Campus Credentials") %>
+        </span>
+    </h1>
+
+    <p class="instructions"><%- gettext("Choose your institution from the list below:") %></p>
+
+    <ul class="institution-list">
+        <% _.each( _.sortBy(providers, "name"), function( provider ) {
+            if ( provider.registerUrl ) { %>
+                <li class="institution">
+                    <a class="institution-login-link" href="<%- provider.registerUrl %>"><%- provider.name %></a>
+                </li>
+            <% }
+        }); %>
+    </ul>
+
+    <div class="section-title lines">
+        <h3>
+            <span class="text"><%- gettext("or") %></span>
+        </h3>
+    </div>
+
+    <div class="toggle-form">
+        <button class="nav-btn form-toggle" data-type="register"><%- gettext("Create an Account") %></button>
+    </div>
+</div>

@@ -1,0 +1,147 @@
+// studio - shame
+// ====================
+// NOTE: use for any bad-form/orphaned scss that knowingly violate edX FED architecture/standards
+// see - http://csswizardry.com/2013/04/shame-css/
+
+// view - dashboard
+.view-dashboard {
+
+  // elements - authorship controls
+  .wrapper-authorshiprights {
+    .ui-toggle-control {
+      // needed to override general a element transition properties - need to fix.
+      transition-duration: $tmg-f2;
+      transition-timing-function: ease-in-out;
+    }
+
+    .fa-times-circle {
+      // needed to override general a element transition properties - need to fix.
+      transition-duration: $tmg-f2;
+      transition-timing-function: ease-in-out;
+    }
+  }
+}
+
+// ====================
+
+// overriding outline styling for general drag and drop cases
+.outline-section,
+.outline-subsection {
+
+  // STATE: is dragging
+  &.is-dragging {
+    border-color: $gray-d3;
+  }
+
+  // STATE: is dragging + valid drop
+  &.valid-drop {
+    border-color: $ui-action-primary-color-focus;
+  }
+}
+
+// ====================
+
+// yes we have no boldness today - need to fix the resets
+body strong,
+body b {
+  @extend %t-ultrastrong;
+}
+
+// ====================
+
+// needed display property reinforcement since manual CSS abstraction happened
+#page-prompt {
+  .wrapper-prompt::before {
+    display: inline-block;
+  }
+}
+
+.ui-datepicker {
+  background: $white !important;
+}
+
+/* known things to do (paint the fence, sand the floor, wax on/off):
+
+* centralize and move form styling into forms.scss - cms/static/sass/views/_textbooks.scss and cms/static/sass/views/_settings.scss
+* move dialogue styles into cms/static/sass/elements/_modal.scss
+* use the @include placeholder Bourbon mixin (http://bourbon.io/docs/#placeholder) for any placeholder styling
+
+*/
+
+.modal-content.cheatsheet-is-shown {
+  overflow: visible !important;
+
+  .CodeMirror {
+    overflow: visible !important;
+  }
+}
+
+// ====================
+
+// Latex Compiler
+.wrapper-comp-editor.latex-problem {
+  margin-top: ($baseline*2.5);
+}
+
+.launch-latex-compiler {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  background-color: $white;
+  padding: $baseline/2 0 $baseline/2 $baseline;
+  border-bottom: 1px solid $gray-l2;
+}
+
+//  hides latex compiler button if settings mode is-active
+div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler {
+  display: none;
+}
+
+// ====================
+
+// masthead button hidden states
+.mast.has-actions .nav-actions .button.is-hidden {
+  @extend .is-hidden;
+}
+
+// ====================
+
+// JQuery UI tabs font-weight override
+.ui-tabs-nav {
+  .ui-state-default {
+    font-weight: normal;
+  }
+}
+
+// ====================
+
+// xmodule editor tab font-weight override
+.xmodule_edit.xmodule_VideoBlock .editor-with-tabs .editor-tabs .inner_tab_wrap a.tab {
+  font-weight: normal !important;
+}
+
+// ====================
+
+// xblock message UI override
+// (to fake the Studio no-content pattern design since validation classes cannot be removed in logic layer)
+.wrapper-xblock .xblock-message.no-container-content.xblock-message.no-container-content {
+  border: 0;
+  padding: ($baseline*1.5) ($baseline*2);
+  background-color: $gray-l4;
+  text-align: center;
+  color: $gray;
+
+  .button,
+  .action {
+    @extend %btn-primary-green;
+  }
+}
+
+// ====================
+
+// TODOs:
+
+// * font-weight syncing
+// * divorce display: inline-block from base button definitions/placeholders
+// * canned typography class syncing
+

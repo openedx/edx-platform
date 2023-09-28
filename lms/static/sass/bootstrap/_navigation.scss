@@ -1,0 +1,107 @@
+// Local overrides for bootstrap navigation bar theming
+.navigation-container {
+  border-bottom: 1px solid theme-color("primary");
+  text-decoration: none;
+  background-color: $body-bg;
+
+  &.slim {
+    border-bottom: 1px solid $border-color;
+    box-shadow: 0 1px 5px 0 $gray-900;
+  }
+
+  .navbar {
+    margin: 0 auto;
+    max-width: map-get($container-max-widths, xl);
+
+
+    .logo-header {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo.slim a {
+      height: $baseline*3/2;
+      margin-top: $baseline/5;
+    }
+
+    .course-header {
+      display: none;
+
+      @include media-breakpoint-up(md) {
+        display: block;
+        font-size: $font-size-base;
+        font-weight: $font-weight-light;
+
+        .provider {
+          font-weight: $font-weight-bold;
+        }
+      }
+    }
+
+    .nav-item {
+      margin: 0 $baseline 0 0;
+      font-weight: $font-weight-normal;
+      font-family: $font-family-base;
+      list-style: none;
+
+      .nav-link {
+        color: theme-color("primary");
+      }
+
+      .user-image-frame {
+        max-width: $baseline*2;
+        border-radius: $border-radius;
+      }
+
+      // Dealing with creating a collapsed menu
+      &.nav-item-open-collapsed-only {
+        display: none;
+      }
+
+      @include media-breakpoint-down(md) {
+        &.nav-item-open-collapsed,
+        &.nav-item-open-collapsed-only {
+          display: initial;
+          margin: $baseline/4 $baseline/2;
+
+          a {
+            color: theme-color("primary");
+            padding: 0;
+            text-decoration: none;
+
+            &:hover {
+              color: $input-border-color;
+            }
+          }
+        }
+
+        &.nav-item-hidden-collapsed {
+          display: none;
+        }
+      }
+    }
+
+    .btn-shopping-cart {
+      padding-top: 0.7rem; // $btn-padding-y-lg once themed
+    }
+
+    .navbar-right .nav-item {
+      @include media-breakpoint-down(md) {
+        .nav-link {
+          text-transform: none;
+          color: $gray-900;
+          font-weight: $font-weight-bold;
+          cursor: pointer;
+        }
+      }
+
+      &.dropdown {
+        cursor: pointer;
+
+        .dropdown-item {
+          text-transform: initial;
+        }
+      }
+    }
+  }
+}

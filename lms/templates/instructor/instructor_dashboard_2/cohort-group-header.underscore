@@ -1,0 +1,21 @@
+<h3 class="hd hd-3 group-header-title" tabindex="-1">
+    <span class="title-value"><%- cohort.get('name') %></span>
+    <span class="group-count"><%-
+        interpolate(
+            ngettext('(contains %(student_count)s student)', '(contains %(student_count)s students)', cohort.get('user_count')),
+            { student_count: cohort.get('user_count') },
+            true
+        )
+    %></span>
+</h3>
+<div class="cohort-management-group-setup">
+    <div class="setup-value">
+        <% if (cohort.get('assignment_type') == "manual") { %>
+            <%- gettext("Learners are added to this cohort only when you provide their email addresses or usernames on this page.") %>
+            <a href="/help_token/cohortmanual" class="incontext-help action-secondary action-help" rel="noopener" target="_blank"><%- gettext("What does this mean?") %></a>
+        <% } else { %>
+            <%- gettext("Learners are added to this cohort automatically.") %>
+            <a href="/help_token/cohortautomatic" class="incontext-help action-secondary action-help" rel="noopener" target="_blank"><%- gettext("What does this mean?") %></a>
+        <% } %>
+    </div>
+</div>

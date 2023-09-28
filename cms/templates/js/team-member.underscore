@@ -1,0 +1,50 @@
+<li class="user-item" data-email="<%- user.email %>">
+    <span class="wrapper-ui-badge">
+    <span class="flag flag-role flag-role-<%- user.role %> is-hanging">
+      <span class="label sr"><%- gettext("Current Role:") %></span>
+      <span class="value">
+        <%- roles[user.role] %>
+        <% if (is_current_user) { %>
+            <span class="msg-you"><%- gettext("You!") %></span>
+        <% } %>
+      </span>
+    </span>
+    </span>
+
+    <div class="item-metadata">
+    <h3 class="user-name">
+      <span class="user-username"><%- user.username %></span>
+      <span class="user-email">
+        <a class="action action-email" href="mailto:<%- user.email %>"
+                title="<%- viewHelpers.format(gettext("send an email message to {email}"), {email: user.email})%>">
+            <%- user.email %>
+        </a>
+      </span>
+    </h3>
+    </div>
+
+    <% if (allow_actions) { %>
+    <ul class="item-actions user-actions">
+        <li class="action action-role">
+        <% for (var i=0; i < actions.length; i++) { %>
+            <% var action = actions[i]; %>
+                <% if (action.notoggle) { %>
+                    <span class="admin-role notoggleforyou"><%- gettext("Promote another member to Admin to remove your admin rights") %></span>
+                <% } else { %>
+                    <a href="#" class="make-<%- action.to_role %> admin-role <%- action.direction %>-admin-role">
+                        <% var template = (action.direction === 'add') ? gettext("Add {role} Access") : gettext("Remove {role} Access"); %>
+                        <%- viewHelpers.format(template, {role: action.label}) %></span>
+                    </a>
+                <% } %>
+        <% } %>
+        </li>
+        <li class="action action-delete <%-!allow_delete ? "is-disabled" : "" %> aria-disabled="<%-!allow_delete%>">
+            <a href="#" class="delete remove-user action-icon" data-id="<%- user.email %>">
+                <span class="icon fa fa-trash-o" aria-hidden="true"></span>
+                <span class="sr"><%- viewHelpers.format(gettext("Delete the user, {username}"), {username:user.username}) %></span>
+            </a>
+        </li>
+    </ul>
+    <% } %>
+
+</li>

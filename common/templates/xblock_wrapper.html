@@ -1,0 +1,12 @@
+## xss-lint: disable=mako-missing-default
+<%!
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
+%>
+<div class="${' '.join(classes) | n, decode.utf8}" ${data_attributes}>
+% if js_init_parameters:
+  <script type="json/xblock-args" class="xblock-json-init-args">
+    ${js_init_parameters | n, dump_js_escaped_json}
+  </script>
+% endif
+  ${content}
+</div>

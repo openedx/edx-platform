@@ -1,0 +1,264 @@
+%fa-copy {
+  @extend %t-copy-base;
+
+  padding: ($baseline/2) 0;
+  margin: 0;
+  color: $m-gray-d2;
+}
+
+.financial-assistance-wrapper {
+  margin: auto;
+  padding: $baseline ($baseline/2);
+  max-width: 1180px;
+
+  h1 {
+    @extend %t-title4;
+
+    @include text-align(left);
+
+    margin: 0;
+    padding: ($baseline/2) 0;
+    border-bottom: 4px solid $gray-l5;
+    color: $m-gray-d3;
+  }
+
+  h2 {
+    @extend %t-title6;
+    @extend %t-strong;
+
+    margin-top: ($baseline/2);
+    text-transform: none;
+  }
+
+  p {
+    @extend %fa-copy;
+
+    font-size: 0.875em;
+  }
+
+  .financial-assistance {
+    padding-bottom: ($baseline/2);
+    border-bottom: 4px solid $gray-l5;
+
+    .apply-form-list {
+      padding: 0;
+      list-style: none;
+
+      .apply-form-section {
+        border-bottom: 2px solid $gray-l5;
+      }
+
+      .apply-form-section:last-child {
+        border: none;
+      }
+
+      .about-me {
+        padding: 0;
+        list-style: none;
+
+        .about-me-item {
+          @include margin-right(150px);
+
+          display: inline-block;
+
+          p {
+            padding: 0;
+            display: block;
+          }
+        }
+      }
+    }
+  }
+
+  .financial-assistance-footer {
+    padding: $baseline;
+
+    .faq-link {
+      padding: $baseline/2;
+    }
+
+    .action-link {
+      @include float(right);
+
+      padding: $baseline/2;
+      background-color: $m-blue-d2;
+      color: $gray-l7;
+      border-radius: 2px;
+    }
+  }
+
+  // Application form View
+  .intro {
+    border-bottom: 4px solid $gray-l5;
+
+    p {
+      margin: 10px 0;
+    }
+  }
+
+  .success-message {
+    p {
+      margin: 10px 0;
+    }
+  }
+
+  .btn-dashboard {
+    @include float(right);
+
+    color: $white;
+
+    &:hover,
+    &:active,
+    &:focus {
+      color: $white;
+    }
+  }
+
+  .user-info {
+    @include clearfix();
+
+    border-bottom: 2px solid $gray-l5;
+    padding: 20px 0;
+    margin-bottom: 20px;
+
+    .info-column {
+      @include float(left);
+
+      width: 100%;
+      margin: 10px 0;
+    }
+
+    .title {
+      @extend %fa-copy;
+
+      padding: 0;
+
+      &.error {
+        color: $red;
+      }
+    }
+
+    .data {
+      @extend %fa-copy;
+
+      padding: 0;
+      color: $black;
+      font-size: 1.125em;
+    }
+  }
+
+  .financial-assistance-form {
+    @extend .login-register;
+
+    max-width: 800px;
+
+    .action-primary {
+      @include float(left);
+
+      width: auto;
+      margin-top: 0;
+    }
+
+    .nav-link {
+      margin: 15px 0;
+      display: block;
+    }
+
+    form {
+      border: none;
+    }
+
+    .form-field {
+      select,
+      input {
+        width: 320px;
+      }
+
+      input {
+        border: {
+          top: none;
+          right: none;
+          bottom: 3px solid $gray-l1;
+          left: none;
+        };
+
+        box-shadow: none;
+      }
+
+      textarea {
+        height: 125px;
+      }
+
+      .checkbox {
+        height: auto;
+        position: absolute;
+        top: 5px;
+
+        & + label {
+          @include margin-left(30px);
+
+          display: inline-block;
+        }
+      }
+    }
+  }
+
+  .cta-wrapper {
+    border-top: 4px solid $gray-l5;
+    padding: 20px 0;
+  }
+
+  @include media($bp-medium) {
+    .user-info {
+      .info-column {
+        width: 50%;
+      }
+    }
+
+    .financial-assistance-form {
+      .action-primary {
+        @include float(right);
+      }
+
+      .nav-link {
+        display: inline-block;
+      }
+    }
+  }
+
+  @include media($bp-large) {
+    .user-info {
+      .info-column {
+        width: 25%;
+      }
+    }
+
+    .financial-assistance-form {
+      .action-primary {
+        @include float(right);
+      }
+
+      .nav-link {
+        display: inline-block;
+      }
+    }
+  }
+
+  @include media($bp-huge) {
+    .user-info {
+      .info-column {
+        width: 25%;
+      }
+    }
+
+    .financial-assistance-form {
+      .action-primary {
+        @include float(right);
+      }
+
+      .nav-link {
+        display: inline-block;
+      }
+    }
+  }
+}

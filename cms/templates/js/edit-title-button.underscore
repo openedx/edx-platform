@@ -1,0 +1,1 @@
+<span class="modal-button-title"><%- title %></span> <button data-tooltip="<%- gettext('Edit Title') %>" class="btn-default action-edit title-edit-button"><span class="icon fa fa-pencil" aria-hidden="true"></span><span class="sr"> <%- gettext('Edit Title') %></span></button>

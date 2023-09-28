@@ -1,0 +1,66 @@
+// ------------------------------
+// // Open edX Certificates: Base
+
+// About: Base resets and definitons (using shared resources from elements when appropriate).
+
+// ------------------------------
+// #RESET
+// ------------------------------
+
+// ------------------------------
+// #BASE
+// ------------------------------
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: $white;
+  font-family: $font-family-sans;
+}
+
+// ------------------------------
+// #TYPOGRAPHY
+// ------------------------------
+// Level one heading
+.hd-1 {
+  margin-bottom: map-get($spacing-vertical, small);
+  font-size: rem(38);
+  line-height: 1.4;
+}
+
+// Level two heading
+.hd-2 {
+  margin-bottom: map-get($spacing-vertical, small);
+  font-size: rem(28);
+  line-height: 1.4;
+}
+
+// Level three heading
+.hd-3 {
+  margin-bottom: map-get($spacing-vertical, x-small);
+  font-size: rem(24);
+  line-height: 1.5;
+}
+
+// Level four heading
+.hd-4 {
+  margin-bottom: map-get($spacing-vertical, x-small);
+  font-size: rem(21);
+  line-height: 1.6;
+}
+
+// Level five heading
+.hd-5 {
+  margin-bottom: map-get($spacing-vertical, x-small);
+  font-size: rem(18);
+  line-height: 1.6;
+}
+
+// Level six heading
+.hd-6 {
+  margin-bottom: map-get($spacing-vertical, xx-small);
+  font-size: rem(16);
+  font-weight: 600;
+  line-height: 1.6;
+}

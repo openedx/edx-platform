@@ -1,0 +1,58 @@
+{
+    "course/course": {
+        "advanced_modules": [
+            "lti",
+            "lti_consumer",
+            "library_content",
+            "split_test",
+            "conditional",
+            "randomize",
+            "drag-and-drop-v2",
+            "library",
+            "acid_parent",
+            "done",
+            "wrapper",
+            "edx_sga",
+            "bookmarks"
+        ],
+        "cert_html_view_enabled": true,
+        "discussion_topics": {
+            "General": {
+                "id": "course"
+            }
+        },
+        "display_name": "Introduction to problems.",
+        "graceperiod": "",
+        "language": "en",
+        "minimum_grade_credit": 0.8,
+        "start": "2030-01-01T00:00:00Z",
+        "tabs": [
+            {
+                "name": "Course",
+                "type": "courseware"
+            },
+            {
+                "name": "Textbooks",
+                "type": "textbooks"
+            },
+            {
+                "name": "Discussion",
+                "type": "discussion"
+            },
+            {
+                "name": "Wiki",
+                "type": "wiki"
+            },
+            {
+                "name": "Progress",
+                "type": "progress"
+            }
+        ],
+        "xml_attributes": {
+            "filename": [
+                "course/course.xml",
+                "course/course.xml"
+            ]
+        }
+    }
+}

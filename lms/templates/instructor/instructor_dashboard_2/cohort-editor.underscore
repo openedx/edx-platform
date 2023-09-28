@@ -1,0 +1,47 @@
+<section class="cohort-management-settings has-tabs">
+    <header class="cohort-management-group-header"></header>
+
+    <ul class="wrapper-tabs">
+        <li class="tab tab-manage_students is-selected" data-tab="manage_students"><button type="button" class="toggle-button"><span class="sr"><%- gettext('Selected tab') %> </span><%- gettext("Manage Learners") %></button></li>
+        <li class="tab tab-settings" data-tab="settings"><button type="button" class="toggle-button"><%- gettext("Settings") %></button></li>
+    </ul>
+
+    <div class="cohort-management-group-add tab-content tab-content-manage_students" tabindex="-1">
+        <form action="" method="post" id="cohort-management-group-add-form" class="cohort-management-group-add-form">
+
+            <h4 class="hd hd-3 form-title"><%- gettext('Add learners to this cohort') %></h4>
+
+            <div class="form-introduction">
+                <p><%- gettext('Note: Learners can be in only one cohort. Adding learners to this group overrides any previous group assignment.') %></p>
+            </div>
+
+            <div class="cohort-confirmations" aria-live="polite" tabindex="-1"></div>
+            <div class="cohort-preassigned" aria-live="polite" tabindex="-1"></div>
+            <div class="cohort-errors" aria-live="polite" tabindex="-1"></div>
+
+            <div class="form-fields">
+                <div class="field field-textarea is-required">
+                    <label for="cohort-management-group-add-students" class="label">
+                        <%- gettext('Enter email addresses and/or usernames, separated by new lines or commas, for the learners you want to add. *') %>
+                        <span class="sr"><%- gettext('(Required Field)') %></span>
+                    </label>
+                    <textarea name="cohort-management-group-add-students" id="cohort-management-group-add-students"
+                              class="input cohort-management-group-add-students"
+                              placeholder="<%- gettext('e.g. johndoe@example.com, JaneDoe, joeydoe@example.com') %>"
+                              aria-describedby="email-notification-tip"></textarea>
+
+                    <span class="tip" id="email-notification-tip"><%- gettext('You will not receive notification for emails that bounce, so double-check your spelling.') %></span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button class="form-submit button action-primary action-view">
+                    <span class="button-icon icon fa fa-plus" aria-hidden="true"></span> <%- gettext('Add Learners') %>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="cohort-management-details tab-content tab-content-settings is-hidden" tabindex="-1">
+    </div>
+</section>

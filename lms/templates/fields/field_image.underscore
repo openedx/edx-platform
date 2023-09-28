@@ -1,0 +1,18 @@
+<div class="image-wrapper">
+    <img class="image-frame" src="<%- imageUrl %>"  alt="<%-imageAltText%>"/>
+    <div class="u-field-actions">
+        <label class="u-field-upload-button">
+            <% // xss-lint: disable=underscore-not-escaped %>
+            <span class="upload-button-icon" aria-hidden="true"><%= uploadButtonIcon %></span>
+            <span class="upload-button-title" aria-live="polite"><%- uploadButtonTitle %></span>
+            <input class="upload-button-input" type="file" name="<%- inputName %>"/>
+       	</label>
+       	<button class="upload-submit" type="button" hidden="true"><%- uploadButtonTitle %></button>
+        <button class="u-field-remove-button" type="button">
+            <% // xss-lint: disable=underscore-not-escaped %>
+            <span class="remove-button-icon" aria-hidden="true"><%= removeButtonIcon %></span>
+            <span class="remove-button-title" aria-live="polite"><%- removeButtonTitle %></span>
+            <span class="sr"><%- screenReaderTitle %></span>
+        </button>
+    </div>
+</div>

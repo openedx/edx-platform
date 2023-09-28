@@ -1,0 +1,101 @@
+// Open edX: components
+// ====================
+
+// Page banner
+.page-banner {
+  max-width: map-get($container-max-widths, xl);
+  margin: 0 auto;
+
+  .user-messages {
+    margin-top: $baseline;
+  }
+
+  .user-messages-ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      margin: 5px 0;
+
+      .alert.alert-warning .message-content .enroll-btn.btn-link {
+        color: #004368;
+      }
+    }
+  }
+}
+
+// Alerts
+.alert {
+  display: flex;
+
+  .icon-alert {
+    margin-right: $baseline;
+  }
+
+  .message-actions {
+    margin-left: $baseline;
+  }
+}
+
+.alert.alert-info a {
+  // Need to have sufficient contrast for blue links on blue background
+  // Based this on some existing css for this use case
+  color: #0075b4;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.alert-error {
+  box-shadow: inset 0 0 0 4px $palette-error-back;
+
+  .alert-copy:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.alert-error .alert-icon {
+  align-self: center;
+  color: $white;
+  background-color: $palette-error-accent;
+  display: none;
+  border-radius: 50%;
+  padding: 0.625rem;
+
+  @include media-breakpoint-up(md) {
+    display: block;
+  }
+}
+
+.alert-message-with-action {
+  @include media-breakpoint-up(md) {
+    width: 80%;
+    padding: 1.25rem;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .alert-copy {
+    display: inline-block;
+    vertical-align: sub;
+  }
+}
+
+// Discussion
+.discussion {
+  .btn-link {
+    border-color: transparent
+  }
+
+  .breadcrumbs {
+    font-size: 0.875rem;
+
+    .all-topics {
+      border: none;
+    }
+  }
+
+  .field-label-text {
+    font-size: 1rem
+  }
+}

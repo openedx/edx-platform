@@ -1,0 +1,65 @@
+{% load i18n %}
+{% load django_markup %}
+<div id="cheatsheetModal" class="modal" aria-hidden="true">
+  <div class="inner-wrapper" role="dialog" aria-labelledby="cheatsheet-title" aria-modal=true>
+    <button class="close-modal"><span class="icon fa fa-remove" aria-hidden="true"></span> <span class="sr">{% trans 'Close' as tmsg %}{{tmsg|force_escape}}</span></button>
+
+    <header>
+      <h2 id="cheatsheet-title">{% trans "Wiki Cheatsheet" as tmsg%}{{tmsg|force_escape}}<span class="sr">, {% trans "window open" as tmsg%}{{tmsg|force_escape}}</span></h2>
+      <hr/>
+    </header>
+    <div id="cheatsheet-body" class="modal-body">
+      <div class="left-column">
+        <section>
+          <h2>{% trans "Wiki Syntax Help" as tmsg %}{{tmsg|force_escape}}</h2>
+          <p>{% trans "This wiki uses {start_strong}Markdown{end_strong} for styling. There are several useful guides online. See any of the links below for in-depth details:" as tmsg%}
+              {% interpolate_html tmsg start_strong='<strong>'|safe end_strong='</strong>'|safe %}</p>
+          <ul>
+              <li><a href="http://daringfireball.net/projects/markdown/basics" rel="noopener" target="_blank">{% trans 'Markdown: Basics' as tmsg %}{{tmsg|force_escape}}</a></li>
+              <li><a href="http://greg.vario.us/doc/markdown.txt" rel="noopener" target="_blank">{% trans 'Quick Markdown Syntax Guide' as tmsg %}{{tmsg|force_escape}}</a></li>
+              <li><a href="http://www.lowendtalk.com/discussion/6/miniature-markdown-guide" rel="noopener" target="_blank">{% trans 'Miniature Markdown Guide' as tmsg%}{{tmsg|force_escape}}</a></li>
+          </ul>
+          <p>{% trans "To create a new wiki article, create a link to it. Clicking the link gives you the creation page." as tmsg %}{{tmsg|force_escape}}</p>
+          <pre>{% trans "[Article Name](wiki:ArticleName)" as tmsg%}{{tmsg|force_escape}}</pre>
+        </section>
+        <section>
+          <h3>{% filter force_escape %}{% blocktrans with platform_name=settings.PLATFORM_NAME %}{{ platform_name }} Additions:{% endblocktrans %}{% endfilter %}</h3>
+          <pre>$LaTeX {% trans "Math Expression" as tmsg %}{{tmsg|force_escape}}$</pre>
+        </section>
+      </div>
+
+      <div class="right-column">
+          <section>
+              <h3>{% trans "Useful examples:" as tmsg%}{{tmsg|force_escape}}</h3>
+              <pre>
+http://wikipedia.org
+[{% trans "Wikipedia" as tmsg%}{{tmsg|force_escape}}](http://wikipedia.org)
+[{% filter force_escape %}{% blocktrans with platform_name=settings.PLATFORM_NAME %}{{ platform_name }} Wiki{% endblocktrans %}]{%endfilter%}(wiki:/edx/)
+              </pre>
+              <pre>
+{% trans "Huge Header" as tmsg%}{{tmsg|force_escape}}
+===========</pre>
+              <pre>
+{% trans "Smaller Header" as tmsg%}{{tmsg|force_escape}}
+--------------</pre>
+              <pre>
+{# Translators: Leave the punctuation, but translate "emphasis" #}
+{% trans "*emphasis* or _emphasis_" as tmsg %}{{tmsg|force_escape}}</pre>
+              <pre>
+{# Translators: Leave the punctuation, but translate "strong" #}
+{% trans "**strong** or __strong__" as tmsg %}{{tmsg|force_escape}}</pre>
+              <pre>
+- {% trans "Unordered List" as tmsg%}{{tmsg|force_escape}}
+  - {% trans "Sub Item 1" as tmsg%}{{tmsg|force_escape}}
+      - {% trans "Sub Item 2" as tmsg %}{{tmsg|force_escape}}</pre>
+              <pre>
+1. {% trans "Ordered" as tmsg%}{{tmsg|force_escape}}
+2. {% trans "List" as tmsg%}{{tmsg|force_escape}}</pre>
+              <pre>
+&gt; {% trans "Quotes" as tmsg%}{{tmsg|force_escape}}</pre>
+          </section>
+      </div>
+
+    </div>
+  </div>
+</div>

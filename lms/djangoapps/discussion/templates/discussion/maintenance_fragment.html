@@ -1,0 +1,20 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%!
+from django.utils.translation import gettext as _
+%>
+
+<%block name="content">
+    <h2>${_("Discussion unavailable")}</h2>
+    <div class="alert alert-error" role="alert" aria-labelledby="alert-title-error" tabindex="-1">
+        <span class="icon alert-icon fa fa-exclamation-triangle" aria-hidden="true"></span>
+
+        <div class="alert-message-with-action">
+            <p class="alert-copy">
+                ${_("The discussions are currently undergoing maintenance. We'll have them back up shortly!")}
+            </p>
+        </div>
+    </div>
+</%block>

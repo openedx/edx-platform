@@ -1,0 +1,14 @@
+# Core dependencies shared between Python sandboxes for secured execution and edx-platform.
+#
+# DON'T JUST ADD NEW DEPENDENCIES!!!
+#
+# If you open a pull request that adds a new dependency, you should:
+#   * verify that the dependency has a license compatible with AGPLv3
+#   * confirm that it has no system requirements beyond what we already install
+#   * run "make upgrade" to update the detailed requirements files
+
+-c ../constraints.txt
+
+cryptography                        # Implementations of assorted cryptography algorithms
+lxml                                # XML parser
+nltk                                # Natural language processing; used by the chem package

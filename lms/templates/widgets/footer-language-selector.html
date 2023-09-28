@@ -1,0 +1,83 @@
+## Language-selection widget for the footer.
+##
+## Requires settings.LANGUAGE_COOKIE_NAME.
+<%page expression_filter="h"/>
+<%!
+  from babel import Locale
+  from django.conf import settings
+  from django.utils.translation import gettext as _
+
+  from openedx.core.djangoapps.lang_pref import COOKIE_DURATION
+  from openedx.core.djangoapps.lang_pref.api import released_languages
+  from openedx.core.djangolib.js_utils import js_escaped_string
+
+  # Make sure LANGUAGE_COOKIE_NAME is present.
+  if not settings.LANGUAGE_COOKIE_NAME:
+      raise ValueError('settings.LANGUAGE_COOKIE_NAME is required to use footer-language-selector.')
+%>
+<%namespace name='static' file='../static_content.html'/>
+
+<div class="footer-language-selector">
+    <div role="group" aria-label="Change page language">
+        <label for="footer-language-select">
+            <span class="icon fa fa-globe" aria-hidden="true"></span>
+            <span class="sr">${_("Choose Language")}</span>
+        </label>
+        <select id="footer-language-select" name="language">
+            % for language in sorted(released_languages(), key=lambda x: x.code):
+                <% language_name = Locale.parse(language.code.replace('_', '-'), sep='-').language_name %>
+                % if language.code == LANGUAGE_CODE:
+                    <option value="${language.code}" selected="selected">${language_name}</option>
+                % else:
+                    <option value="${language.code}">${language_name}</option>
+                % endif
+            % endfor
+        </select>
+        <button id="footer-language-button" type="button" class="btn-edged-blue select-lang-button"
+                onclick="footerLanguageSelector.langSelection()">
+            ${_('Submit')}
+        </button>
+    </div>
+</div>
+
+<script type="text/javascript">
+    window.footerLanguageSelector = {
+        ##
+        ## Set the language cookie using the same settings as
+        ## https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/lang_pref/views.py#L26
+        ## and
+        ## https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/lang_pref/middleware.py#63
+        ## Then refresh the page so that the language negotiation middleware can read it and re-render everything
+        ## in the selected language.
+        ##
+        ## NOTE: For logged-in users, the LMS language negotiation middleware should persist the selected language
+        ## preference to the user's profile. This effect may be delayed on pages that do not use the LMS language
+        ## selection middleware.
+        ##
+        langSelection: function() {
+            var footer = document.getElementById('footer-language-select');
+            var lang = footer.options[footer.selectedIndex].value;
+            this.setLanguageCookie(lang, this.refreshPage);
+        },
+
+        setLanguageCookie: function(value, callback) {
+            var cookie = '${settings.LANGUAGE_COOKIE_NAME | n, js_escaped_string}=' + value + ';path=/';
+
+            <% session_cookie_domain = static.get_value('SESSION_COOKIE_DOMAIN', settings.SESSION_COOKIE_DOMAIN) %>
+            % if session_cookie_domain:
+                cookie += ';domain=${session_cookie_domain | n, js_escaped_string}';
+            % endif
+            % if COOKIE_DURATION:
+                cookie += ';max-age=${COOKIE_DURATION | n, js_escaped_string}';
+            % endif
+
+            document.cookie = cookie;
+
+            callback();
+        },
+
+        refreshPage: function() {
+            window.location.reload();
+        }
+    };
+</script>

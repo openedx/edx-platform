@@ -1,0 +1,8 @@
+{% load i18n %}{% autoescape off %}
+{% blocktrans %}You've registered this recovery email address for {{ platform_name }}.{% endblocktrans %}
+
+{% blocktrans %}If you set this email address, click "confirm email."  If you didn't request this change, you can disregard this email.{% endblocktrans %}
+
+{{ confirm_link }}
+
+{% endautoescape %}

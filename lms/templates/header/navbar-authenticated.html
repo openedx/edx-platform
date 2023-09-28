@@ -1,0 +1,64 @@
+## mako
+
+<%page expression_filter="h" args="online_help_token"/>
+
+<%namespace name='static' file='../static_content.html'/>
+<%namespace file='../main.html' import="login_query"/>
+<%!
+from django.urls import reverse
+from django.utils.translation import gettext as _
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+%>
+
+<%
+  show_explore_courses = settings.FEATURES.get('COURSES_ARE_BROWSABLE')
+  self.real_user = getattr(user, 'real_user', user)
+  enable_help_link = settings.FEATURES.get('ENABLE_HELP_LINK')
+
+  support_link = configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK)
+  doc_link = get_online_help_info(online_help_token)['doc_url']
+
+  if online_help_token == "instructor":
+    help_link = doc_link
+  elif support_link:
+    help_link = support_link
+  else:
+    help_link = doc_link
+%>
+
+<div class="nav-links">
+  <div class="main">
+    % if show_dashboard_tabs:
+      <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+        <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}"
+             aria-current="${'page' if reverse('dashboard') == request.path else 'false'}">
+             ${_("Courses")}
+        </a>
+      </div>
+      % if show_program_listing:
+        <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+          <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}"
+             aria-current="${'page' if reverse('program_listing_view') == request.path else 'false'}">
+             ${_("Programs")}
+          </a>
+        </div>
+      % endif
+    % endif
+    % if show_explore_courses:
+      <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+          <a class="tab-nav-link discover-new-link" href="${marketing_link('COURSES')}"
+             aria-current="${'page' if '/courses' in request.path else 'false'}">
+             ${_('Discover New')}
+          </a>
+      </div>
+    % endif
+  </div>
+  <div class="secondary">
+    % if enable_help_link:
+      <div class="mobile-nav-item hidden-mobile nav-item">
+        <a class="help-link" href="${help_link}" rel="noopener" target="_blank">${_("Help")}</a>
+      </div>
+    % endif
+    <%include file="user_dropdown.html"/>
+  </div>
+</div>

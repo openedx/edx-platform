@@ -1,0 +1,23 @@
+The code in this directory is based on:
+
+    django-mako Copyright (c) 2008 Mikeal Rogers
+
+and is redistributed here with modifications under the same Apache 2.0 license
+as the orginal.
+
+
+================================================================================
+django-mako
+================================================================================
+This module provides a drop in replacement of Django templates for Mako 
+Templates.
+
+Django: http://www.djangoproject.com/
+Mako: http://www.makotemplates.org/
+
+================================================================================
+How to install?
+================================================================================
+
+ $ sudo python setup.py install
+

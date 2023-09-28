@@ -1,0 +1,70 @@
+# Vendor files and generated test artifacts
+**/vendor
+test_root/staticfiles
+
+
+# Vendor files living outside the /vendor/ dir
+*.min.js
+*-min.js
+*.nocache.js
+**/bootstrap*.js
+**/jquery*.js
+**/d3*.js
+
+
+# Translations files
+**/static/js/i18n
+
+
+# Gitignored xmodule stuff
+common/static/xmodule
+
+
+# Symlinks into xmodule/js
+cms/static/xmodule_js
+lms/static/xmodule_js
+
+
+# Mako templates that generate .js files
+cms/djangoapps/pipeline_js/templates
+
+
+# These are es2015 spec files that used to be in an ignored path.
+# Now they live with the rest of the code, but we want to ignore them
+# until the surrounding code is es2015 and we have a chance to clean them.
+# We need to ignore them here, because es2015 will cause a parse error
+# even if we add an eslint-disable line to the file.
+cms/static/js/spec/models/course_spec.js
+cms/static/js/spec/models/metadata_spec.js
+cms/static/js/spec/models/section_spec.js
+cms/static/js/spec/models/settings_course_grader_spec.js
+cms/static/js/spec/models/settings_grading_spec.js
+cms/static/js/spec/models/textbook_spec.js
+cms/static/js/spec/models/upload_spec.js
+cms/static/js/spec/views/assets_squire_spec.js
+cms/static/js/spec/views/course_info_spec.js
+cms/static/js/spec/views/metadata_edit_spec.js
+cms/static/js/spec/views/textbook_spec.js
+cms/static/js/spec/views/upload_spec.js
+xmodule/capa/tests/test_files/js/test_problem_display.js
+xmodule/capa/tests/test_files/js/test_problem_generator.js
+xmodule/capa/tests/test_files/js/test_problem_grader.js
+xmodule/capa/tests/test_files/js/xproblem.js
+lms/static/js/spec/calculator_spec.js
+lms/static/js/spec/courseware_spec.js
+lms/static/js/spec/feedback_form_spec.js
+lms/static/js/spec/helper.js
+lms/static/js/spec/histogram_spec.js
+lms/static/js/spec/modules/tab_spec.js
+lms/static/js/spec/requirejs_spec.js
+xmodule/js/spec/annotatable/display_spec.js
+xmodule/js/spec/capa/display_spec.js
+xmodule/js/spec/html/edit_spec.js
+xmodule/js/spec/problem/edit_spec_hint.js
+xmodule/js/spec/problem/edit_spec.js
+xmodule/js/spec/tabs/edit.js
+
+xmodule/js/public/js
+xmodule/assets/*/public/js
+
+!**/.eslintrc.js

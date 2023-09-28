@@ -1,0 +1,19 @@
+<div class="upload-modal modal" style="display: none;">
+    <a href="#" class="close-button"><span class="icon fa fa-times-circle" aria-hidden="true"></span> <span class="sr"><%- gettext('close') %></span></a>
+    <div class="modal-body">
+        <h1 class="title"><%- gettext("Upload New File") %></h1>
+        <p class="file-name">
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+        <div class="embeddable">
+            <label>URL:</label>
+            <input type="text" class="embeddable-xml-input" value='' readonly>
+        </div>
+        <form class="file-chooser" action="asset-url"
+              method="post" enctype="multipart/form-data">
+            <a href="#" class="choose-file-button"><%- gettext("Choose File") %></a>
+            <input type="file" class="file-input" name="file">
+        </form>
+    </div>
+</div>

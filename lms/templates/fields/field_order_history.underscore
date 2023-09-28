@@ -1,0 +1,17 @@
+<div class="field u-field-order" <% if (receiptUrl) { %> role="group" aria-labelledby="order-title-<%- orderId %>" <% } else { %> aria-hidden="true" <% } %>>
+    <span class="u-field-order-number"><span class="sr"><%- gettext('Order Number') %>: </span><%- orderId %></span>
+    <span class="u-field-order-date"><span class="sr"><%- gettext('Date Placed') %>: </span><%- orderDate %></span>
+    <span class="u-field-order-price"><span class="sr"><%- gettext('Cost') %>: </span><% if (!isNaN(parseFloat(totalPrice))) { %>$<% } %><%- totalPrice %></span>
+    <span class="u-field-order-link">
+        <% if (receiptUrl) { %>
+            <a class="u-field-link" target="_blank" rel="noopener" href="<%- receiptUrl %>"><%- gettext('Order Details') %><span class="sr"> <%- gettext('for') %> <%- orderId %></span></a>
+        <% } %>
+    </span>
+    <% _.each(lines, function(item){ %>
+        <div class="field u-field-order-lines">
+            <span class="u-field-order-number"><span class="sr"><%- gettext('Product Name') %>: </span><%- item.title %></span>
+            <span class="u-field-order-date"><span class="sr"><%- gettext('Date Placed') %>: </span><%- orderDate %></span>
+            <span class="u-field-order-price"><span class="sr"><%- gettext('Cost') %>: </span><% if (!isNaN(parseFloat(item.line_price_excl_tax))) { %>$<% } %><%- item.line_price_excl_tax %></span>
+        </div>
+    <% }); %>
+</div>

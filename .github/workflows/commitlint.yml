@@ -1,0 +1,10 @@
+# Run commitlint on the commit messages in a pull request.
+
+name: Lint Commit Messages
+
+on:
+  - pull_request
+
+jobs:
+  commitlint:
+    uses: openedx/.github/.github/workflows/commitlint.yml@master

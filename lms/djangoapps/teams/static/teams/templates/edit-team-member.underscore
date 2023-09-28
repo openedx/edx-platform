@@ -1,0 +1,16 @@
+<li class="team-member">
+    <a class="member-profile" href="<%= memberProfileUrl /* xss-lint: disable=underscore-not-escaped */%>">
+        <img class="image-url" src="<%= imageUrl /* xss-lint: disable=underscore-not-escaped */%>" alt="<%= username /* xss-lint: disable=underscore-not-escaped */%>'s profile page" />
+    </a>
+    <div class="member-info-container">
+    	<span class="primary"><%= username /* xss-lint: disable=underscore-not-escaped */%></span>
+    	<div class="secondary">
+    		<span id="date-joined"><%= dateJoined /* xss-lint: disable=underscore-not-escaped */%></span>
+    		<span> | </span>
+    		<span id="last-active"><%= lastActive /* xss-lint: disable=underscore-not-escaped */%></span>
+    	</div>
+    </div>
+    <button class="action-remove-member" data-username="<%= username /* xss-lint: disable=underscore-not-escaped */%>">
+        <%- gettext("Remove") %><span class="sr">&nbsp;<%= username /* xss-lint: disable=underscore-not-escaped */%></span>
+    </button>
+</li>

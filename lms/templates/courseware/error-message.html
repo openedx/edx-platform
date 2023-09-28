@@ -1,0 +1,9 @@
+## mako
+<%page expression_filter="h"/>
+<%namespace name='static' file='../static_content.html'/>
+<%!
+from django.utils.translation import gettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<p>${Text(_("We're sorry, this module is temporarily unavailable. Our staff is working to fix it as soon as possible."))}</p>

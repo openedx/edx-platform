@@ -1,0 +1,14 @@
+// HTML component editor:
+.html-editor {
+  @include clearfix();
+
+  .CodeMirror {
+    box-sizing: border-box;
+
+    height: 435px;
+  }
+
+  .is-inactive {
+    display: none;
+  }
+}

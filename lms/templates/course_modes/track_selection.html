@@ -1,0 +1,168 @@
+<%page expression_filter="h"/>
+<%inherit file="../main.html" />
+<%!
+from django.utils.translation import gettext as _
+from openedx.core.djangolib.markup import HTML, Text
+from django.urls import reverse
+from openedx.core.djangolib.js_utils import js_escaped_string
+%>
+
+<%namespace name='static' file='/static_content.html'/>
+<%block name="bodyclass">step-select-track verification-process</%block>
+<%block name="pagetitle">
+    ${_("Enroll In {course_name} | Upgrade Now").format(course_name=course_name)}
+</%block>
+
+<%block name="js_extra">
+    <script type="text/javascript">
+        // upgrade button re-direct to ecommerce basket (which re-directs to Payment MFE)
+        % if use_ecommerce_payment_flow:
+        $(function(){
+            $('button[name=verified_mode]').click(function(e){
+                e.preventDefault();
+                window.location.href = '${ecommerce_payment_page | n, js_escaped_string}?sku=' +
+                encodeURIComponent('${sku | n, js_escaped_string}');
+            });
+        });
+        % endif
+
+        // popover icon toggle
+        $(function(){
+            $('body').click(function (e) {
+                $('.popover').css({"visibility": "hidden", "opacity": 0});
+            });
+            $('.popover-icon').click(function(e){
+                e.stopPropagation();
+                if ($('.popover').css("visibility") == "hidden" || $('.popover').css("visibility") == "" ) {
+                    $('.popover').css({"visibility":"visible", "opacity": 1});   
+                } else {
+                    $('.popover').css({"visibility":"hidden", "opacity": 0});   
+                }
+            });
+        });
+
+        // resize window
+        var onresize = function(e) {
+            width = e.target.outerWidth;
+            if(width <= 768) {
+                $('.collapsible-item').css({"display":"none"});
+                $('.collapsible').css({"display":"block"});
+            };
+        }
+        window.addEventListener("resize", onresize);
+
+        // responsive: show more 
+        $(function(){
+            if($(window).width() <= 768) {
+            $('.collapsible-item').css({"display":"none"});
+            $('.collapsible').css({"display":"block"});
+            };
+        });
+        $(function(){
+            $('.collapsible').click(function(e){
+                e.preventDefault();
+                $('.collapsible').css({"display":"none"});
+            $('.collapsible-item').css({"display":"list-item"});
+            }); 
+        });
+    </script>
+</%block>
+
+<%static:webpack entry="Currency">
+    new Currency();
+</%static:webpack>
+
+<%block name="header_extras">
+    <link rel="stylesheet" type="text/css" href="${static.url('paragon/static/paragon.min.css')}" />
+</%block>
+
+<%block name="content">
+    <div id="currency_data" value="${currency_data}"></div>
+
+    <div class="track-selection-container container-md container-fluid mx-auto">
+        <section class="wrapper m-4 mb-5 m-md-0">
+            <div class="wrapper-register-choose wrapper-content-main">
+                <article class="register-choose content-main">
+                    <header class="page-header">
+                        <h3 class="py-md-3">
+                            % if is_single_mode:
+                                ${_(course_name)}
+                            % else:
+                                ${_("Choose a path for your course in")} ${_(course_name)}
+                            % endif
+                        </h3>
+                    </header>
+
+                    <form class="form-register-choose mb-4 mt-0" method="post" name="enrollment_mode_form" id="enrollment_mode_form">
+                        <div class="row">
+                        % if is_single_mode:
+                        <div class="grid-single">
+                        % else:
+                        <div class="grid-options">
+                        % endif
+                            % if "verified" in modes:
+                            <div class="track-selection-choice track-selection-certificate mr-md-2">
+                                <div class="certificate-container">
+                                    <div class="corner-overlay"></div>
+                                    <span class="award-icon">
+                                        <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M26.6667 3.33333H23.3333V0H6.66667V3.33333H3.33333C1.5 3.33333 0 4.83333 0 6.66667V8.33333C0 12.5833 3.2 16.05 7.31667 16.5667C8.36667 19.0667 10.6167 20.95 13.3333 21.5V26.6667H6.66667V30H23.3333V26.6667H16.6667V21.5C19.3833 20.95 21.6333 19.0667 22.6833 16.5667C26.8 16.05 30 12.5833 30 8.33333V6.66667C30 4.83333 28.5 3.33333 26.6667 3.33333ZM3.33333 8.33333V6.66667H6.66667V13.0333C4.73333 12.3333 3.33333 10.5 3.33333 8.33333ZM26.6667 8.33333C26.6667 10.5 25.2667 12.3333 23.3333 13.0333V6.66667H26.6667V8.33333Z" fill="#EFF8FA"/>
+                                        </svg>
+                                    </span>
+                                    <p class="price-display upgrade-price-string">${currency_symbol}${min_price} ${currency}</p>
+                                    <div class="choice-title"><h4>${_("Earn a certificate")}</h4></div>
+                                    <%block name="track_selection_certificate_bullets"/> 
+                                    <ul class="list-actions">
+                                        <li class="action action-select track-selection-button">
+                                            <input type="hidden" name="contribution" value="${price_before_discount or min_price}" />
+                                                <button id="track_selection_upgrade" type="submit" name="verified_mode" class="mt-2">
+                                                    <span>${_('Upgrade Now')}</span>
+                                                </buton>
+                                        </li>
+                                    </ul>
+                                    <%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
+                                    var upgradeLink = $("#track_selection_upgrade");
+
+                                    TrackECommerceEvents.trackUpsellClick(upgradeLink, 'track_selection', {
+                                        pageName: "track_selection",
+                                        linkType: "button",
+                                        linkCategory: "(none)"
+                                    });
+
+                                    </%static:require_module_async>
+                                </div>
+                            </div>
+                            <div class="verified-note mr-md-2">
+                                <span class="note-icon">
+                                    <svg width="16" height="24" viewBox="0 0 16 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M8 4.22074C5.59364 4.22074 3.63636 6.12408 3.63636 8.46413C3.63636 8.85488 3.96182 9.17137 4.36364 9.17137C4.76545 9.17137 5.09091 8.85488 5.09091 8.46413C5.09091 6.9038 6.39636 5.6352 8 5.6352C8.40182 5.6352 8.72727 5.31871 8.72727 4.92797C8.72727 4.53722 8.40182 4.22074 8 4.22074ZM4.36636 20.9808C4.36636 21.1201 4.40864 21.2558 4.48818 21.3716L5.60227 23C5.73727 23.1971 5.96455 23.3156 6.20773 23.3156H9.79182C10.0355 23.3156 10.2627 23.1971 10.3973 23L11.5114 21.3716C11.5905 21.2558 11.6327 21.1196 11.6332 20.9808L11.6355 19.0722H4.36455L4.36636 20.9808ZM8 0.68457C3.35091 0.68457 0 4.35202 0 8.46413C0 10.4254 0.747727 12.2147 1.98 13.5818C2.73636 14.4212 3.92273 16.1809 4.36273 17.6555V17.6582H6.54455V17.6529C6.54409 17.442 6.51182 17.2325 6.44682 17.0309C6.19273 16.2437 5.40955 14.168 3.62091 12.1833C2.68727 11.1476 2.18818 9.83395 2.18409 8.46413C2.175 5.20909 4.89636 2.80627 8 2.80627C11.2082 2.80627 13.8182 5.34435 13.8182 8.46413C13.8182 9.83307 13.3073 11.1538 12.3795 12.1833C10.6018 14.1551 9.815 16.2265 9.55682 17.0217C9.49019 17.2261 9.45615 17.4393 9.45591 17.6537V17.6582H11.6377V17.656C12.0777 16.1809 13.2641 14.4212 14.0205 13.5823C15.2523 12.2147 16 10.4254 16 8.46413C16 4.16769 12.4182 0.68457 8 0.68457Z" fill="black"/>
+                                    </svg>
+                                </span>
+                                <div class="note-info">${Text(_("Studies show that those who choose this option are  {start_bold}more engaged and motivated{end_bold} to complete their courses")).format(
+                                    start_bold=HTML('<b>'),
+                                    end_bold=HTML('</b>'),
+                                )}</div>
+                            </div>
+                            % endif
+                            % if "audit" in modes:
+                            <div class="track-selection-choice track-selection-audit ml-md-3">
+                                <p class="float-right text-uppercase price-display">${_("Free")}</p>
+                                <div class="choice-title"><h4>${_("Access this course")}</h4></div>
+                                <%block name="track_selection_audit_bullets"/>
+                                <ul class="list-actions">
+                                    <li class="action action-select track-selection-button">
+                                        <button id="track_selection_audit" type="submit" name="audit_mode">
+                                            <span>${_('Continue')}</span>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                            % endif
+                        </div>
+                        <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+                    </form>
+                </article>
+            </div>
+        </section>
+    </div>
+</%block>

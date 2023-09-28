@@ -1,0 +1,23 @@
+{
+    "course/TT_2012_Fall": {
+        "graceperiod": "2 days 5 hours 59 minutes 59 seconds",
+        "start": "2015-07-17T12:00",
+        "display_name": "Two Toys Course"
+    },
+    "chapter/Overview": {
+        "display_name": "Two Toy Overview"
+    },
+    "sequential/Toy_Videos": {
+        "display_name": "Toy Videos",
+        "format": "Lecture Sequence"
+    },
+    "html/toylab": {
+        "display_name": "Toy lab"
+    },
+    "video/Video_Resources": {
+        "display_name": "Video Resources"
+    },
+    "video/Welcome": {
+        "display_name": "Welcome"
+    }
+}

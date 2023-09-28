@@ -1,0 +1,267 @@
+.highlighted-courses,
+.find-courses {
+  .courses {
+    @include clearfix();
+
+    padding: ($baseline*2) 0 ($baseline*0.75);
+
+    .university-column {
+      width: flex-grid(4);
+
+      @include margin-right(flex-gutter());
+
+      float: left;
+
+      &:nth-child(3n+3) {
+        @include margin-right(0);
+      }
+    }
+
+    .course {
+      background: $body-bg;
+      border: 1px solid $border-color-1;
+      border-radius: 2px;
+      box-sizing: border-box;
+      box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+      margin-bottom: ($baseline*1.5);
+      position: relative;
+      width: 100%;
+
+      @include transition(all 0.15s linear 0s);
+
+      .status {
+        @extend %ui-depth3;
+
+        background: $link-color;
+        color: white;
+        font-size: 10px;
+        left: 10px;
+        padding: 2px ($baseline/2);
+        border-radius: 2px;
+        position: absolute;
+        top: -6px;
+      }
+
+      .status::after {
+        border-bottom: 6px solid shade($link-color, 50%);
+        border-right: 6px solid transparent;
+        content: "";
+        display: block;
+        height: 0;
+        position: absolute;
+        right: -6px;
+        top: 0;
+        width: 0;
+      }
+
+      a {
+        position: relative;
+        display: block;
+      }
+
+      a:hover,
+      a:focus {
+        text-decoration: none;
+      }
+
+      .meta-info {
+        background: $dark-trans-bg;
+        bottom: 6px;
+        border: 1px solid rgba(0, 0, 0, 0.5);
+
+        @include border-right-radius(2px);
+
+        box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.15);
+
+        @include clearfix();
+
+        position: absolute;
+        right: -4px;
+
+        @include transition(all 0.15s linear 0s);
+
+        p {
+          color: rgb(255, 255, 255);
+          font-style: italic;
+          line-height: 1.2em;
+          padding: 4px 12px 5px;
+        }
+      }
+
+      .inner-wrapper {
+        border: 1px solid $border-color-4;
+        height: 100%;
+        height: 200px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      header.course-preview {
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        z-index: 3;
+
+        @include background-image(linear-gradient(-90deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.85)));
+
+        box-shadow: inset 0 -1px 0 0 rgba(255, 255, 255, 0.2);
+        border-bottom: 1px solid rgba(150, 150, 150, 0.7);
+        display: block;
+        height: 50px;
+
+        &:hover,
+        &:focus {
+          @include background-image(linear-gradient(-90deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.8)));
+
+          text-decoration: none;
+
+          .info-link {
+            color: $link-color;
+            opacity: 1;
+          }
+
+          h2 {
+            color: $link-color;
+          }
+        }
+
+        .heading-group {
+          left: 0;
+          padding: 0 10px;
+          position: absolute;
+          right: 60px;
+          top: 0;
+
+          h2 {
+            color: $body-color;
+            display: table-cell;
+            font-family: $font-family-sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            height: 48px;
+            letter-spacing: 0;
+            margin-bottom: 0;
+            padding-top: 0;
+            text-shadow: 0 1px rgba(255, 255, 255, 0.6);
+            text-overflow: ellipsis;
+            text-transform: none;
+            vertical-align: middle;
+
+            .course-number {
+              font-weight: 700;
+              text-transform: none;
+            }
+          }
+        }
+
+        .info-link {
+          border-left: 1px solid rgba(150, 150, 150, 0.5);
+          box-sizing: border-box;
+          color: $body-color;
+          display: inline-block;
+          font: bold 1.6em/1.2em $font-family-sans-serif;
+          height: 100%;
+          opacity: 0.6;
+          padding-top: ($baseline/2);
+          position: absolute;
+          right: 0;
+          text-align: center;
+          text-shadow: 0 1px rgba(255, 255, 255, 0.6);
+          top: 0;
+          width: 60px;
+          vertical-align: middle;
+        }
+      }
+
+      .info {
+        background: $body-bg;
+        height: 220px + 130px;
+        left: 0;
+        position: absolute;
+        top: 0;
+
+        @include transition(all 0.15s linear 0s);
+
+        width: 100%;
+        overflow: hidden;
+
+        .cover-image {
+          height: 200px;
+          overflow: hidden;
+          width: 100%;
+
+          img {
+            display: block;
+            min-height: 100%;
+            width: 100%;
+          }
+        }
+
+        .desc {
+          box-sizing: border-box;
+          height: 120px;
+          overflow: hidden;
+          padding: 10px 10px 12px;
+          position: relative;
+          width: 100%;
+
+          section {
+            color: $body-color;
+            font: normal 1em/1.6em $serif;
+            margin: 0;
+            height: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+        }
+
+        .bottom {
+          box-sizing: border-box;
+          padding: 0 10px 10px;
+          width: 100%;
+
+          .university {
+            color: $lighter-base-font-color;
+            letter-spacing: 1px;
+          }
+
+          .start-date {
+            border-left: 1px solid $border-color-2;
+            margin-left: ($baseline/4);
+            padding-left: ($baseline/2);
+            color: $lighter-base-font-color;
+            letter-spacing: 1px;
+          }
+        }
+      }
+
+      &:hover,
+      &:focus {
+        background: $course-profile-bg;
+        border-color: $border-color-1;
+        box-shadow: 0 1px 4px 0 rgba($shadow-color, 0.4);
+
+        .info {
+          top: -150px;
+        }
+
+        .meta-info {
+          opacity: 0;
+        }
+      }
+    }
+  }
+
+  .university-courses {
+    .course {
+      width: flex-grid(4);
+      margin-right: flex-gutter();
+      float: left;
+
+      &:nth-child(3n+3) {
+        margin-right: 0;
+      }
+    }
+  }
+}

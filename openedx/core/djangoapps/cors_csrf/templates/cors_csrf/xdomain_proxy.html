@@ -1,0 +1,12 @@
+<%page expression_filter="h"/>
+
+<%namespace name='static' file='../static_content.html'/>
+<%!
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json
+)
+%>
+<%! import json %>
+<!DOCTYPE HTML>
+<script src="${static.url('js/vendor/xdomain.min.js')}"></script>
+<script>xdomain.masters(${json.loads(xdomain_masters) | n, dump_js_escaped_json});</script>

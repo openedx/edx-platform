@@ -1,0 +1,259 @@
+{% load i18n %}
+<!-- These tags come from the ace_common djangoapp in edx ace -->
+{% load ace %}
+<!-- These tags come from the edx_ace app within the edx_ace repository -->
+{% load acetags %}
+
+{% get_current_language as LANGUAGE_CODE %}
+{% get_current_language_bidi as LANGUAGE_BIDI %}
+
+{# This is preview text that is visible in the inbox view of many email clients but not visible in the actual #}
+{# email itself. #}
+
+<div lang="{{ LANGUAGE_CODE|default:"en" }}" style="
+  display:none;
+  font-size:1px;
+  line-height:1px;
+  max-height:0px;
+  max-width:0px;
+  opacity:0;
+  overflow:hidden;
+  visibility:hidden;
+  ">
+  {% block preview_text %}{% endblock %}
+</div>
+
+{% for image_src in channel.tracker_image_sources %}
+  <img src="{image_src}" alt="" role="presentation" aria-hidden="true" />
+{% endfor %}
+
+{% google_analytics_tracking_pixel %}
+
+<div bgcolor="#f5f5f5" lang="{{ LANGUAGE_CODE|default:"en" }}" dir="{{ LANGUAGE_BIDI|yesno:"rtl,ltr" }}" style="
+  margin: 0;
+  padding: 0;
+  min-width: 100%;
+  background-color: #f5f5f5;
+  ">
+  <!-- Hack for outlook 2010, which wants to render everything in Times New Roman -->
+  <!--[if mso]>
+  <style type="text/css">
+  body, table, td {font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;}
+  </style>
+  <![endif]-->
+
+  <!--[if (gte mso 9)|(IE)]>
+  <table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" border="0">
+  <tr>
+  <td>
+  <![endif]-->
+
+  <!-- CONTENT -->
+  <table class="content" role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" bgcolor="#fbfaf9" width="100%"
+    {% block table_style %}
+      style="
+      font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 1em;
+      line-height: 1.5;
+      max-width: 600px;
+      padding: 0 20px 0 20px;
+      "
+    {% endblock %}
+  >
+    {% block header %}
+      <td class="header" style="background-color: #f5f5f5;">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center" bgcolor="#F5F5F5">
+          <tr>
+            <td valign="top" align="center">
+              <table width="600" cellpadding="0" cellspacing="0" align="center" class="width_100percent">
+                <tr>
+                  <td valign="top" align="center" style="min-width:600px;" class="min_width">
+                    <table width="100%" cellpadding="0" cellspacing="0" bgcolor="#F5F5F5">
+                      <tr><td height="10" style="line-height:1px;">&nbsp;</td></tr>
+                      <tr>
+                        <td align="left" valign="top" style="padding:0 60px;" class="padding_none">
+                          <table cellpadding="0" cellspacing="0" align="left" class="width_100percent">
+                            <tr>
+                              <td align="center" valign="top">
+                                <table cellpadding="0" cellspacing="0">
+                                  <tr>
+                                    <td align="left" valign="top">
+                                      <a href="{% with_link_tracking homepage_url %}">
+                                        <img src="{{ logo_url }}" style="max-height: 65px;" height="auto" alt="{% filter force_escape %}{% blocktrans %}Go to {{ platform_name }} Home Page{% endblocktrans %}{% endfilter %}"/></a>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                          </table>
+                          <table height="66" cellpadding="0" cellspacing="0" align="right" class="width_100percent height_0">
+                            <tr>
+                              <td align="center" valign="middle" class="paddingtop_10">
+                                <table cellpadding="0" cellspacing="0">
+                                  <tr>
+                                    <td align="left" valign="top" style="color: #d23228;">
+                                      {% if courses_url %}
+                                        <a href="{% with_link_tracking courses_url %}" target="_blank" style="font-family:'Inter',Helvetica,Arial,sans-serif;font-size:15px;line-height:20px;text-decoration:none;color:#000001;font-weight:bold;">
+                                          {% trans "Courses" as tmsg %}{{ tmsg | force_escape }}
+                                        </a>
+                                        &nbsp; / &nbsp;
+                                      {% endif %}
+                                      {% if programs_url %}
+                                        <a href="{% with_link_tracking programs_url %}" target="_blank" style="font-family:'Inter',Helvetica,Arial,sans-serif;font-size:15px;line-height:20px;text-decoration:none;color:#000001;font-weight:bold;">
+                                          {% trans "Programs" as tmsg %}{{ tmsg | force_escape }}
+                                        </a>
+                                        &nbsp; / &nbsp;
+                                      {% endif %}
+                                      <a href="{% with_link_tracking dashboard_url %}" target="_blank" style="font-family:'Inter',Helvetica,Arial,sans-serif;font-size:15px;line-height:20px;text-decoration:none;color:#000001;font-weight:bold;">
+                                        {% trans "My Account" as tmsg %}{{ tmsg | force_escape }}
+                                      </a>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr><td height="10" style="line-height:1px;font-size:1px;">&nbsp;</td></tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+    {% endblock %}
+  </td>
+</tr>
+<tr>
+  <!-- MAIN -->
+  <td class="main" bgcolor="#ffffff"
+    {% block main_style %}
+      style="
+      padding: 15px 20px 30px 20px;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.25);
+      "
+    {% endblock %}
+  >
+    {% block content %}{% endblock %}
+  </td>
+</tr>
+
+<tr>
+  <!-- FOOTER -->
+  <td class="footer" style="padding: 20px; background-color: #f5f5f5;">
+    <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="padding-bottom: 20px;">
+          <!-- SOCIAL -->
+          <table role="presentation" align="{{ LANGUAGE_BIDI|yesno:"right,left" }}" border="0" border="0" cellpadding="0" cellspacing="0" width="210">
+            <tr>
+              {% if social_media_urls.linkedin %}
+                <td height="32" width="42">
+                  <a href="{{ social_media_urls.linkedin|safe }}">
+                    <img src="{{ social_media_logo_urls.linkedin }}"
+                      width="32" height="32" alt="{% filter force_escape %}{% blocktrans %}{{ platform_name }} on LinkedIn{% endblocktrans %}{% endfilter %}"/>
+                  </a>
+                </td>
+              {% endif %}
+              {% if social_media_urls.twitter %}
+                <td height="32" width="42">
+                  <a href="{{ social_media_urls.twitter|safe }}">
+                    <img src= "{{ social_media_logo_urls.twitter }}"
+                      width="32" height="32" alt="{% filter force_escape %}{% blocktrans %}{{ platform_name }} on Twitter{% endblocktrans %}{% endfilter %}"/>
+                  </a>
+                </td>
+              {% endif %}
+              {% if social_media_urls.facebook %}
+                <td height="32" width="42">
+                  <a href="{{ social_media_urls.facebook|safe }}">
+                    <img src="{{ social_media_logo_urls.facebook }}"
+                      width="32" height="32" alt="{% filter force_escape %}{% blocktrans %}{{ platform_name }} on Facebook{% endblocktrans %}{% endfilter %}"/>
+                  </a>
+                </td>
+              {% endif %}
+              {% if social_media_urls.google_plus %}
+                <td height="32" width="42">
+                  <a href="{{ social_media_urls.google_plus|safe }}">
+                    <img src="{{ social_media_logo_urls.google_plus}}"
+                      width="32" height="32" alt="{% filter force_escape %}{% blocktrans %}{{ platform_name }} on Google Plus{% endblocktrans %}{% endfilter %}"/>
+                  </a>
+                </td>
+              {% endif %}
+              {% if social_media_urls.reddit %}
+                <td height="32" width="42">
+                  <a href="{{ social_media_urls.reddit|safe }}">
+                    <img src="{{ social_media_logo_urls.reddit}}"
+                      width="32" height="32" alt="{% filter force_escape %}{% blocktrans %}{{ platform_name }} on Reddit{% endblocktrans %}{% endfilter %}"/>
+                  </a>
+                </td>
+              {% endif %}
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <!-- APP BUTTONS -->
+        <td style="padding-bottom: 20px;">
+          {% if mobile_store_urls.apple %}
+            <a href="{{ mobile_store_urls.apple|safe }}" style="text-decoration: none">
+              <img src="{{ mobile_store_logo_urls.apple}}"
+                alt="{% trans "Download the iOS app on the Apple Store" as tmsg %}{{ tmsg | force_escape }}"
+                width="136" height="50" style="margin-{{ LANGUAGE_BIDI|yesno:"left,right" }}: 10px"/>
+            </a>
+          {% endif %}
+          {% if mobile_store_urls.google %}
+            <a href="{{ mobile_store_urls.google|safe }}" style="text-decoration: none">
+              <img src="{{ mobile_store_logo_urls.google}}"
+                alt="{% trans "Download the Android app on the Google Play Store" as tmsg %}{{ tmsg | force_escape }}"
+                width="136" height="50"/>
+            </a>
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <!-- Actions -->
+        <td style="padding-bottom: 20px; background-color: #f5f5f5;">
+          {% get_action_links channel omit_unsubscribe_link=omit_unsubscribe_link as action_links %}
+          {% for action_link_url, action_link_text in action_links %}
+            <p>
+              <a href="{{ action_link_url }}" style="color: #005686">
+                <font color="#005686"><b>{{ action_link_text }}</b></font>
+              </a>
+            </p>
+          {% endfor %}
+        </td>
+      </tr>
+      <tr>
+        <!-- COPYRIGHT -->
+        <td>
+          &copy; {% now "Y" %} {{ platform_name }}, {% trans "All rights reserved" as tmsg %}{{ tmsg | force_escape }}.<br/>
+          <br/>
+          {% trans "Our mailing address is:" as tmsg %}{{ tmsg | force_escape }}<br/>
+          {{ contact_mailing_address }}
+        </td>
+      </tr>
+      {% if unsubscribe_url %}
+        <tr>
+          <td>
+            <a href="{% with_link_tracking unsubscribe_url %}">{% trans "Unsubscribe from these emails." as tmsg %}{{ tmsg | force_escape }}</a>
+          </td>
+        </tr>
+      {% endif %}
+    </table>
+  </td>
+</tr>
+</table>
+
+<!--[if (gte mso 9)|(IE)]>
+  </td>
+  </tr>
+  </table>
+  <![endif]-->
+
+</div>
+
+{# Debug info that is not user-visible #}
+<span id="ace-message-id" style="display:none;">{{ message.log_id }}</span>
+<span id="template-revision" style="display:none;">{{ template_revision }}</span>

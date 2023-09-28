@@ -1,0 +1,831 @@
+// plus on button
+// border radius on inputs
+
+// Account-Centric (Login/Register)
+// =====
+
+// page-level
+.view-register,
+.view-login,
+.view-passwordreset {
+  background: $container-bg;
+
+
+
+  // edx.org - marketing typography
+  %heading-1,
+  %heading-2,
+  %heading-3,
+  %heading-4,
+  %heading-5,
+  %body-text-emphasized,
+  %body-text,
+  %button-primary,
+  %button-secondary {
+    display: block;
+    font-family: $font-family-sans-serif;
+    line-height: lh(1);
+  }
+
+  %heading-2 {
+    font-size: 25px;
+    margin: 0 0 $baseline 0;
+    font-weight: 300;
+    color: $link-color;
+  }
+
+  %heading-3 {
+    font-size: 21px;
+    margin: 0 0 $baseline 0;
+    font-weight: 300;
+    color: $body-color;
+  }
+
+  %heading-4 {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0 !important;
+    color: $m-gray-d2;
+  }
+
+  // specific examples - body
+  %body-text-emphasized {
+    font-size: 18px;
+    margin: 0 0 $baseline 0;
+    font-weight: 300;
+    color: $body-color;
+    font-family: 'Open Sans', sans-serif;
+    line-height: lh(1.1);
+  }
+
+  %body-text {
+    font-size: 15px;
+    margin: 0 0 $baseline 0;
+    color: $body-color;
+    line-height: lh(1);
+  }
+
+  // specific examples - buttons
+  %button-primary {
+    border-radius: 0;
+
+    @include linear-gradient(saturate($link-color,15%) 5%, shade($link-color,15%) 95%);
+
+    display: inline-block;
+    padding: $baseline/2 $baseline*2.5;
+    text-transform: lowercase;
+    color: $very-light-text;
+    letter-spacing: 0.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    border: none !important;
+    text-shadow: none;
+    font-size: $font-size-base;
+    box-shadow: none !important;
+  }
+
+  %button-secondary {
+    @include linear-gradient($outer-border-color 5%, $lighter-base-font-color 95%);
+
+    display: inline-block;
+    padding: $baseline/2 $baseline*2.5;
+    text-transform: lowercase;
+    color: $very-light-text;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    border: none !important;
+    text-shadow: none;
+    letter-spacing: 0;
+    font-size: 16px;
+    box-shadow: 0 !important;
+  }
+
+  // layout
+  .content-wrapper {
+    padding-bottom: 0;
+  }
+
+  .container,
+  .introduction {
+    box-sizing: border-box;
+
+    @include clearfix();
+
+    margin: 0 auto;
+    width: 960px;
+    background: $container-bg;
+  }
+
+  .container {
+    padding: $baseline $baseline ($baseline*2) $baseline;
+  }
+
+  .introduction {
+    padding: 0;
+
+    header {
+      position: relative;
+
+      // CASE: normal typographical headings
+      h1 {
+        @extend %heading-2;
+
+        @include text-align(left);
+
+        margin-bottom: $baseline;
+        padding-bottom: $baseline;
+      }
+
+      // CASE: marketing/imageery-based headings
+      .title {
+        position: absolute;
+        top: ($baseline*2.5);
+
+        @include left($baseline*1.5);
+
+        .title-super,
+        .title-sub {
+          @extend %t-weight1;
+
+          display: block;
+          letter-spacing: 0;
+        }
+
+        .title-super {
+          @include font-size(26);
+          @include line-height(18);
+
+          color: $header-graphic-super-color;
+        }
+
+        .title-sub {
+          @include font-size(20);
+          @include margin-left($baseline*2);
+
+          text-transform: lowercase;
+          color: $header-graphic-sub-color;
+        }
+      }
+    }
+  }
+}
+
+// shared
+.login,
+.register,
+.passwordreset,
+#forgot-password-modal #password-reset {
+
+  // reset - horrible, but necessary
+  p,
+  ol,
+  ul,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  label,
+  input,
+  textarea {
+    @extend %body-text;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    letter-spacing: 0;
+  }
+
+  a {
+    @include transition(color 0.15s ease-in-out 0s, border 0.15s ease-in-out 0s);
+
+    &:link,
+    &:visited,
+    &:hover,
+    &:active,
+    &:focus {
+      color: $link-color;
+      font-weight: 400;
+      text-decoration: none !important; // needed but nasty
+      font-family: $font-family-sans-serif;
+    }
+
+    &:hover,
+    &:active,
+    &:focus {
+      text-decoration: none !important; // needed but nasty
+      border-bottom: 1px dotted $link-color;
+    }
+  }
+
+  strong {
+    font-weight: 600;
+  }
+
+  // basic layout
+  .content,
+  aside {
+    box-sizing: border-box;
+    margin: $baseline 0 0 0;
+  }
+
+  .content {
+    @include float(left);
+    @include margin-right($baseline*2);
+
+    width: 600px;
+  }
+
+  aside {
+    @include float(left);
+
+    width: 280px;
+
+    p,
+    ol,
+    ul {
+      font-size: $font-size-sm !important;
+    }
+  }
+
+  // aside
+  aside {
+    .btn {
+      margin: 0 0 ($baseline*2) 0;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      h3 {
+        @extend %heading-4;
+
+        margin: 0 0 ($baseline/4) 0;
+      }
+    }
+
+    .btn-login {
+      h3.title,
+      .instructions {
+        display: inline-block;
+        margin-bottom: 0;
+      }
+
+      .btn-login-action {
+        @extend %btn-secondary-grey-outline;
+
+        padding: ($baseline/10) ($baseline*0.75);
+
+        @include margin-left($baseline/4);
+      }
+    }
+  }
+
+  // forms
+  form {
+    .instructions {
+      @extend %body-text-emphasized;
+
+      margin-bottom: $baseline;
+    }
+
+    .group-form {
+      margin: 0;
+      padding-top: 0;
+      padding-bottom: $baseline;
+    }
+
+    .list-input {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    // field groups
+    .field-group {
+      @include clearfix();
+
+      margin: 0 0 $baseline 0;
+
+      .field {
+        @include float(left);
+        @include margin(0, ($baseline*1.5), 0, 0);
+
+        display: block;
+        border-bottom: none;
+        padding-bottom: 0;
+
+        input,
+        textarea {
+          width: 100%;
+          font-weight: 600;
+        }
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    .group-form-personalinformation {
+      .field-education-level,
+      .field-gender,
+      .field-yob {
+        display: inline-block;
+        vertical-align: top;
+        margin-bottom: 0;
+      }
+    }
+
+    // individual fields
+    .field {
+      margin: 0 0 $baseline 0;
+
+      // elements
+      label,
+      input,
+      textarea {
+        border-radius: 0;
+        display: block;
+        height: auto;
+        font-family: $font-family-sans-serif;
+        font-style: normal;
+        font-weight: 500;
+        color: $body-color;
+      }
+
+      label {
+        @include transition(color 0.15s ease-in-out 0s);
+
+        margin: 0 0 ($baseline/4) 0;
+        color: tint($black, 20%);
+      }
+
+      .tip {
+        @include transition(color 0.15s ease-in-out 0s);
+
+        display: block;
+        margin-top: ($baseline/4);
+        color: $lighter-base-font-color;
+        font-size: em(13);
+      }
+
+      &.password {
+        position: relative;
+
+        .tip {
+          position: absolute;
+          top: 0;
+
+          @include right(0);
+        }
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        margin: 0;
+        padding: ($baseline/2) ($baseline*0.75);
+
+        &.long {
+          width: 100%;
+        }
+
+        &.short {
+          width: 25%;
+        }
+      }
+
+      textarea.long {
+        height: ($baseline*5);
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      // types - password
+
+      // types - select
+      &.select {
+        select {
+          width: 100%;
+        }
+      }
+
+      // types - checkboxes/radio buttons
+      &.checkbox {
+        input[type="checkbox"] {
+          display: inline-block;
+          width: auto;
+
+          @include margin-right($baseline/4);
+        }
+
+        label {
+          display: inline-block;
+        }
+      }
+
+      // states - all
+      &.disabled,
+      &.submitted {
+        color: rgba(0, 0, 0, 0.25);
+
+        label {
+          cursor: text;
+
+          &::after {
+            @include margin-left($baseline/4);
+          }
+        }
+
+        textarea,
+        input {
+          background: $container-bg;
+          color: rgba(0, 0, 0, 0.25);
+        }
+      }
+
+      // states - focused
+      &.is-focused {
+        label {
+          color: saturate($link-color, 15%);
+        }
+
+        .tip {
+          color: saturate($link-color, 15%);
+        }
+      }
+
+      // states - disabled
+      &.disabled {
+        label::after {
+          color: rgba(0, 0, 0, 0.35);
+          content: "(Disabled Currently)";
+        }
+      }
+
+      &.error {
+        label {
+          color: $red;
+        }
+
+        input,
+        textarea {
+          border-color: tint($red, 50%);
+        }
+      }
+
+      &.required {
+        label {
+          font-weight: 600;
+
+          a {
+            font-weight: 600 !important;
+          }
+        }
+
+        label::after {
+          @include margin-left($baseline/4);
+
+          content: "*";
+        }
+      }
+    }
+  }
+
+  // forms - actions
+  .form-actions {
+    @include clearfix();
+
+    button[type="submit"] {
+      @extend %m-btn-primary;
+      @extend %t-action2;
+
+      &:disabled,
+      &.is-disabled {
+        opacity: 0.3;
+        cursor: default !important;
+      }
+    }
+
+    .action-primary {
+      width: flex-grid(8, 8);
+    }
+
+    .action-secondary {
+      display: block;
+
+      @include float(right);
+
+      width: flex-grid(3, 8);
+      margin: $baseline $baseline 0 0;
+      font-size: em(14);
+
+      @include text-align(right);
+    }
+  }
+
+  // forms - third-party auth
+
+  // UI: deco - divider
+  .deco-divider {
+    position: relative;
+    display: block;
+    margin: ($baseline*1.5) 0;
+    border-top: ($baseline/5) solid $m-gray-l4;
+
+    .copy {
+      @extend %t-copy-lead1;
+      @extend %t-weight4;
+
+      position: absolute;
+      top: -($baseline);
+
+      @include left(43%);
+
+      padding: ($baseline/4) ($baseline*1.5);
+      background: white;
+      text-align: center;
+      color: $m-gray-l2;
+    }
+  }
+
+  // downplay required note
+  .instructions .note {
+    @extend %t-copy-sub2;
+
+    display: block;
+    font-weight: normal;
+    color: $gray;
+  }
+
+  .form-actions.form-third-party-auth {
+    width: flex-grid(8, 8);
+    margin-bottom: $baseline;
+
+    button[type="submit"] {
+      @extend %btn-secondary-blue-outline;
+
+      width: flex-grid(4, 8);
+
+      @include margin-right($baseline/2);
+
+      .icon {
+        @extend %sso-icon;
+
+        @include margin-right($baseline/2);
+
+        color: inherit;
+      }
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      &.button-oa2-google-oauth2:hover,
+      &.button-oa2-google-oauth2:focus {
+        background-color: $google-focus-blue;
+        border: 1px solid $google-focus-blue;
+      }
+
+      &.button-oa2-google-oauth2:hover {
+        box-shadow: 0 2px 1px 0 $google-focus-blue;
+      }
+
+      &.button-oa2-facebook:hover,
+      &.button-oa2-facebook:focus {
+        background-color: $facebook-focus-blue;
+        border: 1px solid $facebook-focus-blue;
+      }
+
+      &.button-oa2-facebook:hover {
+        box-shadow: 0 2px 1px 0 $facebook-focus-blue;
+      }
+
+      &.button-oa2-apple-id:hover,
+      &.button-oa2-apple-id:focus {
+        background-color: $apple-focus-black;
+        border: 1px solid $apple-focus-black;
+      }
+
+      &.button-oa2-apple-id:hover {
+        box-shadow: 0 2px 1px 0 $apple-focus-black;
+      }
+
+      &.button-oa2-linkedin-oauth2:hover,
+      &.button-oa2-linkedin-oauth2:focus {
+        background-color: $linkedin-blue;
+        border: 1px solid #06527d;
+      }
+
+      &.button-oa2-linkedin-oauth2:hover {
+        box-shadow: 0 2px 1px 0 #005d8e;
+      }
+    }
+  }
+
+  // forms - messages/status
+  .status {
+    box-sizing: border-box;
+    margin: 0 0 $baseline 0;
+    border-bottom: 3px solid shade($yellow, 10%);
+    padding: $baseline $baseline;
+    background: tint($yellow, 20%);
+
+    .message-title {
+      @extend %heading-4;
+
+      margin: 0 0 ($baseline/4) 0;
+      font-size: em(14);
+      font-weight: 600;
+    }
+
+    .message-copy {
+      @extend %body-text;
+
+      margin: 0 !important;
+      padding: 0;
+      list-style: none;
+
+      li {
+        margin: 0; /* 0 0 ($baseline/4) 0; */
+      }
+    }
+  }
+
+  .submission-error,
+  .system-error {
+    box-shadow: inset 0 -1px 2px 0 tint($red, 85%);
+    border-bottom: 3px solid shade($red, 10%);
+    background: tint($danger, 95%);
+
+    .message-title {
+      color: shade($danger, 10%) !important;
+    }
+  }
+
+  // misc
+  .orn-plus {
+    color: $very-light-text;
+    padding: 0 $baseline/4;
+  }
+
+  #register-form,
+  #login-form,
+  #passwordreset-form {
+    .status.message {
+      display: none;
+
+      &.is-shown {
+        display: block;
+      }
+    }
+
+    .third-party-signin.message {
+      display: none;
+
+      &.is-shown {
+        display: block;
+      }
+    }
+  }
+}
+
+// =====
+
+// login
+.view-login {
+  .header-global .nav-courseware .btn-login {
+    display: none;
+  }
+
+  .introduction {
+    header {
+      height: 120px;
+      background: transparent $login-banner-image 0 0 no-repeat;
+    }
+  }
+}
+
+// register
+.view-register {
+  .introduction {
+    header {
+      height: 120px;
+      background: transparent $register-banner-image 0 0 no-repeat;
+    }
+  }
+}
+
+// password reset
+.view-passwordreset {
+  .header-global .nav-courseware .btn-login {
+    display: none;
+  }
+
+  .introduction {
+    header {
+      height: 120px;
+      border-bottom: 1px solid $m-gray;
+      background: transparent $passwordreset-banner-image 0 0 no-repeat;
+    }
+  }
+
+  .content {
+    padding: 0;
+  }
+}
+
+// modal password reset form
+#forgot-password-modal {
+  border-radius: 2px;
+
+
+  .inner-wrapper {
+    border-radius: 2px;
+    background: $body-bg;
+    padding-bottom: 0 !important;
+  }
+
+  #password-reset {
+    padding: $baseline;
+
+    header {
+      margin: 0;
+      padding: 0;
+
+      &::before {
+        background-image: none;
+      }
+
+      h2 {
+        @extend %heading-2;
+
+        @include text-align(left);
+      }
+    }
+
+    .message {
+      margin: $baseline 0 0 0;
+    }
+
+    fieldset {
+      margin-bottom: ($baseline/2);
+      padding: 0;
+    }
+
+    .instructions p {
+      margin-bottom: ($baseline/4);
+    }
+
+    form {
+      border-radius: 0;
+      box-shadow: none;
+      margin: 0;
+      border: none;
+      padding: 0;
+
+      .field {
+        &.text,
+        &.email,
+        &.textarea {
+          input {
+            background: #fafafa;
+            margin-bottom: 0;
+          }
+        }
+      }
+
+      .form-actions {
+        padding: 0 !important;
+
+        .action-primary {
+          float: none;
+          display: block !important;
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  .modal-form-error {
+    @extend %body-text;
+
+    box-shadow: inset 0 -1px 2px 0 tint($red, 85%);
+    box-sizing: border-box;
+    margin: $baseline 0 ($baseline/2) 0 !important;
+    padding: $baseline;
+    border: none;
+    border-bottom: 3px solid shade($red, 10%);
+    background: tint($red, 95%);
+  }
+}

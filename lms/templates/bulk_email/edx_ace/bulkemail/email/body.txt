@@ -1,0 +1,10 @@
+{% load i18n %}
+{% autoescape off %}
+{{ formatted_text_message }}
+{% endautoescape %}
+
+
+{% blocktrans %}This email was automatically sent from {{ platform_name }}.{% endblocktrans %}
+{% blocktrans %}You are receiving this email at address {{ email }} because you are enrolled in {{course_title}}.{% endblocktrans %}
+{% blocktrans %}To stop receiving email like this, update your course email settings here {{ email_settings_url }}{% endblocktrans %}
+{% blocktrans %}To unsubscribe click here {{ unsubscribe_link }}{% endblocktrans %}

@@ -1,0 +1,957 @@
+// lms - views - login/register view
+// ====================
+@import '../base/grid-settings';
+@import "neat/neat"; // lib - Neat
+
+@media (min-width: 768px) {
+  .enterprise-content {
+    width: 20%;
+    float: left;
+    height: 100%;
+    padding-left: $baseline;
+    padding-right: $baseline;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .login-register.border-left {
+    border-left: 1px solid #d9d9d9;
+    padding-left: ($baseline*1.5);
+    padding-right: $baseline;
+    margin-left: 0;
+    width: 80%;
+  }
+}
+
+@include media-breakpoint-down(md) {
+  .enterprise-content {
+    margin: auto;
+    display: block;
+    padding-left: ($baseline/2);
+    padding-right: ($baseline/2);
+
+    img.enterprise-logo {
+      display: none;
+    }
+  }
+}
+
+.enterprise-tagline {
+  width: 300px;
+  font-size: 14px;
+  text-align: left;
+  display: inline-block;
+  line-height: normal;
+  padding: 15px 0 0 10px;
+}
+
+@include media-breakpoint-down(md) {
+  .enterprise-tagline {
+    display: none;
+  }
+}
+
+.window-wrap {
+  background: $body-bg;
+}
+
+.login-register-content {
+  box-sizing: border-box;
+
+  @include outer-container;
+
+  width: 100%;
+  justify-content: center;
+  margin-top: $baseline;
+  background: $white;
+  display: flex;
+  flex-wrap: wrap;
+  -webkit-flex-wrap: wrap;
+  -moz-flex-wrap: wrap;
+
+  h1 {
+    @extend %t-title4;
+
+    margin-top: $baseline;
+    letter-spacing: normal;
+    font-family: $font-family-sans-serif;
+    color: $uxpl-blue-hover-active;
+    text-align: left;
+  }
+
+  h3 {
+    @extend %t-title6;
+    @extend %t-light;
+
+    margin: 0;
+    letter-spacing: normal;
+    font-family: $font-family-sans-serif;
+    color: $uxpl-gray-dark;
+  }
+
+  a,
+  label {
+    @extend %expand-clickable-area;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+}
+
+#login-help, #reset-help {
+    padding-left: 8px;
+}
+ul.fa-ul{
+    margin: 0 0 0 0;
+    i {
+        margin-right: 5px;
+    }
+}
+
+.login-register {
+  $grid-columns: 12;
+
+  background: $white;
+  min-height: 100%;
+  margin: 0 auto;
+  padding-left: ($baseline/2);
+  padding-right: ($baseline/2);
+  $third-party-button-height: ($baseline*1.75);
+
+  display: block;
+  max-width: 500px;
+
+  .instructions {
+    @extend %t-copy-base;
+  }
+
+  /* Temp. fix until applied globally */
+  > {
+    box-sizing: border-box;
+  }
+
+
+  /* Remove autocomplete yellow background */
+  input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 50px white inset;
+    -webkit-text-fill-color: #333;
+  }
+
+  input:-webkit-autofill:focus {
+    -webkit-box-shadow: white, 0 0 0 50px white inset;
+    -webkit-text-fill-color: #333;
+  }
+
+  .header {
+    @include outer-container;
+
+    border-bottom: 1px solid $gray-l4;
+    width: 100%;
+    padding-top: 35px;
+    padding-bottom: 35px;
+    overflow: hidden;
+
+    .headline {
+      box-sizing: border-box;
+
+      @include font-size(35);
+
+      padding: 0 10px;
+      font-family: $font-family-sans-serif;
+      font-weight: $font-semibold;
+      text-align: left;
+      margin-bottom: 0;
+      color: $m-blue-d5;
+    }
+
+    .tagline {
+      box-sizing: border-box;
+
+      @include font-size(24);
+
+      padding: 0 10px;
+      font-family: $font-family-sans-serif;
+      font-weight: $font-regular;
+    }
+  }
+
+  .section-title {
+    position: relative;
+    margin: $baseline 0 ($baseline/2);
+
+    &.lines {
+      margin-bottom: $baseline;
+      margin-top: $baseline;
+      text-align: center;
+
+      &::after {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        width: 100%;
+        height: 1px;
+        background: $gray-l3;
+        content: '';
+        z-index: 5;
+      }
+
+      .text {
+        position: relative;
+        top: -1px; // Aligns center of text with center of line (CR)
+        z-index: 6;
+        padding: 0 $baseline;
+        background: $white;
+        font-size: $baseline;
+      }
+    }
+
+    h2 {
+      text-align: center;
+      text-transform: none;
+    }
+  }
+
+  %nav-btn-base {
+    @extend %btn-secondary-blue-outline;
+
+    width: 100%;
+    height: ($baseline*2);
+    text-transform: none;
+    text-shadow: none;
+    letter-spacing: normal;
+  }
+
+  .nav-btn {
+    @extend %nav-btn-base;
+    @extend %t-strong;
+  }
+
+  .form-type,
+  .toggle-form {
+    box-sizing: border-box;
+    max-width: 600px;
+    min-width: 250px;
+    margin: 0 auto;
+  }
+
+  .toggle-form {
+    @extend %t-action1;
+  }
+
+  .note {
+    @extend %t-copy-sub2;
+
+    display: block;
+    margin: ($baseline/2) ($baseline/2) 0 ($baseline/2);
+    color: $m-gray-l1;
+    text-align: center;
+  }
+
+  /** The forms **/
+  .form-wrapper {
+    padding-top: $baseline;
+    padding-bottom: $baseline;
+
+    form {
+      @include clearfix();
+
+      clear: both;
+    }
+
+    .login-providers {
+      text-align: center;
+    }
+  }
+
+  .login-form,
+  .password-reset-form,
+  .register-form {
+    &:focus {
+      outline: none;
+    }
+
+    div[class*="hidden-"] {
+      margin: 0;
+      display: none;
+    }
+
+    .auto-register-message {
+      font-size: 1.1em;
+      line-height: 1.3em;
+    }
+  }
+
+  %bold-label {
+    @include font-size(16);
+
+    font-family: $font-family-sans-serif;
+    font-weight: $font-semibold;
+  }
+
+  .form-label {
+    @extend %bold-label;
+
+    padding: 0 0 0 ($baseline/4);
+  }
+
+  .action-label {
+    @include font-size(13);
+
+    font-family: $font-family-sans-serif;
+  }
+
+  .form-field {
+    @include clearfix();
+
+    clear: both;
+    position: relative;
+    width: 100%;
+    margin: ($baseline/2) 0 0 0;
+
+
+    &.select-year_of_birth {
+      @include margin-left(15px);
+    }
+
+    &.select-gender,
+    &.select-year_of_birth {
+      display: inline-block;
+      width: calc(50% - 10px);
+    }
+
+    &.checkbox-marketing_emails_opt_in {
+      .label-text {
+        font-size: small !important;
+      }
+    }
+
+    .label-text-small {
+      font-size: small;
+    }
+
+    /** FROM _accounts.scss - start **/
+    label,
+    input,
+    select,
+    textarea,
+    .plaintext-field {
+      height: auto;
+      line-height: 1.5em;
+      border-radius: 0;
+      font-family: $font-family-sans-serif;
+      font-style: normal;
+      font-weight: 500;
+
+      &.honor_tos_combined {
+        font-size: small;
+      }
+
+      &.focus-in {
+        position: relative;
+        padding-top: 0;
+        padding-left: 0;
+        opacity: 1;
+      }
+
+      &.focus-out {
+        position: absolute;
+        padding-top: 2.5px;
+        padding-left: 9px;
+        opacity: 0.75;
+        z-index: 1;
+      }
+
+      a {
+        z-index: 1;
+      }
+    }
+
+    #login-remember {
+      line-height: 0;
+      height: auto;
+    }
+
+    label {
+      display: block;
+      margin: 0;
+      color: $black;
+
+      &.inline {
+        display: inline;
+      }
+
+      &[for="register-data_sharing_consent"],
+      &[for="register-honor_code"],
+      &[for="register-terms_of_service"] {
+        display: inline-block;
+        margin: 5px 5px 0 0;
+        vertical-align: top;
+      }
+
+      &[for="login-remember"] {
+        display: inline-block;
+      }
+    }
+
+    .field-link {
+      @extend %t-copy-sub2;
+
+      display: block;
+      margin-bottom: 5px;
+      margin-top: 5px;
+      border: none;
+      padding: 0;
+      background: transparent;
+      box-shadow: none;
+      text-transform: initial;
+      letter-spacing: normal;
+      color: theme-color("primary");
+      font-weight: $font-regular;
+      text-decoration: none;
+      text-shadow: none;
+      font-family: $font-family-sans-serif;
+
+      &:hover,
+      &:focus {
+        text-decoration: underline;
+      }
+      > i {
+        border: none;
+        padding: 0;
+        margin: 0 2px 0 0;
+      }
+    }
+
+    input,
+    select,
+    textarea {
+      display: block;
+      height: 32px;
+      width: 100%;
+      margin: 0 0 ($baseline/4);
+      padding: 0 ($baseline/2);
+
+      &.long {
+        width: 100%;
+      }
+
+      &.short {
+        width: 25%;
+      }
+
+      &.checkbox {
+        display: inline;
+        width: auto;
+        height: auto;
+        margin-right: 0px;
+
+        & + label {
+          display: inline;
+        }
+      }
+
+      &.error {
+        border-color: $red;
+      }
+
+      &.success {
+        border-color: theme-color("success");
+      }
+    }
+
+    textarea,
+    select {
+      &.error {
+        outline-color: $red;
+      }
+
+      &.success {
+        outline-color: theme-color("success");
+      }
+    }
+
+    textarea {
+      resize: none;
+      height: ($baseline*5);
+    }
+
+    select {
+      background: transparent;
+      border: 1px solid $gray;
+      cursor: pointer;
+      -webkit-appearance: none;
+      -webkit-border-radius: 0;
+
+      &:active,
+      &:focus {
+        outline: auto;
+      }
+    }
+
+    span,
+    label {
+      &.error {
+        color: $red;
+      }
+
+      &.success {
+        color: theme-color("success");
+      }
+    }
+
+    .tip,
+    .label-optional {
+      @extend %t-copy-sub1;
+
+      color: $uxpl-gray-base;
+    }
+
+    .tip {
+      display: block;
+    }
+
+    /** FROM _accounts.scss - end **/
+  }
+
+
+  .optional-fields {
+      &.full-length-fields {
+          .select-gender {
+              width: 100%;
+          }
+      }
+  }
+  .input-block {
+    width: 100%;
+    border-color: $gray;
+  }
+
+  .input-inline {
+    display: inline;
+  }
+
+  .desc {
+    @include transition(color 0.15s ease-in-out 0s);
+
+    display: block;
+    margin-top: ($baseline/4);
+    color: $lighter-base-font-color;
+    font-size: em(13);
+  }
+
+  .action-primary {
+    @extend %btn-primary-blue;
+
+    padding: 1ex 1em;
+    text-transform: none;
+    font-weight: 600;
+    letter-spacing: normal;
+    margin-top: $baseline;
+
+    .icon {
+      @extend %sso-icon;
+    }
+  }
+
+  .login-provider {
+    @extend %btn-secondary-grey-outline;
+    @extend %t-action4;
+
+    @include padding(0, 0, 0, $baseline*2);
+    @include text-align(left);
+
+    position: relative;
+    margin-right: ($baseline/4);
+    margin-bottom: ($baseline/4);
+    border-color: $lightGrey1;
+    width: $baseline*6.5;
+    height: $third-party-button-height;
+    text-shadow: none;
+    text-transform: none;
+
+    .icon {
+      @extend %sso-icon;
+
+      @include left(0);
+
+      position: absolute;
+      top: -1px;
+      width: 30px;
+      bottom: -1px;
+      background: $m-blue-d3;
+      line-height: $third-party-button-height;
+      text-align: center;
+      color: $white;
+    }
+
+    span {
+      color: inherit;
+    }
+
+    &:hover,
+    &:focus {
+      background-image: none;
+
+      .icon {
+        top: 0;
+        bottom: 0;
+        line-height: ($third-party-button-height - 2px);
+      }
+    }
+
+    &.button-oa2-google-oauth2 {
+      color: white;
+      border-color: $google-blue;
+      background-color: $google-blue;
+
+      .icon {
+        background: transparent;
+
+        .icon-image {
+          margin-left: 2px;
+        }
+      }
+
+      &:hover,
+      &:focus {
+        background-color: $google-focus-blue;
+        border: 1px solid $google-focus-blue;
+        color: $white;
+      }
+    }
+
+    &.button-oa2-facebook {
+      color: white;
+      border-color: $facebook-blue;
+      background-color: $facebook-blue;
+
+      .icon {
+        background: transparent;
+
+        .icon-image {
+          margin-left: 2px;
+        }
+      }
+
+      &:hover,
+      &:focus {
+        background-color: $facebook-focus-blue;
+        border: 1px solid $facebook-focus-blue;
+        color: $white;
+      }
+    }
+
+    &.button-oa2-apple-id {
+      color: white;
+      border-color: $apple-black;
+      background-color: $apple-black;
+
+      span {
+        vertical-align: middle;
+        @include font-size(16);
+      }
+
+      .icon {
+        background: transparent;
+
+        .icon-image {
+          max-height: 2.2em;
+          max-width: 2.5em;
+          margin-top: 0px;
+        }
+      }
+
+      &:hover,
+      &:focus {
+        background-color: $apple-focus-black;
+        border: 1px solid $apple-focus-black;
+        color: $white;
+      }
+    }
+
+    &.button-oa2-linkedin-oauth2 {
+      color: $linkedin-blue;
+
+      .icon {
+        background: $linkedin-blue;
+      }
+
+      &:hover,
+      &:focus {
+        background-color: $linkedin-blue;
+        border: 1px solid #06527d;
+        color: $white;
+      }
+    }
+
+    &.button-oa2-azuread-oauth2 {
+      color: white;
+      border-color: $microsoft-black;
+      background-color: $microsoft-black;
+
+      .icon {
+        background: transparent;
+      }
+
+      &:hover,
+      &:focus {
+        background-color: $microsoft-focus-black;
+        border: 1px solid $microsoft-focus-black;
+        color: $white;
+      }
+    }
+  }
+
+  .button-secondary-login {
+    @extend %nav-btn-base;
+    @extend %t-action4;
+    @extend %t-regular;
+
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0;
+
+    &:hover {
+      border-color: $m-blue-d3;
+      box-shadow: none;
+    }
+  }
+
+  /** Error Container - from _account.scss **/
+  .status {
+    box-sizing: border-box;
+    margin: 0 0 25px;
+    border-bottom: 3px solid shade($yellow, 10%);
+    padding: 25px;
+    background: tint($yellow, 20%);
+
+    .message-title {
+      @extend %t-title5;
+
+      font-family: $font-family-sans-serif;
+      margin: 0 0 ($baseline/4) 0;
+      font-weight: 600;
+    }
+
+    .message-copy,
+    .message-copy p {
+      @extend %t-copy-base;
+
+      font-family: $font-family-sans-serif;
+      margin: 0 !important;
+      padding: 0;
+
+      li {
+        margin: 0 0 ($baseline/4) $baseline;
+      }
+    }
+
+    &.account-activation {
+      .message-copy {
+        padding: 0 1em !important;
+      }
+
+      &.info {
+        background-color: $palette-info-back;
+        border: $palette-info-border 1px solid;
+        color: $palette-info-text;
+      }
+
+      &.success {
+        background-color: $palette-success-back;
+        border: $palette-success-border 1px solid;
+        color: $palette-success-text;
+      }
+
+      &.error {
+        background-color: $palette-error-back;
+        border: $palette-error-border 1px solid;
+        color: $palette-error-text 1px solid;
+      }
+    }
+  }
+
+  .submission-error,
+  .system-error {
+    box-shadow: inset 0 -1px 2px 0 tint($red, 85%);
+    border-bottom: 3px solid shade($red, 10%);
+    background: tint($red, 95%);
+
+    .message-title {
+      color: shade($red, 10%) !important;
+    }
+  }
+
+  .submission-success {
+    box-shadow: inset 0 -1px 2px 0 tint($green, 85%);
+    border-bottom: 3px solid shade($green, 10%);
+    background: tint($green, 95%);
+
+    .message-title {
+      color: shade($green, 10%) !important;
+    }
+  }
+
+  .institution-list {
+    .institution {
+      @extend %t-copy-base;
+    }
+  }
+
+  @include media(max-width 330px) {
+    .form-type {
+      width: 98%;
+      margin: 0 1%;
+    }
+
+    .login-provider {
+      width: 100%;
+      margin: 10px 0;
+    }
+  }
+}
+
+.finish-auth {
+  box-sizing: border-box;
+
+  @include outer-container;
+  $grid-columns: 12;
+
+  background: $white;
+  min-height: 100%;
+  width: 100%;
+
+  .finish-auth-inner {
+    box-sizing: border-box;
+    max-width: 650px;
+    margin: 1em auto;
+  }
+
+  #finish-auth-status {
+    padding-top: 30px; // Make room for the absolutely positioned loading animation
+  }
+
+  #finish-auth-status li:last-child {
+    font-weight: bold;
+  }
+}
+
+.supplemental-link {
+  margin: 1rem 0;
+}
+
+.enterprise-content {
+  display: inline-block;
+  text-align: left;
+  vertical-align: top;
+  max-width: 500px;
+
+  .centered-div {
+    margin: 0 auto;
+    margin-right: 0;
+    float: right;
+  }
+
+  img {
+    height: 100px;
+  }
+
+  p {
+    &:first-of-type {
+      margin-top: 20px;
+    }
+
+    font-size: 16px;
+    line-height: 1.5;
+    color: $gray-d2;
+  }
+}
+
+.tos-modal {
+  background-color: $black-t1;
+  display: none;
+  height: 120%;
+  left: -10%;
+  overflow: auto;
+  position: fixed;
+  top: -10%;
+  width: 120%;
+  z-index: 1;
+
+  .modal-content {
+    background-color: $white;
+    bottom: auto;
+    left: 50%;
+    margin: auto;
+    max-width: 650px;
+    min-height: 540px;
+    min-width: 300px;
+    position: fixed;
+    right: auto;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+
+    .header {
+      height: 50px;
+      position: relative;
+
+      h1#modal-header-text {
+        float: left;
+        font-family: $font-family-sans-serif;
+        font-size: font-size(large);
+        font-weight: bold;
+        margin-bottom: 0;
+        padding-left: 20px;
+        position: absolute;
+        text-align: left;
+        top: 50%;
+        transform: translate(0, -50%);
+        width: 75%;
+      }
+
+      .modal-close-button {
+        background: $white;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        box-sizing: border-box;
+        color: theme-color("primary");
+        float: right;
+        font-size: font-size(large);
+        height: 48px;
+        letter-spacing: normal;
+        padding: 0;
+        position: absolute;
+        right: 0;
+        text-shadow: none;
+        text-transform: lowercase;
+        top: 50%;
+        transform: translate(0, -50%);
+        width: 80px;
+      }
+
+      .modal-close-button:hover {
+        background: $white;
+        color: $uxpl-blue-hover-active;
+        text-decoration: underline;
+      }
+
+      .modal-close-button:focus {
+        color: $uxpl-blue-hover-active;
+        text-decoration: underline;
+      }
+    }
+
+    iframe {
+      border: 0;
+      width: 100%;
+    }
+  }
+}
+
+body.open-modal {
+  overflow: hidden;
+}
+

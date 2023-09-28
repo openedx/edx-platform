@@ -1,0 +1,9 @@
+{% load i18n %}{% autoescape off %}
+{% blocktrans %}Hello {{full_name}}, {% endblocktrans %}
+{% blocktrans %}Thank you for submitting your photos for identity verification with {{ platform_name }}. {% endblocktrans %}
+{% trans "We have received your photos and they will be reviewed within 3-5 days." %}
+{% blocktrans %}You may check the status on your dashboard: {{ dashboard_link }} {% endblocktrans %}
+
+{% trans "Best regards," %}
+{% blocktrans %}The {{ platform_name }} Team {% endblocktrans %}
+{% endautoescape %}

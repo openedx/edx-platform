@@ -1,0 +1,12 @@
+// ------------------------------
+// LMS: Utilities
+
+// About: Shared utility classes that extend or enhance the interface
+// ------------------------------
+
+// No focus outline on programmatic focus
+.sr-is-focusable,
+.sr-is-focusable:focus,
+.sr-is-focusable:active {
+  @extend %no-outline;
+}

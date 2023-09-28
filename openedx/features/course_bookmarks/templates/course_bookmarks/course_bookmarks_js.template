@@ -1,0 +1,15 @@
+## mako
+
+<%!
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
+%>
+
+(function (require, define) {
+    require(['course_bookmarks/js/course_bookmarks_factory'], function (CourseBookmarksFactory) {
+        CourseBookmarksFactory({
+            $el: $(".course-bookmarks"),
+            courseId: '${str(course.id) | n, js_escaped_string}',
+            bookmarksApiUrl: '${bookmarks_api_url | n, js_escaped_string}',
+        });
+    });
+}).call(this, require || RequireJS.require, define || RequireJS.define);

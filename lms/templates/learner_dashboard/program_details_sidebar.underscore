@@ -1,0 +1,120 @@
+<aside class="aside js-program-progress program-progress">
+    <% if (programCertificate) { %>
+        <h2 class="progress-heading certificate-heading"><%- StringUtils.interpolate(gettext('Your {program} Certificate'), {program: type}, true) %></h2>
+
+        <a href="<%- programCertificate.url %>" class="program-cert-link">
+            <img src="<%- programCertificate.img %>" class="program-cert" alt="<%- interpolate(gettext('Open the certificate you earned for the %(title)s program.'), {title: programCertificate.title}, true) %>" />
+        </a>
+    <% } %>
+</aside>
+<aside class="aside js-course-certificates"></aside>
+<% if (isSubscriptionEligible) { %>
+<aside class="aside js-subscription-info subscription-info">
+    <h2 class="divider-heading">
+        <%- hasActiveTrial
+            ? gettext('Trial subscription')
+            : subscriptionState === 'active'
+            ? gettext('Active subscription')
+            : gettext('Inactive subscription')
+        %>
+    </h2>
+    <div class="sidebar-section">
+        <div class="subscription-section">
+            <p class="my-0">
+                <%= HtmlUtils.interpolateHtml(
+                    (
+                        subscriptionState === 'active'
+                        ? gettext('View your receipts or modify your subscription on the {a_start}Orders and subscriptions{a_end} page')
+                        : subscriptionState === 'inactive'
+                        ? gettext('Restart your subscription for {subscriptionPrice}. Your payment history is still available on the {a_start}Orders and subscriptions{a_end} page')
+                        : gettext('If you had a subscription previously, your payment history is still available on the {a_start}Orders and subscriptions{a_end} page')
+                    ),
+                    {
+                        subscriptionPrice,
+                        a_start: HtmlUtils.HTML(`<a class="subscription-link" href="${orders_and_subscriptions_url}">`),
+                        a_end: HtmlUtils.HTML('</a>'),
+                    }
+                ) %>
+            </p>
+            <p class="my-0">
+                <%= HtmlUtils.interpolateHtml(
+                    gettext('Need help? Check out the {a_start}Learner Help Center{span_start}{icon}{span_end}{a_end} to troubleshoot issues or contact support'),
+                    {
+                        a_start: HtmlUtils.HTML(`<a class="subscription-link" href="${subscriptions_learner_help_center_url}" target="_blank" rel="noopener noreferrer">`),
+                        a_end: HtmlUtils.HTML('</a>'),
+                        span_start: HtmlUtils.HTML('<span class="subscription-icon-arrow-upright">'),
+                        icon: HtmlUtils.HTML(arrowUprightIcon),
+                        span_end: HtmlUtils.HTML('</span>'),
+                    }
+                ) %>
+            </p>
+        </div>
+    </div>
+</aside>
+<% } %>
+<aside class="aside js-program-record program-record">
+    <h2 class="divider-heading"><%- gettext('Program Record') %></h2>
+    <div class="sidebar-section">
+        <p class="motivating-message"><%- gettext('Once you complete one of the program requirements you have a program record. This record is marked complete once you meet all program requirements. A program record can be used to continue your learning journey and demonstrate your learning to others.') %></p>
+    </div>
+    <% if (program_record_url) { %>
+        <div class="sidebar-button-wrapper">
+            <a href="<%- program_record_url %>" class="program-record-link">
+                <button class="btn sidebar-button"><%- gettext('View Program Record') %></button>
+            </a>
+        </div>
+    <% } %>
+</aside>
+<% if (!programTabViewEnabled) { %>
+<% if (creditPathways.length > 0) { %>
+    <aside class="aside js-program-pathways program-credit-pathways">
+        <h2 class = "divider-heading"><%- gettext('Additional Credit Opportunities') %></h2>
+
+        <% for (var i = 0; i < creditPathways.length; i++) {
+            var pathway = creditPathways[i];
+        %>
+           <div class="pathway-wrapper">
+               <div class = "pathway-info">
+                    <h2 class="pathway-heading">  <%- pathway.name %> </h2>
+                    <% if (pathway.description) { %>
+                        <p> <%- pathway.description %> </p>
+                    <% } %>
+                    <% if (pathway.destination_url) { %>
+                        <div class="sidebar-button-wrapper">
+                            <a href="<%- pathway.destination_url %>" class="pathway-link">
+                                <button class="btn pathway-button sidebar-button" data-pathway-uuid="<%- pathway.uuid %>" data-pathway-name="<%- pathway.name %>"><%- gettext('Learn More') %></button>
+                            </a>
+                        </div>
+                    <% } %>
+               </div>
+           </div>
+       <% } %>
+    </aside>
+<% } %>
+
+<% if (industryPathways.length > 0) { %>
+    <aside class="aside js-program-pathways program-industry-pathways">
+        <h2 class = "divider-heading"><%- gettext('Additional Professional Opportunities') %></h2>
+
+        <% for (var i = 0; i < industryPathways.length; i++) {
+            var pathway = industryPathways[i];
+        %>
+           <div class="pathway-wrapper">
+               <div class = "pathway-info">
+                    <h2 class="pathway-heading">  <%- pathway.name %> </h2>
+                    <% if (pathway.description) { %>
+                        <p> <%- pathway.description %> </p>
+                    <% } %>
+                    <% if (pathway.destination_url) { %>
+                        <div class="sidebar-button-wrapper">
+                            <a href="<%- pathway.destination_url %>" class="pathway-link">
+                                <button class="btn pathway-button sidebar-button" data-pathway-uuid="<%- pathway.uuid %>" data-pathway-name="<%- pathway.name %>"><%- gettext('Learn More') %></button>
+                            </a>
+                        </div>
+                    <% } %>
+               </div>
+           </div>
+       <% } %>
+    </aside>
+<% } %>
+<% } %>

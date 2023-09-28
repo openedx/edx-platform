@@ -1,0 +1,15 @@
+// ------------------------------
+// Open edX Certificates: Main Style Compile
+
+// About: Sass compile for the Open edX Certificates Elements.
+
+// NOTE: This is the left to right (LTR) configured style compile.
+// It should mirror main-rtl w/ the exception of bi-app references.
+
+@import '../sass/vendor/bi-app/bi-app-ltr';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins';
+
+// Load the shared build
+@import 'build';

@@ -1,0 +1,39 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+  <tr>
+    <td>
+      <h1>
+        {% trans "ID Verification Approved" as tmsg %}{{ tmsg | force_escape }}
+      </h1>
+      <p style="color: rgba(0,0,0,.75);">
+        {% filter force_escape %}
+          {% blocktrans %}Hello {{ full_name }},{% endblocktrans %}
+        {% endfilter %}
+      </p>
+      <p style="color: rgba(0,0,0,.75);">
+        {% filter force_escape %}
+          {% blocktrans %}Your {{ platform_name }} ID verification photos have been approved.{% endblocktrans %}
+        {% endfilter %}
+
+        {% filter force_escape %}
+          {% blocktrans %}Your approval status remains valid for two years, and it will expire {{ expiration_datetime }}.{% endblocktrans %}
+        {% endfilter %}
+        <br/>
+      </p>
+
+      <p>
+        {% trans "Enjoy your studies," as tmsg %}{{ tmsg | force_escape }}
+        <br/>
+        {% filter force_escape %}
+          {% blocktrans %}The {{ platform_name }} Team {% endblocktrans %}
+        {% endfilter %}
+      </p>
+
+    </td>
+  </tr>
+</table>
+{% endblock %}

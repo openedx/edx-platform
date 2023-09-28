@@ -1,0 +1,49 @@
+<%
+var summaryMessage = validation.get("summary");
+var aggregateMessageType = summaryMessage.type;
+var aggregateValidationClass = aggregateMessageType === "error"? "has-errors" : "has-warnings";
+%>
+    <div class="xblock-message validation <%- aggregateValidationClass %> <%- additionalClasses %>">
+        <p class="<%- aggregateMessageType %>"><span class="icon fa <%- getIcon(aggregateMessageType) %>" aria-hidden="true"></span>
+        <%- summaryMessage.text %>
+        <% if (summaryMessage.action_class) { %>
+            <a href="#" class="button action-button <%- summaryMessage.action_class %>">
+                <span class="action-button-text"><%- summaryMessage.action_label %></span>
+            </a>
+        <% } else if (summaryMessage.action_runtime_event) {%>
+            <a href="#" class="button action-button notification-action-button" data-notification-action="<%- summaryMessage.action_runtime_event %>">
+                <span class="action-button-text"><%- summaryMessage.action_label %></span>
+            </a>
+        <% } %>
+        </p>
+        <% var detailedMessages = validation.get("messages"); %>
+        <% if (detailedMessages.length > 0) { %>
+            <ul class="xblock-message-list">
+                <% for (var i = 0; i < detailedMessages.length; i++) { %>
+                <%
+                var message = detailedMessages[i];
+                var messageType = message.type
+                var messageTypeDisplayName = getDisplayName(messageType)
+                %>
+                <li class="xblock-message-item <%- messageType %>">
+                    <span class="message-text">
+                        <% if (messageTypeDisplayName) { %>
+                            <span class="sr"><%- messageTypeDisplayName %>:</span>
+                        <% } %>
+                        <%- message.text %>
+
+                    <% if (message.action_class) { %>
+                        <a href="#" class="button action-button <%- message.action_class %>">
+                            <span class="action-button-text"><%- message.action_label %></span>
+                        </a>
+                    <% } else if (message.action_runtime_event) {%>
+                       <a href="#" class="button action-button notification-action-button" data-notification-action="<%- message.action_runtime_event %>">
+                            <span class="action-button-text"><%- message.action_label %></span>
+                        </a>
+                    <% } %>
+                    </span>
+                </li>
+                <% } %>
+            </ul>
+        <% } %>
+    </div>

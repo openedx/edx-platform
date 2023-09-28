@@ -1,0 +1,11 @@
+{% load i18n %}
+{% trans "You're almost there!" %}
+{% trans "There's still time to reach your goal" as tmsg %}
+{% blocktrans %}You set a goal of learning {{days_per_week}} times a week in {{course_name}}. You're not quite there, but there's still time to reach that goal!{% endblocktrans %}
+{% trans "Jump back in"}
+{{course_url}}
+{% blocktrans %}Remember, you can always change your learning goal. The best goal is one that you can stick to.  {% endblocktrans %}
+{% trans "Adjust my goal"}
+{{course_url}}
+{% trans "Unsubscribe from goal reminder emails to this course"}
+{{course_url}}

@@ -1,0 +1,66 @@
+## mako
+
+<%!
+
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
+%>
+
+(function (require, define) {
+    var registerDiscussionClass = function(moduleName, modulePath) {
+        define(
+            modulePath,
+            [],
+            function() {
+                var discussionClass = window[moduleName];
+                if (!discussionClass) {
+                  throw new Error('Discussion class not loaded: ' + moduleName);
+                }
+                return discussionClass;
+            }
+        );
+    }
+
+    ## Add RequireJS definitions for each discussion class
+    <%
+    discussion_classes = [
+        ['Discussion', 'common/js/discussion/discussion'],
+        ['Content', 'common/js/discussion/content'],
+        ['DiscussionModuleView', 'common/js/discussion/discussion_module_view'],
+        ['DiscussionThreadView', 'common/js/discussion/views/discussion_thread_view'],
+        ['DiscussionThreadListView', 'common/js/discussion/views/discussion_thread_list_view'],
+        ['DiscussionThreadProfileView', 'common/js/discussion/views/discussion_thread_profile_view'],
+        ['DiscussionUtil', 'common/js/discussion/utils'],
+        ['DiscussionCourseSettings', 'common/js/discussion/models/discussion_course_settings'],
+        ['DiscussionUser', 'common/js/discussion/models/discussion_user'],
+        ['NewPostView', 'common/js/discussion/views/new_post_view'],
+    ]
+    %>
+
+    % for discussion_class_info in discussion_classes:
+        registerDiscussionClass(
+            '${discussion_class_info[0] | n, js_escaped_string}',
+            '${discussion_class_info[1] | n, js_escaped_string}'
+        );
+    % endfor
+
+    ## Install the discussion board once the DOM is ready
+    $(function() {
+        require(['discussion/js/discussion_board_factory'], function (DiscussionBoardFactory) {
+            DiscussionBoardFactory({
+                courseId: '${str(course.id) | n, js_escaped_string}',
+                $el: $(".discussion-board"),
+                rootUrl: '${root_url | n, js_escaped_string}',
+                userInfo: ${user_info | n, dump_js_escaped_json},
+                roles: ${roles | n, dump_js_escaped_json},
+                sortPreference: '${sort_preference | n, js_escaped_string}',
+                threads: ${threads | n, dump_js_escaped_json},
+                threadPages: '${thread_pages | n, js_escaped_string}',
+                contentInfo: ${annotated_content_info | n, dump_js_escaped_json},
+                courseName: '${course.display_name_with_default | n, js_escaped_string}',
+                courseSettings: ${course_settings | n, dump_js_escaped_json},
+                isCommentableDivided: ${is_commentable_divided | n, dump_js_escaped_json},
+                defaultTopicId: '${discussion_default_topic_id | n, js_escaped_string}'
+            });
+        });
+    });
+}).call(this, require || RequireJS.require, define || RequireJS.define);

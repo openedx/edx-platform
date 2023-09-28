@@ -1,0 +1,11 @@
+<problem display_name="Multiple Choice" markdown="This is the first problem.&#10;&#10;&gt;&gt; What kind of swallow?&#10;&#10;(x) African&#10;( ) European&#10;( ) I don't know">
+  <multiplechoiceresponse>
+    <p>This is the first problem.</p>
+    <p>&gt;&gt; What kind of swallow?</p>
+    <choicegroup type="MultipleChoice">
+      <choice correct="true">African</choice>
+      <choice correct="false">European</choice>
+      <choice correct="false">I don't know</choice>
+    </choicegroup>
+  </multiplechoiceresponse>
+</problem>

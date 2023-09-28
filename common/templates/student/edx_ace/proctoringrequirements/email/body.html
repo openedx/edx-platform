@@ -1,0 +1,69 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <h1>
+                {% autoescape off %}
+                {# xss-lint: disable=django-blocktrans-missing-escape-filter #}
+                {% blocktrans %}
+                    Proctoring requirements for {{ course_name }}
+                {% endblocktrans %}
+                {% endautoescape %}
+            </h1>
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
+                {% blocktrans %}
+                    Hello {{full_name}},
+                {% endblocktrans %}
+                {% endfilter %}
+            </p>
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% autoescape off %}
+                {# xss-lint: disable=django-blocktrans-missing-escape-filter #}
+                {% blocktrans %}
+                    You are enrolled in {{ course_name }} at {{ platform_name }}. This course contains proctored exams.
+                {% endblocktrans %}
+                {% endautoescape %}
+            </p>
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% autoescape off %}
+                {# xss-lint: disable=django-blocktrans-missing-escape-filter #}
+                {% blocktrans %}
+                    Proctored exams are timed exams that you take while proctoring software monitors your computer's desktop, webcam video, and audio. Your course uses {{ proctoring_provider }} software for proctoring.
+                {% endblocktrans %}
+                {% endautoescape %}
+            </p>
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
+                {% blocktrans %}
+                    Carefully review the system requirements as well as the steps to take a proctored exam in order to ensure that you are prepared.
+                {% endblocktrans %}
+                {% endfilter %}
+            </p>
+
+            {% filter force_escape %}
+            {% blocktrans asvar course_cta_text %}
+                Proctoring Instructions and Requirements
+            {% endblocktrans %}
+            {% endfilter %}
+            {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=proctoring_requirements_url %}
+
+            <p>
+                {% trans "Thank you," as tmsg %}{{ tmsg | force_escape }}
+                <br />
+                {% filter force_escape %}
+                {% blocktrans %}The {{ platform_name }} Team {% endblocktrans %}
+                {% endfilter %}
+            </p>
+        </td>
+    </tr>
+</table>
+{% endblock %}

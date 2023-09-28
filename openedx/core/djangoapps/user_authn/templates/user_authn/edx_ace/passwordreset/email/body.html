@@ -1,0 +1,45 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <h1>
+                {% trans "Password reset" as tmsg %}{{ tmsg | force_escape }}
+            </h1>
+            <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
+                {% blocktrans %}You're receiving this e-mail because you requested a password reset for your user account at {{ platform_name }}.{% endblocktrans %}
+                {% endfilter %}
+                <br />
+            </p>
+
+            {% if failed %}
+                <p style="color: rgba(0,0,0,.75);">
+                    {% filter force_escape %}
+                    {% blocktrans %}However, there is currently no user account associated with your email address: {{ email_address }}.{% endblocktrans %}
+                    {% endfilter %}
+                    <br />
+                </p>
+
+                <p style="color: rgba(0,0,0,.75);">
+                    {% trans "If you did not request this change, you can ignore this email." as tmsg %}{{ tmsg | force_escape }}
+                    <br />
+                </p>
+            {% else %}
+                <p style="color: rgba(0,0,0,.75);">
+                    {% trans "If you didn't request this change, you can disregard this email - we have not yet reset your password." as tmsg %}{{ tmsg | force_escape }}
+                    <br />
+                </p>
+                {# xss-lint: disable=django-trans-missing-escape #}
+                {% trans "Reset my password" as course_cta_text %}
+
+                {# email client support for style sheets is pretty spotty, so we have to inline all of these styles #}
+                {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text reset_url=reset_link %}
+            {% endif %}
+        </td>
+    </tr>
+</table>
+{% endblock %}

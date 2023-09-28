@@ -1,0 +1,8 @@
+<h1><%- gettext('Financial Assistance Application') %></h1>
+<p class="js-success-message success-message" tabindex="-1"><%- interpolate_text(
+        gettext('Thank you for submitting your financial assistance application for {course_name}! You can expect a response in 2-4 business days.'), {course_name: course}
+    ) %>
+</p>
+<div class="cta-wrapper clearfix">
+	<a href="<%- dashboard_url %>" class="btn btn-blue btn-dashboard"><%- gettext('Go to Dashboard') %></a>
+</div>

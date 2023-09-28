@@ -1,0 +1,527 @@
+<%page expression_filter="h"/>
+<script>
+</script>
+<div class="wrapper-mast wrapper">
+  <header class="mast has-subtitle">
+    <h1 class="page-header">
+      <small class="subtitle">Settings</small>
+      <span class="sr">&gt; </span>Schedule &amp; Details
+    </h1>
+  </header>
+</div>
+
+<div class="wrapper-content wrapper">
+  <div class="content">
+    <div class="content-primary">
+      <form id="settings_details" class="settings-details" method="post" action="">
+        <div class="group-settings basic">
+          <header>
+            <h2 class="title-2">Basic Information</h2>
+            <span class="tip">The nuts and bolts of your course</span>
+          </header>
+
+          <ol class="list-input">
+            <li class="field text is-not-editable" id="field-course-organization">
+              <label for="course-organization">Organization</label>
+              <input title="This field is disabled: this information cannot be changed." type="text" class="long" id="course-organization" readonly="">
+            </li>
+
+            <li class="field text is-not-editable" id="field-course-number">
+              <label for="course-number">Course Number</label>
+              <input title="This field is disabled: this information cannot be changed." type="text" class="short" id="course-number" readonly="">
+            </li>
+
+            <li class="field text is-not-editable" id="field-course-name">
+              <label for="course-name">Course Run</label>
+              <input title="This field is disabled: this information cannot be changed." type="text" class="long" id="course-name" readonly="">
+            </li>
+          </ol>
+
+          <div class="note note-promotion note-promotion-courseURL has-actions">
+            <h3 class="title">Course Summary Page <span class="tip">(for student enrollment and access)</span></h3>
+            <div class="copy">
+
+              <p><a class="link-courseURL" rel="external" href="http://localhost:8000/courses/course-v1:AndyA+AA101+1/about" title="This link will open in a new browser window/tab" rel="noopener" target="_blank">http://localhost:8000/courses/course-v1:AndyA+AA101+1/about</a></p>
+            </div>
+
+            <ul class="list-actions">
+              <li class="action-item">
+
+                <a title="Send a note to students via email" href="mailto:someone@domain.com?Subject=Enroll%20in%20AndyA%27s%20Test%20Course&amp;body=The%20course%20%22AndyA%27s%20Test%20Course%22%2C%20provided%20by%20Your%20Platform%20Name%20Here%2C%20is%20open%20for%20enrollment.%20Please%20navigate%20to%20this%20course%20at%20http%3A//localhost%3A8000/courses/course-v1%3AAndyA%2BAA101%2B1/about%20to%20enroll." class="action action-primary">
+                    <span class="icon fa fa-envelope-o icon-inline" aria-hidden="true"></span>Invite your students</a>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+        <hr class="divide">
+
+
+        <div class="group-settings schedule">
+          <header>
+            <h2 class="title-2">Course Schedule</h2>
+            <span class="tip">Dates that control when your course can be viewed</span>
+          </header>
+
+          <ol class="list-input">
+            <li class="field-group field-group-course-start" id="course-start">
+              <div class="field date" id="field-course-start-date">
+                <label for="course-start-date">Course Start Date</label>
+                <input type="text" class="start-date date start datepicker hasDatepicker" id="course-start-date" placeholder="MM/DD/YYYY" autocomplete="off">
+                <span class="tip tip-stacked">First day the course begins</span>
+              </div>
+
+              <div class="field time" id="field-course-start-time">
+                <label for="course-start-time">Course Start Time</label>
+                <input type="text" class="time start timepicker ui-timepicker-input" id="course-start-time" value="" placeholder="HH:MM" autocomplete="off">
+                <span class="tip tip-stacked timezone">(UTC)</span>
+              </div>
+            </li>
+
+            <li class="field-group field-group-course-end" id="course-end">
+              <div class="field date" id="field-course-end-date">
+                <label for="course-end-date">Course End Date</label>
+                <input type="text" class="end-date date end hasDatepicker" id="course-end-date" placeholder="MM/DD/YYYY" autocomplete="off">
+                <span class="tip tip-stacked">Last day your course is active</span>
+              </div>
+
+              <div class="field time" id="field-course-end-time">
+                <label for="course-end-time">Course End Time</label>
+                <input type="text" class="time end ui-timepicker-input" id="course-end-time" value="" placeholder="HH:MM" autocomplete="off">
+                <span class="tip tip-stacked timezone">(UTC)</span>
+              </div>
+            </li>
+          </ol>
+
+
+          <ol class="list-input">
+            <li class="field-group field-group-enrollment-start" id="enrollment-start">
+              <div class="field date" id="field-enrollment-start-date">
+                <label for="course-enrollment-start-date">Enrollment Start Date</label>
+                <input type="text" class="start-date date start hasDatepicker" id="course-enrollment-start-date" placeholder="MM/DD/YYYY" autocomplete="off">
+                <span class="tip tip-stacked">First day students can enroll</span>
+              </div>
+
+              <div class="field time" id="field-enrollment-start-time">
+                <label for="course-enrollment-start-time">Enrollment Start Time</label>
+                <input type="text" class="time start ui-timepicker-input" id="course-enrollment-start-time" value="" placeholder="HH:MM" autocomplete="off">
+                <span class="tip tip-stacked timezone">(UTC)</span>
+              </div>
+            </li>
+
+            <li class="field-group field-group-enrollment-end" id="enrollment-end">
+              <div class="field date " id="field-enrollment-end-date">
+                <label for="course-enrollment-end-date">Enrollment End Date</label>
+                <input type="text" class="end-date date end hasDatepicker" id="course-enrollment-end-date" placeholder="MM/DD/YYYY" autocomplete="off">
+                <span class="tip tip-stacked">
+                  Last day students can enroll.
+                </span>
+              </div>
+
+              <div class="field time " id="field-enrollment-end-time">
+                <label for="course-enrollment-end-time">Enrollment End Time</label>
+                <input type="text" class="time end ui-timepicker-input" id="course-enrollment-end-time" value="" placeholder="HH:MM" autocomplete="off">
+                <span class="tip tip-stacked timezone">(UTC)</span>
+              </div>
+            </li>
+          </ol>
+
+        </div>
+
+        <div class="group-settings course_details">
+          <header>
+            <h2 class="title-2">Course Details</h2>
+            <span class="tip">Provide useful information about your course</span>
+          </header>
+          <ol class="list-input">
+            <li class="field" id="field-course-language">
+              <label for="course-language">Course Language</label>
+              <select id="course-language">
+                <option value="" selected=""> - </option>
+                  <option value="aa">Afar</option>
+                  <option value="ab">Abkhazian</option>
+                  <option value="af">Afrikaans</option>
+                  <option value="ak">Akan</option>
+                  <option value="sq">Albanian</option>
+                  <option value="am">Amharic</option>
+                  <option value="ar">Arabic</option>
+                  <option value="an">Aragonese</option>
+                  <option value="hy">Armenian</option>
+                  <option value="as">Assamese</option>
+                  <option value="av">Avaric</option>
+                  <option value="ae">Avestan</option>
+                  <option value="ay">Aymara</option>
+                  <option value="az">Azerbaijani</option>
+                  <option value="ba">Bashkir</option>
+                  <option value="bm">Bambara</option>
+                  <option value="eu">Basque</option>
+                  <option value="be">Belarusian</option>
+                  <option value="bn">Bengali</option>
+                  <option value="bh">Bihari languages</option>
+                  <option value="bi">Bislama</option>
+                  <option value="bs">Bosnian</option>
+                  <option value="br">Breton</option>
+                  <option value="bg">Bulgarian</option>
+                  <option value="my">Burmese</option>
+                  <option value="ca">Catalan</option>
+                  <option value="ch">Chamorro</option>
+                  <option value="ce">Chechen</option>
+                  <option value="zh">Chinese</option>
+                  <option value="zh_HANS">Simplified Chinese</option>
+                  <option value="zh_HANT">Traditional Chinese</option>
+                  <option value="cu">Church Slavic</option>
+                  <option value="cv">Chuvash</option>
+                  <option value="kw">Cornish</option>
+                  <option value="co">Corsican</option>
+                  <option value="cr">Cree</option>
+                  <option value="cs">Czech</option>
+                  <option value="da">Danish</option>
+                  <option value="dv">Divehi</option>
+                  <option value="nl">Dutch</option>
+                  <option value="dz">Dzongkha</option>
+                  <option value="en">English</option>
+                  <option value="eo">Esperanto</option>
+                  <option value="et">Estonian</option>
+                  <option value="ee">Ewe</option>
+                  <option value="fo">Faroese</option>
+                  <option value="fj">Fijian</option>
+                  <option value="fi">Finnish</option>
+                  <option value="fr">French</option>
+                  <option value="fy">Western Frisian</option>
+                  <option value="ff">Fulah</option>
+                  <option value="ka">Georgian</option>
+                  <option value="de">German</option>
+                  <option value="gd">Gaelic</option>
+                  <option value="ga">Irish</option>
+                  <option value="gl">Galician</option>
+                  <option value="gv">Manx</option>
+                  <option value="el">Greek</option>
+                  <option value="gn">Guarani</option>
+                  <option value="gu">Gujarati</option>
+                  <option value="ht">Haitian</option>
+                  <option value="ha">Hausa</option>
+                  <option value="he">Hebrew</option>
+                  <option value="hz">Herero</option>
+                  <option value="hi">Hindi</option>
+                  <option value="ho">Hiri Motu</option>
+                  <option value="hr">Croatian</option>
+                  <option value="hu">Hungarian</option>
+                  <option value="ig">Igbo</option>
+                  <option value="is">Icelandic</option>
+                  <option value="io">Ido</option>
+                  <option value="ii">Sichuan Yi</option>
+                  <option value="iu">Inuktitut</option>
+                  <option value="ie">Interlingue</option>
+                  <option value="ia">Interlingua</option>
+                  <option value="id">Indonesian</option>
+                  <option value="ik">Inupiaq</option>
+                  <option value="it">Italian</option>
+                  <option value="jv">Javanese</option>
+                  <option value="ja">Japanese</option>
+                  <option value="kl">Kalaallisut</option>
+                  <option value="kn">Kannada</option>
+                  <option value="ks">Kashmiri</option>
+                  <option value="kr">Kanuri</option>
+                  <option value="kk">Kazakh</option>
+                  <option value="km">Central Khmer</option>
+                  <option value="ki">Kikuyu</option>
+                  <option value="rw">Kinyarwanda</option>
+                  <option value="ky">Kirghiz</option>
+                  <option value="kv">Komi</option>
+                  <option value="kg">Kongo</option>
+                  <option value="ko">Korean</option>
+                  <option value="kj">Kuanyama</option>
+                  <option value="ku">Kurdish</option>
+                  <option value="lo">Lao</option>
+                  <option value="la">Latin</option>
+                  <option value="lv">Latvian</option>
+                  <option value="li">Limburgan</option>
+                  <option value="ln">Lingala</option>
+                  <option value="lt">Lithuanian</option>
+                  <option value="lb">Luxembourgish</option>
+                  <option value="lu">Luba-Katanga</option>
+                  <option value="lg">Ganda</option>
+                  <option value="mk">Macedonian</option>
+                  <option value="mh">Marshallese</option>
+                  <option value="ml">Malayalam</option>
+                  <option value="mi">Maori</option>
+                  <option value="mr">Marathi</option>
+                  <option value="ms">Malay</option>
+                  <option value="mg">Malagasy</option>
+                  <option value="mt">Maltese</option>
+                  <option value="mn">Mongolian</option>
+                  <option value="na">Nauru</option>
+                  <option value="nv">Navajo</option>
+                  <option value="nr">Ndebele, South</option>
+                  <option value="nd">Ndebele, North</option>
+                  <option value="ng">Ndonga</option>
+                  <option value="ne">Nepali</option>
+                  <option value="nn">Norwegian Nynorsk</option>
+                  <option value="nb">Bokmål, Norwegian</option>
+                  <option value="no">Norwegian</option>
+                  <option value="ny">Chichewa</option>
+                  <option value="oc">Occitan</option>
+                  <option value="oj">Ojibwa</option>
+                  <option value="or">Oriya</option>
+                  <option value="om">Oromo</option>
+                  <option value="os">Ossetian</option>
+                  <option value="pa">Panjabi</option>
+                  <option value="fa">Persian</option>
+                  <option value="pi">Pali</option>
+                  <option value="pl">Polish</option>
+                  <option value="pt">Portuguese</option>
+                  <option value="ps">Pushto</option>
+                  <option value="qu">Quechua</option>
+                  <option value="rm">Romansh</option>
+                  <option value="ro">Romanian</option>
+                  <option value="rn">Rundi</option>
+                  <option value="ru">Russian</option>
+                  <option value="sg">Sango</option>
+                  <option value="sa">Sanskrit</option>
+                  <option value="si">Sinhala</option>
+                  <option value="sk">Slovak</option>
+                  <option value="sl">Slovenian</option>
+                  <option value="se">Northern Sami</option>
+                  <option value="sm">Samoan</option>
+                  <option value="sn">Shona</option>
+                  <option value="sd">Sindhi</option>
+                  <option value="so">Somali</option>
+                  <option value="st">Sotho, Southern</option>
+                  <option value="es">Spanish</option>
+                  <option value="sc">Sardinian</option>
+                  <option value="sr">Serbian</option>
+                  <option value="ss">Swati</option>
+                  <option value="su">Sundanese</option>
+                  <option value="sw">Swahili</option>
+                  <option value="sv">Swedish</option>
+                  <option value="ty">Tahitian</option>
+                  <option value="ta">Tamil</option>
+                  <option value="tt">Tatar</option>
+                  <option value="te">Telugu</option>
+                  <option value="tg">Tajik</option>
+                  <option value="tl">Tagalog</option>
+                  <option value="th">Thai</option>
+                  <option value="bo">Tibetan</option>
+                  <option value="ti">Tigrinya</option>
+                  <option value="to">Tonga (Tonga Islands)</option>
+                  <option value="tn">Tswana</option>
+                  <option value="ts">Tsonga</option>
+                  <option value="tk">Turkmen</option>
+                  <option value="tr">Turkish</option>
+                  <option value="tw">Twi</option>
+                  <option value="ug">Uighur</option>
+                  <option value="uk">Ukrainian</option>
+                  <option value="ur">Urdu</option>
+                  <option value="uz">Uzbek</option>
+                  <option value="ve">Venda</option>
+                  <option value="vi">Vietnamese</option>
+                  <option value="vo">Volapük</option>
+                  <option value="cy">Welsh</option>
+                  <option value="wa">Walloon</option>
+                  <option value="wo">Wolof</option>
+                  <option value="xh">Xhosa</option>
+                  <option value="yi">Yiddish</option>
+                  <option value="yo">Yoruba</option>
+                  <option value="za">Zhuang</option>
+                  <option value="zu">Zulu</option>
+              </select>
+              <span class="tip tip-stacked">Identify the course language here. This is used to assist users find courses that are taught in a specific language. It is also used to localize the 'From:' field in bulk emails.</span>
+            </li>
+          </ol>
+        </div>
+
+        <hr class="divide">
+            <div class="group-settings marketing">
+              <header>
+                <h2 class="title-2">Introducing Your Course</h2>
+                <span class="tip">Information for prospective students</span>
+              </header>
+              <ol class="list-input">
+
+
+                <li class="field text" id="field-course-short-description">
+                  <label for="course-short-description">Course Short Description</label>
+                  <textarea class="text" id="course-short-description"></textarea>
+                  <span class="tip tip-stacked">Appears on the course catalog page when students roll over the course name. Limit to ~150 characters</span>
+                </li>
+
+                <li class="field text" id="field-course-overview">
+                  <label for="course-overview">Course Overview</label>
+                  <textarea class="tinymce text-editor" id="course-overview" style="display: none;"></textarea><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 8px; left: 34px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" id="course-overview-cm-textarea" style="position: absolute; padding: 0px; width: 1000px; height: 1em; outline: none; font-size: 4px;"></textarea></div><div class="CodeMirror-hscrollbar" style="left: 29px;"><div style="height: 1px; width: 0px;"></div></div><div class="CodeMirror-vscrollbar" style="display: block; bottom: 0px;"><div style="width: 1px; height: 1108px;"></div></div><div class="CodeMirror-scrollbar-filler"></div><div class="CodeMirror-gutter-filler"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 29px; min-height: 1108px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"><div style="width: 50px; height: 50px; overflow-x: scroll;"></div></div><div style="position: relative; z-index: 1; display: none;"></div><div class="CodeMirror-code" style=""><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="position: absolute; left: -29px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 20px;">1</div></div><pre><span class="cm-tag">&lt;section</span> <span class="cm-attribute">class</span>=<span class="cm-string">"about"</span><span class="cm-tag">&gt;</span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="position: absolute; left: -29px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 20px;">2</div></div><pre>  <span class="cm-tag">&lt;h2&gt;</span>About This Course<span class="cm-tag">&lt;/h2&gt;</span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="position: absolute; left: -29px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 20px;">3</div></div><pre>  <span class="cm-tag">&lt;p&gt;</span>Include your long course description here. The long course description should contain 150-400 words.<span class="cm-tag">&lt;/p&gt;</span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="position: absolute; left: -29px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 20px;">4</div></div><pre>&nbsp;</pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="position: absolute; left: -29px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 20px;">5</div></div><pre>  <span class="cm-tag">&lt;p&gt;</span>This is paragraph 2 of the long course description. Add more paragraphs as needed. Make sure to enclose them in paragraph tags.<span class="cm-tag">&lt;/p&gt;</span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="position: absolute; left: -29px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 20px;">6</div></div><pre><span class="cm-tag">&lt;/section&gt;</span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="position: absolute; left: -29px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 20px;">7</div></div><pre>&nbsp;</pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="position: absolute; left: -29px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 20px;">8</div></div><pre><span class="cm-tag">&lt;section</span> <span class="cm-attribute">class</span>=<span class="cm-string">"prerequisites"</span><span class="cm-tag">&gt;</span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="position: absolute; left: -29px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 20px;">9</div></div><pre>  <span class="cm-tag">&lt;h2&gt;</span>Requirements<span class="cm-tag">&lt;/h2&gt;</span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="position: absolute; left: -29px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 20px;">10</div></div><pre>  <span class="cm-tag">&lt;p&gt;</span>Add information about the skills and knowledge students need to take this course.<span class="cm-tag">&lt;/p&gt;</span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="position: absolute; left: -29px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 20px;">11</div></div><pre><span class="cm-tag">&lt;/section&gt;</span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="position: absolute; left: -29px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 20px;">12</div></div><pre>&nbsp;</pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="position: absolute; left: -29px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 20px;">13</div></div><pre><span class="cm-tag">&lt;section</span> <span class="cm-attribute">class</span>=<span class="cm-string">"course-staff"</span><span class="cm-tag">&gt;</span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="position: absolute; left: -29px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 20px;">14</div></div><pre>  <span class="cm-tag">&lt;h2&gt;</span>Course Staff<span class="cm-tag">&lt;/h2&gt;</span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="position: absolute; left: -29px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 20px;">15</div></div><pre>  <span class="cm-tag">&lt;article</span> <span class="cm-attribute">class</span>=<span class="cm-string">"teacher"</span><span class="cm-tag">&gt;</span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="position: absolute; left: -29px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 20px;">16</div></div><pre> &nbsp;  <span class="cm-tag">&lt;div</span> <span class="cm-attribute">class</span>=<span class="cm-string">"teacher-image"</span><span class="cm-tag">&gt;</span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="position: absolute; left: -29px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 20px;">17</div></div><pre> &nbsp; &nbsp;  <span class="cm-tag">&lt;img</span> <span class="cm-attribute">src</span>=<span class="cm-string">"/static/images/placeholder-faculty.png"</span> <span class="cm-attribute">align</span>=<span class="cm-string">"left"</span> <span class="cm-attribute">style</span>=<span class="cm-string">"margin:0 20 px 0"</span> <span class="cm-attribute">alt</span>=<span class="cm-string">"Course Staff Image #1"</span><span class="cm-tag">&gt;</span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="position: absolute; left: -29px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 20px;">18</div></div><pre> &nbsp;  <span class="cm-tag">&lt;/div&gt;</span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="position: absolute; left: -29px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 20px;">19</div></div><pre>&nbsp;</pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="position: absolute; left: -29px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 20px;">20</div></div><pre> &nbsp;  <span class="cm-tag">&lt;h3&gt;</span>Staff Member #1<span class="cm-tag">&lt;/h3&gt;</span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="position: absolute; left: -29px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 20px;">21</div></div><pre> &nbsp;  <span class="cm-tag">&lt;p&gt;</span>Biography of instructor/staff member #1<span class="cm-tag">&lt;/p&gt;</span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="position: absolute; left: -29px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 20px;">22</div></div><pre>  <span class="cm-tag">&lt;/article&gt;</span></pre></div></div><div class="CodeMirror-cursor" style="left: 4px; top: 3px; height: 14px;">&nbsp;</div><div class="CodeMirror-cursor CodeMirror-secondarycursor" style="display: none;">&nbsp;</div></div></div></div></div><div style="position: absolute; height: 30px; width: 1px; top: 1108px;"></div><div class="CodeMirror-gutters" style="height: 1108px;"><div class="CodeMirror-gutter CodeMirror-linenumbers" style="width: 28px;"></div></div></div></div>
+                  <label class="sr" for="course-overview-cm-textarea">
+                    HTML Code Editor
+                  </label>
+                  <span class="tip tip-stacked">Introductions, prerequisites, FAQs that are used on <a class="link-courseURL" rel="external" href="http://localhost:8000/courses/course-v1:AndyA+AA101+1/about" title="This link will open in a new browser window/tab" rel="noopener" target="_blank">your course summary page</a> (formatted in HTML)</span>
+                </li>
+
+                <li class="field image" id="field-course-image">
+                  <label for="course-image-url">Course Card Image</label>
+                  <div class="current current-course-image">
+                    <span class="wrapper-course-image">
+                      <img class="course-image" id="course-image" src="/asset-v1:AndyA+AA101+1+type@asset+block@images_course_image.jpg" alt="Course Card Image" style="display: none;">
+                    </span>
+
+                    <span class="msg msg-help">
+                    You can manage this image along with all of your other <a href="/assets/course-v1:AndyA+AA101+1/">files and uploads</a>
+                    </span>
+
+                  </div>
+
+                  <div class="wrapper-input">
+                    <div class="input">
+                      <input type="text" dir="ltr" class="long new-course-image-url" id="course-image-url" value="" placeholder="Your course image URL" autocomplete="off">
+                      <span class="tip tip-stacked">Please provide a valid path and name to your course image (Note: only JPEG or PNG format supported)</span>
+                    </div>
+                    <button type="button" class="action action-upload-image" id="upload-course-image">Upload Course Card Image</button>
+                  </div>
+                </li>
+
+
+                <li class="field video" id="field-course-introduction-video">
+                  <label for="course-introduction-video">Course Introduction Video</label>
+                  <div class="input input-existing">
+                    <div class="current current-course-introduction-video">
+                      <iframe width="618" height="350" title="Course Introduction Video" src="" frameborder="0" allowfullscreen=""></iframe>
+                    </div>
+                    <div class="actions">
+                      <a href="#" class="remove-item remove-course-introduction-video remove-video-data" style="display: none;"><span class="delete-icon"></span>Delete Current Video</a>
+                    </div>
+                  </div>
+
+                  <div class="input">
+                    <input type="text" dir="ltr" class="long new-course-introduction-video add-video-data" id="course-introduction-video" value="" placeholder="your YouTube video's ID" autocomplete="off">
+                    <span class="tip tip-stacked">Enter your YouTube video's ID (along with any restriction parameters)</span>
+                  </div>
+                </li>
+              </ol>
+            </div>
+
+
+            <hr class="divide">
+
+            <div class="group-settings requirements">
+              <header>
+                <h2 class="title-2">Requirements</h2>
+                <span class="tip">Expectations of the students taking this course</span>
+              </header>
+
+              <ol class="list-input">
+                <li class="field text" id="field-course-effort">
+                  <label for="course-effort">Hours of Effort per Week</label>
+                  <input type="text" class="short time" id="course-effort" placeholder="HH:MM">
+                  <span class="tip tip-inline">Time spent on all course work</span>
+                </li>
+                <li>
+                    <h3 id="heading-entrance-exam">Entrance Exam</h3>
+                    <div class="show-data">
+                        <div class="heading">
+                            <input type="checkbox" id="entrance-exam-enabled">
+                            <label for="entrance-exam-enabled">Require students to pass an exam before beginning the course.</label>
+                        </div>
+                         <div class="div-grade-requirements" hidden="hidden" style="display: none;">
+                          <p><span class="tip tip-inline">
+                            You can now view and author your course entrance exam from the <a href="/course/course-v1:AndyA+AA101+1">Course Outline</a>.</span></p>
+                          <p></p><h3>Grade Requirements</h3><p></p>
+                          <p></p><div><input type="text" id="entrance-exam-minimum-score-pct" aria-describedby="min-score-format"><span id="min-score-format" class="tip tip-inline"> %</span></div><p></p>
+                          <p><span class="tip tip-inline">The score student must meet in order to successfully complete the entrance exam. </span></p>
+                        </div>
+                    </div>
+                </li>
+              </ol>
+            </div>
+
+
+            <hr class="divide">
+
+            <div class="group-settings license">
+              <header>
+                <h2 class="title-2">Course Content License</h2>
+                <span class="tip">Select the default license for course content</span>
+              </header>
+
+              <ol class="list-input">
+                <li class="field text" id="field-course-license">
+                  <div id="course-license-selector"><div class="wrapper-license">
+    <h3 class="label setting-label">
+        License Type
+    </h3>
+    <ul class="license-types">
+
+
+            <li class="license-type" data-license="all-rights-reserved">
+                <button name="license-all-rights-reserved" class="action license-button " aria-pressed="false" data-tooltip="You reserve all rights for your work">
+                    All Rights Reserved
+                </button>
+                <p class="tip">
+
+                        &nbsp;
+
+                </p>
+            </li>
+
+            <li class="license-type" data-license="creative-commons">
+                <button name="license-creative-commons" class="action license-button " aria-pressed="false" data-tooltip="You waive some rights for your work, such that others can use it too">
+                    Creative Commons
+                </button>
+                <p class="tip">
+
+                        <a href="https://creativecommons.org/about" rel="noopener" target="_blank">
+                            Learn more about Creative Commons
+                        </a>
+
+                </p>
+            </li>
+
+    </ul>
+
+
+
+
+
+    <div class="wrapper-license-preview">
+        <h4 class="label setting-label">
+            License Display
+        </h4>
+        <p class="tip">
+            The following message will be displayed at the bottom of the courseware pages within your course:
+        </p>
+        <div class="license-preview">
+
+
+
+
+            © <span class="license-text">All Rights Reserved</span>
+
+
+    </div>
+
+</div>
+</div></div>
+                </li>
+              </ol>
+            </div>
+      </form>
+    </div>
+    <div class="content-supplementary" role="complementary">
+     <div class="bit">
+        <h3 class="title-3">How are these settings used?</h3>
+        <p>Your course's schedule determines when students can enroll in and begin a course.</p>
+
+        <p>Other information from this page appears on the About page for your course. This information includes the course overview, course image, introduction video, and estimated time requirements. Students use About pages to choose new courses to take.</p>
+     </div>
+
+     <div class="bit">
+
+        <h3 class="title-3">Other Course Settings</h3>
+        <nav class="nav-related" aria-label="Other Course Settings">
+          <ul>
+            <li class="nav-item"><a href="/settings/grading/course-v1:AndyA+AA101+1">Grading</a></li>
+            <li class="nav-item"><a href="/course_team/course-v1:AndyA+AA101+1">Course Team</a></li>
+            <li class="nav-item"><a href="/group_configurations/course-v1:AndyA+AA101+1">Group Configurations</a></li>
+            <li class="nav-item"><a href="/settings/advanced/course-v1:AndyA+AA101+1">Advanced Settings</a></li>
+          </ul>
+        </nav>
+     </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,504 @@
+// Open edX: Studio header
+// =======================
+//
+// Note: these styles replicate the Studio styles directly
+// rather than benefiting from any Bootstrap classes. Ideally
+// the header should be reimagined using Bootstrap and then
+// these styles will no longer be necessary.
+
+// studio - elements - global header
+// ====================
+
+.wrapper-header {
+  @extend %ui-depth3;
+
+  position: relative;
+  width: 100%;
+  box-shadow: 0 1px 2px 0 $shadow-l1;
+  margin: 0;
+  padding: 0 $baseline;
+  background: $white;
+
+  header.primary {
+    @include clearfix();
+
+    max-width: $studio-max-width;
+    width: flex-grid(12);
+    margin: 0 auto;
+  }
+
+  // ====================
+
+  // basic layout
+  .wrapper-l,
+  .wrapper-r {
+    background: $white;
+  }
+
+  .wrapper-l {
+    float: left;
+    width: flex-grid(7, 12);
+  }
+
+  .wrapper-r {
+    float: right;
+    width: flex-grid(4, 12);
+    text-align: right;
+  }
+
+  .branding,
+  .info-course,
+  .nav-course,
+  .nav-account,
+  .nav-pitch {
+    display: inline-block;
+    vertical-align: middle;
+    margin-bottom: 0;
+  }
+
+  .user-language-selector {
+    width: 120px;
+    display: inline-block;
+    margin: 0 10px 0 5px;
+    vertical-align: sub;
+
+    .language-selector {
+      width: 120px;
+    }
+  }
+
+  .nav-account {
+    width: auto;
+  }
+
+  // basic layout - nav items
+  nav {
+    > ol > .nav-item {
+      @extend %t-action3;
+      @extend %t-strong;
+
+      display: inline-block;
+      vertical-align: middle;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+
+    .nav-item a {
+      color: color("gray");
+
+      &:hover {
+        color: $link-hover-color;
+      }
+    }
+  }
+
+  // basic layout - dropdowns
+  .nav-dd {
+    .title {
+      padding: $baseline/2 $baseline/2;
+      font-size: $font-size-lg;
+
+      .fa-caret-down {
+        opacity: 0.25;
+      }
+
+      &:hover {
+        .fa-caret-down {
+          opacity: 1;
+        }
+      }
+
+      .nav-sub .nav-item {
+        .icon {
+          display: inline-block;
+          vertical-align: middle;
+          margin-right: ($baseline/4);
+        }
+      }
+    }
+  }
+
+  // ====================
+
+  // specific elements - branding
+  .branding {
+    padding: ($baseline*0.75) 0;
+
+    a {
+      display: block;
+
+      img {
+        max-height: ($baseline*2);
+        display: block;
+      }
+    }
+  }
+
+  // ====================
+
+  // specific elements - course name/info
+  .info-course {
+    margin-right: flex-gutter();
+    border-right: 1px solid $gray-300;
+    padding: ($baseline*0.75) flex-gutter() ($baseline*0.75) 0;
+
+    .course-org,
+    .course-number {
+      font-size: $font-size-sm;
+      line-height: 12px;
+      display: inline-block;
+      vertical-align: middle;
+      max-width: 45%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      opacity: 1;
+      color: theme-color("primary");
+    }
+
+    .course-org {
+      margin-right: $baseline/4;
+    }
+
+    .course-title {
+      @extend %t-action2;
+      @extend %t-strong;
+
+      display: block;
+      width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    // entire link
+    .course-link {
+      display: block;
+      color: theme-color("primary");
+
+      &:hover {
+        color: $link-hover-color;
+      }
+    }
+  }
+
+  // ====================
+
+  // specific elements - course nav
+  .nav-course {
+    padding: ($baseline*0.75) 0;
+  }
+
+  // ====================
+
+  // specific elements - account-based nav
+  .nav-account {
+    position: relative;
+    padding: ($baseline*0.75) 0;
+
+    .nav-sub {
+      text-align: left;
+    }
+
+    .nav-account-help {
+      .wrapper-nav-sub {
+        width: ($baseline*10);
+      }
+    }
+
+    .nav-account-user {
+      .title {
+        max-width: ($baseline*6.5);
+
+        > .label {
+          display: inline-block;
+          max-width: 84%;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+
+    .settings-language-form {
+      margin-top: 4px;
+
+      .language-selector {
+        width: 130px;
+      }
+    }
+  }
+
+  // ====================
+
+  // specific elements - pitch/how it works nav
+  .nav-pitch {
+    position: relative;
+    padding: ($baseline*0.75) 0;
+
+    .nav-sub {
+      text-align: left;
+    }
+  }
+}
+
+// ====================
+
+// CASE: user signed in
+.is-signedin {
+  .wrapper-l {
+    width: flex-grid(8, 12);
+  }
+
+  .wrapper-r {
+    width: flex-grid(4, 12);
+  }
+
+  .branding {
+    margin-right: 2%;
+  }
+
+  .nav-account {
+    top: ($baseline/4);
+  }
+}
+
+// ====================
+
+// CASE: in course {
+.is-signedin.course {
+  .wrapper-header {
+    .wrapper-l {
+      width: flex-grid(9, 12);
+    }
+
+    .wrapper-r {
+      width: flex-grid(3, 12);
+    }
+
+    .branding {
+      margin-right: 2%;
+    }
+
+    .info-course {
+      width: 25%;
+      margin-right: 2%;
+    }
+
+    .nav-course {
+      width: 45%;
+    }
+  }
+}
+
+// ====================
+
+// CASE: user not signed in
+.not-signedin,
+.view-util {
+  .wrapper-header {
+    .wrapper-l {
+      width: flex-grid(2, 12);
+    }
+
+    .wrapper-r {
+      width: flex-grid(10, 12);
+    }
+
+    .branding {
+      width: 100%;
+    }
+
+    .nav-pitch {
+      top: ($baseline/4);
+
+      .nav-item {
+        margin-right: ($baseline/2);
+
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+
+      .action-signup {
+        padding: ($baseline/4) ($baseline/2);
+        text-transform: uppercase;
+      }
+
+      .action-signin {
+        padding: ($baseline/4) ($baseline/2);
+        text-transform: uppercase;
+      }
+    }
+  }
+}
+
+// dropdown
+.nav-dd {
+  .title {
+    .label,
+    .fa-caret-down {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .ui-toggle-dd {
+      margin: 0;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    // dropped down state
+    &.is-selected {
+      .ui-toggle-dd {
+        transform: rotate(-180deg);
+        transform-origin: 50% 50%;
+      }
+    }
+  }
+
+  .nav-item {
+    position: relative;
+
+    &.nav-course-settings {
+      .wrapper-nav-sub {
+        width: ($baseline*9);
+      }
+    }
+  }
+
+  .wrapper-nav-sub {
+    position: absolute;
+    top: ($baseline*2.5);
+    opacity: 0;
+    pointer-events: none;
+    width: ($baseline*8);
+    overflow: hidden;
+    height: 0;
+
+
+    // dropped down state
+    &.is-shown {
+      opacity: 1;
+      pointer-events: auto;
+      overflow: visible;
+      height: auto;
+    }
+  }
+
+  .nav-sub {
+    border-radius: 2px;
+    box-shadow: 0 1px 1px $shadow-l1;
+    position: relative;
+    width: 100%;
+    border: 1px solid $gray-500;
+    padding: ($baseline/2) ($baseline*0.75);
+    background: $white;
+
+    &::after,
+    &::before {
+      bottom: 100%;
+      border: solid transparent;
+      content: " ";
+      height: 0;
+      width: 0;
+      position: absolute;
+      pointer-events: none;
+    }
+
+    // ui triangle/nub
+    &::after {
+      border-color: rgba(255, 255, 255, 0);
+      border-bottom-color: $white;
+      border-width: 10px;
+    }
+
+    &::before {
+      border-color: rgba(178, 178, 178, 0);
+      border-bottom-color: $gray-500;
+      border-width: 11px;
+    }
+
+    .nav-item {
+      @extend %t-action3;
+      @extend %t-regular;
+
+      display: block;
+      margin: 0 0 ($baseline/4) 0;
+      border-bottom: 1px solid $gray-300;
+      padding: 0 0($baseline/4) 0;
+
+      &:last-child {
+        margin-bottom: 0;
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+
+      h3 {
+        font-size: $font-size-lg;
+      }
+
+      a {
+        display: block;
+        color: $body-color;
+        font-size: $font-size-lg;
+        font-weight: 600;
+
+        &:hover,
+        &:active {
+          color: theme-color("primary");
+        }
+      }
+    }
+  }
+
+  // CASE: left-hand side arrow/dd
+  &.ui-left {
+    .wrapper-nav-sub {
+      left: 0;
+    }
+
+    .nav-sub {
+      text-align: left;
+
+      // ui triangle/nub
+      &::after {
+        left: $baseline;
+        margin-left: -10px;
+      }
+
+      &::before {
+        left: $baseline;
+        margin-left: -11px;
+      }
+    }
+  }
+
+  // CASE: right-hand side arrow/dd
+  &.ui-right {
+    > ol {
+      margin-bottom: 0;
+    }
+
+    .wrapper-nav-sub {
+      left: none;
+      right: 0;
+    }
+
+    .nav-sub {
+
+      // ui triangle/nub
+      &::after {
+        right: $baseline;
+        margin-right: -10px;
+      }
+
+      &::before {
+        right: $baseline;
+        margin-right: -11px;
+      }
+    }
+  }
+}

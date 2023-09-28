@@ -1,0 +1,5 @@
+<div class="new-component">
+    <h5><%- gettext("Add New Component") %></h5>
+    <ul class="new-component-type">
+    </ul>
+</div>

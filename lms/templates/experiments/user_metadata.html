@@ -1,0 +1,13 @@
+<%page expression_filter="h"/>
+<%!
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
+from eventtracking import tracker
+from opaque_keys.edx.keys import CourseKey
+import six
+%>
+<%
+user_metadata = context.get('user_metadata')
+%>
+<script type="application/json" id="user-metadata">
+    ${user_metadata | n, dump_js_escaped_json}
+</script>

@@ -1,0 +1,104 @@
+## mako
+<%! from django.utils.translation import gettext as _ %>
+<p>
+${_("Hi {name},").format(name=recipient_name)}
+</p>
+<p>
+${_("Thank you for your purchase of ")} <b> ${course_names} </b>
+</p>
+%if recipient_type == 'user':
+<p>${_("Your payment was successful.")}</p>
+% if marketing_link('FAQ'):
+<p>${_("If you have billing questions, please read the FAQ ({faq_url}) or contact {billing_email}.").format(billing_email=payment_support_email, faq_url=marketing_link('FAQ'))}</p>
+% else:
+<p>${_("If you have billing questions, please contact {billing_email}.").format(billing_email=payment_support_email)}</p>
+% endif
+
+%elif recipient_type == 'company_contact':
+
+<p>${_("{order_placed_by} placed an order and mentioned your name as the Organization contact.").format(order_placed_by=order_placed_by)}</p>
+
+%elif recipient_type == 'email_recipient':
+
+<p>${_("{order_placed_by} placed an order and mentioned your name as the additional receipt recipient.").format(order_placed_by=order_placed_by)}</p>
+
+%endif
+
+<p>${_("The items in your order are:")}</p>
+
+<p>${_("Quantity - Description - Price")}<br>
+%for order_item in order_items:
+    ${order_item.qty} - ${order_item.line_desc} - ${currency_symbol}${order_item.line_cost}</p>
+%endfor
+
+<p>${_("Total billed to credit/debit card: {currency_symbol}{total_cost}").format(total_cost=order.total_cost, currency_symbol=currency_symbol)}</p>
+
+<p>
+% if order.company_name:
+${_('Company Name:')} ${order.company_name}<br>
+%endif
+% if order.customer_reference_number:
+${_('Purchase Order Number:')} ${order.customer_reference_number}<br>
+%endif
+% if order.company_contact_name:
+${_('Company Contact Name:')} ${order.company_contact_name}<br>
+ %endif
+% if order.company_contact_email:
+${_('Company Contact Email:')} ${order.company_contact_email}<br>
+%endif
+% if order.recipient_name:
+## Translators: this will be the name of a person receiving an email
+${_('Recipient Name:')} ${order.recipient_name}<br>
+ %endif
+% if order.recipient_email:
+## Translators: this will be the email address of a person receiving an email
+${_('Recipient Email:')} ${order.recipient_email}<br>
+ %endif
+
+% if has_billing_info:
+${order.bill_to_cardtype} ${_("#:")} ${order.bill_to_ccnum}<br>
+${order.bill_to_first} ${order.bill_to_last}<br>
+${order.bill_to_street1}<br>
+${order.bill_to_street2}<br>
+${order.bill_to_city}, ${order.bill_to_state} ${order.bill_to_postalcode}<br>
+${order.bill_to_country.upper()}
+% endif
+</p>
+<p>${_("Order Number: {order_number}").format(order_number=order.id)}</p>
+
+<p><b>${_("A CSV file of your registration URLs is attached. Please distribute registration URLs to each student planning to enroll using the email template below.")}</b></p>
+
+% if payment_email_signature:
+## Translators: This is followed by the instructor or course team name (so could be singular or plural)
+<p>${_("Warm regards,")}<br>
+${payment_email_signature}
+% else:
+## Translators: The <br> is a line break (empty line), please keep this html in the string after the sign off.
+<p>${_("Warm regards,<br>"
+"The {platform_name} Team").format(platform_name=platform_name)}
+%endif
+</p>
+
+
+———————————————————————————————————————————
+
+
+## Translators: please translate the text inside [[ ]]. This is meant as a template for course teams to use.
+<p>${_("Dear [[Name]]")}</p>
+
+<p>${_("To enroll in {course_names} we have provided a registration URL for you.  Please follow the instructions below to claim your access.").format(course_names=course_names)}</p>
+
+## Translators: please translate the text inside [[ ]]. This is meant as a template for course teams to use.
+<p>${_("Your redeem url is: [[Enter Redeem URL here from the attached CSV]]")}</p>
+
+<p>${_("(1) Register for an account at {site_name}").format(site_name=u"<a href='https://{sn}'>https://{sn}</a>".format(sn=site_name))}<br>
+${_("(2) Once registered, copy the redeem URL and paste it in your web browser.")}<br>
+${_("(3) On the enrollment confirmation page, Click the 'Activate Enrollment Code' button. This will show the enrollment confirmation.")}<br>
+${_("(4) You should be able to click on 'view course' button or see your course on your student dashboard at {url}").format(
+	 url=u"<a href='https://{dashboard_url}'>https://{dashboard_url}</a>".format(dashboard_url=dashboard_url)
+)}<br>
+${_("(5) Course materials will not be available until the course start date.")}</p>
+
+## Translators: please translate the text inside [[ ]]. This is meant as a template for course teams to use. Please also keep the <p> and </p> HTML tags in place.
+${_("<p>Sincerely,</p>"
+"<p>[[Your Signature]]</p>")}

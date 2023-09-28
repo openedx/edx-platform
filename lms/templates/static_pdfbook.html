@@ -1,0 +1,61 @@
+<%page expression_filter="h"/>
+<%! from django.utils.translation import gettext as _ %>
+
+<%inherit file="main.html" />
+<%namespace name='static' file='static_content.html'/>
+<%!
+from openedx.core.djangolib.js_utils import (
+    js_escaped_string
+)
+%>
+<%block name="pagetitle">${_('{course_number} Textbook').format(course_number=course.display_number_with_default)}</%block>
+<%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+<%static:js group='courseware'/>
+</%block>
+
+
+<%include file="/courseware/course_navigation.html" args="active_page='pdftextbook/{0}'.format(book_index)" />
+<script>
+$(function(){
+  $('.chapter').click(function(e){
+    e.preventDefault();
+    var url = $(this).attr('rel');
+    $('#viewer-frame').attr({
+        'src': '${request.path | n, js_escaped_string}?viewer=true&file=' + url + '#zoom=page-fit&disableRange=true',
+        'title': $(this).text()
+        });
+    $('#viewer-frame').focus();
+    Logger.log("textbook.pdf.chapter.navigated", {"name": "textbook.pdf.chapter.navigated", "chapter": url, "chapter_title": $(this).text()});
+    });
+});
+</script>
+
+<main id="main" aria-label="${_('Content')}" tabindex="-1">
+    <div class="book-wrapper">
+    %if 'chapters' in textbook:
+    <section class="book-sidebar" aria-label="${_('Textbook Navigation')}">
+        <ul id="booknav">
+          % for (index, entry) in enumerate(textbook['chapters']):
+          <li>
+            <a class="chapter" rel="${entry['url']}" href="#viewer-frame">${entry.get('title')}</a>
+          </li>
+          % endfor
+        </ul>
+    </section>
+    %endif
+
+    <div class="book">
+    <iframe
+    title="${current_chapter['title']}"
+    id="viewer-frame"
+    src="${request.path}?viewer=true${viewer_params}"
+    width="856"
+    height="1108"
+    frameborder="0"
+    tabindex="-1"
+    seamless></iframe>
+    </div>
+    </div>
+</main>

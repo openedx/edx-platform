@@ -1,0 +1,18 @@
+<header class="xblock-header">
+    <div class="xblock-header-primary">
+        <div class="header-details">
+            <span class="xblock-display-name">Updated Test Container</span>
+        </div>
+        <div class="header-actions">
+            <ul class="actions-list">
+            </ul>
+        </div>
+    </div>
+</header>
+<article class="xblock-render">
+    <div class="xblock" data-locator="locator-container"
+         data-init="MockXBlock" data-runtime-class="StudioRuntime" data-runtime-version="1">
+        <ol class="reorderable-container">
+        </ol>
+    </div>
+</article>

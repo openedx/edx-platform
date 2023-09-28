@@ -1,0 +1,127 @@
+// Shared styling between courses and programs dashboard
+.course-entitlement-selection-container {
+  width: 100%;
+  position: relative;
+  flex-grow: 1;
+
+  .action-header {
+    padding-bottom: $baseline/4;
+    font-weight: $font-weight-bold;
+    color: theme-color("dark");
+  }
+
+  .action-controls {
+    display: flex;
+
+    .session-select {
+      background-color: theme-color("inverse");
+      height: $baseline*1.5;
+      flex-grow: 5;
+      margin-bottom: $baseline*0.4;
+      max-width: calc(100% - 200px);
+    }
+
+    .enroll-btn-initial {
+      @include margin-left($baseline);
+
+      height: $baseline*1.5;
+      flex-grow: 1;
+      letter-spacing: 0;
+      white-space: nowrap;
+      background: theme-color("inverse");
+      border-color: theme-color("primary");
+      color: theme-color("primary");
+      text-shadow: none;
+      font-size: $font-size-base;
+      padding: 0 $baseline/4;
+      box-shadow: none;
+      border-radius: $border-radius-sm;
+      transition: all 0.4s ease-out;
+
+      &:hover {
+        background: theme-color("primary");
+        border-color: theme-color("primary");
+        color: theme-color("inverse");
+      }
+
+      &.disabled {
+        pointer-events: none;
+        opacity: 0.5;
+      }
+    }
+
+    @include media-breakpoint-down(xs) {
+      flex-direction: column;
+
+      .session-select {
+        max-width: 100%;
+      }
+
+      .enroll-btn-initial {
+        margin: $baseline/4 0;
+      }
+    }
+  }
+
+  .popover {
+    .popover-title {
+      margin-bottom: $baseline/2;
+    }
+
+    .action-items {
+      display: flex;
+      justify-content: space-between;
+      margin-top: $baseline/2;
+
+      .final-confirmation-btn {
+        box-shadow: none;
+        border: 1px solid theme-color("dark");
+        background: none;
+        color: theme-color("dark");
+        text-shadow: none;
+        letter-spacing: 0;
+        flex-grow: 1;
+        margin: 0 $baseline/4;
+        padding: $baseline/10 $baseline;
+        font-size: $font-size-base;
+
+        &:hover {
+          background: theme-color("primary");
+          color: theme-color("inverse");
+        }
+      }
+    }
+  }
+}
+
+// Styling overrides specific to the programs dashboard
+.program-course-card {
+  .course-text {
+    .fa-close {
+      color: theme-color("error");
+    }
+
+    .enroll-error {
+      @include margin-left($baseline/4);
+
+      font-size: $font-size-sm;
+    }
+
+    .change-session {
+      @include margin(0, 0, 0, $baseline/4);
+
+      padding: 0;
+      font-size: $font-size-sm;
+      letter-spacing: normal;
+    }
+  }
+
+  .course-entitlement-selection-container {
+    padding-top: $baseline/2;
+
+    .action-header,
+    .action-controls .session-select {
+      font-size: $font-size-sm;
+    }
+  }
+}

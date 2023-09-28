@@ -1,0 +1,5 @@
+<%page expression_filter="h"/>
+
+% if settings.OPTIMIZELY_PROJECT_ID and not disable_optimizely and not is_from_mobile_app:
+<script src=${ 'https://www.edx.org/optimizelyjs/{}.js'.format(settings.OPTIMIZELY_PROJECT_ID) }></script>
+% endif

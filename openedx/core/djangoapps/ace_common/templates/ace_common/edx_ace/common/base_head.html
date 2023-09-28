@@ -1,0 +1,54 @@
+{% load i18n %}
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+{% get_current_language as LANGUAGE_CODE %}
+<title lang="{{ LANGUAGE_CODE|default:"en" }}">
+  {% block title %}
+  {% filter force_escape %}{% blocktrans %}{{ platform_name }} Email{% endblocktrans %}{% endfilter %}
+  {% endblock %}
+</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<style type="text/css">
+    @media only screen and (min-device-width: 601px) {
+      .content {
+        width: 600px !important;
+      }
+    }
+
+    @-ms-viewport{
+      width: device-width;
+    }
+
+    /* Column Drop Layout Pattern CSS */
+    @media only screen and (max-width: 450px) {
+      td[class="col"] {
+        display: block;
+        width: 100%;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        float: left;
+        text-align: left !important;
+        padding-bottom: 20px;
+      }
+    }
+    * {margin-top:0px;margin-bottom:0px;padding:0px;border:none;outline:none;list-style:none;-webkit-text-size-adjust: none;}
+    body {margin:0 !important;padding:0 !important;width: 100% !important;-webkit-text-size-adjust: 100% !important;-ms-text-size-adjust: 100% !important;-webkit-font-smoothing: antialiased !important;}
+    img {border:0 !important;display: block !important;outline: none !important;}
+    table {border-collapse: collapse;mso-table-lspace:0px;mso-table-rspace: 0px;}
+    td {border-collapse:collapse;mso-line-height-rule:exactly;}
+
+    @media only screen and (max-width:480px){
+      .width_100percent {width: 100% !important;}
+      .min_width {min-width: 320px !important;}
+      .mobile_img {width: 100% !important; height: auto !important;}
+      .background_none {background: none !important;}
+      .display_block {display: block !important;}
+
+      .height_0 {height: 0 !important;}
+      .padding_none {padding-left: 0 !important; padding-right: 0 !important;}
+      .paddingtop_10 {padding-top: 10px !important;}
+    }
+</style>
+{% block additional_styles %}{% endblock %}

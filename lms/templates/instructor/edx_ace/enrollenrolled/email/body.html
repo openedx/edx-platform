@@ -1,0 +1,40 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <h1>
+                {% autoescape off %}
+                {# xss-lint: disable=django-blocktrans-missing-escape-filter #}
+                {% blocktrans %}
+                    You have been enrolled in {{ course_name }}
+                {% endblocktrans %}
+                {% endautoescape %}
+            </h1>
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% autoescape off %}
+                {# xss-lint: disable=django-blocktrans-missing-escape-filter #}
+                {% blocktrans %}You have been enrolled in {{ course_name }} at {{ site_name }} by a member of the course staff. This course will now appear on your {{ site_name }} dashboard.{% endblocktrans %}
+                {% endautoescape %}
+                <br />
+            </p>
+
+            {% filter force_escape %}
+                {% blocktrans asvar course_cta_text %}Access the Course Materials Now{% endblocktrans %}
+            {% endfilter %}
+            {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=course_url %}
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
+                {% blocktrans %}This email was automatically sent from {{ site_name }} to {{ full_name }}{% endblocktrans %}
+                {% endfilter %}
+                <br />
+            </p>
+        </td>
+    </tr>
+</table>
+{% endblock %}

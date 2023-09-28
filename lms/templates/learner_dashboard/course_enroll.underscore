@@ -1,0 +1,58 @@
+<% if (!(is_enrolled && collectionCourseStatus === 'completed')) { %>
+    <% if (is_enrolled && (typeof expired === 'undefined' || expired === false)) { %>
+        <a href="<%- course_url %>" class="view-course-button btn-brand btn cta-primary">
+            <% if (is_course_ended) { %>
+                <%- gettext('View Archived Course') %>
+            <% } else { %>
+                <%- gettext('View Course') %>
+            <% } %>
+        </a>
+    <% } else if (!user_entitlement) { %>
+        <% if (enrollable_course_runs.length > 0) { %>
+            <% if (enrollable_course_runs.length > 1) { %>
+                <div class="run-select-container">
+                    <label class="select-choice" for="select-<%- course_key %>-run">
+                        <%- gettext('Select a session:') %>
+                    </label>
+                    <select id="select-<%- course_key %>-run" class="run-select field-input input-select" autocomplete="off">
+                        <% _.each (enrollable_course_runs, function(courseRun) { %>
+                            <option
+                                value="<%- courseRun.key %>"
+                                <% if (key === courseRun.key) { %>
+                                    selected="selected"
+                                <% }%>
+                            >
+                                <%- courseRun.dateString %>
+                            </option>
+                        <% }); %>
+                    </select>
+                </div>
+            <% } %>
+            <div class="enroll-button">
+                <% if (typeof is_mobile_only != 'undefined' && is_mobile_only === true) { %>
+                <a href="edxapp://enroll?course_id=<%- course_run_key %>&email_opt_in=true" class="enroll-course-button btn-brand btn cta-primary">
+                    <%- gettext('Enroll Now') %>
+                </a>
+                <% } else { %>
+                <button type="button" class="btn-brand btn cta-primary">
+                    <%- gettext('Enroll Now') %>
+                </button>
+                <% } %>
+            </div>
+        <% } else if (upcoming_course_runs.length > 0) {%>
+            <div class="no-action-message">
+                <%- gettext('Coming Soon') %>
+            </div>
+            <div class="enrollment-opens">
+                <%- gettext('Enrollment Opens on') %>
+                <span class="enrollment-open-date">
+                    <%- upcoming_course_runs[0].enrollment_open_date %>
+                </span>
+            </div>
+        <% } else { %>
+            <div class="no-action-message">
+                <%- gettext('Not Currently Available') %>
+            </div>
+        <% } %>
+    <% } %>
+<% } %>

@@ -1,0 +1,8 @@
+<%page args="section_data" expression_filter="h"/>
+<%! from openedx.core.djangolib.markup import HTML %>
+
+<%include file="/courseware/xqa_interface.html/"/>
+
+<section class="open-response-assessment">
+    ${HTML(section_data['fragment'].body_html())}
+</section>

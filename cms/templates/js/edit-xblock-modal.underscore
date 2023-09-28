@@ -1,0 +1,1 @@
+<div class="xblock-editor" data-locator="<%- xblockInfo.get('id') %>" data-course-key="<%- xblockInfo.get('courseKey') %>"></div>

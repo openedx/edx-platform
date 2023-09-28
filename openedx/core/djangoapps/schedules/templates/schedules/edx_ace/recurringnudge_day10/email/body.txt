@@ -1,0 +1,18 @@
+{% autoescape off %}
+{% load i18n %}
+{% load ace %}
+{% if course_ids|length > 1 %}
+    {% blocktrans trimmed %}
+        Many {{ platform_name }} learners are completing more problems every week, and
+        participating in the discussion forums. What do you want to do to keep learning?
+    {% endblocktrans %}
+    {% trans "Keep learning" %} <{% with_link_tracking dashboard_url %}>
+{% else %}
+    {% blocktrans trimmed %}
+        Many {{ platform_name }} learners in {{course_name}} are completing more problems every week, and
+        participating in the discussion forums. What do you want to do to keep learning?
+    {% endblocktrans %}
+    {% trans "Keep learning" %} <{% with_link_tracking course_url %}>
+{% endif %}
+{% include "ace_common/edx_ace/common/upsell_cta.txt"%}
+{% endautoescape %}

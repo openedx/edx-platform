@@ -1,0 +1,15 @@
+<% if (title) { %>
+<h2 class="progress-heading"><%- title %></h2>
+<% } %>
+<div class="progress-circle-wrapper">
+    <svg class="progress-circle" viewBox="0 0 44 44" aria-hidden="true">
+        <circle class="js-circle bg" r="<%- radius %>" cx="<%- x %>" cy="<%- y %>" stroke-width="<%- strokeWidth %>" fill="none"></circle>
+        <%= circleSegments %> <% // xss-lint: disable=underscore-not-escaped %>
+    </svg>
+    <div class="progress-label">
+        <div class="numbers">
+            <span class="complete"><%- progress.completed %></span>/<span class="total"><%- totalCourses %></span>
+        </div>
+        <div class="label"><% if (label) { %><%- label %><% } %></div>
+    </div>
+</div>

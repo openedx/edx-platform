@@ -1,0 +1,24 @@
+// Footer for OpenEdX (right-to-left)
+// ==================================
+
+// libs and resets *do not edit*
+@import 'bourbon/bourbon'; // lib - bourbon
+@import 'vendor/bi-app/bi-app-rtl'; // set the layout for right to left languages
+
+// Base build
+@import 'base/build';
+
+footer#footer-openedx {
+  @import 'base/reset';
+  @import 'base/extends';
+  @import 'base/base';
+}
+
+// base - elements
+@import 'elements/typography';
+
+// shared - platform
+@import 'shared/footer';
+
+// Extra theme-specific rules
+@import 'lms/theme/extras';

@@ -1,0 +1,22 @@
+{% load i18n %}
+{% load static %}
+<div class="content-paywall" role="group" aria-label="{% trans 'Content available only to verified track learners' as tmsg%}{{tmsg|force_escape}}">
+    <div>
+        <h3>
+            <span class="fa fa-lock" aria-hidden="true"></span>
+            {% trans "Verified Track Access" as tmsg%}{{tmsg|force_escape}}
+        </h3>
+        <span class="certSPAN_1">
+            {% trans "Graded assessments are available to Verified Track learners." as tmsg %}{{tmsg|force_escape}}
+        </span>
+        {% if not mobile_app and ecommerce_checkout_link %}
+        <span class="certDIV_1" style="">
+            <a id="accessDeniedUpsell" href="{{ecommerce_checkout_link}}" class="certA_1">
+                {% trans "Upgrade to unlock" as tmsg %}{{tmsg|force_escape}} ({{min_price}})
+            </a>
+        </span>
+        {% endif %}
+    </div>
+    <img src="{% static 'images/edx-verified-mini-cert.png' %}"
+         alt="{% trans 'Example of a verified certificate' as tmsg %}{{ tmsg | force_escape }}">
+</div>

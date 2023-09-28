@@ -1,0 +1,68 @@
+<%page expression_filter="h"/>
+<%namespace name='static' file='../static_content.html'/>
+<%!
+from openedx.core.djangolib.markup import HTML, Text
+from django.utils.translation import gettext as _
+from django.urls import reverse
+%>
+
+<section id="change_language" class="modal modal-settings-language" aria-hidden="true">
+  <div class="inner-wrapper" role="dialog" aria-labelledby="change_language_title">
+    <button class="close-modal">
+      <span class="icon fa fa-remove" aria-hidden="true"></span>
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_('Close')}
+      </span>
+    </button>
+
+    <header>
+      <h2>
+        <span id="change_language_title">${_("Change Preferred Language")}</span>
+        <span class="sr">,
+          ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
+          ${_("window open")}
+        </span>
+      </h2>
+      <hr/>
+    </header>
+    <div id="change_language_body">
+      <form action="/i18n/setlang/" method="post" class="settings-language-form" id="settings-form">
+      <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
+        <ol class="list-input">
+          <li class="field text settings-language-select" id="settings-language-select">
+            <label class="label sr" for="settings-language-value">${_("Please choose your preferred language")}</label>
+            <select class="input select" id="settings-language-value" name="language">
+            % for abbrv in language_options:
+              % for language in settings.LANGUAGES:
+                % if abbrv == language[0]:
+                  % if abbrv == current_language_code:
+                    <option value="${language[0]}" selected="selected">${language[1]}</option>
+                  % else:
+                    <option value="${language[0]}">${language[1]}</option>
+                  % endif
+                % endif
+              % endfor
+            % endfor
+            </select>
+          </li>
+        </ol>
+
+        <div class="submit">
+          <input type="submit" id="submit-lang" value="${_('Save Language Settings')}" />
+        </div>
+      </form>
+
+      <ul class="list list-actions actions-supplemental">
+        <li class="list-actions-item">
+        ${Text(_("Don't see your preferred language? {link_start}Volunteer to become a translator!{link_end}")).format(
+            link_start=HTML('<a class=" action action-volunteer" rel="external" target="_blank"\
+                              href={translators_guide}>').format(translators_guide=settings.TRANSLATORS_GUIDE),
+            link_end=HTML("</a>")
+            )
+        }
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>

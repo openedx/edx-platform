@@ -1,0 +1,42 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%namespace name='static' file='../static_content.html'/>
+<%!
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
+%>
+
+% if mobile_only:
+<div class="program-list-wrapper grid-container py-0">
+    <div class="program-list-container col-12 col-md-9">
+        <div class="program-cards-container col pt-4"></div>
+    </div>
+    <div class="sidebar col-12 col-md-3"></div>
+</div>
+% else:
+<div class="program-list-wrapper grid-container">
+    <div class="program-list-container col-12 col-md-9">
+        <div class="js-program-list-header"></div>
+        <div class="program-cards-container col"></div>
+    </div>
+    <div class="sidebar col-12 col-md-3"></div>
+</div>
+% endif
+
+<%block name="js_extra">
+<%static:webpack entry="ProgramListFactory">
+ProgramListFactory({
+    marketingUrl: '${marketing_url | n, js_escaped_string}',
+    programsData: ${programs | n, dump_js_escaped_json},
+    programsSubscriptionData: ${programs_subscription_data | n, dump_js_escaped_json},
+    subscriptionUpsellData: ${subscription_upsell_data | n, dump_js_escaped_json},
+    userProgress: ${progress | n, dump_js_escaped_json},
+    userPreferences: ${user_preferences | n, dump_js_escaped_json},
+    isUserB2CSubscriptionsEnabled: ${is_user_b2c_subscriptions_enabled | n, dump_js_escaped_json},
+    mobileOnly: ${mobile_only | n, dump_js_escaped_json}
+});
+</%static:webpack>
+</%block>

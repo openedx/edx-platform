@@ -1,0 +1,113 @@
+$bookmark-icon: "\f097"; // .fa-bookmark-o
+$bookmarked-icon: "\f02e"; // .fa-bookmark
+
+// Rules for Bookmarks Results Header
+.bookmarks-results-header {
+  letter-spacing: 0;
+  text-transform: none;
+  margin-bottom: ($baseline/2);
+}
+
+// Rules for Bookmarks Results
+.course-bookmarks {
+  flex-grow: 1;
+
+  .bookmarks-results-list {
+    padding-top: ($baseline/2);
+
+    .bookmarks-results-list-item {
+      @include padding(0, $baseline, ($baseline/4), $baseline);
+
+      display: block;
+      border: 1px solid $border-color;
+      margin-bottom: $baseline;
+
+      &:hover {
+        border-color: theme-color("primary");
+
+        .list-item-breadcrumbtrail {
+          color: theme-color("primary");
+        }
+      }
+
+      .fa-caret-right {
+        transform: rotateY(0deg) #{"/*rtl: rotateY(180deg)*/"};
+        font-size: inherit;
+      }
+    }
+
+    .results-list-item-view {
+      @include float(right);
+
+      margin-top: $baseline;
+    }
+
+    .list-item-date {
+      margin-top: ($baseline/4);
+      color: theme-color("dark");
+      font-size: font-size(small);
+    }
+
+    .bookmarks-results-list-item::before {
+      content: $bookmarked-icon;
+      position: relative;
+      top: -7px;
+      font-family: FontAwesome;
+      color: theme-color("primary");
+    }
+
+    .list-item-content {
+      overflow: hidden;
+      position: relative;
+    }
+
+    .list-item-left-section {
+      display: inline-block;
+      vertical-align: middle;
+      width: 90%;
+    }
+
+    .list-item-right-section {
+      @include right(0);
+
+      bottom: $baseline*-0.75;
+      position: absolute;
+      vertical-align: middle;
+
+      .fa-arrow-right {
+        transform: rotateY(0deg) #{"/*rtl: rotateY(180deg)*/"};
+        font-size: inherit;
+      }
+    }
+  }
+
+  // Override the search count styling
+  .search-results .search-count {
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+  }
+
+  // Override the pagination behavior
+  .pagination.pagination-full {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+// Rules for empty bookmarks list
+.bookmarks-empty {
+  margin-top: $baseline;
+  border: 1px solid $border-color;
+  padding: $baseline;
+  background-color: $white;
+}
+
+.bookmarks-empty-header {
+  @extend %t-title5;
+
+  margin-bottom: ($baseline/2);
+}
+
+.bookmarks-empty-detail {
+  @extend %t-copy-sub1;
+}

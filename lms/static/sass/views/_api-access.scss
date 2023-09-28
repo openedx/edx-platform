@@ -1,0 +1,160 @@
+#api-access-wrapper {
+  h1 {
+    @extend %t-title4;
+
+    margin-bottom: 0;
+    padding: $baseline;
+
+    @include text-align(left);
+  }
+
+  h2 {
+    @extend %t-title5;
+
+    margin: $baseline;
+
+    @include text-align(left);
+  }
+
+  p {
+    @extend %t-copy-sub1;
+
+    margin: $baseline;
+  }
+
+  .request-status {
+    margin: 0 $baseline;
+    padding: $baseline;
+    box-shadow: 0 1px 2px 1px $shadow-l1;
+
+    &.request-pending {
+      border-top: 2px solid $orange;
+    }
+
+    &.request-denied {
+      border-top: 2px solid $red;
+    }
+
+    &.request-approved {
+      border-top: 2px solid $green;
+    }
+  }
+
+  #api-access-status {
+    @extend %t-copy-base;
+  }
+
+  .catalog-body {
+    display: inline-block;
+    width: 100%;
+  }
+
+  .api-form-container {
+    @include float(left);
+
+    width: 50%;
+
+    .api-form {
+      padding: 0 $baseline $baseline $baseline;
+
+      p {
+        margin: 1.5*$baseline 0;
+
+        .helptext {
+          @extend %t-copy-sub1;
+
+          display: block;
+        }
+      }
+
+      label {
+        @extend %t-copy-base;
+
+        display: block;
+        font-style: normal;
+      }
+
+      input[type=checkbox] + label {
+        display: inline-block;
+      }
+
+      input,
+      textarea {
+        @extend %t-copy-base;
+
+        font-family: 'Open Sans';
+        font-style: normal;
+        width: 300px;
+
+        &[type=checkbox] {
+          display: inline-block;
+          width: initial;
+
+          @include margin-right(0.5*$baseline);
+        }
+
+        &[type=submit] {
+          @extend %t-copy-base;
+
+          border-radius: 3px;
+          border: none;
+          background-color: $blue;
+          box-shadow: none;
+          background-image: none;
+          text-shadow: none;
+          text-transform: none;
+        }
+      }
+
+      .errorlist {
+        padding: 0;
+        list-style-type: none;
+
+        li {
+          @extend %t-copy-base;
+
+          margin: 0;
+          color: $red;
+        }
+      }
+
+      #api-access-submit,
+      .preview-query {
+        @extend %t-copy-base;
+
+        border-radius: 3px;
+        border: none;
+        background-color: $blue;
+        box-shadow: none;
+        background-image: none;
+        text-shadow: none;
+        text-transform: none;
+      }
+    }
+  }
+
+  .preview-results {
+    @include float(right);
+
+    width: 50%;
+  }
+
+  .preview-query {
+    display: block;
+    margin-top: $baseline/2;
+  }
+
+  .application-info {
+    margin: $baseline 0;
+
+    p {
+      @extend %t-copy-base;
+
+      margin: $baseline/2 0;
+
+      .application-label {
+        @extend %t-weight4;
+      }
+    }
+  }
+}

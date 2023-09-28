@@ -1,0 +1,3 @@
+<li class="action-item" data-mode="<%- mode %>">
+    <a href="#" class="<%- mode %>-button"><%- displayName %></a>
+</li>

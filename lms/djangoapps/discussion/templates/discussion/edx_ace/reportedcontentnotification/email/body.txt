@@ -1,0 +1,23 @@
+{% load i18n %}
+
+{% block content %}
+{% blocktrans trimmed %}
+    {{ course_name }}: Reported content awaits review
+{% endblocktrans %}
+
+
+<div style="border-left: 1px solid rgba(0,0,0,0.25);
+                    padding: 1px 1px 1px 15px;
+                    margin: 20px 20px 30px 30px;
+                    color: rgba(0,0,0,.75);">
+    <h3> <b> You are receiving this email because the following {{ content_type }} was reported for review </b> </h3>
+    <h3> <b> Post Title: {{ title }} </b> </h3>
+    {{ content_body }}
+</div>
+
+<a href="{{ post_link }}"> {% trans "Go to Discussion" %} </a>
+{% endblock %}
+
+{% block google_analytics_pixel %}
+<img src="{{ ga_tracking_pixel_url }}" alt="" role="presentation" aria-hidden="true" style="display: block;"/>
+{% endblock %}

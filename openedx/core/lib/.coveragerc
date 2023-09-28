@@ -1,0 +1,15 @@
+# .coveragerc for Open edX core lib
+[run]
+data_file = reports/openedx/core/lib/.coverage
+source = openedx/core/lib
+parallel = true
+
+[report]
+ignore_errors = True
+
+[html]
+title = Open edx Core Lib Python Test Coverage Report
+directory = reports/openedx/core/lib/cover
+
+[xml]
+output = reports/openedx/core/lib/coverage.xml

@@ -1,0 +1,350 @@
+// ------------------------------
+// // Open edX Certificates: Print Specific Styling
+
+// About: styling specific for print layouts.
+
+// #UTILITIES
+// #BASE
+// #LAYOUT
+// #ELEMENTS
+// #CASES
+
+// ------------------------------
+// #UTILITIES
+// ------------------------------
+
+// page set up - only available to modern browsers now
+@page {
+  size: landscape;
+}
+
+@media print {
+
+  // helpers
+  %print-no-background {
+    background: none !important;
+  }
+
+  %print-hide {
+    display: none !important;
+  }
+
+  %print-black-on-white {
+    background: $white !important;
+    color: $black !important;
+  }
+
+  %print-layout-wrapper {
+    padding: 0 !important;
+  }
+
+  %print-rendering-section {
+    margin-bottom: map-get($spacing-vertical, small);
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+
+    &:last-child {
+      border: none;
+      padding-bottom: 0;
+    }
+  }
+}
+
+// ------------------------------
+// #BASE
+// ------------------------------
+@media print {
+
+  // prevent images from bleeding over the edge of the printed page
+  img {
+    max-width: 100% !important;
+  }
+
+  // prevent large elements from being split across multiple pages
+  ul,
+  img {
+    page-break-inside: avoid;
+  }
+
+  // reset body/view properties
+  html,
+  body {
+    @extend %print-black-on-white;
+  }
+
+  body {
+    height: auto;
+    margin: map-get($spacing-vertical, mid-large) map-get($spacing-vertical, mid-small) 0 map-get($spacing-vertical, mid-small) !important;
+    padding: 0;
+  }
+
+  .wrapper-view {
+    margin-bottom: 0 !important;
+  }
+}
+
+// force background images and colors
+@media print and (color) {
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact; /* stylelint-disable-line */
+  }
+}
+
+// ------------------------------
+// #LAYOUT
+// ------------------------------
+@media print {
+
+  // hide elements not needed for print rendering
+  .wrapper-banner-user,
+  .wrapper-about,
+  .wrapper-footer,
+  .wrapper-header,
+  .wrapper-introduction,
+  .accomplishment-metadata-title,
+  .accomplishment-metadata .accomplishment-recipient,
+  .deco-corner,
+  .accomplishment-date .label {
+    @extend %print-hide;
+  }
+
+  // remove layout wrappers' padding
+  .wrapper-introduction,
+  .wrapper-accomplishment-rendering,
+  .wrapper-accomplishment-metadata {
+    @extend %print-layout-wrapper;
+  }
+}
+
+// ------------------------------
+// #ELEMENTS
+// ------------------------------
+@media print {
+
+  // headings
+  .hd-1 {
+    font-size: rem(21);
+    line-height: 1.5;
+  }
+
+  .hd-2 {
+    font-size: rem(18);
+    line-height: 1.6;
+  }
+
+  .hd-3 {
+    font-size: rem(18);
+    line-height: 1.6;
+  }
+
+  .hd-4 {
+    font-size: rem(16);
+    line-height: 1.5;
+  }
+
+  .hd-5 {
+    font-size: rem(14);
+    line-height: 1.6;
+  }
+
+  .hd-6 {
+    font-size: rem(12);
+    line-height: 1.5;
+  }
+
+  .hd-7 {
+    font-size: rem(11);
+    line-height: 1.5;
+  }
+
+  // copy
+  .copy.copy-lead {
+    font-size: rem(16);
+    line-height: 1.5;
+  }
+
+  .copy.copy-large {
+    font-size: rem(16);
+    line-height: 1.5;
+  }
+
+  .copy.copy-base {
+    font-size: rem(14);
+    line-height: 1.6;
+  }
+
+  .copy.copy-meta {
+    font-size: rem(12);
+    line-height: 1.6;
+  }
+
+  .copy.copy-micro {
+    font-size: rem(11);
+    line-height: 1.5;
+  }
+
+  // accomplishment
+  .accomplishment-main {
+    @extend %print-no-background;
+  }
+
+  .accomplishment-rendering {
+    top: 0 !important;
+    border: rem(1) solid $gray-back;
+    border-top: rem(2) solid $cert-base-color;
+    box-shadow: none;
+    padding: map-get($spacing-vertical, small) map-get($spacing-horizontal, mid-large);
+
+    @include rtl {
+      display: block !important;
+    }
+
+    .accomplishment-type {
+      margin-top: -(map-get($spacing-vertical, mid-large));
+    }
+
+    .accomplishment-type-symbol {
+      @include size(rem(75));
+
+      border: none !important;
+    }
+
+    .wrapper-statement-and-signatories {
+      border-bottom: rem(2) solid $gray-x-back;
+    }
+
+    .accomplishment-statement {
+      @extend %print-rendering-section;
+
+      @include make-col(8);
+
+      margin: 0 auto;
+    }
+
+    .accomplishment-summary,
+    .accomplishment-statement-detail {
+      margin-bottom: map-get($spacing-vertical, mid-small);
+    }
+
+    .wrapper-orgs::after {
+      display: none;
+    }
+
+    .accomplishment-orgs {
+      margin-bottom: 0 !important;
+      border-bottom: none !important;
+      padding-bottom: 0 !important;
+
+      .wrapper-organization {
+        height: rem(48);
+        margin-top: map-get($spacing-vertical, mid-small) !important;
+        margin-bottom: map-get($spacing-vertical, mid-small) !important;
+      }
+
+      .organization-logo {
+        max-width: 100%;
+        max-height: 80%;
+      }
+    }
+
+    .accomplishment-signatories {
+      @extend %print-rendering-section;
+
+      @include make-col(12);
+      @include margin-right(0);
+
+      .signatory-credentials {
+        font-size: 8pt;
+        line-height: 1.3;
+      }
+
+      .signatory-signature {
+        height: map-get($spacing-vertical, small);
+        max-width: 100%;
+        margin-top: 0;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+      }
+
+      .signatory-name {
+        font-size: rem(12);
+      }
+
+      .signatory-credentials {
+        margin-bottom: 0 !important;
+      }
+
+      // CASE: > 4 signatures
+      &.has-many {
+        .signatory {
+          @include make-col(2);
+        }
+      }
+    }
+  }
+
+  .layout-accomplishment .wrapper-accomplishment-metadata {
+    margin-bottom: 0;
+  }
+
+  .accomplishment-metadata {
+    margin-bottom: 0;
+
+    .wrapper-metadata {
+      @include clearfix();
+
+      margin-bottom: 0;
+
+      .metadata {
+        margin-bottom: 0;
+        border-bottom: none !important;
+        padding-bottom: 0 !important;
+
+        .label,
+        .value {
+          display: inline-block;
+          vertical-align: baseline;
+          font-size: rem(12);
+          line-height: 1.6;
+        }
+
+        .label {
+          @include margin-right(map-get($spacing-horizontal, small));
+        }
+      }
+    }
+
+    .accomplishment-id {
+      float: left;
+      width: 65% !important;
+      margin: 0 !important;
+      flex: none !important;
+      max-width: 65% !important;
+
+      @include text-align(left);
+    }
+
+    .accomplishment-date {
+      float: right;
+      width: 35% !important;
+      margin: 0 !important;
+      flex: none !important;
+      max-width: 35% !important;
+
+      @include text-align(right);
+    }
+  }
+}
+
+// ------------------------------
+// #CASES
+// ------------------------------
+// certificate - distinguished
+@media print {
+  .certificate-distinguished {
+    .accomplishment-rendering {
+      border-top-color: $cert-distinguished-color;
+    }
+  }
+}

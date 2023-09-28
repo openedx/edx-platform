@@ -1,0 +1,9 @@
+{% load i18n %}
+{% load django_markup %}
+<p id="hint_id_content" class="help-block">
+    {% blocktrans trimmed asvar tmsg %}
+        Markdown syntax is allowed. See the {start_link}cheatsheet{end_link} for help.
+    {% endblocktrans %}
+    {% interpolate_html tmsg start_link='<a id="cheatsheetLink" href="#cheatsheetModal" rel="leanModal">'|safe end_link='</a>'|safe %}
+</p>
+<textarea {{ attrs }}>{{ content }}</textarea>

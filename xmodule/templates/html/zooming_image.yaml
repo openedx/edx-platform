@@ -1,0 +1,57 @@
+---
+metadata:
+    display_name: Zooming Image Tool
+data: |
+      <h3 class="hd hd-2">Zooming Image Tool</h3>
+      <p>Use the Zooming Image Tool to enable learners to see details of large, complex images.</p>
+      <p>With the Zooming Image Tool, the learner can move the mouse pointer over a part of the image to enlarge it and see more detail.</p>
+      <p>To use the Zooming Image Tool, you must first add the <a href="http://files.edx.org/jquery.loupeAndLightbox.js" target="_blank">jquery.loupeAndLightbox.js JavaScript file</a> to your course.</p>
+      <p>You must also add both the regular and magnified image files to your course.</p>
+      <p>The following HTML code shows the format required to use the Zooming Image tool. For the example in this template, you must replace the values in <i>italics</i>.</p>
+        <pre>
+        &lt;div class="zooming-image-place" style="position: relative;"&gt;
+          &lt;a class="loupe" href="<i>path to the magnified version of the image</i>"&gt;
+            &lt;img alt="<i>Text for screen readers</i>"
+              src="<i>path to the image you want to display in the unit</i>" /&gt;
+          &lt;/a>
+          &lt;div class="script_placeholder"
+            data-src="<i>path to the jquery.loupeAndLightbox.js JavaScript file in your course</i>"/&gt;
+        &lt;/div&gt;
+        &lt;script type="text/javascript"&gt;// &gt;![CDATA[
+        JavascriptLoader.executeModuleScripts($('.zooming-image-place').eq(0), function() {
+          $('.loupe').loupeAndLightbox({
+            width: 350,
+            height: 350,
+            lightbox: false
+          });
+        });
+        // ]]&gt;&lt;/script&gt;
+        &lt;div id="ap_listener_added"&gt;&lt;/div&gt;
+        </pre>
+
+      <p>You can modify the example below for your own use.</p>
+      <ol>
+        <li>Replace the value of the link's <strong>href</strong> attribute with the path to the magnified image. Do not change the value of the class attribute.</li>
+        <li>Replace the value of the image's <strong>src</strong> attribute with the path to the image that will appear in the unit.</li>
+        <li>Replace the value of the image's <strong>alt</strong> attribute with text that both describes the image and the action or destination of clicking on the image. You <strong>must</strong> include alt text to provide an accessible label.</li>
+        <li>Replace the value of the div element's <strong>data-src</strong> attribute with the path to the jquery.loupeAndLightbox.js JavaScript file in your course.</li>
+      </ol>
+      <p>The example below shows a subset of the biochemical reactions that cells carry out. </p>
+      <p>You can view the chemical structures of the molecules by clicking on them. The magnified view also lists the enzymes involved in each step.</p>
+      <p class="sr">Press spacebar to open the magnifier.</p>
+      <div class="zooming-image-place" style="position: relative;">
+        <a class="loupe" href="https://studio.edx.org/c4x/edX/DemoX/asset/pathways_detail_01.png">
+            <img alt="magnify" src="https://studio.edx.org/c4x/edX/DemoX/asset/pathways_overview_01.png" />
+          </a>
+        <div class="script_placeholder" data-src="https://studio.edx.org/c4x/edX/DemoX/asset/jquery.loupeAndLightbox.js" />
+      </div>
+      <script type="text/javascript">// <![CDATA[
+      JavascriptLoader.executeModuleScripts($('.zooming-image-place').eq(0), function() {
+        $('.loupe').loupeAndLightbox({
+          width: 350,
+          height: 350,
+          lightbox: false
+        });
+      });
+      // ]]></script>
+      <div id="ap_listener_added"></div>

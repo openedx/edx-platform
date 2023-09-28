@@ -1,0 +1,78 @@
+form {
+  font-size: 1em;
+}
+
+label {
+  color: $body-color;
+  font: italic 300 1rem/1.6rem $serif;
+  margin-bottom: ($baseline/4);
+  text-shadow: 0 1px rgba(255, 255, 255, 0.4);
+  -webkit-font-smoothing: antialiased;
+
+  &.register-emails {
+    font-family: $font-family-sans-serif;
+    font-style: normal;
+    font-size: 12px;
+    line-height: 1.5em;
+    font-weight: normal;
+    width: calc(100% - 25px);
+    padding-top: 2px;
+    position: relative;
+    float: right;
+    clear: both;
+  }
+}
+
+textarea,
+input[type="text"],
+input[type="url"],
+input[type="email"],
+input[type="password"],
+input[type="tel"] {
+  background: $form-bg-color;
+  border: 1px solid $border-color-2;
+  border-radius: 3px;
+  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6), inset 0 0 3px 0 $shadow-l1;
+  box-sizing: border-box;
+  font: italic 300 1rem/1.6rem $serif;
+  height: 35px;
+  padding: ($baseline/4) 12px;
+  vertical-align: top;
+  -webkit-font-smoothing: antialiased;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  &:focus {
+    border-color: darken($button-archive-color, 50%);
+    box-shadow: 0 0 6px 0 darken($button-archive-color, 50%), inset 0 0 4px 0 rgba(0, 0, 0, 0.15);
+  }
+}
+
+textarea {
+  height: 60px;
+}
+
+input[type="submit"],
+input[type="button"],
+button,
+.button {
+  border-radius: 3px;
+
+  @include button(shiny, $button-color);
+
+  font: normal 1.2rem/1.6rem $font-family-sans-serif;
+  letter-spacing: 1px;
+  padding: 4px 20px;
+  vertical-align: top;
+  -webkit-font-smoothing: antialiased;
+
+  &:disabled,
+  &.is-disabled,
+  &.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

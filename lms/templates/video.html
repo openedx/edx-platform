@@ -1,0 +1,184 @@
+<%page expression_filter="h"/>
+
+<%!
+from django.utils.translation import gettext as _
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
+%>
+% if display_name is not UNDEFINED and display_name is not None and not is_embed:
+    <h3 class="hd hd-2">${display_name}</h3>
+% endif
+
+<div
+    id="video_${id}"
+    class="video closed"
+    data-metadata='${metadata}'
+    data-bumper-metadata='${bumper_metadata}'
+    data-autoadvance-enabled="${autoadvance_enabled}"
+    data-poster='${poster}'
+    data-block-id='${block_id}'
+    data-course-id='${course_id}'
+    tabindex="-1"
+>
+    <div class="focus_grabber first"></div>
+
+    <div class="tc-wrapper">
+      <div class="video-wrapper">
+          <span tabindex="0" class="spinner" aria-hidden="false" aria-label="${_('Loading video player')}"></span>
+          <span tabindex="-1" class="btn-play fa fa-youtube-play fa-2x is-hidden" aria-hidden="true" aria-label="${_('Play video')}"></span>
+          <div class="video-player-pre"></div>
+          <div class="video-player">
+              <div id="${id}"></div>
+              <h4 class="hd hd-4 video-error is-hidden">${_('No playable video sources found.')}</h4>
+              <h4 class="hd hd-4 video-hls-error is-hidden">
+                  ${_('Your browser does not support this video format. Try using a different browser.')}
+              </h4>
+          </div>
+          <div class="video-player-post"></div>
+          <div class="closed-captions"></div>
+          <div class="video-controls is-hidden">
+              <div>
+                  <div class="vcr"><div class="vidtime">0:00 / 0:00</div></div>
+                  <div class="secondary-controls"></div>
+              </div>
+          </div>
+      </div>
+    </div>
+
+    <div class="focus_grabber last"></div>
+
+    % if (download_video_link or track or handout or branding_info or public_sharing_enabled) and not hide_downloads:
+    <h3 class="hd hd-4 downloads-heading sr" id="video-download-transcripts_${id}">${_('Downloads and transcripts')}</h3>
+    <div class="wrapper-downloads" role="region" aria-labelledby="video-download-transcripts_${id}">
+        % if download_video_link or public_sharing_enabled:
+            <div class="wrapper-download-video">
+                <h4 class="hd hd-5">${_('Video')}</h4>
+                % if download_video_link:
+                    <span class="icon fa fa-download" aria-hidden="true"></span>
+                    <a class="btn-link video-sources video-download-button" href="${download_video_link}">
+                        ${_('Download video file')}
+                    </a>
+                % endif
+                % if download_video_link and public_sharing_enabled:
+                    <br>
+                % endif
+                % if sharing_sites_info:
+                    <div class="wrapper-social-share">
+                        <button
+                            style="background-image: none; background-color: rgb(0, 38, 43); border-radius: 0px; color: white" 
+                            class="social-toggle-btn btn"
+                        >
+                            <span class="icon fa fa-share-alt mr-2" style="text-shadow: none"></span>
+                            ${_('Share this video')}
+                        </button>
+                        <div
+                            hidden
+                            class="container-social-share color-black p-2"
+                            style="width: 300px; border-radius: 6px; background-color: white; box-shadow: 0 .5rem 1rem rgba(0,0,0,.15),0 .25rem .625rem rgba(0,0,0,.15)"
+                        >
+                            ${_('Share this video')}
+                            <div class="btn-link close-btn float-right">
+                                <span style="color: black" class="icon fa fa-close" />
+                            </div>
+
+                            <br />
+                            % for sharing_site_info in sharing_sites_info:
+                            <a
+                                class="btn-link social-share-link"
+                                data-source="${sharing_site_info['name']}"
+                                href="${sharing_site_info['sharing_url']}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style="font-size: 1.5rem"
+                            >
+                                <span class="icon fa ${sharing_site_info['fa_icon_name']}" aria-hidden="true"></span>
+                                <span class="sr">${_("Share on {site}").format(site=sharing_site_info['name'])}</span>
+                            </a>
+                            % endfor
+                            <br />
+                            <div style="background-color: #F2F0EF" class="public-video-url-container p-2">
+                                <a href=${public_video_url} class="d-inline-block align-middle" style="width: 200px">
+                                    <div
+                                        class="text-nowrap"
+                                        style="color: black; overflow: hidden; text-overflow: ellipsis; vertical-align: middle"
+                                    >
+                                        ${public_video_url}
+                                    </div>
+                                </a>
+                                <div
+                                    class="public-video-copy-btn btn-link d-inline-block float-right"
+                                    data-url=${public_video_url}
+                                >
+                                    <span class="icon fa fa-link pr-1"></span>
+                                    <span>${_('Copy')}</span>
+                                </div>
+                              <span>
+                            </div>
+                        </div>
+                    </div>
+                % endif
+            </div>
+        % endif
+        % if track:
+        <div class="wrapper-download-transcripts">
+            <h4 class="hd hd-5">${_('Transcripts')}</h4>
+            % if transcript_download_format:
+            <ul class="list-download-transcripts">
+                % for item in transcript_download_formats_list:
+                    <li class="transcript-option">
+                        <span class="icon fa fa-download" aria-hidden="true"></span>
+                        <% dname = _("Download {file}").format(file=item['display_name']) %>
+                        <a class="btn btn-link" href="${track}" data-value="${item['value']}">${dname}</a>
+                    </li>
+                % endfor
+            </ul>
+            % else:
+            <a class="btn-link external-track" href="${track}">${_('Download transcript')}</a>
+            % endif
+        </div>
+        % endif
+        % if handout:
+        <div class="wrapper-handouts">
+            <h4 class="hd hd-5">${_('Handouts')}</h4>
+            <a class="btn-link" href="${handout}">${_('Download Handout')}</a>
+        </div>
+        % endif
+        % if branding_info:
+        <div class="branding">
+            <span class="host-tag">${branding_info['logo_tag']}</span>
+            <a href="${branding_info['url']}"><img class="brand-logo" src="${branding_info['logo_src']}" alt="${branding_info['logo_tag']}" /></a>
+        </div>
+        % endif
+    </div>
+    % endif
+</div>
+
+% if cdn_eval:
+<script>
+  //TODO: refactor this js into a separate file.
+  function sendPerformanceBeacon(id, expgroup, value, event_name) {
+    var data = {event: event_name, id: id, expgroup: expgroup, value: value, page: "html5vid"};
+    $.ajax({method: "POST", url: "/performance", data: data});
+  }
+  var cdnStartTime;
+  var salt = Math.floor((1 + Math.random()) * 0x100000).toString(36);
+  var id = "${id | n, js_escaped_string}";
+  function initializeCDNExperiment() {
+    sendPerformanceBeacon(id + "_" + salt, ${cdn_exp_group | n, dump_js_escaped_json}, "", "load");
+    cdnStartTime = Date.now();
+    $.each(['loadstart', 'abort', 'error', 'stalled', 'loadedmetadata',
+                    'loadeddata', 'canplay', 'canplaythrough', 'seeked'],
+                    function(index, eventName) {
+      $("#video_" + id).bind("html5:" + eventName, null, function() {
+        timeElapsed = Date.now() - cdnStartTime;
+        sendPerformanceBeacon(id + "_" + salt, ${cdn_exp_group | n, dump_js_escaped_json}, timeElapsed, eventName);
+      });
+    });
+  }
+  $("#video_" + id).bind("initialize", null, initializeCDNExperiment);
+  if ($("#video_" + id).hasClass("is-initialized")) {
+    initializeCDNExperiment();
+  }
+</script>
+% endif

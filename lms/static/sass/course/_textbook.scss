@@ -1,0 +1,236 @@
+div.book-wrapper {
+  max-width: map-get($container-max-widths, xl);
+  margin: 0 auto;
+  width: 100%;
+
+  #open_close_accordion {
+    display: none;
+  }
+
+  .pdfbook-wrap {
+    display: table;
+    width: 100%;
+  }
+
+  .pdfbook-wrap-inner {
+    display: table-row;
+  }
+
+  section.book-sidebar {
+    @extend .sidebar;
+    @extend .tran;
+
+    box-sizing: border-box;
+    padding: ($baseline/2) 0;
+    border-radius: 3px 0 0 3px;
+    border: 1px solid $gray-l3;
+    border-right: none;
+    width: 180px;
+
+    #booknav {
+      list-style: none;
+
+      .chapter {
+        line-height: 1.4em;
+      }
+
+      .page-number {
+        @include float(right);
+
+        width: 12%;
+        font-size: 0.8em;
+        line-height: 2.1em;
+        text-align: right;
+        color: #9a9a9a;
+        opacity: 0;
+
+        @include transition(opacity 0.15s linear 0s);
+      }
+
+      li {
+        background: none;
+        border-bottom: 0;
+        padding-left: ($baseline/2);
+
+        a {
+          @include clearfix();
+
+          padding: 0;
+          color: theme-color("primary");
+
+          &:hover,
+          &:focus {
+            background-color: transparent;
+            color: $uxpl-blue-hover-active;
+
+            .page-number {
+              opacity: 1;
+            }
+          }
+        }
+
+        div.hitarea {
+          background-image: url('#{$static-path}/images/treeview-default.gif');
+          position: relative;
+          top: 4px;
+
+          &:hover,
+          &:focus {
+            filter: alpha(opacity=60);
+            opacity: 0.6;
+          }
+        }
+
+        ul {
+          background: none;
+          margin-top: lh(0.25);
+          padding-top: lh(0.25);
+
+          li {
+            padding-bottom: ($baseline/2);
+          }
+        }
+      }
+
+      > li {
+        padding: ($baseline/4) 6px;
+        margin: ($baseline/4) ($baseline/2);
+      }
+    }
+  }
+
+  .book {
+    @extend .content;
+
+    padding: 0;
+    width: 76%;
+
+    nav {
+      @extend .clearfix;
+
+      a {
+        @extend .block-link;
+
+        padding: 0 lh();
+      }
+
+      ul {
+        @extend .clearfix;
+
+        li {
+          position: absolute;
+          height: 100%;
+          width: flex-grid(2, 8);
+          z-index: 1;
+
+          a {
+            background-color: rgba(#000, 0.7);
+            background-position: center;
+            background-repeat: no-repeat;
+            box-sizing: border-box;
+            display: table;
+            height: 100%;
+            opacity: 0;
+            filter: alpha(opacity=0);
+            text-indent: -9999px;
+
+            @include transition(none);
+
+            vertical-align: middle;
+            width: 100%;
+
+            &:hover,
+            &:focus {
+              opacity: 1;
+            }
+
+            &.is-disabled {
+              display: none;
+            }
+          }
+
+          &.last {
+            left: 0;
+
+            a {
+              background-image: url('#{$static-path}/images/textbook/textbook-left.png');
+            }
+          }
+
+          &.next {
+            right: 0;
+
+            a {
+              background-image: url('#{$static-path}/images/textbook/textbook-right.png');
+            }
+          }
+        }
+      }
+
+      &.bottom-nav {
+        border-bottom: 0;
+        margin-bottom: -(lh());
+        margin-top: lh();
+      }
+    }
+
+    section.page {
+      border-left: 1px solid $border-color;
+      background-color: $white;
+      position: relative;
+      text-align: center;
+      border-radius: 0 3px 3px 0;
+
+      img {
+        max-width: 100%;
+      }
+
+      #viewer {
+        padding: $baseline;
+      }
+
+      div {
+        text-align: left;
+        line-height: 1.6em;
+        margin: ($baseline/4);
+
+        .Paragraph,
+        h2 {
+          margin-top: ($baseline/2);
+        }
+      }
+    }
+  }
+
+  &.closed {
+    section.book-sidebar {
+      width: flex-grid(0.6);
+
+      header#open_close_accordion {
+        padding: 0;
+
+        a {
+          background-image: url('#{$static-path}/images/slide-right-icon.png');
+        }
+
+        h2 {
+          padding: 0;
+          visibility: hidden;
+          width: 10px;
+        }
+      }
+
+      ul#booknav {
+        max-height: 100px;
+        overflow: hidden;
+        padding: 0;
+        visibility: hidden;
+        width: 10px;
+      }
+    }
+
+    section.course-content {
+      width: flex-grid(11.5) + flex-gutter();
+    }
+  }
+}

@@ -1,0 +1,274 @@
+// Updates for decoupled verification A/B test
+.verification-process {
+  .pay-and-verify,
+  .incourse-reverify,
+  .reverify {
+    .review {
+      .title.center-col {
+        padding: 0 calc((100% - 750px) / 2) 10px;
+      }
+
+      h2 {
+        font-size: 16px;
+        font-weight: 600;
+        text-transform: unset;
+        color: #4a4a4a;
+        margin-bottom: 40px;
+
+        .course-title {
+          display: block;
+          font-weight: 100;
+          font-size: 24px;
+          margin-top: 5px;
+        }
+      }
+    }
+
+    .instruction {
+      &.center-col {
+        width: 750px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .instruction-info {
+        font-size: 24px;
+        font-weight: 100;
+        color: #57595a;
+        margin-bottom: 30px;
+
+        .fa-envelope-o {
+          color: #b92167;
+          font-size: 26px;
+          margin-right: 8px;
+        }
+      }
+
+      .activate {
+        font-size: 16px;
+        font-weight: 600;
+        color: #4a4a4a;
+      }
+
+      .activate-info {
+        font-size: 16px;
+        font-weight: 100;
+        color: #4a4a4a;
+      }
+    }
+
+    .payment-info {
+      padding: 5px 0 30px;
+
+      .copy {
+        margin: 20px 0;
+      }
+    }
+
+    .placeholder-cam {
+      .copy {
+        font-weight: bold !important;
+      }
+    }
+
+    .requirements-container {
+      .list-reqs {
+        .req {
+          width: 300px;
+          height: 250px;
+          min-height: 250px;
+          margin-right: 45px;
+
+          &:last-of-type {
+            margin-right: 0;
+          }
+        }
+
+        &.account-not-activated {
+          width: 300px;
+
+          .req {
+            height: 290px;
+            min-height: 290px;
+          }
+        }
+      }
+    }
+
+    .no-content {
+      margin-bottom: 50px;
+    }
+
+    .nav-wizard {
+      &.center {
+        text-align: center;
+      }
+
+      .right {
+        @include float(right);
+
+        padding: 15px 50px;
+      }
+
+      .nav-link {
+        line-height: 45px;
+      }
+
+      .prompt-verify .title {
+        @include float(left);
+        @include text-align(left);
+
+        width: 600px;
+        position: relative;
+        display: inline;
+        line-height: 45px;
+        color: black;
+      }
+
+      .wizard-steps {
+        width: auto;
+      }
+    }
+
+    .photo-controls {
+      position: relative;
+      text-align: center;
+
+      .control {
+        &.control-do {
+          left: 45%;
+          left: calc((50%) - (69px / 2));
+        }
+
+        &.control-retake {
+          left: 40%;
+          left: calc((50%) - (131px / 2));
+        }
+
+        .action-redo {
+          line-height: 28px;
+        }
+      }
+    }
+
+    .retake-photos {
+      color: $blue;
+      background: none !important;
+      border: 0 !important;
+      padding: 0 !important;
+      box-shadow: none;
+      cursor: pointer;
+
+      &:hover,
+      &:focus {
+        text-decoration: underline;
+      }
+    }
+
+    .tip {
+      .is-expandable {
+        .title-expand {
+          color: $blue !important;
+        }
+      }
+
+      .expandable-area {
+        margin-top: 5px;
+        padding-bottom: 20px;
+      }
+    }
+
+    .help-tips {
+      margin-left: 0 !important;
+
+      .title {
+        font-size: 16px !important;
+      }
+
+      .list-tips {
+        .tip {
+          font-size: 16px;
+          line-height: 1.5em;
+        }
+      }
+    }
+
+    .photo-tip {
+      @extend %t-copy-sub1;
+
+      color: black;
+      margin-bottom: 20px;
+    }
+
+    .list-help {
+      list-style: disc;
+
+      @include padding-left($baseline);
+    }
+
+    .list-faq {
+      dd {
+        color: black;
+      }
+    }
+
+    .wrapper-task {
+      .msg-retake {
+        margin-top: 0;
+      }
+
+      .wrapper-photos {
+        margin-bottom: 0 !important;
+      }
+    }
+
+    .report-course {
+      .course-actions {
+        td:last-of-type {
+          width: 300px;
+        }
+      }
+    }
+
+    .enrollment-status-footer {
+      margin: 50px 0;
+
+      h4 {
+        font-weight: 600;
+      }
+
+      .verify-pending-msg {
+        margin: 20px 0;
+      }
+    }
+  }
+
+  .tooltip {
+    @include transition(opacity $tmg-f3 ease-out 0s);
+    @include font-size(12);
+
+    position: absolute;
+    width: 350px;
+    top: 0;
+    left: 0;
+    padding: 10px 20px;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.85);
+    line-height: 26px;
+    color: $white;
+    pointer-events: none;
+    opacity: 0;
+
+    &::after {
+      @include font-size(20);
+
+      content: '▾';
+      display: block;
+      position: absolute;
+      bottom: -14px;
+      left: 50%;
+      margin-left: -7px;
+      color: rgba(0, 0, 0, 0.85);
+    }
+  }
+}

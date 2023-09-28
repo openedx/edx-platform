@@ -1,0 +1,148 @@
+.ccx-schedule-container {
+  float: left;
+  width: 750px;
+}
+
+table.ccx-schedule {
+  width: 100%;
+
+  thead {
+    border-bottom: 2px solid black;
+  }
+
+  th:first-child {
+    width: 40%;
+  }
+
+  th:last-child {
+    width: 18%;
+  }
+
+  th,
+  td {
+    padding: 10px;
+  }
+
+  td.no-link {
+    font-size: 13px;
+    text-shadow: 0 1px 0 #fcfbfb;
+    text-decoration: none;
+  }
+
+  .sequential .unit {
+    padding-left: 25px;
+  }
+
+  .vertical .unit {
+    padding-left: 40px;
+  }
+
+  a.empty {
+    display: block;
+    width: 100%;
+    color: white;
+  }
+
+  a.empty:hover {
+    color: #cbcbcb;
+  }
+}
+
+.ccx-schedule-sidebar {
+  float: left;
+  width: 295px;
+  margin-left: 20px;
+}
+
+
+.ccx-sidebar-panel {
+  border: 1px solid #cbcbcb;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+form.ccx-form {
+  line-height: 1.5;
+  // inspiration was taken from https://github.com/edx/ux-pattern-library
+  select {
+    @include font-size(16);
+
+    background: #fcfcfc;
+    border: 1px solid #e9e8e8;
+    box-sizing: padding-box;
+    color: #282c2e;
+    display: inline-block;
+    font-size: ($baseline*0.9.5);
+    height: 40px;
+    line-height: 20px;
+    padding: 10px;
+    transition: all 125ms ease-in-out 0s;
+    width: 100%;
+
+    &:disabled {
+      border-color: #cfd8dc;
+      background: #e7ecee;
+      cursor: not-allowed;
+    }
+  }
+
+  input {
+    @include font-size(15);
+
+    background: #fcfcfc none repeat scroll 0% 0%;
+    border: 1px solid #e7e6e6;
+    box-sizing: border-box;
+    color: #34383a;
+    display: inline-block;
+    line-height: normal;
+    transition: all 0.125s ease-in-out 0s;
+    padding: 5px 10px;
+
+    &:focus {
+      border-color: #0ea6ec;
+      color: #282c2e;
+      outline: 0;
+    }
+
+    &:disabled {
+      border-color: #cfd8dc;
+      background: #e7ecee;
+      cursor: not-allowed;
+    }
+  }
+
+  .field {
+    margin: 5px 0;
+  }
+}
+
+button.ccx-button-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #069;
+  cursor: pointer;
+
+  &::after {
+    content: "\00a0 ";
+  }
+
+  &:active {
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  &:hover {
+    color: brown;
+    background: none;
+  }
+
+  &:focus {
+    background: none;
+  }
+}
+
+.ccx-manage-student-form input#student-id {
+  width: 60%;
+}

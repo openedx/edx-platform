@@ -1,0 +1,382 @@
+#lean_overlay {
+  background-image: radial-gradient(circle at 50% 30%, $shadow-d1, $shadow-d2);
+  display: none;
+  height: 100%;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 100;
+}
+
+.modal {
+  @extend %ui-depth1;
+
+  display: none;
+  position: absolute;
+  left: 50%;
+  padding: 8px;
+  width: grid-width(5);
+  border-radius: 3px;
+  box-shadow: 0 0 5px 0 $shadow-d1;
+  background: theme-color("dark");
+  color: $body-color;
+
+  &.video-modal {
+    left: 50%;
+    padding: ($baseline/2);
+    width: 582px;
+
+    .inner-wrapper {
+      background: $black;
+      box-shadow: none;
+      height: 315px;
+      padding: ($baseline/2);
+      width: 560px;
+    }
+  }
+
+  &.home-page-video-modal {
+    left: 50%;
+    padding: ($baseline/2);
+    width: 662px;
+
+    .inner-wrapper {
+      background: $black;
+      box-shadow: none;
+      height: 360px;
+      padding: ($baseline/2);
+      width: 640px;
+    }
+  }
+
+  .inner-wrapper {
+    @extend %ui-depth1;
+
+    background: $modal-content-bg;
+    border-radius: 0;
+    border: 1px solid rgba(0, 0, 0, 0.9);
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7);
+    overflow: hidden;
+    padding-left: ($baseline/2);
+    padding-right: ($baseline/2);
+    padding-bottom: ($baseline/2);
+    position: relative;
+
+    p {
+      font-size: 0.9em;
+      line-height: 1.4;
+    }
+
+    header {
+      @extend %ui-depth1;
+
+      margin-bottom: ($baseline*1.5);
+      overflow: hidden;
+      padding: 28px $baseline 0;
+      position: relative;
+
+      &::before {
+        content: "";
+        display: block;
+        height: 400px;
+        left: 0;
+        margin: 0 auto;
+        position: absolute;
+        top: -140px;
+        width: 100%;
+        z-index: 1;
+      }
+
+      hr {
+        @extend %faded-hr-divider-light;
+
+        border: none;
+        margin: 0;
+        position: relative;
+        z-index: 2;
+
+        &::after {
+          @extend %faded-hr-divider;
+
+          bottom: 0;
+          content: "";
+          display: block;
+          position: absolute;
+          top: -1px;
+        }
+      }
+
+      h2 {
+        position: relative;
+        text-align: center;
+        text-shadow: 0 1px rgba(255, 255, 255, 0.4);
+        z-index: 2;
+      }
+    }
+
+    .modal-form-error {
+      background: theme-color("danger");
+      border: 1px solid rgb(143, 14, 14);
+      color: rgb(143, 14, 14);
+      display: none;
+      margin-bottom: $baseline;
+      padding: 12px;
+    }
+
+    .notice {
+      background: $yellow;
+      border: 1px solid darken($yellow, 60%);
+      color: darken($yellow, 60%);
+      display: none;
+      margin-bottom: $baseline;
+      padding: 12px;
+    }
+
+    .activation-message,
+    .message {
+      padding: 0 ($baseline*2) ($baseline/2);
+
+      p {
+        margin-bottom: ($baseline/2);
+      }
+    }
+
+    form {
+      margin-bottom: 12px;
+      padding: 0 ($baseline*2) $baseline;
+      position: relative;
+      z-index: 2;
+
+      .input-group {
+        @include clearfix();
+
+        border-bottom: 1px solid rgb(210, 210, 210);
+        box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
+        margin-bottom: ($baseline*1.5);
+        padding-bottom: ($baseline/2);
+      }
+
+      label {
+        color: $body-color;
+
+        &.field-error {
+          display: block;
+          color: #8f0e0e;
+
+          + input,
+          + textarea {
+            border: 1px solid #ca1111;
+            color: #8f0e0e;
+          }
+        }
+      }
+
+      input[type="checkbox"] {
+        margin-right: ($baseline/4);
+      }
+
+      textarea {
+        background: rgb(255, 255, 255);
+        display: block;
+        height: 45px;
+        margin-bottom: $baseline;
+        width: 100%;
+      }
+
+      input[type="email"],
+      input[type="text"],
+      input[type="password"] {
+        background: theme-color("inverse");
+        display: block;
+        height: 45px;
+        margin-bottom: $baseline;
+        width: 100%;
+      }
+
+      label.remember-me,
+      label.terms-of-service,
+      label.honor-code {
+        background: rgb(233, 233, 233);
+        border: 1px solid rgb(200, 200, 200);
+        border-radius: 3px;
+        box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
+        display: block;
+        margin-bottom: $baseline;
+        padding: 8px ($baseline/2);
+
+        &:hover,
+        &:focus {
+          background: rgb(230, 230, 230);
+        }
+
+        &.field-error {
+          border: 1px solid #ca1111;
+        }
+
+        a {
+          font-style: italic;
+        }
+      }
+
+      .citizenship,
+      .gender,
+      .date-of-birth {
+        margin-bottom: $baseline;
+        float: left;
+        width: flex-grid(4);
+
+        label {
+          display: block;
+        }
+
+        select {
+          box-sizing: border-box;
+          width: 100%;
+          display: block;
+        }
+      }
+
+      .citizenship,
+      .gender {
+        margin-right: flex-gutter();
+      }
+
+      .submit {
+        padding-top: ($baseline/2);
+
+        input[type="submit"] {
+          display: block;
+          height: auto;
+          margin: 0 auto;
+          width: 100%;
+          white-space: normal;
+        }
+      }
+    }
+
+    .login-extra {
+      position: relative;
+      z-index: 2;
+
+      p {
+        color: theme-color("secondary");
+        font-style: italic;
+        text-align: center;
+
+        span {
+          color: theme-color("secondary");
+          font-style: italic;
+        }
+
+        a {
+          color: theme-color("secondary");
+          font-style: italic;
+          text-decoration: underline;
+
+          &:hover,
+          &:focus {
+            color: $body-color;
+          }
+        }
+
+        span + a {
+          margin-left: ($baseline*0.75);
+        }
+      }
+    }
+
+    .close-modal {
+      border-radius: 2px;
+      cursor: pointer;
+      display: inline-block;
+      padding: 10px;
+      position: absolute;
+      right: 2px;
+      top: 0;
+      z-index: 100;
+      color: theme-color("secondary");
+      font: normal 1.2rem/1.2rem $font-family-sans-serif;
+      text-align: center;
+      text-shadow: 0 1px rgba(255, 255, 255, 0.8);
+
+      @include transition(all 0.15s ease-out 0s);
+
+      &:hover,
+      &:focus {
+        color: $body-color;
+        text-decoration: none;
+      }
+    }
+  }
+
+  #help_wrapper,
+  #feedback_form_wrapper,
+  .discussion-alert-wrapper {
+    padding: 0 ($baseline*1.5) ($baseline*1.5) ($baseline*1.5);
+
+    header {
+      margin-bottom: $baseline;
+      padding-right: 0;
+      padding-left: 0;
+    }
+
+    .note {
+      font-size: $font-size-sm;
+      margin-top: ($baseline/2);
+      color: theme-color("secondary");
+    }
+  }
+
+  .discussion-alert-wrapper button {
+    display: block;
+    margin: 0 auto;
+  }
+
+  .tip {
+    font-size: 12px;
+    display: block;
+    color: theme-color("dark");
+  }
+}
+
+.leanModal_box {
+  @extend .modal;
+}
+
+// --------------------
+
+// CASE: language settings
+.modal-settings-language {
+
+  // general reset
+  .list-input,
+  .list-actions {
+    @extend %ui-no-list;
+  }
+
+  .settings-language-select .select {
+    width: 100%;
+  }
+
+  .list-input {
+    margin-bottom: $baseline;
+  }
+
+  .actions-supplemental {
+    padding: 0 ($baseline*2) $baseline ($baseline*2);
+
+    .list-actions-item {
+      @extend %t-copy-sub1;
+
+      color: $body-color;
+      text-align: center;
+    }
+
+    .action {
+      display: block;
+      margin-top: ($baseline/4);
+    }
+  }
+}
+

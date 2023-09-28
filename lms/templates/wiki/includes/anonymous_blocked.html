@@ -1,0 +1,14 @@
+{% load i18n %}
+{% load django_markup %}
+<em>
+{% url 'wiki:signup' as signup_url %}
+{% url 'wiki:login' as login_url %}
+{% if login_url and signup_url %}
+  {% blocktrans trimmed asvar tmsg %}
+  You need to {anchor_start_login}log in{anchor_end} or {anchor_start_signup}sign up{anchor_end} to use this function.
+  {% endblocktrans %}
+    {% interpolate_html tmsg anchor_start_login='<a href="{{ login_url }}">'|safe anchor_end='</a>'|safe anchor_start_signup='<a href="{{ signup_url }}">'|safe %}
+{% else %}
+  {% trans "You need to log in or sign up to use this function." as tmsg %} {{ tmsg|force_escape }}
+{% endif %}
+</em>

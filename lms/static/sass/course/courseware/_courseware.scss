@@ -1,0 +1,842 @@
+// lms - base courseware styling
+// ====================
+// NOTE: this file is deprecated, and we should not continue to add to this file. Use other partials as appropriate.
+
+html {
+  height: 100%;
+  max-height: 100%;
+}
+
+html.video-fullscreen {
+  overflow: hidden;
+
+  body {
+    overflow: hidden;
+  }
+}
+
+.wrap-instructor-info {
+  @extend %ui-print-excluded;
+
+  margin: ($baseline/2) ($baseline/4) 0 0;
+  display: none;
+
+  @include media-breakpoint-up(md) {
+    display: block;
+  }
+
+  &.studio-view {
+    margin: 0;
+    display: inline;
+  }
+
+  .instructor-info-action {
+    @extend %t-copy-sub2;
+
+    @include float(right);
+    @include margin-left($baseline/2);
+    @include text-align(right);
+
+    padding: ($baseline/4) ($baseline/2);
+    border-radius: ($baseline/4);
+    background-color: $light-gray1;
+    color: $staff-color;
+    text-transform: uppercase;
+
+    @extend %ui-print-excluded;
+
+    &:hover {
+      background-color: $staff-color;
+      color: $white;
+    }
+  }
+}
+
+.content-wrapper {
+  .container-footer {
+    @include text-align(right);
+
+    margin: 0 auto;
+    max-width: grid-width(12);
+    min-width: 760px;
+    color: $gray;
+  }
+}
+
+.content-wrapper {
+  .course-license,
+  .xblock-license {
+    @include text-align(right);
+
+    @extend %t-title7;
+
+    display: block;
+    width: auto;
+    padding: ($baseline/4) 0;
+    color: $body-color;
+
+    span {
+      color: inherit;
+    }
+
+    a:link,
+    a:visited {
+      color: $body-color;
+    }
+
+    a:active,
+    a:hover {
+      color: theme-color("primary");
+    }
+
+    .license-label,
+    .license-value,
+    .license-actions {
+      display: inline-block;
+      vertical-align: middle;
+      margin-bottom: 0;
+    }
+
+    i,
+    em {
+      font-style: normal;
+    }
+
+    img {
+      display: inline;
+    }
+  }
+}
+
+.course-wrapper {
+  position: relative;
+
+  .courseware-results-wrapper {
+    display: none;
+  }
+
+  main {
+    padding: $baseline;
+  }
+
+  .course-content {
+    padding: 0;
+  }
+
+  .courseware-results-wrapper {
+    padding: ($baseline*2) 3%; // percent allows for smaller padding on mobile
+  }
+
+  .course-content,
+  .courseware-results-wrapper {
+    @extend .content;
+
+    line-height: 1.6;
+
+    .xblock {
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+      margin: 0 auto;
+      font: -apple-system-body;
+
+      &.xblock-student_view-vertical,
+      &.xblock-public_view-vertical {
+        max-width: $text-width-readability-max;
+      }
+    }
+
+    h1 {
+      margin: 0 0 lh();
+      letter-spacing: 0;
+    }
+
+    div.timed-exam {
+      color: #555353;
+
+      strong {
+        font-weight: 600;
+      }
+
+      h3 {
+        margin-bottom: 12px;
+        font-size: 22px;
+        font-weight: 600;
+      }
+
+      h1 {
+        margin-bottom: ($baseline/2);
+        font-size: 26px;
+        font-weight: 600;
+      }
+
+      h4 {
+        margin: 20px 0;
+        font-weight: 600;
+
+        b.success {
+          color: #2b8048;
+        }
+
+        b.success {
+          color: #2b8048;
+        }
+
+        b.failure {
+          color: #cb4765;
+        }
+      }
+
+      button.gated-sequence {
+        background: $transparent;
+        color: theme-color("primary");
+        border: none;
+        box-shadow: none;
+
+        @include text-align(left);
+
+        @extend %t-copy-base;
+
+        width: 100%;
+
+        &:hover {
+          background-color: transparent;
+          color: $uxpl-blue-hover-active;
+        }
+      }
+
+      .proctored-exam-code {
+        margin: 5px 0;
+        font-size: 1.3em;
+      }
+
+      .gated-sequence {
+        color: theme-color("primary");
+        font-weight: 600;
+        padding: ($baseline / 1.5) ($baseline / 4);
+
+        a.start-timed-exam {
+          cursor: pointer;
+          color: theme-color("primary");
+          font-weight: 600;
+          position: relative;
+          top: ($baseline/10);
+
+          i.fa-arrow-circle-right {
+            font-size: $baseline;
+          }
+        }
+      }
+
+      .copy-exam-code-button {
+        margin: 5px 0;
+        padding: 7.5px 20px;
+        margin-left: -5px;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+
+      .exam-action-button {
+        @extend %t-weight4;
+
+        @include margin-right($baseline);
+
+        background-image: none;
+        box-shadow: none;
+        text-shadow: none;
+
+        &.btn-pl-primary {
+          @extend %btn-pl-primary-base;
+
+          border: 0;
+
+          &:hover,
+          &:focus {
+            border: 0;
+          }
+        }
+      }
+
+      background-color: #f2f8fb;
+      padding: 30px;
+      font-size: 16px;
+      box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.1);
+      border: 1px solid #ddd;
+
+      &.critical-time {
+        border-left: 4px solid #b30101 !important;
+        margin: 0 auto;
+      }
+
+      &.success {
+        border-left: 4px solid #22b557 !important;
+        margin: 0 auto;
+      }
+
+      &.success-top-bar {
+        border-top: 4px solid #22b557 !important;
+        margin: 0 auto;
+      }
+
+      &.success-left-bar {
+        border-left: 4px solid #22b557 !important;
+        margin: 0 auto;
+      }
+
+      &.message-top-bar {
+        border-top: 4px solid #fab95c !important;
+        margin: 0 auto;
+      }
+
+      &.message-left-bar {
+        border-left: 4px solid #fab95c !important;
+        margin: 0 auto;
+      }
+
+      &.failure {
+        border-left: 4px solid #c93b34 !important;
+        margin: 0 auto;
+      }
+
+      &.warning {
+        @include border-left(4px solid $warning-color);
+
+        margin: 0 auto;
+      }
+    }
+
+    div.proctored-exam {
+      @extend .timed-exam;
+
+      .proctored-exam-message {
+        border-top: ($baseline/10) solid $uxpl-gray-background;
+        padding-top: 25px;
+      }
+
+      .proctored-exam-skip-actions {
+        padding-top: 20px;
+      }
+
+      // specialized padding override just for the entrance page
+      &.entrance {
+        button.gated-sequence {
+          padding: 0 ($baseline*5) 0 ($baseline*2.5);
+        }
+      }
+
+      &.instructions {
+        p {
+          margin: 0;
+        }
+
+        h4 {
+          margin-top: ($baseline * 3/2);
+        }
+
+        ul {
+          margin: 0;
+        }
+
+        .exam-action-button {
+          margin-top: $baseline / 2;
+        }
+      }
+
+      hr {
+        border-bottom: 1px solid $uxpl-gray-background;
+      }
+
+      .gated-sequence {
+        border-bottom: 2px solid $uxpl-gray-background;
+        padding: 22px ($baseline*5) 15px 50px;
+        position: relative;
+
+        &.start-timed-exam {
+          margin-bottom: ($baseline/2);
+          display: block;
+
+          &.action-primary {
+            .icon {
+              color: theme-color("primary");
+            }
+          }
+        }
+
+        p {
+          color: $uxpl-gray-base;
+
+          strong {
+            font-weight: 600;
+          }
+        }
+
+        .icon {
+          @include right(35px);
+
+          position: absolute;
+          font-size: 30px;
+          color: $uxpl-gray-base;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+
+    .proctored-exam-skip-confirm-wrapper {
+      border-left: ($baseline/4) solid $red;
+      padding: $baseline ($baseline*1.5);
+      background-color: rgb(242, 244, 245);
+
+      .msg-title {
+        @extend %t-title5;
+        @extend %t-strong;
+      }
+
+      .msg-content {
+        color: $gray-l1;
+
+        strong {
+          @extend %t-strong;
+        }
+      }
+
+      .proctored-exam-skip-actions {
+        @include float(right);
+
+        margin-top: $baseline;
+      }
+    }
+
+    .footer-sequence {
+      padding: 30px 0 20px;
+      border-bottom: ($baseline/10) solid #cfd9dd;
+
+      hr {
+        border-bottom: 1px solid $uxpl-gray-background;
+      }
+
+      .clearfix {
+        clear: both;
+      }
+
+      h4 {
+        margin-bottom: 12px;
+        font-size: 22px;
+        font-weight: 400;
+      }
+
+      span {
+        margin-bottom: 10px;
+        display: inline-block;
+        font-weight: 600;
+      }
+
+      p.proctored-exam-option {
+        float: left;
+        width: 80%;
+        margin-bottom: 25px;
+      }
+
+      a.contest-review {
+        @include float(right);
+        @include text-align(right);
+
+        font-size: 12px;
+        margin: 0;
+        width: 20%;
+      }
+
+      p {
+        margin-bottom: ($baseline/20);
+        color: #797676;
+      }
+
+      .proctored-exam-instruction {
+        padding: ($baseline/2) 0;
+        border-bottom: 2px solid $uxpl-gray-background;
+      }
+    }
+
+    .border-b-0 {
+      border-bottom: none;
+    }
+
+    .padding-b-0 {
+      padding-bottom: ($baseline/20);
+    }
+
+    .faq-proctoring-exam {
+      @extend .footer-sequence;
+
+      border-bottom: none;
+
+      a.footer-link {
+        display: block;
+        padding: ($baseline/2) 0;
+      }
+    }
+
+    p {
+      margin-bottom: lh();
+    }
+
+    .sequential-status-message {
+      margin-bottom: $baseline;
+      background-color: $gray-l5;
+      padding: ($baseline * 0.75);
+      border-radius: 3px;
+
+      @include font-size(13);
+    }
+
+    ul {
+      li {
+        margin-bottom: lh(0.5);
+      }
+    }
+
+    .path {
+      @extend %t-copy-sub1;
+
+      margin-top: -($baseline);
+      margin-bottom: $baseline;
+      color: $gray;
+
+      @media print {
+        margin-top: -12px !important;
+        margin-bottom: 2px !important;
+      }
+    }
+
+    div#seq_content {
+      h1 {
+        background: none;
+        margin-bottom: lh();
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+
+      code::before,
+      code::after {
+        @include display-left-to-right();
+      }
+    }
+
+    .vert-due-date {
+      color: #686b73;
+      display: flex;
+      font-size: 16px;
+
+      .localized-datetime {
+        max-width: 80%;
+      }
+
+      .pill {
+        font-size: 12px;
+        line-height: 14px;
+        max-height: 16px;
+        padding: 2px 8px;
+        border-radius: 5px;
+        margin-top: 4px;
+        margin-left: 8px;
+        vertical-align: top;
+
+        &.completed {
+          background-color: #f0f2f2;
+          color: #212529;
+        }
+
+        &.past-due {
+          background-color: #475b65;
+          color: #fff;
+        }
+      }
+    }
+
+    .vert-mod {
+      padding: 0;
+      margin: 0;
+      line-height: 1.4;
+      list-style: none;
+
+      > div {
+        .collapsible {
+          header {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            font-size: 16px;
+          }
+        }
+
+        header {
+          @extend h1.top-header;
+
+          border-radius: 0 4px 0 0;
+          margin-bottom: -16px;
+          border-bottom: 0;
+
+          h1 {
+            margin: 0;
+            font-size: 1em;
+          }
+
+          h2 {
+            @include border-right(0);
+            @include padding-right(0);
+
+            margin: 12px 0 0;
+            font-size: em(14, 24);
+          }
+        }
+
+        &:last-child {
+          border-bottom: none;
+          margin-bottom: 0;
+          padding-bottom: 0;
+        }
+
+        .histogram {
+          width: 200px;
+          height: 150px;
+        }
+
+        ul {
+          @include padding-left(1em);
+
+          list-style: disc outside none;
+
+          &.discussion-errors {
+            @include padding-left(2em);
+
+            list-style: none;
+          }
+
+          &.admin-actions {
+            list-style: none;
+          }
+        }
+
+        nav.sequence-nav ul li.prev {
+          @include left(4px);
+        }
+
+        nav.sequence-bottom {
+          ul {
+            list-style: none;
+            padding: 0;
+          }
+        }
+      }
+
+      .vert {
+        @extend .clearfix;
+
+        border-bottom: 1px solid #ddd;
+        margin-bottom: ($baseline*0.75);
+        padding: 0 0 15px;
+
+        .problem-reset-btn-wrapper {
+          position: relative;
+          .problem-reset-btn {
+            &:hover,
+            &:focus,
+            &:active {
+              color: $primary;
+            }
+          }
+        }
+      }
+
+      .vert > .xblock-student_view.is-hidden,
+      .vert > .xblock-public_view.is-hidden {
+        display: none;
+        border-bottom: 0;
+        margin-bottom: 0;
+      }
+
+      @media print {
+        > .xblock-student_view {
+          padding: 0 !important;
+        }
+      }
+    }
+
+    section.xblock-student_view-wrapper div.vert-mod > div,
+    section.xblock-public_view-wrapper div.vert-mod > div {
+      border-bottom: none;
+    }
+
+    section.tutorials {
+      h2 {
+        margin-bottom: lh();
+      }
+
+      ul {
+        margin: 0;
+
+        @include clearfix();
+
+        padding: 0;
+        list-style: none;
+
+        li {
+          @include float(left);
+          @include margin-right(flex-gutter(9));
+
+          width: flex-grid(3, 9);
+          margin-bottom: lh();
+          line-height: lh();
+
+          &:nth-child(3n) {
+            @include margin-right(0);
+          }
+
+          &:nth-child(3n+1) {
+            clear: both;
+          }
+
+          a {
+            font-weight: bold;
+          }
+        }
+      }
+    }
+
+    div.staff_actions {
+      p.error {
+        color: theme-color("danger");
+      }
+
+      p.success {
+        color: theme-color("success");
+      }
+    }
+
+    .xqa-modal,
+    .staff-modal,
+    .history-modal {
+      width: 80%;
+      height: 80%;
+      left: left(20%);
+      overflow: auto;
+      display: none;
+    }
+
+    div.staff_info {
+      display: none;
+
+      @include clearfix();
+
+      white-space: pre-wrap;
+      border-top: 1px solid $gray-l3;
+      padding-top: lh();
+      margin-top: lh();
+      line-height: lh();
+      font-family: Consolas, "Lucida Console", Monaco, "Courier New", Courier, monospace;
+
+      // Debugging content is always in English, therefore it's never RTL
+      direction: ltr;
+      text-align: left;
+    }
+
+    div.ui-tabs {
+      border: 0;
+      border-radius: 0;
+      margin: 0;
+      padding: 0;
+
+      .ui-tabs-nav {
+        background: none;
+        border: 0;
+        margin-bottom: lh(0.5);
+      }
+
+      .ui-tabs-panel {
+        border-radius: 0;
+        padding: 0;
+      }
+    }
+
+    @media print {
+      padding: 4mm 2mm 0;
+      background: transparent !important;
+    }
+  }
+
+  &.closed {
+    div.course-index {
+      width: flex-grid(0.6);
+      overflow: hidden;
+
+      header#open_close_accordion {
+        a {
+          background-image: url('#{$static-path}/images/slide-right-icon.png');
+        }
+      }
+
+      .accordion {
+        visibility: hidden;
+        width: 10px;
+        padding: 0;
+
+        nav {
+          white-space: pre;
+          overflow: hidden;
+        }
+      }
+    }
+
+    section.course-content {
+      width: flex-grid(11.5) + flex-gutter();
+    }
+  }
+
+  @media print {
+    border: 0;
+    background: transparent !important;
+  }
+}
+
+.xmodule_VideoModule {
+  margin-bottom: ($baseline*1.5);
+}
+
+textarea.short-form-response {
+  height: 200px;
+  padding: ($baseline/4);
+  margin-top: ($baseline/4);
+  margin-bottom: ($baseline/4);
+  width: 100%;
+}
+
+section.self-assessment {
+  textarea.hint {
+    height: 100px;
+    padding: ($baseline/4);
+    margin-top: ($baseline/4);
+    margin-bottom: ($baseline/4);
+  }
+
+  div {
+    margin-top: ($baseline/4);
+    margin-bottom: ($baseline/4);
+  }
+
+  .error {
+    font-size: 14px;
+    font-weight: bold;
+  }
+}
+
+
+/*
+ * CodeMirror color contrast overrides
+ * (so we don't change the vendor file)
+ */
+
+.CodeMirror {
+  .CodeMirror-linenumber.CodeMirror-gutter-elt {
+    color: $gray-d3 !important;
+  }
+}

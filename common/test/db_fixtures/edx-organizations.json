@@ -1,0 +1,46 @@
+[
+  {
+    "pk": 99,
+    "model": "organizations.organization",
+    "fields": {
+      "name": "Demo org 1",
+      "short_name": "orgX",
+      "description": "Description of organization 1",
+      "logo": "org1_logo.png",
+      "active": 1
+    }
+  },
+  {
+    "pk": 100,
+    "model": "organizations.organization",
+    "fields": {
+      "name": "Demo org 2",
+      "short_name": "orgX2",
+      "description": "Description of organization 2",
+      "logo": "org2_logo.png",
+      "active": 1
+    }
+  },
+  {
+    "pk": 101,
+    "model": "organizations.organization",
+    "fields": {
+      "name": "Demo org 3",
+      "short_name": "orgX3",
+      "description": "Description of organization 3",
+      "logo": "org3_logo.png",
+      "active": 1
+    }
+  },
+  {
+    "pk": 102,
+    "model": "organizations.organization",
+    "fields": {
+      "name": "Demo org 4",
+      "short_name": "test_org",
+      "description": "Description of organization 4",
+      "logo": "org4_logo.png",
+      "active": 1
+    }
+  }
+]

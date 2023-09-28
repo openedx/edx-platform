@@ -1,0 +1,493 @@
+// LMS -- views -- student notes
+// ====================
+
+// in this document:
+// --------------------
+// +notes
+// +base
+// ++header +and search
+// +local variables/utilities
+// +individual group of notes
+// +tabbed views
+// +search - no results
+// +search - error
+// +case - no notes made
+
+// +notes:
+// --------------------
+// * this Sass partial contains all of the styling needed for the student notes listing view.
+// * for other notes styling referenced here, see the Sass partial contains the in-line student notes UI.
+
+// +local variables/utilities:
+// --------------------
+$divider-visual-primary: ($baseline/5) solid $gray-l4;
+$divider-visual-secondary: ($baseline/10) solid $gray-l4;
+$divider-visual-tertiary: ($baseline/20) solid $gray-l4;
+
+%notes-tab-control {
+  @include transition(none);
+
+  @extend %shame-link-base;
+
+  display: inline-block;
+  vertical-align: middle;
+  border-bottom: ($baseline/5) solid $transparent;
+}
+
+.view-student-notes {
+
+  // +base:
+  // --------------------
+  .wrapper-student-notes {
+    @include clearfix();
+
+    padding-bottom: $baseline;
+
+    .student-notes {
+      @include clearfix();
+
+      @extend .content; // needed extend carried over from course handouts UI, but should be cleaned up
+
+      width: 100%;
+    }
+  }
+
+  // +header +and search:
+  // --------------------
+  .title-search-container {
+    @include clearfix();
+
+    margin-bottom: $baseline;
+
+    .wrapper-title {
+      @include float(left);
+
+      width: flex-grid(7, 12);
+
+      .page-title {
+        @extend %t-title4;
+        @extend %t-weight1;
+
+        margin-bottom: 0;
+
+        .page-subtitle {
+          @extend %t-title7;
+          @extend %t-weight2;
+
+          display: block;
+          margin-top: ($baseline/4);
+          color: $lightest-base-font-color;
+          letter-spacing: 0;
+        }
+      }
+    }
+
+    .wrapper-notes-search {
+      @include float(right);
+
+      width: flex-grid(5, 12);
+
+      @include text-align(right);
+    }
+
+    .search-notes-input,
+    .search-notes-submit {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .search-notes-input {
+      @extend %t-demi-strong;
+
+      position: relative;
+
+      @include right(-6px); // manually positioning input right next to submit
+
+      width: 55%;
+      padding: ($baseline/2) ($baseline*0.75);
+      color: $gray-d3;
+    }
+
+    .search-notes-submit {
+      @extend %btn-inherited-primary;
+      @extend %t-action2;
+
+      padding: 8px $baseline 9px $baseline; // manually syncing up height with search input
+    }
+  }
+
+  // +individual group of notes
+  // --------------------
+  .note-group {
+    border-top: $divider-visual-primary;
+    margin: 0;
+    padding-top: ($baseline*1.5);
+
+    // course structure labels
+    .course-title,
+    .tags-title {
+      @extend %t-title6;
+      @extend %t-weight4;
+
+      margin: 0 0 ($baseline/2) 0;
+      color: $gray-d3;
+    }
+
+    .course-subtitle {
+      @extend %t-title7;
+      @extend %t-weight4;
+
+      margin: 0 0 ($baseline/4) 0;
+      border-bottom: $divider-visual-tertiary;
+      padding-bottom: ($baseline/2);
+      color: $gray-d3;
+    }
+
+    .tags-title {
+      border-bottom: $divider-visual-tertiary;
+      padding-bottom: ($baseline/2);
+    }
+
+    // individual note
+    .note {
+      @include clearfix();
+
+      margin: ($baseline*1.5) 0;
+
+      .wrapper-note-excerpts {
+        @include transition(box-shadow $tmg-avg ease-in-out 0, border-color $tmg-avg ease-in-out 0);
+
+        display: inline-block;
+        width: flex-grid(9, 12);
+        border: 1px solid $gray-l5;
+        border-radius: ($baseline/10);
+
+        // note - highlighted content
+        .note-excerpt {
+          @include transition(background-color $tmg-avg ease-in-out 0);
+
+          padding: $baseline;
+          background: $student-notes-highlight-color;
+
+          .note-excerpt-p,
+          .note-excerpt-ul,
+          .note-excerpt-ol {
+            @extend %t-copy-base;
+          }
+        }
+
+        .note-excerpt-more-link {
+          @extend %t-copy-sub1;
+          @extend %t-weight2;
+          @extend %shame-link-text;
+
+          display: inline;
+
+          @include margin-left($baseline/4);
+
+          border: 0;
+          background: transparent;
+          padding: 0;
+
+          &:active {
+            background: transparent;
+            box-shadow: none;
+          }
+        }
+
+        // note - comment made on highlighted content
+        .note-comments {
+          @extend %ui-no-list;
+
+          border-top: ($baseline/5) solid $student-notes-highlight-color-focus;
+
+          .note-comment {
+            @include transition(color $tmg-avg ease-in-out 0);
+
+            padding: ($baseline*0.75) $baseline;
+            color: $gray;
+
+            .note-comment-title {
+              @extend %t-title8;
+
+              letter-spacing: ($baseline/20);
+              margin: 0 0 ($baseline/4) 0;
+              color: $gray-l2;
+            }
+
+            .note-comment-p,
+            .note-comment-ul,
+            .note-comment-ol {
+              @extend %t-copy-sub1;
+              @extend %t-weight2;
+
+              padding: 0;
+              margin: 0;
+              background: transparent;
+            }
+
+            .note-comment-p {
+              word-wrap: break-word;
+            }
+
+            .note-comment-ul,
+            .note-comment-ol {
+              padding: auto;
+              margin: auto;
+            }
+
+            // CASE: when a comment has a term that matches a notes search query
+            .note-highlight {
+              background-color: $result-highlight-color-base;
+            }
+          }
+        }
+      }
+
+      // note reference
+      .reference {
+        @extend %t-copy-sub1;
+
+        display: inline-block;
+        width: flex-grid(3, 12);
+        vertical-align: top;
+
+        .wrapper-reference-content {
+          padding: 0 $baseline;
+          color: $gray-l2;
+
+          .reference-title {
+            @extend %t-title8;
+            @extend %t-weight3;
+
+            margin-top: ($baseline/2);
+            letter-spacing: ($baseline/20);
+            color: $gray-l2;
+
+            // CASE: first reference title of a note
+            &:first-child {
+              margin-top: 0;
+            }
+          }
+
+          .reference-meta {
+            @extend %t-weight2;
+
+            color: $m-gray-d2;
+          }
+
+
+          .reference-meta.reference-tags {
+            word-wrap: break-word;
+            // CASE: tag matches a search query
+            .note-highlight {
+              background-color: $result-highlight-color-base;
+            }
+          }
+          // Put commas between tags.
+          span.reference-meta.reference-tags::after {
+            content: ",";
+            color: $m-gray-d2;
+          }
+
+          // But not after the last tag.
+          span.reference-meta.reference-tags:last-child::after {
+            content: "";
+          }
+
+          // needed for poor base LMS styling scope
+          a.reference-meta {
+            @extend %shame-link-text;
+          }
+        }
+      }
+
+      // STATE: hover/focus
+      &:hover,
+      &:focus {
+        .wrapper-note-excerpts {
+          box-shadow: 0 2px 0 1px $shadow-l2;
+          border-color: $gray-l4;
+        }
+
+        .note-excerpt {
+          background: $student-notes-highlight-color-focus;
+        }
+
+        .note-comment {
+          color: $gray-d2;
+        }
+      }
+    }
+  }
+
+  // +tabbed views
+  // --------------------
+  .wrapper-tabs {
+    .tab-panel,
+    .inline-error,
+    .ui-loading {
+      @extend %no-outline;
+
+      border-top: $divider-visual-primary;
+
+      .listing-tools {
+        @include margin($baseline $baseline (-$baseline/2) 0);
+      }
+
+      .note-group:first-of-type {
+        border-top: none;
+      }
+    }
+
+    .tab-panel.note-group {
+      padding-top: 0;
+    }
+
+    .inline-error {
+      margin: ($baseline/2) 0;
+      border-bottom: 1px solid $red;
+      padding: 0 0 ($baseline/2) 0;
+      color: $red;
+    }
+
+    .tab-list {
+      @include clearfix();
+
+      position: relative;
+      top: ($baseline/5);
+
+      .tabs-label,
+      .tabs {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .tabs-label {
+        @extend %hd-lv5;
+
+        margin-bottom: 0;
+        padding: ($baseline*0.75) 0;
+
+        @include padding-right($baseline);
+
+        color: $lightest-base-font-color;
+        font-weight: $font-semibold !important; // needed for poor base LMS styling scope
+      }
+
+      .tabs {
+        @include clearfix();
+
+        @extend %ui-no-list;
+
+        position: relative;
+        bottom: -($baseline/4);
+      }
+
+      .tab {
+        position: relative;
+        display: inline;
+
+        .tab-label {
+          @extend %notes-tab-control;
+
+          padding: ($baseline/2) ($baseline*0.75);
+          text-align: center;
+
+          .icon {
+            @include margin-right($baseline/10);
+          }
+        }
+
+        // STATE: active/current tab being viewed
+        &.is-active {
+          .tab-label {
+            border-bottom-color: $gray-d3;
+            color: $gray-d3;
+          }
+
+          // CASE: tab-label can be closed
+          .action-close {
+            border-bottom: ($baseline/5) solid $gray-d3;
+          }
+        }
+
+        // CASE: tab-label can be closed
+        .action-close {
+          @extend %notes-tab-control;
+
+          position: relative;
+
+          @include left(-($baseline*0.75));
+
+          padding: ($baseline/2);
+        }
+      }
+    }
+  }
+
+  // +search - no results
+  // --------------------
+  // NOTE: not a lot of elements/classes to reference in this DOM
+  #no-results-panel {
+    p {
+      @extend %t-copy-lead1;
+
+      margin: ($baseline*1.5) 0;
+    }
+  }
+
+  // +search - error
+  // --------------------
+  .wrapper-msg {
+    margin-bottom: $baseline;
+  }
+
+  // +case - no notes made
+  // --------------------
+  .placeholder {
+    background: $gray-l5;
+    border-top: ($baseline/4) solid $active-color;
+    padding: ($baseline*1.5);
+
+    a {
+      color: $blue-d1;
+    }
+  }
+
+  .placeholder-title {
+    @extend %hd-lv3;
+
+    margin-bottom: $baseline;
+    text-transform: none; // reset needed for poor h2 element styling
+    letter-spacing: 0; // reset needed for poor h2 element styling
+  }
+
+  .placeholder-copy {
+    @extend %t-copy-sub1;
+
+    ul {
+      @extend %ui-no-list;
+
+      li {
+        @extend %wipe-last-child;
+
+        display: block;
+        margin-bottom: ($baseline/2);
+      }
+    }
+
+    p,
+    ul {
+      margin-bottom: $baseline;
+    }
+  }
+
+  .placeholder-cta-copy {
+    @extend %t-strong;
+
+    a {
+      @extend %t-strong;
+    }
+  }
+}

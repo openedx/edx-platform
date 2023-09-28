@@ -1,0 +1,59 @@
+[
+    {
+        "pk": 1,
+        "model": "waffle.flag",
+        "fields": {
+            "name": "course_experience.disable_course_outline_page",
+            "everyone": true
+        }
+    },
+    {
+        "pk": 2,
+        "model": "waffle.flag",
+        "fields": {
+            "name": "course_experience.enable_course_goals",
+            "everyone": true
+        }
+    },
+    {
+        "pk": 1,
+        "model": "waffle.switch",
+        "fields": {
+            "name": "studio.enable_policy_page",
+            "active": true
+        }
+    },
+    {
+        "pk": 2,
+        "model": "waffle.switch",
+        "fields": {
+            "name": "completion.enable_completion_tracking",
+            "active": true
+        }
+    },
+    {
+        "pk": 3,
+        "model": "waffle.flag",
+        "fields": {
+            "name": "course_experience.gdpr",
+            "everyone": false
+        }
+    },
+    {
+        "pk": 4,
+        "model": "waffle.switch",
+        "fields": {
+            "name": "studio.enable_checklists_page",
+            "active": true
+        }
+    },
+    {
+        "pk": 5,
+        "model": "waffle.flag",
+        "fields": {
+            "name": "studio.enable_checklists_quality",
+            "staff": true,
+            "superusers": true
+        }
+    }
+]

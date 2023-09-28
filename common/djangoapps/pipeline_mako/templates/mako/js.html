@@ -1,0 +1,9 @@
+<%page expression_filter="h"/>
+<script \
+% if context.get('async', default=None):
+async \
+% endif
+% if defer:
+defer \
+% endif
+type="${type}" src="${ url }" charset="utf-8"></script>

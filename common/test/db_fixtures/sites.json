@@ -1,0 +1,20 @@
+[
+  {
+    "pk": 2,
+    "model": "sites.Site",
+
+    "fields": {
+      "domain": "localhost:8003",
+      "name": "lms"
+    }
+  },
+  {
+    "pk": 3,
+    "model": "sites.Site",
+
+    "fields": {
+      "domain": "localhost:8031",
+      "name": "cms"
+    }
+  }
+]

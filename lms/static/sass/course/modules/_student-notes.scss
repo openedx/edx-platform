@@ -1,0 +1,403 @@
+// LMS -- modules -- student notes
+// ====================
+
+// in this document:
+// --------------------
+// +extends
+// +notes
+// +local variables/utilities
+// +toggling notes
+// +individual note (in context)
+// +creating/editing notes
+// +listing notes
+// +necessary, but ugly overrides
+
+// +extends:
+// --------------------
+%bubble {
+  @include transform(rotate(45deg));
+  @include left(12px);
+
+  position: absolute;
+  bottom: -($baseline/2);
+  display: block;
+  width: 16px;
+  height: 16px;
+  content: " ";
+  background: $white; // Set a default
+  border-bottom: 1px solid $gray-l2;
+  border-right: 1px solid $gray-l2;
+}
+
+// +notes:
+// --------------------
+// this Sass partial contains all of the styling needed for the in-line student notes UI.
+
+// +local variables/utilities:
+// --------------------
+$notes-annotator-background-light: rgb(251, 251, 251); // taken from annotatorJS base colors
+$notes-annotator-background-med: rgb(214, 214, 214); // taken from annotatorJS base colors
+$notes-annotator-background-dark: rgba(122, 122, 122, 0.6); // taken from annotatorJS base colors
+
+%notes-reset-background {
+  background-image: none !important;
+  background-repeat: none !important;
+  background-position: 0 0 !important;
+}
+
+%notes-reset-font {
+  font-family: $font-family-sans-serif !important;
+  font-style: normal !important;
+  font-weight: $font-regular !important;
+}
+
+%notes-reset-icon {
+  font-family: FontAwesome !important;
+  font-style: normal !important;
+  text-indent: 0 !important;
+}
+
+%notes-bubble {
+  border: ($baseline/20) solid $notes-annotator-background-dark !important;
+  border-radius: ($baseline/10);
+  box-shadow: 0 ($baseline/10) 0 ($baseline/20) $shadow-l2 !important;
+  background: $notes-annotator-background-light !important; // syncing to vendor triangle color
+}
+
+// +toggling notes
+// --------------------
+.edx-notes-visibility {
+  .edx-notes-visibility-error {
+    @extend %t-copy-sub2;
+    @extend %text-truncated;
+
+    position: relative;
+    bottom: -($baseline/20); // needed to sync up with current rogue/more complex calc utility alignment
+    max-width: ($baseline*15);
+    display: none;
+    vertical-align: bottom;
+
+    @include margin-right(-($baseline/4));
+    @include border-right(($baseline/4) solid $error-color);
+
+    padding: ($baseline/2) $baseline;
+    background: $black-t3;
+    text-align: center;
+    color: $white;
+  }
+
+  // STATE: has error
+  &.has-error {
+    .edx-notes-visibility-error {
+      display: inline-block;
+    }
+
+    .utility-control {
+      color: $error-color;
+    }
+  }
+}
+
+// CASE: annotator error in toggling notes (vendor customization)
+.annotator-notice {
+  @extend %t-weight4;
+  @extend %t-copy-sub1;
+
+  padding: ($baseline/4) $baseline;
+  background: $black-t3;
+}
+
+// CASE: annotator error in toggling notes
+// vendor customization
+.annotator-notice {
+  @extend %t-weight4;
+  @extend %t-copy-sub1;
+
+  padding: ($baseline/2) $baseline;
+  background: $gray-d4;
+}
+
+// vendor customization
+.annotator-notice-error {
+  border-color: $error-color;
+}
+
+.edx-notes-focus-grabber {
+  outline: none;
+}
+
+.edx-notes-wrapper {
+  // +individual note (in context)
+  // --------------------
+  .annotator-outer {
+    @extend %ui-depth4;
+    @extend %notes-reset-font;
+  }
+
+  // bubble
+  .annotator-widget.annotator-widget {
+    @extend %notes-bubble;
+  }
+
+  .annotator-listing {
+    padding: 0 !important;
+    margin: 0 !important;
+
+    .annotator-widget {
+      &::after {
+        @extend %bubble;
+      }
+    }
+  }
+
+  .annotator-editor {
+    .annotator-widget {
+      &::after {
+        @extend %bubble;
+
+        background: $gray-l5;
+      }
+    }
+  }
+
+  .annotator-item {
+    padding: ($baseline/2) !important;
+    margin-bottom: 0 !important;
+  }
+
+  // +creating/editing notes (overrides for vendor styling)
+  // --------------------
+  // adding
+  .annotator-adder {
+    @extend %notes-reset-background;
+    @extend %ui-depth4;
+
+    button {
+      @extend %notes-bubble;
+
+      position: relative;
+      display: block;
+
+      &::after {
+        @extend %notes-reset-icon;
+        @extend %shame-link-base;
+
+        @include font-size(30);
+
+        position: absolute;
+        top: 35%;
+
+        @include left(15%);
+
+        content: "\f14b";
+      }
+
+      // using annotatorJS triangle styling for adder
+      &::before {
+        @extend %bubble;
+
+        @include left(10px);
+
+        background: whitesmoke;
+      }
+    }
+  }
+
+  // editing
+  .annotator-editor {
+    .annotator-controls {
+      @include text-align(left);
+      @include clearfix();
+
+      @extend %ui-depth1;
+
+      position: relative;
+      padding: 8px;
+      border: none !important;
+      border-radius: 0 !important;
+      background: $gray-l5 !important;
+      font-family: $font-family-sans-serif !important;
+
+      // actions
+      .annotator-save,
+      .annotator-cancel {
+        @extend %notes-reset-background;
+
+        padding: ($baseline/4) ($baseline/2) !important;
+        border: none;
+        box-shadow: none;
+        font-family: $font-family-sans-serif !important;
+        font-size: 14px !important;
+        text-shadow: none !important;
+
+        // removing vendor icons
+        &::after {
+          display: none !important;
+        }
+      }
+
+      .annotator-save {
+        @include float(left);
+      }
+
+      .annotator-cancel {
+        background-color: $transparent !important;
+      }
+    }
+
+    .annotator-item {
+      textarea {
+        @extend %notes-reset-font;
+        @extend %t-demi-strong;
+
+        padding: ($baseline/5) !important;
+        font-size: 14px !important;
+        line-height: 22px !important;
+        color: $gray-d3 !important;
+        background: $notes-annotator-background-light !important; //matches annotator JS editing bubble triangle color
+
+        // STATE: hover/focus
+        &:hover,
+        &:focus {
+          background: $notes-annotator-background-light;
+        }
+      }
+    }
+  }
+
+
+  // +listing notes (overrides for vendor styling)
+  // --------------------
+  // highlight
+  .annotator-hl {
+    background: $student-notes-highlight-color-focus;
+
+    // CASE: a highlight contains a link
+    a {
+      color: $link-color;
+
+      // STATE: hover/focus
+      &:hover,
+      &:focus {
+        text-decoration: underline;
+      }
+
+      // STATE: disabled
+      &:disabled,
+      &.is-disabled {
+        @extend %ui-disabled;
+
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  // CASE: a link contains a highlight
+  a .annotator-hl {
+    color: $link-color;
+
+    // STATE: hover/focus
+    &:hover,
+    &:focus {
+      text-decoration: underline;
+    }
+  }
+
+  // content
+  .annotator-viewer {
+    .annotator-widget.annotator-listing {
+      outline: none;
+    }
+
+    // poorly scoped selector for content of a note's comment
+    div:first-of-type {
+      @extend %notes-reset-font;
+
+      padding: ($baseline/4) !important;
+      font-size: 14px !important;
+      line-height: 22px !important;
+      color: $gray-d2 !important;
+    }
+
+    // controls
+    .annotator-controls {
+      opacity: 1;
+      // RTL support
+      @include right(0);
+
+      top: 0;
+
+      @include float(right);
+      @include padding-left($baseline/4);
+
+      .annotator-edit,
+      .annotator-delete,
+      .annotator-close {
+        position: relative;
+        display: inline-block;
+        vertical-align: middle;
+
+        &::before {
+          @extend %notes-reset-icon;
+          @extend %shame-link-base;
+          @extend %t-icon4;
+
+          position: absolute;
+        }
+      }
+
+      .annotator-edit {
+        @include margin-right($baseline/2);
+
+        &::before {
+          top: 0;
+
+          @include left(0);
+
+          content: "\f040"; // .fa-pencil
+        }
+      }
+
+      .annotator-delete {
+        @include margin-right($baseline/3);
+
+        &::before {
+          top: -($baseline/20);
+
+          @include left(0);
+
+          content: "\f1f8"; // .fa-trash
+        }
+      }
+
+      .annotator-close {
+        &::before {
+          top: -($baseline/20);
+
+          @include left(0);
+
+          content: "\f00d"; // .fa-close
+        }
+      }
+    }
+  }
+}
+// +necessary, but ugly overrides
+// --------------------
+.edx-notes-wrapper .annotator-wrapper.annotator-wrapper .annotator-outer.annotator-viewer .annotator-controls button {
+  @extend %notes-reset-background;
+
+  opacity: 1;
+}
+
+.edx-notes-wrapper .annotator-wrapper .annotator-editor.annotator-outer button.annotator-save {
+  @extend %btn-inherited-primary;
+  @extend %t-action2;
+}
+
+.edx-notes-wrapper .annotator-wrapper .annotator-editor.annotator-outer button.annotator-cancel {
+  @extend %shame-link-base;
+  @extend %t-action2;
+  @extend %t-regular;
+}

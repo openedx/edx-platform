@@ -1,0 +1,27 @@
+<div class="wrapper-comp-setting metadata-videolist-enum">
+  <label class="label setting-label" for="<%- uniqueId %>"><%- model.get('display_name')%></label>
+  <div class="wrapper-videolist-settings">
+    <div class="wrapper-videolist-url videolist-settings-item"><input type="text" id="<%- uniqueId %>"  class="input videolist-url" value="<%- model.get('value')[0] %>"></div>
+    <div class="tip videolist-url-tip setting-help"><%- model.get('help') %></div>
+    <div class="wrapper-videolist-urls">
+      <a href="#" class="collapse-action collapse-setting">
+        <span class="icon fa fa-plus" aria-hidden="true"></span><%- gettext("Add URLs for additional versions") %> <span class="sr"><%- model.get('display_name')%></span>
+      </a>
+      <div class="videolist-extra-videos">
+        <span class="tip videolist-extra-videos-tip setting-help"><%- gettext("To be sure all students can access the video, we recommend providing both an .mp4 and a .webm version of your video. Click below to add a URL for another version. These URLs cannot be YouTube URLs. The first listed video that's compatible with the student's computer will play.") %></span>
+        <ol class="videolist-settings">
+            <li class="videolist-settings-item">
+              <input type="text" class="input" value="<%- model.get('value')[1] %>">
+            </li>
+            <li class="videolist-settings-item">
+              <input type="text" class="input" value="<%- model.get('value')[2] %>">
+            </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="transcripts-status is-invisible">
+    <label class="label setting-label transcripts-label"><%- gettext("Default Timed Transcript") %></label>
+    <div class="wrapper-transcripts-message"></div>
+</div>

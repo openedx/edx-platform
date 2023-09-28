@@ -1,0 +1,915 @@
+// +notes:
+// ---------------------
+// * Styling for the program details main view and sidebar view
+
+// +local variables/utilities:
+// ----------------------
+$btn-color-primary: $primary-dark;
+
+.program-details {
+  .content-wrapper {
+    max-width: 100%;
+    padding: 0px 20px 10px 20px;
+
+    @include media-breakpoint-up(lg){
+      padding: 0px 20px 10px 40px;
+    }
+  }
+}
+
+.program-header {
+  .banner-content {
+    padding-top: 100px;
+  }
+
+  .title {
+    margin: 0;
+  }
+
+  .title,
+  .subtitle {
+    color: $white;
+    font-weight: font-weight(semi-bold);
+  }
+
+  .org-wrapper {
+    position: absolute;
+    top: 0;
+    background: $white;
+    opacity: 0.7;
+    left: 0;
+    padding: 20px;
+  }
+
+  .org-logo {
+    height: 50px;
+  }
+
+  .breadcrumb-wrapper {
+    padding: $full-width-banner-margin;
+
+    @include media-breakpoint-up(xl) {
+      padding-left: 0;
+    }
+  }
+
+  .breadcrumb-list {
+    list-style-type: none;
+    margin: 0;
+  }
+
+  .crumb {
+    @include float(left);
+
+    position: relative;
+    font-size: font-size(x-small);
+    line-height: line-height(x-small);
+    color: $gray-dark;
+
+    &.active {
+      color: $gray-dark;
+    }
+  }
+
+  .crumb-link {
+    font-size: inherit;
+    line-height: inherit;
+    color: $primary-base;
+
+    &:hover,
+    &:focus {
+      color: $gray-dark;
+      text-decoration: underline;
+    }
+  }
+
+  .crumb-separator {
+    font-size: font-size(xx-small);
+    line-height: line-height(xx-small);
+    padding: 0 $full-width-banner-margin/4;
+  }
+}
+
+.program-details-alerts {
+  .page-banner {
+    margin: 0;
+    padding: 0 0 48px;
+    gap: 24px;
+  }
+}
+
+.program-details-tab-alerts {
+  .page-banner {
+    margin: 0;
+    gap: 24px;
+  }
+}
+
+// CSS for April 2017 version of Program Details Page
+.program-details {
+  .window-wrap {
+    background-color: $body-bg;
+  }
+
+  .wrapper-footer,
+  footer#footer-edx-v3 {
+    @include clearfix();
+
+    clear: both;
+  }
+}
+
+.program-details-wrapper {
+  .program-details-header {
+    background-color: $gray-light1;
+    display: flex;
+    color: black;
+    font-family: 'Open Sans';
+    font-weight: normal;
+    flex-wrap: wrap;
+    flex-direction: column;
+    padding: 40px 10px 35px 0px;
+
+    @include media-breakpoint-up(md) {
+      flex-direction: row;
+      padding-right: 30px;
+    }
+
+    @media (min-width: map-get($container-max-widths, xl)) {
+      padding-right: calc(((100% - 1180px) / 2) + 30px);
+    }
+
+    .hd-1 {
+      font-size: 1.5em;
+
+      @include media-breakpoint-up(md) {
+        font-size: 2.375em;
+      }
+    }
+
+    .program-details-icon {
+      @include margin-left(3px);
+
+      margin-top: 10px;
+      height: auto;
+
+      svg {
+        width: inherit;
+      }
+
+      /* IE11 CSS styles */
+      @include media-breakpoint-up(md) {
+        @media (-ms-high-contrast: none), (-ms-high-contrast: active) {
+          height: 50px;
+        }
+      }
+    }
+
+    .micromasters {
+      fill: $micromasters-color;
+      width: 200px;
+
+      @include media-breakpoint-up(md) {
+        width: 250px;
+      }
+    }
+
+    .xseries {
+      fill: xseries-color;
+      width: 150px;
+
+      @include media-breakpoint-up(md) {
+        width: 200px;
+      }
+    }
+
+    .professional.certificate {
+      fill: $professional-certificate-color;
+      width: 250px;
+
+      @include media-breakpoint-up(md) {
+        width: 300px;
+      }
+    }
+
+    .meta-info {
+      margin: 0;
+      display: block;
+
+      @include media-breakpoint-up(md) {
+        width: 70%;
+      }
+
+      @include media-breakpoint-up(lg) {
+        width: 75%;
+      }
+
+      .program-title {
+        font-weight: normal;
+        font-size: 2em;
+      }
+    }
+
+    .authoring-organizations {
+      text-align: center;
+      display: block;
+      padding-left: 24px;
+      width: fit-content;
+
+      @include media-breakpoint-up(md) {
+        padding-left: 0px;
+      }
+
+      .heading {
+        font-family: $font-family-sans-serif;
+        font-weight: bold;
+        color: $primary-dark;
+        font-size: 0.9375em;
+        margin-top: auto;
+        margin-bottom: auto;
+
+        @include media-breakpoint-up(md) {
+          @include margin-right(10px 0 0 0);
+        }
+      }
+
+      .orgs .org-logo {
+        height: 40px;
+      }
+
+      @include media-breakpoint-up(md) {
+        margin: initial;
+        width: 30%;
+
+        .orgs .org-logo {
+          @include margin-left(2.5%);
+        }
+      }
+
+      @include media-breakpoint-up(lg) {
+        width: 25%;
+      }
+    }
+  }
+
+  .program-details-content {
+    margin-bottom: 30px;
+    padding-right: 40px;
+  }
+  .tab-content{
+      .tab-pane {
+          .js-program-pathways {
+              padding-left: 40px;
+          }
+      }
+  }
+
+  .course-list-heading {
+    font-family: $font-family-sans-serif;
+    font-weight: bold;
+    color: $primary-dark;
+    font-size: 0.9375em;
+    line-height: normal;
+    padding-bottom: 5px;
+    border-bottom: 3px solid $divider-color;
+    margin: {
+      top: 10px;
+      bottom: 20px;
+    }
+
+    .status {
+      @include margin-right(7px);
+    }
+  }
+
+  .course-list > div:nth-of-type(even) {
+    background-color: $zebra-stripe-color;
+  }
+
+  .course-list-headings {
+    .motivating-section {
+      font-size: 0.9375em;
+      width: auto;
+
+      .motivating-heading {
+        margin-bottom: 0;
+        font-weight: 600;
+      }
+
+      .motivating-message {
+        color: #414141;
+      }
+    }
+  }
+
+  .program-heading {
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    margin-right: 48px;
+
+    .program-heading-title {
+      font-family: $font-family-sans-serif;
+      font-weight: 700;
+      margin-bottom: 5px;
+      line-height: normal;
+      color: theme-color("primary") !important;
+    }
+
+    .program-heading-message {
+      font-weight: 400;
+      font-size: 18px;
+      line-height: 28px;
+    }
+  }
+
+  .course-enroll-view {
+    .view-course-button {
+      background: $btn-color-primary;
+      border-color: $btn-color-primary;
+      color: $white;
+      height: 37px;
+      padding: 7px 18.5px 0;
+      width: auto;
+      border-radius: 0;
+      text-align: center;
+      font-size: 0.9375em;
+      margin-top: 5px;
+
+      /* IE11 CSS styles */
+      @include media-breakpoint-up(lg) {
+        @media (-ms-high-contrast: none), (-ms-high-contrast: active) {
+          @include float(right);
+        }
+      }
+
+      @include media-breakpoint-up(lg) {
+        margin-top: 0;
+      }
+    }
+
+    .enroll-button {
+      width: 100%;
+
+      @include media-breakpoint-up(sm) {
+        width: initial;
+        margin-bottom: 0;
+        margin-top: 17px;
+      }
+
+      @include media-breakpoint-up(md) {
+        width: initial;
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+
+      button,
+      .enroll-course-button {
+        background-color: $btn-color-primary;
+        color: $white;
+        height: 37px;
+        width: 128px;
+        padding: 0;
+        margin-bottom: 5px;
+        margin-top: 7px;
+        font-size: 0.9375em;
+
+        &:hover {
+          color: $btn-color-primary;
+          background-color: theme-color("inverse");
+        }
+
+        /* IE11 CSS styles */
+        @include media-breakpoint-up(md) {
+          @media (-ms-high-contrast: none), (-ms-high-contrast: active) {
+            @include float(right);
+          }
+        }
+      }
+
+      .enroll-course-button {
+        padding: 7px 18.5px 0;
+      }
+    }
+
+    .select-choice {
+      @include margin-right(2px);
+
+      font-family: $font-family-sans-serif;
+      font-weight: bold;
+      font-size: 0.9375em;
+      color: $gray-base;
+      margin-top: 6px;
+      display: block;
+
+      @include media-breakpoint-up(md) {
+        display: inline;
+      }
+    }
+
+    .run-select-container {
+      @include media-breakpoint-up(md) {
+        margin-top: 8px;
+        display: flex;
+        flex-wrap: wrap;
+      }
+    }
+
+    .run-select {
+      width: 100%;
+      height: 34px;
+      padding: 0;
+    }
+  }
+
+  .upgrade-button {
+    background: theme-color("success");
+    border-color: theme-color("success");
+    color: $white;
+    border-radius: 0;
+    padding: 7px;
+    text-align: center;
+    font-size: 0.9375em;
+
+    /* IE11 CSS styles */
+    @include media-breakpoint-up(md) {
+      @media (-ms-high-contrast: none), (-ms-high-contrast: active) {
+        @include float(right);
+      }
+    }
+
+    &.complete-program {
+      margin: 10px 15px 10px 5px;
+      align-self: flex-start;
+
+      .list-price {
+        text-decoration: line-through;
+      }
+    }
+  }
+
+  .upgrade-subscription {
+    margin: 16px 0 10px;
+    row-gap: 16px;
+    column-gap: 24px;
+  }
+
+  .subscription-icon-launch {
+    width: 22.5px;
+    height: 22.5px;
+    margin-inline-start: 8px;
+  }
+
+  .subscription-icon-restart {
+    width: 22.5px;
+    height: 22.5px;
+    margin-inline-end: 8px;
+  }
+
+  .subscription-icon-arrow-upright {
+    display: inline-flex;
+    align-items: center;
+    width: 15px;
+    height: 15px;
+    margin-inline-start: 8px;
+  }
+
+  .subscription-info-brief {
+    font-size: 0.9375em;
+    color: $gray-500;
+  }
+
+  .subscription-info-upsell {
+    margin-top: 0.25rem;
+    font-size: 0.8125em;
+  }
+
+  .program-course-card {
+    width: 100%;
+    padding: 15px 15px 15px 0px;
+
+    @include media-breakpoint-up(md) {
+      height: auto;
+    }
+
+    .section {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      @include media-breakpoint-up(md) {
+        flex-wrap: wrap;
+      }
+    }
+
+    .section:not(:last-child) {
+      margin-bottom: $baseline/2;
+    }
+
+    .section:not(:first-child) {
+      margin-top: 0;
+    }
+
+    .course-details {
+      width: 100%;
+      float: none;
+
+      @include media-breakpoint-up(md) {
+        display: table-cell;
+        vertical-align: top;
+        float: left;
+      }
+
+      .course-title {
+        font-size: 1em;
+        font-weight: 600;
+        margin: 0;
+
+        .course-title-link,
+        .course-title-link:visited {
+          color: $primary-base;
+          text-decoration: underline;
+        }
+      }
+
+      .run-period,
+      .info-expires-at {
+        color: $gray-base;
+        font-size: 0.9375em;
+      }
+
+      .course-text .enrolled {
+        color: $gray-base;
+      }
+    }
+
+    .course-meta-container {
+      @include media-breakpoint-up(md) {
+        display: table;
+        width: 100%;
+      }
+
+      .course-content {
+        overflow: hidden;
+      }
+    }
+
+    .course-actions {
+      @include media-breakpoint-up(md) {
+        width: 100%;
+        text-align: right;
+        float: right;
+      }
+
+      .course-enroll-view {
+        @include media-breakpoint-up(md) {
+          text-align: right;
+        }
+      }
+    }
+
+    .course-certificate {
+      width: 100%;
+    }
+
+
+    .final-grade {
+      .grade-header {
+        color: $gray-base;
+        font-weight: bold;
+      }
+
+      .grade-display {
+        padding-right: 15px;
+        font-size: 1.5em;
+        color: $primary-accent;
+      }
+    }
+
+    .upgrade-message {
+      flex-wrap: wrap;
+
+      .action {
+        width: 100%;
+        margin: 5px 0;
+
+        @include media-breakpoint-up(md) {
+          margin-left: auto;
+          width: initial;
+        }
+      }
+
+      .certificate-status {
+        padding-top: 0;
+        width: initial;
+
+        @include media-breakpoint-up(sm) {
+          width: 300px;
+        }
+
+        @include media-breakpoint-up(md) {
+          width: initial;
+        }
+
+        .card-msg {
+          font-family: $font-family-sans-serif;
+          font-weight: bold;
+          font-size: 0.9375em;
+          color: $gray-base;
+          display: block;
+
+          @include media-breakpoint-up(sm) {
+            display: inline;
+          }
+        }
+
+        .price {
+          color: theme-color("success");
+          font-weight: bold;
+        }
+      }
+    }
+
+    .certificate-status {
+      .fa-check-circle {
+        color: theme-color("success");
+      }
+
+      .card-msg {
+        font-family: $font-family-sans-serif;
+        font-weight: bold;
+        font-size: 0.9375em;
+        color: $gray-base;
+      }
+
+      .certificate-status-msg {
+        color: $gray-base;
+        font-size: 0.9375em;
+      }
+    }
+
+    .expired-notification {
+      display: inline-block;
+      padding-top: 5px;
+      width: 300px;
+
+      @include media-breakpoint-up(sm) {
+        padding-top: 10px;
+        width: 500px;
+      }
+
+      @include media-breakpoint-up(md) {
+        width: initial;
+      }
+    }
+
+    .expired-icon {
+      @include float(left);
+
+      color: $primary-dark;
+    }
+
+    .expired-text {
+      overflow: hidden;
+      padding-left: 10px;
+    }
+  }
+}
+
+// CSS for the program sidebar
+.program-sidebar {
+  padding: 40px 40px 40px 0px;
+
+  .program-record,.subscription-info {
+    text-align: left;
+    padding-bottom: 2em;
+  }
+
+  .subscription-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    color: #414141;
+
+    .subscription-link {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid currentColor;
+    }
+  }
+
+  .sidebar-section {
+    font-size: 0.9375em;
+    width: auto;
+
+    .motivating-message {
+      color: #414141;
+    }
+  }
+
+  .divider-heading {
+    font-family: $font-family-sans-serif;
+    font-weight: bold;
+    color: $primary-dark;
+    font-size: 0.9375em;
+    line-height: normal;
+    padding-bottom: $baseline*0.25;
+    border-bottom: $baseline*0.15 solid $divider-color;
+    margin: $baseline*0.5 0 $baseline 0;
+  }
+
+  .sidebar-button-wrapper {
+    text-align: right;
+    .sidebar-button {
+      font-size: 0.9375em;
+      background: transparent;
+      border: 1px solid;
+      padding: 10px 16px;
+    }
+  }
+
+  .program-credit-pathways {
+    padding-bottom: 2em;
+  }
+
+  .pathway-wrapper {   
+    width: auto;
+    border-bottom: 1px solid $gray-light3;
+
+
+    .pathway-info {
+      margin: 15px 0;
+      font-size: 0.9375em;
+      color: #414141;
+
+      .pathway-heading {
+        font-weight: bold;
+        margin-bottom: 3px;
+      }
+    }
+  }
+
+  .pathway-wrapper:last-child {
+    border-bottom: none;
+  }
+
+  @include media-breakpoint-up(md) {
+    @include float(right);
+
+    width: $baseline*15;
+    padding: $baseline*1.5 $baseline*1.5 $baseline*1.5 $baseline*0.5;
+    position: relative;
+  }
+
+  @include media-breakpoint-up(lg) {
+    width: $baseline*22.5;
+
+    .program-progress {
+      @include margin-left($baseline*2.5);
+    }
+  }
+
+  @media (min-width: map-get($container-max-widths, xl)) {
+    @include margin-right(calc((100% - 1180px) / 2));
+  }
+}
+
+.certificate-heading {
+  margin-bottom: 10px;
+
+  @include media-breakpoint-up(md) {
+    @include margin-right(30px);
+  }
+
+  @include media-breakpoint-up(lg) {
+    @include margin-left(10px);
+    @include margin-right(0);
+  }
+}
+
+.program-cert-link {
+  display: inline-block;
+
+  &:active,
+  &:focus,
+  &:hover {
+    .program-cert {
+      border-color: $primary-dark1;
+    }
+  }
+}
+
+.program-cert {
+  width: 100%;
+  border: 1px solid $divider-color;
+
+  @include media-breakpoint-up(md) {
+    width: calc(100% - 30px);
+  }
+
+  @include media-breakpoint-up(lg) {
+    width: 100%;
+  }
+}
+
+.certificate-list {
+  @include margin(0, 0, 0, 10px);
+
+  list-style: none;
+
+  .certificate {
+    display: flex;
+    flex-direction: row;
+    padding: 5px 0 10px;
+
+    .image-link {
+      flex: 0 0 100px;
+
+      @include media-breakpoint-up(md) {
+        flex: 0 0 120px;
+      }
+    }
+  }
+
+  .certificate-link {
+    @include margin-left(20px);
+
+    color: $black;
+    font: {
+      size: 1.1em;
+      weight: 600;
+    }
+
+    @include media-breakpoint-up(md) {
+      font-size: 0.9em;
+    }
+
+    @include media-breakpoint-up(lg) {
+      font-size: 1.1em;
+    }
+
+    &:active,
+    &:focus,
+    &:hover {
+      .sample-cert {
+        border-color: $primary-dark1;
+      }
+    }
+  }
+
+  .sample-cert {
+    width: 120px;
+    border: 3px solid $gray-light2;
+    border-radius: 5px;
+
+    @include media-breakpoint-up(md) {
+      width: 100px;
+    }
+
+    @include media-breakpoint-up(lg) {
+      width: 120px;
+    }
+  }
+}
+
+.program-detail-nav {
+  @extend .content;
+
+  display: block;
+  width: 100%;
+  padding: 40px;
+
+  .program-detail-nav-list {
+    @extend %ui-no-list;
+
+    border-bottom: 1px solid $gray-base;
+
+    .nav-item {
+      @extend %t-copy-base;
+
+      font-weight: 500;
+      font-size: 1.125rem;
+      display: inline-block;
+
+      .btn-link {
+        display: inline-block;
+        padding: ($baseline/2);
+        border: 0;
+        box-shadow: none;
+        text-shadow: none;
+        color: theme-color("primary");
+        cursor: pointer;
+
+        &:hover,
+        &:focus {
+          border-bottom: 3px solid theme-color("primary");
+        }
+
+        &.active {
+          border-bottom: 3px solid theme-color("primary");
+        }
+      }
+    }
+  }
+}

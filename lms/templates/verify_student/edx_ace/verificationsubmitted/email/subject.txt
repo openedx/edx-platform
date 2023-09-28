@@ -1,0 +1,4 @@
+{% load i18n %}
+{% autoescape off %}
+{% blocktrans trimmed %}Thank you for submitting your photos!{% endblocktrans %}
+{% endautoescape %}

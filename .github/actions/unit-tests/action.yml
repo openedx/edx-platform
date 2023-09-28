@@ -1,0 +1,34 @@
+name: 'Run unit tests'
+description: 'shared steps to run unit tests on both Github hosted and self hosted runners.'
+runs:
+  using: "composite"
+  steps:
+    - name: set settings path
+      shell: bash
+      run: |
+        echo "settings_path=$(python scripts/unit_test_shards_parser.py --shard-name=${{ matrix.shard_name }} --output settings )" >> $GITHUB_ENV
+
+    - name: get unit tests for shard
+      shell: bash
+      run: |
+        echo "unit_test_paths=$(python scripts/unit_test_shards_parser.py --shard-name=${{ matrix.shard_name }} )" >> $GITHUB_ENV
+
+    - name: run tests
+      shell: bash
+      run: |
+        python -Wd -m pytest -p no:randomly --ds=${{ env.settings_path }} ${{ env.unit_test_paths }} --cov=.
+
+    - name: rename warnings json file
+      if: success()
+      shell: bash
+      run: |
+        cd test_root/log
+        mv pytest_warnings.json pytest_warnings_${{ matrix.shard_name }}.json
+
+    - name: save pytest warnings json file
+      if: success()
+      uses: actions/upload-artifact@v2
+      with:
+        name: pytest-warnings-json
+        path: |
+          test_root/log/pytest_warnings*.json

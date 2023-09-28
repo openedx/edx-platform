@@ -1,0 +1,151 @@
+# .gitignore for edx-platform.
+# There's a lot here, please try to keep it organized.
+
+### Files private to developers
+
+# Files that should be git-ignored, but are hand-edited or otherwise valued,
+# and so should not be destroyed by "make clean".
+# start-noclean
+requirements/private.txt
+requirements/edx/private.in
+requirements/edx/private.txt
+lms/envs/private.py
+cms/envs/private.py
+# end-noclean
+
+### Python artifacts
+*.pyc
+
+### Editor and IDE artifacts
+*~
+*.swp
+*.orig
+/nbproject
+.idea/
+.redcar/
+codekit-config.json
+.pycharm_helpers/
+/_mac/*
+/IntelliLang.xml
+/conda_packages.xml
+/databaseSettings.xml
+/diff.xml
+/debugger.xml
+/editor.xml
+/ide.general.xml
+/inspection/Default.xml
+/other.xml
+/packages.xml
+/web-browsers.xml
+
+### NFS artifacts
+.nfs*
+
+### OS X artifacts
+*.DS_Store
+.AppleDouble
+:2e_*
+:2e#
+
+### Internationalization artifacts
+*.mo
+*.po
+*.prob
+*.dup
+!django.po
+!django.mo
+!djangojs.po
+!djangojs.mo
+conf/locale/en/LC_MESSAGES/*.mo
+conf/locale/fake*/LC_MESSAGES/*.po
+conf/locale/fake*/LC_MESSAGES/*.mo
+# this was a mistake in i18n_tools, now fixed.
+conf/locale/messages.mo
+
+### Testing artifacts
+.testids/
+.noseids
+nosetests.xml
+.cache/
+.coverage
+.coverage.*
+coverage.xml
+cover/
+cover_html/
+reports/
+jscover.log
+jscover.log.*
+.pytest_cache/
+pytest_task*.txt
+.tddium*
+common/test/data/test_unicode/static/
+test_root/courses/
+test_root/data/test_bare.git/
+test_root/export_course_repos/
+test_root/paver_logs/
+test_root/uploads/
+django-pyfs
+.tox/
+common/test/db_cache/bok_choy_*.yaml
+common/test/data/badges/*.png
+
+### Installation artifacts
+*.egg-info
+.pip_download_cache/
+.prereqs_cache
+.vagrant/
+node_modules
+bin/
+
+### Static assets pipeline artifacts
+*.scssc
+lms/static/css/
+lms/static/certificates/css/
+cms/static/css/
+common/static/common/js/vendor/
+common/static/common/css/vendor/
+common/static/bundles
+webpack-stats.json
+
+### Styling generated from templates
+lms/static/sass/*.css
+lms/static/sass/*.css.map
+lms/static/certificates/sass/*.css
+lms/static/themed_sass/
+cms/static/css/
+cms/static/sass/*.css
+cms/static/sass/*.css.map
+cms/static/themed_sass/
+themes/**/css
+
+### Logging artifacts
+log/
+logs
+chromedriver.log
+ghostdriver.log
+
+### Celery artifacts ###
+celerybeat-schedule
+
+### Unknown artifacts
+database.sqlite
+courseware/static/js/mathjax/*
+flushdb.sh
+build
+/src/
+\#*\#
+.env/
+openedx/core/djangoapps/django_comment_common/comment_client/python
+autodeploy.properties
+.ws_migrations_complete
+dist
+*.bak
+
+# Visual Studio Code
+.vscode
+
+# Locally generated PII reports
+pii_report
+
+# Pyenv Python version file
+.python-version

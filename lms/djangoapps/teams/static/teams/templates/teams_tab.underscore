@@ -1,0 +1,13 @@
+<div id="teams-message" class="wrapper-msg is-incontext urgency-low is-hidden" tabindex="-1">
+    <div class="msg">
+        <div class="msg-content">
+            <div class="copy">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="teams-header"></div>
+<div class="teams-instructor-tools-bar"></div>
+<div class="teams-main">
+    <div class="page-content"></div>
+</div>

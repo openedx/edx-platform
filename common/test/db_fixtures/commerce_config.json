@@ -1,0 +1,10 @@
+[
+  {
+    "pk": 2,
+    "model": "commerce.commerceconfiguration",
+    "fields": {
+      "enabled": 1,
+      "change_date": "2016-04-21 10:19:32.034856Z"
+    }
+  }
+]

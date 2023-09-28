@@ -1,0 +1,34 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load django_markup %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <p>
+                {% blocktrans trimmed asvar replied_to_text %}
+                    {{ comment_username }} replied to {start_tag}{{ thread_title }}{end_tag}:
+                {% endblocktrans %}
+                {% interpolate_html replied_to_text start_tag='<b>'|safe end_tag='</b>'|safe %}
+            </p>
+            <div style="border-left: 1px solid rgba(0,0,0,0.25);
+                    padding: 1px 1px 1px 15px;
+                    margin: 20px 20px 30px 30px;
+                    color: rgba(0,0,0,.75);">
+                {{ comment_body }}
+            </div>
+
+            {% filter force_escape %}
+                {% blocktrans asvar course_cta_text %}View discussion{% endblocktrans %}
+            {% endfilter %}
+            {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=post_link%}
+
+            {% block google_analytics_pixel %}
+                <img src="{{ ga_tracking_pixel_url }}" alt="" role="presentation" aria-hidden="true" style="display: block;"/>
+            {% endblock %}
+        </td>
+    </tr>
+</table>
+{% endblock %}

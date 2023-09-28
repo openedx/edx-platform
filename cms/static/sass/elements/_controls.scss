@@ -1,0 +1,564 @@
+// studio - elements - UI controls
+// ====================
+
+// Table of Contents
+// * +General Action - Extend
+// * +General Type and Size - Extend
+// * +Primary Button - Extends
+// * +Secondary Button - Extends
+// * +Button
+// * +UI Dropdown Button - Extend
+// * +UI Nav Dropdown Button - Extend
+// * +UI Actions List - Extend
+// * +UI Expand/Collapse - Extend
+// * +Drag and Drop
+
+
+
+// +General Action - Extend
+// ====================
+%action {
+  @extend %ui-fake-link;
+
+  &.is-disabled {
+    @extend %ui-disabled;
+
+    -webkit-filter: grayscale(65%);
+    opacity: 0.65;
+  }
+}
+
+// +General Type and Size - Extend
+// ====================
+%sizing {
+  @extend %t-action4;
+
+  padding: ($baseline/4) ($baseline/2) ($baseline/3) ($baseline/2);
+}
+
+
+// +Primary Button - Extends
+// ====================
+// gray primary button
+%btn-primary-gray {
+  @extend %ui-btn-primary;
+
+  background: $gray-l1;
+  border-color: $gray-l2;
+  color: $white;
+
+  &:hover,
+  &:active {
+    border-color: $gray-l1;
+    background: $gray;
+  }
+
+  &.current,
+  &.active {
+    background: $gray-d1;
+    color: $gray-l1;
+
+    &:hover,
+    &:active {
+      background: $gray-d1;
+    }
+  }
+}
+
+// blue primary button
+%btn-primary-blue {
+  @extend %ui-btn-primary;
+
+  background: theme-color("primary");
+  border-color: theme-color("primary");
+  color: theme-color("inverse");
+
+  &:hover,
+  &:active {
+    background: $uxpl-blue-hover-active;
+    border-color: $uxpl-blue-hover-active;
+  }
+
+  &.current,
+  &.active {
+    background: $uxpl-blue-hover-active;
+    border-color: $uxpl-blue-hover-active;
+    color: $blue-l4;
+
+    &:hover,
+    &:active {
+      background: $uxpl-blue-hover-active;
+    }
+  }
+}
+
+// green primary button
+%btn-primary-green {
+  @extend %ui-btn-primary;
+
+  background: $uxpl-green-base;
+  border-color: $uxpl-green-base;
+  color: theme-color("inverse");
+
+  &:hover,
+  &:active {
+    background: $uxpl-green-dark-hover-active;
+    border-color: $uxpl-green-dark-hover-active;
+  }
+
+  &.current,
+  &.active {
+    background: $uxpl-green-dark-hover-active;
+    color: theme-color("inverse");
+    border-color: $uxpl-green-dark-hover-active;
+
+    &:hover,
+    &:active {
+      background: $uxpl-green-dark-hover-active;
+    }
+  }
+}
+
+// +Secondary Button - Extends
+// ====================
+// gray secondary button
+%btn-secondary-gray {
+  @extend %ui-btn-secondary;
+
+  border-color: $gray-l3;
+  color: $gray-d1;
+
+  &:hover,
+  &:active {
+    background: $gray-l3;
+    color: $gray-d2;
+  }
+
+  &.current,
+  &.active {
+    background: $gray-d2;
+    color: $gray-l5;
+
+    &:hover,
+    &:active {
+      background: $gray-d2;
+    }
+  }
+}
+
+// blue secondary button
+%btn-secondary-blue {
+  @extend %ui-btn-secondary;
+
+  border-color: $blue-l3;
+  color: theme-color("primary");
+
+  &:hover,
+  &:active {
+    background: $blue-l4;
+    color: $uxpl-blue-hover-active;
+  }
+
+  &.current,
+  &.active {
+    border-color: $blue-l3;
+    background: $blue-l3;
+    color: theme-color("primary");
+  }
+}
+
+// white secondary button
+%btn-secondary-white {
+  @extend %ui-btn-secondary;
+
+  border-color: $white-t2;
+  color: $white-t3;
+
+  &:hover,
+  &:active {
+    border-color: $white;
+    color: $white;
+  }
+
+  &.current,
+  &.active {
+    background: $gray-d2;
+    color: $gray-l5;
+
+    &:hover,
+    &:active {
+      background: $gray-d2;
+    }
+  }
+}
+
+// green secondary button
+%btn-secondary-green {
+  @extend %ui-btn-secondary;
+
+  border-color: $green-l4;
+  color: $green-l2;
+
+  &:hover,
+  &:active {
+    background: $green-l4;
+    color: $green-s1;
+  }
+
+  &.current,
+  &.active {
+    background: $green-s1;
+    color: $green-l4;
+
+    &:hover,
+    &:active {
+      background: $green-s1;
+    }
+  }
+}
+
+// LMS-style CAPA button for consistency with LMS buttons
+%btn-lms-style {
+  border: 1px solid $btn-lms-border;
+  border-radius: 3px;
+  box-shadow: inset 0 1px 0 0 $white;
+  color: $gray-d3;
+  display: inline-block;
+  font-weight: bold;
+  background-color: $btn-lms-background;
+  background-image: -webkit-linear-gradient($btn-lms-background, $btn-lms-gradient);
+  background-image: linear-gradient($btn-lms-background, $btn-lms-gradient);
+  padding: 7px 18px;
+  text-decoration: none;
+  text-shadow: 0 1px 0 $btn-lms-shadow;
+  background-clip: padding-box;
+  font-size: 0.8125em;
+
+  &:focus,
+  &:hover {
+    box-shadow: inset 0 1px 0 0 $btn-lms-shadow-hover;
+    cursor: pointer;
+    background-color: $btn-lms-background-hover;
+    background-image: -webkit-linear-gradient($btn-lms-background-hover, $btn-lms-gradient-hover);
+    background-image: linear-gradient($btn-lms-background-hover, $btn-lms-gradient-hover);
+  }
+
+  &:active {
+    border: 1px solid $btn-lms-border;
+    box-shadow: inset 0 0 8px 4px $btn-lms-shadow-active, inset 0 0 8px 4px $btn-lms-shadow-active;
+  }
+}
+
+// +Button Element
+// ====================
+.button {
+  .icon {
+    @include margin-right($baseline/4);
+
+    display: inline-block;
+    vertical-align: middle;
+  }
+}
+
+// +UI Dropdown Button - Extend
+// ====================
+%ui-btn-dd {
+  @extend %ui-btn;
+  @extend %ui-btn-pill;
+
+  padding: ($baseline/4) ($baseline/2);
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+  text-align: center;
+
+  &:hover,
+  &:active {
+    @extend %ui-fake-link;
+
+    border-color: $gray-l3;
+  }
+
+  &.current,
+  &.active,
+  &.is-selected {
+    box-shadow: inset 0 1px 2px 1px $shadow-l1;
+    border-color: $gray-l3;
+  }
+}
+
+// +UI Nav Dropdown Button - Extend
+// ====================
+%ui-btn-dd-nav-primary {
+  @extend %ui-btn-dd;
+
+  background: $white;
+  border-color: $white;
+  color: $gray-d1;
+
+  &:hover,
+  &:active {
+    background: $white;
+    color: $uxpl-blue-hover-active;
+  }
+
+  &.current,
+  &.active {
+    background: $white;
+    color: $gray-d4;
+
+    &:hover,
+    &:active {
+      color: $uxpl-blue-hover-active;
+    }
+  }
+}
+
+// +UI Actions List - Extend
+// ====================
+%actions-list {
+  display: inline-block;
+  margin-bottom: 0;
+
+  .action-item {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    margin: ($baseline/10) 0 ($baseline/10) ($baseline/10);
+
+    .action-button {
+      @include transition(all $tmg-f3 linear 0s);
+
+      display: block;
+      border-radius: 3px;
+      padding: 3px ($baseline/2);
+      color: $gray-d1;
+
+      &:hover {
+        background-color: theme-color("primary");
+        color: $gray-l6;
+      }
+
+      .action-button-text {
+        padding-left: 1px;
+        text-transform: uppercase;
+      }
+
+      &.delete-button:hover {
+        background-color: $gray-l1;
+      }
+
+      .icon {
+        font-style: normal;
+      }
+    }
+
+    .drag-handle {
+      display: block;
+      float: none;
+      height: ($baseline*1.2);
+      width: ($baseline);
+      margin: 0;
+
+      // CASE: right to left layout
+      @include rtl {
+        background: transparent url("#{$static-path}/images/drag-handles.png") no-repeat left center;
+      }
+
+      // CASE: left to right layout
+      @include ltr {
+        background: transparent url("#{$static-path}/images/drag-handles.png") no-repeat right center;
+      }
+    }
+
+    &.toggle-action {
+      // TODO: generalize and move checkbox styling in from static-pages and assets sass
+    }
+
+    .btn-default.delete-button {
+      border: none;
+    }
+
+    .btn-default.edit-button {
+      font-weight: 300;
+    }
+
+    .stack-move-icon {
+      font-size: 0.52em;
+
+      @include rtl {
+        .fa-file-o {
+          @include transform(rotateY(180deg));
+        }
+
+        .fa-arrow-right {
+          @include transform(rotate(180deg));
+        }
+      }
+    }
+  }
+}
+
+// +UI Expand/Collapse - Extend
+// ====================
+// TODO: this should be transitioned away from in favor of %ui-expand-collapse
+%expand-collapse {
+  @include transition(all $tmg-f2 linear 0s);
+
+  display: inline-block;
+  color: $gray-l2;
+  vertical-align: top;
+
+  &:hover {
+    color: theme-color("primary");
+  }
+
+  .ui-toggle-expansion {
+    @include transition(all $tmg-f2 ease-in-out 0s);
+    @include margin-right($baseline/4);
+
+    @extend %t-action1;
+
+    display: inline-block;
+    color: $gray-l3;
+    vertical-align: middle;
+  }
+
+  &.expand .ui-toggle-expansion {
+    @include transform(rotate(-90deg));
+    @include transform-origin(50% 50%);
+  }
+}
+
+// +UI Expand/Collapse - Extend
+// ====================
+// will replace %expand-collapse
+%ui-expand-collapse {
+  @include transition(all $tmg-f2 linear 0s);
+
+
+  // CASE: default (is expanded)
+  .ui-toggle-expansion {
+    @include transition(all $tmg-f2 ease-in-out 0s);
+
+    display: inline-block;
+    vertical-align: middle;
+
+    .icon {
+      @include transition(all $tmg-f2 ease-in-out 0s);
+    }
+
+    // STATE: hover/active
+    &:hover,
+    &:active {
+      @extend %ui-fake-link;
+
+      color: theme-color("primary");
+    }
+  }
+
+  // CASE: is collapsed
+  &.is-collapsed {
+    .ui-toggle-expansion {
+      .icon {
+        @include transform(rotate(-90deg));
+        @include transform-origin(50% 50%);
+      }
+    }
+  }
+}
+
+// +Drag and Drop Styling
+// ====================
+
+// UI: drag handle
+.drag-handle {
+  &:hover,
+  &:focus {
+    cursor: move;
+  }
+}
+
+// UI: is draggable
+.is-draggable {
+  @include transition(border-color $tmg-f2 ease-in-out 0, box-shadow $tmg-f2 ease-in-out 0, margin $tmg-f2 ease-in-out 0);
+
+  position: relative;
+
+  .draggable-drop-indicator {
+    @extend %ui-depth3;
+
+    @include transition(opacity $tmg-f2 linear 0s);
+    @include size(100%, auto);
+
+    position: absolute;
+    border-top: 1px solid $blue-l1;
+    opacity: 0;
+
+    .fa-caret-right {
+      @extend %t-icon5;
+
+      position: absolute;
+      top: -12px;
+      left: -($baseline/4);
+      color: $blue-d1;
+    }
+  }
+
+  .draggable-drop-indicator-before {
+    top: -($baseline/2);
+  }
+
+  .draggable-drop-indicator-after {
+    bottom: -($baseline/2);
+  }
+}
+
+// UI: is dragging - drag state
+.is-dragging {
+  @extend %ui-depth4;
+
+  left: -($baseline/4);
+  box-shadow: 0 1px 2px 0 $shadow-d1;
+  cursor: move;
+  opacity: 0.65;
+  border: 1px solid $gray-d3;
+
+  // UI: condition - valid drop
+  &.valid-drop {
+    border-color: $ui-action-primary-color-focus;
+    box-shadow: 0 1px 2px 0 rgba($ui-action-primary-color-focus, 0.5);
+  }
+}
+
+// UI: drag state - was dragging
+.was-dragging {
+  @include transition(transform $tmg-f2 ease-in-out 0);
+}
+
+// UI: drag target
+.drop-target {
+  &.drop-target-before {
+    margin-top: ($baseline*1.5);
+
+    > .draggable-drop-indicator-before {
+      opacity: 1;
+    }
+  }
+
+  &.drop-target-after {
+    margin-bottom: ($baseline*1.5);
+
+    > .draggable-drop-indicator-after {
+      opacity: 1;
+    }
+  }
+}
+
+// UI: drop state - was dropped
+.was-dropped {
+  @include animation(was-dropped $tmg-avg ease-in-out 1);
+
+  border-color: $ui-action-primary-color-focus;
+  box-shadow: 0 1px 2px 0 rgba($ui-action-primary-color-focus, 0.5);
+}

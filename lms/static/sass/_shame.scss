@@ -1,0 +1,245 @@
+// edX LMS - shame
+// ====================
+// NOTE: use for any bad-form/orphaned scss that knowingly violate edX FED architecture/standards
+// see - http://csswizardry.com/2013/04/shame-css/
+
+// edx.org marketing site - 7/2013 visual button revamp
+
+// extends btn
+%m-btn {
+  box-sizing: border-box;
+
+  @include transition(color $tmg-f2 ease-in-out, background $tmg-f2 ease-in-out, box-shadow $tmg-f2 ease-in-out);
+
+  display: inline-block;
+  cursor: pointer;
+  text-decoration: none;
+
+  &.disabled,
+  &[disabled] {
+    cursor: default;
+    pointer-events: none;
+  }
+}
+
+%m-btn-pill {
+  border-radius: ($baseline/5);
+}
+
+%m-btn-rounded {
+  border-radius: ($baseline/2);
+}
+
+%m-btn-edged {
+  border-radius: ($baseline/10);
+}
+
+// primary button
+%m-btn-base {
+  @extend %m-btn;
+  @extend %m-btn-edged;
+
+  border: none;
+  padding: ($baseline/2) ($baseline);
+  text-align: center;
+  text-shadow: none;
+  font-weight: 500;
+  letter-spacing: 0;
+
+  &.disabled,
+  &[disabled],
+  &.is-disabled {
+    background: $action-primary-disabled-bg;
+
+    &:hover,
+    &:focus {
+      background: $action-primary-disabled-bg !important; // needed for IE currently
+    }
+  }
+}
+
+// primary button
+%m-btn-primary {
+  @extend %m-btn-base;
+
+  box-shadow: 0 2px 1px 0 $action-primary-shadow;
+  background: $action-primary-bg;
+  color: $action-primary-fg;
+
+  &:hover,
+  &:active,
+  &:focus {
+    background: $action-primary-focused-bg;
+  }
+
+  &:focus {
+    box-shadow: 0 0 6px 0 $action-primary-active-focused-shadow;
+  }
+
+  &.current,
+  &.active {
+    box-shadow: inset 0 2px 1px 1px $action-primary-active-shadow;
+    background: $action-primary-active-bg;
+    color: $action-primary-active-fg;
+
+    &:hover,
+    &:active,
+    &:focus {
+      box-shadow: inset 0 2px 1px 1px $action-primary-active-focused-shadow;
+      color: $action-primary-active-focused-fg;
+    }
+  }
+
+  &.disabled,
+  &[disabled] {
+    box-shadow: none;
+    background: $action-primary-disabled-bg; // needed for IE currently
+  }
+}
+
+// secondary button
+%m-btn-secondary {
+  @extend %m-btn-base;
+
+  box-shadow: 0 2px 1px 0 $action-secondary-shadow;
+  background: $action-secondary-bg;
+  color: $action-secondary-fg;
+
+  &:hover,
+  &:active,
+  &:focus {
+    background: $action-secondary-focused-bg;
+  }
+
+  &:focus {
+    box-shadow: 0 0 6px 0 $action-primary-active-focused-shadow;
+  }
+
+  &.current,
+  &.active {
+    box-shadow: inset 0 2px 1px 1px $action-secondary-active-shadow;
+    background: $action-secondary-active-bg;
+    color: $action-secondary-active-fg;
+
+    &:hover,
+    &:active,
+    &:focus {
+      box-shadow: inset 0 2px 1px 1px $action-secondary-active-focused-shadow;
+      color: $action-secondary-active-focused-fg;
+    }
+  }
+
+  &.disabled,
+  &[disabled] {
+    box-shadow: none;
+    background: $action-secondary-disabled-bg; // needed for IE currently
+  }
+}
+
+
+// ====================
+
+// edx.org marketing site - needed, but bad overrides with importants
+.view-register,
+.view-login,
+.view-passwordreset,
+.view-survey {
+  .form-actions button[type="submit"] {
+    text-transform: none;
+    vertical-align: middle;
+    font-weight: 600 !important;
+    letter-spacing: 0 !important;
+  }
+}
+
+
+// ====================
+
+
+// Verification fixes
+.verification-process {
+
+  //overriding reset link style for nav/header
+  .header-global {
+    .logo a:hover,
+    .logo:active,
+    .logo a:focus {
+      border: none;
+      text-decoration: none;
+      padding-bottom: 0;
+    }
+
+    .nav-global a:hover,
+    .nav-global a:active,
+    .nav-global a:focus {
+      border: none;
+    }
+  }
+
+  // overriding ridiculous hover on input type=button
+  #content .action-primary:hover {
+    background-image: none;
+  }
+}
+
+
+// ====================
+
+
+// The Following is to enable themes to display H1s on login and register pages
+.view-login .introduction header h1,
+.view-register .introduction header h1 {
+  @include login_register_h1_style;
+}
+
+footer .references {
+  @include footer_references_style;
+}
+
+// ====================
+
+// modal semantic button resetting - overriding the poorly scoped button mixin styling
+.close-modal,
+button.close-modal {
+  @extend %ui-reset-button;
+
+  &:focus {
+    border: none !important;
+  }
+}
+
+// ====================
+
+// poor definition/scope on ul elements inside .vert-mod element in courseware - override needed for inline discussion editing
+.course-content .discussion-post.edit-post-form .topic-menu {
+  padding-left: 0;
+  list-style: none;
+
+  .topic-menu-item {
+    margin-bottom: 0;
+  }
+}
+
+.course-content .discussion-post.edit-post-form .topic-submenu {
+  list-style: none;
+}
+
+
+// LMS system feedback button overrides
+.is-in-course .wrapper-prompt .nav-actions {
+  button {
+    font-family: inherit;
+  }
+
+  .action-primary {
+    @extend %t-action4;
+  }
+
+  .action-secondary {
+    @extend %btn-no-style;
+    @extend %t-strong;
+
+    box-shadow: none;
+    text-shadow: none;
+  }
+}

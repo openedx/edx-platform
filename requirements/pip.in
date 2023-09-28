@@ -1,0 +1,6 @@
+-c constraints.txt
+# Core dependencies for installing other dependencies
+
+pip
+setuptools
+wheel

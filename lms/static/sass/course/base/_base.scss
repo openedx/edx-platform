@@ -1,0 +1,249 @@
+// lms - course - base
+// ====================
+
+// Table of Contents
+// * +Containers
+// * +Resets - Old, Body
+// * +Resets - Old, Forms
+// * +Resets - Old, Images
+// * +Resets - Old, Misc
+
+
+// +Containers
+// ====================
+
+.content-wrapper {
+  background: none;
+  border: none;
+}
+
+.container {
+  padding: 0;
+
+  > div {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+    border: 1px solid $border-color-2;
+    background: $container-bg;
+    box-shadow: 0 1px 2px $shadow-l2;
+
+    @extend %ui-print-excluded;
+  }
+}
+
+
+// +Resets - Old, Body
+// ====================
+
+body {
+  min-height: 100%;
+  background-color: $course-bg-color;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+label {
+  @include text-align(left);
+
+  font-family: $font-family-sans-serif;
+}
+
+// we want to hide the outline on the focusable <main> element
+main {
+  outline: none;
+}
+
+table {
+  table-layout: fixed;
+}
+
+.xblock table {
+  table-layout: auto;
+  word-break: normal;
+}
+
+a {
+  &:hover,
+  &:focus {
+    text-decoration: none;
+  }
+
+  @media print {
+    text-decoration: underline !important;
+
+    &:visited {
+      text-decoration: underline !important;
+    }
+  }
+}
+
+// +Resets - Old, Forms
+// ====================
+form {
+  label {
+    display: block;
+  }
+}
+
+form.choicegroup {
+  label {
+    clear: both;
+
+    @include float(left);
+  }
+}
+
+
+textarea,
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  background: $white;
+  border: 1px solid $border-color-2;
+  border-radius: 0;
+  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6), inset 0 0 3px 0 $shadow-l1;
+  box-sizing: border-box;
+  font: normal 1em $font-family-sans-serif;
+  height: 35px;
+  padding: ($baseline/4) 12px;
+  vertical-align: top;
+  -webkit-font-smoothing: antialiased;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  &:focus {
+    border-color: lighten($link-color, 20%);
+    box-shadow: 0 0 6px 0 rgba($blue, 0.4), inset 0 0 4px 0 rgba(0, 0, 0, 0.15);
+  }
+}
+
+label {
+  font-weight: normal;
+  font-style: normal;
+}
+
+input[type="reset"],
+input[type="submit"],
+input[type="button"],
+button,
+.button {
+  @extend .gray-button;
+
+  form & {
+    @extend .gray-button;
+  }
+}
+
+
+// +Resets - Old, Images
+// ====================
+img {
+  max-width: 100%;
+}
+
+.tooltip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 99999;
+  padding: ($baseline/2);
+  border-radius: 3px;
+  background: #ffffff;
+  border-color: #000000;
+  border-width: 2px;
+  border-style: solid;
+  font-size: 11px;
+  font-weight: 400;
+  color: #000000;
+  pointer-events: none;
+  opacity: 0;
+  max-width: 200px;
+
+  @include transition(opacity 0.1s linear 0s);
+
+  &::after {
+    content: '▾';
+    display: block;
+    position: absolute;
+    bottom: -($baseline - 2);
+    left: 50%;
+    margin-left: -7px;
+    font-size: 20px;
+    color: #000000;
+  }
+}
+
+
+// +Resets - Old, Misc
+// ====================
+.test-class {
+  border: 1px solid #f00;
+}
+
+.site-status {
+  display: block;
+}
+
+.toast-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 99999;
+  max-width: 350px;
+  padding: 15px 20px 17px;
+  border-radius: 3px;
+  border: 1px solid $border-color-3;
+  background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0)) rgba(30, 30, 30, 0.92);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.1) inset;
+  font-size: 13px;
+  color: $white;
+  opacity: 0;
+  -webkit-transition: all 0.2s;
+
+  p,
+  span {
+    color: $white;
+  }
+
+  strong {
+    display: block;
+    margin-bottom: ($baseline/2);
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 27px;
+    height: 27px;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 25px;
+    color: #aaa;
+    text-align: center;
+
+    .close-icon {
+      font-size: 16px;
+      font-weight: 700;
+    }
+  }
+
+  .action-btn {
+    @include dark-grey-button;
+
+    margin-top: ($baseline/2);
+    text-align: center;
+  }
+}

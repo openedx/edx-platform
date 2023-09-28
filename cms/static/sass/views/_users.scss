@@ -1,0 +1,228 @@
+// studio - views - course users
+// ====================
+
+.view-team {
+
+  // LAYOUT: page
+  .content-primary,
+  .content-supplementary {
+    box-sizing: border-box;
+  }
+
+  .content-primary {
+    @extend .ui-col-wide;
+  }
+
+  .content-supplementary {
+    @extend .ui-col-narrow;
+  }
+
+  // ELEM: content
+  .content {
+    .introduction {
+      @extend %t-copy-sub1;
+
+      margin: 0 0 ($baseline*2) 0;
+    }
+  }
+
+  // ELEM: no users notice
+  .content .notice-create {
+    width: flexgrid(9, 9);
+    margin-top: $baseline;
+
+    // CASE: notice has actions {
+    &.has-actions {
+      .msg,
+      .list-actions {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .msg {
+        width: flex-grid(6, 9);
+        margin-right: flex-gutter();
+      }
+
+      .list-actions {
+        width: flex-grid(3, 9);
+        text-align: right;
+        margin-top: 0;
+
+        .action-primary {
+          @extend %btn-primary-green;
+
+          padding: ($baseline/2) $baseline;
+        }
+      }
+    }
+  }
+
+
+  // ELEM: new user form
+  .wrapper-create-user {
+    &.is-shown {
+      height: ($baseline*15);
+    }
+  }
+
+  // ELEM: listing of users
+  .user-list,
+  .user-item,
+  .item-metadata,
+  .item-actions {
+    box-sizing: border-box;
+  }
+
+  .user-list {
+    .user-item {
+      @extend %ui-window;
+
+      @include clearfix();
+
+      position: relative;
+      width: flex-grid(9, 9);
+      margin: 0 0 ($baseline/2) 0;
+      padding: ($baseline*1.25) ($baseline*1.5) $baseline ($baseline*1.5);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .item-metadata,
+      .item-actions {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      // ELEM: item - flag
+      .flag-role {
+        @extend %ui-badge;
+
+        color: $white;
+
+        .msg-you {
+          @extend %t-strong;
+
+          margin-left: ($baseline/5);
+          text-transform: none;
+          color: $pink-l3;
+        }
+
+        &::after {
+          border-bottom-color: $pink-d4;
+        }
+
+        &.flag-role-staff {
+          background: $pink-u3;
+        }
+
+        &.flag-role-admin,
+        &.flag-role-instructor {
+          background: $pink;
+        }
+
+        &.flag-role-user,
+        &.flag-role-library_user {
+          background: $yellow-d1;
+          .msg-you { color: $yellow-l1; }
+        }
+      }
+
+      // ELEM: item - metadata
+      .item-metadata {
+        width: flex-grid(4, 9);
+
+        @include margin-right(flex-gutter());
+
+        .user-username,
+        .user-email {
+          display: inline-block;
+          vertical-align: middle;
+        }
+
+        .user-username {
+          @include transition(color $tmg-f2 ease-in-out 0s);
+
+          @extend %t-title4;
+          @extend %t-strong;
+
+          @include margin(0, ($baseline/2), ($baseline/10), 0);
+
+          color: $gray-d4;
+        }
+
+        .user-email {
+          @extend %t-title6;
+        }
+      }
+
+      // ELEM: item - actions
+      .item-actions {
+        width: flex-grid(5, 9);
+        position: static; // nasty reset needed due to base.scss
+        text-align: right;
+
+        .action {
+          display: inline-block;
+          vertical-align: middle;
+        }
+
+        .action-role {
+          width: flex-grid(7, 8);
+          margin-right: flex-gutter();
+
+          .add-admin-role {
+            @include blue-button;
+            @include transition(all 0.15s);
+
+            @extend %t-action2;
+            @extend %t-strong;
+
+            display: inline-block;
+            padding: ($baseline/5) $baseline;
+          }
+
+          .remove-admin-role {
+            @include grey-button;
+            @include transition(all 0.15s);
+
+            @extend %t-action2;
+            @extend %t-strong;
+
+            display: inline-block;
+            padding: ($baseline/5) $baseline;
+          }
+
+          .notoggleforyou {
+            @extend %t-copy-sub1;
+
+            color: $gray-l2;
+          }
+        }
+
+        .action-delete {
+          width: flex-grid(1, 8);
+
+          // STATE: disabled
+          &.is-disabled {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+          }
+        }
+
+        .delete {
+          @extend %ui-btn-non;
+        }
+
+        // HACK: nasty reset needed due to base.scss
+        .delete-button {
+          margin-right: 0;
+          float: none;
+          color: inherit;
+        }
+      }
+    }
+  }
+}

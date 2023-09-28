@@ -1,0 +1,75 @@
+<div id="wrapper-review" class="wrapper-view review-photos-step">
+  <div class="review view">
+    <h3 class="title"><%- gettext( "Review Your Photos" ) %></h3>
+    <div class="instruction">
+      <p><%- gettext( "Make sure we can verify your identity with the photos and information you have provided." ) %></p>
+    </div>
+
+    <div class="wrapper-task">
+      <div class="review-task review-task-photos">
+        <div class="wrapper-photos">
+          <div class="wrapper-photo">
+            <div class="placeholder-photo">
+              <img id="face_image" src="" alt="<%- _.sprintf(  gettext( "Photo of %(fullName)s" ), { fullName: fullName } ) %>"/>
+            </div>
+          </div>
+          <div class="wrapper-photo">
+            <div class="placeholder-photo">
+              <img id="photo_id_image" src="" alt="<%- _.sprintf( gettext( "Photo of %(fullName)s's ID" ), { fullName: fullName } ) %>"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="wrapper-photos">
+          <div class="help-tips">
+            <h5 class="title"><%- gettext( "Photo requirements:" ) %></h5>
+            <ul class="list-help list-tips copy">
+              <li class="tip"><%- gettext( "Does the photo of you show your whole face?" ) %></li>
+              <li class="tip"><%- gettext( "Is your name on your ID readable?" ) %></li>
+              <li class="tip"><%- _.sprintf(  gettext( "Does the name on your ID match your account name: %(fullName)s?" ), { fullName: fullName } ) %>
+                <div class="help-tip is-expandable">
+                  <label for="new-name">
+                    <button type="button" class="title title-expand" aria-expanded="false">
+                      <%- gettext( "Edit Your Name" ) %>
+                    </button>
+                  </label>
+
+                  <div class="copy expandable-area">
+                    <p><%- gettext( "Make sure that the full name on your account matches the name on your ID." ) %></p>
+                    <input type="text" name="new-name" id="new-name" placeholder="<%- fullName %>">
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="msg msg-retake msg-followup">
+          <div class="copy">
+            <p>
+              <%- gettext( "Photos don't meet the requirements?" ) %>
+              <button id="retake_photos_button" class="retake-photos">
+                <%- gettext( "Retake Your Photos" ) %>
+              </button>
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <nav class="nav-wizard">
+      <div class="prompt-verify">
+        <h3 class="title"><%- gettext( "Before proceeding, please confirm that your details match" ) %></h3>
+      </div>
+
+      <ol class="wizard-steps">
+        <li class="wizard-step step-proceed">
+          <button id="next_step_button" class="next action-primary right" aria-hidden="true" aria-disabled="true" title="Confirmation">
+            <%- gettext( "Confirm" ) %>
+          </button>
+        </li>
+      </ol>
+    </nav>
+  </div>
+</div>

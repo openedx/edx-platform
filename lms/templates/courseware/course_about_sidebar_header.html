@@ -1,0 +1,62 @@
+<%page expression_filter="h"/>
+<%namespace name='static' file='../static_content.html'/>
+<%!
+import six
+
+from django.utils.translation import gettext as _
+from django.urls import reverse
+from django.conf import settings
+%>
+
+<header>
+  % if static.get_value('course_about_show_social_links', True):
+  <div class="social-sharing">
+    <div class="sharing-message">${_("Share with friends and family!")}</div>
+    ## TODO: this should probably be an overrideable block,
+    ##       or something allowing themes to do whatever they
+    ##       want here (and on this whole page, really).
+      <%
+        site_domain = static.get_value('site_domain', settings.SITE_NAME)
+        site_protocol = 'https' if settings.HTTPS == 'on' else 'http'
+        platform_name = static.get_platform_name()
+        course_path = reverse('about_course', args=[str(course.id)])
+        course_url = f"{site_protocol}://{site_domain}{course_path}"
+
+        ## Translators: This text will be automatically posted to the student's
+        ## Twitter account. {url} should appear at the end of the text.
+        tweet_text = _("I just enrolled in {number} {title} through {account} {url}").format(
+            number=course.number,
+            title=course.display_name_with_default,
+            account=static.get_value('course_about_twitter_account', settings.PLATFORM_TWITTER_ACCOUNT),
+            url=course_url
+        )
+
+        tweet_action = u"https://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=six.moves.urllib.parse.quote(tweet_text))
+
+        facebook_link = f"https://www.facebook.com/sharer/sharer.php?u={six.moves.urllib.parse.quote(course_url)}"
+
+        email_body = _("I just enrolled in {number} {title} through {platform} {url}").format(
+                number=course.number,
+                title=course.display_name_with_default,
+                platform=platform_name,
+                url=course_url
+        )
+
+        email_subject = _("Take a course with {platform} online").format(platform=platform_name)
+        email_link = u"mailto:?subject={subject}&body={body}".format(
+            subject=six.moves.urllib.parse.quote(email_subject.encode('UTF-8')),
+            body=six.moves.urllib.parse.quote(email_body.encode('UTF-8'))
+        )
+      %>
+      <a href="${tweet_action}" class="share">
+        <span class="icon fa fa-twitter" aria-hidden="true"></span><span class="sr">${_("Tweet that you've enrolled in this course")}</span>
+      </a>
+      <a href="${facebook_link}" class="share">
+        <span class="icon fa fa-facebook" aria-hidden="true"></span><span class="sr">${_("Post a Facebook message to say you've enrolled in this course")}</span>
+      </a>
+      <a href="${email_link}" class="share">
+        <span class="icon fa fa-envelope" aria-hidden="true"></span><span class="sr">${_("Email someone to say you've enrolled in this course")}</span>
+      </a>
+  </div>
+  % endif
+</header>

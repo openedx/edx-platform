@@ -1,0 +1,190 @@
+.date-wrapper {
+  @extend .content;
+
+  font-family: $helvetica;
+
+  .date-title {
+    color: #414141;
+    font-size: 24px;
+    border-bottom: 0;
+  }
+
+  .timeline-item {
+    border-left: solid 1px #2d323e;
+    color: #2d323e;
+    position: relative;
+    padding-left: 18px;
+    margin-left: 6px;
+    padding-bottom: 32px;
+
+    &:first-of-type {
+      margin-top: 24px;
+    }
+
+    &:last-of-type {
+      border-left: solid 1px transparent;
+    }
+  }
+
+  .date-circle {
+    width: 7px;
+    height: 7px;
+    position: absolute;
+    left: -5px;
+    background-color: #2d323e;
+    border-radius: 50%;
+    border-style: solid;
+    border-width: thin;
+
+    &.past-date {
+      background-color: #f5f5f5;
+
+      &.past-due {
+        background-color: #475b65;
+      }
+    }
+
+    &.todays-date {
+      width: 13px;
+      height: 13px;
+      left: -8px;
+      background-color: #ffdb87;
+    }
+  }
+
+  .date-content {
+    display: flex;
+    flex-wrap: wrap;
+    position: relative;
+    top: -7px;
+    flex: 100%;
+    line-height: 1.25;
+
+    &.todays-date {
+      top: -3px;
+    }
+  }
+
+  .no-access {
+    color: #767676;
+  }
+
+  .timeline-date-content {
+    @include font-size(16);
+
+    display: flex;
+    flex: 100%;
+    font-weight: bold;
+    margin-bottom: 8px;
+    align-items: center;
+
+    &.not-released {
+      color: #b1a3a3;
+    }
+  }
+
+  .timeline-date {
+    color: #2d323e;
+  }
+
+  .timeline-title {
+    @include font-size(14);
+
+    display: flex;
+    flex: 100%;
+    margin-bottom: 4px;
+    font-weight: bold;
+    line-height: 1.25;
+
+    a {
+      color: #2d323e;
+      text-decoration: underline;
+    }
+
+    &.not-released {
+      color: #767676;
+    }
+  }
+
+  .timeline-description {
+    @include font-size(14);
+
+    display: flex;
+    flex: 100%;
+    line-height: 1.25;
+
+    a {
+      color: #2d323e;
+      text-decoration: underline;
+    }
+
+    &.not-released {
+        color: #767676;
+      }
+  }
+
+  .timeline-extra-info {
+    @include font-size(14);
+
+    display: flex;
+    flex: 100%;
+    line-height: 1.25;
+
+    a {
+      color: #2d323e;
+      text-decoration: underline;
+    }
+
+    &.not-released {
+      color: #767676;
+    }
+  }
+
+
+  .pill {
+    @include font-size(12);
+
+    padding: 2px 8px;
+    border-radius: 5px;
+    margin-left: 8px;
+    font-weight: normal;
+    vertical-align: top;
+
+    &.completed {
+      background-color: #f0f2f2;
+      color: #212529;
+    }
+
+    &.due-next {
+      background-color: #686b73;
+      color: $white;
+    }
+
+    &.not-released {
+      background-color: $white;
+      border-color: #d1d2d4;
+      border-style: solid;
+      border-width: thin;
+      color: #767676;
+    }
+
+    &.past-due {
+      background-color: #475b65;
+      color: #fff;
+    }
+
+    &.today {
+      background-color: #ffdb87;
+      color: #2d323e;
+    }
+
+    &.verified {
+      background-color: #2d323e;
+      color: $white;
+    }
+  }
+
+  .verified-icon {
+    padding-right: 8px;
+  }
+}

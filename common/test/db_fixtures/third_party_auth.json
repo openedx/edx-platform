@@ -1,0 +1,59 @@
+[
+  {
+    "pk": 1,
+    "model": "third_party_auth.oauth2providerconfig",
+    "fields": {
+      "enabled": true,
+      "change_date": "2001-02-03T04:05:06Z",
+      "changed_by": null,
+      "name": "Google",
+      "icon_class": "fa-google-plus",
+      "icon_image": null,
+      "backend_name": "google-oauth2",
+      "slug": "google-oauth2",
+      "key": "test",
+      "secret": "test",
+      "site": 2,
+      "other_settings": "{}",
+      "visible": true
+    }
+  },
+  {
+    "pk": 2,
+    "model": "third_party_auth.oauth2providerconfig",
+    "fields": {
+      "enabled": true,
+      "change_date": "2001-02-03T04:05:06Z",
+      "changed_by": null,
+      "name": "Facebook",
+      "icon_class": "fa-facebook",
+      "icon_image": null,
+      "backend_name": "facebook",
+      "slug": "facebook",
+      "key": "test",
+      "secret": "test",
+      "site": 2,
+      "other_settings": "{}",
+      "visible": true
+    }
+  },
+  {
+    "pk": 3,
+    "model": "third_party_auth.oauth2providerconfig",
+    "fields": {
+      "enabled": true,
+      "change_date": "2001-02-03T04:05:06Z",
+      "changed_by": null,
+      "name": "Dummy",
+      "icon_class": "",
+      "icon_image": "test-icon.png",
+      "backend_name": "dummy",
+      "slug": "dummy",
+      "key": "",
+      "secret": "",
+      "site": 2,
+      "other_settings": "{}",
+      "visible": true
+    }
+  }
+]

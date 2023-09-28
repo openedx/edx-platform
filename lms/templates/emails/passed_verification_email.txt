@@ -1,0 +1,11 @@
+<%! from django.utils.translation import gettext as _ %>
+
+
+${_("Hello {full_name},").format(full_name=full_name)}
+
+${_("Your {platform_name} ID verification photos have been approved.").format(platform_name=platform_name)}
+
+${_("Your approval status remains valid for two years, and it will expire {expiration_datetime}.").format(expiration_datetime=expiration_datetime)}
+
+${_("Enjoy your studies,")}
+${_("The {platform_name} Team").format(platform_name=platform_name)}

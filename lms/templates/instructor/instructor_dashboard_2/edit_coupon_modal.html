@@ -1,0 +1,67 @@
+<%page args="section_data" expression_filter="h"/>
+<%!
+from django.utils.translation import gettext as _
+from django.urls import reverse
+%>
+<section id="edit-coupon-modal" class="modal" role="dialog" tabindex="-1" aria-labelledby="header-edit-coupon-code">
+    <h2 id="header-edit-coupon-code" class="hd hd-2">${_("Edit Coupon Code")}</h2>
+  <div class="inner-wrapper">
+    <button class="close-modal">
+      <span class="icon fa fa-remove" aria-hidden="true"></span>
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_('Close')}
+      </span>
+    </button>
+
+    <div id="coupon-content">
+      <div class="instructions">
+        <p>
+          ${_("Edit Coupon Code Information")}</p>
+      </div>
+
+      <form id="edit_coupon_form" action="${section_data['ajax_update_coupon']}" method="post" data-remote="true">
+        <div id="coupon_form_error" class="modal-form-error"></div>
+        <fieldset class="group group-form group-form-requiredinformation">
+          <legend class="is-hidden">${_("Required Information")}</legend>
+
+          <ol class="list-input">
+            <li class="field required text" id="edit-coupon-modal-field-code">
+              <label for="edit_coupon_code" class="required">${_("Code")}</label>
+              <input class="field readonly" id="edit_coupon_code" type="text" name="code" maxlength="16" value="" placeholder="${_('example: A123DS')}"
+                    readonly aria-required="true"/>
+            </li>
+            <li class="field required text" id="edit-coupon-modal-field-discount">
+              <label for="edit_coupon_discount" class="required">${_("Percentage Discount")}</label>
+              <input class="field readonly" id="edit_coupon_discount" type="text" name="discount" value="" maxlength="3"
+                     readonly aria-required="true"/>
+            </li>
+
+            <li class="field" id="edit-coupon-modal-field-description">
+              <label for="edit_coupon_description">${_("Description")}</label>
+              <textarea class="field" id="edit_coupon_description" type="text" name="description" value=""
+                    aria-required="true"></textarea>
+            </li>
+
+            <li class="field" id="edit-coupon-modal-field-course_id">
+              <label for="edit_coupon_course_id">${_("Course ID")}</label>
+              <input class="field readonly" id="edit_coupon_course_id" type="text" name="course_id" value=""
+                     readonly aria-required="true"/>
+            </li>
+
+            <li class="field" id="edit-coupon-modal-field-expiration-date">
+              <label for="edit_coupon_expiration_date">${_("Expiration Date")}</label>
+              <input class="field readonly" id="edit_coupon_expiration_date" type="text" name="expiration_date" value=""
+                     readonly aria-required="true"/>
+            </li>
+          </ol>
+        </fieldset>
+
+        <div class="submit">
+          <input type="hidden" name="coupon_id" id="coupon_id"/>
+          <input name="submit" type="button" id="update_coupon_button" value="${_('Update Coupon Code')}"/>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

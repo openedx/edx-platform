@@ -1,0 +1,58 @@
+div#wiki_panel {
+  @extend .sidebar;
+
+  overflow: auto;
+
+  ul {
+    li {
+      &.search {
+        padding: ($baseline/2) lh() ($baseline/2) 0;
+
+        label {
+          display: none;
+        }
+      }
+    }
+  }
+
+  div#wiki_create_form {
+    @extend .clearfix;
+
+    padding: lh(0.5) lh() lh(0.5) 0;
+
+    label {
+      font-family: $font-family-sans-serif;
+      margin-bottom: lh(0.5);
+    }
+
+    input[type="text"] {
+      box-sizing: border-box;
+      display: block;
+      width: 100%;
+      margin-bottom: lh(0.5);
+    }
+
+    ul {
+      list-style: none;
+      margin: 0;
+
+      li {
+        float: left;
+        border-bottom: 0;
+
+        &#cancel {
+          float: right;
+          margin-top: ($baseline/2);
+        }
+      }
+    }
+  }
+
+  input#wiki_search_input_submit {
+    padding: 4px 8px;
+  }
+
+  input#wiki_search_input {
+    margin-right: ($baseline/2);
+  }
+}

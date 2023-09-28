@@ -1,0 +1,47 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <h1>
+                {% autoescape off %}
+                {# xss-lint: disable=django-blocktrans-missing-escape-filter #}
+                {% blocktrans %}You have been removed as a beta tester for {{ course_name }} at {{ site_name }}{% endblocktrans %}
+                {% endautoescape %}
+            </h1>
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% autoescape off %}
+                {# xss-lint: disable=django-blocktrans-missing-escape-filter #}
+                {% blocktrans %}You have been removed as a beta tester for {{ course_name }} at {{ site_name }} by a member of the course staff.{% endblocktrans %}
+                {% endautoescape %}
+                <br />
+            </p>
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
+                {% blocktrans %}This course will remain on your dashboard, but you will no longer be part of the beta testing group.{% endblocktrans %}
+                {% endfilter %}
+                <br />
+            </p>
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
+                {% blocktrans %}Your other courses have not been affected.{% endblocktrans %}
+                {% endfilter %}
+                <br />
+            </p>
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
+                {% blocktrans %}This email was automatically sent from {{ site_name }} to {{ email_address }}{% endblocktrans %}
+                {% endfilter %}
+                <br />
+            </p>
+        </td>
+    </tr>
+</table>
+{% endblock %}

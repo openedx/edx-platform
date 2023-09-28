@@ -1,0 +1,649 @@
+.course-info {
+  .container {
+    padding-bottom: 120px;
+
+    @include media-breakpoint-down(md) {
+      min-width: auto;
+      padding: $baseline;
+    }
+  }
+
+  .safari-wrapper {
+    padding-bottom: 200px;
+  }
+
+  header.course-profile {
+    background: $course-profile-bg;
+    background-image: $homepage-bg-image;
+    background-size: cover;
+    border-bottom: 1px solid $border-color-3;
+    box-shadow: inset 0 1px 5px 0 $shadow-l1;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+
+    .intro-inner-wrapper {
+      background: $course-header-bg;
+      border: 1px solid $border-color-3;
+      box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
+      box-sizing: border-box;
+
+      @include clearfix();
+
+      margin: 0 auto;
+      max-width: map-get($container-max-widths, xl);
+
+      @include media-breakpoint-up(md) {
+        min-width: map-get($container-max-widths, md);
+      }
+
+      position: relative;
+      z-index: 2;
+
+      > div.table {
+        display: table;
+        width: 100%;
+      }
+
+      .intro {
+        box-sizing: border-box;
+
+        @include clearfix();
+
+        display: table-cell;
+        vertical-align: middle;
+        padding: $baseline;
+        position: relative;
+        width: flex-grid(8) + flex-gutter();
+        z-index: 2;
+
+        > .heading-group {
+          border-bottom: 1px solid $border-color-2;
+          box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
+          margin-bottom: $baseline;
+          padding-bottom: $baseline;
+          width: 100%;
+
+          h1 {
+            color: $body-color;
+            font-weight: normal;
+            display: inline-block;
+            margin: 0;
+            letter-spacing: 0;
+
+            @include text-align(left);
+
+            text-shadow: 0 1px rgba(255, 255, 255, 0.6);
+
+            .button-org {
+              @include margin-left($baseline*0.75);
+
+              background: transparent !important;
+              border: none !important;
+              box-shadow: none !important;
+              text-shadow: none !important;
+              text-transform: normal !important;
+              font-size: $body-font-size;
+              color: $body-color !important;
+              letter-spacing: 0 !important;
+
+              &:hover,
+              &:focus {
+                color: $link-color;
+              }
+            }
+          }
+
+          h2 {
+            display: inline-block;
+            margin: 0;
+
+            a {
+              color: $body-color;
+              font: italic 700 1em/1em $font-family-sans-serif;
+              letter-spacing: 0;
+              text-shadow: 0 1px rgba(255, 255, 255, 0.6);
+              text-transform: none;
+
+              &:hover,
+              &:focus {
+                color: $link-color;
+              }
+            }
+          }
+        }
+
+        .main-cta {
+          @include clearfix();
+          @include float(left);
+          @include margin-right(flex-gutter());
+          @include transition(all 0.15s linear 0s);
+
+          width: flex-grid(12);
+
+          > a.find-courses,
+          a.register,
+          a.add-to-cart {
+            @include button(shiny, $button-color);
+
+            box-sizing: border-box;
+            border-radius: 3px;
+            display: block;
+            font: normal 1.2rem/1.6rem $font-family-sans-serif;
+            letter-spacing: 1px;
+            padding: ($baseline/2) 0;
+            text-align: center;
+            width: flex-grid(6);
+
+            &:hover,
+            &:focus {
+              color: rgb(255, 255, 255);
+            }
+
+            span {
+              display: inline-block;
+            }
+          }
+
+          a {
+            &:hover,
+            &:visited,
+            &:focus {
+              text-decoration: none;
+            }
+          }
+
+          strong {
+            @include button(shiny, $button-color);
+
+            box-sizing: border-box;
+            border-radius: 3px;
+            display: block;
+
+            @include float(left);
+
+            font: normal 1.2rem/1.6rem $font-family-sans-serif;
+            letter-spacing: 1px;
+            padding: ($baseline/2) 0;
+            text-align: center;
+            width: flex-grid(3, 8);
+
+            &:hover,
+            &:focus {
+              color: rgb(255, 255, 255);
+            }
+          }
+
+          span.register,
+          span.add-to-cart {
+            background: $button-archive-color;
+            border: 1px solid darken($button-archive-color, 50%);
+            box-sizing: border-box;
+            color: darken($button-archive-color, 50%);
+            display: block;
+            letter-spacing: 1px;
+            padding: 10px 0 8px;
+            text-align: center;
+
+            @include float(left);
+            @include margin(1px, flex-gutter(8), 0, 0);
+            @include transition(none);
+
+            width: flex-grid(5, 8);
+          }
+
+          #register_error {
+            background: $error-color;
+            border: 1px $error-color;
+            color: $white;
+            display: none;
+            padding: 12px;
+            margin-top: ($baseline/4);
+          }
+        }
+      }
+
+      .media {
+        background: transparent;
+        box-sizing: border-box;
+        display: table-cell;
+        padding: 20px;
+        position: relative;
+        width: flex-grid(4);
+        z-index: 2;
+
+        .hero {
+          border: 1px solid $border-color-3;
+          height: 100%;
+          overflow: hidden;
+          position: relative;
+
+          .play-intro {
+            @include background-image(linear-gradient(-90deg, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.75)));
+
+            border-radius: 4px;
+            box-shadow: 0 1px 12px 0 $shadow-d1;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            height: 80px;
+
+            @include left(50%);
+
+            margin-top: -40px;
+
+            @include margin-left(-40px);
+
+            position: absolute;
+            top: 50%;
+            width: 80px;
+
+            &::after {
+              color: rgba(255, 255, 255, 0.8);
+              content: "\25B6";
+              display: block;
+              font: normal 2em/1em $font-family-sans-serif;
+
+              @include left(50%);
+              @include margin-left(-11px);
+
+              margin-top: -16px;
+              position: absolute;
+              text-shadow: 0 -1px rgba(0, 0, 0, 0.8);
+              top: 50%;
+            }
+          }
+
+          img {
+            display: block;
+            width: 100%;
+          }
+        }
+
+        &:hover,
+        &:focus {
+          text-decoration: none;
+
+          .play-intro {
+            @include background-image(linear-gradient(-90deg, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.8)));
+
+            box-shadow: 0 1px 12px 0 rgba(0, 0, 0, 0.5);
+            border-color: rgba(255, 255, 255, 0.9);
+
+            &::after {
+              color: rgba(255, 255, 255, 1);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .container {
+    @include clearfix();
+
+    .wrap-instructor-info {
+      &.studio-view {
+        position: relative;
+        margin: ($baseline/2) 0 0 0;
+      }
+
+      .instructor-info-action {
+        @extend %t-copy-sub2;
+
+        @include float(right);
+
+        padding: ($baseline/4) ($baseline/2);
+        border-radius: ($baseline/4);
+        background-color: $light-gray1;
+
+        @include text-align(right);
+
+        color: $staff-color;
+
+        &:hover {
+          background-color: $staff-color;
+          color: $white;
+        }
+
+        @extend %ui-print-excluded;
+      }
+    }
+  }
+
+  .details {
+    @include media-breakpoint-up(md) {
+      @include float(left);
+      @include margin-right(flex-gutter());
+
+      width: flex-grid(8);
+    }
+
+    font: normal 1em/1.6em $serif;
+
+    h2 {
+      margin-top: ($baseline*1.5);
+    }
+
+    p {
+      margin-bottom: ($baseline/2);
+    }
+
+    dt {
+      margin-top: ($baseline/2);
+      font-weight: 700;
+    }
+
+    .inner-wrapper {
+      > section {
+        margin-bottom: ($baseline*2);
+      }
+
+      .course-staff {
+        .teacher {
+          @include clearfix();
+
+          margin-bottom: ($baseline*2);
+
+          h3 {
+            color: $body-color;
+            font-family: $font-family-sans-serif;
+            font-weight: 700;
+            margin-bottom: ($baseline*0.75);
+            text-transform: none;
+          }
+
+          .teacher-image {
+            background: rgb(255, 255, 255);
+            border: 1px solid $border-color-2;
+            height: 115px;
+
+            @include float(left);
+
+            margin: 0 15px 0 0;
+            overflow: hidden;
+            padding: 1px;
+            width: 115px;
+
+            img {
+              display: block;
+              min-height: 100%;
+              max-width: 100%;
+            }
+          }
+        }
+      }
+
+      .prerequisites,
+      .syllabus {
+        ul {
+          li {
+            font: normal 1em/1.6em $serif;
+          }
+
+          ul {
+            margin: 5px 0 10px;
+          }
+        }
+      }
+
+      .faq {
+        @include clearfix();
+
+        .responses {
+          @include float(left);
+        }
+
+        .response {
+          margin-bottom: ($baseline*2);
+
+          h3 {
+            font-family: $font-family-sans-serif;
+            font-weight: 700;
+            margin-bottom: ($baseline*0.75);
+          }
+        }
+      }
+    }
+  }
+
+  .course-sidebar {
+    @include media-breakpoint-up(md) {
+      box-sizing: border-box;
+
+      @include float(left);
+
+      width: flex-grid(4);
+    }
+
+    > section {
+      box-shadow: inset 0 0 3px 0 rgba(0, 0, 0, 0.15);
+      border: 1px solid $border-color-2;
+
+      &.course-summary {
+        padding: 16px 20px 30px;
+        margin-bottom: 220px;
+        border-top: none;
+      }
+
+      &.additional-resources {
+        padding: 30px;
+
+        .opencourseware {
+          text-indent: -9999px;
+          background: url('#{$static-path}/images/opencourseware.png') 0 0 no-repeat;
+          width: 266px;
+          height: 31px;
+          margin-bottom: $baseline;
+        }
+
+        ul {
+          @include padding-left(0);
+
+          margin-bottom: 0;
+        }
+
+        li {
+          list-style: none;
+
+          @include padding-left(29px);
+
+          background: url('#{$static-path}/images/link-icon.png') left center no-repeat;
+        }
+      }
+
+      &.about-sidebar-html {
+        padding: 0 10px;
+        box-shadow: none;
+        border: none;
+      }
+    }
+
+    header {
+      margin-bottom: 30px;
+      padding-bottom: 16px;
+      position: relative;
+      text-align: center;
+
+      &::after {
+        @extend %faded-hr-divider;
+
+        content: "";
+        display: block;
+        height: 1px;
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        z-index: 1;
+      }
+
+      a.university-name {
+        @include border-right(1px solid $border-color-2);
+
+        color: $body-color;
+        font-family: $font-family-sans-serif;
+        font-style: italic;
+        font-weight: 700;
+        display: inline-block;
+        letter-spacing: 0;
+
+        @include margin-right($baseline*0.75);
+        @include padding-right(15px);
+
+        &:hover,
+        &:focus {
+          color: $lighter-base-font-color;
+        }
+      }
+
+      .social-sharing {
+        box-sizing: border-box;
+
+        @include float(left);
+
+        height: 44px;
+        position: relative;
+        text-align: center;
+        width: flex-grid(12);
+        z-index: 2;
+        float: none;
+
+        &:hover,
+        &:focus {
+          .sharing-message {
+            opacity: 1;
+            top: 56px;
+          }
+        }
+
+        .sharing-message {
+          @include background-image(linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%,
+          rgba(0, 0, 0, 0.7) 100%));
+
+          border: 1px solid rgba(0, 0, 0, 0.5);
+          border-radius: 4px;
+          box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
+          box-sizing: border-box;
+          color: rgb(255, 255, 255);
+
+          @include float(right);
+
+          font-family: $serif;
+          font-size: 0.9em;
+          font-style: italic;
+
+          @include left(50%);
+          @include margin-left(-110px);
+
+          opacity: 0;
+          padding: 6px 10px;
+          position: absolute;
+          text-align: center;
+
+          @include transition(all 0.15s ease-out 0s);
+
+          top: 65px;
+          width: 220px;
+
+          &:hover,
+          &:focus {
+            opacity: 0;
+          }
+        }
+
+        .share {
+          display: inline-block;
+          height: 35px;
+          width: 35px;
+
+          @include margin-right($baseline);
+
+          margin-top: ($baseline/4);
+          font-size: 1.75em;
+          text-decoration: none;
+          color: $black;
+          opacity: 0.5;
+
+          @include transition(all 0.15s linear 0s);
+
+          &:hover,
+          &:focus {
+            opacity: 1;
+          }
+
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+      }
+
+      h1 {
+        font: 1em $serif;
+        letter-spacing: 0;
+        color: #999;
+        margin-bottom: 0;
+      }
+    }
+
+    .important-dates {
+      list-style: none;
+      margin: 0;
+      padding: 0 ($baseline/2);
+
+      li {
+        @include clearfix();
+
+        border-bottom: 1px dotted $border-color-2;
+        margin-bottom: $baseline;
+        padding-bottom: ($baseline/2);
+
+        &:hover,
+        &:focus {
+          .icon {
+            opacity: 1;
+          }
+        }
+
+        .important-dates-item-title {
+          color: $lighter-base-font-color;
+
+          @include float(left);
+
+          font-family: $font-family-sans-serif;
+        }
+
+        .icon {
+          @include float(left);
+
+          padding: 1px;
+
+          @include margin(($baseline/5), ($baseline/2), 0, 0);
+
+          opacity: 0.6;
+        }
+
+        .important-dates-item-text {
+          @include float(right);
+
+          font-weight: 700;
+        }
+      }
+
+      .prerequisite-course {
+        .pre-requisite {
+          max-width: 39%;
+
+          @extend %text-truncated;
+        }
+
+        .tip {
+          @include float(left);
+
+          margin: $baseline 0 ($baseline/2);
+          font-size: 0.8em;
+          color: $lighter-base-font-color;
+          font-family: $font-family-sans-serif;
+        }
+      }
+    }
+  }
+}

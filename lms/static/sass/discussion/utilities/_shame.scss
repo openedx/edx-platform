@@ -1,0 +1,131 @@
+// -------------------
+// navigation - header
+// -------------------
+
+// Temporary breadcrumbs
+.has-breadcrumbs {
+  .breadcrumbs {
+    margin: 5px 0 0;
+
+    .all-topics {
+      font-size: 14px;
+
+      .fa {
+        @include margin-right(10px);
+      }
+    }
+  }
+}
+
+// ------------------------
+// navigation - browse menu
+// ------------------------
+
+// Override global label rules
+.forum-nav-browse-filter label {
+  margin-bottom: 0;
+  width: 100%;
+}
+
+// Override global input rules
+.forum-nav-browse-filter-input {
+  @include padding-left($baseline/4);
+  @include padding-right($baseline/2 + 12px); // Leave room for icon
+
+  box-shadow: none !important;
+  border-radius: $forum-border-radius !important;
+  height: auto !important;
+  font-size: $forum-small-font-size !important;
+}
+
+// --------------------------------
+// navigation - sort and filter bar
+// --------------------------------
+
+// Override global label rules
+.forum-nav-filter-main,
+.forum-nav-filter-cohort,
+.forum-nav-sort {
+  font: inherit;
+  line-height: 1em;
+  margin-bottom: 0;
+}
+
+// Override global select rules
+.forum-nav-filter-main-control,
+.forum-nav-filter-cohort-control,
+.forum-nav-sort-control {
+  font: inherit;
+}
+
+// --------------------------------
+// navigation - thread list
+// --------------------------------
+
+// The following rules would be unnecessary but for broadly scoped rules defined
+// elsewhere in our CSS.
+
+li[class*=forum-nav-thread-label-] {
+  // Override global span rules
+  span {
+    color: inherit;
+  }
+
+  // Override clearfix stuff in .sidebar ul li rules
+  &::before,
+  &::after {
+    display: none !important;
+  }
+}
+
+// -------
+// Actions
+// -------
+
+.discussion {
+
+  // Override courseware
+  .post-actions-list,
+  .response-actions-list,
+  .comment-actions-list {
+    @extend %t-copy-sub2;
+  }
+
+  // Override global span
+  .action-label span,
+  .action-icon span {
+    color: inherit;
+  }
+}
+
+// -------
+// Inline Discussion Module Overrides
+// -------
+.discussion-module {
+  .post-header {
+    margin-bottom: 0 !important;  // overrides default header styling
+    padding-bottom: 0 !important;  // overrides default header styling
+
+    .posted-details {
+      margin: ($baseline/5) 0 !important; // overrides courseware p styling
+    }
+
+    .post-labels {
+      font-size: $forum-base-font-size; // overrides default heading styling
+    }
+
+    .post-title {
+      margin-bottom: 0 !important; // overrides "#seq_content h1" styling
+    }
+  }
+}
+
+// overrides courseware styling to keep views consistent everywhere
+.discussion-article {
+  .response-header {
+    line-height: 1 !important;
+    font-size: $forum-base-font-size !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+}

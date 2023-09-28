@@ -1,0 +1,43 @@
+This course fixture provides a representative sample of scoreable block types.
+
+## Contents of the Course
+
+It contains several scoreable blocks in one sequence:
+
+- CAPA
+- ORA
+- SGA (Staff Graded Assignment)
+- LTI
+- LTI Consumer
+- Randomized Content Block (containing Library Content with CAPA problems)
+- Drag and Drop (v2)
+
+## Adding Blocks
+
+To expand coverage to other block types, you can either edit the course xml
+directly, or do the following:
+
+1. Zip up the scoreable directory into a tarball:
+
+    $ tar cvzf course.tar.gz common/test/data/scoreable'
+
+2. Import the tarball into studio.
+3. Add the new blocks.
+4. Export the modified course.
+5. Unzip to a temporary directory:
+
+    $ cd /tmp
+    $ tar xvzf ~/Downloads/course.*.tar.gz
+    $ somewhere, and
+
+6. Copy the data back into the test directory:
+
+    $ rsync -avz --delete-after /tmp/course/ /path/to/edx-platform/common/test/data/scoreable
+
+## Use in Tests
+
+As of this writing, this course is used in
+`lms/djangoapps/grades/tests/test_new.py`  If you modify the course, you may
+need to adjust the values for `SCORED_BLOCK_COUNT` and `ACTUAL_TOTAL_POSSIBLE`
+in `TestMultipleProblemBlockTypes` to reflect the real number of scoreable
+blocks.

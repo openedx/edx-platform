@@ -1,0 +1,61 @@
+@import "neat/neat-helpers";
+
+// Change the grid settings
+$max-width: map-get($container-max-widths, xl);
+
+// Override the default global box-sizing
+$border-box-sizing: false;
+
+// Grid width variables
+$large-min-width: 769px;
+
+// breakpoints
+$bp-tiny: new-breakpoint(max-width 320px 4);
+$bp-small: new-breakpoint(min-width 321px max-width 540px, 4);
+$bp-medium: new-breakpoint(min-width 541px max-width 768px, 8);
+$bp-large: new-breakpoint(min-width $large-min-width max-width 979px, 12);
+$bp-huge:  new-breakpoint(min-width 980px 12);
+
+// edX-centric breakpoints (to be temporarily used with edx.org features only)
+$edx-bp-tiny: new-breakpoint(max-width 320px 4);
+$edx-bp-small: new-breakpoint(min-width 321px max-width 540px, 4);
+$edx-bp-medium: new-breakpoint(min-width 541px max-width 768px, 8);
+$edx-bp-large: new-breakpoint(min-width $large-min-width 12);
+$edx-bp-huge:  new-breakpoint(min-width 980px 12);
+
+// Wrap grids with grid-container.
+@mixin grid-container() {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap; /* stylelint-disable-line */
+  justify-content: flex-start;
+  align-items: flex-start;
+  box-sizing: border-box;
+  margin: 0 auto;
+}
+
+@mixin span($cols, $margin:'') {
+  @include margin-left(calc(0.5 * #{$grid-gutter-width}));
+  @include margin-right(calc(0.5 * #{$grid-gutter-width}));
+
+  width: calc(#{cols($cols)} - #{$grid-gutter-width});
+
+  @if ($margin == 'before') {
+    @include margin-right(0);
+
+    width: calc(#{cols($cols)} - 0.5 * #{$grid-gutter-width});
+  }
+
+  @else if ($margin == 'after') {
+    @include margin-left(0);
+
+    width: calc(#{cols($cols)} - 0.5 * #{$grid-gutter-width});
+  }
+
+  @else if ($margin == 'none') {
+    @include margin-left(0);
+    @include margin-right(0);
+
+    width: cols($cols);
+  }
+}

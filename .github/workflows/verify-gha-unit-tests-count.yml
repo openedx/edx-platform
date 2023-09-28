@@ -1,0 +1,23 @@
+name: verify unit tests count
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  collect-and-verify:
+    if: (github.repository == 'edx/edx-platform-private') || (github.repository == 'openedx/edx-platform' && (startsWith(github.base_ref, 'open-release') == false))
+    runs-on: [ edx-platform-runner ]
+    steps:
+      - name: sync directory owner
+        run: sudo chown runner:runner -R .*
+
+      - uses: actions/checkout@v2
+      - name: install requirements
+        run: |
+          sudo make test-requirements
+
+      - name: verify unit tests count
+        uses: ./.github/actions/verify-tests-count

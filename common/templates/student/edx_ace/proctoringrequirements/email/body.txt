@@ -1,0 +1,15 @@
+{% load i18n %}{% autoescape off %}{% blocktrans %}Hello {{ full_name }}{% endblocktrans %}
+
+{% blocktrans %}You are enrolled in {{ course_name }} at {{ platform_name }}. This course contains proctored exams.{% endblocktrans %}
+
+{% blocktrans %}Proctored exams are timed exams that you take while proctoring software monitors your computer's desktop, webcam video, and audio. Your course uses {{ proctoring_provider }} software for proctoring.{% endblocktrans %}
+
+{% blocktrans %}Carefully review the system requirements as well as the steps to take a proctored exam in order to ensure that you are prepared.{% endblocktrans %}
+
+{% blocktrans %}To view proctoring instructions and requirements, please visit: {{ proctoring_requirements_url }}{% endblocktrans %}
+
+{% trans "Thank you," %}
+{% blocktrans %}The {{ platform_name }} Team {% endblocktrans %}
+
+{% blocktrans %}This email was automatically sent from {{ platform_name }} to {{ full_name }}.{% endblocktrans %}
+{% endautoescape %}

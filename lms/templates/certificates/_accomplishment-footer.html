@@ -1,0 +1,24 @@
+<%page expression_filter="h"/>
+<div class="wrapper-footer">
+
+    <footer class="footer-app" role="contentinfo" id="company-info">
+        <div class="footer-app-copyright">
+            <p class="copy copy-micro">${copyright_text | n, decode.utf8 }</p>
+        </div>
+        <nav class="footer-app-nav">
+            <ul class="list list-legal">
+                % if company_tos_url is not UNDEFINED:
+                    <li class="nav-item">
+                        <a class="action btn btn-small btn-link" href="${company_tos_url}">${company_tos_urltext}</a>
+                    </li>
+                % endif
+                % if company_privacy_url is not UNDEFINED:
+                    <li class="nav-item">
+                        <a class="action btn btn-small btn-link" href="${company_privacy_url}">${company_privacy_urltext}</a>
+                    </li>
+                % endif
+            </ul>
+        </nav>
+    </footer>
+
+</div>

@@ -1,0 +1,2511 @@
+// lms - views - verification flow
+// ====================
+@import '../base/grid-settings';
+@import 'neat/neat'; // lib - Neat
+
+// MISC: extends - button
+%btn-verify-primary {
+  @extend %btn-primary-green;
+}
+
+// ====================
+
+// MISC: expandable UI
+.is-expandable {
+  .expandable-icon {
+    @include transition(all $tmg-f2 ease-in-out 0s);
+
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: ($baseline/4);
+  }
+
+  // STATE: active
+  &.is-ready {
+    .expandable-icon {
+      @include transform(rotate(-90deg));
+    }
+
+    .title-expand {
+      @extend %ui-fake-link;
+
+      color: $m-blue-d2;
+
+      &:hover,
+      &:focus {
+        color: $m-blue;
+      }
+    }
+  }
+
+  // STATE: expanded
+  &.is-expanded {
+    .expandable-icon {
+      @include transform(rotate(0));
+      @include transform-origin(50% 50%);
+    }
+  }
+}
+
+// ====================
+
+// VIEW: all verification steps
+.verification-process {
+
+  // reset: box-sizing (making things so right its scary)
+  * {
+    box-sizing: border-box;
+  }
+
+  // reset: typography
+  font-family: $font-family-sans-serif;
+
+  // reset: typography - heading
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @extend %t-title;
+
+    color: $m-gray-d4;
+  }
+
+  // reset: typography - copy
+  p,
+  ol,
+  ul,
+  dl,
+  input,
+  select,
+  textarea {
+    font-family: $font-family-sans-serif;
+    color: $m-gray-d1;
+  }
+
+  .copy {
+    p,
+    ul,
+    li,
+    dl,
+    blockquote,
+    input,
+    select {
+      margin-bottom: ($baseline*0.75);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  // reset: copy/text
+
+
+  // reset: forms
+  input,
+  textarea {
+    font-style: normal;
+    font-weight: 400;
+
+    @include margin-right($baseline/5);
+
+    padding: ($baseline/4) ($baseline/2);
+  }
+
+  textarea {
+    padding: ($baseline/2);
+  }
+
+  label {
+    @extend %t-weight4;
+
+    font-family: $font-family-sans-serif;
+    font-style: normal;
+    color: $m-gray-d4;
+  }
+
+  // reset: navigation (needed due to edX's new global-header styling)
+  .header-global-new .nav-global a {
+    padding-bottom: ($baseline +1);
+  }
+
+  // HACK: fix global header height in verification flow ECOM-1808
+  .header-global {
+    height: 76px;
+  }
+
+  // HACK: nasty override due to our bad input/button styling
+  button,
+  input[type="submit"],
+  input[type="button"],
+  button[type="submit"] {
+    @include font-size(16);
+
+    @extend %t-weight4;
+
+    text-transform: none;
+    text-shadow: none;
+    letter-spacing: 0;
+  }
+
+  .checkbox label {
+    display: inline-block;
+  }
+
+  input[type="checkbox"] {
+    width: auto;
+  }
+
+  //  reset: lists
+  .list-actions,
+  .list-steps,
+  .progress-steps,
+  .list-controls,
+  .list-fields,
+  .list-nav,
+  .list-help,
+  .list-faq,
+  .nav-wizard,
+  .list-reqs,
+  .list-faq,
+  .review-tasks,
+  .list-tips,
+  .wrapper-photos,
+  .field-group,
+  .list-info {
+    @extend %ui-no-list;
+  }
+
+  // ====================
+
+  // elements: layout
+  .content-wrapper {
+    background: $body-bg;
+    padding-bottom: 0;
+  }
+
+  .container {
+    background-color: $white;
+
+    @include padding(($baseline*1.5), ($baseline*1.5), ($baseline*2), ($baseline*1.5));
+  }
+
+  // ====================
+
+  // elements: common copy
+  .title {
+    @extend %t-title5;
+    @extend %t-weight1;
+  }
+
+  .copy {
+    @extend %t-weight1;
+  }
+
+  // ====================
+
+  // elements - controls
+  .action-primary {
+    @extend %btn-verify-primary;
+    // needed for override due to .register a:link styling
+    border: 0 !important;
+    color: $white !important;
+  }
+
+  // elements - controls
+  .action-primary-blue {
+    @extend %btn-primary-blue;
+    // needed for override due to .register a:link styling
+    border: 0 !important;
+    color: $white !important;
+  }
+
+  .action-confirm {
+    @extend %btn-verify-primary;
+    // needed for override due to .register a:link styling
+    border: 0 !important;
+    color: $white !important;
+  }
+
+  // ====================
+
+  // elements: page depth
+
+  // ====================
+
+  // UI: reports/tables
+  .wrapper-report {
+    .report {
+      @extend %ui-window;
+
+      width: flex-grid(12, 12);
+      border-color: $m-gray-t3;
+      border-collapse: collapse;
+
+      tr {
+        @include text-align(left);
+      }
+
+      td {
+        @extend %t-weight3;
+
+        vertical-align: middle;
+        padding: ($baseline*0.75) $baseline;
+        color: $m-gray-d3;
+      }
+
+      th {
+        @extend %t-weight2;
+
+        padding: ($baseline/2) $baseline;
+      }
+
+      thead {
+        tr {
+          border-bottom: 1px solid $m-gray-l3;
+        }
+
+        th[scope="col"] {
+          @extend %t-title7;
+          @extend %t-weight2;
+
+          vertical-align: middle;
+          color: $m-gray-d3;
+          background: $m-gray-l4;
+        }
+      }
+
+      tbody {
+        tr {
+          border-bottom: 1px solid $m-gray-l3;
+        }
+      }
+
+      tfoot {
+        background: $m-blue-t0;
+      }
+    }
+  }
+
+  .report-receipt-provider {
+    @extend %ui-window;
+
+    padding: ($baseline*0.75) $baseline;
+
+    .provider-wrapper {
+      width: 70%;
+
+      @include float(left);
+
+      .provider-info {
+        margin-bottom: $baseline;
+        font-weight: 600;
+      }
+    }
+
+    .provider-buttons-logos {
+      @include float(right);
+      @include text-align(center);
+
+      .provider-logo img {
+        max-width: 160px;
+        margin-bottom: $baseline * 0.5;
+      }
+
+      .complete-order {
+        @include text-align(center);
+
+        button {
+          @extend %btn-pl-primary-base;
+
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+  // ====================
+
+  // UI: help
+  .help-item {
+    .title {
+      @extend %hd-lv4;
+
+      margin-bottom: ($baseline/4);
+    }
+
+    .copy {
+      @extend %copy-detail;
+    }
+
+    strong {
+      color: $m-gray-d2;
+    }
+  }
+
+  // ====================
+
+  // UI : message
+  .wrapper-msg {
+    margin-bottom: ($baseline*1.5);
+    border-bottom: ($baseline/4) solid $m-blue;
+    padding: $baseline ($baseline*1.5);
+    background: tint($m-blue, 95%);
+
+    .msg {
+      @include clearfix();
+
+      max-width: grid-width(12);
+      min-width: 760px;
+      width: flex-grid(12);
+      margin: 0 auto;
+    }
+
+    .msg-content,
+    .msg-icon {
+      display: block;
+
+      @include float(left);
+    }
+
+    .msg-content {
+      width: flex-grid(11, 12);
+
+      .title {
+        @extend %t-title6;
+        @extend %t-weight4;
+      }
+
+      .copy {
+        @extend %t-copy-sub1;
+      }
+    }
+
+    .msg-icon {
+      width: flex-grid(1, 12);
+
+      @extend %t-icon2;
+
+      @include margin-right(flex-gutter());
+
+      text-align: center;
+      color: $m-blue;
+    }
+  }
+
+  // UI: error
+  .wrapper-msg-error {
+    border-bottom-color: $red;
+    background: tint($red, 95%);
+
+    .msg-icon {
+      color: $red;
+    }
+
+    .msg-content {
+      .title {
+        color: $red;
+      }
+    }
+  }
+
+  // UI: error
+  .wrapper-msg-activate {
+    border-bottom-color: $m-pink;
+    background: tint($m-pink, 95%);
+
+    .msg-icon {
+      color: $m-pink;
+    }
+
+    .msg-content {
+      .title {
+        color: $m-pink;
+      }
+    }
+  }
+
+  // ====================
+
+  // UI: inline messages
+  .msg-inline {
+    &.msg-error {
+      .copy,
+      .copy p {
+        color: $red;
+      }
+    }
+  }
+
+  // ====================
+
+  // UI: page header
+  .page-header {
+    width: flex-grid(12, 12);
+    margin-bottom: 0;
+    border-bottom: none;
+
+    .title {
+      @include clearfix();
+
+      width: flex-grid(12, 12);
+      margin: 0;
+
+      .sts-course,
+      .sts-track {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .sts-track {
+        width: flex-grid(3, 12);
+
+        @include text-align(right);
+
+        .sts-track-value {
+          @extend %copy-badge;
+
+          display: inline-block;
+          background: $verified-color-lvl3;
+          color: $white;
+          font-weight: 600;
+
+          .context {
+            opacity: 0.8;
+            color: $white;
+            letter-spacing: 0.1rem;
+          }
+        }
+
+        &.professional-ed {
+          .sts-track-value {
+            background-color: $professional-color-lvl1;
+          }
+        }
+      }
+
+      .sts-label,
+      .sts-course-org,
+      .sts-course-number,
+      .sts-course-name {
+        @extend %t-title5;
+        @extend %t-weight4;
+
+        @include font-size(14);
+        @include line-height(14);
+
+        display: inline-block;
+        color: $gray;
+        text-transform: none;
+      }
+
+      .sts-label {
+        margin: 0;
+        border: none;
+        padding: 0;
+      }
+
+      .sts-course {
+        width: initial;
+      }
+
+      .sts-course-org {
+        @include margin-right(0);
+      }
+
+      .wrapper-sts {
+        display: inline-block;
+        width: flex-grid(9, 12);
+        margin-bottom: ($baseline/4);
+      }
+
+      .title .sts-track {
+        display: inline-block;
+
+        .sts-track-value {
+          background: $verified-color-lvl3;
+        }
+
+        &.professional-ed {
+          .sts-track-value {
+            background-color: $professional-color-lvl1;
+          }
+        }
+      }
+    }
+  }
+
+  // ====================
+
+  // UI : progress
+  .wrapper-progress {
+    position: relative;
+    margin-bottom: ($baseline*1.5);
+  }
+
+  .progress-sts {
+    @include size($baseline/4);
+
+    @extend %ui-depth1;
+
+    position: absolute;
+    top: 43px;
+
+    @include left(7%);
+
+    display: block;
+    width: 83%;
+    margin: 0 auto;
+    background: $m-gray-l4;
+
+    .progress-sts-value {
+      width: 0%;
+      height: 100%;
+      display: block;
+      background: $verified-color-lvl4;
+    }
+  }
+
+  .progress {
+    width: flex-grid(12, 12);
+    margin: 0 auto;
+    border-bottom: ($baseline/4) solid $m-gray-l4;
+
+    .progress-steps {
+      @include clearfix();
+
+      position: relative;
+      top: ($baseline/4);
+      display: table;
+      width: 100%;
+    }
+
+    .progress-step {
+      @extend %ui-depth2;
+
+      position: relative;
+      display: table-cell;
+      height: ($baseline*6);
+      padding: $baseline $baseline ($baseline*1.5) $baseline;
+      text-align: center;
+
+      .wrapper-step-number,
+      .step-number,
+      .step-name {
+        display: block;
+      }
+
+      .wrapper-step-number {
+        @include size(($baseline*2) ($baseline*2));
+
+        margin: 0 auto ($baseline/2) auto;
+        border-radius: ($baseline*10);
+        border: ($baseline/5) solid $m-gray-l4;
+        background: $white;
+
+        .step-number {
+          @extend %t-title7;
+          @extend %t-weight4;
+
+          @include line-height(0);
+          @include margin(16px, auto, 0, auto);
+
+          color: $m-gray-l1;
+        }
+      }
+
+      .step-name {
+        @extend %t-title7;
+        @extend %t-weight4;
+
+        color: $m-gray-l1;
+      }
+
+      // confirmation step w/ icon
+      &.progress-step-icon {
+        .step-number {
+          margin-top: ($baseline/2);
+        }
+      }
+
+      // STATE: is completed
+      &.is-completed {
+        border-bottom: ($baseline/5) solid $verified-color-lvl3;
+
+        .wrapper-step-number {
+          border-color: $verified-color-lvl3;
+        }
+
+        .step-number,
+        .step-name {
+          color: $m-gray-l3;
+        }
+      }
+
+      // STATE: is current
+      &.is-current {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number,
+        .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
+  }
+
+  // ====================
+
+  // UI: slides
+  .carousel {
+
+    // carousel item
+    .carousel-item {
+      opacity: 0;
+    }
+
+    // STATE: active
+    .carousel-active {
+      opacity: 1;
+    }
+
+    .view {
+      width: flex-grid(12, 12);
+
+      > .title {
+        @extend %hd-lv2;
+
+        color: $m-blue-d1;
+      }
+
+      .instruction {
+        @extend %t-copy-lead1;
+
+        margin-bottom: $baseline;
+      }
+    }
+
+    @mixin help {
+      margin-bottom: ($baseline*1.5);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .title {
+        @extend %hd-lv3;
+      }
+
+      .copy {
+        @extend %copy-detail;
+      }
+    }
+
+    .requirements {
+      margin-bottom: 10px;
+
+      @include outer-container;
+
+      .title {
+        @extend %hd-lv3;
+
+        margin-bottom: 10px;
+      }
+
+      .requirement {
+        @include help();
+
+        border: 1px solid #e5e5e5;
+        border-top: 5px solid #f4d78a;
+        padding: 10px;
+        box-shadow: 1px 1px 3px #888;
+
+        // TODO Determine why this is not responsive.
+        @include span-columns(6);
+      }
+    }
+
+    .wrapper-task {
+      @include clearfix();
+
+      width: flex-grid(12, 12);
+      margin: $baseline 0;
+
+      .wrapper-help {
+        @include float(right);
+
+        width: flex-grid(6, 12);
+        padding: 0 $baseline;
+
+        .help {
+          @include help();
+
+          .example {
+            color: $m-gray-l2;
+          }
+
+          // help - general list
+          .list-help {
+            margin-top: ($baseline/2);
+            color: $black;
+
+            .help-item {
+              margin-bottom: ($baseline/4);
+              border-bottom: 1px solid $m-gray-l4;
+              padding-bottom: ($baseline/4);
+
+              &:last-child {
+                margin-bottom: 0;
+                border-bottom: none;
+                padding-bottom: 0;
+              }
+            }
+
+            .help-item-emphasis {
+              @extend %t-weight4;
+            }
+          }
+
+          .copy-extra {
+            color: $black;
+          }
+
+          // help - faq
+          .list-faq {
+            margin-bottom: $baseline;
+          }
+        }
+      }
+
+      .task {
+        @extend %ui-window;
+
+        @include float(left);
+        @include margin-right(flex-gutter());
+
+        width: flex-grid(6, 12);
+      }
+
+      .controls {
+        padding: ($baseline*0.75) $baseline;
+        background: $m-gray-l4;
+        text-align: center;
+
+        .list-controls {
+          position: relative;
+        }
+
+        .control {
+          .action {
+            @extend %btn-primary-blue;
+
+            padding: ($baseline/2) ($baseline*0.75);
+
+            .icon {
+              @extend %t-icon4;
+
+              padding: ($baseline*0.25) ($baseline*0.5);
+              display: block;
+            }
+          }
+
+          // STATE: hidden
+          &.is-hidden {
+            visibility: hidden;
+          }
+
+          // STATE: shown
+          &.is-shown {
+            visibility: visible;
+          }
+
+          // STATE: approved
+          &.approved {
+            .action {
+              @extend %btn-verify-primary;
+
+              padding: ($baseline/2) ($baseline*0.75);
+            }
+          }
+        }
+
+        // control - redo
+        .control-redo {
+          position: absolute;
+
+          @include left($baseline/2);
+        }
+
+        // control - take/do, retake
+        .control-do,
+        .control-retake {
+          @include left(45%);
+        }
+
+        // control - approve
+        .control-approve {
+          position: absolute;
+
+          @include right($baseline/2);
+        }
+      }
+
+      .msg {
+        @include clearfix();
+
+        margin-top: ($baseline*2);
+
+        .copy {
+          @include float(left);
+
+          width: flex-grid(8, 12);
+
+          @include margin-right(flex-gutter());
+        }
+
+        .list-actions {
+          position: relative;
+          top: -($baseline/2);
+
+          @include float(left);
+
+          width: flex-grid(4, 12);
+
+          @include text-align(right);
+
+          .action-retakephotos a {
+            @extend %btn-primary-blue;
+
+            @include font-size(14);
+
+            padding: ($baseline/2) ($baseline*0.75);
+          }
+        }
+      }
+
+      .msg-followup {
+        border-top: ($baseline/10) solid $m-gray-t0;
+        padding-top: $baseline;
+      }
+    }
+
+    // indiv slides - review
+    #wrapper-review {
+      color: $black;
+
+      .page-title {
+        @extend %t-strong;
+
+        border-bottom: 2px solid $m-gray-d3;
+        padding-bottom: ($baseline*0.75);
+        margin-bottom: $baseline;
+        text-transform: inherit;
+      }
+
+      .review {
+        .certificate {
+          @include font-size(18);
+
+          background-repeat: no-repeat;
+          padding-left: ($baseline*2.5);
+          overflow: hidden;
+          min-height: 32px;
+
+          p {
+            @include line-height(22);
+
+            @extend %t-strong;
+
+            margin-top: 0;
+            color: $black;
+          }
+
+          .purchase {
+            @include float(right);
+            @include margin-left($baseline*0.75);
+
+            text-align: right;
+
+            .product-info {
+              @include font-size(22);
+
+              @extend %t-strong;
+
+              color: $blue;
+            }
+          }
+
+          &.verified_icon {
+            background-image: url('#{$static-path}/images/icon-sm-verified.png');
+          }
+
+          &.no-id-professional_icon,
+          &.professional_icon {
+            background-image: url('#{$static-path}/images/icon-sm-professional.png');
+          }
+        }
+
+        .payment-buttons {
+          overflow: auto;
+          padding-bottom: ($baseline/4);
+          margin: {
+            top: ($baseline / 2);
+            bottom: ($baseline * 0.75);
+          };
+
+          .payment-button {
+            padding: ($baseline*0.4) $baseline;
+            min-width: 200px;
+          }
+
+          .action-primary-blue {
+            &.is-selected {
+              background: $blue !important;
+            }
+          }
+        }
+
+        .border-gray {
+          border-bottom: 2px solid $gray;
+          margin: ($baseline*1.12) 0;
+        }
+      }
+
+      .container {
+        padding: ($baseline*0.75) 0;
+
+        p {
+          @include line-height(22);
+
+          color: $black;
+        }
+
+        .photo-requirement {
+          @include font-size(12);
+
+          position: relative;
+          padding-left: ($baseline*2);
+          margin-top: ($baseline*0.75);
+          background-repeat: no-repeat;
+          background-position: left top;
+
+          .fa {
+            position: absolute;
+            left: 0;
+            color: $mediumGrey;
+          }
+
+          h6 {
+            font-weight: bold;
+            color: $extraDarkGrey;
+          }
+        }
+      }
+
+
+
+
+      .review-task {
+        margin-bottom: ($baseline*1.5);
+        padding: ($baseline*0.75) $baseline;
+        border-radius: ($baseline/10);
+        background: $m-gray-l4;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        > .title {
+          @extend %hd-lv3;
+        }
+
+        .copy {
+          @extend %copy-base;
+
+          strong {
+            @extend %t-weight5;
+
+            color: $m-gray-d4;
+          }
+        }
+      }
+
+      // individual task - photos
+      .review-task-photos {
+        .wrapper-photos {
+          @include clearfix();
+
+          width: flex-grid(12, 12);
+          margin: $baseline 0;
+
+          .wrapper-photo {
+            @include float(left);
+
+            width: flex-grid(6, 12);
+
+            @include margin-right(flex-gutter());
+
+            &:last-child {
+              @include margin-right(0);
+            }
+
+            .placeholder-photo {
+              @extend %ui-window;
+
+              padding: ($baseline*0.75) $baseline;
+
+              img {
+                display: block;
+                width: 100%;
+                margin: 0 auto;
+              }
+            }
+          }
+
+          .help-tips {
+            @include margin-left($baseline);
+
+            .title {
+              @extend %hd-lv5;
+            }
+
+            .copy {
+              @extend %copy-detail;
+            }
+
+            // help - general list
+            .list-tips {
+              color: $black;
+
+              .tip {
+                margin-bottom: ($baseline/4);
+                border-bottom: 1px solid $m-gray-t0;
+                padding-bottom: ($baseline/4);
+
+                &:last-child {
+                  margin-bottom: 0;
+                  border-bottom: none;
+                  padding-bottom: 0;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // individual task - name
+      .review-task-name {
+        @include clearfix();
+
+        .copy {
+          @include float(left);
+
+          width: flex-grid(8, 12);
+
+          @include margin-right(flex-gutter());
+        }
+
+        .list-actions {
+          position: relative;
+          top: -($baseline);
+
+          @include float(left);
+
+          width: flex-grid(4, 12);
+
+          @include text-align(right);
+
+          .action-editname a {
+            @extend %btn-primary-blue;
+
+            @include font-size(14);
+
+            padding: ($baseline/2) ($baseline*0.75);
+          }
+        }
+      }
+
+      // individual task - contribution
+      .review-task-contribution {
+        .list-fields {
+          @include clearfix();
+
+          margin: $baseline 0;
+
+          .field {
+            @include float(left);
+            @include margin-right(($baseline/2));
+
+            padding: ($baseline/2) ($baseline*0.75);
+            background: $m-gray-t0;
+
+            &:last-child {
+              @include margin-right(0);
+            }
+          }
+
+          .field-group-other {
+            .contribution-option {
+              display: inline-block;
+              vertical-align: middle;
+
+              @include margin-right($baseline/4);
+
+              padding: 3px 0;
+
+              &:last-child {
+                @include margin-right(0);
+              }
+            }
+
+            .contribution-option-other1 label,
+            .contribution-option-other2 label {
+              @extend %text-sr;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // UI: camera states
+  .cam {
+    .placeholder-cam {
+      position: relative;
+      width: 95%;
+      height: 375px;
+      margin: ($baseline/2) auto;
+      background: $m-blue-l5;
+
+      // placeholders
+      .placeholder-art {
+        opacity: 0.7;
+        z-index: 100;
+
+        .copy {
+          position: absolute;
+          top: 40%;
+          margin: 0 40px;
+
+          @include text-align(center);
+        }
+      }
+
+      // previously defined in HTML
+      video,
+      canvas {
+        position: relative;
+        display: block;
+
+        @include size(100% 100%);
+
+        z-index: 500;
+      }
+    }
+
+    .controls {
+      height: ($baseline*4);
+    }
+
+    .preview {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  // ====================
+
+  // UI: deco - divider
+  .deco-divider {
+    position: relative;
+    display: block;
+    margin: $baseline 0 ($baseline*2);
+    border-top: ($baseline/5) solid $m-gray-l4;
+
+    .copy {
+      @extend %t-copy-lead1;
+      @extend %t-weight4;
+
+      @include left(calc(50% - 46px));
+
+      position: absolute;
+      top: -($baseline*1.25);
+      padding: ($baseline/2) ($baseline*1.5);
+      background: white;
+      text-align: center;
+      color: $gray-d2;
+    }
+  }
+
+
+  // ====================
+
+  // UI: nav - wizard
+  .nav-wizard {
+    @extend %ui-well;
+
+    @include clearfix();
+
+    width: flex-grid(12, 12);
+    border-radius: ($baseline/10);
+    background: $m-gray-l4;
+    padding: ($baseline*0.75) $baseline;
+
+    .help-inline {
+      @extend %t-copy-sub1;
+
+      @include float(left);
+
+      width: flex-grid(6, 12);
+
+      @include margin(($baseline*0.75), flex-gutter(), 0, 0);
+    }
+
+    // STATE: is ready
+    &.is-ready {
+      background: $m-blue-l4;
+    }
+
+    &.is-not-ready {
+      background: $m-gray-l4;
+
+      .action-primary {
+        @extend %btn-primary-disabled;
+      }
+    }
+  }
+
+  // ====================
+
+  // UI: forms - payment
+  .contribution-options {
+    .contribution-option {
+      border-radius: ($baseline/5);
+
+      .label,
+      label,
+      input {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .label,
+      label {
+        margin-bottom: 0;
+        padding: 6px 0;
+      }
+
+      input {
+        margin-right: ($baseline/4);
+      }
+
+      .deco-denomination,
+      .label-value,
+      .denomination-name {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .label-value {
+        @extend %t-weight4;
+      }
+
+      .denomination-name {
+        @include font-size(14);
+
+        color: $m-gray-l1;
+      }
+
+      // specific fields
+      #contribution-other-amt {
+        width: ($baseline*4.5);
+        padding: ($baseline/4) ($baseline/2);
+      }
+    }
+  }
+
+  // ====================
+
+  // help - faq
+  .list-faq {
+    .faq-question {
+      @extend %hd-lv3;
+
+      border-bottom: 1px solid $m-gray-l4;
+      padding-bottom: ($baseline/4);
+    }
+
+    .faq-answer {
+      margin-bottom: ($baseline*1.25);
+    }
+  }
+
+  // ====================
+
+  // UI: main content
+  .content-main {
+    width: flex-grid(12, 12);
+
+    > .title {
+      @extend %hd-lv2;
+
+      color: $m-blue-d1;
+    }
+
+    .instruction {
+      @extend %t-copy-lead1;
+
+      margin-bottom: $baseline;
+    }
+  }
+
+  // ====================
+
+  // UI: supplemental content
+  .wrapper-content-supplementary {
+    margin: ($baseline*1.5) 0;
+    border-top: ($baseline/4) solid $m-gray-l4;
+  }
+
+  .content-supplementary {
+    box-sizing: border-box;
+
+    @include outer-container;
+    @include span-columns(12);
+
+    .list-help {
+      @include clearfix();
+
+      .help-item {
+        @include fill-parent;
+
+        margin-bottom: 25px;
+
+        &:last-child {
+          margin: 0;
+        }
+      }
+    }
+
+    @include media(550px) {
+      .list-help {
+        .help-item {
+          @include span-columns(4);
+
+          margin-bottom: 0;
+
+          &.help-item-technical {
+            @include span-columns(8);
+          }
+        }
+      }
+    }
+  }
+
+  // ====================
+
+  // VIEW: select a track
+  &.step-select-track {
+    .container {
+      min-width: 0;
+      max-width: map-get($container-max-widths, xl);
+    }
+
+    .sts-track {
+      @extend %text-sr;
+    }
+
+    .form-register-choose {
+      @include clearfix();
+
+      margin: ($baseline*2) 0;
+
+      .deco-divider {
+        @include fill-parent;
+        @include float(left);
+      }
+    }
+
+    .register-choice,
+    .help-register {
+      @include float(left);
+    }
+
+    .register-choice {
+      @include fill-parent;
+      @include margin(0, flex-gutter(), $baseline, 0);
+
+      border-top: ($baseline/4) solid $m-gray-d4;
+      padding: $baseline ($baseline*1.5);
+      background: $m-gray-l4;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .wrapper-copy,
+      .list-actions {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .list-actions {
+        @include fill-parent;
+        @include text-align(right);
+        @include float(right);
+
+        margin: ($baseline/4) 0;
+        border-top: none;
+        clear: both;
+      }
+
+      .title {
+        @extend %t-title5;
+        @extend %t-weight5;
+
+        margin-bottom: ($baseline/2);
+        width: calc(100% - 30px);
+      }
+
+      .copy {
+        @extend %t-copy-base;
+      }
+
+      .wrapper-copy-inline {
+        @extend %t-copy-base;
+
+        display: inline-block;
+        width: 100%;
+      }
+
+      .copy-inline {
+        @extend %t-copy-base;
+
+        display: inline-block;
+      }
+
+      .action-select {
+        @include fill-parent;
+
+        input {
+          @extend %t-weight4;
+
+          padding: ($baseline/2) ($baseline*0.75);
+          width: 100%;
+          white-space: normal;
+        }
+      }
+    }
+
+    .register-choice-audit {
+      border-color: $m-blue-d1;
+
+      .deco-ribbon {
+        position: relative;
+        top: -($baseline*2.5);
+
+        @include right(-($baseline*0.35));
+        @include float(right);
+
+        display: block;
+        width: ($baseline*2.9);
+        height: ($baseline*4.2);
+      }
+
+      .list-actions {
+        margin: ($baseline) 0;
+      }
+
+      .action-select input {
+        @extend %btn-primary-blue;
+      }
+    }
+
+    .register-choice-certificate {
+      border-color: $verified-color-lvl3;
+      position: relative;
+
+      .deco-ribbon {
+        position: absolute;
+        top: -10px;
+
+        @include right($baseline);
+
+        display: block;
+        width: 45px;
+        height: 45px;
+        background: transparent url('#{$static-path}/images/verified-ribbon.png') no-repeat 0 0;
+      }
+
+      .action-intro,
+      .action-select {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .action-intro {
+        @include fill-parent;
+
+        @extend %copy-detail;
+
+        @include text-align(left);
+      }
+
+      .action-select input,
+      .action-select button {
+        @extend %btn-verify-primary;
+      }
+
+      .action-select button[name="verified_mode"] {
+        font-weight: 600;
+        padding: 10px 15px;
+      }
+
+      // extra register options/info
+      .title-expand {
+        @extend %t-copy-sub1;
+
+        font-weight: 500 !important;
+        display: inline-block;
+        margin: 0;
+      }
+
+      .expandable-area {
+        margin: $baseline 0;
+      }
+    }
+
+    .help-register {
+      @include span-columns(4);
+
+      .title {
+        @extend %hd-lv4;
+        @extend %t-weight4;
+
+        margin-top: $baseline;
+        margin-bottom: ($baseline/2);
+      }
+
+      .copy {
+        @extend %copy-detail;
+      }
+    }
+
+    // progress indicator
+    .progress-sts-value {
+      width: 0%;
+    }
+
+    // contribution selection
+    .field-certificate-contribution {
+      margin: $baseline 0;
+
+      .label {
+        @extend %hd-lv4;
+        @extend %t-weight4;
+
+        margin-bottom: ($baseline/2);
+      }
+    }
+
+    .contribution-options {
+      @include clearfix();
+      @include fill-parent;
+
+      margin: 0;
+
+      &::after {
+        clear: none;
+        display: none;
+      }
+
+      .field {
+        @include fill-parent;
+        @include float(left);
+        @include margin(0, ($baseline/2), ($baseline/2), 0);
+
+        padding: ($baseline/2) ($baseline*0.75);
+        background: $m-gray-t0;
+
+        input {
+          width: auto;
+          padding: 0;
+        }
+
+        &:last-child {
+          @include margin-right(0);
+        }
+      }
+
+      #contribution-other-amt {
+        width: ($baseline*4.5);
+        padding: ($baseline/4) ($baseline/2);
+      }
+
+      .field-group-other {
+        .contribution-option {
+          display: inline-block;
+          vertical-align: middle;
+
+          @include margin-right($baseline/4);
+
+          padding: 1px 0;
+
+          &:last-child {
+            @include margin-right(0);
+          }
+        }
+
+        .contribution-option-other1 label,
+        .contribution-option-other2 label {
+          @extend %text-sr;
+        }
+      }
+    }
+
+    @include media(min-width 550px max-width 768px) {
+      .contribution-options {
+        .field {
+          @include span-columns(6);
+
+          &:nth-of-type(even) {
+            @include margin-right(0);
+          }
+        }
+      }
+
+      .register-choice {
+        .list-actions {
+          @include float(left);
+
+          width: auto;
+        }
+
+        .action-select {
+          width: initial;
+
+          input {
+            width: initial;
+          }
+        }
+      }
+    }
+
+    @include media($edx-bp-large) {
+      .contribution-options {
+        .field {
+          width: auto;
+        }
+      }
+
+      .register-choice {
+        .list-actions {
+          @include span-columns(4);
+
+          width: auto;
+        }
+
+        .action-select {
+          width: initial;
+
+          input {
+            width: initial;
+          }
+        }
+      }
+    }
+
+    @include media($edx-bp-huge) {
+      .register-choice {
+        .list-actions {
+          @include float(right);
+
+          clear: none;
+        }
+      }
+    }
+  }
+
+  // VIEW: requirements
+  &.step-requirements {
+    .help-item-technical {
+      display: none;
+    }
+
+    // progress nav
+    .progress .progress-step {
+
+      // STATE: is current
+      &#progress-step0 {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number,
+        .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
+
+    // progress indicator
+    .progress-sts-value {
+      width: 0%;
+    }
+
+    .list-reqs {
+      @include clearfix();
+
+      width: flex-grid(12, 12);
+      text-align: center;
+
+      .req {
+        @extend %ui-window;
+
+        @include margin-right(flex-gutter());
+
+        display: inline-block;
+        vertical-align: top;
+        width: flex-grid(4, 12);
+        min-height: ($baseline*15);
+        border-color: $verified-color-lvl4;
+        text-align: center;
+
+        &:last-child {
+          @include margin-right(0);
+        }
+
+        .title {
+          @extend %t-title5;
+          @extend %t-weight4;
+
+          padding: $baseline;
+          border-bottom: 1px solid $verified-color-lvl4;
+          background: $verified-color-lvl5;
+        }
+
+        .placeholder-art {
+          position: relative;
+          display: inline-block;
+          margin: $baseline 0 ($baseline/2);
+          padding: $baseline;
+          background: $verified-color-lvl3;
+          border-radius: ($baseline*10);
+
+          *[class^="icon"] {
+            @extend %t-icon1;
+
+            color: $white;
+          }
+
+          .fa-stack-1x,
+          .fa-stack-2x {
+            position: relative;
+          }
+
+          .fa-stack-2x {
+            @extend %ui-depth1;
+          }
+
+          .fa-stack-1x {
+            @extend %ui-depth2;
+            @extend %t-icon5;
+
+            position: absolute;
+
+            @include left(24px);
+
+            top: 34px;
+            background: $verified-color-lvl3;
+            padding: 3px 5px;
+          }
+
+          .id-photo {
+            width: 23px;
+            padding: 3px 0;
+          }
+
+          &.old-id-card {
+            width: 88px;
+            height: 88px;
+
+            .fa-list-alt {
+              @include left(-7px);
+            }
+
+            .id-photo {
+              top: 13px;
+
+              @include left(-3px);
+
+              line-height: 1.1em;
+            }
+          }
+        }
+
+        .copy {
+          padding: ($baseline/2) $baseline;
+        }
+
+        .copy-super,
+        .copy-sub {
+          display: block;
+        }
+
+        .copy-super {
+          @extend %t-copy-base;
+
+          margin-bottom: ($baseline/2);
+          color: $verified-color-lvl1;
+        }
+
+        .copy-sub {
+          @extend %t-copy-sub2;
+        }
+
+        .actions {
+          padding: ($baseline/2) $baseline;
+        }
+      }
+
+      // specific requirements
+      .req-activate {
+        @include float(left);
+
+        text-align: center;
+        border-color: $m-pink-l3;
+
+        .title {
+          @extend %t-title5;
+          @extend %t-weight4;
+
+          border-bottom-color: $m-pink-l3;
+          background: tint($m-pink, 95%);
+          color: $m-pink;
+        }
+
+        .placeholder-art {
+          background: $m-pink-l1;
+        }
+
+        .copy-super {
+          @extend %t-copy-lead1;
+
+          color: $m-pink;
+        }
+
+        .copy-sub {
+          @extend %t-copy-base;
+        }
+      }
+
+      // CASE: account not activated
+      &.account-not-activated {
+        .req {
+          width: flex-grid(3, 12);
+          min-height: ($baseline*18);
+        }
+      }
+    }
+  }
+
+  // VIEW: take cam photo
+  &.step-photos-cam {
+
+    // progress nav
+    .progress .progress-step {
+
+      // STATE: is completed
+      &#progress-step0 {
+        border-bottom: ($baseline/5) solid $verified-color-lvl3;
+
+        .wrapper-step-number {
+          border-color: $verified-color-lvl3;
+        }
+
+        .step-number,
+        .step-name {
+          color: $m-gray-l3;
+        }
+      }
+
+      // STATE: is current
+      &#progress-step1 {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number,
+        .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
+
+    // progress indicator
+    .progress-sts-value {
+      width: 14%;
+    }
+  }
+
+  // VIEW: take id photo
+  &.step-photos-id {
+
+    // progress nav
+    .progress .progress-step {
+
+      // STATE: is completed
+      &#progress-step0,
+      &#progress-step1 {
+        border-bottom: ($baseline/5) solid $verified-color-lvl3;
+
+        .wrapper-step-number {
+          border-color: $verified-color-lvl3;
+        }
+
+        .step-number,
+        .step-name {
+          color: $m-gray-l3;
+        }
+      }
+
+      // STATE: is current
+      &#progress-step2 {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number,
+        .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
+
+    // progress indicator
+    .progress-sts-value {
+      width: 36%;
+    }
+  }
+
+  // VIEW: review photos
+  &.step-review {
+    .help-item-technical {
+      display: none;
+    }
+
+    .modal.edit-name .submit input {
+      color: $white;
+    }
+
+    .modal {
+      fieldset {
+        margin-top: $baseline;
+      }
+
+      .close-modal {
+        @include font-size(24);
+
+        color: $m-blue-d3;
+
+        &:hover,
+        &:focus {
+          color: $m-blue-d1;
+          border: none;
+        }
+      }
+    }
+
+    .nav-wizard {
+      .prompt-verify {
+        @include float(left);
+        @include margin(0, flex-gutter(), 0, 0);
+
+        width: flex-grid(6, 12);
+
+        .title {
+          @extend %hd-lv4;
+
+          margin-bottom: ($baseline/4);
+        }
+
+        .copy {
+          @extend %t-copy-sub1;
+          @extend %t-weight3;
+        }
+
+        .list-actions {
+          margin-top: ($baseline/2);
+        }
+
+        .action-verify label {
+          @extend %t-copy-sub1;
+        }
+      }
+
+      .wizard-steps {
+        margin-top: ($baseline/2);
+
+        .wizard-step {
+          @include margin-right(flex-gutter());
+
+          display: inline-block;
+          vertical-align: middle;
+
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+      }
+
+      .step-match {
+        label {
+          @extend %t-copy-sub1;
+        }
+      }
+    }
+
+    // progress nav
+    .progress .progress-step {
+
+      // STATE: is completed
+      &#progress-step0,
+      &#progress-step1,
+      &#progress-step2 {
+        border-bottom: ($baseline/5) solid $verified-color-lvl3;
+
+        .wrapper-step-number {
+          border-color: $verified-color-lvl3;
+        }
+
+        .step-number,
+        .step-name {
+          color: $m-gray-l3;
+        }
+      }
+
+      // STATE: is current
+      &#progress-step3 {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number,
+        .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
+
+    // progress indicator
+    .progress-sts-value {
+      width: 55%;
+    }
+  }
+
+  // VIEW: confirmation/receipt
+  &.step-confirmation {
+    .help-item-technical {
+      display: none;
+    }
+
+    // progress nav
+    .progress .progress-step {
+
+      // STATE: is completed
+      &#progress-step0,
+      &#progress-step1,
+      &#progress-step2,
+      &#progress-step3,
+      &#progress-step4 {
+        border-bottom: ($baseline/5) solid $verified-color-lvl3;
+
+        .wrapper-step-number {
+          border-color: $verified-color-lvl3;
+        }
+
+        .step-number,
+        .step-name {
+          color: $m-gray-l3;
+        }
+      }
+
+      // STATE: is current
+      &#progress-step5 {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number,
+        .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
+
+    // progress indicator
+    .progress-sts-value {
+      width: 100%;
+    }
+
+    // information elements
+    .list-info {
+      .info-item {
+        margin-bottom: ($baseline*1.5);
+        border-bottom: ($baseline/4) solid $m-gray-l4;
+        padding-bottom: ($baseline*1.5);
+
+        &:last-child {
+          margin-bottom: 0;
+          border-bottom: none;
+          padding-bottom: 0;
+        }
+
+        > .title {
+          @extend %hd-lv3;
+
+          margin-bottom: $baseline;
+        }
+
+        .copy {
+          @extend %copy-base;
+
+          margin-bottom: $baseline;
+        }
+      }
+    }
+
+    // information - course
+    .course-info {
+      .options {
+        .action-course {
+          @extend %btn-primary-blue;
+
+          @include font-size(14);
+
+          padding: 5px 10px;
+        }
+      }
+
+      .course-actions {
+        .action-dashboard {
+          @extend %btn-primary-blue;
+        }
+      }
+    }
+
+    .instruction {
+      display: inline-block;
+      width: flex-grid(8, 12);
+      vertical-align: top;
+    }
+
+    .actions-next {
+      display: inline-block;
+      width: flex-grid(4, 12);
+      vertical-align: top;
+      margin-top: $baseline;
+    }
+
+    .nav-item {
+      display: block;
+
+      @include margin(0, 0, $baseline, 0);
+
+      text-align: center;
+
+      &.conditional::after {
+        content: "or";
+        display: block;
+        margin: $baseline 0;
+      }
+    }
+  }
+
+  .reverify-success-step {
+    .title {
+      @extend %t-title4;
+
+      text-align: left;
+      text-transform: none;
+    }
+
+    .wrapper-actions {
+      margin-top: 20px;
+    }
+  }
+}
+
+.reverify-blocked {
+  @include padding(($baseline*1.5), ($baseline*1.5), ($baseline*2), ($baseline*1.5));
+
+  .title {
+    @extend %t-title4;
+
+    text-align: left;
+    text-transform: none;
+  }
+
+  .wrapper-actions {
+    margin-top: 20px;
+  }
+
+  .action-primary {
+    @extend %btn-primary-blue;
+  }
+}
+
+//reverify notification special styles
+.msg-reverify {
+  .reverify-list {
+    margin: ($baseline/4) 0;
+  }
+}
+
+.facephoto.view {
+  .wrapper-task {
+    #facecam {
+      float: left;
+    }
+
+    .wrapper-help {
+      float: right;
+    }
+  }
+}
+
+// ====================
+
+// STATE: already verified
+.register.is-verified {
+  .nav-wizard .price-value {
+    @extend %t-weight4;
+
+    @include font-size(16);
+
+    margin-top: 18px;
+    color: $m-blue-d1;
+  }
+
+  .title {
+    font-weight: 400;
+  }
+
+  // progress nav
+  .progress .progress-step {
+
+    // STATE: is completed
+    &#progress-step1 {
+      border-bottom: ($baseline/5) solid $verified-color-lvl3;
+
+      .wrapper-step-number {
+        border-color: $verified-color-lvl3;
+      }
+
+      .step-number,
+      .step-name {
+        color: $m-gray-l3;
+      }
+    }
+
+    // STATE: is current
+    &#progress-step2 {
+      border-bottom: ($baseline/5) solid $m-blue-d1;
+      opacity: 1;
+
+      .wrapper-step-number {
+        border-color: $m-blue-d1;
+      }
+
+      .step-number,
+      .step-name {
+        color: $m-gray-d3;
+      }
+    }
+  }
+
+  // progress indicator
+  .progress-sts {
+    width: 75%;
+
+    @include left(13%);
+  }
+
+  .progress-sts-value {
+    width: 32% !important;
+  }
+}
+
+// ====================
+
+// STATE: upgrading registration type
+.register.is-upgrading {
+  .form-register-choose {
+    margin-top: ($baseline*2) !important;
+  }
+}
+
+// STATE: re-verifying
+.register.is-not-verified {
+  .help-item-emphasis {
+    color: $m-pink;
+  }
+
+  // progress indicator
+  .progress-sts {
+    width: 72%;
+
+    @include left(15%);
+  }
+
+  // VIEW: photo
+  &.step-photos {
+
+    // progress nav
+    .progress .progress-step {
+
+      // STATE: is current
+      &#progress-step1 {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number,
+        .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
+
+    .progress-sts-value {
+      width: 0 !important;
+    }
+  }
+
+  // VIEW: ID
+  &.step-photos-id {
+
+    // progress nav
+    .progress .progress-step {
+
+      // STATE: is completed
+      &#progress-step1 {
+        border-bottom: ($baseline/5) solid $verified-color-lvl3;
+
+        .wrapper-step-number {
+          border-color: $verified-color-lvl3;
+        }
+
+        .step-number,
+        .step-name {
+          color: $m-gray-l3;
+        }
+      }
+
+      // STATE: is current
+      &#progress-step2 {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number,
+        .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
+
+    .progress-sts-value {
+      width: 40% !important;
+    }
+  }
+
+  // VIEW: REVIEW
+  &.step-review {
+
+    // progress nav
+    .progress .progress-step {
+
+      // STATE: is completed
+      &#progress-step1,
+      &#progress-step2 {
+        border-bottom: ($baseline/5) solid $verified-color-lvl3;
+
+        .wrapper-step-number {
+          border-color: $verified-color-lvl3;
+        }
+
+        .step-number,
+        .step-name {
+          color: $m-gray-l3;
+        }
+      }
+
+      // STATE: is current
+      &#progress-step3 {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number,
+        .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
+
+    .progress-sts-value {
+      width: 70% !important;
+    }
+  }
+
+  &.step-confirmation {
+    .content-confirmation {
+      margin-bottom: ($baseline*2);
+    }
+
+    .view {
+      .title {
+        @extend %hd-lv2;
+
+        color: $m-blue-d1;
+      }
+
+      .instruction {
+        @extend %t-copy-lead1;
+
+        margin-bottom: $baseline;
+      }
+    }
+  }
+}

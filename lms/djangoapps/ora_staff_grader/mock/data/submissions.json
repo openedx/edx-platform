@@ -1,0 +1,178 @@
+{
+    "block-a": {
+        "SUBMISSION_ID-0": {
+            "submissionUUID": "SUBMISSION_ID-0",
+            "username": "USERNAME-0",
+            "dateSubmitted": 1631215154955,
+            "score": {
+                "pointsEarned": 70,
+                "pointsPossible": 100
+            },
+            "gradeData": {
+                "showValidation": false,
+                "overallFeedback": "",
+                "criteria": [
+                    {
+                        "orderNum": 0,
+                        "name": "grammar",
+                        "selectedOption": "excellent",
+                        "feedback": "test3"
+                    }
+                ],
+                "score": {
+                    "pointsEarned": 0,
+                    "pointsPossible": 100
+                }
+            },
+            "gradeStatus": "graded",
+            "lockStatus": "unlocked"
+        },
+        "SUBMISSION_ID-1": {
+            "submissionUUID": "SUBMISSION_ID-1",
+            "username": "USERNAME-1",
+            "dateSubmitted": 1631301554955,
+            "score": {
+                "pointsEarned": 70,
+                "pointsPossible": 100
+            },
+            "gradeData": {
+                "score": {
+                    "pointsEarned": 70,
+                    "pointsPossible": 100
+                },
+                "overallFeedback": "was okay",
+                "criteria": [
+                    {
+                        "name": "firstCriterion",
+                        "feedback": "did alright",
+                        "selectedOption": "good"
+                    }
+                ]
+            },
+            "gradeStatus": "graded",
+            "lockStatus": "locked"
+        },
+        "SUBMISSION_ID-2": {
+            "submissionUUID": "SUBMISSION_ID-2",
+            "username": "USERNAME-2",
+            "dateSubmitted": 1631387954955,
+            "score": {
+                "pointsEarned": 80,
+                "pointsPossible": 100
+            },
+            "gradeData": {
+                "score": {
+                    "pointsEarned": 80,
+                    "pointsPossible": 100
+                },
+                "overallFeedback": "was okay",
+                "criteria": [
+                    {
+                        "name": "firstCriterion",
+                        "feedback": "did alright",
+                        "selectedOption": "good"
+                    }
+                ]
+            },
+            "gradeStatus": "graded",
+            "lockStatus": "unlocked"
+        },
+        "SUBMISSION_ID-3": {
+            "submissionUUID": "SUBMISSION_ID-3",
+            "username": "USERNAME-3",
+            "dateSubmitted": 1631474354955,
+            "score": null,
+            "gradeData": null,
+            "gradeStatus": "ungraded",
+            "lockStatus": "in-progress"
+        },
+        "SUBMISSION_ID-4": {
+            "submissionUUID": "SUBMISSION_ID-4",
+            "username": "USERNAME-4",
+            "dateSubmitted": 1631474354955,
+            "score": null,
+            "gradeData": null,
+            "gradeStatus": "ungraded",
+            "lockStatus": "locked"
+        }
+    },
+    "block-b": {
+        "TEAM_SUBMISSION_ID-0": {
+            "submissionUUID": "TEAM_SUBMISSION_ID-0",
+            "teamName": "TEAMNAME-0",
+            "dateSubmitted": 1631215154955,
+            "score": null,
+            "gradeData": null,
+            "gradeStatus": "ungraded",
+            "lockStatus": "in-progress"
+        },
+        "TEAM_SUBMISSION_ID-1": {
+            "submissionUUID": "TEAM_SUBMISSION_ID-1",
+            "teamName": "TEAMNAME-1",
+            "dateSubmitted": 1631301554955,
+            "score": {
+                "pointsEarned": 70,
+                "pointsPossible": 100
+            },
+            "gradeData": {
+                "score": {
+                    "pointsEarned": 70,
+                    "pointsPossible": 100
+                },
+                "overallFeedback": "was okay",
+                "criteria": [
+                    {
+                        "name": "firstCriterion",
+                        "feedback": "did alright",
+                        "selectedOption": "good"
+                    }
+                ]
+            },
+            "gradeStatus": "graded",
+            "lockStatus": "locked"
+        },
+        "TEAM_SUBMISSION_ID-2": {
+            "submissionUUID": "TEAM_SUBMISSION_ID-2",
+            "teamName": "TEAMNAME-2",
+            "dateSubmitted": 1631387954955,
+            "score": {
+                "pointsEarned": 80,
+                "pointsPossible": 100
+            },
+            "gradeData": {
+                "score": {
+                    "pointsEarned": 80,
+                    "pointsPossible": 100
+                },
+                "overallFeedback": "was okay",
+                "criteria": [
+                    {
+                        "name": "firstCriterion",
+                        "feedback": "did alright",
+                        "selectedOption": "good"
+                    }
+                ]
+            },
+            "gradeStatus": "graded",
+            "lockStatus": "unlocked"
+        },
+        "TEAM_SUBMISSION_ID-3": {
+            "submissionUUID": "TEAM_SUBMISSION_ID-3",
+            "teamName": "TEAMNAME-3",
+            "dateSubmitted": 1631474354955,
+            "score": null,
+            "gradeData": null,
+            "gradeStatus": "ungraded",
+            "lockStatus": "in-progress"
+        },
+        "TEAM_SUBMISSION_ID-4": {
+            "submissionUUID": "TEAM_SUBMISSION_ID-4",
+            "teamName": "TEAMNAME-4",
+            "dateSubmitted": 1631474354955,
+            "score": null,
+            "gradeData": null,
+            "gradeStatus": "ungraded",
+            "lockStatus": "locked"
+        }
+    }
+}

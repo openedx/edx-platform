@@ -1,0 +1,6 @@
+<div class="xblock-editor" data-locator="<%- xblockInfo.get('id') %>" data-course-key="<%- xblockInfo.get('courseKey') %>">
+    <div class="message modal-introduction">
+        <p><%- introductionMessage %></p>
+    </div>
+    <div class="modal-section"></div>
+</div>

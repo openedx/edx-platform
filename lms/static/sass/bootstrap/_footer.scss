@@ -1,0 +1,73 @@
+// Open edX: LMS footer
+// ====================
+
+.wrapper-footer {
+  box-shadow: 0 -1px 5px 0 $shadow-l1;
+  border-top: 1px solid $navbar-light-disabled-color;
+  background-color: $body-bg;
+  margin-top: $baseline/2;
+  padding: $baseline;
+  font-family: $font-family-sans-serif;
+
+  footer {
+    max-width: map-get($container-max-widths, xl);
+    margin: 0 auto;
+
+    .site-nav {
+      padding: 0;
+      margin-bottom: $baseline;
+
+      .nav-item {
+        margin-right: $baseline;
+
+        .nav-link {
+          text-decoration: none;
+          padding: 0;
+          color: $gray-900;
+
+          &:hover {
+            color: theme-color("primary");
+          }
+        }
+      }
+    }
+    .wrapper-logo {
+      img {
+        height: $header-logo-height * 1.05;
+      }
+    }
+
+    .legal-nav {
+      padding: 0;
+
+      .nav-item {
+        .nav-link {
+          text-decoration: none;
+          padding: 0;
+          margin-right: $baseline/4;
+          font-size: 0.8em;
+        }
+      }
+
+      li:not(:first-child) a::before {
+        content: "- ";
+      }
+    }
+
+    .footer-language-selector {
+      margin: $baseline 0;
+    }
+
+    .copyright {
+      @include text-align(left);
+
+      margin: -2px 0 8px;
+      font-size: 0.8em;
+      color: $gray;
+    }
+
+    .footer-about-openedx {
+      float: right;
+    }
+  }
+}

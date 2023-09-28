@@ -1,0 +1,91 @@
+// Open edX: Help tab
+// ==================
+
+#help-modal {
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
+
+  @include media-breakpoint-down(md) {
+    width: 90% !important;
+    margin-left: -47% !important;
+  }
+
+  @include media-breakpoint-up(md) {
+    width: 700px !important;
+    margin-left: -350px !important;
+  }
+}
+
+.help-tab {
+  @extend %ui-depth2;
+  @extend %ui-print-excluded;
+
+  transform: rotate(-90deg);
+  transform-origin: top left;
+  position: fixed;
+  bottom: $baseline;
+  left: 0;
+
+  a:link,
+  a:visited {
+    border: 1px solid $gray-300;
+    border-top-style: none;
+    border-radius: 0 0 ($baseline/2) ($baseline/2);
+    background: transparentize($white, 0.25);
+    color: transparentize($body-color, 0.25);
+    font-weight: bold;
+    text-decoration: none;
+    padding: 6px 22px 11px;
+    display: inline-block;
+
+    &:hover,
+    &:focus {
+      color: $white;
+      background: $link-color;
+    }
+  }
+}
+
+.help-buttons {
+  display: flex;
+  text-align: center;
+  justify-content: normal;
+  flex-grow: 1;
+
+  .btn:not(:first-child) {
+    @include margin-left($baseline/2);
+  }
+
+  @include media-breakpoint-down(md) {
+    flex-direction: column;
+
+    .btn {
+      width: 100%;
+      margin: $baseline/4 0 0 0 !important;
+    }
+  }
+}
+
+#feedback_form {
+  input,
+  textarea {
+    font: normal 1em/1.4em $font-family-sans-serif;
+  }
+
+  textarea[name="details"] {
+    height: 150px;
+  }
+}
+
+#feedback_success_wrapper {
+  p {
+    padding: 0 $baseline $baseline $baseline;
+  }
+}
+
+.feedback-form-select {
+  background: $white;
+  margin-bottom: $baseline;
+  width: 100%;
+}

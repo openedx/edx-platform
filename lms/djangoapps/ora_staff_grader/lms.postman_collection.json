@@ -1,0 +1,105 @@
+{
+	"info": {
+		"_postman_id": "68587cc2-2edc-45c7-a89a-7be3d5d69cd3",
+		"name": "LMS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var xsrfCookie = postman.getResponseCookie(\"csrftoken\");",
+							"postman.setEnvironmentVariable('csrftoken', xsrfCookie.value);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-CSRFToken",
+						"value": "{{csrftoken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{protocol}}://{{lms_url}}/login",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{lms_url}}"
+					],
+					"path": [
+						"login"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				},
+				"description": "Run this to get an initial CSRF token. Follow with POST to login as {{user}}"
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-CSRFToken",
+						"value": "{{csrftoken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "email",
+							"value": "{{user_email}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{user_password}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{protocol}}://{{lms_url}}/api/user/v1/account/login_session/",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{lms_url}}"
+					],
+					"path": [
+						"api",
+						"user",
+						"v1",
+						"account",
+						"login_session",
+						""
+					]
+				},
+				"description": "Run this to authenticate with LMS. Requires running GET Login first to obtain a CSRF token."
+			},
+			"response": []
+		}
+	]
+}

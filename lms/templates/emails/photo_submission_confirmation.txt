@@ -1,0 +1,12 @@
+## mako
+<%! from django.utils.translation import gettext as _ %>
+
+${_("Hi {full_name},").format(full_name=full_name)}
+
+${_("Thanks for submitting your photos!")}
+${_("We've received your information and the ID verification process has begun."
+"Check for an email from us in the next few days to confirm whether your verification was successful."
+"You can also check the status of the verification process on your dashboard.")}
+
+${_("Thank you,")}
+${_("The {platform_name} team").format(platform_name=platform_name)}

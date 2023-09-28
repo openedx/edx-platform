@@ -1,0 +1,40 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%namespace name='static' file='static_content.html'/>
+<% online_help_token = self.online_help_token() if hasattr(self, 'online_help_token') else None %>
+<%!
+from django.utils.translation import gettext as _
+from openedx.core.djangolib.markup import HTML
+from openedx.core.djangoapps.util.user_messages import PageLevelMessages, UserMessage, UserMessageType
+# app that handles site status messages
+from common.djangoapps.status.status import get_site_status_msg
+%>
+
+<%
+banner_messages = list(PageLevelMessages.user_messages(request))
+
+# insert the global status message
+course_id = course.id if course else None
+site_status_message = get_site_status_msg(course_id)
+if site_status_message:
+    banner_messages.insert(0, UserMessage(UserMessageType.WARNING, site_status_message))
+%>
+
+% if banner_messages:
+    <div class="page-banner">
+        <div class="user-messages" role="complementary" aria-label="messages">
+            <ul class="user-messages-ul">
+                % for message in banner_messages:
+                    <li>
+                        <div class="alert ${message.css_class}" role="alert">
+                            <span class="icon icon-alert fa ${message.icon_class}" aria-hidden="true"></span>
+                            ${HTML(message.message_html)}
+                        </div>
+                    </li>
+                % endfor
+            </ul>
+        </div>
+    </div>
+% endif

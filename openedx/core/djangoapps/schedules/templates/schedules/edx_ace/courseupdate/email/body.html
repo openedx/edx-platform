@@ -1,0 +1,48 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+{% load i18n %}
+{% load django_markup %}
+
+{% block preview_text %}
+    {% filter force_escape %}
+    {% blocktrans trimmed %}
+        Welcome to week {{ week_num }} of {{ course_name }}!
+    {% endblocktrans %}
+    {% endfilter %}
+{% endblock %}
+
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <p>
+                {% blocktrans trimmed asvar tmsg %}
+                    We hope you're enjoying {start_strong}{course_name}{end_strong}!
+                    We want to let you know what you can look forward to in week {week_num}:
+                {% endblocktrans %}
+                {% interpolate_html tmsg start_strong='<strong>'|safe end_strong='</strong>'|safe course_name=course_name|force_escape|safe week_num=week_num|force_escape|safe %}
+                <ul>
+                    {% for highlight in week_highlights %}
+                        <li>{{ highlight }}</li>
+                    {% endfor %}
+                </ul>
+            </p>
+            <p>
+                {% filter force_escape %}
+                {% blocktrans trimmed %}
+                    With self-paced courses, you learn on your own schedule.
+                    We encourage you to spend time with the course each week.
+                    Your focused attention will pay off in the end!
+                {% endblocktrans %}
+                {% endfilter %}
+            </p>
+
+            {% filter force_escape %}
+                {% blocktrans asvar course_cta_text %}Resume your course now{% endblocktrans %}
+            {% endfilter %}
+            {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text%}
+
+            {% include "ace_common/edx_ace/common/upsell_cta.html"%}
+        </td>
+    </tr>
+</table>
+{% endblock %}

@@ -1,0 +1,20 @@
+<header class="xblock-header">
+    <div class="header-details">
+        <a href="#" data-tooltip="Expand or Collapse" class="action expand-collapse collapse">
+            <span class="icon fa fa-caret-down ui-toggle-expansion" aria-hidden="true"></span>
+            <span class="sr">Expand or Collapse</span>
+        </a>
+        <span class="xblock-display-name">Empty Vertical Test</span>
+    </div>
+    <div class="header-actions">
+        <ul class="actions-list">
+            <li class="sr action-item">No Actions</li>
+        </ul>
+    </div>
+</header>
+<article class="xblock-render">
+    <div class="xblock xblock-student_view xmodule_display xmodule_VerticalModule xblock-initialized" data-runtime-class="PreviewRuntime" data-init="XBlockToXModuleShim" data-runtime-version="1" data-usage-id="i4x:;_;_AndyA;_ABT101;_vertical;_131a499ddaa3474194c1aa2eced34455" data-type="None">
+        <ol class="reorderable-container">
+        </ol>
+    </div>
+</article>

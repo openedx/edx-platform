@@ -1,0 +1,76 @@
+<section class="container">
+
+<div class="staff-grading" data-ajax_url="${ajax_url}">
+<h1>Staff grading</h1>
+<div class="breadcrumbs">
+</div>
+<div class="error-container">
+</div>
+<div class="message-container">
+</div>
+
+<! -- Problem List View -->
+<section class="problem-list-container">
+<h2>Instructions</h2>
+<div class="instructions">
+<p>This is the list of problems that current need to be graded in order to train the machine learning models. Each problem needs to be trained separately, and we have indicated the number of student submissions that need to be graded in order for a model to be generated. You can grade more than the minimum required number of submissions--this will improve the accuracy of machine learning, though with diminishing returns. You can see the current accuracy of machine learning while grading.</p>
+</div>
+
+<h2>Problem List</h2>
+    <table class="problem-list">
+    </table>
+</section>
+
+<!-- Grading View -->
+
+<section class="prompt-wrapper">
+    <h2 class="prompt-name"></h2>
+    <div class="meta-info-wrapper">
+        <h3>Problem Information</h3>
+        <div class="problem-meta-info-container">
+        </div>
+        <h3>Maching Learning Information</h3>
+        <div class="ml-error-info-container">
+        </div>
+    </div>
+    <div class="prompt-information-container">
+    <h3>Question</h3>
+        <div class="prompt-container">
+        </div>
+    </div>
+
+</section>
+
+<div class="action-button">
+    <input type=button value="Submit" class="action-button" name="show" />
+</div>
+
+<section class="grading-wrapper">
+<h2>Grading</h2>
+
+<div class="grading-container">
+<div class="submission-wrapper">
+<h3>Student Submission</h3>
+<div class="submission-container">
+</div>
+</div>
+<div class="evaluation">
+  <p class="score-selection-container">
+  </p>
+  <p class="grade-selection-container">
+  </p>
+  <textarea name="feedback" placeholder="Feedback for student (optional)"
+            class="feedback-area" cols="70" ></textarea>
+</div>
+  
+
+<div class="submission">
+<input type="button" value="Submit" class="submit-button" name="show"/>
+<input type="button" value="Skip" class="skip-button" name="skip"/>
+</div>
+
+</div>
+
+</div>
+</section>
+

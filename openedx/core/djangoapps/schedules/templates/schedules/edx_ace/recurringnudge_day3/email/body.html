@@ -1,0 +1,54 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+{% load i18n %}
+{% load django_markup %}
+
+{% block preview_text %}
+    {% if course_ids|length > 1 %}
+        {% filter force_escape %}
+        {% blocktrans trimmed %}
+            Remember when you enrolled in {{ course_name }}, and other courses on {{ platform_name }}? We do, and we’re glad
+            to have you! Come see what everyone is learning.
+        {% endblocktrans %}
+        {% endfilter %}
+    {% else %}
+        {% filter force_escape %}
+        {% blocktrans trimmed %}
+            Remember when you enrolled in {{ course_name }} on {{ platform_name }}? We do, and we’re glad
+            to have you! Come see what everyone is learning.
+        {% endblocktrans %}
+        {% endfilter %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <h1>{% trans "Keep learning today" as tmsg %}{{ tmsg | force_escape}}.</h1>
+
+            <p>
+                {% if course_ids|length > 1 %}
+                    {% blocktrans trimmed asvar tmsg %}
+                        Remember when you enrolled in {start_strong}{course_name}{end_strong}, and other courses on {platform_name}? We do, and we’re glad
+                        to have you! Come see what everyone is learning.
+                    {% endblocktrans %}
+                    {% interpolate_html tmsg start_strong='<strong>'|safe end_strong='</strong>'|safe course_name=course_name|force_escape|safe platform_name=platform_name|force_escape|safe %}
+                {% else %}
+                    {% blocktrans trimmed asvar tmsg %}
+                        Remember when you enrolled in {start_strong}{course_name}{end_strong} on {platform_name}? We do, and we’re glad
+                        to have you! Come see what everyone is learning.
+                    {% endblocktrans %}
+                    {% interpolate_html tmsg start_strong='<strong>'|safe end_strong='</strong>'|safe course_name=course_name|force_escape|safe platform_name=platform_name|force_escape|safe %}
+                {% endif %}
+            </p>
+
+            {% filter force_escape %}
+                {% blocktrans asvar course_cta_text %}Start learning now{% endblocktrans %}
+            {% endfilter %}
+            {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text%}
+
+            {% include "ace_common/edx_ace/common/upsell_cta.html"%}
+        </td>
+    </tr>
+</table>
+{% endblock %}

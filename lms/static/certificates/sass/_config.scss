@@ -1,0 +1,155 @@
+// ------------------------------
+// Open edX Certificates: Config
+
+
+// ------------------------------
+// #VARIABLES
+// ------------------------------
+
+$gray-dark:              rgba(17, 17, 17, 100);
+$gray-base:              rgba(65, 65, 65, 100);
+$gray-accent:            rgba(160, 160, 160, 100);
+$gray-back:              rgba(217, 217, 217, 100);
+$gray-x-back:            rgba(245, 245, 245, 100);
+$gray-transparent:       rgba(65, 65, 65, 0.5);
+
+$primary-accent:         rgba(41, 145, 195, 100);
+$primary-back:           rgba(204, 227, 240, 100);
+
+// certificate characteristics
+$cert-base-color: $gray-dark;
+$cert-distinguished-color: $primary-accent;
+
+$cert-decorative-color: $gray-back;
+$cert-decorative-color-de-emphasized: $gray-back;
+$cert-decorative-color-emphasized: $gray-accent;
+
+// typography: config
+$font-path: '../../certificates/fonts';
+
+@font-face {
+  font-family: 'Domine';
+  font-weight: 400;
+  src: url('#{$font-path}/Domine/Domine-Regular-webfont.woff');
+  src:
+    url('#{$font-path}/Domine/Domine-Regular-webfont.woff2') format('woff2'),
+    url('#{$font-path}/Domine/Domine-Regular-webfont.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Domine';
+  font-weight: 700;
+  src: url('#{$font-path}/Domine/Domine-Bold-webfont.woff');
+  src:
+    url('#{$font-path}/Domine/Domine-Bold-webfont.woff2') format('woff2'),
+    url('#{$font-path}/Domine/Domine-Bold-webfont.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-weight: 300;
+  src: url('#{$font-path}/OpenSans/OpenSans-Light-webfont.woff');
+  src:
+    url('#{$font-path}/OpenSans/OpenSans-Light-webfont.woff2') format('woff2'),
+    url('#{$font-path}/OpenSans/OpenSans-Light-webfont.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-weight: 300;
+  font-style: italic;
+  src: url('#{$font-path}/OpenSans/OpenSans-LightItalic-webfont.woff');
+  src:
+    url('#{$font-path}/OpenSans/OpenSans-LightItalic-webfont.woff2') format('woff2'),
+    url('#{$font-path}/OpenSans/OpenSans-LightItalic-webfont.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-weight: 400;
+  src: url('#{$font-path}/OpenSans/OpenSans-Regular-webfont.woff');
+  src:
+    url('#{$font-path}/OpenSans/OpenSans-Regular-webfont.woff2') format('woff2'),
+    url('#{$font-path}/OpenSans/OpenSans-Regular-webfont.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-weight: 400;
+  font-style: italic;
+  src: url('#{$font-path}/OpenSans/OpenSans-Italic-webfont.woff');
+  src:
+    url('#{$font-path}/OpenSans/OpenSans-Italic-webfont.woff2') format('woff2'),
+    url('#{$font-path}/OpenSans/OpenSans-Italic-webfont.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-weight: 600;
+  src: url('#{$font-path}/OpenSans/OpenSans-Semibold-webfont.woff');
+  src:
+    url('#{$font-path}/OpenSans/OpenSans-Semibold-webfont.woff2') format('woff2'),
+    url('#{$font-path}/OpenSans/OpenSans-Semibold-webfont.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-weight: 600;
+  font-style: italic;
+  src: url('#{$font-path}/OpenSans/OpenSans-SemiboldItalic-webfont.woff');
+  src:
+    url('#{$font-path}/OpenSans/OpenSans-SemiboldItalic-webfont.woff2') format('woff2'),
+    url('#{$font-path}/OpenSans/OpenSans-SemiboldItalic-webfont.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-weight: 700;
+  src: url('#{$font-path}/OpenSans/OpenSans-Bold-webfont.woff');
+  src:
+    url('#{$font-path}/OpenSans/OpenSans-Bold-webfont.woff2') format('woff2'),
+    url('#{$font-path}/OpenSans/OpenSans-Bold-webfont.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-weight: 700;
+  font-style: italic;
+  src: url('#{$font-path}/OpenSans/OpenSans-BoldItalic-webfont.woff');
+  src:
+    url('#{$font-path}/OpenSans/OpenSans-BoldItalic-webfont.woff2') format('woff2'),
+    url('#{$font-path}/OpenSans/OpenSans-BoldItalic-webfont.ttf') format('truetype');
+}
+
+// typography: config - stacks
+$font-family-serif: 'Domine', serif;
+$font-family-sans: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+
+// vertical spacing
+$baseline-vertical:         2.5rem !default;
+
+$spacing-vertical:          (
+  base:                   $baseline-vertical,
+  mid-small:              ($baseline-vertical*0.75),
+  small:                  ($baseline-vertical/2),
+  x-small:                ($baseline-vertical/4),
+  xx-small:               ($baseline-vertical/8),
+  xxx-small:              ($baseline-vertical/10),
+  mid-large:              ($baseline-vertical*1.5),
+  large:                  ($baseline-vertical*2),
+  x-large:                ($baseline-vertical*4)
+);
+
+// horizontal spacing
+$baseline-horizontal:       1.25rem !default;
+
+$spacing-horizontal:        (
+  base:                   $baseline-horizontal,
+  mid-small:              ($baseline-horizontal*0.75),
+  small:                  ($baseline-horizontal/2),
+  x-small:                ($baseline-horizontal/4),
+  xx-small:               ($baseline-horizontal/8),
+  mid-large:              ($baseline-horizontal*1.5),
+  large:                  ($baseline-horizontal*2),
+  x-large:                ($baseline-horizontal*4)
+);

@@ -1,0 +1,44 @@
+{% extends "admin/change_form.html" %}
+{% load i18n static admin_modify %}
+
+{% block content %}
+
+<div id="content-main">
+
+  <form action="" method="POST">
+    {% csrf_token %}
+
+    {% if form.non_field_errors|length > 0 %}
+      <p class="errornote">
+          {% trans "Please correct the errors below." as tmsg %}{{tmsg|force_escape}}
+      </p>
+      {{ form.non_field_errors }}
+    {% endif %}
+
+    {% filter force_escape %}
+    {% blocktrans with username=retirement.user.username %}Are you sure you want to cancel retirement for user "{{ username }}"? {% endblocktrans %}
+    {% endfilter %}
+
+    <fieldset class="module aligned">
+      {% for field in form %}
+        <div class="form-row">
+          {{ field.errors }}
+          {{ field.label_tag }}
+          {{ field }}
+          {% if field.field.help_text %}
+          <p class="help">
+            {{ field.field.help_text|safe }}
+          </p>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </fieldset>
+
+    <div class="submit-row">
+      <input type="submit" class="default" value="{% trans 'Submit' as tmsg %}{{tmsg|force_escape}}">
+    </div>
+
+  </form>
+</div>
+
+{% endblock %}

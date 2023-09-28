@@ -1,0 +1,327 @@
+{
+  "consumer": {
+    "name": "frontend-app-learning"
+  },
+  "provider": {
+    "name": "lms"
+  },
+  "interactions": [
+    {
+      "description": "a request to get course metadata",
+      "providerState": "course metadata exists for course_id course-v1:edX+DemoX+Demo_Course",
+      "request": {
+        "method": "GET",
+        "path": "/api/courseware/course/course-v1:edX+DemoX+Demo_Course",
+        "query": "browser_timezone=Asia%2FKarachi"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+        },
+        "body": {
+          "access_expiration": {
+            "expiration_date": "2013-02-05T05:00:00Z",
+            "masquerading_expired_course": false,
+            "upgrade_deadline": "2013-02-05T05:00:00Z",
+            "upgrade_url": "link"
+          },
+          "can_show_upgrade_sock": false,
+          "content_type_gating_enabled": false,
+          "end": "2013-02-05T05:00:00Z",
+          "enrollment": {
+            "mode": "audit",
+            "is_active": true
+          },
+          "enrollment_start": "2013-02-05T05:00:00Z",
+          "enrollment_end": "2013-02-05T05:00:00Z",
+          "id": "course-v1:edX+DemoX+Demo_Course",
+          "license": "all-rights-reserved",
+          "name": "Demonstration Course",
+          "number": "DemoX",
+          "offer": {
+            "code": "code",
+            "expiration_date": "2013-02-05T05:00:00Z",
+            "original_price": "$99",
+            "discounted_price": "$99",
+            "percentage": 50,
+            "upgrade_url": "url"
+          },
+          "org": "edX",
+          "related_programs": null,
+          "short_description": "",
+          "start": "2013-02-05T05:00:00Z",
+          "tabs": [
+            {
+              "title": "Course",
+              "slug": "courseware",
+              "priority": 0,
+              "type": "courseware",
+              "url": "http://localhost:2000/course/course-v1:edX+DemoX+Demo_Course/home"
+            }
+          ],
+          "user_timezone": null,
+          "verified_mode": {
+            "access_expiration_date": "2013-02-05T05:00:00Z",
+            "currency": "USD",
+            "currency_symbol": "$",
+            "price": 149,
+            "sku": "8CF08E5",
+            "upgrade_url": "http://localhost:18130/basket/add/?sku=8CF08E5"
+          },
+          "show_calculator": false,
+          "original_user_is_staff": true,
+          "is_staff": true,
+          "course_access": {
+            "has_access": true,
+            "error_code": null,
+            "developer_message": null,
+            "user_message": null,
+            "additional_context_user_message": null,
+            "user_fragment": null
+          },
+          "notes": {
+            "enabled": false,
+            "visible": true
+          },
+          "marketing_url": null,
+          "celebrations": {
+            "first_section": false,
+            "streak_length_to_celebrate": null,
+            "streak_discount_enabled": false
+          },
+          "user_has_passing_grade": false,
+          "course_exit_page_is_active": false,
+          "certificate_data": {
+            "cert_status": "audit_passing",
+            "cert_web_view_url": null,
+            "download_url": null,
+            "certificate_available_date": null
+          },
+          "verify_identity_url": null,
+          "verification_status": "none",
+          "linkedin_add_to_profile_url": null,
+          "user_needs_integrity_signature": false
+        },
+        "matchingRules": {
+          "$.body.access_expiration.expiration_date": {
+            "match": "regex",
+            "regex": "^(?:[1-9]\\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:Z|[+-][01]\\d:[0-5]\\d)$"
+          },
+          "$.body.access_expiration.masquerading_expired_course": {
+            "match": "type"
+          },
+          "$.body.access_expiration.upgrade_deadline": {
+            "match": "regex",
+            "regex": "^(?:[1-9]\\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:Z|[+-][01]\\d:[0-5]\\d)$"
+          },
+          "$.body.access_expiration.upgrade_url": {
+            "match": "type"
+          },
+          "$.body.can_show_upgrade_sock": {
+            "match": "type"
+          },
+          "$.body.content_type_gating_enabled": {
+            "match": "type"
+          },
+          "$.body.end": {
+            "match": "regex",
+            "regex": "^(?:[1-9]\\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:Z|[+-][01]\\d:[0-5]\\d)$"
+          },
+          "$.body.enrollment.mode": {
+            "match": "regex",
+            "regex": "^(audit|verified)$"
+          },
+          "$.body.enrollment.is_active": {
+            "match": "type"
+          },
+          "$.body.enrollment_start": {
+            "match": "regex",
+            "regex": "^(?:[1-9]\\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:Z|[+-][01]\\d:[0-5]\\d)$"
+          },
+          "$.body.enrollment_end": {
+            "match": "regex",
+            "regex": "^(?:[1-9]\\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:Z|[+-][01]\\d:[0-5]\\d)$"
+          },
+          "$.body.id": {
+            "match": "regex",
+            "regex": "[\\w\\-~.:]"
+          },
+          "$.body.license": {
+            "match": "type"
+          },
+          "$.body.name": {
+            "match": "type"
+          },
+          "$.body.number": {
+            "match": "type"
+          },
+          "$.body.offer.code": {
+            "match": "type"
+          },
+          "$.body.offer.expiration_date": {
+            "match": "regex",
+            "regex": "^(?:[1-9]\\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:Z|[+-][01]\\d:[0-5]\\d)$"
+          },
+          "$.body.offer.original_price": {
+            "match": "type"
+          },
+          "$.body.offer.discounted_price": {
+            "match": "type"
+          },
+          "$.body.offer.percentage": {
+            "match": "type"
+          },
+          "$.body.offer.upgrade_url": {
+            "match": "type"
+          },
+          "$.body.org": {
+            "match": "type"
+          },
+          "$.body.short_description": {
+            "match": "type"
+          },
+          "$.body.start": {
+            "match": "regex",
+            "regex": "^(?:[1-9]\\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:Z|[+-][01]\\d:[0-5]\\d)$"
+          },
+          "$.body.tabs": {
+            "min": 1
+          },
+          "$.body.tabs[*].*": {
+            "match": "type"
+          },
+          "$.body.verified_mode": {
+            "match": "type"
+          },
+          "$.body.show_calculator": {
+            "match": "type"
+          },
+          "$.body.original_user_is_staff": {
+            "match": "type"
+          },
+          "$.body.is_staff": {
+            "match": "type"
+          },
+          "$.body.course_access": {
+            "match": "type"
+          },
+          "$.body.course_access.has_access": {
+            "match": "type"
+          },
+          "$.body.notes.enabled": {
+            "match": "type"
+          },
+          "$.body.notes.visible": {
+            "match": "type"
+          },
+          "$.body.celebrations.irst_section": {
+            "match": "type"
+          },
+          "$.body.celebrations.streak_discount_enabled": {
+            "match": "type"
+          },
+          "$.body.user_has_passing_grade": {
+            "match": "type"
+          },
+          "$.body.course_exit_page_is_active": {
+            "match": "type"
+          },
+          "$.body.certificate_data.cert_status": {
+            "match": "type"
+          },
+          "$.body.verification_status": {
+            "match": "type"
+          },
+          "$.body.user_needs_integrity_signature": {
+            "match": "type"
+          }
+        }
+      }
+    },
+    {
+      "description": "a request to get sequence metadata",
+      "providerState": "sequence metadata data exists for sequence_id block-v1:edX+DemoX+Demo_Course+type@sequential+block@basic_questions",
+      "request": {
+        "method": "GET",
+        "path": "/api/courseware/sequence/block-v1:edX+DemoX+Demo_Course+type@sequential+block@basic_questions"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+        },
+        "body": {
+          "items": [
+            {
+              "content": "",
+              "page_title": "Pointing on a Picture",
+              "type": "problem",
+              "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@2152d4a4aadc4cb0af5256394a3d1fc7",
+              "bookmarked": false,
+              "path": "Example Week 1: Getting Started > Homework - Question Styles > Pointing on a Picture",
+              "graded": true,
+              "contains_content_type_gated_content": false,
+              "href": ""
+            }
+          ],
+          "item_id": "block-v1:edX+DemoX+Demo_Course+type@sequential+block@basic_questions",
+          "is_time_limited": false,
+          "is_proctored": false,
+          "position": null,
+          "tag": "sequential",
+          "banner_text": null,
+          "save_position": false,
+          "show_completion": false,
+          "gated_content": {
+            "prereq_id": null,
+            "prereq_url": null,
+            "prereq_section_name": null,
+            "gated": false,
+            "gated_section_name": "Homework - Question Styles"
+          },
+          "display_name": "Homework - Question Styles",
+          "format": "Homework"
+        },
+        "matchingRules": {
+          "$.body.items": {
+            "min": 1
+          },
+          "$.body.items[*].*": {
+            "match": "type"
+          },
+          "$.body.item_id": {
+            "match": "type"
+          },
+          "$.body.is_time_limited": {
+            "match": "type"
+          },
+          "$.body.is_proctored": {
+            "match": "type"
+          },
+          "$.body.tag": {
+            "match": "type"
+          },
+          "$.body.save_position": {
+            "match": "type"
+          },
+          "$.body.show_completion": {
+            "match": "type"
+          },
+          "$.body.gated_content": {
+            "match": "type"
+          },
+          "$.body.display_name": {
+            "match": "type"
+          },
+          "$.body.format": {
+            "match": "type"
+          }
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "2.0.0"
+    }
+  }
+}

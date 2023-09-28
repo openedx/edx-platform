@@ -1,0 +1,28 @@
+<%page expression_filter="h"/>
+<%namespace name='static' file='static_content.html'/>
+<%! from django.utils.translation import gettext as _ %>
+
+<section class="courses-container">
+  <section class="highlighted-courses">
+
+    % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
+      <section class="courses">
+        <ul class="courses-listing">
+          ## limiting the course number by using HOMEPAGE_COURSE_MAX as the maximum number of courses
+          %for course in courses[:homepage_course_max]:
+          <li class="courses-listing-item">
+              <%include file="course.html" args="course=course" />
+          </li>
+        %endfor
+        </ul>
+      </section>
+    ## in case there are courses that are not shown on the homepage, a 'View all Courses' link should appear
+      % if homepage_course_max and len(courses) > homepage_course_max:
+      <div class="courses-more">
+        <a class="courses-more-cta" href="${marketing_link('COURSES')}"> ${_("View all Courses")} </a>
+      </div>
+    % endif
+    % endif
+
+  </section>
+</section>

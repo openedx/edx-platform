@@ -1,0 +1,9 @@
+*.pyc
+*~
+*.scssc
+*.swp
+*.orig
+*.DS_Store
+style-main.css
+ie.css
+Gemfile.lock

@@ -1,0 +1,26 @@
+@import 'bourbon/bourbon';
+@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
+@import 'build-course'; // shared app style assets/rendering
+
+.dates-banner {
+    .upgrade-button {
+        button {
+            display: block;
+            border-radius: 2px;
+            border: solid 1px #0175b4;
+            background: white;
+            color: #2d323e;
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 24px;
+            padding: 7px 18px;
+
+            &:hover,
+            &:focus,
+            &:active {
+              cursor: pointer;
+              box-shadow: 0 2px 1px $shadow;
+            }
+        }
+    }
+}

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+<xs:element name="assets" type="assetListType" />
+
+<xs:simpleType name="stringType">
+  <xs:restriction base="xs:string"/>
+</xs:simpleType>
+
+<xs:simpleType name="userIdType">
+  <xs:restriction base="xs:nonNegativeInteger"/>
+</xs:simpleType>
+
+<xs:simpleType name="datetimeType">
+  <xs:restriction base="xs:dateTime"/>
+</xs:simpleType>
+
+<xs:simpleType name="boolType">
+  <xs:restriction base="xs:boolean"/>
+</xs:simpleType>
+
+<xs:complexType name="assetListType">
+  <xs:sequence>
+    <xs:element name="asset" type="assetType" minOccurs="0" maxOccurs="unbounded" />
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="assetType">
+  <xs:all>
+    <xs:element name="type" type="stringType"/>
+    <xs:element name="filename" type="stringType"/>
+    <xs:element name="contenttype" type="stringType"/>
+    <xs:element name="pathname" type="stringType"/>
+    <xs:element name="internal_name" type="stringType"/>
+    <xs:element name="locked" type="boolType"/>
+    <xs:element name="thumbnail" type="stringType" minOccurs="0"/>
+    <xs:element name="created_on" type="datetimeType" />
+    <xs:element name="created_by" type="userIdType" />
+    <xs:element name="created_by_email" type="stringType" minOccurs="0"/>
+    <xs:element name="edited_on" type="datetimeType" />
+    <xs:element name="edited_by" type="userIdType" />
+    <xs:element name="edited_by_email" type="stringType" minOccurs="0"/>
+    <xs:element name="prev_version" type="stringType"/>
+    <xs:element name="curr_version" type="stringType"/>
+    <xs:element name="fields" type="stringType" minOccurs="0"/>
+  </xs:all>
+</xs:complexType>
+
+</xs:schema>

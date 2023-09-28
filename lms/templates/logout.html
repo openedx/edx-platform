@@ -1,0 +1,55 @@
+{% extends "main_django.html" %}
+{% load i18n static %}
+{% load django_markup %}
+
+{% block title %}{% trans "Signed Out" as tmsg %}{{ tmsg | force_escape }} | {{ block.super }}{% endblock %}
+
+{% block body %}
+    {% if show_tpa_logout_link %}
+        <h1>{% trans "You have signed out." as tmsg %}{{ tmsg | force_escape }}</h1>
+
+        <p style="text-align: center; margin-bottom: 20px;">
+            {% blocktrans trimmed asvar sso_signout_msg %}
+              {start_anchor}{{ tpa_logout_url }}{middle_anchor}Click here{end_anchor} to delete your single signed on (SSO) session.
+            {% endblocktrans %}
+            {% interpolate_html sso_signout_msg start_anchor='<a href="' middle_anchor='">'|safe end_anchor='</a>'|safe %}
+        </p>
+
+    {% else %}
+        {% if enterprise_target %}
+            {% comment %}
+                For enterprise SSO flow we intentionally drop learner's session.
+                We are showing this signin message instead of logout message
+                to avoid any confusion for learner in that case.
+            {% endcomment %}
+            <h1>{% trans "We are signing you in." as tmsg %}{{ tmsg | force_escape }}</h1>
+
+            <p style="text-align: center; margin-bottom: 20px;">
+                {% filter force_escape %}
+                {% blocktrans %}
+                  This may take a minute. If you are not redirected, go to the home page.
+                {% endblocktrans %}
+                {% endfilter %}
+            </p>
+        {% else %}
+            <h1>{% trans "You have signed out." as tmsg %}{{ tmsg | force_escape }}</h1>
+
+            <p style="text-align: center; margin-bottom: 20px;">
+                {% blocktrans trimmed asvar signout_msg1 %}
+                  If you are not redirected within 5 seconds, {start_anchor}{{ target }}{middle_anchor}click here to go to the home page{end_anchor}.
+                {% endblocktrans %}
+                {% interpolate_html signout_msg1 start_anchor='<a href="'|safe middle_anchor='">'|safe end_anchor='</a>'|safe %}
+            </p>
+        {% endif %}
+
+        <script type="text/javascript" src="{% static 'js/jquery.allLoaded.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/logout.js' %}"></script>
+    {% endif %}
+
+    <div id="iframeContainer" style="visibility: hidden" data-redirect-url="{{ target }}">
+        {% for uri in logout_uris %}
+            <iframe src="{{ uri }}"></iframe>
+        {% endfor %}
+    </div>
+
+{% endblock body %}

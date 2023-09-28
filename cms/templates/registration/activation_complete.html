@@ -1,0 +1,40 @@
+<%page expression_filter="h"/>
+<%inherit file="../base.html" />
+<%!
+from django.conf import settings
+from django.utils.translation import gettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<%namespace name='static' file='../static_content.html'/>
+
+%if not user_logged_in:
+<%block name="bodyclass">not-signedin view-activation</%block>
+%endif
+
+<%block name="content">
+<section class="container activation">
+
+  <section class="message">
+
+    <p style='padding-top:100px; text-align:center;'>
+      %if not already_active:
+        ${_("Thanks for activating your account.")}
+      %else:
+        ${_("This account has already been activated.")}
+      %endif
+
+      %if user_logged_in:
+        ${Text(_("Visit your {link_start}dashboard{link_end} to see your courses.")).format(
+            link_start=HTML('<a href="/">'),
+            link_end=HTML('</a>')
+        )}
+      %else:
+        ${Text(_("You can now {link_start}sign in{link_end}.")).format(
+            link_start=HTML('<a href="{url}">').format(url=settings.LOGIN_URL, link_end=HTML('</a>'))
+        )}
+      %endif
+    </p>
+  </section>
+</section>
+</%block>

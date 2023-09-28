@@ -1,0 +1,150 @@
+# ingested bok_choy.env.json
+# ingested bok_choy.auth.json
+AWS_ACCESS_KEY_ID: ''
+AWS_SECRET_ACCESS_KEY: ''
+BUGS_EMAIL: bugs@example.com
+BULK_EMAIL_DEFAULT_FROM_EMAIL: no-reply@example.com
+CACHES:
+  celery:
+    BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+    OPTIONS:
+      ignore_exc: true
+      no_delay: true
+      use_pooling: true
+    KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
+    KEY_PREFIX: integration_celery
+    LOCATION: ['localhost:11211']
+  default:
+    BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+    OPTIONS:
+      ignore_exc: true
+      no_delay: true
+      use_pooling: true
+    KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
+    KEY_PREFIX: sandbox_default
+    LOCATION: ['localhost:11211']
+  general:
+    BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+    OPTIONS:
+      ignore_exc: true
+      no_delay: true
+      use_pooling: true
+    KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
+    KEY_PREFIX: sandbox_general
+    LOCATION: ['localhost:11211']
+  mongo_metadata_inheritance:
+    BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+    OPTIONS:
+      ignore_exc: true
+      no_delay: true
+      use_pooling: true
+    KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
+    KEY_PREFIX: integration_mongo_metadata_inheritance
+    LOCATION: ['localhost:11211']
+  staticfiles:
+    BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+    OPTIONS:
+      ignore_exc: true
+      no_delay: true
+      use_pooling: true
+    KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
+    KEY_PREFIX: integration_static_files
+    LOCATION: ['localhost:11211']
+CELERY_ALWAYS_EAGER: true
+CELERY_BROKER_HOSTNAME: localhost
+CELERY_BROKER_PASSWORD: celery
+CELERY_BROKER_TRANSPORT: amqp
+CELERY_BROKER_USER: celery
+CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION: false
+CERT_QUEUE: certificates
+CMS_BASE: localhost:8031
+CODE_JAIL:
+  limits: {REALTIME: 3, VMEM: 0}
+COMMENTS_SERVICE_KEY: password
+COMMENTS_SERVICE_URL: http://localhost:4567
+CONTACT_EMAIL: info@example.com
+CONTENTSTORE:
+  DOC_STORE_CONFIG:
+    collection: modulestore
+    db: test
+    host: [localhost]
+    port: 27017
+  ENGINE: xmodule.contentstore.mongo.MongoContentStore
+  OPTIONS:
+    db: test
+    host: [localhost]
+    port: 27017
+DATABASES:
+  default: {ENGINE: django.db.backends.mysql, HOST: localhost, NAME: edxtest, PASSWORD: '',
+    PORT: '3306', USER: root}
+  student_module_history: {ENGINE: django.db.backends.mysql, HOST: localhost, NAME: student_module_history_test,
+    PASSWORD: '', PORT: '3306', USER: root}
+DEFAULT_FEEDBACK_EMAIL: feedback@example.com
+DEFAULT_FROM_EMAIL: registration@example.com
+DJFS: {aws_access_key_id: test, aws_secret_access_key: test, bucket: test, prefix: test,
+  type: s3fs}
+DOC_STORE_CONFIG:
+  collection: modulestore
+  db: test
+  host: [localhost]
+  port: 27017
+EMAIL_BACKEND: django.core.mail.backends.smtp.EmailBackend
+FEATURES: {CERTIFICATES_HTML_VIEW: true, CUSTOM_COURSES_EDX: true,
+  ENABLE_CONTENT_LIBRARIES: true, ENABLE_DISCUSSION_SERVICE: true, ENABLE_EXTENDED_COURSE_DETAILS: true,
+  ENABLE_GRADE_DOWNLOADS: true, ENABLE_SPECIAL_EXAMS: true, ENTRANCE_EXAMS: true,
+  MILESTONES_APP: true, PREVIEW_LMS_BASE: 'preview.localhost:8003', SHOW_HEADER_LANGUAGE_SELECTOR: true}
+GITHUB_REPO_ROOT: '** OVERRIDDEN **'
+GRADES_DOWNLOAD: {BUCKET: edx-grades, ROOT_PATH: /tmp/edx-s3/grades, STORAGE_TYPE: localfs}
+JWT_AUTH: {JWT_PUBLIC_SIGNING_JWK_SET: '{"keys": [{"kid":
+    "BTZ9HA6K", "e": "AQAB", "kty": "RSA", "n": "o5cn3ljSRi6FaDEKTn0PS-oL9EFyv1pI7dRgffQLD1qf5D6sprmYfWWokSsrWig8u2y0HChSygR6Jn5KXBqQn6FpM0dDJLnWQDRXHLl3Ey1iPYgDSmOIsIGrV9ZyNCQwk03wAgWbfdBTig3QSDYD-sTNOs3pc4UD_PqAvU2nz_1SS2ZiOwOn5F6gulE1L0iE3KEUEvOIagfHNVhz0oxa_VRZILkzV-zr6R_TW1m97h4H8jXl_VJyQGyhMGGypuDrQ9_vaY_RLEulLCyY0INglHWQ7pckxBtI5q55-Vio2wgewe2_qYcGsnBGaDNbySAsvYcWRrqDiFyzrJYivodqTQ"}]}',
+  JWT_SECRET_KEY: super-secret-key}
+LMS_BASE: localhost:8003
+LMS_ROOT_URL: http://localhost:8003
+LOCAL_LOGLEVEL: INFO
+LOGGING_ENV: sandbox
+LOG_DIR: '** OVERRIDDEN **'
+MEDIA_URL: /media/
+MKTG_URL_LINK_MAP: {}
+MODULESTORE:
+  default:
+    ENGINE: xmodule.modulestore.mixed.MixedModuleStore
+    OPTIONS:
+      mappings: {}
+      stores:
+      - DOC_STORE_CONFIG:
+          collection: modulestore
+          db: test
+          host: [localhost]
+          port: 27017
+        ENGINE: xmodule.modulestore.mongo.DraftMongoModuleStore
+        NAME: draft
+        OPTIONS:
+          collection: modulestore
+          db: test
+          default_class: xmodule.hidden_block.HiddenBlock
+          fs_root: '** OVERRIDDEN **'
+          host: [localhost]
+          port: 27017
+          render_template: common.djangoapps.edxmako.shortcuts.render_to_string
+      - ENGINE: xmodule.modulestore.xml.XMLModuleStore
+        NAME: xml
+        OPTIONS: {data_dir: '** OVERRIDDEN **', default_class: xmodule.hidden_block.HiddenBlock}
+# We need to test different scenarios, following setting effectively disbale rate limiting
+PASSWORD_RESET_IP_RATE: '1/s'
+PASSWORD_RESET_EMAIL_RATE: '1/s'
+SECRET_KEY: ''
+SERVER_EMAIL: devops@example.com
+SESSION_COOKIE_DOMAIN: null
+SITE_NAME: localhost
+SOCIAL_SHARING_SETTINGS: {CUSTOM_COURSE_URLS: true}
+STATIC_URL_BASE: /static/
+SYSLOG_SERVER: ''
+TECH_SUPPORT_EMAIL: technical@example.com
+TIME_ZONE: America/New_York
+WIKI_ENABLED: true
+XQUEUE_INTERFACE:
+  basic_auth: [edx, edx]
+  django_auth: {password: password, username: lms}
+  url: http://localhost:18040
+ZENDESK_API_KEY: ''
+ZENDESK_USER: ''

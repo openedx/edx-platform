@@ -1,0 +1,185 @@
+<%page expression_filter="h"/>
+<%namespace name='static' file='static_content.html'/>
+<%!
+from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangolib.js_utils import js_escaped_string
+from django.conf import settings
+from django.urls import reverse
+from django_countries import countries
+from common.djangoapps.student.models import UserProfile
+from datetime import date
+import calendar
+%>
+
+<section id="signup-modal" class="modal signup-modal">
+  <div class="inner-wrapper">
+    <button class="close-modal">
+      <span class="icon fa fa-remove" aria-hidden="true"></span>
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_('Close')}
+      </span>
+    </button>
+
+    <div id="register">
+      <header>
+        <h2>
+	  ${Text(_('Sign Up for {platform_name}')).format(
+	      platform_name=HTML(u'<span class="edx">{}</span>').format(settings.PLATFORM_NAME)
+	  )}
+	</h2>
+        <hr>
+      </header>
+
+      <form id="register_form" class="register_form" method="post" data-remote="true" action="/create_account">
+        <div class="notice"></div>
+        <div id="register_error" class="modal-form-error" name="register_error"></div>
+        <div id="register_error" name="register_error"></div>
+
+        <div class="input-group">
+	  % if has_extauth_info is UNDEFINED:
+          <label data-field="email" for="signup_email">${_('E-mail')} + ' *'</label>
+	    <input id="signup_email" type="email" name="email" placeholder="${_('e.g. yourname@domain.com')}" required />
+
+          <label data-field="password" for="signup_password">${_('Password')} + ' *'</label>
+	    <input id="signup_password" type="password" name="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required />
+
+	  <label data-field="username" for="signup_username">${_('Public Username')} + ' *'</label>
+	    <input id="signup_username" type="text" name="username" placeholder="${_('e.g. yourname (shown on forums)')}" required />
+
+          <label data-field="name" for="signup_fullname">${_('Full Name')} + ' *'</label>
+	    <input id="signup_fullname" type="text" name="name" placeholder="${_('e.g. Your Name (for certificates)')}" required />
+	  % else:
+	  <p>${Text(_('{start_li}Welcome{end_li} {name}')).format(
+                start_li=HTML('<i>'),
+                end_li=HTML('</i>'),
+                name=extauth_id)}</p><br/>
+	  <p><i>${_('Enter a public username:')}</i></p>
+
+          <label data-field="username" for="signup_username">${_('Public Username')} + ' *'</label>
+	      <input id="signup_username" type="text" name="username" value="${extauth_username}" placeholder="${_('e.g. yourname (shown on forums)')}" required />
+
+          % if ask_for_email:
+            <label data-field="email" for="signup_email">${_('E-mail')} + ' *'</label>
+            <input id="signup_email" type="email" name="email" placeholder="${_('e.g. yourname@domain.com')}" required />
+          % endif
+
+
+          % if ask_for_fullname:
+            <label data-field="name" for="signup_fullname">${_("Full Name *")}</label>
+            <input id="signup_fullname" type="text" name="name" placeholder="${_('e.g. Your Name (for certificates)')}" required />
+          % endif
+
+	  % endif
+        </div>
+
+        <div class="input-group">
+
+          % if settings.REGISTRATION_EXTRA_FIELDS['level_of_education'] != 'hidden':
+          <section class="citizenship">
+            <label data-field="level_of_education" for="signup_ed_level">${_("Ed. Completed")}</label>
+            <div class="input-wrapper">
+              <select id="signup_ed_level" name="level_of_education">
+                  <option value="">--</option>
+                  %for code, ed_level in UserProfile.LEVEL_OF_EDUCATION_CHOICES:
+                      <option value="${code}">${_(ed_level)}</option>
+                  %endfor
+              </select>
+            </div>
+          </section>
+          % endif
+
+          % if settings.REGISTRATION_EXTRA_FIELDS['gender'] != 'hidden':
+          <section class="gender">
+            <label data-field="gender" for="signup_gender">${_("Gender")}</label>
+            <div class="input-wrapper">
+              <select id="signup_gender" name="gender">
+                  <option value="">--</option>
+                  %for code, gender in UserProfile.GENDER_CHOICES:
+                      <option value="${code}">${_(gender)}</option>
+                  %endfor
+              </select>
+            </div>
+          </section>
+          % endif
+
+          % if settings.REGISTRATION_EXTRA_FIELDS['year_of_birth'] != 'hidden':
+          <section class="date-of-birth">
+            <label data-field="date-of-birth" for="signup_birth_year">${_("Year of birth")}</label>
+            <div class="input-wrapper">
+              <select id="signup_birth_year" name="year_of_birth">
+                <option value="">--</option>
+                %for year in UserProfile.VALID_YEARS:
+                  <option value="${year}">${year}</option>
+                %endfor
+              </select>
+              ##<input name="year_of_birth" type="text" placeholder="Year of birth">
+            </div>
+          </section>
+          % endif
+
+          % if settings.REGISTRATION_EXTRA_FIELDS['mailing_address'] != 'hidden':
+          <label data-field="mailing_address" for="signup_mailing_address">${_("Mailing address")}</label>
+	    <textarea id="signup_mailing_address" name="mailing_address"></textarea>
+          % endif
+
+          % if settings.REGISTRATION_EXTRA_FIELDS['goals'] != 'hidden':
+          <label data-field="goals" for="signup_goals">${_("Goals in signing up for {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</label>
+	    <textarea name="goals" id="signup_goals"></textarea>
+          % endif
+
+        </div>
+
+        <div class="input-group">
+          <label data-field="terms_of_service" class="terms-of-service" for="signup_tos">
+            <input id="signup_tos" name="terms_of_service" type="checkbox" value="true">
+            ${Text(_('I agree to the {link_start}Terms of Service{link_end}')).format(
+              link_start=HTML('<a href="{url}" rel="noopener" target="_blank">').format(url=reverse('tos')),
+              link_end=HTML('</a>'))} *
+          </label>
+
+          % if settings.REGISTRATION_EXTRA_FIELDS['honor_code'] != 'hidden':
+          <label data-field="honor_code" class="honor-code" for="signup_honor">
+            <input id="signup_honor" name="honor_code" type="checkbox" value="true">
+            ${Text(_('I agree to the {link_start}Honor Code{link_end}')).format(
+              link_start=HTML('<a href="{url}" rel="noopener" target="_blank">').format(url=reverse('honor')),
+              link_end=HTML('</a>'))} *
+          </label>
+          % endif
+        </div>
+
+        <div class="submit">
+          <input name="submit" type="submit" value="${_('Create My Account')}">
+        </div>
+      </form>
+
+      % if has_extauth_info is UNDEFINED:
+      <section class="login-extra">
+        <p>
+          <span>${_("Already have an account?")} <a href="#login-modal" class="close-signup" rel="leanModal">${_("Login.")}</a></span>
+        </p>
+      </section>
+      % endif
+
+    </div>
+  </div>
+</section>
+
+<script type="text/javascript">
+  (function() {
+   $(document).delegate('#register_form', 'ajax:success', function(data, json, xhr) {
+     location.href="${reverse('dashboard') | n, js_escaped_string}";
+    });
+   $(document).delegate('#register_form', 'ajax:error', function(event, jqXHR, textStatus) {
+     json = $.parseJSON(jqXHR.responseText);
+     $(".field-error").removeClass('field-error');
+     $('#register_error').text(json.value).stop().css("display", "block");
+     $("[data-field='"+json.field+"']").addClass('field-error')
+    });
+
+   // removing close link's default behavior
+   $('#login-modal .close-modal').click(function(e) {
+    e.preventDefault();
+   });
+  })(this)
+</script>

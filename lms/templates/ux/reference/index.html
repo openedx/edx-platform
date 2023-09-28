@@ -1,0 +1,39 @@
+## mako
+
+## Override the default styles_version to use Bootstrap
+<%! main_css = "css/bootstrap/lms-main.css" %>
+
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="pagetitle">UX Reference</%block>
+
+<%block name="bodyclass">view-ux-reference</%block>
+
+<%block name="content">
+<div class="main-wrapper">
+    <div class="inner-wrapper">
+        <div class="main-column">
+            <article class="window unit-body">
+                <h2>UX Style Reference</h2>
+
+                <section class="xblock xblock-student_view xmodule_display xmodule_HtmlModule">
+                    <h3>v1-style LMS Pages</h3>
+                    <ul>
+                        <li><a href="v1/course-skeleton.html">Course skeleton page</a></li>
+                        <li><a href="v1/unit-page.html">Unit page</a></li>
+                    </ul>
+
+                    <h3>Bootstrap</h3>
+                    <ul>
+                        <li><a href="bootstrap/course-skeleton.html">Course skeleton page</a></li>
+                        <li><a href="bootstrap/unit-page.html">Unit page</a></li>
+                    </ul>
+                </section>
+            </article>
+        </div>
+    </div>
+</div>
+</%block>

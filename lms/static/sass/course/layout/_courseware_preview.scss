@@ -1,0 +1,219 @@
+$proctoring-banner-text-size: 14px;
+
+.wrapper-preview-menu {
+  @include clearfix();
+
+  margin: 0 auto;
+  padding: ($baseline*0.75);
+  background-color: theme-color("primary");
+  box-sizing: border-box;
+
+  @media print {
+    display: none;
+  }
+
+  .preview-menu {
+    @extend %inner-wrapper;
+
+    width: auto;
+
+    a.btn {
+      margin: 5px 0 5px 5px;
+    }
+  }
+
+  .preview-actions {
+    @include padding-left(0);
+
+    display: inline-block;
+    margin-bottom: 0;
+
+    .action-preview {
+      display: inline-block;
+
+      .action-preview-label {
+        @include margin-right($baseline/2);
+
+        display: inline-block;
+        margin-bottom: 0;
+        vertical-align: middle;
+        color: theme-color("inverse");
+      }
+
+      .action-preview-select {
+        @include margin-right($baseline);
+      }
+
+      .action-preview-username-container {
+        display: none;
+
+        .action-preview-username {
+          vertical-align: middle;
+          height: 25px;
+        }
+      }
+    }
+  }
+
+  .preview-specific-student-notice {
+    color: $inverse;
+    margin-top: ($baseline/2);
+    font-size: 90%;
+  }
+}
+
+.proctored_exam_status {
+  // STATE: Fixed to viewport (used for scrolling)
+  &.is-fixed {
+    @extend %ui-depth4;
+
+    box-shadow: 0 3px 3px $shadow-d1;
+    position: fixed;
+    z-index: 100;
+    top: 0;
+    width: 100%;
+  }
+
+  .exam-timer {
+    font-size: $proctoring-banner-text-size;
+    background-color: rgb(229, 234, 236);
+    padding: $baseline ($baseline*2);
+    border-left: 4px solid theme-color("primary");
+    margin: 0 auto;
+    color: theme-color("secondary");
+
+    .exam-text {
+      display: inline-block;
+
+      @include media-breakpoint-up(md) {
+        width: calc(100% - 250px);
+      }
+    }
+
+    a {
+      color: rgb(9, 121, 186);
+    }
+
+    .pull-right {
+      color: theme-color("secondary");
+
+      b {
+        color: theme-color("dark");
+      }
+    }
+
+    .turn_in_exam {
+      margin-top: -6px;
+    }
+
+    &.low-time {
+      color: theme-color("light");
+      background-color: rgb(79, 88, 92);
+
+      a {
+        color: $white;
+        text-decoration: underline;
+      }
+
+      .pull-right {
+        color: theme-color("light");
+
+        b {
+          color: theme-color("inverse");
+        }
+
+        .exam-button-turn-in-exam {
+          background-color: transparent;
+          border: 1px solid theme-color("inverse");
+          color: theme-color("inverse");
+
+          &:hover {
+            border: 1px solid theme-color("inverse");
+            background-color: theme-color("inverse");
+            color: theme-color("brand");
+          }
+        }
+
+        .exam-timer-clock {
+          background-color: transparent;
+          border: 1px solid $white;
+
+          #toggle_timer,
+          b {
+            color: $white;
+          }
+
+          #toggle_timer {
+            border-top: none;
+            border-right: none;
+            border-bottom: none;
+            border-top-right-radius: 2px;
+            border-bottom-right-radius: 2px;
+
+            &:hover {
+              border-top: none;
+              border-right: none;
+              border-bottom: none;
+            }
+          }
+        }
+      }
+    }
+
+    &.warning {
+      border-left-color: theme-color("warning");
+    }
+
+    &.critical {
+      border-left-color: theme-color("danger");
+      color: theme-color("inverse");
+    }
+
+    .exam-button-turn-in-exam {
+      @extend %btn-pl-primary-base;
+      @extend %t-action3;
+      @extend %t-weight4;
+
+      margin-right: $baseline;
+      border: 0;
+      background-image: none;
+      padding: ($baseline/5) ($baseline*0.75);
+      box-shadow: none;
+      text-shadow: none;
+
+      &:hover,
+      &:focus {
+        border: 0;
+      }
+    }
+
+    .exam-timer-clock {
+      display: inline-block;
+      padding: 0 0 0 ($baseline/3);
+      background-color: theme-color("light");
+      border-radius: 3px;
+
+      #toggle_timer {
+        @extend .exam-button-turn-in-exam;
+
+        padding: ($baseline/5) ($baseline/3);
+        border-bottom-left-radius: 0;
+        border-top-left-radius: 0;
+        margin-right: 0;
+      }
+
+      h3 {
+        display: inline;
+        font-size: $proctoring-banner-text-size;
+      }
+
+      b {
+        padding-right: ($baseline/5);
+
+        &.timer-hidden {
+          visibility: hidden;
+        }
+      }
+    }
+  }
+}

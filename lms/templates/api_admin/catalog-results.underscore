@@ -1,0 +1,6 @@
+<h2 class="api-subheading"><%- gettext("This catalog's courses:") %></h2>
+<ul class="preview-results-list">
+  <% _.each(courses, function (course) { %>
+    <li><a href="<%- catalogApiUrl + encodeURIComponent(course.key) %>"><%- course.title %></a></li>
+  <% }); %>
+</ul>

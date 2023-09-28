@@ -1,0 +1,1770 @@
+// lms - views - user/student dashboard
+// ====================
+
+// +Dashboard
+// ====================
+.dashboard {
+  @include clearfix();
+
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+
+  // Contains main course card listings
+  .main-container {
+    @include padding($baseline*2, $baseline, $baseline, $baseline*2);
+
+    flex-grow: 8;
+    order: 1;
+
+    .my-courses {
+      &:focus {
+        outline: none;
+      }
+
+      .wrapper-header-courses {
+        margin-bottom: $baseline/2;
+
+        .header-courses {
+          @extend %t-title5;
+
+          @include padding-right($baseline/2);
+        }
+      }
+
+      // UI: course list
+      .listing-courses {
+        @extend %ui-no-list;
+
+        .course-item {
+          margin-bottom: $baseline;
+          padding-bottom: $baseline;
+
+          .course-container {
+            border: 1px solid theme-color("light");
+            border-radius: 3px;
+          }
+
+          &:last-of-type {
+            margin-bottom: 0;
+            border-bottom: none;
+            padding-bottom: 0;
+          }
+        }
+      }
+
+      // UI: individual course item
+      .course {
+        box-sizing: box;
+
+        @include transition(all 0.15s linear 0s);
+        @include clearfix();
+
+        @extend %ui-depth2;
+
+        .details {
+          @include clearfix();
+          @include padding-right($baseline);
+
+          .wrapper-course-image {
+            @include float(left);
+            @include margin-right($baseline);
+
+            width: flex-grid(3);
+            max-height: 150px;
+            overflow: hidden;
+
+            .cover {
+              box-sizing: border-box;
+
+              @include transition(all 0.15s linear 0s);
+              @include float(left);
+
+              position: relative;
+
+              .course-image {
+                width: 100%;
+                padding: 2px;
+              }
+            }
+
+            // "enrolled as" status
+            .sts-enrollment {
+              @include float(left);
+
+              width: 100%;
+              position: relative;
+              bottom: 15px;
+              display: inline-block;
+              text-align: center;
+
+              .label {
+                @extend %text-sr;
+              }
+
+              .deco-graphic {
+                position: absolute;
+                top: -5px;
+
+                @include right(0);
+              }
+
+              .sts-enrollment-value {
+                @extend %ui-depth1;
+                @extend %copy-badge;
+                @extend %t-demi-strong;
+
+                font-size: 0.6em;
+                line-height: 1.5em;
+                border-radius: 0;
+                padding: 1px ($baseline/4);
+                color: white;
+              }
+            }
+
+            // Responsive behavior
+            @include media-breakpoint-down(sm) {
+              display: none;
+            }
+          }
+
+          .wrapper-course-details {
+            display: flex;
+            flex-flow: column wrap;
+            padding: 0;
+            margin-bottom: $baseline/2;
+            justify-content: space-between;
+
+            .course-title {
+              flex-basis: 100%;
+              padding-top: $baseline/2;
+
+              a,
+              span {
+                font: -apple-system-short-headline !important;
+
+                @extend %t-title3;
+                @extend %t-regular;
+
+                display: inline-block;
+                margin-bottom: ($baseline/2);
+                text-decoration: none;
+
+                // Responsive behavior
+                @include media-breakpoint-down(sm) {
+                  @extend %t-title4;
+                }
+              }
+            }
+
+            .course-info {
+              flex-grow: 1;
+              flex-shrink: 0;
+              min-width: 15em;
+
+              [class*="info-"] {
+                font: -apple-system-short-subheadline !important;
+                color: $gray-d1;
+
+                @extend %t-title7;
+
+                display: inline-block;
+              }
+
+              .info-date-block-container {
+                display: block;
+
+                .info-date-block {
+                  font: -apple-system-short-subheadline !important;
+
+                  @extend %t-title7;
+
+                  color: $gray; // WCAG 2.0 AA compliant
+
+                  .fa-close {
+                    color: theme-color("error");
+                  }
+
+                  .fa-check {
+                    color: theme-color("success");
+                  }
+                }
+
+                .change-session {
+                  @extend %t-title7;
+
+                  @include margin(0, 0, 0, $baseline/4);
+
+                  padding: 0;
+                  border: none;
+                  letter-spacing: normal;
+                }
+              }
+            }
+
+            .wrapper-course-info-actions {
+              display: flex;
+
+              .wrapper-course-info-row {
+                width: 100%;
+                display: inline-flex;
+                flex-wrap: wrap;
+
+                .course-info {
+                  flex-shrink: 0;
+                  min-width: 10em;
+                }
+
+                .wrapper-course-actions {
+                  margin-top: $baseline;
+
+                  flex-grow: 1;
+                  flex-shrink: 0;
+                }
+              }
+
+              .continue-button {
+                flex-shrink: 0;
+                flex-grow: 1;
+                align-self: flex-end;
+              }
+            }
+
+            // Responsive behavior
+            @include media-breakpoint-down(sm) {
+              .course-info,
+              .wrapper-course-actions {
+                flex-grow: 1;
+
+                .action {
+                  @include margin-right(0);
+                }
+
+                .wrapper-action-more {
+                  padding-top: 3px;
+                }
+              }
+            }
+
+            @include media-breakpoint-down(xs) {
+              margin-bottom: $baseline;
+              @include padding-left($baseline/2);
+
+              .wrapper-course-info-actions {
+                flex-wrap: wrap;
+                flex-flow: row wrap;
+
+                .wrapper-course-info-row {
+                  .wrapper-course-actions {
+                    margin-top: 0px;
+                  }
+                }
+              }
+
+              .continue-button {
+                .enter-course {
+                  flex: 2 100%;
+                  width: 100%;
+                  margin-top: $baseline;
+                }
+              }
+            }
+          }
+
+          .course-actions {
+
+            // UI: course item actions
+            .action {
+              box-sizing: border-box;
+
+              @include margin-right($baseline/2);
+              @include float(right);
+
+              min-width: ($baseline*2);
+              color: $gray-d3;
+              border-radius: 3px;
+              padding: 12px;
+              border: 1px solid $white;
+              text-align: center;
+
+              &:hover,
+              &:focus {
+                color: $gray-d3;
+                border: 1px solid $gray-l4;
+              }
+
+              // STATE: is-disabled
+              &.is-disabled {
+                color: $gray-l4;
+              }
+
+              // TYPE: facebook share
+              &.action-facebook {
+                color: $facebook-blue;
+              }
+
+              // TYPE: twitter share
+              &.action-twitter {
+                color: $twitter-blue;
+              }
+            }
+
+            .action-message {
+              min-width: ($baseline*20);
+              color: $gray-d1;
+              pointer-events: none;
+            }
+
+            // UI: general actions dropdown layout
+            .wrapper-action-more {
+              display: inline-block;
+              position: relative;
+
+              @include float(right);
+
+              .action-more {
+                @include font-size(14);
+
+                box-shadow: none;
+                background: $white;
+                background-image: none;
+                color: $gray;
+                line-height: 16px;
+                text-shadow: none;
+              }
+
+              .actions-dropdown {
+                @extend %ui-no-list;
+                @extend %ui-depth1;
+
+                display: none;
+                position: absolute;
+                top: ($baseline*2);
+
+                @include right(19px);
+
+                pointer-events: none;
+                min-width: ($baseline*7);
+
+                &.is-visible {
+                  display: block;
+                  pointer-events: auto;
+                }
+
+                .actions-dropdown-list {
+                  @extend %ui-no-list;
+
+                  box-sizing: border-box;
+                  display: table;
+                  box-shadow: 0 1px 1px $shadow-l1;
+                  position: relative;
+                  width: 100%;
+                  border-radius: 3px;
+                  margin: ($baseline/4) 0 0 0;
+                  border: 1px solid $gray-l3;
+                  padding: ($baseline/4) ($baseline/2);
+                  background: $white;
+
+                  // ui triangle/nub
+                  &::after,
+                  &::before {
+                    bottom: 100%;
+
+                    @include right(6px);
+
+                    border: solid transparent;
+                    content: " ";
+                    height: 0;
+                    width: 0;
+                    position: absolute;
+                    pointer-events: none;
+                  }
+
+                  &::after {
+                    border-color: $transparent;
+                    border-bottom-color: $white;
+                    border-width: 6px;
+
+                    @include margin-right(1px);
+                  }
+
+                  &::before {
+                    border-color: $transparent;
+                    border-bottom-color: $gray-l3;
+                    border-width: 7px;
+                  }
+                }
+
+                .actions-item {
+                  @extend %t-title7;
+
+                  display: block;
+                  margin: 0;
+
+                  &.is-hidden {
+                    display: none;
+                  }
+
+                  .action {
+                    @include margin-right(0);
+
+                    &:hover,
+                    &:focus {
+                      border: 1px solid transparent;
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          .course-status {
+            background: $yellow;
+            border: 1px solid $border-color-2;
+            box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
+            margin-top: 17px;
+
+            @include margin-right(flex-gutter());
+
+            padding: ($baseline/4);
+            width: flex-grid(8);
+
+            @include float(left);
+
+            box-sizing: border-box;
+
+            p {
+              color: $lighter-base-font-color;
+              font-style: italic;
+              letter-spacing: 1px;
+              text-align: center;
+            }
+          }
+
+          .course-status-completed {
+            background: $gray-l3;
+            color: $very-light-text;
+
+            p {
+              color: $gray-d4;
+
+              span {
+                font-weight: bold;
+              }
+            }
+          }
+
+          .enter-course {
+            font: -apple-system-short-subheadline !important;
+
+            @extend %btn-pl-white-base;
+
+            @include float(right);
+            margin-top: $baseline;
+
+            &.archived {
+              @extend %btn-pl-default-base;
+            }
+          }
+
+          // Responsive behavior
+          @include media-breakpoint-down(md) {
+            @include padding-left($baseline/2);
+          }
+        }
+
+        // ====================
+
+        // CASE: "enrolled as" status - professional ed
+        &.professional {
+
+          // changes to cover
+          .wrapper-course-image .cover {
+            border-color: $professional-color-lvl3;
+            padding: ($baseline/10);
+          }
+
+          // course enrollment status message
+          .sts-enrollment {
+            .label {
+              @extend %text-sr;
+            }
+
+            // status message
+            .sts-enrollment-value {
+              background: $professional-color-lvl3;
+            }
+          }
+        }
+
+        // CASE: "enrolled as" status - verified
+        &.verified {
+
+          // changes to cover
+          .wrapper-course-image .cover {
+            border-color: $verified-color-lvl1;
+            padding: ($baseline/10);
+          }
+
+          // course enrollment status message
+          .sts-enrollment {
+            .label {
+              @extend %text-sr;
+            }
+
+            .deco-graphic {
+              @extend %ui-depth3;
+
+              width: 40px;
+              position: absolute;
+              top: -5px;
+
+              @include right(0);
+            }
+
+            // status message
+            .sts-enrollment-value {
+              background: $verified-color-lvl1;
+            }
+          }
+        }
+
+        // CASE: "enrolled as" status - honor code
+        &.honor {
+
+          // changes to cover
+          .wrapper-course-image .cover {
+            border-color: $honorcode-color-lvl2;
+            padding: ($baseline/10);
+          }
+
+          // status message
+          .sts-enrollment-value {
+            background: $honorcode-color-lvl1;
+          }
+        }
+
+        // CASE: "enrolled as" status - auditing
+        &.audit {
+
+          // changes to cover
+          .wrapper-course-image .cover {
+            border-color: $audit-color-lvl2;
+            padding: ($baseline/10);
+          }
+
+          // status message
+          .sts-enrollment-value {
+            background: $audit-color-lvl1;
+          }
+        }
+      }
+    }
+
+    // Responsive behavior
+    @include media-breakpoint-down(md) {
+      padding: $baseline;
+    }
+  }
+
+  // Secondary functionality
+  .side-container {
+    @include padding($baseline*2, $baseline*2, $baseline, $baseline);
+
+    max-width: $baseline*20;
+    min-width: $baseline*20;
+    min-height: $baseline/2;
+    flex-grow: 1;
+    order: 2;
+
+    .wrapper-find-courses {
+      margin-bottom: $baseline * 0.5;
+
+      .course-advertise {
+        @include clearfix();
+
+        box-sizing: border-box;
+        padding: $baseline;
+        border: 1px solid $border-color-l3;
+
+        .advertise-message {
+          @include font-size(12);
+
+          color: $gray-d4;
+          margin-bottom: $baseline;
+        }
+
+        .marketing-link {
+          @include text-align(center);
+
+          .btn-neutral {
+            padding-bottom: 12px;
+            padding-top: 12px;
+          }
+
+          a {
+            @include font-size(16);
+            @include line-height(17);
+
+            padding: $baseline * 0.5;
+            border: 1px solid theme-color('primary');
+            color: theme-color('primary');
+            text-decoration: none;
+            display: block;
+
+            &:hover,
+            &:focus,
+            &:active {
+              color: $white;
+              background-color: theme-color('primary');
+            }
+
+            span {
+              @include margin-left($baseline*0.25);
+            }
+
+            .icon {
+              @include margin-right($baseline*0.25);
+            }
+          }
+        }
+      }
+    }
+
+    .profile-sidebar {
+      margin-bottom: $baseline * 0.5;
+
+      ul {
+        padding: 0;
+        border: 1px solid theme-color("light");
+      }
+    }
+
+    // Responsive behavior
+    @include media-breakpoint-down(md) {
+      padding: 0;
+      max-width: 100%;
+    }
+
+    // Responsive behavior
+    @include media-breakpoint-down(xl) {
+      max-width: $baseline*15;
+      min-width: $baseline*15;
+    }
+  }
+
+  // Responsive behavior
+  @include media-breakpoint-down(md) {
+    flex-direction: column-reverse;
+  }
+}
+
+// ====================
+// UI: messages
+.wrapper-messages-primary {
+  @include clearfix();
+
+  .messages-list {
+    margin: 0;
+    padding: 0;
+    background-color: theme-color("lightest");
+  }
+
+  .message {
+    @extend %ui-depth1;
+
+    border-radius: 3px;
+    display: none;
+    padding: ($baseline/2) $baseline;
+    border-top: 1px solid $gray-l4;
+    color: $body-color; // Overrides the normal white color in this one case
+
+    // STATE: shown
+    &.is-shown {
+      @include clearfix();
+
+      display: block;
+    }
+
+    a {
+      font-family: $font-family-sans-serif;
+    }
+
+    strong {
+      font-weight: 700;
+
+      a {
+        font-weight: 700;
+      }
+    }
+
+    .actions {
+      @include clearfix();
+
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .message-title,
+    .message-copy .title {
+      @extend %t-title6;
+      @extend %t-weight4;
+
+      line-height: 1em;
+      margin-bottom: ($baseline/4);
+    }
+
+    .message-copy,
+    .message-copy .copy {
+      @extend %t-copy-sub1;
+
+      margin: 2px 0 0;
+    }
+
+    // CASE: expandable
+    &.is-expandable {
+      .wrapper-tip {
+        .message-title,
+        .message-copy {
+          margin-bottom: 0;
+          display: inline-block;
+        }
+
+        .message-title .value,
+        .message-copy {
+          @include transition(color $tmg-f2 ease-in-out 0s);
+        }
+
+        // STATE: hover
+        &:hover {
+          cursor: pointer;
+
+          .message-title .value,
+          .message-copy,
+          .ui-toggle-expansion {
+            color: $link-color;
+          }
+        }
+      }
+
+      .wrapper-extended {
+        @include transition(opacity $tmg-f2 ease-in-out 0);
+
+        display: none;
+        opacity: 0;
+      }
+    }
+
+    // STATE: is expanded
+    &.is-expanded {
+      .ui-toggle-expansion {
+        @include rtl {
+          @include transform(rotate(-90deg));
+        }
+
+        @include ltr {
+          @include transform(rotate(90deg));
+        }
+
+        @include transform-origin(50% 50%);
+      }
+
+      .wrapper-extended {
+        display: block;
+        opacity: 1;
+      }
+    }
+
+    // TYPE: upsell
+    &.message-upsell {
+      padding-left: $baseline;
+      padding-top: $baseline;
+      padding-bottom: $baseline;
+      background-color: #F2F0EF;
+
+      .wrapper-tip {
+        @include clearfix();
+
+        .message-title {
+          @include float(left);
+        }
+
+        .ui-toggle-expansion {
+          @include transition(all $tmg-f2 ease-in-out 0s);
+          @include font-size(18);
+
+          display: inline-block;
+          vertical-align: middle;
+
+          @include margin-right($baseline/4);
+        }
+
+        .message-copy {
+          @include float(right);
+        }
+      }
+
+      .wrapper-extended {
+        display: flex;
+        flex-flow: column wrap;
+        color: #00262B;
+
+        .wrapper-icon-message {
+          width: 100%;
+          display: inline-flex;
+          flex-wrap: wrap;
+
+          svg {
+            flex-shrink: 0;
+            width: 43px;
+            height: 43px;
+            margin-left: -5px;
+          }
+
+          .message-copy {
+            margin-left: $baseline/2;
+            min-width: 15rem;
+            flex: 2;
+
+            .message-copy-bold {
+              font-weight: $font-weight-bold;
+            }
+          }
+
+          a.verified-info {
+            color: #00262B;
+            text-decoration: underline;
+          }
+        }
+
+        .action-upgrade-container {
+          flex-shrink: 0;
+          flex-grow: 1;
+          align-self: flex-end;
+        }
+
+        @include media-breakpoint-down(xs) {
+          .action-upgrade-container {
+            width: 100%;
+            margin-top: $baseline;
+          }
+
+          .action-upgrade {
+            width: 100%;
+            flex: 2 100%;
+          }
+        }
+
+        @include media-breakpoint-up(xl) {
+          flex-flow: nowrap;
+
+          .action-upgrade-container {
+            margin-left: 16px;
+          }
+        }
+      }
+
+      .action-upgrade-container {
+        @include float(right);
+
+        display: inline-block;
+        margin-top: ($baseline/2);
+      }
+
+      .action-upgrade {
+        @extend %btn-primary-green;
+
+        @include clearfix();
+
+        position: inherit;
+
+        @include left($baseline/2);
+        @include padding(($baseline * 0.4), 0, ($baseline * 0.4), ($baseline * 0.75));
+
+        .action-upgrade-icon {
+          @include float(left);
+
+          display: inline;
+
+          @include margin-right($baseline*0.4);
+
+          margin-top: ($baseline/4);
+          background: url('#{$static-path}/images/icon-sm-verified.png') no-repeat;
+          background-position: -($baseline*0.3);
+          background-color: white;
+          width: ($baseline*0.8);
+          height: ($baseline*0.7);
+        }
+
+        .deco-graphic {
+          position: absolute;
+          top: -($baseline/4);
+
+          @include left(-($baseline*0.75));
+
+          width: ($baseline*2);
+        }
+
+        span {
+          color: $white; // nasty but needed override for poor <span> styling
+        }
+
+        .copy,
+        .copy-sub {
+          display: inline-block;
+          vertical-align: middle;
+        }
+
+        .copy {
+          @extend %t-action3;
+          @extend %t-weight4;
+
+          @include margin-right($baseline);
+        }
+
+        .copy-sub {
+          @extend %t-action4;
+
+          opacity: 0.875;
+        }
+      }
+
+      .action-view-consent {
+        @extend %btn-pl-white-base;
+
+        @include float(right);
+
+        &.archived {
+          @extend %btn-pl-default-base;
+        }
+      }
+    }
+
+    // TYPE: status
+    &.message-status {
+      border-color: $gray-l4;
+      margin-bottom: 0;
+
+      .wrapper-message-primary {
+        @include clearfix();
+      }
+
+      .message-copy {
+        @extend %t-copy-sub1;
+
+        margin: 0;
+      }
+
+      .credit-action {
+        .credit-btn {
+          @extend %btn-pl-yellow-base;
+
+          @include float(right);
+          @include margin-right(5px);
+
+          background-image: none;
+          text-shadow: none;
+          box-shadow: none;
+          text-transform: none;
+        }
+      }
+
+      .actions {
+        .action {
+          @include float(left);
+          @include margin(0, 15px, 0, 0);
+
+          .btn {
+            display: inline-block;
+          }
+
+          .btn {
+            box-sizing: border-box;
+
+            @include float(left);
+
+            border-radius: 3px;
+            font: normal 0.8rem/1.2rem $font-family-sans-serif;
+            letter-spacing: 1px;
+            padding: 6px 12px;
+            text-align: center;
+
+            &.disabled {
+              cursor: default !important;
+
+              &:hover,
+              &:focus {
+                @include background-image(linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%));
+
+                background: #eee;
+              }
+            }
+          }
+
+          .btn {
+            @include float(left);
+
+            font: normal 0.8rem/1.2rem $font-family-sans-serif;
+            letter-spacing: 1px;
+            padding: 6px 12px;
+            text-align: center;
+          }
+        }
+      }
+
+      .exam-registration-number {
+        font-family: $font-family-sans-serif;
+        font-size: 18px;
+
+        a {
+          font-family: $font-family-sans-serif;
+        }
+      }
+
+      &.exam-register {
+        .message-copy {
+          margin-top: ($baseline/4);
+          width: 55%;
+        }
+      }
+
+      &.exam-schedule {
+        .exam-button {
+          margin-top: ($baseline/4);
+        }
+      }
+
+      .exam-button {
+        @include button(simple, $pink);
+        @include float(right);
+
+        margin-top: 0;
+      }
+
+      .contact-button {
+        @include button(simple, $pink);
+      }
+
+      .button {
+        display: inline-block;
+        margin-top: ($baseline/2);
+        padding: 9px 18px 10px;
+        font-size: 13px;
+        font-weight: bold;
+        letter-spacing: 0;
+
+        &:hover,
+        &:focus {
+          text-decoration: none;
+        }
+      }
+
+
+      &.course-status-certrendering {
+        .btn {
+          margin-top: 2px;
+        }
+      }
+
+      &.course-status-processing {
+        color: theme-color('error');
+      }
+
+      &.course-status-earned-not-available,
+      &.course-status-certavailable {
+        color: theme-color('success');
+      }
+
+      &.course-status-certavailable {
+        .message-copy {
+          width: flex-grid(6, 12);
+          position: relative;
+
+          @include float(left);
+        }
+
+        .actions-primary {
+          @include float(right);
+
+          .action {
+            @include margin(0, 0, ($baseline/2), ($baseline*0.75));
+
+            float: none;
+            text-align: center;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            .btn {
+              float: none;
+            }
+          }
+
+          .action-certificate .btn {
+            @extend %btn-inherited-primary;
+
+            box-sizing: border-box;
+            padding: 7px $baseline*0.75;
+            float: none;
+            border-radius: 3px;
+            display: block;
+            text-align: center;
+
+            a:link,
+            a:visited {
+              color: #fff;
+            }
+          }
+
+          .action-share .btn {
+            display: inline;
+            letter-spacing: 0;
+          }
+        }
+      }
+
+      .actions-secondary {
+        margin-top: ($baseline/2);
+        border-top: 1px solid $gray-l4;
+        padding-top: ($baseline/2);
+
+        .action-share {
+          @include float(right);
+
+          margin: 0;
+        }
+      }
+
+      .certificate-explanation {
+        @extend %t-copy-sub1;
+
+        margin-top: ($baseline/2);
+        border-top: 1px solid $gray-l4;
+        padding-top: ($baseline/2);
+      }
+
+      .verification-reminder {
+        width: flex-grid(8, 12);
+
+        @include float(left);
+
+        position: relative;
+      }
+
+      .verification-cta {
+        width: flex-grid(4, 12);
+
+        @include float(right);
+
+        position: relative;
+
+        .btn {
+          @extend %btn-pl-green-base;
+
+          @include float(right);
+        }
+      }
+    }
+
+    &.message-related-programs {
+      background: none;
+      padding: $baseline/2;
+      margin-bottom: 0;
+
+      .related-programs-preface  {
+        @include float(left);
+
+        margin: 0 $baseline/2;
+        font-weight: bold;
+      }
+
+      .related-program-container {
+        display: inline;
+        padding: 0;
+        margin: 0;
+      }
+
+      .related-program-element {
+        &.important-element {
+          @include float(left);
+
+          display: inline;
+          padding: 0 0.5em !important;
+
+          .category-icon {
+            @include float(left);
+            @include margin-right($baseline/4);
+
+            margin-top: ($baseline/10);
+            background-color: transparent;
+            background-size: 100%;
+            width: ($baseline*0.7);
+            height: ($baseline*0.7);
+          }
+        }
+      }
+
+      li {
+        border-right: 1px solid;
+      }
+
+      // Remove separator from last list item.
+      li:last-child {
+        border: 0;
+      }
+    }
+
+    // TYPE: pre-requisites
+    .prerequisites {
+      @include clearfix;
+
+      .tip {
+        font-family: $font-family-sans-serif;
+        font-size: 1em;
+        color: $lighter-base-font-color;
+        margin-top: ($baseline/2);
+      }
+    }
+
+    @include media-breakpoint-down(md) {
+      @include padding($baseline/2, $baseline, $baseline/2, $baseline/2);
+    }
+  }
+}
+
+// CASE: empty dashboard
+.empty-dashboard-message {
+  border: 3px solid $gray-l4;
+  background: $gray-l6;
+  padding: ($baseline*2) ($baseline/10);
+  text-align: center;
+
+  p {
+    @include font-size(24);
+
+    color: $lighter-base-font-color;
+    margin-bottom: $baseline;
+    text-shadow: 0 1px rgba(255, 255, 255, 0.6);
+  }
+
+  p.custom-message {
+    @include font-size(14);
+
+    text-shadow: none;
+  }
+
+  a.btn {
+    background-color: theme-color('primary');
+    border: 1px solid theme-color('primary');
+    box-shadow: 0 1px 8px 0 $shadow-l1;
+    box-sizing: border-box;
+    color: $white;
+    font-family: $font-family-sans-serif;
+    display: inline-block;
+    letter-spacing: 1px;
+    margin-top: ($baseline/4);
+    margin-left: ($baseline/4);
+    padding: $baseline*0.75 $baseline;
+
+    &:hover,
+    &:focus {
+      background: theme-color('primary')-l2; /* stylelint-disable-line */
+      text-decoration: none;
+    }
+  }
+}
+
+// +Misc - Uncategorized
+// ====================
+// status - language
+.status-language {
+  .icon {
+    @include font-size(17);
+
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: ($baseline/4);
+    color: $black;
+  }
+
+  .title .icon {
+    opacity: 0.75; // needed to overcome bad specificity elsewhere
+  }
+}
+
+// status - verification
+.status-verification {
+  list-style: none;
+  padding: $baseline/2;
+
+  .status-title {
+    margin: 0 0 ($baseline/4) 0;
+  }
+
+  .status-data {
+    margin: 0 0 ($baseline/2) 0;
+  }
+
+  .status-data-message {
+    @extend %t-copy-sub1;
+    @extend %t-weight4;
+
+    margin-bottom: ($baseline/2);
+  }
+
+  .list-actions {
+    @extend %ui-no-list;
+
+    .action {
+      @extend %t-weight4;
+
+      display: block;
+
+      @include font-size(14);
+    }
+  }
+
+  .status-note {
+    @extend %t-copy-sub2;
+
+    position: relative;
+    padding-top: $baseline/2;
+
+    p {
+      @extend %t-copy-sub2;
+    }
+
+    .deco-arrow {
+      @include triangle(($baseline/2), $m-gray-d3, up);
+
+      position: absolute;
+
+      @include left(45%);
+
+      top: -6px;
+    }
+  }
+
+  // CASE: is denied
+  &.is-denied {
+    border-top: 3px solid $red !important;
+
+    .status-data-message {
+      color: $error-color;
+      border-bottom-color: rgba($error-color, 0.25);
+    }
+
+    .action-reverify {
+      @extend %btn-primary-error;
+      @extend %t-weight4;
+
+      display: block;
+
+      @include font-size(14);
+    }
+
+    .btn-reverify {
+      margin-top: ($baseline/2);
+    }
+
+    .deco-arrow {
+      @include triangle(($baseline/2), $error-color, up);
+    }
+  }
+
+  // CASE: is accepted
+  &.is-accepted {
+    border-top: 3px solid $green !important;
+
+    .status-data-message {
+      color: $verified-color-lvl1;
+      border-bottom-color: $verified-color-lvl4;
+    }
+
+    .action-reverify {
+      @extend %btn-primary-error;
+      @extend %t-weight4;
+
+      display: block;
+
+      @include font-size(14);
+    }
+
+    .btn-reverify {
+      margin-top: ($baseline/2);
+    }
+
+    .deco-arrow {
+      @include triangle(($baseline/2), $verified-color-lvl4, up);
+    }
+  }
+
+  // CASE: is pending
+  &.is-pending {
+    border-top: 3px solid $active-color !important;
+
+    .status-data-message {
+      color: $m-gray-d3;
+      border-bottom-color: $m-gray-l4;
+    }
+  }
+
+  // Warning for status verification
+  &.warning {
+    border-top: 3px solid #ffc01f !important;
+
+    .status-title {
+      font-weight: 400 !important;
+
+      .fa {
+        color: #ffc01f;
+      }
+    }
+
+    .btn {
+      font-size: 16px;
+      line-height: 25.16px;
+      padding: 10px;
+      border: 1px solid #0079bc;
+      color: #0079bc;
+      text-decoration: none;
+      display: block;
+    }
+
+    .btn:hover {
+      cursor: pointer;
+      color: #fff;
+      background-color: #0079bc;
+    }
+  }
+}
+
+// status - verification
+.status--verification {
+  .data {
+    white-space: normal !important;
+    text-overflow: no !important;
+    overflow: visible !important;
+  }
+
+  .list--nav {
+    @include margin-left(26px);
+  }
+
+  // STATE: is denied
+  &.is-denied {
+    .data {
+      color: $error-color !important;
+    }
+  }
+}
+
+// message
+.msg {
+  @include margin(($baseline/2), 0, ($baseline/2), 26px);
+}
+
+.msg__title {
+  @extend %hd-lv5;
+
+  color: $lighter-base-font-color;
+}
+
+.msg__copy {
+  @extend %copy-metadata;
+
+  color: $lighter-base-font-color;
+
+  p {
+    @extend %t-copy;
+  }
+}
+
+p.course-block {
+  border-style: solid;
+  border-color: #e3dc86;
+  padding: ($baseline/4);
+  border-width: 1px;
+  background: #fdfbe4;
+}
+
+.enter-course-blocked {
+  box-sizing: border-box;
+
+  @include float(right);
+
+  display: block;
+  font: normal 15px/1.6rem $font-family-sans-serif;
+  letter-spacing: 0;
+  padding: 6px 32px 7px;
+  text-align: center;
+  margin-top: 16px;
+  opacity: 0.5;
+  background: #808080;
+  border: 0;
+  color: theme-color("inverse");
+  box-shadow: none;
+
+  &.archived {
+    @include button(simple, $button-archive-color);
+
+    font: normal 15px/1.6rem $font-family-sans-serif;
+    padding: 6px 32px 7px;
+
+    &:hover,
+    &:focus {
+      text-decoration: none;
+    }
+  }
+}
+
+a.disable-look {
+  color: #808080;
+}
+
+a.fade-cover {
+  @extend .cover;
+
+  opacity: 0.5;
+}
+
+
+// +Dashboard - Banner
+// ====================
+.dashboard-banner {
+  &:empty {
+    display: none;
+  }
+
+  .wrapper-msg {
+    padding-bottom: 0;
+
+    .msg {
+      @include clearfix();
+
+      font-family: $font-family-sans-serif;
+      padding-bottom: $baseline;
+      border-bottom: thin solid $gray;
+
+      &.title {
+        @extend %t-title5;
+        @extend %t-weight4;
+
+        font-family: $font-family-sans-serif;
+
+        // Overriding Platform h2 styles
+        text-transform: none;
+        letter-spacing: 0;
+      }
+    }
+  }
+}
+
+// Dashboard alert messages
+.activation-message-container {
+  @include clearfix();
+
+  margin: 0 auto;
+  padding-top: ($baseline/2);
+  max-width: grid-width(12);
+  min-width: 760px;
+  width: flex-grid(12);
+}
+
+.account-activation {
+  .message-copy {
+    position: relative;
+    left: 2em;
+    padding: 1em;
+  }
+
+  .message-title {
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  &.info {
+    color: $palette-info-text;
+    background-color: $palette-info-back;
+    border: $palette-info-border 1px solid;
+    padding: 5px;
+
+    .message-title {
+      margin-bottom: 0;
+    }
+
+    &.aa-icon .message-copy::before {
+      position: absolute;
+      left: -1em;
+      content: "\f05a";  // fa-info-circle
+      font-size: 1.5em;
+      padding: 0 2px;
+      font-family: FontAwesome;
+    }
+  }
+
+  &.success {
+    color: $palette-success-text;
+    background-color: $palette-success-back;
+    border: $palette-success-border 1px solid;
+
+    &.aa-icon .message-copy::before {
+      position: absolute;
+      left: -1em;
+      content: "\f00c";  // fa-check
+      font-size: 1.5em;
+      padding: 0 2px;
+      font-family: FontAwesome;
+    }
+  }
+
+  &.error {
+    color: $palette-error-text;
+    background-color: $palette-error-back;
+    border: $palette-error-border 1px solid;
+
+    &.aa-icon .message-copy::before {
+      position: absolute;
+      left: -1em;
+      content: "\f06a";  // fa-exclamation-circle
+      font-size: 1.5em;
+      padding: 0 2px;
+      font-family: FontAwesome;
+    }
+
+    a {
+      text-decoration: underline;
+    }
+  }
+}
+
+#unenroll-modal {
+  margin-top: -60px;
+
+  @media (max-width: 640px) {
+    width: 82% !important;
+    margin-left: -41% !important;
+    box-sizing: border-box;
+  }
+
+  .modal-form-error {
+    background: tint($red, 95%);
+    margin-left: $baseline;
+    margin-right: $baseline;
+  }
+}
+
+#email-settings-modal {
+  margin-top: -60px;
+
+  @media (max-width: 640px) {
+    width: 82% !important;
+    margin-left: -41% !important;
+    box-sizing: border-box;
+  }
+}
+
+#activate-account-modal {
+    display: block;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    margin-top: -60px;
+    text-align: left;
+    height: 252px;
+    width: 450px;
+    box-shadow: none;
+    background: none;
+    outline: 0;
+
+    .inner-wrapper {
+      h3 {
+          font-family: inherit;
+          padding: 1.5rem 1rem 1rem 1rem;
+          text-align: left;
+          font-weight: bold;
+          font-size: 1.3rem;
+          line-height: 1.75rem;
+      }
+        border: none;
+        border-radius: 5px;
+    }
+}
+
+@media (max-width: 460px) and (min-width: 360px) {
+    #activate-account-modal {
+        width: 350px;
+    }
+}
+
+@media (max-width: 360px) {
+    #activate-account-modal {
+        width: 300px;
+    }
+}
+
+.activate-account-modal-button {
+    text-align: right;
+    display: block;
+    padding: 1rem 1rem 1rem 0;
+
+    .btn-primary {
+        text-transform: none;
+        font-weight: 500;
+    }
+}
+.activate-account-modal-body {
+    padding: 0 1rem;
+}
+
+.reasons_survey {
+  margin: 20px;
+
+  .options {
+    list-style: none;
+    padding: 0;
+  }
+
+  .option {
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  input {
+    margin-right: 10px;
+  }
+
+  .unenroll-header {
+    background-image: none;
+  }
+
+  .other_text {
+    margin-top: 0;
+  }
+
+  .other_radio {
+    margin-top: 10px;
+  }
+
+  .submit_reasons {
+    margin-top: 10px;
+  }
+
+  .survey_button {
+    width: 30%;
+    margin-top: 10px;
+    margin-left: 2.5%;
+    margin-right: 2.5%;
+    color: theme-color("inverse");
+  }
+
+  .survey_button:visited,
+  .survey_button:hover,
+  .survey_button:focus {
+    color: theme-color("inverse");
+    text-decoration: none;
+  }
+}

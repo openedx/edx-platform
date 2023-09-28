@@ -1,0 +1,63 @@
+{% extends "wiki/base.html" %}
+{% load wiki_tags i18n sekizai_tags %}
+
+{% block pagetitle %}{% trans "Delete article" as tmsg %}{{tmsg|force_escape}}{% endblock %}
+
+{% block wiki_contents %}
+  <section class="delete">
+  <h1 class="page-header">{% trans "Delete" as tmsg%}{{tmsg|force_escape}} "{{ article.current_revision.title }}"</h1>
+
+  {% if cannot_delete_root %}
+    <p class="lead">{% trans "You cannot delete a root article." as tmsg%}{{tmsg|force_escape}}</p>
+    <p><a href="{% url 'wiki:get' path=urlpath.path article_id=article.id %}">{% trans "Go back" as tmsg %}{{tmsg|force_escape}}</a></p>
+  {% else %}
+
+    {% if cannot_delete_children %}
+
+      <p class="alert alert-error"><strong>{% trans "You cannot delete this article because you do not have permission to delete articles with children. Try to remove the children manually one-by-one." as tmsg %}{{tmsg|force_escape}}</strong></p>
+
+    {% endif %}
+
+    {% if delete_children %}
+
+      <p class="lead">{% trans "You are deleting an article. This means that its children will be deleted as well. If you choose to purge, children will also be purged!" as tmsg%}{{tmsg|force_escape}}</p>
+
+      <h2>{% trans "Articles that will be deleted" as tmsg%}{{tmsg|force_escape}}</h2>
+
+      <ul>
+        {% for child in delete_children %}
+        <li><a href="{% url 'wiki:get' article_id=child.article.id %}" rel="noopener" target="_blank">{{ child.article }}</a></li>
+        {% if delete_children_more %}
+        <li><em>{% trans "...and more!" as tmsg%}{{tmsg|force_escape}}</em></li>
+        {% endif %}
+        {% endfor %}
+      </ul>
+
+    {% endif %}
+
+    {% if not cannot_delete_children %}
+    <p class="lead">{% trans "You are deleting an article. Please confirm." as tmsg%}{{tmsg|force_escape}}</p>
+
+    <form method="POST" class="form-horizontal">
+      {% wiki_form delete_form %}
+      <script type="text/javascript">
+        $('#id_revision').val('{{ article.current_revision.id }}');
+      </script>
+      <div class="form-actions">
+          <button type="submit" name="save_changes" class="btn btn-danger btn-large">
+            <span class="icon fa fa-remove" aria-hidden="true"></span>
+            {% trans "Delete article" as tmsg%}{{tmsg|force_escape}}
+          </button>
+          <a href="{% url 'wiki:get' path=urlpath.path article_id=article.id %}" class="btn btn-large back">
+            <span class="icon fa fa-circle-arrow-left" aria-hidden="true"></span>
+            {% trans "Go back" as tmsg%}{{tmsg|force_escape}}
+          </a>
+      </div>
+    </form>
+    {% endif %}
+
+  {% endif %}
+  </section>
+
+{% endblock %}
+

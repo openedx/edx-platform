@@ -1,0 +1,22 @@
+{% load i18n %}
+
+{% blocktrans trimmed %}
+Hello {{full_name}},
+{% endblocktrans %}
+
+{% blocktrans trimmed %}
+We received a deletion request for your account on {{platform_name}}. We're sorry to see you go! 
+{% endblocktrans %}
+
+{% blocktrans trimmed %}
+Your account will be deleted shortly. Account deletion, including removal from email lists, may take a few weeks to fully process through our system. If you want to opt-out of emails before then, please unsubscribe from the footer of any email.
+{% endblocktrans %}
+
+{% blocktrans trimmed %}
+This is an informational email only. If you did not initiate this request, please contact {{contact_email}}.
+{% endblocktrans %}
+
+{% blocktrans trimmed %}
+Best,
+{{platform_name}}
+{% endblocktrans %}

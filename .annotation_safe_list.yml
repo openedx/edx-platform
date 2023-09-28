@@ -1,0 +1,290 @@
+# This is a Code Annotations automatically-generated Django model safelist file.
+# These models must be annotated as follows in order to be counted in the coverage report.
+# See https://code-annotations.readthedocs.io/en/latest/safelist.html for more information.
+#
+# fake_app_1.FakeModelName:
+#    ".. no_pii::": "This model has no PII"
+# fake_app_2.FakeModel2:
+#    ".. choice_annotation::": foo, bar, baz
+
+# Via Django
+auth.Group:
+  ".. no_pii:" : "No PII"
+auth.Permission:
+  ".. no_pii:" : "No PII"
+auth.User:
+  ".. pii:": "Contains username, password, and email address, retired in AccountRetirementView"
+  ".. pii_types:" : username, email_address, password
+  ".. pii_retirement:" : local_api
+contenttypes.ContentType:
+  ".. no_pii:": "No PII"
+admin.LogEntry:
+  ".. no_pii:": "No PII"
+redirects.Redirect:
+  ".. no_pii:": "No PII"
+sessions.Session:
+  ".. no_pii:": "No PII"
+sites.Site:
+  ".. no_pii:": "No PII"
+
+# Automatically generated models in edx-enterprise that can't be annotated there
+consent.HistoricalDataSharingConsent:
+  ".. pii:": "The username field inherited from Consent contains PII."
+  ".. pii_types:": username
+  ".. pii_retirement:": consumer_api
+degreed.HistoricalDegreedEnterpriseCustomerConfiguration:
+  ".. no_pii:": "No PII"
+enterprise.HistoricalEnrollmentNotificationEmailTemplate:
+  ".. no_pii:": "No PII"
+enterprise.HistoricalEnterpriseCourseEnrollment:
+  ".. no_pii:": "No PII"
+enterprise.HistoricalEnterpriseCustomer:
+  ".. no_pii:": "No PII"
+enterprise.HistoricalEnterpriseCustomerCatalog:
+  ".. no_pii:": "No PII"
+enterprise.HistoricalEnterpriseCustomerEntitlement:
+  ".. no_pii:": "No PII"
+
+# Via ORA2
+assessment.Assessment:
+  ".. no_pii:": "No PII"
+assessment.AssessmentFeedback:
+  ".. no_pii:": "No PII"
+assessment.AssessmentFeedbackOption:
+  ".. no_pii:": "No PII"
+assessment.AssessmentPart:
+  ".. no_pii:": "No PII"
+assessment.Criterion:
+  ".. no_pii:": "No PII"
+assessment.CriterionOption:
+  ".. no_pii:": "No PII"
+assessment.PeerWorkflow:
+  ".. no_pii:": "No PII"
+assessment.PeerWorkflowItem:
+  ".. no_pii:": "No PII"
+assessment.Rubric:
+  ".. no_pii:": "No PII"
+assessment.StaffWorkflow:
+  ".. no_pii:": "No PII"
+assessment.StudentTrainingWorkflow:
+  ".. no_pii:": "No PII"
+assessment.StudentTrainingWorkflowItem:
+  ".. no_pii:": "No PII"
+assessment.TrainingExample:
+  ".. no_pii:": "No PII"
+workflow.AssessmentWorkflow:
+  ".. no_pii:": "No PII"
+workflow.AssessmentWorkflowCancellation:
+  ".. no_pii:": "No PII"
+workflow.AssessmentWorkflowStep:
+  ".. no_pii:": "No PII"
+
+# Via edx-celeryutils
+celery_utils.ChordData:
+  ".. no_pii:": "No PII"
+celery_utils.FailedTask:
+  ".. no_pii:": "No PII"
+
+# Via completion XBlock
+completion.BlockCompletion:
+  ".. no_pii:": "No PII"
+
+# Via django_notify (required / installed by wiki)
+django_notify.Notification:
+  ".. no_pii:": "No PII"
+django_notify.NotificationType:
+  ".. no_pii:": "No PII"
+django_notify.Settings:
+  ".. no_pii:": "No PII"
+django_notify.Subscription:
+  ".. no_pii:": "No PII"
+
+# Via django-openid-auth https://github.com/edx/django-openid-auth
+django_openid_auth.Association:
+  ".. no_pii:": "No PII"
+django_openid_auth.Nonce:
+  ".. no_pii:": "No PII"
+django_openid_auth.UserOpenID:
+  ".. pii:": "User OpenID associations. Not used and empty on edx.org, therefore not retired."
+  ".. pii_types:": external_service, password
+  ".. pii_retirement:": retained
+
+# Via django-celery
+djcelery.CrontabSchedule:
+  ".. no_pii:": "No PII"
+djcelery.IntervalSchedule:
+  ".. no_pii:": "No PII"
+djcelery.PeriodicTask:
+  ".. no_pii:": "No PII"
+djcelery.PeriodicTasks:
+  ".. no_pii:": "No PII"
+djcelery.TaskMeta:
+  ".. no_pii:": "No PII"
+djcelery.TaskSetMeta:
+  ".. no_pii:": "No PII"
+djcelery.TaskState:
+  ".. no_pii:": "No PII"
+djcelery.WorkerState:
+  ".. no_pii:": "No PII"
+
+# Via edx-oauth2-provider https://github.com/edx/edx-oauth2-provider
+edx_oauth2_provider.TrustedClient:
+  ".. no_pii:": "No PII"
+
+# Via VAL
+edxval.CourseVideo:
+  ".. no_pii:": "No PII"
+edxval.EncodedVideo:
+  ".. no_pii:": "No PII"
+edxval.Profile:
+  ".. no_pii:": "No PII"
+edxval.ThirdPartyTranscriptCredentialsState:
+  ".. no_pii:": "No PII"
+edxval.TranscriptPreference:
+  ".. no_pii:": "No PII"
+edxval.Video:
+  ".. no_pii:": "No PII"
+edxval.VideoImage:
+  ".. no_pii:": "No PII"
+edxval.VideoTranscript:
+  ".. no_pii:": "No PII"
+
+# Via Milestones
+milestones.CourseContentMilestone:
+  ".. no_pii:": "No PII"
+milestones.CourseMilestone:
+  ".. no_pii:": "No PII"
+milestones.Milestone:
+  ".. no_pii:": "No PII"
+milestones.MilestoneRelationshipType:
+  ".. no_pii:": "No PII"
+milestones.UserMilestone:
+  ".. no_pii:": "No PII"
+
+# Via Django OAuth2 Provider https://github.com/edx/django-oauth2-provider
+oauth2.Client:
+  ".. no_pii:": "No PII"
+oauth2.AccessToken:
+  ".. pii:": "Contains 3rd party authentication secrets. Retired in DeactivateLogoutView."
+  ".. pii_types:": password, other
+  ".. pii_retirement:": local_api
+oauth2.Grant:
+  ".. pii:": "Contains 3rd party authentication secrets. Retired in DeactivateLogoutView."
+  ".. pii_types:": password, other
+  ".. pii_retirement:": local_api
+oauth2.RefreshToken:
+  ".. pii:": "Contains 3rd party authentication secrets. Retired in DeactivateLogoutView."
+  ".. pii_types:": password, other
+  ".. pii_retirement:": local_api
+
+# Via Django OAuth Toolkit https://github.com/evonove/django-oauth-toolkit
+oauth2_provider.AccessToken:
+  ".. pii:": "Contains 3rd party authentication secrets. Retired in DeactivateLogoutView."
+  ".. pii_types:": password, other
+  ".. pii_retirement:": local_api
+oauth2_provider.Application:
+  ".. pii:": "Contains 3rd party authentication secrets. Retired in DeactivateLogoutView."
+  ".. pii_types:": password, other
+  ".. pii_retirement:": local_api
+oauth2_provider.Grant:
+  ".. pii:": "Contains 3rd party authentication secrets. Retired in DeactivateLogoutView."
+  ".. pii_types:": password, other
+  ".. pii_retirement:": local_api
+oauth2_provider.RefreshToken:
+  ".. pii:": "Contains 3rd party authentication secrets. Retired in DeactivateLogoutView."
+  ".. pii_types:": password, other
+  ".. pii_retirement:": local_api
+
+# Via Django OAuth Plus https://bitbucket.org/david/django-oauth-plus
+oauth_provider.Consumer:
+  ".. no_pii:": "No PII, unused and empty in edx.org"
+oauth_provider.Nonce:
+  ".. no_pii:": "No PII, unused and empty in edx.org"
+oauth_provider.Scope:
+  ".. no_pii:": "No PII, unused and empty in edx.org"
+oauth_provider.Token:
+  ".. pii:": "User OAuth associations. Not used and empty on edx.org, therefore not retired."
+  ".. pii_types:": external_service, password
+  ".. pii_retirement:": retained
+
+# Via edx-organizations
+organizations.Organization:
+  ".. no_pii:": "No PII"
+organizations.OrganizationCourse:
+  ".. no_pii:": "No PII"
+
+# Via Problem Builder XBlock
+problem_builder.Answer:
+  ".. no_pii:": "No PII"
+problem_builder.Share:
+  ".. no_pii:": "No PII"
+
+# Via Social Django https://github.com/python-social-auth/social-app-django
+social_django.Association:
+  ".. no_pii:": "No PII"
+social_django.Code:
+  ".. pii:": "Transient - email address stored with email authentication code, removed automatically so not retired"
+  ".. pii_types:": email_address
+  ".. pii_retirement:": local_api
+social_django.Nonce:
+  ".. no_pii:": "No PII"
+social_django.Partial:
+  ".. no_pii:": "No PII"
+social_django.UserSocialAuth:
+  ".. pii:": "3rd party authentication data, retired in DeactivateLogoutView"
+  ".. pii_types:": external_service
+  ".. pii_retirement:": local_api
+
+# Via Splash https://github.com/openedx/django-splash
+splash.SplashConfig:
+  ".. no_pii:": "No PII"
+
+# Via edx-submissions
+submissions.Score:
+  ".. no_pii:": "No PII"
+submissions.ScoreAnnotation:
+  ".. no_pii:": "No PII"
+submissions.ScoreSummary:
+  ".. no_pii:": "No PII"
+submissions.StudentItem:
+  ".. no_pii:": "No PII"
+submissions.Submission:
+  ".. no_pii:": "No PII"
+
+# Via sorl-thumbnail https://github.com/jazzband/sorl-thumbnail
+thumbnail.KVStore:
+  ".. no_pii:": "No PII"
+
+# Via django-user-tasks
+user_tasks.UserTaskArtifact:
+  ".. no_pii:": "No PII"
+user_tasks.UserTaskStatus:
+  ".. no_pii:": "No PII"
+
+# Via waffle
+waffle.Flag:
+  ".. no_pii:": "No PII"
+waffle.Sample:
+  ".. no_pii:": "No PII"
+waffle.Switch:
+  ".. no_pii:": "No PII"
+
+# Via django-wiki https://github.com/openedx/django-wiki
+wiki.Article:
+  ".. no_pii:": "No PII"
+wiki.ArticleForObject:
+  ".. no_pii:": "No PII"
+wiki.ArticlePlugin:
+  ".. no_pii:": "No PII"
+wiki.ArticleRevision:
+  ".. no_pii:": "No PII"
+wiki.ReusablePlugin:
+  ".. no_pii:": "No PII"
+wiki.RevisionPlugin:
+  ".. no_pii:": "No PII"
+wiki.RevisionPluginRevision:
+  ".. no_pii:": "No PII"
+wiki.SimplePlugin:
+  ".. no_pii:": "No PII"
+wiki.URLPath:
+  ".. no_pii:": "No PII"

@@ -1,0 +1,289 @@
+.track-selection-container {
+    .wrapper-register-choose {
+        max-width: 946px;
+        margin: 0 auto;
+    }
+
+    .page-header h3 {
+        color: #001B1E;
+        font-size: 1.4rem;
+        text-align: center;
+        font-weight: 700;
+        line-height: 1.8rem;
+    }
+
+    .grid-single {
+        margin: auto;
+        width: 450px;
+        margin-bottom: 2rem;
+    }
+
+    .track-selection-choice, .verified-note {
+        margin: 0 1rem;
+    }
+
+    .track-selection-audit {
+        background-color: white;
+        border: 1px solid #707070;
+        position: relative;
+    }
+
+    .track-selection-certificate {
+        float: left;
+    }
+
+    .track-selection-certificate .choice-bullets li:last-child {
+        margin-bottom: 1.5rem;
+    }
+
+    .track-selection-audit .choice-bullets li:last-child {
+        margin-bottom: 5rem;
+    }
+
+    .certificate-container {
+        background-color: #EFF8FA;
+        border: 1px solid #707070;
+        height: auto;
+        position: relative;
+    }
+
+    .award-icon {
+        padding: 12px;
+        color: #EFF8FA;
+        position: absolute;
+    }
+
+    .track-selection-button {
+        text-align: center;
+    }
+
+    .track-selection-button button {
+        width: 90%;
+        font-size: 1rem;
+        box-shadow: none;
+        border-radius: 0px;
+        position: relative;
+        margin-bottom: 1.5rem;
+        padding: 8px;
+    }
+
+    #track_selection_upgrade {
+        background: #00262B;
+    }
+
+    #track_selection_upgrade:hover {
+        background: #2D494E;
+        border-color: transparent;
+        color: #fff;
+    }
+
+    #track_selection_audit {
+        color: #00262B;
+        border-color: #F2F0EF;
+        background: white;
+        position: absolute;
+        bottom: 0;
+        left: 5%;
+    }
+
+    #track_selection_audit:hover {
+        background: #00262B;
+        border-color: #00262B;
+        color: #fff;
+        border-radius: 0px;
+    }
+
+    .verified-note {
+        display: grid;
+        grid-template-columns: 5% 95%;
+        order: 1;
+        margin-bottom: 2rem;
+        margin-top: -1px;
+        border: 1px solid #707070;
+        border-top: 0;
+        padding: 1rem;
+    }
+
+    .note-info {
+        float: right;
+        font-size: 14px;
+        margin-left: 12px;
+        line-height: 1.5rem;
+    }
+
+    .note-icon {
+        display: grid;
+        place-items: center;
+    }
+
+    .choice-bullets {
+        padding: 0 3rem 1rem 2rem;
+        line-height: 1.5rem;
+        font-size: 14px;
+    }
+
+    a:not(.btn), a:visited:not(.btn) {
+        color: #454545;
+    }
+
+    .choice-bullets li {
+        color: #454545;
+        margin-bottom: 1.25rem;
+    }
+
+    .choice-title {
+        width: 100%;
+        display: inline-block;
+    }
+
+    .choice-title h4 {
+        text-align: center;
+        font-weight: 700;
+        color: #454545;
+        line-height: 28px;
+        font-size: 22px;
+    }
+
+    .price-display {
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: 1.25rem;
+        float: right;
+        margin: 0.75rem;
+        color: #454545;
+    }
+
+    .corner-overlay {
+        border-color: #002121 transparent transparent #002121;
+        border-style: solid;
+        border-width: 45px;
+        height: 0;
+        width: 0;
+        position: absolute;
+    }
+
+    .collapsible {
+        color: #00688d !important;
+        font-weight: 700;
+        font-size: 14px !important;
+        display: none;
+        text-decoration: underline;
+    }
+
+    .collapsible-item {
+        letter-spacing: -0.3px;
+    }
+
+    .popover-icon {
+        color: #00262B;
+        position: relative;
+    }
+
+    .popover {
+        visibility: hidden;
+        width: 132px;
+        background-color: #fff;
+        color: #454545;
+        border: 1px solid #B9BABE;
+        border-radius: 6px;
+        text-align: left;
+        padding: 0.8rem 1rem;
+        position: absolute;
+        z-index: 1;
+        top: -22px;
+        left: 178%;
+    }
+
+    .popover a {
+        text-decoration: underline;
+    }
+
+    .visible {
+        visibility: visible;
+    }
+
+    .popover:before {
+        position: absolute;
+        display: inline-block;
+        left: -18px;
+        top: 22px;
+        content: '';
+        border-width: 9px;
+        border-style: solid;
+        border-color: transparent #B9BABE transparent transparent;
+    }
+
+    .popover:after {
+        position: absolute;
+        display: inline-block;
+        border-width: 7px;
+        border-style: solid;
+        border-color: transparent #fff transparent transparent;
+        left: -14px;
+        top: 1.5rem;
+        content: '';
+    }
+
+    section.error-container {
+        height: 42rem;
+    }
+
+    .error-button {
+        margin-top: 2.8rem;
+        margin-bottom: 1.5rem;
+        padding: 10px 16px;
+        box-shadow: none;
+        border-radius: 0px;
+        position: relative;
+    }
+
+    .error-button span {
+        font-weight: 500;
+        font-size: 18px;
+        color: #fff;
+    }
+
+    .error-button:hover {
+        background: #2D494E;
+        border-color: transparent;
+        color: #fff;
+        text-decoration: none;
+    }
+
+    @media (max-width: map-get($grid-breakpoints, 'sm')) {
+        .collapsible {
+            margin-bottom: 1.3rem;
+        }
+
+        .corner-overlay {
+            border-width: 35px !important;
+        }
+
+        .award-icon {
+            padding: 6px !important;
+        }
+
+        .award-icon svg {
+            width: 25px !important;
+        }
+
+        .price-display {
+            font-size: 14px;
+        }
+
+        .choice-bullets {
+            padding: 0 2rem 1rem 1rem;
+        }
+        .grid-single {
+            width: 100%;
+        }
+    }
+
+    @media (min-width: map-get($grid-breakpoints, 'md')) {
+        .grid-options {
+            display: grid;
+            grid-template-columns: 50% 50%;
+        }
+    }
+}    

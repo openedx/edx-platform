@@ -1,0 +1,61 @@
+/*
+NOTE: If you make significant changes to the design, remember to update the Segment event properties and change
+the creative property. This will allow us to better track individual performance of each style of the message.
+Search for the courseware_verified_certificate_upsell promotion ID.
+*/
+
+.course-home-sidebar-upgrade .btn-upgrade {
+  padding: 10px 20px;
+}
+
+.course-home-sidebar-upgrade .promo-learn-more {
+  border: none;
+}
+
+.section.section-upgrade {
+  border-left: solid 1px #d9d9d9;
+  border-bottom: solid 1px #d9d9d9;
+  border-right: solid 1px #d9d9d9;
+  border-top: 5px solid #008100;
+  padding: 20px;
+}
+
+.section.section-upgrade .btn-link {
+  font-weight: normal;
+}
+
+.section.section-upgrade .btn-upgrade {
+  background-color: #008100;
+  border-color: #008100;
+}
+
+.section-upgrade .upgrade-container {
+  margin-top: 15px;
+}
+
+.section-upgrade.no-discount .upgrade-container {
+  float: right;
+  text-align: center;
+}
+
+@media only screen and (max-width: 991px) and (min-width: 768px) {
+  .section-upgrade .upgrade-container {
+    float: none;
+  }
+}
+
+.section.section-upgrade p {
+  margin: 0.5em 0;
+}
+
+.section.section-upgrade.discount p {
+  display: inline-block;
+}
+
+.section-upgrade .btn-brand.btn-upgrade {
+  color: white !important;
+}
+
+.section.section-upgrade img {
+  width: 43%;
+}

@@ -1,0 +1,6 @@
+{% load i18n %}{% autoescape off %}
+{% blocktrans %}This is to confirm that you changed the e-mail associated with {{ platform_name }} from {{ old_email }} to {{ new_email }}. If you did not make this request, please contact us immediately. Contact information is listed at:{% endblocktrans %}
+
+{{ contact_link }}
+
+{% blocktrans %}We keep a log of old e-mails, so if this request was unintentional, we can investigate.{% endblocktrans %}{% endautoescape %}

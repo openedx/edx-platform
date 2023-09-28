@@ -1,0 +1,79 @@
+## mako
+
+## Override the default styles_version to use Bootstrap
+<%! main_css = "css/bootstrap/lms-main.css" %>
+
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+
+<%block name="pagetitle">Course Skeleton</%block>
+
+<%block name="bodyclass">course-skeleton</%block>
+
+<%!
+from django.utils.translation import gettext as _
+%>
+
+<%block name="content">
+<nav class="navbar course-tabs navbar-expand">
+    <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+            <a class="nav-link" href="#">${_('Course')} <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">${_('Discussion')}</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">${_('Wiki')}</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">${_('Progress')}</a>
+        </li>
+    </ul>
+</nav>
+
+<div class="course-view page-content-container" id="course-container">
+    <header class="page-header has-secondary">
+        <div class="page-header-main">
+            <nav class="sr-is-focusable" tabindex="-1">
+                <h2 class="hd hd-3 page-title">${_('Skeleton Page')}</h2>
+            </nav>
+        </div>
+        <div class="page-header-secondary">
+            <div class="page-header-search">
+                <form class="search-form" role="search" action="#">
+                    <label class="field-label sr-only" for="search" id="search-hint">${_('Search the course')}</label>
+                    <input type="text" class="form-control" placeholder="Search" aria-label="Search"/>
+                    <button class="btn btn-small search-button" type="submit">${_('Search')}</button>
+                </form>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-brand">${_('Start Course')}</button>
+            </div>
+        </div>
+    </header>
+    <div class="page-content">
+        <main id="main" aria-label="Content" tabindex="-1" class="page-content-main">
+            <article tabindex="-1" aria-label="Main Content">
+                <h3>Main content goes here.</h3>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis molestie, orci at viverra ornare,
+                    augue urna fermentum ex, vitae dignissim magna est sit amet diam. Nunc sodales dolor finibus
+                    pulvinar placerat. Suspendisse vitae tellus auctor, sodales erat ac, venenatis quam. Etiam
+                    purus est, consequat nec erat vel, bibendum volutpat ex. Fusce vitae consectetur ante.
+                    Suspendisse elit mauris, iaculis sed diam eu, efficitur tempor dui. Praesent tristique nunc
+                    quam, in tincidunt ligula accumsan et. Etiam augue sem, commodo ac ipsum vel, fringilla dapibus
+                    lacus. Sed facilisis euismod felis, non malesuada massa scelerisque sed. Etiam et placerat
+                    lorem. Nullam quis tincidunt sapien.</p>
+            </article>
+        </main>
+        <aside class="page-content-secondary">
+            <h3>Sidebar</h3>
+            <ul>
+                <li>Item one</li>
+                <li>Item two</li>
+                <li>Item three</li>
+            </ul>
+        </aside>
+    </div>
+</div>
+</%block>

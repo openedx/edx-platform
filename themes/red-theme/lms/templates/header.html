@@ -1,0 +1,11 @@
+## mako
+<!--
+To override this page, add a header.html file in the following
+location: {your_theme}/lms/templates/header/header.html.html.
+
+If you do not wish to override the header, you can simply delete
+this file from your theme's repository.
+-->
+<%page expression_filter="h" args="online_help_token"/>
+<%namespace name='static' file='static_content.html'/>
+<%include file="${static.get_template_path(relative_path='header/header.html')}"  args="online_help_token=online_help_token"  />

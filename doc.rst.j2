@@ -1,0 +1,27 @@
+###############
+Feature Toggles
+###############
+
+These are all of our well-documented feature toggles!
+
+{% for group in groups %}
+{{ group.toggle_name }}
+{{ '*'*(group.toggle_name|length) }}
+
+{{ group.toggle_description }}
+
+* Type: {{ group.toggle_type[0] }}
+* Use cases: {{ group.toggle_use_cases|join(", ") }}
+{% if group.toggle_warning != 'None' -%}
+* Warnings: {{ group.toggle_warning }}
+{% endif -%}
+{% if group.toggle_target_removal_date != 'None' -%}
+* Expiration date: {{ group.toggle_target_removal_date }}
+{% endif -%}
+{% if group.toggle_tickets != 'None' -%}
+* Tickets: {{ group.toggle_tickets }}
+{% endif -%}
+* Default: {{ group.toggle_default }}
+* Defined at: {{ group.filename }}:{{ group.line_number }}
+
+{% endfor %}

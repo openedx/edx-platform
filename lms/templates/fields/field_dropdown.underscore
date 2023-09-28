@@ -1,0 +1,52 @@
+<% if (title && titleVisible) { %>
+    <label class="u-field-title" for="u-field-select-<%- id %>">
+        <%- title %>
+    </label>
+<% } else { %>
+    <label class="sr" for="u-field-select-<%- id %>">
+        <%- screenReaderTitle %>
+    </label>
+<% } %>
+
+<% if (editable !== 'never') { %>
+    <% if (iconName) { %>
+        <span class="u-field-icon icon fa <%- iconName %> fa-fw" aria-hidden="true"></span>
+    <% } %>
+<% } %>
+
+<span class="u-field-value">
+    <% if (editable === 'never') { %>
+        <span class="sr"><%- screenReaderTitle %> &nbsp;</span>
+        <span class="u-field-value-readonly"></span>
+    <% } else { %>
+        <select name="select" id="u-field-select-<%- id %>" aria-describedby="u-field-message-<%- id %>">
+            <% if (showBlankOption) { %>
+                <option value=""></option>
+            <% } %>
+            <% _.each(groupOptions, function(groupOption) { %>
+                <% if (groupOption.groupTitle != null) { %>
+                    <optgroup label="<%- groupOption.groupTitle %>">
+                <% } %>
+                <% _.each(groupOption.selectOptions, function(selectOption) { %>
+                    <option value="<%- selectOption[0] %>"><%- selectOption[1] %></option>
+                <% }); %>
+            <% }); %>
+        </select>
+        <button class="u-field-value-display" aria-haspopup="true">
+            <span class="sr"><%- screenReaderTitle %> &nbsp;</span>
+            <span class="u-field-value-readonly"></span>
+            <span class="sr">&nbsp; <%- gettext('Click to edit') %></span>
+        </button>
+    <% } %>
+</span>
+
+<% if (editable != 'never' && id === 'account_privacy') { %>
+    <button class="btn btn-change-privacy hidden">
+        <span><%- gettext('Save') %></span>
+    </button>
+<% } %>
+
+<span class="u-field-message" id="u-field-message-<%- id %>">
+    <span class="u-field-message-notification" aria-live="polite"></span>
+    <span class="u-field-message-help" id="u-field-help-message-<%- id %>"><%- message %></span>
+</span>

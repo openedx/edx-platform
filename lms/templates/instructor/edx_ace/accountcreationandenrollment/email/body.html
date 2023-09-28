@@ -1,0 +1,63 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <h1>
+                {% autoescape off %}
+                {# xss-lint: disable=django-blocktrans-missing-escape-filter #}
+                {% blocktrans %}Welcome to {{ course_name }}{% endblocktrans %}
+                {% endautoescape %}
+            </h1>
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
+                {% blocktrans %}To get started, please visit https://{{ site_name }}.{% endblocktrans %}
+                {% endfilter %}
+                <br />
+            </p>
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
+                {% blocktrans %}The login information for your account follows:{% endblocktrans %}
+                {% endfilter %}
+                <br />
+                {% filter force_escape %}
+                {% blocktrans %}email: {{ email_address }}{% endblocktrans %}
+                {% endfilter %}
+                <br />
+                {% filter force_escape %}
+                {% blocktrans %}password: {{ password }}{% endblocktrans %}
+                {% endfilter %}
+                <br />
+            </p>
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
+                {% blocktrans %}It is recommended that you change your password.{% endblocktrans %}
+                {% endfilter %}
+                <br />
+            </p>
+
+            <p style="color: rgba(0,0,0,.75);">
+              <a href="{{ course_url }}">
+                {% filter force_escape %}
+                {% blocktrans %}You may access your course.{% endblocktrans %}
+                {% endfilter %}
+              </a>
+                <br />
+            </p>
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
+                {% blocktrans %}Sincerely yours, The {{ course_name }} Team{% endblocktrans %}
+                {% endfilter %}
+                <br />
+            </p>
+        </td>
+    </tr>
+</table>
+{% endblock %}

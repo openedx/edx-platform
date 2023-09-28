@@ -1,0 +1,275 @@
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+<%def name="online_help_token()"><% return "progress" %></%def>
+<%!
+from datetime import datetime
+
+from django.conf import settings
+from django.urls import reverse
+from urllib.parse import quote_plus
+from django.utils.translation import gettext as _
+from pytz import UTC
+
+from common.djangoapps.course_modes.models import CourseMode
+from lms.djangoapps.certificates.data import CertificateStatuses
+from lms.djangoapps.grades.api import constants as grades_constants
+from openedx.core.djangolib.markup import HTML, Text
+from openedx.features.enterprise_support.utils import get_enterprise_learner_generic_name
+%>
+
+<%
+username = get_enterprise_learner_generic_name(request) or student.username
+%>
+
+<%block name="bodyclass">view-in-course view-progress</%block>
+
+<%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+</%block>
+
+
+<%namespace name="progress_graph" file="/courseware/progress_graph.js"/>
+
+<%block name="pagetitle">${_("{course_number} Progress").format(course_number=course.display_number_with_default)}</%block>
+
+<%block name="js_extra">
+<script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.stack.js')}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.symbol.js')}"></script>
+<script type="text/javascript" src="${static.url('js/courseware/certificates_api.js')}"></script>
+<script type="text/javascript" src="${static.url('js/courseware/credit_progress.js')}"></script>
+<script>
+    ## This JavaScript is being HTML-escaped because it historically has, and it is not clear what
+    ## the correct syntax is. For safety, maintain the previous behavior.
+    ## xss-lint: disable=mako-invalid-js-filter
+    ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph", not course.no_grade, not course.no_grade)}
+</script>
+</%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='progress'" />
+
+<main id="main" aria-label="Content" tabindex="-1">
+    <div class="container">
+        <div class="profile-wrapper">
+            <section class="course-info" id="course-info-progress"
+              % if getattr(course, 'language'):
+                lang="${course.language}"
+              % endif
+              >
+                % if staff_access and studio_url is not None:
+                <div class="wrap-instructor-info">
+                    <a class="instructor-info-action studio-view" href="${studio_url}">${_("View Grading in studio")}</a>
+                </div>
+                % endif
+                <h2 class="hd hd-2 progress-certificates-title">
+                    ${_("Course Progress for '{username}' ({email})").format(username=username, email=student.email)}
+                </h2>
+                % if course_expiration_fragment:
+                    ${HTML(course_expiration_fragment.content)}
+                % endif
+                <div class="wrapper-msg wrapper-auto-cert">
+                    <div id="errors-info" class="errors-info"></div>
+                    <%block name="certificate_block">
+                        %if certificate_data:
+                        <div class="auto-cert-message" id="course-success">
+                            <div class="has-actions">
+                                <% post_url = reverse('generate_user_cert', args=[str(course.id)]) %>
+                                <div class="msg-content">
+                                    <h4 class="hd hd-4 title">${_(certificate_data.title)}</h4>
+                                    <p class="copy">${_(certificate_data.msg)}</p>
+                                </div>
+                                <div class="msg-actions">
+                                    %if certificate_data.cert_web_view_url:
+                                    <a class="btn" href="${certificate_data.cert_web_view_url}" rel="noopener" target="_blank">${_("View Certificate")} <span class="sr">${_("Opens in a new browser window")}</span></a>
+                                    %elif certificate_data.cert_status == CertificateStatuses.requesting:
+                                    <button class="btn generate_certs" data-endpoint="${post_url}" id="btn_generate_cert">${_('Request Certificate')}</button>
+                                    %endif
+                                </div>
+                            </div>
+                        </div>
+                        %endif
+                    </%block>
+                </div>
+
+                %if not course.disable_progress_graph:
+                <div class="grade-detail-graph" id="grade-detail-graph"></div>
+                %endif
+
+                % if credit_course_requirements:
+                <section class="credit-eligibility">
+                    <h3 class="hd hd-4 eligibility-heading">${_("Requirements for Course Credit")}</h3>
+                    <div class="credit-eligibility-container">
+                        %if credit_course_requirements['eligibility_status'] == 'not_eligible':
+                        <span class="eligibility_msg">${_("{student_name}, you are no longer eligible for credit in this course.").format(student_name=student.profile.name)}</span>
+                        %elif credit_course_requirements['eligibility_status'] == 'eligible':
+                        <span class="eligibility_msg">
+                            ${Text(_("{student_name}, you have met the requirements for credit in this course. {a_start}Go to your dashboard{a_end} to purchase course credit.")).format(
+                                student_name=student.profile.name,
+                                a_start=HTML("<a href={url}>").format(url=reverse('dashboard')),
+                                a_end=HTML("</a>")
+                            )}
+                        </span>
+                        %elif credit_course_requirements['eligibility_status'] == 'partial_eligible':
+                        <span>${_("{student_name}, you have not yet met the requirements for credit.").format(student_name=student.profile.name)}</span>
+                        %endif
+
+                        <a href="${settings.CREDIT_HELP_LINK_URL}" class="credit-help">
+                            <span class="fa fa-question" aria-hidden="true"></span>
+                            <span class="sr">${_("Information about course credit requirements")}</span>
+                        </a><br />
+
+                        <div class="requirement-container" data-eligible="${credit_course_requirements['eligibility_status']}">
+                            %for requirement in credit_course_requirements['requirements']:
+                            <div class="requirement">
+                                <div class="requirement-name">
+                                    ${_(requirement['display_name'])}
+                                    %if requirement['namespace'] == 'grade':
+                                    <span>${int(requirement['criteria']['min_grade'] * 100)}%</span>
+                                    %endif
+                                </div>
+                                <div class="requirement-status">
+                                    %if requirement['status']:
+                                        %if requirement['status'] == 'submitted':
+                                        <span class="requirement-submitted">${_("Verification Submitted")}</span>
+                                        %elif requirement['status'] == 'failed':
+                                        <span class="fa fa-times" aria-hidden="true"></span>
+                                        <span>${_("Verification Failed" )}</span>
+                                        %elif requirement['status'] == 'declined':
+                                        <span class="fa fa-times" aria-hidden="true"></span>
+                                        <span>${_("Verification Declined" )}</span>
+                                        %elif requirement['status'] == 'satisfied':
+                                        <span class="fa fa-check" aria-hidden="true"></span>
+                                        <span class="localized-datetime" data-datetime="${requirement['status_date']}" data-string="${_('Completed by {date}')}" data-timezone="${user_timezone}" data-language="${user_language}"></span>
+                                        %endif
+                                    %else:
+                                    <span class="not-achieve">${_("Upcoming")}</span>
+                                    %endif
+                                </div>
+                            </div>
+                            %endfor
+                        </div>
+                        <button class="detail-collapse">
+                            <span class="fa fa-caret-up" aria-hidden="true"></span>
+                            <span class="requirement-detail">${_("Less")}</span>
+                        </button>
+                    </div>
+                </section>
+                %endif
+
+                %if courseware_summary:
+                <section class="chapters">
+                    <h2 class="sr">${_('Details for each chapter')}</h2>
+                    %for chapter in courseware_summary:
+                        %if not chapter['display_name'] == "hidden":
+                        <section aria-labelledby="chapter_${loop.index}">
+                            <h3 class="hd hd-3" id="chapter_${loop.index}">${ chapter['display_name']}</h3>
+                            <div class="sections">
+                                %for section in chapter['sections']:
+                                    <div>
+                                        <%
+                                        hide_url_date = (section.self_paced and section.end) or section.due
+                                        hide_url = not staff_access and section.hide_after_due and hide_url_date and datetime.now(UTC) > hide_url_date
+
+                                        earned = section.graded_total.earned
+                                        total = section.graded_total.possible
+
+                                        percentageString = "{0:.0%}".format(section.percent_graded) if total > 0 or earned > 0 else ""
+                                        %>
+                                        <h4 class="hd hd-4">
+                                            %if hide_url:
+                                                <p class="d-inline">${section.display_name}
+                                                %if (total > 0 or earned > 0) and section.show_grades(staff_access):
+                                                    <span class="sr">
+                                                        ${_("{earned} of {total} possible points").format(earned='{:.3n}'.format(float(earned)), total='{:.3n}'.format(float(total)))}
+                                                    </span>
+                                                    %endif
+                                                </p>
+                                            %else:
+                                                <a href="${reverse('courseware_section', kwargs=dict(course_id=str(course.id), chapter=chapter['url_name'], section=section.url_name))}">
+                                                    ${ section.display_name}
+                                                    %if (total > 0 or earned > 0) and section.show_grades(staff_access):
+                                                    <span class="sr">
+                                                        ${_("{earned} of {total} possible points").format(earned='{:.3n}'.format(float(earned)), total='{:.3n}'.format(float(total)))}
+                                                    </span>
+                                                    %endif
+                                                </a>
+                                            %endif
+                                            %if (total > 0 or earned > 0) and section.show_grades(staff_access):
+                                            <span> ${"({0:.3n}/{1:.3n}) {2}".format( float(earned), float(total), percentageString )}</span>
+                                            %endif
+                                        </h4>
+                                        <p>
+                                            %if section.format is not None:
+                                                ${section.format}
+                                            %endif
+                                            %if section.due is not None and pacing_type != 'self_paced':
+                                                <em class="localized-datetime" data-datetime="${section.due}" data-string="${_('due {date}')}" data-timezone="${user_timezone}" data-language="${user_language}"></em>
+                                            %endif
+                                        </p>
+                                        <p class="override-notice">
+                                            %if section.override is not None:
+                                                <%last_override_history = section.override.get_history().order_by('created').last()%>
+                                                %if (not last_override_history or last_override_history.system == grades_constants.GradeOverrideFeatureEnum.proctoring) and section.format == "Exam" and earned == 0:
+                                                    ${_("Suspicious activity detected during proctored exam review. Exam score 0.")}
+                                                %else:
+                                                    ${_("Section grade has been overridden.")}
+                                                %endif
+                                            %endif
+                                        </p>
+                                        %if len(section.problem_scores.values()) > 0:
+                                          %if section.show_grades(staff_access):
+                                          <dl class="scores">
+                                              <dt class="hd hd-6">${ _("Problem Scores: ") if section.graded else _("Practice Scores: ")}</dt>
+                                              %for score in section.problem_scores.values():
+                                              <dd>${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible))}</dd>
+                                              %endfor
+                                          </dl>
+                                          %else:
+                                            <p class="hide-scores">
+                                            %if section.show_correctness == 'past_due':
+                                                %if section.graded:
+                                                  ${_("Problem scores are hidden until the due date.")}
+                                                %else:
+                                                  ${_("Practice scores are hidden until the due date.")}
+                                                %endif
+                                            %else:
+                                                %if section.graded:
+                                                  ${_("Problem scores are hidden.")}
+                                                %else:
+                                                  ${_("Practice scores are hidden.")}
+                                                %endif
+                                            %endif
+                                            </p>
+                                          %endif
+                                        %else:
+                                        <p class="no-scores">${_("No problem scores in this section")}</p>
+                                        %endif
+                                    </div>
+                                %endfor
+                            </div>
+                        </section>
+                        %endif
+                    %endfor
+                </section>
+                %endif
+            </section>
+        </div>
+    </div>
+</main>
+<%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
+    DateUtilFactory.transform(iterationKey=".localized-datetime");
+</%static:require_module_async>
+
+<%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
+
+  var fbeLink = $("#FBE_banner");
+
+  TrackECommerceEvents.trackUpsellClick(fbeLink, 'progress_audit_access_expires', {
+      pageName: "progress_tab",
+      linkType: "link",
+      linkCategory: "FBE_banner"
+  });
+
+</%static:require_module_async>

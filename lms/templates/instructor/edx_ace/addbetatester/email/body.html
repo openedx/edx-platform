@@ -1,0 +1,70 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <h1>
+                {% autoescape off %}
+                 {# xss-lint: disable=django-blocktrans-missing-escape-filter #}
+                {% blocktrans %}
+                    You have been invited to be a beta tester for {{ course_name }} at {{ site_name }}
+                {% endblocktrans %}
+                {% endautoescape %}
+            </h1>
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
+                {% blocktrans %}The invitation has been sent by a member of the course staff.{% endblocktrans %}
+                {% endfilter %}
+                <br />
+            </p>
+
+            {% if auto_enroll %}
+                <p style="color: rgba(0,0,0,.75);">
+                    {% filter force_escape %}
+                    {% blocktrans %}To start accessing course materials, please visit:{% endblocktrans %}
+                    {% endfilter %}
+                    <br />
+                </p>
+
+                {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=display_name|default:course.display_name_with_default course_cta_url=course_url %}
+            {% elif course_about_url is not None %}
+                <p style="color: rgba(0,0,0,.75);">
+                    {% filter force_escape %}
+                    {% blocktrans %}To enroll in this course and begin the beta test:{% endblocktrans %}
+                    {% endfilter %}
+                    <br />
+                </p>
+                {% filter force_escape %}
+                {% blocktrans asvar course_cta_text %}Visit {{ course_name }}{% endblocktrans %}
+                {% endfilter %}
+
+                {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=course_about_url %}
+            {% else %}
+                <p style="color: rgba(0,0,0,.75);">
+                    {% filter force_escape %}
+                    {% blocktrans %}To enroll in this course and begin the beta test:{% endblocktrans %}
+                    {% endfilter %}
+                    <br />
+                </p>
+                {% filter force_escape %}
+                {% blocktrans asvar course_cta_text %}Visit {{ site_name }}
+                {% endblocktrans %}
+                {%endfilter%}
+
+                {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=course_url %}
+            {% endif %}
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
+                {% blocktrans %}This email was automatically sent from {{ site_name }} to {{ email_address }}{% endblocktrans %}
+                {% endfilter %}
+                <br />
+            </p>
+        </td>
+    </tr>
+</table>
+{% endblock %}

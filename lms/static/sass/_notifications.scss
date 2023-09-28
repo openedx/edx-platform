@@ -1,0 +1,53 @@
+@mixin news-font {
+  font-family: inherit;
+}
+
+.notifications {
+  @include news-font;
+
+  font-size: 0.9em;
+  padding-left: $baseline;
+  padding-top: $baseline;
+  padding-bottom: $baseline;
+
+  .notification {
+    @include news-font;
+
+    margin-top: ($baseline*0.75);
+    margin-bottom: ($baseline*0.75);
+
+    a {
+      @include news-font;
+    }
+  }
+}
+
+.site-status {
+  @include linear-gradient(top, $shadow-l1, rgba(0, 0, 0, 0));
+
+  padding: ($baseline / 2);
+  background-color: $site-status-color;
+  box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.3) inset;
+  font-size: 14px;
+
+  .icon {
+    @include margin-right($baseline / 2);
+    @include float(left);
+
+    color: $white !important;  // some pages have color inherit
+    font-size: 18px;
+  }
+
+  .inner-wrapper {
+    margin: auto;
+    max-width: map-get($container-max-widths, xl);
+    min-width: 760px;
+  }
+
+  p {
+    margin-bottom: 0;
+    line-height: 1.3;
+    color: $white !important;  // some pages have color inherit
+  }
+}
+

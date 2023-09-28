@@ -1,0 +1,49 @@
+table.wiki-history {
+  thead {
+    background: #ddd;
+    // border-bottom: 1px solid #ddd;
+
+    tr {
+      height: 40px;
+
+      th {
+        padding-top: ($baseline/2);
+        padding-left: 15px;
+
+        &#revision {
+          width: 5%;
+        }
+
+        &#comment {
+          width: 15%;
+        }
+
+        &#diff {
+          width: 60%;
+        }
+
+        &#modified {
+          width: 20%;
+        }
+      }
+    }
+  }
+
+  tbody {
+    tr td {
+      padding: 8px 15px;
+    }
+  }
+
+  tr.dark {
+    background-color: #efefef;
+  }
+}
+
+div.history-controls {
+  margin-top: $baseline;
+
+  input[type="submit"] {
+    @extend .light-button;
+  }
+}

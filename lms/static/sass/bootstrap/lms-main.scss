@@ -1,0 +1,49 @@
+// -----------------------------
+// LMS main styles for Bootstrap
+// -----------------------------
+
+// Set the relative path to the static root
+$static-path: '../..';
+
+// Base build
+@import 'build';
+
+// Elements
+@import 'header';
+@import 'footer';
+@import 'navigation';
+@import 'layouts';
+@import 'components';
+@import 'course/layout/courseware_preview';
+@import 'course/layout/banner_cta';
+@import 'shared/modal';
+@import 'shared/help-tab';
+@import './elements/banners';
+@import './elements/progress-circle';
+@import './elements/program-card';
+@import 'elements/icons';
+@import './elements/pagination';
+
+// Features
+@import 'features/bookmarks';
+@import 'features/course-experience';
+@import 'features/course-search';
+@import 'features/course-sock';
+@import 'features/course-upgrade-message';
+@import 'features/course-duration-limits';
+
+// Individual Pages
+@import "views/program-marketing-page";
+@import "views/entitlement-support-page";
+@import "views/course-entitlements";
+@import "views/program-details";
+@import 'views/program-list';
+
+// Responsive Design
+@import '../header';
+
+// Extra theme-specific rules
+@import 'lms/theme/extras';
+
+// Experiments
+@import 'experiments';

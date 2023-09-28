@@ -1,0 +1,34 @@
+{% load i18n %}
+{% load ace %}
+
+<p>
+    {# email client support for style sheets is pretty spotty, so we have to inline all of these styles #}
+    <a
+    {% if reset_url %}
+        href={{reset_url}}
+    {% elif course_cta_url %}
+        href="{% with_link_tracking course_cta_url %}"
+    {% else %}
+        {%if course_ids|length > 1 %}
+            href="{% with_link_tracking dashboard_url %}"
+        {% else %}
+            href="{% with_link_tracking course_url %}"
+        {% endif %}
+    {% endif %}
+    style="
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 4px;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        background-color: #005686;
+        border-top: 12px solid #005686;
+        border-bottom: 12px solid #005686;
+        border-right: 50px solid #005686;
+        border-left: 50px solid #005686;
+        display: inline-block;
+    ">
+        {# old email clients require the use of the font tag :( #}
+        <font color="#ffffff"><b>{{ course_cta_text }}</b></font>
+    </a>
+</p>

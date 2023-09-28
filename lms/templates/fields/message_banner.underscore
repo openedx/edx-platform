@@ -1,0 +1,10 @@
+<div class="banner-msg wrapper-msg urgency-<%- urgency %> <%- type %> <% if (isRecoveryEmailMsg == true) { %> recovery-email-alert <% } %> <% if (isLearnerPortalEnabled == true) { %> learner-portal-enabled-alert <% } %>" role="alert">
+  <i <% if (hideCloseBtn == true) { %> hidden <% } %> class="fa fa-close close-icon close-btn"></i>
+    <div class="msg">
+        <div class="msg-content">
+            <div class="copy">
+                <p><%= HtmlUtils.HTML(message) %></p>
+            </div>
+        </div>
+    </div>
+</div>

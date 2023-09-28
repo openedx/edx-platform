@@ -1,0 +1,17 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%! from openedx.core.djangolib.markup import HTML %>
+
+<%block name="head_extra">
+    ${HTML(fragment.head_html())}
+</%block>
+
+<%block name="footer_extra">
+    ${HTML(fragment.foot_html())}
+</%block>
+
+<div class="content-wrapper" id="container">
+    ${HTML(fragment.body_html())}
+</div>

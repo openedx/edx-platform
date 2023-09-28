@@ -1,0 +1,137 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+{% load i18n %}
+{% load django_markup %}
+{% load static %}
+{% block table_style %}
+    style="
+        font-family: Inter, Arial, sans-serif !important;
+        font-size: 1em;
+        line-height: 1.5;
+        max-width: 600px;
+        border: 10px solid white;
+    "
+{% endblock %}
+{% block main_style %}
+    style="
+        padding-bottom: 30px;
+        box-shadow: 0 1px 5px rgba(0,0,0,0.25);
+    "
+{% endblock %}
+{% block content %}
+{# email client support for style sheets is pretty spotty, so we have to inline all of these styles #}
+{# we're using important below to override inline styles and my understanding is for email clients where media queries do not work, they'll simply see the desktop css on their phone #}
+
+<table style="width: 100%; min-width: 325px;" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            {% include "goal_reminder_banner.html" %}
+            <tr>
+              <td height="36" align="center" valign="middle" style="margin: 0; font-size: 0px; line-height: 0px;">&nbsp;</td>
+            </tr>
+            <table class="goal-reminder-body-wrapper" style="width:inherit; font-size: 14px; font-size: 0.875rem; padding: 0 20px 0 5%; margin: 0 20px 0 17px; margin: 0 1.25rem 0 1.0625rem;">
+                <tr>
+                    <h3 style="
+                        font-size: 25px;
+                        font-size: 1.563rem;
+                        font-style: normal;
+                        font-weight: 700;
+                        line-height: 28px;
+                        line-height: 1.75rem;
+                        text-align: left;
+                        color: black;
+                        margin-top: 20px;
+                        margin-bottom: 20px;
+                        ">
+                        {% filter force_escape %}{% blocktrans %}
+                            There’s still time to reach your goal
+                        {% endblocktrans %}{% endfilter %}
+                    </h3>
+                </tr>
+
+                <tr>
+                <p style="color: rgba(0,0,0,.75); font-size: 16px; font-size: 1rem; margin: 0; padding-top: 20px; padding-bottom: 14px">
+                    {% filter force_escape %}
+                        {% blocktrans count count=days_per_week asvar goal_text %}
+                            You set a goal of learning {start_bold}{{days_per_week}} time a week in {{course_name}}{end_bold}. You’re not quite there, but there's still time to reach that goal!
+                            {% plural %}
+                            You set a goal of learning {start_bold}{{days_per_week}} times a week in {{course_name}}{end_bold}. You're not quite there, but there's still time to reach that goal!
+                        {% endblocktrans %}
+                    {% endfilter %}
+                    {% interpolate_html goal_text start_bold='<b>'|safe end_bold='</b>'|safe %}
+                 </p>
+                </tr>
+
+                <tr style="padding-top: 16px;">
+                    <a href="{{course_url}}" target="_blank" style="
+                        display: inline-block;
+                        text-decoration:none !important; text-decoration:none;
+                        color: white;
+                        border-color: #D23228;
+                        border-style: solid;
+                        border-width: 8px 12px;
+                        border-width: 0.5rem 0.75rem;
+                        background: #D23228;
+                        font-size: 16px;
+                        font-size: 1rem;
+                        ">
+                            <p style="margin: 0;">
+                            {% filter force_escape %}{% blocktrans %}
+                                Jump back in
+                            {% endblocktrans %}{% endfilter %}
+                            </p>
+                    </a>
+                </tr>
+
+                <tr>
+                    <p style="margin-top: 0; margin-bottom: 0; color: rgba(0,0,0,.75); font-size: 16px; font-size: 1rem; padding-top: 16px; padding-bottom: 14px">
+                        <br>
+                        {% filter force_escape %}{% blocktrans %}
+                            Remember, you can always change your learning goal. The best goal is one that you can stick to.
+                        {% endblocktrans %}{% endfilter %}
+                    </p>
+                </tr>
+
+                <tr>
+                <a style="text-decoration: none; display: inline-block; border: 10px solid #F2F0EF; border: 0.0625rem solid #F2F0EF;"
+                   href="{{course_url}}" target="_blank">
+                    <div style="
+                        border-color: white;
+                        border-style: solid;
+                        border-width: 6px 12px;
+                        border-width: 0.5rem 0.75rem;
+                        background: white;
+                        font-size: 16px;
+                        font-size: 1rem;
+                        color: #D23228;
+                        ">
+                        {% filter force_escape %}{% blocktrans %}
+                            Adjust my goal
+                        {% endblocktrans %}{% endfilter %}
+                    </div>                
+                </a>
+
+                <center>
+                    <a style="
+                        color: #00688D;
+                        display: block;
+                        margin: 20px auto 0 auto;
+                        margin: 1.25rem auto 0 auto;
+                        text-align: center;
+                        text-decoration: none;
+                        width: 250px;
+                        width: 15.625rem;
+                        font-size: 16px;
+                        font-size: 1rem;
+                    "
+                    href="{{goals_unsubscribe_url}}" target="_blank">
+                        {% filter force_escape %}{% blocktrans %}
+                            Unsubscribe from goal reminder emails for this course
+                        {% endblocktrans %}{% endfilter %}
+                    </a>
+                </center>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+{% endblock %}

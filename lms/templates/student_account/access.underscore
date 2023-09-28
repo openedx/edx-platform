@@ -1,0 +1,19 @@
+<section id="login-anchor" class="form-type">
+    <div id="login-form" class="form-wrapper <% if ( mode !== 'login' ) { %>hidden<% } %>"></div>
+</section>
+
+<section id="register-anchor" class="form-type">
+    <div id="register-form" class="form-wrapper <% if ( mode !== 'register' ) { %>hidden<% } %>"></div>
+</section>
+
+<section id="password-reset-anchor" class="form-type">
+    <div id="password-reset-form" class="form-wrapper <% if ( mode !== 'reset' ) { %>hidden<% } %>"></div>
+</section>
+
+<section id="institution_login-anchor" class="form-type">
+    <div id="institution_login-form" class="form-wrapper hidden"></div>
+</section>
+
+<section id="hinted-login-anchor" class="form-type">
+    <div id="hinted-login-form" class="form-wrapper <% if ( mode !== 'hinted_login' ) { %>hidden<% } %>"></div>
+</section>

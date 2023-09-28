@@ -1,0 +1,4 @@
+{% load i18n %}
+{% autoescape off %}
+{% blocktrans %}Proctoring requirements for {{ course_name }}{% endblocktrans %}
+{% endautoescape %}

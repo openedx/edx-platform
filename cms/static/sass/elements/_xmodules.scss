@@ -1,0 +1,346 @@
+// studio - elements - xmodules & xblocks
+// ====================
+
+// general - display mode (xblock-student_view or xmodule_display)
+.xmodule_display,
+.xblock-student_view {
+
+  // font styling
+  i,
+  em {
+    font-style: italic;
+  }
+
+
+  .icon {
+    font-style: normal;
+  }
+}
+
+// ====================
+
+// Video
+.xmodule_VideoModule {
+  // display mode
+  &.xblock-student_view {
+    .video-tracks {
+      .a11y-menu-container {
+        .a11y-menu-list {
+          bottom: 100%;
+          top: auto;
+        }
+      }
+    }
+  }
+}
+
+.xmodule_VideoBlock {
+  .wrapper-comp-settings.basic_metadata_edit {
+    .list-input.settings-list {
+      .field.comp-setting-entry {
+        .setting-label {
+          vertical-align: top;
+          margin-top: ($baseline/2);
+        }
+
+        .setting-help {
+          display: block;
+          width: 45%;
+          max-width: auto;
+          margin-left: 25%;
+          padding: 0 13px;
+        }
+
+        .collapse-setting {
+          @extend %t-action3;
+          @extend %t-strong;
+
+          display: block;
+          width: 100%;
+          padding: ($baseline/2);
+
+          .icon {
+            margin-right: ($baseline/4);
+          }
+        }
+
+        .videolist-url-tip.setting-help,
+        .videolist-extra-videos-tip.setting-help {
+          margin-left: 0;
+          width: 100%;
+          padding: 0 10px 10px;
+        }
+
+        .videolist-url-tip.setting-help {
+          padding: 0 0 10px;
+        }
+
+        .wrapper-comp-setting {
+          width: 100%;
+          display: block;
+          max-width: auto;
+        }
+
+        // inputs and labels
+        .wrapper-videolist-settings {
+          width: 45%;
+          display: inline-block;
+          min-width: ($baseline*5);
+
+          // inputs
+          .input {
+            width: 100%;
+            vertical-align: middle;
+
+            &.is-disabled,
+            [disabled="disabled"] {
+              opacity: 0.5;
+            }
+          }
+
+          .wrapper-videolist-url {
+            margin-bottom: ($baseline/2);
+          }
+
+          .wrapper-videolist-urls {
+            background: $lightGrey;
+            padding: ($baseline/3);
+
+            // enumerated fields
+            .videolist-extra-videos {
+              display: none;
+
+              &.is-visible {
+                display: block;
+              }
+
+              .videolist-settings-item {
+                margin-bottom: ($baseline/2);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .transcripts-status {
+      margin-top: $baseline;
+
+      &.is-invisible {
+        display: none !important;
+      }
+
+      .wrapper-transcripts-message {
+        width: 60%;
+        display: inline-block;
+        vertical-align: top;
+        min-width: ($baseline*5);
+        margin-top: ($baseline/2);
+
+        .transcripts-message {
+          @extend %t-copy-sub2;
+        }
+
+        .transcripts-message-status {
+          @extend %t-strong;
+
+          color: $green;
+
+          &.status-error {
+            color: $red;
+          }
+
+          .icon,
+          [class*=" fa-"] {
+            @extend %t-icon4;
+
+            margin-right: ($baseline/4);
+          }
+        }
+
+        .transcripts-error-message {
+          @extend %t-copy-sub1;
+
+          background: $red;
+          color: $white;
+          padding: ($baseline/3);
+
+          &.is-invisible {
+            display: none;
+          }
+        }
+
+        .wrapper-transcripts-buttons {
+          &.is-invisible {
+            display: none;
+          }
+        }
+      }
+
+      .action {
+        @extend %btn-primary-blue;
+        @extend %t-action3;
+
+        margin-bottom: ($baseline/2);
+      }
+    }
+
+    // TYPE: enumerated video lists of metadata sets
+    .metadata-videolist-enum {
+      * {
+        box-sizing: border-box;
+      }
+    }
+
+    .file-chooser {
+      display: none;
+    }
+
+    .progress-bar {
+      @extend %t-copy-lead1;
+
+      display: block;
+      height: 30px;
+      margin: ($baseline/2) 0;
+      border: 1px solid $blue;
+      text-align: center;
+
+      &.is-invisible {
+        display: none;
+      }
+
+      &.loaded {
+        border-color: #66b93d;
+
+        .progress-fill {
+          background: #66b93d;
+        }
+      }
+
+      .progress-fill {
+        display: block;
+        width: 0%;
+        height: 30px;
+        background: $blue;
+        color: $white;
+        line-height: 28px;
+      }
+    }
+  }
+
+  .wrapper-comp-settings {
+    // TYPE: VideoTranslations
+    .list-input.settings-list {
+      .metadata-video-translations {
+        * {
+          box-sizing: border-box;
+        }
+
+        // label
+        .setting-label {
+          vertical-align: top;
+          margin-top: ($baseline*0.25);
+        }
+
+        // inputs and labels
+        .wrapper-translations-settings {
+          width: 45%;
+          display: inline-block;
+          min-width: 240px;
+
+          // enumerated fields
+          .list-settings {
+            margin: 0;
+
+            .list-settings-item {
+              margin-bottom: ($baseline/2);
+
+              select {
+                width: 80%;
+                margin-right: ($baseline/2);
+              }
+
+              .list-settings-buttons {
+                @extend %cont-truncated;
+
+                padding: ($baseline/2) 0;
+                border-bottom: 1px solid $gray-l4;
+              }
+            }
+
+            // inputs
+            .input {
+              width: 43%;
+              margin-right: ($baseline/4);
+              vertical-align: middle;
+              display: inline-block;
+
+              &.input-value {
+                margin-right: ($baseline/2);
+              }
+            }
+          }
+        }
+
+        .setting-clear.action {
+          vertical-align: top;
+          margin: ($baseline*0.25) ($baseline*0.5) 0;
+        }
+
+        .create-setting {
+          @extend %ui-btn-flat-outline;
+          @extend %t-action3;
+          @extend %t-strong;
+
+          display: block;
+          padding: ($baseline/2);
+
+          .icon {
+            margin-right: ($baseline/4);
+          }
+        }
+
+        .upload-setting {
+          @extend %ui-btn-flat-outline;
+          @extend %t-action3;
+          @extend %t-strong;
+
+          display: inline-block;
+          padding: ($baseline/2);
+          width: 49%;
+          margin-right: 2%;
+        }
+
+        .download-setting {
+          @extend %ui-btn-non;
+          @extend %t-action4;
+          @extend %t-strong;
+
+          display: inline-block;
+          padding: ($baseline/2);
+          width: 49%;
+          text-align: center;
+          color: $blue;
+
+          &:hover {
+            background-color: $blue;
+          }
+        }
+
+        .remove-setting {
+          @include transition(color 0.25s ease-in-out);
+
+          @extend %t-action1;
+
+          display: inline-block;
+          background: transparent;
+          color: $blue-l3;
+
+          &:hover {
+            color: $blue;
+          }
+        }
+      }
+    }
+  }
+}

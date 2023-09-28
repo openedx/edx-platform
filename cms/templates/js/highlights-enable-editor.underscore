@@ -1,0 +1,24 @@
+<p>
+<%- gettext(
+    'When you enable course highlight emails, learners ' +
+    'automatically receive email messages for each section that ' +
+    'has highlights. You cannot disable highlights after you start ' +
+    'sending them.'
+) %>
+</p>
+<p>
+<% // xss-lint: disable=underscore-not-escaped %>
+<%= edx.HtmlUtils.interpolateHtml(
+    gettext(
+        'Are you sure you want to enable course highlight emails? '
+        + '{linkStart}Learn more.{linkEnd}'
+    ),
+    {
+        linkStart: edx.HtmlUtils.interpolateHtml(
+            edx.HtmlUtils.HTML('<a href="{highlightsDocUrl}" rel="noopener" target="_blank">'),
+            {highlightsDocUrl: xblockInfo.attributes.highlights_doc_url}
+        ),
+        linkEnd: edx.HtmlUtils.HTML('</a>')
+    }
+) %>
+</p>

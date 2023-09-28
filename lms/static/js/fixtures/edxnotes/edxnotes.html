@@ -1,0 +1,48 @@
+<section class="container">
+  <div class="wrapper-student-notes">
+    <div class="student-notes">
+    <main id="main" aria-label="Content" tabindex="-1">
+      <div class="title-search-container">
+        <div class="wrapper-title">
+          <h1 class="page-title">
+            Notes
+            <small class="page-subtitle">Highlights and notes you've made in course content</small>
+          </h1>
+        </div>
+
+        <div class="wrapper-notes-search">
+          <form role="search" action="/search_endpoint" method="GET" id="search-notes-form" class="is-hidden">
+            <label for="search-notes-input" class="sr">Search notes for:</label>
+            <input type="search" class="search-notes-input" id="search-notes-input" name="note" placeholder="Search notes for...">
+            <button type="submit" class="search-notes-submit">
+              <span class="icon fa fa-search" aria-hidden="true"></span>
+              <span class="sr">Search</span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="wrapper-msg is-hidden error urgency-high inline-error">
+        <div class="msg msg-error">
+          <div class="msg-content">
+            <p class="copy" aria-live="polite"></p>
+          </div>
+        </div>
+      </div>
+
+      <section class="wrapper-tabs">
+        <div class="tab-list is-hidden">
+          <h2 id="tab-view" class="tabs-label">View notes by</h2>
+        </div>
+
+        <div class="ui-loading" tabindex="-1">
+          <span class="spin">
+            <span class="icon fa fa-refresh" aria-hidden="true"></span>
+          </span>
+          <span class="copy">Loading</span>
+        </div>
+      </section>
+    </main>
+    </div>
+  </div>
+</section>

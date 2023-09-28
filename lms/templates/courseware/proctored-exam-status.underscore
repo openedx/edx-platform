@@ -1,0 +1,39 @@
+<div class="exam-timer">
+    <%
+        function gtLtEscape(str) {
+            return String(str)
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+        }
+    %>
+    <div id="turn_in_exam_id" class="pull-right turn_in_exam" role="region" aria-label="<%- gettext('Exam timer and end exam button')%>">
+        <span>
+            <% if(attempt_status !== 'ready_to_submit') {%>
+                <button class="exam-button-turn-in-exam btn btn-pl-primary btn-primary">
+                    <%- gettext("End My Exam") %>
+                </button>
+            <% } %>
+        </span>
+        <span class="sr timer-announce" aria-live="assertive"></span>
+        <span class="exam-timer-clock">
+            <h3 id="time_remaining_id">
+                <b>
+                </b>
+            </h3>
+            <button role="button" id="toggle_timer" class="btn btn-primary" aria-label="<%- gettext("Hide Timer") %>" aria-pressed="false">
+                <i class="fa fa-eye-slash" aria-hidden="true"></i>
+            </button>
+        </span>
+    </div>
+    <div class='exam-text js-exam-text' data-show-long="true">
+        <% // xss-lint: disable=underscore-not-escaped %>
+        <%= interpolate_text(gettext('You are taking "{exam_link}" as {exam_type}. '), {exam_link: "<a href='" + exam_url_path + "'>"+gtLtEscape(exam_display_name)+"</a>", exam_type: (!_.isUndefined(arguments[0].exam_type)) ? exam_type : gettext('a timed exam')}) %>
+        <span class="js-exam-additional-text" aria-hidden="false">
+            <%- gettext('The timer on the right shows the time remaining in the exam.') %>
+            <%- gettext('To receive credit for problems, you must select "Submit" for each problem before you select "End My Exam".') %>
+        </span>
+        <button class="js-toggle-show-more btn btn-link" data-show-more-text="<%- gettext('Show More') %>" data-show-less-text="<%- gettext('Show Less') %>">
+            <%- gettext('Show Less') %>
+        </button>
+    </div>
+</div>

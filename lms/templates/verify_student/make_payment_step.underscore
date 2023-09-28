@@ -1,0 +1,123 @@
+<div id="wrapper-review" tab-index="0" class="wrapper-view make-payment-step">
+  <div class="review view">
+    <% if ( !upgrade ) { %>
+      <h2 class="right-col">
+        <%= HtmlUtils.interpolateHtml(
+            gettext( "You are enrolling in: {courseName}"),
+            { courseName: HtmlUtils.joinHtml(
+                HtmlUtils.HTML('<span class="course-title">'),
+                courseName,
+                HtmlUtils.HTML('</span>')
+            ) }
+        ) %>
+      </h2>
+    <% } else { %>
+      <h2 class="title">
+        <%= HtmlUtils.interpolateHtml(
+            gettext( "You are upgrading your enrollment for: {courseName}"),
+            { courseName: HtmlUtils.joinHtml(
+                HtmlUtils.HTML('<span class="course-title">'),
+                courseName,
+                HtmlUtils.HTML('</span>')
+            ) }
+        ) %>
+      </h2>
+      <div class="instruction">
+        <%- gettext( "You can now enter your payment information and complete your enrollment." ) %>
+      </div>
+    <% } %>
+
+    <div class="instruction <% if ( !upgrade && isActive ) { %>center-col<% } %>">
+      <% if ( _.some( requirements, function( isVisible ) { return isVisible; } ) ) { %>
+      <p class="instruction-info">
+        <% if ( verificationDeadline && isActive) { %>
+          <p
+            class="localized-datetime"
+            data-datetime="<%-verificationDeadline%>"
+            data-string="<%-gettext( "You can pay now even if you don't have the following items available, but you will need to have these by {date} to qualify to earn a Verified Certificate." )%>"
+            data-timezone="<%-userTimezone%>"
+            data-language="<%-userLanguage%>"
+          >
+        <% } else if ( !isActive ) { %>
+          <i class="fa fa-envelope-o" aria-hidden="true"></i>
+          <%= HtmlUtils.interpolateHtml(
+                gettext( "An email has been sent to {userEmail} with a link for you to activate your account."),
+                {userEmail: userEmail}
+            )
+          %>
+          <h3 class="activate"><%- gettext("Why activate?") %></h3>
+          <div class="activate-info">
+            <%- gettext("We ask you to activate your account to ensure it is really you creating the account and to prevent fraud.") %>
+          <div>
+        <% } else { %>
+            <%- gettext( "You can pay now even if you don't have the following items available, but you will need to have these to qualify to earn a Verified Certificate." ) %>
+        <% } %>
+      </p>
+      <% } %>
+    </div>
+
+    <% if ( requirements['account-activation-required'] || requirements['photo-id-required'] || requirements['webcam-required']) { %>
+    <div class="requirements-container">
+      <ul class="list-reqs <% if ( requirements['account-activation-required'] ) { %>account-not-activated<% } %>">
+        <% if (!requirements['account-activation-required']) {%>
+          <% if ( requirements['photo-id-required'] ) { %>
+          <li class="req req-1 req-id">
+            <h3 class="title"><%- gettext( "Government-Issued Photo ID" ) %></h3>
+            <div class="placeholder-art fa-lg">
+              <span class="icon fa fa-list-alt fa-stack-2x" aria-hidden="true"></span>
+              <span class="icon fa fa-user id-photo fa-stack-1x" aria-hidden="true"></span>
+            </div>
+
+            <div class="copy"></div>
+          </li>
+          <% } %>
+
+          <% if ( requirements['webcam-required'] ) { %>
+          <li class="req req-2 req-webcam">
+            <h3 class="title"><%- gettext( "Webcam" ) %></h3>
+            <div class="placeholder-art">
+              <span class="icon fa fa-video-camera" aria-hidden="true"></span>
+            </div>
+
+            <div class="copy"></div>
+          </li>
+          <% } %>
+        <% } %>
+      </ul>
+    </div>
+    <% } %>
+
+    <% if ( courseModeSlug === 'no-id-professional') { %>
+    <div class="container register is-verified no-min-scale">
+      <h3 class="title"><%- gettext( "ID-Verification is not required for this Professional Education course." ) %></h3>
+      <p><%- gettext( "All professional education courses are fee-based, and require payment to complete the enrollment process." ) %></p>
+    </div>
+    <% } else if ( alreadyVerified && verificationGoodUntil ) { %>
+    <div class="container register is-verified">
+      <h3 class="title"><%- gettext( "You have already verified your ID!" ) %></h3>
+      <p>
+        <%- StringUtils.interpolate(
+          gettext( "Your verification status is good until {verificationGoodUntil}." ),
+          { verificationGoodUntil: verificationGoodUntil }
+        ) %>
+      </p>
+    </div>
+    <% } %>
+
+  <% if ( isActive ) { %>
+  <div class="payment-buttons nav-wizard is-ready center">
+    <input type="hidden" name="contribution" value="<%- minPrice %>" />
+    <input type="hidden" name="sku" value="<%- sku %>" />
+    <div class="purchase">
+      <p class="product-info"><span class="product-name"></span> <%- gettext( "price" ) %>: <span class="price">$<%- minPrice %> USD</span></p>
+    </div>
+    <div class="pay-options">
+      <%
+      // payment buttons will go here
+      %>
+    </div>
+  </div>
+  <% } %>
+
+  <form id="payment-processor-form"></form>
+</div>

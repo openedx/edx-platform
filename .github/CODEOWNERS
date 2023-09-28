@@ -1,0 +1,52 @@
+# This does not cover all the code in edx-platform but it's a good start.
+
+# Ensure that the team responsible for upgrades sees any PRs that would
+# add GitHub-hosted dependencies to that platform.
+requirements/edx/github.in                                          @openedx/arbi-bom
+
+# Core
+common/djangoapps/student/
+common/djangoapps/student/models/__init__.py                        @openedx/teaching-and-learning
+common/djangoapps/student/models/course_enrollment.py               @openedx/teaching-and-learning
+common/djangoapps/third_party_auth/
+lms/djangoapps/course_api/blocks
+lms/djangoapps/courseware/
+lms/djangoapps/grades/
+lms/djangoapps/instructor/
+lms/djangoapps/instructor_task/
+lms/djangoapps/mobile_api/
+openedx/core/djangoapps/heartbeat/
+openedx/core/djangoapps/oauth_dispatch
+openedx/core/djangoapps/user_api/
+openedx/core/djangoapps/user_authn/
+openedx/features/course_experience/
+xmodule/
+
+# Core Extensions
+lms/djangoapps/discussion/
+lms/djangoapps/edxnotes
+
+# Analytics
+common/djangoapps/track/
+
+# Credentials
+lms/djangoapps/certificates/
+
+# Discovery
+common/djangoapps/course_modes/
+common/djangoapps/enrollment/
+lms/djangoapps/commerce/
+lms/djangoapps/experiments/
+lms/djangoapps/learner_dashboard/
+lms/djangoapps/learner_home/
+openedx/features/content_type_gating/
+openedx/features/course_duration_limits/
+openedx/features/discounts/
+
+# Ping Axim On-call if someone uses the QuickStart
+# https://docs.openedx.org/en/latest/developers/quickstarts/first_openedx_pr.html
+lms/templates/dashboard.html               @openedx/axim-oncall
+
+# Ensure minimal.yml stays minimal, this could be a team in the future
+# but it's just me for now, others can sign up if they care as well.
+lms/envs/minimal.yml                                            @feanil

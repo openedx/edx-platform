@@ -1,0 +1,118 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+{% load i18n %}
+{% load django_markup %}
+{% load static %}
+{% load ace %}
+
+{% block preview_text %}
+    {% if course_ids|length > 1 %}
+        {% filter force_escape %}
+        {% blocktrans trimmed %}
+            We hope you are enjoying learning with us so far on {{ platform_name }}! A verified certificate allows you to
+            highlight your new knowledge and skills. An {{ platform_name }} certificate is official and easily
+            shareable.
+
+            Upgrade by {{ user_schedule_upgrade_deadline_time }}.
+        {% endblocktrans %}
+        {% endfilter %}
+    {% else %}
+        {% filter force_escape %}
+        {% blocktrans trimmed %}
+            We hope you are enjoying learning with us so far in {{ first_course_name }}! A verified certificate allows
+            you to highlight your new knowledge and skills. An {{ platform_name }} certificate is official and easily
+            shareable.
+
+            Upgrade by {{ user_schedule_upgrade_deadline_time }}.
+        {% endblocktrans %}
+        {% endfilter %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <h1>{% trans "Upgrade now" as tmsg %}{{ tmsg | force_escape }}</h1>
+
+            <p>
+                {% if course_ids|length > 1 %}
+                    {% blocktrans trimmed asvar tmsg %}
+                        We hope you are enjoying learning with us so far on {start_strong}{{ platform_name }}{end_strong}! A
+                        verified certificate allows you to highlight your new knowledge and skills. An
+                        {{ platform_name }} certificate is official and easily shareable.
+                    {% endblocktrans %}
+                    {% interpolate_html tmsg start_strong='<strong>'|safe end_strong='</strong>'|safe %}
+                {% else %}
+                    {% blocktrans trimmed asvar tmsg %}
+                        We hope you are enjoying learning with us so far in {start_strong}{first_course_name}{end_strong}! A
+                        verified certificate allows you to highlight your new knowledge and skills. An
+                        {platform_name} certificate is official and easily shareable.
+                    {% endblocktrans %}
+                    {% interpolate_html tmsg start_strong='<strong>'|safe end_strong='</strong>'|safe first_course_name=first_course_name|force_escape|safe platform_name=platform_name|force_escape|safe %}
+                {% endif %}
+            </p>
+            <p>
+                {% blocktrans trimmed asvar tmsg %}
+                    Upgrade by {start_strong}{{ user_schedule_upgrade_deadline_time }}{end_strong}.
+                {% endblocktrans %}
+                {% interpolate_html tmsg start_strong='<strong>'|safe end_strong='</strong>'|safe %}
+            </p>
+
+            {% if course_ids|length > 1 and course_ids|length < 10 %}
+                <p>
+                  {% trans "You are eligible to upgrade in these courses:" as tmsg %}{{ tmsg | force_escape }}
+                </p>
+                <ul style="margin-bottom: 30px;">
+                {% for course_link in course_links %}
+                    <li>
+                        <a href="{% with_link_tracking course_link.url %}">{{ course_link.name }}</a>
+                    </li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+
+            <img
+                src="{{ cert_image }}"
+                alt="{% trans 'Example of a verified certificate' as tmsg %}{{ tmsg | force_escape }}"
+                style="
+                    display: block;
+                    margin-right: auto;
+                    margin-left: auto;
+                    margin-top: 50px;
+                    margin-bottom: 50px;
+                    border-top: 1px solid lightgray;
+                    border-bottom: 3px solid lightgray;
+                    border-right: 3px solid lightgray;
+                    border-left: 1px solid lightgray;
+                    "
+            />
+
+            <p>
+                {# email client support for style sheets is pretty spotty, so we have to inline all of these styles #}
+                <a
+                    {% if course_ids|length == 1 %}
+                      href="{% with_link_tracking upsell_link %}"
+                    {% else %}
+                      href="{% with_link_tracking dashboard_url %}"
+                    {% endif %}
+                    style="
+                        color: #ffffff;
+                        text-decoration: none;
+                        border-radius: 4px;
+                        -webkit-border-radius: 4px;
+                        -moz-border-radius: 4px;
+                        background-color: #005686;
+                        border-top: 10px solid #005686;
+                        border-bottom: 10px solid #005686;
+                        border-right: 16px solid #005686;
+                        border-left: 16px solid #005686;
+                        display: inline-block;
+                ">
+                    {# old email clients require the use of the font tag :( #}
+                    <font color="#ffffff"><b>{% trans "Upgrade now" as tmsg %}{{ tmsg | force_escape }}</b></font>
+                </a>
+            </p>
+        </td>
+    </tr>
+</table>
+{% endblock %}

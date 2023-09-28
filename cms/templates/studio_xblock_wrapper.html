@@ -1,0 +1,206 @@
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import gettext as _
+from cms.djangoapps.contentstore.helpers import xblock_studio_url
+from cms.djangoapps.contentstore.utils import is_visible_to_specific_partition_groups, get_editor_page_base_url, determine_label
+from lms.lib.utils import is_unit
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
+from cms.djangoapps.contentstore.toggles import use_new_text_editor, use_new_problem_editor, use_new_video_editor, use_video_gallery_flow
+%>
+<%
+use_new_editor_text = use_new_text_editor()
+use_new_editor_video = use_new_video_editor()
+use_new_editor_problem = use_new_problem_editor()
+use_new_video_gallery_flow = use_video_gallery_flow()
+xblock_url = xblock_studio_url(xblock)
+show_inline = xblock.has_children and not xblock_url
+section_class = "level-nesting" if show_inline else "level-element"
+collapsible_class = "is-collapsible" if xblock.has_children else ""
+label = determine_label(xblock.display_name_with_default, xblock.scope_ids.block_type)
+messages = xblock.validate().to_json()
+block_is_unit = is_unit(xblock)
+%>
+
+<%namespace name='static' file='static_content.html'/>
+
+<%block name="header_extras">
+<script type="text/template" id="xblock-validation-messages-tpl">
+    <%static:include path="js/xblock-validation-messages.underscore" />
+</script>
+</%block>
+
+<script type="text/javascript">
+    XBlockValidationFactory(
+        ${messages | n, dump_js_escaped_json},
+        ${bool(xblock_url) | n, dump_js_escaped_json},  // xblock_url will be None or a string
+        ${bool(is_root) | n, dump_js_escaped_json},  // is_root will be None or a boolean
+        ${bool(block_is_unit) | n, dump_js_escaped_json},  // block_is_unit will be None or a boolean
+        $('div.xblock-validation-messages[data-locator="${xblock.location | n, js_escaped_string}"]')
+    );
+</script>
+
+% if not is_root:
+    % if is_reorderable:
+    <li class="studio-xblock-wrapper is-draggable" data-locator="${xblock.location}" data-course-key="${xblock.location.course_key}">
+    % else:
+    <div class="studio-xblock-wrapper" data-locator="${xblock.location}" data-course-key="${xblock.location.course_key}">
+    % endif
+
+    <section class="wrapper-xblock ${section_class} ${collapsible_class}
+    % if is_visible_to_specific_partition_groups(xblock):
+        has-group-visibility-set
+    % endif
+    ">
+% endif
+
+<header class="xblock-header xblock-header-${xblock.category}">
+    <div class="xblock-header-primary
+    % if not show_preview:
+        is-collapsed
+    % endif
+    "
+    use-new-editor-text = ${use_new_editor_text}
+    use-new-editor-video = ${use_new_editor_video}
+    use-new-editor-problem = ${use_new_editor_problem}
+    use-video-gallery-flow = ${use_new_video_gallery_flow}
+    authoring_MFE_base_url = ${get_editor_page_base_url(xblock.location.course_key)}
+    data-block-type = ${xblock.scope_ids.block_type}
+    data-usage-id = ${xblock.scope_ids.usage_id}
+    >
+        <div class="header-details">
+            % if show_inline:
+            <a href="#" data-tooltip="${_('Expand or Collapse')}" class="action expand-collapse collapse">
+                <span class="icon fa fa-caret-down ui-toggle-expansion" aria-hidden="true"></span>
+                <span class="sr">${_('Expand or Collapse')}</span>
+            </a>
+            % endif
+            <div class="xblock-display-title">
+                <span class="xblock-display-name">${label}</span>
+                % if selected_groups_label:
+                <p class="xblock-group-visibility-label">${selected_groups_label}</p>
+                % endif
+            </div>
+        </div>
+        <div class="header-actions">
+            <ul class="actions-list nav-dd ui-right">
+                % if not is_root:
+                    % if can_edit:
+                        % if not show_inline:
+                            <li class="action-item action-edit">
+                                <button class="btn-default edit-button action-button" data-usage-id=${xblock.scope_ids.usage_id}>
+                                    <span class="icon fa fa-pencil" aria-hidden="true"></span>
+                                    <span class="action-button-text">${_("Edit")}</span>
+                                </button>
+                            </li>
+                        % endif
+                        <li class="action-item action-actions-menu nav-item">
+                            <button data-tooltip="${_("Actions")}" class="btn-default show-actions-menu-button action-button">
+                                <span class="icon fa fa-ellipsis-v" aria-hidden="true"></span>
+                                <span class="sr">${_("Actions")}</span>
+                            </button>
+                            <div class="wrapper wrapper-nav-sub" style="right: -10px; top: 45px;">
+                                <div class="nav-sub">
+                                  <ul>
+                                    % if not show_inline:
+                                        % if is_course:
+                                            <!--
+                                                Only show the "Copy to Clipboard" button for xblocks inside courses since
+                                                the copy/paste functionality is not yet implemented for LibraryContent.
+                                            -->
+                                            <li class="nav-item">
+                                                <a class="copy-button" href="#" role="button">${_("Copy to Clipboard")}</a>
+                                            </li>
+                                        % endif
+                                        % if can_add:
+                                            <li class="nav-item">
+                                                <a class="duplicate-button" href="#" role="button">${_("Duplicate")}</a>
+                                            </li>
+                                        % endif
+                                        % if can_move:
+                                            <li class="nav-item">
+                                                <a class="move-button" href="#" role="button">${_("Move")}</a>
+                                            </li>
+                                        % endif
+                                        % if can_edit_visibility:
+                                            <li class="nav-item">
+                                                <a class="access-button" href="#" role="button">${_("Manage Access")}</a>
+                                            </li>
+                                        % endif
+                                    % endif
+                                    % if can_add:
+                                        <!-- If we can add, we can delete. -->
+                                        <li class="nav-item">
+                                            <a class="delete-button" href="#" role="button">${_("Delete")}</a>
+                                        </li>
+                                    % endif
+                                </ul>
+                                </div>
+                            </div>
+                        </li>
+                        % if is_reorderable:
+                            <li class="action-item action-drag">
+                                <span data-tooltip="${_('Drag to reorder')}" class="drag-handle action"></span>
+                            </li>
+                        % endif
+                    % elif not show_inline:
+                        <li class="action-item action-edit action-edit-view-only">
+                            <a href="#" class="edit-button action-button">
+                                <span class="action-button-text">${_("Details")}</span>
+                            </a>
+                        </li>
+                    % endif
+                % endif
+            </ul>
+        </div>
+    </div>
+    % if not is_root:
+        <div class="wrapper-xblock-message xblock-validation-messages" data-locator="${xblock.location}"/>
+        % if xblock_url:
+        <div class="xblock-header-secondary">
+            <div class="meta-info">${_('This block contains multiple components.')}</div>
+            <ul class="actions-list">
+                <li class="action-item action-view">
+                    <a href="${xblock_url}" class="action-button">
+                        ## Translators: this is a verb describing the action of viewing more details
+                        <span class="action-button-text">${_('View')}</span>
+                        <span class="icon fa fa-arrow-right" aria-hidden="true"></span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        % endif
+    % endif
+ </header>
+
+% if is_root:
+    <div class="wrapper-xblock-message xblock-validation-messages" data-locator="${xblock.location}"/>
+% endif
+
+% if show_preview:
+    % if is_root or not xblock_url:
+        % if not is_root and language:
+            <article class="xblock-render" lang="${language}">
+        % else:
+            <article class="xblock-render">
+        % endif
+        ${content | n, decode.utf8}
+        </article>
+    % else:
+        <div class="xblock-message-area">
+        ${content | n, decode.utf8}
+        </div>
+    % endif
+ % endif
+
+% if not is_root:
+    <!-- footer for xblock_aside -->
+    </section>
+
+    % if is_reorderable:
+        </li>
+    % else:
+        </div>
+    % endif
+% endif

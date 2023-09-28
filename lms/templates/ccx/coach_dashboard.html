@@ -1,0 +1,166 @@
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+<%!
+from django.conf import settings
+from django.utils.translation import gettext as _
+from django.urls import reverse
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
+%>
+
+<%block name="pagetitle">${_("CCX Coach Dashboard")}</%block>
+
+<%block name="headextra">
+  <%static:css group='style-course-vendor'/>
+  <%static:css group='style-vendor-tinymce-content'/>
+  <%static:css group='style-vendor-tinymce-skin'/>
+  <%static:css group='style-course'/>
+</%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='ccx_coach'" />
+
+<section class="container">
+  <div class="instructor-dashboard-wrapper-2">
+        <main id="main" aria-label="Content" tabindex="-1">
+        <section class="instructor-dashboard-content-2" id="ccx-coach-dashboard-content" aria-labelledby="header-ccx-dashboard">
+          <h2 class="hd hd-2" id="header-ccx-dashboard">${_("CCX Coach Dashboard")}</h2>
+
+          %if not ccx:
+            % if messages:
+              <ul class="messages">
+                % for message in messages:
+                  % if message.tags:
+                    <li class="${message.tags}">${message}</li>
+                  % else:
+                    <li>${message}</li>
+                  % endif
+                % endfor
+              </ul>
+            % endif
+            <div>
+              <p class="request-response-error" id="ccx-create-message"></p>
+              <form action="${create_ccx_url}" class="ccx-form" method="POST" onsubmit="return validateForm(this)">
+                <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
+                <div class="field">
+                  <label class="sr" for="ccx_name">${_('Name your CCX')}</label>
+                  <input name="name" id="ccx_name" placeholder="${_('Name your CCX')}"/><br/>
+                </div>
+                <div class="field">
+                  <button id="create-ccx" type="submit">${_('Create a new Custom Course for {platform_name}').format(platform_name=settings.PLATFORM_NAME)}</button>
+                </div>
+              </form>
+          </div>
+          %endif
+
+          %if ccx:
+          <ul class="instructor-nav">
+            <li class="nav-item">
+              <button type="button" class="btn-link" data-section="membership">${_("Enrollment")}</button>
+            </li>
+            <li class="nav-item">
+              <button type="button" class="btn-link" data-section="schedule">${_("Schedule")}</button>
+            </li>
+            <li class="nav-item">
+              <button type="button" class="btn-link" data-section="student_admin">${_("Student Admin")}</button>
+            </li>
+            <li class="nav-item">
+              <button type="button" class="btn-link" data-section="grading_policy">${_("Grading Policy")}</button>
+            </li>
+          </ul>
+          <section id="membership" class="idash-section" aria-label="${_('Batch Enrollment')}">
+            <%include file="enrollment.html" args="" />
+          </section>
+          <section id="schedule" class="idash-section" aria-label="${_('Schedule')}">
+            <%include file="schedule.html" args="" />
+          </section>
+          <section id="student_admin" class="idash-section" aria-label="${_('Student Grades')}">
+            <%include file="student_admin.html" args="" />
+          </section>
+          <section id="grading_policy" class="idash-section" aria-label="${_('Grading Policy')}">
+            <%include file="grading_policy.html" args="" />
+          </section>
+          %endif
+
+      </section>
+        </main>
+  </div>
+</section>
+
+<script>
+  function setup_tabs() {
+    $(".instructor-nav .btn-link").on("click", function(event) {
+        event.preventDefault();
+        $(".instructor-nav .btn-link").removeClass("active-section");
+        var section_sel = "#" + $(this).attr("data-section");
+        $("section.idash-section").hide();
+        $(section_sel).show();
+        $(this).addClass("active-section");
+    });
+
+    var url = document.URL,
+        hashbang = url.indexOf('#!');
+    if (hashbang != -1) {
+      var selector = '.instructor-nav [data-section=' +
+        url.substr(hashbang + 2) + ']';
+      $(selector).click();
+    }
+    else {
+      $(".instructor-nav .btn-link").first().click();
+    }
+  }
+
+  function setup_management_form() {
+
+    $(".member-lists-management-ccx form .revoke").on("click", function(event) {
+        var target, form, action, studentId, selectedStudent;
+        event.preventDefault();
+        target = $(event.target);
+        form = target.parents('form').first();
+        if (target.hasClass('revoke')) {
+          // revoking access for a student, get set form values and submit
+          // get the email address of the student, since they might not be 'enrolled' yet.
+          selectedStudent = target.parent('td').siblings().last().text();
+          action = $('<input />', {
+            type: 'hidden',
+            name: 'student-action',
+            value: 'revoke'
+          });
+          studentId = $('<input />', {
+            type: 'hidden',
+            name: 'student-id',
+            value: edx.HtmlUtils.ensureHtml(selectedStudent)
+          });
+          // xss-lint: disable=javascript-jquery-append
+          form.append(action, studentId).submit();
+        }
+    });
+  }
+
+  $(setup_tabs);
+  $(setup_management_form)
+  $( document ).ready(function() {
+    if ($('#ccx_std_list_messages').length) {
+      $('#ccx_std_list_messages')[0].focus();
+    }
+  });
+  function validateForm(form) {
+    var newCCXName = $(form).find('#ccx_name').val();
+    var $errorMessage =  $('#ccx-create-message');
+    var hasCcxConnector = ${has_ccx_connector | n, dump_js_escaped_json} === 'true';
+
+    if (!newCCXName && !hasCcxConnector) {
+      $errorMessage.text("${_('Please enter a valid CCX name.') | n, js_escaped_string}");
+      $errorMessage.show();
+      return false;
+    } else if (hasCcxConnector) {
+      $errorMessage.text('${use_ccx_con_error_message | n, js_escaped_string}');
+      $errorMessage.show();
+      return false;
+    }
+
+    $errorMessage.hide();
+    return true;
+  }
+</script>

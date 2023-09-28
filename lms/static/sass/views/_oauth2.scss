@@ -1,0 +1,54 @@
+@import 'neat/neat'; // lib - Neat
+
+.oauth2 {
+  @include outer-container();
+
+  .authorization-confirmation {
+    @include span-columns(6);
+    @include shift(3);
+
+    float: unset !important;  // fixes issues with oauth page and edx-theme footer
+    line-height: 1.5em;
+    padding: 50px 0;
+  }
+}
+
+// For the django-oauth-toolkit Authorization view
+.wrapper-authorize {
+  background: $white;
+  padding-right: $baseline/2;
+  padding-left: $baseline/2;
+  font-family: $font-family-sans-serif;
+
+  h1 {
+    @extend %t-title4;
+
+    margin-bottom: 0;
+    margin-left: 0;
+    padding: $baseline;
+    padding-left: 0;
+
+    @include text-align(left);
+  }
+
+  p {
+    @extend %t-copy-base;
+
+    margin: $baseline/2 0;
+  }
+
+  .control-group {
+    float: right;
+  }
+
+  .btn-authorization-allow {
+    @extend %btn-primary-blue;
+
+    margin-left: 20px;
+    line-height: 0.7em;
+  }
+
+  .btn-authorization-cancel {
+    @extend %btn-secondary-blue-outline;
+  }
+}

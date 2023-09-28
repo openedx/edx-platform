@@ -1,0 +1,9 @@
+<span class="member-count"><%- membership_message %></span>
+<ul class="list-member-thumbs">
+    <% _.each(memberships, function (membership) { %>
+        <li class="item-member-thumb"><img alt="<%- membership.user.username %>" src="<%- membership.user.profile_image.image_url_small %>"></img></li>
+    <% }) %>
+    <% if (has_additional_memberships) { %>
+        <li class="item-member-thumb"><span class="sr"><%- sr_message %></span>&hellip;</li>
+    <% } %>
+</ul>

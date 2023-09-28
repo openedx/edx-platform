@@ -1,0 +1,76 @@
+<div id="wrapper-idphoto" class="wrapper-view block-photo id-photo-step">
+  <div class="idphoto view">
+    <h3 class="title"><%- gettext( "Take a Photo of Your ID" ) %></h3>
+    <div class="instruction">
+      <p><%- gettext("Use your webcam to take a photo of your ID.") %></p>
+    </div>
+
+    <div class="wrapper-task">
+      <div id="idcam" class="task cam"></div>
+
+      <div class="wrapper-help">
+         <div class="help help-task photo-tips idtips">
+          <p class="photo-tip"><%- gettext( "You need an ID with your name and photo. A driver's license, passport, or ID are all acceptable." ) %></p>
+
+          <h4 class="title"><%- gettext( "Tips on taking a successful photo" ) %></h4>
+
+          <div class="copy">
+            <ul class="list-help">
+              <li class="help-item"><%- gettext( "Ensure that you can see your photo and read your name" ) %></li>
+              <li class="help-item"><%- gettext( "Make sure your ID is well-lit" ) %></li>
+              <li class="help-item">
+                <%=  HtmlUtils.interpolateHtml( gettext( "Once in position, use the Take Photo button {icon} to capture your ID" ), { icon: HtmlUtils.HTML('<span class="example">(<span class="icon fa fa-camera" aria-hidden="true"></span>)</span>') } ) %>
+              </li>
+              <li class="help-item"><%- gettext( "Use the Retake Photo button if you are not pleased with your photo" ) %></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="help help-faq facefaq">
+          <h4 class="sr title"><%- gettext( "Frequently Asked Questions" ) %></h4>
+
+          <div class="copy">
+            <dl class="list-faq">
+              <dt class="faq-question">
+                <%- _.sprintf( gettext( "Why does %(platformName)s need my photo?" ), { platformName: platformName } ) %>
+              </dt>
+              <dd class="faq-answer">
+                <%- gettext( "As part of the verification process, you take a photo of both your face and a photo ID. Our authorization service confirms your identity by comparing the photo you take with the photo on your ID." ) %>
+              </dd>
+              <dt class="faq-question">
+                <%- _.sprintf( gettext( "What does %(platformName)s do with this photo?" ), { platformName: platformName } ) %>
+              </dt>
+              <dd class="faq-answer">
+                <%- _.sprintf( gettext( "We securely encrypt your photo and send it to our authorization service for review. Your photo and information are not saved or visible anywhere on %(platformName)s after the verification process is complete." ), { platformName: platformName } ) %>
+              </dd>
+              <dt class="faq-question">
+                <%- gettext( "What if I can't see the camera image, or if I can't see my photo do determine which side is visible?" ) %>
+              </dt>
+              <dd class="faq-answer">
+                <%- gettext( "You may be able to complete the image capture procedure without assistance, but it may take a couple of submission attempts to get the camera positioning right.  Optimal camera positioning varies with each computer, but generally, the best position for a photo of an ID card is 8-12 inches (20-30 centimeters) from the camera, with the ID card centered relative to the camera. " ) %>
+                <%- gettext( "If the photos you submit are rejected, try moving the computer or camera orientation to change the lighting angle.  The most common reason for rejection is inability to read the text on the ID card." ) %>
+              </dd>
+              <dt class="faq-question">
+                <%- gettext( "What if I have difficulty holding my ID in position relative to the camera?" ) %>
+              </dt>
+              <dd class="faq-answer">
+                <%- _.sprintf( gettext( "If you require assistance with taking either photo for submission, contact %(platformName)s support for additional suggestions." ), { platformName: platformName } )%>
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <% if ( nextStepTitle ) { %>
+    <nav class="nav-wizard" id="face_next_button_nav">
+      <button id="next_step_button" class="next action-primary right" disabled title="Next">
+        <%- _.sprintf(
+          gettext( "Next: %(nextStepTitle)s" ),
+          { nextStepTitle: nextStepTitle }
+        ) %>
+      </button>
+    </nav>
+    <% } %>
+  </div>
+</div>

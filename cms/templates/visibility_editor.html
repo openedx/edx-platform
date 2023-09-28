@@ -1,0 +1,129 @@
+<%page expression_filter="h"/>
+<%
+from django.conf import settings
+from django.utils.translation import gettext as _
+from cms.djangoapps.contentstore.utils import ancestor_has_staff_lock, get_visibility_partition_info
+from openedx.core.djangolib.markup import HTML, Text
+from lms.lib.utils import is_unit
+
+partition_info = get_visibility_partition_info(xblock)
+selectable_partitions = partition_info["selectable_partitions"]
+selected_partition_index = partition_info["selected_partition_index"]
+selected_groups_label = partition_info["selected_groups_label"]
+
+is_staff_locked = ancestor_has_staff_lock(xblock)
+block_is_unit = is_unit(xblock)
+%>
+<div class="modal-section visibility-summary">
+    % if len(selectable_partitions) == 0:
+        <div class="is-not-configured has-actions">
+            <h3 class="title">${_('Access is not restricted')}</h3>
+            <div class="copy">
+                % if block_is_unit:
+                    <p>${_('Access to this unit is not restricted, but visibility might be affected by inherited settings.')}</p>
+                % else:
+                    <p>${_('Access to this component is not restricted, but visibility might be affected by inherited settings.')}</p>
+                %endif
+                % if settings.FEATURES.get('ENABLE_ENROLLMENT_TRACK_USER_PARTITION'):
+                    % if block_is_unit:
+                        <p>${_('You can restrict access to this unit to learners in specific enrollment tracks or content groups.')}</p>
+                    % else:
+                        <p>${_('You can restrict access to this component to learners in specific enrollment tracks or content groups.')}</p>
+                    % endif
+                % else:
+                    % if block_is_unit:
+                        <p>${_('You can restrict access to this unit to learners in specific content groups.')}</p>
+                    % else:
+                        <p>${_('You can restrict access to this component to learners in specific content groups.')}</p>
+                    % endif
+                % endif
+            </div>
+
+            <div class="actions">
+                <a href="${manage_groups_url}" class="action action-primary action-settings">${_('Manage content groups')}</a>
+            </div>
+        </div>
+    % elif is_staff_locked:
+        <div class="summary-message summary-message-warning visibility-summary-message">
+            <span class="icon fa fa-exclamation-triangle" aria-hidden="true"></span>
+            <p class="copy">
+                ## Translators: Any text between {screen_reader_start} and {screen_reader_end} is only read by screen readers and never shown in the browser.
+                ${Text(_(
+                    "{screen_reader_start}Warning:{screen_reader_end} The unit that contains this component is hidden from learners. The unit setting overrides the component access settings defined here."
+                    )).format(
+                        screen_reader_start=HTML('<span class="sr">'),
+                        screen_reader_end=HTML('</span>'),
+                    )
+                }
+            </p>
+        </div>
+    % endif
+</div>
+
+% if len(selectable_partitions) > 0:
+    <form class="visibility-controls-form" method="post" action="">
+        <div class="modal-section visibility-controls">
+            <h3 class="modal-section-title visibility-header" id="visibility-title">
+                % if selected_partition_index == -1:
+                <span class="current-visibility-title">
+                    <span class="icon fa fa-eye" aria-hidden="true"></span>
+                    <span>${_('Access is not restricted')}</span>
+                </span>
+                % else:
+                <span class="current-visibility-title">
+                    <span class="icon fa fa-eye" aria-hidden="true"></span>
+                    <span>${_('Access is restricted to:')}</span>
+                </span>
+                <span>${selected_groups_label}</span>
+                % endif
+            </h3>
+            <div class="modal-section-content partition-visibility">
+                <label class="group-select-title">${_('Restrict access to:')}
+                    <select>
+                        <option value="-1" selected ="selected">
+                            % if selected_partition_index == -1:
+                                ${_('Select a group type')}
+                            % else:
+                                ${_('All Learners and Staff')}
+                            % endif
+                        </option>
+                        % for index, partition in enumerate(selectable_partitions):
+                            <option value="${partition["id"]}" id="visibility-partition-${partition["id"]}" ${'selected="selected"' if selected_partition_index == index else ''}}>
+                                ${partition["name"]}
+                            </option>
+                        % endfor
+                    </select>
+                </label>
+
+                % for index, partition in enumerate(selectable_partitions):
+                <div role="group" aria-labelledby="partition-group-directions-${partition["id"]}" aria-describedby="visibility-partition-${partition["id"]}"
+                    class="partition-group-control partition-group-control-${partition["id"]} ${'is-hidden' if selected_partition_index != index else ''}">
+                    <div class="partition-group-directions" id="partition-group-directions-${partition["id"]}">${_('Select one or more groups:')}
+                        % for group in partition["groups"]:
+                        <div class="field partition-group-visibility partition-group-visibility-${partition["id"]} ${'was-removed' if group["deleted"] else ''}">
+                            <input type="checkbox"
+                                id="visibility-group-${partition["id"]}-${group["id"]}"
+                                name="visibility-group"
+                                value="${group["id"]}"
+                                class="input input-checkbox"
+                                ${'checked="checked"' if group["selected"] else ''}
+                            />
+                            % if group["deleted"]:
+                            <label for="visibility-group-${partition["id"]}-${group["id"]}" class="label">
+                                ${_("Deleted Group")}
+                                <span class="note">
+                                    ${_('This group no longer exists.  Choose another group or remove the access restriction.')}
+                                </span>
+                            </label>
+                            % else:
+                            <label for="visibility-group-${partition["id"]}-${group["id"]}" class="label">${group["name"]}</label>
+                            % endif
+                         </div>
+                        % endfor
+                    </div>
+                </div>
+                % endfor
+            </div>
+        </div>
+    </form>
+% endif

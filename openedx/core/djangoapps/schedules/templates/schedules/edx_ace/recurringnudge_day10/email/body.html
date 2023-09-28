@@ -1,0 +1,55 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+{% load i18n %}
+{% load django_markup %}
+
+{% block preview_text %}
+    {% if course_ids|length > 1 %}
+    {% filter force_escape %}
+        {% blocktrans trimmed %}
+            Many {{ platform_name }} learners are completing more problems every week, and
+            participating in the discussion forums. What do you want to do to keep learning?
+        {% endblocktrans %}
+    {% endfilter %}
+    {% else %}
+    {% filter force_escape %}
+        {% blocktrans trimmed %}
+            Many {{ platform_name }} learners in {{course_name}} are completing more problems every week, and
+            participating in the discussion forums. What do you want to do to keep learning?
+        {% endblocktrans %}
+    {% endfilter %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <h1>{% trans "Keep up the momentum!" as tmsg %}{{ tmsg | force_escape }}</h1>
+
+            <p>
+                {% if course_ids|length > 1 %}
+                {% filter force_escape %}
+                    {% blocktrans trimmed %}
+                        Many {{ platform_name }} learners are completing more problems every week, and
+                        participating in the discussion forums. What do you want to do to keep learning?
+                    {% endblocktrans %}
+                {% endfilter %}
+                {% else %}
+                    {% blocktrans trimmed asvar tmsg %}
+                        Many {platform_name} learners in {start_strong}{course_name}{end_strong} are completing more problems every week, and
+                        participating in the discussion forums. What do you want to do to keep learning?
+                    {% endblocktrans %}
+                    {% interpolate_html tmsg start_strong='<strong>'|safe end_strong='</strong>'|safe course_name=course_name|force_escape|safe platform_name=platform_name|force_escape|safe %}
+                {% endif %}
+            </p>
+
+            {% filter force_escape %}
+                {% blocktrans asvar course_cta_text %}Keep learning{% endblocktrans %}
+            {% endfilter %}
+            {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text%}
+
+            {% include "ace_common/edx_ace/common/upsell_cta.html"%}
+        </td>
+    </tr>
+</table>
+{% endblock %}

@@ -1,0 +1,48 @@
+<%page expression_filter="h"/>
+<%!
+from openedx.core.djangolib.markup import HTML, Text
+from django.conf import settings
+from django.utils.translation import gettext as _
+
+%>
+<%inherit file="../main.html" />
+
+<%namespace name='static' file='../static_content.html'/>
+
+<%block name="pagetitle">${Text(_("Unsubscribe"))}</%block>
+<section class="container unsubscribe-bulk-email">
+
+  <section class="message">
+       <h1>
+
+          <%block name="pageheader">${Text(_("Unsubscribe"))} </%block>
+
+      </h1>
+
+      <%block name="pagecontent">
+
+            %if unsubscribe:
+                ${Text(_("You have successfully unsubscribed from {org} {course} emails.")).format(
+                        org=HTML("<strong>{}'s</strong>").format(course.display_org_with_default),
+                        course=HTML("<strong>{}</strong>").format(course.display_name_with_default)
+                )}
+
+            %else:
+                ${Text(_("You have not been unsubscribed from {org} {course} emails.")).format(
+                        org=HTML("<strong>{}'s</strong>").format(course.display_org_with_default),
+                        course=HTML("<strong>{}</strong>").format(course.display_name_with_default)
+                )}
+
+            %endif
+            <br><br>
+            ${Text(_("{link_start}Return to {platform_name}{link_end}")).format(
+            link_start=HTML("<u> <a href={lms_route_url}>").format(lms_route_url=settings.LMS_ROOT_URL),
+            platform_name=settings.PLATFORM_NAME,
+            link_end=HTML("</a> </u> "),
+            )}
+
+      </%block>
+
+  </section>
+
+</section>

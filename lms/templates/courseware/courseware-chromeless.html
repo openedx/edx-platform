@@ -1,0 +1,216 @@
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import gettext as _
+
+from openedx.core.djangolib.markup import HTML
+from openedx.core.djangolib.js_utils import js_escaped_string
+
+%>
+<%def name="course_name()">
+ <% return _("{course_number} Courseware").format(course_number=course.display_number_with_default) %>
+</%def>
+<%block name="bodyclass">view-in-course view-courseware courseware ${course.css_class or ''}</%block>
+<%block name="title"><title>
+    % if section_title:
+${static.get_page_title_breadcrumbs(section_title, course_name())}
+    % else:
+${static.get_page_title_breadcrumbs(course_name())}
+    %endif
+</title></%block>
+
+<%block name="header_extras">
+% for template_name in ["image-modal"]:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="common/templates/${template_name}.underscore" />
+</script>
+% endfor
+<%
+  header_file = None
+%>
+</%block>
+
+<%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+## Utility: Notes
+% if edx_notes_enabled:
+<%static:css group='style-student-notes'/>
+% endif
+
+<script type="text/javascript" src="${static.url('js/jquery.autocomplete.js')}" async></script>
+<script type="text/javascript" src="${static.url('js/src/tooltip_manager.js')}" async></script>
+
+<link href="${static.url('css/vendor/jquery.autocomplete.css')}" rel="preload" type="text/css" as="style">
+  ${HTML(fragment.head_html())}
+
+% if is_learning_mfe:
+  ## If this chromeless view is in an iframe in the learning microfrontend app
+  ## then add a base tag in the head (of the iframe document) to force links
+  ## in this iframe to navigate the parent window.
+  <base target="_parent">
+%endif
+
+## Expose the $$course_id variable for course-team-authored JS.
+## We assign it in the <head> so that it will definitely be
+## assigned before any in-XBlock JS is run.
+<script type="text/javascript">
+  var $$course_id = "${course.id | n, js_escaped_string}";
+</script>
+
+</%block>
+
+<%block name="js_extra">
+  <script type="text/javascript" src="${static.url('common/js/vendor/jquery.scrollTo.js')}" async></script>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}" async></script>
+
+  <%static:js group='courseware'/>
+
+  % if enable_mathjax:
+    <%include file="/mathjax_include.html" args="disable_fast_preview=True"/>
+  % endif
+  % if staff_access:
+  	<%include file="xqa_interface.html"/>
+  % endif
+
+${HTML(fragment.foot_html())}
+
+</%block>
+
+<%block name="body_extra"/>
+
+<div class="course-wrapper chromeless">
+  <section class="course-content" id="course-content"\
+    % if enable_completion_on_view_service:
+      data-enable-completion-on-view-service="true" \
+    % else:
+      data-enable-completion-on-view-service="false" \
+    % endif
+    style="display: block; width: auto; margin: 0;"
+  >
+      <main id="main" aria-label="Content">
+        ${HTML(fragment.body_html())}
+      </main>
+  </section>
+</div>
+% if not is_learning_mfe:
+
+  % if course.show_calculator or edx_notes_enabled:
+    <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
+      ## Utility: Notes
+      % if edx_notes_enabled:
+        <%include file="/edxnotes/toggle_notes.html" args="course=course, block=block"/>
+      % endif
+
+      ## Utility: Calc
+      % if course.show_calculator:
+        <%include file="/calculator/toggle_calculator.html" />
+      % endif
+    </nav>
+  % endif
+% else:
+  % if edx_notes_enabled:
+    <%include file="/edxnotes/toggle_notes.html" args="course=course, block=block"/>
+  % endif
+% endif
+
+% if is_learning_mfe:
+<script type="text/javascript">
+  (function() {
+    // If this view is rendered in an iframe within the learning microfrontend app
+    // it will report the height of its contents to the parent window when the
+    // document loads, window resizes, or DOM mutates.
+    if (window !== window.parent) {
+      document.body.className += ' view-in-mfe';
+      var lastHeight = window.offsetHeight;
+      var lastWidth = window.offsetWidth;
+      var contentElement = document.getElementById('content');
+
+      function dispatchResizeMessage(event) {
+        // Note: event is actually an Array of MutationRecord objects when fired from the MutationObserver
+        var isLoadEvent = event.type === 'load';
+        var newHeight = contentElement.offsetHeight;
+        var newWidth = contentElement.offsetWidth;
+        if (!isLoadEvent && newWidth === lastWidth && newHeight === lastHeight) {
+            // Monitor when any anchor tag is clicked, it is checked to make sure
+            // it is referencing an element's id or name (not an external website). If
+            // the href attribute is an id or name, the page will scroll the id or name.
+            $('a').on("click", function(event){
+              if ($(this).attr('href')[0] === '#') {
+                var targetId = $(this).attr('href');
+                // Checks if the href attribute is auto scrolling video transcripts.
+                // The scroll behavior for transcript scrolling requires the viewport
+                // to stay in relatively the same position so viewing of the video
+                // is not disrupted.
+                if ($(this).attr('class') === 'transcript-start'||$(this).attr('class') === 'transcript-end') {
+                  event.preventDefault();
+                  $(targetId)[0].scrollIntoView({
+                    block: 'nearest',
+                  });
+                } else {
+                  var targetName = $(this).attr('href').slice(1);
+                  // Checks if the target uses an id or name.
+                  var target = $(targetId)[0] || document.getElementsByName(targetName)[0];
+                  // The scroll behavior fro all other types of href's will scroll
+                  // the target to the top of the page
+                  if (target) {
+                    event.preventDefault();
+                    target.scrollIntoView({
+                      block: 'start',
+                    });
+                  }
+                }
+              }
+            })
+          return;
+        }
+        // Monitor for messages and checks if the message contains an id. If
+        // there is an id, then the location of the selected focus element
+        // is sent through its offset attribute. The offset will allow the
+        // page to scroll to the location of the focus element so that it is
+        // at the top of the page. Unique ids and names are required for
+        // proper scrolling.
+        window.addEventListener('message', function (event) {
+          if (event.data.hashName) {
+            var targetId = event.data.hashName;
+            var targetName = event.data.hashName.slice(1);
+            // Checks if the target uses an id or name to focus and gets offset.
+            var targetOffset = $(targetId).offset() || $(document.getElementsByName(targetName)[0]).offset();
+            window.parent.postMessage({ 'offset': targetOffset.top }, document.referrer);
+          }
+        })
+
+        window.parent.postMessage({
+            type: 'plugin.resize',
+            payload: {
+              width: newWidth,
+              height: newHeight,
+            }
+          }, document.referrer
+        );
+
+        lastHeight = newHeight;
+        lastWidth = newWidth;
+
+        // Within the learning microfrontend the iframe resizes to match the
+        // height of this document and it should never scroll. It does scroll
+        // ocassionally when javascript is used to focus elements on the page
+        // before the parent iframe has been resized to match the content
+        // height. This window.scrollTo is an attempt to keep the content at the
+        // top of the page. See TNL-7094
+        window.scrollTo(0, 0);
+      }
+
+      // Create an observer instance linked to the callback function
+      const observer = new MutationObserver(dispatchResizeMessage);
+
+      // Start observing the target node for configured mutations
+      observer.observe(document.body, { attributes: true, childList: true, subtree: true });
+
+      window.addEventListener('load', dispatchResizeMessage);
+      window.addEventListener('resize', dispatchResizeMessage);
+    }
+  }());
+</script>
+% endif

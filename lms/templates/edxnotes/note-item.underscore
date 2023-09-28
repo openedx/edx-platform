@@ -1,0 +1,57 @@
+<div class="wrapper-note-excerpts">
+    <% if (message) { %>
+    <div class="note-excerpt" role="region" aria-label="<%- gettext('Highlighted text') %>">
+        <p class="note-excerpt-p"><%- message %>
+          <% if (show_link) { %>
+          <% if (is_expanded) { %>
+              <button type="button" class="note-excerpt-more-link"><%- gettext('Less') %></button>
+          <% } else { %>
+              <button type="button" class="note-excerpt-more-link"><%- gettext('More') %></button>
+          <% } %>
+          <% } %>
+        </p>
+    </div>
+    <% } %>
+
+    <% if (text) { %>
+    <ol class="note-comments" role="region" aria-label="<%- gettext('Note') %>">
+        <li class="note-comment">
+            <p class="note-comment-title"><%- gettext("You commented...") %></p>
+            <p class="note-comment-p">
+                <% // xss-lint: disable=underscore-not-escaped %>
+                <%= interpolate_text(_.escape(text), {
+                    elasticsearch_highlight_start: '<span class="note-highlight">',
+                    elasticsearch_highlight_end: '</span>'
+                })%>
+            </p>
+        </li>
+    </ol>
+    <% } %>
+</div>
+
+<footer class="reference">
+    <div class="wrapper-reference-content">
+        <p class="reference-title"><%- gettext("Noted in:") %></p>
+        <% if (unit.url) { %>
+          <a class="reference-meta reference-unit-link" href="<%- unit.url %>#<%- id %>"><%- unit.display_name %></a>
+        <% } else { %>
+          <span class="reference-meta"><%- unit.display_name %></span>
+        <% } %>
+
+        <p class="reference-title"><%- gettext("Last Edited:") %></p>
+        <span class="reference-meta reference-updated-date"><%- updated %></span>
+
+        <% if (tags.length > 0) { %>
+            <p class="reference-title"><%- gettext("Tags:") %></p>
+            <% for (var i = 0; i < tags.length; i++) { %>
+                <span class="reference-meta reference-tags">
+                    <% // xss-lint: disable=underscore-not-escaped %>
+                    <%= interpolate_text(_.escape(tags[i]), {
+                        elasticsearch_highlight_start: '<span class="note-highlight">',
+                        elasticsearch_highlight_end: '</span>'
+                    })%>
+                </span>
+            <% } %>
+        <% } %>
+    </div>
+</footer>

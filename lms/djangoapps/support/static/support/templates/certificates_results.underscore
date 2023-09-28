@@ -1,0 +1,42 @@
+<% if (certificates.length === 0) { %>
+<p><%- gettext("No results") %></p>
+<% } else { %>
+<table>
+    <tr>
+        <th><%- gettext("Course Key") %></th>
+        <th><%- gettext("Type") %></th>
+        <th><%- gettext("Status") %></th>
+        <th><%- gettext("Grade") %></th>
+        <th><%- gettext("Last Updated") %></th>
+        <th></th>
+    </tr>
+    <% for (var i = 0; i < certificates.length; i++) {
+        var cert = certificates.at(i);
+    %>
+    <tr>
+        <td><%- cert.get("course_key") %></td>
+        <td><%- cert.get("type") %></td>
+        <td><%- cert.get("status") %></td>
+        <td><%- cert.get("grade") %></td>
+        <td><%- cert.get("modified") %></td>
+        <td>
+            <% if (cert.get("regenerate")) { %>
+            <button
+                class="btn-cert-regenerate btn-disable-on-submit"
+                data-username="<%- cert.get("username") %>"
+                data-course-key="<%- cert.get("course_key") %>"
+            ><%- gettext("Regenerate") %></button>
+            <span class="sr"><%- gettext("Regenerate the user's certificate") %></span>
+             <% } else { %>
+             <button
+                class="btn-cert-generate btn-disable-on-submit"
+                data-username="<%- cert.get("username") %>"
+                data-course-key="<%- cert.get("course_key") %>"
+            ><%- gettext("Generate") %></button>
+            <span class="sr"><%- gettext("Generate the user's certificate") %></span>
+            <% } %>
+        </td>
+    </tr>
+    <% } %>
+</table>
+<% } %>

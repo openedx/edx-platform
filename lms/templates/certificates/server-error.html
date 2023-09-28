@@ -1,0 +1,25 @@
+<%page expression_filter="h"/>
+<%! from django.utils.translation import gettext as _ %>
+<%inherit file="../main.html" />
+
+<%block name="pagetitle">${_("Invalid Certificate Configuration.")}</%block>
+
+<section class="outside-app">
+    <h1>
+        ${_(u"There is a problem with this certificate.")}
+    </h1>
+
+    <div>
+        <p>
+            ${_("To resolve the problem, your partner manager should verify that the following information is correct.")}
+        </p>
+        <ul>
+            <li>${_("The institution's logo.")}</li>
+            <li>${_("The institution that is linked to the course.")}</li>
+            <li>${_("The course information in the Course Administration tool.")}</li>
+        </ul>
+        <br/>
+        <p>${_("If all of the information is correct and the problem persists, contact technical support.")}</p>
+    </div>
+
+</section>

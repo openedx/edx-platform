@@ -1,0 +1,38 @@
+<%! from django.utils.translation import gettext as _ %>
+
+
+${_("Sorry! The photos you submitted for ID verification were not accepted, for the following reason(s):")}
+${_("The photo(s) of you:")}
+
+%for reason in reasons:
+    %if reason.get('userPhotoReasons'):
+        ${_("The photo of you:")}
+        <ul>
+        %for item in reason.get('userPhotoReasons'):
+            <li>${item}</li>
+        %endfor
+        </ul>
+    %endif
+    %if reason.get('photoIdReasons'):
+        ${_("The photo of your ID:")}
+        <ul>
+        %for item in reason.get('photoIdReasons'):
+            <li>${item}</li>
+        %endfor
+        </ul>
+    %endif
+    %if reason.get('generalReasons'):
+        ${_("Other Reasons:")}
+        <ul>
+        %for item in reason.get('generalReasons'):
+            <li>${item}</li>
+        %endfor
+        </ul>
+    %endif
+%endfor
+
+${_("Resubmit Verification: {reverify_url}").format(reverify_url=reverify_url)}
+${_("ID Verification FAQ: {faq_url}").format(faq_url=faq_url)}
+
+${_("Thank you,")}
+${_("The {platform_name} team").format(platform_name=platform_name)}

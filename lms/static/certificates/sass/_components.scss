@@ -1,0 +1,637 @@
+// ------------------------------
+// // Open edX Certificates: Components
+
+// About: styling for specific UI components ranging from global to modular.
+
+// #HEADINGS
+// #DEPTH
+// #MESSAGES
+// #IMAGES
+
+// #HEADER APP
+// #BANNER
+// #INTRODUCTION
+// #ACCOMPLISHMENT
+// #RENDERING
+// #ACCOMPLISHMENT RELATED
+// #CERTIFICATE
+// #ABOUT
+
+// ------------------------------
+// #HEADINGS
+// ------------------------------
+%hd-subsection {
+  margin-bottom: map-get($spacing-vertical, mid-small);
+  border-bottom: rem(2) solid $gray-x-back;
+  padding-bottom: map-get($spacing-vertical, x-small);
+}
+
+// ------------------------------
+// #DEPTH
+// ------------------------------
+%depth-base-focus {
+  background: $white;
+  padding: map-get($spacing-vertical, small) map-get($spacing-horizontal, base);
+}
+
+%depth-well {
+  box-shadow: 0 rem(1) rem(3) 0 $gray-back inset;
+  padding: map-get($spacing-vertical, small) map-get($spacing-horizontal, base);
+  background: $gray-x-back;
+}
+
+%depth-card {
+  box-shadow: 0 rem(1) rem(2) 0 $gray-back;
+  padding: map-get($spacing-vertical, small) map-get($spacing-horizontal, base);
+  background: $white;
+}
+
+.depth-base-focus {
+  @extend %depth-base-focus;
+}
+
+.depth-well {
+  @extend %depth-well;
+}
+
+.depth-card {
+  @extend %depth-card;
+}
+
+// ------------------------------
+// #IMAGES
+// ------------------------------
+// circular cropped
+%img-cropped {
+  .src {
+    display: block;
+    width: 100%;
+    border-radius: 50%;
+  }
+}
+
+// ------------------------------
+// #HEADER APP
+// ------------------------------
+.wrapper-header {
+  @extend %divider-2;
+
+  border-bottom-color: $gray-x-back;
+  background: $white;
+}
+
+// ------------------------------
+// #BANNER
+// ------------------------------
+.banner {
+  .message-copy {
+    margin-bottom: 0;
+  }
+}
+
+// message to user-centric banner
+.wrapper-banner-user {
+  box-shadow: inset 0 rem(2) rem(2) 0 $black;
+  background: $gray-dark;
+}
+
+.banner-user {
+  .message-title {
+    color: $white;
+    font-weight: 600;
+    margin-top: 0;
+  }
+
+  .message-copy {
+    color: $white;
+  }
+
+  .message-actions .action {
+    @include button-outline-variant($gray-x-back, $gray-dark);
+
+    padding: 0.625rem;
+    font-size: rem(14);
+    transition: color 0.125s ease-in-out 0s, border-color 0.125s ease-in-out 0s, background 0.125s ease-in-out 0s, box-shadow 0.125s ease-in-out 0s;
+    border: 1px solid;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: $font-family-sans;
+    font-weight: 600;
+
+    .icon {
+      @include margin-right(map-get($spacing-horizontal, x-small));
+
+      font-size: rem(18);
+    }
+
+    // CASE: icon display only
+    &.icon-only {
+      .action-label {
+        @include sr-only;
+      }
+    }
+
+    // CASE mozilla open badges logo
+    .icon-mozillaopenbadges {
+      width: rem(18);
+    }
+  }
+}
+
+// ------------------------------
+// #INTRODUCTION
+// ------------------------------
+.introduction {
+  margin-bottom: map-get($spacing-vertical, base);
+
+  @include text-align(center);
+
+  .introduction-copy {
+    font-weight: 600;
+    margin-top: 0;
+  }
+}
+
+// ------------------------------
+// #ACCOMPLISHMENTS
+// ------------------------------
+// base accomplishment
+.accomplishment {
+  .accomplishment-type-symbol .src {
+    display: block;
+    width: 100%;
+  }
+}
+
+// main accomplishment
+.accomplishment-main {
+  background: $gray-x-back;
+}
+
+// brief accomplishment
+.accomplishment-brief {
+  @extend %depth-card;
+
+  .accomplishment-type-symbol,
+  .accomplishment-details {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .accomplishment-type-symbol {
+    @include size(20%);
+  }
+
+  .accomplishment-details {
+    width: 70%;
+  }
+
+
+  .accomplishment-summary {
+    margin-bottom: 0;
+  }
+}
+
+// ------------------------------
+// #RENDERING
+// ------------------------------
+%rendering-accomplishment-line {
+  display: block;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+%rendering-section {
+  margin-bottom: map-get($spacing-vertical, base);
+  border-bottom: rem(2) solid $gray-x-back;
+  padding-bottom: map-get($spacing-vertical, base);
+}
+
+%rendering-hd-section {
+  margin-bottom: map-get($spacing-vertical, mid-small);
+  border-bottom: rem(2) solid $gray-x-back;
+  padding-bottom: map-get($spacing-vertical, x-small);
+  color: $cert-base-color;
+
+  @include text-align(center);
+}
+
+.accomplishment-rendering {
+  @extend %depth-card;
+
+  position: relative;
+  top: -(map-get($spacing-vertical, base));
+  border-top: rem(4) solid $cert-base-color;
+
+  // type
+  .accomplishment-type {
+    @include text-align(center);
+
+    margin-top: -(map-get($spacing-vertical, large));
+    margin-bottom: map-get($spacing-vertical, base);
+  }
+
+  .accomplishment-type-label,
+  .accomplishment-type-symbol {
+    display: block;
+  }
+
+  .accomplishment-type-label {
+    @include make-col(10);
+
+    margin: 0 auto;
+    font-weight: 600;
+  }
+
+  .accomplishment-type-symbol {
+    @include size(rem(100));
+
+    margin: 0 auto map-get($spacing-vertical, small) auto;
+  }
+
+  // statement
+  .accomplishment-statement {
+    @extend %rendering-section;
+
+    @include text-align(center);
+  }
+
+  .accomplishment-statement-lead {
+    @extend .hd-2;
+  }
+
+  .accomplishment-recipient {
+    @extend %rendering-accomplishment-line;
+  }
+
+  .accomplishment-summary {
+    @extend %rendering-accomplishment-line;
+    @extend %copy-lead;
+
+    margin-bottom: map-get($spacing-vertical, mid-small);
+  }
+
+  .accomplishment-course {
+    @extend %rendering-accomplishment-line;
+
+    font-weight: 600;
+  }
+
+  .accomplishment-course-description {
+    @extend %rendering-accomplishment-line;
+  }
+
+  .accomplishment-statement-detail {
+    @extend %rendering-accomplishment-line;
+    @extend %copy-lead;
+  }
+
+  // organizations
+  .accomplishment-orgs {
+    margin-bottom: map-get($spacing-vertical, base);
+  }
+
+  .accomplishment-orgs-title {
+    @extend %rendering-hd-section;
+  }
+
+  // signatories
+  .accomplishment-signatories {
+    @extend %rendering-section;
+
+    .signatory-signature {
+      display: block;
+      margin: 0 auto map-get($spacing-vertical, x-small) auto;
+      box-sizing: border-box;
+    }
+
+    .signatory-name,
+    .signatory-credentials {
+      @include text-align(center);
+    }
+
+    .signatory-name {
+      margin-bottom: map-get($spacing-vertical, xx-small);
+      margin-top: 0;
+      font-weight: 400;
+    }
+
+    .signatory-credentials {
+      @extend %copy-micro;
+
+      margin-top: 0;
+
+      .role,
+      .organization {
+        white-space: pre-line;
+        display: block;
+      }
+    }
+  }
+
+  .accomplishment-signatories-title {
+    @extend %rendering-hd-section;
+  }
+}
+
+// metadata
+.accomplishment-metadata {
+  margin-bottom: map-get($spacing-vertical, base);
+
+  .metadata {
+    .label {
+      @extend %copy-meta;
+
+      margin-bottom: map-get($spacing-vertical, xx-small);
+      padding: 0 rem(8);
+    }
+
+    .label-explanation {
+      display: block;
+      font-weight: 400;
+      margin-top: map-get($spacing-vertical, xx-small);
+    }
+
+    .value {
+      @extend %copy-base;
+
+      font-weight: 600;
+      color: $gray-dark;
+      margin: 0;
+      padding: 0 rem(8);
+    }
+  }
+
+  .recipient-img,
+  .recipient-details {
+    display: inline-block;
+    vertical-align: top;
+  }
+
+  .recipient-img {
+    @extend %img-cropped;
+
+    width: rem(100);
+
+    @include margin-right(map-get($spacing-horizontal, small));
+
+    .src {
+      max-height: 100%;
+      border: rem(4) solid $white;
+    }
+  }
+
+  .recipient-details {
+    @extend %copy-base;
+
+    font-weight: 600;
+    max-width: calc(100% - (#{rem(100)} + #{map-get($spacing-horizontal, small)} + 5px));
+  }
+
+  .recipient-name {
+    margin-bottom: map-get($spacing-vertical, xx-small);
+  }
+
+  .recipient-username {
+    margin-bottom: 0;
+    margin-top: rem(28);
+  }
+
+  .accomplishment-id .value {
+    word-wrap: break-word;
+  }
+}
+
+.accomplishment-metadata-title {
+  @extend %hd-subsection;
+
+  border-bottom-color: $gray-back;
+}
+
+// ------------------------------
+// #ACCOMPLISHMENT RELATED
+// ------------------------------
+.accomplishment-related-title {
+  @extend %hd-subsection;
+}
+
+// ------------------------------
+// #CERTIFICATE
+// ------------------------------
+// certficate - default
+.certificate {
+  .accomplishment-rendering {
+
+    // decorative corners for certs
+    .deco-corner {
+      position: absolute;
+    }
+
+    .deco-corner-tl {
+      @include triangle(20px, $cert-base-color, up-right);
+
+      top: 0;
+      right: 0;
+    }
+
+    .deco-corner-tr {
+      @include triangle(20px, $cert-base-color, up-left);
+
+      top: 0;
+      left: 0;
+    }
+
+    .deco-corner-bl {
+      @include triangle(20px, $cert-base-color, down-right);
+
+      bottom: 0;
+      right: 0;
+    }
+
+    .deco-corner-br {
+      @include triangle(20px, $cert-base-color, down-left);
+
+      bottom: 0;
+      left: 0;
+    }
+
+    .accomplishment-type-label {
+      color: $cert-base-color;
+    }
+
+    .accomplishment-signatories-title,
+    .accomplishment-orgs-title {
+      color: $cert-decorative-color;
+    }
+
+    .wrapper-statement-and-signatories {
+      width: 100%;
+    }
+
+    // statement
+    .accomplishment-statement,
+    .accomplishment-statement-lead,
+    .accomplishment-recipient,
+    .accomplishment-course {
+      font-family: $font-family-serif;
+    }
+
+    .accomplishment-recipient,
+    .accomplishment-course {
+      letter-spacing: rem(1);
+    }
+  }
+}
+
+// certificate - base + honor
+.layout-accomplishment.certificate-honor {
+  .introduction {
+    margin-bottom: 0;
+  }
+
+  .accomplishment-main {
+    background: $gray-x-back;
+  }
+
+  .accomplishment-rendering {
+    .accomplishment-type {
+      margin-top: 0;
+    }
+
+    // hide the fancy
+    .accomplishment-signatories .signatory-signature,
+    .accomplishment-type-symbol {
+      display: none;
+    }
+  }
+}
+
+// certificate - distinguished + verified
+.layout-accomplishment.certificate-verified {
+  .introduction {
+    margin-bottom: map-get($spacing-vertical, base);
+  }
+
+  .accomplishment-main {
+    background: $primary-back;
+  }
+
+  .accomplishment-rendering {
+    background: $white url('../images/bg-verified.png') center no-repeat;
+    background-size: 65%;
+
+    .deco-corner-tl {
+      @include triangle(20px, $cert-distinguished-color, up-right);
+    }
+
+    .deco-corner-tr {
+      @include triangle(20px, $cert-distinguished-color, up-left);
+    }
+
+    .deco-corner-bl {
+      @include triangle(20px, $cert-distinguished-color, down-right);
+    }
+
+    .deco-corner-br {
+      @include triangle(20px, $cert-distinguished-color, down-left);
+    }
+  }
+
+  .accomplishment-rendering {
+    border-color: $cert-distinguished-color;
+
+    .accomplishment-type-label {
+      color: $cert-distinguished-color;
+    }
+  }
+}
+
+// ------------------------------
+// #FOOTER
+// ------------------------------
+.footer-app {
+  border-top: rem(4) solid $gray-x-back;
+  padding-top: map-get($spacing-vertical, base);
+}
+
+.footer-app-nav {
+  .list {
+    padding: 0;
+  }
+}
+
+// ------------------------------
+// #BADGES MODAL
+// ------------------------------
+.badges-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  background-color: $gray-transparent; /* dim the background */
+  width: 100%;
+  height: 100%;
+  vertical-align: middle;
+
+  .badges-modal {
+    @extend %copy-large;
+
+    box-sizing: content-box;
+    position: fixed;
+    top: map-get($spacing-vertical, large);
+    right: 0;
+    left: 0;
+    z-index: 1000;
+    max-width: 50%;
+    margin-right: auto;
+    margin-left: auto;
+    border-top: rem(10) solid $primary-back;
+    background: $gray-x-back;
+    padding-right: map-get($spacing-horizontal, large);
+    padding-left: map-get($spacing-horizontal, large);
+    overflow-x: hidden;
+    color: $gray-dark;
+
+    .close {
+      position: absolute;
+      right: map-get($spacing-horizontal, mid-small);
+      top: map-get($spacing-vertical, small);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .badges-steps {
+      display: table;
+
+      a {
+        @extend %link;
+      }
+    }
+
+    .image-container {
+      // Lines the image up with the content of the above list.
+      @include ltr {
+        @include padding-left(2em);
+      }
+
+      @include rtl {
+        @include padding-right(1em);
+
+        float: right;
+      }
+    }
+
+    .backpack-logo {
+      @include float(right);
+      @include margin-left(map-get($spacing-horizontal, small));
+    }
+  }
+}
+
+.modal-hr {
+  display: block;
+  border: none;
+  background-color: $gray-back;
+  height: rem(2);
+  width: 100%;
+}

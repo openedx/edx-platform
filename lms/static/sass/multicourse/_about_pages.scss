@@ -1,0 +1,331 @@
+.container.about {
+  padding: 20px 30px 120px;
+
+  > nav {
+    margin-bottom: ($baseline*4);
+    text-align: center;
+    width: flex-grid(12);
+
+    &::after {
+      @extend %faded-hr-divider;
+
+      content: "";
+      display: block;
+    }
+
+    a {
+      border-bottom: 3px solid transparent;
+      color: $lighter-base-font-color;
+      font-family: $serif;
+      font-style: italic;
+      display: inline-block;
+      letter-spacing: 1px;
+      margin: 0 15px;
+      padding: 20px 10px;
+
+      @include transition(all 0.15s linear 0s);
+
+      text-transform: lowercase;
+
+      &:hover,
+      &:active,
+      &:focus {
+        border-color: rgb(200, 200, 200);
+        color: $body-color;
+        text-decoration: none;
+      }
+    }
+  }
+
+  .vision {
+    h1 + hr {
+      margin-bottom: ($baseline*4);
+    }
+
+    .our-mission {
+      border-bottom: 1px solid rgb(220, 220, 220);
+
+      @include clearfix();
+
+      margin: 0 auto 100px;
+      padding-bottom: 40px;
+
+      .logo {
+        @include border-right(1px solid rgb(200, 200, 200));
+
+        box-sizing: border-box;
+
+        @include float(left);
+
+        height: 115px;
+
+        @include margin-right(flex-gutter());
+
+        text-align: center;
+        width: flex-grid(3);
+
+        > img {
+          display: inline-block;
+          margin-top: 26px;
+          max-height: 60px;
+        }
+      }
+
+      h2.mission-quote {
+        box-sizing: border-box;
+
+        @include float(right);
+
+        font-style: italic;
+        line-height: 1.4;
+        margin: 0;
+
+        @include padding(5px, 0, 5px, 20px);
+
+        text-transform: none;
+        width: flex-grid(9);
+      }
+    }
+
+    .message {
+      border-bottom: 1px solid rgb(220, 220, 220);
+
+      @include clearfix();
+
+      margin-bottom: ($baseline*4);
+      padding-bottom: 80px;
+      position: relative;
+
+      hr {
+        bottom: 0;
+        display: none;
+        margin: 0;
+        position: absolute;
+        width: 100%;
+      }
+
+      h2 {
+        border-bottom: 1px solid rgb(200, 200, 200);
+        padding-bottom: 15px;
+      }
+
+      .photo {
+        box-sizing: border-box;
+        background: rgb(255, 255, 255);
+        border: 1px solid rgb(210, 210, 210);
+        margin-top: 37px;
+        padding: 1px;
+        width: flex-grid(3);
+
+        img {
+          background: rgb(245, 245, 245);
+          display: block;
+          width: 100%;
+        }
+      }
+
+      > article {
+        box-sizing: border-box;
+
+        @include float(left);
+        @include padding-left($baseline);
+
+        width: flex-grid(9);
+      }
+
+      &.left {
+        .photo {
+          @include float(left);
+          @include margin-right(flex-gutter());
+        }
+      }
+
+      &.right {
+        .photo {
+          @include float(right);
+          @include margin-left(flex-gutter());
+        }
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    .partners {
+      @include clearfix();
+
+      > article {
+        @include float(left);
+
+        width: flex-grid(6);
+
+        &:first-child {
+          @include margin-right(flex-gutter());
+        }
+      }
+    }
+  }
+
+
+  .faq {
+    @include clearfix();
+
+    nav.categories {
+      border: 1px solid rgb(220, 220, 220);
+      box-sizing: border-box;
+
+      @include float(left);
+      @include margin-left(flex-gutter());
+
+      padding: 20px;
+      width: flex-grid(3);
+
+      a {
+        display: block;
+        letter-spacing: 1px;
+        margin: 0 -20px;
+
+        @include padding(12px, 0, 12px, 20px);
+
+        text-align: left;
+
+        &:hover,
+        &:focus {
+          background: rgb(245, 245, 245);
+          text-decoration: none;
+        }
+      }
+    }
+
+    .responses {
+      @include float(left);
+
+      width: flex-grid(9);
+
+      .category {
+        padding-top: 40px;
+
+        &:first-child {
+          padding-top: 0;
+        }
+
+        > h2 {
+          border-bottom: 1px solid rgb(220, 220, 220);
+          margin-bottom: ($baseline*2);
+          padding-bottom: $baseline;
+        }
+      }
+
+      .response {
+        margin-bottom: ($baseline*2);
+
+        h3 {
+          font-family: $font-family-sans-serif;
+          font-weight: 700;
+          margin-bottom: ($baseline*0.75);
+        }
+      }
+    }
+  }
+
+  .press {
+    .press-story {
+      border-bottom: 1px solid rgb(220, 220, 220);
+
+      @include clearfix();
+
+      margin-bottom: ($baseline*2);
+      padding-bottom: 40px;
+
+      &:last-child {
+        border: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .article-cover {
+        background: rgb(255, 255, 255);
+        border: 1px solid rgb(120, 120, 120);
+        box-sizing: border-box;
+
+        @include float(left);
+
+        height: 140px;
+
+        @include margin-right(flex-gutter());
+
+        overflow: hidden;
+        width: flex-grid(2);
+
+        img {
+          display: block;
+          //min-height: 100%;
+          //width: 100%;
+        }
+      }
+
+      .press-info {
+        @include float(left);
+
+        width: flex-grid(10);
+
+        header {
+          margin-bottom: ($baseline/2);
+
+          h3 {
+            font-family: $font-family-sans-serif;
+            font-weight: 700;
+            margin-bottom: ($baseline/4);
+          }
+
+          span.post-date {
+            color: $lighter-base-font-color;
+
+            @include margin-right($baseline/2);
+          }
+        }
+      }
+    }
+  }
+
+  .contact {
+    @include clearfix();
+
+    margin: 0 auto;
+
+    .photo {
+      box-sizing: border-box;
+      background: rgb(255, 255, 255);
+      border: 1px solid rgb(210, 210, 210);
+      padding: 1px;
+
+      @include float(left);
+
+      width: flex-grid(3);
+
+      img {
+        max-width: 100%;
+      }
+    }
+
+    .contacts {
+      box-sizing: border-box;
+
+      @include float(left);
+      @include padding-left(40px);
+
+      width: flex-grid(9);
+
+      ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        li {
+          margin-bottom: ($baseline/2);
+        }
+      }
+    }
+  }
+}

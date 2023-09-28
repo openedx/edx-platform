@@ -1,0 +1,871 @@
+// edX theme: LMS Footer
+// ====================
+@import '../base/grid-settings';
+@import 'neat/neat'; // lib - Neat
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/breakpoints';
+
+$edx-footer-link-color: $primary;
+$edx-footer-bg-color: rgb(252, 252, 252);
+
+// Aggressively scoped for Drupal
+// ==============================
+// These styles are being loaded on Drupal, LMS and WordPress
+// sites so the scope has to be aggressive to override default
+// CMS styles
+footer#footer-edx-v3 {
+  background: $edx-footer-bg-color;
+  padding: $baseline*0.75 0;
+  border-top: 1px solid $courseware-button-border-color;
+
+  // There is a generic style similar applying div and box shadow on the wiki page of course.
+  // so disabling that design for footer in the lines below
+  .container > div {
+    border: none;
+    box-shadow: none;
+    background: inherit;
+  }
+
+  .column-styles {
+    position: relative;
+    width: 100%;
+    flex: 0 0 100%;
+    max-width: 100%;
+    min-height: 1px;
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+
+  a.social-links {
+    font-size: 35px;
+  }
+
+  .first-div-border,
+  .second-div-border,
+  .third-div-border,
+  .fourth-div-border {
+    @include border-left(none);
+  }
+
+  .main-row {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+  }
+
+
+  .list-unstyled {
+    list-style: none;
+
+    @include padding-left(0);
+  }
+
+  .flex-column {
+    flex-direction: column;
+  }
+
+  a.social-links.external:hover {
+    text-decoration: none;
+  }
+
+  .full-height {
+    height: 100%;
+  }
+
+  .social-app-links-div {
+    float: none;
+    display: table-cell;
+    vertical-align: top;
+  }
+
+  div.container {
+    min-width: 0;
+    padding: 0 $baseline*0.75;
+  }
+
+  ul.clear-margins li {
+    padding-bottom: 5px;
+  }
+
+  .row.small-screen {
+    display: none;
+  }
+
+  .row.all-screens {
+    display: flex;
+  }
+
+  h2.heading {
+    font-weight: 600;
+    padding: $baseline*0.25 0;
+    color: $lighter-base-font-color;
+
+    @include margin-left(8px);
+  }
+
+  ul.clear-margins {
+    list-style: outside none none;
+    padding-bottom: $baseline*0.75;
+    margin-top: $baseline*0.75;
+
+    @include margin-left(8px);
+
+    border-bottom: 1px solid $courseware-button-border-color;
+    line-height: 1.5;
+  }
+
+  .footer-language-selector {
+    @include float(right);
+  }
+
+  .app-links {
+    margin-top: $baseline*0.75;
+    height: auto;
+    display: inline-flex;
+  }
+
+  .app-link img {
+    height: 35px;
+  }
+
+  .social {
+    margin-top: $baseline*1.5;
+    height: auto;
+
+    @include margin-left($baseline*0.25);
+  }
+
+  ul.social li {
+    display: inline-flex;
+
+    @include margin-right(10px);
+  }
+
+  .edx-footer-logo {
+    display: inline-flex;
+
+    @include margin-left(5px);
+
+    img {
+      height: $header-logo-height*1.05;
+    }
+  }
+
+  // To match the Pattern Library
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  .footer-content-wrapper {
+    @include outer-container;
+
+    box-sizing: border-box;
+  }
+
+  p {
+    @include font-size(14);
+    @include line-height(14);
+
+    font-family: $font-family-sans-serif;
+  }
+
+  .copyright {
+    margin-top: 30px;
+
+    a {
+      text-decoration: underline !important;
+    }
+
+    @include margin-left(8px);
+    @include font-size(16);
+    @include line-height(24px);
+  }
+
+  .site-nav,
+  .legal-notices {
+    li {
+      @include font-size(14);
+      @include line-height(14);
+      @include margin-right($baseline);
+
+      color: $edx-footer-link-color;
+
+      &:last-of-type {
+        @include margin-right(0);
+      }
+
+      &:hover,
+      &:focus {
+        border: none;
+      }
+    }
+  }
+
+  .footer-logo,
+  .site-details,
+  .external-links {
+    @include span-columns(12);
+  }
+
+  .site-details,
+  .external-links {
+    margin-top: 5px;
+  }
+
+  .footer-logo {
+    margin-bottom: 30px;
+  }
+
+  .legal-notices {
+    margin: 20px 0;
+  }
+
+  .openedx-link {
+    @include margin(10px, 0, 30px, -8px);
+
+    width: 141px;
+
+    a {
+      display: inline-block;
+    }
+
+    img {
+      width: 100%;
+    }
+  }
+
+  .about-links,
+  .legal-links,
+  .social-media-links,
+  .mobile-app-links {
+    @extend %ui-no-list;
+
+    .list-item {
+      display: inline-block;
+    }
+  }
+
+  .mobile-app-links {
+    @include clearfix();
+
+    position: relative;
+    width: 260px;
+    height: 42px;
+  }
+
+  .social-media-links {
+    @include clearfix();
+
+    margin-bottom: 30px;
+  }
+
+  .icon {
+    font-family: 'FontAwesome';
+    font-style: normal;
+    color: $edx-footer-link-color;
+  }
+
+
+
+  a.sm-link {
+    @include float(left);
+    @include margin(0, 6, 10, 0);
+    @include font-size(40);
+    @include line-height(28);
+
+    width: 35px;
+    height: 30px;
+    line-height: 1;
+    position: relative;
+    display: inline;
+    background: none;
+
+    @include text-align(left);
+
+    &:first-of-type {
+      @include margin-left(0);
+    }
+
+    &:hover,
+    &:focus {
+      opacity: 0.7;
+      border: none;
+    }
+  }
+
+  a.social-links {
+    @include font-size(30);
+    @include line-height(1);
+
+    position: relative;
+    display: inline;
+    background: none;
+    text-align: left;
+
+    &:first-of-type {
+      @include margin-left(0);
+    }
+
+    &:hover,
+    &:focus {
+      opacity: 0.7;
+      border: none;
+    }
+  }
+
+  .app-link {
+    &:first-of-type {
+      @include left(0);
+    }
+
+    &:last-of-type {
+      @include right(0);
+    }
+
+    img {
+      height: 40px;
+      max-width: 200px;
+    }
+
+    padding: $baseline*0.35;
+  }
+
+  .site-nav,
+  .legal-notices,
+  .footer-logo,
+  .external-links {
+    @extend %ui-print-excluded;
+  }
+
+  @media print {
+    .site-details p {
+      @include float(left);
+    }
+
+    .openedx-link {
+      margin: 0;
+
+      @include float(right);
+    }
+  }
+
+  @include media-breakpoint-up(sm) {
+    padding: $baseline $baseline*0.5;
+
+    .column-1 {
+      flex: 0 0 58.33333%;
+      max-width: 58.33333%;
+    }
+
+    .column-2,
+    .column-3 {
+      flex: 0 0 50%;
+      max-width: 50%;
+    }
+
+    .column-2-1,
+    .column-3-1,
+    .column-3-2 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+
+    .column-2-2 {
+      flex: 0 0 80%;
+      max-width: 80%;
+
+      @include margin-left(10%);
+    }
+
+    ul.social {
+      padding: 0;
+      margin: 0;
+      list-style-type: none;
+      margin-top: 15px;
+    }
+
+    .logo-div {
+      @include margin-left(7%);
+
+      display: inline-flex;
+    }
+
+    ul.social li {
+      width: 65px;
+      height: 35px;
+      float: left;
+      margin-left: 7px;
+    }
+
+    div.container {
+      min-width: 0;
+      padding: 0;
+    }
+
+    .first-div-border div div {
+      border-bottom: 1px solid $courseware-button-border-color;
+
+      @include margin-left(10%);
+    }
+
+    .second-div-border div div {
+      border-bottom: 1px solid $courseware-button-border-color;
+
+      @include margin-left(10%);
+    }
+
+    .third-div-border div div {
+      border-bottom: none;
+
+      @include margin-left(10%);
+    }
+
+    .fourth-div-border {
+      @include border-left(1px solid $courseware-button-border-color);
+    }
+
+    .site-details {
+      @include span-columns(8);
+    }
+
+    .external-links {
+      @include span-columns(4);
+    }
+
+    .social-media-links,
+    .mobile-app-links {
+      @include float(right);
+    }
+
+    .social-media-links {
+      margin-bottom: 40px;
+    }
+
+    ul.clear-margins {
+      margin-top: 5px;
+      border-bottom: none;
+    }
+
+    .app-link img {
+      height: 35px;
+      margin-top: 10px;
+    }
+
+    a.social-links {
+      @include font-size(35);
+
+      margin-top: 5px;
+
+      @include margin-left($baseline*0.25);
+    }
+
+    .footer-language-selector {
+      display: inline-block;
+      float: none;
+    }
+  }
+
+  @include media-breakpoint-up(md) {
+    .ml-auto {
+      margin-left: auto;
+    }
+
+    .footer-language-selector {
+      display: inline-block;
+      width: max-content;
+    }
+
+    .column-1 {
+      flex: 0 0 25%;
+      max-width: 25%;
+    }
+
+    .column-2 {
+      flex: 0 0 75%;
+      max-width: 75%;
+    }
+
+    .column-2-2 {
+      flex: 0 0 80%;
+      max-width: 80%;
+
+      @include margin-left(0);
+    }
+
+    .column-2-2,
+    .column-3,
+    .column-3-2 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+
+    .column-2-1 {
+      flex: 0 0 33.3333%;
+      max-width: 33.3333%;
+    }
+
+    .column-3-1 {
+      flex: 0 0 75%;
+      max-width: 75%;
+    }
+
+    .edx-footer-logo {
+      display: inline-flex;
+
+      @include margin-left(0);
+
+      margin-top: 5px;
+    }
+
+    .first-div-border {
+      @include border-left(none);
+
+      border-bottom: none;
+    }
+
+    .first-div-border div div {
+      border-bottom: none;
+
+      @include margin-left(0);
+    }
+
+    .second-div-border div div {
+      border-bottom: none;
+
+      @include margin-left(0);
+    }
+
+    .second-div-border {
+      @include border-left(1px solid $courseware-button-border-color);
+
+      border-bottom: none;
+    }
+
+    .third-div-border {
+      @include border-left(1px solid $courseware-button-border-color);
+    }
+
+    padding: $baseline $baseline*0.5;
+
+    .site-details {
+      @include span-columns(8);
+    }
+
+    .external-links {
+      @include span-columns(4);
+    }
+
+    .social-media-links,
+    .mobile-app-links {
+      @include float(right);
+    }
+
+    .social-media-links {
+      margin-bottom: 40px;
+    }
+
+    ul.clear-margins {
+      margin-top: 15px;
+      border-bottom: none;
+    }
+
+    .social {
+      display: inline-flex;
+      vertical-align: middle;
+    }
+
+    ul.social {
+      margin-top: 29px;
+    }
+
+    .app-links {
+      display: inline-flex;
+
+      @include margin-left($baseline*0.25);
+
+      vertical-align: middle;
+    }
+
+    ul.clear-margins li {
+      @include font-size(16);
+    }
+
+    h2.heading {
+      font-weight: 700;
+    }
+
+    .col-md-3 .footer-language-selector {
+      float: none;
+      display: block;
+
+      @include margin-left(0);
+    }
+
+    ul.social li {
+      display: inline-flex;
+      width: auto;
+    }
+  }
+
+  @include media-breakpoint-up(lg) {
+    padding: $baseline $baseline*0.5;
+
+    .column-1,
+    .column-2-2,
+    .column-3-1,
+    .column-3-2 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+
+    .column-2 {
+      flex: 0 0 66.66667%;
+      max-width: 66.66667%;
+    }
+
+    .column-2-1,
+    .column-3 {
+      flex: 0 0 33.3333%;
+      max-width: 33.3333%;
+    }
+
+    .column-2-2 {
+      @include margin-left(0);
+    }
+
+    .edx-footer-logo {
+      @include margin-left($baseline);
+    }
+
+    .first-div-border {
+      @include border-left(none);
+    }
+
+    .second-div-border {
+      @include border-left(1px solid $courseware-button-border-color);
+    }
+
+    .third-div-border {
+      @include border-left(1px solid $courseware-button-border-color);
+    }
+
+    .fourth-div-border {
+      @include border-left(1px solid $courseware-button-border-color);
+    }
+
+
+    .col-xl-2 .edx-footer-logo {
+      @include margin-left(0);
+      @include padding(0, 0, $baseline, $baseline);
+    }
+
+    div.col-xl-6 div.col-xl-4 div div {
+      border-bottom: none;
+    }
+
+    .col-xl-10 div.row div:nth-child(1) div.row:nth-child(1) {
+      @include padding-left($baseline*1.75);
+    }
+
+    .col-xl-2.col-md-12.col-sm-3.col-xs-10 {
+      text-align: left;
+    }
+
+    .site-details {
+      @include span-columns(8);
+    }
+
+    .external-links {
+      @include span-columns(4);
+    }
+
+    .app-links {
+      @include margin-left(0);
+    }
+
+    .social-media-links,
+    .mobile-app-links {
+      @include float(right);
+    }
+
+    .social-media-links {
+      margin-bottom: 40px;
+    }
+
+    ul.clear-margins {
+      margin-top: $baseline*0.75;
+      border-bottom: none;
+    }
+
+    .social {
+      display: inline-flex;
+      vertical-align: middle;
+      margin-top: $baseline;
+    }
+
+    .app-links {
+      display: inline-flex;
+      vertical-align: middle;
+    }
+
+    ul.clear-margins li {
+      @include font-size(16);
+
+      padding-bottom: $baseline*0.25;
+    }
+
+    h2.heading {
+      font-weight: 700;
+      padding-bottom: $baseline*0.5;
+    }
+
+    .col-xl-2 .footer-language-selector {
+      display: inline-block;
+      width: max-content;
+      margin-left: 0;
+    }
+
+    ul.social li {
+      display: inline;
+    }
+  }
+
+  @include media-breakpoint-up(xl) {
+    .margin {
+      @include margin-left(0);
+    }
+
+    .first-div-border {
+      @include border-left(1px solid $courseware-button-border-color);
+    }
+
+    .column-1 {
+      flex: 0 0 16.6667%;
+      max-width: 16.6667%;
+    }
+
+    .column-2 {
+      flex: 0 0 50%;
+      max-width: 50%;
+    }
+
+    .column-2-1,
+    .column-3 {
+      flex: 0 0 33.3333%;
+      max-width: 33.3333%;
+    }
+
+    .column-2-2 {
+      @include margin-left(0%);
+    }
+
+    .column-2-2,
+    .column-3-1,
+    .column-3-2 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+
+    .second-div-border {
+      @include border-left(1px solid $courseware-button-border-color);
+    }
+
+    .third-div-border {
+      @include border-left(1px solid $courseware-button-border-color);
+    }
+
+    .fourth-div-border {
+      @include border-left(1px solid $courseware-button-border-color);
+    }
+
+    .footer-logo {
+      @include span-columns(2);
+    }
+
+    .app-links {
+      @include margin-left(0);
+    }
+
+    .site-details {
+      @include span-columns(7);
+    }
+
+    .external-links {
+      @include span-columns(3);
+    }
+
+    ul.clear-margins li {
+      @include font-size(16);
+    }
+
+    .col-xl-2 .edx-footer-logo {
+      @include padding_left(0);
+    }
+
+    .social-media-links {
+      margin-bottom: $baseline*2.5;
+    }
+
+    ul.social li {
+      display: inline;
+    }
+
+
+    .col-xl-10 div.row div div.row {
+      height: 100%;
+    }
+
+    .clear-margins {
+      border-bottom: none;
+    }
+
+    .col-xl-10 div.row div:nth-child(1) div.row:nth-child(1) {
+      padding: 0;
+    }
+
+    .footer-language-selector {
+      margin: 20px 0;
+      padding: 0;
+      float: none;
+    }
+  }
+
+  .footer-language-selector {
+    margin: 10px 0;
+
+    label[for=footer-language-select] {
+      display: inline-block;
+      cursor: initial;
+    }
+  }
+
+  .select-lang-button {
+    padding: 3px;
+    color: $m-blue-d3 !important;
+    height: 30px;
+    margin-left: 0;
+
+    &:hover,
+    &:active,
+    &:focus {
+      background: $m-blue-d3 !important;
+      color: white !important;
+    }
+  }
+
+
+  @extend %ui-print-excluded;
+}

@@ -1,0 +1,928 @@
+@import '../base/grid-settings';
+@import 'neat/neat'; // lib - Neat
+
+.header-global {
+  @extend %ui-depth1;
+
+  border-bottom: 1px solid $header-border-color;
+  box-shadow: 0 1px 5px 0 $shadow-l1;
+  background: $header-bg;
+  position: relative;
+  width: 100%;
+  height: 76px;
+
+  .wrapper-header {
+    @include clearfix();
+
+    height: 40px;
+    margin: 0 auto;
+    padding: 18px ($baseline/2) 0;
+    max-width: grid-width(12);
+  }
+
+  .logo-header {
+    display: inline;
+  }
+
+  .logo {
+    @include float(left);
+    @include margin(-2px, 39px, 0, 0);
+
+    position: relative;
+
+    a {
+      display: block;
+    }
+  }
+
+  nav {
+    @include clearfix();
+
+    height: 40px;
+    margin: 0 auto;
+    padding: 18px ($baseline/2) 0;
+    max-width: grid-width(12);
+  }
+
+  .left {
+    @include float(left);
+  }
+
+  .guest {
+    @include float(right);
+  }
+
+  > li {
+    display: inline-block;
+    margin-right: $baseline;
+    position: relative;
+    vertical-align: middle;
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    a {
+      letter-spacing: 1px;
+      vertical-align: middle;
+    }
+  }
+
+  li.secondary {
+    > a {
+      color: $link-color;
+      font-family: $font-family-sans-serif;
+      display: inline-block;
+      margin: 0 ($baseline*1.5) 0 0;
+      text-decoration: none;
+      text-shadow: 0 1px rgba(255, 255, 255, 0.6);
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      &:hover,
+      &:focus {
+        color: $body-color;
+      }
+    }
+  }
+
+  .primary {
+    margin-right: ($baseline/4);
+
+    > a {
+      @include background-image($button-bg-image);
+
+      background-color: $button-bg-color;
+      box-sizing: border-box;
+      box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
+      color: $body-color;
+      display: inline-block;
+      font-family: $font-family-sans-serif;
+      line-height: 1em;
+      margin: 1px 5px;
+      padding: 10px 12px;
+      text-decoration: none;
+      text-shadow: 0 1px rgba(255, 255, 255, 0.6);
+      vertical-align: middle;
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      &:hover,
+      &:focus,
+      &:active {
+        background: $button-bg-hover-color;
+      }
+    }
+  }
+
+  .user {
+    @include float(right);
+
+    @extend %ui-print-excluded;
+
+    padding-left: 0;
+    margin: 0;
+
+    .settings-language-form {
+      margin: 4px;
+
+      .language-selector {
+        width: 120px;
+      }
+    }
+
+    > .primary {
+      display: block;
+
+      @include float(left);
+
+      margin: 0;
+      position: relative;
+
+      > a {
+        margin: 0;
+        background-image: none;
+      }
+
+      &:last-child {
+        > a {
+          padding: ($baseline/2);
+
+          &.shopping-cart {
+            border-radius: 4px;
+            border: 1px solid $border-color-2;
+
+            @include margin-right(10px);
+
+            padding-bottom: 6px;
+          }
+        }
+      }
+    }
+
+    .user-link {
+      padding: 0;
+      position: relative;
+      text-transform: none;
+      font-size: 14px;
+      font-weight: bold;
+      letter-spacing: 0;
+
+      .user-image-frame {
+        margin: 0;
+        padding: 0;
+        max-width: ($baseline*2);
+        border-radius: 10%;
+      }
+
+      .icon {
+        display: inline-block;
+
+        @include float(left);
+        @include margin(2px, 6px, -3px, 3px);
+
+        font-size: 1.2em;
+        color: $m-gray;
+      }
+
+      .label-username {
+        @include float(right);
+        @include margin(($baseline*0.75), ($baseline/4), ($baseline*0.75), ($baseline*0.75));
+      }
+    }
+
+    .user-dropdown,
+    .dropdown {
+      font-size: $body-font-size;
+      padding: ($baseline/4) ($baseline/2);
+      color: $body-color;
+      border: none;
+      background: $white;
+      box-shadow: none;
+      text-shadow: none;
+    }
+
+    .user-dropdown-menu,
+    .dropdown-menu {
+      background: $white;
+      border-radius: 4px;
+      box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.3);
+      border: 1px solid $gray-l3;
+      display: none;
+      margin-top: 0;
+      padding: 5px 10px;
+      position: absolute;
+
+      @include right(0);
+
+      top: 37px;
+      min-width: 120px;
+      z-index: 3;
+
+      &.expanded {
+        display: block;
+      }
+
+      &::before {
+        background: transparent;
+        border: {
+          top: 6px solid $border-color-4;
+          right: 6px solid $border-color-4;
+          bottom: 6px solid transparent;
+          left: 6px solid transparent;
+        }
+
+        box-shadow: 1px 0 0 0 $gray-l3, 0 -1px 0 0 $gray-l3;
+        content: "";
+        display: block;
+        height: 0;
+        position: absolute;
+
+        @include transform(rotate(-45deg));
+        @include right(7px);
+
+        top: -5px;
+        width: 0;
+      }
+
+      li {
+        display: block;
+        border-top: 1px dotted $border-color-2;
+        box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+
+        &:first-child {
+          border: none;
+          box-shadow: none;
+        }
+
+        > a {
+          border: 1px solid transparent;
+          border-radius: 3px;
+          box-sizing: border-box;
+          color: $link-color;
+          cursor: pointer;
+          display: block;
+          margin: 5px 0;
+          overflow: hidden;
+          padding: 3px 5px 4px;
+          text-overflow: ellipsis;
+
+          @include transition(padding 0.15s linear 0s);
+
+          white-space: nowrap;
+          width: 100%;
+
+          &:hover,
+          &:focus {
+            color: $body-color;
+            text-decoration: none;
+          }
+        }
+      }
+    }
+  }
+
+  .nav-global {
+    margin-top: ($baseline/2);
+    list-style: none;
+
+    @include float(left);
+
+    .tab-nav-item {
+      display: flex;
+      margin: 0;
+      text-transform: none;
+
+      @include float(left);
+
+      justify-content: center;
+
+      .tab-nav-link {
+        font-size: em(16);
+        color: $gray;
+        padding: 5px 25px 23px;
+        display: inline-block;
+
+        &:hover,
+        &:focus {
+          border-bottom: 4px solid $courseware-border-bottom-color;
+        }
+      }
+
+      .active {
+        border-bottom: 4px solid $black-t3 !important;
+      }
+    }
+
+    li,
+    div {
+      display: inline-block;
+      margin: 0 $baseline+1 0 0;
+      font-size: em(14);
+      font-weight: 600;
+      letter-spacing: 0 !important;
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      a {
+        display: block;
+        padding: ($baseline/4);
+        color: $link-color;
+        font-weight: 600;
+
+        &:hover,
+        &:focus,
+        &:active {
+          text-decoration: none;
+          color: $link-color;
+        }
+      }
+
+      &.active {
+        a {
+          text-decoration: none;
+          color: $link-color;
+        }
+      }
+    }
+  }
+
+  .nav-courseware {
+    @include float(right);
+
+    list-style: none;
+
+    li,
+    div {
+      display: inline-block;
+
+      .btn {
+        @extend %m-btn-primary;
+      }
+    }
+  }
+}
+
+// marketing site design syncing
+.view-register,
+.view-login,
+.view-passwordreset {
+  .header-global nav {
+    width: 960px;
+  }
+}
+
+// page-based nav states
+.view-howitworks .nav-global-01,
+.view-courses .nav-global-02,
+.view-schools .nav-global-03,
+.view-register .nav-global-04 {
+  a {
+    text-decoration: none;
+    color: $link-color !important;
+  }
+}
+
+// edX theme: Global Header
+// ====================
+
+// CASE: marketing/course discovery
+.header-global-new {
+  @extend %ui-depth1;
+
+  /* Temp. fix until applied globally */
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  border-bottom: 1px solid $gray-l1;
+  box-shadow: 0 1px 5px 0 $shadow-l1;
+  background: $header-bg;
+
+  .wrapper-header {
+    @include clearfix();
+
+    box-sizing: border-box;
+    height: 74px;
+    margin: 0 auto;
+    padding: 17px 0;
+    max-width: grid-width(12);
+
+    &:not(.rwd) {
+      min-width: grid-width(9);
+    }
+  }
+
+  .logo {
+    @include float(left);
+
+    margin: -2px 39px 0 10px;
+    position: relative;
+
+    a {
+      display: block;
+    }
+  }
+
+  .nav-global {
+    @include float(left);
+
+    .tab-nav-item {
+      display: flex;
+      margin: 0;
+      text-transform: none;
+
+      @include float(left);
+
+      justify-content: center;
+
+      .tab-nav-link {
+        font-size: em(16);
+        color: $gray;
+        display: inline-block;
+        padding: 5px 25px 19px;
+
+        &:hover,
+        &:focus {
+          border-bottom: 4px solid $courseware-border-bottom-color;
+        }
+      }
+
+      .active {
+        border-bottom: 4px solid $black-t3 !important;
+      }
+    }
+  }
+
+  .logo-header {
+    display: inline;
+  }
+
+  .nav-account-management {
+    margin: 0 auto;
+    display: inline;
+  }
+
+  .guest {
+    @include float(right);
+  }
+
+  > li {
+    display: inline-block;
+    margin-right: $baseline;
+    position: relative;
+    vertical-align: middle;
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    a {
+      vertical-align: middle;
+    }
+  }
+
+  li.secondary {
+    > a {
+      color: $link-color;
+      font-family: $font-family-sans-serif;
+      display: inline-block;
+      margin: 0 ($baseline*1.5) 0 0;
+      text-decoration: none;
+      text-shadow: 0 1px rgba(255, 255, 255, 0.6);
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      &:hover,
+      &:focus {
+        color: $body-color;
+      }
+    }
+  }
+
+  .primary {
+    @include margin-right(5px);
+
+    > a {
+      @include background-image($button-bg-image);
+
+      background-color: $button-bg-color;
+      box-sizing: border-box;
+      box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
+      color: $body-color;
+      font-family: $header-sans-serif;
+      display: inline-block;
+      line-height: 1em;
+      margin: 1px 5px;
+      padding: 10px 12px;
+      text-decoration: none;
+      text-shadow: 0 1px rgba(255, 255, 255, 0.6);
+      vertical-align: middle;
+
+      &:last-child {
+        @include margin-right(0);
+      }
+
+      &:hover,
+      &:focus,
+      &:active {
+        background: $button-bg-hover-color;
+      }
+    }
+  }
+
+  .user {
+    @include float(right);
+
+    margin-top: 0;
+
+    > .primary {
+      display: block;
+
+      @include float(left);
+
+      margin: 0;
+      position: relative;
+
+      > a {
+        margin: 0;
+
+        @include border-right-radius(0);
+
+        background-image: none;
+      }
+
+      &:last-child {
+        > a {
+          @include border-radius(0, 4px, 4px, 0);
+          @include border-left(none);
+
+          padding: ($baseline/2) ($baseline/2);
+
+          &.shopping-cart {
+            border-radius: 4px;
+            border: 1px solid $border-color-2;
+            margin-right: ($baseline/2);
+            padding-bottom: 6px;
+          }
+        }
+      }
+    }
+
+    .user-link {
+      padding: 0;
+      position: relative;
+      text-transform: none;
+      font-size: 14px;
+      font-weight: bold;
+      letter-spacing: 0;
+
+      .user-image-frame {
+        max-width: ($baseline*2);
+        border-radius: 10%;
+      }
+
+      .icon {
+        display: inline-block;
+
+        @include float(left);
+        @include margin(2px, 6px, -3px, 3px);
+
+        font-size: 1.2em;
+        color: $m-gray;
+      }
+
+      .label-username {
+        @include float(right);
+        @include margin(($baseline*0.75), ($baseline/4), ($baseline*0.75), ($baseline*0.75));
+      }
+    }
+
+    .user-dropdown,
+    .dropdown {
+      font-size: $body-font-size;
+      padding: ($baseline/5) ($baseline/2);
+      color: $body-color;
+      border: none;
+      background: $white;
+      box-shadow: none;
+      text-shadow: none;
+    }
+
+    .user-dropdown-menu,
+    .dropdown-menu {
+      background: $border-color-4;
+      border-radius: 4px;
+      box-shadow: 0 2px 24px 0 rgba(0, 0, 0, 0.3);
+      border: 1px solid $border-color-3;
+      display: none;
+      margin-top: 0;
+      padding: 5px 10px;
+      position: absolute;
+
+      @include right(0);
+
+      top: 34px;
+      width: 170px;
+      z-index: 3;
+
+      &.expanded {
+        display: block;
+      }
+
+      &::before {
+        background: transparent;
+        border: {
+          top: 6px solid $border-color-4;
+          right: 6px solid $border-color-4;
+          bottom: 6px solid transparent;
+          left: 6px solid transparent;
+        }
+
+        box-shadow: 1px 0 0 0 $border-color-3, 0 -1px 0 0 $border-color-3;
+        content: "";
+        display: block;
+        height: 0;
+        position: absolute;
+
+        @include transform(rotate(-45deg));
+        @include right(7px);
+
+        top: -6px;
+        width: 0;
+      }
+
+      li {
+        display: block;
+        border-top: 1px solid $gray-l3;
+        box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+
+        &:first-child {
+          border: none;
+          box-shadow: none;
+        }
+
+        > a {
+          border: 1px solid transparent;
+          border-radius: 3px;
+          box-sizing: border-box;
+          color: $link-color;
+          cursor: pointer;
+          display: block;
+          margin: 5px 0;
+          overflow: hidden;
+          padding: 3px 5px 4px;
+          text-overflow: ellipsis;
+
+          @include transition(padding 0.15s linear 0s);
+
+          white-space: nowrap;
+          width: 100%;
+
+          &:hover,
+          &:focus {
+            color: $body-color;
+            text-decoration: none;
+          }
+        }
+      }
+    }
+  }
+
+  .nav-courseware {
+    @include float(right);
+
+    div {
+      display: inline-block;
+      letter-spacing: 0 !important;
+      position: relative;
+      margin-right: $baseline/2;
+
+      a {
+        &.nav-courseware-button {
+          border: 3px solid $courseware-button-border-color;
+          border-radius: 5px;
+          margin-top: -22px;
+
+          &:hover,
+          &:focus,
+          &:active {
+            border-color: $courseware-navigation-color;
+          }
+
+          .view-login &:hover,
+          &:focus,
+          &:active {
+            border-color: $courseware-button-border-color;
+          }
+        }
+      }
+    }
+  }
+
+  &.rwd {
+    .wrapper-header {
+      width: 320px;
+    }
+
+    .mobile-menu-button {
+      @include float(left);
+
+      display: inline;
+      text-decoration: none;
+      color: $m-gray;
+      font-size: 18px;
+      margin-top: 9px;
+
+      &:hover,
+      &:active,
+      &:focus {
+        text-decoration: none;
+      }
+    }
+
+    .logo {
+      position: absolute;
+      top: 20px;
+
+      @include left(calc(50% - 90px));
+
+      width: 54px;
+
+      img {
+        width: 54px;
+      }
+    }
+
+    .nav-global,
+    .nav-courseware {
+      a {
+        font-size: 14px;
+
+        &.nav-courseware-button {
+          text-align: center;
+          margin-top: -3px;
+        }
+      }
+    }
+
+    .nav-global,
+    .nav-courseware-01 {
+      display: none;
+    }
+
+    .nav-global {
+      position: absolute;
+      top: 73px;
+      left: calc(50% - 160px);
+      z-index: 1000;
+      width: 320px;
+      background: $m-blue-d3;
+
+      &.show {
+        display: inline;
+      }
+
+      a {
+        color: white;
+        padding: 10px;
+        font-weight: 400;
+
+        &:hover,
+        &:focus {
+          background: $m-blue-d5;
+          color: white;
+          border-bottom: none;
+        }
+      }
+
+      li {
+        display: block;
+        border-bottom: 1px solid $m-blue-d5;
+      }
+    }
+
+    .nav-courseware {
+      display: inline;
+
+      div:last-child {
+        margin-right: 0;
+      }
+    }
+
+    @include media($edx-bp-large) {
+      .wrapper-header {
+        width: 100%;
+        min-width: 800px;
+      }
+
+      .mobile-menu-button {
+        display: none;
+      }
+
+      .logo {
+        position: relative;
+        top: 0;
+
+        @include left(0);
+
+        width: auto;
+
+        img {
+          width: auto;
+        }
+      }
+
+      .nav-global {
+        display: inline;
+        position: relative;
+        z-index: auto;
+        width: auto;
+        top: auto;
+        left: auto;
+        background: inherit;
+
+        a {
+          color: $courseware-navigation-color;
+          padding: 3px 10px;
+          font-weight: 600;
+
+          &:hover,
+          &:focus {
+            background: inherit;
+            color: $courseware-hover-color;
+          }
+        }
+
+        li {
+          display: inline-block;
+          border-bottom: none;
+        }
+      }
+
+      .nav-courseware {
+        div:last-child {
+          margin-right: ($baseline/2);
+        }
+      }
+
+      .nav-courseware-01 {
+        display: inline-block;
+      }
+
+      .desktop-hide {
+        display: none !important;
+      }
+    }
+
+    @include media($edx-bp-huge) {
+      .wrapper-header {
+        padding: 17px 0;
+      }
+    }
+  }
+}
+
+// marketing site design syncing
+.view-register,
+.view-login {
+  .header-global nav {
+    width: 960px;
+  }
+}
+
+// page-based nav states
+.view-howitworks .nav-global-01,
+.view-courses .nav-global-02,
+.view-schools .nav-global-03,
+.view-register .nav-global-04 {
+  a {
+    text-decoration: none;
+    color: $link-color !important;
+  }
+}
+
+.doc-link {
+  @include float(right);
+  @include margin(($baseline*0.75), ($baseline*0.75), ($baseline*0.75), ($baseline*0.75));
+
+  font-size: 14px;
+  font-weight: bold;
+  color: $body-color;
+
+  &:visited {
+    color: $body-color;
+  }
+}
+
+.page-header {
+  padding: $baseline;
+  border-bottom: 1px solid $border-color-2;
+}

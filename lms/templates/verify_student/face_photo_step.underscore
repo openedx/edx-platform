@@ -1,0 +1,86 @@
+<div id="wrapper-facephoto" class="wrapper-view block-photo face-photo-step">
+
+    <div class="requirements">
+        <h2 class="title"><%- gettext( "What You Need for Verification" ) %></h2>
+        <div class="requirement">
+            <h3 class="title"><%- gettext( "Device with Camera" ) %></h3>
+            <p class="copy"><%- gettext( "You need a device that has a webcam. If you receive a browser prompt for access to your camera, please make sure to click 'Allow'." ) %></p>
+        </div>
+        <div class="requirement">
+            <h3 class="title"><%- gettext( "Photo Identification" ) %></h3>
+            <p class="copy"><%- gettext( "You need a valid ID that contains your full name and photo." ) %></p>
+        </div>
+    </div>
+
+
+  <div class="facephoto view">
+    <h3 class="title"><%- gettext( "Take Your Photo" ) %></h2>
+    <div class="instruction">
+      <p><%=  HtmlUtils.interpolateHtml( gettext( "When your face is in position, use the Take Photo button {icon} below to take your photo." ), { icon: HtmlUtils.HTML('<span class="example">(<span class="icon fa fa-camera" aria-hidden="true"></span><span class="sr">icon</span>)</span>') } ) %></p>
+    </div>
+
+    <div class="wrapper-task">
+      <div class="wrapper-help">
+        <div class="help help-task photo-tips facetips">
+          <h3 class="title"><%- gettext( "To take a successful photo, make sure that:" ) %></h3>
+
+          <div class="copy">
+            <ul class="list-help">
+              <li class="help-item"><%- gettext( "Your face is well-lit." ) %></li>
+              <li class="help-item"><%- gettext( "Your entire face fits inside the frame." ) %></li>
+            </ul>
+
+            <p class="copy-extra"><%=  HtmlUtils.interpolateHtml( gettext( "To take the photo of your face, click on the camera button {icon}. If you need to try again, click 'Retake Photo'." ), { icon: HtmlUtils.HTML('<span class="example">(<span class="icon fa fa-camera" aria-hidden="true"></span><span class="sr">icon</span>)</span>') } ) %></p>
+          </div>
+        </div>
+
+        <div class="help help-faq facefaq">
+          <h3 class="sr title"><%- gettext( "Frequently Asked Questions" ) %></h3>
+          <div class="copy">
+            <dl class="list-faq">
+              <dt class="faq-question">
+                <%- _.sprintf( gettext( "Why does %(platformName)s need my photo?" ), { platformName: platformName } ) %>
+              </dt>
+              <dd class="faq-answer"><%- gettext( "We use your verification photos to confirm your identity and ensure the validity of your certificate." ) %></dd>
+              <dt class="faq-question">
+                <%- _.sprintf( gettext( "What does %(platformName)s do with this photo?" ), { platformName: platformName } ) %>
+              </dt>
+              <dd class="faq-answer">
+                <%- _.sprintf( gettext( "We securely encrypt your photo and send it to our authorization service for review. Your photo and information are not saved or visible anywhere on %(platformName)s after the verification process is complete." ), { platformName: platformName } ) %>
+              </dd>
+              <dt class="faq-question">
+                <%- gettext( "What if I can't see the camera image, or if I can't see my photo do determine which side is visible?" ) %>
+              </dt>
+              <dd class="faq-answer">
+                <%- gettext( "You may be able to complete the image capture procedure without assistance, but it may take a couple of submission attempts to get the camera positioning right.  Optimal camera positioning varies with each computer, but generally the best position for a headshot is approximately 12-18 inches (30-45 centimeters) from the camera, with your head centered relative to the computer screen. " ) %>
+                <%- gettext( "If the photos you submit are rejected, try moving the computer or camera orientation to change the lighting angle.  The most common reason for rejection is inability to read the text on the ID card." ) %>
+              </dd>
+              <dt class="faq-question">
+                <%- gettext( "What if I have difficulty holding my head in position relative to the camera?" ) %>
+              </dt>
+              <dd class="faq-answer">
+                <%- _.sprintf( gettext( "If you require assistance with taking either photo for submission, contact %(platformName)s support for additional suggestions." ), { platformName: platformName } ) %>
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      <div id="facecam" class="task cam"></div>
+    </div>
+
+    <% if ( nextStepTitle ) { %>
+    <nav class="nav-wizard" id="face_next_button_nav">
+      <button id="next_step_button" class="next action-primary is-disabled right" aria-disabled="true" title="Next">
+      <span class="sr" id="photo_message"></span>
+        <%- _.sprintf(
+          gettext( "Next: %(nextStepTitle)s" ),
+          { nextStepTitle: nextStepTitle }
+        ) %>
+      </button>
+    </nav>
+
+    <% } %>
+
+  </div>
+</div>

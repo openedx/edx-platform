@@ -1,0 +1,9 @@
+<problem>
+  <stringresponse answer="edX" type="ci">
+    <p>This is the first problem</p>
+    <label>What company do you work for?</label>
+    <description>Hint: It's not Microsoft. </description>
+    <additional_answer answer="edX.org"/>
+    <textline size="20"/>
+  </stringresponse>
+</problem>

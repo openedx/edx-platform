@@ -1,0 +1,12 @@
+<%page expression_filter="h"/>
+<%!
+  from lms.djangoapps.courseware.courses import get_course_about_section
+  from openedx.core.djangolib.markup import HTML
+%>
+<%namespace name='static' file='static_content.html'/>
+
+<div id="video-modal" class="modal video-modal">
+  <div class="inner-wrapper">
+    ${HTML(get_course_about_section(request, course, "video"))}
+  </div>
+</div>

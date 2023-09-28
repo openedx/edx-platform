@@ -1,0 +1,100 @@
+.program-list-alerts {
+  .page-banner {
+    padding-top: 32px;
+    gap: 24px;
+  }
+}
+
+.program-list-wrapper {
+  @include make-row();
+  padding: ($baseline*2) ($baseline/2);
+  max-width: 79rem;
+  margin: 0 auto;
+
+  @include media-breakpoint-up(md) {
+    padding: ($baseline*2) 0;
+  }
+
+  @include media-breakpoint-up(lg) {
+    padding: ($baseline*2) $baseline;
+  }
+
+  .program-list-container {
+    @include media-breakpoint-up(lg) {
+      padding-right: $baseline;
+    }
+  }
+
+  .view-button {
+    background: theme-color("success");
+    border-color: theme-color("success");
+    border-radius: 0;
+    color: $white;
+    padding: 7px;
+    text-align: center;
+    font-size: 0.875rem;
+  }
+}
+
+.program-cards-container {
+  @include grid-container();
+  padding-top: 32px;
+
+  .subscription-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 10;
+  }
+}
+
+.sidebar {
+  @include float(right);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 24px;
+
+  @include media-breakpoint-up(md) {
+    padding-top: 76px;
+  }
+
+  .aside {
+    display: flex;
+    flex-direction: column;
+    padding: $baseline;
+    box-sizing: border-box;
+    gap: 16px;
+    background: #fbfaf9;
+    border: 1px solid #d7d3d1;
+  }
+
+  .program-advertise {
+    clear: both;
+  }
+
+  .advertise-message {
+    font-size: 1rem;
+    color: $gray-dark;
+    margin: 0;
+  }
+
+  .view-button {
+    white-space: normal;
+  }
+}
+
+.empty-programs-message {
+  @include make-col(12);
+
+  background: $gray-light4;
+  border: 3px solid $gray-light3;
+  padding: ($baseline*2) 0;
+  text-align: center;
+  margin-bottom: 20px;
+
+  .hd-3 {
+    color: $black;
+    margin-bottom: $baseline;
+  }
+}

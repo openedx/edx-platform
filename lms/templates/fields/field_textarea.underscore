@@ -1,0 +1,64 @@
+<div class="wrapper-u-field" role="group">
+    <div class="u-field-header">
+        <% if (mode === 'edit') { %>
+            <label class="u-field-title" for="u-field-textarea-<%- id %>" id="u-field-title-<%- id %>"></label>
+        <% } else { %>
+            <span class="u-field-title" id="u-field-title-<%- id %>"></span>
+        <% } %>
+        <% if (messagePosition === 'header') { %>
+            <span class="u-field-message" id="u-field-message-<%- id %>">
+                <span class="u-field-message-notification" aria-live="polite"></span>
+                <span class="u-field-message-help" id="u-field-message-help-<%- id %>"> <%- message %></span>
+            </span>
+        <% }%>
+    </div>
+
+    <div class="u-field-value" id="u-field-value-<%- id %>"
+        <% if (mode === 'edit') { %>
+            aria-labelledby="u-field-title-<%- id %>"><textarea maxlength="<%- maxCharacters%>" id="u-field-textarea-<%- id %>" rows="4"
+            <% if (message) { %>
+                aria-describedby="u-field-message-help-<%- id %>"
+            <% } else { %>
+                aria-describedby="character-count-<%- id %>"
+            <% } %>
+            ><%- value %></textarea>
+        <% } else if (editable === 'never') { %>
+            ><p class="sr"><%- screenReaderTitle %></p><span class="u-field-value-readonly" aria-hidden="false"
+            <% if (message) { %>
+                aria-describedby="u-field-message-help-<%- id %>"
+            <% } %>
+            ><%- value %></span>
+        <% } else { %>
+            ><span class="clickable" role="button" tabindex="0">
+            <span class="sr"><%- screenReaderTitle %></span>
+            <span class="u-field-value-readonly" aria-hidden="false" aria-describedby="u-field-placeholder-value-<%- id %>"><%- value %></span>
+            <span class="sr"><%- gettext('Click to edit') %></span>
+            <span class="sr" id="u-field-placeholder-value-<%- id %>"><%- placeholderValue %></span>
+            </span>
+        <% } %>
+    </div>
+
+    <div class="u-field-footer">
+        <% if (messagePosition === 'footer') { %>
+            <span class="u-field-message" id="u-field-message-<%- id %>">
+                <span class="u-field-message-notification" aria-live="polite"></span>
+                <span class="u-field-message-help" id="u-field-message-help-<%- id %>"> <%- message %></span>
+            </span>
+        <% } %>
+        <% if (mode === 'edit' && maxCharacters) { %>
+            <div id="character-count-<%- id %>" class="field-textarea-character-count">
+                <%=
+                    HtmlUtils.interpolateHtml(
+                        gettext('{currentCountOpeningTag}{currentCharacterCount}{currentCountClosingTag} of {maxCharacters}'),
+                        {
+                            currentCountOpeningTag: HtmlUtils.HTML('<span class="current-char-count">'),
+                            currentCountClosingTag: HtmlUtils.HTML('</span>'),
+                            currentCharacterCount: value.length,
+                            maxCharacters: maxCharacters
+                        }
+                    )
+                %>
+            </div>
+        <% } %>
+    </div>
+</div>

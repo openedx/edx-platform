@@ -1,0 +1,158 @@
+<%page expression_filter="h" args="cert_status, course_ended_not_passing, course_overview, enrollment" />
+
+<%!
+from django.urls import reverse
+
+from django.utils.translation import gettext as _
+from openedx.core.djangolib.markup import HTML, Text
+from common.djangoapps.course_modes.models import CourseMode
+from lms.djangoapps.certificates.data import CertificateStatuses
+from xmodule.data import CertificatesDisplayBehaviors
+from common.djangoapps.student.helpers import user_has_passing_grade_in_course
+%>
+<%namespace name='static' file='../static_content.html'/>
+
+<%
+  cert_name_short = course_overview.cert_name_short
+  if cert_name_short == "":
+    cert_name_short = settings.CERT_NAME_SHORT
+
+  cert_name_long = course_overview.cert_name_long
+  if cert_name_long == "":
+    cert_name_long = settings.CERT_NAME_LONG
+%>
+
+<%
+if cert_status['status'] == 'certificate_earned_but_not_available':
+    status_css_class = 'course-status-earned-not-available'
+elif cert_status['status'] == CertificateStatuses.generating:
+    status_css_class = 'course-status-certrendering'
+elif cert_status['status'] == CertificateStatuses.downloadable or cert_status['status'] == CertificateStatuses.requesting:
+    status_css_class = 'course-status-certavailable'
+elif cert_status['status'] == CertificateStatuses.notpassing:
+    status_css_class = 'course-status-certnotavailable'
+else:
+    status_css_class = 'course-status-processing'
+%>
+<%
+  requesting_post_url = reverse('generate_user_cert', args=[str(course_overview.id)])
+  progress_page_url = reverse('progress', args=[str(course_overview.id)])
+%>
+
+% if cert_status['status'] != 'processing':
+  % if cert_status['status'] == 'certificate_earned_but_not_available':
+    <div class="message message-status ${status_css_class} is-shown">
+      <p class="message-copy">
+        <%
+          if settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS", False):
+            certificate_available_date_string = ""
+            if course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE and course_overview.certificate_available_date:
+              certificate_available_date_string = course_overview.certificate_available_date.strftime('%Y-%m-%dT%H:%M:%S%z')
+            elif course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END and course_overview.end:
+              certificate_available_date_string = course_overview.end.strftime('%Y-%m-%dT%H:%M:%S%z')
+          else:
+            certificate_available_date_string = course_overview.certificate_available_date.strftime('%Y-%m-%dT%H:%M:%S%z')
+          container_string = _("Your grade and certificate will be ready after {date}.")
+          format = 'shortDate'
+        %>
+        <span class="info-date-block localized-datetime" data-language="${user_language}" data-timezone="${user_timezone}" data-datetime="${certificate_available_date_string}" data-format=${format} data-string="${container_string}"></span>
+      </p>
+    </div>
+  % else:
+    <div class="message message-status ${status_css_class} d-flex justify-content-between align-items-center">
+      <div class="message-copy">
+        % if cert_status['status'] == CertificateStatuses.downloadable or cert_status['status'] == CertificateStatuses.requesting:
+            ${_("Congratulations! Your certificate is ready.")}
+        % elif cert_status['status'] == 'notpassing':
+          % if enrollment.mode != 'audit':
+            ${_("Grade required for a {cert_name_short}:").format(cert_name_short=cert_name_short)}
+          % else:
+            ${_("Grade required to pass this course:")}
+          % endif
+          <span class="grade-value">${"{0:.0f}%".format(float(course_overview.lowest_passing_grade)*100)}</span>.
+        % elif cert_status['status'] == 'restricted' and enrollment.mode == 'verified':
+          <p class="message-copy">
+            ${Text(_("Your verified {cert_name_long} is being held pending confirmation that the issuance of your {cert_name_short} is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting {email}. If you would like a refund on your {cert_name_long}, please contact our billing address {billing_email}")).format(email=HTML('<a class="contact-link" href="mailto:{email}">{email}</a>.').format(email=settings.CONTACT_EMAIL), billing_email=HTML('<a class="contact-link" href="mailto:{email}">{email}</a>').format(email=settings.PAYMENT_SUPPORT_EMAIL), cert_name_short=cert_name_short, cert_name_long=cert_name_long)}
+          </p>
+        % elif cert_status['status'] == 'restricted':
+          <p class="message-copy">
+            ${Text(_("Your {cert_name_long} is being held pending confirmation that the issuance of your {cert_name_short} is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting {email}.")).format(email=HTML('<a class="contact-link" href="mailto:{email}">{email}</a>.').format(email=settings.CONTACT_EMAIL), cert_name_short=cert_name_short, cert_name_long=cert_name_long)}
+          </p>
+        % elif cert_status['status'] == 'unverified':
+          <p class="message-copy">
+            ${Text(_("Your certificate was not issued because you do not have a current verified identity with {platform_name}. ")).format(platform_name=settings.PLATFORM_NAME)}
+          </p>
+        % endif
+      </div>
+
+      % if cert_status['status'] == CertificateStatuses.generating or cert_status['status'] == CertificateStatuses.downloadable or cert_status['status'] == CertificateStatuses.requesting or cert_status['show_survey_button']:
+        <div class="wrapper-message-primary">
+          <ul class="actions actions-primary">
+            % if cert_status['status'] == CertificateStatuses.generating:
+              <li class="action">
+                <span class="disabled">
+                  ${_("Your {cert_name_short} is Generating").format(cert_name_short=cert_name_short)}
+                </span>
+              </li>
+            % elif cert_status['status'] == CertificateStatuses.requesting:
+              <li>
+                  <button class="btn btn-primary request-cert" data-endpoint="${requesting_post_url}">
+                      ${_('Request Certificate')}
+                  </button>
+              </li>
+            % elif cert_status['status'] == CertificateStatuses.downloadable and cert_status.get('show_cert_web_view', False):
+              <li>
+                <a class="btn btn-primary" href="${cert_status['cert_web_view_url']}" rel="noopener" target="_blank"
+                   title="${_('This link will open the certificate web view')}">
+                  ${_("View my {cert_name_short}").format(cert_name_short=cert_name_short)}
+                </a>
+              </li>
+            % endif
+
+            % if cert_status['show_survey_button']:
+              <li class="action">
+                <a class="cta" href="${cert_status['survey_url']}">
+                  ${_("Complete our course feedback survey")}
+                </a>
+              </li>
+            % endif
+          </ul>
+        </div>
+
+        % if cert_status['status'] == 'downloadable' and cert_status['linked_in_url']:
+          <ul class="actions actions-secondary">
+              <li class="action action-share">
+                <a class="action-linkedin-profile" rel="noopener" target="_blank" href="${cert_status['linked_in_url']}"
+                 title="${_('Add Certificate to LinkedIn Profile')}"
+                 data-course-id="${course_overview.id}"
+                 data-certificate-mode="${cert_status['mode']}"
+                >
+                  <img class="action-linkedin-profile-img"
+                       src="${static.url('images/linkedin_add_to_profile.png')}"
+                       alt="${_('Share on LinkedIn')}">
+                </a>
+            </li>
+          </ul>
+        % endif
+      % endif
+
+    </div>
+  % endif
+% elif course_ended_not_passing:
+  <div class="message message-status ${status_css_class} d-flex justify-content-between align-items-center">
+    <div class="message-copy">
+      <%
+        container_string = _("You are not yet eligible for a certificate.")
+      %>
+      <span class="info-date-block localized-datetime" data-language="${user_language}" data-timezone="${user_timezone}" data-string="${container_string}"></span>
+    </div>
+    <ul class="actions actions-primary">
+      <li class="action">
+        <a class="btn btn-primary" rel="noopener" href="${progress_page_url}" target="_blank" title="${_('This link will open the course progress page' )}">
+          ${_("View grades")}
+        </a>
+      </li>
+    </ul>
+  </div>
+% endif
+

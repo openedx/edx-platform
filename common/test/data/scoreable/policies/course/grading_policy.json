@@ -1,0 +1,14 @@
+{
+    "GRADER": [
+        {
+            "drop_count": 0,
+            "min_count": 1,
+            "short_label": "Prob",
+            "type": "Problems",
+            "weight": 1.0
+        }
+    ],
+    "GRADE_CUTOFFS": {
+        "Pass": 0.5
+    }
+}

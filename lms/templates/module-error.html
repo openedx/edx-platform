@@ -1,0 +1,34 @@
+<%page expression_filter="h" />
+<%!
+from django.utils.translation import gettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+<%namespace name='static' file='static_content.html'/>
+
+<section class="outside-app">
+  <h1>
+    ${Text(_("There has been an error on the {platform_name} servers")).format(
+        platform_name=HTML(u"<em>{}</em>").format(static.get_platform_name())
+    )}
+  </h1>
+  <p>
+    ${Text(_("We're sorry, this module is temporarily unavailable. Our staff is working "
+    "to fix it as soon as possible. " )) }
+  </p>
+
+% if staff_access:
+<h1>${_("Details")}</h1>
+
+<p>${_("Error:")}
+<pre>
+${error}
+</pre>
+</p>
+
+<p>${_("Raw data:")}
+
+<pre>${data}</pre>
+</p>
+
+% endif
+</section>

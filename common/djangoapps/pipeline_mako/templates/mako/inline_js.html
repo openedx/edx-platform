@@ -1,0 +1,13 @@
+<%page expression_filter="h"/>
+<%! from openedx.core.djangolib.js_utils import dump_js_escaped_json %>
+<script \
+% if context.get('async', default=None):
+async \
+% endif
+% if defer:
+defer \
+% endif
+type="text/javascript" charset="utf-8">
+    ## xss-lint: disable=mako-invalid-html-filter
+    ${source | n, dump_js_escaped_json}
+</script>

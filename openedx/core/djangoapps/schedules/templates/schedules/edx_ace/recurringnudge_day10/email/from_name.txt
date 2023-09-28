@@ -1,0 +1,7 @@
+{% autoescape off %}
+{% if course_ids|length > 1 %}
+{{ platform_name }}
+{% else %}
+{{ course_name }}
+{% endif %}
+{% endautoescape %}

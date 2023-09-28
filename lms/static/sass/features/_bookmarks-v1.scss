@@ -1,0 +1,68 @@
+$bookmark-icon: "\f097"; // .fa-bookmark-o
+$bookmarked-icon: "\f02e"; // .fa-bookmark
+
+// Rules for placing bookmarks and search button side by side
+.wrapper-course-modes {
+  border-bottom: 1px solid $gray-l3;
+  padding: ($baseline/4);
+
+  > div {
+    box-sizing: border-box;
+    display: inline-block;
+  }
+}
+
+// Rules for Bookmarks Button
+.courseware-bookmarks-button {
+  width: flex-grid(5);
+  vertical-align: top;
+
+  .bookmarks-list-button {
+    @extend %ui-clear-button;
+
+    // set styles
+    @extend %btn-pl-default-base;
+
+    @include font-size(13);
+
+    width: 100%;
+    padding: ($baseline/4) ($baseline/2);
+
+    &::before {
+      content: $bookmarked-icon;
+      font-family: FontAwesome;
+    }
+  }
+}
+
+// Rules for bookmark icon shown on each sequence nav item
+.course-content {
+  .bookmark-icon.bookmarked {
+    @include right($baseline / 4);
+
+    top: -3px;
+    position: absolute;
+  }
+
+  // Rules for bookmark button's different styles
+  .bookmark-button-wrapper {
+    margin-bottom: ($baseline * 1.5);
+
+    @extend %ui-print-excluded;
+  }
+
+  .bookmark-button {
+    &::before {
+      @include padding-right($baseline / 4);
+
+      content: $bookmark-icon;
+      font-family: FontAwesome;
+    }
+
+    &.bookmarked {
+      &::before {
+        content: $bookmarked-icon;
+      }
+    }
+  }
+}

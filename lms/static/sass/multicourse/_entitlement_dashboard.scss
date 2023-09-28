@@ -1,0 +1,75 @@
+.entitlement-actions-wrapper {
+  @extend .wrapper-action-more;
+
+  .entitlement-action {
+    @extend .action;
+  }
+
+  .entitlement-action-more {
+    @extend .action-more;
+  }
+
+  .entitlement-actions-dropdown {
+    @extend .actions-dropdown;
+
+    .entitlement-actions-dropdown-list {
+      @extend .actions-dropdown-list;
+
+      .entitlement-actions-item {
+        @extend .actions-item;
+      }
+    }
+  }
+}
+
+.entitlement-unenrollment-modal {
+  @extend .modal;
+
+  margin-top: -3*$baseline;
+
+  .entitlement-unenrollment-modal-inner-wrapper {
+    @extend .inner-wrapper;
+
+    height: 98%;
+    overflow-y: scroll;
+
+    .entitlement-unenrollment-modal-close-btn {
+      @extend .close-modal;
+    }
+
+    .entitlement-unenrollment-modal-header {
+      @extend .unenroll-header;
+    }
+
+    .entitlement-unenrollment-modal-error-text {
+      @extend .modal-form-error;
+
+      background: tint($red, 95%);
+      margin-left: $baseline;
+      margin-right: $baseline;
+    }
+
+    .entitlement-unenrollment-modal-error-text-visible {
+      display: block;
+    }
+
+    .entitlement-unenrollment-modal-submit-wrapper {
+      margin-bottom: $baseline*0.6;
+      position: relative;
+      z-index: 2;
+      padding: $baseline ($baseline*2);
+
+      .entitlement-unenrollment-modal-submit {
+        display: block;
+        height: auto;
+        margin: 0 auto;
+        width: 100%;
+        white-space: normal;
+      }
+    }
+  }
+}
+
+.entitlement-unenrollment-modal-long-survey {
+  height: 70%;
+}

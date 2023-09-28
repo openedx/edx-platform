@@ -1,0 +1,23 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{% trans "Please wait" as tmsg %}{{tmsg|force_escape}}</title>
+    <style type="text/css">
+    #djDebug {display:none;}
+    </style>
+</head>
+<body>
+    <form id="sso-data-form" action="{{post_url}}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="sso_data" value="{{data}}">
+        <input type="hidden" name="sso_data_hmac" value="{{hmac}}">
+        <noscript>
+        <input id="submit-button" type="submit" value="Click to continue" autofocus>
+        </noscript>
+    </form>
+    <script>
+    document.getElementById('sso-data-form').submit();
+    </script>
+</body>
+</html>

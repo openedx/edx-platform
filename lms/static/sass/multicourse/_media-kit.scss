@@ -1,0 +1,262 @@
+// vars
+$baseline: 20px;
+$white: rgb(255, 255, 255);
+
+.mediakit {
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: ($baseline*3) 0;
+  width: 980px;
+
+  .wrapper-mediakit {
+    border-radius: 4px;
+    box-sizing: border-box;
+    box-shadow: 0 1px 10px 0 $shadow-l1;
+    margin: ($baseline*3) 0 0 0;
+    border: 1px solid $border-color;
+    padding: ($baseline*2) ($baseline*3);
+
+    > section {
+      margin: 0 0 ($baseline*2) 0;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  h1 {
+    margin: 0 0 $baseline 0;
+    position: relative;
+    font-size: 36px;
+  }
+
+  hr {
+    @extend %faded-hr-divider-light;
+
+    border: none;
+    margin: 0;
+    position: relative;
+    z-index: 2;
+
+    &::after {
+      @extend %faded-hr-divider;
+
+      bottom: 0;
+      content: "";
+      display: block;
+      position: absolute;
+      top: -1px;
+    }
+  }
+
+  // general
+  a.action-download {
+    position: relative;
+    color: $blue;
+    font-family: $font-family-sans-serif;
+    text-decoration: none;
+
+    @include transition(all 0.1s linear 0s);
+
+    .note {
+      position: relative;
+      color: $blue;
+      font-family: $font-family-sans-serif;
+      font-size: 13px;
+      text-decoration: none;
+
+      @include transition(all 0.1s linear 0s);
+
+      &::before {
+        position: relative;
+        top: -1px;
+
+        @include margin(0, 5px, 0, 0);
+
+        content: "➤";
+        font-size: 11px;
+      }
+    }
+
+    &:hover,
+    &:focus {
+      .note {
+        color: shade($blue, 25%);
+      }
+    }
+  }
+
+  // introduction section
+  .introduction {
+    @include clearfix();
+
+    header {
+      @include margin(0, 0, ($baseline*1.5), 0);
+
+      h2 {
+        margin: 0;
+        color: rgb(178, 181, 185);
+        font-size: 32px;
+
+        .org-name {
+          color: rgb(178, 181, 185);
+          font-family: $serif;
+          text-transform: none;
+        }
+      }
+    }
+
+    article {
+      box-sizing: border-box;
+      width: 500px;
+
+      @include margin-right($baseline);
+      @include float(left);
+    }
+
+    aside {
+      border-radius: 2px;
+      box-sizing: border-box;
+      box-shadow: 0 1px 4px 0 $shadow;
+      width: 330px;
+
+      @include float(left);
+
+      border: 3px solid tint(rgb(96, 155, 216), 35%);
+      background: tint(rgb(96, 155, 216), 35%);
+
+      h3 {
+        padding: ($baseline/2) ($baseline*0.75);
+        font-family: $font-family-sans-serif;
+        font-weight: bold;
+        font-size: 16px;
+        letter-spacing: 0;
+        color: $white;
+
+        .org-name {
+          color: $white !important;
+          font-weight: bold;
+          text-transform: none;
+        }
+      }
+
+      a.action-download {
+        .note {
+          width: 100%;
+          display: inline-block;
+          text-align: center;
+        }
+      }
+
+      figure {
+        box-sizing: border-box;
+        background: $white;
+        width: 100%;
+
+        figcaption {
+          display: none;
+        }
+
+        a {
+          display: block;
+          padding: ($baseline/2);
+        }
+
+        img {
+          display: block;
+          margin: 0 auto;
+          width: 60%;
+        }
+      }
+    }
+  }
+
+  // library section
+  .library {
+    border-radius: 2px;
+    box-sizing: border-box;
+    box-shadow: 0 1px 4px 0 $shadow;
+    border: 3px solid tint($light-gray, 50%);
+    padding: 0;
+    background: tint($light-gray, 50%);
+
+    header {
+      padding: ($baseline*0.75) $baseline;
+
+      h2 {
+        margin: 0;
+        padding: 0;
+        color: $dark-gray;
+        font-size: 16px;
+        font-family: $font-family-sans-serif;
+        font-weight: bold;
+        letter-spacing: 0;
+
+        .org-name {
+          color: $dark-gray !important;
+          font-weight: bold;
+          text-transform: none;
+        }
+      }
+    }
+
+    .listing {
+      @include clearfix();
+
+      background: $white;
+      margin: 0;
+      padding: ($baseline*2);
+      list-style: none;
+
+      li {
+        box-sizing: border-box;
+        overflow-y: auto;
+
+        @include float(left);
+
+        width: 350px;
+
+        @include margin(0, 0, $baseline, 0);
+
+        &:nth-child(odd) {
+          @include margin-right($baseline*3.5);
+        }
+      }
+
+      figure {
+        a {
+          border-radius: 2px;
+          box-sizing: border-box;
+          box-shadow: 0 1px 2px 0 $shadow-l1;
+          display: block;
+          min-height: 380px;
+          border: 2px solid tint($light-gray, 75%);
+          padding: $baseline;
+
+          &:hover,
+          &:focus {
+            border-color: $blue;
+          }
+        }
+
+        img {
+          display: block;
+          border: 2px solid tint($light-gray, 80%);
+          margin: 0 auto ($baseline*0.75);
+        }
+
+        figcaption {
+          font-size: 13px;
+          line-height: 18px;
+          color: $text-color;
+        }
+
+        .note {
+          display: inline-block;
+          margin-top: ($baseline/2);
+        }
+      }
+    }
+  }
+}

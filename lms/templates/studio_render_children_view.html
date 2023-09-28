@@ -1,0 +1,30 @@
+<%! from django.utils.translation import gettext as _ %>
+% if can_reorder:
+    <ol class="reorderable-container">
+% endif
+    % for item in items:
+    ${item['content']}
+    % endfor
+% if can_reorder:
+    </ol>
+% endif
+% if can_add:
+<div class="add-xblock-component new-component-item adding"></div>
+<div class="paste-component" style="display: none;">
+    <button type="button" class="button paste-component-button">
+        <span class="icon fa fa-paste" aria-hidden="true"></span>
+        ${_('Paste Component')}
+    </button>
+    <div class="paste-component-whats-in-clipboard" tabindex="0">
+        <!-- These details get filled in by JavaScript code when it makes the paste button visible: -->
+        <a href="#" class="clipboard-details-popup" onClick="if (this.getAttribute('href') === '#') return false;" target="_blank">
+            <span class="fa fa-external-link" aria-hidden="true"></span>
+            <strong class="detail-block-name">Block Name</strong>
+            <span class="detail-block-type">Type</span>
+            ${_("From:")} <span class="detail-course-name">Course Name Goes Here</span>
+        </a>
+        <span class="icon fa fa-question-circle" aria-hidden="true"></span>
+        ${_("What's in my clipboard?")}
+    </div>
+</div>
+% endif

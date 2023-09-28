@@ -1,0 +1,9 @@
+<%!
+from openedx.core.djangolib.markup import HTML
+%>
+<%page expression_filter="h"/>
+
+<%namespace name='static' file='static_content.html'/>
+
+<%static:webpack entry="XModuleShim"/>
+${HTML(content)}

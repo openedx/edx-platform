@@ -1,0 +1,8 @@
+{% load i18n %}{% autoescape off %}{% blocktrans %}Dear {{ full_name }}{% endblocktrans %}
+
+{% blocktrans %}You have been removed as a beta tester for {{ course_name }} at {{ site_name }} by a member of the course staff. This course will remain on your dashboard, but you will no longer be part of the beta testing group.{% endblocktrans %}
+
+{% blocktrans %}Your other courses have not been affected.{% endblocktrans %}
+
+----
+{% blocktrans %}This email was automatically sent from {{ site_name }} to {{ email_address }}{% endblocktrans %}{% endautoescape %}

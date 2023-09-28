@@ -1,0 +1,23 @@
+<table width="100%" class="tb_registration_code_status">
+    <thead>
+        <th width="15%"> <%- gettext("Code") %> </th>
+        <th width="20%"> <%- gettext("Used") %> </th>
+        <th width="14%"> <%- gettext("Valid") %> </th>
+        <th> <%- gettext("Actions") %> </th>
+    </thead>
+    <tbody>
+        <tr>
+            <td> <%- lookup_registration_code %> </td>
+            <td> <%- is_registration_code_redeemed %> </td>
+            <td> <%- is_registration_code_valid %> </td>
+            <td>
+                <% _.each(actions, function(action){ %>
+                    <a class="registration_code_action_link" data-registration-code="<%- action.registration_code %>" data-action-type="<%- action.action_type %>" href="#" data-endpoint="<%- action.action_url %>">
+                        <%- action.action_name %>
+                    </a>
+                <% }); %>
+
+            </td>
+        </tr>
+    </tbody>
+</table>

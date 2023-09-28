@@ -1,0 +1,29 @@
+## Override the default styles_version to use Bootstrap
+<%! main_css = "css/bootstrap/studio-main.css" %>
+
+<%page expression_filter="h"/>
+
+<%inherit file="../../base.html" />
+
+<%block name="title">UX Style Reference</%block>
+<%block name="bodyclass">ux-reference</%block>
+
+<%block name="content">
+<div class="wrapper-content wrapper">
+    <div class="content">
+        <div class="content-primary">
+            <h2>UX Style Reference</h2>
+
+            <h3>v1-style Pages</h3>
+            <ul>
+                <li><a href="v1/course-settings.html">Course settings page</a></li>
+            </ul>
+
+            <h3>Bootstrap</h3>
+            <ul>
+                <li><a href="bootstrap/course-settings.html">Course settings page</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+</%block>

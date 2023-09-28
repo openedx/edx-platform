@@ -1,0 +1,20 @@
+<%page expression_filter="h" />
+<%inherit file="main.html" />
+<%! from django.utils.translation import gettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<section class="container activation">
+
+  <section class="message">
+    <h1 class="invalid">${_("Invalid email change key")}</h1>
+    <hr class="horizontal-divider">
+    <p> ${_("This e-mail key is not valid. Please check:")}</p>
+    <ul>
+      <li>${_("Was this key already used? Check whether the e-mail change has already happened.")}
+      <li>${_("Did your e-mail client break the URL into two lines?")}
+      <li>${_("The keys are valid for a limited amount of time. Has the key expired?")}
+    </ul>
+    <p>${Text(_('Go back to the {link_start}home page{link_end}.')).format(link_start=HTML('<a href="/">'), link_end=HTML('</a>'))}</p>
+  </section>
+</section>

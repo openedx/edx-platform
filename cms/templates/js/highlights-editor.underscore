@@ -1,0 +1,61 @@
+<form>
+<h3 class="modal-section-title" id="highlights_label"><%- gettext('Section Highlights') %></h3>
+    <div class="highlights-info">
+
+<%- gettext('Enter 3-5 highlights to include in the email message that learners receive for this section (250 character limit).') %>
+
+<p>
+<br>
+<% // xss-lint: disable=underscore-not-escaped %>
+<%= edx.HtmlUtils.interpolateHtml(
+    gettext(
+        'For more information and an example of the email template, ' +
+        'read our {linkStart}documentation{linkEnd}.'
+    ),
+    {
+        linkStart: edx.HtmlUtils.interpolateHtml(
+            edx.HtmlUtils.HTML('<a href={highlightsDocUrl}">'),
+            {highlightsDocUrl: highlights_doc_url}
+        ),
+        linkEnd: edx.HtmlUtils.HTML('</a>')
+    }
+) %>
+</p>
+</div>
+
+<hr>
+
+<div class="modal-section-content block-highlights">
+    <div role="group" class="list-fields" aria-labelledby="highlights_label">
+        <%
+            var max_number_of_highlights = 5;
+        %>
+        <% _.each(highlights, function(highlight, i){ %>
+            <label class="highlight-input-label">
+                <%- edx.StringUtils.interpolate(
+                    gettext('Highlight {highlight_index}'),
+                    { highlight_index: i + 1 }
+                ) %>
+                <input
+                        class="input input-text highlight-input-text"
+                        type="text" maxlength="250" aria-describedby="highlights_description"
+                        value="<%= _.escape(highlight) %>"
+                />
+            </label>
+        <% }); %>
+        <% for (i = highlights.length; i < max_number_of_highlights; i++) { %>
+            <label class="highlight-input-label">
+                <%- edx.StringUtils.interpolate(
+                    gettext('Highlight {highlight_index}'),
+                    { highlight_index: i + 1 }
+                ) %>
+                <input
+                        class="input input-text highlight-input-text"
+                        type="text" maxlength="250" aria-describedby="highlights_description"
+                        placeholder="<%- gettext('A highlight to look forward to this week.') %>"
+                />
+            </label>
+        <% } %>
+    </div>
+</div>
+</form>

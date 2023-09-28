@@ -1,0 +1,49 @@
+## mako
+<%page expression_filter="h"/>
+<%inherit file="../../main.html"/>
+<%!
+from django.urls import reverse
+from django.utils.translation import gettext as _
+from openedx.core.djangolib.js_utils import js_escaped_string
+%>
+
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="pagetitle">${_("Catalogs for {username}").format(username=username)}</%block>
+
+<%block name="js_extra">
+<%static:require_module module_name="js/api_admin/catalog_preview_factory" class_name="CatalogPreviewFactory">
+CatalogPreviewFactory({
+  previewUrl: "${preview_url | n, js_escaped_string}",
+  catalogApiUrl: "${catalog_api_url | n, js_escaped_string}",
+});
+</%static:require_module>
+</%block>
+
+<%block name="content">
+<div id="api-access-wrapper">
+  <h1 id="api-header">${_("Catalogs for {username}").format(username=username)}</h1>
+  <ul>
+    % for catalog in catalogs:
+    <li>
+      <a href="${reverse('api_admin:catalog-edit', args=(catalog.id,))}">${catalog.name}</a>&nbsp;
+      (<a
+          href="${'{root}/{id}/csv/'.format(root=catalog_api_catalog_endpoint, id=catalog.id)}" rel="noopener"
+          target="_blank">${_("Download CSV")}</a>)
+    </li>
+    % endfor
+  </ul>
+
+  <div class="catalog-body">
+    <h2 class="api-subheading">${_("Create new catalog:")}</h2>
+    <div class="api-form-container">
+      <form class="api-form" id="catalog-create" action="${reverse('api_admin:catalog-list', args={'username': username})}" method="post">
+        <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+        ${form.as_p() | n, decode.utf8}
+        <input id="catalog-create-submit" type="submit" value="${_('Create Catalog')}"/>
+      </form>
+    </div>
+    <div class="preview-results"></div>
+  </div>
+</div>
+</%block>

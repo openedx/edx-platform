@@ -1,0 +1,32 @@
+---
+metadata:
+    display_name: IFrame Tool
+data: |
+      <h3 class="hd hd-2">IFrame Tool</h3>
+      <p>Use the IFrame tool to embed an exercise or tool from any web site into your course content. For example, the tool below allows learners to experiment with how the shape of a triangle affects a line that is derived from the triangle.</p>
+      <p>Exercises in an IFrame are not graded. To embed graded exercises, use a Custom JavaScript Problem.</p>
+      <p>The following code is the HTML format required to use the IFrame tool. For the IFrame in this template, you must replace the values in <i>italics</i>.</p>
+        <pre>
+        &lt;iframe title="<i>The required title of the tool</i>"
+          src="<i>The URL of the tool, starting with https://</i>"&gt;
+           <i>Message displayed when the browser does not support IFrames.</i>
+        &lt;/iframe&gt;
+        </pre>
+      <p>The Iframe below includes the width, height, marginwidth, marginheight, frameborder, and scrolling attributes. These attributes are optional. You can remove these attributes or replace their values.</p>
+      <p>Modify this template as needed.</p>
+      <p>To modify the IFrame, you must edit the HTML source code. When editing this template, click <strong>HTML</strong> in the toolbar.</p>
+      <p>Then modify the example below for your own use.
+      <ol>
+      <li>Replace the value of the <strong>src</strong> attribute of the IFrame with the URL of the tool that you want in your course.
+      <p><strong>Note</strong>: The URL must start with <strong>https</strong> instead of http, to ensure that the tool appears in all browsers that support IFrames.</p></li>
+      <li>Replace the value of the <strong>title</strong> attribute with the title of the tool. You <strong>must</strong> include the title to provide an accessible label.</li>
+      <li>Replace other IFrame attributes as needed. See <a href="http://www.w3.org/wiki/HTML/Elements/iframe" target="_blank">the IFrame specification</a> for more information.</li>
+      <li>Optionally, replace the text between the opening and closing <strong>iframe</strong> tags.
+          <pre>Your browser does not support IFrames.</pre>
+          <p>A learner sees this text if the browser does not support IFrames.</p>
+      </li>
+      </ol>
+      <p>The sample IFrame follows. Modify its attributes as described above.</p>
+      <iframe title="Euler Line Demo" src="https://studio.edx.org/c4x/edX/DemoX/asset/eulerLineDemo.html" width="402" height="402" marginwidth="0" marginheight="0" frameborder="0" scrolling="no">
+      Your browser does not support IFrames.
+      </iframe>

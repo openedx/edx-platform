@@ -1,0 +1,23 @@
+<%namespace name='static' file='../../static_content.html'/>
+<%
+  import json
+  import copy
+%>
+
+## js templates
+<script id="metadata-editor-tpl" type="text/template">
+    <%static:include path="js/metadata-editor.underscore" />
+</script>
+
+% for template_name in ["metadata-number-entry", "metadata-string-entry", "metadata-option-entry", "metadata-option-public-access", "metadata-list-entry", "metadata-dict-entry", "metadata-file-uploader-entry", "metadata-file-uploader-item"]:
+    <script id="${template_name}" type="text/template">
+        <%static:include path="js/${template_name}.underscore" />
+    </script>
+% endfor
+<% metadata_field_copy = copy.copy(editable_metadata_fields) %>
+## Delete 'thumbnail' field (if it exists) so metadata editor view does not attempt to render it.
+% if 'thumbnail' in editable_metadata_fields:
+    ## the new video editor needs access to the 'thumbnail' value, so delete from a copy.
+    <% del metadata_field_copy['thumbnail'] %>
+% endif
+<div class="wrapper-comp-settings metadata_edit" id="settings-tab" data-metadata='${json.dumps(metadata_field_copy) | h}'></div>

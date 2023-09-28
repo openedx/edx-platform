@@ -1,0 +1,167 @@
+// ------------------------------------
+// LMS support for legacy Sass partials
+//
+// The intention is that this makes it
+// easier to reuse existing partials
+// that were not built with Bootstrap
+// in mind.
+// ------------------------------------
+
+@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
+
+@mixin font-size($sizeValue: 16) {
+  font-size: ($sizeValue/10) + rem;
+}
+
+// Adds a simple extension that indicates that this element should not print
+%ui-print-excluded {
+  @media print {
+    display: none;
+  }
+}
+
+// Support .sr as a synonym for .sr-only
+.sr {
+  @extend .sr-only;
+}
+
+// ----------------------------
+// #LEGACY VARIABLES
+// ----------------------------
+
+// ----------------------------
+// #GRID
+// ----------------------------
+
+$grid-breakpoints-sm: 576px !default;
+$grid-breakpoints-md: 768px !default;
+$grid-breakpoints-lg: 992px !default;
+
+// Wrap grids with grid-container.
+@mixin grid-container() {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  box-sizing: border-box;
+  margin: 0 auto;
+}
+
+@mixin span($cols, $margin:'') {
+  @include margin-left(calc(0.5 * #{$grid-gutter-width}));
+  @include margin-right(calc(0.5 * #{$grid-gutter-width}));
+
+  width: calc(#{cols($cols)} - #{$grid-gutter-width});
+
+  @if ($margin == 'before') {
+    @include margin-right(0);
+
+    width: calc(#{cols($cols)} - 0.5 * #{$grid-gutter-width});
+  }
+
+  @else if ($margin == 'after') {
+    @include margin-left(0);
+
+    width: calc(#{cols($cols)} - 0.5 * #{$grid-gutter-width});
+  }
+
+  @else if ($margin == 'none') {
+    @include margin-left(0);
+    @include margin-right(0);
+
+    width: cols($cols);
+  }
+}
+
+// Flexible grid
+$gw-column: 80px !default;
+$gw-gutter: 20px !default;
+$fg-column: $gw-column !default;
+$fg-gutter: $gw-gutter !default;
+$fg-max-columns: 12 !default;
+$fg-max-width: 1400px !default;
+$fg-min-width: 810px !default;
+
+@function flex-grid($columns, $container-columns: $fg-max-columns) {
+  $width: $columns * $fg-column + ($columns - 1) * $fg-gutter;
+  $container-width: $container-columns * $fg-column + ($container-columns - 1) * $fg-gutter;
+  @return percentage($width / $container-width);
+}
+
+// ----------------------------
+// #FONTS
+// ----------------------------
+
+$body-font-size: $font-size-base !default;
+$font-light: 300 !default;
+$font-regular: 400 !default;
+$font-semibold: 600 !default;
+$font-bold: 700 !default;
+
+// ----------------------------
+// #COLORS
+// ----------------------------
+
+$gray: $gray-600 !default;
+$lms-container-background-color: theme-color("inverse") !default;
+$lms-preview-menu-color: $gray-400 !default;
+$success-color-hover: darken($success, 15%) !default;
+$lms-hero-color: #005e90 !default;
+$border-color-2: $gray-400 !default;
+$link-hover: #065683 !default; // wcag2a compliant
+
+// Blacks
+$black:     rgb(0, 0, 0) !default;
+$black-t0:  rgba($black, 0.125) !default;
+$black-t1:  rgba($black, 0.25) !default;
+$black-t2:  rgba($black, 0.5) !default;
+$black-t3:  rgba($black, 0.75) !default;
+
+// Shadows
+$shadow: rgba(0, 0, 0, 0.2) !default;
+$shadow-l1: rgba(0, 0, 0, 0.1) !default;
+$shadow-l2: rgba(0, 0, 0, 0.05) !default;
+$shadow-d1: rgba(0, 0, 0, 0.4) !default;
+$shadow-d2: rgba($black, 0.6) !default;
+
+$primary-dark: rgba(6, 86, 131, 100) !default;
+$primary-dark1: mix($black, $blue, 20%) !default;
+$primary-dark2: desaturate($blue, 15%) !default;
+$primary-base: rgba(0, 117, 180, 100) !default;
+$primary-accent: rgba(41, 145, 195, 100) !default;
+
+$gray-dark: rgba(17, 17, 17, 100) !default;
+$gray-base: rgba(65, 65, 65, 100) !default;
+$gray-light1: rgb(252, 252, 252) !default;
+$gray-light2: mix($white, $gray, 60%) !default;
+$gray-light3: mix($white, $gray, 80%) !default;
+$gray-light4: mix($white, $gray, 95%) !default;
+
+// ----------------------------
+// #COLORS- Bootstrap-style
+// ----------------------------
+
+$state-success-text: $black !default;
+$state-success-bg: #dff0d8 !default;
+$state-success-border: darken($state-success-bg, 5%) !default;
+
+$state-info-text: #31708f !default;
+$state-info-text-link: #245269 !default;
+$state-info-bg: #d9edf7 !default;
+$state-info-border: darken($state-info-bg, 7%) !default;
+
+$state-warning-text: $black !default;
+$state-warning-bg: #fcf8e3 !default;
+$state-warning-border: darken($state-warning-bg, 5%) !default;
+
+$state-danger-text: $black !default;
+$state-danger-bg: #f2dede !default;
+$state-danger-border: darken($state-danger-bg, 5%) !default;
+
+$palette-error-accent: #cb0712;
+$palette-error-back: #feeced;
+
+// logo colors
+$micromasters-color: #005585 !default;
+$zebra-stripe-color: rgb(249, 250, 252) !default;
+$divider-color: rgb(226, 231, 236) !default;

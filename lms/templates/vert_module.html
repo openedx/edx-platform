@@ -1,0 +1,86 @@
+<%page expression_filter="h"/>
+
+<%namespace name='static' file='/static_content.html'/>
+
+<%!
+from django.utils.translation import gettext as _
+
+from openedx.core.djangolib.markup import HTML
+%>
+
+%if unit_title and show_title:
+  <h2 class="hd hd-2 unit-title">${unit_title}</h2>
+% endif
+
+% if has_assignments and due:
+  % if subsection_format:
+    <%
+    data_string = _("{subsection_format} due {{date}}").format(subsection_format=subsection_format)
+    %>
+  % else:
+    <%
+    data_string = _("Due {date}")
+    %>
+  % endif
+  <div class="vert-due-date">
+    <div class="localized-datetime" data-datetime="${due}" data-string="${data_string}" data-timezone="${user_timezone}"></div>
+    % if completed:
+      <div class="pill completed">${_('Completed')}</div>
+    % elif past_due:
+      <div class="pill past-due">${_('Past due')}</div>
+    % endif
+  </div>
+% endif
+
+% if show_bookmark_button:
+  <%include file='bookmark_button.html' args="bookmark_id=bookmark_id, is_bookmarked=bookmarked"/>
+% endif
+
+% if vertical_banner_ctas:
+  % for vertical_banner_cta in vertical_banner_ctas:
+    <div class="banner-cta has-button">
+      <div class="banner-cta-text">${vertical_banner_cta['description']}</div>
+      % if vertical_banner_cta.get('event_data'):
+        <div class="banner-cta-button">
+            <button class="btn btn-outline-primary" onclick="emit_event(${vertical_banner_cta['event_data']})">${vertical_banner_cta['link_name']}</button>
+        </div>
+      % else:
+        <div class="banner-cta-button">
+          <form method="post" action="${vertical_banner_cta['link']}">
+            <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+            % for form_name, form_value in vertical_banner_cta['form_values'].items():
+              <input type="hidden" name="${form_name}" value="${form_value}">
+            % endfor
+            <button class="btn btn-outline-primary">${vertical_banner_cta['link_name']}</button>
+          </form>
+        </div>
+     % endif
+    </div>
+  % endfor
+% endif
+
+<div class="vert-mod">
+% for idx, item in enumerate(items):
+  % if item['content']:
+    <div class="vert vert-${idx}" data-id="${item['id']}">
+        ${HTML(item['content'])}
+    </div>
+  %endif
+% endfor
+</div>
+
+% if reset_button:
+  <div class="problem-reset-btn-wrapper">
+    <button type="button" class="problem-reset-btn btn-link" data-value="${_('Reset Problems')}"><span aria-hidden="true">${_('Reset Problems')}</span><span class="sr">${_("Reset Problems")}</span></button>
+  </div>
+% endif
+
+<%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
+    DateUtilFactory.transform('.localized-datetime');
+</%static:require_module_async>
+
+<script>
+    function emit_event(message) {
+        parent.postMessage(message, '*');
+    }
+</script>
