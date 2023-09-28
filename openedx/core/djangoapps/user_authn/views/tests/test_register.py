@@ -2689,20 +2689,30 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestM
             {"username": str(USERNAME_INVALID_CHARS_ASCII)}
         )
 
+    @override_settings(AUTH_PASSWORD_VALIDATORS=[
+        create_validator_config(
+            'common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 4}
+        )
+    ])
     def test_password_empty_validation_decision(self):
         # 2 is the default setting for minimum length found in lms/envs/common.py
         # under AUTH_PASSWORD_VALIDATORS.MinimumLengthValidator
-        msg = 'This password is too short. It must contain at least 2 characters.'
+        msg = 'This password is too short. It must contain at least 4 characters.'
         self.assertValidationDecision(
             {'password': ''},
             {"password": msg}
         )
 
+    @override_settings(AUTH_PASSWORD_VALIDATORS=[
+        create_validator_config(
+            'common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 4}
+        )
+    ])
     def test_password_bad_min_length_validation_decision(self):
         password = 'p'
         # 2 is the default setting for minimum length found in lms/envs/common.py
         # under AUTH_PASSWORD_VALIDATORS.MinimumLengthValidator
-        msg = 'This password is too short. It must contain at least 2 characters.'
+        msg = 'This password is too short. It must contain at least 4 characters.'
         self.assertValidationDecision(
             {'password': password},
             {"password": msg}

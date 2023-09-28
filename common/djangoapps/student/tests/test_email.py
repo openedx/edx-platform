@@ -136,7 +136,7 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
         params = {
             'username': 'test_user',
             'email': 'test_user@example.com',
-            'password': 'edx',
+            'password': 'long_password',
             'name': 'Test User',
             'honor_code': True,
             'terms_of_service': True
