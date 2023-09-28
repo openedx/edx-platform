@@ -83,6 +83,8 @@ Test Locations
 Running Tests
 =============
 
+**Unless otherwise mentioned, all the following commands should be run from inside the lms docker container.**
+
 You can run all of the unit-level tests using this command::
 
     paver test
@@ -93,9 +95,6 @@ Note -
 `paver` is a scripting tool. To get information about various options, you can run the this command::
 
     paver -h
-
-Note -
-Unless otherwise mentioned, all the following commands should be run from inside lms docker container.
 
 Running Python Unit tests
 -------------------------
