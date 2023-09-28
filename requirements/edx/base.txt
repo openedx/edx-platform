@@ -778,7 +778,7 @@ openedx-filters==1.2.0
     #   lti-consumer-xblock
 optimizely-sdk==4.1.1
     # via -r requirements/edx/base.in
-ora2==5.0.0
+ora2==5.1.1
     # via -r requirements/edx/base.in
 oscrypto==1.3.0
     # via snowflake-connector-python
