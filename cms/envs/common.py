@@ -121,6 +121,9 @@ from lms.envs.common import (
     # Methods to derive settings
     _make_mako_template_dirs,
     _make_locale_paths,
+
+    # Password Validator Settings
+    AUTH_PASSWORD_VALIDATORS
 )
 from path import Path as path
 from django.urls import reverse_lazy
@@ -1878,24 +1881,6 @@ EVENT_TRACKING_PROCESSORS = []
 EVENT_TRACKING_SEGMENTIO_EMIT_WHITELIST = []
 
 #### PASSWORD POLICY SETTINGS #####
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "common.djangoapps.util.password_policy_validators.MinimumLengthValidator",
-        "OPTIONS": {
-            "min_length": 2
-        }
-    },
-    {
-        "NAME": "common.djangoapps.util.password_policy_validators.MaximumLengthValidator",
-        "OPTIONS": {
-            "max_length": 75
-        }
-    },
-]
-
 PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG = {
     'ENFORCE_COMPLIANCE_ON_LOGIN': False
 }
