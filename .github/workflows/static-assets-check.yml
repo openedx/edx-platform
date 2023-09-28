@@ -62,6 +62,11 @@ jobs:
     - name: Add node_modules bin to $Path
       run: echo $GITHUB_WORKSPACE/node_modules/.bin >> $GITHUB_PATH
 
+    - name: Run Static Assets Check
+      env:
+        LMS_CFG: lms/envs/minimal.yml
+        CMS_CFG: cms/envs/minimal.yml
+        
       run: |
         paver update_assets lms
         paver update_assets cms
