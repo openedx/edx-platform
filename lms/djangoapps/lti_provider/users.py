@@ -35,10 +35,11 @@ def authenticate_lti_user(request, lti_user_id, lti_consumer):
         )
     except LtiUser.DoesNotExist:
         # This is the first time that the user has been here. Create an account.
-        lis_email = ""
         if lti_consumer.auto_link_users_using_email:
-            lis_email = request.POST.get("lis_person_contact_email_primary", "")
-        lti_user = create_lti_user(lti_user_id, lti_consumer, lis_email)
+            lis_email = request.POST.get("lis_person_contact_email_primary")
+            lti_user = create_lti_user(lti_user_id, lti_consumer, lis_email)
+        else:
+            lti_user = create_lti_user(lti_user_id, lti_consumer)
 
     if not (request.user.is_authenticated and
             request.user == lti_user.edx_user):
@@ -47,19 +48,16 @@ def authenticate_lti_user(request, lti_user_id, lti_consumer):
         switch_user(request, lti_user, lti_consumer)
 
 
-def create_lti_user(lti_user_id, lti_consumer, email=""):
+def create_lti_user(lti_user_id, lti_consumer, email=None):
     """
     Generate a new user on the edX platform with a random username and password,
     and associates that account with the LTI identity.
     """
-    edx_password = str(uuid.uuid4())
+    edx_user = User.objects.filter(email=email).first() if email else None
 
-    existing_user = User.objects.filter(email=email).first() if email else None
-
-    if existing_user:
-        edx_user = existing_user
-    else:
+    if not edx_user:
         created = False
+        edx_password = str(uuid.uuid4())
         while not created:
             try:
                 edx_user_id = generate_random_edx_username()
