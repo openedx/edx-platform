@@ -26,7 +26,7 @@ class ExamCompletionEventBusTests(TestCase):
         super().setUpClass()
         cls.course_key = CourseKey.from_string('course-v1:edX+TestX+Test_Course')
         cls.subsection_id = 'block-v1:edX+TestX+Test_Course+type@sequential+block@subsection'
-        cls.subsection_key = UsageKey.from_string(cls.subsection_id)
+        cls.usage_key = UsageKey.from_string(cls.subsection_id)
         cls.student_user = UserFactory(
             username='student_user',
         )
@@ -70,15 +70,16 @@ class ExamCompletionEventBusTests(TestCase):
             time=datetime.now(timezone.utc)
         )
 
-    @mock.patch('lms.djangoapps.certificates.services.CertificateService.invalidate_certificate', autospec=True)
-    def test_exam_attempt_rejected_event(self, mock_service_function):
+    @mock.patch('lms.djangoapps.certificates.api.invalidate_certificate_legacy_and_new')
+    def test_exam_attempt_rejected_event(self, mock_api_function):
         """
-        Assert that CertificateService.invalidate_certificate is called upon consuming the event
+        Assert that CertificateService api's invalidate_certificate_legacy_and_new is called upon consuming the event
         """
         exam_event_data = self._get_exam_event_data(self.student_user,
                                                     self.course_key,
-                                                    self.subsection_key,
+                                                    self.usage_key,
                                                     exam_type='proctored')
+        # print("\n\n\nexam_event_data:", exam_event_data)
         event_metadata = self._get_exam_event_metadata(EXAM_ATTEMPT_REJECTED)
 
         event_kwargs = {
@@ -86,5 +87,6 @@ class ExamCompletionEventBusTests(TestCase):
             'metadata': event_metadata
         }
         handle_exam_attempt_rejected_event(None, EXAM_ATTEMPT_REJECTED, **event_kwargs)
-        # TODO: Change params here accordingly
-        mock_service_function.assert_called_once_with((self.student_user, self.course_key))
+        # TODO: THURS MORNING MAKE THIS WORK!!!
+        mock_api_function.assert_called()
+        mock_api_function.assert_called_once_with(self.student_user.id, self.course_key)

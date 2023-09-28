@@ -8,13 +8,11 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.dispatch import receiver
 from openedx_events.learning.signals import EXAM_ATTEMPT_REJECTED
 
-from lms.djangoapps.certificates.services import CertificateService
+from lms.djangoapps.certificates.api import invalidate_certificate_legacy_and_new
 
 User = get_user_model()
 
 log = logging.getLogger(__name__)
-
-
 
 
 @receiver(EXAM_ATTEMPT_REJECTED)
@@ -25,7 +23,7 @@ def handle_exam_attempt_rejected_event(sender, signal, **kwargs):
     """
     event_data = kwargs.get('exam_attempt')
     user_data = event_data.student_user
-    usage_key = event_data.usage_key
+    course_key = event_data.course_key
 
-    # Note that the usage_key is the same as the course_key, and is being passed in as the course_key param
-    CertificateService.invalidate_certificate(user_id=user_data.id, course_key_or_id=usage_key)
+    # Note that the course_key is the same as the course_key_or_id, and is being passed in as the course_key param
+    invalidate_certificate_legacy_and_new(user_id=user_data.id, course_key_or_id=course_key)
