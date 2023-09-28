@@ -4,7 +4,7 @@ Logging and monitoring ignored errors
 Status
 ------
 
-Accepted
+Partially Superseded (see 0002-logging-and-monitoring-expected-errors-removed.rst)
 
 Context
 -------
@@ -26,3 +26,10 @@ The new capabilities have been built in edx-platform, although they could be mov
 The new feature adds the ability to mark errors as expected, temporarily or permanently, even without "ignoring" them everywhere. For example, the errors and stacktraces would still appear, but it would be possible for alert conditions to ignore expected errors.
 
 See how_tos/logging-and-monitoring-expected-errors.rst for more information.
+
+Changelog
+---------
+
+* **2023-09-28** - Changed status to "Partially Superseded", because expected errors will no longer be handled. See 0002-logging-and-monitoring-expected-errors-removed.rst for details.
+
+* **2021-03-17** - Original "Accepted" ADR
