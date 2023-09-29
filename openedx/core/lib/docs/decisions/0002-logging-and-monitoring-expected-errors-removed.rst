@@ -43,7 +43,7 @@ Consequence
 
   * In many placed in the code, "expected" was used to mean "ignored and expected", and all such instances will be renamed to "ignored".
   * The setting ``EXPECTED_ERRORS`` will be renamed to ``IGNORED_ERRORS``, which better matches how it was being used in the first place.
-  * The setting ``EXPECTED_ERRORS[EXPECTED_REASON]`` will be renamed to ``IGNORED_ERRORS[IGNORED_REASON]``.
+  * The setting ``EXPECTED_ERRORS[REASON_EXPECTED]`` will be renamed to ``IGNORED_ERRORS[REASON_IGNORED]``.
   * The setting toggle ``EXPECTED_ERRORS[IS_IGNORED]`` will be removed, because it will now always be True.
   * The how-to will be renamed to how_tos/logging-and-monitoring-ignored-errors.rst.
   * For more details, see https://github.com/openedx/edx-platform/pull/33184 where this work is underway.
