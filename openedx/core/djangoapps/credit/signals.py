@@ -5,11 +5,17 @@ This file contains receivers of course publication signals.
 
 import logging
 
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ObjectDoesNotExist
 from django.dispatch import receiver
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
+from openedx_events.learning.signals import EXAM_ATTEMPT_RESET
 
+from openedx.core.djangoapps.credit.api.eligibility import is_credit_course, remove_credit_requirement_status
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_CHANGED
+
+User = get_user_model()
 
 log = logging.getLogger(__name__)
 
@@ -94,3 +100,46 @@ def listen_for_grade_calculation(sender, user, course_grade, course_key, deadlin
                     api.set_credit_requirement_status(
                         user, course_id, 'grade', 'grade', status=status, reason=reason
                     )
+
+
+@receiver(EXAM_ATTEMPT_RESET)
+def handle_exam_reset(sender, signal, **kwargs):
+    """
+    exam reset event from the event bus
+    """
+    event_data = kwargs.get('exam_attempt')
+    user_data = event_data.student_user
+    course_key = event_data.course_key
+    usage_key = event_data.usage_key
+    request_namespace = 'special_exam'
+ 
+    # quick exit, if course is not credit enabled
+    if not is_credit_course(course_key):
+        return
+
+    # always log any deleted activity to the credit requirements
+    # table. This will be to help debug any issues that might
+    # arise in production
+    log_msg = (
+        'recieved EXAM_ATTEMPT_RESET signal, resetting credit requirement for '
+        f'user_id={user_data.id}, course_key_or_id={course_key} '
+        f'content_id={usage_key}'
+    )
+    log.info(log_msg)
+
+    try:
+        user = User.objects.get(id=user_data.id)
+    except ObjectDoesNotExist:
+        log.error(
+            'Error occurred while handling EXAM_ATTEMPT_RESET signal for '
+            f'{user_data.id} and content_id {usage_key}. '
+            'User does not exist!'
+        )
+        return
+
+    remove_credit_requirement_status(
+        user.username,
+        course_key,
+        request_namespace,
+        str(usage_key),
+    )

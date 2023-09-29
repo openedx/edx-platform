@@ -3,21 +3,27 @@ Tests for minimum grade requirement status
 """
 
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from unittest import mock
+from uuid import uuid4
 
-from unittest.mock import MagicMock
 import ddt
 import pytz
 from django.test.client import RequestFactory
+from opaque_keys.edx.keys import UsageKey
+from openedx_events.data import EventsMetadata
+from openedx_events.learning.data import ExamAttemptData, UserData, UserPersonalData
+from openedx_events.learning.signals import EXAM_ATTEMPT_RESET
 
 from common.djangoapps.course_modes.models import CourseMode
-from openedx.core.djangoapps.credit.api import get_credit_requirement_status, set_credit_requirements
-from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
-from openedx.core.djangoapps.credit.signals import listen_for_grade_calculation
-from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.djangoapps.credit.api import get_credit_requirement_status, set_credit_requirements
+from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
+from openedx.core.djangoapps.credit.signals import handle_exam_reset, listen_for_grade_calculation
+from openedx.core.djangolib.testing.utils import skip_unless_lms
+from xmodule.modulestore.tests.django_utils import \
+    ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
@@ -76,7 +82,7 @@ class TestMinGradedRequirementStatus(ModuleStoreTestCase):
 
     def assert_requirement_status(self, grade, due_date, expected_status):
         """ Verify the user's credit requirement status is as expected after simulating a grading calculation. """
-        course_grade = MagicMock()
+        course_grade = mock.MagicMock()
         course_grade.percent = grade
         listen_for_grade_calculation(None, self.user, course_grade, self.course.id, due_date)
         req_status = get_credit_requirement_status(self.course.id, self.request.user.username, 'grade', 'grade')
@@ -129,3 +135,98 @@ class TestMinGradedRequirementStatus(ModuleStoreTestCase):
         """Test with valid grades submitted before deadline with non-verified enrollment."""
         self.enrollment.update_enrollment(mode, True)
         self.assert_requirement_status(0.8, self.VALID_DUE_DATE, None)
+
+
+@skip_unless_lms
+class TestExamEvents(ModuleStoreTestCase):
+    """
+    Test exam events
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.course = CourseFactory.create(
+            org='TestX', number='999', display_name='Test Course'
+        )
+        self.subsection_key = UsageKey.from_string('block-v1:edX+TestX+Test_Course+type@sequential+block@subsection')
+
+        self.user = UserFactory()
+
+        # Enable the course for credit
+        CreditCourse.objects.create(
+            course_key=self.course.id,
+            enabled=True,
+        )
+
+    @staticmethod
+    def _get_exam_event_data(user, course, usage_key):
+        """ create ExamAttemptData object for user """
+        return ExamAttemptData(
+            student_user=UserData(
+                id=user.id,
+                is_active=True,
+                pii=UserPersonalData(
+                    username=user.username,
+                    email=user.email,
+                ),
+            ),
+            course_key=course.id,
+            usage_key=usage_key,
+            exam_type='timed',
+            requesting_user=None,
+        )
+
+    @staticmethod
+    def _get_exam_event_metadata(event_signal):
+        """ create metadata object for event """
+        return EventsMetadata(
+            event_type=event_signal.event_type,
+            id=uuid4(),
+            minorversion=0,
+            source='openedx/lms/web',
+            sourcehost='lms.test',
+            time=datetime.now(timezone.utc)
+        )
+
+    @mock.patch('openedx.core.djangoapps.credit.signals.remove_credit_requirement_status', autospec=True)
+    def test_exam_reset(self, mock_remove_credit_status):
+        """
+        Test exam reset event
+        """
+        event_data = self._get_exam_event_data(self.user, self.course, self.subsection_key)
+        event_metadata = self._get_exam_event_metadata(EXAM_ATTEMPT_RESET)
+
+        handle_exam_reset(None, EXAM_ATTEMPT_RESET, event_metadata=event_metadata, exam_attempt=event_data)
+
+        mock_remove_credit_status.assert_called_once_with(
+            self.user.username, self.course.id, 'special_exam', str(self.subsection_key)
+        )
+
+    def test_exam_reset_bad_user(self):
+        """
+        Test exam reset event with a user that does not exist in the LMS
+        """
+        self.user.id = 999  # don't save to db so user doesn't exist
+        event_data = self._get_exam_event_data(self.user, self.course, self.subsection_key)
+        event_metadata = self._get_exam_event_metadata(EXAM_ATTEMPT_RESET)
+
+        with mock.patch('openedx.core.djangoapps.credit.signals.log.error') as mock_log:
+            handle_exam_reset(None, EXAM_ATTEMPT_RESET, event_metadata=event_metadata, exam_attempt=event_data)
+            mock_log.assert_called_once_with(
+                'Error occurred while handling EXAM_ATTEMPT_RESET signal for '
+                f'{self.user.id} and content_id {self.subsection_key}. '
+                'User does not exist!'
+            )
+
+    @mock.patch('openedx.core.djangoapps.credit.signals.remove_credit_requirement_status', autospec=True)
+    def test_exam_reset_non_credit_course(self, mock_remove_credit_status):
+        """
+        Credit logic should not run on non-credit courses
+        """
+        non_credit_course = CourseFactory.create()
+        event_data = self._get_exam_event_data(self.user, non_credit_course, self.subsection_key)
+        event_metadata = self._get_exam_event_metadata(EXAM_ATTEMPT_RESET)
+
+        handle_exam_reset(None, EXAM_ATTEMPT_RESET, event_metadata=event_metadata, exam_attempt=event_data)
+
+        mock_remove_credit_status.assert_not_called()
