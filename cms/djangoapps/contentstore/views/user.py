@@ -120,6 +120,7 @@ def _course_team_user(request, course_key, email):
     else:
         role_hierarchy = (CourseInstructorRole, CourseStaffRole)
 
+    MANAGE_ALL_USERS_PERMISSION = "manage_all_users"
     if request.method == "GET":
         # just return info about the user
         msg = {
