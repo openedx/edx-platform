@@ -20,7 +20,7 @@ The functionality supporting expected errors was added:
 Updates regarding these three original reasons:
 
 * New Relic now supports expected errors, so the custom functionality is redundant and complicated, and
-* This functionality has yet to be used, so it is also unnecessary, and
+* This functionality has yet to be used, so it is also unnecessary
 
 Note that the need for custom functionality for ignored errors differs from expected errors in the following ways:
 
@@ -39,6 +39,13 @@ The custom ignored error functionality proposed in 0001-logging-and-monitoring-i
 Consequence
 -----------
 
-* The setting ``EXPECTED_ERRORS`` will be renamed to ``IGNORED_ERRORS``, which better matches how it was being used in the first place.
+* A number of code changes are required to remove the expected functionality.
+
+  * In many placed in the code, "expected" was used to mean "ignored and expected", and all such instances will be renamed to "ignored".
+  * The setting ``EXPECTED_ERRORS`` will be renamed to ``IGNORED_ERRORS``, which better matches how it was being used in the first place.
+  * The setting ``EXPECTED_ERRORS[EXPECTED_REASON]`` will be renamed to ``IGNORED_ERRORS[IGNORED_REASON]``.
+  * The setting toggle ``EXPECTED_ERRORS[IS_IGNORED]`` will be removed, because it will now always be True.
+  * The how-to will be renamed to how_tos/logging-and-monitoring-ignored-errors.rst.
+  * For more details, see https://github.com/openedx/edx-platform/pull/33184 where this work is underway.
+
 * If anyone ever uses New Relic's expected error functionality, the reason for marking an error as expected would need to be captured elsewhere.
-* The how-to will be renamed to how_tos/logging-and-monitoring-ignored-errors.rst.
