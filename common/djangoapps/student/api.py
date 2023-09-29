@@ -30,6 +30,7 @@ from common.djangoapps.student.roles import (
     GlobalStaff,
     REGISTERED_ACCESS_ROLES as _REGISTERED_ACCESS_ROLES,
 )
+from openedx.core.djangoapps.course_roles.helpers import course_permission_check
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
@@ -130,9 +131,14 @@ def is_user_staff_or_instructor_in_course(user, course_key):
     """
     if not isinstance(course_key, CourseKey):
         course_key = CourseKey.from_string(course_key)
-
+    MANAGE_STUDENTS_PERMISSION = "manage_students"
+    # TODO: course roles: If the course roles feature flag is disabled the course_permission_check call
+    #       below will never be true.
+    #       Remove the CourseStaffRole and the CourseInstructorRole .has_user() calls below when course
+    #       roles are implemented.
     return (
         GlobalStaff().has_user(user) or
         CourseStaffRole(course_key).has_user(user) or
-        CourseInstructorRole(course_key).has_user(user)
+        CourseInstructorRole(course_key).has_user(user) or
+        course_permission_check(user, MANAGE_STUDENTS_PERMISSION, course_key)
     )

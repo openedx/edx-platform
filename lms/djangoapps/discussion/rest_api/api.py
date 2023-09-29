@@ -40,6 +40,7 @@ from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.toggles_utils import reported_content_email_notification_enabled
 from lms.djangoapps.discussion.views import is_privileged_user
+from openedx.core.djangoapps.course_roles.helpers import course_permission_check
 from openedx.core.djangoapps.discussions.models import (
     DiscussionsConfiguration,
     DiscussionTopicLink,
@@ -334,6 +335,7 @@ def get_course(request, course_key):
         course.get_discussion_blackout_datetimes()
     )
 
+    MODEREATE_DISCUSSION_FORUM_PERMISSION = 'moderate_discussion_forum'
     return {
         "id": str(course_key),
         "is_posting_enabled": is_posting_enabled,
@@ -359,8 +361,13 @@ def get_course(request, course_key):
         }),
         "is_group_ta": bool(user_roles & {FORUM_ROLE_GROUP_MODERATOR}),
         "is_user_admin": request.user.is_staff,
-        "is_course_staff": CourseStaffRole(course_key).has_user(request.user),
-        "is_course_admin": CourseInstructorRole(course_key).has_user(request.user),
+        # TODO: course roles: If the course roles feature flag is disabled the calls to course_permission_check
+        #       below will never be true.
+        #       Remove .has_user() calls below when course_roles Django app are implemented.
+        "is_course_staff": (CourseStaffRole(course_key).has_user(request.user) or
+                            course_permission_check(request.user, MODEREATE_DISCUSSION_FORUM_PERMISSION, course_key)),
+        "is_course_admin": (CourseInstructorRole(course_key).has_user(request.user) or
+                            course_permission_check(request.user, MODEREATE_DISCUSSION_FORUM_PERMISSION, course_key)),
         "provider": course_config.provider_type,
         "enable_in_context": course_config.enable_in_context,
         "group_at_subsection": course_config.plugin_configuration.get("group_at_subsection", False),
