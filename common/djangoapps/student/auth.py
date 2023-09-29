@@ -25,6 +25,12 @@ from common.djangoapps.student.roles import (
     OrgLibraryUserRole,
     OrgStaffRole
 )
+from openedx.core.djangoapps.course_roles.helpers import (
+    course_permissions_list_check,
+    course_or_organization_permission_check,
+    course_or_organization_permission_list_check,
+    organization_permissions_list_check
+)
 
 # Studio permissions:
 STUDIO_EDIT_ROLES = 8
@@ -79,6 +85,20 @@ def get_user_permissions(user, course_key, org=None):
     Can also set course_key=None and pass in an org to get the user's
     permissions for that organization as a whole.
     """
+    COURSE_INSTRUCTOR_ROLE_PERMISSIONS = [
+        "edit_content",
+        "manage_course_settings",
+        "manage_adv_settings",
+        "view_course_settings",
+        "manage_all_users"
+    ]
+    STAFF_ROLE_PERMISSIONS = [
+        "edit_content",
+        "manage_course_settings",
+        "manage_adv_settings",
+        "view_course_settings",
+        "manage_users_except_admin_and_staff"
+    ]
     if org is None:
         org = course_key.org
         course_key = course_key.for_branch(None)
@@ -89,19 +109,48 @@ def get_user_permissions(user, course_key, org=None):
         return STUDIO_NO_PERMISSIONS
     all_perms = STUDIO_EDIT_ROLES | STUDIO_VIEW_USERS | STUDIO_EDIT_CONTENT | STUDIO_VIEW_CONTENT
     # global staff, org instructors, and course instructors have all permissions:
-    if GlobalStaff().has_user(user) or OrgInstructorRole(org=org).has_user(user):
+    # TODO: course roles: If the course roles feature flag is disabled the organization_permissions_list_check call
+    #       below will never return true.
+    #       Remove the OrgInstructorRole .has_user call when course_roles Django app are implemented.
+    if (
+        GlobalStaff().has_user(user)
+        or OrgInstructorRole(org=org).has_user(user)
+        or organization_permissions_list_check(user, COURSE_INSTRUCTOR_ROLE_PERMISSIONS, org)
+    ):
         return all_perms
-    if course_key and user_has_role(user, CourseInstructorRole(course_key)):
+
+    # TODO: course roles: If the course roles feature flag is disabled the course_permissions_list_check call
+    #       below will never return true.
+    #       Remove the user_has_role call when course_roles Django app are implemented.
+    if course_key and (
+        user_has_role(user, CourseInstructorRole(course_key))
+        or course_permissions_list_check(user, COURSE_INSTRUCTOR_ROLE_PERMISSIONS, course_key)
+    ):
         return all_perms
+
     # Limited Course Staff does not have access to Studio.
+    # TODO: course roles: Remove this validation when course roles app are implemented
     if course_key and user_has_role(user, CourseLimitedStaffRole(course_key)):
         return STUDIO_NO_PERMISSIONS
     # Staff have all permissions except EDIT_ROLES:
-    if OrgStaffRole(org=org).has_user(user) or (course_key and user_has_role(user, CourseStaffRole(course_key))):
+    # TODO: course roles: If the course roles feature flag is disabled the
+    #       course_or_organization_permissions_list_check call below will never return true.
+    #       Remove the OrgStaffRole has_user call and the user_has_role call when course_roles Django app are implemented.
+    if (OrgStaffRole(org=org).has_user(user) or
+        (course_key and user_has_role(user, CourseStaffRole(course_key)))) or (
+        course_or_organization_permission_list_check(user, STAFF_ROLE_PERMISSIONS, course_key, org)
+    ):
         return STUDIO_VIEW_USERS | STUDIO_EDIT_CONTENT | STUDIO_VIEW_CONTENT
     # Otherwise, for libraries, users can view only:
+    LIBRARY_USER_ROLE_PERMISSION = "view_library"
     if course_key and isinstance(course_key, LibraryLocator):
-        if OrgLibraryUserRole(org=org).has_user(user) or user_has_role(user, LibraryUserRole(course_key)):
+        # TODO: course roles: If the course roles feature flag is disabled the course_or_organization_permission_check
+        #       call below will never return true.
+        #       Remove the OrgLibraryUserRole has_user call and the user_has_role call
+        #       when course_roles Django app are implemented.
+        if (OrgLibraryUserRole(org=org).has_user(user) or user_has_role(user, LibraryUserRole(course_key))) or (
+            course_or_organization_permission_check(user, LIBRARY_USER_ROLE_PERMISSION, course_key, org)
+        ):
             return STUDIO_VIEW_USERS | STUDIO_VIEW_CONTENT
     return STUDIO_NO_PERMISSIONS
 
@@ -223,7 +272,6 @@ def _check_caller_authority(caller, role):
     # superuser
     if GlobalStaff().has_user(caller):
         return
-
     if isinstance(role, (GlobalStaff, CourseCreatorRole, OrgContentCreatorRole)):  # lint-amnesty, pylint: disable=no-else-raise
         raise PermissionDenied
     elif isinstance(role, CourseRole):  # instructors can change the roles w/in their course
