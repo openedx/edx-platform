@@ -493,6 +493,17 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/7845
     'ENABLE_COURSE_DISCOVERY': False,
 
+    # .. toggle_name: FEATURES['ENABLE_COURSE_FILENAME_CCX_SUFFIX']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: If set to True, CCX ID will be included in the generated filename for CCX courses.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2021-03-16
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: None
+    # .. toggle_warnings: Turning this feature ON will affect all generated filenames which are related to CCX courses.
+    'ENABLE_COURSE_FILENAME_CCX_SUFFIX': False,
+
     # Setting for overriding default filtering facets for Course discovery
     # COURSE_DISCOVERY_FILTERS = ["org", "language", "modes"]
 
@@ -2275,6 +2286,10 @@ DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
 ################################# CELERY ######################################
 
+# Celery beat configuration
+
+CELERYBEAT_SCHEDULER = 'celery.beat:PersistentScheduler'
+
 # Message configuration
 
 CELERY_TASK_SERIALIZER = 'json'
@@ -2299,24 +2314,42 @@ CELERY_SEND_TASK_SENT_EVENT = True
 CELERY_DEFAULT_EXCHANGE = 'edx.core'
 CELERY_DEFAULT_EXCHANGE_TYPE = 'direct'
 
+
+# SERVICE_VARIANT specifies name of the variant used, which decides what JSON
+# configuration files are read during startup.
+SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', "lms")
+
+# CONFIG_PREFIX specifies the prefix of the JSON configuration files,
+# based on the service variant. If no variant is use, don't use a
+# prefix.
+CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
+
 # Queues configuration
 
-HIGH_PRIORITY_QUEUE = 'edx.core.high'
-DEFAULT_PRIORITY_QUEUE = 'edx.core.default'
-HIGH_MEM_QUEUE = 'edx.core.high_mem'
+# Name the exchange and queues w.r.t the SERVICE_VARIANT
+QUEUE_VARIANT = CONFIG_PREFIX.lower()
 
-CELERY_QUEUE_HA_POLICY = 'all'
+CELERY_DEFAULT_EXCHANGE = f'edx.{QUEUE_VARIANT}core'
 
-CELERY_CREATE_MISSING_QUEUES = True
+HIGH_PRIORITY_QUEUE = f'edx.{QUEUE_VARIANT}core.high'
+DEFAULT_PRIORITY_QUEUE = f'edx.{QUEUE_VARIANT}core.default'
+HIGH_MEM_QUEUE = f'edx.{QUEUE_VARIANT}core.high_mem'
 
 CELERY_DEFAULT_QUEUE = DEFAULT_PRIORITY_QUEUE
 CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
-CELERY_QUEUES = [
-    'edx.lms.core.default',
-    'edx.lms.core.high',
-    'edx.lms.core.high_mem'
-]
+CELERY_QUEUES = {
+    HIGH_PRIORITY_QUEUE: {},
+    DEFAULT_PRIORITY_QUEUE: {},
+    HIGH_MEM_QUEUE: {},
+}
+
+CELERY_ROUTES = "openedx.core.lib.celery.routers.route_task"
+CELERYBEAT_SCHEDULE = {}  # For scheduling tasks, entries can be added to this dict
+
+CELERY_QUEUE_HA_POLICY = 'all'
+
+CELERY_CREATE_MISSING_QUEUES = True
 
 # let logging work as configured:
 CELERYD_HIJACK_ROOT_LOGGER = False
