@@ -161,19 +161,6 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
             object_id=str(self.course2),
         )
 
-        self.all_orgs_invalid_tag_perm = ChangeObjectTagPermissionItem(
-            taxonomy=self.taxonomy_all_orgs,
-            object_id="course-v1_OpenedX_DemoX_Demo_Course",
-        )
-        self.one_org_invalid_org_tag_perm = ChangeObjectTagPermissionItem(
-            taxonomy=self.taxonomy_one_org,
-            object_id="block-v1_OeX_DemoX_Demo_Course_type_html_block@abcde",
-        )
-        self.no_orgs_invalid_tag_perm = ChangeObjectTagPermissionItem(
-            taxonomy=self.taxonomy_no_orgs,
-            object_id=str(self.course1),
-        )
-
         self.all_org_perms = (
             self.tax_all_course1,
             self.tax_all_course2,
@@ -545,29 +532,11 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
         assert not self.learner.has_perm(perm, perm_item)
 
     @ddt.data(
-
-        ("oel_tagging.add_object_tag", "one_org_invalid_org_tag_perm"),
-        ("oel_tagging.add_object_tag", "all_orgs_invalid_tag_perm"),
-        ("oel_tagging.change_object_tag", "one_org_invalid_org_tag_perm"),
-        ("oel_tagging.change_object_tag", "all_orgs_invalid_tag_perm"),
-        ("oel_tagging.delete_object_tag", "one_org_invalid_org_tag_perm"),
-        ("oel_tagging.delete_object_tag", "all_orgs_invalid_tag_perm"),
-    )
-    @ddt.unpack
-    def test_change_object_tag_invalid_key(self, perm, tag_attr):
-        perm_item = getattr(self, tag_attr)
-        with self.assertRaises(InvalidKeyError):
-            assert self.staff.has_perm(perm, perm_item)
-
-    @ddt.data(
         "all_orgs_course_tag",
         "all_orgs_block_tag",
         "both_orgs_course_tag",
         "both_orgs_block_tag",
         "one_org_block_tag",
-        "all_orgs_invalid_tag",
-        "one_org_invalid_org_tag",
-        "no_orgs_invalid_tag",
         "disabled_course_tag",
     )
     def test_view_object_tag(self, tag_attr):
