@@ -2,7 +2,7 @@
 import ddt
 from django.test.testcases import TestCase
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from openedx_tagging.core.tagging.models import ObjectTag, Tag
+from openedx_tagging.core.tagging.models import Tag
 from organizations.models import Organization
 
 from .. import api

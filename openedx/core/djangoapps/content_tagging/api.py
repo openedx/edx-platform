@@ -3,7 +3,7 @@ Content Tagging APIs
 """
 from __future__ import annotations
 
-from typing import Iterator, List, Type
+from typing import Iterator
 
 import openedx_tagging.core.tagging.api as oel_tagging
 from django.db.models import Q, QuerySet, Exists, OuterRef
@@ -38,7 +38,7 @@ def create_taxonomy(
 def set_taxonomy_orgs(
     taxonomy: Taxonomy,
     all_orgs=False,
-    orgs: List[Organization] = None,
+    orgs: list[Organization] = None,
     relationship: TaxonomyOrg.RelType = TaxonomyOrg.RelType.OWNER,
 ):
     """

@@ -76,7 +76,6 @@ def update_course_tags(course_key_str: str) -> bool:
         return True
     except Exception as e:  # pylint: disable=broad-except
         log.error("Error updating tags for Course with id: %s. %s", course_key, e)
-        raise e
         return False
 
 

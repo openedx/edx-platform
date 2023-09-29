@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Exists, OuterRef, Q, QuerySet
+from django.db.models import Q, QuerySet
 from django.utils.translation import gettext as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import LearningContextKey, UsageKey
@@ -108,5 +108,5 @@ class ContentObjectTag(ObjectTag):
         # Make sure that object_id is a valid key
         try:
             self.object_key
-        except InvalidKeyError:
-            raise ValidationError("object_id is not a valid opaque key string.")
+        except InvalidKeyError as err:
+            raise ValidationError("object_id is not a valid opaque key string.") from err

@@ -8,7 +8,7 @@ from unittest.mock import patch
 from django.core.management import call_command
 from django.test import override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag
-from openedx_tagging.core.tagging.models import LanguageTaxonomy, ObjectTag, Tag, Taxonomy
+from openedx_tagging.core.tagging.models import LanguageTaxonomy, Tag, Taxonomy
 from organizations.models import Organization
 
 from common.djangoapps.student.tests.factories import UserFactory
