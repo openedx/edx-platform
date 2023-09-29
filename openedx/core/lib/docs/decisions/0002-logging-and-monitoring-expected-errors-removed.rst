@@ -20,7 +20,7 @@ The functionality supporting expected errors was added:
 Updates regarding these three original reasons:
 
 * New Relic now supports expected errors, so the custom functionality is redundant and complicated, and
-* This functionality has yet to be used, so it is also unnecessary
+* This functionality has yet to be used, so it is also unnecessary.
 
 Note that the need for custom functionality for ignored errors differs from expected errors in the following ways:
 
