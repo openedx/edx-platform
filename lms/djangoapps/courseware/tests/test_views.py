@@ -712,7 +712,7 @@ class ViewsTestCase(BaseViewsTestCase):
         # log into a staff account
         admin = AdminFactory()
 
-        assert self.client.login(username=admin.username, password='test')
+        assert self.client.login(username=admin.username, password=TEST_PASSWORD)
 
         url = reverse('submission_history', kwargs={
             'course_id': str(self.course_key),
@@ -727,7 +727,7 @@ class ViewsTestCase(BaseViewsTestCase):
         # log into a staff account
         admin = AdminFactory()
 
-        assert self.client.login(username=admin.username, password='test')
+        assert self.client.login(username=admin.username, password=TEST_PASSWORD)
 
         # try it with an existing user and a malicious location
         url = reverse('submission_history', kwargs={
@@ -751,7 +751,7 @@ class ViewsTestCase(BaseViewsTestCase):
         # log into a staff account
         admin = AdminFactory.create()
 
-        assert self.client.login(username=admin.username, password='test')
+        assert self.client.login(username=admin.username, password=TEST_PASSWORD)
 
         usage_key = self.course_key.make_usage_key('problem', 'test-history')
         state_client = DjangoXBlockUserStateClient(admin)
@@ -814,7 +814,7 @@ class ViewsTestCase(BaseViewsTestCase):
                 course_key = course.id
                 client = Client()
                 admin = AdminFactory.create()
-                assert client.login(username=admin.username, password='test')
+                assert client.login(username=admin.username, password=TEST_PASSWORD)
                 state_client = DjangoXBlockUserStateClient(admin)
                 usage_key = course_key.make_usage_key('problem', 'test-history')
                 state_client.set(
@@ -1253,7 +1253,7 @@ class ProgressPageBaseTests(ModuleStoreTestCase):
     def setUp(self):
         super().setUp()
         self.user = UserFactory.create()
-        assert self.client.login(username=self.user.username, password='test')
+        assert self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
         self.setup_course()
 
@@ -1352,7 +1352,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         # Create a new course, a user which will not be enrolled in course, admin user for staff access
         course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
         admin = AdminFactory.create()
-        assert self.client.login(username=admin.username, password='test')
+        assert self.client.login(username=admin.username, password=TEST_PASSWORD)
 
         # Create and enable Credit course
         CreditCourse.objects.create(course_key=course.id, enabled=True)
@@ -1646,7 +1646,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         """
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         user = UserFactory.create()
-        assert self.client.login(username=user.username, password='test')
+        assert self.client.login(username=user.username, password=TEST_PASSWORD)
         add_course_mode(self.course, mode_slug=CourseMode.AUDIT)
         add_course_mode(self.course)
         CourseEnrollmentFactory(user=user, course_id=self.course.id, mode=course_mode)
@@ -1679,7 +1679,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         """
         CourseDurationLimitConfig.objects.create(enabled=False)
         user = UserFactory.create()
-        assert self.client.login(username=user.username, password='test')
+        assert self.client.login(username=user.username, password=TEST_PASSWORD)
         CourseModeFactory.create(
             course_id=self.course.id,
             mode_slug=course_mode
@@ -1698,7 +1698,7 @@ class ProgressPageTests(ProgressPageBaseTests):
          in an ineligible mode.
         """
         user = UserFactory.create()
-        assert self.client.login(username=user.username, password='test')
+        assert self.client.login(username=user.username, password=TEST_PASSWORD)
         CourseEnrollmentFactory(user=user, course_id=self.course.id, mode=course_mode)
 
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
@@ -2081,7 +2081,7 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         self.setup_course(show_correctness=show_correctness, due_date=due_date, graded=graded)
         self.add_problem()
 
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
         resp = self._get_progress_page()
 
         # Ensure that expected text is present
@@ -2133,7 +2133,7 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         self.add_problem()
 
         # Login as a course staff user to view the student progress page.
-        self.client.login(username=self.staff_user.username, password='test')
+        self.client.login(username=self.staff_user.username, password=TEST_PASSWORD)
 
         resp = self._get_student_progress_page()
 
@@ -3198,7 +3198,7 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ModuleStoreTestCa
     def setUp(self):
         super().setUp()
         self.user = UserFactory.create()
-        assert self.client.login(username=self.user.username, password='test')
+        assert self.client.login(username=self.user.username, password=TEST_PASSWORD)
         self.course = CourseFactory.create()
         CourseOverview.load_from_module_store(self.course.id)
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
@@ -3298,7 +3298,7 @@ class PreviewTests(BaseViewsTestCase):
             # Previews will not redirect to the mfe
             course_staff = UserFactory.create(is_staff=False)
             CourseStaffRole(self.course_key).add_users(course_staff)
-            self.client.login(username=course_staff.username, password='test')
+            self.client.login(username=course_staff.username, password=TEST_PASSWORD)
             assert self.client.get(preview_url).status_code == 200
 
 
@@ -3435,7 +3435,7 @@ class TestCourseWideResources(ModuleStoreTestCase):
         CourseEnrollmentFactory(user=user, course_id=course.id)
         if is_instructor:
             allow_access(course, user, 'instructor')
-        assert self.client.login(username=user.username, password='test')
+        assert self.client.login(username=user.username, password=TEST_PASSWORD)
 
         kwargs = None
         if param == 'course_id':

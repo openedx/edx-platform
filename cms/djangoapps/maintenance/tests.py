@@ -30,7 +30,7 @@ class TestMaintenanceIndex(ModuleStoreTestCase):
     def setUp(self):
         super().setUp()
         self.user = AdminFactory()
-        login_success = self.client.login(username=self.user.username, password='test')
+        login_success = self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         self.assertTrue(login_success)
         self.view_url = reverse('maintenance:maintenance_index')
 
@@ -56,7 +56,7 @@ class MaintenanceViewTestCase(ModuleStoreTestCase):
     def setUp(self):
         super().setUp()
         self.user = AdminFactory()
-        login_success = self.client.login(username=self.user.username, password='test')
+        login_success = self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         self.assertTrue(login_success)
 
     def verify_error_message(self, data, error_message):
@@ -110,8 +110,8 @@ class MaintenanceViewAccessTests(MaintenanceViewTestCase):
         """
         Test that all maintenance app views are not accessible to non-global-staff user.
         """
-        user = UserFactory(username='test', email='test@example.com', password='test')
-        login_success = self.client.login(username=user.username, password='test')
+        user = UserFactory(username='test', email='test@example.com', password=self.TEST_PASSWORD)
+        login_success = self.client.login(username=user.username, password=self.TEST_PASSWORD)
         self.assertTrue(login_success)
 
         response = self.client.get(url)
@@ -245,13 +245,13 @@ class TestAnnouncementsViews(MaintenanceViewTestCase):
         self.admin = AdminFactory.create(
             email='staff@edx.org',
             username='admin',
-            password='pass'
+            password=self.TEST_PASSWORD
         )
-        self.client.login(username=self.admin.username, password='pass')
+        self.client.login(username=self.admin.username, password=self.TEST_PASSWORD)
         self.non_staff_user = UserFactory.create(
             email='test@edx.org',
             username='test',
-            password='pass'
+            password=self.TEST_PASSWORD
         )
 
     def test_index(self):
@@ -301,7 +301,7 @@ class TestAnnouncementsViews(MaintenanceViewTestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_authorization(self):
-        self.client.login(username=self.non_staff_user, password='pass')
+        self.client.login(username=self.non_staff_user, password=self.TEST_PASSWORD)
         announcement = Announcement.objects.create(content="Test Delete")
         announcement.save()
 

@@ -2758,7 +2758,7 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
             discussion_topics={"Test Topic": {"id": "test_topic"}}
         )
         self.path = reverse('discussion_course_settings', kwargs={'course_id': str(self.course.id)})
-        self.password = 'edx'
+        self.password = 'password'
         self.user = UserFactory(username='staff', password=self.password, is_staff=True)
 
     def _get_oauth_headers(self, user):
@@ -3056,7 +3056,7 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
             run="z",
             start=datetime.now(UTC),
         )
-        self.password = 'edx'
+        self.password = 'password'
         self.user = UserFactory(username='staff', password=self.password, is_staff=True)
         course_key = CourseKey.from_string('course-v1:x+y+z')
         seed_permissions_roles(course_key)
@@ -3278,7 +3278,7 @@ class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceM
         """
         Tests that for a regular user stats are returned without flag counts
         """
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         response = self.client.get(self.url)
         data = response.json()
         assert data["results"] == self.stats_without_flags
@@ -3288,7 +3288,7 @@ class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceM
         """
         Tests that for a moderator user stats are returned with flag counts
         """
-        self.client.login(username=self.moderator.username, password='test')
+        self.client.login(username=self.moderator.username, password=self.TEST_PASSWORD)
         response = self.client.get(self.url)
         data = response.json()
         assert data["results"] == self.stats
@@ -3308,7 +3308,7 @@ class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceM
         """
         Test valid sorting options and defaults
         """
-        self.client.login(username=username, password='test')
+        self.client.login(username=username, password=self.TEST_PASSWORD)
         params = {}
         if ordering_requested:
             params = {"order_by": ordering_requested}
@@ -3326,7 +3326,7 @@ class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceM
         """
         Test for invalid sorting options for regular users.
         """
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         response = self.client.get(self.url, {"order_by": order_by})
         assert "order_by" in response.json()["field_errors"]
 
@@ -3341,7 +3341,7 @@ class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceM
         Test for endpoint with username param.
         """
         params = {'username': username_search_string}
-        self.client.login(username=self.moderator.username, password='test')
+        self.client.login(username=self.moderator.username, password=self.TEST_PASSWORD)
         self.client.get(self.url, params)
         assert urlparse(
             httpretty.last_request().path  # lint-amnesty, pylint: disable=no-member
@@ -3356,7 +3356,7 @@ class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceM
         Test for endpoint with username param with no matches.
         """
         params = {'username': 'unknown'}
-        self.client.login(username=self.moderator.username, password='test')
+        self.client.login(username=self.moderator.username, password=self.TEST_PASSWORD)
         response = self.client.get(self.url, params)
         data = response.json()
         self.assertFalse(data['results'])

@@ -21,8 +21,8 @@ class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     Create the test environment with the crowdsourcehinter xblock.
     """
     STUDENTS = [
-        {'email': 'view@test.com', 'password': 'foo'},
-        {'email': 'view2@test.com', 'password': 'foo'}
+        {'email': 'view@test.com', 'password': 'password1234'},
+        {'email': 'view2@test.com', 'password': 'password1234'}
     ]
     XBLOCK_NAMES = ['crowdsourcehinter']
 

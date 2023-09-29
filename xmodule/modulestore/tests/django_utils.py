@@ -369,7 +369,7 @@ class ModuleStoreTestUsersMixin():
     """
     A mixin to help manage test users.
     """
-    TEST_PASSWORD = 'test'
+    TEST_PASSWORD = 'password'
 
     def create_user_for_course(self, course, user_type=CourseUserType.ENROLLED):
         """

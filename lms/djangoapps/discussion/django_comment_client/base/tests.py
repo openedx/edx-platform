@@ -241,7 +241,7 @@ class ViewsTestCaseMixin:
         with patch('common.djangoapps.student.models.user.cc.User.save'):
             uname = 'student'
             email = 'student@edx.org'
-            self.password = 'test'
+            self.password = 'password'
 
             # Create the user and make them active so we can log them in.
             self.student = UserFactory.create(username=uname, email=email, password=self.password)
@@ -464,7 +464,7 @@ class ViewsTestCase(
         with patch('common.djangoapps.student.models.user.cc.User.save'):
             uname = 'student'
             email = 'student@edx.org'
-            self.password = 'test'
+            self.password = 'password'
 
             # Create the user and make them active so we can log them in.
             self.student = UserFactory.create(username=uname, email=email, password=self.password)

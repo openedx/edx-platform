@@ -88,7 +88,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
     This includes the specific types of error raised, and default behavior when optional arguments
     are not specified.
     """
-    password = "test"
+    password = "password"
 
     def setUp(self):
         super().setUp()

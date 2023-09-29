@@ -50,7 +50,7 @@ class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
         """
         super().setUp()
         # Set up users.
-        self.password = 'test'
+        self.password = 'password'
         self.user = UserFactory.create(password=self.password)
         self.staff = UserFactory.create(password=self.password, is_staff=True)
 
@@ -253,7 +253,7 @@ class BlockParentsMapTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
                     parent_block.children.append(self.xblock_keys[i])
                     update_block(parent_block)
 
-        self.password = 'test'
+        self.password = 'password'
         self.student = UserFactory.create(is_staff=False, username='test_student', password=self.password)
         self.staff = UserFactory.create(is_staff=True, username='test_staff', password=self.password)
         CourseEnrollmentFactory.create(

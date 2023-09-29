@@ -284,7 +284,7 @@ class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, SharedModuleSt
         # pylint: disable=attribute-defined-outside-init
         # create a new account since the first account is already enrolled in the course
         self.email = 'foo_second@test.com'
-        self.password = 'bar'
+        self.password = 'password'
         self.username = 'test_second'
         self.create_account(self.username, self.email, self.password)
         self.activate_user(self.email)

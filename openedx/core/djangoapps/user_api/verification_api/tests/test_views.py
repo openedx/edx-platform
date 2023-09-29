@@ -23,7 +23,7 @@ class VerificationViewTestsMixinBase:
     """ Base class for the tests on verification views """
     VIEW_NAME = None
     CREATED_AT = datetime.datetime.strptime(FROZEN_TIME, '%Y-%m-%d')
-    PASSWORD = 'test'
+    PASSWORD = 'password'
 
     def setUp(self):
         freezer = freezegun.freeze_time(FROZEN_TIME)

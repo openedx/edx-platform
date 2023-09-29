@@ -184,7 +184,7 @@ class InternationalizationTest(ModuleStoreTestCase):
 
         self.uname = 'testuser'
         self.email = 'test+courses@edx.org'
-        self.password = 'foo'
+        self.password = 'password'
 
         # Create the use so we can log them in.
         self.user = UserFactory.create(username=self.uname, email=self.email, password=self.password)
