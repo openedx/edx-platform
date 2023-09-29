@@ -119,26 +119,3 @@ class IntegritySignatureView(AuthenticatedAPIView):
         signature = create_integrity_signature(username, course_id)
         serializer = IntegritySignatureSerializer(signature)
         return Response(serializer.data)
-
-
-class LTIPIISignatureView(AuthenticatedAPIView):
-    """
-    Endpoint for an PII sharing LTI Signature
-    /integrity_signature/{course_id}
-
-    HTTP POST
-        * If an integrity signature does not exist for the user + course, creates one and
-          returns it. If one does exist, returns the existing signature.
-    """
-
-    def post(self, request, course_id):
-        """
-        Create an LTI PII signature for the requesting user and course. If a signature
-        already exists, returns the existing signature instead of creating a new one.
-
-        /api/agreements/v1/lti_pii_signature/{course_id}
-        """
-        username = request.user.username
-        #signature = create_lti_pii_signature(username, course_id, lti_tools)
-        #serializer = IntegritySignatureSerializer(signature)
-        #return Response(serializer.data)
