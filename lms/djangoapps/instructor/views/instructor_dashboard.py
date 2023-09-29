@@ -189,7 +189,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
     MANAGE_STUDENTS_PERMISSION = "manage_students"
     # TODO: course roles: If the course roles feature flag is disabled the course_permission_check call
     #       below will never return true.
-    #       Remove .has_user() calls below when course roles are implemented.
+    #       Remove .has_user() calls below when course_roles Django app are implemented.
     user_has_access = any([
         request.user.is_staff,
         CourseStaffRole(course_key).has_user(request.user),

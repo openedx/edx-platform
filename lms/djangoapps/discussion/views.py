@@ -760,7 +760,7 @@ def is_course_staff(course_key: CourseKey, user: User):
     MODEREATE_DISCUSSION_FORUM_PERMISSION = 'moderate_discussion_forum'
     # TODO: course roles: If the course roles feature flag is disabled the course_permission_check
     #       below will never return true.
-    #       Remove .has_user() calls when implementing course roles.
+    #       Remove .has_user() calls when implementing course_roles Django app.
     return ((CourseInstructorRole(course_key).has_user(user) or CourseStaffRole(course_key).has_user(user)) or
             course_permission_check(user, MODEREATE_DISCUSSION_FORUM_PERMISSION, course_key))
 

@@ -65,7 +65,7 @@ class ScheduleOutlineProcessor(OutlineProcessor):
         VIEW_ONLY_LIVE_PUBLISHED_CONTENT_PERMISSION = "view_only_live_published_content"
         # TODO: course roles: If the course roles feature flag is disabled the course_permission_check calls
         #       below will never return true.
-        #       Remove the user_has_role call when course roles are implemented.
+        #       Remove the user_has_role call when course_roles Django app are implemented.
         self._is_beta_tester = user_has_role(self.user, CourseBetaTesterRole(self.course_key)) or (
             course_permission_check(self.user, VIEW_ALL_PUBLISHED_CONTENT_PERMISSION, self.course_key)
             or course_permission_check(self.user, VIEW_ONLY_LIVE_PUBLISHED_CONTENT_PERMISSION, self.course_key)

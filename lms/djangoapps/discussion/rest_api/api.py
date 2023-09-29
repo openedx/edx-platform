@@ -362,7 +362,7 @@ def get_course(request, course_key):
         "is_user_admin": request.user.is_staff,
         # TODO: course roles: If the course roles feature flag is disabled the calls to course_permission_check
         #       below will never be true.
-        #       Remove .has_user() calls below when course roles are implemented.
+        #       Remove .has_user() calls below when course_roles Django app are implemented.
         "is_course_staff": (CourseStaffRole(course_key).has_user(request.user) or
                             course_permission_check(request.user, MODEREATE_DISCUSSION_FORUM_PERMISSION, course_key)),
         "is_course_admin": (CourseInstructorRole(course_key).has_user(request.user) or
