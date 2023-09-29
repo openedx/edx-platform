@@ -50,6 +50,7 @@ from lms.djangoapps.discussion.exceptions import TeamDiscussionHiddenFromUserExc
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.teams import api as team_api
+from openedx.core.djangoapps.course_roles.helpers import course_permission_check
 from openedx.core.djangoapps.discussions.utils import (
     available_division_schemes,
     get_discussion_categories_ids,
@@ -756,7 +757,12 @@ def is_course_staff(course_key: CourseKey, user: User):
     """
     Check if user has course instructor or course staff role.
     """
-    return CourseInstructorRole(course_key).has_user(user) or CourseStaffRole(course_key).has_user(user)
+    MODEREATE_DISCUSSION_FORUM_PERMISSION = 'moderate_discussion_forum'
+    # TODO: course roles: If the course roles feature flag is disabled the course_permission_check
+    #       below will never return true.
+    #       Remove .has_user() calls when implementing course_roles Django app.
+    return ((CourseInstructorRole(course_key).has_user(user) or CourseStaffRole(course_key).has_user(user)) or
+            course_permission_check(user, MODEREATE_DISCUSSION_FORUM_PERMISSION, course_key))
 
 
 def is_privileged_user(course_key: CourseKey, user: User):
