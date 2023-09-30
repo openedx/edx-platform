@@ -3,7 +3,13 @@ Referencing Content Blocks in Library V2
 
 Status
 =======
-Pending
+
+**Deferred** as of September 2023.
+
+The goals described in the ADR are still relevant to future development,
+but for the intial launch of Blockstore-backed content libraries,
+the existing ``library_content`` block will be used instead,
+and it will continue to copy blocks from Blockstore into Modulestore as necessary.
 
 Context
 =======

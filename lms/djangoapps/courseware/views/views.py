@@ -1636,6 +1636,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
         context = {
             'fragment': fragment,
             'course': course,
+            'block': block,
             'disable_accordion': True,
             'allow_iframing': True,
             'disable_header': True,

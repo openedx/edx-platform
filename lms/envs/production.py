@@ -23,6 +23,7 @@ import os
 
 import yaml
 from corsheaders.defaults import default_headers as corsheaders_default_headers
+import django
 from django.core.exceptions import ImproperlyConfigured
 from edx_django_utils.plugins import add_plugins
 from path import Path as path
@@ -146,8 +147,9 @@ REQUIRE_BUILD_PROFILE = ENV_TOKENS.get('REQUIRE_BUILD_PROFILE', REQUIRE_BUILD_PR
 PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME') or PLATFORM_NAME
 PLATFORM_DESCRIPTION = ENV_TOKENS.get('PLATFORM_DESCRIPTION') or PLATFORM_DESCRIPTION
 
+DATA_DIR = path(ENV_TOKENS.get('DATA_DIR', DATA_DIR))
 CC_MERCHANT_NAME = ENV_TOKENS.get('CC_MERCHANT_NAME', PLATFORM_NAME)
-EMAIL_FILE_PATH = ENV_TOKENS.get('EMAIL_FILE_PATH', None)
+EMAIL_FILE_PATH = ENV_TOKENS.get('EMAIL_FILE_PATH', DATA_DIR / "emails" / "lms")
 EMAIL_HOST = ENV_TOKENS.get('EMAIL_HOST', 'localhost')  # django default is localhost
 EMAIL_PORT = ENV_TOKENS.get('EMAIL_PORT', 25)  # django default is 25
 EMAIL_USE_TLS = ENV_TOKENS.get('EMAIL_USE_TLS', False)  # django default is False
@@ -317,7 +319,6 @@ for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
 
 local_loglevel = ENV_TOKENS.get('LOCAL_LOGLEVEL', 'INFO')
 LOG_DIR = ENV_TOKENS.get('LOG_DIR', LOG_DIR)
-DATA_DIR = path(ENV_TOKENS.get('DATA_DIR', DATA_DIR))
 
 LOGGING = get_logger_config(LOG_DIR,
                             logging_env=ENV_TOKENS.get('LOGGING_ENV', LOGGING_ENV),
@@ -366,6 +367,10 @@ CSRF_COOKIE_SECURE = ENV_TOKENS.get('CSRF_COOKIE_SECURE', False)
 
 # Determines which origins are trusted for unsafe requests eg. POST requests.
 CSRF_TRUSTED_ORIGINS = ENV_TOKENS.get('CSRF_TRUSTED_ORIGINS', [])
+# values are already updated above with default CSRF_TRUSTED_ORIGINS values but in
+# case of new django version these values will override.
+if django.VERSION[0] >= 4:  # for greater than django 3.2 use schemes.
+    CSRF_TRUSTED_ORIGINS = ENV_TOKENS.get('CSRF_TRUSTED_ORIGINS_WITH_SCHEME', [])
 
 ############# CORS headers for cross-domain requests #################
 
@@ -471,6 +476,7 @@ elif AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 else:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
 
 # If there is a database called 'read_replica', you can use the use_read_replica_if_available
 # function in util/query.py, which is useful for very large database reads
@@ -1072,6 +1078,15 @@ EXPLICIT_QUEUES = {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
     'openedx.core.djangoapps.programs.tasks.award_course_certificate': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
+    'openassessment.workflow.tasks.update_workflows_for_all_blocked_submissions_task': {
+        'queue': ORA_WORKFLOW_UPDATE_ROUTING_KEY},
+    'openassessment.workflow.tasks.update_workflows_for_course_task': {
+        'queue': ORA_WORKFLOW_UPDATE_ROUTING_KEY},
+    'openassessment.workflow.tasks.update_workflows_for_ora_block_task': {
+        'queue': ORA_WORKFLOW_UPDATE_ROUTING_KEY},
+    'openassessment.workflow.tasks.update_workflow_for_submission_task': {
+        'queue': ORA_WORKFLOW_UPDATE_ROUTING_KEY},
+
 }
 
 LOGO_IMAGE_EXTRA_TEXT = ENV_TOKENS.get('LOGO_IMAGE_EXTRA_TEXT', '')

@@ -18,6 +18,7 @@ from collections import OrderedDict
 from uuid import uuid4
 
 import openid.oidutil
+import django
 from django.utils.translation import gettext_lazy
 from edx_django_utils.plugins import add_plugins
 from path import Path as path
@@ -677,3 +678,10 @@ SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-su
 SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL = None
 SUBSCRIPTIONS_MINIMUM_PRICE = '$39'
 SUBSCRIPTIONS_TRIAL_LENGTH = 7
+CSRF_TRUSTED_ORIGINS = ['.example.com']
+CSRF_TRUSTED_ORIGINS_WITH_SCHEME = ['https://*.example.com']
+
+# values are already updated above with default CSRF_TRUSTED_ORIGINS values but in
+# case of new django version these values will override.
+if django.VERSION[0] >= 4:  # for greater than django 3.2 use with schemes.
+    CSRF_TRUSTED_ORIGINS = CSRF_TRUSTED_ORIGINS_WITH_SCHEME

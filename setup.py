@@ -22,7 +22,6 @@ XBLOCKS = [
     "image = xmodule.template_block:TranslateCustomTagBlock",
     "library = xmodule.library_root_xblock:LibraryRoot",
     "library_content = xmodule.library_content_block:LibraryContentBlock",
-    "library_sourced = xmodule.library_sourced_block:LibrarySourcedBlock",
     "lti = xmodule.lti_block:LTIBlock",
     "poll_question = xmodule.poll_block:PollBlock",
     "problem = xmodule.capa_block:ProblemBlock",

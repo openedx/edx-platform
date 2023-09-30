@@ -120,7 +120,6 @@ from .serializers import (
     UserStatsSerializer,
     get_context
 )
-from .tasks import send_thread_created_notification
 from .utils import (
     AttributeDict,
     add_stats_for_users_with_no_discussion_content,
@@ -129,7 +128,6 @@ from .utils import (
     get_usernames_for_course,
     get_usernames_from_search_string,
     is_posting_allowed,
-    send_response_notifications,
     set_attribute,
 )
 
@@ -1469,8 +1467,6 @@ def create_thread(request, thread_data):
     track_thread_created_event(request, course, cc_thread, actions_form.cleaned_data["following"],
                                from_mfe_sidebar)
 
-    thread_id = cc_thread.attributes['id']
-    send_thread_created_notification.apply_async(args=[thread_id, str(course.id), request.user.id])
     return api_thread
 
 
@@ -1517,8 +1513,6 @@ def create_comment(request, comment_data):
 
     track_comment_created_event(request, course, cc_comment, cc_thread["commentable_id"], followed=False,
                                 from_mfe_sidebar=from_mfe_sidebar)
-    send_response_notifications(thread=cc_thread, course=course, creator=request.user,
-                                parent_id=comment_data.get("parent_id"))
     return api_comment
 
 

@@ -14,7 +14,7 @@ click==8.1.6
     #   nltk
 codejail-includes==1.0.0
     # via -r requirements/edx-sandbox/py38.in
-contourpy==1.1.0
+contourpy==1.1.1
     # via matplotlib
 cryptography==38.0.4
     # via
@@ -24,7 +24,7 @@ cycler==0.11.0
     # via matplotlib
 fonttools==4.42.1
     # via matplotlib
-importlib-resources==6.0.1
+importlib-resources==6.1.0
     # via matplotlib
 joblib==1.3.2
     # via nltk
@@ -38,7 +38,7 @@ markupsafe==2.1.3
     # via
     #   chem
     #   openedx-calc
-matplotlib==3.7.2
+matplotlib==3.7.3
     # via -r requirements/edx-sandbox/py38.in
 mpmath==1.3.0
     # via sympy
@@ -65,7 +65,7 @@ pillow==9.5.0
     #   matplotlib
 pycparser==2.21
     # via cffi
-pyparsing==3.0.9
+pyparsing==3.1.1
     # via
     #   -r requirements/edx-sandbox/py38.in
     #   chem
@@ -94,5 +94,5 @@ sympy==1.12
     #   openedx-calc
 tqdm==4.66.1
     # via nltk
-zipp==3.16.2
+zipp==3.17.0
     # via importlib-resources

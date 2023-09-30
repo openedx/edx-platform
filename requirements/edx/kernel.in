@@ -58,6 +58,7 @@ django-user-tasks
 django-waffle
 django-webpack-loader               # Used to wire webpack bundles into the django asset pipeline
 djangorestframework
+drf-spectacular
 edx-ace
 edx-api-doc-tools
 edx-auth-backends                   # Allow Studio to use LMS SSO
@@ -80,13 +81,12 @@ edx-name-affirmation
 edx-opaque-keys
 edx-organizations
 edx-proctoring>=2.0.1
-edx-proctoring-proctortrack==1.0.5  # Intentionally and permanently pinned to ensure code changes are reviewed
+edx-proctoring-proctortrack==1.2.1  # Intentionally and permanently pinned to ensure code changes are reviewed
 edx-rest-api-client
 edx-search
 edx-submissions
 edx-toggles                         # Feature toggles management
 edx-token-utils			    # Validate exam access tokens
-edx-user-state-client
 edx-when
 edxval
 event-tracking
@@ -111,9 +111,10 @@ mysqlclient                         # Driver for the default production relation
 nodeenv                             # Utility for managing Node.js environments; we use this for deployments and testing
 oauthlib                            # OAuth specification support for authenticating via LTI or other Open edX services
 olxcleaner
+openedx-atlas                       # CLI tool to manage translations
 openedx-calc                        # Library supporting mathematical calculations for Open edX
 openedx-django-require
-openedx-events>=8.3.0               # Open edX Events from Hooks Extension Framework (OEP-50)
+openedx-events                      # Open edX Events from Hooks Extension Framework (OEP-50)
 openedx-filters                     # Open edX Filters from Hooks Extension Framework (OEP-50)
 openedx-learning                    # Open edX Learning core (experimental)
 openedx-mongodbproxy
