@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-09-24 20:36+0000\n"
-"PO-Revision-Date: 2023-09-24 20:36:20.303017\n"
+"POT-Creation-Date: 2023-10-01 20:36+0000\n"
+"PO-Revision-Date: 2023-10-01 20:36:14.857987\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -7490,6 +7490,14 @@ msgstr "Ƀlɐɔʞlᴉsʇ {country} ɟøɹ {course}"
 #: openedx/core/djangoapps/learner_pathway/apps.py
 msgid "Learner Pathways"
 msgstr "Łǝɐɹnǝɹ Ᵽɐʇɥʍɐʎs"
+
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification App"
+msgstr "Nøʇᴉɟᴉɔɐʇᴉøn Ⱥdd"
+
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification Type"
+msgstr "Nøʇᴉɟᴉɔɐʇᴉøn Ŧʎdǝ"
 
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
