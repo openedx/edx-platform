@@ -552,6 +552,7 @@ django-ses==3.5.0
     #   -r requirements/edx/testing.txt
 django-simple-history==3.4.0
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-enterprise

@@ -342,6 +342,7 @@ django-ses==3.5.0
     # via -r requirements/edx/bundled.in
 django-simple-history==3.4.0
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
     #   edx-name-affirmation
@@ -648,7 +649,9 @@ jsonfield==3.1.0
     #   lti-consumer-xblock
     #   ora2
 jsonschema==4.19.1
-    # via optimizely-sdk
+    # via
+    #   drf-spectacular
+    #   optimizely-sdk
 jsonschema-specifications==2023.7.1
     # via jsonschema
 jwcrypto==1.5.0
@@ -783,7 +786,9 @@ openedx-filters==1.6.0
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
 openedx-learning==0.1.7
-    # via -r requirements/edx/kernel.in
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/kernel.in
 openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/kernel.in
 optimizely-sdk==4.1.1
