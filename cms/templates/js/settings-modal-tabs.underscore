@@ -8,3 +8,4 @@
 <% _.each(tabs, function(tab) { %>
 <div class='settings-tab <%- tab.name %>'></div>
 <% }); %>
+

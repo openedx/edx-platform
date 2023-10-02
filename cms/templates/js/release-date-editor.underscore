@@ -34,12 +34,6 @@
             Sub Text 
             </h3>
             <textarea id='sub-text' style="width:100% ; height:150px"></textarea>
-            <div>
-                <a style='font-size:18px;cursor: pointer;' id='sub-text-submit' hrfe='#' class='button action-cancel' >
-                Save Sub Text
-                </a>
-               
-            </div>
         </div>
     </form>
 </div>
@@ -48,7 +42,9 @@
     const sequenceId = document.querySelector('.xblock-editor').getAttribute('data-locator')
     const subTextElement = document.querySelector('#sub-text')
     const btnSubmit = document.querySelector('#sub-text-submit')
+    const btnSave = document.querySelector('.action-save')
 
+   
     async function fetchData (){
         try{
             const response = await fetch ('/api/sub_text/' + sequenceId)
@@ -85,7 +81,7 @@
 
 
 
-    btnSubmit.addEventListener('click', async (e) =>{
+    btnSave.addEventListener('click', async (e) =>{
         
          try{
             const csrftoken = getCookie('csrftoken')
