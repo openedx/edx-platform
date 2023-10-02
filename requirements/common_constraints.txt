@@ -17,13 +17,14 @@
 
 
 # using LTS django version
-Django<4.0
+
 
 # elasticsearch>=7.14.0 includes breaking changes in it which caused issues in discovery upgrade process.
 # elastic search changelog: https://www.elastic.co/guide/en/enterprise-search/master/release-notes-7.14.0.html
 elasticsearch<7.14.0
 
 # django-simple-history>3.0.0 adds indexing and causes a lot of migrations to be affected
+django-simple-history==3.0.0
 
 # tox>4.0.0 isn't yet compatible with many tox plugins, causing CI failures in almost all repos.
 # Details can be found in this discussion: https://github.com/tox-dev/tox/discussions/1810
