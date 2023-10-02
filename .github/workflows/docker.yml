@@ -73,7 +73,7 @@ jobs:
           docker-compose run cms /openedx/edx-platform/.github/test/tests_cms.sh cms/djangoapps/contentstore/views/tests/test_videos.py && docker-compose down -v
 
       - name: Login to GitHub Container Registry
-        if: startsWith(github.ref, 'refs/heads/eol-release/')
+        if: startsWith('refs/heads/eol-release/', github.ref)
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -81,7 +81,7 @@ jobs:
           password: ${{ secrets.CR_PAT }}
 
       - name: Push production image to the registry
-        if: startsWith(github.ref, 'refs/heads/eol-release/')
+        if: startsWith('refs/heads/eol-release/', github.ref)
         run: |
           docker push ghcr.io/eol-uchile/edx-platform:${GITHUB_SHA}
           docker push ghcr.io/eol-uchile/edx-platform:${{ env.RELEASE-NAME }}-${{ env.TS }}
