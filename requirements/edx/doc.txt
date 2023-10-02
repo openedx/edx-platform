@@ -103,13 +103,13 @@ boto==2.39.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-boto3==1.28.53
+boto3==1.28.57
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.31.53
+botocore==1.31.57
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -133,7 +133,7 @@ certifi==2023.7.22
     #   py2neo
     #   requests
     #   snowflake-connector-python
-cffi==1.15.1
+cffi==1.16.0
     # via
     #   -r requirements/edx/base.txt
     #   cryptography
@@ -481,7 +481,7 @@ drf-nested-routers==0.93.4
     # via
     #   -r requirements/edx/base.txt
     #   openedx-blockstore
-drf-spectacular==0.26.4
+drf-spectacular==0.26.5
     # via -r requirements/edx/base.txt
 drf-yasg==1.21.5
     # via
@@ -570,7 +570,7 @@ edx-i18n-tools==1.2.0
     #   ora2
 edx-milestones==0.5.0
     # via -r requirements/edx/base.txt
-edx-name-affirmation==2.3.6
+edx-name-affirmation==2.3.7
     # via -r requirements/edx/base.txt
 edx-opaque-keys[django]==2.5.1
     # via
@@ -694,7 +694,7 @@ html5lib==1.1
     # via
     #   -r requirements/edx/base.txt
     #   ora2
-icalendar==5.0.8
+icalendar==5.0.10
     # via -r requirements/edx/base.txt
 idna==3.4
     # via
@@ -869,7 +869,7 @@ mysqlclient==2.2.0
     # via
     #   -r requirements/edx/base.txt
     #   openedx-blockstore
-newrelic==9.0.0
+newrelic==9.1.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -895,7 +895,7 @@ oauthlib==3.2.2
     #   social-auth-core
 olxcleaner==0.2.1
     # via -r requirements/edx/base.txt
-openai==0.28.0
+openai==0.28.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -932,13 +932,13 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/base.txt
 optimizely-sdk==4.1.1
     # via -r requirements/edx/base.txt
-ora2==5.5.0
+ora2==5.5.1
     # via -r requirements/edx/base.txt
 oscrypto==1.3.0
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
-packaging==23.1
+packaging==23.2
     # via
     #   -r requirements/edx/base.txt
     #   drf-yasg
@@ -1158,7 +1158,7 @@ random2==1.0.1
     # via -r requirements/edx/base.txt
 recommender-xblock==2.0.1
     # via -r requirements/edx/base.txt
-redis==5.0.0
+redis==5.0.1
     # via
     #   -r requirements/edx/base.txt
     #   walrus
@@ -1204,7 +1204,7 @@ rpds-py==0.10.3
     #   -r requirements/edx/base.txt
     #   jsonschema
     #   referencing
-ruamel-yaml==0.17.32
+ruamel-yaml==0.17.33
     # via
     #   -r requirements/edx/base.txt
     #   drf-yasg
@@ -1218,7 +1218,7 @@ rules==3.3
     #   edx-enterprise
     #   edx-proctoring
     #   openedx-learning
-s3transfer==0.6.2
+s3transfer==0.7.0
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -1443,7 +1443,7 @@ walrus==0.9.3
     #   edx-event-bus-redis
 watchdog==3.0.0
     # via -r requirements/edx/base.txt
-wcwidth==0.2.6
+wcwidth==0.2.8
     # via
     #   -r requirements/edx/base.txt
     #   prompt-toolkit
@@ -1469,7 +1469,7 @@ wrapt==1.15.0
     # via
     #   -r requirements/edx/base.txt
     #   deprecated
-xblock[django]==1.7.0
+xblock[django]==1.8.0
     # via
     #   -r requirements/edx/base.txt
     #   acid-xblock
