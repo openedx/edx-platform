@@ -128,3 +128,6 @@ click==8.1.6
 
 # plz upgrade this in separate ticket
 redis==4.6.0
+
+# temp pin otherwise it get overridden.
+django-simple-history==3.4.0
