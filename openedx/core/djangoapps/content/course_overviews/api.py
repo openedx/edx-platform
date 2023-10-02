@@ -4,9 +4,13 @@ CourseOverview api
 import logging
 
 from django.http.response import Http404
+from rest_framework.decorators import api_view
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie 
+from common.djangoapps.util.json_request import JsonResponse
 
 from openedx.core.djangoapps.catalog.api import get_course_run_details
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview, CourseOverviewSubText
 from openedx.core.djangoapps.content.course_overviews.serializers import (
     CourseOverviewBaseSerializer,
 )
@@ -77,3 +81,44 @@ def get_course_overviews(course_ids):
     """
     overviews = CourseOverview.objects.filter(id__in=course_ids)
     return CourseOverviewBaseSerializer(overviews, many=True).data
+
+
+# courseOverview_subtext
+
+@api_view(['GET'])
+@login_required
+@ensure_csrf_cookie
+def get_course_subtext (request,sequence_id) :
+
+    sequenceSubText = CourseOverviewSubText.sequenceSubText(sequence_id)
+
+    if sequenceSubText is not None :
+        data = {
+        "id" : sequence_id,
+        "sub_text" : sequenceSubText.sub_text,
+        "title" : sequenceSubText.title,
+ 
+    }
+    else : 
+        data = {
+            "id" : sequence_id,
+            "sub_text" : "" ,
+
+        }
+    
+
+    return JsonResponse(data)
+
+
+@api_view(['POST'])
+@login_required
+@ensure_csrf_cookie
+def set_course_subtext (request) :
+    
+    if request.method == 'POST' :
+        sub_text = request.data.get('subtext')
+        sequence_id = request.data.get('suquence_id')
+        course_id = request.data.get('courseId')
+       
+        CourseOverviewSubText.setSubTextSequence(sequence_id=sequence_id, sub_text=sub_text, course_id=course_id)
+    return JsonResponse({'a':'a'})

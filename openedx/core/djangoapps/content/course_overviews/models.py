@@ -1138,3 +1138,42 @@ post_save.connect(_invalidate_overview_cache, sender=CourseOverview)
 post_save.connect(_invalidate_overview_cache, sender=CourseOverviewImageConfig)
 post_delete.connect(_invalidate_overview_cache, sender=CourseOverview)
 post_delete.connect(_invalidate_overview_cache, sender=CourseOverviewImageConfig)
+
+
+
+# courseOverview_subtext
+
+class CourseOverviewSubText (models.Model) :
+    course_overview = models.ForeignKey(CourseOverview, db_index=True, related_name="tab", on_delete=models.CASCADE)
+    usage_key = UsageKeyField(max_length=255)
+    title = models.CharField(max_length=1000, blank=True)
+    sub_text = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.title
+
+    @classmethod
+    def courseSubText (cls, course_id) :
+        
+        return CourseOverviewSubText.objects.filter(course_overview_id = course_id)
+    
+    @classmethod
+    def sequenceSubText (cls, sequence_id):
+
+        try :
+            return CourseOverviewSubText.objects.filter(usage_key = sequence_id)[0]
+        except :
+            return None
+        
+    @classmethod
+    def setSubTextSequence(cls, sequence_id, sub_text, course_id):
+      
+        try:
+   
+            subtext_obj = CourseOverviewSubText.objects.get(usage_key=sequence_id, course_overview_id=course_id)
+            subtext_obj.sub_text = sub_text
+            subtext_obj.save()
+        except CourseOverviewSubText.DoesNotExist:
+            return CourseOverviewSubText.objects.create(usage_key=sequence_id, sub_text=sub_text, course_overview_id=course_id)
+            
+        

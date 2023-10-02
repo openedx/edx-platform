@@ -22,7 +22,7 @@ from openedx.core.apidocs import api_info
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
 from openedx.core import toggles as core_toggles
-
+from openedx.core.djangoapps.content.course_overviews.api import get_course_subtext ,set_course_subtext
 
 django_autodiscover()
 admin.site.site_header = _('Studio Administration')
@@ -332,4 +332,10 @@ urlpatterns.extend(get_plugin_url_patterns(ProjectType.CMS))
 # Contentstore
 urlpatterns += [
     path('api/contentstore/', include('cms.djangoapps.contentstore.rest_api.urls'))
+]
+
+# course sub-text api 
+urlpatterns += [
+    path('api/sub_text/<str:sequence_id>', get_course_subtext , name='sub_text'),
+     path('api/set_sub_text' , set_course_subtext, name='set_sub_text' )
 ]
