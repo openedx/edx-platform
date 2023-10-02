@@ -13,7 +13,7 @@ from rest_framework import permissions
 from edx_rest_framework_extensions.permissions import IsStaff, IsUserInUrl
 from openedx.core.lib.log_utils import audit_log
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
-from openedx.core.djangoapps.course_roles import course_permission_check
+from openedx.core.djangoapps.course_roles import course_permission_check, course_permissions_list_check
 
 class ApiKeyHeaderPermission(permissions.BasePermission):
     """
@@ -68,7 +68,7 @@ class IsCourseStaffInstructor(permissions.BasePermission):
                 (hasattr(obj, 'course_id') and
                  (CourseInstructorRole(obj.course_id).has_user(request.user) or
                   CourseStaffRole(obj.course_id).has_user(request.user))) or
-                  (course_permission_check(request.user, "manage_course_settings", obj.course_id) and course_permission_check(request.user, "manage_students", obj.course_id)) or
+                  course_permissions_list_check(request.user, ["manage_coures_settings", "manage_students"], obj.course_id) or
                 # or it is a safe method and the user is a coach on the course object
                 (request.method in permissions.SAFE_METHODS
                  and hasattr(obj, 'coach') and obj.coach == request.user))

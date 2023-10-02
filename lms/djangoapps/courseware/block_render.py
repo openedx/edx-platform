@@ -97,7 +97,7 @@ from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from openedx.core.lib.cache_utils import CacheService
-from openedx.core.djangoapps.course_roles import course_permission_check, organization_permission_check
+from openedx.core.djangoapps.course_roles import course_or_organization_permission_list_check, course_or_organization_permission_check
 
 if TYPE_CHECKING:
     from rest_framework.request import Request
@@ -575,12 +575,10 @@ def prepare_runtime_for_user(
     block_wrappers.append(partial(course_expiration_wrapper, user))
     block_wrappers.append(partial(offer_banner_wrapper, user))
 
+    permissions = ["view_all_content","specific_masquerading"]
     user_is_staff = (
         bool(has_access(user, 'staff', course_id)) 
-        or course_permission_check(user, "view_all_content", course_id) 
-        or course_permission_check(user, "specific_masquerading", course_id) 
-        or organization_permission_check(user, "view_all_content", course_id.org__name)
-        or organization_permission_check(user, "specific_masquerading", course_id.org__name)
+        or course_or_organization_permission_list_check(user, permissions, course_id)
     )
 
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
@@ -605,10 +603,10 @@ def prepare_runtime_for_user(
             # See the docstring of `DjangoXBlockUserService`.
             deprecated_anonymous_user_id=anonymous_id_for_user(user, None),
             request_country_code=user_location,
-            user_has_manage_content=course_permission_check(user, "manage_content", course_id) or organization_permission_check(user, "manage_content", course_id.org__name),
-            user_has_manage_grades=course_permission_check(user, "manage_grades", course_id) or organization_permission_check(user, "manage_grades", course_id.org__name),
-            user_has_access_data_downloads=course_permission_check(user, "access_data_downloads", course_id) or organization_permission_check(user, "access_data_downloads", course_id.org__name),
-            user_has_view_all_content=course_permission_check(user, "view_all_content", course_id) or organization_permission_check(user, "view_all_content", course_id.org__name)
+            user_has_manage_content=course_or_organization_permission_check(user, "manage_content", course_id),
+            user_has_manage_grades=course_or_organization_permission_check(user, "manage_grades", course_id),
+            user_has_access_data_downloads=course_or_organization_permission_check(user, "access_data_downloads", course_id),
+            user_has_view_all_content=course_or_organization_permission_check(user, "view_all_content", course_id)
         ),
         'verification': XBlockVerificationService(),
         'proctoring': ProctoringService(),
