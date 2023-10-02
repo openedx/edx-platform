@@ -714,10 +714,7 @@ class LibraryContentBlock(
                 if system.error_tracker is not None:
                     system.error_tracker(msg)
 
-        definition = {
-            attr_name: json.loads(attr_value)
-            for attr_name, attr_value in xml_object.attrib.items()
-        }
+        definition = dict(xml_object.attrib.items())
         return definition, children
 
     def definition_to_xml(self, resource_fs):

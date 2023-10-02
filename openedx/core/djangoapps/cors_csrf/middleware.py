@@ -120,12 +120,18 @@ class CsrfCrossDomainCookieMiddleware(MiddlewareMixin):
             log.debug("Could not set cross-domain CSRF cookie.")
             return response
 
-        # Check whether (a) the CSRF middleware has already set a cookie, and
-        # (b) this is a view decorated with `@ensure_cross_domain_csrf_cookie`
-        # If so, we can send the cross-domain CSRF cookie.
+        # Send the cross-domain CSRF cookie if this is a view decorated with
+        # `@ensure_cross_domain_csrf_cookie` and the same-domain CSRF cookie
+        # value is available.
+        #
+        # Because CSRF_COOKIE can be set either by an inbound CSRF token or
+        # by the middleware generating a new one or echoing the old one for
+        # the response, this might result in sending the cookie more often
+        # than the CSRF value actually changes, but as of Django 4.0 we no
+        # longer have a good way of finding out when the csrf middleware has
+        # updated the value.
         should_set_cookie = (
             request.META.get('CROSS_DOMAIN_CSRF_COOKIE_USED', False) and
-            request.META.get('CSRF_COOKIE_USED', False) and
             request.META.get('CSRF_COOKIE') is not None
         )
 

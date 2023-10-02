@@ -1,14 +1,16 @@
 
 
 """
-Tests for the xblock view of the Studio Content API. This tests only the view itself,
+Tests for the xblock view of the CMS API. This tests only the view itself,
 not the underlying Xblock service.
 It checks that the assets_handler method of the Xblock service is called with the expected parameters.
 """
 from unittest.mock import patch
+from django.core.files import File
 from django.http import JsonResponse
 
 from django.urls import reverse
+from mock import MagicMock
 from rest_framework import status
 from rest_framework.test import APITestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -17,6 +19,8 @@ from cms.djangoapps.contentstore.tests.test_utils import AuthorizeStaffTestCase
 
 
 ASSET_KEY_STRING = "asset-v1:dede+aba+weagi+type@asset+block@_0e37192a-42c4-441e-a3e1-8e40ec304e2e.jpg"
+mock_image = MagicMock(file=File)
+mock_image.name = "test.jpg"
 
 
 class AssetsViewTestCase(AuthorizeStaffTestCase):
@@ -40,7 +44,7 @@ class AssetsViewTestCase(AuthorizeStaffTestCase):
 
     def get_url(self, _course_id=None):
         return reverse(
-            "cms.djangoapps.contentstore:v1:studio_content_assets",
+            "cms.djangoapps.contentstore:v1:cms_api_update_destroy_assets",
             kwargs=self.get_url_params(),
         )
 
@@ -98,6 +102,12 @@ class AssetsViewGetTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
     def get_url_params(self):
         return {"course_id": self.get_course_key_string()}
 
+    def get_url(self, _course_id=None):
+        return reverse(
+            "cms.djangoapps.contentstore:v1:cms_api_create_retrieve_assets",
+            kwargs=self.get_url_params(),
+        )
+
     def get_test_data(self):
         return None
 
@@ -144,9 +154,15 @@ class AssetsViewPostTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
     def get_url_params(self):
         return {"course_id": self.get_course_key_string()}
 
+    def get_url(self, _course_id=None):
+        return reverse(
+            "cms.djangoapps.contentstore:v1:cms_api_create_retrieve_assets",
+            kwargs=self.get_url_params(),
+        )
+
     def get_test_data(self):
         return {
-            "file": ASSET_KEY_STRING,
+            "file": mock_image,
         }
 
     def assert_assets_handler_called(self, *, mock_handle_assets, response):
@@ -159,7 +175,7 @@ class AssetsViewPostTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
 
         course_id = self.get_course_key_string()
 
-        assert passed_args.data.get("file") == ASSET_KEY_STRING
+        assert passed_args.data.get("file").name == mock_image.name
         assert passed_args.method == "POST"
         assert passed_args.path == self.get_url()
 

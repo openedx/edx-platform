@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
-from rest_framework import generics, permissions, status
+from rest_framework import generics, status
 from rest_framework.generics import UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -19,6 +19,7 @@ from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
     get_course_notification_preference_config_version
 )
+from openedx.core.djangoapps.notifications.permissions import allow_any_authenticated_user
 
 from .base_notification import COURSE_NOTIFICATION_APPS
 from .config.waffle import ENABLE_NOTIFICATIONS
@@ -38,6 +39,7 @@ from .serializers import (
 from .utils import get_show_notifications_tray
 
 
+@allow_any_authenticated_user()
 class CourseEnrollmentListView(generics.ListAPIView):
     """
     API endpoint to get active CourseEnrollments for requester.
@@ -67,7 +69,6 @@ class CourseEnrollmentListView(generics.ListAPIView):
     - 403: The requester cannot access resource.
     """
     serializer_class = NotificationCourseEnrollmentSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
     def get_paginated_response(self, data):
         """
@@ -105,6 +106,7 @@ class CourseEnrollmentListView(generics.ListAPIView):
         })
 
 
+@allow_any_authenticated_user()
 class UserNotificationPreferenceView(APIView):
     """
     Supports retrieving and patching the UserNotificationPreference
@@ -141,7 +143,6 @@ class UserNotificationPreferenceView(APIView):
         }
     }
     """
-    permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, course_key_string):
         """
@@ -220,6 +221,7 @@ class UserNotificationPreferenceView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@allow_any_authenticated_user()
 class NotificationListAPIView(generics.ListAPIView):
     """
     API view for listing notifications for a user.
@@ -253,7 +255,6 @@ class NotificationListAPIView(generics.ListAPIView):
     """
 
     serializer_class = NotificationSerializer
-    permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
         """
@@ -263,7 +264,8 @@ class NotificationListAPIView(generics.ListAPIView):
         app_name = self.request.query_params.get('app_name')
 
         if self.request.query_params.get('tray_opened'):
-            notification_tray_opened_event(self.request.user)
+            unseen_count = Notification.objects.filter(user_id=self.request.user, last_seen__isnull=True).count()
+            notification_tray_opened_event(self.request.user, unseen_count)
 
         if app_name:
             return Notification.objects.filter(
@@ -278,12 +280,11 @@ class NotificationListAPIView(generics.ListAPIView):
             ).order_by('-id')
 
 
+@allow_any_authenticated_user()
 class NotificationCountView(APIView):
     """
     API view for getting the unseen notifications count and show_notification_tray flag for a user.
     """
-
-    permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request):
         """
@@ -333,12 +334,11 @@ class NotificationCountView(APIView):
         })
 
 
+@allow_any_authenticated_user()
 class MarkNotificationsSeenAPIView(UpdateAPIView):
     """
     API view for marking user's all notifications seen for a provided app_name.
     """
-
-    permission_classes = (permissions.IsAuthenticated,)
 
     def update(self, request, *args, **kwargs):
         """
@@ -367,12 +367,11 @@ class MarkNotificationsSeenAPIView(UpdateAPIView):
         return Response({'message': _('Notifications marked as seen.')}, status=200)
 
 
+@allow_any_authenticated_user()
 class NotificationReadAPIView(APIView):
     """
     API view for marking user notifications as read, either all notifications or a single notification
     """
-
-    permission_classes = (permissions.IsAuthenticated,)
 
     def patch(self, request, *args, **kwargs):
         """
@@ -400,9 +399,10 @@ class NotificationReadAPIView(APIView):
 
         if notification_id:
             notification = get_object_or_404(Notification, pk=notification_id, user=request.user)
+            first_time_read = notification.last_read is None
             notification.last_read = read_at
             notification.save()
-            notification_read_event(request.user, notification)
+            notification_read_event(request.user, notification, first_time_read)
             return Response({'message': _('Notification marked read.')}, status=status.HTTP_200_OK)
 
         app_name = request.data.get('app_name', '')

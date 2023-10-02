@@ -1390,9 +1390,63 @@ def get_help_urls():
     return help_tokens
 
 
+def get_response_format(request):
+    return request.GET.get('format') or request.POST.get('format') or 'html'
+
+
+def request_response_format_is_json(request, response_format):
+    return response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json')
+
+
+def get_library_context(request, request_is_json=False):
+    """
+    Utils is used to get context of course home library tab.
+    It is used for both DRF and django views.
+    """
+    from cms.djangoapps.contentstore.views.course import (
+        get_allowed_organizations,
+        get_allowed_organizations_for_libraries,
+        user_can_create_organizations,
+        _accessible_libraries_iter,
+        _get_course_creator_status,
+        _format_library_for_view,
+    )
+    from cms.djangoapps.contentstore.views.library import (
+        LIBRARIES_ENABLED,
+    )
+
+    libraries = _accessible_libraries_iter(request.user) if LIBRARIES_ENABLED else []
+    data = {
+        'libraries': [_format_library_for_view(lib, request) for lib in libraries],
+    }
+
+    if not request_is_json:
+        return {
+            **data,
+            'in_process_course_actions': [],
+            'courses': [],
+            'libraries_enabled': LIBRARIES_ENABLED,
+            'show_new_library_button': LIBRARIES_ENABLED and request.user.is_active,
+            'user': request.user,
+            'request_course_creator_url': reverse('request_course_creator'),
+            'course_creator_status': _get_course_creator_status(request.user),
+            'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
+            'archived_courses': True,
+            'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
+            'rerun_creator_status': GlobalStaff().has_user(request.user),
+            'split_studio_home': split_library_view_on_dashboard(),
+            'active_tab': 'libraries',
+            'allowed_organizations_for_libraries': get_allowed_organizations_for_libraries(request.user),
+            'allowed_organizations': get_allowed_organizations(request.user),
+            'can_create_organizations': user_can_create_organizations(request.user),
+        }
+
+    return data
+
+
 def get_home_context(request):
     """
-    Utils is used to get context of course grading.
+    Utils is used to get context of course home.
     It is used for both DRF and django views.
     """
 
@@ -1420,8 +1474,14 @@ def get_home_context(request):
     courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
     user = request.user
     libraries = []
+    response_format = get_response_format(request)
+
     if not split_library_view_on_dashboard() and LIBRARIES_ENABLED:
-        libraries = _accessible_libraries_iter(request.user)
+        accessible_libraries = _accessible_libraries_iter(user)
+        libraries = [_format_library_for_view(lib, request) for lib in accessible_libraries]
+
+    if split_library_view_on_dashboard() and request_response_format_is_json(request, response_format):
+        libraries = get_library_context(request, True)['libraries']
 
     def format_in_process_course_view(uca):
         """
@@ -1456,7 +1516,7 @@ def get_home_context(request):
         'libraries_enabled': LIBRARIES_ENABLED,
         'redirect_to_library_authoring_mfe': should_redirect_to_library_authoring_mfe(),
         'library_authoring_mfe_url': LIBRARY_AUTHORING_MICROFRONTEND_URL,
-        'libraries': [_format_library_for_view(lib, request) for lib in libraries],
+        'libraries': libraries,
         'show_new_library_button': user_can_create_library(user) and not should_redirect_to_library_authoring_mfe(),
         'user': user,
         'request_course_creator_url': reverse('request_course_creator'),

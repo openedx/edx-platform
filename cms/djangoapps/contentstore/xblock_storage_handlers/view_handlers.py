@@ -175,7 +175,7 @@ def handle_xblock(request, usage_key_string=None):
     """
     Service method with all business logic for handling xblock requests.
     This method is used both by the internal xblock_handler API and by
-    the public studio content API.
+    the public CMS API.
     """
     if usage_key_string:
         usage_key = usage_key_with_run(usage_key_string)

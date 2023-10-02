@@ -378,6 +378,10 @@ class GeneratedCertificate(models.Model):
 
         if not grade:
             grade = ''
+        # the grade can come through revocation as a float, so we must convert it to a string to be compatible with the
+        # `CERTIFICATE_REVOKED` event definition
+        elif isinstance(grade, float):
+            grade = str(grade)
 
         if not mode:
             mode = self.mode
