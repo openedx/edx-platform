@@ -1,7 +1,6 @@
 """
 Unit tests for certificates signals
 """
-import json
 from datetime import datetime, timezone
 from unittest import mock
 from uuid import uuid4
@@ -13,7 +12,6 @@ from openedx_events.learning.data import ExamAttemptData, UserData, UserPersonal
 from openedx_events.learning.signals import EXAM_ATTEMPT_REJECTED
 
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.certificates.handlers import handle_exam_attempt_rejected_event
 
 
@@ -70,7 +68,7 @@ class ExamCompletionEventBusTests(TestCase):
             time=datetime.now(timezone.utc)
         )
 
-    @mock.patch('lms.djangoapps.certificates.api.invalidate_certificate_legacy_and_new')
+    @mock.patch('lms.djangoapps.certificates.handlers.invalidate_certificate_legacy_and_new')
     def test_exam_attempt_rejected_event(self, mock_api_function):
         """
         Assert that CertificateService api's invalidate_certificate_legacy_and_new is called upon consuming the event
@@ -79,7 +77,6 @@ class ExamCompletionEventBusTests(TestCase):
                                                     self.course_key,
                                                     self.usage_key,
                                                     exam_type='proctored')
-        # print("\n\n\nexam_event_data:", exam_event_data)
         event_metadata = self._get_exam_event_metadata(EXAM_ATTEMPT_REJECTED)
 
         event_kwargs = {
@@ -87,6 +84,4 @@ class ExamCompletionEventBusTests(TestCase):
             'metadata': event_metadata
         }
         handle_exam_attempt_rejected_event(None, EXAM_ATTEMPT_REJECTED, **event_kwargs)
-        # TODO: THURS MORNING MAKE THIS WORK!!!
-        mock_api_function.assert_called()
         mock_api_function.assert_called_once_with(self.student_user.id, self.course_key)
