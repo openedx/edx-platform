@@ -5386,4 +5386,5 @@ EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
 SIMPLE_HISTORY_DATE_INDEX = False
 
 #### Event bus publishing ####
+## Will be more filled out as part of https://github.com/edx/edx-arch-experiments/issues/381
 EVENT_BUS_PRODUCER_CONFIG = {}
