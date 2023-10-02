@@ -20,6 +20,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
 from common.djangoapps.util.json_request import JsonResponse, expect_json
 from openedx.core.djangoapps.course_roles.helpers import course_permission_check
+from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 
 from ..toggles import use_new_course_team_page
 from ..utils import get_course_team_url, get_course_team
@@ -119,7 +120,6 @@ def _course_team_user(request, course_key, email):
     else:
         role_hierarchy = (CourseInstructorRole, CourseStaffRole)
 
-    MANAGE_ALL_USERS_PERMISSION = "manage_all_users"
     if request.method == "GET":
         # just return info about the user
         msg = {
@@ -133,7 +133,7 @@ def _course_team_user(request, course_key, email):
             #       below will never be true.
             #       Remove the .has_user call when course_roles Django app are implemented.
             if (role(course_key).has_user(user) or
-               course_permission_check(user, MANAGE_ALL_USERS_PERMISSION, course_key)):
+               course_permission_check(user, CourseRolesPermission.MANAGE_ALL_USERS.value, course_key)):
                 msg["role"] = role.ROLE
                 break
         return JsonResponse(msg)
@@ -177,7 +177,7 @@ def _course_team_user(request, course_key, email):
         #       below will never return true.
         #       Remove the .has_user() call below when course_roles Django app are implemented.
         elif (role.has_user(user, check_user_activation=False) or  # pylint: disable=no-value-for-parameter
-              course_permission_check(user, MANAGE_ALL_USERS_PERMISSION, course_key)):
+              course_permission_check(user, CourseRolesPermission.MANAGE_ALL_USERS.value, course_key)):
             # Remove the user from this old role:
             old_roles.add(role)
 
