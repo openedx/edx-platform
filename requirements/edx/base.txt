@@ -774,7 +774,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/kernel.in
 openedx-django-wiki==2.0.3
     # via -r requirements/edx/kernel.in
-openedx-events==8.5.0
+openedx-events==8.6.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
