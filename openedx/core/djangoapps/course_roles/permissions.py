@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class Permission(Enum):
+class CourseRolesPermission(Enum):
     MANAGE_CONTENT = "manage_content"
     MANAGE_COURSE_SETTINGS = "manage_course_settings"
     MANAGE_ADVANCED_SETTINGS = "manage_advanced_settings"
