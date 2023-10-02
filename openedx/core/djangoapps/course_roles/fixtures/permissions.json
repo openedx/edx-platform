@@ -1,0 +1,156 @@
+[
+    {
+        "pk": 1,
+        "model": "course_roles.courserolespermission",
+        "fields": {
+            "name": "manage_content"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "course_roles.courserolespermission",
+        "fields": {
+            "name": "manage_course_settings"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "course_roles.courserolespermission",
+        "fields": {
+            "name": "manage_advanced_settings"
+        }
+    },
+    {
+        "pk": 4,
+        "model": "course_roles.courserolespermission",
+        "fields": {
+            "name": "view_course_settings"
+        }
+    },
+    {
+        "pk": 5,
+        "model": "course_roles.courserolespermission",
+        "fields": {
+            "name": "view_all_content"
+        }
+    },
+    {
+        "pk": 6,
+        "model": "course_roles.courserolespermission",
+        "fields": {
+            "name": "view_only_live_published_content"
+        }
+    },
+    {
+        "pk": 7,
+        "model": "course_roles.courserolespermission",
+        "fields": {
+            "name": "view_all_published_content"
+        }
+    },
+    {
+        "pk": 8,
+        "model": "course_roles.courserolespermission",
+        "fields": {
+            "name": "access_instructor_dashboard"
+        }
+    },
+    {
+        "pk": 9,
+        "model": "course_roles.courserolespermission",
+        "fields": {
+            "name": "access_data_downloads"
+        }
+    },
+    {
+        "pk": 10,
+        "model": "course_roles.courserolespermission",
+        "fields": {
+            "name": "manage_grades"
+        }
+    },
+    {
+        "pk": 11,
+        "model": "course_roles.courserolespermission",
+        "fields": {
+            "name": "view_gradebook"
+        }
+    },
+    {
+        "pk": 11,
+        "model": "course_roles.courserolespermission",
+        "fields": {
+            "name": "manage_all_users"
+        }
+    },
+    {
+        "pk": 12,
+        "model": "course_roles.courserolespermission",
+        "fields": {
+            "name": "manage_users_except_admin_and_staff"
+        }
+    },
+    {
+        "pk": 13,
+        "model": "course_roles.courserolespermission",
+        "fields": {
+            "name": "manage_discussion_moderators"
+        }
+    },
+    {
+        "pk": 14,
+        "model": "course_roles.courserolespermission",
+        "fields": {
+            "name": "manage_cohorts"
+        }
+    },
+    {
+        "pk": 15,
+        "model": "course_roles.courserolespermission",
+        "fields": {
+            "name": "manage_students"
+        }
+    },
+    {
+        "pk": 16,
+        "model": "course_roles.courserolespermission",
+        "fields": {
+            "name": "moderate_discussion_forums"
+        }
+    },
+    {
+        "pk": 17,
+        "model": "course_roles.courserolespermission",
+        "fields": {
+            "name": "moderate_discussion_forums_for_a_cohort"
+        }
+    },
+    {
+        "pk": 18,
+        "model": "course_roles.courserolespermission",
+        "fields": {
+            "name": "manage_certificates"
+        }
+    },
+    {
+        "pk": 19,
+        "model": "course_roles.courserolespermission",
+        "fields": {
+            "name": "manage_libraries"
+        }
+    },
+    {
+        "pk": 20,
+        "model": "course_roles.courserolespermission",
+        "fields": {
+            "name": "general_masquerading"
+        }
+    },
+    {
+        "pk": 21,
+        "model": "course_roles.courserolespermission",
+        "fields": {
+            "name": "specific_masquerading"
+        }
+    }
+]
