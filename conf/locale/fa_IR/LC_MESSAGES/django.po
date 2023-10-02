@@ -134,7 +134,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-09-03 20:43+0000\n"
+"POT-Creation-Date: 2023-09-24 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Somaye Joolaee, 2022\n"
 "Language-Team: Persian (Iran) (https://app.transifex.com/open-edx/teams/6205/fa_IR/)\n"
@@ -7068,6 +7068,19 @@ msgstr ""
 msgid "Original usage key/ID of the thing that is in the clipboard."
 msgstr "استفاده اصلی کلید/شناسه از چیزی که در کلیپ بورد است."
 
+#: openedx/core/djangoapps/content_tagging/models/base.py
+#: wiki/models/article.py
+msgid "owner"
+msgstr "مالک"
+
+#: openedx/core/djangoapps/content_tagging/models/base.py
+msgid ""
+"Organization that is related to this taxonomy.If None, then this taxonomy is"
+" related to all organizations."
+msgstr ""
+"سازمانی که به این طبقه بندی مربوط می شود. اگر هیچ کدام، پس این طبقه بندی به "
+"همه سازمان ها مربوط می شود."
+
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
 "List of domains that are allowed to make cross-domain requests to this site."
@@ -9076,18 +9089,6 @@ msgid ""
 "to date."
 msgstr ""
 "شما با موفقیت برنامۀ آموزشی خود را تغییر داده‌اید و تقویم شما روزآمد است."
-
-#: openedx/features/content_tagging/models/base.py wiki/models/article.py
-msgid "owner"
-msgstr "مالک"
-
-#: openedx/features/content_tagging/models/base.py
-msgid ""
-"Organization that is related to this taxonomy.If None, then this taxonomy is"
-" related to all organizations."
-msgstr ""
-"سازمانی که به این طبقه بندی مربوط می شود. اگر هیچ کدام، پس این طبقه بندی به "
-"همه سازمان ها مربوط می شود."
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
