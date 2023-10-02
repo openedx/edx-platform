@@ -2787,3 +2787,6 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
     'PREPROCESSING_HOOKS': ['cms.lib.spectacular.cms_api_filter'],  # restrict spectacular to CMS API endpoints
 }
+
+#### Event bus publishing ####
+EVENT_BUS_PRODUCER_CONFIG = {}

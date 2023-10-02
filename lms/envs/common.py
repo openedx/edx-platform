@@ -5384,3 +5384,6 @@ EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
 #### django-simple-history##
 # disable indexing on date field its coming from django-simple-history.
 SIMPLE_HISTORY_DATE_INDEX = False
+
+#### Event bus publishing ####
+EVENT_BUS_PRODUCER_CONFIG = {}
