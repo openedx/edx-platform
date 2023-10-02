@@ -169,13 +169,8 @@ def user_lti_pii_signature_needed(username, course_id):
     signature_exists = _user_lti_pii_signature_exists(username, course_id)
     signature_out_of_date = _user_signature_out_of_date(username, course_id)
 
-    if ((course_has_lti_pii_tools and (not signature_exists)) or
-            (course_has_lti_pii_tools and signature_exists and signature_out_of_date)):
-        # write a new signature, or update an existing signature
-        return True
-    else:
-        # course does not have lti pii tools, or signature is up to date
-        return False
+    return ((course_has_lti_pii_tools and (not signature_exists)) or
+            (course_has_lti_pii_tools and signature_exists and signature_out_of_date))
 
 
 def _course_has_lti_pii_tools(course_id):
@@ -192,7 +187,7 @@ def _course_has_lti_pii_tools(course_id):
     course_key = CourseKey.from_string(course_id)
     try:
         course_lti_pii_tools = LTIPIITool.objects.get(course_key=course_key)
-    except (LTIPIITool.DoesNotExist):
+    except LTIPIITool.DoesNotExist:
         # no entry in the database
         return False
     else:
