@@ -5,6 +5,8 @@ on:
     workflows: ["Testing Image CI"]
     types:
       - completed
+    branches:
+      - 'eol/**'
 
 jobs:
   triggering-staging:
