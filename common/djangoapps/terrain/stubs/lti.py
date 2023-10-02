@@ -13,7 +13,6 @@ not possible to have this LTI multiple times on a single page in LMS.
 import base64
 import hashlib
 import logging
-import os
 import textwrap
 from unittest import mock
 from uuid import uuid4

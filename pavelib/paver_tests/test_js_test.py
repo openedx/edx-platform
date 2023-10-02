@@ -127,7 +127,7 @@ class TestPaverJavaScriptTestTasks(PaverTestCase):
             if suite != 'jest-snapshot':
                 karma_config_file = Env.KARMA_CONFIG_FILES[Env.JS_TEST_ID_KEYS.index(suite)]
                 expected_test_tool_command = command_template.format(
-                   options=self.EXPECTED_KARMA_OPTIONS.format(
+                    options=self.EXPECTED_KARMA_OPTIONS.format(
                         config_file=karma_config_file,
                         single_run='false' if dev_mode else 'true',
                         suite=suite,
