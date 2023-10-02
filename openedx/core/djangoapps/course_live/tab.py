@@ -16,7 +16,7 @@ from openedx.features.course_experience.url_helpers import get_learning_mfe_home
 from openedx.features.lti_course_tab.tab import LtiCourseLaunchMixin
 from xmodule.course_block import CourseBlock
 from xmodule.tabs import TabFragmentViewMixin
-from openedx.core.djangoapps.course_roles import course_permisison_list_check_any
+from openedx.core.djangoapps.course_roles import course_permissions_list_check_any
 
 @request_cached()
 def provider_is_zoom(course_key: CourseKey) -> bool:
@@ -38,7 +38,7 @@ def user_is_staff_or_instructor(user: AbstractBaseUser, course: CourseBlock) -> 
     return (
         CourseStaffRole(course.id).has_user(user) or
         CourseInstructorRole(course.id).has_user(user) or
-        course_permisison_list_check_any(user, permissions, course.id)
+        course_permissions_list_check_any(user, permissions, course.id)
     )
 
 

@@ -46,6 +46,6 @@ class IsEnrolledOrStaff(BasePermission):
         return (
             CourseInstructorRole(course_key).has_user(request.user) or
             CourseStaffRole(course_key).has_user(request.user) or
-            course_permisison_list_check_any(request.user, permissions, course_key) or
+            course_permissions_list_check_any(request.user, permissions, course_key) or
             CourseEnrollment.is_enrolled(request.user, course_key)
         )

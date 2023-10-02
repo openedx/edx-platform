@@ -50,7 +50,7 @@ from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 from xmodule.partitions.partitions_service import PartitionService
-from openedx.core.djangoapps.course_roles import course_permission_check_list
+from openedx.core.djangoapps.course_roles import course_permissions_list_check
 
 log = logging.getLogger(__name__)
 
@@ -132,7 +132,7 @@ def has_discussion_privileges(user, course_id):
     for user_ids in roles.values():
         if user.id in user_ids:
             return True
-    if course_permission_check_list(user.id, ["moderate_discussion_forums", "moderate_discussion_forums_for_a_cohort"], course_id):
+    if course_permissions_list_check(user.id, ["moderate_discussion_forums", "moderate_discussion_forums_for_a_cohort"], course_id):
         return True
     return False
 
