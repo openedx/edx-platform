@@ -17,7 +17,6 @@ class RemoteContextPlugin:
     def pytest_configure(config):
         config.pluginmanager.register(RemoteContextPlugin(config), "remotecontextplugin")
 
-
     def pytest_addoption(parser):
         group = parser.getgroup("coverage")
         group.addoption(

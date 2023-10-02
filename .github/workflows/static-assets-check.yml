@@ -65,7 +65,7 @@ jobs:
     - name: Run Static Assets Check
       env:
         LMS_CFG: lms/envs/minimal.yml
-        CMS_CFG: cms/envs/minimal.yml
+        CMS_CFG: lms/envs/minimal.yml
 
       run: |
         paver update_assets lms
