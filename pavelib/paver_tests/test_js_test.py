@@ -122,29 +122,29 @@ class TestPaverJavaScriptTestTasks(PaverTestCase):
             'node --max_old_space_size=4096 node_modules/.bin/karma start {options}'
         )
 
-        # for suite in suites:
-        #     # Karma test command
-        #     if suite != 'jest-snapshot':
-        #         karma_config_file = Env.KARMA_CONFIG_FILES[Env.JS_TEST_ID_KEYS.index(suite)]
-        #         expected_test_tool_command = command_template.format(
-        #             options=self.EXPECTED_KARMA_OPTIONS.format(
-        #                 config_file=karma_config_file,
-        #                 single_run='false' if dev_mode else 'true',
-        #                 suite=suite,
-        #                 platform_root=self.platform_root,
-        #                 browser=Env.KARMA_BROWSER,
-        #             ),
-        #         )
-        #         if is_coverage:
-        #             expected_test_tool_command += self.EXPECTED_COVERAGE_OPTIONS.format(
-        #                 platform_root=self.platform_root,
-        #                 suite=suite
-        #             )
-        #         if port:
-        #             expected_test_tool_command += f" --port={port}"
-        #     else:
-        #         expected_test_tool_command = 'jest'
+        for suite in suites:
+            # Karma test command
+            if suite != 'jest-snapshot':
+                karma_config_file = Env.KARMA_CONFIG_FILES[Env.JS_TEST_ID_KEYS.index(suite)]
+                expected_test_tool_command = command_template.format(
+                   options=self.EXPECTED_KARMA_OPTIONS.format(
+                        config_file=karma_config_file,
+                        single_run='false' if dev_mode else 'true',
+                        suite=suite,
+                        platform_root=self.platform_root,
+                        browser=Env.KARMA_BROWSER,
+                    ),
+                )
+                if is_coverage:
+                    expected_test_tool_command += self.EXPECTED_COVERAGE_OPTIONS.format(
+                        platform_root=self.platform_root,
+                        suite=suite
+                    )
+                if port:
+                    expected_test_tool_command += f" --port={port}"
+            else:
+                expected_test_tool_command = 'jest'
 
-        #     expected_messages.append(expected_test_tool_command)
+            expected_messages.append(expected_test_tool_command)
 
         assert self.task_messages == expected_messages

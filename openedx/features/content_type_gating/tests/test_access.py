@@ -228,7 +228,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):  # pyli
                 graded=False,
             )
             cls.graded_score_weight_blocks[(graded, has_score, weight)] = block
-        host = os.environ.get('127.0.0.1')
+        host = '127.0.0.1'
         metadata_lti_xblock = {
             'lti_id': 'correct_lti_id',
             'launch_url': 'http://{}:{}/{}'.format(host, '8765', 'correct_lti_endpoint'),
