@@ -723,12 +723,13 @@ def _has_access_to_course(user, access_level, course_key):
         return ACCESS_DENIED
 
     global_staff, staff_access, instructor_access = administrative_accesses_to_course_for_user(user, course_key)
+    permissions_access = course_or_organization_permission_check(user, "view_all_content", course_key)
 
     if global_staff:
         debug("Allow: user.is_staff")
         return ACCESS_GRANTED
 
-    if access_level not in ('staff', 'instructor'):
+    if access_level not in ('staff', 'instructor') and not permissions_access:
         log.debug("Error in access._has_access_to_course access_level=%s unknown", access_level)
         debug("Deny: unknown access level")
         return ACCESS_DENIED
@@ -739,6 +740,10 @@ def _has_access_to_course(user, access_level, course_key):
 
     if instructor_access and access_level in ('staff', 'instructor'):
         debug("Allow: user has course instructor access")
+        return ACCESS_GRANTED
+    
+    if permissions_access:
+        debug("Allow: user has view all content permission")
         return ACCESS_GRANTED
 
     debug("Deny: user did not have correct access")
