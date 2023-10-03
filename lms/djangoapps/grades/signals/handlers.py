@@ -8,7 +8,7 @@ from logging import getLogger
 
 from django.dispatch import receiver
 from opaque_keys.edx.keys import LearningContextKey
-from openedx_events.learning.signals import EXAM_ATTEMPT_VERIFIED
+from openedx_events.learning.signals import EXAM_ATTEMPT_REJECTED, EXAM_ATTEMPT_VERIFIED
 from submissions.models import score_reset, score_set
 from xblock.scorable import ScorableXBlockMixin, Score
 
@@ -322,3 +322,28 @@ def exam_attempt_verified_event_handler(sender, signal, **kwargs):  # pylint: di
 
     if should_override_grade_on_rejected_exam(course_key):
         undo_override_subsection_grade(user_data.id, course_key, usage_key, GradeOverrideFeatureEnum.proctoring)
+
+
+@receiver(EXAM_ATTEMPT_REJECTED)
+def exam_attempt_rejected_event_handler(sender, signal, **kwargs):  # pylint: disable=unused-argument
+    """
+    Consume `EXAM_ATTEMPT_REJECTED` events from the event bus. This will trigger a subsection override.
+    """
+    from ..api import override_subsection_grade
+
+    event_data = kwargs.get('exam_attempt')
+    override_grade_value = 0.0
+    user_data = event_data.student_user
+    course_key = event_data.course_key
+    usage_key = event_data.usage_key
+
+    override_subsection_grade(
+        user_data.id,
+        course_key,
+        usage_key,
+        earned_all=override_grade_value,
+        earned_graded=override_grade_value,
+        feature=GradeOverrideFeatureEnum.proctoring,
+        overrider=None,
+        comment=None,
+    )
