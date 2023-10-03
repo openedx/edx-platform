@@ -257,11 +257,11 @@ class TestGradeIteration(SharedModuleStoreTestCase):
         """
         with patch.object(
             BlockStructureFactory,
-            'create_from_store',
-            wraps=BlockStructureFactory.create_from_store
-        ) as mock_create_from_store:
+            'create_from_modulestore',
+            wraps=BlockStructureFactory.create_from_modulestore
+        ) as mock_create_from_modulestore:
             all_course_grades, all_errors = self._course_grades_and_errors_for(self.course, self.students)
-            assert mock_create_from_store.call_count == 1
+            assert mock_create_from_modulestore.call_count == 1
 
         assert len(all_errors) == 0
         for course_grade in all_course_grades.values():
