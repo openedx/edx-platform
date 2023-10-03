@@ -11,8 +11,6 @@ from django.test.utils import override_settings
 
 from common.djangoapps.util.db import enable_named_outer_atomic, generate_int_id, outer_atomic
 
-GET_DJANGO_VERSION = int(version('django').split('.')[0])
-
 
 def do_nothing():
     """Just return."""
