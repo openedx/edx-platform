@@ -1,7 +1,6 @@
 """
 Test audit user's access to various content based on content-gating features.
 """
-import os
 from datetime import datetime, timedelta
 from unittest.mock import patch, Mock
 
