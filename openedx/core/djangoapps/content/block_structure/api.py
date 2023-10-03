@@ -29,7 +29,7 @@ def update_course_in_cache(course_key):
     block_structure.updated_collected function that updates the block
     structure in the cache for the given course_key.
     """
-    return get_block_structure_manager(course_key).update_collected_if_needed()
+    return get_block_structure_manager(course_key)._update_collected()
 
 
 def clear_course_from_cache(course_key):
