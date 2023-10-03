@@ -33,8 +33,7 @@ def check_taxonomy(
     name,
     description=None,
     enabled=True,
-    required=False,
-    allow_multiple=False,
+    allow_multiple=True,
     allow_free_text=False,
     system_defined=False,
     visible_to_authors=True,
@@ -47,7 +46,6 @@ def check_taxonomy(
     assert data["name"] == name
     assert data["description"] == description
     assert data["enabled"] == enabled
-    assert data["required"] == required
     assert data["allow_multiple"] == allow_multiple
     assert data["allow_free_text"] == allow_free_text
     assert data["system_defined"] == system_defined
@@ -350,7 +348,6 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
             "name": "taxonomy_data",
             "description": "This is a description",
             "enabled": True,
-            "required": True,
             "allow_multiple": True,
         }
 
@@ -444,7 +441,6 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
                     "name": "new name",
                     "description": taxonomy.description,
                     "enabled": taxonomy.enabled,
-                    "required": taxonomy.required,
                 },
             )
 
@@ -540,7 +536,6 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
                     "name": "new name",
                     "description": taxonomy.description,
                     "enabled": taxonomy.enabled,
-                    "required": taxonomy.required,
                 },
             )
 
@@ -668,13 +663,13 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
         )
 
         self.multiple_taxonomy = Taxonomy.objects.create(name="Multiple Taxonomy", allow_multiple=True)
-        self.required_taxonomy = Taxonomy.objects.create(name="Required Taxonomy", required=True)
+        self.single_value_taxonomy = Taxonomy.objects.create(name="Required Taxonomy", allow_multiple=False)
         for i in range(20):
             # Valid ObjectTags
             Tag.objects.create(taxonomy=self.tA1, value=f"Tag {i}")
             Tag.objects.create(taxonomy=self.tA2, value=f"Tag {i}")
             Tag.objects.create(taxonomy=self.multiple_taxonomy, value=f"Tag {i}")
-            Tag.objects.create(taxonomy=self.required_taxonomy, value=f"Tag {i}")
+            Tag.objects.create(taxonomy=self.single_value_taxonomy, value=f"Tag {i}")
 
         self.open_taxonomy = Taxonomy.objects.create(name="Enabled Free-Text Taxonomy", allow_free_text=True)
 
@@ -685,7 +680,7 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
             rel_type=TaxonomyOrg.RelType.OWNER,
         )
         TaxonomyOrg.objects.create(
-            taxonomy=self.required_taxonomy,
+            taxonomy=self.single_value_taxonomy,
             org=self.orgA,
             rel_type=TaxonomyOrg.RelType.OWNER,
         )
