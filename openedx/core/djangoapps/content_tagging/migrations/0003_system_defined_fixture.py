@@ -38,12 +38,6 @@ def load_system_defined_taxonomies(apps, schema_editor):
     org_taxonomy.taxonomy_class = ContentOrganizationTaxonomy
     org_taxonomy.save()
 
-    # Adding taxonomy class to the language taxonomy
-    language_taxonomy = Taxonomy.objects.get(id=-1)
-    ContentLanguageTaxonomy = apps.get_model("content_tagging", "ContentLanguageTaxonomy")
-    language_taxonomy.taxonomy_class = ContentLanguageTaxonomy
-    language_taxonomy.save()
-
 
 def revert_system_defined_taxonomies(apps, schema_editor):
     """
