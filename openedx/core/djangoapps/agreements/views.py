@@ -4,21 +4,19 @@ Views served by the Agreements app
 
 from django.conf import settings
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
-from opaque_keys.edx.keys import CourseKey
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from common.djangoapps.student import auth
 from common.djangoapps.student.roles import CourseStaffRole
-from openedx.core.djangoapps.agreements.api import (
-    create_integrity_signature,
-    get_integrity_signature,
-)
+from openedx.core.djangoapps.agreements.api import create_integrity_signature, get_integrity_signature
 from openedx.core.djangoapps.agreements.serializers import IntegritySignatureSerializer
-from openedx.core.djangoapps.course_roles import course_permission_check
+from openedx.core.djangoapps.course_roles.helpers import course_permission_check
+
 
 def is_user_course_or_global_staff(user, course_id):
     """
@@ -27,7 +25,7 @@ def is_user_course_or_global_staff(user, course_id):
     """
 
     return (
-        user.is_staff 
+        user.is_staff
         or auth.user_has_role(user, CourseStaffRole(CourseKey.from_string(course_id)))
         or course_permission_check(user, "manage_students", course_id)
     )

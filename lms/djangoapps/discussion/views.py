@@ -23,7 +23,6 @@ from edx_django_utils.monitoring import function_trace
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from web_fragments.fragment import Fragment
-from xmodule.modulestore.django import modulestore
 
 import lms.djangoapps.discussion.django_comment_client.utils as utils
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
@@ -69,7 +68,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
 from openedx.core.djangoapps.django_comment_common.utils import ThreadContext
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
-from openedx.core.djangoapps.course_roles import course_permission_check
+from xmodule.modulestore.django import modulestore
 
 User = get_user_model()
 log = logging.getLogger("edx.discussions")

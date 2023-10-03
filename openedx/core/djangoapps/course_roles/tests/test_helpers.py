@@ -208,7 +208,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         Test that the course_permisison_list_check_any returns True when the user has any of 
         the permissions on the list at the course level
         """
-        CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1, course_id=self.course_1.id. org=self.organization_1)
+        CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1, course_id=self.course_1.id, org=self.organization_1)
         test_permissions = [self.permission_1.name, self.permission_2.name]
         assert course_permissions_list_check_any(self.user_1, test_permissions, self.course_1.id)
 
@@ -221,11 +221,13 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         assert not course_permissions_list_check_any(self.user_1, test_permissions, self.course_1.id)
 
     def test_course_permission_list_check_any_with_a_permission_in_a_different_course(self):
-         """
+        """
         Test that the course_permisison_list_check_any returns Fale when the user has a permission in the list, 
         but not on the correct course
         """
-        CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1, course_id=self.course_1.id. org=self.organization_1)
+        CourseRolesUserRole.objects.create(
+            user=self.user_1, role=self.role_1, course_id=self.course_1.id, org=self.organization_1
+        )
         test_permissions = [self.permission_2.name]
         assert not course_permissions_list_check_any(self.user_1, test_permissions, self.course_1.id)
 

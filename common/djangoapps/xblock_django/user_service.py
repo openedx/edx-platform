@@ -7,24 +7,27 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from opaque_keys.edx.keys import CourseKey
 from xblock.reference.user_service import UserService, XBlockUser
 
+from common.djangoapps.student.models import anonymous_id_for_user, get_user_by_username_or_email, user_by_anonymous_id
 from openedx.core.djangoapps.external_user_ids.models import ExternalId
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
-from common.djangoapps.student.models import anonymous_id_for_user, get_user_by_username_or_email, user_by_anonymous_id
 
 from .constants import (
     ATTR_KEY_ANONYMOUS_USER_ID,
     ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID,
     ATTR_KEY_IS_AUTHENTICATED,
     ATTR_KEY_REQUEST_COUNTRY_CODE,
+    ATTR_KEY_USER_HAS_ACCESS_DATA_DOWNLOADS,
+    ATTR_KEY_USER_HAS_MANAGE_CONTENT,
+    ATTR_KEY_USER_HAS_MANAGE_GRADES,
+    ATTR_KEY_USER_HAS_VIEW_ALL_CONTENT,
     ATTR_KEY_USER_ID,
-    ATTR_KEY_USERNAME,
     ATTR_KEY_USER_IS_BETA_TESTER,
     ATTR_KEY_USER_IS_GLOBAL_STAFF,
     ATTR_KEY_USER_IS_STAFF,
     ATTR_KEY_USER_PREFERENCES,
     ATTR_KEY_USER_ROLE,
+    ATTR_KEY_USERNAME
 )
-
 
 USER_PREFERENCES_WHITE_LIST = ['pref-lang', 'time_zone']
 

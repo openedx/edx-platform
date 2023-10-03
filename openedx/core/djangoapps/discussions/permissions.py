@@ -4,10 +4,10 @@ API library for Django REST Framework permissions-oriented workflows
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import BasePermission
 
-from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff, CourseInstructorRole
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
+from openedx.core.djangoapps.course_roles.helpers import course_permission_check
 from openedx.core.lib.api.view_utils import validate_course_key
-from openedx.core.djangoapps.course_roles import course_permission_check
 
 DEFAULT_MESSAGE = "You're not authorized to perform this operation."
 PERMISSION_MESSAGES = {
@@ -34,7 +34,7 @@ class IsStaffOrCourseTeam(BasePermission):
         return (
             CourseInstructorRole(course_key).has_user(request.user) or
             CourseStaffRole(course_key).has_user(request.user) or
-            course_permission_check(request.user, "moderate_discussion_forums", course_key) or 
+            course_permission_check(request.user, "moderate_discussion_forums", course_key) or
             has_discussion_privileges(request.user, course_key)
         )
 

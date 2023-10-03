@@ -11,12 +11,13 @@ from lms.djangoapps.courseware.tabs import EnrolledTab
 from openedx.core.djangoapps.course_live.config.waffle import ENABLE_COURSE_LIVE
 from openedx.core.djangoapps.course_live.models import CourseLiveConfiguration
 from openedx.core.djangoapps.course_live.providers import HasGlobalCredentials, ProviderManager
+from openedx.core.djangoapps.course_roles.helpers import course_permissions_list_check_any
 from openedx.core.lib.cache_utils import request_cached
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from openedx.features.lti_course_tab.tab import LtiCourseLaunchMixin
 from xmodule.course_block import CourseBlock
 from xmodule.tabs import TabFragmentViewMixin
-from openedx.core.djangoapps.course_roles import course_permissions_list_check_any
+
 
 @request_cached()
 def provider_is_zoom(course_key: CourseKey) -> bool:
@@ -34,7 +35,7 @@ def user_is_staff_or_instructor(user: AbstractBaseUser, course: CourseBlock) -> 
     """
     Check if the user is a staff or instructor for the course.
     """
-    permissions = ["view_all_content","view_only_live_published_content","view_all_published_content"]
+    permissions = ["view_all_content", "view_only_live_published_content", "view_all_published_content"]
     return (
         CourseStaffRole(course.id).has_user(user) or
         CourseInstructorRole(course.id).has_user(user) or

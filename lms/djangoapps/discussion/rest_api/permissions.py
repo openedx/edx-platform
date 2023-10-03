@@ -7,21 +7,17 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions
 
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.roles import (
-    CourseInstructorRole,
-    CourseStaffRole,
-    GlobalStaff,
-)
-from lms.djangoapps.discussion.django_comment_client.utils import (
-    get_user_role_names,
-    has_discussion_privileges,
-)
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
+from lms.djangoapps.discussion.django_comment_client.utils import get_user_role_names, has_discussion_privileges
+from openedx.core.djangoapps.course_roles.helpers import course_permissions_list_check
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.django_comment_common.models import (
-    FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_MODERATOR
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_MODERATOR
 )
-from openedx.core.djangoapps.course_roles import course_permissions_list_check
+
 
 def _is_author(cc_content, context):
     """
@@ -159,7 +155,11 @@ class IsStaffOrCourseTeamOrEnrolled(permissions.BasePermission):
             GlobalStaff().has_user(request.user) or
             CourseStaffRole(course_key).has_user(request.user) or
             CourseInstructorRole(course_key).has_user(request.user) or
-            course_permissions_list_check(request.user, ["moderate_discussion_forums","moderate_discussion_forums_for_a_cohort"], course_key) or
+            course_permissions_list_check(
+                request.user,
+                ["moderate_discussion_forums", "moderate_discussion_forums_for_a_cohort"],
+                course_key
+            ) or
             CourseEnrollment.is_enrolled(request.user, course_key) or
             has_discussion_privileges(request.user, course_key)
         )

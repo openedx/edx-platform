@@ -3,12 +3,13 @@ Block rendering
 """
 
 from __future__ import annotations
+
 import json
 import logging
 import textwrap
 from collections import OrderedDict
-
 from functools import partial
+from typing import TYPE_CHECKING, Callable
 
 from completion.services import CompletionService
 from django.conf import settings
@@ -33,29 +34,25 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import APIException
-from typing import Callable, TYPE_CHECKING
 from web_fragments.fragment import Fragment
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
 from xblock.reference.plugins import FSService
 from xblock.runtime import KvsFieldData
 
-from lms.djangoapps.badges.service import BadgingService
-from lms.djangoapps.badges.utils import badges_enabled
-from lms.djangoapps.teams.services import TeamsService
-from openedx.core.lib.xblock_services.call_to_action import CallToActionService
-from xmodule.contentstore.django import contentstore
-from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.library_tools import LibraryToolsService
-from xmodule.modulestore.django import XBlockI18nService, modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.partitions.partitions_service import PartitionService
-from xmodule.util.sandboxing import SandboxService
-from xmodule.services import EventPublishingService, RebindUserService, SettingsService, TeamsConfigurationService
+from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.static_replace.wrapper import replace_urls_wrapper
+from common.djangoapps.student.models import anonymous_id_for_user
+from common.djangoapps.student.roles import CourseBetaTesterRole
+from common.djangoapps.util import milestones_helpers
+from common.djangoapps.util.json_request import JsonResponse
+from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
+from lms.djangoapps.badges.service import BadgingService
+from lms.djangoapps.badges.utils import badges_enabled
 from lms.djangoapps.courseware.access import get_user_role, has_access
 from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
+from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.courseware.masquerade import (
     MasqueradingKeyValueStore,
     filter_displayed_blocks,
@@ -63,41 +60,42 @@ from lms.djangoapps.courseware.masquerade import (
     setup_masquerade
 )
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
-from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.courseware.services import UserStateService
 from lms.djangoapps.grades.api import GradesUtilService
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
-from lms.djangoapps.lms_xblock.runtime import UserTagsService, lms_wrappers_aside, lms_applicable_aside_types
+from lms.djangoapps.lms_xblock.runtime import UserTagsService, lms_applicable_aside_types, lms_wrappers_aside
+from lms.djangoapps.teams.services import TeamsService
 from lms.djangoapps.verify_student.services import XBlockVerificationService
 from openedx.core.djangoapps.bookmarks.api import BookmarksService
+from openedx.core.djangoapps.course_roles.helpers import (
+    course_or_organization_permission_check,
+    course_or_organization_permission_list_check
+)
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
 from openedx.core.djangoapps.util.user_utils import SystemUser
 from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import view_auth_classes
+from openedx.core.lib.cache_utils import CacheService
 from openedx.core.lib.gating.services import GatingService
 from openedx.core.lib.license import wrap_with_license
 from openedx.core.lib.url_utils import quote_slashes, unquote_slashes
-from openedx.core.lib.xblock_utils import (
-    add_staff_markup,
-    get_aside_from_xblock,
-    hash_resource,
-    is_xblock_aside
-)
+from openedx.core.lib.xblock_services.call_to_action import CallToActionService
+from openedx.core.lib.xblock_utils import add_staff_markup, get_aside_from_xblock, hash_resource, is_xblock_aside
 from openedx.core.lib.xblock_utils import request_token as xblock_request_token
 from openedx.core.lib.xblock_utils import wrap_xblock
+from openedx.features.content_type_gating.services import ContentTypeGatingService
 from openedx.features.course_duration_limits.access import course_expiration_wrapper
 from openedx.features.discounts.utils import offer_banner_wrapper
-from openedx.features.content_type_gating.services import ContentTypeGatingService
-from common.djangoapps.student.models import anonymous_id_for_user
-from common.djangoapps.student.roles import CourseBetaTesterRole
-from common.djangoapps.util import milestones_helpers
-from common.djangoapps.util.json_request import JsonResponse
-from common.djangoapps.edxmako.services import MakoService
-from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
-from openedx.core.lib.cache_utils import CacheService
-from openedx.core.djangoapps.course_roles import course_or_organization_permission_list_check, course_or_organization_permission_check
+from xmodule.contentstore.django import contentstore
+from xmodule.exceptions import NotFoundError, ProcessingError
+from xmodule.library_tools import LibraryToolsService
+from xmodule.modulestore.django import XBlockI18nService, modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.partitions.partitions_service import PartitionService
+from xmodule.services import EventPublishingService, RebindUserService, SettingsService, TeamsConfigurationService
+from xmodule.util.sandboxing import SandboxService
 
 if TYPE_CHECKING:
     from rest_framework.request import Request
@@ -605,7 +603,11 @@ def prepare_runtime_for_user(
             request_country_code=user_location,
             user_has_manage_content=course_or_organization_permission_check(user, "manage_content", course_id),
             user_has_manage_grades=course_or_organization_permission_check(user, "manage_grades", course_id),
-            user_has_access_data_downloads=course_or_organization_permission_check(user, "access_data_downloads", course_id),
+            user_has_access_data_downloads=course_or_organization_permission_check(
+                user,
+                "access_data_downloads",
+                course_id
+            ),
             user_has_view_all_content=course_or_organization_permission_check(user, "view_all_content", course_id)
         ),
         'verification': XBlockVerificationService(),
