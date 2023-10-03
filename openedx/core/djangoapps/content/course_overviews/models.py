@@ -923,9 +923,9 @@ class CourseOverviewTab(models.Model):
     def create_date_tab (cls,course_overview):
         existing_tab = CourseOverviewTab.objects.filter(tab_id='dates', course_overview=course_overview).exists()
         if existing_tab  :
-            return CourseOverviewTab.objects.create(course_overview=course_overview, tab_id='dates' ,type='dates' ,name='Date', is_hidden='0' , course_staff_only='0')
-        else :
             return None
+        else :
+            return CourseOverviewTab.objects.create(course_overview=course_overview, tab_id='dates' ,type='dates' ,name='Date', is_hidden='0' , course_staff_only='0')
 
 
 class CourseOverviewImageSet(TimeStampedModel):
