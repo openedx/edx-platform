@@ -10,7 +10,6 @@ import ddt
 from django.test.client import RequestFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import SampleCourseFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
@@ -218,7 +217,7 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
         self._get_blocks(
             course,
             expected_mongo_queries=0,
-            expected_sql_queries=14,
+            expected_sql_queries=13,
         )
 
     @ddt.data(
@@ -227,7 +226,6 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
     @ddt.unpack
     def test_query_counts_uncached(self, store_type, expected_mongo_queries, num_sql_queries):
         course = self._create_course(store_type)
-        clear_course_from_cache(course.id)
         self._get_blocks(
             course,
             expected_mongo_queries,
