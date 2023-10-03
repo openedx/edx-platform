@@ -77,13 +77,13 @@ boto==2.39.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
-boto3==1.28.57
+boto3==1.28.58
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.31.57
+botocore==1.31.58
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -288,7 +288,7 @@ django-filter==23.3
     #   edx-enterprise
     #   lti-consumer-xblock
     #   openedx-blockstore
-django-ipware==5.0.0
+django-ipware==5.0.1
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
@@ -480,7 +480,7 @@ edx-drf-extensions==8.10.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.4.0
+edx-enterprise==4.5.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -791,7 +791,7 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/kernel.in
 optimizely-sdk==4.1.1
     # via -r requirements/edx/bundled.in
-ora2==5.5.1
+ora2==5.5.2
     # via -r requirements/edx/bundled.in
 oscrypto==1.3.0
     # via snowflake-connector-python
@@ -1158,7 +1158,7 @@ uritemplate==4.1.1
     #   coreapi
     #   drf-spectacular
     #   drf-yasg
-urllib3==1.26.16
+urllib3==1.26.17
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/paver.txt
