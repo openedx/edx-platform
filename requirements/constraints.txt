@@ -121,7 +121,7 @@ libsass==0.10.0
 click==8.1.6
 
 # pinning this version to avoid updates while the library is being developed
-openedx-learning==0.2.0
+openedx-learning==0.2.3
 
 # lti-consumer-xblock 9.6.2 contains a breaking change that makes
 # existing custom parameter configurations unusable.
