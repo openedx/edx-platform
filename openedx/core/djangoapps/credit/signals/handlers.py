@@ -44,12 +44,11 @@ def handle_exam_event(signal, event_data, credit_status=None):
         return
 
     # log any activity to the credit requirements table
-    log_msg = (
-        f'recieved {signal} signal, changing credit requirement for '
+    log.info(
+        f'Recieved {signal} signal, changing credit requirement for '
         f'user_id={user_data.id}, course_key_or_id={course_key} '
         f'content_id={usage_key}'
     )
-    log.info(log_msg)
 
     try:
         user = User.objects.get(id=user_data.id)

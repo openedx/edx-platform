@@ -25,7 +25,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.credit.api import get_credit_requirement_status, set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
-from openedx.core.djangoapps.credit.signals import (
+from openedx.core.djangoapps.credit.signals.handlers import (
     listen_for_exam_errored,
     listen_for_exam_rejected,
     listen_for_exam_reset,
@@ -208,7 +208,7 @@ class TestExamEvents(ModuleStoreTestCase):
             time=datetime.now(timezone.utc)
         )
 
-    @mock.patch('openedx.core.djangoapps.credit.signals.remove_credit_requirement_status', autospec=True)
+    @mock.patch('openedx.core.djangoapps.credit.signals.handlers.remove_credit_requirement_status', autospec=True)
     def test_exam_reset(self, mock_remove_credit_status):
         """
         Test exam reset event
@@ -229,7 +229,7 @@ class TestExamEvents(ModuleStoreTestCase):
         (EXAM_ATTEMPT_SUBMITTED, 'submitted'),
     )
     @ddt.unpack
-    @mock.patch('openedx.core.djangoapps.credit.signals.set_credit_requirement_status', autospec=True)
+    @mock.patch('openedx.core.djangoapps.credit.signals.handlers.set_credit_requirement_status', autospec=True)
     def test_exam_update_event(self, event_signal, expected_status, mock_set_credit_status):
         """
         Test exam events that update credit status
@@ -260,7 +260,7 @@ class TestExamEvents(ModuleStoreTestCase):
         event_metadata = self._get_exam_event_metadata(event_signal)
         handler = self.HANDLERS.get(event_signal)
 
-        with mock.patch('openedx.core.djangoapps.credit.signals.log.error') as mock_log:
+        with mock.patch('openedx.core.djangoapps.credit.signals.handlers.log.error') as mock_log:
             handler(None, event_signal, event_metadata=event_metadata, exam_attempt=event_data)
             mock_log.assert_called_once_with(
                 'Error occurred while handling exam event for '
@@ -275,8 +275,8 @@ class TestExamEvents(ModuleStoreTestCase):
         EXAM_ATTEMPT_VERIFIED,
         EXAM_ATTEMPT_SUBMITTED,
     )
-    @mock.patch('openedx.core.djangoapps.credit.signals.remove_credit_requirement_status', autospec=True)
-    @mock.patch('openedx.core.djangoapps.credit.signals.set_credit_requirement_status', autospec=True)
+    @mock.patch('openedx.core.djangoapps.credit.signals.handlers.remove_credit_requirement_status', autospec=True)
+    @mock.patch('openedx.core.djangoapps.credit.signals.handlers.set_credit_requirement_status', autospec=True)
     def test_exam_event_non_credit_course(self, event_signal, mock_remove_credit_status, mock_set_credit_status):
         """
         Credit credit logic should not run on non-credit courses
