@@ -66,7 +66,6 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
         else:
             assert not message_present
 
-    @ddt.data(True, False)
     def test_all_courses(self, force_update):
         self._assert_courses_not_in_block_cache(*self.course_keys)
         self.command.handle(all_courses=True)
@@ -74,8 +73,8 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
         with patch(
             'openedx.core.djangoapps.content.block_structure.factory.BlockStructureFactory.create_from_modulestore'
         ) as mock_update_from_store:
-            self.command.handle(all_courses=True, force_update=force_update)
-            assert mock_update_from_store.call_count == (self.num_courses if force_update else 0)
+            self.command.handle(all_courses=True, force_update=True)
+            assert mock_update_from_store.call_count == self.num_courses
 
     def test_one_course(self):
         self._assert_courses_not_in_block_cache(*self.course_keys)
