@@ -1,6 +1,5 @@
 """Tests for util.db module."""
 
-from importlib.metadata import version
 from io import StringIO
 
 import ddt
