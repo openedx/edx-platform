@@ -58,6 +58,7 @@ django-user-tasks
 django-waffle
 django-webpack-loader               # Used to wire webpack bundles into the django asset pipeline
 djangorestframework
+drf-spectacular
 edx-ace
 edx-api-doc-tools
 edx-auth-backends                   # Allow Studio to use LMS SSO
@@ -80,7 +81,7 @@ edx-name-affirmation
 edx-opaque-keys
 edx-organizations
 edx-proctoring>=2.0.1
-edx-proctoring-proctortrack==1.0.5  # Intentionally and permanently pinned to ensure code changes are reviewed
+edx-proctoring-proctortrack==1.2.1  # Intentionally and permanently pinned to ensure code changes are reviewed
 edx-rest-api-client
 edx-search
 edx-submissions

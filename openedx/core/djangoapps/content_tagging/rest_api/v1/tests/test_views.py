@@ -7,22 +7,24 @@ from urllib.parse import parse_qs, urlparse
 import ddt
 from django.contrib.auth import get_user_model
 from django.test.testcases import override_settings
-from openedx_tagging.core.tagging.models import Taxonomy
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from openedx_tagging.core.tagging.models import Tag, Taxonomy
 from openedx_tagging.core.tagging.models.system_defined import SystemDefinedTaxonomy
 from openedx_tagging.core.tagging.rest_api.v1.serializers import TaxonomySerializer
 from organizations.models import Organization
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from common.djangoapps.student.auth import update_org_role
-from common.djangoapps.student.roles import OrgContentCreatorRole
+from common.djangoapps.student.auth import add_users, update_org_role
+from common.djangoapps.student.roles import CourseStaffRole, OrgContentCreatorRole
+from openedx.core.djangoapps.content_tagging.models import TaxonomyOrg
 from openedx.core.djangolib.testing.utils import skip_unless_cms
-from openedx.features.content_tagging.models import TaxonomyOrg
 
 User = get_user_model()
 
 TAXONOMY_ORG_LIST_URL = "/api/content_tagging/v1/taxonomies/"
 TAXONOMY_ORG_DETAIL_URL = "/api/content_tagging/v1/taxonomies/{pk}/"
+OBJECT_TAG_UPDATE_URL = "/api/content_tagging/v1/object_tags/{object_id}/?taxonomy={taxonomy_id}"
 
 
 def check_taxonomy(
@@ -52,7 +54,7 @@ def check_taxonomy(
     assert data["visible_to_authors"] == visible_to_authors
 
 
-class TestTaxonomyViewSetMixin:
+class TestTaxonomyObjectsMixin:
     """
     Sets up data for testing Content Taxonomies.
     """
@@ -168,7 +170,7 @@ class TestTaxonomyViewSetMixin:
 @skip_unless_cms
 @ddt.ddt
 @override_settings(FEATURES={"ENABLE_CREATOR_GROUP": True})
-class TestTaxonomyViewSet(TestTaxonomyViewSetMixin, APITestCase):
+class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
     """
     Test cases for TaxonomyViewSet when ENABLE_CREATOR_GROUP is True
     """
@@ -639,3 +641,211 @@ class TestTaxonomyViewSetNoCreatorGroup(TestTaxonomyViewSet):  # pylint: disable
 
     The permissions are the same for when ENABLED_CREATOR_GRUP is True
     """
+
+
+@skip_unless_cms
+@ddt.ddt
+class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
+    """
+    Testing various cases for the ObjectTagView.
+    """
+    def setUp(self):
+        """
+        Setup the test cases
+        """
+        super().setUp()
+        self.courseA = CourseLocator("orgA", "101", "test")
+        self.xblockA = BlockUsageLocator(
+            course_key=self.courseA,
+            block_type='problem',
+            block_id='block_id'
+        )
+        self.courseB = CourseLocator("orgB", "101", "test")
+        self.xblockB = BlockUsageLocator(
+            course_key=self.courseB,
+            block_type='problem',
+            block_id='block_id'
+        )
+
+        self.multiple_taxonomy = Taxonomy.objects.create(name="Multiple Taxonomy", allow_multiple=True)
+        self.required_taxonomy = Taxonomy.objects.create(name="Required Taxonomy", required=True)
+        for i in range(20):
+            # Valid ObjectTags
+            Tag.objects.create(taxonomy=self.tA1, value=f"Tag {i}")
+            Tag.objects.create(taxonomy=self.tA2, value=f"Tag {i}")
+            Tag.objects.create(taxonomy=self.multiple_taxonomy, value=f"Tag {i}")
+            Tag.objects.create(taxonomy=self.required_taxonomy, value=f"Tag {i}")
+
+        self.open_taxonomy = Taxonomy.objects.create(name="Enabled Free-Text Taxonomy", allow_free_text=True)
+
+        # Add org permissions to taxonomy
+        TaxonomyOrg.objects.create(
+            taxonomy=self.multiple_taxonomy,
+            org=self.orgA,
+            rel_type=TaxonomyOrg.RelType.OWNER,
+        )
+        TaxonomyOrg.objects.create(
+            taxonomy=self.required_taxonomy,
+            org=self.orgA,
+            rel_type=TaxonomyOrg.RelType.OWNER,
+        )
+        TaxonomyOrg.objects.create(
+            taxonomy=self.open_taxonomy,
+            org=self.orgA,
+            rel_type=TaxonomyOrg.RelType.OWNER,
+        )
+
+        add_users(self.userS, CourseStaffRole(self.courseA), self.userA)
+
+    @ddt.data(
+        # userA and userS are staff in courseA and can tag using enabled taxonomies
+        (None, "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
+        ("user", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
+        ("userA", "tA1", ["Tag 1"], status.HTTP_200_OK),
+        ("userS", "tA1", ["Tag 1"], status.HTTP_200_OK),
+        (None, "tA1", [], status.HTTP_403_FORBIDDEN),
+        ("user", "tA1", [], status.HTTP_403_FORBIDDEN),
+        ("userA", "tA1", [], status.HTTP_200_OK),
+        ("userS", "tA1", [], status.HTTP_200_OK),
+        (None, "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_403_FORBIDDEN),
+        ("user", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_403_FORBIDDEN),
+        ("userA", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
+        ("userS", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
+        (None, "open_taxonomy", ["tag1"], status.HTTP_403_FORBIDDEN),
+        ("user", "open_taxonomy", ["tag1"], status.HTTP_403_FORBIDDEN),
+        ("userA", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
+        ("userS", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
+        # Only userS is Tagging Admin and can tag objects using disabled taxonomies
+        (None, "tA2", ["Tag 1"], status.HTTP_403_FORBIDDEN),
+        ("user", "tA2", ["Tag 1"], status.HTTP_403_FORBIDDEN),
+        ("userA", "tA2", ["Tag 1"], status.HTTP_403_FORBIDDEN),
+        ("userS", "tA2", ["Tag 1"], status.HTTP_200_OK),
+    )
+    @ddt.unpack
+    def test_tag_course(self, user_attr, taxonomy_attr, tag_values, expected_status):
+        if user_attr:
+            user = getattr(self, user_attr)
+            self.client.force_authenticate(user=user)
+
+        taxonomy = getattr(self, taxonomy_attr)
+
+        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.courseA, taxonomy_id=taxonomy.pk)
+
+        response = self.client.put(url, {"tags": tag_values}, format="json")
+
+        assert response.status_code == expected_status
+        if status.is_success(expected_status):
+            assert len(response.data) == len(tag_values)
+            assert set(t["value"] for t in response.data) == set(tag_values)
+
+    @ddt.data(
+        # Can't add invalid tags to a object using a closed taxonomy
+        (None, "tA1", ["invalid"], status.HTTP_403_FORBIDDEN),
+        ("user", "tA1", ["invalid"], status.HTTP_403_FORBIDDEN),
+        ("userA", "tA1", ["invalid"], status.HTTP_400_BAD_REQUEST),
+        ("userS", "tA1", ["invalid"], status.HTTP_400_BAD_REQUEST),
+        (None, "multiple_taxonomy", ["invalid"], status.HTTP_403_FORBIDDEN),
+        ("user", "multiple_taxonomy", ["invalid"], status.HTTP_403_FORBIDDEN),
+        ("userA", "multiple_taxonomy", ["invalid"], status.HTTP_400_BAD_REQUEST),
+        ("userS", "multiple_taxonomy", ["invalid"], status.HTTP_400_BAD_REQUEST),
+        # Staff can't add invalid tags to a object using a closed taxonomy
+        ("userS", "tA2", ["invalid"], status.HTTP_400_BAD_REQUEST),
+    )
+    @ddt.unpack
+    def test_tag_course_invalid(self, user_attr, taxonomy_attr, tag_values, expected_status):
+        if user_attr:
+            user = getattr(self, user_attr)
+            self.client.force_authenticate(user=user)
+
+        taxonomy = getattr(self, taxonomy_attr)
+
+        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.courseA, taxonomy_id=taxonomy.pk)
+
+        response = self.client.put(url, {"tags": tag_values}, format="json")
+        assert response.status_code == expected_status
+        assert not status.is_success(expected_status)  # No success cases here
+
+    @ddt.data(
+        # userA and userS are staff in courseA (owner of xblockA) and can tag using enabled taxonomies
+        (None, "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
+        ("user", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
+        ("userA", "tA1", ["Tag 1"], status.HTTP_200_OK),
+        ("userS", "tA1", ["Tag 1"], status.HTTP_200_OK),
+        (None, "tA1", [], status.HTTP_403_FORBIDDEN),
+        ("user", "tA1", [], status.HTTP_403_FORBIDDEN),
+        ("userA", "tA1", [], status.HTTP_200_OK),
+        ("userS", "tA1", [], status.HTTP_200_OK),
+        (None, "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_403_FORBIDDEN),
+        ("user", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_403_FORBIDDEN),
+        ("userA", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
+        ("userS", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
+        (None, "open_taxonomy", ["tag1"], status.HTTP_403_FORBIDDEN),
+        ("user", "open_taxonomy", ["tag1"], status.HTTP_403_FORBIDDEN),
+        ("userA", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
+        ("userS", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
+        # Only userS is Tagging Admin and can tag objects using disabled taxonomies
+        (None, "tA2", ["Tag 1"], status.HTTP_403_FORBIDDEN),
+        ("user", "tA2", ["Tag 1"], status.HTTP_403_FORBIDDEN),
+        ("userA", "tA2", ["Tag 1"], status.HTTP_403_FORBIDDEN),
+        ("userS", "tA2", ["Tag 1"], status.HTTP_200_OK),
+    )
+    @ddt.unpack
+    def test_tag_xblock(self, user_attr, taxonomy_attr, tag_values, expected_status):
+        if user_attr:
+            user = getattr(self, user_attr)
+            self.client.force_authenticate(user=user)
+
+        taxonomy = getattr(self, taxonomy_attr)
+
+        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.xblockA, taxonomy_id=taxonomy.pk)
+
+        response = self.client.put(url, {"tags": tag_values}, format="json")
+
+        assert response.status_code == expected_status
+        if status.is_success(expected_status):
+            assert len(response.data) == len(tag_values)
+            assert set(t["value"] for t in response.data) == set(tag_values)
+
+    @ddt.data(
+        # Can't add invalid tags to a object using a closed taxonomy
+        (None, "tA1", ["invalid"], status.HTTP_403_FORBIDDEN),
+        ("user", "tA1", ["invalid"], status.HTTP_403_FORBIDDEN),
+        ("userA", "tA1", ["invalid"], status.HTTP_400_BAD_REQUEST),
+        ("userS", "tA1", ["invalid"], status.HTTP_400_BAD_REQUEST),
+        (None, "multiple_taxonomy", ["invalid"], status.HTTP_403_FORBIDDEN),
+        ("user", "multiple_taxonomy", ["invalid"], status.HTTP_403_FORBIDDEN),
+        ("userA", "multiple_taxonomy", ["invalid"], status.HTTP_400_BAD_REQUEST),
+        ("userS", "multiple_taxonomy", ["invalid"], status.HTTP_400_BAD_REQUEST),
+        # Staff can't add invalid tags to a object using a closed taxonomy
+        ("userS", "tA2", ["invalid"], status.HTTP_400_BAD_REQUEST),
+    )
+    @ddt.unpack
+    def test_tag_xblock_invalid(self, user_attr, taxonomy_attr, tag_values, expected_status):
+        if user_attr:
+            user = getattr(self, user_attr)
+            self.client.force_authenticate(user=user)
+
+        taxonomy = getattr(self, taxonomy_attr)
+
+        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.xblockA, taxonomy_id=taxonomy.pk)
+
+        response = self.client.put(url, {"tags": tag_values}, format="json")
+        assert response.status_code == expected_status
+        assert not status.is_success(expected_status)  # No success cases here
+
+    @ddt.data(
+        "courseB",
+        "xblockB",
+    )
+    def test_tag_unauthorized(self, objectid_attr):
+        """
+        Test that a user without access to courseB can't apply tags to it
+        """
+        self.client.force_authenticate(user=self.userA)
+        object_id = getattr(self, objectid_attr)
+
+        url = OBJECT_TAG_UPDATE_URL.format(object_id=object_id, taxonomy_id=self.tA1.pk)
+
+        response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN

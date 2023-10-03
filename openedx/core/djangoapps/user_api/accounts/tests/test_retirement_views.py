@@ -74,6 +74,7 @@ from common.djangoapps.student.tests.factories import (
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory, AccessTokenFactory
 
 from ...tests.factories import UserOrgTagFactory
 from ..views import USER_PROFILE_PII, AccountRetirementView
@@ -262,6 +263,22 @@ class TestDeactivateLogout(RetirementTestCase):
         headers = build_jwt_headers(self.test_user)
         response = self.client.post(self.url, self.build_post(self.test_password), **headers)
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_bearer_auth(self):
+        """
+        Test the account deactivation/logout endpoint using Bearer auth
+        """
+        # testing with broken token
+        headers = {'HTTP_AUTHORIZATION': 'Bearer broken_token'}
+        response = self.client.post(self.url, self.build_post(self.test_password), **headers)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        # testing with correct token
+        access_token = AccessTokenFactory(user=self.test_user,
+                                          application=ApplicationFactory(name="test_bearer",
+                                                                         user=self.test_user)).token
+        headers = {'HTTP_AUTHORIZATION': f'Bearer {access_token}'}
+        response = self.client.post(self.url, self.build_post(self.test_password), **headers)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
 @skip_unless_lms

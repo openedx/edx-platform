@@ -89,7 +89,6 @@ from ..courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from ..tasks import rerun_course as rerun_course_task
 from ..toggles import (
     default_enable_flexible_peer_openassessments,
-    split_library_view_on_dashboard,
     use_new_course_outline_page,
     use_new_home_page,
     use_new_updates_page,
@@ -102,6 +101,7 @@ from ..utils import (
     get_course_settings,
     get_course_grading,
     get_home_context,
+    get_library_context,
     get_lms_link_for_item,
     get_proctored_exam_settings_url,
     get_course_outline_url,
@@ -121,7 +121,6 @@ from ..utils import (
     update_course_discussions_settings,
 )
 from .component import ADVANCED_COMPONENT_TYPES
-from .library import LIBRARIES_ENABLED
 
 log = logging.getLogger(__name__)
 User = get_user_model()
@@ -551,26 +550,7 @@ def library_listing(request):
     """
     List all Libraries available to the logged in user
     """
-    libraries = _accessible_libraries_iter(request.user) if LIBRARIES_ENABLED else []
-    data = {
-        'in_process_course_actions': [],
-        'courses': [],
-        'libraries_enabled': LIBRARIES_ENABLED,
-        'libraries': [_format_library_for_view(lib, request) for lib in libraries],
-        'show_new_library_button': LIBRARIES_ENABLED and request.user.is_active,
-        'user': request.user,
-        'request_course_creator_url': reverse('request_course_creator'),
-        'course_creator_status': _get_course_creator_status(request.user),
-        'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
-        'archived_courses': True,
-        'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
-        'rerun_creator_status': GlobalStaff().has_user(request.user),
-        'split_studio_home': split_library_view_on_dashboard(),
-        'active_tab': 'libraries',
-        'allowed_organizations': get_allowed_organizations(request.user),
-        'allowed_organizations_for_libraries': get_allowed_organizations_for_libraries(request.user),
-        'can_create_organizations': user_can_create_organizations(request.user),
-    }
+    data = get_library_context(request)
     return render_to_response('index.html', data)
 
 
