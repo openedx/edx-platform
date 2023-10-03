@@ -5,13 +5,76 @@ This file contains receivers of course publication signals.
 
 import logging
 
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ObjectDoesNotExist
 from django.dispatch import receiver
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
+from openedx_events.learning.signals import (
+    EXAM_ATTEMPT_ERRORED,
+    EXAM_ATTEMPT_REJECTED,
+    EXAM_ATTEMPT_RESET,
+    EXAM_ATTEMPT_SUBMITTED,
+    EXAM_ATTEMPT_VERIFIED
+)
 
+from openedx.core.djangoapps.credit.api.eligibility import (
+    is_credit_course,
+    remove_credit_requirement_status,
+    set_credit_requirement_status
+)
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_CHANGED
 
+User = get_user_model()
+
 log = logging.getLogger(__name__)
+
+
+def handle_exam_event(signal, event_data, credit_status=None):
+    """
+    update credit requirements based on exam event
+    """
+    user_data = event_data.student_user
+    course_key = event_data.course_key
+    usage_key = event_data.usage_key
+    request_namespace = 'exam'
+
+    # quick exit, if course is not credit enabled
+    if not is_credit_course(course_key):
+        return
+
+    # log any activity to the credit requirements table
+    log.info(
+        f'Recieved {signal} signal, changing credit requirement for '
+        f'user_id={user_data.id}, course_key_or_id={course_key} '
+        f'content_id={usage_key}'
+    )
+
+    try:
+        user = User.objects.get(id=user_data.id)
+    except ObjectDoesNotExist:
+        log.error(
+            'Error occurred while handling exam event for '
+            f'{user_data.id} and content_id {usage_key}. '
+            'User does not exist!'
+        )
+        return
+
+    if signal == EXAM_ATTEMPT_RESET:
+        remove_credit_requirement_status(
+            user.username,
+            course_key,
+            request_namespace,
+            str(usage_key),
+        )
+    else:
+        set_credit_requirement_status(
+            user.username,
+            course_key,
+            request_namespace,
+            str(usage_key),
+            credit_status
+        )
 
 
 def on_course_publish(course_key):
@@ -94,3 +157,48 @@ def listen_for_grade_calculation(sender, user, course_grade, course_key, deadlin
                     api.set_credit_requirement_status(
                         user, course_id, 'grade', 'grade', status=status, reason=reason
                     )
+
+
+@receiver(EXAM_ATTEMPT_RESET)
+def listen_for_exam_reset(sender, signal, **kwargs):
+    """
+    exam reset event from the event bus
+    """
+    event_data = kwargs.get('exam_attempt')
+    handle_exam_event(signal, event_data)
+
+
+@receiver(EXAM_ATTEMPT_SUBMITTED)
+def listen_for_exam_submitted(sender, signal, **kwargs):
+    """
+    exam submission event from the event bus
+    """
+    event_data = kwargs.get('exam_attempt')
+    handle_exam_event(signal, event_data, credit_status='submitted')
+
+
+@receiver(EXAM_ATTEMPT_VERIFIED)
+def listen_for_exam_verified(sender, signal, **kwargs):
+    """
+    exam verification event from the event bus
+    """
+    event_data = kwargs.get('exam_attempt')
+    handle_exam_event(signal, event_data, credit_status='satisfied')
+
+
+@receiver(EXAM_ATTEMPT_REJECTED)
+def listen_for_exam_rejected(sender, signal, **kwargs):
+    """
+    exam rejection event from the event bus
+    """
+    event_data = kwargs.get('exam_attempt')
+    handle_exam_event(signal, event_data, credit_status='failed')
+
+
+@receiver(EXAM_ATTEMPT_ERRORED)
+def listen_for_exam_errored(sender, signal, **kwargs):
+    """
+    exam error event from the event bus
+    """
+    event_data = kwargs.get('exam_attempt')
+    handle_exam_event(signal, event_data, credit_status='failed')

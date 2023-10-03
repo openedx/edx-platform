@@ -256,7 +256,7 @@ def update_special_exams_and_publish(course_key_str):
     """
     from cms.djangoapps.contentstore.exams import register_exams
     from cms.djangoapps.contentstore.proctoring import register_special_exams as register_exams_legacy
-    from openedx.core.djangoapps.credit.signals import on_course_publish
+    from openedx.core.djangoapps.credit.signals.handlers import on_course_publish
 
     course_key = CourseKey.from_string(course_key_str)
     LOGGER.info('Attempting to register exams for course %s', course_key_str)
