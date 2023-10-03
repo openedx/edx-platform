@@ -88,7 +88,7 @@ typing-extensions==4.8.0
     #   semgrep
 ujson==5.8.0
     # via python-lsp-jsonrpc
-urllib3==1.26.16
+urllib3==1.26.17
     # via
     #   -c requirements/edx/../constraints.txt
     #   requests
