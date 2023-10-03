@@ -205,7 +205,7 @@ class PasswordResetFormNoActive(PasswordResetForm):
 
         if not self.users_cache:
             raise forms.ValidationError(self.error_messages['unknown'])
-        if any((user.password.startswith(UNUSABLE_PASSWORD_PREFIX))
+        if any((user.password.startswith(UNUSABLE_PASSWORD_PREFIX) or not user.is_active) 
                for user in self.users_cache):
             raise forms.ValidationError(self.error_messages['unusable'])
         return email
