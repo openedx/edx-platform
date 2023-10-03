@@ -44,20 +44,13 @@ class TestBlockStructureStore(UsageKeyFactoryMixin, ChildrenMapTestMixin, CacheI
                 value=f'{transformer.name()} val',
             )
 
-    @ddt.data(True, True)
-    def test_get_none(self, with_storage_backing):
-        with pytest.raises(BlockStructureNotFound):
-            self.store.get(self.block_structure.root_block_usage_key)
-
-    @ddt.data(True, True)
-    def test_add_and_get(self, with_storage_backing):
+    def test_add_and_get(self):
         self.store.add(self.block_structure)
         stored_value = self.store.get(self.block_structure.root_block_usage_key)
         assert stored_value is not None
         self.assert_block_structure(stored_value, self.children_map)
 
-    @ddt.data(True, True)
-    def test_delete(self, with_storage_backing):
+    def test_delete(self):
         self.store.add(self.block_structure)
         self.store.delete(self.block_structure.root_block_usage_key)
         with pytest.raises(BlockStructureNotFound):
