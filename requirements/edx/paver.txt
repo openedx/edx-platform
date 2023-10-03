@@ -54,7 +54,7 @@ stevedore==5.1.0
     #   edx-opaque-keys
 typing-extensions==4.8.0
     # via edx-opaque-keys
-urllib3==1.26.16
+urllib3==1.26.17
     # via
     #   -c requirements/edx/../constraints.txt
     #   requests
