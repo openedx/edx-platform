@@ -924,7 +924,7 @@ def _has_passed_or_is_allowlisted(course, student, course_grade):
     return has_passed or is_allowlisted
 
 
-def invalidate_certificate_legacy_and_new(user_id, course_key_or_id):
+def invalidate_certificate(user_id, course_key_or_id, source):
     """
     Invalidate the user certificate in a given course if it exists and the user is not on the allowlist for this
     course run.
@@ -943,7 +943,7 @@ def invalidate_certificate_legacy_and_new(user_id, course_key_or_id):
             user=user_id,
             course_id=course_key
         )
-        generated_certificate.invalidate(source='certificate_service')
+        generated_certificate.invalidate(source=source)
     except ObjectDoesNotExist:
         log.warning(
             'Invalidation failed because a certificate for user %d in course %s does not exist.',

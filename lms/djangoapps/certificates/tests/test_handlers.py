@@ -68,10 +68,10 @@ class ExamCompletionEventBusTests(TestCase):
             time=datetime.now(timezone.utc)
         )
 
-    @mock.patch('lms.djangoapps.certificates.handlers.invalidate_certificate_legacy_and_new')
+    @mock.patch('lms.djangoapps.certificates.handlers.invalidate_certificate')
     def test_exam_attempt_rejected_event(self, mock_api_function):
         """
-        Assert that CertificateService api's invalidate_certificate_legacy_and_new is called upon consuming the event
+        Assert that CertificateService api's invalidate_certificate is called upon consuming the event
         """
         exam_event_data = self._get_exam_event_data(self.student_user,
                                                     self.course_key,
@@ -84,4 +84,4 @@ class ExamCompletionEventBusTests(TestCase):
             'metadata': event_metadata
         }
         handle_exam_attempt_rejected_event(None, EXAM_ATTEMPT_REJECTED, **event_kwargs)
-        mock_api_function.assert_called_once_with(self.student_user.id, self.course_key)
+        mock_api_function.assert_called_once_with(self.student_user.id, self.course_key, source='exam_event')

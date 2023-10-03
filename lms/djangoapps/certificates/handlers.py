@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from django.dispatch import receiver
 from openedx_events.learning.signals import EXAM_ATTEMPT_REJECTED
 
-from lms.djangoapps.certificates.api import invalidate_certificate_legacy_and_new
+from lms.djangoapps.certificates.api import invalidate_certificate
 
 User = get_user_model()
 
@@ -25,4 +25,4 @@ def handle_exam_attempt_rejected_event(sender, signal, **kwargs):
     course_key = event_data.course_key
 
     # Note that the course_key is the same as the course_key_or_id, and is being passed in as the course_key param
-    invalidate_certificate_legacy_and_new(user_data.id, course_key)
+    invalidate_certificate(user_data.id, course_key, source='exam_event')
