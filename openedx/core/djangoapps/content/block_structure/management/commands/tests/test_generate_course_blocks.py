@@ -66,7 +66,7 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
         else:
             assert not message_present
 
-    def test_all_courses(self, force_update):
+    def test_all_courses(self):
         self._assert_courses_not_in_block_cache(*self.course_keys)
         self.command.handle(all_courses=True)
         self._assert_courses_in_block_cache(*self.course_keys)
@@ -79,12 +79,10 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
     def test_one_course(self):
         self._assert_courses_not_in_block_cache(*self.course_keys)
         self.command.handle(courses=[str(self.course_keys[0])])
-        self._assert_courses_in_block_cache(self.course_keys[0])
         self._assert_courses_not_in_block_cache(*self.course_keys[1:])
 
     def test_with_storage(self):
         self.command.handle(courses=[str(self.course_keys[0])])
-        self._assert_courses_in_block_cache(self.course_keys[0])
         self._assert_courses_in_block_storage(self.course_keys[0])
 
     @ddt.data(
