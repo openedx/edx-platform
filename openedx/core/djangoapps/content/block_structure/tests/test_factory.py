@@ -8,7 +8,7 @@ from django.test import TestCase
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from ..factory import BlockStructureFactory
-from .helpers import ChildrenMapTestMixin, MockCache, MockModulestoreFactory
+from .helpers import ChildrenMapTestMixin, MockModulestoreFactory
 
 
 class TestBlockStructureFactory(TestCase, ChildrenMapTestMixin):
