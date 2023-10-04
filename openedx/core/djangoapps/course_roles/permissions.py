@@ -78,7 +78,7 @@ course_roles_permissions = {
     },
     CourseRolesPermission.MANAGE_GRADES: {
         "name": _("Manage Grades"),
-        "description": _("Can view and edit grades in Student Admin tab, " "Gradebook, and Open Responses."),
+        "description": _("Can view and edit grades in Student Admin tab, Gradebook, and Open Responses."),
     },
     CourseRolesPermission.VIEW_GRADEBOOK: {
         "name": _("View Gradebook"),
