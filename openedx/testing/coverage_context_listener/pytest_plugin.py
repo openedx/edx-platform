@@ -3,9 +3,6 @@ A pytest plugin that reports test contexts to coverage running in another proces
 """
 
 import pytest
-# import requests
-
-# from pavelib.utils.envs import Env
 
 
 class RemoteContextPlugin:
