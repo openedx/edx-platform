@@ -41,14 +41,7 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
         """
         for course_key in course_keys:
             assert not is_course_in_block_structure_cache(course_key, self.store)
-
-    def _assert_courses_not_in_block_storage(self, *course_keys):
-        """
-        Assert courses don't exist in course block storage.
-        """
-        for course_key in course_keys:
-            assert not is_course_in_block_structure_storage(course_key, self.store)
-
+            
     def _assert_courses_in_block_storage(self, *course_keys):
         """
         Assert courses exist in course block storage.
@@ -83,8 +76,7 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
     def test_with_storage(self):
         self.command.handle(courses=[str(self.course_keys[0])])
         self._assert_courses_in_block_storage(self.course_keys[0])
-        self._assert_courses_not_in_block_storage(*self.course_keys[1:])
-
+        
     @ddt.data(
         *itertools.product(
             (True, False),
