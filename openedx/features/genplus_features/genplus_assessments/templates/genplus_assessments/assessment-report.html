@@ -12,10 +12,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=2.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="${static.url('genplus_assessments/assets/css/main.css')}">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
   <div class="wrapper">
@@ -192,7 +192,7 @@
         "Very confident"
     ];
     const likertChart = new Chart(likertCTX, {
-      type: 'bar',
+      type: 'horizontalBar',
       data: {
         labels: [
           "Communication",
@@ -214,6 +214,7 @@
       },
       options: {
         indexAxis: 'y',
+          animation:false,
         elements: {
           bar: {
             inflateAmount: 0,
@@ -251,7 +252,7 @@
               },
               stepSize: 1,
               color: '#000',
-              callback: (value) => {
+              callback: function (value) {
                 if (value < 0) return likertLabels[value + 2];
                 if (value > 0) return likertLabels[value + 1];
                 return '';
@@ -301,8 +302,8 @@
             points: 4
         }
     ];
-    const nuanceChart = new Chart(nuanceCTX, {
-      type: 'bar',
+    var nuanceChart = new Chart(nuanceCTX, {
+      type: 'horizontalBar',
       data: {
           labels: [
               "Communication",
@@ -319,6 +320,7 @@
       },
       options: {
         indexAxis: 'y',
+          animation:false,
         elements: {
           bar: {
             inflateAmount: 0,
@@ -346,7 +348,9 @@
               },
               stepSize: 1,
               color: '#000',
-              callback: (_, index) => xLabels[index].text,
+                callback: function (_, index) {
+                    return xLabels[index].text
+                },
             },
             min: 0,
             max: 4,
