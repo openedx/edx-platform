@@ -4,6 +4,8 @@
 #
 #    make upgrade
 #
+-e git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2#egg=edx_proctoring_proctortrack
+    # via -r requirements/edx/github.in
 acid-xblock==0.2.1
     # via -r requirements/edx/kernel.in
 aiohttp==3.8.5
@@ -77,13 +79,13 @@ boto==2.39.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
-boto3==1.28.58
+boto3==1.28.59
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.31.58
+botocore==1.31.59
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -486,7 +488,7 @@ edx-enterprise==4.5.0
     #   -r requirements/edx/kernel.in
 edx-event-bus-kafka==5.5.0
     # via -r requirements/edx/kernel.in
-edx-event-bus-redis==0.3.1
+edx-event-bus-redis==0.3.2
     # via -r requirements/edx/kernel.in
 edx-i18n-tools==1.2.0
     # via ora2
@@ -516,8 +518,6 @@ edx-proctoring==4.16.1
     # via
     #   -r requirements/edx/kernel.in
     #   edx-proctoring-proctortrack
-edx-proctoring-proctortrack==1.2.1
-    # via -r requirements/edx/kernel.in
 edx-rbac==1.8.0
     # via edx-enterprise
 edx-rest-api-client==5.6.0
@@ -567,7 +567,7 @@ event-tracking==2.2.0
     #   -r requirements/edx/kernel.in
     #   edx-proctoring
     #   edx-search
-fastavro==1.8.3
+fastavro==1.8.4
     # via openedx-events
 filelock==3.12.4
     # via snowflake-connector-python
@@ -833,7 +833,7 @@ pillow==9.5.0
     #   edxval
 pkgutil-resolve-name==1.3.10
     # via jsonschema
-platformdirs==3.8.1
+platformdirs==3.11.0
     # via snowflake-connector-python
 polib==1.2.0
     # via edx-i18n-tools
@@ -984,7 +984,7 @@ referencing==0.30.2
     # via
     #   jsonschema
     #   jsonschema-specifications
-regex==2023.8.8
+regex==2023.10.3
     # via nltk
 requests==2.31.0
     # via
@@ -1017,9 +1017,9 @@ rpds-py==0.10.3
     # via
     #   jsonschema
     #   referencing
-ruamel-yaml==0.17.33
+ruamel-yaml==0.17.34
     # via drf-yasg
-ruamel-yaml-clib==0.2.7
+ruamel-yaml-clib==0.2.8
     # via ruamel-yaml
 rules==3.3
     # via
@@ -1081,7 +1081,7 @@ slumber==0.7.1
     #   edx-bulk-grades
     #   edx-enterprise
     #   edx-rest-api-client
-snowflake-connector-python==3.2.0
+snowflake-connector-python==3.2.1
     # via edx-enterprise
 social-auth-app-django==5.0.0
     # via
@@ -1224,7 +1224,7 @@ xblock-google-drive==0.4.0
     # via -r requirements/edx/bundled.in
 xblock-poll==1.13.0
     # via -r requirements/edx/bundled.in
-xblock-utils==3.4.1
+xblock-utils==4.0.0
     # via
     #   -r requirements/edx/kernel.in
     #   done-xblock
