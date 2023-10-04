@@ -91,15 +91,7 @@ class BlockStructureManager:
                 starting at root_block_usage_key, with collected data
                 from each registered transformer.
         """
-        try:
-            block_structure = BlockStructureFactory.create_from_modulestore(
-                self.root_block_usage_key,
-                self.store,
-            )
-            BlockStructureTransformers.verify_versions(block_structure)
-
-        except (BlockStructureNotFound, TransformerDataIncompatible):
-            block_structure = self._update_collected()
+        block_structure = self._update_collected()
         return block_structure
 
     def _update_collected(self):
