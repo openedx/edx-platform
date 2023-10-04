@@ -208,6 +208,10 @@ class TestCourseListing(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 403)
 
     @override_settings(FEATURES={'ENABLE_CREATOR_GROUP': True})
+    @mock.patch(
+        'cms.djangoapps.course_creators.admin.render_to_string',
+        mock.Mock(side_effect=mock_render_to_string, autospec=True)
+    )
     def test_course_creation_when_user_in_org_with_creator_role(self):
         """
         Tests course creation with user having the organization content creation role.
@@ -218,6 +222,9 @@ class TestCourseListing(ModuleStoreTestCase):
             'description': 'Testing Organization Description',
         })
         update_org_role(self.global_admin, OrgContentCreatorRole, self.user, [self.source_course_key.org])
+        self.course_creator_entry.all_organizations = True
+        self.course_creator_entry.state = CourseCreator.GRANTED
+        self.creator_admin.save_model(self.request, self.course_creator_entry, None, True)
         self.assertIn(self.source_course_key.org, get_allowed_organizations(self.user))
         response = self.client.ajax_post(self.course_create_rerun_url, {
             'org': self.source_course_key.org,

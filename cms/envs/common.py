@@ -2787,3 +2787,7 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
     'PREPROCESSING_HOOKS': ['cms.lib.spectacular.cms_api_filter'],  # restrict spectacular to CMS API endpoints
 }
+
+#### Event bus publishing ####
+## Will be more filled out as part of https://github.com/edx/edx-arch-experiments/issues/381
+EVENT_BUS_PRODUCER_CONFIG = {}
