@@ -52,6 +52,7 @@ from lms.djangoapps.grades.api import is_writable_gradebook_enabled
 from lms.djangoapps.instructor.constants import INSTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
 from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, get_course_cohorts, is_course_cohorted
 from openedx.core.djangoapps.course_roles.helpers import course_permission_check
+from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
 from openedx.core.djangoapps.discussions.utils import available_division_schemes
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
@@ -187,7 +188,6 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
     # Gate access to Special Exam tab depending if either timed exams or proctored exams
     # are enabled in the course
 
-    MANAGE_STUDENTS_PERMISSION = "manage_students"
     # TODO: course roles: If the course roles feature flag is disabled the course_permission_check call
     #       below will never return true.
     #       Remove .has_user() calls below when course_roles Django app are implemented.
@@ -195,7 +195,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
         request.user.is_staff,
         CourseStaffRole(course_key).has_user(request.user),
         CourseInstructorRole(course_key).has_user(request.user),
-        course_permission_check(request.user, MANAGE_STUDENTS_PERMISSION, course_key)
+        course_permission_check(request.user, CourseRolesPermission.MANAGE_STUDENTS.value, course_key)
     ])
     course_has_special_exams = course.enable_proctored_exams or course.enable_timed_exams
     can_see_special_exams = course_has_special_exams and user_has_access and settings.FEATURES.get(

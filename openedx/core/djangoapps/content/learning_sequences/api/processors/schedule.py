@@ -9,6 +9,7 @@ from edx_when.api import get_dates_for_course
 from opaque_keys.edx.keys import UsageKey, CourseKey  # lint-amnesty, pylint: disable=unused-import
 from openedx.core import types
 from openedx.core.djangoapps.course_roles.helpers import course_permission_check
+from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 
 from common.djangoapps.student.auth import user_has_role
 from common.djangoapps.student.roles import CourseBetaTesterRole
@@ -61,14 +62,14 @@ class ScheduleOutlineProcessor(OutlineProcessor):
         course_usage_key = self.course_key.make_usage_key('course', 'course')
         self._course_start = self.keys_to_schedule_fields[course_usage_key].get('start')
         self._course_end = self.keys_to_schedule_fields[course_usage_key].get('end')
-        VIEW_ALL_PUBLISHED_CONTENT_PERMISSION = "view_all_published_content"
-        VIEW_ONLY_LIVE_PUBLISHED_CONTENT_PERMISSION = "view_only_live_published_content"
         # TODO: course roles: If the course roles feature flag is disabled the course_permission_check calls
         #       below will never return true.
         #       Remove the user_has_role call when course_roles Django app are implemented.
         self._is_beta_tester = user_has_role(self.user, CourseBetaTesterRole(self.course_key)) or (
-            course_permission_check(self.user, VIEW_ALL_PUBLISHED_CONTENT_PERMISSION, self.course_key)
-            or course_permission_check(self.user, VIEW_ONLY_LIVE_PUBLISHED_CONTENT_PERMISSION, self.course_key)
+            course_permission_check(self.user, CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.value, self.course_key)
+            or course_permission_check(self.user,
+                                       CourseRolesPermission.VIEW_ONLY_LIVE_PUBLISHED_CONTENT.value,
+                                       self.course_key)
         )
 
     def inaccessible_sequences(self, full_course_outline):
