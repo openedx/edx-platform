@@ -364,9 +364,13 @@ def get_course(request, course_key):
         #       below will never be true.
         #       Remove .has_user() calls below when course_roles Django app are implemented.
         "is_course_staff": (CourseStaffRole(course_key).has_user(request.user) or
-                            course_permission_check(request.user, CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value, course_key)),
+                            course_permission_check(request.user,
+                                                    CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value,
+                                                    course_key)),
         "is_course_admin": (CourseInstructorRole(course_key).has_user(request.user) or
-                            course_permission_check(request.user, CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value, course_key)),
+                            course_permission_check(request.user,
+                                                    CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value,
+                                                    course_key)),
         "provider": course_config.provider_type,
         "enable_in_context": course_config.enable_in_context,
         "group_at_subsection": course_config.plugin_configuration.get("group_at_subsection", False),

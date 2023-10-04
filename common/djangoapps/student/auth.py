@@ -136,7 +136,8 @@ def get_user_permissions(user, course_key, org=None):
     # Staff have all permissions except EDIT_ROLES:
     # TODO: course roles: If the course roles feature flag is disabled the
     #       course_or_organization_permissions_list_check call below will never return true.
-    #       Remove the OrgStaffRole has_user call and the user_has_role call when course_roles Django app are implemented.
+    #       Remove the OrgStaffRole has_user call and the user_has_role call
+    #       when course_roles Django app are implemented.
     if (OrgStaffRole(org=org).has_user(user) or
         (course_key and user_has_role(user, CourseStaffRole(course_key)))) or (
         course_or_organization_permission_list_check(user, STAFF_ROLE_PERMISSIONS, course_key, org)

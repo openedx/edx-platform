@@ -67,7 +67,9 @@ class ScheduleOutlineProcessor(OutlineProcessor):
         #       Remove the user_has_role call when course_roles Django app are implemented.
         self._is_beta_tester = user_has_role(self.user, CourseBetaTesterRole(self.course_key)) or (
             course_permission_check(self.user, CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.value, self.course_key)
-            or course_permission_check(self.user, CourseRolesPermission.VIEW_ONLY_LIVE_PUBLISHED_CONTENT.value, self.course_key)
+            or course_permission_check(self.user,
+                                       CourseRolesPermission.VIEW_ONLY_LIVE_PUBLISHED_CONTENT.value,
+                                       self.course_key)
         )
 
     def inaccessible_sequences(self, full_course_outline):
