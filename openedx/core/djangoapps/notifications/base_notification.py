@@ -322,3 +322,16 @@ def get_notification_content(notification_type, context):
         if notification_type_content_template:
             return notification_type_content_template.format(**context, **html_tags_context)
     return ''
+
+
+def get_default_values_of_preference(notification_app, notification_type):
+    """
+    Returns default preference for notification_type
+    """
+    default_prefs = NotificationAppManager().get_notification_app_preferences()
+    app_prefs = default_prefs.get(notification_app, {})
+    core_notification_types = app_prefs.get('core_notification_types', [])
+    notification_types = app_prefs.get('notification_types', {})
+    if notification_type in core_notification_types:
+        return notification_types.get('core', {})
+    return notification_types.get(notification_type, {})
