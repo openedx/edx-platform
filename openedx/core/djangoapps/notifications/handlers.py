@@ -11,8 +11,6 @@ from openedx_events.learning.signals import (
     COURSE_UNENROLLMENT_COMPLETED,
     USER_NOTIFICATION_REQUESTED
 )
-from django.db.models.signals import post_save
-import traceback
 
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.models import CourseNotificationPreference
@@ -61,16 +59,3 @@ def generate_user_notifications(signal, sender, notification_data, metadata, **k
     notification_data = notification_data.__dict__
     notification_data['course_key'] = str(notification_data['course_key'])
     send_notifications.delay(**notification_data)
-
-
-@receiver(post_save, sender=CourseNotificationPreference)
-def notification_post_save(signal, sender, instance, created, **kwargs):
-    """
-    Watches for post_save signal for update on the CourseNotificationPreference table.
-    Generate a log with traceback if CourseNotificationPreference is updated
-    """
-    if not created:
-        # Get the stack trace
-        stack_trace = traceback.format_stack()
-        # Log the update along with the stack trace
-        log.info(f"{sender.__name__} (ID: {instance.pk}) was updated. Update induced by:\n{stack_trace}")

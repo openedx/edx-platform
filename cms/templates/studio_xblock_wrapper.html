@@ -104,9 +104,15 @@ block_is_unit = is_unit(xblock)
                                 <div class="nav-sub">
                                   <ul>
                                     % if not show_inline:
-                                        <li class="nav-item">
-                                            <a class="copy-button" href="#" role="button">${_("Copy to Clipboard")}</a>
-                                        </li>
+                                        % if is_course:
+                                            <!--
+                                                Only show the "Copy to Clipboard" button for xblocks inside courses since
+                                                the copy/paste functionality is not yet implemented for LibraryContent.
+                                            -->
+                                            <li class="nav-item">
+                                                <a class="copy-button" href="#" role="button">${_("Copy to Clipboard")}</a>
+                                            </li>
+                                        % endif
                                         % if can_add:
                                             <li class="nav-item">
                                                 <a class="duplicate-button" href="#" role="button">${_("Duplicate")}</a>

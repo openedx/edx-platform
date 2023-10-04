@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-09-20 12:47+0000\n"
-"PO-Revision-Date: 2023-09-20 12:47:19.650590\n"
+"POT-Creation-Date: 2023-10-01 20:36+0000\n"
+"PO-Revision-Date: 2023-10-01 20:36:14.857987\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -7007,6 +7007,19 @@ msgstr ""
 msgid "Original usage key/ID of the thing that is in the clipboard."
 msgstr "Øɹᴉƃᴉnɐl nsɐƃǝ ʞǝʎ/ƗĐ øɟ ʇɥǝ ʇɥᴉnƃ ʇɥɐʇ ᴉs ᴉn ʇɥǝ ɔlᴉdbøɐɹd."
 
+#: openedx/core/djangoapps/content_tagging/models/base.py
+#: wiki/models/article.py
+msgid "owner"
+msgstr "øʍnǝɹ"
+
+#: openedx/core/djangoapps/content_tagging/models/base.py
+msgid ""
+"Organization that is related to this taxonomy.If None, then this taxonomy is"
+" related to all organizations."
+msgstr ""
+"Øɹƃɐnᴉzɐʇᴉøn ʇɥɐʇ ᴉs ɹǝlɐʇǝd ʇø ʇɥᴉs ʇɐxønøɯʎ.Ɨɟ Nønǝ, ʇɥǝn ʇɥᴉs ʇɐxønøɯʎ ᴉs"
+" ɹǝlɐʇǝd ʇø ɐll øɹƃɐnᴉzɐʇᴉøns."
+
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
 "List of domains that are allowed to make cross-domain requests to this site."
@@ -7477,6 +7490,14 @@ msgstr "Ƀlɐɔʞlᴉsʇ {country} ɟøɹ {course}"
 #: openedx/core/djangoapps/learner_pathway/apps.py
 msgid "Learner Pathways"
 msgstr "Łǝɐɹnǝɹ Ᵽɐʇɥʍɐʎs"
+
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification App"
+msgstr "Nøʇᴉɟᴉɔɐʇᴉøn Ⱥdd"
+
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification Type"
+msgstr "Nøʇᴉɟᴉɔɐʇᴉøn Ŧʎdǝ"
 
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
@@ -9017,18 +9038,6 @@ msgid ""
 msgstr ""
 "Ɏøn ɥɐʌǝ snɔɔǝssɟnllʎ sɥᴉɟʇǝd ʎønɹ ɔønɹsǝ sɔɥǝdnlǝ ɐnd ʎønɹ ɔɐlǝndɐɹ ᴉs nd "
 "ʇø dɐʇǝ."
-
-#: openedx/features/content_tagging/models/base.py wiki/models/article.py
-msgid "owner"
-msgstr "øʍnǝɹ"
-
-#: openedx/features/content_tagging/models/base.py
-msgid ""
-"Organization that is related to this taxonomy.If None, then this taxonomy is"
-" related to all organizations."
-msgstr ""
-"Øɹƃɐnᴉzɐʇᴉøn ʇɥɐʇ ᴉs ɹǝlɐʇǝd ʇø ʇɥᴉs ʇɐxønøɯʎ.Ɨɟ Nønǝ, ʇɥǝn ʇɥᴉs ʇɐxønøɯʎ ᴉs"
-" ɹǝlɐʇǝd ʇø ɐll øɹƃɐnᴉzɐʇᴉøns."
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py

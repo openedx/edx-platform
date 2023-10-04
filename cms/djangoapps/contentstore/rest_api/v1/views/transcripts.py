@@ -21,6 +21,11 @@ from cms.djangoapps.contentstore.transcript_storage_handlers import (
     handle_transcript_download,
 )
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
+from cms.djangoapps.contentstore.rest_api.v1.serializers import TranscriptSerializer
+from rest_framework.parsers import (MultiPartParser, FormParser)
+from openedx.core.lib.api.parsers import TypedFileUploadParser
+
+from .utils import validate_request_with_serializer
 
 log = logging.getLogger(__name__)
 toggles = contentstore_toggles
@@ -34,6 +39,8 @@ class TranscriptView(DeveloperErrorViewMixin, CreateAPIView, RetrieveAPIView, De
     edx_video_id: optional query parameter, needed to identify the transcript.
     language_code: optional query parameter, needed to identify the transcript.
     """
+    serializer_class = TranscriptSerializer
+    parser_classes = (MultiPartParser, FormParser, TypedFileUploadParser)
 
     def dispatch(self, request, *args, **kwargs):
         if not toggles.use_studio_content_api():
@@ -43,6 +50,7 @@ class TranscriptView(DeveloperErrorViewMixin, CreateAPIView, RetrieveAPIView, De
     @csrf_exempt
     @course_author_access_required
     @expect_json_in_class_view
+    @validate_request_with_serializer
     def create(self, request, course_key_string):  # pylint: disable=arguments-differ
         return upload_transcript(request)
 

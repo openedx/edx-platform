@@ -83,8 +83,9 @@ def user_can_create_library(user, org=None):
         is_course_creator = get_course_creator_status(user) == 'granted'
         has_org_staff_role = OrgStaffRole().get_orgs_for_user(user).exists()
         has_course_staff_role = UserBasedRole(user=user, role=CourseStaffRole.ROLE).courses_with_role().exists()
+        has_course_admin_role = UserBasedRole(user=user, role=CourseInstructorRole.ROLE).courses_with_role().exists()
 
-        return is_course_creator or has_org_staff_role or has_course_staff_role
+        return is_course_creator or has_org_staff_role or has_course_staff_role or has_course_admin_role
     else:
         # EDUCATOR-1924: DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION, if present.
         disable_library_creation = settings.FEATURES.get('DISABLE_LIBRARY_CREATION', None)

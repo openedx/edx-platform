@@ -7279,6 +7279,16 @@ msgstr ""
 "Chave de utilização/ID original do objecto que se encontra na área de "
 "transferência."
 
+#: wiki/models/article.py
+msgid "owner"
+msgstr "proprietário"
+
+#: openedx/core/djangoapps/content_tagging/models/base.py
+msgid ""
+"Organization that is related to this taxonomy.If None, then this taxonomy is"
+" related to all organizations."
+msgstr ""
+
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
 "List of domains that are allowed to make cross-domain requests to this site."
@@ -9316,16 +9326,6 @@ msgid ""
 msgstr ""
 "Mudou com sucesso a sua programação de cursos e o seu calendário já se "
 "encontra atualizado."
-
-#: wiki/models/article.py
-msgid "owner"
-msgstr "proprietário"
-
-#: openedx/features/content_tagging/models/base.py
-msgid ""
-"Organization that is related to this taxonomy.If None, then this taxonomy is"
-" related to all organizations."
-msgstr ""
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py

@@ -477,6 +477,7 @@ elif AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
 else:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
+
 # If there is a database called 'read_replica', you can use the use_read_replica_if_available
 # function in util/query.py, which is useful for very large database reads
 DATABASES = AUTH_TOKENS.get('DATABASES', DATABASES)
@@ -1077,6 +1078,15 @@ EXPLICIT_QUEUES = {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
     'openedx.core.djangoapps.programs.tasks.award_course_certificate': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
+    'openassessment.workflow.tasks.update_workflows_for_all_blocked_submissions_task': {
+        'queue': ORA_WORKFLOW_UPDATE_ROUTING_KEY},
+    'openassessment.workflow.tasks.update_workflows_for_course_task': {
+        'queue': ORA_WORKFLOW_UPDATE_ROUTING_KEY},
+    'openassessment.workflow.tasks.update_workflows_for_ora_block_task': {
+        'queue': ORA_WORKFLOW_UPDATE_ROUTING_KEY},
+    'openassessment.workflow.tasks.update_workflow_for_submission_task': {
+        'queue': ORA_WORKFLOW_UPDATE_ROUTING_KEY},
+
 }
 
 LOGO_IMAGE_EXTRA_TEXT = ENV_TOKENS.get('LOGO_IMAGE_EXTRA_TEXT', '')

@@ -37,7 +37,6 @@ from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
-from lms.djangoapps.discussion.rest_api.tasks import send_thread_created_notification
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.toggles_utils import reported_content_email_notification_enabled
 from lms.djangoapps.discussion.views import is_privileged_user
@@ -129,7 +128,6 @@ from .utils import (
     get_usernames_for_course,
     get_usernames_from_search_string,
     is_posting_allowed,
-    send_response_notifications,
     set_attribute,
 )
 
@@ -1469,8 +1467,6 @@ def create_thread(request, thread_data):
     track_thread_created_event(request, course, cc_thread, actions_form.cleaned_data["following"],
                                from_mfe_sidebar)
 
-    thread_id = cc_thread.attributes['id']
-    send_thread_created_notification.apply_async(args=[thread_id, str(course.id), request.user.id])
     return api_thread
 
 
@@ -1517,8 +1513,6 @@ def create_comment(request, comment_data):
 
     track_comment_created_event(request, course, cc_comment, cc_thread["commentable_id"], followed=False,
                                 from_mfe_sidebar=from_mfe_sidebar)
-    send_response_notifications(thread=cc_thread, course=course, creator=request.user,
-                                parent_id=comment_data.get("parent_id"))
     return api_comment
 
 
