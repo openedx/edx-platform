@@ -101,7 +101,8 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
     .wrapper-download-video,
     .wrapper-download-transcripts,
     .wrapper-handouts,
-    .branding {
+    .branding,
+    .wrapper-transcript-feedback {
       flex: 1;
       margin-top: $baseline;
 
@@ -150,6 +151,21 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
         max-height: ($baseline*2);
         padding: ($baseline/4) 0;
         vertical-align: middle;
+      }
+    }
+
+    .wrapper-transcript-feedback {
+      .transcript-feedback-buttons {
+        display: flex;
+      }
+      .transcript-feedback-btn-wrapper {
+        margin-right: 10px;
+      }
+      .thumbs-up-btn,
+      .thumbs-down-btn {
+        border: none;
+        box-shadow: none;
+        background: transparent;
       }
     }
   }

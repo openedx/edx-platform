@@ -486,6 +486,7 @@ class VideoBlock(
             'track': track_url,
             'transcript_download_format': transcript_download_format,
             'transcript_download_formats_list': self.fields['transcript_download_format'].values,  # lint-amnesty, pylint: disable=unsubscriptable-object
+            'transcript_feedback_enabled': self.is_transcript_feedback_enabled(),
         }
         if self.is_public_sharing_enabled():
             public_video_url = self.get_public_video_url()
@@ -540,6 +541,13 @@ class VideoBlock(
         # Equivalent to COURSE_VIDEO_SHARING_PER_VIDEO or None / unset
         else:
             return self.public_access
+
+    def is_transcript_feedback_enabled(self):
+        """
+        Is transcript feedback enabled for this video?
+        """
+        # TODO
+        return True
 
     def get_public_video_url(self):
         """
