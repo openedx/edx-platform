@@ -5,6 +5,10 @@ from django.utils.translation import ugettext as _
 
 @unique
 class CourseRolesPermission(Enum):
+    """
+    Enum of all user permissions, the values are the permissions names
+    in the course_roles_permission table in database.
+    """
     MANAGE_CONTENT = "manage_content"
     MANAGE_COURSE_SETTINGS = "manage_course_settings"
     MANAGE_ADVANCED_SETTINGS = "manage_advanced_settings"
