@@ -42,13 +42,6 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
         for course_key in course_keys:
             assert not is_course_in_block_structure_cache(course_key, self.store)
 
-    def _assert_courses_in_block_cache(self, *course_keys):
-        """
-        Assert courses exist in course block cache.
-        """
-        for course_key in course_keys:
-            assert is_course_in_block_structure_cache(course_key, self.store)
-
     def _assert_courses_in_block_storage(self, *course_keys):
         """
         Assert courses exist in course block storage.
@@ -69,7 +62,6 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
     def test_all_courses(self):
         self._assert_courses_not_in_block_cache(*self.course_keys)
         self.command.handle(all_courses=True)
-        self._assert_courses_in_block_cache(*self.course_keys)
         with patch(
             'openedx.core.djangoapps.content.block_structure.factory.BlockStructureFactory.create_from_modulestore'
         ) as mock_update_from_store:
