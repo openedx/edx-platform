@@ -228,7 +228,7 @@ DATABASES:
         ATOMIC_REQUESTS: true
         CONN_MAX_AGE: 0
         ENGINE: django.db.backends.mysql
-        HOST: edx.devstack.mysql57
+        HOST: edx.devstack.mysql80
         NAME: edxapp
         OPTIONS:
             isolation_level: read committed
@@ -238,7 +238,7 @@ DATABASES:
     read_replica:
         CONN_MAX_AGE: 0
         ENGINE: django.db.backends.mysql
-        HOST: edx.devstack.mysql57
+        HOST: edx.devstack.mysql80
         NAME: edxapp
         OPTIONS:
             isolation_level: read committed
@@ -248,7 +248,7 @@ DATABASES:
     student_module_history:
         CONN_MAX_AGE: 0
         ENGINE: django.db.backends.mysql
-        HOST: edx.devstack.mysql57
+        HOST: edx.devstack.mysql80
         NAME: edxapp_csmh
         OPTIONS:
             isolation_level: read committed
