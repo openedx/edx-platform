@@ -10,6 +10,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
 from lms.djangoapps.discussion.django_comment_client.utils import get_user_role_names, has_discussion_privileges
 from openedx.core.djangoapps.course_roles.helpers import course_permissions_list_check
+from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.django_comment_common.models import (
@@ -157,7 +158,10 @@ class IsStaffOrCourseTeamOrEnrolled(permissions.BasePermission):
             CourseInstructorRole(course_key).has_user(request.user) or
             course_permissions_list_check(
                 request.user,
-                ["moderate_discussion_forums", "moderate_discussion_forums_for_a_cohort"],
+                [
+                    CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value,
+                    CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.value
+                ],
                 course_key
             ) or
             CourseEnrollment.is_enrolled(request.user, course_key) or

@@ -4,6 +4,7 @@
 from common.djangoapps.student import auth
 from common.djangoapps.student.roles import CourseInstructorRole
 from openedx.core.djangoapps.course_roles.helpers import course_permission_check
+from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 
 
 def get_user_role(user, course_id):
@@ -20,7 +21,7 @@ def get_user_role(user, course_id):
     # afaik, this is only used in lti
     if (
         auth.user_has_role(user, CourseInstructorRole(course_id)) or
-        course_permission_check(user, "manage_all_users", course_id)
+        course_permission_check(user, CourseRolesPermission.MANAGE_ALL_USERS.value, course_id)
     ):
         return 'instructor'
     else:

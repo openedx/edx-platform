@@ -40,6 +40,7 @@ from lms.djangoapps.learner_home.serializers import LearnerDashboardSerializer
 from lms.djangoapps.learner_home.utils import get_masquerade_user
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_roles.helpers import course_or_organization_permission_check
+from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
@@ -316,7 +317,11 @@ def check_course_access(user, course_enrollments):
                 administrative_accesses_to_course_for_user(
                     user, course_enrollment.course_id
                 ) or
-                course_or_organization_permission_check(user, "view_all_content", course_enrollment.course_id)
+                course_or_organization_permission_check(
+                    user,
+                    CourseRolesPermission.VIEW_ALL_CONTENT.value,
+                    course_enrollment.course_id
+                )
             ),
         }
 

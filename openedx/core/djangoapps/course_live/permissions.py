@@ -6,6 +6,7 @@ from rest_framework.permissions import BasePermission
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
 from openedx.core.djangoapps.course_roles.helpers import course_permission_check, course_permissions_list_check_any
+from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 from openedx.core.lib.api.view_utils import validate_course_key
 
 
@@ -26,8 +27,8 @@ class IsStaffOrInstructor(BasePermission):
 
         return (
             CourseInstructorRole(course_key).has_user(request.user) or
-            CourseStaffRole(course_key).has_user(request.user) or 
-            course_permission_check(request.user, "manage_content", course_key)
+            CourseStaffRole(course_key).has_user(request.user) or
+            course_permission_check(request.user, CourseRolesPermission.MANAGE_CONTENT.value, course_key)
         )
 
 
@@ -43,7 +44,11 @@ class IsEnrolledOrStaff(BasePermission):
         if GlobalStaff().has_user(request.user):
             return True
 
-        permissions = ["view_all_content", "view_only_live_published_content", "view_all_published_content"]
+        permissions = [
+            CourseRolesPermission.VIEW_ALL_CONTENT.value,
+            CourseRolesPermission.VIEW_ONLY_LIVE_PUBLISHED_CONTENT.value,
+            CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.value
+        ]
         return (
             CourseInstructorRole(course_key).has_user(request.user) or
             CourseStaffRole(course_key).has_user(request.user) or

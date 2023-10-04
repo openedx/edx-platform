@@ -29,12 +29,14 @@ def course_permissions_list_check(user, permission_names, course_id):
     """
     return all(course_permission_check(user, permission_name, course_id) for permission_name in permission_names)
 
+
 @request_cached()
 def course_permissions_list_check_any(user, permission_names, course_id):
     """
     Check if a user has ANY of the given permissions in a course.
     """
     return any(course_permission_check(user, permission_name, course_id) for permission_name in permission_names)
+
 
 @request_cached()
 def organization_permission_check(user, permission_name, organization_name):
@@ -59,6 +61,7 @@ def organization_permissions_list_check(user, permission_names, organization_nam
     return all(
         organization_permission_check(user, permission_name, organization_name) for permission_name in permission_names
     )
+
 
 @request_cached()
 def course_or_organization_permission_check(user, permission_name, course_id, organization_name=None):

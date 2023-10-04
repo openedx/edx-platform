@@ -34,6 +34,7 @@ from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticati
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup, add_user_to_cohort, get_cohort_by_name
 from openedx.core.djangoapps.course_roles.helpers import course_permission_check
+from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.enrollments import api
 from openedx.core.djangoapps.enrollments.errors import (
@@ -670,7 +671,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             course_key = CourseKey.from_string(enrollment["course_details"]["course_id"])
             if user_has_role(request.user, CourseStaffRole(course_key)) or course_permission_check(
                 request.user,
-                "manage_users_except_admin_and_staff",
+                CourseRolesPermission.MANAGE_USERS_EXCEPT_ADMIN_AND_STAFF.value,
                 course_key
             ):
                 filtered_data.append(enrollment)

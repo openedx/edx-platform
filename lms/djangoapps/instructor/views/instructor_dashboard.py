@@ -118,14 +118,30 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
 
     course = get_course_by_id(course_key, depth=None)
 
+    permission_set = [
+        CourseRolesPermission.MANAGE_STUDENTS.value,
+        CourseRolesPermission.ACCESS_INSTRUCTOR_DASHBOARD.value
+    ]
     access = {
         'admin': request.user.is_staff,
-        'instructor': bool(has_access(request.user, 'instructor', course)) or course_permissions_list_check(request.user, ["manage_students", "access_instructor_dashboard"], course_key),
+        'instructor': (
+            bool(has_access(request.user, 'instructor', course)) or
+            course_permissions_list_check(request.user, permission_set, course_key)
+        ),
         'finance_admin': CourseFinanceAdminRole(course_key).has_user(request.user),
         'sales_admin': CourseSalesAdminRole(course_key).has_user(request.user),
-        'staff': bool(has_access(request.user, 'staff', course)) or course_permissions_list_check(request.user, ["manage_students", "access_instructor_dashboard"], course_key),
-        'forum_admin': has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR) or course_permission_check(request.user, "manage_discussion_moderators", course_key),
-        'data_researcher': request.user.has_perm(permissions.CAN_RESEARCH, course_key) or course_permission_check(request.user, "access_data_downloads", course_key),
+        'staff': (
+            bool(has_access(request.user, 'staff', course)) or
+            course_permissions_list_check(request.user, permission_set, course_key)
+        ),
+        'forum_admin': (
+            has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR) or
+            course_permission_check(request.user, CourseRolesPermission.MANAGE_DISCUSSION_MODERATORS.value, course_key)
+        ),
+        'data_researcher': (
+            request.user.has_perm(permissions.CAN_RESEARCH, course_key) or
+            course_permission_check(request.user, CourseRolesPermission.ACCESS_DATA_DOWNLOADS.value, course_key)
+        ),
     }
 
     if not request.user.has_perm(permissions.VIEW_DASHBOARD, course_key):

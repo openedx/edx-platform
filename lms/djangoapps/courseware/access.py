@@ -65,7 +65,12 @@ from xmodule.course_block import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_CA
 from xmodule.error_block import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError  # lint-amnesty, pylint: disable=wrong-import-order
 
-from openedx.core.djangoapps.course_roles.helpers import course_permission_check, course_or_organization_permission_check, course_permissions_list_check
+from openedx.core.djangoapps.course_roles.helpers import (
+    course_permission_check,
+    course_or_organization_permission_check,
+    course_permissions_list_check
+)
+from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 
 log = logging.getLogger(__name__)
 
@@ -85,7 +90,7 @@ def has_ccx_coach_role(user, course_key):
         ccx_id = course_key.ccx
         role = CourseCcxCoachRole(course_key)
 
-        if role.has_user(user) or course_permission_check(user, "manage_students", ccx_id):
+        if role.has_user(user) or course_permission_check(user, CourseRolesPermission.MANAGE_STUDENTS.value, ccx_id):
             list_ccx = CustomCourseForEdX.objects.filter(
                 course_id=course_key.to_course_locator(),
                 coach=user
@@ -175,8 +180,12 @@ def has_staff_access_to_preview_mode(user, course_key):
     A user can access a course in preview mode only if User has staff access to course.
     """
     has_admin_access_to_course = any(administrative_accesses_to_course_for_user(user, course_key))
-   
-    return has_admin_access_to_course or is_masquerading_as_student(user, course_key) or  course_or_organization_permission_check(user, "view_all_content", course_key)
+
+    return (
+        has_admin_access_to_course or
+        is_masquerading_as_student(user, course_key) or
+        course_or_organization_permission_check(user, CourseRolesPermission.VIEW_ALL_CONTENT.value, course_key)
+    )
 
 
 def _can_view_courseware_with_prerequisites(user, course):
@@ -723,7 +732,12 @@ def _has_access_to_course(user, access_level, course_key):
         return ACCESS_DENIED
 
     global_staff, staff_access, instructor_access = administrative_accesses_to_course_for_user(user, course_key)
-    permissions_access = course_or_organization_permission_check(user, "view_all_content", course_key)
+    permissions_access = course_or_organization_permission_check(
+        user,
+        CourseRolesPermission.VIEW_ALL_CONTENT.value,
+        course_key,
+        course_key.org
+    )
 
     if global_staff:
         debug("Allow: user.is_staff")
@@ -741,7 +755,7 @@ def _has_access_to_course(user, access_level, course_key):
     if instructor_access and access_level in ('staff', 'instructor'):
         debug("Allow: user has course instructor access")
         return ACCESS_GRANTED
-    
+
     if permissions_access:
         debug("Allow: user has view all content permission")
         return ACCESS_GRANTED
@@ -885,9 +899,13 @@ def is_mobile_available_for_user(user, block):
     Arguments:
         block (CourseBlock|CourseOverview): course or overview of course in question
     """
+    permissions_list = [
+        CourseRolesPermission.VIEW_ONLY_LIVE_PUBLISHED_CONTENT.value,
+        CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.value
+    ]
     return (
         auth.user_has_role(user, CourseBetaTesterRole(block.id))
-        or course_permissions_list_check(user, ["view_only_published_live_content", "view_all_published_content"], block.id)
+        or course_permissions_list_check(user, permissions_list, block.id)
         or _has_staff_access_to_block(user, block, block.id)
         or _is_block_mobile_available(block)
     )
