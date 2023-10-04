@@ -1,6 +1,8 @@
-from enum import Enum
+from enum import Enum, unique
 
 
+
+@unique
 class CourseRolesPermission(Enum):
     MANAGE_CONTENT = "manage_content"
     MANAGE_COURSE_SETTINGS = "manage_course_settings"
