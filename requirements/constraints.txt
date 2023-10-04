@@ -20,20 +20,17 @@ celery>=5.2.2,<6.0.0
 # required for celery>=5.2.0;<5.3.0
 click>=8.0,<9.0
 
-# django-storages version upgrade
-django-storages==1.13.2
-
+# each version upgrade need release notes review.
+django-storages==1.14
 
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==4.3.0
+edx-enterprise==4.5.0
 
-# 1. django-oauth-toolkit version >=2.0.0 has breaking changes. More details
-#    mentioned on this issue https://github.com/openedx/edx-platform/issues/32884
-# 2. Versions from 1.5.0 to 2.0.0 have some migrations related changes.
-#    so we're upgrading minor versions one by one.
-django-oauth-toolkit==1.5.0
+# django-oauth-toolkit version >=2.0.0 has breaking changes. More details
+# mentioned on this issue https://github.com/openedx/edx-platform/issues/32884
+django-oauth-toolkit==1.7.1
 
 
 # constrained in opaque_keys. migration guide here: https://pymongo.readthedocs.io/en/4.0/migrate-to-pymongo4.html
@@ -78,8 +75,7 @@ pylint<2.16.0 # greater version failing quality test. Fix them in seperate ticke
 # Deprecated version of the AWS SDK;
 # we should stop using this
 boto==2.39.0
-boto3==1.7.0                       # Amazon Web Services SDK for Python
-botocore==1.10.84                  # via boto3, s3transfer
+
 
 # adding these constraints to minimize boto3 and botocore changeset
 social-auth-core==4.3.0
@@ -124,11 +120,8 @@ libsass==0.10.0
 # greater version breaking upgrade builds
 click==8.1.6
 
-# openedx-events 8.6.0 introduces publishing via configuration. Ticket to unpin: https://github.com/edx/edx-arch-experiments/issues/381
-openedx-events<8.6.0               # Open edX Events from Hooks Extension Framework (OEP-50)
-
 # pinning this version to avoid updates while the library is being developed
-openedx-learning==0.1.6
+openedx-learning==0.1.7
 
 # lti-consumer-xblock 9.6.2 contains a breaking change that makes
 # existing custom parameter configurations unusable.

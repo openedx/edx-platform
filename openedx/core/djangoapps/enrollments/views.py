@@ -1066,7 +1066,9 @@ class EnrollmentAllowedView(APIView):
 
         **Example Request**
 
-        POST /api/enrollment/v1/enrollment_allowed
+        POST /api/enrollment/v1/enrollment_allowed/
+
+        Note: The URL for this request must finish with /
 
         Example request data:
         ```
@@ -1086,7 +1088,6 @@ class EnrollmentAllowedView(APIView):
         - `auto_enroll` (optional, bool: default=false, _body_)
 
         **Responses**
-        - 200: Success, enrollment allowed found.
         - 400: Bad request, missing data.
         - 403: Forbidden, you need to be staff.
         - 409: Conflict, enrollment allowed already exists.
@@ -1122,7 +1123,9 @@ class EnrollmentAllowedView(APIView):
 
         **Example Request**
 
-        DELETE /api/enrollment/v1/enrollment_allowed
+        DELETE /api/enrollment/v1/enrollment_allowed/
+
+        Note: The URL for this request must finish with /
 
         Example request data:
         ```

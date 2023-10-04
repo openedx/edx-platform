@@ -17,8 +17,8 @@ from rest_framework.test import APITestCase
 
 from common.djangoapps.student.auth import add_users, update_org_role
 from common.djangoapps.student.roles import CourseStaffRole, OrgContentCreatorRole
+from openedx.core.djangoapps.content_tagging.models import TaxonomyOrg
 from openedx.core.djangolib.testing.utils import skip_unless_cms
-from openedx.features.content_tagging.models import TaxonomyOrg
 
 User = get_user_model()
 
@@ -735,8 +735,8 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
 
         assert response.status_code == expected_status
         if status.is_success(expected_status):
-            assert len(response.data.get("results")) == len(tag_values)
-            assert set(t["value"] for t in response.data["results"]) == set(tag_values)
+            assert len(response.data) == len(tag_values)
+            assert set(t["value"] for t in response.data) == set(tag_values)
 
     @ddt.data(
         # Can't add invalid tags to a object using a closed taxonomy
@@ -803,8 +803,8 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
 
         assert response.status_code == expected_status
         if status.is_success(expected_status):
-            assert len(response.data.get("results")) == len(tag_values)
-            assert set(t["value"] for t in response.data["results"]) == set(tag_values)
+            assert len(response.data) == len(tag_values)
+            assert set(t["value"] for t in response.data) == set(tag_values)
 
     @ddt.data(
         # Can't add invalid tags to a object using a closed taxonomy
