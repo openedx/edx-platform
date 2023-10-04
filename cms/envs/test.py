@@ -142,8 +142,6 @@ COURSE_AUTHORING_MICROFRONTEND_URL = "http://course-authoring-mfe"
 DISCUSSIONS_MICROFRONTEND_URL = "http://discussions-mfe"
 
 CACHES = {
-    # This is the cache used for most things.will not work without a
-    # functioning cache -- it relies on caching to load its settings in places.
     # In staging/prod envs, the sessions also live here.
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
