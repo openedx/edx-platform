@@ -30,6 +30,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from pytz import UTC
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
 from rest_framework import status
+from rest_framework.test import APIClient
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, String
@@ -76,7 +77,10 @@ from lms.djangoapps.courseware.block_render import get_block, handle_xblock_call
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin, get_expiration_banner_text, set_preview_mode
 from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
-from lms.djangoapps.courseware.toggles import COURSEWARE_OPTIMIZED_RENDER_XBLOCK
+from lms.djangoapps.courseware.toggles import (
+    COURSEWARE_MICROFRONTEND_SEARCH_ENABLED,
+    COURSEWARE_OPTIMIZED_RENDER_XBLOCK,
+)
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.courseware.views.views import (
     BasePublicVideoXBlockView,
@@ -3683,3 +3687,41 @@ class TestPublicVideoXBlockEmbedView(TestBasePublicVideoXBlock):
             assert template == 'public_video_share_embed.html'
             assert context['fragment'] == fragment
             assert context['course'] == self.course
+
+
+class TestCoursewareMFESearchAPI(SharedModuleStoreTestCase):
+    """
+    Tests the endpoint to fetch the Courseware Search waffle flag enabled status.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.course = CourseFactory.create()
+
+        self.client = APIClient()
+        self.apiUrl = reverse('courseware_search_enabled_view', kwargs={'course_id': str(self.course.id)})
+
+    @override_waffle_flag(COURSEWARE_MICROFRONTEND_SEARCH_ENABLED, active=True)
+    def test_courseware_mfe_search_enabled(self):
+        """
+        Getter to check if user is allowed to use Courseware Search.
+        """
+
+        response = self.client.get(self.apiUrl, content_type='application/json')
+        body = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(body, {'enabled': True})
+
+    @override_waffle_flag(COURSEWARE_MICROFRONTEND_SEARCH_ENABLED, active=False)
+    def test_is_mfe_search_disabled(self):
+        """
+        Getter to check if user is allowed to use Courseware Search.
+        """
+
+        response = self.client.get(self.apiUrl, content_type='application/json')
+        body = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(body, {'enabled': False})
