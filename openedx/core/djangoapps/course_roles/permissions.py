@@ -1,3 +1,6 @@
+"""
+Permissions for course roles app.
+"""
 from enum import Enum, unique
 
 from django.utils.translation import ugettext as _
