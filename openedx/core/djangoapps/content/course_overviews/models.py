@@ -923,6 +923,10 @@ class CourseOverviewTab(models.Model):
     @classmethod
     def create_date_tab (cls,course_overview):
         existing_tab = CourseOverviewTab.objects.filter(tab_id='dates', course_overview=course_overview).exists()
+        try : 
+            CourseOverviewTab.objects.filter(tab_id='progress', course_overview=course_overview).delete()
+        except:
+            None
         if existing_tab  :
             return None
         else :
