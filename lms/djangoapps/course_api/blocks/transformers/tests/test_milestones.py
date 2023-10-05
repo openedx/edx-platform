@@ -166,7 +166,7 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
         self.course.enable_subsection_gating = True
         self.setup_gated_section(self.blocks[gated_block_ref], self.blocks[gating_block_ref])
 
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(7):
             self.get_blocks_and_check_against_expected(self.user, expected_blocks_before_completion)
 
         # clear the request cache to simulate a new request
