@@ -137,6 +137,7 @@ python3-openid ; python_version>='3'
 python3-saml
 pyuca                               # For more accurate sorting of translated country names in django-countries
 pysrt                               # Support for SubRip subtitle files, used in the video XModule
+pytest-split                        # Allows bulky test runs to be split up and ran in parallel
 pytz                                # Time zone information database
 PyYAML                              # Used to parse XModule resource templates
 redis                               # celery task broker

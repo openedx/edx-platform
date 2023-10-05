@@ -110,13 +110,13 @@ boto==2.39.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-boto3==1.28.58
+boto3==1.28.60
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.31.58
+botocore==1.31.60
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -258,7 +258,7 @@ dill==0.3.7
     # via pylint
 distlib==0.3.7
     # via virtualenv
-django==3.2.21
+django==3.2.22
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.txt
@@ -589,7 +589,7 @@ edx-enterprise==4.5.0
     #   -r requirements/edx/base.txt
 edx-event-bus-kafka==5.5.0
     # via -r requirements/edx/base.txt
-edx-event-bus-redis==0.3.1
+edx-event-bus-redis==0.3.2
     # via -r requirements/edx/base.txt
 edx-i18n-tools==1.2.0
     # via
@@ -663,7 +663,7 @@ edx-when==2.4.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring
-edxval==2.4.3
+edxval==2.4.4
     # via -r requirements/edx/base.txt
 elasticsearch==7.13.4
     # via
@@ -683,6 +683,7 @@ event-tracking==2.2.0
     #   edx-search
 exceptiongroup==1.1.3
     # via
+    #   -r requirements/edx/base.txt
     #   anyio
     #   pytest
 execnet==2.0.2
@@ -693,7 +694,7 @@ faker==19.6.2
     # via factory-boy
 fastapi==0.103.2
     # via pact-python
-fastavro==1.8.3
+fastavro==1.8.4
     # via
     #   -r requirements/edx/base.txt
     #   openedx-events
@@ -777,7 +778,9 @@ inflection==0.5.1
     #   drf-spectacular
     #   drf-yasg
 iniconfig==2.0.0
-    # via pytest
+    # via
+    #   -r requirements/edx/base.txt
+    #   pytest
 interchange==2021.0.4
     # via
     #   -r requirements/edx/base.txt
@@ -981,7 +984,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.0.3
     # via -r requirements/edx/base.txt
-openedx-events==8.8.0
+openedx-events==8.9.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-event-bus-kafka
@@ -1053,7 +1056,7 @@ pkgutil-resolve-name==1.3.10
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
-platformdirs==3.8.1
+platformdirs==3.11.0
     # via
     #   -r requirements/edx/base.txt
     #   pylint
@@ -1061,6 +1064,7 @@ platformdirs==3.8.1
     #   virtualenv
 pluggy==1.3.0
     # via
+    #   -r requirements/edx/base.txt
     #   -r requirements/edx/coverage.txt
     #   diff-cover
     #   pytest
@@ -1196,6 +1200,7 @@ pysrt==1.1.2
     #   edxval
 pytest==7.4.2
     # via
+    #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
     #   pylint-pytest
     #   pytest-attrib
@@ -1204,6 +1209,7 @@ pytest==7.4.2
     #   pytest-json-report
     #   pytest-metadata
     #   pytest-randomly
+    #   pytest-split
     #   pytest-xdist
 pytest-attrib==0.1.3
     # via -r requirements/edx/testing.in
@@ -1219,6 +1225,8 @@ pytest-metadata==1.8.0
     #   pytest-json-report
 pytest-randomly==3.15.0
     # via -r requirements/edx/testing.in
+pytest-split==0.8.1
+    # via -r requirements/edx/base.txt
 pytest-xdist[psutil]==3.3.1
     # via -r requirements/edx/testing.in
 python-dateutil==2.8.2
@@ -1298,7 +1306,7 @@ referencing==0.30.2
     #   -r requirements/edx/base.txt
     #   jsonschema
     #   jsonschema-specifications
-regex==2023.8.8
+regex==2023.10.3
     # via
     #   -r requirements/edx/base.txt
     #   nltk
@@ -1332,16 +1340,16 @@ requests-oauthlib==1.3.1
     #   social-auth-core
 rfc3986[idna2008]==1.5.0
     # via httpx
-rpds-py==0.10.3
+rpds-py==0.10.4
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
     #   referencing
-ruamel-yaml==0.17.33
+ruamel-yaml==0.17.35
     # via
     #   -r requirements/edx/base.txt
     #   drf-yasg
-ruamel-yaml-clib==0.2.7
+ruamel-yaml-clib==0.2.8
     # via
     #   -r requirements/edx/base.txt
     #   ruamel-yaml
@@ -1426,7 +1434,7 @@ sniffio==1.3.0
     #   anyio
     #   httpcore
     #   httpx
-snowflake-connector-python==3.2.0
+snowflake-connector-python==3.2.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -1441,7 +1449,7 @@ social-auth-core==4.3.0
     #   -r requirements/edx/base.txt
     #   edx-auth-backends
     #   social-auth-app-django
-sorl-thumbnail==12.9.0
+sorl-thumbnail==12.10.0
     # via
     #   -r requirements/edx/base.txt
     #   openedx-django-wiki
@@ -1493,6 +1501,7 @@ tinycss2==1.1.1
     #   bleach
 tomli==2.0.1
     # via
+    #   -r requirements/edx/base.txt
     #   coverage
     #   import-linter
     #   pylint
@@ -1573,7 +1582,7 @@ vine==5.0.0
     #   amqp
     #   celery
     #   kombu
-virtualenv==20.24.1
+virtualenv==20.24.5
     # via tox
 voluptuous==0.13.1
     # via
@@ -1633,7 +1642,7 @@ xblock-google-drive==0.4.0
     # via -r requirements/edx/base.txt
 xblock-poll==1.13.0
     # via -r requirements/edx/base.txt
-xblock-utils==3.4.1
+xblock-utils==4.0.0
     # via
     #   -r requirements/edx/base.txt
     #   done-xblock
