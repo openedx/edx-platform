@@ -10,12 +10,13 @@ from celery_utils.logged_task import LoggedTask
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from edx_django_utils.monitoring import set_code_owner_attribute
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.keys import LearningContextKey, UsageKey
 from openedx_tagging.core.tagging.models import Taxonomy
 
 from xmodule.modulestore.django import modulestore
 
 from . import api
+from .types import ContentKey
 
 LANGUAGE_TAXONOMY_ID = -1
 
@@ -23,53 +24,32 @@ log = logging.getLogger(__name__)
 User = get_user_model()
 
 
-def _has_taxonomy(taxonomy: Taxonomy, content_object: CourseKey | UsageKey) -> bool:
-    """
-    Return True if this Taxonomy have some Tag set in the content_object
-    """
-    _exausted = object()
-
-    content_tags = api.get_content_tags(object_id=str(content_object), taxonomy_id=taxonomy.id)
-    return next(content_tags, _exausted) is not _exausted
-
-
-def _set_initial_language_tag(content_object: CourseKey | UsageKey, lang: str) -> None:
+def _set_initial_language_tag(content_key: ContentKey, lang_code: str) -> None:
     """
     Create a tag for the language taxonomy in the content_object if it doesn't exist.
+
+    lang_code is the two-letter language code, optionally with country suffix.
 
     If the language is not configured in the plataform or the language tag doesn't exist,
     use the default language of the platform.
     """
-    lang_taxonomy = Taxonomy.objects.get(pk=LANGUAGE_TAXONOMY_ID)
+    lang_taxonomy = Taxonomy.objects.get(pk=LANGUAGE_TAXONOMY_ID).cast()
 
-    if lang and not _has_taxonomy(lang_taxonomy, content_object):
-        tags = api.get_tags(lang_taxonomy)
-        is_language_configured = any(lang_code == lang for lang_code, _ in settings.LANGUAGES) is not None
-        if not is_language_configured:
+    if lang_code and not api.get_content_tags(object_key=content_key, taxonomy_id=lang_taxonomy.id).exists():
+        try:
+            lang_tag = lang_taxonomy.tag_for_external_id(lang_code)
+        except api.oel_tagging.TagDoesNotExist:
+            default_lang_code = settings.LANGUAGE_CODE
             logging.warning(
                 "Language not configured in the plataform: %s. Using default language: %s",
-                lang,
-                settings.LANGUAGE_CODE,
+                lang_code,
+                default_lang_code,
             )
-            lang = settings.LANGUAGE_CODE
-
-        lang_tag = next((tag for tag in tags if tag.external_id == lang), None)
-        if lang_tag is None:
-            if not is_language_configured:
-                logging.error(
-                    "Language tag not found for default language: %s. Skipping", lang
-                )
-                return
-
-            logging.warning(
-                "Language tag not found for language: %s. Using default language: %s", lang, settings.LANGUAGE_CODE
-            )
-            lang_tag = next(tag for tag in tags if tag.external_id == settings.LANGUAGE_CODE)
-
-        api.tag_content_object(lang_taxonomy, [lang_tag.id], content_object)
+            lang_tag = lang_taxonomy.tag_for_external_id(default_lang_code)
+        api.tag_content_object(content_key, lang_taxonomy, [lang_tag.value])
 
 
-def _delete_tags(content_object: CourseKey | UsageKey) -> None:
+def _delete_tags(content_object: ContentKey) -> None:
     api.delete_object_tags(str(content_object))
 
 
@@ -84,14 +64,14 @@ def update_course_tags(course_key_str: str) -> bool:
         course_key_str (str): identifier of the Course
     """
     try:
-        course_key = CourseKey.from_string(course_key_str)
+        course_key = LearningContextKey.from_string(course_key_str)
 
         log.info("Updating tags for Course with id: %s", course_key)
 
         course = modulestore().get_course(course_key)
         if course:
-            lang = course.language
-            _set_initial_language_tag(course_key, lang)
+            lang_code = course.language
+            _set_initial_language_tag(course_key, lang_code)
 
         return True
     except Exception as e:  # pylint: disable=broad-except
@@ -109,7 +89,7 @@ def delete_course_tags(course_key_str: str) -> bool:
         course_key_str (str): identifier of the Course
     """
     try:
-        course_key = CourseKey.from_string(course_key_str)
+        course_key = LearningContextKey.from_string(course_key_str)
 
         log.info("Deleting tags for Course with id: %s", course_key)
 
@@ -140,11 +120,11 @@ def update_xblock_tags(usage_key_str: str) -> bool:
             course = modulestore().get_course(usage_key.course_key)
             if course is None:
                 return True
-            lang = course.language
+            lang_code = course.language
         else:
             return True
 
-        _set_initial_language_tag(usage_key, lang)
+        _set_initial_language_tag(usage_key, lang_code)
 
         return True
     except Exception as e:  # pylint: disable=broad-except
