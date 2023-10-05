@@ -70,11 +70,10 @@ def handle_exam_reset(sender, signal, **kwargs):
             delete_module=True,
         )
     except (StudentModule.DoesNotExist, enrollment.sub_api.SubmissionError):
-        err_msg = (
+        log.error(
             'Error occurred while attempting to reset module state for user_id '
             f'{student.id} for content_id {content_id}.'
         )
-        log.error(err_msg)
 
     # In some cases, reset_student_attempts does not clear the entire exam's completion state.
     # One example of this is an exam with multiple units (verticals) within it and the learner
