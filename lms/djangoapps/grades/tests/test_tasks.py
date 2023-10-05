@@ -210,7 +210,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         )
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 2, 41),
+        (ModuleStoreEnum.Type.split, 2, 43),
     )
     @ddt.unpack
     def test_persistent_grades_on_course(self, default_store, num_mongo_queries, num_sql_queries):
