@@ -501,3 +501,71 @@ class ShowCorrectness:
 
         # else: show_correctness == cls.ALWAYS
         return True
+
+
+class ShowAnswer:
+    """
+    Helper class for determining whether an answer is currently hidden for a block.
+
+    When an answer is hidden, this limits the user's access to it.
+    """
+
+    # Constants used to indicate when to show an answer
+    ALWAYS = "always"
+    ANSWERED = "answered"
+    ATTEMPTED = "attempted"
+    CLOSED = "closed"
+    FINISHED = "finished"
+    CORRECT_OR_PAST_DUE = "correct_or_past_due"
+    PAST_DUE = "past_due"
+    NEVER = "never"
+    AFTER_SOME_NUMBER_OF_ATTEMPTS = "after_attempts"
+    AFTER_ALL_ATTEMPTS = "after_all_attempts"
+    AFTER_ALL_ATTEMPTS_OR_CORRECT = "after_all_attempts_or_correct"
+    ATTEMPTED_NO_PAST_DUE = "attempted_no_past_due"
+
+    @classmethod
+    def answer_available(
+            cls, show_answer='', show_correctness='', past_due=False, attempts=0,
+            is_attempted=False, is_correct=False, required_attempts=0,
+            max_attempts=0, used_all_attempts=False, closed=False,
+            has_staff_access=False):
+        """
+        Returns whether correctness is available now, for the given attributes.
+        """
+        if not show_correctness:
+            # If correctness is being withheld, then don't show answers either.
+            return False
+        elif show_answer == cls.NEVER:
+            return False
+        elif has_staff_access:
+            # This is after the 'never' check because course staff can see correctness
+            # unless the sequence/problem explicitly prevents it
+            return True
+        elif show_answer == cls.ATTEMPTED:
+            return is_attempted or past_due
+        elif show_answer == cls.ANSWERED:
+            # NOTE: this is slightly different from 'attempted' -- resetting the problems
+            # makes lcp.done False, but leaves attempts unchanged.
+            return is_correct
+        elif show_answer == cls.CLOSED:
+            return closed
+        elif show_answer == cls.FINISHED:
+            return closed or is_correct
+        elif show_answer == cls.CORRECT_OR_PAST_DUE:
+            return is_correct or past_due
+        elif show_answer == cls.PAST_DUE:
+            return past_due
+        elif show_answer == cls.AFTER_SOME_NUMBER_OF_ATTEMPTS:
+            if max_attempts and required_attempts >= max_attempts:
+                required_attempts = max_attempts
+            return attempts >= required_attempts
+        elif show_answer == cls.ALWAYS:
+            return True
+        elif show_answer == cls.AFTER_ALL_ATTEMPTS:
+            return used_all_attempts
+        elif show_answer == cls.AFTER_ALL_ATTEMPTS_OR_CORRECT:
+            return used_all_attempts or is_correct
+        elif show_answer == cls.ATTEMPTED_NO_PAST_DUE:
+            return is_attempted
+        return False
