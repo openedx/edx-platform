@@ -8,7 +8,7 @@ from unittest.mock import patch
 from django.core.management import call_command
 from django.test import override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag
-from openedx_tagging.core.tagging.models import ObjectTag, Tag, Taxonomy
+from openedx_tagging.core.tagging.models import LanguageTaxonomy, Tag, Taxonomy
 from organizations.models import Organization
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -16,8 +16,9 @@ from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 
 from .. import api
-from ..models import ContentLanguageTaxonomy, TaxonomyOrg
+from ..models import TaxonomyOrg
 from ..toggles import CONTENT_TAGGING_AUTO
+from ..types import ContentKey
 
 LANGUAGE_TAXONOMY_ID = -1
 
@@ -31,13 +32,16 @@ class TestAutoTagging(ModuleStoreTestCase):
 
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
-    def _check_tag(self, object_id: str, taxonomy_id: int, value: str | None):
+    def _check_tag(self, object_key: ContentKey, taxonomy_id: int, value: str | None):
         """
         Check if the ObjectTag exists for the given object_id and taxonomy_id
 
         If value is None, check if the ObjectTag does not exists
         """
-        object_tag = ObjectTag.objects.filter(object_id=object_id, taxonomy_id=taxonomy_id).first()
+        object_tags = api.get_content_tags(object_key, taxonomy_id=taxonomy_id)
+        object_tag = object_tags[0] if len(object_tags) == 1 else None
+        if len(object_tags) > 1:
+            raise ValueError("Found too many object tags")
         if value is None:
             assert not object_tag, f"Expected no tag for taxonomy_id={taxonomy_id}, " \
                 f"but one found with value={object_tag.value}"
@@ -52,13 +56,9 @@ class TestAutoTagging(ModuleStoreTestCase):
         # Run fixtures to create the system defined tags
         call_command("loaddata", "--app=oel_tagging", "language_taxonomy.yaml")
 
-        # Configure language taxonomy
-        language_taxonomy = Taxonomy.objects.get(id=-1)
-        language_taxonomy.taxonomy_class = ContentLanguageTaxonomy
-        language_taxonomy.save()
-
         # Enable Language taxonomy for all orgs
-        TaxonomyOrg.objects.create(id=-1, taxonomy=language_taxonomy, org=None)
+        language_taxonomy = LanguageTaxonomy.objects.get(id=LANGUAGE_TAXONOMY_ID)
+        TaxonomyOrg.objects.create(taxonomy=language_taxonomy, org=None)
 
         super().setUpClass()
 
@@ -80,13 +80,13 @@ class TestAutoTagging(ModuleStoreTestCase):
             "test_course",
             "test_run",
             self.user_id,
-            fields={"language": "pt"},
+            fields={"language": "pl"},
         )
 
         # Check if the tags are created in the Course
-        assert self._check_tag(course.id, LANGUAGE_TAXONOMY_ID, "Portuguese")
+        assert self._check_tag(course.id, LANGUAGE_TAXONOMY_ID, "Polski")
 
-    @override_settings(LANGUAGE_CODE='pt')
+    @override_settings(LANGUAGE_CODE='pt-br')
     def test_create_course_invalid_language(self):
         # Create course
         course = self.store.create_course(
@@ -98,26 +98,10 @@ class TestAutoTagging(ModuleStoreTestCase):
         )
 
         # Check if the tags are created in the Course is the system default
-        assert self._check_tag(course.id, LANGUAGE_TAXONOMY_ID, "Portuguese")
+        assert self._check_tag(course.id, LANGUAGE_TAXONOMY_ID, "Português (Brasil)")
 
-    @override_settings(LANGUAGES=[('pt', 'Portuguese')], LANGUAGE_CODE='pt')
+    @override_settings(LANGUAGES=[('pt', 'Portuguese')], LANGUAGE_DICT={'pt': 'Portuguese'}, LANGUAGE_CODE='pt')
     def test_create_course_unsuported_language(self):
-        # Create course
-        course = self.store.create_course(
-            self.orgA.short_name,
-            "test_course",
-            "test_run",
-            self.user_id,
-            fields={"language": "en"},
-        )
-
-        # Check if the tags are created in the Course is the system default
-        assert self._check_tag(course.id, LANGUAGE_TAXONOMY_ID, "Portuguese")
-
-    @override_settings(LANGUAGE_CODE='pt')
-    def test_create_course_no_tag_language(self):
-        # Remove English tag
-        Tag.objects.filter(taxonomy_id=LANGUAGE_TAXONOMY_ID, value="English").delete()
         # Create course
         course = self.store.create_course(
             self.orgA.short_name,
@@ -153,19 +137,19 @@ class TestAutoTagging(ModuleStoreTestCase):
             "test_course",
             "test_run",
             self.user_id,
-            fields={"language": "pt"},
+            fields={"language": "pt-br"},
         )
 
         # Simulates user manually changing a tag
         lang_taxonomy = Taxonomy.objects.get(pk=LANGUAGE_TAXONOMY_ID)
-        api.tag_content_object(lang_taxonomy, ["Spanish"], course.id)
+        api.tag_content_object(course.id, lang_taxonomy, ["Español (España)"])
 
         # Update course language
         course.language = "en"
         self.store.update_item(course, self.user_id)
 
         # Does not automatically update the tag
-        assert self._check_tag(course.id, LANGUAGE_TAXONOMY_ID, "Spanish")
+        assert self._check_tag(course.id, LANGUAGE_TAXONOMY_ID, "Español (España)")
 
     def test_create_delete_xblock(self):
         # Create course
@@ -174,7 +158,7 @@ class TestAutoTagging(ModuleStoreTestCase):
             "test_course",
             "test_run",
             self.user_id,
-            fields={"language": "pt"},
+            fields={"language": "pt-br"},
         )
 
         # Create XBlocks
@@ -184,7 +168,7 @@ class TestAutoTagging(ModuleStoreTestCase):
         usage_key_str = str(vertical.location)
 
         # Check if the tags are created in the XBlock
-        assert self._check_tag(usage_key_str, LANGUAGE_TAXONOMY_ID, "Portuguese")
+        assert self._check_tag(usage_key_str, LANGUAGE_TAXONOMY_ID, "Português (Brasil)")
 
         # Delete the XBlock
         self.store.delete_item(vertical.location, self.user_id)

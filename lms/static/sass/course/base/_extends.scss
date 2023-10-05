@@ -30,7 +30,7 @@ h1.top-header {
 }
 
 .light-button,
-a.light-button, // only used in askbot as classes
+a.light-button,
 .gray-button {
   @include simple($gray-l5);
 

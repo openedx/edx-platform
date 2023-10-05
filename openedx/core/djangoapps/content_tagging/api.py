@@ -3,15 +3,15 @@ Content Tagging APIs
 """
 from __future__ import annotations
 
-from typing import Iterator, List, Type
+from typing import Iterator
 
 import openedx_tagging.core.tagging.api as oel_tagging
-from django.db.models import QuerySet
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from django.db.models import Q, QuerySet, Exists, OuterRef
 from openedx_tagging.core.tagging.models import Taxonomy
 from organizations.models import Organization
 
-from .models import ContentObjectTag, ContentTaxonomy, TaxonomyOrg
+from .models import ContentObjectTag, TaxonomyOrg
+from .types import ContentKey
 
 
 def create_taxonomy(
@@ -21,12 +21,9 @@ def create_taxonomy(
     required=False,
     allow_multiple=False,
     allow_free_text=False,
-    taxonomy_class: Type = ContentTaxonomy,
 ) -> Taxonomy:
     """
     Creates, saves, and returns a new Taxonomy with the given attributes.
-
-    If `taxonomy_class` not provided, then uses ContentTaxonomy.
     """
     return oel_tagging.create_taxonomy(
         name=name,
@@ -35,14 +32,13 @@ def create_taxonomy(
         required=required,
         allow_multiple=allow_multiple,
         allow_free_text=allow_free_text,
-        taxonomy_class=taxonomy_class,
     )
 
 
 def set_taxonomy_orgs(
     taxonomy: Taxonomy,
     all_orgs=False,
-    orgs: List[Organization] = None,
+    orgs: list[Organization] = None,
     relationship: TaxonomyOrg.RelType = TaxonomyOrg.RelType.OWNER,
 ):
     """
@@ -81,7 +77,7 @@ def set_taxonomy_orgs(
 
 def get_taxonomies_for_org(
     enabled=True,
-    org_owner: Organization = None,
+    org_owner: Organization | None = None,
 ) -> QuerySet:
     """
     Generates a list of the enabled Taxonomies available for the given org, sorted by name.
@@ -94,32 +90,38 @@ def get_taxonomies_for_org(
     If you want the disabled Taxonomies, pass enabled=False.
     If you want all Taxonomies (both enabled and disabled), pass enabled=None.
     """
-    taxonomies = oel_tagging.get_taxonomies(enabled=enabled)
-    return ContentTaxonomy.taxonomies_for_org(
-        org=org_owner,
-        queryset=taxonomies,
+    org_short_name = org_owner.short_name if org_owner else None
+    return oel_tagging.get_taxonomies(enabled=enabled).filter(
+        Exists(
+            TaxonomyOrg.get_relationships(
+                taxonomy=OuterRef("pk"),
+                rel_type=TaxonomyOrg.RelType.OWNER,
+                org_short_name=org_short_name,
+            )
+        )
     )
 
 
 def get_content_tags(
-    object_id: str, taxonomy_id: str = None
+    object_key: ContentKey,
+    taxonomy_id: str | None = None,
 ) -> Iterator[ContentObjectTag]:
     """
     Generates a list of content tags for a given object.
 
     Pass taxonomy to limit the returned object_tags to a specific taxonomy.
     """
-    for object_tag in oel_tagging.get_object_tags(
-        object_id=object_id,
+    return oel_tagging.get_object_tags(
+        object_id=str(object_key),
         taxonomy_id=taxonomy_id,
-    ):
-        yield ContentObjectTag.cast(object_tag)
+        object_tag_class=ContentObjectTag,
+    )
 
 
 def tag_content_object(
+    object_key: ContentKey,
     taxonomy: Taxonomy,
     tags: list,
-    object_id: CourseKey | UsageKey,
 ) -> list[ContentObjectTag]:
     """
     This is the main API to use when you want to add/update/delete tags from a content object (e.g. an XBlock or
@@ -136,14 +138,18 @@ def tag_content_object(
     Raises ValueError if the proposed tags are invalid for this taxonomy.
     Preserves existing (valid) tags, adds new (valid) tags, and removes omitted (or invalid) tags.
     """
-    content_tags = []
-    for object_tag in oel_tagging.tag_object(
+    if not taxonomy.system_defined:
+        # We require that this taxonomy is linked to the content object's "org" or linked to "all orgs" (None):
+        org_short_name = object_key.org
+        if not taxonomy.taxonomyorg_set.filter(Q(org__short_name=org_short_name) | Q(org=None)).exists():
+            raise ValueError(f"The specified Taxonomy is not enabled for the content object's org ({org_short_name})")
+    oel_tagging.tag_object(
         taxonomy=taxonomy,
         tags=tags,
-        object_id=str(object_id),
-    ):
-        content_tags.append(ContentObjectTag.cast(object_tag))
-    return content_tags
+        object_id=str(object_key),
+        object_tag_class=ContentObjectTag,
+    )
+    return get_content_tags(str(object_key), taxonomy_id=taxonomy.id)
 
 
 # Expose the oel_tagging APIs

@@ -215,9 +215,13 @@ class ProgramDetailsView extends Backbone.View {
             && this.remainingCourseCollection.length === 0
         );
 
+        const isSubscriptionActiveSunsetting = (
+            this.subscriptionModel.get('subscriptionState') === 'active'
+        )
+
         return (
             this.options.isUserB2CSubscriptionsEnabled
-            && this.options.programData.subscription_eligible
+            && isSubscriptionActiveSunsetting
             && !programPurchasedWithoutSubscription
         );
     }
