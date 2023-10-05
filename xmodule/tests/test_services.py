@@ -3,10 +3,12 @@ Tests for SettingsService
 """
 import unittest
 from unittest import mock
+from datetime import datetime, timedelta
 
 import pytest
 from django.test import TestCase
 import ddt
+from pytz import UTC
 
 from config_models.models import ConfigurationModel
 from django.conf import settings
@@ -14,7 +16,8 @@ from django.test.utils import override_settings
 from xblock.runtime import Mixologist
 
 from opaque_keys.edx.locator import CourseLocator
-from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService
+from xmodule.graders import ShowCorrectness
+from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService, ProblemFeedbackService
 from openedx.core.lib.teams_config import TeamsConfig
 
 
@@ -163,3 +166,82 @@ class TestTeamsConfigurationService(ConfigurationServiceBaseClass):
     def test_get_teamsconfiguration(self):
         teams_config = self.configuration_service.get_teams_configuration(self.course.id)
         assert teams_config == self.teams_config
+
+
+@ddt.ddt
+class TestProblemFeedbackService(unittest.TestCase):
+    """
+    Tests the correctness_available method
+    """
+
+    def setUp(self):
+        super().setUp()
+        self._xblock = mock.MagicMock()
+        now = datetime.now(UTC)
+        day_delta = timedelta(days=1)
+        self.yesterday = now - day_delta
+        self.today = now
+        self.tomorrow = now + day_delta
+
+    def test_show_correctness_default(self):
+        """
+        Test that correctness is visible by default.
+        """
+        assert ProblemFeedbackService(self._xblock).correctness_available()
+
+    @ddt.data(
+        (ShowCorrectness.ALWAYS, True),
+        (ShowCorrectness.ALWAYS, False),
+        # Any non-constant values behave like "always"
+        ('', True),
+        ('', False),
+        ('other-value', True),
+        ('other-value', False),
+    )
+    @ddt.unpack
+    def test_show_correctness_always(self, show_correctness, has_staff_access):
+        """
+        Test that correctness is visible when show_correctness is turned on.
+        """
+        self._xblock.show_correctness = show_correctness
+        assert ProblemFeedbackService(self._xblock, user_is_staff=has_staff_access).correctness_available()
+
+    @ddt.data(True, False)
+    def test_show_correctness_never(self, has_staff_access):
+        """
+        Test that show_correctness="never" hides correctness from learners and course staff.
+        """
+        self._xblock.show_correctness = ShowCorrectness.NEVER
+        assert not ProblemFeedbackService(self._xblock, user_is_staff=has_staff_access).correctness_available()
+
+    @ddt.data(
+        # Correctness not visible to learners if due date in the future
+        ('tomorrow', False, False),
+        # Correctness is visible to learners if due date in the past
+        ('yesterday', False, True),
+        # Correctness is visible to learners if due date in the past (just)
+        ('today', False, True),
+        # Correctness is visible to learners if there is no due date
+        (None, False, True),
+        # Correctness is visible to staff if due date in the future
+        ('tomorrow', True, True),
+        # Correctness is visible to staff if due date in the past
+        ('yesterday', True, True),
+        # Correctness is visible to staff if there is no due date
+        (None, True, True),
+    )
+    @ddt.unpack
+    def test_show_correctness_past_due(self, due_date_str, has_staff_access, expected_result):
+        """
+        Test show_correctness="past_due" to ensure:
+        * correctness is always visible to course staff
+        * correctness is always visible to everyone if there is no due date
+        * correctness is visible to learners after the due date, when there is a due date.
+        """
+        self._xblock.show_correctness = ShowCorrectness.PAST_DUE
+        if due_date_str is None:
+            self._xblock.due = None
+        else:
+            self._xblock.due = getattr(self, due_date_str)
+        assert ProblemFeedbackService(self._xblock, user_is_staff=has_staff_access).correctness_available() ==\
+               expected_result

@@ -21,7 +21,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore.django import XBlockI18nService, modulestore
 from xmodule.partitions.partitions_service import PartitionService
-from xmodule.services import SettingsService, TeamsConfigurationService
+from xmodule.services import SettingsService, TeamsConfigurationService, ProblemFeedbackService
 from xmodule.studio_editable import has_author_view
 from xmodule.util.sandboxing import SandboxService
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment
@@ -212,7 +212,8 @@ def _prepare_runtime_for_preview(request, block):
         "teams_configuration": TeamsConfigurationService(),
         "sandbox": SandboxService(contentstore=contentstore, course_id=course_id),
         "cache": CacheService(cache),
-        'replace_urls': ReplaceURLService
+        'replace_urls': ReplaceURLService,
+        "problem_feedback": partial(ProblemFeedbackService, user_is_staff=True),
     }
 
     block.runtime.get_block_for_descriptor = partial(_load_preview_block, request)
