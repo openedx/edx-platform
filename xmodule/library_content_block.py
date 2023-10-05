@@ -15,14 +15,18 @@ from django.utils.functional import classproperty
 from lazy import lazy
 from lxml import etree
 from lxml.etree import XMLSyntaxError
+from mako.template import Template as MakoTemplate
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
+from pkg_resources import resource_string
 from rest_framework import status
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.fields import Boolean, Integer, List, Scope, String
+from xblockutils.resources import ResourceLoader
+from xblockutils.studio_editable import StudioEditableXBlockMixin
 
 from xmodule.capa.responsetypes import registry
 from xmodule.mako_block import MakoTemplateBlockBase
@@ -43,9 +47,9 @@ from xmodule.x_module import (
 _ = lambda text: text
 
 logger = logging.getLogger(__name__)
+loader = ResourceLoader(__name__)
 
 ANY_CAPA_TYPE_VALUE = 'any'
-
 
 def _get_human_name(problem_class):
     """
@@ -71,8 +75,8 @@ def _get_capa_types():
 @XBlock.wants('user')
 @XBlock.needs('mako')
 class LibraryContentBlock(
+    StudioEditableXBlockMixin,
     MakoTemplateBlockBase,
-    XmlMixin,
     XModuleToXBlockMixin,
     ResourceTemplates,
     XModuleMixin,
@@ -87,6 +91,8 @@ class LibraryContentBlock(
     any particular student.
     """
     # pylint: disable=abstract-method
+
+    editable_fields = ("candidates",)
     has_children = True
     has_author_view = True
 
@@ -96,6 +102,87 @@ class LibraryContentBlock(
     studio_js_module_name = "VerticalDescriptor"
 
     show_in_read_only_mode = True
+
+    resources_dir = 'assets/library_content'
+
+    preview_view_js = {
+        'js': [],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+    }
+    preview_view_css = {
+        'scss': [],
+    }
+    mako_template = 'widgets/metadata-edit.html'
+    studio_js_module_name = "VerticalDescriptor"
+    studio_view_js = {
+        'js': [
+            resource_string(__name__, 'js/src/vertical/edit.js'),
+        ],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+    }
+    studio_view_css = {
+        'scss': [],
+    }
+
+    display_name = String(
+        display_name=_("Display Name"),
+        help=_("The display name for this component."),
+        default="Library Reference Block",
+        scope=Scope.settings,
+    )
+    source_library_id = String(
+        display_name=_("Library"),
+        help=_("Select the library from which you want to draw content."),
+        scope=Scope.settings,
+        values_provider=lambda instance: instance.source_library_values(),
+    )
+    source_library_version = String(
+        # This is a hidden field that stores the version of source_library when we last pulled content from it
+        display_name=_("Library Version"),
+        scope=Scope.settings,
+    )
+    max_count = Integer(
+        display_name=_("Count"),
+        help=_("Enter the number of components to display to each student. Set it to -1 to display all components."),
+        default=-1,
+        scope=Scope.settings,
+    )
+    capa_type = String(
+        display_name=_("Problem Type"),
+        help=_('Choose a problem type to fetch from the library. If "Any Type" is selected no filtering is applied.'),
+        default=ANY_CAPA_TYPE_VALUE,
+        values=_get_capa_types(),
+        scope=Scope.settings,
+    )
+    candidates = List(
+        # This is a list of (block_type, block_id) tuples used to record the set of blocks
+        # which are candidates for the selected list.
+        display_name=_("Manually Selected Blocks"),
+        default=[],
+        scope=Scope.settings,
+    )
+    selected = List(
+        # This is a list of (block_type, block_id) tuples used to record
+        # which set of matching blocks was selected per user
+        default=[],
+        scope=Scope.user_state,
+    )
+    shuffle = Boolean(
+         default=True,
+         scope=Scope.settings,
+    )
+    manual = Boolean(
+         default=False,
+         scope=Scope.settings,
+    )
+    # This cannot be called `show_reset_button`, because children blocks inherit this as a default value.
+    allow_resetting_children = Boolean(
+        display_name=_("Show Reset Button"),
+        help=_("Determines whether a 'Reset Problems' button is shown, so users may reset their answers and reshuffle "
+               "selected items."),
+        scope=Scope.settings,
+        default=False
+    )
 
     # noinspection PyMethodParameters
     @classproperty
@@ -110,62 +197,6 @@ class LibraryContentBlock(
 
         return XBlockCompletionMode.AGGREGATOR
 
-    display_name = String(
-        display_name=_("Display Name"),
-        help=_("The display name for this component."),
-        default="Randomized Content Block",
-        scope=Scope.settings,
-    )
-    source_library_id = String(
-        display_name=_("Library"),
-        help=_("Select the library from which you want to draw content."),
-        scope=Scope.settings,
-        values_provider=lambda instance: instance.source_library_values(),
-    )
-    source_library_version = String(
-        # This is a hidden field that stores the version of source_library when we last pulled content from it
-        display_name=_("Library Version"),
-        scope=Scope.settings,
-    )
-    mode = String(
-        display_name=_("Mode"),
-        help=_("Determines how content is drawn from the library"),
-        default="random",
-        values=[
-            {"display_name": _("Choose n at random"), "value": "random"}
-            # Future addition: Choose a new random set of n every time the student refreshes the block, for self tests
-            # Future addition: manually selected blocks
-        ],
-        scope=Scope.settings,
-    )
-    max_count = Integer(
-        display_name=_("Count"),
-        help=_("Enter the number of components to display to each student. Set it to -1 to display all components."),
-        default=1,
-        scope=Scope.settings,
-    )
-    capa_type = String(
-        display_name=_("Problem Type"),
-        help=_('Choose a problem type to fetch from the library. If "Any Type" is selected no filtering is applied.'),
-        default=ANY_CAPA_TYPE_VALUE,
-        values=_get_capa_types(),
-        scope=Scope.settings,
-    )
-    selected = List(
-        # This is a list of (block_type, block_id) tuples used to record
-        # which random/first set of matching blocks was selected per user
-        default=[],
-        scope=Scope.user_state,
-    )
-    # This cannot be called `show_reset_button`, because children blocks inherit this as a default value.
-    allow_resetting_children = Boolean(
-        display_name=_("Show Reset Button"),
-        help=_("Determines whether a 'Reset Problems' button is shown, so users may reset their answers and reshuffle "
-               "selected items."),
-        scope=Scope.settings,
-        default=False
-    )
-
     @property
     def source_library_key(self):
         """
@@ -178,69 +209,14 @@ class LibraryContentBlock(
         except InvalidKeyError:
             return LibraryLocatorV2.from_string(self.source_library_id)
 
-    @classmethod
-    def make_selection(cls, selected, children, max_count, mode):
-        """
-        Dynamically selects block_ids indicating which of the possible children are displayed to the current user.
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super().non_editable_metadata_fields
+        non_editable_fields.extend([
+            LibraryContentBlock.source_library_version,
+        ])
+        return non_editable_fields
 
-        Arguments:
-            selected - list of (block_type, block_id) tuples assigned to this student
-            children - children of this block
-            max_count - number of components to display to each student
-            mode - how content is drawn from the library
-
-        Returns:
-            A dict containing the following keys:
-
-            'selected' (set) of (block_type, block_id) tuples assigned to this student
-            'invalid' (set) of dropped (block_type, block_id) tuples that are no longer valid
-            'overlimit' (set) of dropped (block_type, block_id) tuples that were previously selected
-            'added' (set) of newly added (block_type, block_id) tuples
-        """
-        rand = random.Random()
-
-        selected_keys = {tuple(k) for k in selected}  # set of (block_type, block_id) tuples assigned to this student
-
-        # Determine which of our children we will show:
-        valid_block_keys = {(c.block_type, c.block_id) for c in children}
-
-        # Remove any selected blocks that are no longer valid:
-        invalid_block_keys = (selected_keys - valid_block_keys)
-        if invalid_block_keys:
-            selected_keys -= invalid_block_keys
-
-        # If max_count has been decreased, we may have to drop some previously selected blocks:
-        overlimit_block_keys = set()
-        if len(selected_keys) > max_count:
-            num_to_remove = len(selected_keys) - max_count
-            overlimit_block_keys = set(rand.sample(selected_keys, num_to_remove))
-            selected_keys -= overlimit_block_keys
-
-        # Do we have enough blocks now?
-        num_to_add = max_count - len(selected_keys)
-
-        added_block_keys = None
-        if num_to_add > 0:
-            # We need to select [more] blocks to display to this user:
-            pool = valid_block_keys - selected_keys
-            if mode == "random":
-                num_to_add = min(len(pool), num_to_add)
-                added_block_keys = set(rand.sample(pool, num_to_add))
-                # We now have the correct n random children to show for this user.
-            else:
-                raise NotImplementedError("Unsupported mode.")
-            selected_keys |= added_block_keys
-
-        if any((invalid_block_keys, overlimit_block_keys, added_block_keys)):
-            selected = list(selected_keys)
-            random.shuffle(selected)
-
-        return {
-            'selected': selected,
-            'invalid': invalid_block_keys,
-            'overlimit': overlimit_block_keys,
-            'added': added_block_keys,
-        }
 
     def _publish_event(self, event_name, result, **kwargs):
         """
@@ -255,6 +231,61 @@ class LibraryContentBlock(
         event_data.update(kwargs)
         self.runtime.publish(self, f"edx.librarycontentblock.content.{event_name}", event_data)
         self._last_event_result_count = len(result)  # pylint: disable=attribute-defined-outside-init
+
+    @classmethod
+    def _get_valid_children(self, library_children, candidates, manual):
+        """
+        Dynamically selects block_ids which children are possible for selection
+        """
+        if candidates and manual:
+            print("candididates found brother")
+            print(candidates)
+            return candidates
+        return {(child.block_type, child.block_id) for child in library_children}
+
+    @classmethod
+    def make_selection(self, selected, library_children, candidates, max_count, manual, shuffle):
+        """
+        Dynamically selects block_ids indicating which of the possible children are displayed to the current user.
+        The blocks returned are kept consistent for a user,
+        unless changes have been made to the library's contents or the settings of the block.
+        Returns:
+            A dict containing the following keys:
+            'selected' (set) of (block_type, block_id) tuples assigned to this student
+            'invalid' (set) of dropped (block_type, block_id) tuples that are no longer valid
+            'overlimit' (set) of dropped (block_type, block_id) tuples that were previously selected
+            'added' (set) of newly added (block_type, block_id) tuples
+        """
+        old_selected = set(tuple(k) for k in selected)
+        valid_block_keys = self._get_valid_children(library_children, candidates, manual)
+        valid_old_block_keys = valid_block_keys.intersection(old_selected)
+        valid_additions = valid_block_keys.difference(valid_old_block_keys)
+        new_selected = set()
+        overlimit_block_keys = []
+        size = max_count if len(valid_block_keys) >= max_count else len(valid_block_keys)
+
+        if shuffle:
+            #determine how many blocks need to be added or removed.
+            vaccancies_in_selected = size - len(valid_old_block_keys) if size > 0 else len(valid_block_keys)-len(valid_old_block_keys)
+            if vaccancies_in_selected < 0:
+                new_selected = list(valid_old_block_keys)[0:size]
+                overlimit_block_keys = list(valid_old_block_keys)[size:]
+            else:
+                if not manual:
+                    new_selected = list(valid_old_block_keys) + random.sample(valid_additions,vaccancies_in_selected)
+                else:
+                    new_selected = list(valid_old_block_keys) + list(valid_additions)[0:vaccancies_in_selected]
+                if new_selected != old_selected:
+                    random.shuffle(new_selected)
+        else:
+            new_selected = list(valid_block_keys)[:size]
+        return {
+            'selected': new_selected,
+            'invalid': list(old_selected.difference(set(new_selected))),
+            'overlimit': overlimit_block_keys,
+            'added': list(set(new_selected)-old_selected),
+        }
+
 
     @classmethod
     def publish_selected_children_events(cls, block_keys, format_block_keys, publish_event):
@@ -326,8 +357,9 @@ class LibraryContentBlock(
         if max_count < 0:
             max_count = len(self.children)
 
-        block_keys = self.make_selection(self.selected, self.children, max_count, "random")  # pylint: disable=no-member
+        block_keys = self.make_selection(self.selected, self.children, self.candidates, self.max_count, self.manual, self.shuffle)
 
+        print(block_keys)
         # Publish events for analytics purposes:
         lib_tools = self.runtime.service(self, 'library_tools')
         format_block_keys = lambda keys: lib_tools.create_block_analytics_summary(self.location.course_key, keys)
@@ -370,13 +402,19 @@ class LibraryContentBlock(
         Generator returning XBlock instances of the children selected for the
         current user.
         """
+        print("_get_selected_child_blocks")
         for block_type, block_id in self.selected_children():
             yield self.runtime.get_block(self.location.course_key.make_usage_key(block_type, block_id))
 
     def student_view(self, context):  # lint-amnesty, pylint: disable=missing-function-docstring
+        """
+        Renders the view that learners see.
+        """
         fragment = Fragment()
         contents = []
         child_context = {} if not context else copy(context)
+
+        logger.error(f'hello world foralbe{self.get_children}')
 
         for child in self._get_selected_child_blocks():
             if child is None:
@@ -415,6 +453,9 @@ class LibraryContentBlock(
         Normal studio view: If block is properly configured, displays library status summary
         Studio container view: displays a preview of all possible children.
         """
+        print("NORBITS")
+        print(self.get_children)
+        print(self.get_children())
         fragment = Fragment()
         root_xblock = context.get('root_xblock')
         is_root = root_xblock and root_xblock.location == self.location
@@ -425,15 +466,11 @@ class LibraryContentBlock(
                 max_count = self.max_count
                 if max_count < 0:
                     max_count = len(self.children)
-
-                fragment.add_content(self.runtime.service(self, 'mako').render_cms_template(
-                    "library-block-author-preview-header.html", {
-                        'max_count': max_count,
-                        'display_name': self.display_name or self.url_name,
-                    }))
+                context = {} if not context else copy(context)
                 context['can_edit_visibility'] = False
                 context['can_move'] = False
                 context['can_collapse'] = True
+                context['selectable'] = True
                 self.render_children(context, fragment, can_reorder=False, can_add=False)
         # else: When shown on a unit page, don't show any sort of preview -
         # just the status of this block in the validation area.
@@ -446,33 +483,16 @@ class LibraryContentBlock(
 
     def studio_view(self, _context):
         """
-        Return the studio view.
+        Render a form for editing this XBlock
         """
         fragment = Fragment(
-            self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
+            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
         )
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit_helpers.js'))
-        add_webpack_js_to_fragment(fragment, 'LibraryContentBlockEditor')
+        add_webpack_js_to_fragment(fragment, 'LibraryContentBlockStudio')
         shim_xmodule_js(fragment, self.studio_js_module_name)
+
         return fragment
-
-    def get_child_blocks(self):
-        """
-        Return only the subset of our children relevant to the current student.
-        """
-        return list(self._get_selected_child_blocks())
-
-    @property
-    def non_editable_metadata_fields(self):
-        non_editable_fields = super().non_editable_metadata_fields
-        # The only supported mode is currently 'random'.
-        # Add the mode field to non_editable_metadata_fields so that it doesn't
-        # render in the edit form.
-        non_editable_fields.extend([
-            LibraryContentBlock.mode,
-            LibraryContentBlock.source_library_version,
-        ])
-        return non_editable_fields
 
     @lazy
     def tools(self):
@@ -492,6 +512,39 @@ class LibraryContentBlock(
         else:
             user_id = None
         return user_id
+
+    def render_children(self, context, fragment, can_reorder=False, can_add=False):
+        """
+        Renders the children of the module with HTML appropriate for Studio. If can_reorder is True,
+        then the children will be rendered to support drag and drop.
+        """
+        contents = []
+        for child in self.get_children():  # pylint: disable=no-member
+            if can_reorder:
+                context['reorderable_items'].add(child.location)
+            context['can_add'] = can_add
+            context['is_selected'] = str(child.location) in self.candidates
+            rendered_child = child.render(StudioEditableBlock.get_preview_view_name(child), context)
+            fragment.add_fragment_resources(rendered_child)
+
+            contents.append({
+                'id': str(child.location),
+                'content': rendered_child.content
+            })
+
+        fragment.add_content(self.runtime.service(self, 'mako').render_template("studio_render_children_view.html", {  # pylint: disable=no-member
+            'items': contents,
+            'xblock_context': context,
+            'can_add': can_add,
+            'can_reorder': can_reorder,
+        }))
+
+    @XBlock.handler
+    def get_block_ids(self, request, suffix=''):  # lint-amnesty, pylint: disable=unused-argument
+        """
+        Return source_block_ids for selection.
+        """
+        return Response(json.dumps({'source_block_ids': self.candidates}))
 
     @XBlock.handler
     def refresh_children(self, request=None, suffix=None):  # lint-amnesty, pylint: disable=unused-argument

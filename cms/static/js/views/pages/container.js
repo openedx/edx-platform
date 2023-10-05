@@ -53,7 +53,7 @@ function($, _, Backbone, gettext, BasePage,
         initialize: function(options) {
             BasePage.prototype.initialize.call(this, options);
             this.viewClass = options.viewClass || this.defaultViewClass;
-            this.isLibraryPage = (this.model.attributes.category === 'library');
+            this.isLibraryPage = (this.model.attributes.category === 'library_content');
             this.nameEditor = new XBlockStringFieldEditor({
                 el: this.$('.wrapper-xblock-field'),
                 model: this.model
@@ -107,7 +107,11 @@ function($, _, Backbone, gettext, BasePage,
                     model: this.model
                 });
                 this.unitOutlineView.render();
-
+            }
+            if (this.isLibraryPage) {
+                this.selectedLibraryComponents = [];
+                this.storedSelectedLibraryComponents = [];
+                this.getSelectedLibraryComponents();
             }
 
             this.listenTo(Backbone, 'move:onXBlockMoved', this.onXBlockMoved);
@@ -592,7 +596,6 @@ function($, _, Backbone, gettext, BasePage,
         getSelectedLibraryComponents: function() {
             var self = this;
             var locator = this.$el.find('.studio-xblock-wrapper').data('locator');
-            console.log(ModuleUtils);
             $.getJSON(
                 ModuleUtils.getUpdateUrl(locator) + '/handler/get_block_ids',
                 function(data) {
@@ -608,7 +611,7 @@ function($, _, Backbone, gettext, BasePage,
             e.preventDefault();
             $.postJSON(
                 ModuleUtils.getUpdateUrl(locator) + '/handler/submit_studio_edits',
-                {values: {source_block_ids: self.storedSelectedLibraryComponents}},
+                {values: {candidates: self.storedSelectedLibraryComponents}},
                 function() {
                     self.selectedLibraryComponents = Array.from(self.storedSelectedLibraryComponents);
                     self.toggleSaveButton();
@@ -618,6 +621,7 @@ function($, _, Backbone, gettext, BasePage,
 
         toggleLibraryComponent: function(event) {
             var componentId = $(event.target).closest('.studio-xblock-wrapper').data('locator');
+
             var storeIndex = this.storedSelectedLibraryComponents.indexOf(componentId);
             if (storeIndex > -1) {
                 this.storedSelectedLibraryComponents.splice(storeIndex, 1);
@@ -626,6 +630,7 @@ function($, _, Backbone, gettext, BasePage,
                 this.storedSelectedLibraryComponents.push(componentId);
                 this.toggleSaveButton();
             }
+            console.log(this.storedSelectedLibraryComponents);
         },
 
         toggleSaveButton: function() {

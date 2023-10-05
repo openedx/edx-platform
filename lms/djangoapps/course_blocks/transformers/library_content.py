@@ -83,7 +83,8 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
             if library_children:
                 all_library_children.update(library_children)
                 selected = []
-                mode = block_structure.get_xblock_field(block_key, 'mode')
+                shuffle = block_structure.get_xblock_field(block_key, 'shuffle')
+                manual = block_structure.get_xblock_field(block_key, 'manual')
                 max_count = block_structure.get_xblock_field(block_key, 'max_count')
                 if max_count < 0:
                     max_count = len(library_children)
@@ -98,9 +99,12 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                     if usage_key in library_children:
                         selected.append(selected_block)
 
+                #Get "canidate" blocks which have been manually selected
+                candidates = state_dict.get('candidates', [])
+
                 # Update selected
                 previous_count = len(selected)
-                block_keys = LibraryContentBlock.make_selection(selected, library_children, max_count, mode)
+                block_keys = LibraryContentBlock.make_selection(selected, library_children,candidates, max_count, manual, shuffle)
                 selected = block_keys['selected']
 
                 # Save back any changes
