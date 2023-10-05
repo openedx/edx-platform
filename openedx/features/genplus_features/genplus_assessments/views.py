@@ -1,4 +1,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
+
+import json
+
 import io
 import os
 import six
@@ -20,6 +23,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.staticfiles import finders
 from django.urls import reverse
 from django.views.decorators.csrf import ensure_csrf_cookie
+from openedx.features.genplus_features.genplus_assessments.api.v1.views import SkillReflectionIndividualApiView
 from web_fragments.fragment import Fragment
 
 from lms.djangoapps.courseware.courses import get_course_with_access
@@ -67,6 +71,8 @@ class AssessmentReportPDFView(TemplateView):
         if not gen_user:
             raise PermissionDenied()
 
+        skill_reflection_data = SkillReflectionIndividualApiView.as_view()(request, user_id=self.request.user.id)
+
         if gen_user.is_student:
             user_id = self.request.user.id
             student = gen_user.student
@@ -82,6 +88,7 @@ class AssessmentReportPDFView(TemplateView):
             raise PermissionDenied()
 
         context = self.get_context_data(user_id, student, **kwargs)
+        context.update(skill_reflection_data=json.dumps(skill_reflection_data.data))
 
         if 'html' in request.GET:
             # Output HTML

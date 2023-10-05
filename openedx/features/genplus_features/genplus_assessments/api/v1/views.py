@@ -521,7 +521,7 @@ class SaveRatingResponseApiView(views.APIView):
 class ProgramFilterMixin(views.APIView):
     def get_program_queryset(self):
         program_id = self.request.GET.get('program_id')
-        program_ids = [program_id]
+        program_ids = [program_id] if program_id else []
         if program_id is None and self.kwargs.get('class_id'):
             class_id = self.kwargs['class_id']
             gen_class = Class.objects.prefetch_related('students').get(pk=class_id)
@@ -529,7 +529,8 @@ class ProgramFilterMixin(views.APIView):
 
         qs = Program.get_active_programs()
 
-        qs = qs.filter(id__in=program_ids)
+        if program_ids:
+            qs = qs.filter(id__in=program_ids)
         return qs
 
 
@@ -539,7 +540,7 @@ class SkillReflectionApiView(ProgramFilterMixin):
 
     def get(self, request, **kwargs):
         class_id = kwargs['class_id']
-        skills = self.get_program_queryset().values_list('units__skill__name', flat=True).distinct().all()
+        skills = list(self.get_program_queryset().values_list('units__skill__name', flat=True).distinct().all())
         courses = self.get_program_queryset().values_list('units__course', flat=True).all()
         likert_questions = SkillAssessmentQuestion.objects.filter(
             start_unit__in=courses,
@@ -567,7 +568,7 @@ class SkillReflectionIndividualApiView(ProgramFilterMixin):
 
     def get(self, request, **kwargs):
         user_id = kwargs['user_id']
-        skills = self.get_program_queryset().values_list('units__skill__name', flat=True).distinct().all()
+        skills = list(self.get_program_queryset().values_list('units__skill__name', flat=True).distinct().all())
         courses = self.get_program_queryset().values_list('units__course', flat=True).all()
         likert_questions = SkillAssessmentQuestion.objects.filter(
             start_unit__in=courses,
