@@ -272,7 +272,8 @@ class LibraryUpdateChildrenTask(UserTask):  # pylint: disable=abstract-method
 
 
 @shared_task(base=LibraryUpdateChildrenTask, bind=True)
-@set_code_owner_attribute
+# Note: The decorator @set_code_owner_attribute cannot be used here because the UserTaskMixin
+#   does stack inspection and can't handle additional decorators.
 def update_children_task(self, user_id, dest_block_key, version=None):
     """
     Update xBlock's children.
