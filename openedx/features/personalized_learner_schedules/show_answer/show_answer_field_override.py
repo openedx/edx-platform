@@ -5,7 +5,7 @@ new Show Answer values that remove the Past Due check (keeping the rest intact)
 
 from lms.djangoapps.courseware.field_overrides import FieldOverrideProvider
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
-from xmodule.capa_block import SHOWANSWER  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.graders import ShowAnswer
 
 
 class ShowAnswerFieldOverride(FieldOverrideProvider):
@@ -27,11 +27,11 @@ class ShowAnswerFieldOverride(FieldOverrideProvider):
             return default
 
         mapping = {
-            SHOWANSWER.ATTEMPTED: SHOWANSWER.ATTEMPTED_NO_PAST_DUE,
-            SHOWANSWER.CLOSED: SHOWANSWER.AFTER_ALL_ATTEMPTS,
-            SHOWANSWER.CORRECT_OR_PAST_DUE: SHOWANSWER.ANSWERED,
-            SHOWANSWER.FINISHED: SHOWANSWER.AFTER_ALL_ATTEMPTS_OR_CORRECT,
-            SHOWANSWER.PAST_DUE: SHOWANSWER.NEVER,
+            ShowAnswer.ATTEMPTED: ShowAnswer.ATTEMPTED_NO_PAST_DUE,
+            ShowAnswer.CLOSED: ShowAnswer.AFTER_ALL_ATTEMPTS,
+            ShowAnswer.CORRECT_OR_PAST_DUE: ShowAnswer.ANSWERED,
+            ShowAnswer.FINISHED: ShowAnswer.AFTER_ALL_ATTEMPTS_OR_CORRECT,
+            ShowAnswer.PAST_DUE: ShowAnswer.NEVER,
         }
         current_show_answer_value = self.fallback_field_data.get(block, 'showanswer')
 
