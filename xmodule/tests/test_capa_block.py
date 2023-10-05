@@ -36,9 +36,10 @@ from xmodule.capa.correctmap import CorrectMap
 from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
 from xmodule.capa.xqueue_interface import XQueueInterface
 from xmodule.capa_block import ComplexEncoder, ProblemBlock
+from xmodule.graders import ShowAnswer
 from xmodule.tests import DATA_DIR
 
-from ..capa_block import RANDOMIZATION, SHOWANSWER
+from ..capa_block import RANDOMIZATION
 from . import get_test_system
 
 
@@ -564,7 +565,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         """
         # Can not see "Show Answer" when student answer is wrong
         answer_wrong = CapaFactory.create(
-            showanswer=SHOWANSWER.ANSWERED,
+            showanswer=ShowAnswer.ANSWERED,
             max_attempts="1",
             attempts="0",
             due=self.tomorrow_str,
@@ -574,7 +575,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         # Expect to see "Show Answer" when answer is correct
         answer_correct = CapaFactory.create(
-            showanswer=SHOWANSWER.ANSWERED,
+            showanswer=ShowAnswer.ANSWERED,
             max_attempts="1",
             attempts="0",
             due=self.tomorrow_str,

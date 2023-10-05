@@ -41,7 +41,7 @@ from xmodule.capa.util import convert_files_to_filenames, get_inner_html_from_xp
 from xmodule.contentstore.django import contentstore
 from xmodule.editing_block import EditingMixin
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.graders import ShowCorrectness
+from xmodule.graders import ShowCorrectness, ShowAnswer
 from xmodule.raw_block import RawMixin
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_css_to_fragment
 from xmodule.util.sandboxing import SandboxService
@@ -74,22 +74,8 @@ except ImproperlyConfigured:
     FEATURES = {}
 
 
-class SHOWANSWER:
-    """
-    Constants for when to show answer
-    """
-    ALWAYS = "always"
-    ANSWERED = "answered"
-    ATTEMPTED = "attempted"
-    CLOSED = "closed"
-    FINISHED = "finished"
-    CORRECT_OR_PAST_DUE = "correct_or_past_due"
-    PAST_DUE = "past_due"
-    NEVER = "never"
-    AFTER_SOME_NUMBER_OF_ATTEMPTS = "after_attempts"
-    AFTER_ALL_ATTEMPTS = "after_all_attempts"
-    AFTER_ALL_ATTEMPTS_OR_CORRECT = "after_all_attempts_or_correct"
-    ATTEMPTED_NO_PAST_DUE = "attempted_no_past_due"
+# Left for backwards compatibility
+SHOWANSWER = ShowAnswer
 
 
 class GRADING_METHOD:
@@ -132,6 +118,7 @@ class Randomization(String):
 @XBlock.needs('cache')
 @XBlock.needs('sandbox')
 @XBlock.needs('replace_urls')
+@XBlock.needs('problem_feedback')
 @XBlock.wants('call_to_action')
 class _BuiltInProblemBlock(
     ScorableXBlockMixin,
@@ -230,20 +217,20 @@ class _BuiltInProblemBlock(
         help=_("Defines when to show the answer to the problem. "
                "A default value can be set in Advanced Settings."),
         scope=Scope.settings,
-        default=SHOWANSWER.FINISHED,
+        default=ShowAnswer.FINISHED,
         values=[
-            {"display_name": _("Always"), "value": SHOWANSWER.ALWAYS},
-            {"display_name": _("Answered"), "value": SHOWANSWER.ANSWERED},
-            {"display_name": _("Attempted or Past Due"), "value": SHOWANSWER.ATTEMPTED},
-            {"display_name": _("Closed"), "value": SHOWANSWER.CLOSED},
-            {"display_name": _("Finished"), "value": SHOWANSWER.FINISHED},
-            {"display_name": _("Correct or Past Due"), "value": SHOWANSWER.CORRECT_OR_PAST_DUE},
-            {"display_name": _("Past Due"), "value": SHOWANSWER.PAST_DUE},
-            {"display_name": _("Never"), "value": SHOWANSWER.NEVER},
-            {"display_name": _("After Some Number of Attempts"), "value": SHOWANSWER.AFTER_SOME_NUMBER_OF_ATTEMPTS},
-            {"display_name": _("After All Attempts"), "value": SHOWANSWER.AFTER_ALL_ATTEMPTS},
-            {"display_name": _("After All Attempts or Correct"), "value": SHOWANSWER.AFTER_ALL_ATTEMPTS_OR_CORRECT},
-            {"display_name": _("Attempted"), "value": SHOWANSWER.ATTEMPTED_NO_PAST_DUE},
+            {"display_name": _("Always"), "value": ShowAnswer.ALWAYS},
+            {"display_name": _("Answered"), "value": ShowAnswer.ANSWERED},
+            {"display_name": _("Attempted or Past Due"), "value": ShowAnswer.ATTEMPTED},
+            {"display_name": _("Closed"), "value": ShowAnswer.CLOSED},
+            {"display_name": _("Finished"), "value": ShowAnswer.FINISHED},
+            {"display_name": _("Correct or Past Due"), "value": ShowAnswer.CORRECT_OR_PAST_DUE},
+            {"display_name": _("Past Due"), "value": ShowAnswer.PAST_DUE},
+            {"display_name": _("Never"), "value": ShowAnswer.NEVER},
+            {"display_name": _("After Some Number of Attempts"), "value": ShowAnswer.AFTER_SOME_NUMBER_OF_ATTEMPTS},
+            {"display_name": _("After All Attempts"), "value": ShowAnswer.AFTER_ALL_ATTEMPTS},
+            {"display_name": _("After All Attempts or Correct"), "value": ShowAnswer.AFTER_ALL_ATTEMPTS_OR_CORRECT},
+            {"display_name": _("Attempted"), "value": ShowAnswer.ATTEMPTED_NO_PAST_DUE},
         ]
     )
     attempts_before_showanswer_button = Integer(
@@ -1438,25 +1425,19 @@ class _BuiltInProblemBlock(
 
     def used_all_attempts(self):
         """ All attempts have been used """
-        return self.max_attempts is not None and self.attempts >= self.max_attempts
+        return self.runtime.service(self, 'problem_feedback').used_all_attempts()
 
     def is_past_due(self):
         """
         Is it now past this problem's due date, including grace period?
         """
-        return (self.close_date is not None and
-                datetime.datetime.now(utc) > self.close_date)
+        return self.runtime.service(self, 'problem_feedback').is_past_due()
 
     def closed(self):
         """
         Is the student still allowed to submit answers?
         """
-        if self.used_all_attempts():
-            return True
-        if self.is_past_due():
-            return True
-
-        return False
+        return self.runtime.service(self, 'problem_feedback').closed()
 
     def is_submitted(self):
         """
@@ -1475,7 +1456,7 @@ class _BuiltInProblemBlock(
 
         used by conditional block
         """
-        return self.attempts > 0
+        return self.runtime.service(self, 'problem_feedback').is_attempted()
 
     def is_correct(self):
         """
@@ -1489,47 +1470,7 @@ class _BuiltInProblemBlock(
         """
         Is the user allowed to see an answer?
         """
-        user_is_staff = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
-        if not self.correctness_available():
-            # If correctness is being withheld, then don't show answers either.
-            return False
-        elif self.showanswer == '':
-            return False
-        elif self.showanswer == SHOWANSWER.NEVER:
-            return False
-        elif user_is_staff:
-            # This is after the 'never' check because admins can see the answer
-            # unless the problem explicitly prevents it
-            return True
-        elif self.showanswer == SHOWANSWER.ATTEMPTED:
-            return self.is_attempted() or self.is_past_due()
-        elif self.showanswer == SHOWANSWER.ANSWERED:
-            # NOTE: this is slightly different from 'attempted' -- resetting the problems
-            # makes lcp.done False, but leaves attempts unchanged.
-            return self.is_correct()
-        elif self.showanswer == SHOWANSWER.CLOSED:
-            return self.closed()
-        elif self.showanswer == SHOWANSWER.FINISHED:
-            return self.closed() or self.is_correct()
-
-        elif self.showanswer == SHOWANSWER.CORRECT_OR_PAST_DUE:
-            return self.is_correct() or self.is_past_due()
-        elif self.showanswer == SHOWANSWER.PAST_DUE:
-            return self.is_past_due()
-        elif self.showanswer == SHOWANSWER.AFTER_SOME_NUMBER_OF_ATTEMPTS:
-            required_attempts = self.attempts_before_showanswer_button
-            if self.max_attempts and required_attempts >= self.max_attempts:
-                required_attempts = self.max_attempts
-            return self.attempts >= required_attempts
-        elif self.showanswer == SHOWANSWER.ALWAYS:
-            return True
-        elif self.showanswer == SHOWANSWER.AFTER_ALL_ATTEMPTS:
-            return self.used_all_attempts()
-        elif self.showanswer == SHOWANSWER.AFTER_ALL_ATTEMPTS_OR_CORRECT:
-            return self.used_all_attempts() or self.is_correct()
-        elif self.showanswer == SHOWANSWER.ATTEMPTED_NO_PAST_DUE:
-            return self.is_attempted()
-        return False
+        return self.runtime.service(self, 'problem_feedback').answer_available()
 
     def correctness_available(self):
         """
@@ -1537,12 +1478,7 @@ class _BuiltInProblemBlock(
 
         Limits access to the correct/incorrect flags, messages, and problem score.
         """
-        user_is_staff = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
-        return ShowCorrectness.correctness_available(
-            show_correctness=self.show_correctness,
-            due_date=self.close_date,
-            has_staff_access=user_is_staff,
-        )
+        return self.runtime.service(self, 'problem_feedback').correctness_available()
 
     def update_score(self, data):
         """

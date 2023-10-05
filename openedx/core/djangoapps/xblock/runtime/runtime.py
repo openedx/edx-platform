@@ -25,7 +25,7 @@ from xblock.runtime import IdReader, KvsFieldData, MemoryIdManager, Runtime
 from xmodule.errortracker import make_error_tracker
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import XBlockI18nService
-from xmodule.services import EventPublishingService, RebindUserService
+from xmodule.services import EventPublishingService, RebindUserService, ProblemFeedbackService
 from xmodule.util.sandboxing import SandboxService
 from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.static_replace.services import ReplaceURLService
@@ -341,6 +341,8 @@ class XBlockRuntime(RuntimeShim, Runtime):
             return EnrollmentsService()
         elif service_name == 'error_tracker':
             return make_error_tracker()
+        elif service_name == 'problem_feedback':
+            return ProblemFeedbackService(block=block, user_is_staff=self.user.is_staff)  # type: ignore
 
         # Otherwise, fall back to the base implementation which loads services
         # defined in the constructor:
