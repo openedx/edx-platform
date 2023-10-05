@@ -48,6 +48,7 @@ def import_blocks_from_course(import_task_id, course_key_str):
     """
     A Celery task to import blocks from a course through modulestore.
     """
+    _assert_cms()
 
     course_key = CourseKey.from_string(course_key_str)
 
@@ -203,6 +204,7 @@ def import_from_blockstore(user_id, store, dest_block, blockstore_block_ids):
     content library) into modulestore, as a new child of dest_block.
     Any existing children of dest_block are replaced.
     """
+    _assert_cms()
     dest_key = dest_block.scope_ids.usage_id
     if not isinstance(dest_key, BlockUsageLocator):
         raise TypeError(f"Destination {dest_key} should be a modulestore course.")
@@ -287,6 +289,7 @@ def update_children_task(self, user_id, dest_block_key, version=None):
     if dest_block is up to date or not.
     """
     set_code_owner_attribute_from_module(__name__)
+    _assert_cms()
     store = modulestore()
     dest_block_id = BlockUsageLocator.from_string(dest_block_key)
     dest_block = store.get_item(dest_block_id)
@@ -351,3 +354,20 @@ def get_import_task_is_in_progress(dest_block_key):
     task_status = UserTaskStatus.objects.filter(name=name).order_by('-created').first()
     if task_status:
         return task_status.state == UserTaskStatus.IN_PROGRESS
+
+
+def _assert_cms():
+   """
+   Raise an assertion error if this function is run in the context of LMS.
+
+   Several functions in this file manage the copying/updating of blocks in modulestore
+   and blockstore. These operations should only be performed within the context of CMS.
+   However, due to existing edx-platform code structure, we've had to define the functions
+   in shared source tree (openedx/) and the tasks are registered in both LMS and CMS.
+
+   A longer-term solution to this issue would be to move the content_libraries app to cms:
+   https://github.com/openedx/edx-platform/issues/33428
+   """
+   assert settings.ROOT_URLCONF == 'cms.urls', (
+       "Content library block operations must be performed in a CMS context!"
+   )
