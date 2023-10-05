@@ -1,5 +1,5 @@
 """
-Tests for the xblock view of the Studio Content API. This tests only the view itself,
+Tests for the xblock view of the CMS API. This tests only the view itself,
 not the underlying Xblock service.
 It checks that the xblock_handler method of the Xblock service is called with the expected parameters.
 """
@@ -38,7 +38,7 @@ class XBlockViewTestCase(AuthorizeStaffTestCase):
 
     def get_url(self, _course_id=None):
         return reverse(
-            "cms.djangoapps.contentstore:v1:studio_content",
+            "cms.djangoapps.contentstore:v1:cms_api_xblock",
             kwargs=self.get_url_params(),
         )
 
@@ -50,7 +50,7 @@ class XBlockViewTestCase(AuthorizeStaffTestCase):
         return_value=JsonResponse(
             {
                 "locator": TEST_LOCATOR,
-                "courseKey": AuthorizeStaffTestCase.get_course_key_string(),
+                "course_key": AuthorizeStaffTestCase.get_course_key_string(),
             }
         ),
     )
@@ -128,7 +128,6 @@ class XBlockViewGetTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data["locator"] == TEST_LOCATOR
-        assert data["courseKey"] == self.get_course_key_string()
 
 
 class XBlockViewPostTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
@@ -141,7 +140,7 @@ class XBlockViewPostTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
 
     def get_url(self, _course_id=None):
         return reverse(
-            "cms.djangoapps.contentstore:v1:studio_content",
+            "cms.djangoapps.contentstore:v1:cms_api_create_xblock",
             kwargs=self.get_url_params(),
         )
 
@@ -150,7 +149,6 @@ class XBlockViewPostTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
         return {
             "parent_locator": course_id,
             "category": "html",
-            "courseKey": course_id,
         }
 
     def assert_xblock_handler_called(self, *, mock_handle_xblock, response):
@@ -161,9 +159,6 @@ class XBlockViewPostTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
         mock_handle_xblock.assert_called_once()
         passed_args = mock_handle_xblock.call_args[0][0]
 
-        course_id = self.get_course_key_string()
-
-        assert passed_args.data.get("courseKey") == course_id
         assert passed_args.method == "POST"
         assert passed_args.path == self.get_url()
 
@@ -187,7 +182,6 @@ class XBlockViewPostTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data["locator"] == TEST_LOCATOR
-        assert data["courseKey"] == self.get_course_key_string()
 
 
 class XBlockViewPutTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
@@ -196,10 +190,8 @@ class XBlockViewPutTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
     """
 
     def get_test_data(self):
-        course_id = self.get_course_key_string()
         return {
             "category": "html",
-            "courseKey": course_id,
             "data": "<p>Updated block!</p>",
             "has_changes": True,
             "id": TEST_LOCATOR,
@@ -216,9 +208,6 @@ class XBlockViewPutTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
         mock_handle_xblock.assert_called_once()
         passed_args = mock_handle_xblock.call_args[0][0]
 
-        course_id = self.get_course_key_string()
-
-        assert passed_args.data.get("courseKey") == course_id
         assert passed_args.data.get("data") == "<p>Updated block!</p>"
         assert passed_args.data.get("id") == TEST_LOCATOR
         assert passed_args.method == "PUT"
@@ -244,7 +233,6 @@ class XBlockViewPutTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data["locator"] == TEST_LOCATOR
-        assert data["courseKey"] == self.get_course_key_string()
 
 
 class XBlockViewPatchTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
@@ -253,10 +241,8 @@ class XBlockViewPatchTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
     """
 
     def get_test_data(self):
-        course_id = self.get_course_key_string()
         return {
             "category": "html",
-            "courseKey": course_id,
             "data": "<p>Patched block!</p>",
             "has_changes": True,
             "id": TEST_LOCATOR,
@@ -273,9 +259,6 @@ class XBlockViewPatchTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
         mock_handle_xblock.assert_called_once()
         passed_args = mock_handle_xblock.call_args[0][0]
 
-        course_id = self.get_course_key_string()
-
-        assert passed_args.data.get("courseKey") == course_id
         assert passed_args.data.get("data") == "<p>Patched block!</p>"
         assert passed_args.data.get("id") == TEST_LOCATOR
         assert passed_args.method == "PATCH"
@@ -301,7 +284,6 @@ class XBlockViewPatchTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data["locator"] == TEST_LOCATOR
-        assert data["courseKey"] == self.get_course_key_string()
 
 
 class XBlockViewDeleteTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
@@ -343,4 +325,3 @@ class XBlockViewDeleteTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase)
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data["locator"] == TEST_LOCATOR
-        assert data["courseKey"] == self.get_course_key_string()

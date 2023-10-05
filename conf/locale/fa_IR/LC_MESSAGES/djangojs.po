@@ -88,7 +88,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-08-27 20:42+0000\n"
+"POT-Creation-Date: 2023-09-17 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: SeyedMahdi Saeid <saeid@edspirit.com>, 2023\n"
 "Language-Team: Persian (Iran) (http://app.transifex.com/open-edx/edx-platform/language/fa_IR/)\n"
@@ -98,16 +98,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Generated-By: Babel 2.8.0\n"
-
-#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
-#: cms/static/js/views/video_transcripts.js
-#: xmodule/assets/library_source_block/public/js/library_source_block.js
-msgid ""
-"This may be happening because of an error with our server or your internet "
-"connection. Try refreshing the page or making sure you are online."
-msgstr ""
-"عامل این اتفاق ممکن است سرور ما یا اتصال شما به اینترنت باشد. بار دیگر صفحه "
-"را باز کنید و یا از اتصال به اینترنت اطمینان حاصل نمایید."
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -120,7 +110,6 @@ msgstr ""
 #: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/tabs.js
 #: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
 #: lms/static/js/views/fields.js
-#: xmodule/assets/library_source_block/public/js/library_source_block.js
 msgid "Saving"
 msgstr "در حال ذخیره‌سازی"
 
@@ -4141,18 +4130,6 @@ msgstr "پرونده کاربری"
 msgid "Updating with latest library content"
 msgstr "روزآمدسازی با آخرین محتوای کتابخانه"
 
-#: xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
-msgid "Loading..."
-msgstr "در حال بارگیری ..."
-
-#: xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
-msgid "Selected blocks"
-msgstr "بلوک‌های منتخب"
-
-#: xmodule/assets/library_source_block/public/js/library_source_block.js
-msgid "Unable to update settings"
-msgstr "تنظیمات روزآمد نشد"
-
 #: xmodule/assets/split_test/public/js/split_test_author_view.js
 #: xmodule/js/public/js/split_test_author_view.js
 msgid "Creating missing groups"
@@ -5814,6 +5791,13 @@ msgstr "فعالسازی زیرنویس"
 msgid "Turn off transcripts"
 msgstr "غیرفعالسازی زیرنویس"
 
+#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
+#: cms/static/js/views/video_transcripts.js
+msgid ""
+"This may be happening because of an error with our server or your internet "
+"connection. Try refreshing the page or making sure you are online."
+msgstr ""
+
 #: cms/static/cms/js/main.js
 msgid "Studio's having trouble saving your work"
 msgstr "استودیو برای ذخیره کار شما مشکل دارد"
@@ -6378,13 +6362,23 @@ msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
-msgid "New files were added to this course's Files & Uploads"
-msgstr "فایل های جدید به \"فایل ها و آپلودها\"ی این دوره اضافه شد"
+msgid "New file(s) added to Files & Uploads."
+msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
 msgid "The following required files were imported to this course:"
 msgstr "فایل های مورد نیاز زیر به این دوره وارد شدند:"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "View files"
+msgstr ""
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "Dismiss"
+msgstr ""
 
 #: cms/static/js/views/course_rerun.js
 msgid "Create Re-run"

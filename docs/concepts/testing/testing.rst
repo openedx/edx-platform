@@ -83,19 +83,8 @@ Test Locations
 Running Tests
 =============
 
-You can run all of the unit-level tests using this command::
+**Unless otherwise mentioned, all the following commands should be run from inside the lms docker container.**
 
-    paver test
-
-This includes python, JavaScript, and documentation tests.
-
-Note -
-`paver` is a scripting tool. To get information about various options, you can run the this command::
-
-    paver -h
-
-Note -
-Unless otherwise mentioned, all the following commands should be run from inside lms docker container.
 
 Running Python Unit tests
 -------------------------
@@ -107,8 +96,8 @@ Pytest (and all of the plugins we use with it) has a lot of options. Use `pytest
 .. _pytest: https://pytest.org/
 
 
-Running a Single Test
-~~~~~~~~~~~~~~~~~~~~~
+Running Python Test Subsets
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When developing tests, it is often helpful to be able to really just run one single test without the overhead of PIP installs, UX builds, etc.
 

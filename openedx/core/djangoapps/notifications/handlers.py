@@ -4,7 +4,7 @@ Handlers for notifications
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.dispatch import receiver
 from openedx_events.learning.signals import (
     COURSE_ENROLLMENT_CREATED,
@@ -26,12 +26,13 @@ def course_enrollment_post_save(signal, sender, enrollment, metadata, **kwargs):
     """
     if ENABLE_NOTIFICATIONS.is_enabled(enrollment.course.course_key):
         try:
-            CourseNotificationPreference.objects.create(
-                user_id=enrollment.user.id,
-                course_id=enrollment.course.course_key
-            )
+            with transaction.atomic():
+                CourseNotificationPreference.objects.create(
+                    user_id=enrollment.user.id,
+                    course_id=enrollment.course.course_key
+                )
         except IntegrityError:
-            log.info(f'CourseNotificationPreference already exists for user {enrollment.user} '
+            log.info(f'CourseNotificationPreference already exists for user {enrollment.user.id} '
                      f'and course {enrollment.course.course_key}')
 
 

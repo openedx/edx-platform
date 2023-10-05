@@ -2188,8 +2188,8 @@ MIDDLEWARE = [
     # Before anything that looks at cookies, especially the session middleware
     'openedx.core.djangoapps.cookie_metadata.middleware.CookieNameChange',
 
-    # Monitoring and logging for expected and ignored errors
-    'openedx.core.lib.request_utils.ExpectedErrorMiddleware',
+    # Monitoring and logging for ignored errors
+    'openedx.core.lib.request_utils.IgnoredErrorMiddleware',
 
     'lms.djangoapps.mobile_api.middleware.AppVersionUpgrade',
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
@@ -3230,7 +3230,7 @@ INSTALLED_APPS = [
 
     # Tagging
     'openedx_tagging.core.tagging.apps.TaggingConfig',
-    'openedx.features.content_tagging',
+    'openedx.core.djangoapps.content_tagging',
 
     # Features
     'openedx.features.calendar_sync',
@@ -3314,6 +3314,7 @@ CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
 # end users
 CSRF_COOKIE_SECURE = False
 CSRF_TRUSTED_ORIGINS = []
+CSRF_TRUSTED_ORIGINS_WITH_SCHEME = []
 CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ''
 CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
 
@@ -3329,7 +3330,7 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
     ),
-    'EXCEPTION_HANDLER': 'openedx.core.lib.request_utils.expected_error_exception_handler',
+    'EXCEPTION_HANDLER': 'openedx.core.lib.request_utils.ignored_error_exception_handler',
     'PAGE_SIZE': 10,
     'URL_FORMAT_OVERRIDE': None,
     'DEFAULT_THROTTLE_RATES': {
@@ -3771,6 +3772,7 @@ PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG = {
 }
 
 ############################ ORA 2 ############################################
+ORA_WORKFLOW_UPDATE_ROUTING_KEY = "edx.lms.core.ora_workflow_update"
 
 # By default, don't use a file prefix
 ORA2_FILE_PREFIX = None
@@ -5382,3 +5384,7 @@ EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
 #### django-simple-history##
 # disable indexing on date field its coming from django-simple-history.
 SIMPLE_HISTORY_DATE_INDEX = False
+
+#### Event bus publishing ####
+## Will be more filled out as part of https://github.com/edx/edx-arch-experiments/issues/381
+EVENT_BUS_PRODUCER_CONFIG = {}
