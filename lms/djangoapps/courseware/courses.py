@@ -629,11 +629,11 @@ def get_course_assignments(course_key, user, include_access=False):  # lint-amne
                     subsection_key, title, url, due, contains_gated_content,
                     complete, past_due, assignment_type, None, first_component_block_id
                 ))
-            assignments.extend(get_ora_blocks_as_assignments(block_data, subsection_key))
+            assignments.extend(get_ora_blocks_as_assignments(course_key,block_data, subsection_key))
     return assignments
 
 
-def get_ora_blocks_as_assignments(block_data, subsection_key):
+def get_ora_blocks_as_assignments(course_key, block_data, subsection_key):
     """
     Given a subsection key, navigate through descendents and find open response assessments.
     For each graded ORA, return a list of "Assignment" tuples that map to the individual steps
@@ -645,11 +645,11 @@ def get_ora_blocks_as_assignments(block_data, subsection_key):
         descendent = descendents.pop()
         descendents.extend(block_data.get_children(descendent))
         if block_data.get_xblock_field(descendent, 'category', None) == 'openassessment':
-            ora_assignments.extend(get_ora_as_assignments(block_data, descendent))
+            ora_assignments.extend(get_ora_as_assignments(course_key, block_data, descendent))
     return ora_assignments
 
 
-def get_ora_as_assignments(block_data, ora_block):
+def get_ora_as_assignments(course_key, block_data, ora_block):
     """
     Given an individual ORA, return the list of individual ORA steps as Assignment tuples
     """
@@ -677,6 +677,7 @@ def get_ora_as_assignments(block_data, ora_block):
     assignments = []
     for assessment in all_assessments:
         assignment = _ora_assessment_to_assignment(
+            course_key,
             block_data,
             ora_block,
             complete,
@@ -688,6 +689,7 @@ def get_ora_as_assignments(block_data, ora_block):
 
 
 def _ora_assessment_to_assignment(
+    course_key,
     block_data,
     ora_block,
     complete,
@@ -699,7 +701,6 @@ def _ora_assessment_to_assignment(
     date_config_type = block_data.get_xblock_field(ora_block, 'date_config_type', 'manual')
     assignment_type = block_data.get_xblock_field(ora_block, 'format', None)
     block_title = block_data.get_xblock_field(ora_block, 'title', _('Open Response Assessment'))
-    course_key = block_data.root_block_usage_key
 
     # Steps with no "due" date, like staff or training, should not show up here
     assessment_step_due = assessment.get('start')
