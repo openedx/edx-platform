@@ -10,10 +10,13 @@ from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx_events.data import EventsMetadata
 from openedx_events.learning.data import ExamAttemptData, UserData, UserPersonalData
-from openedx_events.learning.signals import EXAM_ATTEMPT_VERIFIED
+from openedx_events.learning.signals import EXAM_ATTEMPT_REJECTED, EXAM_ATTEMPT_VERIFIED
 
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.grades.signals.handlers import exam_attempt_verified_event_handler
+from lms.djangoapps.grades.signals.handlers import (
+    exam_attempt_rejected_event_handler,
+    exam_attempt_verified_event_handler
+)
 from ..constants import GradeOverrideFeatureEnum
 
 
@@ -101,3 +104,30 @@ class ExamCompletionEventBusTests(TestCase):
             )
         else:
             mock_undo_override.assert_not_called()
+
+    @mock.patch('lms.djangoapps.grades.api.override_subsection_grade')
+    def test_exam_attempt_rejected_event_handler(self, mock_override):
+        exam_event_data = self._get_exam_event_data(self.student_user,
+                                                    self.course_key,
+                                                    self.usage_key,
+                                                    exam_type='proctored')
+        event_metadata = self._get_exam_event_metadata(EXAM_ATTEMPT_REJECTED)
+
+        event_kwargs = {
+            'exam_attempt': exam_event_data,
+            'metadata': event_metadata
+        }
+        exam_attempt_rejected_event_handler(None, EXAM_ATTEMPT_REJECTED, ** event_kwargs)
+
+        override_grade_value = 0.0
+
+        mock_override.assert_called_once_with(
+            self.student_user.id,
+            self.course_key,
+            self.usage_key,
+            earned_all=override_grade_value,
+            earned_graded=override_grade_value,
+            feature=GradeOverrideFeatureEnum.proctoring,
+            overrider=None,
+            comment=None,
+        )
