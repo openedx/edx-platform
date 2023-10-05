@@ -273,7 +273,8 @@ class LibraryUpdateChildrenTask(UserTask):  # pylint: disable=abstract-method
 
 @shared_task(base=LibraryUpdateChildrenTask, bind=True)
 # Note: The decorator @set_code_owner_attribute cannot be used here because the UserTaskMixin
-#   does stack inspection and can't handle additional decorators.
+#       does stack inspection and can't handle additional decorators.
+#       So, wet set the code_owner attribute in the task's body instead.
 def update_children_task(self, user_id, dest_block_key, version=None):
     """
     Update xBlock's children.
@@ -285,6 +286,7 @@ def update_children_task(self, user_id, dest_block_key, version=None):
     store the version number of the libraries used, so we easily determine
     if dest_block is up to date or not.
     """
+    set_code_owner_attribute_from_module(__name__)
     store = modulestore()
     dest_block_id = BlockUsageLocator.from_string(dest_block_key)
     dest_block = store.get_item(dest_block_id)
