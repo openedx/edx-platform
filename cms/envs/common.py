@@ -115,7 +115,6 @@ from lms.envs.common import (
     ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL,
 
     # Blockstore
-    BLOCKSTORE_USE_BLOCKSTORE_APP_API,
     BUNDLE_ASSET_STORAGE_SETTINGS,
 
     # Methods to derive settings
@@ -294,9 +293,6 @@ FEATURES = {
 
     # Enable content libraries (modulestore) search functionality
     'ENABLE_LIBRARY_INDEX': False,
-
-    # Enable content libraries (blockstore) indexing
-    'ENABLE_CONTENT_LIBRARY_INDEX': False,
 
     # .. toggle_name: FEATURES['ALLOW_COURSE_RERUNS']
     # .. toggle_implementation: DjangoSetting
@@ -2164,7 +2160,7 @@ CUSTOM_RESOURCE_TEMPLATES_DIRECTORY = None
 
 DATABASE_ROUTERS = [
     'openedx.core.lib.django_courseware_routers.StudentModuleHistoryExtendedRouter',
-    'openedx.core.lib.blockstore_api.db_routers.BlockstoreRouter',
+    'cms.lib.blockstore_db_router.BlockstoreRouter',
 ]
 
 ############################ Cache Configuration ###############################
@@ -2598,21 +2594,9 @@ PROCTORING_BACKENDS = {
 PROCTORING_SETTINGS = {}
 
 ################## BLOCKSTORE RELATED SETTINGS  #########################
-BLOCKSTORE_PUBLIC_URL_ROOT = 'http://localhost:18250'
-BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
 # Which of django's caches to use for storing anonymous user state for XBlocks
 # in the blockstore-based XBlock runtime
 XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
-
-# .. setting_name: BLOCKSTORE_BUNDLE_CACHE_TIMEOUT
-# .. setting_default: 3000
-# .. setting_description: Maximum time-to-live of cached Bundles fetched from
-#     Blockstore, in seconds. When the values returned from Blockstore have
-#     TTLs of their own (such as signed S3 URLs), the maximum TTL of this cache
-#     must be lower than the minimum TTL of those values.
-#     We use a default of 3000s (50mins) because temporary URLs are often
-#     configured to expire after one hour.
-BLOCKSTORE_BUNDLE_CACHE_TIMEOUT = 3000
 
 ###################### LEARNER PORTAL ################################
 LEARNER_PORTAL_URL_ROOT = 'https://learner-portal-localhost:18000'
