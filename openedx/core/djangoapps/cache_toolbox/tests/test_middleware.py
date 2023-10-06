@@ -48,6 +48,7 @@ class CachedAuthMiddlewareTestCase(TestCase):
             self.assertRedirects(response, redirect_url, target_status_code=target_status_code)
 
     def _test_custom_attribute_after_changing_hash(self, test_url, mock_set_custom_attribute):
+        """verify that set_custom_attribute is called with expected values"""
         response = self.client.get(test_url)
         mock_set_custom_attribute.assert_has_calls([
             call('DEFAULT_HASHING_ALGORITHM', settings.DEFAULT_HASHING_ALGORITHM),
@@ -79,14 +80,14 @@ class CachedAuthMiddlewareTestCase(TestCase):
     @skip_unless_lms
     @patch("openedx.core.djangoapps.cache_toolbox.middleware.set_custom_attribute")
     def test_custom_attribute_after_changing_hash_lms(self, mock_set_custom_attribute):
-        """Test set_custom_attribute is called with expected values"""
+        """Test set_custom_attribute is called with expected values in LMS"""
         test_url = reverse('dashboard')
         self._test_custom_attribute_after_changing_hash(test_url, mock_set_custom_attribute)
 
     @skip_unless_cms
     @patch("openedx.core.djangoapps.cache_toolbox.middleware.set_custom_attribute")
     def test_custom_attribute_after_changing_hash_cms(self, mock_set_custom_attribute):
-        """Test set_custom_attribute is called with expected values"""
+        """Test set_custom_attribute is called with expected values in CMS"""
         test_url = reverse('home')
         self._test_custom_attribute_after_changing_hash(test_url, mock_set_custom_attribute)
 
