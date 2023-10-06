@@ -25,7 +25,7 @@ class JsTestSuite(TestSuite):
         self.opts = kwargs
 
         suite = args[0]
-        # self.subsuites = self._default_subsuites if suite == 'all' else [JsTestSubSuite(*args, **kwargs)]
+        self.subsuites = self._default_subsuites if suite == 'all' else [JsTestSubSuite(*args, **kwargs)]
 
     def __enter__(self):
         super().__enter__()
