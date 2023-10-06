@@ -67,6 +67,10 @@ class IsCourseStaffInstructor(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return (hasattr(request, 'user') and
                 # either the user is a staff or instructor of the master course
+                # TODO: course roles: If the course roles feature flag is disabled the 
+                # course_permissions_list_check below will never return true.
+                # Remove the CourseInstructorRole and
+                # CourseStaffRole checks when course_roles Django app are implemented.
                 (hasattr(obj, 'course_id') and (
                     CourseInstructorRole(obj.course_id).has_user(request.user) or
                     CourseStaffRole(obj.course_id).has_user(request.user) or
@@ -105,6 +109,9 @@ class IsMasterCourseStaffInstructor(permissions.BasePermission):
                 course_key = CourseKey.from_string(master_course_id)
             except InvalidKeyError:
                 raise Http404()  # lint-amnesty, pylint: disable=raise-missing-from
+            # TODO: course roles: If the course roles feature flag is disabled the course_permission_check
+            # below will never return true. Remove the CourseInstructorRole and
+            # CourseStaffRole checks when course_roles Django app are implemented.
             return (hasattr(request, 'user') and (
                     CourseInstructorRole(course_key).has_user(request.user) or
                     CourseStaffRole(course_key).has_user(request.user) or
@@ -127,6 +134,9 @@ class IsStaffOrReadOnly(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
+        # TODO: course roles: If the course roles feature flag is disabled the course_permission_check
+        # below will never return true. Remove the
+        # CourseStaffRole check when course_roles Django app are implemented.
         return (request.user.is_staff or
                 CourseStaffRole(obj.course_id).has_user(request.user) or
                 course_permission_check(request.user, CourseRolesPermission.MANAGE_STUDENTS.value, obj.course_id) or

@@ -26,6 +26,8 @@ ATTR_KEY_USER_IS_STAFF = 'edx-platform.user_is_staff'
 ATTR_KEY_USER_PREFERENCES = 'edx-platform.user_preferences'
 # The user's role in the course ('staff', 'instructor', or 'student').
 ATTR_KEY_USER_ROLE = 'edx-platform.user_role'
+# Permissions attributes (4) have been added, but the role attributes cannot be remove
+# until all x-blocks have been updated to use permissions in place of roles
 # Whether the user has the manage content permission
 ATTR_KEY_USER_HAS_MANAGE_CONTENT = 'edx-platform.user_has_manage_content'
 # Whether the user has the manage grades permission

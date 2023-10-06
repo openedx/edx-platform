@@ -51,6 +51,10 @@ class DjangoXBlockUserService(UserService):
                 (course-agnostic) anonymized ID. To preserve backward compatibility, we will continue to provide it.
                 Using course-specific anonymous user ID (`anonymous_user_id`) is a preferred approach.
             request_country_code(str): optional -- country code determined from the user's request IP address.
+            user_has_manage_content(bool): optional - whether the user has the manage_content permission on any of their roles for the course or org
+            user_has_manage_grades(bool): optional - whether the user has the manage_grades permission on any of their roles for the course or org
+            user_has_access_data_downloads(bool): optional - whether the user has the access_data_downloads permission on any of their roles for the course or org
+            user_has_view_all_content(bool): optional - whether the user has the view_all_content permission for any of their roles for the course or org
         """
         super().__init__(**kwargs)
         self._django_user = django_user
@@ -61,7 +65,7 @@ class DjangoXBlockUserService(UserService):
         self._anonymous_user_id = kwargs.get('anonymous_user_id', None)
         self._deprecated_anonymous_user_id = kwargs.get('deprecated_anonymous_user_id', None)
         self._request_country_code = kwargs.get('request_country_code', None)
-        self._user_has_manage_content = kwargs.get('user_has_manaege_content', False)
+        self._user_has_manage_content = kwargs.get('user_has_manage_content', False)
         self._user_has_manage_grades = kwargs.get('user_has_manage_grades', False)
         self._user_has_access_data_downloads = kwargs.get('user_has_access_data_downloads', False)
         self._user_has_view_all_content = kwargs.get('user_has_view_all_content', False)

@@ -134,6 +134,9 @@ def has_discussion_privileges(user, course_id):
     for user_ids in roles.values():
         if user.id in user_ids:
             return True
+    # TODO: course roles: If the course roles feature flag is disabled the course_permissions_list_check
+    # call below will never return true.
+    # Remove the if user.id in user_ids when course_roles Django app are implemented.
     if course_permissions_list_check(
         user.id,
         [

@@ -313,6 +313,10 @@ def check_course_access(user, course_enrollments):
             "is_too_early_to_view": not check_course_open_for_learner(
                 user, course_enrollment.course
             ),
+            # TODO: course roles: If the course roles feature flag is disabled the
+            # course_or_organization_permission_check call below will never return true.
+            # administrative_access also checks global staff, once course_roles are implemented
+            # switch first check to check for global staff only and leave permissions check in place
             "user_has_staff_access": any(
                 administrative_accesses_to_course_for_user(
                     user, course_enrollment.course_id

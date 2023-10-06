@@ -118,21 +118,24 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
 
     course = get_course_by_id(course_key, depth=None)
 
-    permission_set = [
+    permissions_list = [
         CourseRolesPermission.MANAGE_STUDENTS.value,
         CourseRolesPermission.ACCESS_INSTRUCTOR_DASHBOARD.value
     ]
+    # TODO: course roles: If the course roles feature flag is disabled the course_permissions_list_check
+    # and course_permission_check calls below will never return true.
+    # Remove the role checks when course_roles Django app are implemented.
     access = {
         'admin': request.user.is_staff,
         'instructor': (
             bool(has_access(request.user, 'instructor', course)) or
-            course_permissions_list_check(request.user, permission_set, course_key)
+            course_permissions_list_check(request.user, permissions_list, course_key)
         ),
         'finance_admin': CourseFinanceAdminRole(course_key).has_user(request.user),
         'sales_admin': CourseSalesAdminRole(course_key).has_user(request.user),
         'staff': (
             bool(has_access(request.user, 'staff', course)) or
-            course_permissions_list_check(request.user, permission_set, course_key)
+            course_permissions_list_check(request.user, permissions_list, course_key)
         ),
         'forum_admin': (
             has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR) or
@@ -205,8 +208,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
     # are enabled in the course
 
     # TODO: course roles: If the course roles feature flag is disabled the course_permission_check call
-    #       below will never return true.
-    #       Remove .has_user() calls below when course_roles Django app are implemented.
+    # below will never return true. Remove .has_user() calls below when course_roles Django app are implemented.
     user_has_access = any([
         request.user.is_staff,
         CourseStaffRole(course_key).has_user(request.user),

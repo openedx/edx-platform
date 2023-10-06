@@ -106,6 +106,9 @@ class ProgramCourseEnrollmentSerializer(serializers.Serializer):
         return str(obj.program_enrollment.curriculum_uuid)
 
     def get_course_staff(self, obj):
+        # TODO: course roles: If the course roles feature flag is disabled the
+        # course_permission_check call below will never return true.
+        # Remove the is_course_staff_enrollment check when course_roles Django app are implemented.
         return (
             is_course_staff_enrollment(obj) or
             course_permission_check(

@@ -25,6 +25,9 @@ def is_user_course_or_global_staff(user, course_id):
     or is global staff.
     """
 
+    # TODO: course roles: If the course roles feature flag is disabled the course_permission_check
+    # below will never return true.
+    # Remove the user_is_staff and auth.user_has_role checks when course_roles Django app are implemented.
     return (
         user.is_staff
         or auth.user_has_role(user, CourseStaffRole(CourseKey.from_string(course_id)))

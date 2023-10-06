@@ -19,6 +19,10 @@ def get_user_role(user, course_id):
     :param course_id: the course_id of the course we're interested in
     """
     # afaik, this is only used in lti
+
+    # TODO: course roles: If the course roles feature flag is disabled the course_permission_check
+    # call below will never return true.
+    # Remove the auth.has_user_role call when course_roles Django app are implemented.
     if (
         auth.user_has_role(user, CourseInstructorRole(course_id)) or
         course_permission_check(user, CourseRolesPermission.MANAGE_ALL_USERS.value, course_id)

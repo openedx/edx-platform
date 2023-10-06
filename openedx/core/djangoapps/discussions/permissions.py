@@ -31,7 +31,9 @@ class IsStaffOrCourseTeam(BasePermission):
 
         if GlobalStaff().has_user(request.user):
             return True
-
+        # TODO: course roles: If the course roles feature flag is disabled the course_permission_check
+        # below will never return true. Remove the CourseInstructorRole and
+        # CourseStaffRole checks when course_roles Django app are implemented.
         return (
             CourseInstructorRole(course_key).has_user(request.user) or
             CourseStaffRole(course_key).has_user(request.user) or

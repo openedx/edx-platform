@@ -89,8 +89,10 @@ def has_ccx_coach_role(user, course_key):
     if hasattr(course_key, 'ccx'):
         ccx_id = course_key.ccx
         role = CourseCcxCoachRole(course_key)
-
-        if role.has_user(user) or course_permission_check(user, CourseRolesPermission.MANAGE_STUDENTS.value, ccx_id):
+        # TODO: course roles: If the course roles feature flag is disabled the course_permission_check 
+        # call below will never return true.
+        # Remove the role.has_user call when course_roles Django app are implemented.
+        if role.has_user(user) or course_permission_check(user, CourseRolesPermission.MANAGE_STUDENTS.value, course_key):
             list_ccx = CustomCourseForEdX.objects.filter(
                 course_id=course_key.to_course_locator(),
                 coach=user
@@ -181,6 +183,9 @@ def has_staff_access_to_preview_mode(user, course_key):
     """
     has_admin_access_to_course = any(administrative_accesses_to_course_for_user(user, course_key))
 
+    # TODO: course roles: If the course roles feature flag is disabled the 
+    # course_or_organization_permission_check call below will never return true.
+    # Remove the has_admin_access_to_course call when course_roles Django app are implemented.
     return (
         has_admin_access_to_course or
         is_masquerading_as_student(user, course_key) or
@@ -731,6 +736,10 @@ def _has_access_to_course(user, access_level, course_key):
     if is_masquerading_as_student(user, course_key):
         return ACCESS_DENIED
 
+    # TODO: course roles: If the course roles feature flag is disabled the 
+    # course_or_organization_permission_check call below will never return true.
+    # Remove the staff_access and instructor_access checks from the if statements
+    # when course_roles Django app are implemented.
     global_staff, staff_access, instructor_access = administrative_accesses_to_course_for_user(user, course_key)
     permissions_access = course_or_organization_permission_check(
         user,
@@ -896,6 +905,7 @@ def is_mobile_available_for_user(user, block):
     Checks:
         mobile_available flag on the course
         Beta User and staff access overrides the mobile_available flag
+        Permission to view_all_published_content or view_only_live_published_content overrides mobile_available flag
     Arguments:
         block (CourseBlock|CourseOverview): course or overview of course in question
     """
@@ -903,6 +913,9 @@ def is_mobile_available_for_user(user, block):
         CourseRolesPermission.VIEW_ONLY_LIVE_PUBLISHED_CONTENT.value,
         CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.value
     ]
+    # TODO: course roles: If the course roles feature flag is disabled the course_permissions_list_check
+    # call below will never return true.
+    # Remove the auth.user_has_role checks when course_roles Django app are implemented.
     return (
         auth.user_has_role(user, CourseBetaTesterRole(block.id))
         or course_permissions_list_check(user, permissions_list, block.id)

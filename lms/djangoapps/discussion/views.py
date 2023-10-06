@@ -810,6 +810,9 @@ class DiscussionBoardFragmentView(EdxFragmentView):
         course_key = CourseKey.from_string(course_id)
         # Force using the legacy view if a user profile is requested or the URL contains a specific topic or thread
         force_legacy_view = (profile_page_context or thread_id or discussion_id)
+        # TODO: course roles: If the course roles feature flag is disabled the course_permission_check
+        # call below will never return true.
+        # Remove the is_course_staff check when course_roles Django app are implemented.
         is_educator_or_staff = (
             is_course_staff(course_key, request.user) or
             GlobalStaff().has_user(request.user) or

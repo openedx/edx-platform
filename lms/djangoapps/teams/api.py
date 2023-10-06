@@ -146,6 +146,9 @@ def has_course_staff_privileges(user, course_key):
         return True
     if CourseInstructorRole(course_key).has_user(user):
         return True
+    # TODO: course roles: If the course roles feature flag is disabled the
+    # course_permission_check call below will never return true.
+    # Remove the CourseStaffRole and CourseInstructorRole checks when course_roles Django app are implemented.
     if course_permission_check(user, CourseRolesPermission.MANAGE_STUDENTS.value, course_key):
         return True
     return False

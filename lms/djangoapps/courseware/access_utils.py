@@ -57,6 +57,9 @@ def adjust_start_date(user, days_early_for_beta, start, course_key):
         # bail early if no beta testing is set up
         return start
 
+    # TODO: course roles: If the course roles feature flag is disabled the course_permission_check
+    # call below will never return true.
+    # Remove the CourseBetaTesterRole check when course_roles Django app are implemented.
     if CourseBetaTesterRole(course_key).has_user(user) or course_permission_check(
         user,
         CourseRolesPermission.VIEW_ONLY_LIVE_PUBLISHED_CONTENT.value,

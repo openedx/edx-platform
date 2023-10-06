@@ -41,6 +41,9 @@ def user_is_staff_or_instructor(user: AbstractBaseUser, course: CourseBlock) -> 
         CourseRolesPermission.VIEW_ONLY_LIVE_PUBLISHED_CONTENT.value,
         CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.value
     ]
+    # TODO: course roles: If the course roles feature flag is disabled the course_permissions_list_check
+    # below will never return true. Remove the CourseInstructorRole and
+    # CourseStaffRole checks when course_roles Django app are implemented.
     return (
         CourseStaffRole(course.id).has_user(user) or
         CourseInstructorRole(course.id).has_user(user) or

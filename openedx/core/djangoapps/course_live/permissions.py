@@ -24,7 +24,9 @@ class IsStaffOrInstructor(BasePermission):
 
         if GlobalStaff().has_user(request.user):
             return True
-
+        # TODO: course roles: If the course roles feature flag is disabled the course_permission_check
+        # below will never return true. Remove the CourseInstructorRole and
+        # CourseStaffRole checks when course_roles Django app are implemented.
         return (
             CourseInstructorRole(course_key).has_user(request.user) or
             CourseStaffRole(course_key).has_user(request.user) or
@@ -49,6 +51,9 @@ class IsEnrolledOrStaff(BasePermission):
             CourseRolesPermission.VIEW_ONLY_LIVE_PUBLISHED_CONTENT.value,
             CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.value
         ]
+        # TODO: course roles: If the course roles feature flag is disabled the course_permissions_list_check
+        # below will never return true. Remove the CourseInstructorRole and
+        # CourseStaffRole checks when course_roles Django app are implemented.
         return (
             CourseInstructorRole(course_key).has_user(request.user) or
             CourseStaffRole(course_key).has_user(request.user) or

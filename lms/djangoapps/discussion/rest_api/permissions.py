@@ -152,6 +152,10 @@ class IsStaffOrCourseTeamOrEnrolled(permissions.BasePermission):
     def has_permission(self, request, view):
         """Returns true if the user is enrolled or is staff."""
         course_key = CourseKey.from_string(view.kwargs.get('course_id'))
+        # TODO: course roles: If the course roles feature flag is disabled the course_permissions_list_check
+        # call below will never return true.
+        # Remove the CourseStaffRole and CourseInstructorRole checks
+        # when course_roles Django app are implemented.
         return (
             GlobalStaff().has_user(request.user) or
             CourseStaffRole(course_key).has_user(request.user) or
