@@ -127,6 +127,8 @@ class BlockStructureStore:
         except BlockStructureNotFound:
             pass
 
+        return False
+
     def _get_model(self, root_block_usage_key):
         """
         Returns the model associated with the given key.
