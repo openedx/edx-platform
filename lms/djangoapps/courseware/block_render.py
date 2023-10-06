@@ -579,7 +579,7 @@ def prepare_runtime_for_user(
         CourseRolesPermission.SPECIFIC_MASQUERADING.value
     ]
 
-    # TODO: course roles: If the course roles feature flag is disabled the 
+    # TODO: course roles: If the course roles feature flag is disabled the
     # course_or_organization_permission_list_check call below will never return true.
     # Remove the has_access staff check when course_roles Django app are implemented.
     user_is_staff = (
@@ -596,7 +596,7 @@ def prepare_runtime_for_user(
 
     store = modulestore()
 
-    # TODO: course roles: If the course roles feature flag is disabled the 
+    # TODO: course roles: If the course roles feature flag is disabled the
     # course_or_organization_permission_check calls below will never return true.
     # The user_is_staff, user_is_beta_tester, and user_role cannot be removed until
     # all x-blocks have been updated to use permissions

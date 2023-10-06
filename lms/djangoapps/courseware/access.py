@@ -89,7 +89,7 @@ def has_ccx_coach_role(user, course_key):
     if hasattr(course_key, 'ccx'):
         ccx_id = course_key.ccx
         role = CourseCcxCoachRole(course_key)
-        # TODO: course roles: If the course roles feature flag is disabled the course_permission_check 
+        # TODO: course roles: If the course roles feature flag is disabled the course_permission_check
         # call below will never return true.
         # Remove the role.has_user call when course_roles Django app are implemented.
         if role.has_user(user) or course_permission_check(user, CourseRolesPermission.MANAGE_STUDENTS.value, course_key):
@@ -183,7 +183,7 @@ def has_staff_access_to_preview_mode(user, course_key):
     """
     has_admin_access_to_course = any(administrative_accesses_to_course_for_user(user, course_key))
 
-    # TODO: course roles: If the course roles feature flag is disabled the 
+    # TODO: course roles: If the course roles feature flag is disabled the
     # course_or_organization_permission_check call below will never return true.
     # Remove the has_admin_access_to_course call when course_roles Django app are implemented.
     return (
@@ -736,7 +736,7 @@ def _has_access_to_course(user, access_level, course_key):
     if is_masquerading_as_student(user, course_key):
         return ACCESS_DENIED
 
-    # TODO: course roles: If the course roles feature flag is disabled the 
+    # TODO: course roles: If the course roles feature flag is disabled the
     # course_or_organization_permission_check call below will never return true.
     # Remove the staff_access and instructor_access checks from the if statements
     # when course_roles Django app are implemented.

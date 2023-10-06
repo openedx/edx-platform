@@ -670,7 +670,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         for enrollment in enrollment_data:
             course_key = CourseKey.from_string(enrollment["course_details"]["course_id"])
             # TODO: course roles: If the course roles feature flag is disabled the course_permission_check
-            # below will never return true. 
+            # below will never return true.
             # Remove the user_has_role check when course_roles Django app are implemented.
             if user_has_role(request.user, CourseStaffRole(course_key)) or course_permission_check(
                 request.user,

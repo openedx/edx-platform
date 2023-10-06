@@ -67,7 +67,7 @@ class IsCourseStaffInstructor(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return (hasattr(request, 'user') and
                 # either the user is a staff or instructor of the master course
-                # TODO: course roles: If the course roles feature flag is disabled the 
+                # TODO: course roles: If the course roles feature flag is disabled the
                 # course_permissions_list_check below will never return true.
                 # Remove the CourseInstructorRole and
                 # CourseStaffRole checks when course_roles Django app are implemented.
