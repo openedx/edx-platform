@@ -33,6 +33,14 @@ class TestBlockStructureFactory(TestCase, ChildrenMapTestMixin):
                 root_block_usage_key=len(self.children_map) + 1,
                 modulestore=self.modulestore,
             )
+        
+    def test_from_cache(self):
+        block_structure = self.create_block_structure(self.children_map)
+        from_cache_block_structure = BlockStructureFactory.create_from_modulestore(
+            block_structure.root_block_usage_key,
+            self.modulestore,
+        )
+        self.assert_block_structure(from_cache_block_structure, self.children_map)
 
     def test_new(self):
         block_structure = BlockStructureFactory.create_from_modulestore(
