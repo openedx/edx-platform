@@ -85,7 +85,13 @@ class Command(BaseCommand):
         course_id_strings = [str(course.id) for course in courses]
 
         # Use Celery to distribute the workload
-        tasks = group(undo_all_library_source_blocks_ids_for_course.s(course_id, v1_to_v2_lib_map) for course_id in course_id_strings)
+        tasks = group(
+            undo_all_library_source_blocks_ids_for_course.s(
+                course_id,
+                v1_to_v2_lib_map
+            )
+            for course_id in course_id_strings
+        )
         results = tasks.apply_async()
 
         for result in results.get():
