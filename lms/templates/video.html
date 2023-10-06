@@ -150,7 +150,23 @@ from openedx.core.djangolib.js_utils import (
             <a href="${branding_info['url']}"><img class="brand-logo" src="${branding_info['logo_src']}" alt="${branding_info['logo_tag']}" /></a>
         </div>
         % endif
-        <!-- TODO: FEEDBACK FEATURE -->
+        % if transcript_feedback_enabled:
+            <div class="wrapper-transcript-feedback">
+                <h4 class="hd hd-5">${_('How is the transcript quality ?')}</h4>
+                <div class="transcript-feedback-buttons">
+                    <div class="transcript-feedback-btn-wrapper">
+                        <button class="thumbs-up-btn">
+                            <span class="icon fa fa-thumbs-o-up thumbs-up-icon"></span>
+                        </button>
+                    </div>
+                    <div class="transcript-feedback-btn-wrapper">
+                        <button class="thumbs-down-btn">
+                            <span class="icon fa fa-thumbs-o-down thumbs-down-icon"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        % endif
     </div>
     % endif
 </div>
