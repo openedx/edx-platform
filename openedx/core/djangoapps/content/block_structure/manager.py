@@ -6,7 +6,7 @@ BlockStructures.
 
 from contextlib import contextmanager
 
-from .exceptions import UsageKeyNotInBlockStructure
+from .exceptions import BlockStructureNotFound, TransformerDataIncompatible, UsageKeyNotInBlockStructure
 from .factory import BlockStructureFactory
 from .store import BlockStructureStore
 from .transformers import BlockStructureTransformers
@@ -91,8 +91,26 @@ class BlockStructureManager:
                 starting at root_block_usage_key, with collected data
                 from each registered transformer.
         """
-        block_structure = self._update_collected()
+        try:
+            block_structure = BlockStructureFactory.create_from_store(
+                self.root_block_usage_key,
+                self.store,
+            )
+            BlockStructureTransformers.verify_versions(block_structure)
+
+        except (BlockStructureNotFound, TransformerDataIncompatible):
+            block_structure = self._update_collected()
+
         return block_structure
+
+    def update_collected_if_needed(self):
+        """
+        The store is updated with newly collected transformers data from
+        the modulestore, only if the data in the store is outdated.
+        """
+        with self._bulk_operations():
+            if not self.store.is_up_to_date(self.root_block_usage_key, self.modulestore):
+                self._update_collected()
 
     def _update_collected(self):
         """
@@ -105,6 +123,7 @@ class BlockStructureManager:
                 self.modulestore,
             )
             BlockStructureTransformers.collect(block_structure)
+            self.store.add(block_structure)
             return block_structure
 
     def clear(self):
