@@ -138,6 +138,7 @@ class TestVideoYouTube(TestVideo):  # lint-amnesty, pylint: disable=missing-clas
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
+            'transcript_feedback_enabled': True,
         }
 
         mako_service = self.block.runtime.service(self.block, 'mako')
@@ -223,6 +224,7 @@ class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
+            'transcript_feedback_enabled': True,
         }
 
         mako_service = self.block.runtime.service(self.block, 'mako')
@@ -465,6 +467,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
+            'transcript_feedback_enabled': True,
         }
 
         for data in cases:
@@ -595,6 +598,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
+            'transcript_feedback_enabled': True,
         }
         initial_context['metadata']['duration'] = None
 
@@ -730,6 +734,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             ],
             'poster': 'null',
             'metadata': metadata,
+            'transcript_feedback_enabled': True,
         }
 
         DATA = SOURCE_XML.format(  # lint-amnesty, pylint: disable=invalid-name
@@ -907,6 +912,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             ],
             'poster': 'null',
             'metadata': metadata,
+            'transcript_feedback_enabled': True,
         }
 
         # pylint: disable=invalid-name
@@ -1024,6 +1030,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
+            'transcript_feedback_enabled': True,
         }
         initial_context['metadata']['duration'] = None
 
@@ -1122,6 +1129,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
+            'transcript_feedback_enabled': True,
         }
         initial_context['metadata']['duration'] = None
 
@@ -2407,7 +2415,8 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
             'poster': json.dumps(OrderedDict({
                 'url': 'http://img.youtube.com/vi/ZwkTiUPN0mg/0.jpg',
                 'type': 'youtube'
-            }))
+            })),
+            'transcript_feedback_enabled': True,
         }
 
         mako_service = self.block.runtime.service(self.block, 'mako')
@@ -2487,7 +2496,8 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
-            'poster': 'null'
+            'poster': 'null',
+            'transcript_feedback_enabled': True,
         }
         return context
 
