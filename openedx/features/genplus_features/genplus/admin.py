@@ -70,6 +70,10 @@ class CsvImportForm(forms.Form):
     csv_file = forms.FileField()
     force_change_password = forms.BooleanField(initial=True, required=False)
 
+@admin.register(LocalAuthority)
+class LocalAuthorityAdmin(admin.ModelAdmin):
+    search_fields = ('name',)
+    list_display = ('name', 'saml_configuration_slug')
 
 @admin.register(School)
 class SchoolAdmin(admin.ModelAdmin):
@@ -78,6 +82,7 @@ class SchoolAdmin(admin.ModelAdmin):
         'guid',
         'name',
         'type',
+        'local_authority',
         'is_active',
         'external_id',
         'classes',
@@ -86,7 +91,7 @@ class SchoolAdmin(admin.ModelAdmin):
         'enrolled_students'
     )
     search_fields = ('name',)
-    list_filter = ('type', 'is_active')
+    list_filter = ('type', 'is_active', 'local_authority')
     actions = ['sync_registration_group_classes', 'sync_teaching_group_classes']
 
     def get_urls(self):
