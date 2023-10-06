@@ -32,7 +32,7 @@ from xblock.runtime import KvsFieldData
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE
 from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag, CourseYoutubeBlockedFlag
-from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
+from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE, TRANSCRIPT_FEEDBACK
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.courses import get_course_by_id
@@ -546,8 +546,13 @@ class VideoBlock(
         """
         Is transcript feedback enabled for this video?
         """
-        # TODO
-        return True
+        try:
+            # Video transcript feedback must be enabled in order to show the widget
+            feature_enabled = TRANSCRIPT_FEEDBACK.is_enabled(self.location.course_key)
+        except Exception as err:  # pylint: disable=broad-except
+            log.exception(f"Error retrieving course for course ID: {self.location.course_key}")
+            return False
+        return feature_enabled
 
     def get_public_video_url(self):
         """
