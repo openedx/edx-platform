@@ -33,6 +33,7 @@ class CourseBlocksSignalTest(ModuleStoreTestCase):
         # Course exists in cache initially
         bs_manager = get_block_structure_manager(self.course.id)
         orig_block_structure = bs_manager.get_collected()
+        assert is_course_in_block_structure_cache(self.course.id, self.store)
         assert test_display_name != orig_block_structure.get_xblock_field(self.course_usage_key, 'display_name')
 
         self.course.display_name = test_display_name
@@ -45,7 +46,7 @@ class CourseBlocksSignalTest(ModuleStoreTestCase):
     def test_course_delete(self):
         bs_manager = get_block_structure_manager(self.course.id)
         assert bs_manager.get_collected() is not None
-
+        assert is_course_in_block_structure_cache(self.course.id, self.store)
         self.store.delete_course(self.course.id, self.user.id)
         with pytest.raises(ItemNotFoundError):
             bs_manager.get_collected()
