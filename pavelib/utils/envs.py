@@ -89,7 +89,7 @@ class Env:
     if USING_DOCKER:
         KARMA_BROWSER = 'ChromeDocker' if SELENIUM_BROWSER == 'chrome' else 'FirefoxDocker'
     else:
-    KARMA_BROWSER = 'FirefoxNoUpdates'
+        KARMA_BROWSER = 'FirefoxNoUpdates'
 
     # Files used to run each of the js test suites
     # TODO:  Store this as a dict. Order seems to matter for some
