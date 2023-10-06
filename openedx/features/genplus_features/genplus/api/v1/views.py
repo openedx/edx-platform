@@ -14,7 +14,7 @@ from rest_framework.decorators import action
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from drf_multiple_model.mixins import FlatMultipleModelMixin
-
+from common.djangoapps.third_party_auth.models import SAMLProviderConfig
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.features.genplus_features.genplus.models import (
     GenUser, Character, Class, Teacher, Student, JournalPost, Skill, School, XporterDetail
@@ -460,3 +460,38 @@ class XporterAuth(APIView):
         except XporterException as e:
             logger.exception(str(e))
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class SchoolView(APIView):
+    def post(self, request):
+        user_email = request.data.get('email')
+
+        if not user_email:
+            return Response({'message': 'No email provided!'}, status=status.HTTP_400_BAD_REQUEST)
+
+        student = get_object_or_404(GenUser, email=user_email)
+
+        school_type = student.school.type
+        slugs = None
+
+        if school_type == SchoolTypes.PRIVATE:
+            return Response({'message': 'Student belongs to a private school'}, status=status.HTTP_404_NOT_FOUND)
+        elif school_type == SchoolTypes.RM_UNIFY:
+            slugs = settings.RM_UNIFY_PROVIDER_SLUGS
+        elif school_type == SchoolTypes.XPORTER:
+            slugs = settings.ABERDEEN_PROVIDER_SLUGS
+
+        provider = SAMLProviderConfig.objects.filter(slug__in=slugs).first()
+
+        if not provider:
+            return Response({'message': 'No provider found for the school type'}, status=status.HTTP_404_NOT_FOUND)
+
+        data = {
+            'icon': provider.icon_image.url if provider.icon_image else None,
+            'provider_id': provider.provider_id,
+            'provider_name': provider.name,
+            'local_authority_name': student.school.local_authority.name if student.school.local_authority is not None else student.school.name,
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
+

@@ -10,11 +10,22 @@ from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
+
 USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
+
+class LocalAuthority(TimeStampedModel):
+    name = models.CharField(max_length=64, unique=True)
+    saml_configuration_slug = models.SlugField(null=True, blank=True, max_length=30,
+                                               help_text='Slug of saml configuration i.e rmunify-dev, rmunify-stage')
+
+
+    def __str__(self):
+       return self.name
 
 
 class School(TimeStampedModel):
     SCHOOL_CHOICES = SchoolTypes.__MODEL_CHOICES__
+    local_authority = models.ForeignKey(LocalAuthority, on_delete=models.SET_NULL, null=True)
     guid = models.CharField(primary_key=True, max_length=128)
     name = models.CharField(max_length=64)
     external_id = models.CharField(max_length=32)

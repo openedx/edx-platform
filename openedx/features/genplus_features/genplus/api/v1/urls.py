@@ -14,7 +14,8 @@ from .views import (
     ContactAPIView,
     ChangePasswordByTeacherView,
     ChangePasswordView,
-    XporterAuth
+    XporterAuth,
+    SchoolView
 )
 
 app_name = 'genplus_api_v1'
@@ -33,5 +34,6 @@ urlpatterns = [
     url(r'^change-password-teacher/$', ChangePasswordByTeacherView.as_view()),
     url(r'^characters/select/(?P<pk>\d+)/$', CharacterViewSet.as_view({"put": "select_character"})),
     url(r'^classes/(?P<pk>\w+)/add_class/$', ClassViewSet.as_view({"put": "add_my_class"})),
+    url(r'^school/$', SchoolView.as_view()),
     path('', include(router.urls)),
 ]

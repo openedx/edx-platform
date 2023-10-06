@@ -47,6 +47,8 @@ def third_party_auth_context(request, redirect_to, tpa_hint=None):
             info = {
                 "id": enabled.provider_id,
                 "name": enabled.name,
+                "slug": enabled.slug,
+                "rmunify_slugs": settings.RM_UNIFY_PROVIDER_SLUGS,
                 "iconClass": enabled.icon_class or None,
                 "iconImage": enabled.icon_image.url if enabled.icon_image else None,
                 "skipHintedLogin": enabled.skip_hinted_login_dialog,
