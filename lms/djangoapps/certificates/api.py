@@ -49,6 +49,8 @@ from lms.djangoapps.certificates.utils import (
     certificate_status_for_student as _certificate_status_for_student,
 )
 from lms.djangoapps.instructor import access
+from lms.djangoapps.utils import _get_key
+from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
@@ -920,3 +922,34 @@ def _has_passed_or_is_allowlisted(course, student, course_grade):
     has_passed = course_grade and course_grade.passed
 
     return has_passed or is_allowlisted
+
+
+def invalidate_certificate(user_id, course_key_or_id, source):
+    """
+    Invalidate the user certificate in a given course if it exists and the user is not on the allowlist for this
+    course run.
+
+    This function is called in services.py and handlers.py within the certificates folder. As of now,
+    The call in services.py occurs when an exam attempt is rejected in the legacy exams backend, edx-proctoring.
+    The call in handlers.py is occurs when an exam attempt is rejected in the newer exams backend, edx-exams.
+    """
+    course_key = _get_key(course_key_or_id, CourseKey)
+    if _is_on_certificate_allowlist(user_id, course_key):
+        log.info(f'User {user_id} is on the allowlist for {course_key}. The certificate will not be invalidated.')
+        return False
+
+    try:
+        generated_certificate = GeneratedCertificate.objects.get(
+            user=user_id,
+            course_id=course_key
+        )
+        generated_certificate.invalidate(source=source)
+    except ObjectDoesNotExist:
+        log.warning(
+            'Invalidation failed because a certificate for user %d in course %s does not exist.',
+            user_id,
+            course_key
+        )
+        return False
+
+    return True

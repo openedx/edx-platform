@@ -754,6 +754,16 @@ urlpatterns += [
 
 urlpatterns += [
     re_path(
+        r'^courses/{}/courseware-search/enabled/$'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        courseware_views.courseware_mfe_search_enabled,
+        name='courseware_search_enabled_view',
+    ),
+]
+
+urlpatterns += [
+    re_path(
         r'^courses/{}/lti_tab/(?P<provider_uuid>[^/]+)/$'.format(
             settings.COURSE_ID_PATTERN,
         ),

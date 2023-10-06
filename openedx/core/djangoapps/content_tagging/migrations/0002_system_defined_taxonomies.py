@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 'indexes': [],
                 'constraints': [],
             },
-            bases=(openedx.core.djangoapps.content_tagging.models.base.ContentTaxonomyMixin, 'oel_tagging.usersystemdefinedtaxonomy'),
+            bases=('oel_tagging.usersystemdefinedtaxonomy', ),
         ),
         migrations.CreateModel(
             name='ContentLanguageTaxonomy',
@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                 'indexes': [],
                 'constraints': [],
             },
-            bases=(openedx.core.djangoapps.content_tagging.models.base.ContentTaxonomyMixin, 'oel_tagging.languagetaxonomy'),
+            bases=('oel_tagging.languagetaxonomy', ),
         ),
         migrations.CreateModel(
             name='ContentOrganizationTaxonomy',
@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
                 'indexes': [],
                 'constraints': [],
             },
-            bases=(openedx.core.djangoapps.content_tagging.models.base.ContentTaxonomyMixin, 'oel_tagging.modelsystemdefinedtaxonomy'),
+            bases=('oel_tagging.modelsystemdefinedtaxonomy', ),
         ),
         migrations.CreateModel(
             name='OrganizationModelObjectTag',
