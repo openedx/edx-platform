@@ -92,7 +92,11 @@ def has_ccx_coach_role(user, course_key):
         # TODO: course roles: If the course roles feature flag is disabled the course_permission_check
         # call below will never return true.
         # Remove the role.has_user call when course_roles Django app are implemented.
-        if role.has_user(user) or course_permission_check(user, CourseRolesPermission.MANAGE_STUDENTS.value, course_key):
+        if role.has_user(user) or course_permission_check(
+            user,
+            CourseRolesPermission.MANAGE_STUDENTS.value,
+            course_key
+        ):
             list_ccx = CustomCourseForEdX.objects.filter(
                 course_id=course_key.to_course_locator(),
                 coach=user

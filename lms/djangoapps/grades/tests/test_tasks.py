@@ -153,8 +153,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             assert mock_block_structure_create.call_count == 1
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 2, 41, True),
-        (ModuleStoreEnum.Type.split, 2, 41, False),
+        (ModuleStoreEnum.Type.split, 2, 43, True),
+        (ModuleStoreEnum.Type.split, 2, 43, False),
     )
     @ddt.unpack
     def test_query_counts(self, default_store, num_mongo_calls, num_sql_calls, create_multiple_subsections):
