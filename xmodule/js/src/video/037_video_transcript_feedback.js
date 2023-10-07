@@ -56,6 +56,7 @@
                         'language_menu:hide': this.onHideLanguageMenu,
                         destroy: this.destroy
                     };
+                    this.getFeedbackForCurrentTranscript();
                     this.bindHandlers();
                 },
 
@@ -63,7 +64,27 @@
                     this.state.el.on(this.events);
                 },
 
-                sendPositiveFeedback: function() {
+                getFeedbackForCurrentTranscript: function() {
+                    // commenting this until rodri finishes the fetch for these 3 attributes
+                    // var url = this.state.config.getFeedbackUrl + `'/transcript-feedback' + '?transcript_language=' + this.currentTranscriptLanguage + '&video_uuid=' + this.videoUuid + '&user_uuid=' + this.userUuid;
+                    var url = 'http://localhost:18760/api/v1/transcript-feedback?transcript_language=es&video_uuid=6f437f8c-2287-49e0-8d5d-26fc87f038ac&user_uuid=33d199ea-57f2-11ee-8c99-0242ac120002';
+
+                    $.ajax({
+                        url: url,
+                        type: 'GET',
+                    })
+                    .success(function(data) {
+                        console.log('Success: ', data);
+
+                        if (data.value === true) {
+                            this.markAsPositiveFeedback();
+                        } else {
+                            this.markAsNegativeFeedback();
+                        }
+                    });
+                },
+
+                markAsPositiveFeedback: function() {
                     this.thumbsUpIcon = this.thumbsUpButton.find('.thumbs-up-icon');
                     if (this.thumbsUpIcon[0].classList.contains('fa-thumbs-o-up')) {
                         this.thumbsUpIcon[0].classList.remove("fa-thumbs-o-up");
@@ -72,10 +93,9 @@
                         this.thumbsUpIcon[0].classList.remove("fa-thumbs-up");
                         this.thumbsUpIcon[0].classList.add("fa-thumbs-o-up");
                     }
-                    // Send request
                 },
 
-                sendNegativeFeedback: function() {
+                markAsNegativeFeedback: function() {
                     this.thumbsDownIcon = this.thumbsDownButton.find('.thumbs-down-icon');
                     if (this.thumbsDownIcon[0].classList.contains('fa-thumbs-o-down')) {
                         this.thumbsDownIcon[0].classList.remove("fa-thumbs-o-down");
@@ -84,6 +104,15 @@
                         this.thumbsDownIcon[0].classList.remove("fa-thumbs-down");
                         this.thumbsDownIcon[0].classList.add("fa-thumbs-o-down");
                     }
+                },
+
+                sendPositiveFeedback: function() {
+                    markAsPositiveFeedback();
+                    // Send request
+                },
+
+                sendNegativeFeedback: function() {
+                    markAsNegativeFeedback();
                     // Send request
                 },
 
