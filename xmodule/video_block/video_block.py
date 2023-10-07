@@ -448,6 +448,7 @@ class VideoBlock(
             'transcriptAvailableTranslationsUrl': self.runtime.handler_url(
                 self, 'transcript', 'available_translations'
             ).rstrip('/?'),
+            # 'aiTranslationsUrl': settings.AI_TRANSLATIONS_URL,
             'transcriptLanguage': transcript_language,
             'transcriptLanguages': sorted_languages,
             'transcriptTranslationUrl': self.runtime.handler_url(
