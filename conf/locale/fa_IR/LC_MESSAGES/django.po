@@ -7548,6 +7548,14 @@ msgstr "فهرست سیاه {country}  برای {course}"
 msgid "Learner Pathways"
 msgstr "مسیرهای یادگیرنده"
 
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification App"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification Type"
+msgstr ""
+
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
 msgid ""
