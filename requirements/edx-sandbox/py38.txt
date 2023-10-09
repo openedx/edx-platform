@@ -20,9 +20,9 @@ cryptography==38.0.4
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
-cycler==0.12.0
+cycler==0.12.1
     # via matplotlib
-fonttools==4.43.0
+fonttools==4.43.1
     # via matplotlib
 importlib-resources==6.1.0
     # via matplotlib
