@@ -73,10 +73,43 @@
                         url: url,
                         type: 'GET',
                     })
-                    .success(function(data) {
-                        console.log('Success: ', data);
+                    .success(function(response) {
+                        console.log('Success: ', response.data);
 
-                        if (data.value === true) {
+                        if (response.data.value === true) {
+                            this.markAsPositiveFeedback();
+                        } else {
+                            this.markAsNegativeFeedback();
+                        }
+                    });
+                },
+
+                setFeedbackForCurrentTranscript: function(feedbackValue) {
+                    var url = 'http://localhost:18760/api/v1/transcript-feedback';
+
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        dataType: 'json',
+                        // commenting this until rodri finishes the fetch for these 3 attributes
+                        // data: {
+                        //     transcript_language: this.currentTranscriptLanguage,
+                        //     video_uuid: this.videoUuid,
+                        //     user_uuid: this.userUuid,
+                        //     value: feedbackValue,
+                        // },
+
+                        data: {
+                            transcript_language: 'es',
+                            video_uuid: '6f437f8c-2287-49e0-8d5d-26fc87f038ac',
+                            user_uuid: '33d199ea-57f2-11ee-8c99-0242ac120002',
+                            value: feedbackValue,
+                        },
+                    })
+                    .success(function(response) {
+                        console.log('Success: ', response.data);
+
+                        if (feedbackValue === true) {
                             this.markAsPositiveFeedback();
                         } else {
                             this.markAsNegativeFeedback();
@@ -107,13 +140,11 @@
                 },
 
                 sendPositiveFeedback: function() {
-                    markAsPositiveFeedback();
-                    // Send request
+                    this.setFeedbackForCurrentTranscript(true)
                 },
 
                 sendNegativeFeedback: function() {
-                    markAsNegativeFeedback();
-                    // Send request
+                    this.setFeedbackForCurrentTranscript(false)
                 },
 
                 onHideLanguageMenu: function() {
