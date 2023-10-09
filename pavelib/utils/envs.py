@@ -79,7 +79,7 @@ class Env:
     # Detect if in a Docker container, and if so which one
     SERVER_HOST = '0.0.0.0'
     USING_DOCKER = SERVER_HOST != '0.0.0.0'
-    DEVSTACK_SETTINGS = 'devstack'
+    DEVSTACK_SETTINGS = 'devstack_docker' if USING_DOCKER else 'devstack'
     TEST_SETTINGS = 'test'
 
     # Test Ids Directory
