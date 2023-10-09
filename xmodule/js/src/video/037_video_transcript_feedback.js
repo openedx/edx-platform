@@ -49,8 +49,10 @@
                 initialize: function() {
                     this.el = this.state.el.find('.wrapper-transcript-feedback');
 
-                    this.video_id = this.el.data('video-id');
-                    this.user_id = this.el.data('user-id');
+                    this.videoId = this.el.data('video-id');
+                    this.userId = this.el.data('user-id');
+                    // this.aiTranslationsUrl = this.state.config.getFeedbackUrl;
+                    this.aiTranslationsUrl = 'http://localhost:18760/api/v1';
 
                     this.thumbsUpButton = this.el.find('.thumbs-up-btn');
                     this.thumbsDownButton = this.el.find('.thumbs-down-btn');
@@ -61,6 +63,7 @@
                         'language_menu:hide': this.onHideLanguageMenu,
                         destroy: this.destroy
                     };
+                    this.getFeedbackForCurrentTranscript();
                     this.bindHandlers();
                 },
 
@@ -68,7 +71,23 @@
                     this.state.el.on(this.events);
                 },
 
-                sendPositiveFeedback: function() {
+                getFeedbackForCurrentTranscript: function() {
+                    var url = this.aiTranslationsUrl + '/transcript-feedback' + '?transcript_language=' + this.currentTranscriptLanguage + '&video_uuid=' + this.videoId + '&user_id=' + this.userId;
+
+                    $.ajax({
+                        url: url,
+                        type: 'GET',
+                    })
+                    .success(function(data) {
+                        if (data.value === true) {
+                            this.markAsPositiveFeedback();
+                        } else {
+                            this.markAsNegativeFeedback();
+                        }
+                    });
+                },
+
+                markAsPositiveFeedback: function() {
                     this.thumbsUpIcon = this.thumbsUpButton.find('.thumbs-up-icon');
                     if (this.thumbsUpIcon[0].classList.contains('fa-thumbs-o-up')) {
                         this.thumbsUpIcon[0].classList.remove("fa-thumbs-o-up");
@@ -77,10 +96,9 @@
                         this.thumbsUpIcon[0].classList.remove("fa-thumbs-up");
                         this.thumbsUpIcon[0].classList.add("fa-thumbs-o-up");
                     }
-                    // Send request
                 },
 
-                sendNegativeFeedback: function() {
+                markAsNegativeFeedback: function() {
                     this.thumbsDownIcon = this.thumbsDownButton.find('.thumbs-down-icon');
                     if (this.thumbsDownIcon[0].classList.contains('fa-thumbs-o-down')) {
                         this.thumbsDownIcon[0].classList.remove("fa-thumbs-o-down");
@@ -89,6 +107,15 @@
                         this.thumbsDownIcon[0].classList.remove("fa-thumbs-down");
                         this.thumbsDownIcon[0].classList.add("fa-thumbs-o-down");
                     }
+                },
+
+                sendPositiveFeedback: function() {
+                    markAsPositiveFeedback();
+                    // Send request
+                },
+
+                sendNegativeFeedback: function() {
+                    markAsNegativeFeedback();
                     // Send request
                 },
 
