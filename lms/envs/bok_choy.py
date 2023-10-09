@@ -70,7 +70,7 @@ STATICFILES_DIRS = [
     (TEST_ROOT / "staticfiles" / "lms").abspath(),
 ]
 
-DEFAULT_FILE_STORAGE = 'openedx.core.storage.ProductionStorage'
+DEFAULT_FILE_STORAGE = 'openedx.core.storage.ProductionS3Storage'
 MEDIA_ROOT = TEST_ROOT / "uploads"
 
 # Webpack loader must use webpack output setting
@@ -152,3 +152,6 @@ try:
     from .private import *      # pylint: disable=wildcard-import
 except ImportError:
     pass
+
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
