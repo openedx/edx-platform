@@ -70,11 +70,11 @@ requests==2.31.0
     # via semgrep
 rich==13.6.0
     # via semgrep
-rpds-py==0.10.3
+rpds-py==0.10.4
     # via
     #   jsonschema
     #   referencing
-ruamel-yaml==0.17.34
+ruamel-yaml==0.17.35
     # via semgrep
 ruamel-yaml-clib==0.2.8
     # via ruamel-yaml
