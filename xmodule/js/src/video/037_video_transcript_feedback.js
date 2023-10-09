@@ -1,31 +1,38 @@
 (function(define) {
-    // eslint-disable-next-line lines-around-directive
-    'use strict';
-
     // VideoTranscriptFeedbackHandler module.
-    define(
-        'video/037_video_transcript_feedback.js', ['underscore'],
-        function(_) {
-            var VideoTranscriptFeedbackHandler;
 
+        'use strict';
+
+        define('video/037_video_caption.js', ['underscore'],
+        function(_) {
             /**
-             * Video Transcript Feedback control module.
-             * @exports video/037_video_transcript_feedback.js
-             * @constructor
-             * @param {jquery Element} element
-             * @param {Object} options
+             * @desc VideoTranscriptFeedbackHandler module exports a function.
+             *
+             * @type {function}
+             * @access public
+             *
+             * @param {object} state - The object containing the state of the video
+             *     player. All other modules, their parameters, public variables, etc.
+             *     are available via this object.
+             *
+             * @this {object} The global window object.
+             *
              */
-            VideoTranscriptFeedbackHandler = function(element, options) {
+
+            var VideoTranscriptFeedbackHandler = function(state) {
                 if (!(this instanceof VideoTranscriptFeedbackHandler)) {
-                    return new VideoTranscriptFeedbackHandler(element, options);
+                    return new VideoTranscriptFeedbackHandler(state);
                 }
 
-                _.bindAll(this, 'sendPositiveFeedback');
-                _.bindAll(this, 'sendNegativeFeedback');
+                _.bindAll(this, 'sendPositiveFeedback', 'sendNegativeFeedback', 'onHideLanguageMenu',
+                    'destroy'
+                );
 
-                this.container = element;
+                this.state = state;
+                this.currentTranscriptLanguage = this.state.lang;
+                this.transcriptLanguages = this.state.config.transcriptLanguages;
 
-                if (this.container.find('.wrapper-downloads .wrapper-transcript-feedback')) {
+                if (this.state.el.find('.wrapper-downloads .wrapper-transcript-feedback')) {
                     this.initialize();
                 }
 
@@ -34,13 +41,31 @@
 
             VideoTranscriptFeedbackHandler.prototype = {
 
+                destroy: function() {
+                    this.state.el.off(this.events);
+                },
+
                 // Initializes the module.
                 initialize: function() {
-                    this.el = this.container.find('.wrapper-transcript-feedback');
+                    this.el = this.state.el.find('.wrapper-transcript-feedback');
+
+                    this.video_id = this.el.data('video-id');
+                    this.user_id = this.el.data('user-id');
+
                     this.thumbsUpButton = this.el.find('.thumbs-up-btn');
                     this.thumbsDownButton = this.el.find('.thumbs-down-btn');
                     this.thumbsUpButton.on('click', this.sendPositiveFeedback);
                     this.thumbsDownButton.on('click', this.sendNegativeFeedback);
+
+                    this.events = {
+                        'language_menu:hide': this.onHideLanguageMenu,
+                        destroy: this.destroy
+                    };
+                    this.bindHandlers();
+                },
+
+                bindHandlers: function() {
+                    this.state.el.on(this.events);
                 },
 
                 sendPositiveFeedback: function() {
@@ -65,6 +90,15 @@
                         this.thumbsDownIcon[0].classList.add("fa-thumbs-o-down");
                     }
                     // Send request
+                },
+
+                onHideLanguageMenu: function() {
+                    this.currentTranscriptLanguage = this.getCurrentLanguage();
+                },
+
+                getCurrentLanguage: function() {
+                    var language = this.state.lang;
+                    return language;
                 },
             };
 

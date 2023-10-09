@@ -151,7 +151,7 @@ from openedx.core.djangolib.js_utils import (
         </div>
         % endif
         % if transcript_feedback_enabled:
-            <div class="wrapper-transcript-feedback">
+            <div class="wrapper-transcript-feedback" data-video-id='${video_id}' data-user-id='${user_id}'>
                 <h4 class="hd hd-5">${_('How is the transcript quality ?')}</h4>
                 <div class="transcript-feedback-buttons">
                     <div class="transcript-feedback-btn-wrapper">
