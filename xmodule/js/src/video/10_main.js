@@ -93,10 +93,10 @@
                         FocusGrabber, VideoControl, VideoPlayPlaceholder,
                         VideoPlayPauseControl, VideoProgressSlider, VideoSpeedControl,
                         VideoVolumeControl, VideoQualityControl, VideoFullScreen, VideoCaption, VideoCommands,
-                        VideoContextMenu, VideoSaveStatePlugin, VideoEventsPlugin, VideoCompletionHandler
+                        VideoContextMenu, VideoSaveStatePlugin, VideoEventsPlugin, VideoCompletionHandler, VideoTranscriptFeedback
                     ].concat(autoAdvanceEnabled ? [VideoAutoAdvanceControl] : []),
                     bumperVideoModules = [VideoControl, VideoPlaySkipControl, VideoSkipControl,
-                        VideoVolumeControl, VideoCaption, VideoCommands, VideoSaveStatePlugin,
+                        VideoVolumeControl, VideoCaption, VideoCommands, VideoSaveStatePlugin, VideoTranscriptFeedback,
                         VideoEventsBumperPlugin, VideoCompletionHandler],
                     state = {
                         el: el,
@@ -138,7 +138,6 @@
                 });
 
                 VideoSocialSharing(el);
-                VideoTranscriptFeedback(el);
 
                 if (bumperMetadata) {
                     VideoPoster(el, {
