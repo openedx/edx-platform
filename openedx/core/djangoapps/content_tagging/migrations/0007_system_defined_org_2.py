@@ -19,7 +19,7 @@ def revert_mark_language_taxonomy_as_all_orgs(apps, _schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('content_tagging', '0006_simplify_models'),
+        ('content_tagging', '0001_squashed'),
         ("oel_tagging", "0012_language_taxonomy"),
     ]
 
