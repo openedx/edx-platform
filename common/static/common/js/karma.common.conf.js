@@ -45,6 +45,7 @@ var appRoot = path.join(__dirname, '../../../../');
 // eslint-disable-next-line import/no-extraneous-dependencies
 var webdriver = require('selenium-webdriver');
 // eslint-disable-next-line import/no-extraneous-dependencies
+var firefox = require('selenium-webdriver/firefox');
 
 var webpackConfig = require(path.join(appRoot, 'webpack.dev.config.js'));
 
@@ -296,6 +297,8 @@ function getBaseConfig(config, useRequireJs) {
             'karma-requirejs',
             'karma-junit-reporter',
             'karma-coverage',
+            'karma-chrome-launcher',
+            'karma-firefox-launcher',
             'karma-spec-reporter',
             'karma-selenium-webdriver-launcher',
             'karma-webpack',
@@ -333,6 +336,46 @@ function getBaseConfig(config, useRequireJs) {
 
         // enable / disable watching file and executing tests whenever any file changes
         autoWatch: false,
+
+        // start these browsers
+        // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
+        browsers: ['FirefoxNoUpdates'],
+
+        customLaunchers: {
+            // Firefox configuration that doesn't perform auto-updates
+            FirefoxNoUpdates: {
+                base: 'Firefox',
+                prefs: {
+                    'app.update.auto': false,
+                    'app.update.enabled': false
+                }
+            },
+            ChromeDocker: {
+                base: 'SeleniumWebdriver',
+                browserName: 'chrome',
+                getDriver: function() {
+                    return new webdriver.Builder()
+                        .forBrowser('chrome')
+                        .usingServer('http://edx.devstack.chrome:4444/wd/hub')
+                        .build();
+                }
+            },
+            FirefoxDocker: {
+                base: 'SeleniumWebdriver',
+                browserName: 'firefox',
+                getDriver: function() {
+                    var options = new firefox.Options(),
+                        profile = new firefox.Profile();
+                    profile.setPreference('focusmanager.testmode', true);
+                    options.setProfile(profile);
+                    return new webdriver.Builder()
+                        .forBrowser('firefox')
+                        .usingServer('http://edx.devstack.firefox:4444/wd/hub')
+                        .setFirefoxOptions(options)
+                        .build();
+                }
+            }
+        },
         
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits

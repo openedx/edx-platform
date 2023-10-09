@@ -85,7 +85,7 @@ class Env:
     # Test Ids Directory
     TEST_DIR = REPO_ROOT / ".testids"
 
-    # Configured browser to use for the js test suites    
+    # Configured browser to use for the js test suites
     SELENIUM_BROWSER = os.environ.get('SELENIUM_BROWSER', 'firefox')
     if USING_DOCKER:
         KARMA_BROWSER = 'ChromeDocker' if SELENIUM_BROWSER == 'chrome' else 'FirefoxDocker'
