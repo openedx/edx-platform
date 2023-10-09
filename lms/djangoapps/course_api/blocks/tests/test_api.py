@@ -222,7 +222,7 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
 
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, 5, 14),
-        (ModuleStoreEnum.Type.split, 2, 14),
+        (ModuleStoreEnum.Type.split, 0, 14),
     )
     @ddt.unpack
     def test_query_counts_uncached(self, store_type, expected_mongo_queries, num_sql_queries):
