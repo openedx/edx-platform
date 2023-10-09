@@ -96,7 +96,7 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
         self._assert_courses_in_block_cache(self.course_keys[0])
         self._assert_courses_in_block_storage(self.course_keys[0])
         self._assert_courses_not_in_block_storage(*self.course_keys[1:])
-        
+
     @ddt.data(
         *itertools.product(
             (True, False),
