@@ -82,6 +82,9 @@ class Env:
     DEVSTACK_SETTINGS = 'devstack_docker' if USING_DOCKER else 'devstack'
     TEST_SETTINGS = 'test'
 
+    # Mongo databases that will be dropped before/after the tests run
+    MONGO_HOST = 'edx.devstack.mongo' if USING_DOCKER else 'localhost'
+
     # Test Ids Directory
     TEST_DIR = REPO_ROOT / ".testids"
 
