@@ -3,10 +3,12 @@ Signal handler for enabling/disabling self-generated certificates based on the c
 """
 
 import logging
+from django.conf import settings
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from openedx_events.event_bus import get_producer
+from edx_django_utils.monitoring import set_custom_attribute
 
 from common.djangoapps.course_modes import api as modes_api
 from common.djangoapps.student.models import CourseEnrollment
@@ -161,12 +163,47 @@ def _listen_for_enrollment_mode_change(sender, user, course_key, mode, **kwargs)
             return False
 
 
+def _determine_producer_config_for_signal_and_topic(signal, topic):
+    """
+    Utility method to determine the setting for the given signal and topic in EVENT_BUS_PRODUCER_CONFIG
+
+    Records to New Relic for later analysis.
+
+    Parameters
+        signal (OpenEdxPublicSignal): The signal being sent to the event bus
+        topic (string): The topic to which the signal is being sent
+
+    Returns
+        True if the signal is enabled for that topic in EVENT_BUS_PRODUCER_CONFIG
+        False if the signal is explicitly disabled for that topic in EVENT_BUS_PRODUCER_CONFIG
+        None if the signal/topic pair is not present in EVENT_BUS_PRODUCER_CONFIG
+    """
+    event_type_producer_configs = getattr(settings, "EVENT_BUS_PRODUCER_CONFIG",
+                                          {}).get(signal.event_type, {})
+    topic_config = event_type_producer_configs.get(topic, {})
+    topic_setting = topic_config.get('enabled', None)
+    if topic_setting is True:
+        set_custom_attribute('producer_config_setting', 'True')
+    if topic_setting is False:
+        set_custom_attribute('producer_config_setting', 'False')
+    if topic_setting is None:
+        set_custom_attribute('producer_config_setting', 'Unset')
+    return topic_setting
+
+
 @receiver(CERTIFICATE_CREATED)
 def listen_for_certificate_created_event(sender, signal, **kwargs):  # pylint: disable=unused-argument
     """
     Publish `CERTIFICATE_CREATED` events to the event bus.
     """
+    # temporary: defer to EVENT_BUS_PRODUCER_CONFIG if present
+    producer_config_setting = _determine_producer_config_for_signal_and_topic(CERTIFICATE_CREATED,
+                                                                              'learning-certificate-lifecycle')
+    if producer_config_setting is True:
+        log.info("Producing certificate-created event via config")
+        return
     if SEND_CERTIFICATE_CREATED_SIGNAL.is_enabled():
+        log.info("Producing certificate-created event via manual send")
         get_producer().send(
             signal=CERTIFICATE_CREATED,
             topic='learning-certificate-lifecycle',
@@ -181,7 +218,14 @@ def listen_for_certificate_revoked_event(sender, signal, **kwargs):  # pylint: d
     """
     Publish `CERTIFICATE_REVOKED` events to the event bus.
     """
+    # temporary: defer to EVENT_BUS_PRODUCER_CONFIG if present
+    producer_config_setting = _determine_producer_config_for_signal_and_topic(CERTIFICATE_REVOKED,
+                                                                              'learning-certificate-lifecycle')
+    if producer_config_setting is True:
+        log.info("Producing certificate-revoked event via config")
+        return
     if SEND_CERTIFICATE_REVOKED_SIGNAL.is_enabled():
+        log.info("Producing certificate-revoked event via manual send")
         get_producer().send(
             signal=CERTIFICATE_REVOKED,
             topic='learning-certificate-lifecycle',

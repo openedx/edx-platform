@@ -1039,6 +1039,18 @@ FEATURES = {
     # .. toggle_creation_date: 2022-06-06
     # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/29538'
     'DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED': False,
+
+    # .. toggle_name: SEND_LEARNING_CERTIFICATE_LIFECYCLE_EVENTS_TO_BUS
+    # .. toggle_implementation: SettingToggle
+    # .. toggle_default: False
+    # .. toggle_description: When True, the system will publish certificate lifecycle signals to the event bus.
+    #    This toggle is used to create the EVENT_BUS_PRODUCER_CONFIG setting.
+    # .. toggle_warning: The default may be changed in a later release. See
+    #    https://github.com/openedx/openedx-events/issues/265
+    # .. toggle_use_cases: opt_in
+    # .. toggle_creation_date: 2023-10-10
+    # .. toggle_tickets: https://github.com/openedx/openedx-events/issues/210
+    'SEND_LEARNING_CERTIFICATE_LIFECYCLE_EVENTS_TO_BUS': False
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
@@ -5386,6 +5398,73 @@ NOTIFICATION_CREATION_BATCH_SIZE = 99
 # disable indexing on date field its coming from django-simple-history.
 SIMPLE_HISTORY_DATE_INDEX = False
 
-#### Event bus publishing ####
-## Will be more filled out as part of https://github.com/edx/edx-arch-experiments/issues/381
-EVENT_BUS_PRODUCER_CONFIG = {}
+
+def _should_send_certificate_events(settings):
+    return settings.FEATURES['SEND_LEARNING_CERTIFICATE_LIFECYCLE_EVENTS_TO_BUS']
+#### Event bus producing ####
+# .. setting_name: EVENT_BUS_PRODUCER_CONFIG
+# .. setting_default: {}
+# .. setting_description: Dictionary of event_types mapped to dictionaries of topic to topic-related configuration.
+#    Each topic configuration dictionary contains
+#    * `enabled`: a toggle denoting whether the event will be published to the topic. These should be annotated
+#       according to
+#       https://edx.readthedocs.io/projects/edx-toggles/en/latest/how_to/documenting_new_feature_toggles.html
+#    * `event_key_field` which is a period-delimited string path to event data field to use as event key.
+#    Note: The topic names should not include environment prefix as it will be dynamically added based on
+#    EVENT_BUS_TOPIC_PREFIX setting.
+EVENT_BUS_PRODUCER_CONFIG = {
+    'org.openedx.learning.certificate.created.v1': {
+        'learning-certificate-lifecycle':
+            {'event_key_field': 'certificate.course.course_key', 'enabled': _should_send_certificate_events},
+    },
+    'org.openedx.learning.certificate.revoked.v1': {
+        'learning-certificate-lifecycle':
+            {'event_key_field': 'certificate.course.course_key', 'enabled': _should_send_certificate_events},
+    },
+    'org.openedx.learning.course.unenrollment.completed.v1': {
+        'course-unenrollment-lifecycle':
+            {'event_key_field': 'enrollment.course.course_key',
+             # .. toggle_name: ENABLE_SEND_COURSE_UNENROLLMENT_COMPLETED_EVENTS_OVER_BUS
+             # .. toggle_implementation: DjangoSetting
+             # .. toggle_default: False
+             # .. toggle_description: Enables sending COURSE_UNENROLLMENT_COMPLETED events over the event bus.
+             # .. toggle_use_cases: opt_in
+             # .. toggle_creation_date: 2023-09-18
+             # .. toggle_warning: The default may be changed in a later release. See
+             #   https://github.com/openedx/openedx-events/issues/265
+             # .. toggle_tickets: https://github.com/openedx/openedx-events/issues/210
+             'enabled': False},
+    },
+    'org.openedx.learning.xblock.skill.verified.v1': {
+        'learning-xblock-skill-verified':
+            {'event_key_field': 'xblock_info.usage_key',
+             # .. toggle_name: ENABLE_SEND_XBLOCK_SKILL_VERIFIED_EVENTS_OVER_BUS
+             # .. toggle_implementation: DjangoSetting
+             # .. toggle_default: False
+             # .. toggle_description: Enables sending xblock_skill_verified events over the event bus.
+             # .. toggle_use_cases: opt_in
+             # .. toggle_creation_date: 2023-09-18
+             # .. toggle_warning: The default may be changed in a later release. See
+             #   https://github.com/openedx/openedx-events/issues/265
+             # .. toggle_tickets: https://github.com/openedx/openedx-events/issues/210
+             'enabled': False}
+    },
+    # CMS events. These have to be copied over here because cms.common adds some derived entries as well,
+    # and the derivation fails if the keys are missing. If we ever remove the import of cms.common, we can remove these.
+    'org.openedx.content_authoring.xblock.published.v1': {
+        'course-authoring-xblock-lifecycle':
+            {'event_key_field': 'xblock_info.usage_key', 'enabled': False},
+    },
+    'org.openedx.content_authoring.xblock.deleted.v1': {
+        'course-authoring-xblock-lifecycle':
+            {'event_key_field': 'xblock_info.usage_key', 'enabled': False},
+    },
+    'org.openedx.content_authoring.xblock.duplicated.v1': {
+        'course-authoring-xblock-lifecycle':
+            {'event_key_field': 'xblock_info.usage_key', 'enabled': False},
+    },
+}
+derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.certificate.created.v1',
+                         'learning-certificate-lifecycle', 'enabled')
+derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.certificate.revoked.v1',
+                         'learning-certificate-lifecycle', 'enabled')

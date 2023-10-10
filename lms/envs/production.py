@@ -26,6 +26,7 @@ from corsheaders.defaults import default_headers as corsheaders_default_headers
 import django
 from django.core.exceptions import ImproperlyConfigured
 from edx_django_utils.plugins import add_plugins
+from openedx_events.event_bus import merge_producer_configs
 from path import Path as path
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
@@ -1133,3 +1134,7 @@ AVAILABLE_DISCUSSION_TOURS = ENV_TOKENS.get('AVAILABLE_DISCUSSION_TOURS', [])
 
 ############## NOTIFICATIONS EXPIRY ##############
 NOTIFICATIONS_EXPIRY = ENV_TOKENS.get('NOTIFICATIONS_EXPIRY', NOTIFICATIONS_EXPIRY)
+
+############## Event bus producer ##############
+EVENT_BUS_PRODUCER_CONFIG = merge_producer_configs(EVENT_BUS_PRODUCER_CONFIG,
+                                                   ENV_TOKENS.get('EVENT_BUS_PRODUCER_CONFIG', {}))

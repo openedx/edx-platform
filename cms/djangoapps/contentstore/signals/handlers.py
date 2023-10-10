@@ -10,6 +10,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.db import transaction
 from django.dispatch import receiver
+from edx_django_utils.monitoring import set_custom_attribute
 from edx_toggles.toggles import SettingToggle
 from opaque_keys.edx.keys import CourseKey
 from openedx_events.content_authoring.data import CourseCatalogData, CourseScheduleData
@@ -159,11 +160,46 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
     transaction.on_commit(lambda: emit_catalog_info_changed_signal(course_key))
 
 
+def _determine_producer_config_for_signal_and_topic(signal, topic):
+    """
+    Utility method to determine the setting for the given signal and topic in EVENT_BUS_PRODUCER_CONFIG
+
+    Records to New Relic for later analysis.
+
+    Parameters
+        signal (OpenEdxPublicSignal): The signal being sent to the event bus
+        topic (string): The topic to which the signal is being sent
+
+    Returns
+        True if the signal is enabled for that topic in EVENT_BUS_PRODUCER_CONFIG
+        False if the signal is explicitly disabled for that topic in EVENT_BUS_PRODUCER_CONFIG
+        None if the signal/topic pair is not present in EVENT_BUS_PRODUCER_CONFIG
+    """
+    event_type_producer_configs = getattr(settings, "EVENT_BUS_PRODUCER_CONFIG",
+                                          {}).get(signal.event_type, {})
+    topic_config = event_type_producer_configs.get(topic, {})
+    topic_setting = topic_config.get('enabled', None)
+    if topic_setting is True:
+        set_custom_attribute('producer_config_setting', 'True')
+    if topic_setting is False:
+        set_custom_attribute('producer_config_setting', 'False')
+    if topic_setting is None:
+        set_custom_attribute('producer_config_setting', 'Unset')
+    return topic_setting
+
+
 @receiver(COURSE_CATALOG_INFO_CHANGED)
 def listen_for_course_catalog_info_changed(sender, signal, **kwargs):
     """
     Publish COURSE_CATALOG_INFO_CHANGED signals onto the event bus.
     """
+    # temporary: defer to EVENT_BUS_PRODUCER_CONFIG if present
+    producer_config_setting = _determine_producer_config_for_signal_and_topic(COURSE_CATALOG_INFO_CHANGED,
+                                                                              'course-catalog-info-changed')
+    if producer_config_setting is True:
+        log.info("Producing course-catalog-info-changed event via config")
+        return
+    log.info("Producing course-catalog-info-changed event via manual send")
     get_producer().send(
         signal=COURSE_CATALOG_INFO_CHANGED, topic='course-catalog-info-changed',
         event_key_field='catalog_info.course_key', event_data={'catalog_info': kwargs['catalog_info']},
@@ -176,8 +212,14 @@ def listen_for_xblock_published(sender, signal, **kwargs):
     """
     Publish XBLOCK_PUBLISHED signals onto the event bus.
     """
+    # temporary: defer to EVENT_BUS_PRODUCER_CONFIG if present
+    topic = getattr(settings, "EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC", "course-authoring-xblock-lifecycle")
+    producer_config_setting = _determine_producer_config_for_signal_and_topic(XBLOCK_PUBLISHED, topic)
+    if producer_config_setting is True:
+        log.info("Producing xblock-published event via config")
+        return
     if settings.FEATURES.get("ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS"):
-        topic = getattr(settings, "EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC", "course-authoring-xblock-lifecycle")
+        log.info("Producing xblock-published event via manual send")
         get_producer().send(
             signal=XBLOCK_PUBLISHED, topic=topic,
             event_key_field='xblock_info.usage_key', event_data={'xblock_info': kwargs['xblock_info']},
@@ -190,8 +232,14 @@ def listen_for_xblock_deleted(sender, signal, **kwargs):
     """
     Publish XBLOCK_DELETED signals onto the event bus.
     """
+    # temporary: defer to EVENT_BUS_PRODUCER_CONFIG if present
+    topic = getattr(settings, "EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC", "course-authoring-xblock-lifecycle")
+    producer_config_setting = _determine_producer_config_for_signal_and_topic(XBLOCK_DELETED, topic)
+    if producer_config_setting is True:
+        log.info("Producing xblock-deleted event via config")
+        return
     if settings.FEATURES.get("ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS"):
-        topic = getattr(settings, "EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC", "course-authoring-xblock-lifecycle")
+        log.info("Producing xblock-deleted event via manual send")
         get_producer().send(
             signal=XBLOCK_DELETED, topic=topic,
             event_key_field='xblock_info.usage_key', event_data={'xblock_info': kwargs['xblock_info']},
@@ -204,8 +252,14 @@ def listen_for_xblock_duplicated(sender, signal, **kwargs):
     """
     Publish XBLOCK_DUPLICATED signals onto the event bus.
     """
+    # temporary: defer to EVENT_BUS_PRODUCER_CONFIG if present
+    topic = getattr(settings, "EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC", "course-authoring-xblock-lifecycle")
+    producer_config_setting = _determine_producer_config_for_signal_and_topic(XBLOCK_DUPLICATED, topic)
+    if producer_config_setting is True:
+        log.info("Producing xblock-duplicated event via config")
+        return
     if settings.FEATURES.get("ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS"):
-        topic = getattr(settings, "EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC", "course-authoring-xblock-lifecycle")
+        log.info("Producing xblock-duplicated event via manual send")
         get_producer().send(
             signal=XBLOCK_DUPLICATED, topic=topic,
             event_key_field='xblock_info.usage_key', event_data={'xblock_info': kwargs['xblock_info']},
