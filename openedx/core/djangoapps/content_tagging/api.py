@@ -18,7 +18,6 @@ def create_taxonomy(
     name: str,
     description: str = None,
     enabled=True,
-    required=False,
     allow_multiple=False,
     allow_free_text=False,
 ) -> Taxonomy:
@@ -29,7 +28,6 @@ def create_taxonomy(
         name=name,
         description=description,
         enabled=enabled,
-        required=required,
         allow_multiple=allow_multiple,
         allow_free_text=allow_free_text,
     )

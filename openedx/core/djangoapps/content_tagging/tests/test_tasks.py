@@ -5,10 +5,9 @@ from __future__ import annotations
 
 from unittest.mock import patch
 
-from django.core.management import call_command
 from django.test import override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag
-from openedx_tagging.core.tagging.models import LanguageTaxonomy, Tag, Taxonomy
+from openedx_tagging.core.tagging.models import Tag, Taxonomy
 from organizations.models import Organization
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -16,16 +15,43 @@ from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 
 from .. import api
-from ..models import TaxonomyOrg
+from ..models.base import TaxonomyOrg
 from ..toggles import CONTENT_TAGGING_AUTO
 from ..types import ContentKey
 
 LANGUAGE_TAXONOMY_ID = -1
 
 
+class LanguageTaxonomyTestMixin:
+    """
+    Mixin for test cases that expect the Language System Taxonomy to exist.
+    """
+
+    def setUp(self):
+        """
+        When pytest runs, it creates the database by inspecting models, not by
+        running migrations. So data created by our migrations is not present.
+        In particular, the Language Taxonomy is not present. So this mixin will
+        create the taxonomy, simulating the effect of the following migrations:
+            1. openedx_tagging.core.tagging.migrations.0012_language_taxonomy
+            2. content_tagging.migrations.0007_system_defined_org_2
+        """
+        super().setUp()
+        Taxonomy.objects.get_or_create(id=-1, defaults={
+            "name": "Languages",
+            "description": "Languages that are enabled on this system.",
+            "enabled": True,
+            "allow_multiple": False,
+            "allow_free_text": False,
+            "visible_to_authors": True,
+            "_taxonomy_class": "openedx_tagging.core.tagging.models.system_defined.LanguageTaxonomy",
+        })
+        TaxonomyOrg.objects.get_or_create(taxonomy_id=-1, defaults={"org": None})
+
+
 @skip_unless_cms  # Auto-tagging is only available in the CMS
 @override_waffle_flag(CONTENT_TAGGING_AUTO, active=True)
-class TestAutoTagging(ModuleStoreTestCase):
+class TestAutoTagging(LanguageTaxonomyTestMixin, ModuleStoreTestCase):
     """
     Test if the Course and XBlock tags are automatically created
     """
@@ -50,17 +76,6 @@ class TestAutoTagging(ModuleStoreTestCase):
             assert object_tag.value == value, f"Tag value mismatch {object_tag.value} != {value}"
 
         return True
-
-    @classmethod
-    def setUpClass(cls):
-        # Run fixtures to create the system defined tags
-        call_command("loaddata", "--app=oel_tagging", "language_taxonomy.yaml")
-
-        # Enable Language taxonomy for all orgs
-        language_taxonomy = LanguageTaxonomy.objects.get(id=LANGUAGE_TAXONOMY_ID)
-        TaxonomyOrg.objects.create(taxonomy=language_taxonomy, org=None)
-
-        super().setUpClass()
 
     def setUp(self):
         super().setUp()
