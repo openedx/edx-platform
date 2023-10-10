@@ -46,7 +46,7 @@ class LanguageTaxonomyTestMixin:
             "visible_to_authors": True,
             "_taxonomy_class": "openedx_tagging.core.tagging.models.system_defined.LanguageTaxonomy",
         })
-        TaxonomyOrg.objects.create(taxonomy_id=-1, org=None)
+        TaxonomyOrg.objects.get_or_create(taxonomy_id=-1, defaults={"org": None})
 
 
 @skip_unless_cms  # Auto-tagging is only available in the CMS
