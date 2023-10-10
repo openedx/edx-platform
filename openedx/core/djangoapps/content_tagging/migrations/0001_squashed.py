@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("oel_tagging", "0012_language_taxonomy"),
+        ("oel_tagging", "0001_squashed"),
         ('organizations', '0003_historicalorganizationcourse'),
     ]
 
