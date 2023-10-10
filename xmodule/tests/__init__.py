@@ -36,6 +36,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.tests.helpers import StubReplaceURLService, mock_render_template, StubMakoService, StubUserService
 from xmodule.util.sandboxing import SandboxService
+from xmodule.services import ShowAnswerService, ShowCorrectnessService
 from xmodule.x_module import DoNothingCache, XModuleMixin
 from openedx.core.lib.cache_utils import CacheService
 
@@ -165,6 +166,8 @@ def get_test_system(
         'cache': CacheService(DoNothingCache()),
         'field-data': DictFieldData({}),
         'sandbox': SandboxService(contentstore, course_id),
+        'show_answer': ShowAnswerService(),
+        'show_correctness': ShowCorrectnessService(),
     }
 
     descriptor_system.get_block_for_descriptor = get_block  # lint-amnesty, pylint: disable=attribute-defined-outside-init
@@ -220,6 +223,8 @@ def prepare_block_runtime(
         'cache': CacheService(DoNothingCache()),
         'field-data': DictFieldData({}),
         'sandbox': SandboxService(contentstore, course_id),
+        'show_answer': ShowAnswerService(),
+        'show_correctness': ShowCorrectnessService(),
     }
 
     if add_overrides:

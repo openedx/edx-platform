@@ -74,24 +74,6 @@ except ImproperlyConfigured:
     FEATURES = {}
 
 
-class SHOWANSWER:
-    """
-    Constants for when to show answer
-    """
-    ALWAYS = "always"
-    ANSWERED = "answered"
-    ATTEMPTED = "attempted"
-    CLOSED = "closed"
-    FINISHED = "finished"
-    CORRECT_OR_PAST_DUE = "correct_or_past_due"
-    PAST_DUE = "past_due"
-    NEVER = "never"
-    AFTER_SOME_NUMBER_OF_ATTEMPTS = "after_attempts"
-    AFTER_ALL_ATTEMPTS = "after_all_attempts"
-    AFTER_ALL_ATTEMPTS_OR_CORRECT = "after_all_attempts_or_correct"
-    ATTEMPTED_NO_PAST_DUE = "attempted_no_past_due"
-
-
 class RANDOMIZATION:
     """
     Constants for problem randomization
@@ -123,6 +105,8 @@ class Randomization(String):
 @XBlock.needs('sandbox')
 @XBlock.needs('replace_urls')
 @XBlock.wants('call_to_action')
+@XBlock.wants('show_correctness')
+@XBlock.wants('show_answer')
 class ProblemBlock(
     ScorableXBlockMixin,
     RawMixin,
@@ -1407,9 +1391,9 @@ class ProblemBlock(
         Is the user allowed to see an answer?
         """
         user_is_staff = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
-        return ShowAnswer.answer_available(
+        return self.runtime.service(self, 'show_answer').answer_available(
             show_answer=self.showanswer,
-            show_correctness=self.show_correctness_available(),
+            show_correctness=self.correctness_available(),
             past_due=self.is_past_due(),
             attempts=self.attempts,
             is_attempted=self.is_attempted(),
@@ -1428,7 +1412,7 @@ class ProblemBlock(
         Limits access to the correct/incorrect flags, messages, and problem score.
         """
         user_is_staff = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
-        return ShowCorrectness.correctness_available(
+        return self.runtime.service(self, 'show_correctness').correctness_available(
             show_correctness=self.show_correctness,
             due_date=self.close_date,
             has_staff_access=user_is_staff,

@@ -130,6 +130,8 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 @XBlock.needs('teams')
 @XBlock.needs('teams_configuration')
 @XBlock.needs('call_to_action')
+@XBlock.needs('show_answer')
+@XBlock.needs('show_correctness')
 class PureXBlock(XBlock):
     """
     Pure XBlock to use in tests.
@@ -2342,6 +2344,8 @@ class LMSXBlockServiceBindingTest(LMSXBlockServiceMixin):
         'teams',
         'teams_configuration',
         'call_to_action',
+        'show_correctness',
+        'show_answer',
     )
     def test_expected_services_exist(self, expected_service):
         """

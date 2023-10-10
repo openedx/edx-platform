@@ -12,7 +12,8 @@ from lazy import lazy
 from lms.djangoapps.grades.models import BlockRecord, PersistentSubsectionGrade
 from lms.djangoapps.grades.scores import compute_percent, get_score, possibly_scored
 from xmodule import block_metadata_utils, graders  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.graders import AggregatedScore, ShowCorrectness  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.graders import AggregatedScore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.services import ShowCorrectnessService
 
 log = getLogger(__name__)
 
@@ -59,7 +60,7 @@ class SubsectionGradeBase(metaclass=ABCMeta):
         """
         Returns whether subsection scores are currently available to users with or without staff access.
         """
-        return ShowCorrectness.correctness_available(self.show_correctness, self.due, has_staff_access)
+        return ShowCorrectnessService.correctness_available(self.show_correctness, self.due, has_staff_access)
 
     @property
     def attempted_graded(self):

@@ -6,6 +6,9 @@ Module contains various XModule/XBlock services
 import inspect
 import logging
 from functools import partial
+from datetime import datetime
+
+from pytz import UTC
 
 from config_models.models import ConfigurationModel
 from django.conf import settings
@@ -17,13 +20,14 @@ from xblock.runtime import KvsFieldData
 from common.djangoapps.track import contexts
 from lms.djangoapps.courseware.masquerade import is_masquerading_as_specific_student
 from xmodule.modulestore.django import modulestore
+from xmodule.graders import ShowCorrectness, ShowAnswer
 
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 
-from lms.djangoapps.grades.api import signals as grades_signals
+from lms.djangoapps.grades.signals import signals as grades_signals
 
 log = logging.getLogger(__name__)
 
@@ -308,3 +312,81 @@ class EventPublishingService(Service):
         # in order to avoid duplicate work and possibly conflicting semantics.
         if not getattr(block, 'has_custom_completion', False):
             self.completion_service.submit_completion(block.scope_ids.usage_id, 1.0)
+
+
+class ShowAnswerService(Service):
+    """
+    An XBlock Service that allows XModules to define if the answers are visible.
+    """
+    @classmethod
+    def answer_available(
+            cls, show_answer='', show_correctness='', past_due=False, attempts=0,
+            is_attempted=False, is_correct=False, required_attempts=0,
+            max_attempts=0, used_all_attempts=False, closed=False,
+            has_staff_access=False):
+        """
+        Returns whether correctness is available now, for the given attributes.
+        """
+        if not show_correctness:
+            # If correctness is being withheld, then don't show answers either.
+            return False
+        elif show_answer == ShowAnswer.NEVER:
+            return False
+        elif has_staff_access:
+            # This is after the 'never' check because course staff can see correctness
+            # unless the sequence/problem explicitly prevents it
+            return True
+        elif show_answer == ShowAnswer.ATTEMPTED:
+            return is_attempted or past_due
+        elif show_answer == ShowAnswer.ANSWERED:
+            # NOTE: this is slightly different from 'attempted' -- resetting the problems
+            # makes lcp.done False, but leaves attempts unchanged.
+            return is_correct
+        elif show_answer == ShowAnswer.CLOSED:
+            return closed
+        elif show_answer == ShowAnswer.FINISHED:
+            return closed or is_correct
+        elif show_answer == ShowAnswer.CORRECT_OR_PAST_DUE:
+            return is_correct or past_due
+        elif show_answer == ShowAnswer.PAST_DUE:
+            return past_due
+        elif show_answer == ShowAnswer.AFTER_SOME_NUMBER_OF_ATTEMPTS:
+            if max_attempts and required_attempts >= max_attempts:
+                required_attempts = max_attempts
+            return attempts >= required_attempts
+        elif show_answer == ShowAnswer.ALWAYS:
+            return True
+        elif show_answer == ShowAnswer.AFTER_ALL_ATTEMPTS:
+            return used_all_attempts
+        elif show_answer == ShowAnswer.AFTER_ALL_ATTEMPTS_OR_CORRECT:
+            return used_all_attempts or is_correct
+        elif show_answer == ShowAnswer.ATTEMPTED_NO_PAST_DUE:
+            return is_attempted
+        return False
+
+
+class ShowCorrectnessService(Service):
+    """
+    An XBlock Service that allows XModules to define whether correctness is currently hidden.
+
+    When correctness is hidden, this limits the user's access to the correct/incorrect flags, messages, problem scores,
+    and aggregate subsection and course grades.
+    """
+    @classmethod
+    def correctness_available(cls, show_correctness='', due_date=None, has_staff_access=False):
+        """
+        Returns whether correctness is available now, for the given attributes.
+        """
+        if show_correctness == ShowCorrectness.NEVER:
+            return False
+        elif has_staff_access:
+            # This is after the 'never' check because course staff can see correctness
+            # unless the sequence/problem explicitly prevents it
+            return True
+        elif show_correctness == ShowCorrectness.PAST_DUE:
+            # Is it now past the due date?
+            return (due_date is None or
+                    due_date < datetime.now(UTC))
+
+        # else: show_correctness == ShowCorrectness.ALWAYS
+        return True
