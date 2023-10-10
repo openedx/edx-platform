@@ -32,33 +32,8 @@ describe('Sidebar View', () => {
         expect(view).toBeDefined();
     });
 
-    it('should not render the subscription upsell section if B2CSubscriptions are disabled', () => {
-        view.remove();
-        view = new SidebarView({
-            el: '.sidebar',
-            context: {
-                ...context,
-                isUserB2CSubscriptionsEnabled: false,
-            },
-        });
-        view.render();
+    it('should not render the subscription upsell section', () => {
         expect(view.$('.js-subscription-upsell')[0]).not.toBeInDOM();
-    });
-
-    it('should render the subscription upsell section', () => {
-        expect(view.$('.js-subscription-upsell')[0]).toBeInDOM();
-        expect(view.$('.js-subscription-upsell .badge').html().trim())
-            .toEqual('New');
-        expect(view.$('.js-subscription-upsell h4').html().trim())
-            .toMatch(/^Monthly program subscriptions . more flexible, more affordable$/);
-        expect(view.$('.js-subscription-upsell .advertise-message').html().trim())
-            .toEqual(
-                'Now available for many popular programs, affordable monthly subscription pricing can help you manage your budget more effectively. Subscriptions start at $39/month USD per program, after a 7-day full access free trial. Cancel at any time.',
-            );
-        expect(view.$('.js-subscription-upsell a span:last').html().trim())
-            .toEqual('Explore subscription options');
-        expect(view.$('.js-subscription-upsell a').attr('href'))
-            .toEqual('https://www.example.org/program-subscriptions');
     });
 
     it('should load the exploration panel given a marketing URL', () => {

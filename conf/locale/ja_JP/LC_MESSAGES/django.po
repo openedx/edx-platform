@@ -6410,6 +6410,16 @@ msgstr ""
 msgid "Original usage key/ID of the thing that is in the clipboard."
 msgstr ""
 
+#: wiki/models/article.py
+msgid "owner"
+msgstr "オーナー"
+
+#: openedx/core/djangoapps/content_tagging/models/base.py
+msgid ""
+"Organization that is related to this taxonomy.If None, then this taxonomy is"
+" related to all organizations."
+msgstr ""
+
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
 "List of domains that are allowed to make cross-domain requests to this site."
@@ -6840,6 +6850,14 @@ msgstr "{course} 講座のブラックリスト {country} "
 
 #: openedx/core/djangoapps/learner_pathway/apps.py
 msgid "Learner Pathways"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification App"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification Type"
 msgstr ""
 
 #: openedx/core/djangoapps/notifications/base_notification.py
@@ -8210,16 +8228,6 @@ msgstr ""
 msgid ""
 "You have successfully shifted your course schedule and your calendar is up "
 "to date."
-msgstr ""
-
-#: wiki/models/article.py
-msgid "owner"
-msgstr "オーナー"
-
-#: openedx/features/content_tagging/models/base.py
-msgid ""
-"Organization that is related to this taxonomy.If None, then this taxonomy is"
-" related to all organizations."
 msgstr ""
 
 #: openedx/features/content_type_gating/models.py

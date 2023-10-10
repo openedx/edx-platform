@@ -130,12 +130,12 @@ class CourseNotificationPreference(TimeStampedModel):
         return f'{self.user.username} - {self.course_id}'
 
     @staticmethod
-    def get_updated_user_course_preferences(user, course_id):
+    def get_user_course_preference(user_id, course_id):
         """
         Returns updated courses preferences for a user
         """
         preferences, _ = CourseNotificationPreference.objects.get_or_create(
-            user=user,
+            user_id=user_id,
             course_id=course_id,
             is_active=True,
         )
@@ -149,8 +149,12 @@ class CourseNotificationPreference(TimeStampedModel):
                 preferences.save()
                 # pylint: disable-next=broad-except
             except Exception as e:
-                log.error(f'Unable to update notification preference for {user.username} to new config. {e}')
+                log.error(f'Unable to update notification preference to new config. {e}')
         return preferences
+
+    @staticmethod
+    def get_updated_user_course_preferences(user, course_id):
+        return CourseNotificationPreference.get_user_course_preference(user.id, course_id)
 
     def get_app_config(self, app_name) -> Dict:
         """

@@ -344,7 +344,7 @@ def _track_user_login(user, request):
     segment.identify(
         user.id,
         {
-            'email': request.POST.get('email'),
+            'email': user.email,
             'username': user.username
         },
         {

@@ -52,7 +52,7 @@ markdown-it-py==3.0.0
     # via rich
 mdurl==0.1.2
     # via markdown-it-py
-packaging==23.1
+packaging==23.2
     # via semgrep
 peewee==3.16.3
     # via semgrep
@@ -68,17 +68,17 @@ referencing==0.30.2
     #   jsonschema-specifications
 requests==2.31.0
     # via semgrep
-rich==13.5.3
+rich==13.6.0
     # via semgrep
-rpds-py==0.10.3
+rpds-py==0.10.4
     # via
     #   jsonschema
     #   referencing
-ruamel-yaml==0.17.32
+ruamel-yaml==0.17.35
     # via semgrep
-ruamel-yaml-clib==0.2.7
+ruamel-yaml-clib==0.2.8
     # via ruamel-yaml
-semgrep==1.41.0
+semgrep==1.43.0
     # via -r requirements/edx/semgrep.in
 tomli==2.0.1
     # via semgrep
@@ -88,7 +88,7 @@ typing-extensions==4.8.0
     #   semgrep
 ujson==5.8.0
     # via python-lsp-jsonrpc
-urllib3==1.26.16
+urllib3==1.26.17
     # via
     #   -c requirements/edx/../constraints.txt
     #   requests

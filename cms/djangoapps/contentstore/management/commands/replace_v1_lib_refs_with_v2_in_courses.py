@@ -35,14 +35,15 @@ class Command(BaseCommand):
         """A method to replace 'source_library_id' in all relevant blocks."""
 
         courses = CourseOverview.get_all_courses()
+        course_id_strings = [str(course.id) for course in courses]
 
         # Use Celery to distribute the workload
         tasks = group(
             replace_all_library_source_blocks_ids_for_course.s(
-                course,
+                course_id_string,
                 v1_to_v2_lib_map
             )
-            for course in courses
+            for course_id_string in course_id_strings
         )
         results = tasks.apply_async()
 
@@ -58,7 +59,8 @@ class Command(BaseCommand):
     def validate(self, v1_to_v2_lib_map):
         """ Validate that replace_all_library_source_blocks_ids was successful"""
         courses = CourseOverview.get_all_courses()
-        tasks = group(validate_all_library_source_blocks_ids_for_course.s(course, v1_to_v2_lib_map) for course in courses)  # lint-amnesty, pylint: disable=line-too-long
+        course_id_strings = [str(course.id) for course in courses]
+        tasks = group(validate_all_library_source_blocks_ids_for_course.s(course_id, v1_to_v2_lib_map) for course_id in course_id_strings)  # lint-amnesty, pylint: disable=line-too-long
         results = tasks.apply_async()
 
         validation = set()
@@ -80,9 +82,16 @@ class Command(BaseCommand):
     def undo(self, v1_to_v2_lib_map):
         """ undo the changes made by replace_all_library_source_blocks_ids"""
         courses = CourseOverview.get_all_courses()
+        course_id_strings = [str(course.id) for course in courses]
 
         # Use Celery to distribute the workload
-        tasks = group(undo_all_library_source_blocks_ids_for_course.s(course, v1_to_v2_lib_map) for course in courses)
+        tasks = group(
+            undo_all_library_source_blocks_ids_for_course.s(
+                course_id,
+                v1_to_v2_lib_map
+            )
+            for course_id in course_id_strings
+        )
         results = tasks.apply_async()
 
         for result in results.get():

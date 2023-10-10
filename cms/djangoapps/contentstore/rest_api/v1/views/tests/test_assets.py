@@ -44,7 +44,7 @@ class AssetsViewTestCase(AuthorizeStaffTestCase):
 
     def get_url(self, _course_id=None):
         return reverse(
-            "cms.djangoapps.contentstore:v1:studio_content_assets",
+            "cms.djangoapps.contentstore:v1:cms_api_update_destroy_assets",
             kwargs=self.get_url_params(),
         )
 
@@ -102,6 +102,12 @@ class AssetsViewGetTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
     def get_url_params(self):
         return {"course_id": self.get_course_key_string()}
 
+    def get_url(self, _course_id=None):
+        return reverse(
+            "cms.djangoapps.contentstore:v1:cms_api_create_retrieve_assets",
+            kwargs=self.get_url_params(),
+        )
+
     def get_test_data(self):
         return None
 
@@ -147,6 +153,12 @@ class AssetsViewPostTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
 
     def get_url_params(self):
         return {"course_id": self.get_course_key_string()}
+
+    def get_url(self, _course_id=None):
+        return reverse(
+            "cms.djangoapps.contentstore:v1:cms_api_create_retrieve_assets",
+            kwargs=self.get_url_params(),
+        )
 
     def get_test_data(self):
         return {
