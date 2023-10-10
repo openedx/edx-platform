@@ -90,9 +90,3 @@
 # django42 support PR merged but new release is pending.
 # https://github.com/openedx/edx-platform/issues/33431
 -e git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2#egg=edx_proctoring_proctortrack
-
-# official py2neo version has been removed from both GitHub and PyPI
-# Using a backup py2neo package for now
-# A migration issue will be created to migrate from py2neo to official Neo4j driver
-# Follow up issue to remove this fork: https://github.com/openedx/edx-platform/issues/33456
--e git+https://github.com/UsamaSadiq/py2neo.git@7f57cbe1797945ce27e93cfd6ee5dfa291129be5#egg=py2neo
