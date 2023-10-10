@@ -299,7 +299,7 @@ def submit_delete_entrance_exam_state_for_student(request, usage_key, student): 
     return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
 
 
-def submit_bulk_course_email(request, course_key, email_id, schedule=None, individual_emails=[]):
+def submit_bulk_course_email(request, course_key, email_id, schedule=None, individual_emails=None):
     """
     Request to have bulk email sent as a background task.
 

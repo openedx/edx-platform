@@ -420,7 +420,15 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             ('update_forum_role_membership',
              {'unique_student_identifier': self.user.email, 'rolename': 'Moderator', 'action': 'allow'}),
             ('list_forum_members', {'rolename': FORUM_ROLE_COMMUNITY_TA}),
-            ('send_email', {'send_to': '["staff"]', 'individual_learners_emails': '[]' ,'subject': 'test', 'message': 'asdf'}),
+            (
+                'send_email',
+                {
+                    'send_to': '["staff"]',
+                    'individual_learners_emails': '[]',
+                    'subject': 'test',
+                    'message': 'asdf',
+                }
+            ),
             ('list_instructor_tasks', {}),
             ('instructor_api_v1:list_instructor_tasks', {}),
             ('list_background_email_tasks', {}),
@@ -3531,7 +3539,7 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
         response = self.client.post(url, self.full_test_message)
 
         assert response.status_code == 200
-        _, _, _, arg_schedule, _  = mock_task_api.call_args.args
+        _, _, _, arg_schedule, _ = mock_task_api.call_args.args
         assert arg_schedule == expected_schedule
 
     @patch("lms.djangoapps.instructor.views.api.task_api.submit_bulk_course_email")
