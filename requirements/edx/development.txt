@@ -10,6 +10,7 @@
     #   -r requirements/edx/testing.txt
 -e git+https://github.com/UsamaSadiq/py2neo.git@7f57cbe1797945ce27e93cfd6ee5dfa291129be5#egg=py2neo
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
 accessible-pygments==0.0.4

@@ -7,7 +7,9 @@
 -e git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2#egg=edx_proctoring_proctortrack
     # via -r requirements/edx/base.txt
 -e git+https://github.com/UsamaSadiq/py2neo.git@7f57cbe1797945ce27e93cfd6ee5dfa291129be5#egg=py2neo
-    # via -r requirements/edx/base.txt
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/base.txt
 accessible-pygments==0.0.4
     # via pydata-sphinx-theme
 acid-xblock==0.2.1
