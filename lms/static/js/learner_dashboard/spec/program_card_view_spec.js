@@ -176,4 +176,7 @@ describe('Program card View', () => {
         expect(view.$el.find('.banner-image').attr('srcset')).toEqual('');
     });
 
+    it('should render the subscription badge if subscription is active', () => {
+        expect(view.$('.subscription-badge .badge').html()?.trim()).toEqual('Subscribed');
+    });
 });
