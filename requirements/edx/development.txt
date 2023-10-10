@@ -8,6 +8,10 @@
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
+-e git+https://github.com/UsamaSadiq/py2neo.git@7f57cbe1797945ce27e93cfd6ee5dfa291129be5#egg=py2neo
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
 accessible-pygments==0.0.4
     # via
     #   -r requirements/edx/doc.txt
@@ -1445,11 +1449,6 @@ py==1.11.0
     # via
     #   -r requirements/edx/testing.txt
     #   tox
-py2neo==2021.2.3
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
 pyasn1==0.5.0
     # via
     #   -r requirements/edx/doc.txt
