@@ -2704,7 +2704,7 @@ def send_email(request, course_id):
         return HttpResponseForbidden("Email is not enabled for this course.")
 
     targets = json.loads(request.POST.get("send_to"))
-    emails = json.loads(request.POST.get("individual_learners_emails", []))
+    individual_emails = json.loads(request.POST.get("individual_learners_emails", "[]"))
     subject = request.POST.get("subject")
     message = request.POST.get("message")
     # optional, this is a date and time in the form of an ISO8601 string
@@ -2747,7 +2747,7 @@ def send_email(request, course_id):
         return HttpResponseBadRequest(repr(err))
 
     # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
-    task_api.submit_bulk_course_email(request, course_id, email.id, schedule_dt, emails)
+    task_api.submit_bulk_course_email(request, course_id, email.id, schedule_dt, individual_emails)
 
     response_payload = {
         'course_id': str(course_id),

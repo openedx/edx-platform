@@ -107,7 +107,7 @@ class Target(models.Model):
         else:
             return self.get_target_type_display()
 
-    def get_users(self, course_id, user_id=None, emails=None):
+    def get_users(self, course_id, user_id=None, individual_emails=None):
         """
         Gets the users for a given target.
 
@@ -152,7 +152,7 @@ class Target(models.Model):
         elif self.target_type == SEND_TO_INDIVIDUAL_LEARNERS:
             return use_read_replica_if_available(
                 User.objects.filter(
-                    models.Q(email__in=emails)
+                    models.Q(email__in=individual_emails)
                     & enrollment_query
                 )
             )
