@@ -748,8 +748,7 @@ def _has_access_to_course(user, access_level, course_key):
     permissions_access = course_or_organization_permission_check(
         user,
         CourseRolesPermission.VIEW_ALL_CONTENT.value,
-        course_key,
-        course_key.org
+        course_key
     )
 
     if global_staff:
