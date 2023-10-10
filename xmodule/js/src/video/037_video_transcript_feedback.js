@@ -24,8 +24,9 @@
                     return new VideoTranscriptFeedbackHandler(state);
                 }
 
-                _.bindAll(this, 'sendPositiveFeedback', 'sendNegativeFeedback', 'onHideLanguageMenu',
-                    'destroy'
+                _.bindAll(this,  'destroy', 'getFeedbackForCurrentTranscript', 'markAsPositiveFeedback', 'markAsNegativeFeedback', 'markAsEmptyFeedback',
+                    'selectThumbsUp', 'selectThumbsDown', 'unselectThumbsUp', 'unselectThumbsDown', 'thumbsUpClickHandler', 'thumbsDownClickHandler',
+                    'onHideLanguageMenu', 'getCurrentLanguage', 'instantiateWidget', 'shouldShowWidget', 'showWidget', 'hideWidget'
                 );
 
                 this.state = state;
