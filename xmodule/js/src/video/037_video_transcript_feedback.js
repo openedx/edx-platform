@@ -26,7 +26,8 @@
 
                 _.bindAll(this,  'destroy', 'getFeedbackForCurrentTranscript', 'markAsPositiveFeedback', 'markAsNegativeFeedback', 'markAsEmptyFeedback',
                     'selectThumbsUp', 'selectThumbsDown', 'unselectThumbsUp', 'unselectThumbsDown', 'thumbsUpClickHandler', 'thumbsDownClickHandler',
-                    'onHideLanguageMenu', 'getCurrentLanguage', 'instantiateWidget', 'shouldShowWidget', 'showWidget', 'hideWidget'
+                    'sendFeedbackForCurrentTranscript', 'onHideLanguageMenu', 'getCurrentLanguage', 'instantiateWidget', 'shouldShowWidget',
+                    'showWidget', 'hideWidget'
                 );
 
                 this.state = state;
@@ -75,7 +76,6 @@
                 getFeedbackForCurrentTranscript: function() {
                     var self = this;
                     var url = this.aiTranslationsUrl + '/transcript-feedback' + '?transcript_language=' + this.currentTranscriptLanguage + '&video_uuid=' + this.videoId + '&user_id=' + this.userId;
-
                     $.ajax({
                         url: url,
                         type: 'GET',
@@ -145,22 +145,50 @@
 
                 thumbsUpClickHandler: function() {
                     if (this.currentFeedback) {
-                        // Send request with null
+                        this.sendFeedbackForCurrentTranscript(null);
                         this.markAsEmptyFeedback();
                     } else {
-                        // Send request with true
+                        this.sendFeedbackForCurrentTranscript(true);
                         this.markAsPositiveFeedback();
                     }
                 },
 
                 thumbsDownClickHandler: function() {
                     if (this.currentFeedback === false) {
-                        // Send request with null
+                        this.sendFeedbackForCurrentTranscript(null);
                         this.markAsEmptyFeedback();
                     } else {
-                        // Send request with false
+                        this.sendFeedbackForCurrentTranscript(false);
                         this.markAsNegativeFeedback();
                     }
+                },
+
+                sendFeedbackForCurrentTranscript: function(feedbackValue) {
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            transcript_language: this.currentTranscriptLanguage,
+                            video_uuid: this.videoId,
+                            user_uuid: this.userId,
+                            value: feedbackValue,
+                        },
+                    })
+                    .success(function() {
+                        if (feedbackValue === true) {
+                            this.markAsPositiveFeedback();
+                            this.currentFeedback = true;
+                        } else {
+                            if (feedbackValue === false) {
+                                this.markAsNegativeFeedback();
+                                this.currentFeedback = false;
+                            } else {
+                                this.markAsEmptyFeedback();
+                                this.currentFeedback = null;
+                            }
+                        }
+                    })
                 },
 
                 onHideLanguageMenu: function() {
