@@ -12,6 +12,7 @@ from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 # .. toggle_warning: None
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2023-10
+# .. toggle_target_removal_date: None
 # .. toggle_tickets: MST-2055
 
 
