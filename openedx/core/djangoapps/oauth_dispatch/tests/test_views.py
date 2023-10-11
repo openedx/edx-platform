@@ -86,7 +86,7 @@ class _DispatchingViewTestCase(TestCase):
     """
     def setUp(self):
         super().setUp()
-        self.TEST_PASSWORD = "password"
+        self.TEST_PASSWORD = 'Password1234'
         self.dot_adapter = adapters.DOTAdapter()
         self.user = UserFactory(password=self.TEST_PASSWORD)
         self.dot_app = self.dot_adapter.create_public_client(

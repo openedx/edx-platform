@@ -24,7 +24,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
         # Create two accounts
         self.student = 'view@test.com'
         self.instructor = 'view2@test.com'
-        self.password = 'password'
+        self.password = 'Password1234'
         for username, email in [('u1', self.student), ('u2', self.instructor)]:
             self.create_account(username, email, self.password)
             self.activate_user(email)

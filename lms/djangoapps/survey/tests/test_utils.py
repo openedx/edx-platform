@@ -28,7 +28,7 @@ class SurveyModelsTests(ModuleStoreTestCase):
         self.client = Client()
 
         # Create two accounts
-        self.password = 'password'
+        self.password = 'Password1234'
         self.student = UserFactory.create(
             username='student', email='student@test.com', password=self.password,
         )

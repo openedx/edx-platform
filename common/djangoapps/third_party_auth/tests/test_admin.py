@@ -14,7 +14,7 @@ from common.djangoapps.third_party_auth.tests import testutil
 from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
 
 
-TEST_PASSWORD = 'password'
+TEST_PASSWORD = 'Password1234'
 
 
 # This is necessary because cms does not implement third party auth

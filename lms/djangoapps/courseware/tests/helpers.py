@@ -173,7 +173,7 @@ class LoginEnrollmentTestCase(TestCase):
         Create a user account, activate, and log in.
         """
         self.email = 'foo@test.com'  # lint-amnesty, pylint: disable=attribute-defined-outside-init
-        self.password = 'password'  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.password = 'Password1234'  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         self.username = 'test'  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         self.user = self.create_account(
             self.username,

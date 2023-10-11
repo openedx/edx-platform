@@ -33,7 +33,7 @@ from lms.djangoapps.instructor.access import allow_access, list_with_level
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
 from openedx.core.lib.courses import get_course_by_id
 
-USER_PASSWORD = 'password'
+USER_PASSWORD = 'Password1234'
 
 
 class CcxRestApiTest(CcxTestCase, APITestCase):

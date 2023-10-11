@@ -36,7 +36,7 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
         self.user = UserFactory.create()
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request()
-        self.TEST_PASSWORD = 'password'
+        self.TEST_PASSWORD = 'Password1234'
 
     def assert_response(self, safe_cookie_data=None, success=True):
         """
@@ -251,7 +251,7 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, CacheIsolationTestCase
 
     def setUp(self):
         super().setUp()
-        self.TEST_PASSWORD = 'password'
+        self.TEST_PASSWORD = 'Password1234'
         self.user = UserFactory.create(password=self.TEST_PASSWORD)
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request()

@@ -29,7 +29,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
     Check that view authentication works properly.
     """
 
-    ACCOUNT_INFO = [('view@test.com', 'password1234'), ('view2@test.com', 'password1234')]
+    ACCOUNT_INFO = [('view@test.com', 'Password1234'), ('view2@test.com', 'Password1234')]
     ENABLED_SIGNALS = ['course_published']
 
     @staticmethod

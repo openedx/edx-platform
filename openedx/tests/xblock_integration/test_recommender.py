@@ -27,8 +27,8 @@ class TestRecommender(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     Check that Recommender state is saved properly
     """
     STUDENTS = [
-        {'email': 'view@test.com', 'password': 'password1234'},
-        {'email': 'view2@test.com', 'password': 'password1234'}
+        {'email': 'view@test.com', 'password': 'Password1234'},
+        {'email': 'view2@test.com', 'password': 'Password1234'}
     ]
     XBLOCK_NAMES = ['recommender', 'recommender_second']
 

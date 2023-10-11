@@ -319,7 +319,7 @@ class NotificationListAPIViewTest(APITestCase):
     """
 
     def setUp(self):
-        self.TEST_PASSWORD = "password"
+        self.TEST_PASSWORD = 'Password1234'
         self.user = UserFactory(password=self.TEST_PASSWORD)
         self.url = reverse('notifications-list')
 
@@ -569,7 +569,7 @@ class MarkNotificationsSeenAPIViewTestCase(APITestCase):
     """
 
     def setUp(self):
-        self.TEST_PASSWORD = "password"
+        self.TEST_PASSWORD = 'Password1234'
         self.user = UserFactory(password=self.TEST_PASSWORD)
 
         # Create some sample notifications for the user
@@ -602,7 +602,7 @@ class NotificationReadAPIViewTestCase(APITestCase):
     """
 
     def setUp(self):
-        self.TEST_PASSWORD = "password"
+        self.TEST_PASSWORD = 'Password1234'
         self.user = UserFactory(password=self.TEST_PASSWORD)
         self.url = reverse('notifications-read')
         self.client.login(username=self.user.username, password=self.TEST_PASSWORD)

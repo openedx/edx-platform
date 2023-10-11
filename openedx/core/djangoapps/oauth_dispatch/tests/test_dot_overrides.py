@@ -31,7 +31,7 @@ class AuthenticateTestCase(TestCase):
 
     def setUp(self):
         super().setUp()
-        self.TEST_PASSWORD = 'password'
+        self.TEST_PASSWORD = 'Password1234'
         self.user = UserFactory.create(
             username='darkhelmet',
             password=self.TEST_PASSWORD,
@@ -57,7 +57,7 @@ class CustomValidationTestCase(TestCase):
     """
     def setUp(self):
         super().setUp()
-        self.TEST_PASSWORD = "password"
+        self.TEST_PASSWORD = 'Password1234'
         self.user = UserFactory.create(
             username='darkhelmet',
             password=self.TEST_PASSWORD,
@@ -89,7 +89,7 @@ class CustomAuthorizationViewTestCase(TestCase):
     """
     def setUp(self):
         super().setUp()
-        self.TEST_PASSWORD = 'password'
+        self.TEST_PASSWORD = 'Password1234'
         self.dot_adapter = adapters.DOTAdapter()
         self.user = UserFactory(password=self.TEST_PASSWORD)
         self.client.login(username=self.user.username, password=self.TEST_PASSWORD)

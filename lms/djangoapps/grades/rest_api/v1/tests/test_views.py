@@ -548,7 +548,7 @@ class CourseSubmissionHistoryWithDataTest(TestSubmittingProblems):
     def setUp(self):
         super().setUp()
         self.namespaced_url = 'grades_api:v1:submission_history'
-        self.password = 'password'
+        self.password = 'Password1234'
         self.basic_setup()
         self.global_staff = GlobalStaffFactory.create()
 

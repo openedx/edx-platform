@@ -24,7 +24,7 @@ class TestComprehensiveThemeLMS(TestCase):
         Clear static file finders cache and register cleanup methods.
         """
         super().setUp()
-        self.TEST_PASSWORD = 'password'
+        self.TEST_PASSWORD = 'Password1234'
         self.user = UserFactory(password=self.TEST_PASSWORD)
 
         # Clear the internal staticfiles caches, to get test isolation.

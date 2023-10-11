@@ -192,11 +192,11 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
         UserFactory.create(
             username='edx',
             email='edx@example.com',
-            password='password',
+            password='Password1234',
             is_superuser=is_superuser,
             is_staff=is_staff,
         )
-        self.client.login(username='edx', password='password')
+        self.client.login(username='edx', password='Password1234')
 
         response = self._change_password_from_support(email_from_support_tools=self.OLD_EMAIL)
         assert response.status_code == 200

@@ -129,7 +129,7 @@ class TestAdminAccessCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         ccx = self.make_ccx()
         ccx_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
         self.url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_key})
-        self.TEST_PASSWORD = 'password'
+        self.TEST_PASSWORD = 'Password1234'
 
     def test_staff_access_coach_dashboard(self):
         """

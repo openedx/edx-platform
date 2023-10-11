@@ -26,7 +26,7 @@ class TestRecommendationsBase(APITestCase):
 
     def setUp(self):
         super().setUp()
-        self.TEST_PASSWORD = 'password'
+        self.TEST_PASSWORD = 'Password1234'
         self.user = UserFactory(password=self.TEST_PASSWORD)
         self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         self.recommended_courses = [
@@ -164,7 +164,7 @@ class TestRecommendationsContextView(APITestCase):
     def setUp(self):
         super().setUp()
         self.user = UserFactory()
-        self.password = "password"
+        self.password = 'Password1234'
         self.url = reverse_lazy("learner_recommendations:recommendations_context")
 
     @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
@@ -370,7 +370,7 @@ class TestProductRecommendationsView(APITestCase):
 
     def setUp(self):
         super().setUp()
-        self.TEST_PASSWORD = 'password'
+        self.TEST_PASSWORD = 'Password1234'
         self.user = UserFactory(password=self.TEST_PASSWORD)
         self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         self.associated_course_keys = ["edx+HL1", "edx+HL2"]

@@ -324,9 +324,9 @@ class LoginFailuresAdminTest(TestCase):
     def setUpClass(cls):
         """Setup class"""
         super().setUpClass()
-        cls.user = UserFactory.create(username='§', is_staff=True, is_superuser=True)
+        cls.TEST_PASSWORD = 'Password1234'
+        cls.user = UserFactory.create(username='§', password=cls.TEST_PASSWORD, is_staff=True, is_superuser=True)
         cls.user.save()
-        cls.TEST_PASSWORD = 'password'
 
     def setUp(self):
         """Setup."""

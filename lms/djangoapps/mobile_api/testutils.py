@@ -50,7 +50,7 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
             certificate_available_date=datetime.datetime.now(pytz.UTC)
         )
         self.user = UserFactory.create()
-        self.password = 'password'
+        self.password = 'Password1234'
         self.username = self.user.username
         self.api_version = API_V1
         IgnoreMobileAvailableFlagConfig(enabled=False).save()
