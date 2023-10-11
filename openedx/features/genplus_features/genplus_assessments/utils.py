@@ -859,12 +859,14 @@ def skill_reflection_response(skills, likert_questions, nuance_interrogation_que
         'outros': [],
         'nuance_interrogation': [],
     }
+    store = modulestore()
 
     def process_question_responses(questions, response_key, location_key):
         for question in questions:
             skill = question.skill.name
-            submissions = list(question.submissions.filter(problem_location=getattr(question, location_key)).all())
-            total_submissions = question.submissions.filter(problem_location=getattr(question, location_key)).count()
+            usage_key = getattr(question, location_key)
+            submissions = list(question.submissions.filter(problem_location=usage_key).all())
+            total_submissions = question.submissions.filter(problem_location=usage_key).count()
             stats = defaultdict(int)
 
             question_stats = {
@@ -895,6 +897,17 @@ def skill_reflection_response(skills, likert_questions, nuance_interrogation_que
                     question_stats['submissions'].append({'key': sk, "value": stats[sk], 'points': points_dict[sk]})
 
                 _response[response_key].append(question_stats)
+            else:
+                if usage_key and usage_key.block_type == 'problem':
+                    assessment_xblock = store.get_item(usage_key)
+                    question_data = get_problem_attributes(assessment_xblock.data, usage_key)
+                    question = question_data['question_text']
+                    choices = question_data['problem_choices']
+                    question_stats['title'] = question
+                    question_stats['submissions'] = [
+                        {'key': sub['statement'], 'value': 0, 'points': sub['point']} for sub in choices.values()
+                    ]
+                    _response[response_key].append(question_stats)
 
     process_question_responses(likert_questions, 'intros', 'start_unit_location')
     process_question_responses(likert_questions, 'outros', 'end_unit_location')
