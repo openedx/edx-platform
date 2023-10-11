@@ -95,7 +95,6 @@ from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.utils.crypto import constant_time_compare
 from django.utils.deprecation import MiddlewareMixin
-from edx_django_utils.monitoring import set_custom_attribute
 
 from openedx.core.djangoapps.safe_sessions.middleware import SafeSessionMiddleware, _mark_cookie_for_deletion
 
@@ -113,7 +112,6 @@ class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware, MiddlewareMi
         super().__init__(*args, **kwargs)
 
     def process_request(self, request):
-        set_custom_attribute('DEFAULT_HASHING_ALGORITHM', settings.DEFAULT_HASHING_ALGORITHM)
         try:
             # Try and construct a User instance from data stored in the cache
             session_user_id = SafeSessionMiddleware.get_user_id_from_session(request)
@@ -143,29 +141,9 @@ class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware, MiddlewareMi
         auto_auth_enabled = settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING', False)
         if not auto_auth_enabled and hasattr(request.user, 'get_session_auth_hash'):
             session_hash = request.session.get(HASH_SESSION_KEY)
-            session_hash_verified = session_hash and constant_time_compare(
-                session_hash, request.user.get_session_auth_hash())
-
-            # session hash is verified from the default algo, so skip legacy check
-            if session_hash_verified:
-                set_custom_attribute('session_hash_verified', "default")
-                return
-
-            if (
-                session_hash and
-                hasattr(request.user, '_legacy_get_session_auth_hash') and
-                constant_time_compare(
-                    session_hash,
-                    request.user._legacy_get_session_auth_hash()  # pylint: disable=protected-access
-                )
-            ):
-                # session hash is verified from legacy hashing algorithm.
-                set_custom_attribute('session_hash_verified', "fallback")
-                return
-
-            # The session hash has changed due to a password
-            # change. Log the user out.
-            request.session.flush()
-            request.user = AnonymousUser()
-            _mark_cookie_for_deletion(request)
-            set_custom_attribute('failed_session_verification', True)
+            if not (session_hash and constant_time_compare(session_hash, request.user.get_session_auth_hash())):
+                # The session hash has changed due to a password
+                # change. Log the user out.
+                request.session.flush()
+                request.user = AnonymousUser()
+                _mark_cookie_for_deletion(request)
