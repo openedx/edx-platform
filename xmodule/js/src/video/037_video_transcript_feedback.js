@@ -73,6 +73,7 @@
                 },
 
                 getFeedbackForCurrentTranscript: function() {
+                    var self = this;
                     var url = this.aiTranslationsUrl + '/transcript-feedback' + '?transcript_language=' + this.currentTranscriptLanguage + '&video_uuid=' + this.videoId + '&user_id=' + this.userId;
 
                     $.ajax({
@@ -80,16 +81,16 @@
                         type: 'GET',
                     })
                     .success(function(data) {
-                        if (data.value === true) {
-                            this.markAsPositiveFeedback();
-                            this.currentFeedback = true;
+                        if (data && data.value === true) {
+                            self.markAsPositiveFeedback();
+                            self.currentFeedback = true;
                         } else {
-                            if (data.value === false) {
-                                this.markAsNegativeFeedback();
-                                this.currentFeedback = false;
+                            if (data && data.value === false) {
+                                self.markAsNegativeFeedback();
+                                self.currentFeedback = false;
                             } else {
-                                this.markAsEmptyFeedback();
-                                this.currentFeedback = null;
+                                self.markAsEmptyFeedback();
+                                self.currentFeedback = null;
                             }
                         }
                     });
@@ -176,20 +177,24 @@
                 },
 
                 instantiateWidget: function() {
-                    if (this.shouldShowWidget()) {
-                        this.showWidget();
-                        this.getFeedbackForCurrentTranscript();
-                    } else {
-                        this.hideWidget();
-                    }
+                    var self = this;
+                    $.when(this.shouldShowWidget()).done(function(shouldShowWidget) {
+                        if (shouldShowWidget) {
+                            self.showWidget();
+                            self.getFeedbackForCurrentTranscript();
+                        } else {
+                            self.hideWidget();
+                        }
+                    })
                 },
 
                 shouldShowWidget: function() {
                     var url = this.aiTranslationsUrl + '/video-transcript' + '?transcript_language=' + this.currentTranscriptLanguage + '&video_uuid=' + this.videoId;
 
-                    $.ajax({
+                    return $.ajax({
                         url: url,
                         type: 'GET',
+                        async: false,
                     })
                     .success(function(data) {
                         return (data && data.status === 'Completed')
@@ -202,7 +207,7 @@
 
                 hideWidget: function() {
                     this.el.hide();
-                }
+                },
 
             };
 
