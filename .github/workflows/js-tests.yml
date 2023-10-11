@@ -73,7 +73,7 @@ jobs:
         xvfb-run --auto-servernum ./scripts/all-tests.sh
 
     - name: Save Job Artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: Build-Artifacts
         path: |

@@ -294,6 +294,45 @@ class RegistrationViewValidationErrorTest(
             }
         )
 
+        # testing for http/https
+        response = self.client.post(self.url, {
+            "email": "bob@example.com",
+            "name": "http://",
+            "username": "bob",
+            "password": "password",
+            "honor_code": "true",
+        })
+        assert response.status_code == 400
+        response_json = json.loads(response.content.decode('utf-8'))
+        self.assertDictEqual(
+            response_json,
+            {
+                "name": [{"user_message": 'Enter a valid name'}],
+                "error_code": "validation-error"
+            }
+        )
+
+    def test_register_fullname_html_validation_error(self):
+        """
+        Test for catching invalid full name errors
+        """
+        response = self.client.post(self.url, {
+            "email": "bob@example.com",
+            "name": "<Bob Smith>",
+            "username": "bob",
+            "password": "password",
+            "honor_code": "true",
+        })
+        assert response.status_code == 400
+        response_json = json.loads(response.content.decode('utf-8'))
+        self.assertDictEqual(
+            response_json,
+            {
+                'name': [{'user_message': 'Full Name cannot contain the following characters: < >'}],
+                "error_code": "validation-error"
+            }
+        )
+
     def test_register_duplicate_username_account_validation_error(self):
         # Register the first user
         response = self.client.post(self.url, {
