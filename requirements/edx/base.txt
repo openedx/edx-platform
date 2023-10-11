@@ -483,7 +483,7 @@ edx-drf-extensions==8.10.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.5.7
+edx-enterprise==4.6.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -786,7 +786,7 @@ openedx-filters==1.6.0
     # via
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
-openedx-learning==0.2.0
+openedx-learning==0.2.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -846,7 +846,7 @@ psutil==5.9.5
     # via
     #   -r requirements/edx/paver.txt
     #   edx-django-utils
-py2neo==2021.2.3
+py2neo @ https://github.com/overhangio/py2neo/releases/download/2021.2.3/py2neo-2021.2.3.tar.gz
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/bundled.in

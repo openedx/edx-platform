@@ -11,7 +11,9 @@ from django.test.utils import CaptureQueriesContext
 from common.djangoapps.third_party_auth import provider
 from common.djangoapps.third_party_auth.tests import testutil
 from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
-from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
+from openedx.core.djangoapps.site_configuration.tests.test_util import (
+    with_site_configuration, with_site_configuration_context
+)
 
 SITE_DOMAIN_A = 'professionalx.example.com'
 SITE_DOMAIN_B = 'somethingelse.example.com'
@@ -114,13 +116,13 @@ class RegistryTest(testutil.TestCase):
         assert no_log_in_provider.provider_id not in provider_ids
         assert normal_provider.provider_id in provider_ids
 
-    def test_tpa_hint_provider_displayed_for_login(self):
+    def test_tpa_hint_exp_hidden_provider_displayed_for_login(self):
         """
-        Tests to ensure that an enabled-but-not-visible provider is presented
+        Test to ensure that an explicitly enabled-but-not-visible provider is presented
         for use in the UI when the "tpa_hint" parameter is specified
+        A hidden provider should be accessible with tpa_hint (this is the main case)
         """
 
-        # A hidden provider should be accessible with tpa_hint (this is the main case)
         hidden_provider = self.configure_google_provider(visible=False, enabled=True)
         provider_ids = [
             idp.provider_id
@@ -128,8 +130,14 @@ class RegistryTest(testutil.TestCase):
         ]
         assert hidden_provider.provider_id in provider_ids
 
-        # New providers are hidden (ie, not flagged as 'visible') by default
-        # The tpa_hint parameter should work for these providers as well
+    def test_tpa_hint_hidden_provider_displayed_for_login(self):
+        """
+        Tests to ensure that an implicitly enabled-but-not-visible provider is presented
+        for use in the UI when the "tpa_hint" parameter is specified.
+        New providers are hidden (ie, not flagged as 'visible') by default
+        The tpa_hint parameter should work for these providers as well.
+        """
+
         implicitly_hidden_provider = self.configure_linkedin_provider(enabled=True)
         provider_ids = [
             idp.provider_id
@@ -137,7 +145,10 @@ class RegistryTest(testutil.TestCase):
         ]
         assert implicitly_hidden_provider.provider_id in provider_ids
 
-        # Disabled providers should not be matched in tpa_hint scenarios
+    def test_tpa_hint_disabled_hidden_provider_displayed_for_login(self):
+        """
+        Disabled providers should not be matched in tpa_hint scenarios
+        """
         disabled_provider = self.configure_twitter_provider(visible=True, enabled=False)
         provider_ids = [
             idp.provider_id
@@ -145,13 +156,40 @@ class RegistryTest(testutil.TestCase):
         ]
         assert disabled_provider.provider_id not in provider_ids
 
-        # Providers not utilized for learner authentication should not match tpa_hint
+    def test_tpa_hint_no_log_hidden_provider_displayed_for_login(self):
+        """
+        Providers not utilized for learner authentication should not match tpa_hint
+        """
         no_log_in_provider = self.configure_lti_provider()
         provider_ids = [
             idp.provider_id
             for idp in provider.Registry.displayed_for_login(tpa_hint=no_log_in_provider.provider_id)
         ]
         assert no_log_in_provider.provider_id not in provider_ids
+
+    def test_get_current_site_oauth_provider(self):
+        """
+        Verify that correct provider for current site is returned even if same backend is used for multiple sites.
+        """
+        site_a = Site.objects.get_or_create(domain=SITE_DOMAIN_A, name=SITE_DOMAIN_A)[0]
+        site_b = Site.objects.get_or_create(domain=SITE_DOMAIN_B, name=SITE_DOMAIN_B)[0]
+        site_a_provider = self.configure_google_provider(visible=True, enabled=True, site=site_a)
+        site_b_provider = self.configure_google_provider(visible=True, enabled=True, site=site_b)
+        with with_site_configuration_context(domain=SITE_DOMAIN_A):
+            assert site_a_provider.enabled_for_current_site is True
+
+            # Registry.displayed_for_login gets providers enabled for current site
+            provider_ids = provider.Registry.displayed_for_login()
+            # Google oauth provider for current site should be displayed
+            assert site_a_provider in provider_ids
+            assert site_b_provider not in provider_ids
+
+        # Similarly, the other site should only see its own providers
+        with with_site_configuration_context(domain=SITE_DOMAIN_B):
+            assert site_b_provider.enabled_for_current_site is True
+            provider_ids = provider.Registry.displayed_for_login()
+            assert site_b_provider in provider_ids
+            assert site_a_provider not in provider_ids
 
     def test_provider_enabled_for_current_site(self):
         """
@@ -201,7 +239,7 @@ class RegistryTest(testutil.TestCase):
     def test_get_returns_none_if_provider_id_is_none(self):
         assert provider.Registry.get(None) is None
 
-    def test_get_returns_none_if_provider_not_enabled(self):
+    def test_get_returns_none_if_provider_not_enabled_change(self):
         linkedin_provider_id = "oa2-linkedin-oauth2"
         # At this point there should be no configuration entries at all so no providers should be enabled
         assert provider.Registry.enabled() == []
@@ -209,6 +247,12 @@ class RegistryTest(testutil.TestCase):
         # Now explicitly disabled this provider:
         self.configure_linkedin_provider(enabled=False)
         assert provider.Registry.get(linkedin_provider_id) is None
+
+    def test_get_returns_provider_if_provider_enabled(self):
+        """
+        Test to ensure that Registry gets enabled providers.
+        """
+        linkedin_provider_id = "oa2-linkedin-oauth2"
         self.configure_linkedin_provider(enabled=True)
         assert provider.Registry.get(linkedin_provider_id).provider_id == linkedin_provider_id
 
