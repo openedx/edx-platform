@@ -1,4 +1,4 @@
-"""Tests for cached authentication middleware for django32."""
+"""Tests for cached authentication middleware."""
 from unittest.mock import call, patch
 
 import django
@@ -37,32 +37,68 @@ class CachedAuthMiddlewareTestCase(TestCase):
         """
         response = self.client.get(test_url)
         assert response.status_code == 200
-        with patch.object(User, 'get_session_auth_hash', return_value='abc123', autospec=True):
-            # Django 3.2 has _legacy_get_session_auth_hash, and Django 4 does not
-            # Remove once we reach Django 4
-            if hasattr(User, '_legacy_get_session_auth_hash'):
-                with patch.object(User, '_legacy_get_session_auth_hash', return_value='abc123'):
+
+        with patch(
+            "openedx.core.djangoapps.cache_toolbox.middleware.set_custom_attribute"
+        ) as mock_set_custom_attribute:
+            with patch.object(User, 'get_session_auth_hash', return_value='abc123', autospec=True):
+                # Django 3.2 has _legacy_get_session_auth_hash, and Django 4 does not
+                # Remove once we reach Django 4
+                if hasattr(User, '_legacy_get_session_auth_hash'):
+                    with patch.object(User, '_legacy_get_session_auth_hash', return_value='abc123'):
+                        response = self.client.get(test_url)
+                else:
                     response = self.client.get(test_url)
-            else:
-                response = self.client.get(test_url)
-            self.assertRedirects(response, redirect_url, target_status_code=target_status_code)
+
+        self.assertRedirects(response, redirect_url, target_status_code=target_status_code)
+        mock_set_custom_attribute.assert_any_call('failed_session_verification', True)
 
     def _test_custom_attribute_after_changing_hash(self, test_url, mock_set_custom_attribute):
         """verify that set_custom_attribute is called with expected values"""
-        response = self.client.get(test_url)
+        password = 'test-password'
+
+        # Test DEFAULT_HASHING_ALGORITHM of 'sha1' for both login and client get
+        with self.settings(DEFAULT_HASHING_ALGORITHM='sha1'):
+            self.client.login(username=self.user.username, password=password)
+            self.client.get(test_url)
+        # For Django 3.2, the setting 'sha1' applies and is the "default".
+        # For Django 4, the setting no longer applies, and 'sha256' will be used for both as the "default".
         mock_set_custom_attribute.assert_has_calls([
-            call('DEFAULT_HASHING_ALGORITHM', settings.DEFAULT_HASHING_ALGORITHM),
+            call('DEFAULT_HASHING_ALGORITHM', 'sha1'),
             call('session_hash_verified', "default"),
         ])
-        if django.VERSION < (4, 0):
-            # Reset for testing with change algo, do only for Django 3.2
-            mock_set_custom_attribute.reset_mock()
+        mock_set_custom_attribute.reset_mock()
+
+        # Test DEFAULT_HASHING_ALGORITHM of 'sha1' for login and switch to 'sha256' for client get.
+        with self.settings(DEFAULT_HASHING_ALGORITHM='sha1'):
+            self.client.login(username=self.user.username, password=password)
             with self.settings(DEFAULT_HASHING_ALGORITHM='sha256'):
-                response = self.client.get(test_url)
-                mock_set_custom_attribute.assert_has_calls([
-                    call('DEFAULT_HASHING_ALGORITHM', "sha256"),
-                    call('session_hash_verified', "fallback"),
-                ])
+                self.client.get(test_url)
+        if django.VERSION < (4, 0):
+            # For Django 3.2, the setting 'sha1' applies to login, and uses 'she256' for client get,
+            # and should "fallback" to 'sha1".
+            mock_set_custom_attribute.assert_has_calls([
+                call('DEFAULT_HASHING_ALGORITHM', 'sha256'),
+                call('session_hash_verified', "fallback"),
+            ])
+        else:
+            # For Django 4, the setting no longer applies, and again 'sha256' will be used for both as the "default".
+            mock_set_custom_attribute.assert_has_calls([
+                call('DEFAULT_HASHING_ALGORITHM', 'sha256'),
+                call('session_hash_verified', "default"),
+            ])
+        mock_set_custom_attribute.reset_mock()
+
+        # Test DEFAULT_HASHING_ALGORITHM of 'sha256' for both login and client get
+        with self.settings(DEFAULT_HASHING_ALGORITHM='sha256'):
+            self.client.login(username=self.user.username, password=password)
+            self.client.get(test_url)
+        # For Django 3.2, the setting 'sha256' applies and is the "default".
+        # For Django 4, the setting no longer applies, and 'sha256' will be used for both as the "default".
+        mock_set_custom_attribute.assert_has_calls([
+            call('DEFAULT_HASHING_ALGORITHM', 'sha256'),
+            call('session_hash_verified', "default"),
+        ])
 
     @skip_unless_lms
     def test_session_change_lms(self):
