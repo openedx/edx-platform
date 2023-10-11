@@ -574,6 +574,8 @@ class SkillReflectionIndividualApiView(ProgramFilterMixin):
             start_unit__in=courses,
             problem_type=SkillReflectionQuestionType.LIKERT.value,
         ).all()
+        print(courses)
+        print(likert_questions)
 
         nuance_interogation_questions = SkillAssessmentQuestion.objects.filter(
             start_unit__in=courses,
