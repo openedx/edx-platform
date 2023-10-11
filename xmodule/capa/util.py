@@ -192,7 +192,7 @@ def sanitize_html(html_code):
     output = bleach.clean(
         html_code,
         protocols=bleach.ALLOWED_PROTOCOLS + ['data'],
-        tags=bleach.ALLOWED_TAGS + ['div', 'p', 'audio', 'pre', 'img', 'span'],
+        tags=bleach.ALLOWED_TAGS | {'div', 'p', 'audio', 'pre', 'img', 'span'},
         css_sanitizer=CSSSanitizer(allowed_css_properties=["white-space"]),
         attributes=attributes
     )
