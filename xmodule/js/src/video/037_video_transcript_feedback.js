@@ -146,24 +146,22 @@
                 thumbsUpClickHandler: function() {
                     if (this.currentFeedback) {
                         this.sendFeedbackForCurrentTranscript(null);
-                        this.markAsEmptyFeedback();
                     } else {
                         this.sendFeedbackForCurrentTranscript(true);
-                        this.markAsPositiveFeedback();
                     }
                 },
 
                 thumbsDownClickHandler: function() {
                     if (this.currentFeedback === false) {
                         this.sendFeedbackForCurrentTranscript(null);
-                        this.markAsEmptyFeedback();
                     } else {
                         this.sendFeedbackForCurrentTranscript(false);
-                        this.markAsNegativeFeedback();
                     }
                 },
 
                 sendFeedbackForCurrentTranscript: function(feedbackValue) {
+                    var self = this;
+                    var url = this.aiTranslationsUrl + '/transcript-feedback/';
                     $.ajax({
                         url: url,
                         type: 'POST',
@@ -171,21 +169,21 @@
                         data: {
                             transcript_language: this.currentTranscriptLanguage,
                             video_uuid: this.videoId,
-                            user_uuid: this.userId,
+                            user_id: this.userId,
                             value: feedbackValue,
                         },
                     })
-                    .success(function() {
-                        if (feedbackValue === true) {
-                            this.markAsPositiveFeedback();
-                            this.currentFeedback = true;
+                    .success(function(data) {
+                        if (data && data.value === true) {
+                            self.markAsPositiveFeedback();
+                            self.currentFeedback = true;
                         } else {
-                            if (feedbackValue === false) {
-                                this.markAsNegativeFeedback();
-                                this.currentFeedback = false;
+                            if (data && data.value === false) {
+                                self.markAsNegativeFeedback();
+                                self.currentFeedback = false;
                             } else {
-                                this.markAsEmptyFeedback();
-                                this.currentFeedback = null;
+                                self.markAsEmptyFeedback();
+                                self.currentFeedback = null;
                             }
                         }
                     })
