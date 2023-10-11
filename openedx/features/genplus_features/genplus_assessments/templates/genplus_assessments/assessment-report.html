@@ -7,18 +7,15 @@
 <html lang="en">
 <head>
   <title>Assessment Report</title>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=2.0">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=2.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="${static.url('genplus_assessments/assets/css/main.css')}">
-  <script type="text/javascript">
-      const skill_reflection_data =${skill_reflection_data | n};
-  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="${static.url('genplus_assessments/assets/css/main.css')}" />
 </head>
 <body>
   <div class="wrapper">
@@ -31,11 +28,13 @@
           <ol>
             <li>
               <p><strong>Skills Progress Graph: </strong> This graph compares your starting answers in each unit with your answers at the end. It helps you see how you've progressed. The questions asked about your confidence in certain skills, like how comfortable you are using different tools to communicate. If there's a skill you still don't feel very sure about, it could be something to focus on and get better at.</p>
+              <ul id="likertTitles"></ul>
               <div><canvas id="likertChart" style="height: 300px;"></canvas></div>
             </li>
             <li>
               <p><strong>Skills Improvement Graph: </strong> The second graph shows how you did throughout the whole course. It's about how much you think you've improved in a skill after learning more about it. Learning to honestly see your progress is important because it lets you find areas where you can improve and also celebrate the areas where you've made great progress.</p>
-              <div><canvas id="nuanceChart" style="height: 200px;"></canvas></div>
+              <ul id="nuanceTitles"></ul>
+              <div><canvas id="nuanceChart" style="height: 300px;"></canvas></div>
             </li>
           </ol>
         </section>
@@ -187,34 +186,105 @@
         return fn.apply(thisp, arguments);
       };
     };
-    const likertCTX = document.getElementById('likertChart');
-    const likertLabels = [
-        "Not confident at all",
-        "Not confident",
-        "Confident",
-        "Very confident"
-    ];
-    const likertChart = new Chart(likertCTX, {
-      type: 'horizontalBar',
+    var skillReflectionData = ${skill_reflection_data | n};
+    var likert = {
+      xLabels: [],
+      titles: [],
       data: {
-        labels: [
-          "Communication",
-          "Organisation",
-          "Resilience"
-        ],
+        labels: [],
         datasets: [
           {
-              label: "Start of the course",
-              data: [ -2, -2, -1 ],
-              backgroundColor: "#ed207c"
+            label: 'Start of the course',
+            data: [],
+            backgroundColor: '#ed207c',
           },
           {
-              label: "End of the course",
-              data: [ 2, 2, 1 ],
-              backgroundColor: "#5863f8"
-          }
-        ]
+            label: 'End of the course',
+            data: [],
+            backgroundColor: '#5863f8',
+          },
+        ],
       },
+    };
+
+    var nuanceInterrogation = {
+      titles: [],
+      xLabels: [{ text: '', points: 0 }],
+      data: {
+        yLabels: [],
+        datasets: [
+          {
+            label: 'Nuanced Interrogration',
+            data: [],
+            backgroundColor: '#5863f8',
+          },
+        ],
+      },
+    };
+
+    function prepareLikerts(lables, index) {
+      lables.forEach(function(intro) {
+        intro.choices.forEach(function(introLabel) {
+         likert.xLabels.push(introLabel.text)
+        });
+        if (index === 0) {
+          likert.titles.push({ skill: intro.skill, title: intro.question });
+        }
+        if (likert.data.labels.indexOf(intro.skill) === -1) {
+          likert.data.labels.push(intro.skill);
+        }
+        likert.data.datasets[index].data.push(intro.point < 3 ? intro.point - 3 : intro.point - 2);
+      });
+    };
+
+    function prepareNuanceInterrogation(interros) {
+      interros.forEach(function(interro) {
+        nuanceInterrogation.titles.push({ skill: interro.skill, title: interro.question });
+        nuanceInterrogation.data.yLabels.push(interro.skill);
+        nuanceInterrogation.data.datasets[0].data.push(interro.point);
+        if (nuanceInterrogation.xLabels.length < 2) {
+          interro.choices.forEach(function(choice) {
+            nuanceInterrogation.xLabels.push(choice)
+          })
+        }
+      });
+    };
+
+    function generateTtitles(id, titles ) {
+      var html = ''
+      titles.forEach(function (title){
+        html += '<li><strong>'+ title.skill +': </strong> '+ title.title +'</li>'
+      });
+      var container = document.getElementById(id);
+      container.innerHTML = html;
+    }
+
+    function prepareIntros(lables)  {
+      prepareLikerts(lables, 0);
+    };
+
+    function prepareOutros(lables) {
+      prepareLikerts(lables, 1);
+    };
+
+    if (skillReflectionData.intros) {
+      prepareIntros(skillReflectionData.intros);
+      generateTtitles('likertTitles', likert.titles);
+    }
+    if (skillReflectionData.outros) {
+      prepareOutros(skillReflectionData.outros);
+    }
+
+    if (skillReflectionData.outros) {
+      prepareNuanceInterrogation(skillReflectionData.nuance_interrogation);
+      generateTtitles('nuanceTitles', nuanceInterrogation.titles);
+    }
+
+    var likertCTX = document.getElementById('likertChart');
+
+    var likertChart = new Chart(likertCTX, {
+      type: 'horizontalBar',
+      data: likert.data,
       options: {
         indexAxis: 'y',
           animation:false,
@@ -223,155 +293,100 @@
             inflateAmount: 0,
           },
         },
-        plugins: {
-          title: {
-            display: false,
-          },
-          legend: {
-            position: 'bottom',
-            labels: {
-              usePointStyle: true,
-              boxWidth: 8,
-              boxHeight: 8,
-              color: '#000',
-              font: {
-                size: 12,
-                family: 'Readex Pro',
-              },
-            },
+        legend: {
+          position: 'bottom',
+          labels: {
+            usePointStyle: true,
+            boxWidth: 8,
+            boxHeight: 8,
+            fontSize: 13,
+            fontColor: '#000',
+            fontfamily: 'Readex Pro',
           },
         },
         scales: {
-          x: {
-            grid: {
-              color: 'transparent',
-              borderColor: '#000',
+          xAxes: [{
+            gridLines: {
+              offsetGridLines: false
             },
             ticks: {
-              font: {
-                size: 13,
-                weight: 300,
-                family: 'IBM Plex Sans, Readex Pro',
-              },
               stepSize: 1,
-              color: '#000',
+              min: -2,
+              max: 2,
+              fontSize: 13,
+              fontColor: '#000',
+              fontfamily: 'Readex Pro',
               callback: function (value) {
-                if (value < 0) return likertLabels[value + 2];
-                if (value > 0) return likertLabels[value + 1];
+                if (value < 0) return likert.xLabels[value + 2];
+                if (value > 0) return likert.xLabels[value + 1];
                 return '';
               },
-            },
-            min: -2,
-            max: 2,
-          },
-          y: {
-            grid: {
-              color: 'transparent',
-              borderColor: '#000',
+            }
+          }],
+          yAxes: [{
+            gridLines: {
+              offsetGridLines: false
             },
             ticks: {
-              font: {
-                size: 12,
-                weight: 300,
-                family: 'IBM Plex Sans, Readex Pro',
-              },
-              color: '#000',
-            },
-          },
+              fontSize: 13,
+              fontColor: '#000',
+              fontfamily: 'Readex Pro',
+            }
+          }],
         },
       },
     });
 
-    const nuanceCTX = document.getElementById('nuanceChart');
-    const xLabels = [
-        {
-            text: "",
-            points: 0
-        },
-        {
-            text: "Very Uncomfortable",
-            points: 1
-        },
-        {
-            text: "Uncomfortable",
-            points: 2
-        },
-        {
-            text: "Comfortable",
-            points: 3
-        },
-        {
-            text: "Very Comfortable",
-            points: 4
-        }
-    ];
+    var nuanceCTX = document.getElementById('nuanceChart');
     var nuanceChart = new Chart(nuanceCTX, {
       type: 'horizontalBar',
-      data: {
-          labels: [
-              "Communication",
-              "Organisation",
-              "Resilience"
-          ],
-          datasets: [
-              {
-                  label: "Nuanced Interrogration",
-                  data: [ 1, 4, 3 ],
-                  backgroundColor: "#5863f8"
-              }
-          ]
-      },
+      data: nuanceInterrogation.data,
       options: {
         indexAxis: 'y',
-          animation:false,
+        animation: false,
         elements: {
           bar: {
             inflateAmount: 0,
           },
         },
-        plugins: {
-          title: {
-            display: false,
-          },
-          legend: {
-            display: false,
+        legend: {
+          position: 'bottom',
+          labels: {
+            usePointStyle: true,
+            boxWidth: 8,
+            boxHeight: 8,
+            fontSize: 13,
+            fontColor: '#000',
+            fontfamily: 'Readex Pro',
           },
         },
         scales: {
-          x: {
-            grid: {
-              color: 'transparent',
-              borderColor: '#000',
+          xAxes: [{
+            gridLines: {
+              offsetGridLines: false
             },
             ticks: {
-              font: {
-                size: 13,
-                weight: 300,
-                family: 'IBM Plex Sans, Readex Pro',
-              },
               stepSize: 1,
-              color: '#000',
-                callback: function (_, index) {
-                    return xLabels[index].text
-                },
-            },
-            min: 0,
-            max: 4,
-          },
-          y: {
-            grid: {
-              color: 'transparent',
-              borderColor: '#000',
+              min: 0,
+              max: 4,
+              fontSize: 13,
+              fontColor: '#000',
+              fontfamily: 'Readex Pro',
+              callback: function(value, index, values) {
+                return nuanceInterrogation.xLabels[index].text
+              }
+            }
+          }],
+          yAxes: [{
+            gridLines: {
+              offsetGridLines: false
             },
             ticks: {
-              font: {
-                size: 12,
-                weight: 300,
-                family: 'IBM Plex Sans, Readex Pro',
-              },
-              color: '#000',
-            },
-          },
+              fontSize: 13,
+              fontColor: '#000',
+              fontfamily: 'Readex Pro',
+            }
+          }],
         },
       },
     });
