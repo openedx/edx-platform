@@ -6852,6 +6852,14 @@ msgstr "{course} 講座のブラックリスト {country} "
 msgid "Learner Pathways"
 msgstr ""
 
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification App"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification Type"
+msgstr ""
+
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
 msgid ""

@@ -7234,6 +7234,14 @@ msgstr "课程{course}的黑名单国家： {country}"
 msgid "Learner Pathways"
 msgstr "学习者路径"
 
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification App"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification Type"
+msgstr ""
+
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
 msgid ""
