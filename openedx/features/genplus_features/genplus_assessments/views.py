@@ -269,12 +269,14 @@ class AssessmentReportPDFView(TemplateView):
         school_name = ''
         if student.user:
             student_name = student.user.profile.name
+            class_name = student.active_class.name
             school_name = student.gen_user.school.name
 
         student_data = {
             "user_id": user_id,
             "full_name": student_name,
             "school_name": school_name,
+            "class_name": class_name,
             "character_image_url": character_image_url,
             "units": [],
         }
