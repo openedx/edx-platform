@@ -5401,9 +5401,9 @@ SIMPLE_HISTORY_DATE_INDEX = False
 
 def _should_send_certificate_events(settings):
     return settings.FEATURES['SEND_LEARNING_CERTIFICATE_LIFECYCLE_EVENTS_TO_BUS']
+
 #### Event bus producing ####
 # .. setting_name: EVENT_BUS_PRODUCER_CONFIG
-# .. setting_default: {}
 # .. setting_description: Dictionary of event_types mapped to dictionaries of topic to topic-related configuration.
 #    Each topic configuration dictionary contains
 #    * `enabled`: a toggle denoting whether the event will be published to the topic. These should be annotated
@@ -5424,7 +5424,8 @@ EVENT_BUS_PRODUCER_CONFIG = {
     'org.openedx.learning.course.unenrollment.completed.v1': {
         'course-unenrollment-lifecycle':
             {'event_key_field': 'enrollment.course.course_key',
-             # .. toggle_name: ENABLE_SEND_COURSE_UNENROLLMENT_COMPLETED_EVENTS_OVER_BUS
+             # .. toggle_name: EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.course.unenrollment.completed.v1']
+             #    ['course-unenrollment-lifecycle']['enabled']
              # .. toggle_implementation: DjangoSetting
              # .. toggle_default: False
              # .. toggle_description: Enables sending COURSE_UNENROLLMENT_COMPLETED events over the event bus.
@@ -5438,7 +5439,8 @@ EVENT_BUS_PRODUCER_CONFIG = {
     'org.openedx.learning.xblock.skill.verified.v1': {
         'learning-xblock-skill-verified':
             {'event_key_field': 'xblock_info.usage_key',
-             # .. toggle_name: ENABLE_SEND_XBLOCK_SKILL_VERIFIED_EVENTS_OVER_BUS
+             # .. toggle_name: EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.xblock.skill.verified.v1']
+             #    ['learning-xblock-skill-verified']['enabled']
              # .. toggle_implementation: DjangoSetting
              # .. toggle_default: False
              # .. toggle_description: Enables sending xblock_skill_verified events over the event bus.
@@ -5450,7 +5452,8 @@ EVENT_BUS_PRODUCER_CONFIG = {
              'enabled': False}
     },
     # CMS events. These have to be copied over here because cms.common adds some derived entries as well,
-    # and the derivation fails if the keys are missing. If we ever remove the import of cms.common, we can remove these.
+    # and the derivation fails if the keys are missing. If we ever fully decouple the lms and cms settings,
+    # we can remove these.
     'org.openedx.content_authoring.xblock.published.v1': {
         'course-authoring-xblock-lifecycle':
             {'event_key_field': 'xblock_info.usage_key', 'enabled': False},

@@ -1808,7 +1808,7 @@ INSTALLED_APPS = [
 
     # alternative swagger generator for CMS API
     'drf_spectacular',
-    'openedx_events'
+    'openedx_events',
 ]
 
 
@@ -2805,8 +2805,10 @@ SPECTACULAR_SETTINGS = {
 
 
 #### Event bus producing ####
+def _should_send_xblock_events(settings):
+    return settings.FEATURES['ENABLE_SEND_XBLOCK_LIFECYCLE_EVENTS_OVER_BUS']
+
 # .. setting_name: EVENT_BUS_PRODUCER_CONFIG
-# .. setting_default: {}
 # .. setting_description: Dictionary of event_types mapped to dictionaries of topic to topic-related configuration.
 #    Each topic configuration dictionary contains
 #    * `enabled`: a toggle denoting whether the event will be published to the topic. These should be annotated
@@ -2815,15 +2817,13 @@ SPECTACULAR_SETTINGS = {
 #    * `event_key_field` which is a period-delimited string path to event data field to use as event key.
 #    Note: The topic names should not include environment prefix as it will be dynamically added based on
 #    EVENT_BUS_TOPIC_PREFIX setting.
-def _should_send_xblock_events(settings):
-    return settings.FEATURES['ENABLE_SEND_XBLOCK_LIFECYCLE_EVENTS_OVER_BUS']
-
 
 EVENT_BUS_PRODUCER_CONFIG = {
     'org.openedx.content_authoring.course.catalog_info.changed.v1': {
         'course-catalog-info-changed':
             {'event_key_field': 'catalog_info.course_key',
-             # .. toggle_name: ENABLE_SEND_COURSE_CATALOG_INFO_CHANGED_EVENTS_OVER_BUS
+             # .. toggle_name: EVENT_BUS_PRODUCER_CONFIG['org.openedx.content_authoring.course.catalog_info.changed.v1']
+             #    ['course-catalog-info-changed']['enabled']
              # .. toggle_implementation: DjangoSetting
              # .. toggle_default: False
              # .. toggle_description: if enabled, will publish COURSE_CATALOG_INFO_CHANGED events to the event bus on
@@ -2857,6 +2857,7 @@ EVENT_BUS_PRODUCER_CONFIG = {
             {'event_key_field': 'certificate.course.course_key', 'enabled': False},
     },
 }
+
 
 derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.content_authoring.xblock.published.v1',
                          'course-authoring-xblock-lifecycle', 'enabled')

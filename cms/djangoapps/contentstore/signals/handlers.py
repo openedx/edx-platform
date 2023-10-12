@@ -168,7 +168,7 @@ def _determine_producer_config_for_signal_and_topic(signal, topic):
 
     Parameters
         signal (OpenEdxPublicSignal): The signal being sent to the event bus
-        topic (string): The topic to which the signal is being sent
+        topic (string): The topic to which the signal is being sent (without environment prefix)
 
     Returns
         True if the signal is enabled for that topic in EVENT_BUS_PRODUCER_CONFIG
@@ -179,12 +179,8 @@ def _determine_producer_config_for_signal_and_topic(signal, topic):
                                           {}).get(signal.event_type, {})
     topic_config = event_type_producer_configs.get(topic, {})
     topic_setting = topic_config.get('enabled', None)
-    if topic_setting is True:
-        set_custom_attribute('producer_config_setting', 'True')
-    if topic_setting is False:
-        set_custom_attribute('producer_config_setting', 'False')
-    if topic_setting is None:
-        set_custom_attribute('producer_config_setting', 'Unset')
+    set_custom_attribute(f'producer_config_setting_{topic}_{signal.event_type}',
+                         topic_setting if topic_setting is not None else 'Unset')
     return topic_setting
 
 
