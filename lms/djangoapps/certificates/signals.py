@@ -29,6 +29,7 @@ from lms.djangoapps.certificates.models import (
 from lms.djangoapps.certificates.api import auto_certificate_generation_enabled
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.content.course_overviews.signals import COURSE_PACING_CHANGED
+from openedx.core.lib.events import determine_producer_config_for_signal_and_topic
 from openedx.core.djangoapps.signals.signals import (
     COURSE_GRADE_NOW_FAILED,
     COURSE_GRADE_NOW_PASSED,
@@ -193,8 +194,8 @@ def listen_for_certificate_created_event(sender, signal, **kwargs):  # pylint: d
     Publish `CERTIFICATE_CREATED` events to the event bus.
     """
     # temporary: defer to EVENT_BUS_PRODUCER_CONFIG if present
-    producer_config_setting = _determine_producer_config_for_signal_and_topic(CERTIFICATE_CREATED,
-                                                                              'learning-certificate-lifecycle')
+    producer_config_setting = determine_producer_config_for_signal_and_topic(CERTIFICATE_CREATED,
+                                                                             'learning-certificate-lifecycle')
     if producer_config_setting is True:
         log.info("Producing certificate-created event via config")
         return
@@ -215,8 +216,8 @@ def listen_for_certificate_revoked_event(sender, signal, **kwargs):  # pylint: d
     Publish `CERTIFICATE_REVOKED` events to the event bus.
     """
     # temporary: defer to EVENT_BUS_PRODUCER_CONFIG if present
-    producer_config_setting = _determine_producer_config_for_signal_and_topic(CERTIFICATE_REVOKED,
-                                                                              'learning-certificate-lifecycle')
+    producer_config_setting = determine_producer_config_for_signal_and_topic(CERTIFICATE_REVOKED,
+                                                                             'learning-certificate-lifecycle')
     if producer_config_setting is True:
         log.info("Producing certificate-revoked event via config")
         return
