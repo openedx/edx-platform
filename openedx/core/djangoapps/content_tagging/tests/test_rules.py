@@ -8,7 +8,7 @@ from openedx_tagging.core.tagging.models import (
     Tag,
     UserSystemDefinedTaxonomy,
 )
-from openedx_tagging.core.tagging.rules import ChangeObjectTagPermissionItem
+from openedx_tagging.core.tagging.rules import ObjectTagPermissionItem
 from organizations.models import Organization
 
 from common.djangoapps.student.auth import add_users, update_org_role
@@ -94,60 +94,60 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
         add_users(self.staff, CourseStaffRole(self.course2), self.user_org2)
         add_users(self.staff, CourseStaffRole(self.course2), self.user_org2)
 
-        self.tax_all_course1 = ChangeObjectTagPermissionItem(
+        self.tax_all_course1 = ObjectTagPermissionItem(
             taxonomy=self.taxonomy_all_orgs,
             object_id=str(self.course1),
         )
-        self.tax_all_course2 = ChangeObjectTagPermissionItem(
+        self.tax_all_course2 = ObjectTagPermissionItem(
             taxonomy=self.taxonomy_all_orgs,
             object_id=str(self.course2),
         )
-        self.tax_all_xblock1 = ChangeObjectTagPermissionItem(
+        self.tax_all_xblock1 = ObjectTagPermissionItem(
             taxonomy=self.taxonomy_all_orgs,
             object_id=str(self.xblock1),
         )
-        self.tax_all_xblock2 = ChangeObjectTagPermissionItem(
+        self.tax_all_xblock2 = ObjectTagPermissionItem(
             taxonomy=self.taxonomy_all_orgs,
             object_id=str(self.xblock2),
         )
 
-        self.tax_both_course1 = ChangeObjectTagPermissionItem(
+        self.tax_both_course1 = ObjectTagPermissionItem(
             taxonomy=self.taxonomy_both_orgs,
             object_id=str(self.course1),
         )
-        self.tax_both_course2 = ChangeObjectTagPermissionItem(
+        self.tax_both_course2 = ObjectTagPermissionItem(
             taxonomy=self.taxonomy_both_orgs,
             object_id=str(self.course2),
         )
-        self.tax_both_xblock1 = ChangeObjectTagPermissionItem(
+        self.tax_both_xblock1 = ObjectTagPermissionItem(
             taxonomy=self.taxonomy_both_orgs,
             object_id=str(self.xblock1),
         )
-        self.tax_both_xblock2 = ChangeObjectTagPermissionItem(
+        self.tax_both_xblock2 = ObjectTagPermissionItem(
             taxonomy=self.taxonomy_both_orgs,
             object_id=str(self.xblock2),
         )
 
-        self.tax1_course1 = ChangeObjectTagPermissionItem(
+        self.tax1_course1 = ObjectTagPermissionItem(
             taxonomy=self.taxonomy_one_org,
             object_id=str(self.course1),
         )
-        self.tax1_xblock1 = ChangeObjectTagPermissionItem(
+        self.tax1_xblock1 = ObjectTagPermissionItem(
             taxonomy=self.taxonomy_one_org,
             object_id=str(self.xblock1),
         )
 
-        self.tax_no_org_course1 = ChangeObjectTagPermissionItem(
+        self.tax_no_org_course1 = ObjectTagPermissionItem(
             taxonomy=self.taxonomy_no_orgs,
             object_id=str(self.course1),
         )
 
-        self.tax_no_org_xblock1 = ChangeObjectTagPermissionItem(
+        self.tax_no_org_xblock1 = ObjectTagPermissionItem(
             taxonomy=self.taxonomy_no_orgs,
             object_id=str(self.xblock1),
         )
 
-        self.disabled_course2_tag_perm = ChangeObjectTagPermissionItem(
+        self.disabled_course2_tag_perm = ObjectTagPermissionItem(
             taxonomy=self.taxonomy_disabled,
             object_id=str(self.course2),
         )
