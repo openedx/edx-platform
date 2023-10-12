@@ -34,7 +34,10 @@ class Command(BaseCommand):
     def replace_all_library_source_blocks_ids(self, v1_to_v2_lib_map):
         """A method to replace 'source_library_id' in all relevant blocks."""
 
-        course_id_strings = CourseOverview.get_all_course_keys()
+        course_id_strings = list(CourseOverview.get_all_course_keys())
+
+        # Following is used for debugging and should be removed
+        logging.warning(course_id_string) for course_id_string in course_id_strings
 
         # Use Celery to distribute the workload
         tasks = group(
@@ -57,7 +60,7 @@ class Command(BaseCommand):
 
     def validate(self, v1_to_v2_lib_map):
         """ Validate that replace_all_library_source_blocks_ids was successful"""
-        course_id_strings = CourseOverview.get_all_course_keys()
+        course_id_strings = list(CourseOverview.get_all_course_keys())
         tasks = group(validate_all_library_source_blocks_ids_for_course.s(course_id, v1_to_v2_lib_map) for course_id in course_id_strings)  # lint-amnesty, pylint: disable=line-too-long
         results = tasks.apply_async()
 
@@ -79,7 +82,7 @@ class Command(BaseCommand):
 
     def undo(self, v1_to_v2_lib_map):
         """ undo the changes made by replace_all_library_source_blocks_ids"""
-        course_id_strings = CourseOverview.get_all_course_keys()
+        course_id_strings = list(CourseOverview.get_all_course_keys())
 
         # Use Celery to distribute the workload
         tasks = group(
