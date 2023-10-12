@@ -117,33 +117,33 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
                 preference.get_app_config(app_name).get('enabled', False)
             ):
                 batch_user_ids.remove(preference.user_id)
-            if ENABLE_NOTIFICATIONS_FILTERS.is_enabled(course_key):
-                logger.info(f'Sending notifications to {len(batch_user_ids)} users.')
-                batch_user_ids = NotificationFilter().apply_filters(batch_user_ids, course_key, notification_type)
-                logger.info(f'After applying filters, sending notifications to {len(batch_user_ids)} users.')
+        if ENABLE_NOTIFICATIONS_FILTERS.is_enabled(course_key):
+            logger.info(f'Sending notifications to {len(batch_user_ids)} users.')
+            batch_user_ids = NotificationFilter().apply_filters(batch_user_ids, course_key, notification_type)
+            logger.info(f'After applying filters, sending notifications to {len(batch_user_ids)} users.')
 
-            notifications = []
-            for user_id in batch_user_ids:
-                notifications.append(
-                    Notification(
-                        user_id=user_id,
-                        app_name=app_name,
-                        notification_type=notification_type,
-                        content_context=context,
-                        content_url=content_url,
-                        course_id=course_key,
-                    )
+        notifications = []
+        for user_id in batch_user_ids:
+            notifications.append(
+                Notification(
+                    user_id=user_id,
+                    app_name=app_name,
+                    notification_type=notification_type,
+                    content_context=context,
+                    content_url=content_url,
+                    course_id=course_key,
                 )
-            # send notification to users but use bulk_create
-            notification_objects = Notification.objects.bulk_create(notifications)
-            if notification_objects and not notifications_generated:
-                notifications_generated = True
-                notification_content = notification_objects[0].content
+            )
+        # send notification to users but use bulk_create
+        notification_objects = Notification.objects.bulk_create(notifications)
+        if notification_objects and not notifications_generated:
+            notifications_generated = True
+            notification_content = notification_objects[0].content
 
-            if notifications_generated:
-                notification_generated_event(
-                    batch_user_ids, app_name, notification_type, course_key, content_url, notification_content,
-                )
+        if notifications_generated:
+            notification_generated_event(
+                batch_user_ids, app_name, notification_type, course_key, content_url, notification_content,
+            )
 
 
 def update_user_preference(preference: CourseNotificationPreference, user_id, course_id):
