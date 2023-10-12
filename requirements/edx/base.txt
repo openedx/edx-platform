@@ -793,7 +793,7 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/kernel.in
 optimizely-sdk==4.1.1
     # via -r requirements/edx/bundled.in
-ora2==5.5.4
+ora2==5.5.5
     # via -r requirements/edx/bundled.in
 oscrypto==1.3.0
     # via snowflake-connector-python
@@ -1229,7 +1229,6 @@ xblock-poll==1.13.0
     # via -r requirements/edx/bundled.in
 xblock-utils==4.0.0
     # via
-    #   -r requirements/edx/kernel.in
     #   done-xblock
     #   edx-sga
     #   lti-consumer-xblock
