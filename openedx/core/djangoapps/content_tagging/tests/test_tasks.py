@@ -64,7 +64,7 @@ class TestAutoTagging(LanguageTaxonomyTestMixin, ModuleStoreTestCase):
 
         If value is None, check if the ObjectTag does not exists
         """
-        object_tags = api.get_content_tags(object_key, taxonomy_id=taxonomy_id)
+        object_tags = list(api.get_content_tags(object_key, taxonomy_id=taxonomy_id))
         object_tag = object_tags[0] if len(object_tags) == 1 else None
         if len(object_tags) > 1:
             raise ValueError("Found too many object tags")
