@@ -9,7 +9,6 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from requests.exceptions import HTTPError
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_409_CONFLICT
 from rest_framework.views import APIView
@@ -164,7 +163,6 @@ class BasketOrderView(APIView):
     Retrieve the order associated with a basket.
     """
 
-    authentication_classes = (SessionAuthentication,)
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, *_args, **kwargs):
