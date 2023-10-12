@@ -140,7 +140,12 @@ openedx-blockstore
 path
 piexif                              # Exif image metadata manipulation, used in the profile_images app
 Pillow                              # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.
-py2neo                              # Driver for converting Python modulestore structures to Neo4j's schema (for Coursegraph).
+
+# Driver for converting Python modulestore structures to Neo4j's schema (for Coursegraph).
+# Using the fork because official package has been removed from PyPI/GitHub
+# Follow up issue to remove this fork: https://github.com/openedx/edx-platform/issues/33456
+https://github.com/overhangio/py2neo/releases/download/2021.2.3/py2neo-2021.2.3.tar.gz
+
 pycountry
 pycryptodomex
 pygments                            # Used to support colors in paver command output
