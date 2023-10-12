@@ -101,7 +101,7 @@ jobs:
         run: sudo chown runner:runner -R .*
       - uses: actions/checkout@v3
       - name: collect pytest warnings files
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: pytest-warnings-json
           path: test_root/log
