@@ -77,13 +77,6 @@
         }
     },
     {
-        "pk": 11,
-        "model": "course_roles.courserolespermission",
-        "fields": {
-            "name": "manage_all_users"
-        }
-    },
-    {
         "pk": 12,
         "model": "course_roles.courserolespermission",
         "fields": {
@@ -151,6 +144,13 @@
         "model": "course_roles.courserolespermission",
         "fields": {
             "name": "specific_masquerading"
+        }
+    },
+    {
+        "pk": 22,
+        "model": "course_roles.courserolespermission",
+        "fields": {
+            "name": "manage_all_users"
         }
     }
 ]
