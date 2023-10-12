@@ -5404,6 +5404,7 @@ def _should_send_certificate_events(settings):
 
 #### Event bus producing ####
 # .. setting_name: EVENT_BUS_PRODUCER_CONFIG
+# .. setting_default: all events disabled
 # .. setting_description: Dictionary of event_types mapped to dictionaries of topic to topic-related configuration.
 #    Each topic configuration dictionary contains
 #    * `enabled`: a toggle denoting whether the event will be published to the topic. These should be annotated
