@@ -10,7 +10,7 @@ from edx_rest_framework_extensions.auth.session.authentication import SessionAut
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx import locator
 from opaque_keys.edx.keys import CourseKey
-from rest_framework import authentication, generics, status, viewsets
+from rest_framework import generics, status, viewsets
 from rest_framework.exceptions import ParseError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
