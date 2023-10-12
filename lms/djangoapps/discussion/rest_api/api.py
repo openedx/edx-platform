@@ -127,8 +127,8 @@ from .utils import (
     discussion_open_for_user,
     get_usernames_for_course,
     get_usernames_from_search_string,
-    is_posting_allowed,
     set_attribute,
+    is_posting_allowed
 )
 
 
