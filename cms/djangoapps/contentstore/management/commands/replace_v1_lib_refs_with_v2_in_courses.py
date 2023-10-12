@@ -37,7 +37,8 @@ class Command(BaseCommand):
         course_id_strings = list(CourseOverview.get_all_course_keys())
 
         # Following is used for debugging and should be removed
-        logging.warning(course_id_string) for course_id_string in course_id_strings
+        for course_id_string in course_id_strings:
+            log.info(course_id_string)
 
         # Use Celery to distribute the workload
         tasks = group(
