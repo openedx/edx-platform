@@ -25,3 +25,4 @@ def determine_producer_config_for_signal_and_topic(signal, topic):
     topic_setting = topic_config.get('enabled', None)
     set_custom_attribute(f'producer_config_setting_{topic}_{signal.event_type}',
                          topic_setting if topic_setting is not None else 'Unset')
+    return topic_config
