@@ -164,7 +164,6 @@ class BasketOrderView(APIView):
     Retrieve the order associated with a basket.
     """
 
-    authentication_classes = (SessionAuthentication,)
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, *_args, **kwargs):

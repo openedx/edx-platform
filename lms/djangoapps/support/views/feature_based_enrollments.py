@@ -43,9 +43,6 @@ class FeatureBasedEnrollmentSupportAPIView(GenericAPIView):
     Support-only API View for getting feature based enrollment configuration details
     for a course.
     """
-    authentication_classes = (
-        JwtAuthentication, SessionAuthentication
-    )
     permission_classes = (IsAuthenticated,)
 
     @method_decorator(require_support_permission)
