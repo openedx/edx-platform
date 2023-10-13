@@ -9,7 +9,7 @@ from urllib.parse import parse_qs, urlparse
 import ddt
 import uuid
 from django.contrib.auth import get_user_model
-from django.test.testcases import override_settings
+from django.test import override_settings
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from openedx_tagging.core.tagging.models import Tag, Taxonomy
 from openedx_tagging.core.tagging.models.system_defined import SystemDefinedTaxonomy
@@ -27,8 +27,8 @@ from common.djangoapps.student.roles import (
     OrgLibraryUserRole,
     OrgStaffRole,
 )
-from openedx.core.djangoapps.content_libraries.api import set_library_user_permissions, AccessLevel
-from openedx.core.djangoapps.content_libraries.models import ContentLibrary
+from openedx.core.djangoapps.content_libraries.api import AccessLevel, create_library, set_library_user_permissions
+from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIGHTS_RESERVED
 from openedx.core.djangoapps.content_tagging.models import TaxonomyOrg
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 
@@ -129,12 +129,16 @@ class TestTaxonomyObjectsMixin:
             username="library_userA",
             email="library_userA@example.com",
         )
-        self.content_libraryA = ContentLibrary.objects.create(
+        self.content_libraryA = create_library(
+            collection_uuid=uuid.uuid4(),
             org=self.orgA,
-            slug='foobar',
-            bundle_uuid=uuid.uuid4(),
+            slug="lib_a",
+            library_type=COMPLEX,
+            title="Library Org A",
+            description="This is a library from Org A",
             allow_public_learning=False,
             allow_public_read=False,
+            library_license=ALL_RIGHTS_RESERVED,
         )
         set_library_user_permissions(
             self.content_libraryA.library_key,
