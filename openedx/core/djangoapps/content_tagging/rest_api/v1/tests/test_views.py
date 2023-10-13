@@ -27,8 +27,13 @@ from common.djangoapps.student.roles import (
     OrgLibraryUserRole,
     OrgStaffRole,
 )
-from openedx.core.djangoapps.content_libraries.api import AccessLevel, create_library, set_library_user_permissions
-from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIGHTS_RESERVED
+from openedx.core.djangoapps.content_libraries.api import (
+    AccessLevel,
+    ALL_RIGHTS_RESERVED,
+    create_library,
+    COMPLEX,
+    set_library_user_permissions,
+)
 from openedx.core.djangoapps.content_tagging.models import TaxonomyOrg
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.core.lib import blockstore_api
