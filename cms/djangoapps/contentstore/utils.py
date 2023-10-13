@@ -435,6 +435,9 @@ def get_custom_pages_url(course_locator) -> str:
 
 
 def get_taxonomy_list_url():
+    """
+    Gets course authoring microfrontend URL for taxonomy list page view.
+    """
     taxonomy_list_url = None
     if use_tagging_taxonomy_list_page():
         mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
@@ -1563,6 +1566,7 @@ def get_course_rerun_context(course_key, course_block, user):
     }
 
     return course_rerun_context
+
 
 class StudioPermissionsService:
     """
