@@ -29,7 +29,6 @@ from common.djangoapps.student.roles import (
 )
 from openedx.core.djangoapps.content_libraries.api import (
     AccessLevel,
-    ALL_RIGHTS_RESERVED,
     create_library,
     COMPLEX,
     set_library_user_permissions,
@@ -145,7 +144,7 @@ class TestTaxonomyObjectsMixin:
             description="This is a library from Org A",
             allow_public_learning=False,
             allow_public_read=False,
-            library_license=ALL_RIGHTS_RESERVED,
+            library_license="",
         )
         set_library_user_permissions(
             self.content_libraryA.key,
