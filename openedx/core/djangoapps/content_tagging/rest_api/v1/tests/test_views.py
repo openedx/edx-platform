@@ -31,6 +31,7 @@ from openedx.core.djangoapps.content_libraries.api import AccessLevel, create_li
 from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIGHTS_RESERVED
 from openedx.core.djangoapps.content_tagging.models import TaxonomyOrg
 from openedx.core.djangolib.testing.utils import skip_unless_cms
+from openedx.core.lib import blockstore_api
 
 User = get_user_model()
 
@@ -129,8 +130,9 @@ class TestTaxonomyObjectsMixin:
             username="library_userA",
             email="library_userA@example.com",
         )
+        self.collection = blockstore_api.create_collection("Test library collection")
         self.content_libraryA = create_library(
-            collection_uuid=uuid.uuid4(),
+            collection_uuid=self.collection.uuid,
             org=self.orgA,
             slug="lib_a",
             library_type=COMPLEX,
@@ -141,7 +143,7 @@ class TestTaxonomyObjectsMixin:
             library_license=ALL_RIGHTS_RESERVED,
         )
         set_library_user_permissions(
-            self.content_libraryA.library_key,
+            self.content_libraryA.key,
             self.library_userA,
             AccessLevel.READ_LEVEL
         )
@@ -688,7 +690,7 @@ class TestTaxonomyReadCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
         )
 
     @ddt.data(
-        (None, status.HTTP_403_FORBIDDEN),
+        (None, status.HTTP_401_UNAUTHORIZED),
         ("user", status.HTTP_403_FORBIDDEN),
         ("content_creatorA", status.HTTP_403_FORBIDDEN),
         ("instructorA", status.HTTP_403_FORBIDDEN),
@@ -1076,19 +1078,15 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
 
     @ddt.data(
         # userA and userS are staff in courseA and can tag using enabled taxonomies
-        (None, "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
         ("user", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
         ("staffA", "tA1", ["Tag 1"], status.HTTP_200_OK),
         ("staff", "tA1", ["Tag 1"], status.HTTP_200_OK),
-        (None, "tA1", [], status.HTTP_403_FORBIDDEN),
         ("user", "tA1", [], status.HTTP_403_FORBIDDEN),
         ("staffA", "tA1", [], status.HTTP_200_OK),
         ("staff", "tA1", [], status.HTTP_200_OK),
-        (None, "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_403_FORBIDDEN),
         ("user", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_403_FORBIDDEN),
         ("staffA", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
         ("staff", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
-        (None, "open_taxonomy", ["tag1"], status.HTTP_403_FORBIDDEN),
         ("user", "open_taxonomy", ["tag1"], status.HTTP_403_FORBIDDEN),
         ("staffA", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
         ("staff", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
@@ -1226,7 +1224,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         "courseB",
         "xblockB",
     )
-    def test_tag_unauthorized(self, objectid_attr):
+    def test_tag_no_permission(self, objectid_attr):
         """
         Test that a user without access to courseB can't apply tags to it
         """
@@ -1238,6 +1236,22 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    @ddt.data(
+        "courseB",
+        "xblockB",
+    )
+    def test_tag_unauthorized(self, objectid_attr):
+        """
+        Test that a user without access to courseB can't apply tags to it
+        """
+        object_id = getattr(self, objectid_attr)
+
+        url = OBJECT_TAG_UPDATE_URL.format(object_id=object_id, taxonomy_id=self.tA1.pk)
+
+        response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 @skip_unless_cms
