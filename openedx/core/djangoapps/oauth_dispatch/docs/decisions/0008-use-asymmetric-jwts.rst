@@ -47,23 +47,10 @@ be the only service configured with the aymmetric keypair, including its Private
 All other OAuth Clients will be configured with only the Public key portion of the asymmetric key pair.
 This will ultimately replace all uses of "symmetric" keys for signing JWTs.
 
-"kid" Key Identifier
-~~~~~~~~~~~~~~~~~~~~
-
-In order to support key rotation in a forward compatible manner, we will identify the asymmetric keys,
-using the `JSON Web Key (JWK)`_ standard's `"kid" (Key ID)`_ parameter.  When a `JSON Web Signature (JWS)`_
-is created to sign a JWT, its `"kid" header parameter`_ specifies which key was used to secure the JWS.
-The code examples below show this in action.
-
-.. _JSON Web Key (JWK): https://tools.ietf.org/html/draft-ietf-jose-json-web-key-36
-.. _`"kid" (Key ID)`: https://tools.ietf.org/html/draft-ietf-jose-json-web-key-36#section-4.5
-.. _JSON Web Signature (JWS): https://tools.ietf.org/html/rfc7515
-.. _`"kid" header parameter`: https://tools.ietf.org/html/rfc7515#section-4.1.4
-
 Remove JWT_ISSUERS
 ~~~~~~~~~~~~~~~~~~
 
-edx_rest_framework_extensions.settings_ supports having a list of **JWT_ISSUERS** instead of just a single
+`edx_rest_framework_extensions.settings`_ supports having a list of **JWT_ISSUERS** instead of just a single
 one. This support for configuring multiple issuers is present across many services. However, this does not
 conform to the `JWT standard`_, where the `issuer`_ is intended to identify the entity that generates and
 signs the JWT. In our case, that should be the single Auth service only.
@@ -146,18 +133,18 @@ Verify Signature
 
 To verify the signature we'll be simply looping through the public keys and try to verify the signature with each of them.
 For more details you can have a look at `verify_jwk_signature_using_keyset`_. To generate ``keyset`` required for verification you
-can simply use `verify_jwk_signature_using_keyset`_ method.
+can simply use `get_verification_jwk_key_set`_ method.
 
 .. _verify_jwk_signature_using_keyset: https://github.com/openedx/edx-drf-extensions/blob/master/edx_rest_framework_extensions/auth/jwt/decoder.py#L270
-.. _verify_jwk_signature_using_keyset : https://github.com/openedx/edx-drf-extensions/blob/master/edx_rest_framework_extensions/auth/jwt/decoder.py#L270
+.. _get_verification_jwk_key_set : https://github.com/openedx/edx-drf-extensions/blob/master/edx_rest_framework_extensions/auth/jwt/decoder.py#L395
 
 Key Rotation
 ~~~~~~~~~~~~
 
 In future if we plan to rotate the keys, we can simply add new key public key to the public keyset and remove the old private one.
-Means, at any time there might be more than one public key but there will be only one private key. The clients will be able to verify the signature using the new public key and the old clients will be able to verify the signature using
-the old public key. Considering that we are doing verification by looping through all the available public keys, the ``kid`` parameter is not
-is not much important. But it is still a good practice to have it.
+Means, at any time there might be more than one public key but there will be only one private key. Considering that we are doing verification
+by looping through all the available public keys, the ``kid`` parameter is not
+as important as it was before. But it is still a good practice to have it.
 
 Consequences
 ------------
