@@ -109,6 +109,9 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
         if default_web_config:
             preferences = create_notification_pref_if_not_exists(batch_user_ids, preferences, course_key)
 
+        if not preferences:
+            return
+
         for preference in preferences:
             preference = update_user_preference(preference, preference.user_id, course_key)
             if not (
