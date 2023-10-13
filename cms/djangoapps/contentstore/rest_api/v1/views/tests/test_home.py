@@ -7,7 +7,7 @@ from django.urls import reverse
 from edx_toggles.toggles.testutils import (
     override_waffle_switch,
     override_waffle_flag,
-) 
+)
 from rest_framework import status
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
