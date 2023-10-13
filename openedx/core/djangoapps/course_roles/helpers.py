@@ -1,5 +1,5 @@
 """
-Helpers for the course roles app.
+Helpers for the course roles app which is used for authorization.
 """
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
