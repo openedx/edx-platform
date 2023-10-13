@@ -1,11 +1,14 @@
 """
 Helpers for the course roles app.
 """
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 
 from openedx.core.djangoapps.course_roles.models import CourseRolesUserRole
 from openedx.core.lib.cache_utils import request_cached
 from xmodule.modulestore.django import modulestore
+
+User = get_user_model()
 
 
 @request_cached()
@@ -13,7 +16,7 @@ def course_permission_check(user, permission_name, course_id):
     """
     Check if a user has a permission in a course.
     """
-    if isinstance(user, AnonymousUser):
+    if isinstance(user, AnonymousUser) or not isinstance(user, User):
         return False
     return CourseRolesUserRole.objects.filter(
         user=user,
@@ -43,7 +46,7 @@ def organization_permission_check(user, permission_name, organization_name):
     """
     Check if a user has a permission in an organization.
     """
-    if isinstance(user, AnonymousUser):
+    if isinstance(user, AnonymousUser) or not isinstance(user, User):
         return False
     return CourseRolesUserRole.objects.filter(
         user=user,
@@ -68,7 +71,7 @@ def course_or_organization_permission_check(user, permission_name, course_id, or
     """
     Check if a user has a permission in an organization or a course.
     """
-    if isinstance(user, AnonymousUser):
+    if isinstance(user, AnonymousUser) or not isinstance(user, User):
         return False
     if organization_name is None:
         organization_name = modulestore().get_course(course_id).org
