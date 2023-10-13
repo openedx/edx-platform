@@ -25,6 +25,7 @@ User = get_user_model()
 TAXONOMY_ORG_LIST_URL = "/api/content_tagging/v1/taxonomies/"
 TAXONOMY_ORG_DETAIL_URL = "/api/content_tagging/v1/taxonomies/{pk}/"
 OBJECT_TAG_UPDATE_URL = "/api/content_tagging/v1/object_tags/{object_id}/?taxonomy={taxonomy_id}"
+TAXONOMY_TEMPLATE_URL = "/api/content_tagging/v1/taxonomies/import/{filename}"
 
 
 def check_taxonomy(
@@ -844,3 +845,33 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
         response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@skip_unless_cms
+@ddt.ddt
+class TestDownloadTemplateView(APITestCase):
+    """
+    Tests the taxonomy template downloads.
+    """
+    @ddt.data(
+        ("template.csv", "text/csv"),
+        ("template.json", "application/json"),
+    )
+    @ddt.unpack
+    def test_download(self, filename, content_type):
+        url = TAXONOMY_TEMPLATE_URL.format(filename=filename)
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.headers['Content-Type'] == content_type
+        assert response.headers['Content-Disposition'] == f'attachment; filename="{filename}"'
+        assert int(response.headers['Content-Length']) > 0
+
+    def test_download_not_found(self):
+        url = TAXONOMY_TEMPLATE_URL.format(filename="template.txt")
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_download_method_not_allowed(self):
+        url = TAXONOMY_TEMPLATE_URL.format(filename="template.txt")
+        response = self.client.post(url)
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
