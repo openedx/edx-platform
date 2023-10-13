@@ -405,7 +405,6 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-
     @ddt.data(
         (None, status.HTTP_401_UNAUTHORIZED),
         ("user", status.HTTP_403_FORBIDDEN),
@@ -450,6 +449,7 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
             # Also checks if the taxonomy was associated with the org
             if user_attr == "staffA":
                 assert TaxonomyOrg.objects.filter(taxonomy=response.data["id"], org=self.orgA).exists()
+
 
 @ddt.ddt
 class TestTaxonomyDetailExportMixin(TestTaxonomyObjectsMixin):
@@ -730,6 +730,7 @@ class TestTaxonomyDetailExportMixin(TestTaxonomyObjectsMixin):
             reason="Staff should see all taxonomies",
         )
 
+
 @skip_unless_cms
 @override_settings(FEATURES={"ENABLE_CREATOR_GROUP": True})
 class TestTaxonomyDetailViewSet(TestTaxonomyDetailExportMixin, APITestCase):
@@ -760,6 +761,7 @@ class TestTaxonomyDetailViewSet(TestTaxonomyDetailExportMixin, APITestCase):
 
         if status.is_success(expected_status):
             check_taxonomy(response.data, taxonomy.pk, **(TaxonomySerializer(taxonomy.cast()).data))
+
 
 @skip_unless_cms
 @override_settings(FEATURES={"ENABLE_CREATOR_GROUP": True})
