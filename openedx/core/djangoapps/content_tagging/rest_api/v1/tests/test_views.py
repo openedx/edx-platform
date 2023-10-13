@@ -257,7 +257,7 @@ class TestTaxonomyObjectsMixin:
 @skip_unless_cms
 @ddt.ddt
 @override_settings(FEATURES={"ENABLE_CREATOR_GROUP": True})
-class TestTaxonomyReadCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
+class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
     """
     Test cases for TestTaxonomyReadViewSet when ENABLE_CREATOR_GROUP is True
     """
@@ -405,26 +405,63 @@ class TestTaxonomyReadCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def _test_detail_taxonomy(
-        self, user_attr: str, taxonomy_attr: str, expected_status: int, reason: str = "Unexpected response status"
-    ) -> None:
-        """
-        Helper function to call the retrieve endpoint and check the response
-        """
-        taxonomy = getattr(self, taxonomy_attr)
 
-        url = TAXONOMY_ORG_DETAIL_URL.format(pk=taxonomy.pk)
+    @ddt.data(
+        (None, status.HTTP_401_UNAUTHORIZED),
+        ("user", status.HTTP_403_FORBIDDEN),
+        ("content_creatorA", status.HTTP_403_FORBIDDEN),
+        ("instructorA", status.HTTP_403_FORBIDDEN),
+        ("library_staffA", status.HTTP_403_FORBIDDEN),
+        ("course_instructorA", status.HTTP_403_FORBIDDEN),
+        ("course_staffA", status.HTTP_403_FORBIDDEN),
+        ("library_userA", status.HTTP_403_FORBIDDEN),
+        ("staffA", status.HTTP_201_CREATED),
+        ("staff", status.HTTP_201_CREATED),
+    )
+    @ddt.unpack
+    def test_create_taxonomy(self, user_attr: str, expected_status: int) -> None:
+        """
+        Tests that only Taxonomy admins and org level admins can create taxonomies
+        """
+        url = TAXONOMY_ORG_LIST_URL
+
+        create_data = {
+            "name": "taxonomy_data",
+            "description": "This is a description",
+            "enabled": True,
+            "allow_multiple": True,
+        }
 
         if user_attr:
             user = getattr(self, user_attr)
             self.client.force_authenticate(user=user)
 
-        response = self.client.get(url)
-        assert response.status_code == expected_status, reason
+        response = self.client.post(url, create_data, format="json")
+        assert response.status_code == expected_status
 
+        # If we were able to create the taxonomy, check if it was created
         if status.is_success(expected_status):
-            check_taxonomy(response.data, taxonomy.pk, **(TaxonomySerializer(taxonomy.cast()).data))
-        pass
+            check_taxonomy(response.data, response.data["id"], **create_data)
+            url = TAXONOMY_ORG_DETAIL_URL.format(pk=response.data["id"])
+
+            response = self.client.get(url)
+            check_taxonomy(response.data, response.data["id"], **create_data)
+
+            # Also checks if the taxonomy was associated with the org
+            if user_attr == "staffA":
+                assert TaxonomyOrg.objects.filter(taxonomy=response.data["id"], org=self.orgA).exists()
+
+@ddt.ddt
+class TestTaxonomyDetailExportMixin(TestTaxonomyObjectsMixin):
+    """
+    Test cases to be used with detail and export actions
+    """
+
+    @abstractmethod
+    def _test_api_call(self, **_kwargs) -> None:
+        """
+        Helper function to call the detail/export endpoint and check the response
+        """
 
     @ddt.data(
         "user",
@@ -439,7 +476,7 @@ class TestTaxonomyReadCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
         """
         Tests that everyone can see enabled global taxonomies
         """
-        self._test_detail_taxonomy(
+        self._test_api_call(
             user_attr=user_attr,
             taxonomy_attr="t1",
             expected_status=status.HTTP_200_OK,
@@ -508,7 +545,7 @@ class TestTaxonomyReadCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
         Tests that org users (content creators and instructors) can see enabled global taxonomies and taxonomies
         from their orgs
         """
-        self._test_detail_taxonomy(
+        self._test_api_call(
             user_attr=user_attr,
             taxonomy_attr=taxonomy_attr,
             expected_status=status.HTTP_200_OK,
@@ -523,7 +560,7 @@ class TestTaxonomyReadCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
         """
         Tests that org admins can see disabled taxonomies from their orgs
         """
-        self._test_detail_taxonomy(
+        self._test_api_call(
             user_attr="staffA",
             taxonomy_attr=taxonomy_attr,
             expected_status=status.HTTP_200_OK,
@@ -538,7 +575,7 @@ class TestTaxonomyReadCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
         """
         Tests that org admins can't see disabled global taxonomies
         """
-        self._test_detail_taxonomy(
+        self._test_api_call(
             user_attr="staffA",
             taxonomy_attr=taxonomy_attr,
             expected_status=status.HTTP_404_NOT_FOUND,
@@ -605,7 +642,7 @@ class TestTaxonomyReadCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
         Tests that org users (content creators and instructors) can't see disabled global taxonomies and taxonomies
         from their orgs
         """
-        self._test_detail_taxonomy(
+        self._test_api_call(
             user_attr=user_attr,
             taxonomy_attr=taxonomy_attr,
             expected_status=status.HTTP_404_NOT_FOUND,
@@ -621,7 +658,7 @@ class TestTaxonomyReadCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
         """
         Tests that staff can see taxonomies with no org
         """
-        self._test_detail_taxonomy(
+        self._test_api_call(
             user_attr=user_attr,
             taxonomy_attr=taxonomy_attr,
             expected_status=status.HTTP_200_OK,
@@ -641,7 +678,7 @@ class TestTaxonomyReadCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
         """
         Tests that org users can't see taxonomies with no org
         """
-        self._test_detail_taxonomy(
+        self._test_api_call(
             user_attr=user_attr,
             taxonomy_attr="ot1",
             expected_status=status.HTTP_404_NOT_FOUND,
@@ -661,7 +698,7 @@ class TestTaxonomyReadCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
         """
         Tests that org users can't see taxonomies from other orgs
         """
-        self._test_detail_taxonomy(
+        self._test_api_call(
             user_attr=user_attr,
             taxonomy_attr="tB1",
             expected_status=status.HTTP_404_NOT_FOUND,
@@ -686,73 +723,85 @@ class TestTaxonomyReadCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
         """
         Tests that org users can't see taxonomies from other orgs
         """
-        self._test_detail_taxonomy(
+        self._test_api_call(
             user_attr="staff",
             taxonomy_attr=taxonomy_attr,
             expected_status=status.HTTP_200_OK,
             reason="Staff should see all taxonomies",
         )
 
-    @ddt.data(
-        (None, status.HTTP_401_UNAUTHORIZED),
-        ("user", status.HTTP_403_FORBIDDEN),
-        ("content_creatorA", status.HTTP_403_FORBIDDEN),
-        ("instructorA", status.HTTP_403_FORBIDDEN),
-        ("library_staffA", status.HTTP_403_FORBIDDEN),
-        ("course_instructorA", status.HTTP_403_FORBIDDEN),
-        ("course_staffA", status.HTTP_403_FORBIDDEN),
-        ("library_userA", status.HTTP_403_FORBIDDEN),
-        ("staffA", status.HTTP_201_CREATED),
-        ("staff", status.HTTP_201_CREATED),
-    )
-    @ddt.unpack
-    def test_create_taxonomy(self, user_attr: str, expected_status: int) -> None:
-        """
-        Tests that only Taxonomy admins and org level admins can create taxonomies
-        """
-        url = TAXONOMY_ORG_LIST_URL
+@skip_unless_cms
+@override_settings(FEATURES={"ENABLE_CREATOR_GROUP": True})
+class TestTaxonomyDetailViewSet(TestTaxonomyDetailExportMixin, APITestCase):
+    """
+    Test cases for TaxonomyViewSet with detail action
+    """
 
-        create_data = {
-            "name": "taxonomy_data",
-            "description": "This is a description",
-            "enabled": True,
-            "allow_multiple": True,
-        }
+    def _test_api_call(
+            self,
+            user_attr: str,
+            taxonomy_attr: str,
+            expected_status: int,
+            reason: str = "Unexpected response status"
+    ) -> None:
+        """
+        Helper function to call the retrieve endpoint and check the response
+        """
+        taxonomy = getattr(self, taxonomy_attr)
+
+        url = TAXONOMY_ORG_DETAIL_URL.format(pk=taxonomy.pk)
 
         if user_attr:
             user = getattr(self, user_attr)
             self.client.force_authenticate(user=user)
 
-        response = self.client.post(url, create_data, format="json")
-        assert response.status_code == expected_status
+        response = self.client.get(url)
+        assert response.status_code == expected_status, reason
 
-        # If we were able to create the taxonomy, check if it was created
         if status.is_success(expected_status):
-            check_taxonomy(response.data, response.data["id"], **create_data)
-            url = TAXONOMY_ORG_DETAIL_URL.format(pk=response.data["id"])
+            check_taxonomy(response.data, taxonomy.pk, **(TaxonomySerializer(taxonomy.cast()).data))
 
-            response = self.client.get(url)
-            check_taxonomy(response.data, response.data["id"], **create_data)
+@skip_unless_cms
+@override_settings(FEATURES={"ENABLE_CREATOR_GROUP": True})
+class TestTaxonomyExportViewSet(TestTaxonomyDetailExportMixin, APITestCase):
+    """
+    Test cases for TaxonomyViewSet with export action
+    """
 
-            # Also checks if the taxonomy was associated with the org
-            if user_attr == "staffA":
-                assert TaxonomyOrg.objects.filter(taxonomy=response.data["id"], org=self.orgA).exists()
+    def _test_api_call(
+            self,
+            user_attr: str,
+            taxonomy_attr: str,
+            expected_status: int,
+            reason: str = "Unexpected response status"
+    ) -> None:
+        """
+        Helper function to call the export endpoint and check the response
+        """
+        taxonomy = getattr(self, taxonomy_attr)
+
+        url = TAXONOMY_ORG_DETAIL_URL.format(pk=taxonomy.pk)
+
+        if user_attr:
+            user = getattr(self, user_attr)
+            self.client.force_authenticate(user=user)
+
+        response = self.client.get(url)
+        assert response.status_code == expected_status, reason
+        assert len(response.data) > 0
 
 
 @ddt.ddt
 class TestTaxonomyChangeMixin(TestTaxonomyObjectsMixin):
     """
-    Test cases for TestTaxonomyChangeViewSet when ENABLE_CREATOR_GROUP is True
+    Test cases to be used with update, patch and delete actions
     """
 
-    def _test_api_call(
-            self,
-            **_kwargs,
-    ) -> None:
+    @abstractmethod
+    def _test_api_call(self, **_kwargs) -> None:
         """
-        Helper function to call the update endpoint and check the response
+        Helper function to call the update/patch/delete endpoint and check the response
         """
-        pass
 
     @ddt.data(
         "ot1",
@@ -984,7 +1033,7 @@ class TestTaxonomyDeleteViewSet(TestTaxonomyChangeMixin, APITestCase):
 
 @skip_unless_cms
 @override_settings(FEATURES={"ENABLE_CREATOR_GROUP": False})
-class TestTaxonomyReadViewSetNoCreatorGroup(TestTaxonomyReadCreateViewSet):  # pylint: disable=test-inherits-tests
+class TestTaxonomyReadViewSetNoCreatorGroup(TestTaxonomyListCreateViewSet):  # pylint: disable=test-inherits-tests
     """
     Test cases for TaxonomyReadViewSet when ENABLE_CREATOR_GROUP is False
 
