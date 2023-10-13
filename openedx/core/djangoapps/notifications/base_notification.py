@@ -82,9 +82,6 @@ COURSE_NOTIFICATION_TYPES = {
         'notification_app': 'discussion',
         'name': 'response_on_followed_post',
         'is_core': True,
-        'web': False,
-        'email': False,
-        'push': False,
         'info': '',
         'non_editable': [],
         'content_template': _('<{p}><{strong}>{replier_name}</{strong}> responded to a post you’re following: '
@@ -99,9 +96,6 @@ COURSE_NOTIFICATION_TYPES = {
         'notification_app': 'discussion',
         'name': 'comment_on_followed_post',
         'is_core': True,
-        'web': False,
-        'email': False,
-        'push': False,
         'info': '',
         'non_editable': [],
         'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on {author_name}\'s response in '
