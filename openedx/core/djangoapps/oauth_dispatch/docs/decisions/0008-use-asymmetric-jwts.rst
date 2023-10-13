@@ -87,30 +87,12 @@ Example Code
 KeyPair Generation
 ~~~~~~~~~~~~~~~~~~
 
-Here is code for generating a keypair::
+Please have a look at ``openedx/core/djangoapps/oauth_dispatch/management/commands/generate_jwt_signing_key.py``
+to get better understanding how to generate keypair using ``PyJWT``.
 
-    import json
-    from Cryptodome.PublicKey import RSA
-    from jwt.algorithms import get_default_algorithms
+The public and private keypair would be similar to the following::
 
-    rsa_key = RSA.generate(2048)
-    algo = get_default_algorithms()['RS512']
-    pem = rsa_key.export_key('PEM').decode()
-    rsa_jwk = json.loads(algo.to_jwk(algo.prepare_key(pem)))
-    public_rsa_jwk = json.loads(algo.to_jwk(algo.prepare_key(pem).public_key()))
-
-    kid = 'your_key_id'
-    rsa_jwk['kid'] = kid
-    public_rsa_jwk['kid'] = kid
-
-
-To serialize the **public key** in a `JSON Web Key Set (JWK Set)`_::
-
-    public_keys = { 'keys': [public_rsa_jwk] }
-    serialized_public_keys_json = json.dumps(public_keys)
-
-and its sample output::
-
+    ## Public keyset
     """
         {
             "keys": [
@@ -125,12 +107,8 @@ and its sample output::
         }
     """
 
-To serialize the **keypair** as a JWK::
 
-    serialized_keypair_json = json.dumps(rsa_jwk)
-
-and its sample output::
-
+    ## Private key
     """
         {
             "kty": "RSA",
@@ -152,15 +130,11 @@ Signing
 
 To deserialize the keypair from above::
 
-    from jwt.api_jwk import PyJWK
-
-    private_key = PyJWK.from_json(serialized_keypair_json)
+    private_key = PyJWK.from_json(your_private_jwk)
 
 To create a signature::
 
-    import jwt
-
-    signed_message = jwt.encode("JWT payload in dict format", key=private_key.key, algorithm="RS512")
+    signed_message = jwt.encode("JWT payload in dict format", key=private_key, algorithm="RS512")
 
 Note: we specify **RS512** above to identify *RSASSA-PKCS1-v1_5 using SHA-512* as
 the signature algorithm value as described in the `JSON Web Algorithms (JWA)`_ spec.
@@ -170,49 +144,20 @@ the signature algorithm value as described in the `JSON Web Algorithms (JWA)`_ s
 Verify Signature
 ~~~~~~~~~~~~~~~~
 
-To verify the signature from above::
+To verify the signature we'll be simply looping through the public keys and try to verify the signature with each of them.
+For more details you can have a look at `verify_jwk_signature_using_keyset`_. To generate ``keyset`` required for verification you
+can simply use `verify_jwk_signature_using_keyset`_ method.
 
-    def _verify_jws_using_keyset(signed_message, key_set)
-        for i in range(len(key_set)):
-            try:
-                algorithms = None
-                if key_set[i].key_type == 'RSA':
-                    algorithms = ['RS256', 'RS512',]
-                elif key_set[i].key_type == 'oct':
-                    algorithms = ['HS256',]
-
-                return jwt.decode(
-                        signed_message,
-                        key=key_set[i].key,
-                        algorithms=algorithms,
-                    )
-            except Exception:
-                if i == len(key_set) - 1:
-                    raise
-
-    key_set = PyJWKSet.from_json(serialized_public_keys_json).keys
-    verified_message = _verify_jws_using_keyset(signed_message, key_set)
+.. _verify_jwk_signature_using_keyset: https://github.com/openedx/edx-drf-extensions/blob/master/edx_rest_framework_extensions/auth/jwt/decoder.py#L270
+.. _verify_jwk_signature_using_keyset : https://github.com/openedx/edx-drf-extensions/blob/master/edx_rest_framework_extensions/auth/jwt/decoder.py#L270
 
 Key Rotation
 ~~~~~~~~~~~~
 
-When a new public key is added in the future, it should have a unique "kid"
-value and added to the public keys JWK set::
-
-    rsa_key = RSA.generate(2048)
-    algo = get_default_algorithms()['RS512']
-    pem = rsa_key.export_key('PEM').decode()
-    rsa_jwk = json.loads(algo.to_jwk(algo.prepare_key(pem)))
-    public_rsa_jwk = json.loads(algo.to_jwk(algo.prepare_key(pem).public_key()))
-
-    kid = 'new_id'
-    rsa_jwk['kid'] = kid
-    public_rsa_jwk['kid'] = kid
-
-    public_keys['keys'].append(public_rsa_jwk)
-
-When a JWS is created, it is signed with a certain "kid"-identified keypair. When it
-is later verified, the public key with the matching "kid" in the JWK set is used.
+In future if we plan to rotate the keys, we can simply add new key public key to the public keyset and remove the old private one.
+Means, at any time there might be more than one public key but there will be only one private key. The clients will be able to verify the signature using the new public key and the old clients will be able to verify the signature using
+the old public key. Considering that we are doing verification by looping through all the available public keys, the ``kid`` parameter is not
+is not much important. But it is still a good practice to have it.
 
 Consequences
 ------------
