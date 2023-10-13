@@ -68,8 +68,8 @@ issuer, but with (the potential of) multiple signing keys stored in a JWT Set.
 .. _JSON Web Key Set (JWK Set): https://tools.ietf.org/html/draft-ietf-jose-json-web-key-36#section-5
 .. _site configuration: https://github.com/openedx/edx-platform/blob/af841336c7e39d634c238cd8a11c5a3a661aa9e2/openedx/core/djangoapps/site_configuration/__init__.py
 
-Example Code
-------------
+Features
+--------
 
 KeyPair Generation
 ~~~~~~~~~~~~~~~~~~
