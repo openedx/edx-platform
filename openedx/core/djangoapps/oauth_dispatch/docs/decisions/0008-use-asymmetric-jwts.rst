@@ -115,11 +115,7 @@ The public and private keypair would be similar to the following::
 Signing
 ~~~~~~~
 
-To deserialize the keypair from above::
-
-    private_key = PyJWK.from_json(your_private_jwk)
-
-To create a signature::
+To create a signature you simply need a **payload**, **private key** and your hashing algorithm::
 
     signed_message = jwt.encode("JWT payload in dict format", key=private_key, algorithm="RS512")
 
@@ -131,9 +127,9 @@ the signature algorithm value as described in the `JSON Web Algorithms (JWA)`_ s
 Verify Signature
 ~~~~~~~~~~~~~~~~
 
-To verify the signature we'll be simply looping through the public keys and try to verify the signature with each of them.
+To verify the signature we'll be looping through the public keys and try to verify the signature with each of them.
 For more details you can have a look at `verify_jwk_signature_using_keyset`_. To generate ``keyset`` required for verification you
-can simply use `get_verification_jwk_key_set`_ method.
+can use `get_verification_jwk_key_set`_ method.
 
 .. _verify_jwk_signature_using_keyset: https://github.com/openedx/edx-drf-extensions/blob/master/edx_rest_framework_extensions/auth/jwt/decoder.py#L270
 .. _get_verification_jwk_key_set : https://github.com/openedx/edx-drf-extensions/blob/master/edx_rest_framework_extensions/auth/jwt/decoder.py#L395
