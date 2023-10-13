@@ -1082,8 +1082,8 @@ DATABASES = {
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
-# This will be overridden through CMS config
-DEFAULT_HASHING_ALGORITHM = 'sha1'
+DEFAULT_HASHING_ALGORITHM = 'sha256'
+
 #################### Python sandbox ############################################
 
 CODE_JAIL = {
