@@ -6,8 +6,8 @@ from __future__ import annotations
 
 from urllib.parse import parse_qs, urlparse
 
+import abc
 import ddt
-import uuid
 from django.contrib.auth import get_user_model
 from django.test import override_settings
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
@@ -457,7 +457,7 @@ class TestTaxonomyDetailExportMixin(TestTaxonomyObjectsMixin):
     Test cases to be used with detail and export actions
     """
 
-    @abstractmethod
+    @abc.abstractmethod
     def _test_api_call(self, **_kwargs) -> None:
         """
         Helper function to call the detail/export endpoint and check the response
@@ -797,7 +797,7 @@ class TestTaxonomyChangeMixin(TestTaxonomyObjectsMixin):
     Test cases to be used with update, patch and delete actions
     """
 
-    @abstractmethod
+    @abc.abstractmethod
     def _test_api_call(self, **_kwargs) -> None:
         """
         Helper function to call the update/patch/delete endpoint and check the response
