@@ -3,10 +3,9 @@ Base setup for Notification Apps and Types.
 """
 from django.utils.translation import gettext_lazy as _
 
-from .utils import (
-    find_app_in_normalized_apps,
-    find_pref_in_normalized_prefs,
-)
+from .utils import find_app_in_normalized_apps, find_pref_in_normalized_prefs
+
+FILTER_AUDIT_EXPIRED = 'filter_audit_expired'
 
 COURSE_NOTIFICATION_TYPES = {
     'new_comment_on_response': {
@@ -20,6 +19,7 @@ COURSE_NOTIFICATION_TYPES = {
             'replier_name': 'replier name',
         },
         'email_template': '',
+        'filters': [FILTER_AUDIT_EXPIRED]
     },
     'new_comment': {
         'notification_app': 'discussion',
@@ -33,6 +33,7 @@ COURSE_NOTIFICATION_TYPES = {
             'replier_name': 'replier name',
         },
         'email_template': '',
+        'filters': [FILTER_AUDIT_EXPIRED]
     },
     'new_response': {
         'notification_app': 'discussion',
@@ -45,6 +46,7 @@ COURSE_NOTIFICATION_TYPES = {
             'replier_name': 'replier name',
         },
         'email_template': '',
+        'filters': [FILTER_AUDIT_EXPIRED]
     },
     'new_discussion_post': {
         'notification_app': 'discussion',
@@ -61,6 +63,7 @@ COURSE_NOTIFICATION_TYPES = {
             'username': 'Post author name',
         },
         'email_template': '',
+        'filters': [FILTER_AUDIT_EXPIRED]
     },
     'new_question_post': {
         'notification_app': 'discussion',
@@ -77,6 +80,7 @@ COURSE_NOTIFICATION_TYPES = {
             'username': 'Post author name',
         },
         'email_template': '',
+        'filters': [FILTER_AUDIT_EXPIRED]
     },
     'response_on_followed_post': {
         'notification_app': 'discussion',
@@ -91,6 +95,7 @@ COURSE_NOTIFICATION_TYPES = {
             'replier_name': 'replier name',
         },
         'email_template': '',
+        'filter': [FILTER_AUDIT_EXPIRED]
     },
     'comment_on_followed_post': {
         'notification_app': 'discussion',
@@ -106,6 +111,7 @@ COURSE_NOTIFICATION_TYPES = {
             'replier_name': 'replier name',
         },
         'email_template': '',
+        'filter': [FILTER_AUDIT_EXPIRED]
     },
 }
 
