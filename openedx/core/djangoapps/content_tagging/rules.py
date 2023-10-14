@@ -36,25 +36,11 @@ def is_org_admin(user: UserType, orgs: list[Organization] | None = None) -> bool
     return len(get_admin_orgs(user, orgs)) > 0
 
 
-def is_org_content_creator(user: UserType, orgs: list[Organization]) -> bool:
-    """
-    Return True if the given user is a content creator for any of the given orgs.
-    """
-    return len(get_content_creator_orgs(user, orgs)) > 0
-
-
 def is_org_user(user: UserType, orgs: list[Organization]) -> bool:
     """
     Return True if the given user is a member of any of the given orgs.
     """
     return len(get_user_orgs(user, orgs)) > 0
-
-
-def is_org_instructor(user: UserType, orgs: list[Organization]) -> bool:
-    """
-    Return True if the given user is an instructor for any of the given orgs.
-    """
-    return len(get_instructor_orgs(user, orgs)) > 0
 
 
 def get_admin_orgs(user: UserType, orgs: list[Organization] | None = None) -> list[Organization]:
