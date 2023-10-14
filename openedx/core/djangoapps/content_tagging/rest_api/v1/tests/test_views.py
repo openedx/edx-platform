@@ -237,22 +237,6 @@ class TestTaxonomyObjectsMixin:
             rel_type=TaxonomyOrg.RelType.OWNER,
         )
 
-        # # ToDo: OrgX content library test
-        # # This will show tX1 to every studio user
-        # self.content_libraryX = ContentLibrary.objects.create(
-        #     org=self.orgX,
-        #     slug='foobar',
-        #     bundle_uuid=uuid.uuid4(),
-        #     allow_public_learning=True,
-        #     allow_public_read=True,
-        # )
-        # self.tX1 = Taxonomy.objects.create(name="tX1", enabled=True)
-        # TaxonomyOrg.objects.create(
-        #     taxonomy=self.tX1,
-        #     org=self.orgX,
-        #     rel_type=TaxonomyOrg.RelType.OWNER,
-        # )
-
 
 @skip_unless_cms
 @ddt.ddt
