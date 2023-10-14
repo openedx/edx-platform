@@ -164,6 +164,7 @@ class SendNotificationsTest(ModuleStoreTestCase):
 
 
 @ddt.ddt
+@patch('openedx.core.djangoapps.notifications.tasks.ENABLE_NOTIFICATIONS_FILTERS.is_enabled', lambda x: False)
 class SendBatchNotificationsTest(ModuleStoreTestCase):
     """
     Test that notification and notification preferences are created in batches
