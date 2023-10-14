@@ -127,10 +127,13 @@
                     <a href="${advanced_settings_url}">${_("Advanced Settings")}</a>
                   </li>
                   % if certificates_url:
-                  <li class="nav-item nav-course-settings-certificates">
+                  <!-- <li class="nav-item nav-course-settings-certificates">
                     <a href="${certificates_url}">${_("Certificates")}</a>
-                  </li>
+                  </li> -->
                   % endif
+                  <li class="nav-item nav-course-settings-certificates">
+                    <a href="/specialization/${course_key}">Specialization</a>
+                  </li>
                   % if frontend_app_publisher_url:
                   <li class="nav-item nav-course-courseware-videos">
                     <a href="${frontend_app_publisher_url}/course-runs/${url_encoded_course_key}">${_("Publisher")}</a>
