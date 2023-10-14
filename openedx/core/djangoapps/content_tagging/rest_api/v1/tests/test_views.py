@@ -274,9 +274,8 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
         """
         url = TAXONOMY_ORG_LIST_URL
 
-        if user_attr:
-            user = getattr(self, user_attr)
-            self.client.force_authenticate(user=user)
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
 
         # Set parameters cleaning empty values
         query_params = {k: v for k, v in {"enabled": enabled_parameter, "org": org_parameter}.items() if v is not None}
@@ -375,9 +374,8 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
         """
         url = TAXONOMY_ORG_LIST_URL
 
-        if user_attr:
-            user = getattr(self, user_attr)
-            self.client.force_authenticate(user=user)
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
 
         query_params = {"page_size": 3, "page": 2}
 
@@ -752,9 +750,8 @@ class TestTaxonomyDetailViewSet(TestTaxonomyDetailExportMixin, APITestCase):
 
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=taxonomy.pk)
 
-        if user_attr:
-            user = getattr(self, user_attr)
-            self.client.force_authenticate(user=user)
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
 
         response = self.client.get(url)
         assert response.status_code == expected_status, reason
@@ -784,9 +781,8 @@ class TestTaxonomyExportViewSet(TestTaxonomyDetailExportMixin, APITestCase):
 
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=taxonomy.pk)
 
-        if user_attr:
-            user = getattr(self, user_attr)
-            self.client.force_authenticate(user=user)
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
 
         response = self.client.get(url)
         assert response.status_code == expected_status, reason
@@ -942,9 +938,8 @@ class TestTaxonomyUpdateViewSet(TestTaxonomyChangeMixin, APITestCase):
 
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=taxonomy.pk)
 
-        if user_attr:
-            user = getattr(self, user_attr)
-            self.client.force_authenticate(user=user)
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
 
         response = self.client.put(url, {"name": "new name"}, format="json")
         assert response.status_code in expected_status, reason
@@ -981,9 +976,8 @@ class TestTaxonomyPatchViewSet(TestTaxonomyChangeMixin, APITestCase):
 
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=taxonomy.pk)
 
-        if user_attr:
-            user = getattr(self, user_attr)
-            self.client.force_authenticate(user=user)
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
 
         response = self.client.patch(url, {"name": "new name"}, format="json")
         assert response.status_code in expected_status, reason
@@ -1020,9 +1014,8 @@ class TestTaxonomyDeleteViewSet(TestTaxonomyChangeMixin, APITestCase):
 
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=taxonomy.pk)
 
-        if user_attr:
-            user = getattr(self, user_attr)
-            self.client.force_authenticate(user=user)
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
 
         response = self.client.delete(url)
         assert response.status_code in expected_status, reason
@@ -1148,9 +1141,11 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
     )
     @ddt.unpack
     def test_tag_course(self, user_attr, taxonomy_attr, tag_values, expected_status):
-        if user_attr:
-            user = getattr(self, user_attr)
-            self.client.force_authenticate(user=user)
+        """
+        Tests that only staff and org level users can tag courses
+        """
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
 
         taxonomy = getattr(self, taxonomy_attr)
 
@@ -1171,9 +1166,8 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         """
         Nobody can use disable taxonomies to tag objects
         """
-        if user_attr:
-            user = getattr(self, user_attr)
-            self.client.force_authenticate(user=user)
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
 
         disabled_taxonomy = self.tA2
         assert disabled_taxonomy.enabled is False
@@ -1194,9 +1188,8 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         """
         Tests that nobody can add invalid tags to a course using a closed taxonomy
         """
-        if user_attr:
-            user = getattr(self, user_attr)
-            self.client.force_authenticate(user=user)
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
 
         taxonomy = getattr(self, taxonomy_attr)
 
@@ -1207,20 +1200,25 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
 
     @ddt.data(
         # userA and userS are staff in courseA (owner of xblockA) and can tag using any taxonomies
+        ("user", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
         ("staffA", "tA1", ["Tag 1"], status.HTTP_200_OK),
         ("staff", "tA1", ["Tag 1"], status.HTTP_200_OK),
+        ("user", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_403_FORBIDDEN),
         ("staffA", "tA1", [], status.HTTP_200_OK),
         ("staff", "tA1", [], status.HTTP_200_OK),
         ("staffA", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
         ("staff", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
+        ("user", "open_taxonomy", ["tag1"], status.HTTP_403_FORBIDDEN),
         ("staffA", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
         ("staff", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
     )
     @ddt.unpack
     def test_tag_xblock(self, user_attr, taxonomy_attr, tag_values, expected_status):
-        if user_attr:
-            user = getattr(self, user_attr)
-            self.client.force_authenticate(user=user)
+        """
+        Tests that only staff and org level users can tag xblocks
+        """
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
 
         taxonomy = getattr(self, taxonomy_attr)
 
@@ -1241,9 +1239,8 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         """
         Tests that nobody can use disabled taxonomies to tag xblocks
         """
-        if user_attr:
-            user = getattr(self, user_attr)
-            self.client.force_authenticate(user=user)
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
 
         disabled_taxonomy = self.tA2
         assert disabled_taxonomy.enabled is False
@@ -1264,9 +1261,8 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         """
         Tests that staff can't add invalid tags to a xblock using a closed taxonomy
         """
-        if user_attr:
-            user = getattr(self, user_attr)
-            self.client.force_authenticate(user=user)
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
 
         taxonomy = getattr(self, taxonomy_attr)
 
