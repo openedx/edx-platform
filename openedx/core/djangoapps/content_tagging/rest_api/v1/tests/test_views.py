@@ -76,166 +76,194 @@ class TestTaxonomyObjectsMixin:
     """
 
     def setUp(self):
+        def _setUp_orgs():
+            """
+            Create orgs for testing
+            """
+            self.orgA = Organization.objects.create(name="Organization A", short_name="orgA")
+            self.orgB = Organization.objects.create(name="Organization B", short_name="orgB")
+            self.orgX = Organization.objects.create(name="Organization X", short_name="orgX")
+
+        def _setUp_courses():
+            """
+            Create courses for testing
+            """
+            self.courseA = CourseLocator("orgA", "101", "test")
+            self.courseB = CourseLocator("orgB", "101", "test")
+
+        def _setUp_library():
+            """
+            Create library for testing
+            """
+            self.collection = blockstore_api.create_collection("Test library collection")
+            self.content_libraryA = create_library(
+                collection_uuid=self.collection.uuid,
+                org=self.orgA,
+                slug="lib_a",
+                library_type=COMPLEX,
+                title="Library Org A",
+                description="This is a library from Org A",
+                allow_public_learning=False,
+                allow_public_read=False,
+                library_license="",
+            )
+
+        def _setUp_users():
+            """
+            Create users for testing
+            """
+            self.user = User.objects.create(
+                username="user",
+                email="user@example.com",
+            )
+            self.staff = User.objects.create(
+                username="staff",
+                email="staff@example.com",
+                is_staff=True,
+            )
+
+            self.staffA = User.objects.create(
+                username="staffA",
+                email="userA@example.com",
+            )
+            update_org_role(self.staff, OrgStaffRole, self.staffA, [self.orgA.short_name])
+
+            self.content_creatorA = User.objects.create(
+                username="content_creatorA",
+                email="content_creatorA@example.com",
+            )
+            update_org_role(self.staff, OrgContentCreatorRole, self.content_creatorA, [self.orgA.short_name])
+
+            self.instructorA = User.objects.create(
+                username="instructorA",
+                email="instructorA@example.com",
+            )
+            update_org_role(self.staff, OrgInstructorRole, self.instructorA, [self.orgA.short_name])
+
+            self.library_staffA = User.objects.create(
+                username="library_staffA",
+                email="library_staffA@example.com",
+            )
+            update_org_role(self.staff, OrgLibraryUserRole, self.library_staffA, [self.orgA.short_name])
+
+            self.course_instructorA = User.objects.create(
+                username="course_instructorA",
+                email="course_instructorA@example.com",
+            )
+            add_users(self.staff, CourseInstructorRole(self.courseA), self.course_instructorA)
+
+            self.course_staffA = User.objects.create(
+                username="course_staffA",
+                email="course_staffA@example.com",
+            )
+            add_users(self.staff, CourseStaffRole(self.courseA), self.course_staffA)
+
+            self.library_userA = User.objects.create(
+                username="library_userA",
+                email="library_userA@example.com",
+            )
+            set_library_user_permissions(
+                self.content_libraryA.key,
+                self.library_userA,
+                AccessLevel.READ_LEVEL
+            )
+
+        def _setUp_taxonomies():
+            """
+            Create taxonomies for testing
+            """
+            # Orphaned taxonomy
+            self.ot1 = Taxonomy.objects.create(name="ot1", enabled=True)
+            self.ot2 = Taxonomy.objects.create(name="ot2", enabled=False)
+
+            # System defined taxonomy
+            self.st1 = Taxonomy.objects.create(name="st1", enabled=True)
+            self.st1.taxonomy_class = SystemDefinedTaxonomy
+            self.st1.save()
+            TaxonomyOrg.objects.create(
+                taxonomy=self.st1,
+                rel_type=TaxonomyOrg.RelType.OWNER,
+                org=None,
+            )
+            self.st2 = Taxonomy.objects.create(name="st2", enabled=False)
+            self.st2.taxonomy_class = SystemDefinedTaxonomy
+            self.st2.save()
+            TaxonomyOrg.objects.create(
+                taxonomy=self.st2,
+                rel_type=TaxonomyOrg.RelType.OWNER,
+            )
+
+            # Global taxonomy
+            self.t1 = Taxonomy.objects.create(name="t1", enabled=True)
+            TaxonomyOrg.objects.create(
+                taxonomy=self.t1,
+                rel_type=TaxonomyOrg.RelType.OWNER,
+            )
+            self.t2 = Taxonomy.objects.create(name="t2", enabled=False)
+            TaxonomyOrg.objects.create(
+                taxonomy=self.t2,
+                rel_type=TaxonomyOrg.RelType.OWNER,
+            )
+
+            # OrgA taxonomy
+            self.tA1 = Taxonomy.objects.create(name="tA1", enabled=True)
+            TaxonomyOrg.objects.create(
+                taxonomy=self.tA1,
+                org=self.orgA,
+                rel_type=TaxonomyOrg.RelType.OWNER,
+            )
+            self.tA2 = Taxonomy.objects.create(name="tA2", enabled=False)
+            TaxonomyOrg.objects.create(
+                taxonomy=self.tA2,
+                org=self.orgA,
+                rel_type=TaxonomyOrg.RelType.OWNER,
+            )
+
+            # OrgB taxonomy
+            self.tB1 = Taxonomy.objects.create(name="tB1", enabled=True)
+            TaxonomyOrg.objects.create(
+                taxonomy=self.tB1,
+                org=self.orgB,
+                rel_type=TaxonomyOrg.RelType.OWNER,
+            )
+            self.tB2 = Taxonomy.objects.create(name="tB2", enabled=False)
+            TaxonomyOrg.objects.create(
+                taxonomy=self.tB2,
+                org=self.orgB,
+                rel_type=TaxonomyOrg.RelType.OWNER,
+            )
+
+            # OrgA and OrgB taxonomy
+            self.tBA1 = Taxonomy.objects.create(name="tBA1", enabled=True)
+            TaxonomyOrg.objects.create(
+                taxonomy=self.tBA1,
+                org=self.orgA,
+                rel_type=TaxonomyOrg.RelType.OWNER,
+            )
+            TaxonomyOrg.objects.create(
+                taxonomy=self.tBA1,
+                org=self.orgB,
+                rel_type=TaxonomyOrg.RelType.OWNER,
+            )
+            self.tBA2 = Taxonomy.objects.create(name="tBA2", enabled=False)
+            TaxonomyOrg.objects.create(
+                taxonomy=self.tBA2,
+                org=self.orgA,
+                rel_type=TaxonomyOrg.RelType.OWNER,
+            )
+            TaxonomyOrg.objects.create(
+                taxonomy=self.tBA2,
+                org=self.orgB,
+                rel_type=TaxonomyOrg.RelType.OWNER,
+            )
+
         super().setUp()
-        self.user = User.objects.create(
-            username="user",
-            email="user@example.com",
-        )
-        self.staff = User.objects.create(
-            username="staff",
-            email="staff@example.com",
-            is_staff=True,
-        )
 
-        self.orgA = Organization.objects.create(name="Organization A", short_name="orgA")
-        self.orgB = Organization.objects.create(name="Organization B", short_name="orgB")
-        self.orgX = Organization.objects.create(name="Organization X", short_name="orgX")
-
-        self.courseA = CourseLocator("orgA", "101", "test")
-        self.courseB = CourseLocator("orgB", "101", "test")
-
-        self.staffA = User.objects.create(
-            username="staffA",
-            email="userA@example.com",
-        )
-        update_org_role(self.staff, OrgStaffRole, self.staffA, [self.orgA.short_name])
-
-        self.content_creatorA = User.objects.create(
-            username="content_creatorA",
-            email="content_creatorA@example.com",
-        )
-        update_org_role(self.staff, OrgContentCreatorRole, self.content_creatorA, [self.orgA.short_name])
-
-        self.instructorA = User.objects.create(
-            username="instructorA",
-            email="instructorA@example.com",
-        )
-        update_org_role(self.staff, OrgInstructorRole, self.instructorA, [self.orgA.short_name])
-
-        self.library_staffA = User.objects.create(
-            username="library_staffA",
-            email="library_staffA@example.com",
-        )
-        update_org_role(self.staff, OrgLibraryUserRole, self.library_staffA, [self.orgA.short_name])
-
-        self.course_instructorA = User.objects.create(
-            username="course_instructorA",
-            email="course_instructorA@example.com",
-        )
-        add_users(self.staff, CourseInstructorRole(self.courseA), self.course_instructorA)
-
-        self.course_staffA = User.objects.create(
-            username="course_staffA",
-            email="course_staffA@example.com",
-        )
-        add_users(self.staff, CourseStaffRole(self.courseA), self.course_staffA)
-
-        self.library_userA = User.objects.create(
-            username="library_userA",
-            email="library_userA@example.com",
-        )
-        self.collection = blockstore_api.create_collection("Test library collection")
-        self.content_libraryA = create_library(
-            collection_uuid=self.collection.uuid,
-            org=self.orgA,
-            slug="lib_a",
-            library_type=COMPLEX,
-            title="Library Org A",
-            description="This is a library from Org A",
-            allow_public_learning=False,
-            allow_public_read=False,
-            library_license="",
-        )
-        set_library_user_permissions(
-            self.content_libraryA.key,
-            self.library_userA,
-            AccessLevel.READ_LEVEL
-        )
-
-        # Orphaned taxonomy
-        self.ot1 = Taxonomy.objects.create(name="ot1", enabled=True)
-        self.ot2 = Taxonomy.objects.create(name="ot2", enabled=False)
-
-        # System defined taxonomy
-        self.st1 = Taxonomy.objects.create(name="st1", enabled=True)
-        self.st1.taxonomy_class = SystemDefinedTaxonomy
-        self.st1.save()
-        TaxonomyOrg.objects.create(
-            taxonomy=self.st1,
-            rel_type=TaxonomyOrg.RelType.OWNER,
-            org=None,
-        )
-        self.st2 = Taxonomy.objects.create(name="st2", enabled=False)
-        self.st2.taxonomy_class = SystemDefinedTaxonomy
-        self.st2.save()
-        TaxonomyOrg.objects.create(
-            taxonomy=self.st2,
-            rel_type=TaxonomyOrg.RelType.OWNER,
-        )
-
-        # Global taxonomy
-        self.t1 = Taxonomy.objects.create(name="t1", enabled=True)
-        TaxonomyOrg.objects.create(
-            taxonomy=self.t1,
-            rel_type=TaxonomyOrg.RelType.OWNER,
-        )
-        self.t2 = Taxonomy.objects.create(name="t2", enabled=False)
-        TaxonomyOrg.objects.create(
-            taxonomy=self.t2,
-            rel_type=TaxonomyOrg.RelType.OWNER,
-        )
-
-        # OrgA taxonomy
-        self.tA1 = Taxonomy.objects.create(name="tA1", enabled=True)
-        TaxonomyOrg.objects.create(
-            taxonomy=self.tA1,
-            org=self.orgA,
-            rel_type=TaxonomyOrg.RelType.OWNER,
-        )
-        self.tA2 = Taxonomy.objects.create(name="tA2", enabled=False)
-        TaxonomyOrg.objects.create(
-            taxonomy=self.tA2,
-            org=self.orgA,
-            rel_type=TaxonomyOrg.RelType.OWNER,
-        )
-
-        # OrgB taxonomy
-        self.tB1 = Taxonomy.objects.create(name="tB1", enabled=True)
-        TaxonomyOrg.objects.create(
-            taxonomy=self.tB1,
-            org=self.orgB,
-            rel_type=TaxonomyOrg.RelType.OWNER,
-        )
-        self.tB2 = Taxonomy.objects.create(name="tB2", enabled=False)
-        TaxonomyOrg.objects.create(
-            taxonomy=self.tB2,
-            org=self.orgB,
-            rel_type=TaxonomyOrg.RelType.OWNER,
-        )
-
-        # OrgA and OrgB taxonomy
-        self.tBA1 = Taxonomy.objects.create(name="tBA1", enabled=True)
-        TaxonomyOrg.objects.create(
-            taxonomy=self.tBA1,
-            org=self.orgA,
-            rel_type=TaxonomyOrg.RelType.OWNER,
-        )
-        TaxonomyOrg.objects.create(
-            taxonomy=self.tBA1,
-            org=self.orgB,
-            rel_type=TaxonomyOrg.RelType.OWNER,
-        )
-        self.tBA2 = Taxonomy.objects.create(name="tBA2", enabled=False)
-        TaxonomyOrg.objects.create(
-            taxonomy=self.tBA2,
-            org=self.orgA,
-            rel_type=TaxonomyOrg.RelType.OWNER,
-        )
-        TaxonomyOrg.objects.create(
-            taxonomy=self.tBA2,
-            org=self.orgB,
-            rel_type=TaxonomyOrg.RelType.OWNER,
-        )
+        _setUp_orgs()
+        _setUp_courses()
+        _setUp_library()
+        _setUp_users()
+        _setUp_taxonomies()
 
 
 @skip_unless_cms
@@ -720,16 +748,15 @@ class TestTaxonomyDetailViewSet(TestTaxonomyDetailExportMixin, APITestCase):
     Test cases for TaxonomyViewSet with detail action
     """
 
-    def _test_api_call(
-            self,
-            user_attr: str,
-            taxonomy_attr: str,
-            expected_status: int,
-            reason: str = "Unexpected response status"
-    ) -> None:
+    def _test_api_call(self, **kwargs) -> None:
         """
         Helper function to call the retrieve endpoint and check the response
         """
+        user_attr = kwargs.get("user_attr")
+        taxonomy_attr = kwargs.get("taxonomy_attr")
+        expected_status = kwargs.get("expected_status")
+        reason = kwargs.get("reason", "Unexpected response status")
+
         taxonomy = getattr(self, taxonomy_attr)
 
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=taxonomy.pk)
@@ -751,16 +778,15 @@ class TestTaxonomyExportViewSet(TestTaxonomyDetailExportMixin, APITestCase):
     Test cases for TaxonomyViewSet with export action
     """
 
-    def _test_api_call(
-            self,
-            user_attr: str,
-            taxonomy_attr: str,
-            expected_status: int,
-            reason: str = "Unexpected response status"
-    ) -> None:
+    def _test_api_call(self, **kwargs) -> None:
         """
         Helper function to call the export endpoint and check the response
         """
+        user_attr = kwargs.get("user_attr")
+        taxonomy_attr = kwargs.get("taxonomy_attr")
+        expected_status = kwargs.get("expected_status")
+        reason = kwargs.get("reason", "Unexpected response status")
+
         taxonomy = getattr(self, taxonomy_attr)
 
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=taxonomy.pk)
@@ -911,13 +937,12 @@ class TestTaxonomyUpdateViewSet(TestTaxonomyChangeMixin, APITestCase):
     Test cases for TaxonomyChangeViewSet with PUT method
     """
 
-    def _test_api_call(
-            self,
-            user_attr: str,
-            taxonomy_attr: str,
-            expected_status: list[int],
-            reason: str = "Unexpected response status"
-    ) -> None:
+    def _test_api_call(self, **kwargs) -> None:
+        user_attr = kwargs.get("user_attr")
+        taxonomy_attr = kwargs.get("taxonomy_attr")
+        expected_status = kwargs.get("expected_status")
+        reason = kwargs.get("reason", "Unexpected response status")
+
         taxonomy = getattr(self, taxonomy_attr)
 
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=taxonomy.pk)
@@ -949,13 +974,12 @@ class TestTaxonomyPatchViewSet(TestTaxonomyChangeMixin, APITestCase):
     Test cases for TaxonomyChangeViewSet with PATCH method
     """
 
-    def _test_api_call(
-            self,
-            user_attr: str,
-            taxonomy_attr: str,
-            expected_status: list[int],
-            reason: str = "Unexpected response status"
-    ) -> None:
+    def _test_api_call(self, **kwargs) -> None:
+        user_attr = kwargs.get("user_attr")
+        taxonomy_attr = kwargs.get("taxonomy_attr")
+        expected_status = kwargs.get("expected_status")
+        reason = kwargs.get("reason", "Unexpected response status")
+
         taxonomy = getattr(self, taxonomy_attr)
 
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=taxonomy.pk)
@@ -987,13 +1011,12 @@ class TestTaxonomyDeleteViewSet(TestTaxonomyChangeMixin, APITestCase):
     Test cases for TaxonomyChangeViewSet with DELETE method
     """
 
-    def _test_api_call(
-            self,
-            user_attr: str,
-            taxonomy_attr: str,
-            expected_status: list[int],
-            reason: str = "Unexpected response status"
-    ) -> None:
+    def _test_api_call(self, **kwargs) -> None:
+        user_attr = kwargs.get("user_attr")
+        taxonomy_attr = kwargs.get("taxonomy_attr")
+        expected_status = kwargs.get("expected_status")
+        reason = kwargs.get("reason", "Unexpected response status")
+
         taxonomy = getattr(self, taxonomy_attr)
 
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=taxonomy.pk)
