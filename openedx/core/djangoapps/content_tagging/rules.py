@@ -94,7 +94,8 @@ def get_library_user_orgs(user: UserType, orgs: list[Organization]) -> list[Orga
 
 def get_user_orgs(user: UserType, orgs: list[Organization]) -> list[Organization]:
     """
-    Return a list of orgs that the given user is a member of (instructor or content creator), from the given list of orgs.
+    Return a list of orgs that the given user is a member of (instructor or content creator),
+    from the given list of orgs.
     """
     content_creator_orgs = get_content_creator_orgs(user, orgs)
     instructor_orgs = get_instructor_orgs(user, orgs)
