@@ -20,7 +20,7 @@ def create_taxonomy(
     enabled=True,
     allow_multiple=False,
     allow_free_text=False,
-    orgs: list[Organization] = [],
+    orgs: list[Organization] | None = None,
 ) -> Taxonomy:
     """
     Creates, saves, and returns a new Taxonomy with the given attributes.
@@ -33,7 +33,8 @@ def create_taxonomy(
         allow_free_text=allow_free_text,
     )
 
-    set_taxonomy_orgs(taxonomy=taxonomy, all_orgs=False, orgs=orgs)
+    if orgs is not None:
+        set_taxonomy_orgs(taxonomy=taxonomy, all_orgs=False, orgs=orgs)
 
     return taxonomy
 
