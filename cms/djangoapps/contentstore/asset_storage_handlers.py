@@ -43,6 +43,7 @@ REQUEST_DEFAULTS = {
     'direction': '',
     'asset_type': '',
     'text_search': '',
+    'display_name': '',
 }
 
 
@@ -61,7 +62,9 @@ def handle_assets(request, course_key_string=None, asset_key_string=None):
             sort: the asset field to sort by (defaults to 'date_added')
             direction: the sort direction (defaults to 'descending')
             asset_type: the file type to filter items to (defaults to All)
-            text_search: string to filter results by file name (defaults to '')
+            text_search: string to perform a search on filenames (defaults to '')
+            display_name: string to filter results by exact display name (defaults to '').
+                Use the display_name parameter multiple times to filter by multiple filenames.
     POST
         json: create or update an asset. The only updating that can be done is changing the lock state.
     PUT
@@ -172,6 +175,9 @@ def _assets_json(request, course_key):
 
         filter_parameters.update(_get_content_type_filter_for_mongo(request_options['requested_asset_type']))
 
+    if request_options['requested_display_names']:
+        filter_parameters.update(_get_displayname_filter_for_mongo(request_options['requested_display_names']))
+
     if request_options['requested_text_search']:
         filter_parameters.update(_get_displayname_search_filter_for_mongo(request_options['requested_text_search']))
 
@@ -223,11 +229,16 @@ def _parse_request_to_dictionary(request):
         'requested_sort_direction': _get_requested_attribute(request, 'direction'),
         'requested_asset_type': _get_requested_attribute(request, 'asset_type'),
         'requested_text_search': _get_requested_attribute(request, 'text_search'),
+        'requested_display_names': _get_requested_attribute_list(request, 'display_name'),
     }
 
 
 def _get_requested_attribute(request, attribute):
     return request.GET.get(attribute, REQUEST_DEFAULTS.get(attribute))
+
+
+def _get_requested_attribute_list(request, attribute):
+    return request.GET.getlist(attribute, REQUEST_DEFAULTS.get(attribute))
 
 
 def _get_error_if_invalid_parameters(requested_filter):
@@ -300,6 +311,24 @@ def _get_mongo_expression_for_type_filter(requested_file_types):
         'contentType': {
             '$in': content_types
         }
+    }
+
+
+def _get_displayname_filter_for_mongo(displaynames):
+    """
+    Construct and return pymongo query dict, filtering for the given list of displaynames.
+    """
+    filters = []
+
+    for displayname in displaynames:
+        filters.append({
+            'displayname': {
+                '$eq': displayname,
+            },
+        })
+
+    return {
+        '$or': filters,
     }
 
 
