@@ -580,22 +580,35 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
         assert not self.learner.has_perm(perm, perm_item)
 
     @ddt.data(
-        "all_orgs_course_tag",
-        "all_orgs_block_tag",
-        "both_orgs_course_tag",
-        "both_orgs_block_tag",
-        "one_org_block_tag",
-        "disabled_course_tag",
+        "tax_all_course1",
+        "tax_all_course2",
+        "tax_all_xblock1",
+        "tax_all_xblock2",
+        "tax_both_course1",
+        "tax_both_course2",
+        "tax_both_xblock1",
+        "tax_both_xblock2",
     )
     def test_view_object_tag(self, tag_attr):
         """Anyone can view any ObjectTag"""
-        object_tag = getattr(self, tag_attr)
-        self._expected_users_have_perm(
-            "oel_tagging.view_objecttag",
-            object_tag,
-            learner_perm=True,
-            learner_obj=True,
-        )
+        perm = "oel_tagging.view_objecttag"
+        perm_item = getattr(self, tag_attr)
+        assert self.superuser.has_perm(perm, perm_item)
+        assert self.staff.has_perm(perm, perm_item)
+        assert self.user_both_orgs.has_perm(perm, perm_item)
+        assert self.user_org2.has_perm(perm, perm_item) == tag_attr.endswith("2")
+        assert not self.learner.has_perm(perm, perm_item)
+
+    def test_view_object_tag_diabled(self):
+        """
+        Noboty can view a ObjectTag from a disable taxonomy
+        """
+        perm = "oel_tagging.view_objecttag"
+        assert self.superuser.has_perm(perm, self.disabled_course_tag)
+        assert not self.staff.has_perm(perm, self.disabled_course_tag)
+        assert not self.user_both_orgs.has_perm(perm, self.disabled_course_tag)
+        assert not self.user_org2.has_perm(perm, self.disabled_course_tag)
+        assert not self.learner.has_perm(perm, self.disabled_course_tag)
 
 
 @ddt.ddt
