@@ -1129,6 +1129,9 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
     Testing various cases for the ObjectTagView.
     """
 
+    def test_get_tags(self):
+        pass
+
     @ddt.data(
         # userA and userS are staff in courseA and can tag using enabled taxonomies
         ("user", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
@@ -1161,6 +1164,11 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         assert response.status_code == expected_status
         if status.is_success(expected_status):
             assert len(response.data) == len(tag_values)
+            assert set(t["value"] for t in response.data) == set(tag_values)
+
+            # Check that re-fetching the tags returns what we set
+            response = self.client.get(url, format="json")
+            assert status.is_success(response.status_code)
             assert set(t["value"] for t in response.data) == set(tag_values)
 
     @ddt.data(
@@ -1234,6 +1242,11 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         assert response.status_code == expected_status
         if status.is_success(expected_status):
             assert len(response.data) == len(tag_values)
+            assert set(t["value"] for t in response.data) == set(tag_values)
+
+            # Check that re-fetching the tags returns what we set
+            response = self.client.get(url, format="json")
+            assert status.is_success(response.status_code)
             assert set(t["value"] for t in response.data) == set(tag_values)
 
     @ddt.data(
