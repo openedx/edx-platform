@@ -23,7 +23,7 @@ from openedx.core.djangoapps.password_policy import compliance as password_polic
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
 from openedx.core import toggles as core_toggles
 from openedx.core.djangoapps.content.course_overviews.api import get_course_subtext ,set_course_subtext
-from openedx.features.funix_specialization.views import funix_specialization_view , setting_specialization , remove_specialization
+from openedx.features.funix_specialization.views import funix_specialization_view , setting_specialization , remove_specialization,specialization_course
 
 django_autodiscover()
 admin.site.site_header = _('Studio Administration')
@@ -350,5 +350,7 @@ urlpatterns += [
     path('specialization/<str:course_id>', funix_specialization_view, name='funix_specialization'),
 # api
     path('api/setting_specialization', setting_specialization, name='create_specialization'),
-    path('api/remove_specialization_course', remove_specialization , name='remove_specialization')
+    path('api/remove_specialization_course', remove_specialization , name='remove_specialization'),
+    path('api/specialization_course/<str:course_id>', specialization_course, name ='specialization_course')
+
 ]

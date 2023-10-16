@@ -1,5 +1,7 @@
 from django.db import models
 
+
+
 class FunixSpecialization (models.Model):
     spec_name =   models.CharField(max_length=255)
     user_id = models.CharField(max_length=255)
@@ -42,3 +44,25 @@ class FunixSpecializationCourse (models.Model):
     @classmethod
     def getSpecializationCourse (cls, course_id):
         return FunixSpecializationCourse.objects.filter(course_id=course_id)
+
+    @classmethod
+    def getAllCourseSpecialization (cls, course_id):
+      
+        list_speci = cls.getSpecializationCourse(course_id)
+        list_course = []
+        for course in list_speci :
+            course_speci = FunixSpecializationCourse.objects.filter(spec = course.spec)
+            for course_ in course_speci:
+                list_course.append(course_.course_id)
+        
+        course_count = {}
+        duplicate_courses = []
+        
+        for course in list_course:
+            if course in course_count:
+                course_count[course] += 1
+            else:
+                course_count[course] = 1
+                duplicate_courses.append(course)
+       
+        return duplicate_courses
