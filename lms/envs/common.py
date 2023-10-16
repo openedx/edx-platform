@@ -1040,7 +1040,7 @@ FEATURES = {
     # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/29538'
     'DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED': False,
 
-    # .. toggle_name: SEND_LEARNING_CERTIFICATE_LIFECYCLE_EVENTS_TO_BUS
+    # .. toggle_name: FEATURES['SEND_LEARNING_CERTIFICATE_LIFECYCLE_EVENTS_TO_BUS']
     # .. toggle_implementation: SettingToggle
     # .. toggle_default: False
     # .. toggle_description: When True, the system will publish certificate lifecycle signals to the event bus.
@@ -3316,6 +3316,7 @@ INSTALLED_APPS = [
 
     # Notifications
     'openedx.core.djangoapps.notifications',
+    'openedx_events',
 ]
 
 ######################### CSRF #########################################
