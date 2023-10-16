@@ -118,4 +118,12 @@ class Command(BaseCommand):
                 output_writer.writerow(["v1_library_id", "v2_library_id", "status", "error_msg"])
                 for result in group_result:
                     output_writer.writerow(result.values())
+
+            # Create a backup output file
+            timestr = time.strftime("%Y%m%d-%H%M%S", gmtime())
+            with open("_".join([options['output_csv'], timestr]), 'w', encoding='utf-8', newline='') as file:
+                output_writer = csv.writer(file)
+                output_writer.writerow(["v1_library_id", "v2_library_id", "status", "error_msg"])
+                for result in group_result:
+                    output_writer.writerow(result.values())
         log.info(group_result)
