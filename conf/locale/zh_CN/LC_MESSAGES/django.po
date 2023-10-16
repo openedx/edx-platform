@@ -403,7 +403,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-09-17 20:43+0000\n"
+"POT-Creation-Date: 2023-10-08 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
 "Language-Team: Chinese (China) (https://app.transifex.com/open-edx/teams/6205/zh_CN/)\n"
@@ -525,13 +525,13 @@ msgstr "空白"
 #: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #: openedx/core/djangoapps/xblock/rest_api/views.py
 msgid "Invalid data"
-msgstr ""
+msgstr "无效的数据"
 
 #: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #: openedx/core/djangoapps/xblock/rest_api/views.py
 #, python-brace-format
 msgid "Invalid data ({details})"
-msgstr ""
+msgstr "无效的数据 ({details})"
 
 #: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
 msgid "Django site admin"
@@ -6797,6 +6797,7 @@ msgstr ""
 msgid "Original usage key/ID of the thing that is in the clipboard."
 msgstr ""
 
+#: openedx/core/djangoapps/content_tagging/models/base.py
 #: wiki/models/article.py
 msgid "owner"
 msgstr "所有者"
@@ -11959,19 +11960,19 @@ msgstr "课程团队用户不存在"
 #, python-brace-format
 msgid ""
 "Number of course outline regenerations successfully requested: {regenerates}"
-msgstr ""
+msgstr "成功请求的课程大纲重新生成数：{regenerates}"
 
 #: cms/djangoapps/contentstore/admin.py
 msgid "Regenerate selected course outlines"
-msgstr ""
+msgstr "重新生成选定的课程大纲"
 
 #: cms/djangoapps/contentstore/admin.py
 msgid "All course outline regenerations successfully requested."
-msgstr ""
+msgstr "已成功请求所有课程大纲重新生成。"
 
 #: cms/djangoapps/contentstore/admin.py
 msgid "Regenerate *all* course outlines"
-msgstr ""
+msgstr "重新生成*所有*课程大纲"
 
 #: cms/djangoapps/contentstore/asset_storage_handlers.py
 msgid "Upload completed"
@@ -12033,11 +12034,11 @@ msgstr "(未命名)"
 
 #: cms/djangoapps/contentstore/errors.py
 msgid "Aborting import because a course with this id: {} already exists."
-msgstr ""
+msgstr "正在中止导入，因为具有此 ID 的课程：{} 已经存在。"
 
 #: cms/djangoapps/contentstore/errors.py
 msgid "Permission denied. You do not have write access to this course."
-msgstr ""
+msgstr "您没有对此课程的写入权限。"
 
 #: cms/djangoapps/contentstore/errors.py
 #, python-brace-format
@@ -12046,7 +12047,7 @@ msgstr "无法在包中找到{0}文件。"
 
 #: cms/djangoapps/contentstore/errors.py
 msgid "Uploaded Tar file not found. Try again."
-msgstr ""
+msgstr "找不到上传文件。再试一次。"
 
 #: cms/djangoapps/contentstore/errors.py
 #: cms/djangoapps/contentstore/views/import_export.py
@@ -12055,11 +12056,11 @@ msgstr "我们仅支持上传.tar.gz格式文件。"
 
 #: cms/djangoapps/contentstore/errors.py
 msgid "Aborting import since a library with this id already exists."
-msgstr ""
+msgstr "中止导入，因为具有此id的文件已存在。"
 
 #: cms/djangoapps/contentstore/errors.py
 msgid "Course olx validation failed. Please check your email."
-msgstr ""
+msgstr "课程验证失败。请查看你的邮箱。"
 
 #: cms/djangoapps/contentstore/errors.py
 msgid "Permission denied"
@@ -12067,11 +12068,11 @@ msgstr "没有权限"
 
 #: cms/djangoapps/contentstore/errors.py
 msgid "Unknown error while importing course."
-msgstr ""
+msgstr "导入课程时出现未知错误。"
 
 #: cms/djangoapps/contentstore/errors.py
 msgid "An Unknown error occurred during the unpacking step."
-msgstr ""
+msgstr "解压包过程中发生未知错误。"
 
 #: cms/djangoapps/contentstore/errors.py
 #, python-brace-format
@@ -12099,6 +12100,7 @@ msgid ""
 "Non writable git url provided. Expecting something like: "
 "git@github.com:openedx/openedx-demo-course.git"
 msgstr ""
+"提供的GIT URL地址不正确。正确内容比如如下：git@github.com:openedx/openedx-demo-course.git"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
@@ -12166,39 +12168,39 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/advanced_settings.py
 msgid "Marks a field as deprecated."
-msgstr ""
+msgstr "标记的字段已弃用。"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/advanced_settings.py
 msgid "User-friendly display name for the field"
-msgstr ""
+msgstr "该用户名的字段显示"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/advanced_settings.py
 msgid "Help text that describes the setting."
-msgstr ""
+msgstr "描述设置的帮助文本。"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "Tab type"
-msgstr ""
+msgstr "标签类型"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "Default name for the tab displayed to users"
-msgstr ""
+msgstr "向用户显示的选项卡的默认名称"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "True if it's possible to hide the tab for a course"
-msgstr ""
+msgstr "此课程可能设置隐藏"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "True the tab is hidden for the course"
-msgstr ""
+msgstr "课程设置为隐藏"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "True if it's possible to reorder the tab in the list of tabs"
-msgstr ""
+msgstr "可在选项卡列表中可能设置重新排序选项卡，"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "True if this tab should be displayed only for instructors"
-msgstr ""
+msgstr "此选项卡只应为教师"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "Name of the tab displayed to users. Overrides title."
