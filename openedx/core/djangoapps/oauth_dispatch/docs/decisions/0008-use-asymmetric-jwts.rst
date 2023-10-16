@@ -47,6 +47,19 @@ be the only service configured with the aymmetric keypair, including its Private
 All other OAuth Clients will be configured with only the Public key portion of the asymmetric key pair.
 This will ultimately replace all uses of "symmetric" keys for signing JWTs.
 
+"kid" Key Identifier
+~~~~~~~~~~~~~~~~~~~~
+
+In order to support key rotation in a forward compatible manner, we will identify the asymmetric keys,
+using the `JSON Web Key (JWK)`_ standard's `"kid" (Key ID)`_ parameter.  When a `JSON Web Signature (JWS)`_
+is created to sign a JWT, its `"kid" header parameter`_ specifies which key was used to secure the JWS.
+The code examples below show this in action.
+
+.. _JSON Web Key (JWK): https://tools.ietf.org/html/draft-ietf-jose-json-web-key-36
+.. _`"kid" (Key ID)`: https://tools.ietf.org/html/draft-ietf-jose-json-web-key-36#section-4.5
+.. _JSON Web Signature (JWS): https://tools.ietf.org/html/rfc7515
+.. _`"kid" header parameter`: https://tools.ietf.org/html/rfc7515#section-4.1.4
+
 Remove JWT_ISSUERS
 ~~~~~~~~~~~~~~~~~~
 
@@ -140,7 +153,7 @@ Key Rotation
 In future if we plan to rotate the keys, we can simply add new key public key to the public keyset and remove the old private one.
 Means, at any time there might be more than one public key but there will be only one private key. Considering that we are doing verification
 by looping through all the available public keys, the ``kid`` parameter is not
-as important as it was before. But it is still a good practice to have it.
+as important as it was before. But it's still recommended to use it. It will help us to differentiate between the old and new public keys.
 
 Consequences
 ------------
