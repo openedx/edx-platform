@@ -288,5 +288,5 @@ rules.set_perm("oel_tagging.view_objecttag", oel_tagging.can_view_object_tag)
 # to include Organization and objects permissions.
 rules.set_perm("oel_tagging.view_objecttag_taxonomy", oel_tagging.can_view_object_tag_taxonomy)
 rules.set_perm("oel_tagging.view_objecttag_objectid", can_view_object_tag_objectid)
-rules.set_perm("oel_tagging.change_objecttag_taxonomy", oel_tagging.can_change_object_tag_taxonomy)
+rules.set_perm("oel_tagging.change_objecttag_taxonomy", oel_tagging.can_view_object_tag_taxonomy)
 rules.set_perm("oel_tagging.change_objecttag_objectid", can_change_object_tag_objectid)
