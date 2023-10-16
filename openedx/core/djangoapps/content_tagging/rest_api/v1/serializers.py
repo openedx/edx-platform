@@ -16,7 +16,7 @@ class TaxonomyOrgListQueryParamsSerializer(TaxonomyListQueryParamsSerializer):
     Serializer for the query params for the GET view
     """
 
-    org:fields.Field = serializers.SlugRelatedField(
+    org: fields.Field = serializers.SlugRelatedField(
         slug_field="short_name",
         queryset=Organization.objects.all(),
         required=False,

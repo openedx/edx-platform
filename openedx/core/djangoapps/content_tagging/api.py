@@ -138,7 +138,7 @@ def tag_content_object(
     """
     if not taxonomy.system_defined:
         # We require that this taxonomy is linked to the content object's "org" or linked to "all orgs" (None):
-        org_short_name = object_key.org # type: ignore
+        org_short_name = object_key.org  # type: ignore
         if not taxonomy.taxonomyorg_set.filter(Q(org__short_name=org_short_name) | Q(org=None)).exists():
             raise ValueError(f"The specified Taxonomy is not enabled for the content object's org ({org_short_name})")
     oel_tagging.tag_object(

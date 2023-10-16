@@ -51,7 +51,7 @@ class LanguageTaxonomyTestMixin:
 
 @skip_unless_cms  # Auto-tagging is only available in the CMS
 @override_waffle_flag(CONTENT_TAGGING_AUTO, active=True)
-class TestAutoTagging(LanguageTaxonomyTestMixin, ModuleStoreTestCase):
+class TestAutoTagging(LanguageTaxonomyTestMixin, ModuleStoreTestCase):  # type: ignore[misc]
     """
     Test if the Course and XBlock tags are automatically created
     """
