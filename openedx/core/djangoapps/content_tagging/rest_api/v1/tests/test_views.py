@@ -6,7 +6,7 @@ from urllib.parse import parse_qs, urlparse
 
 import ddt
 from django.contrib.auth import get_user_model
-from django.test.testcases import override_settings
+from django.test import override_settings
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from openedx_tagging.core.tagging.models import Tag, Taxonomy
 from openedx_tagging.core.tagging.models.system_defined import SystemDefinedTaxonomy
