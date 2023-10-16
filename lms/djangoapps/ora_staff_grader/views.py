@@ -24,6 +24,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from lms.djangoapps.ora_staff_grader.constants import (
     PARAM_ORA_LOCATION,
     PARAM_SUBMISSION_ID,
+    PARAM_ASSESSMENT_TYPE,
 )
 from lms.djangoapps.ora_staff_grader.errors import (
     BadOraLocationResponse,
@@ -43,11 +44,13 @@ from lms.djangoapps.ora_staff_grader.ora_api import (
     get_assessment_info,
     get_submission_info,
     get_submissions,
+    get_assessments,
     submit_grade,
 )
 from lms.djangoapps.ora_staff_grader.serializers import (
     FileListSerializer,
     InitializeSerializer,
+    AssessmentFeedbackSerializer,
     LockStatusSerializer,
     StaffAssessSerializer,
     SubmissionFetchSerializer,
@@ -142,6 +145,64 @@ class InitializeView(StaffGraderBaseView):
             return InternalErrorResponse(context=ex.context)
 
         # Blanket exception handling in case something blows up
+        except Exception as ex:
+            log.exception(ex)
+            return UnknownErrorResponse()
+
+
+class AssessmentFeedbackView(StaffGraderBaseView):
+    """
+    GET data about Assessments by submission_uuid and ora_location
+
+    Response: {
+        assessments (list of dict): [
+            {
+                "assessment_id: (string) assessment id
+                "scorer_name: (string) scorer name
+                "scorer_username: (string) scorer username
+                "scorer_email: (string) scorer email
+                "assessment_date: (string) assessment date
+                "assessment_scores (list of dict) [
+                    {
+                        "criterion_name: (string) criterion name
+                        "score_earned: (int) score earned
+                        "score_type: (string) score type
+                    }
+                ]
+                "problem_step (string) problem step (Self, Peer, or Staff)
+                "feedback: (string) feedback
+            }
+        ]
+    }
+
+    Errors:
+    - MissingParamResponse (HTTP 400) for missing params
+    - BadOraLocationResponse (HTTP 400) for bad ORA location
+    - XBlockInternalError (HTTP 500) for an issue with ORA
+    - UnknownError (HTTP 500) for other errors
+    """
+
+    @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID, PARAM_ASSESSMENT_TYPE])
+    def get(self, request, ora_location, submission_uuid, assessment_type, *args, **kwargs):
+
+        try:
+            assessments_data = {
+                "assessments": get_assessments(
+                    request, ora_location, submission_uuid, assessment_type
+                )
+            }
+
+            response_data = AssessmentFeedbackSerializer(assessments_data).data
+            return Response(response_data)
+
+        except (InvalidKeyError, ItemNotFoundError):
+            log.error(f"Bad ORA location provided: {ora_location}")
+            return BadOraLocationResponse()
+
+        except XBlockInternalError as ex:
+            log.error(ex)
+            return InternalErrorResponse(context=ex.context)
+
         except Exception as ex:
             log.exception(ex)
             return UnknownErrorResponse()

@@ -135,11 +135,13 @@ class ScoreSerializer(serializers.Serializer):
 
 class SubmissionMetadataSerializer(serializers.Serializer):
     """
-    Submission metadata for displaying submissions table in ESG
+    Submission metadata for displaying submissions table in Enhanced Staff Grader (ESG)
     """
 
     submissionUUID = serializers.CharField(source="submissionUuid")
     username = serializers.CharField(allow_null=True)
+    email = serializers.CharField(allow_null=True)
+    fullname = serializers.CharField(allow_null=True)
     teamName = serializers.CharField(allow_null=True)
     dateSubmitted = serializers.DateTimeField()
     dateGraded = serializers.DateTimeField(allow_null=True)
@@ -159,6 +161,56 @@ class SubmissionMetadataSerializer(serializers.Serializer):
             "gradeStatus",
             "lockStatus",
             "score",
+            "email",
+            "fullname",
+        ]
+        read_only_fields = fields
+
+
+class AssessmentScoresSerializer(serializers.Serializer):
+    """
+    Score information associated with a specific assessment.
+
+    This serializer was intended for displaying assessment information in the Enhanced Staff Grader (ESG).
+    """
+    criterion_name = serializers.CharField()
+    score_earned = serializers.IntegerField()
+    score_type = serializers.CharField()
+
+    class Meta:
+        fields = [
+            "criterion_name",
+            "score_earned",
+            "score_type",
+        ]
+        read_only_fields = fields
+
+
+class AssessmentSerializer(serializers.Serializer):
+    """
+    Data for displaying Assessment objects for the response from the assessment
+    feedback endpoint in Enhanced Staff Grader (ESG)
+    This serializer is included in the AssessmentFeedbackSerializer as a ListField
+    """
+    assessment_id = serializers.CharField()
+    scorer_name = serializers.CharField(allow_null=True)
+    scorer_username = serializers.CharField(allow_null=True)
+    scorer_email = serializers.CharField(allow_null=True)
+    assesment_date = serializers.DateTimeField()
+    assesment_scores = serializers.ListField(child=AssessmentScoresSerializer())
+    problem_step = serializers.CharField(allow_null=True)
+    feedback = serializers.CharField(allow_null=True)
+
+    class Meta:
+        fields = [
+            "assessment_id",
+            "scorer_name",
+            "scorer_username",
+            "scorer_email",
+            "assesment_date",
+            "assesment_scores",
+            "problem_step",
+            "feedback",
         ]
         read_only_fields = fields
 
@@ -188,6 +240,19 @@ class InitializeSerializer(serializers.Serializer):
         Revert back to BooleanField in AU-617 when ESG officially supports team ORAs
         """
         return obj['isEnabled'] and not obj['oraMetadata'].teams_enabled
+
+
+class AssessmentFeedbackSerializer(serializers.Serializer):
+    """
+    Serialize info for every assessment for the response from the assessment
+    feedback endpoint in Enhanced Staff Grader (ESG)
+    """
+
+    assessments = serializers.ListField(child=AssessmentSerializer())
+
+    class Meta:
+        fields = ["assessments", ]
+        read_only_fields = fields
 
 
 class UploadedFileSerializer(serializers.Serializer):
