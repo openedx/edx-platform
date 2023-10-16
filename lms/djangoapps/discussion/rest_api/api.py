@@ -336,7 +336,6 @@ def get_course(request, course_key):
         course.get_discussion_blackout_datetimes()
     )
 
-    MODEREATE_DISCUSSION_FORUM_PERMISSION = 'moderate_discussion_forum'
     return {
         "id": str(course_key),
         "is_posting_enabled": is_posting_enabled,
