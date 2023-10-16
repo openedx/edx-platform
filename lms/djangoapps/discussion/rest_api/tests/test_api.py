@@ -2747,6 +2747,7 @@ class UpdateThreadTest(
             assert event_data['id'] == 'test_thread'
             assert event_data['followed'] == new_following
             assert event_data['user_forums_roles'] == ['Student']
+            assert event_data['target_username'] == [self.user.username]
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack

@@ -1878,14 +1878,15 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
 
         assert mock_emit.called
         event_name, event_data = mock_emit.call_args[0]
-        action_name = 'followed' if view_name == 'follow_thread' else 'unfollowed'
+        expected_action_name = 'followed' if view_name == 'follow_thread' else 'unfollowed'
         expected_action_value = True if view_name == 'follow_thread' else False
-        assert event_name == f'edx.forum.thread.{action_name}'
+        assert event_name == f'edx.forum.thread.{expected_action_name}'
         assert event_data['commentable_id'] == 'test_commentable_id'
         assert event_data['id'] == 'thread_id'
         assert event_data['followed'] == expected_action_value
         assert event_data['user_forums_roles'] == ['Student']
         assert event_data['user_course_roles'] == ['Wizard']
+        assert event_data['target_username'] == ['test_user']
 
 
 class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRequestSetupMixin):

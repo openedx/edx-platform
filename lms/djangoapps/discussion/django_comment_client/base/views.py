@@ -145,6 +145,8 @@ def track_thread_followed_event(request, course, thread, followed):
         'id': thread.id,
         'followed': followed,
     }
+    if hasattr(thread, 'username'):
+        event_data['target_username'] = thread.get('username', '')
     track_forum_event(request, event_name, course, thread, event_data)
 
 
