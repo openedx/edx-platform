@@ -268,7 +268,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
             var cutoffs = this.descendingCutoffs;
             this.$el.find('.range').each(function(i) {
                 var min = (i < cutoffs.length ? cutoffs[i].cutoff : 0);
-                var max = (i > 0 ? cutoffs[i - 1].cutoff : 100);
+                var max = (i > 0 ? cutoffs[i - 1].cutoff - 1 : 100);
                 $(this).text(min + '-' + max);
             });
         },
