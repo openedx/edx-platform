@@ -36,14 +36,10 @@ class Command(BaseCommand):
 
         course_id_strings = list(CourseOverview.get_all_course_keys())
 
-        # Following is used for debugging and should be removed
-        for course_id_string in course_id_strings:
-            log.info(course_id_string)
-
         # Use Celery to distribute the workload
         tasks = group(
             replace_all_library_source_blocks_ids_for_course.s(
-                course_id_string,
+                str(course_id_string),
                 v1_to_v2_lib_map
             )
             for course_id_string in course_id_strings
@@ -62,7 +58,7 @@ class Command(BaseCommand):
     def validate(self, v1_to_v2_lib_map):
         """ Validate that replace_all_library_source_blocks_ids was successful"""
         course_id_strings = list(CourseOverview.get_all_course_keys())
-        tasks = group(validate_all_library_source_blocks_ids_for_course.s(course_id, v1_to_v2_lib_map) for course_id in course_id_strings)  # lint-amnesty, pylint: disable=line-too-long
+        tasks = group(validate_all_library_source_blocks_ids_for_course.s(str(course_id), v1_to_v2_lib_map) for course_id in course_id_strings)  # lint-amnesty, pylint: disable=line-too-long
         results = tasks.apply_async()
 
         validation = set()
@@ -88,7 +84,7 @@ class Command(BaseCommand):
         # Use Celery to distribute the workload
         tasks = group(
             undo_all_library_source_blocks_ids_for_course.s(
-                course_id,
+                str(course_id),
                 v1_to_v2_lib_map
             )
             for course_id in course_id_strings
