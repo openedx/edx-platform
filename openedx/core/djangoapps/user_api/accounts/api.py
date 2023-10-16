@@ -420,6 +420,10 @@ def get_name_validation_error(name):
         return bool(regex)
 
     if name:
+        # Validation for the name length
+        if len(name) > 255:
+            return _("Full name can`t be longer than 255 symbols")
+
         return _('Enter a valid name') if (contains_html(name) or contains_url(name)) else ''
     else:
         return accounts.REQUIRED_FIELD_NAME_MSG
