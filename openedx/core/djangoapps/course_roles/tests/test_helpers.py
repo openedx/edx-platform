@@ -6,6 +6,7 @@ from organizations.tests.factories import OrganizationFactory
 import pytest
 
 from common.djangoapps.student.tests.factories import AnonymousUserFactory, UserFactory
+from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.course_roles.helpers import (
     course_or_organization_permission_check,
     course_or_organization_permission_list_check,
@@ -14,6 +15,7 @@ from openedx.core.djangoapps.course_roles.helpers import (
     organization_permission_check,
     organization_permissions_list_check,
     get_all_user_permissions_for_a_course,
+    USE_PERMISSION_CHECKS_FLAG
 )
 from openedx.core.djangoapps.course_roles.models import (
     CourseRolesPermission,
@@ -25,6 +27,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
+@override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=True)
 class PermissionCheckTestCase(SharedModuleStoreTestCase):
     """
     Tests of the permission check functions in course_roles.helpers module
@@ -451,6 +454,72 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         """
         CourseRolesUserRole.objects.create(
             user=self.user_1, role=self.role_2, course_id=self.course_2.id, org=self.organization_2
+        )
+        test_permissions = [self.permission_1.name, self.permission_2.name]
+        assert not course_or_organization_permission_list_check(
+            self.user_1, test_permissions, self.course_1.id, self.organization_1.name
+        )
+
+    @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=False)
+    def test_course_permission_check_with_waffle_flag_disabled(self):
+        """
+        Tests that the helper function returns false if the USE_PERMISSION_CHECKS_FLAG is not enabled
+        Uses the same data as the earlier test, with the only difference being the waffle flag value
+        """
+        assert not course_permission_check(self.user_1, self.permission_1.name, self.course_1.id)
+
+    @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=False)
+    def test_course_permissions_list_check_with_waffle_flag_disabled(self):
+        """
+        Tests that the helper function returns false if the USE_PERMISSION_CHECKS_FLAG is not enabled
+        Uses the same data as the earlier test, with the only difference being the waffle flag value
+        """
+        CourseRolesUserRole.objects.create(
+            user=self.user_1, role=self.role_2, course_id=self.course_1.id, org=self.organization_1
+        )
+        test_permissions = [self.permission_1.name, self.permission_2.name]
+        assert not course_permissions_list_check(self.user_1, test_permissions, self.course_1.id)
+
+    @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=False)
+    def test_organization_permission_check_with_waffle_flag_disabled(self):
+        """
+        Tests that the helper function returns false if the USE_PERMISSION_CHECKS_FLAG is not enabled
+        Uses the same data as the earlier test, with the only difference being the waffle flag value
+        """
+        CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1, org=self.organization_1)
+        assert not organization_permission_check(self.user_1, self.permission_1.name, self.organization_1.name)
+
+    @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=False)
+    def test_organization_permissions_list_check_with_waffle_flag_disabled(self):
+        """
+        Tests that the helper function returns false if the USE_PERMISSION_CHECKS_FLAG is not enabled
+        Uses the same data as the earlier test, with the only difference being the waffle flag value
+        """
+        CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_2, org=self.organization_1)
+        test_permissions = [self.permission_1.name, self.permission_2.name]
+        assert not organization_permissions_list_check(self.user_1, test_permissions, self.organization_1.name)
+
+    @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=False)
+    def test_course_or_organization_permission_check_with_waffle_flag_disabled(self):
+        """
+        Tests that the helper function returns false if the USE_PERMISSION_CHECKS_FLAG is not enabled
+        Uses the same data as the earlier test, with the only difference being the waffle flag value
+        """
+        CourseRolesUserRole.objects.create(
+            user=self.user_1, role=self.role_1, course_id=self.course_1.id, org=self.organization_1
+        )
+        assert not course_or_organization_permission_check(
+            self.user_1, self.permission_1.name, self.course_1.id, self.organization_1.name
+        )
+
+    @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=False)
+    def test_course_or_organization_list_permission_check_with_waffle_flag_disabled(self):
+        """
+        Tests that the helper function returns false if the USE_PERMISSION_CHECKS_FLAG is not enabled
+        Uses the same data as the earlier test, with the only difference being the waffle flag value
+        """
+        CourseRolesUserRole.objects.create(
+            user=self.user_1, role=self.role_2, course_id=self.course_1.id, org=self.organization_1
         )
         test_permissions = [self.permission_1.name, self.permission_2.name]
         assert not course_or_organization_permission_list_check(
