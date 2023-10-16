@@ -138,6 +138,8 @@ class SubmissionMetadataSerializer(serializers.Serializer):
 
     submissionUUID = serializers.CharField(source="submissionUuid")
     username = serializers.CharField(allow_null=True)
+    email = serializers.CharField(allow_null=True)
+    fullname = serializers.CharField(allow_null=True)
     teamName = serializers.CharField(allow_null=True)
     dateSubmitted = serializers.DateTimeField()
     dateGraded = serializers.DateTimeField(allow_null=True)
@@ -157,6 +159,8 @@ class SubmissionMetadataSerializer(serializers.Serializer):
             "gradeStatus",
             "lockStatus",
             "score",
+            "email",
+            "fullname",
         ]
         read_only_fields = fields
 
