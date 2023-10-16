@@ -789,6 +789,10 @@ class TestTaxonomyExportViewSet(TestTaxonomyDetailExportMixin, APITestCase):
         expected_status = kwargs.get("expected_status")
         reason = kwargs.get("reason", "Unexpected response status")
 
+        assert taxonomy_attr is not None, "taxonomy_attr is required"
+        assert user_attr is not None, "user_attr is required"
+        assert expected_status is not None, "expected_status is required"
+
         taxonomy = getattr(self, taxonomy_attr)
 
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=taxonomy.pk)
