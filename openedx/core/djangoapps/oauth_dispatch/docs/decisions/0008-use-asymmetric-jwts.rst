@@ -86,8 +86,8 @@ The public and private keypair would be similar to the following::
                 {
                     "kty": "RSA",
                     "key_ops": ["verify"],
-                    "n": "banana",
-                    "e": "AQAB",
+                    "n": "...",
+                    "e": "...",
                     "kid": "your_key_id"
                 }
             ]
@@ -100,14 +100,14 @@ The public and private keypair would be similar to the following::
         {
             "kty": "RSA",
             "key_ops": ["sign"],
-            "n": "banana",
-            "e": "AQAB",
-            "d": "apple",
-            "p": "peach",
-            "q": "pear",
-            "dp": "palm",
-            "dq": "pineapple",
-            "qi": "watermelon",
+            "n": "...",
+            "e": "...",
+            "d": "...",
+            "p": "...",
+            "q": "...",
+            "dp": "...",
+            "dq": "...",
+            "qi": "...",
             "kid": "your_key_id"
         }
     """
