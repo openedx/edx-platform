@@ -232,6 +232,17 @@ def can_change_object_tag_objectid(user: UserType, object_id: str) -> bool:
 
 
 @rules.predicate
+def can_view_object_tag_taxonomy(user: UserType, taxonomy: oel_tagging.Taxonomy) -> bool:
+    """
+    Only enabled taxonomy and users with permission to view this taxonomy can view object tags
+    from that taxonomy.
+
+    This rule is different from can_view_taxonomy because it checks if the taxonomy is enabled.
+    """
+    return taxonomy.cast().enabled and can_view_taxonomy(user, taxonomy)
+
+
+@rules.predicate
 def can_view_object_tag_objectid(user: UserType, object_id: str) -> bool:
     """
     Everyone that has permission to view the object should be able to tag it.
@@ -286,7 +297,7 @@ rules.set_perm("oel_tagging.view_objecttag", oel_tagging.can_view_object_tag)
 
 # This perms are used in the tagging rest api from openedx_tagging that is exposed in the CMS. They are overridden here
 # to include Organization and objects permissions.
-rules.set_perm("oel_tagging.view_objecttag_taxonomy", oel_tagging.can_view_object_tag_taxonomy)
+rules.set_perm("oel_tagging.view_objecttag_taxonomy", can_view_object_tag_taxonomy)
 rules.set_perm("oel_tagging.view_objecttag_objectid", can_view_object_tag_objectid)
-rules.set_perm("oel_tagging.change_objecttag_taxonomy", oel_tagging.can_view_object_tag_taxonomy)
+rules.set_perm("oel_tagging.change_objecttag_taxonomy", can_view_object_tag_taxonomy)
 rules.set_perm("oel_tagging.change_objecttag_objectid", can_change_object_tag_objectid)
