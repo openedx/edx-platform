@@ -404,9 +404,23 @@ def get_name_validation_error(name):
     :return: Validation error message.
 
     """
+
+    def contains_html(value):
+        """
+        Validator method to check whether name contains html tags
+        """
+        regex = re.compile('(<|>)', re.UNICODE)
+        return bool(regex.search(value))
+
+    def contains_url(value):
+        """
+        Validator method to check whether full name contains url
+        """
+        regex = re.findall(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))*', value)
+        return bool(regex)
+
     if name:
-        regex = re.findall(r'https|http?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', name)
-        return _('Enter a valid name') if bool(regex) else ''
+        return _('Enter a valid name') if (contains_html(name) or contains_url(name)) else ''
     else:
         return accounts.REQUIRED_FIELD_NAME_MSG
 

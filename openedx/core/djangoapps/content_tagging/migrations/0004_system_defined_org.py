@@ -6,8 +6,9 @@ def load_system_defined_org_taxonomies(apps, _schema_editor):
     Associates the system defined taxonomy Language (id=-1) to all orgs and
     removes the ContentOrganizationTaxonomy (id=-3) from the database
     """
-    TaxonomyOrg = apps.get_model("content_tagging", "TaxonomyOrg")
-    TaxonomyOrg.objects.create(id=-1, taxonomy_id=-1, org=None)
+    # Disabled for now as the way that this taxonomy is created has changed.
+    # TaxonomyOrg = apps.get_model("content_tagging", "TaxonomyOrg")
+    # TaxonomyOrg.objects.create(id=-1, taxonomy_id=-1, org=None)
 
     Taxonomy = apps.get_model("oel_tagging", "Taxonomy")
     Taxonomy.objects.get(id=-3).delete()
@@ -20,8 +21,8 @@ def revert_system_defined_org_taxonomies(apps, _schema_editor):
     Deletes association of system defined taxonomy Language (id=-1) to all orgs and
     creates the ContentOrganizationTaxonomy (id=-3) in the database
     """
-    TaxonomyOrg = apps.get_model("content_tagging", "TaxonomyOrg")
-    TaxonomyOrg.objects.get(id=-1).delete()
+    # TaxonomyOrg = apps.get_model("content_tagging", "TaxonomyOrg")
+    # TaxonomyOrg.objects.get(id=-1).delete()
 
     Taxonomy = apps.get_model("oel_tagging", "Taxonomy")
     org_taxonomy = Taxonomy(

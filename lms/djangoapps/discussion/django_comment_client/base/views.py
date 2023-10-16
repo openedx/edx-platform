@@ -134,6 +134,20 @@ def track_thread_created_event(request, course, thread, followed, from_mfe_sideb
     track_created_event(request, event_name, course, thread, event_data)
 
 
+def track_thread_followed_event(request, course, thread, followed):
+    """
+    Send analytics event for a newly followed/unfollowed thread.
+    """
+    action_name = 'followed' if followed else 'unfollowed'
+    event_name = _EVENT_NAME_TEMPLATE.format(obj_type='thread', action_name=action_name)
+    event_data = {
+        'commentable_id': thread.commentable_id,
+        'id': thread.id,
+        'followed': followed,
+    }
+    track_forum_event(request, event_name, course, thread, event_data)
+
+
 def track_comment_created_event(request, course, comment, commentable_id, followed, from_mfe_sidebar=False):
     """
     Send analytics event for a newly created response or comment.
@@ -938,9 +952,12 @@ def un_pin_thread(request, course_id, thread_id):
 @permitted
 def follow_thread(request, course_id, thread_id):  # lint-amnesty, pylint: disable=missing-function-docstring, unused-argument
     user = cc.User.from_django_user(request.user)
+    course_key = CourseKey.from_string(course_id)
+    course = get_course_by_id(course_key)
     thread = cc.Thread.find(thread_id)
     user.follow(thread)
     thread_followed.send(sender=None, user=request.user, post=thread)
+    track_thread_followed_event(request, course, thread, True)
     return JsonResponse({})
 
 
@@ -966,10 +983,13 @@ def unfollow_thread(request, course_id, thread_id):  # lint-amnesty, pylint: dis
     given a course id and thread id, stop following this thread
     ajax only
     """
+    course_key = CourseKey.from_string(course_id)
+    course = get_course_by_id(course_key)
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     user.unfollow(thread)
     thread_unfollowed.send(sender=None, user=request.user, post=thread)
+    track_thread_followed_event(request, course, thread, False)
     return JsonResponse({})
 
 

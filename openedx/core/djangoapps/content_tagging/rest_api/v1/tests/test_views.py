@@ -25,6 +25,7 @@ User = get_user_model()
 TAXONOMY_ORG_LIST_URL = "/api/content_tagging/v1/taxonomies/"
 TAXONOMY_ORG_DETAIL_URL = "/api/content_tagging/v1/taxonomies/{pk}/"
 OBJECT_TAG_UPDATE_URL = "/api/content_tagging/v1/object_tags/{object_id}/?taxonomy={taxonomy_id}"
+TAXONOMY_TEMPLATE_URL = "/api/content_tagging/v1/taxonomies/import/{filename}"
 
 
 def check_taxonomy(
@@ -33,8 +34,7 @@ def check_taxonomy(
     name,
     description=None,
     enabled=True,
-    required=False,
-    allow_multiple=False,
+    allow_multiple=True,
     allow_free_text=False,
     system_defined=False,
     visible_to_authors=True,
@@ -47,7 +47,6 @@ def check_taxonomy(
     assert data["name"] == name
     assert data["description"] == description
     assert data["enabled"] == enabled
-    assert data["required"] == required
     assert data["allow_multiple"] == allow_multiple
     assert data["allow_free_text"] == allow_free_text
     assert data["system_defined"] == system_defined
@@ -350,7 +349,6 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
             "name": "taxonomy_data",
             "description": "This is a description",
             "enabled": True,
-            "required": True,
             "allow_multiple": True,
         }
 
@@ -444,7 +442,6 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
                     "name": "new name",
                     "description": taxonomy.description,
                     "enabled": taxonomy.enabled,
-                    "required": taxonomy.required,
                 },
             )
 
@@ -540,7 +537,6 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
                     "name": "new name",
                     "description": taxonomy.description,
                     "enabled": taxonomy.enabled,
-                    "required": taxonomy.required,
                 },
             )
 
@@ -668,13 +664,13 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
         )
 
         self.multiple_taxonomy = Taxonomy.objects.create(name="Multiple Taxonomy", allow_multiple=True)
-        self.required_taxonomy = Taxonomy.objects.create(name="Required Taxonomy", required=True)
+        self.single_value_taxonomy = Taxonomy.objects.create(name="Required Taxonomy", allow_multiple=False)
         for i in range(20):
             # Valid ObjectTags
             Tag.objects.create(taxonomy=self.tA1, value=f"Tag {i}")
             Tag.objects.create(taxonomy=self.tA2, value=f"Tag {i}")
             Tag.objects.create(taxonomy=self.multiple_taxonomy, value=f"Tag {i}")
-            Tag.objects.create(taxonomy=self.required_taxonomy, value=f"Tag {i}")
+            Tag.objects.create(taxonomy=self.single_value_taxonomy, value=f"Tag {i}")
 
         self.open_taxonomy = Taxonomy.objects.create(name="Enabled Free-Text Taxonomy", allow_free_text=True)
 
@@ -685,7 +681,7 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
             rel_type=TaxonomyOrg.RelType.OWNER,
         )
         TaxonomyOrg.objects.create(
-            taxonomy=self.required_taxonomy,
+            taxonomy=self.single_value_taxonomy,
             org=self.orgA,
             rel_type=TaxonomyOrg.RelType.OWNER,
         )
@@ -849,3 +845,33 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
         response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@skip_unless_cms
+@ddt.ddt
+class TestDownloadTemplateView(APITestCase):
+    """
+    Tests the taxonomy template downloads.
+    """
+    @ddt.data(
+        ("template.csv", "text/csv"),
+        ("template.json", "application/json"),
+    )
+    @ddt.unpack
+    def test_download(self, filename, content_type):
+        url = TAXONOMY_TEMPLATE_URL.format(filename=filename)
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.headers['Content-Type'] == content_type
+        assert response.headers['Content-Disposition'] == f'attachment; filename="{filename}"'
+        assert int(response.headers['Content-Length']) > 0
+
+    def test_download_not_found(self):
+        url = TAXONOMY_TEMPLATE_URL.format(filename="template.txt")
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_download_method_not_allowed(self):
+        url = TAXONOMY_TEMPLATE_URL.format(filename="template.txt")
+        response = self.client.post(url)
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
