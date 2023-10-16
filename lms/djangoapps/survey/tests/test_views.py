@@ -29,7 +29,7 @@ class SurveyViewsTests(ModuleStoreTestCase):
         self.client = Client()
 
         # Create two accounts
-        self.password = 'Password1234'
+        self.password = self.TEST_PASSWORD
         self.student = UserFactory.create(username='student', email='student@test.com', password=self.password)
 
         self.test_survey_name = 'TestSurvey'
