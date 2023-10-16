@@ -193,16 +193,17 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         response = self.client.get(reverse(url_name))
         self._assert_third_party_auth_data(response, None, None, [], None)
 
+    @mock.patch('common.djangoapps.third_party_auth.models.OAuth2ProviderConfig.get_setting')
     @mock.patch('openedx.core.djangoapps.user_authn.views.login_form.enterprise_customer_for_request')
     @ddt.data(
-        ("signin_user", None, None, None, False),
-        ("register_user", None, None, None, False),
-        ("signin_user", "google-oauth2", "Google", None, False),
-        ("register_user", "google-oauth2", "Google", None, False),
-        ("signin_user", "facebook", "Facebook", None, False),
-        ("register_user", "facebook", "Facebook", None, False),
-        ("signin_user", "dummy", "Dummy", None, False),
-        ("register_user", "dummy", "Dummy", None, False),
+        ("signin_user", None, None, None, False, None),
+        ("register_user", None, None, None, False, None),
+        ("signin_user", "google-oauth2", "Google", None, False, None),
+        ("register_user", "google-oauth2", "Google", None, False, None),
+        ("signin_user", "facebook", "Facebook", None, False, None),
+        ("register_user", "facebook", "Facebook", None, False, None),
+        ("signin_user", "dummy", "Dummy", None, False, None),
+        ("register_user", "dummy", "Dummy", None, False, None),
         (
             "signin_user",
             "google-oauth2",
@@ -212,7 +213,24 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
                 'logo': 'https://host.com/logo.jpg',
                 'welcome_msg': 'No message'
             },
-            True
+            True,
+            None
+        ),
+        (
+            "signin_user",
+            "google-oauth2",
+            "Google",
+            None,
+            False,
+            'http://example.com'
+        ),
+        (
+            "signin_user",
+            "google-oauth2",
+            "Google",
+            None,
+            False,
+            123  # Test invalid configuration.
         )
     )
     @ddt.unpack
@@ -223,7 +241,9 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
             current_provider,
             expected_enterprise_customer_mock_attrs,
             add_user_details,
+            unlinked_account_provision_url,
             enterprise_customer_mock,
+            get_setting_mock
     ):
         params = [
             ('course_id', 'course-v1:Org+Course+Run'),
@@ -248,6 +268,12 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         if add_user_details:
             email = 'test@test.com'
         enterprise_customer_mock.return_value = expected_ec
+
+        if unlinked_account_provision_url is not None:
+            other_settings = {
+                'unlinked_account_provision_url': unlinked_account_provision_url
+            }
+            get_setting_mock.side_effect = other_settings.__getitem__
 
         # Simulate a running pipeline
         if current_backend is not None:
@@ -292,14 +318,21 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
                 "registerUrl": self._third_party_login_url("google-oauth2", "register", params)
             },
         ]
-        self._assert_third_party_auth_data(
-            response,
-            current_backend,
-            current_provider,
-            expected_providers,
-            expected_ec,
-            add_user_details
-        )
+        if unlinked_account_provision_url and isinstance(unlinked_account_provision_url, str):
+            self.assertRedirects(
+                response,
+                unlinked_account_provision_url,
+                fetch_redirect_response=False
+            )
+        else:
+            self._assert_third_party_auth_data(
+                response,
+                current_backend,
+                current_provider,
+                expected_providers,
+                expected_ec,
+                add_user_details
+            )
 
     def _configure_testshib_provider(self, provider_name, idp_slug):
         """

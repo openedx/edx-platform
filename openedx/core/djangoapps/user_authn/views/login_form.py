@@ -35,7 +35,7 @@ from openedx.features.enterprise_support.utils import (
     update_logistration_context_for_enterprise
 )
 from common.djangoapps.student.helpers import get_next_url_for_login_page
-from common.djangoapps.third_party_auth import pipeline
+from common.djangoapps.third_party_auth import pipeline, provider
 from common.djangoapps.third_party_auth.decorators import xframe_allow_whitelisted
 from common.djangoapps.util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 
@@ -126,6 +126,19 @@ def get_login_session_form(request):
     return form_desc
 
 
+def _get_unlinked_provision_url(current_provider):
+    try:
+        unlinked_provision_url = current_provider.get_setting(
+            'unlinked_account_provision_url'
+        )
+    except (AttributeError, KeyError):
+        # Not all provider subclasses implement get_setting().
+        pass
+    else:
+        if isinstance(unlinked_provision_url, str):
+            return unlinked_provision_url
+
+
 @require_http_methods(['GET'])
 @ratelimit(
     key='openedx.core.djangoapps.util.ratelimit.real_ip',
@@ -196,6 +209,14 @@ def login_and_registration_form(request, initial_mode="login"):
     saml_provider = False
     running_pipeline = pipeline.get(request)
     if running_pipeline:
+        # Redirect to provisioning URL if there is a current third-party
+        # authentication provider but the user is not authenticated.
+        current_provider = provider.Registry.get_from_pipeline(running_pipeline)
+        if current_provider:
+            unlinked_provision_url = _get_unlinked_provision_url(current_provider)
+            if unlinked_provision_url:
+                return redirect(unlinked_provision_url)
+
         saml_provider, __ = third_party_auth.utils.is_saml_provider(
             running_pipeline.get('backend'), running_pipeline.get('kwargs')
         )
