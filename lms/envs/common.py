@@ -4247,8 +4247,8 @@ SOCIAL_PLATFORMS = {
     },
     'twitter': {
         'display_name': 'Twitter',
-        'url_stub': 'twitter.com/',
-        'example': 'https://www.twitter.com/username'
+        'url_stub': 'x.com/',
+        'example': 'https://www.x.com/username'
     },
     'linkedin': {
         'display_name': 'LinkedIn',
