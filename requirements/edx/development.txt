@@ -1708,3 +1708,5 @@ zipp==3.9.0
 # The following packages are considered to be unsafe in a requirements file:
 # pip
 # setuptools
+
+tablib==3.5.0
