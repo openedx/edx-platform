@@ -51,7 +51,7 @@ class TestCourseListing(ModuleStoreTestCase):
         self.factory = RequestFactory()
         self.global_admin = AdminFactory()
         self.client = AjaxEnabledTestClient()
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         self.course_create_rerun_url = reverse('course_handler')
         self.course_start = datetime.datetime.utcnow()
         self.course_end = self.course_start + datetime.timedelta(days=30)
