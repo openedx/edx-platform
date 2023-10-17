@@ -59,7 +59,7 @@ def viewImportExcel (request, course_id) :
             for v in list_video :
       
                 for e in v['video'] :
-                    url_ = f'<p><a href="{e}" title={v["title"]}>Video: {v["title"]}</a></p>'
+                    url_ = f'<p><a href="{e}" target="_blank" title={v["title"]}>Video: {v["title"]}</a></p>'
                     url_video += url_
             _save_xblock(xblock=html_block , user=request.user, data=url_video)
 
