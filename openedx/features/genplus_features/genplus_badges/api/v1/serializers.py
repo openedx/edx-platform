@@ -5,6 +5,7 @@ from django.conf import settings
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from lms.djangoapps.badges.models import BadgeClass, BadgeAssertion
+from openedx.features.genplus_features.genplus.api.v1.serializers import TeacherSerializer
 from openedx.features.genplus_features.genplus_badges.models import (BoosterBadge,
                                                                      BoosterBadgeAward,
                                                                      BoosterBadgeType,
@@ -183,7 +184,20 @@ class BoosterBadgesTypeSerializer(serializers.ModelSerializer):
 class JournalBoosterBadgeSerializer(serializers.ModelSerializer):
     badge_name = serializers.CharField(source='badge.display_name')
     badge_type = serializers.CharField(source='badge.type.name')
+    teacher = serializers.SerializerMethodField()
+
+    def get_teacher(self, instance):
+        teacher = Teacher.objects.get(gen_user=instance.awarded_by.gen_user)
+        return TeacherSerializer(teacher, read_only=True).data
 
     class Meta:
         model = BoosterBadgeAward
-        fields = ('id', 'image_url', 'feedback', 'badge_name', 'badge_type', 'modified')
+        fields = (
+            'id',
+            'image_url',
+            'feedback',
+            'badge_name',
+            'badge_type',
+            'modified',
+            'teacher',
+        )
