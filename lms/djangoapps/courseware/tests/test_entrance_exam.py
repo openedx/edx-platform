@@ -136,7 +136,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         self.request = get_mock_request(UserFactory())
         self.course = self.update_course(self.course, self.request.user.id)
 
-        self.client.login(username=self.request.user.username, password="test")
+        self.client.login(username=self.request.user.username, password=self.TEST_PASSWORD)
         CourseEnrollment.enroll(self.request.user, self.course.id)
 
         self.expected_locked_toc = (
@@ -257,7 +257,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
 
         # hit skip entrance exam api in instructor app
         instructor = InstructorFactory(course_key=self.course.id)
-        self.client.login(username=instructor.username, password='test')
+        self.client.login(username=instructor.username, password=self.TEST_PASSWORD)
         url = reverse('mark_student_can_skip_entrance_exam', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url, {
             'unique_student_identifier': self.request.user.email,
@@ -277,7 +277,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         self.client.logout()
         staff_user = StaffFactory(course_key=self.course.id)
         staff_user.is_staff = True
-        self.client.login(username=staff_user.username, password='test')
+        self.client.login(username=staff_user.username, password=self.TEST_PASSWORD)
 
         # assert staff has access to all toc
         self.request.user = staff_user
