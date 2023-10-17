@@ -729,7 +729,7 @@ class TestTaxonomyDetailExportMixin(TestTaxonomyObjectsMixin):
     )
     def test_detail_taxonomy_staff_see_all(self, taxonomy_attr: str) -> None:
         """
-        Tests that org users can't see taxonomies from other orgs
+        Tests that staff can see all taxonomies
         """
         self._test_api_call(
             user_attr="staff",
