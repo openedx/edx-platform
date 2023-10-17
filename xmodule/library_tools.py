@@ -49,10 +49,6 @@ class LibraryToolsService:
 
         Given a library key like "library-v1:ProblemX+PR0B" (V1) or "lib:RG:rg-1" (v2), return the 'library'.
 
-        is_v2_lib (bool) indicates which library storage should be requested:
-            True - blockstore (V2 library);
-            False - modulestore (V1 library).
-
         Returns None on error.
         """
 
