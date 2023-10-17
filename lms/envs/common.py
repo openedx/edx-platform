@@ -40,7 +40,6 @@ Conventions
 # and throws spurious errors. Therefore, we disable invalid-name checking.
 # pylint: disable=invalid-name
 
-
 import importlib.util
 import sys
 import os
@@ -3316,8 +3315,24 @@ INSTALLED_APPS = [
 
     # Notifications
     'openedx.core.djangoapps.notifications',
+
+
     'openedx_events',
+
+    # Learning Core Apps
+    "openedx_learning.core.components.apps.ComponentsConfig",
+    "openedx_learning.core.contents.apps.ContentsConfig",
+    "openedx_learning.core.publishing.apps.PublishingConfig",
+
+    # Learning Contrib Apps
+    # "openedx_learning.contrib.media_server.apps.MediaServerConfig",
 ]
+
+OPENEDX_LEARNING = {
+    # Custom file storage, though this is better done through Django's
+    # STORAGES setting in Django >= 4.2
+    "STORAGE": None,
+}
 
 ######################### CSRF #########################################
 

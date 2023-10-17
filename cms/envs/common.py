@@ -1811,8 +1811,23 @@ INSTALLED_APPS = [
 
     # alternative swagger generator for CMS API
     'drf_spectacular',
+
     'openedx_events',
+
+    # Learning Core Apps
+    "openedx_learning.core.components.apps.ComponentsConfig",
+    "openedx_learning.core.contents.apps.ContentsConfig",
+    "openedx_learning.core.publishing.apps.PublishingConfig",
+    
+    # Learning Contrib Apps
+    # "openedx_learning.contrib.media_server.apps.MediaServerConfig",
 ]
+
+OPENEDX_LEARNING = {
+    # Custom file storage, though this is better done through Django's
+    # STORAGES setting in Django >= 4.2
+    "STORAGE": None,
+}
 
 
 ################# EDX MARKETING SITE ##################################
