@@ -8,7 +8,7 @@ from common.djangoapps.util.json_request import JsonResponse
 from opaque_keys.edx.keys import  CourseKey
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from cms.djangoapps.contentstore.views.item import create_item_import , _update_with_callback ,_save_xblock
-import openpyxl
+
 import tablib
 
 @login_required
