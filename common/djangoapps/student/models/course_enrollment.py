@@ -225,12 +225,6 @@ class CourseEnrollmentManager(models.Manager):
         enroll_dict['total'] = total
         return enroll_dict
 
-    def enrolled_and_dropped_out_users(self, course_id):
-        """Return a queryset of Users in the course."""
-        return User.objects.filter(
-            courseenrollment__course_id=course_id
-        )
-
 
 # Named tuple for fields pertaining to the state of
 # CourseEnrollment for a user in a course.  This type
