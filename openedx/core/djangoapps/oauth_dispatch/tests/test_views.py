@@ -86,8 +86,9 @@ class _DispatchingViewTestCase(TestCase):
     """
     def setUp(self):
         super().setUp()
+        self.TEST_PASSWORD = 'Password1234'
         self.dot_adapter = adapters.DOTAdapter()
-        self.user = UserFactory()
+        self.user = UserFactory(password=self.TEST_PASSWORD)
         self.dot_app = self.dot_adapter.create_public_client(
             name='test dot application',
             user=self.user,
@@ -148,7 +149,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
 
         if grant_type == dot_models.Application.GRANT_PASSWORD:
             body['username'] = user.username
-            body['password'] = 'test'
+            body['password'] = self.TEST_PASSWORD
         elif grant_type == dot_models.Application.GRANT_CLIENT_CREDENTIALS:
             body['client_secret'] = client.client_secret
 
@@ -598,7 +599,7 @@ class TestAuthorizationView(_DispatchingViewTestCase):
     @ddt.unpack
     def test_post_authorization_view(self, client_type, allow_field):
         oauth_application = getattr(self, f'{client_type}_app')
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         response = self.client.post(
             '/oauth2/authorize/',
             {
@@ -620,7 +621,7 @@ class TestAuthorizationView(_DispatchingViewTestCase):
         Make sure we get the overridden Authorization page - not
         the default django-oauth-toolkit when we perform a page load
         """
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         response = self.client.get(
             '/oauth2/authorize/',
             {
@@ -787,7 +788,7 @@ class TestRevokeTokenView(AccessTokenLoginMixin, _DispatchingViewTestCase):  # p
             'client_id': self.dot_app.client_id,
             'grant_type': 'password',
             'username': self.user.username,
-            'password': 'test',
+            'password': self.TEST_PASSWORD,
         }
 
     def access_token_post_body_with_refresh_token(self, refresh_token):
