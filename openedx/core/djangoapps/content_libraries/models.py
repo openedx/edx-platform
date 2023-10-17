@@ -56,6 +56,7 @@ from openedx.core.djangoapps.content_libraries.constants import (
     LIBRARY_TYPES, COMPLEX, LICENSE_OPTIONS,
     ALL_RIGHTS_RESERVED,
 )
+from openedx_learning.core.publishing.models import LearningPackage
 from organizations.models import Organization  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .apps import ContentLibrariesConfig
@@ -527,3 +528,16 @@ class LtiGradedResource(models.Model):
 
     def __str__(self):
         return str(self.usage_key)
+
+
+class ContentLibraryLearningPackage(models.Model):
+    content_library = models.OneToOneField(
+        ContentLibrary,
+        primary_key=True,
+        on_delete=models.CASCADE,
+        related_name='contents',
+    )
+    learning_package = models.ForeignKey(
+        LearningPackage,
+        on_delete=models.RESTRICT
+    )

@@ -2,7 +2,7 @@
 Admin site for content libraries
 """
 from django.contrib import admin
-from .models import ContentLibrary, ContentLibraryPermission
+from .models import ContentLibrary, ContentLibraryLearningPackage, ContentLibraryPermission
 
 
 class ContentLibraryPermissionInline(admin.TabularInline):
@@ -40,3 +40,7 @@ class ContentLibraryAdmin(admin.ModelAdmin):
             return ["library_key", "org", "slug", "bundle_uuid"]
         else:
             return ["library_key", ]
+
+@admin.register(ContentLibraryLearningPackage)
+class ContentLibraryLearningPackageAdmin(admin.ModelAdmin):
+    pass
