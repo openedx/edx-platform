@@ -330,7 +330,7 @@ class CourseEnrollment(models.Model):
                attribute), this method will automatically save it before
                adding an enrollment for it.
 
-        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+        `course_key` must be a opaque_keys CourseKey object.
 
         It is expected that this method is called from a method which has already
         verified the user authentication and access.
