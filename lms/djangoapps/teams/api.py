@@ -236,7 +236,7 @@ def has_specific_teamset_access(user, course_block, teamset_id):
     #       below will never return true.
     #       Remove the has_course_staff_privileges when course_roles Django app are implemented.
     user_has_manage_student_permission = course_or_organization_permission_check(
-        user, CourseRolesPermission.MANAGE_STUDENTS.value, course_block.course_id
+        user, CourseRolesPermission.MANAGE_STUDENTS.value, course_block.id
         )
     return has_course_staff_privileges(user, course_block.id) or user_has_manage_student_permission or \
         teamset_is_public_or_user_is_on_team_in_teamset(user, course_block, teamset_id)
