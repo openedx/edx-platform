@@ -20,10 +20,10 @@ class ExternalIdType(TimeStampedModel):
 
     .. no_pii:
     """
-    MICROBACHELORS_COACHING = 'mb_coaching'
-    CALIPER = 'caliper'
-    XAPI = 'xapi'
-    LTI = 'lti'
+
+    CALIPER = "caliper"
+    XAPI = "xapi"
+    LTI = "lti"
 
     name = models.CharField(max_length=32, blank=False, unique=True, db_index=True)
     description = models.TextField()
