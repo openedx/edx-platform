@@ -5,15 +5,18 @@ Unit tests for video utils.
 
 from datetime import datetime
 from unittest import TestCase
-from unittest.mock import patch
+from unittest import mock
 
 import ddt
 import pytz
 import requests
 from django.conf import settings
+from django.core.files.base import ContentFile
+from django.core.files.storage import get_storage_class
 from django.core.files.uploadedfile import UploadedFile
 from django.test.utils import override_settings
 from edxval.api import create_profile, create_video, get_course_video_image_url, update_video_image
+from storages.backends.s3boto3 import S3Boto3Storage
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.video_utils import (
@@ -141,7 +144,7 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
         return mocked_response
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
-    @patch('requests.get')
+    @mock.patch('requests.get')
     @ddt.data(
         (
             {
@@ -225,7 +228,7 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
         self.assertEqual(thumbnail_content_type, 'image/jpeg')
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
-    @patch('requests.get')
+    @mock.patch('requests.get')
     def test_scrape_youtube_thumbnail(self, mocked_request):
         """
         Test that youtube thumbnails are correctly scrapped.
@@ -270,8 +273,8 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
         )
     )
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
-    @patch('cms.djangoapps.contentstore.video_utils.LOGGER')
-    @patch('requests.get')
+    @mock.patch('cms.djangoapps.contentstore.video_utils.LOGGER')
+    @mock.patch('requests.get')
     @ddt.unpack
     def test_scrape_youtube_thumbnail_logging(
         self,
@@ -330,8 +333,8 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
             )
         ),
     )
-    @patch('cms.djangoapps.contentstore.video_utils.LOGGER')
-    @patch('cms.djangoapps.contentstore.video_utils.download_youtube_video_thumbnail')
+    @mock.patch('cms.djangoapps.contentstore.video_utils.LOGGER')
+    @mock.patch('cms.djangoapps.contentstore.video_utils.download_youtube_video_thumbnail')
     @ddt.unpack
     def test_no_video_thumbnail_downloaded(
         self,
@@ -365,3 +368,124 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
         # Verify that no image is attached to video1.
         video1_image_url = get_course_video_image_url(course_id=course_id, edx_video_id=video1_edx_video_id)
         self.assertIsNone(video1_image_url)
+
+
+@ddt.ddt
+class S3Boto3TestCase(TestCase):
+    """ verify s3boto3 returns valid backend."""
+
+    def setUp(self):
+        self.storage = S3Boto3Storage()
+        self.storage._connections.connection = mock.MagicMock()  # pylint: disable=protected-access
+
+    def order_dict(self, dictionary):
+        """
+        sorting dict key:values for tests cases.
+        """
+        sorted_key_values = sorted(dictionary.items())
+        dictionary.clear()
+        dictionary.update(sorted_key_values)
+        return dictionary
+
+    def test_video_backend(self):
+        self.assertEqual(
+            S3Boto3Storage,
+            get_storage_class(
+                'storages.backends.s3boto3.S3Boto3Storage',
+            )(**settings.VIDEO_IMAGE_SETTINGS.get('STORAGE_KWARGS', {})).__class__
+        )
+
+    @override_settings(VIDEO_IMAGE_SETTINGS={
+        'STORAGE_CLASS': 'storages.backends.s3boto3.S3Boto3Storage',
+        'STORAGE_KWARGS':
+            {'bucket_name': 'test', 'default_acl': None, 'location': 'abc/def'}}
+    )
+    def test_boto3_backend_with_params(self):
+        storage = get_storage_class(
+            settings.VIDEO_IMAGE_SETTINGS.get('STORAGE_CLASS', {})
+        )(**settings.VIDEO_IMAGE_SETTINGS.get('STORAGE_KWARGS', {}))
+
+        self.assertEqual(S3Boto3Storage, storage.__class__)
+
+    def test_storage_without_global_default_acl_setting(self):
+        """
+        In 1.9.1 package provides the default-acl=`public-read`.
+        AWS_DEFAULT_ACL is not defined but package will send public-read.
+        In 1.10.1 this test will fail because that version has no default value.
+        """
+        name = 'test_storage_save231.txt'
+        content = ContentFile('new content')
+
+        storage = S3Boto3Storage(**{'bucket_name': 'test'})
+        storage._connections.connection = mock.MagicMock()  # pylint: disable=protected-access
+
+        storage.save(name, content)
+        storage.bucket.Object.assert_called_once_with(name)
+
+        obj = storage.bucket.Object.return_value
+        obj.upload_fileobj.assert_called_with(
+            mock.ANY,
+            ExtraArgs=self.order_dict({
+                'ContentType': 'text/plain',
+            }),
+            Config=storage.transfer_config  # pylint: disable=protected-access
+        )
+
+    @override_settings(AWS_DEFAULT_ACL='public-read')
+    @ddt.data(
+        ('public-read', 'public-read'),
+        ('private', 'private'),
+        (None, None)
+    )
+    @ddt.unpack
+    def test_storage_without_global_default_acl_setting_and_bucket_acls(self, default_acl, output_acl):
+        """
+        AWS_DEFAULT_ACL set to private and let bucket level acl overrides it behaviour.
+        """
+        name = 'test_storage_save.txt'
+        content = ContentFile('new content')
+        storage = S3Boto3Storage(**{'bucket_name': 'test', 'default_acl': default_acl})
+        storage._connections.connection = mock.MagicMock()  # pylint: disable=protected-access
+
+        storage.save(name, content)
+        storage.bucket.Object.assert_called_once_with(name)
+
+        obj = storage.bucket.Object.return_value
+
+        ExtraArgs = {
+            'ACL': output_acl,
+            'ContentType': 'text/plain',
+        }
+
+        if default_acl is None:
+            del ExtraArgs['ACL']
+
+        obj.upload_fileobj.assert_called_with(
+            mock.ANY,
+            ExtraArgs=self.order_dict(ExtraArgs),
+            Config=storage.transfer_config  # pylint: disable=protected-access
+        )
+
+    @ddt.data('public-read', 'private')
+    def test_storage_passing_default_acl_as_none(self, input_acl):
+        """
+        check bucket-level None behaviour with different AWS_DEFAULT_ACL
+        """
+        with override_settings(AWS_DEFAULT_ACL=input_acl):
+            name = 'test_storage_save231.txt'
+            content = ContentFile('new content')
+
+            storage = S3Boto3Storage(**{'bucket_name': 'test', 'default_acl': None})
+            storage._connections.connection = mock.MagicMock()   # pylint: disable=protected-access
+
+            storage.save(name, content)
+            storage.bucket.Object.assert_called_once_with(name)
+
+            obj = storage.bucket.Object.return_value
+            obj.upload_fileobj.assert_called_with(
+                mock.ANY,
+                Config=storage.transfer_config,  # pylint: disable=protected-access
+                ExtraArgs={
+                    'ContentType': 'text/plain',
+                },
+            )

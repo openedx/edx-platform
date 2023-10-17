@@ -10,10 +10,11 @@
  */
 define(['jquery', 'underscore', 'js/views/xblock_outline', 'edx-ui-toolkit/js/utils/string-utils',
     'common/js/components/utils/view_utils', 'js/views/utils/xblock_utils',
-    'js/models/xblock_outline_info', 'js/views/modals/course_outline_modals', 'js/utils/drag_and_drop'],
+    'js/models/xblock_outline_info', 'js/views/modals/course_outline_modals', 'js/utils/drag_and_drop',
+    'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',],
 function(
     $, _, XBlockOutlineView, StringUtils, ViewUtils, XBlockViewUtils,
-    XBlockOutlineInfo, CourseOutlineModalsFactory, ContentDragger
+    XBlockOutlineInfo, CourseOutlineModalsFactory, ContentDragger, NotificationView, PromptView
 ) {
     var CourseOutlineView = XBlockOutlineView.extend({
         // takes XBlockOutlineInfo as a model
@@ -314,7 +315,11 @@ function(
                         </span>
                     </h3>
                     <div class="${category}-header-actions" style="width: 50%; text-align: right;">
-                        <span class="icon fa fa-spinner fa-pulse fa-spin" aria-hidden="true"></span>
+                        <ul class="actions-list nav-dd ui-right">
+                            <li class="action-item">
+                                <span class="icon fa fa-spinner fa-pulse fa-spin" aria-hidden="true"></span>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             `;
@@ -376,13 +381,29 @@ function(
                     }));
                 }
                 if (newFiles.length) {
-                    notices.push(() => new NotificationView.Confirmation({
-                        title: gettext("New files were added to this course's Files & Uploads"),
+                    notices.push(() => new NotificationView.Info({
+                        title: gettext("New file(s) added to Files & Uploads."),
                         message: (
                             gettext("The following required files were imported to this course:") +
                             " "  + newFiles.join(", ")
                         ),
-                        closeIcon: true,
+                        actions: {
+                            primary: {
+                                text: gettext('View files'),
+                                click: function(notification) {
+                                    const article = document.querySelector('[data-course-assets]');
+                                    const assetsUrl = $(article).attr('data-course-assets');
+                                    window.location.href = assetsUrl;
+                                    return;
+                                }
+                            },
+                            secondary: {
+                                text: gettext('Dismiss'),
+                                click: function(notification) {
+                                    return notification.hide();
+                                }
+                            }
+                        }
                     }));
                 }
                 if (notices.length) {

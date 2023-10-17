@@ -23,7 +23,7 @@ from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, p
 from ....tests.mocks import mock_order_endpoint
 from ....tests.test_views import UserMixin
 
-PASSWORD = 'test'
+PASSWORD = 'Password1234'
 JSON_CONTENT_TYPE = 'application/json'
 
 

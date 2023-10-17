@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
-from openedx_filters.learning.filters import CourseEnrollmentAPIRenderStarted
+from openedx_filters.learning.filters import CourseEnrollmentAPIRenderStarted, CourseRunAPIRenderStarted
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.features.course_experience import course_home_url
@@ -135,6 +135,14 @@ class CourseRunSerializer(serializers.Serializer):
 
     def get_resumeUrl(self, instance):
         return self.context.get("resume_course_urls", {}).get(instance.course_id)
+
+    def to_representation(self, instance):
+        """Serialize the courserun instance to be able to update the values before the API finishes rendering."""
+        serialized_courserun = super().to_representation(instance)
+        serialized_courserun = CourseRunAPIRenderStarted().run_filter(
+            serialized_courserun=serialized_courserun,
+        )
+        return serialized_courserun
 
 
 class CoursewareAccessSerializer(serializers.Serializer):

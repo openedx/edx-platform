@@ -256,7 +256,7 @@ def update_special_exams_and_publish(course_key_str):
     """
     from cms.djangoapps.contentstore.exams import register_exams
     from cms.djangoapps.contentstore.proctoring import register_special_exams as register_exams_legacy
-    from openedx.core.djangoapps.credit.signals import on_course_publish
+    from openedx.core.djangoapps.credit.signals.handlers import on_course_publish
 
     course_key = CourseKey.from_string(course_key_str)
     LOGGER.info('Attempting to register exams for course %s', course_key_str)
@@ -1006,23 +1006,24 @@ def delete_v1_library(v1_library_key_string):
 
 @shared_task(time_limit=30)
 @set_code_owner_attribute
-def validate_all_library_source_blocks_ids_for_course(course, v1_to_v2_lib_map):
+def validate_all_library_source_blocks_ids_for_course(course_key_string, v1_to_v2_lib_map):
     """Search a Modulestore for all library source blocks in a course by querying mongo.
         replace all source_library_ids with the corresponding v2 value from the map
     """
+    course_id = CourseKey.from_string(course_key_string)
     store = modulestore()
-    with store.bulk_operations(course.id):
+    with store.bulk_operations(course_id):
         visited = []
         for branch in [ModuleStoreEnum.BranchName.draft, ModuleStoreEnum.BranchName.published]:
             blocks = store.get_items(
-                course.id.for_branch(branch),
+                course_id.for_branch(branch),
                 settings={'source_library_id': {'$exists': True}}
             )
             for xblock in blocks:
                 if xblock.source_library_id not in v1_to_v2_lib_map.values():
                     # lint-amnesty, pylint: disable=broad-except
                     raise Exception(
-                        f'{xblock.source_library_id} in {course.id} is not found in mapping. Validation failed'
+                        f'{xblock.source_library_id} in {course_id} is not found in mapping. Validation failed'
                     )
                 visited.append(xblock.source_library_id)
     # return sucess
@@ -1031,18 +1032,20 @@ def validate_all_library_source_blocks_ids_for_course(course, v1_to_v2_lib_map):
 
 @shared_task(time_limit=30)
 @set_code_owner_attribute
-def replace_all_library_source_blocks_ids_for_course(course, v1_to_v2_lib_map):  # lint-amnesty, pylint: disable=useless-return
+def replace_all_library_source_blocks_ids_for_course(course_key_string, v1_to_v2_lib_map):  # lint-amnesty, pylint: disable=useless-return
     """Search a Modulestore for all library source blocks in a course by querying mongo.
         replace all source_library_ids with the corresponding v2 value from the map.
 
         This will trigger a publish on the course for every published library source block.
     """
     store = modulestore()
-    with store.bulk_operations(course.id):
+    course_id = CourseKey.from_string(course_key_string)
+
+    with store.bulk_operations(course_id):
         #for branch in [ModuleStoreEnum.BranchName.draft, ModuleStoreEnum.BranchName.published]:
         draft_blocks, published_blocks = [
             store.get_items(
-                course.id.for_branch(branch),
+                course_id.for_branch(branch),
                 settings={'source_library_id': {'$exists': True}}
             )
             for branch in [ModuleStoreEnum.BranchName.draft, ModuleStoreEnum.BranchName.published]
@@ -1058,7 +1061,7 @@ def replace_all_library_source_blocks_ids_for_course(course, v1_to_v2_lib_map): 
                 LOGGER.error(
                     'Key %s not found in mapping. Skipping block for course %s',
                     str({draft_library_source_block.source_library_id}),
-                    str(course.id)
+                    str(course_id)
                 )
                 continue
 
@@ -1088,18 +1091,19 @@ def replace_all_library_source_blocks_ids_for_course(course, v1_to_v2_lib_map): 
 
 @shared_task(time_limit=30)
 @set_code_owner_attribute
-def undo_all_library_source_blocks_ids_for_course(course, v1_to_v2_lib_map):  # lint-amnesty, pylint: disable=useless-return
+def undo_all_library_source_blocks_ids_for_course(course_key_string, v1_to_v2_lib_map):  # lint-amnesty, pylint: disable=useless-return
     """Search a Modulestore for all library source blocks in a course by querying mongo.
         replace all source_library_ids with the corresponding v1 value from the inverted map.
         This is exists to undo changes made previously.
     """
+    course_id = CourseKey.from_string(course_key_string)
 
     v2_to_v1_lib_map = {v: k for k, v in v1_to_v2_lib_map.items()}
 
     store = modulestore()
     draft_blocks, published_blocks = [
         store.get_items(
-            course.id.for_branch(branch),
+            course_id.for_branch(branch),
             settings={'source_library_id': {'$exists': True}}
         )
         for branch in [ModuleStoreEnum.BranchName.draft, ModuleStoreEnum.BranchName.published]
@@ -1115,7 +1119,7 @@ def undo_all_library_source_blocks_ids_for_course(course, v1_to_v2_lib_map):  # 
             LOGGER.error(
                 'Key %s not found in mapping. Skipping block for course %s',
                 str({draft_library_source_block.source_library_id}),
-                str(course.id)
+                str(course_id)
             )
             continue
 

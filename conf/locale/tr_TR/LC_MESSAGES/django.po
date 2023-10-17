@@ -132,7 +132,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-30 20:42+0000\n"
+"POT-Creation-Date: 2023-10-01 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2021\n"
 "Language-Team: Turkish (Turkey) (https://app.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -234,8 +234,8 @@ msgid "Video"
 msgstr "Video"
 
 #: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr "Boş Gelişmiş Problem"
+msgid "Blank Problem"
+msgstr "Boş Problem"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -340,8 +340,8 @@ msgstr "Profesyonel Eğitim"
 #: common/djangoapps/course_modes/models.py xmodule/annotatable_block.py
 #: xmodule/capa_block.py xmodule/conditional_block.py
 #: xmodule/discussion_block.py xmodule/html_block.py
-#: xmodule/library_content_block.py xmodule/library_sourced_block.py
-#: xmodule/lti_block.py xmodule/split_test_block.py xmodule/unit_block.py
+#: xmodule/library_content_block.py xmodule/lti_block.py
+#: xmodule/split_test_block.py xmodule/unit_block.py
 #: xmodule/word_cloud_block.py xmodule/x_module.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
@@ -3153,6 +3153,14 @@ msgid "Open Response Assessment"
 msgstr "Açık Yanıt Değerlendirmesi"
 
 #: lms/djangoapps/courseware/courses.py
+msgid ""
+"This Open Response Assessment's due dates are set by your instructor and "
+"can't be shifted."
+msgstr ""
+"Bu ORA - Açık Cevap Değerlendirmesinin son tarihleri eğitmeniniz tarafından "
+"belirlenir ve değiştirilemez. "
+
+#: lms/djangoapps/courseware/courses.py
 msgid "Self Assessment"
 msgstr "Öz Değerlendirme"
 
@@ -3167,14 +3175,6 @@ msgstr "Personel Değerlendirmesi"
 #: lms/djangoapps/courseware/courses.py
 msgid "Submission"
 msgstr "Gönderim"
-
-#: lms/djangoapps/courseware/courses.py
-msgid ""
-"Open Response Assessment due dates are set by your instructor and can't be "
-"shifted."
-msgstr ""
-"Açık Cevap Değerlendirmesi - ORA son tarihleri eğitmeniniz tarafından "
-"belirlenir ve değiştirilemez. "
 
 #. Translators: 'absolute' is a date such as "Jan 01,
 #. 2020". 'relative' is a fuzzy description of the time until
@@ -3431,7 +3431,7 @@ msgstr "Açık Yanıt Değerlendirmesi Ayarları"
 
 #: lms/djangoapps/courseware/plugins.py
 msgid "Course level settings for Open Response Assessment."
-msgstr ""
+msgstr "Açık Cevap Değerlendirmesi için ders seviyesi ayarları."
 
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
 #: openedx/features/course_experience/__init__.py xmodule/tabs.py
@@ -3706,6 +3706,16 @@ msgstr ""
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Good"
 msgstr "İyi"
+
+#. Translators: Replier commented on "your" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "your"
+msgstr "size"
+
+#. Translators: Replier commented on "their" response to your post
+#: lms/djangoapps/discussion/rest_api/utils.py
+msgid "their"
+msgstr "onlara"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #, python-format
@@ -5933,7 +5943,6 @@ msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
 #: openedx/core/djangoapps/user_api/admin.py
-#: xmodule/templates/library-sourced-block-studio-view.html
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/videos_index_pagination.html
@@ -6399,13 +6408,11 @@ msgid "Quotes"
 msgstr "Alıntılar"
 
 #: lms/templates/wiki/includes/editor_widget.html
-#, python-format
+#, python-brace-format
 msgid ""
-"Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for"
-" help."
+"Markdown syntax is allowed. See the {start_link}cheatsheet{end_link} for "
+"help."
 msgstr ""
-"Markdown yazımına izin verilmektedir. Yardım için "
-"%(start_link)sipuçları%(end_link)ssayfasına bakın."
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
@@ -7145,6 +7152,17 @@ msgstr ""
 msgid "Original usage key/ID of the thing that is in the clipboard."
 msgstr ""
 
+#: openedx/core/djangoapps/content_tagging/models/base.py
+#: wiki/models/article.py
+msgid "owner"
+msgstr "sahip"
+
+#: openedx/core/djangoapps/content_tagging/models/base.py
+msgid ""
+"Organization that is related to this taxonomy.If None, then this taxonomy is"
+" related to all organizations."
+msgstr ""
+
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
 "List of domains that are allowed to make cross-domain requests to this site."
@@ -7445,8 +7463,8 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
-"The Posting availabilty in discussions whether it will be enabled, scheduled"
-" or indefinitely disabled."
+"The Posting availability in discussions whether it will be enabled, "
+"scheduled or indefinitely disabled."
 msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
@@ -7621,6 +7639,14 @@ msgstr "{course} dersi için {country} kara listede"
 msgid "Learner Pathways"
 msgstr "Öğrenci Patikaları"
 
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification App"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification Type"
+msgstr ""
+
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
 msgid ""
@@ -7632,7 +7658,7 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "<{p}><{strong}>{replier_name}</{strong}> commented on "
-"<{strong}>{author_name}'s</{strong}> response to your post "
+"<{strong}>{author_name}</{strong}> response to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
 
@@ -7642,6 +7668,32 @@ msgid ""
 "<{p}><{strong}>{replier_name}</{strong}> responded to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> gönderinize cevap yazdı "
+"<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> posted "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{username}</{strong}> gönderdi "
+"<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> asked "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{username}</{strong}> sordu "
+"<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+msgid ""
+"Notifications for responses and comments on your posts, and the ones you’re "
+"following, including endorsements to your responses and on your posts."
+msgstr ""
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "The notification preference config version is not up to date."
@@ -7649,23 +7701,23 @@ msgstr ""
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "Invalid app name."
-msgstr ""
+msgstr "Geçersiz uygulama adı."
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "Notifications marked as seen."
-msgstr ""
+msgstr "Bildirimler görüldü olarak işaretlendi."
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "Notification marked read."
-msgstr ""
+msgstr "Bildirim okundu olarak işaretlendi."
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "Notifications marked read."
-msgstr ""
+msgstr "Bildirimler okundu olarak işaretlendi."
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "Invalid app_name or notification_id."
-msgstr ""
+msgstr "Geçersiz uyg_adı ya da bildirim_id."
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid ""
@@ -9149,16 +9201,6 @@ msgid ""
 "to date."
 msgstr "Ders programınızı başarıyla değiştirdiniz ve takviminiz güncel. "
 
-#: openedx/features/content_tagging/models/base.py wiki/models/article.py
-msgid "owner"
-msgstr "sahip"
-
-#: openedx/features/content_tagging/models/base.py
-msgid ""
-"Organization that is related to this taxonomy.If None, then this taxonomy is"
-" related to all organizations."
-msgstr ""
-
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
 #: lms/templates/support/feature_based_enrollments.html
@@ -9486,8 +9528,7 @@ msgstr "Bilgi notu için XML verisi"
 #: xmodule/annotatable_block.py xmodule/capa_block.py
 #: xmodule/conditional_block.py xmodule/discussion_block.py
 #: xmodule/html_block.py xmodule/library_content_block.py
-#: xmodule/library_root_xblock.py xmodule/library_sourced_block.py
-#: xmodule/poll_block.py xmodule/unit_block.py
+#: xmodule/library_root_xblock.py xmodule/poll_block.py xmodule/unit_block.py
 #: xmodule/video_block/video_xfields.py xmodule/word_cloud_block.py
 #: xmodule/x_module.py
 msgid "The display name for this component."
@@ -11738,36 +11779,6 @@ msgstr "Kütüphane Görünen Adı"
 msgid "Enter the names of the advanced components to use in your library."
 msgstr "Kütüphanenizde kullanmak için gelişmiş bileşenlerin adlarını girin."
 
-#: xmodule/library_sourced_block.py
-msgid "Library Blocks List"
-msgstr "Kütüphane XBlock Listesi"
-
-#: xmodule/library_sourced_block.py
-msgid "Enter the IDs of the library XBlocks that you wish to use."
-msgstr "Kullanmak istediğiniz kütüphane XBlock'ının kimliğini girin."
-
-#: xmodule/library_sourced_block.py
-#, python-brace-format
-msgid "A maximum of {0} components may be added."
-msgstr "En fazla {0} bileşen eklenebilir."
-
-#: xmodule/library_sourced_block.py
-msgid ""
-"No XBlock has been configured for this component. Use the editor to select "
-"the target blocks."
-msgstr ""
-"Bu bileşen için herhangi bir XBlock yapılandırılmamış. Hedef block seçmek "
-"için editörü kullanın."
-
-#: xmodule/library_sourced_block.py
-msgid "Open Editor"
-msgstr "Açık Düzenleyici"
-
-#: xmodule/library_sourced_block.py
-msgid "Importing Library Block failed - are the IDs valid and readable?"
-msgstr ""
-"Kütüphane Block içe aktarımı başarısız - ID'ler geçerli ve okunabilir mi?"
-
 #: xmodule/lti_block.py
 msgid ""
 "The display name for this component. Analytics reports may also use the "
@@ -12478,10 +12489,6 @@ msgstr "Bu içerik deneyinin içerik görünürlüğünü etkileyen sorunları v
 #: xmodule/tabs.py
 msgid "External Discussion"
 msgstr "Harici Tartışma"
-
-#: xmodule/templates/library-sourced-block-studio-view.html
-msgid "Save and Import"
-msgstr "Kaydet ve İçe Aktar"
 
 #: xmodule/vertical_block.py
 msgid "Enable in-context discussions for the Unit"
@@ -14475,24 +14482,6 @@ msgstr "E-posta istemciniz URL'i iki satıra mı ayırdı?"
 msgid "The keys are valid for a limited amount of time. Has the key expired?"
 msgstr "Anahtarlar kısıtlı bir zaman dilimi için geçerlidir. Süresi mi geçti?"
 
-#: lms/templates/library-block-author-preview-header.html
-msgid ""
-"Showing all matching content eligible to be added into {display_name}. Each "
-"student will be assigned {max_count} component drawn randomly from this "
-"list."
-msgid_plural ""
-"Showing all matching content eligible to be added into {display_name}. Each "
-"student will be assigned {max_count} components drawn randomly from this "
-"list."
-msgstr[0] ""
-"{display_name} içine eklenmeye uygun tüm eşleşen içerikler  "
-"gösterilmektedir. Her öğrenciye bu listeden rastgele seçilen {max_count} "
-"bileşen atanacaktır."
-msgstr[1] ""
-"{display_name} içine eklenmeye uygun tüm eşleşen içerikler  "
-"gösterilmektedir. Her öğrenciye bu listeden rastgele seçilen {max_count} "
-"bileşen atanacaktır."
-
 #. Translators:  "External resource" means that this learning module is hosted
 #. on a platform external to the edX LMS
 #: lms/templates/lti.html
@@ -14718,7 +14707,7 @@ msgstr "Bu ders hakkında daha fazla bilgi"
 
 #: lms/templates/public_video.html
 msgid "Go to course"
-msgstr ""
+msgstr "Derse git"
 
 #: lms/templates/public_video.html
 msgid "Enroll in this course"
@@ -15120,7 +15109,7 @@ msgstr "Video dosyasını indir"
 
 #: lms/templates/video.html
 msgid "Share this video"
-msgstr ""
+msgstr "Bu videoyu paylaş"
 
 #: lms/templates/video.html
 msgid "Share on {site}"
@@ -15128,7 +15117,7 @@ msgstr "{site} sitesinde paylaş"
 
 #: lms/templates/video.html
 msgid "Copy"
-msgstr ""
+msgstr "Kopyala"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -15532,6 +15521,21 @@ msgid ""
 "distribute or modify the APIs or any API Content (including adaptation, "
 "editing, excerpting, or creating derivative works)."
 msgstr ""
+"API'lerin ve tüm API İçeriğinin {platform_name} ve ortaklarının değerli "
+"fikri mülkiyetlerini içerdiğini kabul ve beyan edersiniz. API'ler ve tüm API"
+" İçeriği, Amerika Birleşik Devletleri ve yabancı ülkelerdeki telif hakkı, "
+"ticari marka ve diğer yasalar tarafından korunmaktadır. Açıkça verilmemişse,"
+" API'ler ve API İçeriği'ndeki tüm haklar saklıdır. API'leri veya herhangi "
+"bir API İçeriği'ni kullanarak, API'lerdeki veya API İçeriği'ndeki herhangi "
+"bir hakkın sahipliğini elde etmezsiniz. API'lerde veya herhangi bir API "
+"İçeriği'nde sahiplik iddia etmemeli veya iddia etmeye çalışmamalı veya "
+"kendinizi veya şirketinizi veya Uygulamanızı herhangi bir API İçeriği'nin "
+"kaynağı olarak yanlış tanıtmamalısınız. Herhangi bir API İçeriği'ni tamamen "
+"veya kısmen kendi adınıza veya herhangi bir üçüncü taraf adına değiştiremez,"
+" türev çalışmalar oluşturamaz veya kullanmaya, lisanslamaya veya herhangi "
+"bir şekilde istismar etmeye teşebbüs edemezsiniz. API'leri veya herhangi bir"
+" API İçeriği'ni dağıtamaz veya değiştiremezsiniz (uyarlama, düzenleme, "
+"alıntı yapma veya türev çalışmalar oluşturma dahil)."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -15550,6 +15554,21 @@ msgid ""
 "other entities providing information, API Content or services for the APIs, "
 "the course instructors and their staffs."
 msgstr ""
+"API'lerde, API İçeriği'nde veya API'ler üzerinde veya API'ler aracılığıyla "
+"sunulan hizmetlerde veya bunlar aracılığıyla görünen tüm isimler, logolar ve"
+" mühürler (\"Ticari Markalar\"), varsa, ilgili sahiplerinin mülkiyetindedir."
+" API İçeriği'ne dahil edilen veya eşlik eden telif hakkı, Ticari Marka veya "
+"diğer mülkiyet hakları bildirimlerini kaldıramaz, değiştiremez veya "
+"gizleyemezsiniz. Herhangi bir {platform_name} Paydaşının (bundan sonra "
+"tanımlandığı gibi) veya diğer üçüncü tarafın, Ticari Markalar dahil ancak "
+"bunlarla sınırlı olmamak üzere, söz konusu {platform_name} Paydaşının veya "
+"üçüncü tarafın sahip olduğu veya kontrol ettiği API İçeriği'ne erişimi iptal"
+" etmesi durumunda, söz konusu {platform_name} Paydaşına veya üçüncü tarafa "
+"ait tüm API İçeriği'nin Uygulamanızdan ve ağlarınızdan, sistemlerinizden ve "
+"sunucularınızdan mümkün olan en kısa sürede silinmesini sağlamalısınız. "
+"\"{platform_name_capitalized} Paydaşları\" MIT, Harvard ve API'ler için "
+"bilgi, API İçeriği veya hizmetleri sağlayan diğer kuruluşlar, ders "
+"eğitmenleri ve onların personeli anlamına gelir."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -16353,10 +16372,6 @@ msgstr "Öğrenci notlarını indir"
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Print or share your certificate:"
 msgstr "Sertifikanı yazdır veya paylaş:"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-msgid "Click the link to see my certificate."
-msgstr "Sertifikanızı görmek için bağlantıya tıklayın."
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
@@ -19391,7 +19406,7 @@ msgstr "Personel Ekle"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Limited Staff"
-msgstr ""
+msgstr "Sınırlı Personel"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -19400,10 +19415,15 @@ msgid ""
 "grades and access all course data. Limited Staff don't have access to your "
 "course in Studio. You can only give course team roles to enrolled users."
 msgstr ""
+"Sınırlı Personel rolüne sahip ders ekibi üyeleri dersiniz, yönetmenize "
+"yardımcı olur. Sınırlı Personel, öğrencilerin kaydını yapabilir ve "
+"kayıtlarını kaldırabilir, ayrıca notlarını değiştirebilir ve tüm ders "
+"verilerine erişebilir. Sınırlı Personelin Studio'daki dersinize erişimi "
+"yoktur. Ders ekibi rollerini yalnızca kayıtlı kullanıcılara verebilirsiniz."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Limited Staff"
-msgstr ""
+msgstr "Sınırlı Personel Ekle"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Admin"
@@ -23329,6 +23349,18 @@ msgstr ""
 "dizinlerinizi kontrol edin. Hala e-posta doğrulamasını bulamadınız mı? "
 "Aşağıdaki bağlantıdan yardım isteyin."
 
+#: cms/templates/library-block-author-preview-header.html
+msgid ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} component drawn randomly from this "
+"list."
+msgid_plural ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} components drawn randomly from this "
+"list."
+msgstr[0] ""
+msgstr[1] ""
+
 #: cms/templates/library.html
 msgid "Content Library"
 msgstr "İçerik Kütüphanesi"
@@ -24319,14 +24351,6 @@ msgid "Expand or Collapse"
 msgstr "Genişlet veya Daralt"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Access Settings"
-msgstr "Erişim Ayarları"
-
-#: cms/templates/studio_xblock_wrapper.html
-msgid "Set Access"
-msgstr "Erişim Ver"
-
-#: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"
 msgstr ""
 
@@ -24692,10 +24716,6 @@ msgstr "Ders Navigasyonu"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Taslak"
-
-#: cms/templates/widgets/header.html
-msgid "Files & Media"
-msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

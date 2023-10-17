@@ -63,7 +63,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
         # Python-social saves auth failure notifcations in Django messages.
         # See pipeline.get_duplicate_provider() for details.
         self.request.COOKIES = {}
-        MessageMiddleware().process_request(self.request)
+        MessageMiddleware(get_response=lambda request: None).process_request(self.request)
         messages.error(self.request, 'Facebook is already in use.', extra_tags='Auth facebook')
 
     @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')

@@ -147,7 +147,7 @@ def xblock_type_display_name(xblock, default_display_name=None):
     elif category == 'vertical':
         return _('Unit')
     elif category == 'problem':
-        # The problem XBlock's display_name.default is not helpful ("Blank Advanced Problem") but changing it could have
+        # The problem XBlock's display_name.default is not helpful ("Blank Problem") but changing it could have
         # too many ripple effects in other places, so we have a special case for capa problems here.
         # Note: With a ProblemBlock instance, we could actually check block.problem_types to give a more specific
         # description like "Multiple Choice Problem", but that won't work if our 'block' argument is just the block_type

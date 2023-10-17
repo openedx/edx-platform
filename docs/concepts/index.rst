@@ -10,3 +10,4 @@ Concepts and Guides
     frontend/styling
     frontend/bootstrap
     frontend/static_assets
+    rest_apis

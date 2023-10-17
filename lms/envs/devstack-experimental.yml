@@ -61,7 +61,6 @@ BLOCKSTORE_API_URL: http://localhost:18250/api/v1
 BLOCKSTORE_PUBLIC_URL_ROOT: http://localhost:18250
 BLOCK_STRUCTURES_SETTINGS:
     COURSE_PUBLISH_TASK_DELAY: 30
-    PRUNING_ACTIVE: false
     TASK_DEFAULT_RETRY_DELAY: 30
     TASK_MAX_RETRIES: 5
 BRANCH_IO_KEY: ''
@@ -229,7 +228,7 @@ DATABASES:
         ATOMIC_REQUESTS: true
         CONN_MAX_AGE: 0
         ENGINE: django.db.backends.mysql
-        HOST: edx.devstack.mysql57
+        HOST: edx.devstack.mysql80
         NAME: edxapp
         OPTIONS:
             isolation_level: read committed
@@ -239,7 +238,7 @@ DATABASES:
     read_replica:
         CONN_MAX_AGE: 0
         ENGINE: django.db.backends.mysql
-        HOST: edx.devstack.mysql57
+        HOST: edx.devstack.mysql80
         NAME: edxapp
         OPTIONS:
             isolation_level: read committed
@@ -249,7 +248,7 @@ DATABASES:
     student_module_history:
         CONN_MAX_AGE: 0
         ENGINE: django.db.backends.mysql
-        HOST: edx.devstack.mysql57
+        HOST: edx.devstack.mysql80
         NAME: edxapp_csmh
         OPTIONS:
             isolation_level: read committed
@@ -615,17 +614,17 @@ VIDEO_IMAGE_MAX_AGE: 31536000
 VIDEO_IMAGE_SETTINGS:
     DIRECTORY_PREFIX: video-images/
     STORAGE_KWARGS:
-        base_url: /media/
-        location: /edx/var/edxapp/media//
+        location: /edx/var/edxapp/media/
     VIDEO_IMAGE_MAX_BYTES: 2097152
     VIDEO_IMAGE_MIN_BYTES: 2048
+    BASE_URL: /media/
 VIDEO_TRANSCRIPTS_MAX_AGE: 31536000
 VIDEO_TRANSCRIPTS_SETTINGS:
     DIRECTORY_PREFIX: video-transcripts/
     STORAGE_KWARGS:
-        base_url: /media/
-        location: /edx/var/edxapp/media//
+        location: /edx/var/edxapp/media/
     VIDEO_TRANSCRIPTS_MAX_BYTES: 3145728
+    BASE_URL: /media/
 VIDEO_UPLOAD_PIPELINE:
     BUCKET: ''
     ROOT_PATH: ''

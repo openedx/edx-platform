@@ -33,10 +33,9 @@ class StudioEditableBlock(XBlockMixin):
                 'content': rendered_child.content
             })
 
-        # 'lms.' namespace_prefix is required for rendering in studio
         mako_service = self.runtime.service(self, 'mako')
-        mako_service.namespace_prefix = 'lms.'
-        fragment.add_content(mako_service.render_template("studio_render_children_view.html", {  # pylint: disable=no-member
+        # For historic reasons, this template is in the LMS folder, and some code like xblock-utils expects that.
+        fragment.add_content(mako_service.render_lms_template("studio_render_children_view.html", {  # pylint: disable=no-member
             'items': contents,
             'xblock_context': context,
             'can_add': can_add,

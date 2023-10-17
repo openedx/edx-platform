@@ -56,6 +56,7 @@ from enterprise.constants import (
     ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE,
     ENTERPRISE_FULFILLMENT_OPERATOR_ROLE,
     ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE,
+    ENTERPRISE_SSO_ORCHESTRATOR_OPERATOR_ROLE,
     ENTERPRISE_OPERATOR_ROLE
 )
 
@@ -778,6 +779,15 @@ FEATURES = {
     # .. toggle_tickets: https://openedx.atlassian.net/browse/YONK-513
     'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
 
+    # .. toggle_name: FEATURES['SHOW_REGISTRATION_LINKS']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: Allow registration links. If this is disabled, users will no longer see buttons to the
+    #   the signup page.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2023-03-27
+    'SHOW_REGISTRATION_LINKS': True,
+
     # .. toggle_name: FEATURES['ENABLE_COOKIE_CONSENT']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -1029,6 +1039,18 @@ FEATURES = {
     # .. toggle_creation_date: 2022-06-06
     # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/29538'
     'DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED': False,
+
+    # .. toggle_name: FEATURES['SEND_LEARNING_CERTIFICATE_LIFECYCLE_EVENTS_TO_BUS']
+    # .. toggle_implementation: SettingToggle
+    # .. toggle_default: False
+    # .. toggle_description: When True, the system will publish certificate lifecycle signals to the event bus.
+    #    This toggle is used to create the EVENT_BUS_PRODUCER_CONFIG setting.
+    # .. toggle_warning: The default may be changed in a later release. See
+    #    https://github.com/openedx/openedx-events/issues/265
+    # .. toggle_use_cases: opt_in
+    # .. toggle_creation_date: 2023-10-10
+    # .. toggle_tickets: https://github.com/openedx/openedx-events/issues/210
+    'SEND_LEARNING_CERTIFICATE_LIFECYCLE_EVENTS_TO_BUS': False
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
@@ -1724,8 +1746,8 @@ DATABASES = {
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+# This will be overridden through LMS config
 DEFAULT_HASHING_ALGORITHM = 'sha1'
-
 #################### Python sandbox ############################################
 
 CODE_JAIL = {
@@ -2178,8 +2200,8 @@ MIDDLEWARE = [
     # Before anything that looks at cookies, especially the session middleware
     'openedx.core.djangoapps.cookie_metadata.middleware.CookieNameChange',
 
-    # Monitoring and logging for expected and ignored errors
-    'openedx.core.lib.request_utils.ExpectedErrorMiddleware',
+    # Monitoring and logging for ignored errors
+    'openedx.core.lib.request_utils.IgnoredErrorMiddleware',
 
     'lms.djangoapps.mobile_api.middleware.AppVersionUpgrade',
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
@@ -2884,22 +2906,6 @@ BLOCK_STRUCTURES_SETTINGS = dict(
     #   For more information, check https://github.com/openedx/edx-platform/pull/13388 and
     #   https://github.com/openedx/edx-platform/pull/14571.
     TASK_MAX_RETRIES=5,
-
-    # .. toggle_name: BLOCK_STRUCTURES_SETTINGS['PRUNING_ACTIVE']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: When `True`, only a specified number of versions of block structure
-    #   files are kept for each structure, and the rest are cleaned up. The number of versions that
-    #   are kept can be specified in the `BlockStructureConfiguration`, which can be edited in
-    #   Django Admin. The default number of versions that are kept is `5`.
-    # .. toggle_warning: This toggle will likely be deprecated and removed.
-    # .. toggle_use_cases: temporary
-    # .. toggle_creation_date: 2018-03-22
-    # .. toggle_target_removal_date: 2018-06-22
-    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/14571,
-    #   https://github.com/openedx/edx-platform/pull/17760,
-    #   https://openedx.atlassian.net/browse/DEPR-146
-    PRUNING_ACTIVE=False,
 )
 
 ################################ Bulk Email ###################################
@@ -3236,7 +3242,7 @@ INSTALLED_APPS = [
 
     # Tagging
     'openedx_tagging.core.tagging.apps.TaggingConfig',
-    'openedx.features.content_tagging',
+    'openedx.core.djangoapps.content_tagging',
 
     # Features
     'openedx.features.calendar_sync',
@@ -3310,6 +3316,7 @@ INSTALLED_APPS = [
 
     # Notifications
     'openedx.core.djangoapps.notifications',
+    'openedx_events',
 ]
 
 ######################### CSRF #########################################
@@ -3320,24 +3327,23 @@ CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
 # end users
 CSRF_COOKIE_SECURE = False
 CSRF_TRUSTED_ORIGINS = []
+CSRF_TRUSTED_ORIGINS_WITH_SCHEME = []
 CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ''
 CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
 
 ######################### Django Rest Framework ########################
 
 REST_FRAMEWORK = {
-    # This matches the original DRF default of Session and Basic Authentication, but
-    # adds observability to help us potentially adjust the defaults. We would like to
-    # add JwtAuthentication and drop BasicAuthentication, based on our findings.
+    # These default classes add observability around endpoints using defaults, and should
+    # not be used anywhere else.
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'openedx.core.djangolib.default_auth_classes.DefaultSessionAuthentication',
-        'openedx.core.djangolib.default_auth_classes.DefaultBasicAuthentication'
     ],
     'DEFAULT_PAGINATION_CLASS': 'edx_rest_framework_extensions.paginators.DefaultPagination',
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
     ),
-    'EXCEPTION_HANDLER': 'openedx.core.lib.request_utils.expected_error_exception_handler',
+    'EXCEPTION_HANDLER': 'openedx.core.lib.request_utils.ignored_error_exception_handler',
     'PAGE_SIZE': 10,
     'URL_FORMAT_OVERRIDE': None,
     'DEFAULT_THROTTLE_RATES': {
@@ -3763,7 +3769,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "common.djangoapps.util.password_policy_validators.MinimumLengthValidator",
         "OPTIONS": {
-            "min_length": 2
+            "min_length": 8
         }
     },
     {
@@ -3779,6 +3785,7 @@ PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG = {
 }
 
 ############################ ORA 2 ############################################
+ORA_WORKFLOW_UPDATE_ROUTING_KEY = "edx.lms.core.ora_workflow_update"
 
 # By default, don't use a file prefix
 ORA2_FILE_PREFIX = None
@@ -3819,9 +3826,10 @@ VIDEO_IMAGE_SETTINGS = dict(
     # STORAGE_KWARGS=dict(bucket='video-image-bucket'),
     STORAGE_KWARGS=dict(
         location=MEDIA_ROOT,
-        base_url=MEDIA_URL,
     ),
     DIRECTORY_PREFIX='video-images/',
+    BASE_URL=MEDIA_URL,
+
 )
 
 VIDEO_IMAGE_MAX_AGE = 31536000
@@ -3835,9 +3843,9 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
     # STORAGE_KWARGS=dict(bucket='video-transcripts-bucket'),
     STORAGE_KWARGS=dict(
         location=MEDIA_ROOT,
-        base_url=MEDIA_URL,
     ),
     DIRECTORY_PREFIX='video-transcripts/',
+    BASE_URL=MEDIA_URL,
 )
 
 VIDEO_TRANSCRIPTS_MAX_AGE = 31536000
@@ -4634,6 +4642,13 @@ ENTERPRISE_ALL_SERVICE_USERNAMES = [
     'subscriptions_worker'
 ]
 
+# Setting for Open API key and prompts used by edx-enterprise.
+OPENAI_API_KEY = ''
+LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT = ''
+LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT = ''
+LEARNER_PROGRESS_PROMPT_FOR_ACTIVE_CONTRACT = ''
+LEARNER_PROGRESS_PROMPT_FOR_NON_ACTIVE_CONTRACT = ''
+
 
 ############## ENTERPRISE SERVICE LMS CONFIGURATION ##################################
 # The LMS has some features embedded that are related to the Enterprise service, but
@@ -4682,6 +4697,7 @@ SYSTEM_TO_FEATURE_ROLE_MAPPING = {
         ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE,
         ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE,
         ENTERPRISE_FULFILLMENT_OPERATOR_ROLE,
+        ENTERPRISE_SSO_ORCHESTRATOR_OPERATOR_ROLE,
     ],
 }
 
@@ -5377,7 +5393,83 @@ SUBSCRIPTIONS_SERVICE_WORKER_USERNAME = 'subscriptions_worker'
 ############## NOTIFICATIONS EXPIRY ##############
 NOTIFICATIONS_EXPIRY = 60
 EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
+NOTIFICATION_CREATION_BATCH_SIZE = 99
 
 #### django-simple-history##
 # disable indexing on date field its coming from django-simple-history.
 SIMPLE_HISTORY_DATE_INDEX = False
+
+
+def _should_send_certificate_events(settings):
+    return settings.FEATURES['SEND_LEARNING_CERTIFICATE_LIFECYCLE_EVENTS_TO_BUS']
+
+#### Event bus producing ####
+# .. setting_name: EVENT_BUS_PRODUCER_CONFIG
+# .. setting_default: all events disabled
+# .. setting_description: Dictionary of event_types mapped to dictionaries of topic to topic-related configuration.
+#    Each topic configuration dictionary contains
+#    * `enabled`: a toggle denoting whether the event will be published to the topic. These should be annotated
+#       according to
+#       https://edx.readthedocs.io/projects/edx-toggles/en/latest/how_to/documenting_new_feature_toggles.html
+#    * `event_key_field` which is a period-delimited string path to event data field to use as event key.
+#    Note: The topic names should not include environment prefix as it will be dynamically added based on
+#    EVENT_BUS_TOPIC_PREFIX setting.
+EVENT_BUS_PRODUCER_CONFIG = {
+    'org.openedx.learning.certificate.created.v1': {
+        'learning-certificate-lifecycle':
+            {'event_key_field': 'certificate.course.course_key', 'enabled': _should_send_certificate_events},
+    },
+    'org.openedx.learning.certificate.revoked.v1': {
+        'learning-certificate-lifecycle':
+            {'event_key_field': 'certificate.course.course_key', 'enabled': _should_send_certificate_events},
+    },
+    'org.openedx.learning.course.unenrollment.completed.v1': {
+        'course-unenrollment-lifecycle':
+            {'event_key_field': 'enrollment.course.course_key',
+             # .. toggle_name: EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.course.unenrollment.completed.v1']
+             #    ['course-unenrollment-lifecycle']['enabled']
+             # .. toggle_implementation: DjangoSetting
+             # .. toggle_default: False
+             # .. toggle_description: Enables sending COURSE_UNENROLLMENT_COMPLETED events over the event bus.
+             # .. toggle_use_cases: opt_in
+             # .. toggle_creation_date: 2023-09-18
+             # .. toggle_warning: The default may be changed in a later release. See
+             #   https://github.com/openedx/openedx-events/issues/265
+             # .. toggle_tickets: https://github.com/openedx/openedx-events/issues/210
+             'enabled': False},
+    },
+    'org.openedx.learning.xblock.skill.verified.v1': {
+        'learning-xblock-skill-verified':
+            {'event_key_field': 'xblock_info.usage_key',
+             # .. toggle_name: EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.xblock.skill.verified.v1']
+             #    ['learning-xblock-skill-verified']['enabled']
+             # .. toggle_implementation: DjangoSetting
+             # .. toggle_default: False
+             # .. toggle_description: Enables sending xblock_skill_verified events over the event bus.
+             # .. toggle_use_cases: opt_in
+             # .. toggle_creation_date: 2023-09-18
+             # .. toggle_warning: The default may be changed in a later release. See
+             #   https://github.com/openedx/openedx-events/issues/265
+             # .. toggle_tickets: https://github.com/openedx/openedx-events/issues/210
+             'enabled': False}
+    },
+    # CMS events. These have to be copied over here because cms.common adds some derived entries as well,
+    # and the derivation fails if the keys are missing. If we ever fully decouple the lms and cms settings,
+    # we can remove these.
+    'org.openedx.content_authoring.xblock.published.v1': {
+        'course-authoring-xblock-lifecycle':
+            {'event_key_field': 'xblock_info.usage_key', 'enabled': False},
+    },
+    'org.openedx.content_authoring.xblock.deleted.v1': {
+        'course-authoring-xblock-lifecycle':
+            {'event_key_field': 'xblock_info.usage_key', 'enabled': False},
+    },
+    'org.openedx.content_authoring.xblock.duplicated.v1': {
+        'course-authoring-xblock-lifecycle':
+            {'event_key_field': 'xblock_info.usage_key', 'enabled': False},
+    },
+}
+derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.certificate.created.v1',
+                         'learning-certificate-lifecycle', 'enabled')
+derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.certificate.revoked.v1',
+                         'learning-certificate-lifecycle', 'enabled')

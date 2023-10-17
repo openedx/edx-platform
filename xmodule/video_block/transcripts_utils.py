@@ -203,7 +203,7 @@ def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_
 
     Returns (status, transcripts): bool, dict.
     """
-    _ = i18n.ugettext
+    _ = i18n.gettext
 
     utf8_parser = etree.XMLParser(encoding='utf-8')
 
@@ -259,7 +259,7 @@ def download_youtube_subs(youtube_id, video_block, settings):  # lint-amnesty, p
         GetTranscriptsFromYouTubeException, if fails.
     """
     i18n = video_block.runtime.service(video_block, "i18n")
-    _ = i18n.ugettext
+    _ = i18n.gettext
 
     subs = get_transcripts_from_youtube(youtube_id, settings, i18n)
     return json.dumps(subs, indent=2)
@@ -285,7 +285,7 @@ def generate_subs_from_source(speed_subs, subs_type, subs_filedata, block, langu
     :param language: str, language of translation of transcripts
     :returns: True, if all subs are generated and saved successfully.
     """
-    _ = block.runtime.service(block, "i18n").ugettext
+    _ = block.runtime.service(block, "i18n").gettext
     if subs_type.lower() != 'srt':
         raise TranscriptsGenerationException(_("We support only SubRip (*.srt) transcripts format."))
     try:
@@ -434,7 +434,7 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
         (To avoid confusing situation if you attempt to correct a translation by uploading
         a new version of the SRT file with same name).
     """
-    _ = item.runtime.service(item, "i18n").ugettext
+    _ = item.runtime.service(item, "i18n").gettext
 
     # # 1.
     # html5_ids = get_html5_ids(item.html5_sources)
@@ -519,7 +519,7 @@ def generate_sjson_for_all_speeds(block, user_filename, result_subs_dict, lang):
     """
     Generates sjson from srt for given lang.
     """
-    _ = block.runtime.service(block, "i18n").ugettext
+    _ = block.runtime.service(block, "i18n").gettext
 
     try:
         srt_transcripts = contentstore().find(Transcript.asset_location(block.location, user_filename))

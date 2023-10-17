@@ -3,17 +3,15 @@ Base setup for Notification Apps and Types.
 """
 from django.utils.translation import gettext_lazy as _
 
-from .utils import (
-    find_app_in_normalized_apps,
-    find_pref_in_normalized_prefs,
-)
+from .utils import find_app_in_normalized_apps, find_pref_in_normalized_prefs
+
+FILTER_AUDIT_EXPIRED = 'filter_audit_expired'
 
 COURSE_NOTIFICATION_TYPES = {
     'new_comment_on_response': {
         'notification_app': 'discussion',
         'name': 'new_comment_on_response',
         'is_core': True,
-        'info': 'Comment on response',
         'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on your response to the post '
                               '<{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
@@ -21,14 +19,13 @@ COURSE_NOTIFICATION_TYPES = {
             'replier_name': 'replier name',
         },
         'email_template': '',
+        'filters': [FILTER_AUDIT_EXPIRED]
     },
     'new_comment': {
         'notification_app': 'discussion',
         'name': 'new_comment',
         'is_core': True,
-        'info': 'Comment on post',
-        'non_editable': ['web', 'email'],
-        'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on <{strong}>{author_name}\'s'
+        'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on <{strong}>{author_name}'
                               '</{strong}> response to your post <{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
             'post_title': 'Post title',
@@ -36,13 +33,12 @@ COURSE_NOTIFICATION_TYPES = {
             'replier_name': 'replier name',
         },
         'email_template': '',
+        'filters': [FILTER_AUDIT_EXPIRED]
     },
     'new_response': {
         'notification_app': 'discussion',
         'name': 'new_response',
         'is_core': True,
-        'info': 'Response on post',
-        'non_editable': [],
         'content_template': _('<{p}><{strong}>{replier_name}</{strong}> responded to your '
                               'post <{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
@@ -50,13 +46,80 @@ COURSE_NOTIFICATION_TYPES = {
             'replier_name': 'replier name',
         },
         'email_template': '',
+        'filters': [FILTER_AUDIT_EXPIRED]
+    },
+    'new_discussion_post': {
+        'notification_app': 'discussion',
+        'name': 'new_discussion_post',
+        'is_core': False,
+        'info': '',
+        'web': False,
+        'email': False,
+        'push': False,
+        'non_editable': [],
+        'content_template': _('<{p}><{strong}>{username}</{strong}> posted <{strong}>{post_title}</{strong}></{p}>'),
+        'content_context': {
+            'post_title': 'Post title',
+            'username': 'Post author name',
+        },
+        'email_template': '',
+        'filters': [FILTER_AUDIT_EXPIRED]
+    },
+    'new_question_post': {
+        'notification_app': 'discussion',
+        'name': 'new_question_post',
+        'is_core': False,
+        'info': '',
+        'web': False,
+        'email': False,
+        'push': False,
+        'non_editable': [],
+        'content_template': _('<{p}><{strong}>{username}</{strong}> asked <{strong}>{post_title}</{strong}></{p}>'),
+        'content_context': {
+            'post_title': 'Post title',
+            'username': 'Post author name',
+        },
+        'email_template': '',
+        'filters': [FILTER_AUDIT_EXPIRED]
+    },
+    'response_on_followed_post': {
+        'notification_app': 'discussion',
+        'name': 'response_on_followed_post',
+        'is_core': True,
+        'info': '',
+        'non_editable': [],
+        'content_template': _('<{p}><{strong}>{replier_name}</{strong}> responded to a post you’re following: '
+                              '<{strong}>{post_title}</{strong}></{p}>'),
+        'content_context': {
+            'post_title': 'Post title',
+            'replier_name': 'replier name',
+        },
+        'email_template': '',
+        'filter': [FILTER_AUDIT_EXPIRED]
+    },
+    'comment_on_followed_post': {
+        'notification_app': 'discussion',
+        'name': 'comment_on_followed_post',
+        'is_core': True,
+        'info': '',
+        'non_editable': [],
+        'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on {author_name}\'s response in '
+                              'a post you’re following <{strong}>{post_title}</{strong}></{p}>'),
+        'content_context': {
+            'post_title': 'Post title',
+            'author_name': 'author name',
+            'replier_name': 'replier name',
+        },
+        'email_template': '',
+        'filter': [FILTER_AUDIT_EXPIRED]
     },
 }
 
 COURSE_NOTIFICATION_APPS = {
     'discussion': {
         'enabled': True,
-        'core_info': '',
+        'core_info': _('Notifications for responses and comments on your posts, and the ones you’re '
+                       'following, including endorsements to your responses and on your posts.'),
         'core_web': True,
         'core_email': True,
         'core_push': True,
@@ -179,7 +242,7 @@ class NotificationTypeManager:
         Returns notification types for the given notification app.
         """
         return [
-            notification_type for _, notification_type in self.notification_types.items()
+            notification_type.copy() for _, notification_type in self.notification_types.items()
             if notification_type.get('notification_app', None) == notification_app
         ]
 
@@ -220,7 +283,6 @@ class NotificationTypeManager:
                 'web': notification_type.get('web', False),
                 'email': notification_type.get('email', False),
                 'push': notification_type.get('push', False),
-                'info': notification_type.get('info', ''),
             }
         return non_core_notification_type_preferences
 
@@ -252,7 +314,6 @@ class NotificationAppManager:
             'web': notification_app_attrs.get('core_web', False),
             'email': notification_app_attrs.get('core_email', False),
             'push': notification_app_attrs.get('core_push', False),
-            'info': notification_app_attrs.get('core_info', ''),
         }
 
     def add_core_notification_non_editable(self, notification_app_attrs, non_editable_channels):
@@ -296,3 +357,16 @@ def get_notification_content(notification_type, context):
         if notification_type_content_template:
             return notification_type_content_template.format(**context, **html_tags_context)
     return ''
+
+
+def get_default_values_of_preference(notification_app, notification_type):
+    """
+    Returns default preference for notification_type
+    """
+    default_prefs = NotificationAppManager().get_notification_app_preferences()
+    app_prefs = default_prefs.get(notification_app, {})
+    core_notification_types = app_prefs.get('core_notification_types', [])
+    notification_types = app_prefs.get('notification_types', {})
+    if notification_type in core_notification_types:
+        return notification_types.get('core', {})
+    return notification_types.get(notification_type, {})
