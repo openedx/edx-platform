@@ -835,7 +835,8 @@ blockquote cite {
   color: #ff0d5a;
 }
 .booster-badges .group-image {
-  width: 70%;
+  width: 100%;
+  max-width: 500px;
   height: auto;
   display: block;
   margin: 0 auto;

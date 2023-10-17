@@ -549,7 +549,8 @@ def get_problem_attributes(raw_data, block_key):
         elif e.text and e.tag == 'choice':
             choice_dict = {
                 'statement': str(e.text).strip(),
-                'correct': e.attrib.get('correct')
+                'correct': e.attrib.get('correct'),
+                'point': e.attrib.get('point')
             }
             if e.attrib.get('correct') == 'true':
                 responses['selection'] += 1
@@ -858,12 +859,14 @@ def skill_reflection_response(skills, likert_questions, nuance_interrogation_que
         'outros': [],
         'nuance_interrogation': [],
     }
+    store = modulestore()
 
     def process_question_responses(questions, response_key, location_key):
         for question in questions:
             skill = question.skill.name
-            submissions = list(question.submissions.filter(problem_location=getattr(question, location_key)).all())
-            total_submissions = question.submissions.filter(problem_location=getattr(question, location_key)).count()
+            usage_key = getattr(question, location_key)
+            submissions = list(question.submissions.filter(problem_location=usage_key).all())
+            total_submissions = question.submissions.filter(problem_location=usage_key).count()
             stats = defaultdict(int)
 
             question_stats = {
@@ -894,6 +897,17 @@ def skill_reflection_response(skills, likert_questions, nuance_interrogation_que
                     question_stats['submissions'].append({'key': sk, "value": stats[sk], 'points': points_dict[sk]})
 
                 _response[response_key].append(question_stats)
+            else:
+                if usage_key and usage_key.block_type == 'problem':
+                    assessment_xblock = store.get_item(usage_key)
+                    question_data = get_problem_attributes(assessment_xblock.data, usage_key)
+                    question = question_data['question_text']
+                    choices = question_data['problem_choices']
+                    question_stats['title'] = question
+                    question_stats['submissions'] = [
+                        {'key': sub['statement'], 'value': 0, 'points': sub['point']} for sub in choices.values()
+                    ]
+                    _response[response_key].append(question_stats)
 
     process_question_responses(likert_questions, 'intros', 'start_unit_location')
     process_question_responses(likert_questions, 'outros', 'end_unit_location')
@@ -939,21 +953,39 @@ def skill_reflection_individual_response(skills, likert_questions, nuance_interr
         'outros': [],
         'nuance_interrogation': [],
     }
+    store = modulestore()
 
     def process_question_responses(questions, response_key, location_key):
         for question in questions:
             skill = question.skill.name
+            usage_key = getattr(question, location_key)
             submission = question.submissions.filter(
-                user_id=user_id, problem_location=getattr(question, location_key),
+                user_id=user_id, problem_location=usage_key,
             ).first()
+
             if submission:
                 question_response = submission.question_response
-                question=question_response['question']
-                choices=question_response['choices']
+                question = question_response['question']
+                choices = question_response['choices']
                 response_text = question_response['student_response']['response_text']
                 points = question_response['student_response']['points']
                 response[response_key].append(
-                    {'skill': skill, 'response_text': response_text, 'question': question, 'point': points, 'choices': choices.values()})
+                    {'skill': skill, 'response_text': response_text, 'question': question, 'point': points,
+                     'choices': list(choices.values())})
+            elif usage_key and usage_key.block_type == 'problem':
+                assessment_xblock = store.get_item(usage_key)
+                question_data = get_problem_attributes(assessment_xblock.data, usage_key)
+                question = question_data['question_text']
+                choices = question_data['problem_choices']
+                response[response_key].append(
+                    {
+                        'skill': skill,
+                        'response_text': None,
+                        'question': question,
+                        'point': None,
+                        'choices': list(choices.values())
+                    }
+                )
 
     process_question_responses(likert_questions, 'intros', 'start_unit_location')
     process_question_responses(likert_questions, 'outros', 'end_unit_location')
