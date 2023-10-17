@@ -15,6 +15,7 @@ from boto.s3.connection import S3Connection
 from boto import s3
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core.exceptions import PermissionDenied
 from django.http import FileResponse, HttpResponseNotFound
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -29,7 +30,6 @@ from edxval.api import (
     get_3rd_party_transcription_plans,
     get_available_transcript_languages,
     get_video_transcript_url,
-    get_transcript_credentials_state_for_org,
     get_transcript_preferences,
     get_videos_for_course,
     remove_transcript_preferences,
@@ -43,6 +43,8 @@ from rest_framework import status as rest_status
 from rest_framework.response import Response
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.student.auth import has_course_author_access
+from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE
 from common.djangoapps.util.json_request import JsonResponse
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
@@ -51,11 +53,13 @@ from openedx.core.djangoapps.video_pipeline.config.waffle import (
     ENABLE_DEVSTACK_VIDEO_UPLOADS,
 )
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
-from xmodule.video_block.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.video_block.video_utils import rewrite_video_url # lint-amnesty, pylint: disable=wrong-import-order
+
 
 from .models import VideoUploadConfig
 from .toggles import use_new_video_uploads_page, use_mock_video_uploads
-from .utils import reverse_course_url, get_video_uploads_url
+from .utils import reverse_course_url, get_video_uploads_url, get_course_videos_context
 from .video_utils import validate_video_image
 from .views.course import get_course_and_check_access
 
@@ -221,6 +225,77 @@ def handle_videos(request, course_key_string, edx_video_id=None):
 
         data, status = videos_post(course, request)
         return JsonResponse(data, status=status)
+
+    
+def get_video_usage_path(request, course_key, edx_video_id):
+    if not has_course_author_access(request.user, course_key):
+        raise PermissionDenied()
+    store = modulestore()
+    usage_locations = []
+    videos = store.get_items(
+        course_key,
+        qualifiers={
+            'category': 'video'
+        },
+    )
+    for video in videos:
+        video_id = getattr(video, 'edx_video_id', '')
+        if video_id == edx_video_id:
+            unit = video.get_parent()
+            subsection = unit.get_parent()
+            subsection_display_name = getattr(subsection, 'display_name', '')
+            unit_display_name = getattr(unit, 'display_name', '')
+            xblock_display_name = getattr(video, 'display_name', '')
+            usage_locations.append(f'{subsection_display_name} - {unit_display_name} / {xblock_display_name}')
+    return {'usage_locations': usage_locations}
+
+
+def generate_video_download_link(request, course_key, edx_video_id):
+    try:
+        import edxval.api as edxval_api
+    except ImportError:
+        edxval_api = None
+    download_video_link = ''
+    # Determine if there is an alternative source for this video
+    # based on user locale.  This exists to support cases where
+    # we leverage a geography specific CDN, like China.
+    default_cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get('default')
+    print(request.user, request)
+    # user_location = request.user.get_current_user().opt_attrs[ATTR_KEY_REQUEST_COUNTRY_CODE]
+    cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(None, default_cdn_url)
+    if edx_video_id and edxval_api:  # lint-amnesty, pylint: disable=too-many-nested-blocks
+        try:
+            val_profiles = ["youtube", "desktop_webm", "desktop_mp4"]
+
+            # if HLSPlaybackEnabledFlag.feature_enabled(self.course_id):
+            #     val_profiles.append('hls')
+
+            # strip edx_video_id to prevent ValVideoNotFoundError error if unwanted spaces are there. TNL-5769
+            val_video_urls = edxval_api.get_urls_for_profiles(edx_video_id.strip(), val_profiles)
+
+            # VAL will always give us the keys for the profiles we asked for, but
+            # if it doesn't have an encoded video entry for that Video + Profile, the
+            # value will map to `None`
+
+            # add the non-youtube urls to the list of alternative sources
+            # use the last non-None non-youtube non-hls url as the link to download the video
+            for url in [val_video_urls[p] for p in val_profiles if p != "youtube"]:
+                if url:
+                    # don't include hls urls for download
+                    if not url.endswith('.m3u8'):
+                        # function returns None when the url cannot be re-written
+                        rewritten_link = rewrite_video_url(cdn_url, url)
+                        if rewritten_link:
+                            download_video_link = rewritten_link
+                        else:
+                            download_video_link = url
+
+        except (edxval_api.ValInternalError, edxval_api.ValVideoNotFoundError):
+            # VAL raises this exception if it can't find data for the edx video ID. This can happen if the
+            # course data is ported to a machine that does not have the VAL data. So for now, pass on this
+            # exception and fallback to whatever we find in the VideoBlock.
+            log.warning("Could not retrieve information from VAL for edx Video ID: %s.", edx_video_id)
+    return {"download_link": download_video_link}
 
 
 def handle_generate_video_upload_link(request, course_key_string):
@@ -636,54 +711,15 @@ def videos_index_html(course, pagination_conf=None):
     """
     Returns an HTML page to display previous video uploads and allow new ones
     """
-    is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course.id)
-    previous_uploads, pagination_context = _get_index_videos(course, pagination_conf)
-    context = {
-        'context_course': course,
-        'image_upload_url': reverse_course_url('video_images_handler', str(course.id)),
-        'video_handler_url': reverse_course_url('videos_handler', str(course.id)),
-        'encodings_download_url': reverse_course_url('video_encodings_download', str(course.id)),
-        'default_video_image_url': _get_default_video_image_url(),
-        'previous_uploads': previous_uploads,
-        'concurrent_upload_limit': settings.VIDEO_UPLOAD_PIPELINE.get('CONCURRENT_UPLOAD_LIMIT', 0),
-        'video_supported_file_formats': list(VIDEO_SUPPORTED_FILE_FORMATS.keys()),
-        'video_upload_max_file_size': VIDEO_UPLOAD_MAX_FILE_SIZE_GB,
-        'video_image_settings': {
-            'video_image_upload_enabled': VIDEO_IMAGE_UPLOAD_ENABLED.is_enabled(),
-            'max_size': settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MAX_BYTES'],
-            'min_size': settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MIN_BYTES'],
-            'max_width': settings.VIDEO_IMAGE_MAX_WIDTH,
-            'max_height': settings.VIDEO_IMAGE_MAX_HEIGHT,
-            'supported_file_formats': settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS
-        },
-        'is_video_transcript_enabled': is_video_transcript_enabled,
-        'active_transcript_preferences': None,
-        'transcript_credentials': None,
-        'transcript_available_languages': get_all_transcript_languages(),
-        'video_transcript_settings': {
-            'transcript_download_handler_url': reverse('transcript_download_handler'),
-            'transcript_upload_handler_url': reverse('transcript_upload_handler'),
-            'transcript_delete_handler_url': reverse_course_url('transcript_delete_handler', str(course.id)),
-            'trancript_download_file_format': Transcript.SRT
-        },
-        'pagination_context': pagination_context
-    }
-
-    if is_video_transcript_enabled:
-        context['video_transcript_settings'].update({
-            'transcript_preferences_handler_url': reverse_course_url(
-                'transcript_preferences_handler',
-                str(course.id)
-            ),
-            'transcript_credentials_handler_url': reverse_course_url(
-                'transcript_credentials_handler',
-                str(course.id)
-            ),
-            'transcription_plans': get_3rd_party_transcription_plans(),
-        })
-        context['active_transcript_preferences'] = get_transcript_preferences(str(course.id))
-        # Cached state for transcript providers' credentials (org-specific)
-        context['transcript_credentials'] = get_transcript_credentials_state_for_org(course.id.org)
+    videos = _get_index_videos(course, pagination_conf)
+    transcript_languages = get_all_transcript_languages()
+    default_video_image_url = _get_default_video_image_url()
+    context = get_course_videos_context(
+        course,
+        transcript_languages,
+        videos,
+        default_video_image_url,
+    )
     if use_new_video_uploads_page(course.id):
         return redirect(get_video_uploads_url(course.id))
     return render_to_response('videos_index.html', context)

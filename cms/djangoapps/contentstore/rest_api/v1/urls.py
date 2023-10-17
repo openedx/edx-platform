@@ -11,6 +11,7 @@ from .views import (
     CourseGradingView,
     CourseRerunView,
     CourseSettingsView,
+    CourseVideosView,
     HomePageView,
     ProctoredExamSettingsView,
     ProctoringErrorsView,
@@ -19,6 +20,8 @@ from .views import (
     videos,
     transcripts,
     HelpUrlsView,
+    VideoDownloadView,
+    VideoUsageView
 )
 
 app_name = 'v1'
@@ -30,6 +33,21 @@ urlpatterns = [
         'home',
         HomePageView.as_view(),
         name="home"
+    ),
+    re_path(
+        fr'^videos/{COURSE_ID_PATTERN}$',
+        CourseVideosView.as_view(),
+        name="course_videos"
+    ),
+    re_path(
+        fr'^videos/{COURSE_ID_PATTERN}/{VIDEO_ID_PATTERN}$',
+        VideoDownloadView.as_view(),
+        name="video_download"
+    ),
+    re_path(
+        fr'^videos/{COURSE_ID_PATTERN}/{VIDEO_ID_PATTERN}/usage$',
+        VideoUsageView.as_view(),
+        name="video_usage"
     ),
     re_path(
         fr'^proctored_exam_settings/{COURSE_ID_PATTERN}$',
