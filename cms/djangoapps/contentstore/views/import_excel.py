@@ -8,7 +8,7 @@ from common.djangoapps.util.json_request import JsonResponse
 from opaque_keys.edx.keys import  CourseKey
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from cms.djangoapps.contentstore.views.item import create_item_import , _update_with_callback ,_save_xblock
-
+import openpyxl
 import tablib
 
 @login_required
@@ -41,7 +41,7 @@ def viewImportExcel (request, course_id) :
         #     # html = create_item_import(request, parent_locator= str(unit.location)  ,category='html')  
            
             section_block = create_item_import(request ,parent_locator, category='chapter', display_name='Nội dung khoá học')
-
+            list_video = []
             for data in dataImport:
                 if data[1] is not None :
                     if ':' in data[1] :
@@ -51,9 +51,17 @@ def viewImportExcel (request, course_id) :
                         unit_block=create_item_import(request, parent_locator=str(lesson_block.location), category='vertical', display_name='Nội dung bài học')
                         html_block =create_item_import(request, parent_locator= str(unit_block.location) ,category='html')  
                     if data[3] is not None and 'video' in data[3].lower() and data[5] is not None:
-                        
-                        _save_xblock(xblock=html_block , user=request.user, data=f'<p><a href="{data[5]}" title={data[2]}>video: {data[2]}</a></p>')
-
+                        videos =[]
+                        videos.append(data[5])
+                        list_video.append({'title' : data[2], 'video' : videos})
+                        # _save_xblock(xblock=html_block , user=request.user, data=f'<p><a href="{data[5]}" title={data[2]}>video: {data[2]}</a></p>')
+            url_video = ''
+            for v in list_video :
+      
+                for e in v['video'] :
+                    url_ = f'<p><a href="{e}" title={v["title"]}>Video: {v["title"]}</a></p>'
+                    url_video += url_
+            _save_xblock(xblock=html_block , user=request.user, data=url_video)
 
            
                   
