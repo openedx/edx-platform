@@ -1859,6 +1859,34 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
         assert event['undo_vote'] == undo
         assert event['vote_value'] == 'up'
 
+    @ddt.data('follow_thread', 'unfollow_thread',)
+    @patch('eventtracking.tracker.emit')
+    @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
+    def test_thread_followed_event(self, view_name, mock_request, mock_emit):
+        self._set_mock_request_data(mock_request, {
+            'closed': False,
+            'commentable_id': 'test_commentable_id',
+            'username': 'test_user',
+        })
+        request = RequestFactory().post('dummy_url', {})
+        request.user = self.student
+        request.view_name = view_name
+        view_function = getattr(views, view_name)
+        kwargs = dict(course_id=str(self.course.id))
+        kwargs['thread_id'] = 'thread_id'
+        view_function(request, **kwargs)
+
+        assert mock_emit.called
+        event_name, event_data = mock_emit.call_args[0]
+        action_name = 'followed' if view_name == 'follow_thread' else 'unfollowed'
+        expected_action_value = True if view_name == 'follow_thread' else False
+        assert event_name == f'edx.forum.thread.{action_name}'
+        assert event_data['commentable_id'] == 'test_commentable_id'
+        assert event_data['id'] == 'thread_id'
+        assert event_data['followed'] == expected_action_value
+        assert event_data['user_forums_roles'] == ['Student']
+        assert event_data['user_course_roles'] == ['Wizard']
+
 
 class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRequestSetupMixin):
 

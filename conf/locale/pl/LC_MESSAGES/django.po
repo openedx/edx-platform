@@ -150,7 +150,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-09-17 20:43+0000\n"
+"POT-Creation-Date: 2023-10-08 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Marcin Miłek, 2022\n"
 "Language-Team: Polish (https://app.transifex.com/open-edx/teams/6205/pl/)\n"
@@ -7294,6 +7294,14 @@ msgstr "Dodaj kraj \"{country}\" do czarnej listy kursu {course}"
 
 #: openedx/core/djangoapps/learner_pathway/apps.py
 msgid "Learner Pathways"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification App"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification Type"
 msgstr ""
 
 #: openedx/core/djangoapps/notifications/base_notification.py

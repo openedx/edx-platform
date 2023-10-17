@@ -6,7 +6,7 @@ from urllib.parse import parse_qs, urlparse
 
 import ddt
 from django.contrib.auth import get_user_model
-from django.test.testcases import override_settings
+from django.test import override_settings
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from openedx_tagging.core.tagging.models import Tag, Taxonomy
 from openedx_tagging.core.tagging.models.system_defined import SystemDefinedTaxonomy
@@ -25,6 +25,7 @@ User = get_user_model()
 TAXONOMY_ORG_LIST_URL = "/api/content_tagging/v1/taxonomies/"
 TAXONOMY_ORG_DETAIL_URL = "/api/content_tagging/v1/taxonomies/{pk}/"
 OBJECT_TAG_UPDATE_URL = "/api/content_tagging/v1/object_tags/{object_id}/?taxonomy={taxonomy_id}"
+TAXONOMY_TEMPLATE_URL = "/api/content_tagging/v1/taxonomies/import/{filename}"
 
 
 def check_taxonomy(
@@ -33,8 +34,7 @@ def check_taxonomy(
     name,
     description=None,
     enabled=True,
-    required=False,
-    allow_multiple=False,
+    allow_multiple=True,
     allow_free_text=False,
     system_defined=False,
     visible_to_authors=True,
@@ -47,7 +47,6 @@ def check_taxonomy(
     assert data["name"] == name
     assert data["description"] == description
     assert data["enabled"] == enabled
-    assert data["required"] == required
     assert data["allow_multiple"] == allow_multiple
     assert data["allow_free_text"] == allow_free_text
     assert data["system_defined"] == system_defined
@@ -271,18 +270,18 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     @ddt.data(
-        (None, "ot1", status.HTTP_403_FORBIDDEN),
-        (None, "ot2", status.HTTP_403_FORBIDDEN),
-        (None, "st1", status.HTTP_403_FORBIDDEN),
-        (None, "st2", status.HTTP_403_FORBIDDEN),
-        (None, "t1", status.HTTP_403_FORBIDDEN),
-        (None, "t2", status.HTTP_403_FORBIDDEN),
-        (None, "tA1", status.HTTP_403_FORBIDDEN),
-        (None, "tA2", status.HTTP_403_FORBIDDEN),
-        (None, "tB1", status.HTTP_403_FORBIDDEN),
-        (None, "tB2", status.HTTP_403_FORBIDDEN),
-        (None, "tC1", status.HTTP_403_FORBIDDEN),
-        (None, "tC2", status.HTTP_403_FORBIDDEN),
+        (None, "ot1", status.HTTP_401_UNAUTHORIZED),
+        (None, "ot2", status.HTTP_401_UNAUTHORIZED),
+        (None, "st1", status.HTTP_401_UNAUTHORIZED),
+        (None, "st2", status.HTTP_401_UNAUTHORIZED),
+        (None, "t1", status.HTTP_401_UNAUTHORIZED),
+        (None, "t2", status.HTTP_401_UNAUTHORIZED),
+        (None, "tA1", status.HTTP_401_UNAUTHORIZED),
+        (None, "tA2", status.HTTP_401_UNAUTHORIZED),
+        (None, "tB1", status.HTTP_401_UNAUTHORIZED),
+        (None, "tB2", status.HTTP_401_UNAUTHORIZED),
+        (None, "tC1", status.HTTP_401_UNAUTHORIZED),
+        (None, "tC2", status.HTTP_401_UNAUTHORIZED),
         ("user", "ot1", status.HTTP_200_OK),
         ("user", "ot2", status.HTTP_404_NOT_FOUND),
         ("user", "st1", status.HTTP_200_OK),
@@ -337,7 +336,7 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
             check_taxonomy(response.data, taxonomy.pk, **(TaxonomySerializer(taxonomy.cast()).data))
 
     @ddt.data(
-        (None, status.HTTP_403_FORBIDDEN),
+        (None, status.HTTP_401_UNAUTHORIZED),
         ("user", status.HTTP_403_FORBIDDEN),
         ("userA", status.HTTP_403_FORBIDDEN),
         ("userS", status.HTTP_201_CREATED),
@@ -350,7 +349,6 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
             "name": "taxonomy_data",
             "description": "This is a description",
             "enabled": True,
-            "required": True,
             "allow_multiple": True,
         }
 
@@ -370,18 +368,18 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
             check_taxonomy(response.data, response.data["id"], **create_data)
 
     @ddt.data(
-        (None, "ot1", status.HTTP_403_FORBIDDEN),
-        (None, "ot2", status.HTTP_403_FORBIDDEN),
-        (None, "st1", status.HTTP_403_FORBIDDEN),
-        (None, "st2", status.HTTP_403_FORBIDDEN),
-        (None, "t1", status.HTTP_403_FORBIDDEN),
-        (None, "t2", status.HTTP_403_FORBIDDEN),
-        (None, "tA1", status.HTTP_403_FORBIDDEN),
-        (None, "tA2", status.HTTP_403_FORBIDDEN),
-        (None, "tB1", status.HTTP_403_FORBIDDEN),
-        (None, "tB2", status.HTTP_403_FORBIDDEN),
-        (None, "tC1", status.HTTP_403_FORBIDDEN),
-        (None, "tC2", status.HTTP_403_FORBIDDEN),
+        (None, "ot1", status.HTTP_401_UNAUTHORIZED),
+        (None, "ot2", status.HTTP_401_UNAUTHORIZED),
+        (None, "st1", status.HTTP_401_UNAUTHORIZED),
+        (None, "st2", status.HTTP_401_UNAUTHORIZED),
+        (None, "t1", status.HTTP_401_UNAUTHORIZED),
+        (None, "t2", status.HTTP_401_UNAUTHORIZED),
+        (None, "tA1", status.HTTP_401_UNAUTHORIZED),
+        (None, "tA2", status.HTTP_401_UNAUTHORIZED),
+        (None, "tB1", status.HTTP_401_UNAUTHORIZED),
+        (None, "tB2", status.HTTP_401_UNAUTHORIZED),
+        (None, "tC1", status.HTTP_401_UNAUTHORIZED),
+        (None, "tC2", status.HTTP_401_UNAUTHORIZED),
         ("user", "ot1", status.HTTP_403_FORBIDDEN),
         ("user", "ot2", status.HTTP_403_FORBIDDEN),
         ("user", "st1", status.HTTP_403_FORBIDDEN),
@@ -444,7 +442,6 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
                     "name": "new name",
                     "description": taxonomy.description,
                     "enabled": taxonomy.enabled,
-                    "required": taxonomy.required,
                 },
             )
 
@@ -468,18 +465,18 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
         assert response.data["system_defined"] is True
 
     @ddt.data(
-        (None, "ot1", status.HTTP_403_FORBIDDEN),
-        (None, "ot2", status.HTTP_403_FORBIDDEN),
-        (None, "st1", status.HTTP_403_FORBIDDEN),
-        (None, "st2", status.HTTP_403_FORBIDDEN),
-        (None, "t1", status.HTTP_403_FORBIDDEN),
-        (None, "t2", status.HTTP_403_FORBIDDEN),
-        (None, "tA1", status.HTTP_403_FORBIDDEN),
-        (None, "tA2", status.HTTP_403_FORBIDDEN),
-        (None, "tB1", status.HTTP_403_FORBIDDEN),
-        (None, "tB2", status.HTTP_403_FORBIDDEN),
-        (None, "tC1", status.HTTP_403_FORBIDDEN),
-        (None, "tC2", status.HTTP_403_FORBIDDEN),
+        (None, "ot1", status.HTTP_401_UNAUTHORIZED),
+        (None, "ot2", status.HTTP_401_UNAUTHORIZED),
+        (None, "st1", status.HTTP_401_UNAUTHORIZED),
+        (None, "st2", status.HTTP_401_UNAUTHORIZED),
+        (None, "t1", status.HTTP_401_UNAUTHORIZED),
+        (None, "t2", status.HTTP_401_UNAUTHORIZED),
+        (None, "tA1", status.HTTP_401_UNAUTHORIZED),
+        (None, "tA2", status.HTTP_401_UNAUTHORIZED),
+        (None, "tB1", status.HTTP_401_UNAUTHORIZED),
+        (None, "tB2", status.HTTP_401_UNAUTHORIZED),
+        (None, "tC1", status.HTTP_401_UNAUTHORIZED),
+        (None, "tC2", status.HTTP_401_UNAUTHORIZED),
         ("user", "ot1", status.HTTP_403_FORBIDDEN),
         ("user", "ot2", status.HTTP_403_FORBIDDEN),
         ("user", "st1", status.HTTP_403_FORBIDDEN),
@@ -540,7 +537,6 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
                     "name": "new name",
                     "description": taxonomy.description,
                     "enabled": taxonomy.enabled,
-                    "required": taxonomy.required,
                 },
             )
 
@@ -564,18 +560,18 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
         assert response.data["system_defined"] is True
 
     @ddt.data(
-        (None, "ot1", status.HTTP_403_FORBIDDEN),
-        (None, "ot2", status.HTTP_403_FORBIDDEN),
-        (None, "st1", status.HTTP_403_FORBIDDEN),
-        (None, "st2", status.HTTP_403_FORBIDDEN),
-        (None, "t1", status.HTTP_403_FORBIDDEN),
-        (None, "t2", status.HTTP_403_FORBIDDEN),
-        (None, "tA1", status.HTTP_403_FORBIDDEN),
-        (None, "tA2", status.HTTP_403_FORBIDDEN),
-        (None, "tB1", status.HTTP_403_FORBIDDEN),
-        (None, "tB2", status.HTTP_403_FORBIDDEN),
-        (None, "tC1", status.HTTP_403_FORBIDDEN),
-        (None, "tC2", status.HTTP_403_FORBIDDEN),
+        (None, "ot1", status.HTTP_401_UNAUTHORIZED),
+        (None, "ot2", status.HTTP_401_UNAUTHORIZED),
+        (None, "st1", status.HTTP_401_UNAUTHORIZED),
+        (None, "st2", status.HTTP_401_UNAUTHORIZED),
+        (None, "t1", status.HTTP_401_UNAUTHORIZED),
+        (None, "t2", status.HTTP_401_UNAUTHORIZED),
+        (None, "tA1", status.HTTP_401_UNAUTHORIZED),
+        (None, "tA2", status.HTTP_401_UNAUTHORIZED),
+        (None, "tB1", status.HTTP_401_UNAUTHORIZED),
+        (None, "tB2", status.HTTP_401_UNAUTHORIZED),
+        (None, "tC1", status.HTTP_401_UNAUTHORIZED),
+        (None, "tC2", status.HTTP_401_UNAUTHORIZED),
         ("user", "ot1", status.HTTP_403_FORBIDDEN),
         ("user", "ot2", status.HTTP_403_FORBIDDEN),
         ("user", "st1", status.HTTP_403_FORBIDDEN),
@@ -668,13 +664,13 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
         )
 
         self.multiple_taxonomy = Taxonomy.objects.create(name="Multiple Taxonomy", allow_multiple=True)
-        self.required_taxonomy = Taxonomy.objects.create(name="Required Taxonomy", required=True)
+        self.single_value_taxonomy = Taxonomy.objects.create(name="Required Taxonomy", allow_multiple=False)
         for i in range(20):
             # Valid ObjectTags
             Tag.objects.create(taxonomy=self.tA1, value=f"Tag {i}")
             Tag.objects.create(taxonomy=self.tA2, value=f"Tag {i}")
             Tag.objects.create(taxonomy=self.multiple_taxonomy, value=f"Tag {i}")
-            Tag.objects.create(taxonomy=self.required_taxonomy, value=f"Tag {i}")
+            Tag.objects.create(taxonomy=self.single_value_taxonomy, value=f"Tag {i}")
 
         self.open_taxonomy = Taxonomy.objects.create(name="Enabled Free-Text Taxonomy", allow_free_text=True)
 
@@ -685,7 +681,7 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
             rel_type=TaxonomyOrg.RelType.OWNER,
         )
         TaxonomyOrg.objects.create(
-            taxonomy=self.required_taxonomy,
+            taxonomy=self.single_value_taxonomy,
             org=self.orgA,
             rel_type=TaxonomyOrg.RelType.OWNER,
         )
@@ -699,24 +695,24 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
 
     @ddt.data(
         # userA and userS are staff in courseA and can tag using enabled taxonomies
-        (None, "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
+        (None, "tA1", ["Tag 1"], status.HTTP_401_UNAUTHORIZED),
         ("user", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
         ("userA", "tA1", ["Tag 1"], status.HTTP_200_OK),
         ("userS", "tA1", ["Tag 1"], status.HTTP_200_OK),
-        (None, "tA1", [], status.HTTP_403_FORBIDDEN),
+        (None, "tA1", [], status.HTTP_401_UNAUTHORIZED),
         ("user", "tA1", [], status.HTTP_403_FORBIDDEN),
         ("userA", "tA1", [], status.HTTP_200_OK),
         ("userS", "tA1", [], status.HTTP_200_OK),
-        (None, "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_403_FORBIDDEN),
+        (None, "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_401_UNAUTHORIZED),
         ("user", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_403_FORBIDDEN),
         ("userA", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
         ("userS", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
-        (None, "open_taxonomy", ["tag1"], status.HTTP_403_FORBIDDEN),
+        (None, "open_taxonomy", ["tag1"], status.HTTP_401_UNAUTHORIZED),
         ("user", "open_taxonomy", ["tag1"], status.HTTP_403_FORBIDDEN),
         ("userA", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
         ("userS", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
         # Only userS is Tagging Admin and can tag objects using disabled taxonomies
-        (None, "tA2", ["Tag 1"], status.HTTP_403_FORBIDDEN),
+        (None, "tA2", ["Tag 1"], status.HTTP_401_UNAUTHORIZED),
         ("user", "tA2", ["Tag 1"], status.HTTP_403_FORBIDDEN),
         ("userA", "tA2", ["Tag 1"], status.HTTP_403_FORBIDDEN),
         ("userS", "tA2", ["Tag 1"], status.HTTP_200_OK),
@@ -740,11 +736,11 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
 
     @ddt.data(
         # Can't add invalid tags to a object using a closed taxonomy
-        (None, "tA1", ["invalid"], status.HTTP_403_FORBIDDEN),
+        (None, "tA1", ["invalid"], status.HTTP_401_UNAUTHORIZED),
         ("user", "tA1", ["invalid"], status.HTTP_403_FORBIDDEN),
         ("userA", "tA1", ["invalid"], status.HTTP_400_BAD_REQUEST),
         ("userS", "tA1", ["invalid"], status.HTTP_400_BAD_REQUEST),
-        (None, "multiple_taxonomy", ["invalid"], status.HTTP_403_FORBIDDEN),
+        (None, "multiple_taxonomy", ["invalid"], status.HTTP_401_UNAUTHORIZED),
         ("user", "multiple_taxonomy", ["invalid"], status.HTTP_403_FORBIDDEN),
         ("userA", "multiple_taxonomy", ["invalid"], status.HTTP_400_BAD_REQUEST),
         ("userS", "multiple_taxonomy", ["invalid"], status.HTTP_400_BAD_REQUEST),
@@ -767,24 +763,24 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
 
     @ddt.data(
         # userA and userS are staff in courseA (owner of xblockA) and can tag using enabled taxonomies
-        (None, "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
+        (None, "tA1", ["Tag 1"], status.HTTP_401_UNAUTHORIZED),
         ("user", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
         ("userA", "tA1", ["Tag 1"], status.HTTP_200_OK),
         ("userS", "tA1", ["Tag 1"], status.HTTP_200_OK),
-        (None, "tA1", [], status.HTTP_403_FORBIDDEN),
+        (None, "tA1", [], status.HTTP_401_UNAUTHORIZED),
         ("user", "tA1", [], status.HTTP_403_FORBIDDEN),
         ("userA", "tA1", [], status.HTTP_200_OK),
         ("userS", "tA1", [], status.HTTP_200_OK),
-        (None, "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_403_FORBIDDEN),
+        (None, "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_401_UNAUTHORIZED),
         ("user", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_403_FORBIDDEN),
         ("userA", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
         ("userS", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
-        (None, "open_taxonomy", ["tag1"], status.HTTP_403_FORBIDDEN),
+        (None, "open_taxonomy", ["tag1"], status.HTTP_401_UNAUTHORIZED),
         ("user", "open_taxonomy", ["tag1"], status.HTTP_403_FORBIDDEN),
         ("userA", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
         ("userS", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
         # Only userS is Tagging Admin and can tag objects using disabled taxonomies
-        (None, "tA2", ["Tag 1"], status.HTTP_403_FORBIDDEN),
+        (None, "tA2", ["Tag 1"], status.HTTP_401_UNAUTHORIZED),
         ("user", "tA2", ["Tag 1"], status.HTTP_403_FORBIDDEN),
         ("userA", "tA2", ["Tag 1"], status.HTTP_403_FORBIDDEN),
         ("userS", "tA2", ["Tag 1"], status.HTTP_200_OK),
@@ -808,11 +804,11 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
 
     @ddt.data(
         # Can't add invalid tags to a object using a closed taxonomy
-        (None, "tA1", ["invalid"], status.HTTP_403_FORBIDDEN),
+        (None, "tA1", ["invalid"], status.HTTP_401_UNAUTHORIZED),
         ("user", "tA1", ["invalid"], status.HTTP_403_FORBIDDEN),
         ("userA", "tA1", ["invalid"], status.HTTP_400_BAD_REQUEST),
         ("userS", "tA1", ["invalid"], status.HTTP_400_BAD_REQUEST),
-        (None, "multiple_taxonomy", ["invalid"], status.HTTP_403_FORBIDDEN),
+        (None, "multiple_taxonomy", ["invalid"], status.HTTP_401_UNAUTHORIZED),
         ("user", "multiple_taxonomy", ["invalid"], status.HTTP_403_FORBIDDEN),
         ("userA", "multiple_taxonomy", ["invalid"], status.HTTP_400_BAD_REQUEST),
         ("userS", "multiple_taxonomy", ["invalid"], status.HTTP_400_BAD_REQUEST),
@@ -849,3 +845,33 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
         response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@skip_unless_cms
+@ddt.ddt
+class TestDownloadTemplateView(APITestCase):
+    """
+    Tests the taxonomy template downloads.
+    """
+    @ddt.data(
+        ("template.csv", "text/csv"),
+        ("template.json", "application/json"),
+    )
+    @ddt.unpack
+    def test_download(self, filename, content_type):
+        url = TAXONOMY_TEMPLATE_URL.format(filename=filename)
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.headers['Content-Type'] == content_type
+        assert response.headers['Content-Disposition'] == f'attachment; filename="{filename}"'
+        assert int(response.headers['Content-Length']) > 0
+
+    def test_download_not_found(self):
+        url = TAXONOMY_TEMPLATE_URL.format(filename="template.txt")
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_download_method_not_allowed(self):
+        url = TAXONOMY_TEMPLATE_URL.format(filename="template.txt")
+        response = self.client.post(url)
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
