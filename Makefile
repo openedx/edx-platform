@@ -117,6 +117,8 @@ $(COMMON_CONSTRAINTS_TXT):
 
 compile-requirements: export CUSTOM_COMPILE_COMMAND=make upgrade
 compile-requirements: pre-requirements $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements to *.txt
+	sed 's/tox<4.0.0//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
+	mv requirements/common_constraints.tmp requirements/common_constraints.txt
 	@# Bootstrapping: Rebuild pip and pip-tools first, and then install them
 	@# so that if there are any failures we'll know now, rather than the next
 	@# time someone tries to use the outputs.
@@ -143,9 +145,7 @@ $(COMMON_CONSTRAINTS_TXT):
 	wget -O "$(@)" https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt || touch "$(@)"
 	echo "$(COMMON_CONSTRAINTS_TEMP_COMMENT)" | cat - $(@) > temp && mv temp $(@)
 
-upgrade: $(COMMON_CONSTRAINTS_TXT) ## update the pip requirements files to use the latest releases satisfying our constraints
-	sed 's/tox<4.0.0//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
-	mv requirements/common_constraints.tmp requirements/common_constraints.txt
+upgrade:  ## update the pip requirements files to use the latest releases satisfying our constraints
 	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade"
 
 upgrade-package: ## update just one package to the latest usable release
