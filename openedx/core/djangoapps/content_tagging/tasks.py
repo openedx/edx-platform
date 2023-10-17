@@ -35,7 +35,7 @@ def _set_initial_language_tag(content_key: ContentKey, lang_code: str) -> None:
     """
     lang_taxonomy = Taxonomy.objects.get(pk=LANGUAGE_TAXONOMY_ID).cast()
 
-    if lang_code and not api.get_content_tags(object_key=content_key, taxonomy_id=lang_taxonomy.id).exists():
+    if lang_code and not api.get_content_tags(object_key=content_key, taxonomy_id=lang_taxonomy.id):
         try:
             lang_tag = lang_taxonomy.tag_for_external_id(lang_code)
         except api.oel_tagging.TagDoesNotExist:
