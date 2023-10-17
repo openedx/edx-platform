@@ -41,6 +41,9 @@ perms[ENABLE_CERTIFICATE_GENERATION] = is_staff
 perms[GENERATE_CERTIFICATE_EXCEPTIONS] = is_staff
 perms[GENERATE_BULK_CERTIFICATE_EXCEPTIONS] = is_staff
 perms[GIVE_STUDENT_EXTENSION] = HasAccessRule('staff')
+# TODO: course roles: If the course roles feature flag is disabled the HasPermissionRule
+#       below will never return true.
+#       Remove the HasRolesRule('data_researcher') call when course_roles Django app are implemented.
 perms[VIEW_ISSUED_CERTIFICATES] = (
     HasAccessRule('staff')
     | HasRolesRule('data_researcher')
@@ -48,16 +51,25 @@ perms[VIEW_ISSUED_CERTIFICATES] = (
 )
 # only global staff or those with the data_researcher role can access the data download tab
 # HasAccessRule('staff') also includes course staff
+# TODO: course roles: If the course roles feature flag is disabled the HasPermissionRule
+#       below will never return true.
+#       Remove the HasRolesRule('data_researcher') call when course_roles Django app are implemented.
 perms[CAN_RESEARCH] = (
     is_staff | HasRolesRule('data_researcher') | HasPermissionRule(CourseRolesPermission.ACCESS_DATA_DOWNLOADS.value)
 )
 perms[CAN_ENROLL] = HasAccessRule('staff')
 perms[CAN_BETATEST] = HasAccessRule('instructor')
+# TODO: course roles: If the course roles feature flag is disabled the HasPermissionRule
+#       below will never return true.
+#       Remove the HasRolesRule('data_researcher') call when course_roles Django app are implemented.
 perms[ENROLLMENT_REPORT] = (
     HasAccessRule('staff')
     | HasRolesRule('data_researcher')
     | HasPermissionRule(CourseRolesPermission.ACCESS_DATA_DOWNLOADS.value)
 )
+# TODO: course roles: If the course roles feature flag is disabled the HasPermissionRule
+#       below will never return true.
+#       Remove the HasRolesRule('data_researcher') call when course_roles Django app are implemented.
 perms[VIEW_COUPONS] = (
     HasAccessRule('staff')
     | HasRolesRule('data_researcher')
@@ -65,6 +77,9 @@ perms[VIEW_COUPONS] = (
 )
 perms[EXAM_RESULTS] = HasAccessRule('staff')
 perms[OVERRIDE_GRADES] = HasAccessRule('staff')
+# TODO: course roles: If the course roles feature flag is disabled the HasPermissionRule
+#       below will never return true.
+#       Remove the HasRolesRule('data_researcher') call when course_roles Django app are implemented.
 perms[SHOW_TASKS] = (
     HasAccessRule('staff')
     | HasRolesRule('data_researcher')
@@ -77,6 +92,9 @@ perms[SHOW_TASKS] = (
 perms[EMAIL] = HasAccessRule('staff')
 perms[RESCORE_EXAMS] = HasAccessRule('instructor')
 perms[VIEW_REGISTRATION] = HasAccessRule('staff')
+# TODO: course roles: If the course roles feature flag is disabled the HasPermissionRule
+#       below will never return true.
+#       Remove the HasRolesRule('staff', 'instructor', 'data_researcher') call when course_roles Django app are implemented.
 perms[VIEW_DASHBOARD] = (
     HasRolesRule('staff', 'instructor', 'data_researcher')
     | HasAccessRule('staff')
