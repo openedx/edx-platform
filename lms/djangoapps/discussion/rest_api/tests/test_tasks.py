@@ -307,6 +307,7 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'replier_name': self.user_2.username,
             'post_title': 'test thread',
             'course_name': self.course.display_name,
+            'sender_id': self.user_2.id
         }
         self.assertDictEqual(args.context, expected_context)
         self.assertEqual(
@@ -344,6 +345,7 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'post_title': self.thread.title,
             'author_name': 'dummy\'s',
             'course_name': self.course.display_name,
+            'sender_id': self.user_3.id
         }
         self.assertDictEqual(args_comment.context, expected_context)
         self.assertEqual(
@@ -359,6 +361,7 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'replier_name': self.user_3.username,
             'post_title': self.thread.title,
             'course_name': self.course.display_name,
+            'sender_id': self.user_3.id
         }
         self.assertDictEqual(args_comment_on_response.context, expected_context)
         self.assertEqual(
@@ -404,6 +407,7 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'post_title': self.thread.title,
             'author_name': 'your',
             'course_name': self.course.display_name,
+            'sender_id': self.user_3.id,
         }
         self.assertDictEqual(args_comment.context, expected_context)
         self.assertEqual(
@@ -440,6 +444,7 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'replier_name': self.user_2.username,
             'post_title': 'test thread',
             'course_name': self.course.display_name,
+            'sender_id': self.user_2.id,
         }
         if parent_id:
             expected_context['author_name'] = 'dummy'

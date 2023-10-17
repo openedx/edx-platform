@@ -97,6 +97,7 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
 
     notifications_generated = False
     notification_content = ''
+    sender_id = context.pop('sender_id', None)
     default_web_config = get_default_values_of_preference(app_name, notification_type).get('web', True)
     for batch_user_ids in get_list_in_batches(user_ids, batch_size):
         # check if what is preferences of user and make decision to send notification or not
@@ -146,6 +147,7 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
         if notifications_generated:
             notification_generated_event(
                 batch_user_ids, app_name, notification_type, course_key, content_url, notification_content,
+                sender_id=sender_id
             )
 
 
