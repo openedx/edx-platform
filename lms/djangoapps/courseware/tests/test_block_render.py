@@ -362,7 +362,7 @@ class BlockRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_session_authentication(self):
         """ Test that the xblock endpoint supports session authentication."""
-        self.client.login(username=self.mock_user.username, password="test")
+        self.client.login(username=self.mock_user.username, password=self.TEST_PASSWORD)
         dispatch_url = self._get_dispatch_url()
         response = self.client.post(dispatch_url)
         assert 200 == response.status_code
@@ -387,7 +387,7 @@ class BlockRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Test that sending POST request without or invalid position argument don't raise server error
         """
-        self.client.login(username=self.mock_user.username, password="test")
+        self.client.login(username=self.mock_user.username, password=self.TEST_PASSWORD)
         dispatch_url = self._get_dispatch_url()
         response = self.client.post(dispatch_url)
         assert 200 == response.status_code

@@ -294,6 +294,45 @@ class RegistrationViewValidationErrorTest(
             }
         )
 
+        # testing for http/https
+        response = self.client.post(self.url, {
+            "email": "bob@example.com",
+            "name": "http://",
+            "username": "bob",
+            "password": "password",
+            "honor_code": "true",
+        })
+        assert response.status_code == 400
+        response_json = json.loads(response.content.decode('utf-8'))
+        self.assertDictEqual(
+            response_json,
+            {
+                "name": [{"user_message": 'Enter a valid name'}],
+                "error_code": "validation-error"
+            }
+        )
+
+    def test_register_fullname_html_validation_error(self):
+        """
+        Test for catching invalid full name errors
+        """
+        response = self.client.post(self.url, {
+            "email": "bob@example.com",
+            "name": "<Bob Smith>",
+            "username": "bob",
+            "password": "password",
+            "honor_code": "true",
+        })
+        assert response.status_code == 400
+        response_json = json.loads(response.content.decode('utf-8'))
+        self.assertDictEqual(
+            response_json,
+            {
+                'name': [{'user_message': 'Full Name cannot contain the following characters: < >'}],
+                "error_code": "validation-error"
+            }
+        )
+
     def test_register_duplicate_username_account_validation_error(self):
         # Register the first user
         response = self.client.post(self.url, {
@@ -2689,20 +2728,30 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestM
             {"username": str(USERNAME_INVALID_CHARS_ASCII)}
         )
 
+    @override_settings(AUTH_PASSWORD_VALIDATORS=[
+        create_validator_config(
+            'common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 4}
+        )
+    ])
     def test_password_empty_validation_decision(self):
         # 2 is the default setting for minimum length found in lms/envs/common.py
         # under AUTH_PASSWORD_VALIDATORS.MinimumLengthValidator
-        msg = 'This password is too short. It must contain at least 2 characters.'
+        msg = 'This password is too short. It must contain at least 4 characters.'
         self.assertValidationDecision(
             {'password': ''},
             {"password": msg}
         )
 
+    @override_settings(AUTH_PASSWORD_VALIDATORS=[
+        create_validator_config(
+            'common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 4}
+        )
+    ])
     def test_password_bad_min_length_validation_decision(self):
         password = 'p'
         # 2 is the default setting for minimum length found in lms/envs/common.py
         # under AUTH_PASSWORD_VALIDATORS.MinimumLengthValidator
-        msg = 'This password is too short. It must contain at least 2 characters.'
+        msg = 'This password is too short. It must contain at least 4 characters.'
         self.assertValidationDecision(
             {'password': password},
             {"password": msg}

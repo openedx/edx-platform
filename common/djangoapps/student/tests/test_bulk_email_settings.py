@@ -33,7 +33,7 @@ class TestStudentDashboardEmailView(SharedModuleStoreTestCase):
         # Create student account
         student = UserFactory.create()
         CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
-        self.client.login(username=student.username, password="test")
+        self.client.login(username=student.username, password=self.TEST_PASSWORD)
 
         self.url = reverse('dashboard')
         # URL for email settings modal

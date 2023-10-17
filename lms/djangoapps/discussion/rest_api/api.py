@@ -37,7 +37,6 @@ from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
-from lms.djangoapps.discussion.rest_api.tasks import send_thread_created_notification
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.toggles_utils import reported_content_email_notification_enabled
 from lms.djangoapps.discussion.views import is_privileged_user
@@ -94,7 +93,7 @@ from ..django_comment_client.base.views import (
     track_voted_event,
     track_discussion_reported_event,
     track_discussion_unreported_event,
-    track_forum_search_event
+    track_forum_search_event, track_thread_followed_event
 )
 from ..django_comment_client.utils import (
     get_group_id_for_user,
@@ -128,9 +127,8 @@ from .utils import (
     discussion_open_for_user,
     get_usernames_for_course,
     get_usernames_from_search_string,
-    is_posting_allowed,
-    send_response_notifications,
     set_attribute,
+    is_posting_allowed
 )
 
 
@@ -1335,7 +1333,7 @@ def _do_extra_actions(api_content, cc_content, request_fields, actions_form, con
         if field in request_fields and field in api_content and form_value != api_content[field]:
             api_content[field] = form_value
             if field == "following":
-                _handle_following_field(form_value, context["cc_requester"], cc_content)
+                _handle_following_field(form_value, context["cc_requester"], cc_content, request)
             elif field == "abuse_flagged":
                 _handle_abuse_flagged_field(form_value, context["cc_requester"], cc_content, request)
             elif field == "voted":
@@ -1348,12 +1346,15 @@ def _do_extra_actions(api_content, cc_content, request_fields, actions_form, con
                 raise ValidationError({field: ["Invalid Key"]})
 
 
-def _handle_following_field(form_value, user, cc_content):
+def _handle_following_field(form_value, user, cc_content, request):
     """follow/unfollow thread for the user"""
+    course_key = CourseKey.from_string(cc_content.course_id)
+    course = get_course_with_access(request.user, 'load', course_key)
     if form_value:
         user.follow(cc_content)
     else:
         user.unfollow(cc_content)
+    track_thread_followed_event(request, course, cc_content, form_value)
 
 
 def _handle_abuse_flagged_field(form_value, user, cc_content, request):
@@ -1469,8 +1470,6 @@ def create_thread(request, thread_data):
     track_thread_created_event(request, course, cc_thread, actions_form.cleaned_data["following"],
                                from_mfe_sidebar)
 
-    thread_id = cc_thread.attributes['id']
-    send_thread_created_notification.apply_async(args=[thread_id, str(course.id), request.user.id])
     return api_thread
 
 
@@ -1517,8 +1516,6 @@ def create_comment(request, comment_data):
 
     track_comment_created_event(request, course, cc_comment, cc_thread["commentable_id"], followed=False,
                                 from_mfe_sidebar=from_mfe_sidebar)
-    send_response_notifications(thread=cc_thread, course=course, creator=request.user,
-                                parent_id=comment_data.get("parent_id"))
     return api_comment
 
 
