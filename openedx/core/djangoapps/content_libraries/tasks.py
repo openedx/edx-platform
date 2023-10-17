@@ -357,17 +357,17 @@ def get_import_task_is_in_progress(dest_block_key):
 
 
 def _assert_cms():
-   """
-   Raise an assertion error if this function is run in the context of LMS.
+    """
+    Raise an assertion error if this function is run in the context of LMS.
 
-   Several functions in this file manage the copying/updating of blocks in modulestore
-   and blockstore. These operations should only be performed within the context of CMS.
-   However, due to existing edx-platform code structure, we've had to define the functions
-   in shared source tree (openedx/) and the tasks are registered in both LMS and CMS.
+    Several functions in this file manage the copying/updating of blocks in modulestore
+    and blockstore. These operations should only be performed within the context of CMS.
+    However, due to existing edx-platform code structure, we've had to define the functions
+    in shared source tree (openedx/) and the tasks are registered in both LMS and CMS.
 
-   A longer-term solution to this issue would be to move the content_libraries app to cms:
-   https://github.com/openedx/edx-platform/issues/33428
-   """
-   assert settings.ROOT_URLCONF == 'cms.urls', (
-       "Content library block operations must be performed in a CMS context!"
-   )
+    A longer-term solution to this issue would be to move the content_libraries app to cms:
+    https://github.com/openedx/edx-platform/issues/33428
+    """
+    assert settings.ROOT_URLCONF == 'cms.urls', (
+        "Content library block operations must be performed in a CMS context!"
+    )
