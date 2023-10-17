@@ -1021,10 +1021,12 @@ def validate_all_library_source_blocks_ids_for_course(course_key_string, v1_to_v
             )
             for xblock in blocks:
                 if xblock.source_library_id not in v1_to_v2_lib_map.values():
-                    # lint-amnesty, pylint: disable=broad-except
-                    raise Exception(
-                        f'{xblock.source_library_id} in {course_id} is not found in mapping. Validation failed'
-                    )
+                    lib_version = xblock.source_library_id.split(':')[0]
+                    if lib_version is "library-v1":
+                        # lint-amnesty, pylint: disable=broad-except
+                        raise Exception(
+                            f'{xblock.source_library_id} in {course_id} is not found in mapping and points to v1 library. Validation failed'
+                        )
                 visited.append(xblock.source_library_id)
     # return sucess
     return visited
