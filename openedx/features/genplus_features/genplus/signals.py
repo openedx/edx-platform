@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.db.models.signals import post_save, pre_save
 from .models import GenUser, Student, Teacher, Class, JournalPost, Activity, GenLog
-from .constants import JournalTypes, ActivityTypes, GenLogTypes
+from .constants import JournalTypes, ActivityTypes, GenLogTypes, SchoolTypes
 
 USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
@@ -18,6 +18,15 @@ def create_user_profile(sender, instance, created, **kwargs):
             Student.objects.create(gen_user=instance)
         elif instance.is_teacher:
             Teacher.objects.create(gen_user=instance)
+    if instance.user is not None and instance.school.type == SchoolTypes.XPORTER:
+            # update the user profile name in case of xporter school
+            try:
+                _user = instance.user
+                _user.profile.name = f'{_user.first_name} {_user.last_name}'
+                _user.profile.save()
+            except Exception as e:
+                logger.exception(str(e))
+
     if not created:
         # create a gen log if school is updated for gen user
         if instance.school != instance.pre_save_instance.school:
