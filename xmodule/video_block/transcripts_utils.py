@@ -19,7 +19,6 @@ from opaque_keys.edx.locator import BundleDefinitionLocator
 from pysrt import SubRipFile, SubRipItem, SubRipTime
 from pysrt.srtexc import Error
 
-from openedx.core.djangolib import blockstore_cache
 from openedx.core.lib import blockstore_api
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore

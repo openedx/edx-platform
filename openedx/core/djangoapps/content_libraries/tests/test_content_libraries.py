@@ -28,7 +28,6 @@ from openedx.core.djangoapps.content_libraries.tests.base import (
     URL_BLOCK_XBLOCK_HANDLER,
 )
 from openedx.core.djangoapps.content_libraries.constants import VIDEO, COMPLEX, PROBLEM, CC_4_BY, ALL_RIGHTS_RESERVED
-from openedx.core.djangolib.blockstore_cache import cache
 from openedx.core.lib import blockstore_api
 from common.djangoapps.student.tests.factories import UserFactory
 

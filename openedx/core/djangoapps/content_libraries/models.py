@@ -56,6 +56,7 @@ from openedx.core.djangoapps.content_libraries.constants import (
     LIBRARY_TYPES, COMPLEX, LICENSE_OPTIONS,
     ALL_RIGHTS_RESERVED,
 )
+from openedx_learning.core.publishing.models import LearningPackage
 from organizations.models import Organization  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .apps import ContentLibrariesConfig
@@ -75,7 +76,8 @@ class ContentLibraryManager(models.Manager):
         Get the ContentLibrary for the given LibraryLocatorV2 key.
         """
         assert isinstance(library_key, LibraryLocatorV2)
-        return self.get(org__short_name=library_key.org, slug=library_key.slug)
+        return self.select_related('learning_package') \
+                   .get(org__short_name=library_key.org, slug=library_key.slug)
 
 
 class ContentLibrary(models.Model):
@@ -97,9 +99,19 @@ class ContentLibrary(models.Model):
     # e.g. "lib:org:slug" is the opaque key for a library.
     org = models.ForeignKey(Organization, on_delete=models.PROTECT, null=False)
     slug = models.SlugField(allow_unicode=True)
-    bundle_uuid = models.UUIDField(unique=True, null=False)
     type = models.CharField(max_length=25, default=COMPLEX, choices=LIBRARY_TYPES)
     license = models.CharField(max_length=25, default=ALL_RIGHTS_RESERVED, choices=LICENSE_OPTIONS)
+    learning_package = models.OneToOneField(
+        LearningPackage,
+        # We can't delete the LearningPackage that holds a Library's content
+        # unless we're deleting both at the same time.
+        on_delete=models.RESTRICT,
+        # This is nullable mostly for backwards compatibility, though it should
+        # be possible to have the abstract notion of a Library with no actual
+        # content in it yet.
+        null=True,
+        default=None,
+    )
 
     # How is this library going to be used?
     allow_public_learning = models.BooleanField(
@@ -527,3 +539,4 @@ class LtiGradedResource(models.Model):
 
     def __str__(self):
         return str(self.usage_key)
+

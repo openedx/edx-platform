@@ -9,32 +9,36 @@ Studio APIs cover use cases like adding/deleting/editing blocks.
 """
 # pylint: disable=unused-import
 
+from datetime import datetime
 import logging
 import threading
 
 from django.urls import reverse
 from django.utils.translation import gettext as _
+from openedx_learning.core.components import api as components_api
+from openedx_learning.core.publishing import api as publishing_api
 from opaque_keys.edx.keys import UsageKeyV2
-from opaque_keys.edx.locator import BundleDefinitionLocator
+from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryUsageLocatorV2
+
 from rest_framework.exceptions import NotFound
 from xblock.core import XBlock
 from xblock.exceptions import NoSuchViewError
 
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
-from openedx.core.djangoapps.xblock.runtime.blockstore_runtime import BlockstoreXBlockRuntime, xml_for_definition
+
+from openedx.core.djangoapps.xblock.runtime.learning_core_runtime import (
+    LearningCoreFieldData,
+    LearningCoreOpaqueKeyReader,
+    LearningCoreXBlockRuntime,
+)
+
+
 from openedx.core.djangoapps.xblock.runtime.runtime import XBlockRuntimeSystem as _XBlockRuntimeSystem
-from openedx.core.djangolib.blockstore_cache import BundleCache
 from .utils import get_secure_token_for_xblock_handler, get_xblock_id_for_anonymous_user
 
 # Made available as part of this package's public API:
 from openedx.core.djangoapps.xblock.learning_context import LearningContext
-from openedx.core.djangoapps.xblock.runtime.olx_parsing import (
-    BundleFormatException,
-    definition_for_include,
-    parse_xblock_include,
-    XBlockInclude,
-)
 
 # Implementation:
 
@@ -50,6 +54,10 @@ def get_runtime_system():
     keep application startup faster, it's only initialized when first accessed
     via this method.
     """
+    # TODO: Is any of the following necessary now that we're no longer using
+    # Blockstore or its caching mechanisms? And why were we doing a dict with
+    # attributes manually set by thread ID instead of a ContextVar?
+    #
     # The runtime system should not be shared among threads, as there is currently a race condition when parsing XML
     # that can lead to duplicate children.
     # (In BlockstoreXBlockRuntime.get_block(), has_cached_definition(def_id) returns false so parse_xml is called, but
@@ -63,12 +71,25 @@ def get_runtime_system():
     if not hasattr(get_runtime_system, cache_name):
         params = dict(
             handler_url=get_handler_url,
-            runtime_class=BlockstoreXBlockRuntime,
+            runtime_class=LearningCoreXBlockRuntime,
         )
         params.update(get_xblock_app_config().get_runtime_system_params())
         setattr(get_runtime_system, cache_name, _XBlockRuntimeSystem(**params))
     return getattr(get_runtime_system, cache_name)
 
+def get_runtime_system():
+    params = get_xblock_app_config().get_runtime_system_params()
+    params.update(
+        runtime_class=LearningCoreXBlockRuntime,
+        handler_url=get_handler_url,
+        authored_data_store=LearningCoreFieldData(),
+    )
+    start = datetime.now()
+    runtime = _XBlockRuntimeSystem(**params)
+    end = datetime.now()
+    log.info(f"Runtime initiated in {end - start}")
+
+    return runtime
 
 def load_block(usage_key, user):
     """
@@ -87,6 +108,9 @@ def load_block(usage_key, user):
     # Is this block part of a course, a library, or what?
     # Get the Learning Context Implementation based on the usage key
     context_impl = get_learning_context_impl(usage_key)
+
+    log.error(f"load_block using {context_impl} for {usage_key}")
+
     # Now, check if the block exists in this context and if the user has
     # permission to render this XBlock view:
     if user is not None and not context_impl.can_view_block(user, usage_key):
@@ -172,39 +196,38 @@ def xblock_type_display_name(block_type):
         return block_type  # Just use the block type as the name
 
 
+def _get_component_from_usage_key(self, usage_key):
+    learning_package = publishing_api.get_learning_package_by_key(str(usage_key.lib_key))
+    return components_api.get_component_by_key(
+        learning_package.id,
+        namespace='xblock.v1',
+        type_name=usage_key.block_type,
+        local_key=usage_key.block_id,
+    )
+
+def get_library_block_olx(usage_key: LibraryUsageLocatorV2):
+    """
+    Get the OLX source of the given XBlock.
+    """
+    # Inefficient but simple approach first
+    component = _get_component_from_usage_key(usage_key)
+    component_version = component.versioning.draft
+    text_content = component_version.contents.get(key="block.xml").text_content
+
+    return text_content.text
+
+
 def get_block_display_name(block_or_key):
-    """
-    Efficiently get the display name of the specified block. This is done in a
-    way that avoids having to load and parse the block's entire XML field data
-    using its parse_xml() method, which may be very expensive (e.g. the video
-    XBlock parse_xml leads to various slow edxval API calls in some cases).
+    if isinstance(block_or_key, XBlock):
+        return block_or_key.display_name
+    elif isinstance(block_or_key, UsageKeyV2):
+        component = _get_component_from_usage_key(block_or_key)
+        return component.draft.title if component.draft else ""
 
-    This method also defines and implements various fallback mechanisms in case
-    the ID can't be loaded.
-
-    block_or_key can be an XBlock instance, a usage key or a definition key.
-
-    Returns the display name as a string
-    """
-    def_key = resolve_definition(block_or_key)
-    use_draft = get_xblock_app_config().get_learning_context_params().get('use_draft')
-    cache = BundleCache(def_key.bundle_uuid, draft_name=use_draft)
-    cache_key = ('block_display_name', str(def_key))
-    display_name = cache.get(cache_key)
-    if display_name is None:
-        # Instead of loading the block, just load its XML and parse it
-        try:
-            olx_node = xml_for_definition(def_key)
-        except Exception:  # pylint: disable=broad-except
-            log.exception("Error when trying to get display_name for block definition %s", def_key)
-            # Return now so we don't cache the error result
-            return xblock_type_display_name(def_key.block_type)
-        try:
-            display_name = olx_node.attrib['display_name']
-        except KeyError:
-            display_name = xblock_type_display_name(def_key.block_type)
-        cache.set(cache_key, display_name)
-    return display_name
+    raise TypeError(
+        "display_name lookup expects a UsageKeyV2 or XBlock, " +
+        f"got {type(block_or_key)}: {block_or_key} instead"
+    )
 
 
 def render_block_view(block, view_name, user):  # pylint: disable=unused-argument

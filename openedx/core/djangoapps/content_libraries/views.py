@@ -62,8 +62,6 @@ from openedx.core.djangoapps.content_libraries.serializers import (
     LibraryXBlockCreationSerializer,
     LibraryXBlockMetadataSerializer,
     LibraryXBlockTypeSerializer,
-    LibraryBundleLinkSerializer,
-    LibraryBundleLinkUpdateSerializer,
     LibraryXBlockOlxSerializer,
     LibraryXBlockStaticFileSerializer,
     LibraryXBlockStaticFilesSerializer,
@@ -143,7 +141,6 @@ class LibraryRootView(APIView):
     Views to list, search for, and create content libraries.
     """
 
-    @atomic
     @apidocs.schema(
         parameters=[
             *LibraryApiPagination.apidoc_params,
@@ -171,13 +168,17 @@ class LibraryRootView(APIView):
 
         paginator = LibraryApiPagination()
         queryset = api.get_libraries_for_user(request.user, org=org, library_type=library_type)
-        if text_search:
-            result = api.get_metadata(queryset, text_search=text_search)
-            result = paginator.paginate_queryset(result, request)
-        else:
-            # We can paginate queryset early and prevent fetching unneeded metadata
-            paginated_qs = paginator.paginate_queryset(queryset, request)
-            result = api.get_metadata(paginated_qs)
+
+        #if text_search:
+        #    result = api.get_metadata_from_index(queryset, text_search=text_search)
+        #    result = paginator.paginate_queryset(result, request)
+        #else:
+        #    # We can paginate queryset early and prevent fetching unneeded metadata
+        #    paginated_qs = paginator.paginate_queryset(queryset, request)
+        #    result = api.get_metadata_from_index(paginated_qs)
+
+        paginated_qs = paginator.paginate_queryset(queryset, request)
+        result = api.get_metadata(paginated_qs)
 
         serializer = ContentLibraryMetadataSerializer(result, many=True)
         # Verify `pagination` param to maintain compatibility with older
@@ -226,7 +227,6 @@ class LibraryDetailsView(APIView):
     """
     Views to work with a specific content library
     """
-    @atomic
     @convert_exceptions
     def get(self, request, lib_key_str):
         """
@@ -309,7 +309,6 @@ class LibraryTeamView(APIView):
         grant = api.get_library_user_permissions(key, user)
         return Response(ContentLibraryPermissionSerializer(grant).data)
 
-    @atomic
     @convert_exceptions
     def get(self, request, lib_key_str):
         """
@@ -347,7 +346,6 @@ class LibraryTeamUserView(APIView):
         grant = api.get_library_user_permissions(key, user)
         return Response(ContentLibraryPermissionSerializer(grant).data)
 
-    @atomic
     @convert_exceptions
     def get(self, request, lib_key_str, username):
         """
@@ -417,7 +415,6 @@ class LibraryBlockTypesView(APIView):
     """
     View to get the list of XBlock types that can be added to this library
     """
-    @atomic
     @convert_exceptions
     def get(self, request, lib_key_str):
         """
@@ -427,84 +424,6 @@ class LibraryBlockTypesView(APIView):
         api.require_permission_for_library_key(key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
         result = api.get_allowed_block_types(key)
         return Response(LibraryXBlockTypeSerializer(result, many=True).data)
-
-
-@view_auth_classes()
-class LibraryLinksView(APIView):
-    """
-    View to get the list of bundles/libraries linked to this content library.
-
-    Because every content library is a blockstore bundle, it can have "links" to
-    other bundles, which may or may not be content libraries. This allows using
-    XBlocks (or perhaps even static assets etc.) from another bundle without
-    needing to duplicate/copy the data.
-
-    Links always point to a specific published version of the target bundle.
-    Links are identified by a slug-like ID, e.g. "link1"
-    """
-    @atomic
-    @convert_exceptions
-    def get(self, request, lib_key_str):
-        """
-        Get the list of bundles that this library links to, if any
-        """
-        key = LibraryLocatorV2.from_string(lib_key_str)
-        api.require_permission_for_library_key(key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
-        result = api.get_bundle_links(key)
-        return Response(LibraryBundleLinkSerializer(result, many=True).data)
-
-    @atomic
-    @convert_exceptions
-    def post(self, request, lib_key_str):
-        """
-        Create a new link in this library.
-        """
-        key = LibraryLocatorV2.from_string(lib_key_str)
-        api.require_permission_for_library_key(key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
-        serializer = LibraryBundleLinkSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        target_key = LibraryLocatorV2.from_string(serializer.validated_data['opaque_key'])
-        api.create_bundle_link(
-            library_key=key,
-            link_id=serializer.validated_data['id'],
-            target_opaque_key=target_key,
-            version=serializer.validated_data['version'],  # a number, or None for "use latest version"
-        )
-        return Response({})
-
-
-@view_auth_classes()
-class LibraryLinkDetailView(APIView):
-    """
-    View to update/delete an existing library link
-    """
-    @atomic
-    @convert_exceptions
-    def patch(self, request, lib_key_str, link_id):
-        """
-        Update the specified link to point to a different version of its
-        target bundle.
-
-        Pass e.g. {"version": 40} or pass {"version": None} to update to the
-        latest published version.
-        """
-        key = LibraryLocatorV2.from_string(lib_key_str)
-        api.require_permission_for_library_key(key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
-        serializer = LibraryBundleLinkUpdateSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        api.update_bundle_link(key, link_id, version=serializer.validated_data['version'])
-        return Response({})
-
-    @atomic
-    @convert_exceptions
-    def delete(self, request, lib_key_str, link_id):  # pylint: disable=unused-argument
-        """
-        Delete a link from this library.
-        """
-        key = LibraryLocatorV2.from_string(lib_key_str)
-        api.require_permission_for_library_key(key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
-        api.update_bundle_link(key, link_id, delete=True)
-        return Response({})
 
 
 @view_auth_classes()
@@ -542,7 +461,6 @@ class LibraryBlocksView(APIView):
     """
     Views to work with XBlocks in a specific content library.
     """
-    @atomic
     @apidocs.schema(
         parameters=[
             *LibraryApiPagination.apidoc_params,
@@ -569,17 +487,15 @@ class LibraryBlocksView(APIView):
         block_types = request.query_params.getlist('block_type') or None
 
         api.require_permission_for_library_key(key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
-        result = api.get_library_blocks(key, text_search=text_search, block_types=block_types)
+        components = api.get_library_components(key, text_search=text_search, block_types=block_types)
 
-        # Verify `pagination` param to maintain compatibility with older
-        # non pagination-aware clients
-        if request.GET.get('pagination', 'false').lower() == 'true':
-            paginator = LibraryApiPagination()
-            result = paginator.paginate_queryset(result, request)
-            serializer = LibraryXBlockMetadataSerializer(result, many=True)
-            return paginator.get_paginated_response(serializer.data)
-
-        return Response(LibraryXBlockMetadataSerializer(result, many=True).data)
+        paginator = LibraryApiPagination()
+        paginated_xblock_metadata = [
+            api.LibraryXBlockMetadata.from_component(key, component)
+            for component in paginator.paginate_queryset(components, request)
+        ]
+        serializer = LibraryXBlockMetadataSerializer(paginated_xblock_metadata, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     @atomic
     @convert_exceptions
@@ -592,12 +508,15 @@ class LibraryBlocksView(APIView):
         serializer = LibraryXBlockCreationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         parent_block_usage_str = serializer.validated_data.pop("parent_block", None)
+
         if parent_block_usage_str:
             # Add this as a child of an existing block:
             parent_block_usage = LibraryUsageLocatorV2.from_string(parent_block_usage_str)
             if parent_block_usage.context_key != library_key:
                 raise ValidationError(detail={"parent_block": "Usage ID doesn't match library ID in the URL."})
+
             result = api.create_library_block_child(parent_block_usage, **serializer.validated_data)
+
         else:
             # Create a new regular top-level block:
             try:
@@ -672,7 +591,6 @@ class LibraryBlockOlxView(APIView):
     """
     Views to work with an existing XBlock's OLX
     """
-    @atomic
     @convert_exceptions
     def get(self, request, usage_key_str):
         """
@@ -680,7 +598,7 @@ class LibraryBlockOlxView(APIView):
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
         api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
-        xml_str = api.get_library_block_olx(key)
+        xml_str = xblock_api.get_library_block_olx(key)
         return Response(LibraryXBlockOlxSerializer({"olx": xml_str}).data)
 
     @atomic
