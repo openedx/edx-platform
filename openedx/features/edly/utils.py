@@ -2,6 +2,7 @@
 Utilities for edly app.
 """
 import logging
+from functools import partial
 from datetime import datetime
 from urllib.parse import urljoin, urlparse
 
@@ -21,15 +22,18 @@ from student.models import CourseAccessRole
 from student.roles import CourseInstructorRole, CourseStaffRole, GlobalCourseCreatorRole, GlobalStaff, UserBasedRole
 from util.organizations_helpers import get_organizations
 from xmodule.modulestore.django import modulestore
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
 
 from lms.djangoapps.branding.api import get_privacy_url, get_tos_and_honor_code_url
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
+from openedx.core.djangoapps.contentserver.caching import del_cached_content
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration.helpers import get_current_site_configuration
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings, get_current_site
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.lib.celery.task_utils import emulate_http_request
-from openedx.features.edly.constants import ESSENTIALS
+from openedx.features.edly.constants import ESSENTIALS, DEFAULT_COURSE_IMAGE, DEFAULT_COURSE_IMAGE_PATH
 from openedx.features.edly.context_processor import Colour
 from openedx.features.edly.models import EdlyMultiSiteAccess, EdlySubOrganization
 
@@ -627,3 +631,30 @@ def get_value_from_django_settings_override(key, default=None, site=get_current_
                 'DJANGO_SETTINGS_OVERRIDE', {}).get(key, default)
 
     return value
+
+
+def add_default_image_to_course_assets(course_key):
+    """
+    helper function to Add default image to course assets.
+    """
+    from django.contrib.staticfiles import finders
+    content_location = StaticContent.compute_location(course_key, DEFAULT_COURSE_IMAGE)
+    static_file = finders.find(DEFAULT_COURSE_IMAGE_PATH)
+    if static_file:
+        upload_file = open(static_file, "rb")
+
+        static_content_partial = partial(StaticContent, content_location, DEFAULT_COURSE_IMAGE, 'image/jpg')
+
+        content = static_content_partial(upload_file.read())
+        temporary_file_path = None
+
+        (thumbnail_content, thumbnail_location) = contentstore().generate_thumbnail(content,
+                                                                                    tempfile_path=temporary_file_path)
+
+        del_cached_content(thumbnail_location)
+
+        if thumbnail_content is not None:
+            content.thumbnail_location = thumbnail_location
+
+        contentstore().save(content)
+        del_cached_content(content.location)

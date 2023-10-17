@@ -27,3 +27,7 @@ ROLE_ASSIGNED = 'role_assigned'
 ROLE_REVOKED = 'role_revoked'
 SUBSCRIPTION_EXPIRE = 'subscription_expire'
 ACTIVATION_EMAIL = 'activation_email'
+
+# DEFAULT COURSE IMAGE
+DEFAULT_COURSE_IMAGE = "images_course_image.jpg"
+DEFAULT_COURSE_IMAGE_PATH = 'images/images_course_image.jpg'
