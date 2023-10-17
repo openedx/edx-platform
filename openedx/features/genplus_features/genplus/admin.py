@@ -29,7 +29,6 @@ from openedx.features.genplus_features.genplus_learning.utils import (
 )
 from common.djangoapps.third_party_auth.models import clean_username
 
-
 @admin.register(GenUser)
 class GenUserAdmin(admin.ModelAdmin):
     list_display = (
@@ -70,10 +69,16 @@ class CsvImportForm(forms.Form):
     csv_file = forms.FileField()
     force_change_password = forms.BooleanField(initial=True, required=False)
 
+@admin.register(LocalAuthorityDomain)
+class LocalAuthorityDomainAdmin(admin.ModelAdmin):
+    search_fields = ('name',)
+
+
 @admin.register(LocalAuthority)
 class LocalAuthorityAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_display = ('name', 'saml_configuration_slug')
+    filter_horizontal = ('domains',)
 
 @admin.register(School)
 class SchoolAdmin(admin.ModelAdmin):
@@ -82,6 +87,7 @@ class SchoolAdmin(admin.ModelAdmin):
         'guid',
         'name',
         'type',
+        'cost_center',
         'local_authority',
         'is_active',
         'external_id',
@@ -281,7 +287,6 @@ class SchoolAdmin(admin.ModelAdmin):
         messages.add_message(request, messages.INFO,
                              'Classes will be updated on background. Please refresh your page after a while.')
 
-
 @admin.register(Character)
 class CharacterAdmin(admin.ModelAdmin):
     filter_horizontal = ('skills',)
@@ -404,7 +409,7 @@ class TeacherAdmin(admin.ModelAdmin):
 class StudentAdmin(admin.ModelAdmin):
     search_fields = ('gen_user__user__email', 'gen_user__email')
     list_filter = (MoreThanOneClassFilter, DifferentActiveClassFilter, 'gen_user__school',)
-    list_display = ('username', 'school', 'enrolled_classes', 'active_class', 'progress')
+    list_display = ('username', 'school', 'scn', 'enrolled_classes', 'active_class', 'progress')
     autocomplete_fields = ['active_class']
 
     def username(self, obj):

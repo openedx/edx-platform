@@ -13,10 +13,17 @@ from django.contrib.contenttypes.models import ContentType
 
 USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
+class LocalAuthorityDomain(TimeStampedModel):
+    name = models.CharField(max_length=128, unique=True)
+
+    def __str__(self):
+        return self.name
+
 class LocalAuthority(TimeStampedModel):
     name = models.CharField(max_length=64, unique=True)
     saml_configuration_slug = models.SlugField(null=True, blank=True, max_length=30,
                                                help_text='Slug of saml configuration i.e rmunify-dev, rmunify-stage')
+    domains = models.ManyToManyField(LocalAuthorityDomain, blank=True, related_name='local_authorities')
 
 
     def __str__(self):
@@ -29,6 +36,8 @@ class School(TimeStampedModel):
     guid = models.CharField(primary_key=True, max_length=128)
     name = models.CharField(max_length=64)
     external_id = models.CharField(max_length=32)
+    cost_center = models.CharField(max_length=32,unique=True, default=None, null=True, blank=True,
+                                    help_text='Need in the case of xporter schools.')
     type = models.CharField(blank=True, null=True, max_length=32, choices=SCHOOL_CHOICES)
     is_active = models.BooleanField(default=True,
                                     help_text='If De-selected the users related to this school cannot access the platform')
@@ -122,7 +131,7 @@ class Character(models.Model):
 class GenUser(models.Model):
     ROLE_CHOICES = GenUserRoles.__MODEL_CHOICES__
 
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True, default=None, null=True, blank=True)
     identity_guid = models.CharField(null=True, max_length=1024)
     user = models.OneToOneField(USER_MODEL, on_delete=models.CASCADE, null=True, blank=True, related_name='gen_user')
     role = models.CharField(blank=True, null=True, max_length=32, choices=ROLE_CHOICES)
@@ -174,7 +183,7 @@ class Student(models.Model):
         return self.classes.count() > 0
 
     def __str__(self):
-        return self.gen_user.email
+        return self.gen_user.email or ''
 
 
 class ClassManager(models.Manager):
@@ -362,6 +371,14 @@ class GenLog(TimeStampedModel):
         cls.objects.create(
             gen_log_type=GenLogTypes.PROGRAM_ENROLLMENTS_REMOVE,
             description=f'Program Enrollment delete for user {email}',
+            metadata=details
+        )
+
+    @classmethod
+    def registration_failed(cls, email, details=None):
+        cls.objects.create(
+            gen_log_type=GenLogTypes.REGISTRATION_FAILED,
+            description=f'Registration failed for {email}',
             metadata=details
         )
 
