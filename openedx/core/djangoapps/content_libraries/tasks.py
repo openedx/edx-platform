@@ -8,9 +8,10 @@ import hashlib
 from celery import shared_task
 from celery_utils.logged_task import LoggedTask
 from celery.utils.log import get_task_logger
+from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
-from edx_django_utils.monitoring import set_code_owner_attribute
+from edx_django_utils.monitoring import set_code_owner_attribute, set_code_owner_attribute_from_module
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import (
     BlockUsageLocator,
