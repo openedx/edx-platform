@@ -128,7 +128,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
         self.clients = {user.username: Client() for user in self.users}
         self.login_statuses = [
             self.clients[user.username].login(
-                username=user.username, password='test')
+                username=user.username, password=self.TEST_PASSWORD)
             for user in self.users
         ]
 
@@ -173,7 +173,7 @@ class LoginEnrollmentTestCase(TestCase):
         Create a user account, activate, and log in.
         """
         self.email = 'foo@test.com'  # lint-amnesty, pylint: disable=attribute-defined-outside-init
-        self.password = 'bar'  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.password = 'Password1234'  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         self.username = 'test'  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         self.user = self.create_account(
             self.username,

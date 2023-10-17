@@ -36,7 +36,7 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
 
         # Create instructor account
         self.instructor = AdminFactory.create()
-        self.client.login(username=self.instructor.username, password="test")
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
 
     def setup_course_url(self, course):
         """
