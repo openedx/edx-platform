@@ -80,20 +80,20 @@
                     $.ajax({
                         url: url,
                         type: 'GET',
-                    })
-                    .success(function(data) {
-                        if (data && data.value === true) {
-                            self.markAsPositiveFeedback();
-                            self.currentFeedback = true;
-                        } else {
-                            if (data && data.value === false) {
-                                self.markAsNegativeFeedback();
-                                self.currentFeedback = false;
+                        sucess: function(data) {
+                            if (data && data.value === true) {
+                                self.markAsPositiveFeedback();
+                                self.currentFeedback = true;
                             } else {
-                                self.markAsEmptyFeedback();
-                                self.currentFeedback = null;
+                                if (data && data.value === false) {
+                                    self.markAsNegativeFeedback();
+                                    self.currentFeedback = false;
+                                } else {
+                                    self.markAsEmptyFeedback();
+                                    self.currentFeedback = null;
+                                }
                             }
-                        }
+                        },
                     });
                 },
 
@@ -173,21 +173,21 @@
                             user_id: this.userId,
                             value: feedbackValue,
                         },
-                    })
-                    .success(function(data) {
-                        if (data && data.value === true) {
-                            self.markAsPositiveFeedback();
-                            self.currentFeedback = true;
-                        } else {
-                            if (data && data.value === false) {
-                                self.markAsNegativeFeedback();
-                                self.currentFeedback = false;
+                        sucess: function(data) {
+                            if (data && data.value === true) {
+                                self.markAsPositiveFeedback();
+                                self.currentFeedback = true;
                             } else {
-                                self.markAsEmptyFeedback();
-                                self.currentFeedback = null;
+                                if (data && data.value === false) {
+                                    self.markAsNegativeFeedback();
+                                    self.currentFeedback = false;
+                                } else {
+                                    self.markAsEmptyFeedback();
+                                    self.currentFeedback = null;
+                                }
                             }
-                        }
-                    })
+                        },
+                    });
                 },
 
                 onHideLanguageMenu: function() {
@@ -222,9 +222,9 @@
                         url: url,
                         type: 'GET',
                         async: false,
-                    })
-                    .success(function(data) {
-                        return (data && data.status === 'Completed')
+                        sucess: function(data) {
+                            return (data && data.status === 'Completed')
+                        },
                     });
                 },
 
