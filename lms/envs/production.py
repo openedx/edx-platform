@@ -23,7 +23,6 @@ import os
 
 import yaml
 from corsheaders.defaults import default_headers as corsheaders_default_headers
-import django
 from django.core.exceptions import ImproperlyConfigured
 from edx_django_utils.plugins import add_plugins
 from path import Path as path
