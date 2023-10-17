@@ -1038,6 +1038,7 @@ class TestTOC(ModuleStoreTestCase):
     #     - 1 for 5 definitions
     # Split makes 1 MySQL query to render the toc:
     #     - 1 MySQL for the active version at the start of the bulk operation (no mongo calls)
+    # course_roles permissions checks run 2 queries to check access
     def test_toc_toy_from_chapter(self):
         with self.store.default_store(ModuleStoreEnum.Type.split):
             self.setup_request_and_course(2, 0)
@@ -1058,7 +1059,7 @@ class TestTOC(ModuleStoreTestCase):
                           'url_name': 'secret:magic', 'display_name': 'secret:magic', 'display_id': 'secretmagic'}])
 
             course = self.store.get_course(self.toy_course.id, depth=2)
-            with check_mongo_calls(0):
+            with check_mongo_calls(2):
                 actual = render.toc_for_course(
                     self.request.user, self.request, course, self.chapter, None, self.field_data_cache
                 )
@@ -1072,6 +1073,7 @@ class TestTOC(ModuleStoreTestCase):
     #     - 1 for 5 definitions
     # Split makes 1 MySQL query to render the toc:
     #     - 1 MySQL for the active version at the start of the bulk operation (no mongo calls)
+    # course_roles permissions checks run 2 queries to check access
     def test_toc_toy_from_section(self):
         with self.store.default_store(ModuleStoreEnum.Type.split):
             self.setup_request_and_course(2, 0)
@@ -1091,7 +1093,7 @@ class TestTOC(ModuleStoreTestCase):
                             'format': '', 'due': None, 'active': False}],
                           'url_name': 'secret:magic', 'display_name': 'secret:magic', 'display_id': 'secretmagic'}])
 
-            with check_mongo_calls(0):
+            with check_mongo_calls(2):
                 actual = render.toc_for_course(
                     self.request.user, self.request, self.toy_course, self.chapter, section, self.field_data_cache
                 )
@@ -1888,6 +1890,7 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         super().setUpClass()
         cls.course_key = ToyCourseFactory.create().id
         cls.course = modulestore().get_course(cls.course_key)
+        print(f"cls.course {cls.course}")
 
     def setUp(self):
         super().setUp()
