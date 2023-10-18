@@ -24,6 +24,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from lms.djangoapps.ora_staff_grader.constants import (
     PARAM_ORA_LOCATION,
     PARAM_SUBMISSION_ID,
+    PARAM_ASSESSMENT_TYPE,
 )
 from lms.djangoapps.ora_staff_grader.errors import (
     BadOraLocationResponse,
@@ -43,11 +44,13 @@ from lms.djangoapps.ora_staff_grader.ora_api import (
     get_assessment_info,
     get_submission_info,
     get_submissions,
+    get_assessments_grades,
     submit_grade,
 )
 from lms.djangoapps.ora_staff_grader.serializers import (
     FileListSerializer,
     InitializeSerializer,
+    FeedbackSerializer,
     LockStatusSerializer,
     StaffAssessSerializer,
     SubmissionFetchSerializer,
@@ -135,6 +138,49 @@ class InitializeView(StaffGraderBaseView):
         except (InvalidKeyError, ItemNotFoundError):
             log.error(f"Bad ORA location provided: {ora_location}")
             return BadOraLocationResponse()
+
+        # Issues with the XBlock handlers
+        except XBlockInternalError as ex:
+            log.error(ex)
+            return InternalErrorResponse(context=ex.context)
+
+        # Blanket exception handling in case something blows up
+        except Exception as ex:
+            log.exception(ex)
+            return UnknownErrorResponse()
+
+
+class FeedbackListView(StaffGraderBaseView):
+    """
+    GET course metadata
+
+    Response: {
+        courseMetadata
+        oraMetadata
+        submissions
+        isEnabled
+    }
+
+    Errors:
+    - MissingParamResponse (HTTP 400) for missing params
+    - BadOraLocationResponse (HTTP 400) for bad ORA location
+    - XBlockInternalError (HTTP 500) for an issue with ORA
+    - UnknownError (HTTP 500) for other errors
+    """
+
+    @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID, PARAM_ASSESSMENT_TYPE])
+    def get(self, request, ora_location, submission_uuid, assessment_type=None, *args, **kwargs):
+
+        try:
+            init_data = {}
+
+            # Get list of submissions for this ORA
+            init_data["assessments"] = get_assessments_grades(request, ora_location, submission_uuid, assessment_type)
+            #init_data["assessments"] = TEST
+
+            response_data = FeedbackSerializer(init_data).data
+            log.info(response_data)
+            return Response(response_data)
 
         # Issues with the XBlock handlers
         except XBlockInternalError as ex:

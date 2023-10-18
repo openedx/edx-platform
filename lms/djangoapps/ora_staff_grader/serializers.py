@@ -165,6 +165,49 @@ class SubmissionMetadataSerializer(serializers.Serializer):
         read_only_fields = fields
 
 
+class AssessmentScoresMetadataSerializer(serializers.Serializer):
+    """
+    Assessment Score metadata for displaying assessment table in ESG
+    """
+    type = serializers.CharField()
+    score = serializers.IntegerField()
+    score_type = serializers.CharField()
+
+    class Meta:
+        fields = [
+            "type",
+            "score",
+            "score_type",
+        ]
+        read_only_fields = fields
+
+
+class AssessmentMetadataSerializer(serializers.Serializer):
+    """
+    Assessment metadata for displaying assessment table in ESG
+    """
+    idAssessment = serializers.CharField()
+    grader_name = serializers.CharField(allow_null=True)
+    grader_username = serializers.CharField(allow_null=True)
+    grader_email = serializers.CharField(allow_null=True)
+    assesmentDate = serializers.DateTimeField()
+    assesmentScores = serializers.ListField(child=AssessmentScoresMetadataSerializer())
+    problemStep = serializers.CharField(allow_null=True)
+    feedback = serializers.CharField(allow_null=True)
+
+    class Meta:
+        fields = [
+            "idAssessment",
+            "grader_name",
+            "grader_username",
+            "grader_email",
+            "assesmentDate",
+            "assesmentScores",
+            "problemStep",
+            "feedback",
+        ]
+        read_only_fields = fields
+
 class InitializeSerializer(serializers.Serializer):
     """
     Serialize info for the initialize call. Packages ORA, course, submission, and rubric data.
@@ -191,6 +234,16 @@ class InitializeSerializer(serializers.Serializer):
         """
         return obj['isEnabled'] and not obj['oraMetadata'].teams_enabled
 
+class FeedbackSerializer(serializers.Serializer):
+    """
+    Serialize info for the initialize call. Packages ORA, course, submission, and rubric data.
+    """
+
+    assessments = serializers.ListField(child=AssessmentMetadataSerializer())
+
+    class Meta:
+        fields = ["assessments",]
+        read_only_fields = fields
 
 class UploadedFileSerializer(serializers.Serializer):
     """Serializer for a file uploaded as a part of a response"""
