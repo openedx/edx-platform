@@ -3969,12 +3969,12 @@ msgid "Good"
 msgstr "Bien"
 
 #. Translators: Replier commented on "your" response to your post
-#: lms/djangoapps/discussion/rest_api/utils.py
+#: lms/djangoapps/discussion/rest_api/discussions_notifications.py
 msgid "your"
 msgstr "su"
 
 #. Translators: Replier commented on "their" response to your post
-#: lms/djangoapps/discussion/rest_api/utils.py
+#: lms/djangoapps/discussion/rest_api/discussions_notifications.py
 msgid "their"
 msgstr "su"
 
@@ -8023,6 +8023,25 @@ msgid ""
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
 "<{p}><{strong}>{username}</{strong}> preguntó "
+"<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> responded to a post you’re "
+"following: <{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> respondió a su publicación "
+"<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> commented on {author_name}'s "
+"response in a post you’re following <{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> respondió el "
+"<{strong}>{author_name}</{strong}> respuesta a su publicación "
 "<{strong}>{post_title}</{strong}></{p}>"
 
 #: openedx/core/djangoapps/notifications/base_notification.py
