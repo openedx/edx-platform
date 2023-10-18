@@ -78,7 +78,7 @@
       "lms/tests.py"
     ]
   },
-  "openedx-1": {
+  "openedx-1-with-lms": {
     "settings": "lms.envs.test",
     "paths": [
       "openedx/core/djangoapps/ace_common/",
@@ -116,7 +116,7 @@
       "openedx/core/djangoapps/external_user_ids/"
     ]
   },
-  "openedx-2": {
+  "openedx-2-with-lms": {
     "settings": "lms.envs.test",
     "paths": [
       "openedx/core/djangoapps/geoinfo/",
@@ -159,7 +159,7 @@
       "openedx/tests/"
     ]
   },
-  "openedx-3": {
+  "openedx-1-with-cms": {
     "settings": "cms.envs.test",
     "paths": [
       "openedx/core/djangoapps/ace_common/",
@@ -197,7 +197,7 @@
       "openedx/core/djangoapps/external_user_ids/"
     ]
   },
-  "openedx-4": {
+  "openedx-2-with-cms": {
     "settings": "cms.envs.test",
     "paths": [
       "openedx/core/djangoapps/content_tagging/",
@@ -258,20 +258,26 @@
       "cms/djangoapps/contentstore/"
     ]
   },
-  "common-1": {
+  "common-with-lms": {
     "settings": "lms.envs.test",
     "paths": [
       "common/djangoapps/"
     ]
   },
-  "common-2": {
+  "common-with-cms": {
     "settings": "cms.envs.test",
     "paths": [
       "common/djangoapps/"
     ]
   },
-  "xmodule-1": {
+  "xmodule-with-lms": {
     "settings": "lms.envs.test",
+    "paths": [
+      "xmodule/"
+    ]
+  },
+  "xmodule-with-cms": {
+    "settings": "cms.envs.test",
     "paths": [
       "xmodule/"
     ]

@@ -1,5 +1,5 @@
 """
-Tests for library tools service.
+Tests for library tools service (only used by CMS)
 """
 
 from unittest import mock
@@ -8,6 +8,11 @@ import ddt
 from bson.objectid import ObjectId
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
+from openedx.core.djangolib.testing.utils import skip_unless_cms
+from openedx.core.djangoapps.content_libraries import api as library_api
+from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
+from openedx.core.djangoapps.xblock.api import load_block
+from common.djangoapps.student.roles import CourseInstructorRole
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
@@ -19,6 +24,7 @@ from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrarie
 from openedx.core.djangoapps.xblock.api import load_block
 
 
+@skip_unless_cms
 @ddt.ddt
 class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
     """
