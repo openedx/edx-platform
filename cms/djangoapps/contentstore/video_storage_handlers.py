@@ -54,7 +54,7 @@ from openedx.core.djangoapps.video_pipeline.config.waffle import (
 )
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.video_block.video_utils import rewrite_video_url # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.video_block.video_utils import rewrite_video_url  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 from .models import VideoUploadConfig
@@ -226,8 +226,12 @@ def handle_videos(request, course_key_string, edx_video_id=None):
         data, status = videos_post(course, request)
         return JsonResponse(data, status=status)
 
-    
+ 
 def get_video_usage_path(request, course_key, edx_video_id):
+    """
+    API for fetching the locations a specific video is used in a course.
+    Returns a list of paths to a video.
+    """
     if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
     store = modulestore()
@@ -250,25 +254,31 @@ def get_video_usage_path(request, course_key, edx_video_id):
     return {'usage_locations': usage_locations}
 
 
-def generate_video_download_link(request, course_key, edx_video_id):
+def generate_video_download_link(request, edx_video_id):
+    """
+    API for fetching a video download link. Returns an url that can be used to download a video.
+    """
     try:
         import edxval.api as edxval_api
     except ImportError:
         edxval_api = None
+
+    from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
+
     download_video_link = ''
+
     # Determine if there is an alternative source for this video
     # based on user locale.  This exists to support cases where
     # we leverage a geography specific CDN, like China.
     default_cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get('default')
-    print(request.user, request)
-    # user_location = request.user.get_current_user().opt_attrs[ATTR_KEY_REQUEST_COUNTRY_CODE]
-    cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(None, default_cdn_url)
+    user  = DjangoXBlockUserService(request.user)
+    user_location = user.get_current_user().opt_attrs[ATTR_KEY_REQUEST_COUNTRY_CODE]
+    cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(user_location, default_cdn_url)
+
     if edx_video_id and edxval_api:  # lint-amnesty, pylint: disable=too-many-nested-blocks
+        # code partially taken from xmodule/video_block/video_block.py -> get_html()
         try:
             val_profiles = ["youtube", "desktop_webm", "desktop_mp4"]
-
-            # if HLSPlaybackEnabledFlag.feature_enabled(self.course_id):
-            #     val_profiles.append('hls')
 
             # strip edx_video_id to prevent ValVideoNotFoundError error if unwanted spaces are there. TNL-5769
             val_video_urls = edxval_api.get_urls_for_profiles(edx_video_id.strip(), val_profiles)
@@ -294,7 +304,7 @@ def generate_video_download_link(request, course_key, edx_video_id):
             # VAL raises this exception if it can't find data for the edx video ID. This can happen if the
             # course data is ported to a machine that does not have the VAL data. So for now, pass on this
             # exception and fallback to whatever we find in the VideoBlock.
-            log.warning("Could not retrieve information from VAL for edx Video ID: %s.", edx_video_id)
+            LOGGER.warning("Could not retrieve information from VAL for edx Video ID: %s.", edx_video_id)
     return {"download_link": download_video_link}
 
 

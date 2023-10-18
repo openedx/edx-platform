@@ -2,7 +2,7 @@
 API Serializers for videos
 """
 from rest_framework import serializers
-from .common import StrictSerializer, CourseCommonSerializer
+from .common import StrictSerializer
 
 
 class FileSpecSerializer(StrictSerializer):
@@ -12,6 +12,7 @@ class FileSpecSerializer(StrictSerializer):
 
 
 class VideoImageSettingsSerializer(serializers.Serializer):
+    """Serializer for image settings"""
     video_image_upload_enabled = serializers.BooleanField()
     max_size = serializers.IntegerField()
     min_size = serializers.IntegerField()
@@ -23,6 +24,7 @@ class VideoImageSettingsSerializer(serializers.Serializer):
 
 
 class VideoTranscriptSettingsSerializer(serializers.Serializer):
+    """Serializer for transcript settings"""
     transcript_download_handler_url = serializers.CharField()
     transcript_upload_handler_url = serializers.CharField()
     transcript_delete_handler_url = serializers.CharField()
@@ -30,13 +32,14 @@ class VideoTranscriptSettingsSerializer(serializers.Serializer):
     transcript_preferences_handler_url = serializers.CharField(required=False, allow_null=True)
     transcript_credentials_handler_url = serializers.CharField(required=False, allow_null=True)
     transcription_plans = serializers.DictField(
-        child = serializers.DictField(),
+        child=serializers.DictField(),
         required=False,
         allow_null=True,
     )
 
 
 class VideoModelSerializer(serializers.Serializer):
+    """Serializer for a video"""
     client_video_id = serializers.CharField()
     course_video_image_url = serializers.CharField()
     created = serializers.CharField()
@@ -52,9 +55,9 @@ class VideoModelSerializer(serializers.Serializer):
         child=serializers.CharField()
     )
 
+
 class CourseVideosSerializer(serializers.Serializer):
-    """Serializer for course home"""
-    # context_course = CourseCommonSerializer()
+    """Serializer for course videos"""
     image_upload_url = serializers.CharField()
     video_handler_url = serializers.CharField()
     encodings_download_url = serializers.CharField()
@@ -85,10 +88,12 @@ class CourseVideosSerializer(serializers.Serializer):
 
 
 class VideoDownloadSerializer(serializers.Serializer):
+    """Serializer for video download"""
     download_link = serializers.CharField()
 
 
 class VideoUsageSerializer(serializers.Serializer):
+    """Serializer for video usage"""
     usage_locations = serializers.ListField(
         child=serializers.CharField()
     )

@@ -1610,9 +1610,7 @@ def get_course_videos_context(course_block, transcript_languages, videos, defaul
         },
         'pagination_context': pagination_context
     }
-    print('got contessxt')
     if is_video_transcript_enabled:
-        print('transcripts enabled')
         course_video_context['video_transcript_settings'].update({
             'transcript_preferences_handler_url': reverse_course_url(
                 'transcript_preferences_handler',
@@ -1627,7 +1625,6 @@ def get_course_videos_context(course_block, transcript_languages, videos, defaul
         course_video_context['active_transcript_preferences'] = get_transcript_preferences(str(course_block.id))
         # Cached state for transcript providers' credentials (org-specific)
         course_video_context['transcript_credentials'] = get_transcript_credentials_state_for_org(course_block.id.org)
-    print(course_video_context['video_transcript_settings'])
     return course_video_context
 
 

@@ -38,11 +38,11 @@ from cms.djangoapps.contentstore.video_storage_handlers import (
     get_video_usage_path
 )
 from cms.djangoapps.contentstore.rest_api.v1.serializers import (
-  CourseVideosSerializer,
-  VideoUploadSerializer,
-  VideoImageSerializer,
-  VideoDownloadSerializer,
-  VideoUsageSerializer,
+    CourseVideosSerializer,
+    VideoUploadSerializer,
+    VideoImageSerializer,
+    VideoDownloadSerializer,
+    VideoUsageSerializer,
 )
 from cms.djangoapps.contentstore.video_storage_handlers import get_all_transcript_languages
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
@@ -94,14 +94,19 @@ class CourseVideosView(DeveloperErrorViewMixin, APIView):
         course_key = CourseKey.from_string(course_id)
 
         if not has_studio_read_access(request.user, course_key):
-            self.permission_denied(request)            
+            self.permission_denied(request)
 
         transcript_languages = get_all_transcript_languages()
         default_video_image_url = staticfiles_storage.url(settings.VIDEO_IMAGE_DEFAULT_FILENAME)
         with modulestore().bulk_operations(course_key):
             course_block = modulestore().get_course(course_key)
             videos = _get_index_videos(course_block)
-            course_videos_context = get_course_videos_context(course_block, transcript_languages, videos, default_video_image_url)
+            course_videos_context = get_course_videos_context(
+                course_block,
+                transcript_languages,
+                videos,
+                default_video_image_url
+            )
         del course_videos_context['context_course']
         serializer = CourseVideosSerializer(course_videos_context)
         return Response(serializer.data)
@@ -145,11 +150,11 @@ class VideoDownloadView(DeveloperErrorViewMixin, APIView):
 
         if not has_studio_read_access(request.user, course_key):
             self.permission_denied(request)
-        
-        download_link = generate_video_download_link(request, course_key, edx_video_id)
+
+        download_link = generate_video_download_link(request, edx_video_id)
         serializer = VideoDownloadSerializer(download_link)
         return Response(serializer.data)
-    
+
 
 @view_auth_classes(is_authenticated=True)
 class VideoUsageView(DeveloperErrorViewMixin, APIView):
@@ -189,31 +194,10 @@ class VideoUsageView(DeveloperErrorViewMixin, APIView):
 
         if not has_studio_read_access(request.user, course_key):
             self.permission_denied(request)
-        
+
         usage_locations = get_video_usage_path(request, course_key, edx_video_id)
-        print('LOCATION!!!!! \n', usage_locations)
         serializer = VideoUsageSerializer(usage_locations)
         return Response(serializer.data)
-    
-
-@view_auth_classes()
-class TranscriptCredentialsView(DeveloperErrorViewMixin, APIView):
-    """
-    View for course videos.
-    """
-    @apidocs.schema(
-        parameters=[
-            apidocs.string_parameter("course_id", apidocs.ParameterLocation.PATH, description="Course ID"),
-        ],
-        responses={
-            200: CourseVideosSerializer,
-            401: "The requester is not authenticated",
-            403: "The requester cannot access the specified course",
-            404: "The requested course does not exist",
-        },
-    )
-    def post(self, request: Request, course_id: str):
-        pass
 
 
 @view_auth_classes()
