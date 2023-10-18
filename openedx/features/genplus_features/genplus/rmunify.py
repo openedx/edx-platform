@@ -155,6 +155,16 @@ class RmUnify(BaseRmUnify):
             logger.exception(str(e))
             return True
 
+    def fetch_teachers(self, schoold_id):
+        try:
+            resource_url = f'{schoold_id}/TeachingStaff'
+            url = self.generate_url(self.ORGANISATION, resource_url)
+            return self.fetch(url)
+        except Exception as e:
+            logger.exception(str(e))
+            return False
+
+
 
 class RmUnifyProvisioning(BaseRmUnify):
 
