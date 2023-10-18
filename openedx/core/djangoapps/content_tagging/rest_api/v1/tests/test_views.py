@@ -9,7 +9,6 @@ from urllib.parse import parse_qs, urlparse
 import abc
 import ddt
 from django.contrib.auth import get_user_model
-from django.test import override_settings
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from openedx_tagging.core.tagging.models import Tag, Taxonomy
 from openedx_tagging.core.tagging.models.system_defined import SystemDefinedTaxonomy
@@ -266,10 +265,9 @@ class TestTaxonomyObjectsMixin:
 
 @skip_unless_cms
 @ddt.ddt
-@override_settings(FEATURES={"ENABLE_CREATOR_GROUP": True})
 class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
     """
-    Test cases for TestTaxonomyReadViewSet when ENABLE_CREATOR_GROUP is True
+    Test cases for TaxonomyViewSet for list and create actions
     """
 
     def _test_list_taxonomy(
@@ -740,7 +738,6 @@ class TestTaxonomyDetailExportMixin(TestTaxonomyObjectsMixin):
 
 
 @skip_unless_cms
-@override_settings(FEATURES={"ENABLE_CREATOR_GROUP": True})
 class TestTaxonomyDetailViewSet(TestTaxonomyDetailExportMixin, APITestCase):
     """
     Test cases for TaxonomyViewSet with detail action
@@ -774,7 +771,6 @@ class TestTaxonomyDetailViewSet(TestTaxonomyDetailExportMixin, APITestCase):
 
 
 @skip_unless_cms
-@override_settings(FEATURES={"ENABLE_CREATOR_GROUP": True})
 class TestTaxonomyExportViewSet(TestTaxonomyDetailExportMixin, APITestCase):
     """
     Test cases for TaxonomyViewSet with export action
@@ -937,10 +933,9 @@ class TestTaxonomyChangeMixin(TestTaxonomyObjectsMixin):
 
 
 @skip_unless_cms
-@override_settings(FEATURES={"ENABLE_CREATOR_GROUP": True})
 class TestTaxonomyUpdateViewSet(TestTaxonomyChangeMixin, APITestCase):
     """
-    Test cases for TaxonomyChangeViewSet with PUT method
+    Test cases for TaxonomyViewSet with PUT method
     """
 
     def _test_api_call(self, **kwargs) -> None:
@@ -978,10 +973,9 @@ class TestTaxonomyUpdateViewSet(TestTaxonomyChangeMixin, APITestCase):
 
 
 @skip_unless_cms
-@override_settings(FEATURES={"ENABLE_CREATOR_GROUP": True})
 class TestTaxonomyPatchViewSet(TestTaxonomyChangeMixin, APITestCase):
     """
-    Test cases for TaxonomyChangeViewSet with PATCH method
+    Test cases for TaxonomyViewSet with PATCH method
     """
 
     def _test_api_call(self, **kwargs) -> None:
@@ -1019,10 +1013,9 @@ class TestTaxonomyPatchViewSet(TestTaxonomyChangeMixin, APITestCase):
 
 
 @skip_unless_cms
-@override_settings(FEATURES={"ENABLE_CREATOR_GROUP": True})
 class TestTaxonomyDeleteViewSet(TestTaxonomyChangeMixin, APITestCase):
     """
-    Test cases for TaxonomyChangeViewSet with DELETE method
+    Test cases for TaxonomyViewSet with DELETE method
     """
 
     def _test_api_call(self, **kwargs) -> None:
@@ -1049,46 +1042,6 @@ class TestTaxonomyDeleteViewSet(TestTaxonomyChangeMixin, APITestCase):
         if status.is_success(response.status_code):
             response = self.client.get(url)
             assert response.status_code == status.HTTP_404_NOT_FOUND
-
-
-@skip_unless_cms
-@override_settings(FEATURES={"ENABLE_CREATOR_GROUP": False})
-class TestTaxonomyReadViewSetNoCreatorGroup(TestTaxonomyListCreateViewSet):  # pylint: disable=test-inherits-tests
-    """
-    Test cases for TaxonomyReadViewSet when ENABLE_CREATOR_GROUP is False
-
-    The permissions are the same for when ENABLED_CREATOR_GRUP is True
-    """
-
-
-@skip_unless_cms
-@override_settings(FEATURES={"ENABLE_CREATOR_GROUP": False})
-class TestTaxonomyUpdateViewSetNoCreatorGroup(TestTaxonomyUpdateViewSet):  # pylint: disable=test-inherits-tests
-    """
-    Test cases for TaxonomyUpdateViewSet when ENABLE_CREATOR_GROUP is False
-
-    The permissions are the same for when ENABLED_CREATOR_GRUP is True
-    """
-
-
-@skip_unless_cms
-@override_settings(FEATURES={"ENABLE_CREATOR_GROUP": False})
-class TestTaxonomyPatchViewSetNoCreatorGroup(TestTaxonomyUpdateViewSet):  # pylint: disable=test-inherits-tests
-    """
-    Test cases for TaxonomyPatchViewSet when ENABLE_CREATOR_GROUP is False
-
-    The permissions are the same for when ENABLED_CREATOR_GRUP is True
-    """
-
-
-@skip_unless_cms
-@override_settings(FEATURES={"ENABLE_CREATOR_GROUP": False})
-class TestTaxonomyDeleteViewSetNoCreatorGroup(TestTaxonomyPatchViewSet):  # pylint: disable=test-inherits-tests
-    """
-    Test cases for TaxonomyDeleteViewSet when ENABLE_CREATOR_GROUP is False
-
-    The permissions are the same for when ENABLED_CREATOR_GRUP is True
-    """
 
 
 class TestObjectTagMixin(TestTaxonomyObjectsMixin):

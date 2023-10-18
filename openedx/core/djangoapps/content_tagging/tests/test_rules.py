@@ -2,14 +2,13 @@
 
 import ddt
 from django.contrib.auth import get_user_model
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from openedx_tagging.core.tagging.models import (
     Tag,
     UserSystemDefinedTaxonomy,
 )
 from openedx_tagging.core.tagging.rules import ObjectTagPermissionItem
-from organizations.models import Organization
 
 from common.djangoapps.student.auth import add_users, update_org_role
 from common.djangoapps.student.roles import CourseStaffRole, OrgStaffRole
@@ -21,7 +20,6 @@ User = get_user_model()
 
 
 @ddt.ddt
-@override_settings(FEATURES={"ENABLE_CREATOR_GROUP": True})
 class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
     """
     Tests that the expected rules have been applied to the Taxonomy models.
@@ -609,60 +607,3 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
         assert not self.user_both_orgs.has_perm(perm, self.disabled_course_tag)
         assert not self.user_org2.has_perm(perm, self.disabled_course_tag)
         assert not self.learner.has_perm(perm, self.disabled_course_tag)
-
-
-@ddt.ddt
-@override_settings(FEATURES={"ENABLE_CREATOR_GROUP": False})
-class TestRulesTaxonomyNoCreatorGroup(
-    TestRulesTaxonomy
-):  # pylint: disable=test-inherits-tests
-    """
-    Run the above tests with ENABLE_CREATOR_GROUP unset, to demonstrate that all users have course creator access for
-    all orgs, and therefore everyone is a Taxonomy Administrator.
-
-    However, if there are no Organizations in the database, then nobody has access to the Tagging models.
-    """
-
-    def _expected_users_have_perm(
-        self, perm, obj, learner_perm=False, learner_obj=False, user_org2=True
-    ):
-        """
-        When ENABLE_CREATOR_GROUP is disabled, all users have all permissions.
-        """
-        super()._expected_users_have_perm(
-            perm=perm,
-            obj=obj,
-            learner_perm=learner_perm,
-            learner_obj=learner_obj,
-            user_org2=user_org2,
-        )
-
-    # Taxonomy
-
-    @ddt.data(
-        ("oel_tagging.change_taxonomy", "taxonomy_all_orgs"),
-        ("oel_tagging.change_taxonomy", "taxonomy_both_orgs"),
-        ("oel_tagging.change_taxonomy", "taxonomy_disabled"),
-        ("oel_tagging.change_taxonomy", "taxonomy_one_org"),
-        ("oel_tagging.change_taxonomy", "taxonomy_no_orgs"),
-        ("oel_tagging.delete_taxonomy", "taxonomy_all_orgs"),
-        ("oel_tagging.delete_taxonomy", "taxonomy_both_orgs"),
-        ("oel_tagging.delete_taxonomy", "taxonomy_disabled"),
-        ("oel_tagging.delete_taxonomy", "taxonomy_one_org"),
-        ("oel_tagging.delete_taxonomy", "taxonomy_no_orgs"),
-    )
-    @ddt.unpack
-    def test_no_orgs_no_perms(self, perm, taxonomy_attr):
-        """
-        Org-level permissions are revoked when there are no orgs.
-        """
-        Organization.objects.all().delete()
-        taxonomy = getattr(self, taxonomy_attr)
-        # Superusers & Staff always have access
-        assert self.superuser.has_perm(perm, taxonomy)
-        assert self.staff.has_perm(perm, taxonomy)
-
-        # But everyone else's object-level access is removed
-        assert not self.user_both_orgs.has_perm(perm, taxonomy)
-        assert not self.user_org2.has_perm(perm, taxonomy)
-        assert not self.learner.has_perm(perm, taxonomy)
