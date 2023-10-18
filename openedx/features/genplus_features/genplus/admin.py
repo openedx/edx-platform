@@ -1,6 +1,8 @@
 import csv
 import codecs
 from django.contrib import admin
+from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin
 from django.core.validators import ValidationError
 from openedx.features.genplus_features.genplus.models import *
 from openedx.features.genplus_features.genplus_learning.models import Program, UnitCompletion, ProgramEnrollment
@@ -12,7 +14,12 @@ from django.urls import reverse
 from django.utils.text import format_lazy
 from django.utils.safestring import mark_safe
 from django.contrib.admin.widgets import FilteredSelectMultiple
-from .filters import MoreThanOneClassFilter, DifferentActiveClassFilter
+from .filters import (
+    MoreThanOneClassFilter,
+    DifferentActiveClassFilter,
+    WithoutClassStudents,
+    SchoolFilter,
+)
 from django.template.loader import get_template
 from django.shortcuts import redirect, render
 from django.conf.urls import url
@@ -29,6 +36,8 @@ from openedx.features.genplus_features.genplus_learning.utils import (
 )
 from common.djangoapps.third_party_auth.models import clean_username
 
+User = get_user_model()
+admin.site.unregister(User)
 @admin.register(GenUser)
 class GenUserAdmin(admin.ModelAdmin):
     list_display = (
@@ -498,3 +507,12 @@ class GenError(admin.ModelAdmin):
 @admin.register(JournalPost)
 class JournalPostAdmin(admin.ModelAdmin):
     list_display = ('uuid', 'student', 'teacher', 'title', 'description', 'journal_type')
+
+
+@admin.register(User)
+class CustomUserAdmin(UserAdmin):
+
+    list_filter = UserAdmin.list_filter + (
+        WithoutClassStudents,
+        SchoolFilter,
+    )
