@@ -18,7 +18,6 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import PermissionDenied
 from django.http import FileResponse, HttpResponseNotFound
 from django.shortcuts import redirect
-from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_noop
 from edx_toggles.toggles import WaffleSwitch
@@ -59,7 +58,7 @@ from xmodule.video_block.video_utils import rewrite_video_url  # lint-amnesty, p
 
 from .models import VideoUploadConfig
 from .toggles import use_new_video_uploads_page, use_mock_video_uploads
-from .utils import reverse_course_url, get_video_uploads_url, get_course_videos_context
+from .utils import get_video_uploads_url, get_course_videos_context
 from .video_utils import validate_video_image
 from .views.course import get_course_and_check_access
 
@@ -226,7 +225,7 @@ def handle_videos(request, course_key_string, edx_video_id=None):
         data, status = videos_post(course, request)
         return JsonResponse(data, status=status)
 
- 
+
 def get_video_usage_path(request, course_key, edx_video_id):
     """
     API for fetching the locations a specific video is used in a course.
@@ -271,7 +270,7 @@ def generate_video_download_link(request, edx_video_id):
     # based on user locale.  This exists to support cases where
     # we leverage a geography specific CDN, like China.
     default_cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get('default')
-    user  = DjangoXBlockUserService(request.user)
+    user = DjangoXBlockUserService(request.user)
     user_location = user.get_current_user().opt_attrs[ATTR_KEY_REQUEST_COUNTRY_CODE]
     cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(user_location, default_cdn_url)
 

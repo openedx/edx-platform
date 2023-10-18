@@ -20,6 +20,6 @@ from .videos import (
     VideoImageSerializer,
     VideoDownloadSerializer,
     VideoUsageSerializer
-  )
+)
 from .transcripts import TranscriptSerializer
 from .assets import AssetSerializer
