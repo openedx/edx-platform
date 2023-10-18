@@ -4,7 +4,8 @@ Models for contentstore
 
 
 from config_models.models import ConfigurationModel
-from django.db.models.fields import IntegerField, TextField
+from django.db.models.fields import IntegerField, TextField,CharField
+from django.db import models
 
 
 class VideoUploadConfig(ConfigurationModel):
@@ -63,3 +64,18 @@ class CleanStaleCertificateAvailabilityDatesConfig(ConfigurationModel):
             "`clean_stale_certificate_available_dates` management command.' See the management command for options."
         )
     )
+
+# model course unit time
+
+class CourseUnitTime (models.Model):
+    block_id =  CharField(max_length=255)
+    course_id = CharField(max_length=255)
+    display_name = CharField(max_length=255)
+    total = IntegerField(default=0)
+
+    def __str__(self):
+        return self.block_id
+    
+    @classmethod
+    def create_unit_time(self, course_id, block_id, display_name, total ):
+        return CourseUnitTime.objects.create(course_id=course_id, block_id=block_id, display_name=display_name, total=total)

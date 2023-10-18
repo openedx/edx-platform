@@ -8,6 +8,7 @@ from common.djangoapps.util.json_request import JsonResponse
 from opaque_keys.edx.keys import  CourseKey
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from cms.djangoapps.contentstore.views.item import create_item_import , _update_with_callback ,_save_xblock 
+from cms.djangoapps.contentstore.models import CourseUnitTime
 
 import openpyxl
 
@@ -35,24 +36,26 @@ def viewImportExcel (request, course_id) :
         if excel_file.name.endswith('.xlsx'):
             workbook = openpyxl.load_workbook(excel_file, data_only=True)
             sheets = workbook.sheetnames
-            first_sheet = workbook['2. Details']       
-
-            section=create_item_import(request, parent_locator, category='chapter', display_name='Mở đầu')
+            Details = workbook['2. Details']       
+            Duration = workbook['3. Duration']
+            # section=create_item_import(request, parent_locator, category='chapter', display_name='Mở đầu')
 
             section_block = create_item_import(request ,parent_locator, category='chapter', display_name='Nội dung khoá học')
            
+            # sheet details
             list_video = []
             url_ = ''
-            for data in first_sheet.iter_rows(values_only=True):
+            list_unit = []
+            for data in Details.iter_rows(values_only=True):
                 
                 if data[1] is not None :
                     if ':' in data[1] :
-                        
+                   
                         lesson_block =create_item_import(request, parent_locator=str(section_block.location) , category='sequential', display_name=data[1]) 
                         create_item_import(request, parent_locator=str(lesson_block.location), category='vertical', display_name='Mở đầu')
                         unit_block=create_item_import(request, parent_locator=str(lesson_block.location), category='vertical', display_name='Nội dung bài học')
                         html_block =create_item_import(request, parent_locator= str(unit_block.location) ,category='html')  
-                        
+                        list_unit.append({'unit' : data[1] , "block_id" : str(unit_block.location) })
                     if data[3] is not None and 'video' in data[3].lower() and data[5] is not None:
                         videos =[]
                         videos.append(data[5])
@@ -76,6 +79,15 @@ def viewImportExcel (request, course_id) :
                     for v in a['video']:
                         url_ += f'<p><a href="{v}" target="_blank" title={a["title"]}>Video: {a["title"]}</a></p>'
                 _save_xblock(xblock=block['block'] , user=request.user, data=url_)
+
+            # sheet Duration
+            for data in Duration.iter_rows(values_only=True):
+                if data[0] is not None:
+                    for u in list_unit :
+                        if data[0] in u['unit']:
+                          
+                            CourseUnitTime.create_unit_time(course_id=course_id, block_id=u['block_id'], display_name=u['unit'], total=data[10])
+            
             workbook.close()
            
                   
