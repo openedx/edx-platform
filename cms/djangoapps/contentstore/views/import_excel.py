@@ -38,7 +38,7 @@ def viewImportExcel (request, course_id) :
             sheets = workbook.sheetnames
             Details = workbook['2. Details']       
             Duration = workbook['3. Duration']
-            # section=create_item_import(request, parent_locator, category='chapter', display_name='Mở đầu')
+            section=create_item_import(request, parent_locator, category='chapter', display_name='Mở đầu')
 
             section_block = create_item_import(request ,parent_locator, category='chapter', display_name='Nội dung khoá học')
            
