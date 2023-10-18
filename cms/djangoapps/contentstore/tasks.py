@@ -47,7 +47,12 @@ from cms.djangoapps.contentstore.courseware_index import (
     SearchIndexingError
 )
 from cms.djangoapps.contentstore.storage import course_import_export_storage
-from cms.djangoapps.contentstore.utils import initialize_permissions, reverse_usage_url, translation_language
+from cms.djangoapps.contentstore.utils import (
+    initialize_permissions,
+    reverse_usage_url,
+    translation_language,
+    IMPORTABLE_FILE_TYPES,
+)
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 
 from common.djangoapps.course_action_state.models import CourseRerunState
@@ -60,7 +65,7 @@ from openedx.core.djangoapps.course_apps.toggles import exams_ida_enabled
 from openedx.core.djangoapps.discussions.tasks import update_unit_discussion_state_from_discussion_blocks
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
 from openedx.core.lib.blockstore_api import get_collection
-from openedx.core.lib.extract_tar import safetar_extractall
+from openedx.core.lib.extract_archives import safe_extractall
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.course_block import CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.exceptions import SerializationError  # lint-amnesty, pylint: disable=wrong-import-order
@@ -448,7 +453,7 @@ class CourseImportTask(UserTask):  # pylint: disable=abstract-method
 # lint-amnesty, pylint: disable=too-many-statements
 def import_olx(self, user_id, course_key_string, archive_path, archive_name, language):
     """
-    Import a course or library from a provided OLX .tar.gz archive.
+    Import a course or library from a provided OLX .tar.gz or .zip archive.
     """
     set_code_owner_attribute_from_module(__name__)
     current_step = 'Unpacking'
@@ -485,7 +490,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
 
     def file_is_supported():
         """Check if it is a supported file."""
-        file_is_valid = archive_name.endswith('.tar.gz')
+        file_is_valid = archive_name.endswith(IMPORTABLE_FILE_TYPES)
 
         if not file_is_valid:
             message = f'Unsupported file {archive_name}'
@@ -614,17 +619,14 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
 
     # try-finally block for proper clean up after receiving file.
     try:
-        tar_file = tarfile.open(temp_filepath)  # lint-amnesty, pylint: disable=consider-using-with
         try:
-            safetar_extractall(tar_file, (course_dir + '/'))
+            safe_extractall(temp_filepath, course_dir)
         except SuspiciousOperation as exc:
             with translation_language(language):
-                self.status.fail(UserErrors.UNSAFE_TAR_FILE)
-            LOGGER.error(f'{log_prefix}: Unsafe tar file')
+                self.status.fail(UserErrors.UNSAFE_ARCHIVE_FILE)
+            LOGGER.error(f'{log_prefix}: Unsafe archive file')
             monitor_import_failure(courselike_key, current_step, exception=exc)
             return
-        finally:
-            tar_file.close()
 
         current_step = 'Verifying'
         self.status.set_state(current_step)

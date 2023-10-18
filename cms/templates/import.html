@@ -45,13 +45,14 @@ else:
     <article class="content-primary" role="main">
       <div class="introduction">
         ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
+        ## Translators: ".zip" is a file extension, and files with that extension are called "zipped files": these terms should not be translated
         %if library:
             <p>${Text(_("Be sure you want to import a library before continuing. The contents of the imported library will replace the contents of the existing library. {em_start}You cannot undo a library import{em_end}. Before you proceed, we recommend that you export the current library, so that you have a backup copy of it.")).format(em_start=HTML('<strong>'), em_end=HTML("</strong>"))}</p>
             <p>${_("The library that you import must be in a .tar.gz file (that is, a .tar file compressed with GNU Zip). This .tar.gz file must contain a library.xml file. It may also contain other files.")}</p>
             <p>${_("The import process has five stages. During the first two stages, you must stay on this page. You can leave this page after the Unpacking stage has completed. We recommend, however, that you don't make important changes to your library until the import operation has completed.")}</p>
         %else:
             <p>${Text(_("Be sure you want to import a course before continuing. The contents of the imported course will replace the contents of the existing course. {em_start}You cannot undo a course import{em_end}. Before you proceed, we recommend that you export the current course, so that you have a backup copy of it.")).format(em_start=HTML('<strong>'), em_end=HTML("</strong>"))}</p>
-            <p>${_("The course that you import must be in a .tar.gz file (that is, a .tar file compressed with GNU Zip). This .tar.gz file must contain a course.xml file. It may also contain other files.")}</p>
+            <p>${_("The course that you import must be in a .tar.gz file (that is, a .tar file compressed with GNU Zip) or .zip (that is a compressed file). This .tar.gz or .zip file must contain a course.xml file. It may also contain other files.")}</p>
             <p>${_("The import process has five stages. During the first two stages, you must stay on this page. You can leave this page after the Unpacking stage has completed. We recommend, however, that you don't make important changes to your course until the import operation has completed.")}</p>
         %endif
 
@@ -60,11 +61,12 @@ else:
       <form id="fileupload" method="post" enctype="multipart/form-data" class="import-form">
 
         ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
+        ## Translators: ".zip" is a file extension, and files with that extension are called "zipped files": these terms should not be translated
         <h2 class="title">
             %if library:
                 ${_("Select a .tar.gz File to Replace Your Library Content")}
             %else:
-                ${_("Select a .tar.gz File to Replace Your Course Content")}
+                ${_("Select a .tar.gz or .zip File to Replace Your Course Content")}
             %endif
         </h2>
 

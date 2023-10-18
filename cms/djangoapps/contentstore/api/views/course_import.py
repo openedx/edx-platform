@@ -19,6 +19,7 @@ from user_tasks.models import UserTaskStatus
 
 from cms.djangoapps.contentstore.storage import course_import_export_storage
 from cms.djangoapps.contentstore.tasks import CourseImportTask, import_olx
+from cms.djangoapps.contentstore.utils import IMPORTABLE_FILE_TYPES
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 
 from .utils import course_author_access_required
@@ -44,8 +45,8 @@ class CourseImportView(CourseImportExportViewMixin, GenericAPIView):
     """
     **Use Case**
 
-        * Start an asynchronous task to import a course from a .tar.gz file into
-        the specified course ID, overwriting the existing course
+        * Start an asynchronous task to import a course from a .tar.gz or .zip
+        file into the specified course ID, overwriting the existing course
         * Get a status on an asynchronous task import
 
     **Example Requests**
@@ -59,7 +60,7 @@ class CourseImportView(CourseImportExportViewMixin, GenericAPIView):
 
         * course_id: (required) A string representation of a Course ID,
                                 e.g., course-v1:edX+DemoX+Demo_Course
-        * course_data: (required) The course .tar.gz file to import
+        * course_data: (required) The course .tar.gz or .zip file to import
 
     **POST Response Values**
 
@@ -83,7 +84,7 @@ class CourseImportView(CourseImportExportViewMixin, GenericAPIView):
         A GET request must include the following parameters.
 
         * task_id: (required) The UUID of the task to check, e.g. "4b357bb3-2a1e-441d-9f6c-2210cf76606f"
-        * filename: (required) The filename of the uploaded course .tar.gz
+        * filename: (required) The filename of the uploaded course .tar.gz or .zip
 
     **GET Response Values**
 
@@ -124,7 +125,7 @@ class CourseImportView(CourseImportExportViewMixin, GenericAPIView):
                 )
 
             filename = request.FILES['course_data'].name
-            if not filename.endswith('.tar.gz'):
+            if not filename.endswith(IMPORTABLE_FILE_TYPES):
                 raise self.api_error(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     developer_message='Parameter in the wrong format',
