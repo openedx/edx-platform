@@ -285,14 +285,14 @@ class CourseGroupTest(TestCase):
         with pytest.raises(PermissionDenied):
             remove_users(self.staff, CourseStaffRole(self.course_key), another_staff)
 
-    def test_no_limited_staff_read_or_write_access(self):
+    def test_limited_staff_no_studio_read_access(self):
         """
-        Test that course limited staff have no read or write access.
+        Verifies that course limited staff have no read, but have write access.
         """
         add_users(self.global_admin, CourseLimitedStaffRole(self.course_key), self.limited_staff)
 
         assert not has_studio_read_access(self.limited_staff, self.course_key)
-        assert not has_studio_write_access(self.limited_staff, self.course_key)
+        assert has_studio_write_access(self.limited_staff, self.course_key)
 
 
 class CourseOrgGroupTest(TestCase):

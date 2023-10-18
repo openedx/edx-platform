@@ -5,12 +5,13 @@ import json
 import logging
 from time import time
 
+import jwt
 from django.conf import settings
 from edx_django_utils.monitoring import increment, set_custom_attribute
 from edx_rbac.utils import create_role_auth_claim_for_user
 from edx_toggles.toggles import SettingToggle
-from jwkest import jwk
-from jwkest.jws import JWS
+from jwt import PyJWK
+from jwt.utils import base64url_encode
 
 from common.djangoapps.student.models import UserProfile, anonymous_id_for_user
 
@@ -273,17 +274,14 @@ def _attach_profile_claim(payload, user):
 
 def _encode_and_sign(payload, use_asymmetric_key, secret):
     """Encode and sign the provided payload."""
-    keys = jwk.KEYS()
 
     if use_asymmetric_key:
-        serialized_keypair = json.loads(settings.JWT_AUTH['JWT_PRIVATE_SIGNING_JWK'])
-        keys.add(serialized_keypair)
+        key = json.loads(settings.JWT_AUTH['JWT_PRIVATE_SIGNING_JWK'])
         algorithm = settings.JWT_AUTH['JWT_SIGNING_ALGORITHM']
     else:
-        key = secret if secret else settings.JWT_AUTH['JWT_SECRET_KEY']
-        keys.add({'key': key, 'kty': 'oct'})
+        secret = secret if secret else settings.JWT_AUTH['JWT_SECRET_KEY']
+        key = {'k': base64url_encode(secret.encode('utf-8')), 'kty': 'oct'}
         algorithm = settings.JWT_AUTH['JWT_ALGORITHM']
 
-    data = json.dumps(payload)
-    jws = JWS(data, alg=algorithm)
-    return jws.sign_compact(keys=keys)
+    jwk = PyJWK(key, algorithm)
+    return jwt.encode(payload, jwk.key, algorithm=algorithm)

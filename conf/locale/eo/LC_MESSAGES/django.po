@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-08 20:36+0000\n"
-"PO-Revision-Date: 2023-10-08 20:36:26.861016\n"
+"POT-Creation-Date: 2023-10-15 20:36+0000\n"
+"PO-Revision-Date: 2023-10-15 20:36:20.949198\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -4122,12 +4122,12 @@ msgid "Good"
 msgstr "Gööd Ⱡ'σяєм ι#"
 
 #. Translators: Replier commented on "your" response to your post
-#: lms/djangoapps/discussion/rest_api/utils.py
+#: lms/djangoapps/discussion/rest_api/discussions_notifications.py
 msgid "your"
 msgstr "ýöür Ⱡ'σяєм ι#"
 
 #. Translators: Replier commented on "their" response to your post
-#: lms/djangoapps/discussion/rest_api/utils.py
+#: lms/djangoapps/discussion/rest_api/discussions_notifications.py
 msgid "their"
 msgstr "théïr Ⱡ'σяєм ιρѕ#"
 
@@ -8712,6 +8712,26 @@ msgstr ""
 "<{p}><{strong}>{username}</{strong}> äskéd "
 "<{strong}>{post_title}</{strong}></{p}> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢т#"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> responded to a post you’re "
+"following: <{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> réspöndéd tö ä pöst ýöü’ré "
+"föllöwïng: <{strong}>{post_title}</{strong}></{p}> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> commented on {author_name}'s "
+"response in a post you’re following <{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> çömméntéd ön {author_name}'s "
+"réspönsé ïn ä pöst ýöü’ré föllöwïng <{strong}>{post_title}</{strong}></{p}> "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: openedx/core/djangoapps/notifications/base_notification.py
 msgid ""
