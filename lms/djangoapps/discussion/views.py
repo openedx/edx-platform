@@ -784,7 +784,7 @@ def is_privileged_user(course_key: CourseKey, user: User):
     permissions = [
         CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value,
         CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.value,
-        ]
+    ]
     has_moderate_discussion_permissions = course_permissions_list_check_any(user, permissions, course_key)
     return GlobalStaff().has_user(user) or has_course_role or has_moderate_discussion_permissions
 

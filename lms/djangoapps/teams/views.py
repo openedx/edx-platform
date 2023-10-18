@@ -1077,7 +1077,7 @@ def _filter_hidden_private_teamsets(user, teamsets, course_block):
     #       Remove the has_course_staff_privileges when course_roles Django app are implemented.
     user_has_manage_student_permission = course_or_organization_permission_check(
         user, CourseRolesPermission.MANAGE_STUDENTS.value, course_block.id
-        )
+    )
     if has_course_staff_privileges(user, course_block.id) or user_has_manage_student_permission:
         return teamsets
     private_teamset_ids = [teamset.teamset_id for teamset in course_block.teamsets if teamset.is_private_managed]
@@ -1398,7 +1398,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
             #       Remove the has_course_staff_privileges when course_roles Django app are implemented.
             user_has_manage_student_permission = course_or_organization_permission_check(
                 request.user, CourseRolesPermission.MANAGE_STUDENTS.value, requested_course_key
-                )
+            )
             if has_course_staff_privileges(request.user, requested_course_key) or user_has_manage_student_permission:
                 teams_with_access = list(teamset_teams)
             else:
@@ -1709,7 +1709,7 @@ class MembershipBulkManagementView(GenericAPIView):
         #       Remove the has_course_staff_privileges when course_roles Django app are implemented.
         user_has_manage_student_permission = course_or_organization_permission_check(
             self.request.user, CourseRolesPermission.MANAGE_STUDENTS.value, self.course.id
-            )
+        )
         if not has_course_staff_privileges(self.request.user, self.course.id) or user_has_manage_student_permission:
             raise PermissionDenied(
                 "To manage team membership of {}, you must be course staff.".format(

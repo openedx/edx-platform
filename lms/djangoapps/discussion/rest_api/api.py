@@ -995,7 +995,7 @@ def get_thread_list(
         permissions = [
             CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value,
             CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.value,
-            ]
+        ]
         has_moderate_discussion_permissions = course_permissions_list_check_any(request.user, permissions, course_key)
         if (Role.user_has_role_for_course(request.user, course_key, allowed_roles) or
                 has_moderate_discussion_permissions):

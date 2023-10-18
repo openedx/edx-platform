@@ -94,7 +94,8 @@ perms[RESCORE_EXAMS] = HasAccessRule('instructor')
 perms[VIEW_REGISTRATION] = HasAccessRule('staff')
 # TODO: course roles: If the course roles feature flag is disabled the HasPermissionRule
 #       below will never return true.
-#       Remove the HasRolesRule('staff', 'instructor', 'data_researcher') call when course_roles Django app are implemented.
+#       Remove the HasRolesRule('staff', 'instructor', 'data_researcher') 
+#       call when course_roles Django app are implemented.
 perms[VIEW_DASHBOARD] = (
     HasRolesRule('staff', 'instructor', 'data_researcher')
     | HasAccessRule('staff')

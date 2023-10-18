@@ -168,7 +168,7 @@ def has_team_api_access(user, course_key, access_username=None):
     #       when course_roles Django app are implemented.
     user_has_manage_student_permission = course_or_organization_permission_check(
         user, CourseRolesPermission.MANAGE_STUDENTS.value, course_key
-        )
+    )
     if has_course_staff_privileges(user, course_key) or user_has_manage_student_permission:
         return True
     if has_discussion_privileges(user, course_key):
@@ -190,7 +190,7 @@ def user_organization_protection_status(user, course_key):
     #       Remove the has_course_staff_privileges when course_roles Django app are implemented.
     user_has_manage_student_permission = course_or_organization_permission_check(
         user, CourseRolesPermission.MANAGE_STUDENTS.value, course_key
-        )
+    )
     if has_course_staff_privileges(user, course_key) or user_has_manage_student_permission:
         return OrganizationProtectionStatus.protection_exempt
     enrollment = CourseEnrollment.get_enrollment(user, course_key)
@@ -220,7 +220,7 @@ def has_specific_team_access(user, team):
     #       Remove the has_course_staff_privileges when course_roles Django app are implemented.
     user_has_manage_student_permission = course_or_organization_permission_check(
         user, CourseRolesPermission.MANAGE_STUDENTS.value, team.course_id
-        )
+    )
     return has_course_staff_privileges(user, team.course_id) or user_has_manage_student_permission or (
         user_protection_status_matches_team(user, team) and user_on_team_or_team_is_public(user, team)
     )
@@ -237,7 +237,7 @@ def has_specific_teamset_access(user, course_block, teamset_id):
     #       Remove the has_course_staff_privileges when course_roles Django app are implemented.
     user_has_manage_student_permission = course_or_organization_permission_check(
         user, CourseRolesPermission.MANAGE_STUDENTS.value, course_block.id
-        )
+    )
     return has_course_staff_privileges(user, course_block.id) or user_has_manage_student_permission or \
         teamset_is_public_or_user_is_on_team_in_teamset(user, course_block, teamset_id)
 
@@ -354,7 +354,7 @@ def can_user_modify_team(user, team):
     #       Remove the has_course_staff_privileges when course_roles Django app are implemented.
     user_has_manage_student_permission = course_or_organization_permission_check(
         user, CourseRolesPermission.MANAGE_STUDENTS.value, team.course_id
-        )
+    )
     return (
         (not is_instructor_managed_team(team)) or
         has_course_staff_privileges(user, team.course_id) or
@@ -373,7 +373,7 @@ def can_user_create_team_in_topic(user, course_id, topic_id):
     #       Remove the has_course_staff_privileges when course_roles Django app are implemented.
     user_has_manage_student_permission = course_or_organization_permission_check(
         user, CourseRolesPermission.MANAGE_STUDENTS.value, course_id
-        )
+    )
     return (
         (not is_instructor_managed_topic(course_id, topic_id)) or
         has_course_staff_privileges(user, course_id) or
@@ -447,7 +447,7 @@ def anonymous_user_ids_for_team(user, team):
     #       Remove the has_course_staff_privileges when course_roles Django app are implemented.
     user_has_manage_student_permission = course_or_organization_permission_check(
         user, CourseRolesPermission.MANAGE_STUDENTS.value, team.course_id
-        )
+    )
     if (
         not has_course_staff_privileges(user, team.course_id) or not user_has_manage_student_permission
     ) and not user_is_a_team_member(user, team):

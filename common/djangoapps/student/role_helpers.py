@@ -43,7 +43,7 @@ def has_staff_roles(user, course_key):
     permissions = [
         CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value,
         CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.value,
-        ]
+    ]
     has_moderate_discussion_permissions = course_permissions_list_check_any(user, permissions, course_key)
     has_forum_role = Role.user_has_role_for_course(user, course_key, forum_roles)
     if any([is_staff, is_instructor, is_beta_tester, is_org_staff,
