@@ -1,21 +1,11 @@
-// See common/templates/mathjax_include.html for info on Fast Preview mode.
-var disableFastPreview = true,
-    vendorScript;
+var vendorScript;
 if (typeof MathJax === 'undefined') {
-    if (disableFastPreview) {
-        window.MathJax = {
-            menuSettings: {CHTMLpreview: false}
-        };
-    }
-
     vendorScript = document.createElement('script');
     vendorScript.onload = function() {
         'use strict';
 
-        var MathJax = window.MathJax,
-            setMathJaxDisplayDivSettings;
-        MathJax.Hub.Config({
-            tex2jax: {
+        window.MathJax = {
+            tex: {
                 inlineMath: [
                     ['\\(', '\\)'],
                     ['[mathjaxinline]', '[/mathjaxinline]']
@@ -23,34 +13,28 @@ if (typeof MathJax === 'undefined') {
                 displayMath: [
                     ['\\[', '\\]'],
                     ['[mathjax]', '[/mathjax]']
-                ]
+                ],
+                autoload: {
+                    color: [],
+                    colorv2: ['color']
+                },
+                packages: {'[+]': ['noerrors']}
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process',
+                menuOptions: {
+                    settings: {
+                        collapsible: true,
+                        explorer: true
+                    },
+                },
+            },
+            loader: {
+                load: ['input/asciimath', '[tex]/noerrors']
             }
-        });
-        if (disableFastPreview) {
-            MathJax.Hub.processSectionDelay = 0;
-        }
-        MathJax.Hub.signal.Interest(function(message) {
-            if (message[0] === 'End Math') {
-                setMathJaxDisplayDivSettings();
-            }
-        });
-        setMathJaxDisplayDivSettings = function() {
-            $('.MathJax_Display').each(function() {
-                this.setAttribute('tabindex', '0');
-                this.setAttribute('aria-live', 'off');
-                this.removeAttribute('role');
-                this.removeAttribute('aria-readonly');
-            });
         };
     };
-    // Automatic loading of Mathjax accessibility files
-    window.MathJax = {
-        menuSettings: {
-            collapsible: true,
-            autocollapse: false,
-            explorer: true
-        }
-    };
-    vendorScript.src = 'https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML';
+    vendorScript.src = 'https://cdn.jsdelivr.net/npm/mathjax@3.2.1/es5/tex-mml-svg.js';
     document.body.appendChild(vendorScript);
 }

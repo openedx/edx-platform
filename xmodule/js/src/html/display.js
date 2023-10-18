@@ -8,7 +8,8 @@
       JavascriptLoader.executeModuleScripts(this.el);
       Collapsible.setCollapsibles(this.el);
       if (typeof MathJax !== "undefined" && MathJax !== null) {
-        MathJax.Hub.Queue(["Typeset", MathJax.Hub, this.el[0]]);
+        MathJax.startup.promise
+          .then(() => MathJax.typesetPromise([this.el[0]]));
       }
       if (typeof setupFullScreenModal !== "undefined" && setupFullScreenModal !== null) {
         setupFullScreenModal();

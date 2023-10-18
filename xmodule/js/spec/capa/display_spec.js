@@ -10,11 +10,14 @@ describe('Problem', function() {
   beforeEach(function() {
     // Stub MathJax
     window.MathJax = {
-      Hub: jasmine.createSpyObj('MathJax.Hub', ['getAllJax', 'Queue']),
-      Callback: jasmine.createSpyObj('MathJax.Callback', ['After'])
+      startup: {
+        document: jasmine.createSpyObj('MathJax.startup.document', ['getMathItemsWithin']),
+      },
+      toMML: jasmine.createSpyObj('MathJax.startup', ['toMML']),
+      typesetPromise: jasmine.createSpyObj('MathJax.typesetPromise'),
     };
-    this.stubbedJax = {root: jasmine.createSpyObj('jax.root', ['toMathML'])};
-    MathJax.Hub.getAllJax.and.returnValue([this.stubbedJax]);
+    spyOn(MathJax.typesetPromise).and.returnValue(Promise.resolve());
+    this.stubbedJax = jasmine.createSpyObj('jax', ['root']);
     window.update_schematics = function() {};
     spyOn(SR, 'readText');
     spyOn(SR, 'readTexts');
@@ -59,11 +62,11 @@ data-url='/problem/quiz/'> \
   describe('bind', function() {
     beforeEach(function() {
       spyOn(window, 'update_schematics');
-      MathJax.Hub.getAllJax.and.returnValue([this.stubbedJax]);
+      MathJax.startup.document.getMathItemsWithin.and.returnValue([this.stubbedJax]);
       this.problem = new Problem($('.xblock-student_view'));
     });
 
-    it('set mathjax typeset', () => expect(MathJax.Hub.Queue).toHaveBeenCalled());
+    it('set mathjax typeset', () => expect(MathJax.typesetPromise).toHaveBeenCalled());
 
     it('update schematics', () => expect(window.update_schematics).toHaveBeenCalled());
 
@@ -95,7 +98,7 @@ data-url='/problem/quiz/'> \
   describe('bind_with_custom_input_id', function() {
     beforeEach(function() {
       spyOn(window, 'update_schematics');
-      MathJax.Hub.getAllJax.and.returnValue([this.stubbedJax]);
+      MathJax.startup.document.getMathItemsWithin.and.returnValue([this.stubbedJax]);
       this.problem = new Problem($('.xblock-student_view'));
       return $(this).html(readFixtures('problem_content_1240.html'));
     });
@@ -929,15 +932,15 @@ data-url='/problem/quiz/'> \
     });
 
     it('should queue the conversion and MathML element update', function() {
-      expect(MathJax.Hub.Queue).toHaveBeenCalledWith(['Text', this.stubbedJax, 'E=mc^2'],
-        [this.problem.updateMathML, this.stubbedJax, $('#input_example_1').get(0)]);
+      expect(MathJax.typesetClear).toHaveBeenCalledWith([this.stubbedJax]);
+      expect(MathJax.typesetPromise).toHaveBeenCalledWith([this.stubbedJax]);
   });
 });
 
   describe('updateMathML', function() {
     beforeEach(function() {
       this.problem = new Problem($('.xblock-student_view'));
-      this.stubbedJax.root.toMathML.and.returnValue('<MathML>');
+      MathJax.startup.toMML.and.returnValue('<MathML>');
     });
 
     describe('when there is no exception', function() {
@@ -952,12 +955,13 @@ data-url='/problem/quiz/'> \
       beforeEach(function() {
         const error = new Error();
         error.restart = true;
-        this.stubbedJax.root.toMathML.and.throwError(error);
+        MathJax.startup.toMML.and.throwError(error);
         this.problem.updateMathML(this.stubbedJax, $('#input_example_1').get(0));
       });
 
       it('should queue up the exception', function() {
-        expect(MathJax.Callback.After).toHaveBeenCalledWith([this.problem.refreshMath, this.stubbedJax], true);
+        expect(MathJax.startup.promise).toHaveBeenCalled();
+        expect(this.problem.refreshMath.toHaveBeenCalledWith(null,$('#input_example_1').get(0)));
       });
     });
   });

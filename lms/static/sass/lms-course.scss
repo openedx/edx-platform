@@ -34,3 +34,11 @@
         width: 54px !important;
     }
 }
+
+.MathJax>svg {
+    max-width: 100%,
+}
+
+table>tbody>tr>td>.MathJax>svg {
+    max-width: inherit
+}

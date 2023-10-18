@@ -13,8 +13,6 @@
 
     MathJaxDelayRenderer.prototype.maxDelay = 3000;
 
-    MathJaxDelayRenderer.prototype.mathjaxRunning = false;
-
     MathJaxDelayRenderer.prototype.elapsedTime = 0;
 
     MathJaxDelayRenderer.prototype.mathjaxDelay = 0;
@@ -60,7 +58,10 @@
           text = preprocessor(text);
         }
         $(elem).html(text); // xss-lint: disable=javascript-jquery-html
-        return MathJax.Hub.Queue(["Typeset", MathJax.Hub, $(elem).attr("id")]);
+        if (typeof MathJax !== 'undefined' && MathJax !== null) {
+          return MathJax.startup.promise
+            .then(() => MathJax.typesetPromise([$(elem).attr("id")]));
+        }
       } else {
         if (this.mathjaxTimeout) {
           window.clearTimeout(this.mathjaxTimeout);
@@ -70,9 +71,6 @@
         renderer = (function(_this) {
           return function() {
             var curTime, prevTime;
-            if (_this.mathjaxRunning) {
-              return;
-            }
             prevTime = getTime();
             if (preprocessor != null) {
               text = preprocessor(text);
@@ -82,17 +80,18 @@
             _this.elapsedTime = curTime - prevTime;
             if (typeof MathJax !== "undefined" && MathJax !== null) {
               prevTime = getTime();
-              _this.mathjaxRunning = true;
-              return MathJax.Hub.Queue(["Typeset", MathJax.Hub, _this.$buffer.attr("id")], function() {
-                _this.mathjaxRunning = false;
-                curTime = getTime();
-                _this.mathjaxDelay = curTime - prevTime;
-                if (previewSetter) {
-                  return previewSetter($(_this.$buffer).html());
-                } else {
-                  return $(elem).html($(_this.$buffer).html()); // xss-lint: disable=javascript-jquery-html
-                }
-              });
+              return MathJax.startup.promise
+                .then(
+                  () => MathJax.typesetPromise([_this.$buffer[0]]).then(() => {
+                    curTime = getTime();
+                    _this.mathjaxDelay = curTime - prevTime;
+                    if (previewSetter) {
+                      return previewSetter($(_this.$buffer).html());
+                    } else {
+                      return $(elem).html($(_this.$buffer).html()); // xss-lint: disable=javascript-jquery-html
+                    }
+                  })
+                );
             } else {
               return _this.mathjaxDelay = 0;
             }
