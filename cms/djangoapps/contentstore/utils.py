@@ -101,6 +101,7 @@ from xmodule.partitions.partitions_service import get_all_partitions_for_course 
 from xmodule.services import SettingsService, ConfigurationService, TeamsConfigurationService
 
 
+IMPORTABLE_FILE_TYPES = ('.tar.gz', '.zip')
 log = logging.getLogger(__name__)
 
 
