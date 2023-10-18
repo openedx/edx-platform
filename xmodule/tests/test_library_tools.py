@@ -6,6 +6,8 @@ from unittest import mock
 
 import ddt
 from bson.objectid import ObjectId
+from django.conf import settings
+from django.test import override_settings
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
 
@@ -48,8 +50,7 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         assert all_libraries
         assert len(all_libraries) == 2
 
-        # enable FEATURES[ENABLE_LIBRARY_AUTHORING_MICROFRONTEND]
-        with mock().patch('settings.FEATURES.get', return_value=True):
+        with override_settings(FEATURES={**settings.FEATURES, "ENABLE_LIBRARY_AUTHORING_MICROFRONTEND": True}):
             all_libraries = self.tools.list_available_libraries()
             assert all_libraries
             assert len(all_libraries) == 1
