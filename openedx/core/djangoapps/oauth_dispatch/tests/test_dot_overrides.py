@@ -31,19 +31,20 @@ class AuthenticateTestCase(TestCase):
 
     def setUp(self):
         super().setUp()
+        self.TEST_PASSWORD = 'Password1234'
         self.user = UserFactory.create(
             username='darkhelmet',
-            password='12345',
+            password=self.TEST_PASSWORD,
             email='darkhelmet@spaceball_one.org',
         )
         self.validator = EdxOAuth2Validator()
 
     def test_authenticate_with_username(self):
-        user = self.validator._authenticate(username='darkhelmet', password='12345')
+        user = self.validator._authenticate(username='darkhelmet', password=self.TEST_PASSWORD)
         assert self.user == user
 
     def test_authenticate_with_email(self):
-        user = self.validator._authenticate(username='darkhelmet@spaceball_one.org', password='12345')
+        user = self.validator._authenticate(username='darkhelmet@spaceball_one.org', password=self.TEST_PASSWORD)
         assert self.user == user
 
 
@@ -56,9 +57,10 @@ class CustomValidationTestCase(TestCase):
     """
     def setUp(self):
         super().setUp()
+        self.TEST_PASSWORD = 'Password1234'
         self.user = UserFactory.create(
             username='darkhelmet',
-            password='12345',
+            password=self.TEST_PASSWORD,
             email='darkhelmet@spaceball_one.org',
         )
         self.validator = EdxOAuth2Validator()
@@ -67,13 +69,13 @@ class CustomValidationTestCase(TestCase):
     def test_active_user_validates(self):
         assert self.user.is_active
         request = self.request_factory.get('/')
-        assert self.validator.validate_user('darkhelmet', '12345', client=None, request=request)
+        assert self.validator.validate_user('darkhelmet', self.TEST_PASSWORD, client=None, request=request)
 
     def test_inactive_user_validates(self):
         self.user.is_active = False
         self.user.save()
         request = self.request_factory.get('/')
-        assert self.validator.validate_user('darkhelmet', '12345', client=None, request=request)
+        assert self.validator.validate_user('darkhelmet', self.TEST_PASSWORD, client=None, request=request)
 
 
 @skip_unless_lms
@@ -87,9 +89,10 @@ class CustomAuthorizationViewTestCase(TestCase):
     """
     def setUp(self):
         super().setUp()
+        self.TEST_PASSWORD = 'Password1234'
         self.dot_adapter = adapters.DOTAdapter()
-        self.user = UserFactory()
-        self.client.login(username=self.user.username, password='test')
+        self.user = UserFactory(password=self.TEST_PASSWORD)
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         self.restricted_dot_app = self._create_restricted_app()
         self._create_expired_token(self.restricted_dot_app)
