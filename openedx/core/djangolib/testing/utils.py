@@ -11,16 +11,19 @@ Utility classes for testing django applications.
 
 import copy
 import re
-from unittest import skipUnless
+from unittest import skip
 
 import crum
 from django.conf import settings
 from django.contrib import sites
 from django.core.cache import caches
+from django.core.exceptions import ImproperlyConfigured
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.test import RequestFactory, TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
 from edx_django_utils.cache import RequestCache
+
+from openedx.core.lib import ensure_cms, ensure_lms
 
 
 class CacheIsolationMixin:
@@ -245,11 +248,17 @@ def skip_unless_cms(func):
     """
     Only run the decorated test in the CMS test suite
     """
-    return skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in CMS')(func)
+    try:
+        ensure_cms()
+    except ImproperlyConfigured:
+        skip('Test only valid in CMS')(func)
 
 
 def skip_unless_lms(func):
     """
     Only run the decorated test in the LMS test suite
     """
-    return skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')(func)
+    try:
+        ensure_lms()
+    except ImproperlyConfigured:
+        skip('Test only valid in LMS')(func)

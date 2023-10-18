@@ -19,7 +19,7 @@ from xblock.fields import Scope
 
 from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.xblock.api import load_block
-from openedx.core.lib import blockstore_api
+from openedx.core.lib import ensure_cms, blockstore_api
 from common.djangoapps.student.auth import has_studio_write_access
 from xmodule.capa_block import ProblemBlock
 from xmodule.modulestore import ModuleStoreEnum
@@ -38,10 +38,13 @@ class LibraryToolsService:
     Service for LibraryContentBlock.
 
     Allows to interact with libraries in the modulestore and blockstore.
+
+    Should only be used in the CMS.
     """
     def __init__(self, modulestore, user_id):
         self.store = modulestore
         self.user_id = user_id
+        ensure_cms("Library Tools are should only be used in authoring runtimes")
 
     def _get_library(self, library_key):
         """
