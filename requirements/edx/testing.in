@@ -38,7 +38,7 @@ pytest-attrib             # Select tests based on attributes
 pytest-cov                # pytest plugin for measuring code coverage
 pytest-django             # Django support for pytest
 pytest-json-report        # Output json formatted warnings after running pytest
-pytest-metadata==1.8.0     # To prevent 'make upgrade' failure, dependency of pytest-json-report
+pytest-metadata
 pytest-randomly           # pytest plugin to randomly order tests
 pytest-xdist[psutil]      # Parallel execution of tests on multiple CPU cores or hosts
 selenium                  # Browser automation library, used for acceptance tests
