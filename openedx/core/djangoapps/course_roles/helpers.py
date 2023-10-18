@@ -7,8 +7,11 @@ from django.contrib.auth.models import AnonymousUser
 from openedx.core.djangoapps.course_roles.models import CourseRolesUserRole
 from openedx.core.lib.cache_utils import request_cached
 from xmodule.modulestore.django import modulestore
+import logging
+
 
 User = get_user_model()
+LOGGER = logging.getLogger(__name__)
 
 
 @request_cached()
@@ -74,7 +77,11 @@ def course_or_organization_permission_check(user, permission_name, course_id, or
     if isinstance(user, AnonymousUser) or not isinstance(user, User):
         return False
     if organization_name is None:
-        organization_name = modulestore().get_course(course_id).org
+        course = modulestore().get_course(course_id)
+        if course:
+            organization_name = modulestore().get_course(course_id).org
+        else:
+            return course_permission_check(user, permission_name, course_id)
     return (course_permission_check(user, permission_name, course_id) or
             organization_permission_check(user, permission_name, organization_name)
             )
