@@ -3266,12 +3266,12 @@ msgid "Good"
 msgstr ""
 
 #. Translators: Replier commented on "your" response to your post
-#: lms/djangoapps/discussion/rest_api/utils.py
+#: lms/djangoapps/discussion/rest_api/discussions_notifications.py
 msgid "your"
 msgstr ""
 
 #. Translators: Replier commented on "their" response to your post
-#: lms/djangoapps/discussion/rest_api/utils.py
+#: lms/djangoapps/discussion/rest_api/discussions_notifications.py
 msgid "their"
 msgstr ""
 
@@ -6809,6 +6809,20 @@ msgstr ""
 msgid ""
 "<{p}><{strong}>{username}</{strong}> asked "
 "<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> responded to a post you’re "
+"following: <{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> commented on {author_name}'s "
+"response in a post you’re following <{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
 
 #: openedx/core/djangoapps/notifications/base_notification.py
