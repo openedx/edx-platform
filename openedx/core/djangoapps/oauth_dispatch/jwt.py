@@ -12,6 +12,7 @@ from edx_rbac.utils import create_role_auth_claim_for_user
 from edx_toggles.toggles import SettingToggle
 from jwt import PyJWK
 from jwt.utils import base64url_encode
+from oauth2_provider.models import Application
 
 from common.djangoapps.student.models import UserProfile, anonymous_id_for_user
 
@@ -170,7 +171,11 @@ def _create_jwt(
     # Default scopes should only contain non-privileged data.
     # Do not be misled by the fact that `email` and `profile` are default scopes. They
     # were included for legacy compatibility, even though they contain privileged data.
+    # The scope `user_id` must be added for requests with grant_type password.
     scopes = scopes or ['email', 'profile']
+    if grant_type == Application.GRANT_PASSWORD:
+        scopes.append('user_id')
+
     iat, exp = _compute_time_fields(expires_in)
 
     payload = {
@@ -187,7 +192,6 @@ def _create_jwt(
         'filters': filters or [],
         'is_restricted': is_restricted,
         'email_verified': user.is_active,
-        'user_id': user.id,
     }
     payload.update(additional_claims or {})
     _update_from_additional_handlers(payload, user, scopes)
