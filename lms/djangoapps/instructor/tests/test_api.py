@@ -325,7 +325,7 @@ class TestEndpointHttpMethods(SharedModuleStoreTestCase, LoginEnrollmentTestCase
         """
         super().setUp()
         global_user = GlobalStaffFactory()
-        self.client.login(username=global_user.username, password='test')
+        self.client.login(username=global_user.username, password=self.TEST_PASSWORD)
 
     @ddt.data(*INSTRUCTOR_POST_ENDPOINTS)
     def test_endpoints_reject_get(self, data):
@@ -478,7 +478,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
         """
         Ensure that an enrolled student can't access staff or instructor endpoints.
         """
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         for endpoint, args in self.staff_level_endpoints:
             self._access_endpoint(
@@ -518,7 +518,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
         CourseEnrollment.enroll(staff_member, self.course.id)
         CourseFinanceAdminRole(self.course.id).add_users(staff_member)
         CourseDataResearcherRole(self.course.id).add_users(staff_member)
-        self.client.login(username=staff_member.username, password='test')
+        self.client.login(username=staff_member.username, password=self.TEST_PASSWORD)
         # Try to promote to forums admin - not working
         # update_forum_role(self.course.id, staff_member, FORUM_ROLE_ADMINISTRATOR, 'allow')
 
@@ -558,7 +558,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
 
         CourseFinanceAdminRole(self.course.id).add_users(inst)
         CourseDataResearcherRole(self.course.id).add_users(inst)
-        self.client.login(username=inst.username, password='test')
+        self.client.login(username=inst.username, password=self.TEST_PASSWORD)
 
         for endpoint, args in self.staff_level_endpoints:
             expected_status = 200
@@ -632,7 +632,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         self.audit_course_instructor = InstructorFactory(course_key=self.audit_course.id)
         self.white_label_course_instructor = InstructorFactory(course_key=self.white_label_course.id)
 
-        self.client.login(username=self.instructor.username, password='test')
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
 
         self.not_enrolled_student = UserFactory(
             username='NotEnrolledStudent',
@@ -945,7 +945,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         Test that enrollment mode for audit courses (paid courses) is 'audit'.
         """
         # Login Audit Course instructor
-        self.client.login(username=self.audit_course_instructor.username, password='test')
+        self.client.login(username=self.audit_course_instructor.username, password=self.TEST_PASSWORD)
 
         csv_content = b"test_student_wl@example.com,test_student_wl,Test Student,USA"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
@@ -976,7 +976,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         self.white_label_course_mode.save()
 
         # Login Audit Course instructor
-        self.client.login(username=self.white_label_course_instructor.username, password='test')
+        self.client.login(username=self.white_label_course_instructor.username, password=self.TEST_PASSWORD)
 
         csv_content = b"test_student_wl@example.com,test_student_wl,Test Student,USA"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
@@ -1024,7 +1024,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
 
         self.request = RequestFactory().request()
         self.instructor = InstructorFactory(course_key=self.course.id)
-        self.client.login(username=self.instructor.username, password='test')
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
 
         self.enrolled_student = UserFactory(username='EnrolledStudent', first_name='Enrolled', last_name='Student')
         CourseEnrollment.enroll(
@@ -1873,7 +1873,7 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
         super().setUp()
 
         self.instructor = InstructorFactory(course_key=self.course.id)
-        self.client.login(username=self.instructor.username, password='test')
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
 
         self.beta_tester = BetaTesterFactory(course_key=self.course.id)
         CourseEnrollment.enroll(
@@ -2218,7 +2218,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
         super().setUp()
 
         self.instructor = InstructorFactory(course_key=self.course.id)
-        self.client.login(username=self.instructor.username, password='test')
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
 
         self.other_instructor = InstructorFactory(course_key=self.course.id)
         self.other_staff = StaffFactory(course_key=self.course.id)
@@ -2458,7 +2458,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         self.course_mode.save()
         self.instructor = InstructorFactory(course_key=self.course.id)
         CourseDataResearcherRole(self.course.id).add_users(self.instructor)
-        self.client.login(username=self.instructor.username, password='test')
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
 
         self.students = [UserFactory() for _ in range(6)]
         for student in self.students:
@@ -2600,7 +2600,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             }))
             course_instructor = InstructorFactory(course_key=self.course.id)
             CourseDataResearcherRole(self.course.id).add_users(course_instructor)
-            self.client.login(username=course_instructor.username, password='test')
+            self.client.login(username=course_instructor.username, password=self.TEST_PASSWORD)
 
         url = reverse('get_students_features', kwargs={'course_id': str(self.course.id)})
 
@@ -2972,7 +2972,7 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
     def setUp(self):
         super().setUp()
         self.instructor = InstructorFactory(course_key=self.course.id)
-        self.client.login(username=self.instructor.username, password='test')
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
 
         self.student = UserFactory()
         CourseEnrollment.enroll(self.student, self.course.id)
@@ -3158,7 +3158,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
         self.instructor = InstructorFactory(course_key=self.course.id)
         # Add instructor to invalid ee course
         CourseInstructorRole(self.course_with_invalid_ee.id).add_users(self.instructor)
-        self.client.login(username=self.instructor.username, password='test')
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
 
         self.student = UserFactory()
         CourseEnrollment.enroll(self.student, self.course.id)
@@ -3261,7 +3261,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
         """ Test entrance exam delete state failure with staff access. """
         self.client.logout()
         staff_user = StaffFactory(course_key=self.course.id)
-        self.client.login(username=staff_user.username, password='test')
+        self.client.login(username=staff_user.username, password=self.TEST_PASSWORD)
         url = reverse('reset_student_attempts_for_entrance_exam',
                       kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url, {
@@ -3414,7 +3414,7 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
         }
 
         self.instructor = InstructorFactory(course_key=self.course.id)
-        self.client.login(username=self.instructor.username, password='test')
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
 
     def tearDown(self):
         super().tearDown()
@@ -3434,7 +3434,7 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
     def test_send_email_but_not_staff(self):
         self.client.logout()
         student = UserFactory()
-        self.client.login(username=student.username, password='test')
+        self.client.login(username=student.username, password=self.TEST_PASSWORD)
         url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url, self.full_test_message)
         assert response.status_code == 403
@@ -3631,7 +3631,7 @@ class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestC
     def setUp(self):
         super().setUp()
         self.instructor = InstructorFactory(course_key=self.course.id)
-        self.client.login(username=self.instructor.username, password='test')
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
 
         self.student = UserFactory()
         CourseEnrollment.enroll(self.student, self.course.id)
@@ -3768,7 +3768,7 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
         super().setUp()
 
         self.instructor = InstructorFactory(course_key=self.course.id)
-        self.client.login(username=self.instructor.username, password='test')
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
         self.tasks = {}
         self.emails = {}
         self.emails_info = {}
@@ -4030,7 +4030,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         CourseEnrollmentFactory.create(user=self.user1, course_id=self.course.id)
         CourseEnrollmentFactory.create(user=self.user2, course_id=self.course.id)
         self.instructor = InstructorFactory(course_key=self.course.id)
-        self.client.login(username=self.instructor.username, password='test')
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
         extract_dates(None, self.course.id)
 
     def test_change_due_date(self):
@@ -4206,7 +4206,7 @@ class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestC
         CourseEnrollmentFactory.create(user=self.user1, course_id=self.course.id)
         CourseEnrollmentFactory.create(user=self.user2, course_id=self.course.id)
         self.instructor = InstructorFactory(course_key=self.course.id)
-        self.client.login(username=self.instructor.username, password='test')
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
         extract_dates(None, self.course.id)
 
     @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
@@ -4251,7 +4251,7 @@ class TestCourseIssuedCertificatesData(SharedModuleStoreTestCase):
     def setUp(self):
         super().setUp()
         self.instructor = InstructorFactory(course_key=self.course.id)
-        self.client.login(username=self.instructor.username, password='test')
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
 
     def generate_certificate(self, course_id, mode, status):
         """
@@ -4379,7 +4379,7 @@ class TestBulkCohorting(SharedModuleStoreTestCase):
         """
         Verify that we get the error we expect for a given file input.
         """
-        self.client.login(username=self.staff_user.username, password='test')
+        self.client.login(username=self.staff_user.username, password=self.TEST_PASSWORD)
         response = self.call_add_users_to_cohorts(file_content, suffix=file_suffix)
         assert response.status_code == 400
         result = json.loads(response.content.decode('utf-8'))
@@ -4392,7 +4392,7 @@ class TestBulkCohorting(SharedModuleStoreTestCase):
         background task.
         """
         mock_store_upload.return_value = (None, 'fake_file_name.csv')
-        self.client.login(username=self.staff_user.username, password='test')
+        self.client.login(username=self.staff_user.username, password=self.TEST_PASSWORD)
         response = self.call_add_users_to_cohorts(file_content)
         assert response.status_code == 204
         assert mock_store_upload.called
@@ -4438,7 +4438,7 @@ class TestBulkCohorting(SharedModuleStoreTestCase):
         """
         Verify that we can't access the view when we aren't a staff user.
         """
-        self.client.login(username=self.non_staff_user.username, password='test')
+        self.client.login(username=self.non_staff_user.username, password=self.TEST_PASSWORD)
         response = self.call_add_users_to_cohorts('')
         assert response.status_code == 403
 
