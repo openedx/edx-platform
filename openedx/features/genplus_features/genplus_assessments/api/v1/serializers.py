@@ -141,7 +141,9 @@ class SkillReflectionQuestionSerializer(serializers.ModelSerializer):
         common_filters = {}
 
         if class_id:
-            common_filters['user__gen_user__student__active_class_id'] = class_id
+            gen_class = Class.objects.prefetch_related('students').get(pk=class_id)
+            users = gen_class.students.select_related('gen_user__user').values('gen_user__user').all()
+            common_filters['user__in'] = users
 
         intro_submissions = obj.submissions.filter(
             problem_location=obj.start_unit_location,
