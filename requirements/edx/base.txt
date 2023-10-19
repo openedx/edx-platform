@@ -79,13 +79,13 @@ boto==2.39.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
-boto3==1.28.65
+boto3==1.28.66
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.31.65
+botocore==1.31.66
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -1084,7 +1084,7 @@ slumber==0.7.1
     #   edx-bulk-grades
     #   edx-enterprise
     #   edx-rest-api-client
-snowflake-connector-python==3.3.0
+snowflake-connector-python==3.3.1
     # via edx-enterprise
 social-auth-app-django==5.0.0
     # via
