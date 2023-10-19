@@ -79,3 +79,29 @@ class CourseUnitTime (models.Model):
     @classmethod
     def create_unit_time(self, course_id, block_id, display_name, total ):
         return CourseUnitTime.objects.create(course_id=course_id, block_id=block_id, display_name=display_name, total=total)
+    
+    @classmethod
+    def get_unit_time (self,  block_id) :
+        try:
+            return CourseUnitTime.objects.filter( block_id=block_id)[0]
+        except :
+            return None
+
+    
+    @classmethod
+    def set_unit_time (self, block_id, total , course_id, display_name):
+        try:
+   
+            total_obj = CourseUnitTime.objects.get(block_id=block_id , course_id = course_id)
+            total_obj.total = total
+            total_obj.save()
+        except CourseUnitTime.DoesNotExist:
+            return CourseUnitTime.objects.create(block_id=block_id, total=total, course_id=course_id, display_name=display_name)
+        
+    @classmethod
+    def remove_unit_time_seuqe (self, block_id):
+        try:
+            return CourseUnitTime.objects.filter(block_id=block_id).delete()
+        except:
+            return None
+    

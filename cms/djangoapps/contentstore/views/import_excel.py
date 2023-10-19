@@ -55,7 +55,7 @@ def viewImportExcel (request, course_id) :
                         create_item_import(request, parent_locator=str(lesson_block.location), category='vertical', display_name='Mở đầu')
                         unit_block=create_item_import(request, parent_locator=str(lesson_block.location), category='vertical', display_name='Nội dung bài học')
                         html_block =create_item_import(request, parent_locator= str(unit_block.location) ,category='html')  
-                        list_unit.append({'unit' : data[1] , "block_id" : str(unit_block.location) })
+                        list_unit.append({'unit' : data[1] , "block_id" : str(lesson_block.location) })
                     if data[3] is not None and 'video' in data[3].lower() and data[5] is not None:
                         videos =[]
                         videos.append(data[5])

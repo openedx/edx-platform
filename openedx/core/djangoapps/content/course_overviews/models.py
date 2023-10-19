@@ -1171,7 +1171,7 @@ class CourseOverviewSubText (models.Model) :
             return None
         
     @classmethod
-    def setSubTextSequence(cls, sequence_id, sub_text, course_id):
+    def setSubTextSequence(cls, sequence_id, sub_text, course_id, title):
       
         try:
    
@@ -1179,6 +1179,13 @@ class CourseOverviewSubText (models.Model) :
             subtext_obj.sub_text = sub_text
             subtext_obj.save()
         except CourseOverviewSubText.DoesNotExist:
-            return CourseOverviewSubText.objects.create(usage_key=sequence_id, sub_text=sub_text, course_overview_id=course_id)
+            return CourseOverviewSubText.objects.create(usage_key=sequence_id, sub_text=sub_text, course_overview_id=course_id, title=title)
+        
+    @classmethod
+    def removeSubText(cls, sequence_id):
+        try:
+            return CourseOverviewSubText.objects.filter(usage_key=sequence_id).delete()
+        except :
+            return None
             
         

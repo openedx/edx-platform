@@ -25,6 +25,7 @@ from openedx.core import toggles as core_toggles
 from openedx.core.djangoapps.content.course_overviews.api import get_course_subtext ,set_course_subtext
 from openedx.features.funix_specialization.views import funix_specialization_view , setting_specialization , remove_specialization,specialization_course
 from cms.djangoapps.contentstore.views.import_excel import viewImportExcel
+from cms.djangoapps.contentstore.views.unit_time import get_time_course_unit, set_course_time_unit
 
 django_autodiscover()
 admin.site.site_header = _('Studio Administration')
@@ -357,4 +358,10 @@ urlpatterns += [
 # funix import excel
 urlpatterns +=[
     path('import_excel/<str:course_id>' ,viewImportExcel, name='import_excel')
+]
+
+# api course unit time
+urlpatterns +=[
+    path ('api/course_unit_time/<str:block_id>', get_time_course_unit , name='get_time_course_unit'),
+    path('api/set_course_unit_time',set_course_time_unit, name='set_course_time_unit' )
 ]

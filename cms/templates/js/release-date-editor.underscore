@@ -39,5 +39,16 @@
 </div>
 
 
+<div style='padding-bottom:10px'>
+   
+        <div>
+         <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken"  />
+            <h3 class="modal-section-title">
+            Time Unit: 
+            </h3>
+            <input type='number' name='time_unit'  class='time_unit'/>
+        </div>
+   
+</div>
 
 <script src='/static/studio/js/sub-text.js'>/<script>

@@ -2,7 +2,9 @@ const sequenceId = document.querySelector('.xblock-editor').getAttribute('data-l
 const subTextElement = document.querySelector('#sub-text')
 const btnSubmit = document.querySelector('#sub-text-submit')
 const btnSave = document.querySelector('.action-save')
-
+const inputTimeUnit = document.querySelector('.time_unit')
+const titleModal = document.querySelector('#modal-window-title')
+const title = titleModal.textContent.trim()
 
 const fetchData = async (url)=>{
     try {
@@ -35,7 +37,17 @@ async function getDataSubText() {
   
 getDataSubText();
 
+async function getDataInputTime (){
+    const url = '/api/course_unit_time/' + sequenceId
+    try {
+        const data = await fetchData(url)
 
+        inputTimeUnit.value = data.total
+    } catch (error) {
+        console.log(error)
+    } 
+}
+getDataInputTime()
 
 function getCookie(cookieName) {
 const name = cookieName + "=";
@@ -63,16 +75,29 @@ btnSave.addEventListener('click', async (e) =>{
         const url = window.location.href
         const parts = url.split('/')
         const courseId = parts[parts.length -1]
-        const response = await fetch('/api/set_sub_text', {
-            method : 'POST',
-            headers: {
-            'Content-Type': 'application/json',
-             'X-CSRFToken': csrftoken
-        },
-        body: JSON.stringify({ subtext: textareaValue  , suquence_id: sequenceId , courseId:courseId}) 
-        })
+        if (textareaValue.length > 0){
+            const response = await fetch('/api/set_sub_text', {
+                method : 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                 'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({ subtext: textareaValue  , suquence_id: sequenceId , courseId:courseId , title:title}) 
+            })
+        }
 
-      
+        if(inputTimeUnit.value.length > 0){
+            const response_time_unit = await fetch('/api/set_course_unit_time' ,{
+                method : 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                 'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({ total: inputTimeUnit.value  , suquence_id: sequenceId , courseId:courseId , title:title}) 
+            })
+        }
+        
+        
     }
     catch(error){
         console.log(error)

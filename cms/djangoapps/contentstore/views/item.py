@@ -54,7 +54,8 @@ from xmodule.modulestore.inheritance import own_metadata  # lint-amnesty, pylint
 from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.tabs import CourseTabList  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
-
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverviewSubText
+from cms.djangoapps.contentstore.models import CourseUnitTime
 from ..utils import (
     ancestor_has_staff_lock,
     find_release_date_source,
@@ -169,8 +170,9 @@ def xblock_handler(request, usage_key_string=None):
                      if duplicate_source_locator is not present
               The locator (unicode representation of a UsageKey) for the created xblock (minus children) is returned.
     """
-    
+
     if usage_key_string:
+
         usage_key = usage_key_with_run(usage_key_string)
         
         access_check = has_studio_read_access if request.method == 'GET' else has_studio_write_access
@@ -198,10 +200,12 @@ def xblock_handler(request, usage_key_string=None):
                 return HttpResponse(status=406)
 
         elif request.method == 'DELETE':
+           
+
             _delete_item(usage_key, request.user)
             return JsonResponse()
         else:  # Since we have a usage_key, we are updating an existing xblock.
-           
+            
             return _save_xblock(
                 request.user,
                 _get_xblock(usage_key, request.user),
@@ -743,7 +747,7 @@ def _create_item(request):
                 },
                 status=400
             )
-    print('======json===', request.json)
+    # print('======json===', request.json)
     created_block = create_xblock(
         parent_locator=parent_locator,
         user=request.user,
@@ -751,7 +755,7 @@ def _create_item(request):
         display_name=request.json.get('display_name'),
         boilerplate=request.json.get('boilerplate'),
     )
-    print('=====created_blockcreated_block===', created_block)
+    # print('=====created_blockcreated_block===', created_block)
     return JsonResponse(
         {'locator': str(created_block.location), 'courseKey': str(created_block.location.course_key)}
     )
@@ -1012,6 +1016,13 @@ def _delete_item(usage_key, user):
     If the xblock is a Static Tab, removes it from course.tabs as well.
     """
     store = modulestore()
+    CourseOverviewSubText.removeSubText(sequence_id=str(usage_key))
+    CourseUnitTime.remove_unit_time_seuqe(block_id = str(usage_key))
+
+    block = _get_xblock(usage_key=usage_key, user=user)
+    for a in block.children :
+        CourseOverviewSubText.removeSubText(sequence_id=str(a))
+        CourseUnitTime.remove_unit_time_seuqe(block_id = str(a))
 
     with store.bulk_operations(usage_key.course_key):
         # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
@@ -1046,6 +1057,7 @@ def orphan_handler(request, course_key_string):
             raise PermissionDenied()
     if request.method == 'DELETE':
         if request.user.is_staff:
+            # print('====usage_key=========', course_usage_key)
             deleted_items = _delete_orphans(course_usage_key, request.user.id, commit=True)
             return JsonResponse({'deleted': deleted_items})
         else:
