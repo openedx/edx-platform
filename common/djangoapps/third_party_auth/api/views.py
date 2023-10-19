@@ -9,7 +9,6 @@ from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db.models import Q
 from django.http import Http404
-from django.urls import reverse
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from rest_framework import exceptions, permissions, status, throttling
@@ -425,7 +424,7 @@ class ThirdPartyAuthUserStatusView(APIView):
                         state.provider.provider_id,
                         pipeline.AUTH_ENTRY_ACCOUNT_SETTINGS,
                         # The url the user should be directed to after the auth process has completed.
-                        redirect_url=reverse('account_settings'),
+                        redirect_url=settings.ACCOUNT_MICROFRONTEND_URL,
                     ),
                     'accepts_logins': state.provider.accepts_logins,
                     # If the user is connected, sending a POST request to this url removes the connection
