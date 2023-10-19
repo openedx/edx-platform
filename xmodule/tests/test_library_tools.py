@@ -1,9 +1,10 @@
 """
-Tests for library tools service.
+Tests for library tools service (only used by CMS)
 """
 from unittest.mock import patch
 
 from opaque_keys.edx.keys import UsageKey
+from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
 from openedx.core.djangoapps.xblock.api import load_block
@@ -13,6 +14,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 
 
+@skip_unless_cms
 class LibraryToolsServiceTest(MixedSplitTestCase):
     """
     Tests for library service.
@@ -40,6 +42,7 @@ class LibraryToolsServiceTest(MixedSplitTestCase):
         assert mock_get_library_summaries.called
 
 
+@skip_unless_cms
 class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
     """
     Tests for LibraryToolsService which interact with blockstore-based content libraries
@@ -63,16 +66,16 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         course = CourseFactory.create(modulestore=self.store, user_id=self.user.id)
         CourseInstructorRole(course.id).add_users(self.user)
         # Add Source from library block to the course
-        sourced_block = self.make_block("library_sourced", course, user_id=self.user.id)
+        lc_block = self.make_block("library_content", course, user_id=self.user.id)
 
         # Import the unit block from the library to the course
-        self.tools.import_from_blockstore(sourced_block, [unit_block_id])
+        self.tools.import_from_blockstore(lc_block, [unit_block_id])
 
         # Verify imported block with its children
-        assert len(sourced_block.children) == 1
-        assert sourced_block.children[0].category == 'unit'
+        assert len(lc_block.children) == 1
+        assert lc_block.children[0].category == 'unit'
 
-        imported_unit_block = self.store.get_item(sourced_block.children[0])
+        imported_unit_block = self.store.get_item(lc_block.children[0])
         assert len(imported_unit_block.children) == 1
         assert imported_unit_block.children[0].category == 'html'
 
@@ -86,10 +89,10 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
 
         # Check that reimporting updates the target block
         self._set_library_block_olx(html_block_id, '<html><a href="/static/test.txt">Foo bar</a></html>')
-        self.tools.import_from_blockstore(sourced_block, [unit_block_id])
+        self.tools.import_from_blockstore(lc_block, [unit_block_id])
 
-        assert len(sourced_block.children) == 1
-        imported_unit_block = self.store.get_item(sourced_block.children[0])
+        assert len(lc_block.children) == 1
+        imported_unit_block = self.store.get_item(lc_block.children[0])
         assert len(imported_unit_block.children) == 1
         imported_html_block = self.store.get_item(imported_unit_block.children[0])
         assert 'Hello world' not in imported_html_block.data

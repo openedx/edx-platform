@@ -20,7 +20,7 @@ class ExternalIdType(TimeStampedModel):
 
     .. no_pii:
     """
-    MICROBACHELORS_COACHING = 'mb_coaching'
+
     CALIPER = 'caliper'
     XAPI = 'xapi'
     LTI = 'lti'
