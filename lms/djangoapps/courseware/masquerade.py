@@ -113,7 +113,7 @@ class MasqueradeView(View):
             course_key,
         )
         is_staff = has_staff_roles(request.user, course_key)
-        if not is_staff or not has_masquerade_permissions:
+        if not is_staff and not has_masquerade_permissions:
             return JsonResponse({
                 'success': False,
             })
@@ -192,7 +192,7 @@ class MasqueradeView(View):
             course_key,
         )
         is_staff = has_staff_roles(request.user, course_key)
-        if not is_staff or not has_masquerade_permissions:
+        if not is_staff and not has_masquerade_permissions:
             return JsonResponse({
                 'success': False,
             })
@@ -437,7 +437,7 @@ def check_content_start_date_for_masquerade_user(course_key, user, request, cour
         ]
         has_permissions = has_specific_masquerade and course_permissions_list_check_any(user, permissions, course_key)
         is_staff = has_staff_roles(user, course_key)
-        if group_masquerade or (specific_student_masquerade and (not is_staff or not has_permissions)):
+        if group_masquerade or (specific_student_masquerade and (not is_staff and not has_permissions)):
             PageLevelMessages.register_warning_message(
                 request,
                 HTML(_('This user does not have access to this content because \
