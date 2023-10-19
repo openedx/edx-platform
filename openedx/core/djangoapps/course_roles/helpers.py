@@ -71,7 +71,11 @@ def course_or_organization_permission_check(user, permission_name, course_id, or
     if isinstance(user, AnonymousUser):
         return False
     if organization_name is None:
-        organization_name = modulestore().get_course(course_id).org
+        course = modulestore().get_course(course_id)
+        if course:
+            organization_name = modulestore().get_course(course_id).org
+        else:
+            return course_permission_check(user, permission_name, course_id)
     return (course_permission_check(user, permission_name, course_id) or
             organization_permission_check(user, permission_name, organization_name)
             )
