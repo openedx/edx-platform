@@ -485,8 +485,10 @@ class SchoolView(APIView):
                 if local_authority.saml_configuration_slug in settings.RM_UNIFY_PROVIDER_SLUGS:
                     return Response({'message': 'User belongs to Glow account.'}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
-                try:
-                    provider = SAMLProviderConfig.objects.get(slug=local_authority.saml_configuration_slug, enabled=True, archived=False)
+                provider_queryset = SAMLProviderConfig.objects.current_set()
+                provider = provider_queryset.filter(slug=local_authority.saml_configuration_slug, enabled=True,
+                                                    archived=False)
+                if provider.first():
                     data = {
                         'icon': provider.icon_image.url if provider.icon_image else None,
                         'provider_id': provider.provider_id,
@@ -494,9 +496,8 @@ class SchoolView(APIView):
                         'local_authority_name': local_authority.name
                     }
                     return Response(data, status=status.HTTP_200_OK)
-                except SAMLProviderConfig.DoesNotExist:
-                    return Response({'message': 'Student belongs to a private school'},
-                                    status=status.HTTP_404_NOT_FOUND)
+                return Response({'message': 'Student belongs to a private school'},
+                                status=status.HTTP_404_NOT_FOUND)
         except (LocalAuthorityDomain.DoesNotExist, Exception):
             return Response({'message': 'Student belongs to a private school'}, status=status.HTTP_404_NOT_FOUND)
 
