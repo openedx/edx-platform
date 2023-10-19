@@ -11,7 +11,7 @@ Utility classes for testing django applications.
 
 import copy
 import re
-from unittest import skip
+from unittest import skipUnless
 
 import crum
 from django.conf import settings
@@ -251,7 +251,10 @@ def skip_unless_cms(func):
     try:
         ensure_cms()
     except ImproperlyConfigured:
-        skip('Test only valid in CMS')(func)
+        is_cms = False
+    else:
+        is_cms = True
+    return skipUnless(is_cms, 'Test only valid in CMS')(func)
 
 
 def skip_unless_lms(func):
@@ -261,4 +264,7 @@ def skip_unless_lms(func):
     try:
         ensure_lms()
     except ImproperlyConfigured:
-        skip('Test only valid in LMS')(func)
+        is_lms = False
+    else:
+        is_lms = True
+    return skipUnless(is_lms, 'Test only valid in LMS')(func)

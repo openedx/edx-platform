@@ -13,6 +13,7 @@ from django.core.exceptions import ImproperlyConfigured
 _LMS_URLCONF = 'lms.urls'
 _CMS_URLCONF = 'cms.urls'
 
+
 def ensure_lms(message: str = "This code may only be called by LMS, but it was called by CMS"):
     """
     Assert that we're configured as LMS.
