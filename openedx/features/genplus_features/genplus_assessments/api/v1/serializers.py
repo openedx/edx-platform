@@ -137,10 +137,20 @@ class SkillReflectionQuestionSerializer(serializers.ModelSerializer):
         return SkillReflectionQuestionType(obj.problem_type).name
 
     def get_submissions(self, obj: SkillAssessmentQuestion):
-        intro_submissions = obj.submissions.filter(problem_location=obj.start_unit_location).all()
-        outro_submissions = obj.submissions.filter(problem_location=obj.end_unit_location).all()
-        print(intro_submissions)
-        print(outro_submissions)
+        class_id = self.context.get('class_id')
+        common_filters = {}
+
+        if class_id:
+            common_filters['user__gen_user__student__active_class_id'] = class_id
+
+        intro_submissions = obj.submissions.filter(
+            problem_location=obj.start_unit_location,
+            **common_filters
+        ).all()
+        outro_submissions = obj.submissions.filter(
+            problem_location=obj.end_unit_location,
+            **common_filters
+        ).all()
         map_response = lambda i: {
             **i.question_response['student_response'],
             'username': i.user.username,
