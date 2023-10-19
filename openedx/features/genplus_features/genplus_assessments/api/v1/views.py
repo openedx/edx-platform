@@ -597,6 +597,15 @@ class SkillReflectionQuestionModelView(viewsets.ModelViewSet):
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
     permission_classes = [IsAuthenticated, IsStudentOrTeacher]
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({
+            'program_id': self.request.GET.get('program_id'),
+            'problem_type': self.request.GET.get('problem_type'),
+            'class_id': self.request.GET.get('class_id'),
+        })
+        return context
+
     def get_queryset(self):
         program_id = self.request.GET.get('program_id')
         problem_type = self.request.GET.get('problem_type')
