@@ -1,0 +1,683 @@
+// lms - application - account settings
+// ====================
+
+// Table of Contents
+// * +Container - Account Settings
+// * +Main - Header
+// * +Settings Section
+// * +Alert Messages
+
+
+// +Container - Account Settings
+.wrapper-account-settings {
+  background: $white;
+  width: 100%;
+
+  .account-settings-container {
+    max-width: grid-width(12);
+    padding: 10px;
+    margin: 0 auto;
+  }
+
+  .ui-loading-indicator,
+  .ui-loading-error {
+    @extend .ui-loading-base;
+    // center horizontally
+    @include margin-left(auto);
+    @include margin-right(auto);
+
+    padding: ($baseline*3);
+    text-align: center;
+
+    .message-error {
+      color: $alert-color;
+    }
+  }
+}
+
+// +Main - Header
+.wrapper-account-settings {
+  .wrapper-header {
+    max-width: grid-width(12);
+    height: 139px;
+    border-bottom: 4px solid $m-gray-l4;
+
+    .header-title {
+      @extend %t-title4;
+
+      margin-bottom: ($baseline/2);
+      padding-top: ($baseline*2);
+    }
+
+    .header-subtitle {
+      color: $gray-l2;
+    }
+
+    .account-nav {
+      @include float(left);
+
+      margin: ($baseline/2) 0;
+      padding: 0;
+      list-style: none;
+
+      .account-nav-link {
+        @include float(left);
+
+        font-size: em(14);
+        color: $gray;
+        padding: $baseline/4 $baseline*1.25 $baseline;
+        display: inline-block;
+        box-shadow: none;
+        border-bottom: 4px solid transparent;
+        border-radius: 0;
+        background: transparent none;
+      }
+
+      button {
+        @extend %ui-clear-button;
+        @extend %btn-no-style;
+
+        @include appearance(none);
+
+        display: block;
+        padding: ($baseline/4);
+
+        &:hover,
+        &:focus {
+          text-decoration: none;
+          border-bottom-color: $courseware-border-bottom-color;
+        }
+
+        &.active {
+          border-bottom-color: theme-color("dark");
+        }
+      }
+    }
+
+    @include media-breakpoint-down(md) {
+      border-bottom-color: transparent;
+
+      .account-nav {
+        display: flex;
+        border-bottom: none;
+
+        .account-nav-link {
+          border-bottom: 4px solid theme-color("light");
+        }
+      }
+    }
+  }
+}
+
+// +Settings Section
+.account-settings-sections {
+  .section-header {
+    @extend %t-title5;
+    @extend %t-strong;
+
+    padding-top: ($baseline/2)*3;
+    color: $dark-gray1;
+  }
+
+  .section {
+    background-color: $white;
+    margin: $baseline 5% 0;
+    border-bottom: 4px solid $m-gray-l4;
+
+    .account-settings-header-subtitle {
+      font-size: em(14);
+      line-height: normal;
+      color: $dark-gray;
+      padding-bottom: 10px;
+    }
+
+    .account-settings-header-subtitle-warning {
+      @extend .account-settings-header-subtitle;
+
+      color: $alert-color;
+    }
+
+    .account-settings-section-body {
+      .u-field {
+        border-bottom: 2px solid $m-gray-l4;
+        padding: $baseline*0.75 0;
+
+        .field {
+          width: 30%;
+          vertical-align: top;
+          display: inline-block;
+          position: relative;
+
+          select {
+            @include appearance(none);
+
+            padding: 14px 30px 14px 15px;
+            border: 1px solid $gray58-border;
+            background-color: transparent;
+            border-radius: 2px;
+            position: relative;
+            z-index: 10;
+
+            &::-ms-expand {
+              display: none;
+            }
+
+            ~ .icon-caret-down {
+              &::after {
+                content: "";
+                border-left: 6px solid transparent;
+                border-right: 6px solid transparent;
+                border-top: 7px solid $blue;
+                position: absolute;
+                right: 10px;
+                bottom: 20px;
+                z-index: 0;
+              }
+            }
+          }
+
+          .field-label {
+            display: block;
+            width: auto;
+            margin-bottom: 0.625rem;
+            font-size: 1rem;
+            line-height: 1;
+            color: $dark-gray;
+            white-space: nowrap;
+          }
+
+          .field-input {
+            @include transition(all 0.125s ease-in-out 0s);
+
+            display: inline-block;
+            padding: 0.625rem;
+            border: 1px solid $gray58-border;
+            border-radius: 2px;
+            background: $white;
+            font-size: $body-font-size;
+            color: $dark-gray;
+            width: 100%;
+            height: 48px;
+            box-shadow: none;
+          }
+
+          .u-field-link {
+            @extend %ui-clear-button;
+
+            // set styles
+            @extend %btn-pl-default-base;
+
+            @include font-size(18);
+
+            width: 100%;
+            border: 1px solid $blue;
+            color: $blue;
+            padding: 11px 14px;
+            line-height: normal;
+          }
+        }
+
+        .u-field-order {
+          display: flex;
+          align-items: center;
+          font-size: em(16);
+          font-weight: 600;
+          color: $dark-gray;
+          width: 100%;
+          padding-top: $baseline;
+          padding-bottom: $baseline;
+          line-height: normal;
+          flex-flow: row wrap;
+
+          span {
+            padding: $baseline;
+          }
+
+          .u-field-order-number {
+            @include float(left);
+
+            width: 30%;
+          }
+
+          .u-field-order-date {
+            @include float(left);
+
+            padding-left: 30px;
+            width: 20%;
+          }
+
+          .u-field-order-price {
+            @include float(left);
+
+            width: 15%;
+          }
+
+          .u-field-order-link {
+            width: 10%;
+            padding: 0;
+
+            .u-field-link {
+              @extend %ui-clear-button;
+              @extend %btn-pl-default-base;
+
+              @include font-size(14);
+
+              border: 1px solid $blue;
+              color: $blue;
+              line-height: normal;
+              padding: 10px;
+              width: 110px;
+            }
+          }
+        }
+
+        .u-field-order-lines {
+          @extend .u-field-order;
+
+          padding: 5px 0 0;
+          font-weight: 100;
+
+          .u-field-order-number {
+            padding: 20px 10px 20px 30px;
+          }
+        }
+
+        .social-field-linked {
+          background: $m-gray-l4;
+          box-shadow: 0 1px 2px 1px $shadow-l2;
+          padding: 1.25rem;
+          box-sizing: border-box;
+          margin: 10px;
+          width: 100%;
+
+          .field-label {
+            @include font-size(24);
+          }
+
+          .u-field-social-help {
+            display: inline-block;
+            padding: 20px 0 6px;
+          }
+
+          .u-field-link {
+            @include font-size(14);
+            @include text-align(left);
+
+            border: none;
+            margin-top: $baseline;
+            font-weight: $font-semibold;
+            padding: 0;
+
+            &:focus,
+            &:hover,
+            &:active {
+              background-color: transparent;
+              color: $m-blue-d3;
+              border: none;
+            }
+          }
+        }
+
+        .social-field-unlinked {
+          background: $m-gray-l4;
+          box-shadow: 0 1px 2px 1px $shadow-l2;
+          padding: 1.25rem;
+          box-sizing: border-box;
+          text-align: center;
+          margin: 10px;
+          width: 100%;
+
+          .field-label {
+            @include font-size(24);
+
+            text-align: center;
+          }
+
+          .u-field-link {
+            @include font-size(14);
+
+            margin-top: $baseline;
+            font-weight: $font-semibold;
+          }
+        }
+
+        .u-field-message {
+          position: relative;
+          padding: $baseline*0.75 0 0 ($baseline*4);
+          width: 60%;
+
+          .u-field-message-notification {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            padding: 38px 0 0 ($baseline*5);
+          }
+        }
+
+        &:last-child {
+          border-bottom: none;
+          margin-bottom: ($baseline*2);
+        }
+
+        // Responsive behavior
+        @include media-breakpoint-down(md) {
+          .u-field-value {
+            width: 100%;
+          }
+
+          .u-field-message {
+            width: 100%;
+            padding: $baseline/2 0;
+
+            .u-field-message-notification {
+              position: relative;
+              padding: 0;
+            }
+          }
+
+          .u-field-order {
+            display: flex;
+            flex-wrap: nowrap;
+
+            .u-field-order-number,
+            .u-field-order-date,
+            .u-field-order-price,
+            .u-field-order-link {
+              width: auto;
+              float: none;
+              flex-grow: 1;
+
+              &:first-of-type {
+                flex-grow: 2;
+              }
+            }
+          }
+        }
+      }
+
+      .u-field {
+        &.u-field-dropdown,
+        &.editable-never &.mode-display {
+          .u-field-value {
+            margin-bottom: ($baseline);
+
+            .u-field-title {
+              font-size: 16px;
+              line-height: 22px;
+              margin-bottom: 18px;
+            }
+
+            .u-field-value-readonly {
+              font-size: 22px;
+              color: #636c72;
+              line-height: 30px;
+              white-space: nowrap;
+            }
+          }
+        }
+      }
+
+      .u-field-readonly .u-field-title {
+        font-size: 16px;
+        color: #636c72;
+        line-height: 22px;
+        padding-top: ($baseline/2);
+        padding-bottom: 0;
+        margin-bottom: 8px !important;
+      }
+
+      .u-field-readonly .u-field-value {
+        font-size: 22px;
+        color: #636c72;
+        line-height: 30px;
+        padding-top: 8px;
+        padding-bottom: ($baseline);
+        white-space: nowrap;
+      }
+
+      .u-field-orderHistory {
+        border-bottom: none;
+        border: 1px solid $m-gray-l4;
+        margin-bottom: $baseline;
+        padding: 0;
+
+        &:last-child {
+          border-bottom: 1px solid $m-gray-l4;
+        }
+
+        &:hover,
+        &:focus {
+          background-color: $light-gray4;
+        }
+      }
+
+      .u-field-order-orderId {
+        border: none;
+        margin-top: $baseline;
+        margin-bottom: 0;
+        padding-bottom: 0;
+
+        &:hover,
+        &:focus {
+          background-color: transparent;
+        }
+
+        .u-field-order {
+          font-weight: $font-semibold;
+          padding-top: 0;
+          padding-bottom: 0;
+
+          .u-field-order-title {
+            font-size: em(16);
+          }
+        }
+      }
+
+      .u-field-social {
+        border-bottom: none;
+        margin-right: 20px;
+        width: 30%;
+        display: inline-block;
+        vertical-align: top;
+
+        .u-field-social-help {
+          @include font-size(12);
+
+          color: $m-gray-d1;
+        }
+      }
+    }
+
+    .account-deletion-details {
+      .btn-outline-primary {
+        @extend %ui-clear-button;
+
+        // set styles
+        @extend %btn-pl-default-base;
+
+        @include font-size(18);
+
+        border: 1px solid $blue;
+        color: $blue;
+        padding: 11px 14px;
+        line-height: normal;
+        margin: 20px 0;
+      }
+
+      .paragon__modal-open {
+        overflow-y: scroll;
+        color: $dark-gray;
+
+        .paragon__modal-title {
+          font-weight: $font-semibold;
+        }
+
+        .paragon__modal-body {
+          line-height: 1.5;
+
+          .alert-title {
+            line-height: 1.5;
+          }
+        }
+
+        .paragon__alert-warning {
+          color: $dark-gray;
+        }
+
+        .next-steps {
+          margin-bottom: 10px;
+          font-weight: $font-semibold;
+        }
+
+        .confirm-password-input {
+          width: 50%;
+        }
+
+        .paragon__btn:not(.cancel-btn) {
+          @extend %btn-primary-blue;
+        }
+      }
+
+      .modal-alert {
+        display: flex;
+
+        .icon-wrapper {
+          padding-right: 15px;
+        }
+
+        .alert-content {
+          .alert-title {
+            color: $dark-gray;
+            margin-bottom: 10px;
+            font: {
+              size: 1rem;
+              weight: $font-semibold;
+            }
+          }
+
+          a {
+            color: $blue-u1;
+          }
+        }
+      }
+
+      .delete-confirmation-wrapper {
+        .paragon__modal-footer {
+          .paragon__btn-outline-primary {
+            @extend %ui-clear-button;
+
+            // set styles
+            @extend %btn-pl-default-base;
+
+            @include margin-left(25px);
+
+            border-color: $blue;
+            color: $blue;
+            padding: 11px 14px;
+            line-height: normal;
+          }
+        }
+      }
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
+// * +Alert Messages
+.account-settings-message,
+.account-settings-section-message {
+  font-size: 16px;
+  line-height: 22px;
+  margin-top: 15px;
+  margin-bottom: 30px;
+
+  .alert-message {
+    color: #292b2c;
+    font-family: $font-family-sans-serif;
+    position: relative;
+    padding: 10px 10px 10px 35px;
+    border: 1px solid transparent;
+    border-radius: 0;
+    box-shadow: none;
+    margin-bottom: 8px;
+
+    & > .fa {
+      position: absolute;
+      left: 11px;
+      top: 13px;
+      font-size: 16px;
+    }
+
+    span {
+      display: block;
+
+      a {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .success {
+    background-color: #ecfaec;
+    border-color: #b9edb9;
+  }
+
+  .info {
+    background-color: #d8edf8;
+    border-color: #bbdff2;
+  }
+
+  .warning {
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+  }
+
+  .error {
+    background-color: #f2dede;
+    border-color: #ebccd1;
+  }
+}
+
+.account-settings-message {
+  margin-bottom: 0;
+
+  .alert-message {
+    padding: 10px;
+
+    .alert-actions {
+      margin-top: 10px;
+
+      .btn-alert-primary {
+        @extend %btn-primary-blue;
+
+        @include font-size(18);
+
+        border: 1px solid $m-blue-d3;
+        border-radius: 3px;
+        box-shadow: none;
+        padding: 11px 14px;
+        line-height: normal;
+      }
+
+      .btn-alert-secondary {
+        @extend %ui-clear-button;
+
+        // set styles
+        @extend %btn-pl-default-base;
+
+        @include font-size(18);
+
+        background-color: white;
+        border: 1px solid $blue;
+        color: $blue;
+        padding: 11px 14px;
+        line-height: normal;
+      }
+    }
+  }
+}
