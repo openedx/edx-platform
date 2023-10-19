@@ -274,7 +274,8 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
     def test_schedule_context(self):
         resolver = self.create_resolver()
         # using this to make sure the select_related stays intact
-        with self.assertNumQueries(30):
+        # TODO: course roles: number of querys increased from 30 to 32
+        with self.assertNumQueries(32):
             sc = resolver.get_schedules()
             schedules = list(sc)
         apple_logo_url = 'http://email-media.s3.amazonaws.com/edX/2021/store_apple_229x78.jpg'

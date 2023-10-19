@@ -49,7 +49,8 @@ class TestCourseUpdatesPage(BaseCourseUpdatesTestCase):
 
         # Fetch the view and verify that the query counts haven't changed
         # TODO: decrease query count as part of REVO-28
-        with self.assertNumQueries(52, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
+        # TODO: course roles: number of querys increased from 52 to 59
+        with self.assertNumQueries(59, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
             with check_mongo_calls(3):
                 url = course_updates_url(self.course)
                 self.client.get(url)
