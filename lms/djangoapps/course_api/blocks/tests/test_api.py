@@ -207,9 +207,7 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
     """
 
     @ddt.data(
-        *product(
-            (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split),
-        )
+            (ModuleStoreEnum.Type.split),
     )
     @ddt.unpack
     def test_query_counts_cached(self, store_type):
@@ -221,7 +219,6 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
         )
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 5, 14),
         (ModuleStoreEnum.Type.split, 0, 14),
     )
     @ddt.unpack
