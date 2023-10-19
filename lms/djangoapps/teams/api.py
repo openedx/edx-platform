@@ -449,7 +449,7 @@ def anonymous_user_ids_for_team(user, team):
         user, CourseRolesPermission.MANAGE_STUDENTS.value, team.course_id
     )
     if (
-        not has_course_staff_privileges(user, team.course_id) or not user_has_manage_student_permission
+        not has_course_staff_privileges(user, team.course_id) and not user_has_manage_student_permission
     ) and not user_is_a_team_member(user, team):
         raise Exception("User {user} is not permitted to access team info for {team}".format(
             user=user.username,
