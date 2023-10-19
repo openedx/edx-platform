@@ -1,0 +1,10 @@
+<div class="profile-section-two-fields">
+    <div class="field-container"></div>
+    <% if (!showFullProfile) { %>
+        <% if(ownProfile) { %>
+            <span class="profile-private-message"><%- gettext("You are currently sharing a limited profile.") %></span>
+        <% } else {  %>
+            <span class="profile-private-message"><%- gettext("This learner is currently sharing a limited profile.") %></span>
+        <% } %>
+    <% } %>
+</div>
