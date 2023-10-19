@@ -236,9 +236,14 @@ class EffortEstimationTransformer(BlockStructureTransformer):
         cls = EffortEstimationTransformer
         vertical_childs = block_structure.get_children(block_key)
         if len(vertical_childs) > 0:
-            first_html = block_structure.get_children(vertical_childs[0])[0]
-            time = block_structure.get_transformer_block_field(first_html, cls, self.TIME_BY_REGEX)
-
+            child_list = block_structure.get_children(vertical_childs[0])
+            if len(child_list) > 0:
+                first_html = child_list[0]
+                time = block_structure.get_transformer_block_field(first_html, cls, self.TIME_BY_REGEX)
+            else:
+                time = 0
+        else:
+            time = 0
         activities = self._gather_child_values(block_structure, block_key, self.EFFORT_ACTIVITIES, default=1)
         time = time * 60 if time is not None else None
 
