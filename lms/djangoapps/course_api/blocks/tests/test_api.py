@@ -206,10 +206,7 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
     Tests query counts for the get_blocks function.
     """
 
-    @ddt.data(
-            (ModuleStoreEnum.Type.split),
-    )
-    @ddt.unpack
+    @ddt.data(ModuleStoreEnum.Type.split)
     def test_query_counts_cached(self, store_type):
         course = self._create_course(store_type)
         self._get_blocks(
