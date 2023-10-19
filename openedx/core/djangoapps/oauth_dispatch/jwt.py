@@ -172,10 +172,7 @@ def _create_jwt(
     # Do not be misled by the fact that `email` and `profile` are default scopes. They
     # were included for legacy compatibility, even though they contain privileged data.
     # The scope `user_id` must be added for requests with grant_type password.
-    scopes = scopes or ['email', 'profile']
-    if grant_type == Application.GRANT_PASSWORD:
-        scopes.append('user_id')
-
+    scopes = _update_user_id_in_scopes(scopes or ['email', 'profile'], grant_type)
     iat, exp = _compute_time_fields(expires_in)
 
     payload = {
@@ -290,3 +287,9 @@ def _encode_and_sign(payload, use_asymmetric_key, secret):
 
     jwk = PyJWK(key, algorithm)
     return jwt.encode(payload, jwk.key, algorithm=algorithm)
+
+
+def _update_user_id_in_scopes(scopes, grant_type):
+    if grant_type == Application.GRANT_PASSWORD and 'user_id' not in scopes:
+        scopes.append('user_id')
+    return scopes
