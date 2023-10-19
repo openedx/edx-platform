@@ -32,6 +32,7 @@ from common.djangoapps.student.roles import (
 )
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
+from openedx.core.djangoapps.content_libraries import tasks as libs_tasks
 
 
 class LibraryTestCase(ModuleStoreTestCase):
@@ -404,7 +405,7 @@ class TestLibraries(LibraryTestCase):
         html_block = modulestore().get_item(lc_block.children[0])
         self.assertEqual(html_block.data, data2)
 
-    @patch("xmodule.tasks.SearchEngine.get_search_engine", Mock(return_value=None, autospec=True))
+    @patch.object(libs_tasks.SearchEngine, "get_search_engine", Mock(return_value=None, autospec=True))
     def test_refreshes_children_if_capa_type_change(self):
         """ Tests that children are automatically refreshed if capa type field changes """
         name1, name2 = "Option Problem", "Multiple Choice Problem"
