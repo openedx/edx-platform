@@ -19122,10 +19122,6 @@ msgid ""
 msgstr "עיין בקורסים שהושקו לאחרונה וראה מה חדש בנושאים האהובים עליך."
 
 #: themes/edx.org/lms/templates/dashboard.html
-msgid "Take advantage of free coaching!"
-msgstr ""
-
-#: themes/edx.org/lms/templates/dashboard.html
 msgid "Get Started"
 msgstr ""
 
