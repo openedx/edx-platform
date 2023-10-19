@@ -31,10 +31,11 @@
                 );
 
                 this.state = state;
+                this.state.videoTranscriptFeedback = this;
                 this.currentTranscriptLanguage = this.state.lang;
                 this.transcriptLanguages = this.state.config.transcriptLanguages;
 
-                if (this.state.el.find('.wrapper-downloads .wrapper-transcript-feedback')) {
+                if (this.state.el.find('.wrapper-transcript-feedback').length) {
                     this.initialize();
                 }
 
