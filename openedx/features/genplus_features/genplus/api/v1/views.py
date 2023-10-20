@@ -487,8 +487,8 @@ class SchoolView(APIView):
 
                 provider_queryset = SAMLProviderConfig.objects.current_set()
                 provider = provider_queryset.filter(slug=local_authority.saml_configuration_slug, enabled=True,
-                                                    archived=False)
-                if provider.first():
+                                                    archived=False).first()
+                if provider:
                     data = {
                         'icon': provider.icon_image.url if provider.icon_image else None,
                         'provider_id': provider.provider_id,
