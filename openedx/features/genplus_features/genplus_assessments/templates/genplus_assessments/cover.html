@@ -1,4 +1,8 @@
 ## mako
+
+<%page expression_filter="h"/>
+<%namespace name='static' file='../static_content.html'/>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,7 +31,7 @@
             <div class="image-frame">
               <img src="${unit.get('unit_image_url')}" alt="${unit.get('display_name')}">
               % if unit.get('is_complete'):
-              <img class="completed" src="${static.url('genplus_assessments/assets/images/check.png')}" alt="Completed">
+              <img class="completed" src="${static.url('genplus_assessments/assets/images/check-1.png')}" alt="Completed">
               % endif
             </div>
             <span class="text">${unit.get('display_name')}</span>

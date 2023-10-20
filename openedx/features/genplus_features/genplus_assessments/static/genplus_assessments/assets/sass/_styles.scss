@@ -485,21 +485,17 @@ blockquote {
   .image-frame {
     height: 5rem;
     width: 5rem;
-    border-radius: 50%;
-    margin: 0 auto .6rem;
-    border: .5rem solid #ccc;
+    margin: 0 auto .8rem;
     background: #fff;
-    padding: .5rem;
     position: relative;
     z-index: 1;
 
     .completed {
       position: absolute;
-      top: 50%;
-      left: 50%;
+      top: 0;
+      right: 0;
+      width: 20px;
       max-width: 3rem;
-      margin: -18px 0 0 -24px;
-      display: none;
     }
   }
 
@@ -507,25 +503,6 @@ blockquote {
     display: inline-block;
     vertical-align: top;
     margin: .25rem;
-
-    img {
-      opacity: .5;
-    }
-
-    &.active {
-
-        img {
-          opacity: 1;
-        }
-
-        .image-frame {
-          border-color: $pink-lighter;
-
-        .completed {
-          display: block;
-        }
-      }
-    }
   }
 
   .text {
@@ -638,7 +615,6 @@ blockquote {
 }
 
 .skills-reflection {
-  page-break-after: always;
 
   .heading {
     color: $pink;

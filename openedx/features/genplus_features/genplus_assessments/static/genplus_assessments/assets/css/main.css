@@ -751,38 +751,22 @@ blockquote cite {
 .completion-badges .image-frame {
   height: 5rem;
   width: 5rem;
-  border-radius: 50%;
-  margin: 0 auto 0.6rem;
-  border: 0.5rem solid #ccc;
+  margin: 0 auto 0.8rem;
   background: #fff;
-  padding: 0.5rem;
   position: relative;
   z-index: 1;
 }
 .completion-badges .image-frame .completed {
   position: absolute;
-  top: 50%;
-  left: 50%;
+  top: 0;
+  right: 0;
+  width: 20px;
   max-width: 3rem;
-  margin: -18px 0 0 -24px;
-  display: none;
 }
 .completion-badges li {
   display: inline-block;
   vertical-align: top;
   margin: 0.25rem;
-}
-.completion-badges li img {
-  opacity: 0.5;
-}
-.completion-badges li.active img {
-  opacity: 1;
-}
-.completion-badges li.active .image-frame {
-  border-color: #eecae2;
-}
-.completion-badges li.active .image-frame .completed {
-  display: block;
 }
 .completion-badges .text {
   display: block;
@@ -880,9 +864,6 @@ blockquote cite {
   list-style: none;
 }
 
-.skills-reflection {
-  page-break-after: always;
-}
 .skills-reflection .heading {
   color: #ff0d5a;
 }
