@@ -133,7 +133,7 @@ class ScoreSerializer(serializers.Serializer):
 
 class SubmissionMetadataSerializer(serializers.Serializer):
     """
-    Submission metadata for displaying submissions table in ESG
+    Submission metadata for displaying submissions table in Enhanced Staff Grader (ESG)
     """
 
     submissionUUID = serializers.CharField(source="submissionUuid")
@@ -165,45 +165,45 @@ class SubmissionMetadataSerializer(serializers.Serializer):
         read_only_fields = fields
 
 
-class AssessmentScoresMetadataSerializer(serializers.Serializer):
+class AssessmentScoresSerializer(serializers.Serializer):
     """
-    Assessment Score metadata for displaying assessment table in ESG
+    Assessment Score for displaying assessment table in Enhanced Staff Grader (ESG)
     """
-    type = serializers.CharField()
-    score = serializers.IntegerField()
+    criterion_name = serializers.CharField()
+    score_earned = serializers.IntegerField()
     score_type = serializers.CharField()
 
     class Meta:
         fields = [
-            "type",
-            "score",
+            "criterion_name",
+            "score_earned",
             "score_type",
         ]
         read_only_fields = fields
 
 
-class AssessmentMetadataSerializer(serializers.Serializer):
+class AssessmentSerializer(serializers.Serializer):
     """
-    Assessment metadata for displaying assessment table in ESG
+    Assessment metadata for displaying assessment table in Enhanced Staff Grader (ESG)
     """
-    idAssessment = serializers.CharField()
-    grader_name = serializers.CharField(allow_null=True)
-    grader_username = serializers.CharField(allow_null=True)
-    grader_email = serializers.CharField(allow_null=True)
-    assesmentDate = serializers.DateTimeField()
-    assesmentScores = serializers.ListField(child=AssessmentScoresMetadataSerializer())
-    problemStep = serializers.CharField(allow_null=True)
+    id_assessment = serializers.CharField()
+    scorer_name = serializers.CharField(allow_null=True)
+    scorer_username = serializers.CharField(allow_null=True)
+    scorer_email = serializers.CharField(allow_null=True)
+    assesment_date = serializers.DateTimeField()
+    assesment_scores = serializers.ListField(child=AssessmentScoresSerializer())
+    problem_step = serializers.CharField(allow_null=True)
     feedback = serializers.CharField(allow_null=True)
 
     class Meta:
         fields = [
-            "idAssessment",
-            "grader_name",
-            "grader_username",
-            "grader_email",
-            "assesmentDate",
-            "assesmentScores",
-            "problemStep",
+            "id_assessment",
+            "scorer_name",
+            "scorer_username",
+            "scorer_email",
+            "assesment_date",
+            "assesment_scores",
+            "problem_step",
             "feedback",
         ]
         read_only_fields = fields
@@ -234,12 +234,12 @@ class InitializeSerializer(serializers.Serializer):
         """
         return obj['isEnabled'] and not obj['oraMetadata'].teams_enabled
 
-class FeedbackSerializer(serializers.Serializer):
+class AssessmentFeedbackSerializer(serializers.Serializer):
     """
     Serialize info for the initialize call. Packages ORA, course, submission, and rubric data.
     """
 
-    assessments = serializers.ListField(child=AssessmentMetadataSerializer())
+    assessments = serializers.ListField(child=AssessmentSerializer())
 
     class Meta:
         fields = ["assessments",]

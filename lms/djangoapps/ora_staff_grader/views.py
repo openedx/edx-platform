@@ -44,13 +44,13 @@ from lms.djangoapps.ora_staff_grader.ora_api import (
     get_assessment_info,
     get_submission_info,
     get_submissions,
-    get_assessments_grades,
+    get_assessments,
     submit_grade,
 )
 from lms.djangoapps.ora_staff_grader.serializers import (
     FileListSerializer,
     InitializeSerializer,
-    FeedbackSerializer,
+    AssessmentFeedbackSerializer,
     LockStatusSerializer,
     StaffAssessSerializer,
     SubmissionFetchSerializer,
@@ -150,7 +150,7 @@ class InitializeView(StaffGraderBaseView):
             return UnknownErrorResponse()
 
 
-class FeedbackListView(StaffGraderBaseView):
+class AssessmentFeedbackView(StaffGraderBaseView):
     """
     GET course metadata
 
@@ -172,13 +172,12 @@ class FeedbackListView(StaffGraderBaseView):
     def get(self, request, ora_location, submission_uuid, assessment_type=None, *args, **kwargs):
 
         try:
-            init_data = {}
+            assessments_data = {}
 
             # Get list of submissions for this ORA
-            init_data["assessments"] = get_assessments_grades(request, ora_location, submission_uuid, assessment_type)
-            #init_data["assessments"] = TEST
+            assessments_data["assessments"] = get_assessments(request, ora_location, submission_uuid, assessment_type)
 
-            response_data = FeedbackSerializer(init_data).data
+            response_data = AssessmentFeedbackSerializer(assessments_data).data
             log.info(response_data)
             return Response(response_data)
 
