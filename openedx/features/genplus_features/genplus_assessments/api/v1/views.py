@@ -139,13 +139,20 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
         try:
             gen_class = Class.objects.get(pk=class_id)
             program = gen_class.program
-
+            # TODO Deprecated Start
             if student_id != "all" and student_id is not None:
-                text_assessment = UserResponse.objects.filter(user=student_id, gen_class=class_id, program=program)
-                rating_assessment = UserRating.objects.filter(user=student_id, gen_class=class_id, program=program)
+                # TODO Disabling rating and text assessment problem data, marking it for deprecation
+                # text_assessment = UserResponse.objects.objects.none()
+                text_assessment = UserResponse.objects.none()
+                # rating_assessment = UserRating.objects.filter(user=student_id, gen_class=class_id, program=program)
+                rating_assessment = UserRating.objects.none()
             else:
-                text_assessment = UserResponse.objects.filter(gen_class=class_id, program=program)
-                rating_assessment = UserRating.objects.filter( gen_class=class_id, program=program)
+                # TODO Disabling rating and text assessment problem data, marking it for deprecation
+                # text_assessment = UserResponse.objects.filter(gen_class=class_id, program=program)
+                text_assessment = UserResponse.objects.none()
+                # rating_assessment = UserRating.objects.filter( gen_class=class_id, program=program)
+                rating_assessment = UserRating.objects.none()
+            # TODO Deprecated End
 
             text_assessment_data = TextAssessmentSerializer(text_assessment, many=True).data
             rating_assessment_data = RatingAssessmentSerializer(rating_assessment, many=True).data

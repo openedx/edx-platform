@@ -1,5 +1,7 @@
 import itertools
 import json
+import logging
+
 from lxml import etree
 from django.test import RequestFactory
 from django.db.models import Q
@@ -8,6 +10,8 @@ from opaque_keys.edx.keys import UsageKey, CourseKey
 from collections import defaultdict
 
 from django.contrib.auth import get_user_model
+from xmodule.modulestore.exceptions import ItemNotFoundError
+
 from openedx.features.course_experience.utils import get_course_outline_block_tree
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
@@ -20,7 +24,7 @@ from openedx.features.genplus_features.genplus_assessments.constants import Prob
 from openedx.features.genplus_features.genplus_assessments.models import SkillAssessmentQuestion, \
     SkillAssessmentResponse
 
-
+loggger = logging.getLogger(__name__)
 class StudentResponse:
 
     def __init__(self):
@@ -973,19 +977,23 @@ def skill_reflection_individual_response(skills, likert_questions, nuance_interr
                     {'skill': skill, 'response_text': response_text, 'question': question, 'point': points,
                      'choices': list(choices.values())})
             elif usage_key and usage_key.block_type == 'problem':
-                assessment_xblock = store.get_item(usage_key)
-                question_data = get_problem_attributes(assessment_xblock.data, usage_key)
-                question = question_data['question_text']
-                choices = question_data['problem_choices']
-                response[response_key].append(
-                    {
-                        'skill': skill,
-                        'response_text': None,
-                        'question': question,
-                        'point': None,
-                        'choices': list(choices.values())
-                    }
-                )
+                try:
+                    assessment_xblock = store.get_item(usage_key)
+                    question_data = get_problem_attributes(assessment_xblock.data, usage_key)
+                    question = question_data['question_text']
+                    choices = question_data['problem_choices']
+                    response[response_key].append(
+                        {
+                            'skill': skill,
+                            'response_text': None,
+                            'question': question,
+                            'point': None,
+                            'choices': list(choices.values())
+                        }
+                    )
+                except ItemNotFoundError as e:
+                    loggger.error(e)
+
 
     process_question_responses(likert_questions, 'intros', 'start_unit_location')
     process_question_responses(likert_questions, 'outros', 'end_unit_location')
