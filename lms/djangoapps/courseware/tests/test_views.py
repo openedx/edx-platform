@@ -1492,8 +1492,10 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, "earned a certificate for this course.")
 
     @ddt.data(
-        (True, 53),
-        (False, 53),
+        # TODO: course roles: number of querys increased from 53 to 60
+        (True, 60),
+        # TODO: course roles: number of querys increased from 53 to 60
+        (False, 60),
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
