@@ -784,7 +784,18 @@ class FieldDataCache:
         for block in blocks:
             for field in block.fields.values():
                 scope_map[field.scope].add(field)
-        return scope_map
+
+        try:
+            block = blocks[0]
+            from openedx.core.lib.xblock_utils import get_aside_from_xblock  # pylint: disable=import-outside-toplevel
+            for aside in self.asides:
+                xblock_aside = get_aside_from_xblock(block, aside)
+                for field in xblock_aside.fields.values():
+                    scope_map[field.scope].add(field)
+            return scope_map
+        except IndexError:
+            # No blocks to cache
+            return scope_map
 
     def get(self, key):
         """
