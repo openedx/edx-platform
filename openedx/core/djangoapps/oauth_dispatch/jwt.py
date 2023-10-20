@@ -168,11 +168,7 @@ def _create_jwt(
     else:
         increment('create_symmetric_jwt_count')
 
-    # Default scopes should only contain non-privileged data.
-    # Do not be misled by the fact that `email` and `profile` are default scopes. They
-    # were included for legacy compatibility, even though they contain privileged data.
-    # The scope `user_id` must be added for requests with grant_type password.
-    scopes = _update_user_id_in_scopes(scopes or ['email', 'profile'], grant_type)
+    scopes = _get_updated_scopes(scopes, grant_type)
     iat, exp = _compute_time_fields(expires_in)
 
     payload = {
@@ -289,7 +285,15 @@ def _encode_and_sign(payload, use_asymmetric_key, secret):
     return jwt.encode(payload, jwk.key, algorithm=algorithm)
 
 
-def _update_user_id_in_scopes(scopes, grant_type):
+def _get_updated_scopes(scopes, grant_type):
+    """
+    Default scopes should only contain non-privileged data.
+    Do not be misled by the fact that `email` and `profile` are default scopes.
+    They were included for legacy compatibility, even though they contain privileged
+    data. The scope `user_id` must be added for requests with grant_type password.
+    """
+    scopes = scopes or ['email', 'profile']
+
     if grant_type == Application.GRANT_PASSWORD and 'user_id' not in scopes:
         scopes.append('user_id')
     return scopes
