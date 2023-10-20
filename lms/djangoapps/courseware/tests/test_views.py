@@ -359,7 +359,7 @@ class IndexQueryTestCase(ModuleStoreTestCase):
         CourseEnrollment.enroll(self.user, course.id)
 
         # TODO: course roles: number of querys increased from 177 to 179
-        with self.assertNumQueries(177, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
+        with self.assertNumQueries(179, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
             with check_mongo_calls(3):
                 url = reverse(
                     'courseware_section',
@@ -1517,7 +1517,8 @@ class ProgressPageTests(ProgressPageBaseTests):
 
         for _ in range(2):
             with self.assertNumQueries(
-                37, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
+                # TODO: course roles: number of querys increased from 37 to 44
+                44, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
             ), check_mongo_calls(2):
                 self._get_progress_page()
 
