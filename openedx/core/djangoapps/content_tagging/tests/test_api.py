@@ -210,7 +210,12 @@ class TestAPITaxonomy(TestTaxonomyMixin, TestCase):
         assert valid_tags[0].id == object_tag.id
 
     def test_get_tags(self):
-        assert api.get_tags(self.taxonomy_all_orgs) == [self.tag_all_orgs]
+        result = list(api.get_tags(self.taxonomy_all_orgs))
+        assert len(result) == 1
+        assert result[0]["value"] == self.tag_all_orgs.value
+        assert result[0]["_id"] == self.tag_all_orgs.id
+        assert result[0]["parent_value"] is None
+        assert result[0]["depth"] == 0
 
     def test_cannot_tag_across_orgs(self):
         """
