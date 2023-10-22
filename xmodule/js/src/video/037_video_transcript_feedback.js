@@ -54,8 +54,8 @@
 
                     this.videoId = this.el.data('video-id');
                     this.userId = this.el.data('user-id');
-                    // this.aiTranslationsUrl = this.state.config.getFeedbackUrl;
-                    this.aiTranslationsUrl = 'http://localhost:18760/api/v1';
+                    this.aiTranslationsUrl = this.state.config.getFeedbackUrl;
+                    // this.aiTranslationsUrl = 'http://localhost:18760/api/v1';
 
                     this.thumbsUpButton = this.el.find('.thumbs-up-btn');
                     this.thumbsDownButton = this.el.find('.thumbs-down-btn');
