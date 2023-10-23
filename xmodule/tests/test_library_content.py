@@ -110,6 +110,7 @@ class TestLibraryContentExportImport(LibraryContentTest):
         # Children will only set after calling this.
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
+        self.lc_block.shuffle = True
 
         self.expected_olx = (
             '<library_content display_name="{block.display_name}" max_count="{block.max_count}"'
@@ -154,6 +155,7 @@ class TestLibraryContentExportImport(LibraryContentTest):
         Test the export-import cycle.
         """
         # Read back the olx.
+        print(self.export_fs.open)
         with self.export_fs.open('{dir}/{file_name}.xml'.format(
             dir=self.lc_block.scope_ids.usage_id.block_type,
             file_name=self.lc_block.scope_ids.usage_id.block_id
@@ -412,8 +414,8 @@ class LibraryContentBlockTestMixin:
         Test the settings that are marked as "non-editable".
         """
         non_editable_metadata_fields = self.lc_block.non_editable_metadata_fields
-        assert LibraryContentBlock.mode in non_editable_metadata_fields
         assert LibraryContentBlock.display_name not in non_editable_metadata_fields
+        assert LibraryContentBlock.source_library_version in non_editable_metadata_fields
 
     def test_overlimit_blocks_chosen_randomly(self):
         """
@@ -445,6 +447,7 @@ class LibraryContentBlockTestMixin:
         """
         self.lc_block.max_count = count
         selected = self.lc_block.get_child_blocks()
+        print(selected)
         assert len(selected) == count
         return selected
 
@@ -570,6 +573,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         self.publisher = Mock()
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
+        self.lc_block.shuffle = True
         self._bind_course_block(self.lc_block)
         self.lc_block.runtime.publish = self.publisher
 
@@ -740,3 +744,99 @@ class TestLibraryContentAnalytics(LibraryContentTest):
                  'original_usage_key': str(keep_block_lib_usage_key),
                  'original_usage_version': str(keep_block_lib_version), 'descendants': []}]
         assert event_data['reason'] == 'invalid'
+
+
+class TestLibraryContentSelectionInShuffleMode(LibraryContentTest):
+    """
+    Test the content filtering and selection features which allow randomized reference.
+    """
+    def setUp(self):
+        super().setUp()
+        self.lc_block.refresh_children()
+        self.lc_block.shuffle = True
+        self.lc_block.manual = False
+        self.lc_block = self.store.get_item(self.lc_block.location)
+        self._bind_course_block(self.lc_block)
+
+    def test_block_added(self):
+        """
+        Test that increasing the "max_count" value leads to more selected blocks.
+        """
+        # Start by assigning two blocks to the student:
+        self.lc_block.get_child_blocks()  # This line is needed in the test environment or the change has no effect
+        self.lc_block.max_count = 2
+        initial_blocks_assigned = [block.location for block in self.lc_block.get_child_blocks()]
+        assert len(initial_blocks_assigned) == 2
+        self.lc_block.max_count = 3
+        blocks_assigned_with_addition = [block.location for block in self.lc_block.get_child_blocks()]
+        assert len(blocks_assigned_with_addition) == 3
+
+        assert initial_blocks_assigned[0] in blocks_assigned_with_addition
+        assert initial_blocks_assigned[1] in blocks_assigned_with_addition
+
+    def test_block_removed_invalid(self):
+        """
+        Test that if a block is deleted from the children (removed from the library),
+        the selected blocks are preserved, except for that now invalid block, which is removed and replaced with a new block at random.
+        """
+
+        # Start by assigning all blocks to the student:
+        self.lc_block.get_child_blocks()  # This line is needed in the test environment or the change has no effect
+        self.lc_block.max_count = 4
+        all_blocks = self.lc_block.get_child_blocks()
+
+        # Then assigning 2 blocks to the student:
+        self.lc_block.get_child_blocks()  # This line is needed in the test environment or the change has no effect
+        self.lc_block.max_count = 2
+        initial_blocks_assigned = self.lc_block.get_child_blocks()
+
+        # Keep one block, delete one block
+        keep_block_key = initial_blocks_assigned[0].location
+        keep_block_lib_usage_key, keep_block_lib_version = self.store.get_block_original_usage(keep_block_key)
+        assert keep_block_lib_usage_key is not None
+        deleted_block_key = initial_blocks_assigned[1].location
+
+        self.lc_block.children = [block.location for block in all_blocks if block.location != deleted_block_key]
+        children = self.lc_block.get_child_blocks()
+
+        assert initial_blocks_assigned[0].location in [child.location for child in children]
+        assert initial_blocks_assigned[1].location not in [child.location for child in children]
+
+    def test_block_removed_overlimit(self):
+        """
+        Test that decrasing the "max_count" value leads to that many fewer selected blocks.
+        """
+        # Start by assigning six blocks to the student:
+        self.lc_block.get_child_blocks()  # This line is needed in the test environment or the change has no effect
+        self.lc_block.max_count = 4
+        initial_blocks_assigned = self.lc_block.get_child_blocks()
+        assert len(initial_blocks_assigned) == 4
+        self.lc_block.max_count = 2
+        blocks_assigned_with_addition = self.lc_block.get_child_blocks()
+        assert len(blocks_assigned_with_addition) == 2
+
+
+class TestLibraryContentSelectionInManualMode(LibraryContentTest):
+    """
+    Test the content filtering and selection features which allow specific reference of content.
+    """
+    def setUp(self):
+        super().setUp()
+        self.lc_block.refresh_children()
+        self.lc_block = self.store.get_item(self.lc_block.location)
+        self.lc_block.shuffle = False
+        self.lc_block.manual = True
+        self._bind_course_block(self.lc_block)
+
+    def selects_children_from_candidates(self):
+        """
+        Test that if "manual" mode is enabled, the user is shown all content from the manually selected content.
+        """
+
+        # set the candidate pool
+        children = self.lc_block.children
+        pool = [(child.block_type, child.location) for child in children[:2]]
+        self.lc_block.candidates = pool
+        print(pool)
+        manualy_selected_blocks = self.lc_block.get_child_blocks()
+        assert manualy_selected_blocks == pool

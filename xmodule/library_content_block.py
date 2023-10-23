@@ -51,6 +51,7 @@ loader = ResourceLoader(__name__)
 
 ANY_CAPA_TYPE_VALUE = 'any'
 
+
 def _get_human_name(problem_class):
     """
     Get the human-friendly name for a problem type.
@@ -168,12 +169,14 @@ class LibraryContentBlock(
         scope=Scope.user_state,
     )
     shuffle = Boolean(
-         default=True,
-         scope=Scope.settings,
+        #is the block content randomized for every user.
+        default=True,
+        scope=Scope.settings,
     )
     manual = Boolean(
-         default=False,
-         scope=Scope.settings,
+        #is the block content only drawn from content which is in the candidates list?
+        default=False,
+        cope=Scope.settings,
     )
     # This cannot be called `show_reset_button`, because children blocks inherit this as a default value.
     allow_resetting_children = Boolean(
@@ -217,7 +220,6 @@ class LibraryContentBlock(
         ])
         return non_editable_fields
 
-
     def _publish_event(self, event_name, result, **kwargs):
         """
         Helper method to publish an event for analytics purposes
@@ -238,8 +240,6 @@ class LibraryContentBlock(
         Dynamically selects block_ids which children are possible for selection
         """
         if candidates and manual:
-            print("candididates found brother")
-            print(candidates)
             return candidates
         return {(child.block_type, child.block_id) for child in library_children}
 
@@ -266,26 +266,27 @@ class LibraryContentBlock(
 
         if shuffle:
             #determine how many blocks need to be added or removed.
-            vaccancies_in_selected = size - len(valid_old_block_keys) if size > 0 else len(valid_block_keys)-len(valid_old_block_keys)
+            vaccancies_in_selected = size - len(valid_old_block_keys) if size >= 0 else len(valid_block_keys) - len(valid_old_block_keys)
+
             if vaccancies_in_selected < 0:
                 new_selected = list(valid_old_block_keys)[0:size]
                 overlimit_block_keys = list(valid_old_block_keys)[size:]
             else:
                 if not manual:
-                    new_selected = list(valid_old_block_keys) + random.sample(valid_additions,vaccancies_in_selected)
+                    new_selected = list(valid_old_block_keys) + random.sample(valid_additions, vaccancies_in_selected)
                 else:
                     new_selected = list(valid_old_block_keys) + list(valid_additions)[0:vaccancies_in_selected]
                 if new_selected != old_selected:
                     random.shuffle(new_selected)
         else:
             new_selected = list(valid_block_keys)[:size]
+
         return {
             'selected': new_selected,
             'invalid': list(old_selected.difference(set(new_selected))),
             'overlimit': overlimit_block_keys,
-            'added': list(set(new_selected)-old_selected),
+            'added': list(set(new_selected) - old_selected),
         }
-
 
     @classmethod
     def publish_selected_children_events(cls, block_keys, format_block_keys, publish_event):
@@ -359,7 +360,6 @@ class LibraryContentBlock(
 
         block_keys = self.make_selection(self.selected, self.children, self.candidates, self.max_count, self.manual, self.shuffle)
 
-        print(block_keys)
         # Publish events for analytics purposes:
         lib_tools = self.runtime.service(self, 'library_tools')
         format_block_keys = lambda keys: lib_tools.create_block_analytics_summary(self.location.course_key, keys)
@@ -402,7 +402,6 @@ class LibraryContentBlock(
         Generator returning XBlock instances of the children selected for the
         current user.
         """
-        print("_get_selected_child_blocks")
         for block_type, block_id in self.selected_children():
             yield self.runtime.get_block(self.location.course_key.make_usage_key(block_type, block_id))
 
@@ -453,9 +452,6 @@ class LibraryContentBlock(
         Normal studio view: If block is properly configured, displays library status summary
         Studio container view: displays a preview of all possible children.
         """
-        print("NORBITS")
-        print(self.get_children)
-        print(self.get_children())
         fragment = Fragment()
         root_xblock = context.get('root_xblock')
         is_root = root_xblock and root_xblock.location == self.location
@@ -491,7 +487,6 @@ class LibraryContentBlock(
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit_helpers.js'))
         add_webpack_js_to_fragment(fragment, 'LibraryContentBlockStudio')
         shim_xmodule_js(fragment, self.studio_js_module_name)
-
         return fragment
 
     @lazy
@@ -538,6 +533,12 @@ class LibraryContentBlock(
             'can_add': can_add,
             'can_reorder': can_reorder,
         }))
+
+    def get_child_blocks(self):
+        """
+        Return only the subset of our children relevant to the current student.
+        """
+        return list(self._get_selected_child_blocks())
 
     @XBlock.handler
     def get_block_ids(self, request, suffix=''):  # lint-amnesty, pylint: disable=unused-argument
