@@ -777,7 +777,8 @@ class TestLibraryContentSelectionInShuffleMode(LibraryContentTest):
     def test_block_removed_invalid(self):
         """
         Test that if a block is deleted from the children (removed from the library),
-        the selected blocks are preserved, except for that now invalid block, which is removed and replaced with a new block at random.
+        the selected blocks are preserved,
+        except for that now invalid block, which is removed and replaced with a new block at random.
         """
 
         # Start by assigning all blocks to the student:

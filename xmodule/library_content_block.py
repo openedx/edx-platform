@@ -15,7 +15,6 @@ from django.utils.functional import classproperty
 from lazy import lazy
 from lxml import etree
 from lxml.etree import XMLSyntaxError
-from mako.template import Template as MakoTemplate
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
 from pkg_resources import resource_string
@@ -33,7 +32,6 @@ from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.studio_editable import StudioEditableBlock
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
-from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
     STUDENT_VIEW,
     ResourceTemplates,
@@ -235,7 +233,7 @@ class LibraryContentBlock(
         self._last_event_result_count = len(result)  # pylint: disable=attribute-defined-outside-init
 
     @classmethod
-    def _get_valid_children(self, library_children, candidates, manual):
+    def _get_valid_children(cls, library_children, candidates, manual):
         """
         Dynamically selects block_ids which children are possible for selection
         """
@@ -244,7 +242,7 @@ class LibraryContentBlock(
         return {(child.block_type, child.block_id) for child in library_children}
 
     @classmethod
-    def make_selection(self, selected, library_children, candidates, max_count, manual, shuffle):
+    def make_selection(cls, selected, library_children, candidates, max_count, manual, shuffle):
         """
         Dynamically selects block_ids indicating which of the possible children are displayed to the current user.
         The blocks returned are kept consistent for a user,
@@ -257,7 +255,7 @@ class LibraryContentBlock(
             'added' (set) of newly added (block_type, block_id) tuples
         """
         old_selected = set(tuple(k) for k in selected)
-        valid_block_keys = self._get_valid_children(library_children, candidates, manual)
+        valid_block_keys = LibraryContentBlock._get_valid_children(library_children, candidates, manual)
         valid_old_block_keys = valid_block_keys.intersection(old_selected)
         valid_additions = valid_block_keys.difference(valid_old_block_keys)
         new_selected = set()
@@ -266,7 +264,9 @@ class LibraryContentBlock(
 
         if shuffle:
             #determine how many blocks need to be added or removed.
-            vaccancies_in_selected = size - len(valid_old_block_keys) if size >= 0 else len(valid_block_keys) - len(valid_old_block_keys)
+            vaccancies_in_selected = (size - len(valid_old_block_keys)
+                          if size >= 0
+                          else len(valid_block_keys) - len(valid_old_block_keys))
 
             if vaccancies_in_selected < 0:
                 new_selected = list(valid_old_block_keys)[0:size]
@@ -358,7 +358,14 @@ class LibraryContentBlock(
         if max_count < 0:
             max_count = len(self.children)
 
-        block_keys = self.make_selection(self.selected, self.children, self.candidates, self.max_count, self.manual, self.shuffle)
+        block_keys = self.make_selection(
+            self.selected,
+            self.children,
+            self.candidates,
+            self.max_count,
+            self.manual,
+            self.shuffle
+        )
 
         # Publish events for analytics purposes:
         lib_tools = self.runtime.service(self, 'library_tools')
@@ -795,6 +802,9 @@ class LibraryContentBlock(
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
+        """
+        parses the definition and child objects from a piece of xml, the storage format for xblocks.
+        """
         children = []
 
         for child in xml_object.getchildren():
