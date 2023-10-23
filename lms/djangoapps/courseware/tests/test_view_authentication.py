@@ -29,7 +29,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
     Check that view authentication works properly.
     """
 
-    ACCOUNT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
+    ACCOUNT_INFO = [('view@test.com', 'Password1234'), ('view2@test.com', 'Password1234')]
     ENABLED_SIGNALS = ['course_published']
 
     @staticmethod
@@ -111,7 +111,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         self.assert_request_status_code(302, url)
 
     def login(self, user):  # lint-amnesty, pylint: disable=arguments-differ
-        return super().login(user.email, 'test')
+        return super().login(user.email, self.TEST_PASSWORD)
 
     def setUp(self):
         super().setUp()

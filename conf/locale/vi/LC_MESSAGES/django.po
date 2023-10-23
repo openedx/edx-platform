@@ -198,7 +198,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-08-27 20:43+0000\n"
+"POT-Creation-Date: 2023-10-08 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Le Minh Tri <trilm@hihexa.com>, 2020\n"
 "Language-Team: Vietnamese (https://app.transifex.com/open-edx/teams/6205/vi/)\n"
@@ -281,7 +281,7 @@ msgid "Video"
 msgstr "Video"
 
 #: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
-msgid "Blank Advanced Problem"
+msgid "Blank Problem"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
@@ -2817,6 +2817,12 @@ msgid "Open Response Assessment"
 msgstr ""
 
 #: lms/djangoapps/courseware/courses.py
+msgid ""
+"This Open Response Assessment's due dates are set by your instructor and "
+"can't be shifted."
+msgstr ""
+
+#: lms/djangoapps/courseware/courses.py
 msgid "Self Assessment"
 msgstr ""
 
@@ -2830,12 +2836,6 @@ msgstr ""
 
 #: lms/djangoapps/courseware/courses.py
 msgid "Submission"
-msgstr ""
-
-#: lms/djangoapps/courseware/courses.py
-msgid ""
-"Open Response Assessment due dates are set by your instructor and can't be "
-"shifted."
 msgstr ""
 
 #. Translators: 'absolute' is a date such as "Jan 01,
@@ -3300,12 +3300,12 @@ msgid "Good"
 msgstr ""
 
 #. Translators: Replier commented on "your" response to your post
-#: lms/djangoapps/discussion/rest_api/utils.py
+#: lms/djangoapps/discussion/rest_api/discussions_notifications.py
 msgid "your"
 msgstr ""
 
 #. Translators: Replier commented on "their" response to your post
-#: lms/djangoapps/discussion/rest_api/utils.py
+#: lms/djangoapps/discussion/rest_api/discussions_notifications.py
 msgid "their"
 msgstr ""
 
@@ -5264,7 +5264,6 @@ msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
 #: openedx/core/djangoapps/user_api/admin.py
-#: xmodule/templates/library-sourced-block-studio-view.html
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/videos_index_pagination.html
@@ -5692,10 +5691,10 @@ msgid "Quotes"
 msgstr "Trích dẫn"
 
 #: lms/templates/wiki/includes/editor_widget.html
-#, python-format
+#, python-brace-format
 msgid ""
-"Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for"
-" help."
+"Markdown syntax is allowed. See the {start_link}cheatsheet{end_link} for "
+"help."
 msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html
@@ -6351,6 +6350,16 @@ msgstr ""
 msgid "Original usage key/ID of the thing that is in the clipboard."
 msgstr ""
 
+#: wiki/models/article.py
+msgid "owner"
+msgstr "chủ sở hữu"
+
+#: openedx/core/djangoapps/content_tagging/models/base.py
+msgid ""
+"Organization that is related to this taxonomy.If None, then this taxonomy is"
+" related to all organizations."
+msgstr ""
+
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
 "List of domains that are allowed to make cross-domain requests to this site."
@@ -6617,8 +6626,8 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
-"The Posting availabilty in discussions whether it will be enabled, scheduled"
-" or indefinitely disabled."
+"The Posting availability in discussions whether it will be enabled, "
+"scheduled or indefinitely disabled."
 msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
@@ -6774,6 +6783,14 @@ msgstr ""
 msgid "Learner Pathways"
 msgstr ""
 
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification App"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification Type"
+msgstr ""
+
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
 msgid ""
@@ -6808,6 +6825,20 @@ msgstr ""
 msgid ""
 "<{p}><{strong}>{username}</{strong}> asked "
 "<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> responded to a post you’re "
+"following: <{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> commented on {author_name}'s "
+"response in a post you’re following <{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
 
 #: openedx/core/djangoapps/notifications/base_notification.py
@@ -8110,16 +8141,6 @@ msgid ""
 "to date."
 msgstr ""
 
-#: wiki/models/article.py
-msgid "owner"
-msgstr "chủ sở hữu"
-
-#: openedx/features/content_tagging/models/base.py
-msgid ""
-"Organization that is related to this taxonomy.If None, then this taxonomy is"
-" related to all organizations."
-msgstr ""
-
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
 #: lms/templates/support/feature_based_enrollments.html
@@ -8391,8 +8412,7 @@ msgstr ""
 #: xmodule/annotatable_block.py xmodule/capa_block.py
 #: xmodule/conditional_block.py xmodule/discussion_block.py
 #: xmodule/html_block.py xmodule/library_content_block.py
-#: xmodule/library_root_xblock.py xmodule/library_sourced_block.py
-#: xmodule/poll_block.py xmodule/unit_block.py
+#: xmodule/library_root_xblock.py xmodule/poll_block.py xmodule/unit_block.py
 #: xmodule/video_block/video_xfields.py xmodule/word_cloud_block.py
 #: xmodule/x_module.py
 msgid "The display name for this component."
@@ -10343,33 +10363,6 @@ msgstr ""
 msgid "Enter the names of the advanced components to use in your library."
 msgstr ""
 
-#: xmodule/library_sourced_block.py
-msgid "Library Blocks List"
-msgstr ""
-
-#: xmodule/library_sourced_block.py
-msgid "Enter the IDs of the library XBlocks that you wish to use."
-msgstr ""
-
-#: xmodule/library_sourced_block.py
-#, python-brace-format
-msgid "A maximum of {0} components may be added."
-msgstr ""
-
-#: xmodule/library_sourced_block.py
-msgid ""
-"No XBlock has been configured for this component. Use the editor to select "
-"the target blocks."
-msgstr ""
-
-#: xmodule/library_sourced_block.py
-msgid "Open Editor"
-msgstr ""
-
-#: xmodule/library_sourced_block.py
-msgid "Importing Library Block failed - are the IDs valid and readable?"
-msgstr ""
-
 #: xmodule/lti_block.py
 msgid ""
 "The display name for this component. Analytics reports may also use the "
@@ -10954,10 +10947,6 @@ msgstr ""
 
 #: xmodule/tabs.py
 msgid "External Discussion"
-msgstr ""
-
-#: xmodule/templates/library-sourced-block-studio-view.html
-msgid "Save and Import"
 msgstr ""
 
 #: xmodule/vertical_block.py
@@ -14677,10 +14666,6 @@ msgstr "Tải bảng điểm học viên"
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Print or share your certificate:"
 msgstr "In hoặc chia sẻ giấy chứng nhận của bạn:"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-msgid "Click the link to see my certificate."
-msgstr "Nhấn vào link để xem chứng chỉ."
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"

@@ -1,5 +1,18 @@
 """
 Celery tasks for Content Libraries.
+
+Architecture note:
+
+    Several functions in this file manage the copying/updating of blocks in modulestore
+    and blockstore. These operations should only be performed within the context of CMS.
+    However, due to existing edx-platform code structure, we've had to define the functions
+    in shared source tree (openedx/) and the tasks are registered in both LMS and CMS.
+
+    To ensure that we're not accidentally importing things from blockstore in the LMS context,
+    we use ensure_cms throughout this module.
+
+    A longer-term solution to this issue would be to move the content_libraries app to cms:
+    https://github.com/openedx/edx-platform/issues/33428
 """
 
 import logging
@@ -10,7 +23,7 @@ from celery_utils.logged_task import LoggedTask
 from celery.utils.log import get_task_logger
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
-from edx_django_utils.monitoring import set_code_owner_attribute
+from edx_django_utils.monitoring import set_code_owner_attribute, set_code_owner_attribute_from_module
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import (
     BlockUsageLocator,
@@ -28,7 +41,7 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary
 from openedx.core.djangoapps.xblock.api import load_block
-from openedx.core.lib import blockstore_api
+from openedx.core.lib import ensure_cms, blockstore_api
 from xmodule.capa_block import ProblemBlock
 from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE
 from xmodule.modulestore import ModuleStoreEnum
@@ -48,6 +61,7 @@ def import_blocks_from_course(import_task_id, course_key_str):
     """
     A Celery task to import blocks from a course through modulestore.
     """
+    ensure_cms("import_blocks_from_course may only be executed in a CMS context")
 
     course_key = CourseKey.from_string(course_key_str)
 
@@ -203,6 +217,7 @@ def import_from_blockstore(user_id, store, dest_block, blockstore_block_ids):
     content library) into modulestore, as a new child of dest_block.
     Any existing children of dest_block are replaced.
     """
+    ensure_cms("import_from_blockstore may only be executed in a CMS context")
     dest_key = dest_block.scope_ids.usage_id
     if not isinstance(dest_key, BlockUsageLocator):
         raise TypeError(f"Destination {dest_key} should be a modulestore course.")
@@ -272,7 +287,9 @@ class LibraryUpdateChildrenTask(UserTask):  # pylint: disable=abstract-method
 
 
 @shared_task(base=LibraryUpdateChildrenTask, bind=True)
-@set_code_owner_attribute
+# Note: The decorator @set_code_owner_attribute cannot be used here because the UserTaskMixin
+#       does stack inspection and can't handle additional decorators.
+#       So, wet set the code_owner attribute in the task's body instead.
 def update_children_task(self, user_id, dest_block_key, version=None):
     """
     Update xBlock's children.
@@ -284,6 +301,8 @@ def update_children_task(self, user_id, dest_block_key, version=None):
     store the version number of the libraries used, so we easily determine
     if dest_block is up to date or not.
     """
+    set_code_owner_attribute_from_module(__name__)
+    ensure_cms("library_content block children may only be updated in a CMS context")
     store = modulestore()
     dest_block_id = BlockUsageLocator.from_string(dest_block_key)
     dest_block = store.get_item(dest_block_id)

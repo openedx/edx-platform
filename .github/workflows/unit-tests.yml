@@ -17,7 +17,7 @@ jobs:
           - "3.8"
         django-version:
           - "pinned"
-          #- "4.0"
+          - "4.2"
         # When updating the shards, remember to make the same changes in
         # .github/workflows/unit-tests-gh-hosted.yml
         shard_name:
@@ -27,15 +27,16 @@ jobs:
           - "lms-4"
           - "lms-5"
           - "lms-6"
-          - "openedx-1"
-          - "openedx-2"
-          - "openedx-3"
-          - "openedx-4"
+          - "openedx-1-with-lms"
+          - "openedx-2-with-lms"
+          - "openedx-1-with-cms"
+          - "openedx-2-with-cms"
           - "cms-1"
           - "cms-2"
-          - "common-1"
-          - "common-2"
-          - "xmodule-1"
+          - "common-with-lms"
+          - "common-with-cms"
+          - "xmodule-with-lms"
+          - "xmodule-with-cms"
     # We expect Django 4.0 to fail, so don't stop when it fails.
     continue-on-error: ${{ matrix.django-version == '4.0' }}
 
@@ -89,7 +90,7 @@ jobs:
     steps:
       - name: Decide whether the needed jobs succeeded or failed
         # uses: re-actors/alls-green@v1.2.1
-        uses: re-actors/alls-green@13b4244b312e8a314951e03958a2f91519a6a3c9
+        uses: re-actors/alls-green@05ac9388f0aebcb5727afa17fcccfecd6f8ec5fe
         with:
           jobs: ${{ toJSON(needs) }}
 
@@ -101,7 +102,7 @@ jobs:
         run: sudo chown runner:runner -R .*
       - uses: actions/checkout@v3
       - name: collect pytest warnings files
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: pytest-warnings-json
           path: test_root/log

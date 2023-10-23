@@ -1,18 +1,14 @@
 """Tests for util.db module."""
 
-from importlib.metadata import version
 from io import StringIO
 
 import ddt
-import pytest
 from django.core.management import call_command
 from django.db.transaction import TransactionManagementError, atomic
 from django.test import TestCase, TransactionTestCase
 from django.test.utils import override_settings
 
 from common.djangoapps.util.db import enable_named_outer_atomic, generate_int_id, outer_atomic
-
-GET_DJANGO_VERSION = int(version('django').split('.')[0])
 
 
 def do_nothing():
@@ -119,7 +115,6 @@ class GenerateIntIdTestCase(TestCase):
             assert int_id in list(set(range(minimum, (maximum + 1))) - used_ids)
 
 
-@pytest.mark.skipif(GET_DJANGO_VERSION > 3, reason="django4.2 brings new migrations, so only run for dj32 for now.")
 class MigrationTests(TestCase):
     """
     Tests for migrations.

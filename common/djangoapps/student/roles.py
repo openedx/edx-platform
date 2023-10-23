@@ -7,6 +7,7 @@ adding users, removing users, and listing members
 import logging
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
+from contextlib import contextmanager
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from opaque_keys.edx.django.models import CourseKeyField
@@ -44,6 +45,21 @@ def register_access_role(cls):
     return cls
 
 
+@contextmanager
+def strict_role_checking():
+    """
+    Context manager that temporarily disables role inheritance.
+
+    You may want to use it to check if a user has a base role. For example, if a user has `CourseLimitedStaffRole`,
+    by enclosing `has_role` call with this context manager, you can check it has the `CourseStaffRole` too. This is
+    useful when derived roles have less permissions than their base roles, but users can have both roles at the same.
+    """
+    OLD_ACCESS_ROLES_INHERITANCE = ACCESS_ROLES_INHERITANCE.copy()
+    ACCESS_ROLES_INHERITANCE.clear()
+    yield
+    ACCESS_ROLES_INHERITANCE.update(OLD_ACCESS_ROLES_INHERITANCE)
+
+
 class BulkRoleCache:  # lint-amnesty, pylint: disable=missing-class-docstring
     CACHE_NAMESPACE = "student.roles.BulkRoleCache"
     CACHE_KEY = 'roles_by_user'
@@ -78,7 +94,7 @@ class RoleCache:
             )
 
     @staticmethod
-    def _get_roles(role):
+    def get_roles(role):
         """
         Return the roles that should have the same permissions as the specified role.
         """
@@ -90,7 +106,7 @@ class RoleCache:
         or a role that inherits from the specified role, course_id and org.
         """
         return any(
-            access_role.role in self._get_roles(role) and
+            access_role.role in self.get_roles(role) and
             access_role.course_id == course_id and
             access_role.org == org
             for access_role in self._roles
@@ -463,11 +479,11 @@ class UserBasedRole:
 
     def courses_with_role(self):
         """
-        Return a django QuerySet for all of the courses with this user x role. You can access
+        Return a django QuerySet for all of the courses with this user x (or derived from x) role. You can access
         any of these properties on each result record:
         * user (will be self.user--thus uninteresting)
         * org
         * course_id
         * role (will be self.role--thus uninteresting)
         """
-        return CourseAccessRole.objects.filter(role=self.role, user=self.user)
+        return CourseAccessRole.objects.filter(role__in=RoleCache.get_roles(self.role), user=self.user)

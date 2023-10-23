@@ -544,6 +544,28 @@ describe('Program Details View', () => {
             .toContainText(body);
     };
 
+    const testSubscriptionSunsetting = (state, heading, body) => {
+        const subscriptionData = {
+            ...options.subscriptionData[0],
+            subscription_state: state,
+        };
+        // eslint-disable-next-line no-use-before-define
+        view = initView({
+            // eslint-disable-next-line no-undef
+            programData: $.extend({}, options.programData, {
+                subscription_eligible: false,
+            }),
+            isUserB2CSubscriptionsEnabled: true,
+            subscriptionData: [subscriptionData],
+        });
+        view.render();
+        expect(view.$('.upgrade-subscription')[0]).not.toBeInDOM();
+        expect(view.$('.upgrade-subscription .upgrade-button')).not
+            .toContainText(heading);
+        expect(view.$('.upgrade-subscription .subscription-info-brief')).not
+            .toContainText(body);
+    };
+
     const initView = (updates) => {
         // eslint-disable-next-line no-undef
         const viewOptions = $.extend({}, options, updates);
@@ -709,8 +731,8 @@ describe('Program Details View', () => {
         );
     });
 
-    it('should render the get subscription link if program is subscription eligible', () => {
-        testSubscriptionState(
+    it('should not render the get subscription link if program is not active', () => {
+        testSubscriptionSunsetting(
             'pre',
             'Start 7-day free trial',
             '$100/month USD subscription after trial ends. Cancel anytime.',
@@ -734,8 +756,8 @@ describe('Program Details View', () => {
         );
     });
 
-    it('should render appropriate subscription text when subscription is inactive', () => {
-        testSubscriptionState(
+    it('should not render appropriate subscription text when subscription is inactive', () => {
+        testSubscriptionSunsetting(
             'inactive',
             'Restart my subscription',
             '$100/month USD subscription. Cancel anytime.',

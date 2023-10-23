@@ -32,7 +32,7 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .exceptions import AssetNotFoundException, AssetSizeTooLargeException
-from .utils import reverse_course_url, get_files_uploads_url
+from .utils import reverse_course_url, get_files_uploads_url, get_response_format, request_response_format_is_json
 from .toggles import use_new_files_uploads_page
 
 
@@ -73,8 +73,8 @@ def handle_assets(request, course_key_string=None, asset_key_string=None):
     if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
 
-    response_format = _get_response_format(request)
-    if _request_response_format_is_json(request, response_format):
+    response_format = get_response_format(request)
+    if request_response_format_is_json(request, response_format):
         if request.method == 'GET':
             return _assets_json(request, course_key)
 
@@ -131,14 +131,6 @@ def get_asset_usage_path(request, course_key, asset_key_string):
                 xblock_display_name = getattr(block, 'display_name', '')
                 usage_locations.append(f'{subsection_display_name} - {unit_display_name} / {xblock_display_name}')
     return JsonResponse({'usage_locations': usage_locations})
-
-
-def _get_response_format(request):
-    return request.GET.get('format') or request.POST.get('format') or 'html'
-
-
-def _request_response_format_is_json(request, response_format):
-    return response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json')
 
 
 def _asset_index(request, course_key):
@@ -575,7 +567,7 @@ def _get_thumbnail_asset_key(asset, course_key):
 
 
 # TODO: this method needs improvement. These view decorators should be at the top in an actual view method,
-#  but this is just a method called by the asset_handler. The asset_handler used by the public studio content API
+#  but this is just a method called by the asset_handler. The asset_handler used by the public CMS API
 # just ignores all of this stuff.
 @require_http_methods(('DELETE', 'POST', 'PUT'))
 @login_required

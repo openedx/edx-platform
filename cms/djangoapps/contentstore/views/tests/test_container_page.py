@@ -9,6 +9,7 @@ from unittest.mock import Mock, patch
 
 from django.http import Http404
 from django.test.client import RequestFactory
+from django.urls import reverse
 from pytz import UTC
 from urllib.parse import quote
 
@@ -57,11 +58,16 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         self.store.publish(self.vertical.location, self.user.id)
 
     def test_container_html(self):
+        assets_url = reverse(
+            'assets_handler', kwargs={'course_key_string': str(self.child_container.location.course_key)}
+        )
         self._test_html_content(
             self.child_container,
             expected_section_tag=(
                 '<section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" '
-                'data-locator="{0}" data-course-key="{0.course_key}">'.format(self.child_container.location)
+                'data-locator="{0}" data-course-key="{0.course_key}" data-course-assets="{1}">'.format(
+                    self.child_container.location, assets_url
+                )
             ),
             expected_breadcrumbs=(
                 '<li class="nav-item">\\s*<a href="/course/{course}{section_parameters}">Week 1<\\/a>.*'
@@ -86,11 +92,16 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         self._create_block(draft_container, "html", "Child HTML")
 
         def test_container_html(xblock):
+            assets_url = reverse(
+                'assets_handler', kwargs={'course_key_string': str(draft_container.location.course_key)}
+            )
             self._test_html_content(
                 xblock,
                 expected_section_tag=(
                     '<section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" '
-                    'data-locator="{0}" data-course-key="{0.course_key}">'.format(draft_container.location)
+                    'data-locator="{0}" data-course-key="{0.course_key}" data-course-assets="{1}">'.format(
+                        draft_container.location, assets_url
+                    )
                 ),
                 expected_breadcrumbs=(
                     '<a href="/course/{course}{subsection_parameters}">Lesson 1</a>.*'

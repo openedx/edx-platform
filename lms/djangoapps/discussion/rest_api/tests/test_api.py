@@ -1853,10 +1853,7 @@ class CreateThreadTest(
         }
 
     @mock.patch("eventtracking.tracker.emit")
-    @mock.patch(
-        'lms.djangoapps.discussion.rest_api.tasks.send_thread_created_notification.apply_async'
-    )
-    def test_basic(self, mock_notification_task, mock_emit):
+    def test_basic(self, mock_emit):
         cs_thread = make_minimal_cs_thread({
             "id": "test_id",
             "username": self.user.username,
@@ -1872,7 +1869,6 @@ class CreateThreadTest(
             "read": True,
         })
         assert actual == expected
-        mock_notification_task.assert_called_once()
         assert parsed_body(httpretty.last_request()) == {
             'course_id': [str(self.course.id)],
             'commentable_id': ['test_topic'],
@@ -1915,10 +1911,7 @@ class CreateThreadTest(
         self.assertEqual(assertion.exception.detail, "Discussions are in blackout period.")
 
     @mock.patch("eventtracking.tracker.emit")
-    @mock.patch(
-        'lms.djangoapps.discussion.rest_api.tasks.send_thread_created_notification.apply_async'
-    )
-    def test_basic_in_blackout_period_with_user_access(self, mock_notification_task, mock_emit):
+    def test_basic_in_blackout_period_with_user_access(self, mock_emit):
         """
         Test case when course is in blackout period and user has special privileges.
         """
@@ -1958,7 +1951,6 @@ class CreateThreadTest(
             ],
         })
         assert actual == expected
-        mock_notification_task.assert_called_once()
         self.assertEqual(
             parsed_body(httpretty.last_request()),
             {
@@ -2042,10 +2034,7 @@ class CreateThreadTest(
         )
     )
     @ddt.unpack
-    @mock.patch(
-        'lms.djangoapps.discussion.rest_api.tasks.send_thread_created_notification.apply_async'
-    )
-    def test_group_id(self, role_name, course_is_cohorted, topic_is_cohorted, data_group_state, mock_notification_task):
+    def test_group_id(self, role_name, course_is_cohorted, topic_is_cohorted, data_group_state):
         """
         Tests whether the user has permission to create a thread with certain
         group_id values.
@@ -2083,7 +2072,6 @@ class CreateThreadTest(
         try:
             create_thread(self.request, data)
             assert not expected_error
-            mock_notification_task.assert_called_once()
             actual_post_data = parsed_body(httpretty.last_request())
             if data_group_state == "group_is_set":
                 assert actual_post_data['group_id'] == [str(data['group_id'])]
@@ -2095,26 +2083,19 @@ class CreateThreadTest(
             if not expected_error:
                 self.fail(f"Unexpected validation error: {ex}")
 
-    @mock.patch(
-        'lms.djangoapps.discussion.rest_api.tasks.send_thread_created_notification.apply_async'
-    )
-    def test_following(self, mock_notification_task):
+    def test_following(self):
         self.register_post_thread_response({"id": "test_id", "username": self.user.username})
         self.register_subscription_response(self.user)
         data = self.minimal_data.copy()
         data["following"] = "True"
         result = create_thread(self.request, data)
         assert result['following'] is True
-        mock_notification_task.assert_called_once()
         cs_request = httpretty.last_request()
         assert urlparse(cs_request.path).path == f"/api/v1/users/{self.user.id}/subscriptions"  # lint-amnesty, pylint: disable=no-member
         assert cs_request.method == 'POST'
         assert parsed_body(cs_request) == {'source_type': ['thread'], 'source_id': ['test_id']}
 
-    @mock.patch(
-        'lms.djangoapps.discussion.rest_api.tasks.send_thread_created_notification.apply_async'
-    )
-    def test_voted(self, mock_notification_task):
+    def test_voted(self):
         self.register_post_thread_response({"id": "test_id", "username": self.user.username})
         self.register_thread_votes_response("test_id")
         data = self.minimal_data.copy()
@@ -2122,16 +2103,12 @@ class CreateThreadTest(
         with self.assert_signal_sent(api, 'thread_voted', sender=None, user=self.user, exclude_args=('post',)):
             result = create_thread(self.request, data)
         assert result['voted'] is True
-        mock_notification_task.assert_called_once()
         cs_request = httpretty.last_request()
         assert urlparse(cs_request.path).path == '/api/v1/threads/test_id/votes'  # lint-amnesty, pylint: disable=no-member
         assert cs_request.method == 'PUT'
         assert parsed_body(cs_request) == {'user_id': [str(self.user.id)], 'value': ['up']}
 
-    @mock.patch(
-        'lms.djangoapps.discussion.rest_api.tasks.send_thread_created_notification.apply_async'
-    )
-    def test_abuse_flagged(self, mock_notification_task):
+    def test_abuse_flagged(self):
         self.register_post_thread_response({"id": "test_id", "username": self.user.username})
         self.register_thread_flag_response("test_id")
         data = self.minimal_data.copy()
@@ -2139,7 +2116,6 @@ class CreateThreadTest(
         result = create_thread(self.request, data)
         assert result['abuse_flagged'] is True
         cs_request = httpretty.last_request()
-        mock_notification_task.assert_called_once()
         assert urlparse(cs_request.path).path == '/api/v1/threads/test_id/abuse_flag'  # lint-amnesty, pylint: disable=no-member
         assert cs_request.method == 'PUT'
         assert parsed_body(cs_request) == {'user_id': [str(self.user.id)]}
@@ -2180,6 +2156,7 @@ class CreateThreadTest(
 @disable_signal(api, 'comment_created')
 @disable_signal(api, 'comment_voted')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+@mock.patch("lms.djangoapps.discussion.signals.handlers.send_response_notifications", new=mock.Mock())
 class CreateCommentTest(
         ForumsEnableMixin,
         CommentsServiceMockMixin,
@@ -2217,6 +2194,17 @@ class CreateCommentTest(
             "thread_id": "test_thread",
             "raw_body": "Test body",
         }
+
+        mock_response = {
+            'collection': [],
+            'page': 1,
+            'num_pages': 1,
+            'subscriptions_count': 1,
+            'corrected_text': None
+
+        }
+        self.register_get_subscriptions('cohort_thread', mock_response)
+        self.register_get_subscriptions('test_thread', mock_response)
 
     @ddt.data(None, "test_parent")
     @mock.patch("eventtracking.tracker.emit")
@@ -2721,7 +2709,8 @@ class UpdateThreadTest(
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
-    def test_following(self, old_following, new_following):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_following(self, old_following, new_following, mock_emit):
         """
         Test attempts to edit the "following" field.
 
@@ -2751,6 +2740,13 @@ class UpdateThreadTest(
             )
             request_data.pop("request_id", None)
             assert request_data == {'source_type': ['thread'], 'source_id': ['test_thread']}
+            event_name, event_data = mock_emit.call_args[0]
+            expected_event_action = 'followed' if new_following else 'unfollowed'
+            assert event_name == f'edx.forum.thread.{expected_event_action}'
+            assert event_data['commentable_id'] == 'original_topic'
+            assert event_data['id'] == 'test_thread'
+            assert event_data['followed'] == new_following
+            assert event_data['user_forums_roles'] == ['Student']
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack

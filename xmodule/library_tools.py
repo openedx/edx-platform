@@ -38,6 +38,8 @@ class LibraryToolsService:
     Service for LibraryContentBlock.
 
     Allows to interact with libraries in the modulestore and blockstore.
+
+    Should only be used in the CMS.
     """
     def __init__(self, modulestore, user_id):
         self.store = modulestore
@@ -48,10 +50,6 @@ class LibraryToolsService:
         Helper method to get either V1 or V2 library.
 
         Given a library key like "library-v1:ProblemX+PR0B" (V1) or "lib:RG:rg-1" (v2), return the 'library'.
-
-        is_v2_lib (bool) indicates which library storage should be requested:
-            True - blockstore (V2 library);
-            False - modulestore (V1 library).
 
         Returns None on error.
         """
