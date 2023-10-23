@@ -8,9 +8,10 @@ from django.contrib.admin import autodiscover as django_autodiscover
 from django.urls import include
 from django.urls import path, re_path
 from django.utils.translation import gettext_lazy as _
+from django.contrib import admin
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from auth_backends.urls import oauth2_urlpatterns
 from edx_api_doc_tools import make_docs_urls
-from django.contrib import admin
 
 import openedx.core.djangoapps.common_views.xblock
 import openedx.core.djangoapps.debug.views
@@ -338,5 +339,11 @@ urlpatterns += [
 
 # Content tagging
 urlpatterns += [
-    path('api/content_tagging/', include(('openedx.features.content_tagging.urls'))),
+    path('api/content_tagging/', include(('openedx.core.djangoapps.content_tagging.urls'))),
+]
+
+# studio-content-api specific API docs (using drf-spectacular and openapi-v3)
+urlpatterns += [
+    re_path('^cms-api/ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    re_path('^cms-api/schema/', SpectacularAPIView.as_view(), name='schema'),
 ]

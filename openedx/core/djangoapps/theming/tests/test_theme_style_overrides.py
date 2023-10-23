@@ -24,14 +24,15 @@ class TestComprehensiveThemeLMS(TestCase):
         Clear static file finders cache and register cleanup methods.
         """
         super().setUp()
-        self.user = UserFactory()
+        self.TEST_PASSWORD = 'Password1234'
+        self.user = UserFactory(password=self.TEST_PASSWORD)
 
         # Clear the internal staticfiles caches, to get test isolation.
         staticfiles.finders.get_finder.cache_clear()
 
     def _login(self):
         """ Log into LMS. """
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
     @with_comprehensive_theme("test-theme")
     def test_footer(self):

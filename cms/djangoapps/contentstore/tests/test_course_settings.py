@@ -1866,10 +1866,10 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
         """
         Return the course details page as either global or non-global staff
         """
-        user = UserFactory(is_staff=global_staff)
+        user = UserFactory(is_staff=global_staff, password=self.TEST_PASSWORD)
         CourseInstructorRole(self.course.id).add_users(user)
 
-        self.client.login(username=user.username, password='test')
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
 
         return self.client.get_html(self.course_details_url)
 

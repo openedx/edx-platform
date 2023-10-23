@@ -404,7 +404,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
         # login as instructor hit skip entrance exam api in instructor app
         instructor = InstructorFactory(course_key=self.course.id)
         self.client.logout()
-        self.client.login(username=instructor.username, password='test')
+        self.client.login(username=instructor.username, password=self.TEST_PASSWORD)
 
         url = reverse('mark_student_can_skip_entrance_exam', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url, {
@@ -426,7 +426,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
         # Login as member of staff
         self.client.logout()
         staff_user = StaffFactory(course_key=self.course.id)
-        self.client.login(username=staff_user.username, password='test')
+        self.client.login(username=staff_user.username, password=self.TEST_PASSWORD)
         course_tab_list = get_course_tab_list(staff_user, self.course)
         assert len(course_tab_list) == 4
 
@@ -685,7 +685,7 @@ class CourseTabListTestCase(TabListTestCase):
         # Login as member of staff
         self.client.logout()
         staff_user = StaffFactory(course_key=self.course.id)
-        self.client.login(username=staff_user.username, password='test')
+        self.client.login(username=staff_user.username, password=self.TEST_PASSWORD)
         course_tab_list_staff = get_course_tab_list(staff_user, self.course)
         name_list_staff = [x.name for x in course_tab_list_staff]
         assert 'Static Tab Free' in name_list_staff

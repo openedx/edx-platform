@@ -23,8 +23,10 @@ import os
 
 import yaml
 from corsheaders.defaults import default_headers as corsheaders_default_headers
+import django
 from django.core.exceptions import ImproperlyConfigured
 from edx_django_utils.plugins import add_plugins
+from openedx_events.event_bus import merge_producer_configs
 from path import Path as path
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
@@ -83,6 +85,7 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
         'MKTG_URL_LINK_MAP',
         'MKTG_URL_OVERRIDES',
         'REST_FRAMEWORK',
+        'EVENT_BUS_PRODUCER_CONFIG',
     ]
     for key in KEYS_WITH_MERGED_VALUES:
         if key in __config_copy__:
@@ -366,6 +369,10 @@ CSRF_COOKIE_SECURE = ENV_TOKENS.get('CSRF_COOKIE_SECURE', False)
 
 # Determines which origins are trusted for unsafe requests eg. POST requests.
 CSRF_TRUSTED_ORIGINS = ENV_TOKENS.get('CSRF_TRUSTED_ORIGINS', [])
+# values are already updated above with default CSRF_TRUSTED_ORIGINS values but in
+# case of new django version these values will override.
+if django.VERSION[0] >= 4:  # for greater than django 3.2 use schemes.
+    CSRF_TRUSTED_ORIGINS = ENV_TOKENS.get('CSRF_TRUSTED_ORIGINS_WITH_SCHEME', [])
 
 ############# CORS headers for cross-domain requests #################
 
@@ -471,6 +478,7 @@ elif AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 else:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
 
 # If there is a database called 'read_replica', you can use the use_read_replica_if_available
 # function in util/query.py, which is useful for very large database reads
@@ -1072,6 +1080,15 @@ EXPLICIT_QUEUES = {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
     'openedx.core.djangoapps.programs.tasks.award_course_certificate': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
+    'openassessment.workflow.tasks.update_workflows_for_all_blocked_submissions_task': {
+        'queue': ORA_WORKFLOW_UPDATE_ROUTING_KEY},
+    'openassessment.workflow.tasks.update_workflows_for_course_task': {
+        'queue': ORA_WORKFLOW_UPDATE_ROUTING_KEY},
+    'openassessment.workflow.tasks.update_workflows_for_ora_block_task': {
+        'queue': ORA_WORKFLOW_UPDATE_ROUTING_KEY},
+    'openassessment.workflow.tasks.update_workflow_for_submission_task': {
+        'queue': ORA_WORKFLOW_UPDATE_ROUTING_KEY},
+
 }
 
 LOGO_IMAGE_EXTRA_TEXT = ENV_TOKENS.get('LOGO_IMAGE_EXTRA_TEXT', '')
@@ -1118,3 +1135,7 @@ AVAILABLE_DISCUSSION_TOURS = ENV_TOKENS.get('AVAILABLE_DISCUSSION_TOURS', [])
 
 ############## NOTIFICATIONS EXPIRY ##############
 NOTIFICATIONS_EXPIRY = ENV_TOKENS.get('NOTIFICATIONS_EXPIRY', NOTIFICATIONS_EXPIRY)
+
+############## Event bus producer ##############
+EVENT_BUS_PRODUCER_CONFIG = merge_producer_configs(EVENT_BUS_PRODUCER_CONFIG,
+                                                   ENV_TOKENS.get('EVENT_BUS_PRODUCER_CONFIG', {}))

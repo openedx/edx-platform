@@ -112,7 +112,10 @@ class XBlockSerializer:
             olx_node.attrib["editor"] = block.editor
         if block.use_latex_compiler:
             olx_node.attrib["use_latex_compiler"] = "true"
-        olx_node.text = etree.CDATA("\n" + block.data + "\n")
+
+        # Escape any CDATA special chars
+        escaped_block_data = block.data.replace("]]>", "]]&gt;")
+        olx_node.text = etree.CDATA("\n" + escaped_block_data + "\n")
         return olx_node
 
 
