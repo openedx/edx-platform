@@ -145,7 +145,7 @@ class LibraryContentBlock(
     max_count = Integer(
         display_name=_("Count"),
         help=_("Enter the number of components to display to each student. Set it to -1 to display all components."),
-        default=-1,
+        default=1,
         scope=Scope.settings,
     )
     capa_type = String(
