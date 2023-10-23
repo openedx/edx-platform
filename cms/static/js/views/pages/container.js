@@ -53,7 +53,7 @@ function($, _, Backbone, gettext, BasePage,
         initialize: function(options) {
             BasePage.prototype.initialize.call(this, options);
             this.viewClass = options.viewClass || this.defaultViewClass;
-            this.isLibraryPage = (this.model.attributes.category === 'library');
+            this.isLibraryPage = (this.model.attributes.category === 'library_content');
             this.isLibraryContentPage = (this.model.attributes.category === 'library_content');
             this.nameEditor = new XBlockStringFieldEditor({
                 el: this.$('.wrapper-xblock-field'),

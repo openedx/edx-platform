@@ -32,6 +32,7 @@ from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.studio_editable import StudioEditableBlock
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
+from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
     STUDENT_VIEW,
     ResourceTemplates,
@@ -74,6 +75,7 @@ def _get_capa_types():
 @XBlock.wants('user')
 @XBlock.needs('mako')
 class LibraryContentBlock(
+    XmlMixin,
     StudioEditableXBlockMixin,
     MakoTemplateBlockBase,
     XModuleToXBlockMixin,
@@ -264,9 +266,11 @@ class LibraryContentBlock(
 
         if shuffle:
             #determine how many blocks need to be added or removed.
-            vaccancies_in_selected = (size - len(valid_old_block_keys)
-                          if size >= 0
-                          else len(valid_block_keys) - len(valid_old_block_keys))
+            vaccancies_in_selected = (
+                size - len(valid_old_block_keys)
+                if size >= 0
+                else len(valid_block_keys) - len(valid_old_block_keys)
+            )
 
             if vaccancies_in_selected < 0:
                 new_selected = list(valid_old_block_keys)[0:size]

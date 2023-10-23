@@ -112,7 +112,6 @@ class TestLibraryContentExportImport(LibraryContentTest):
         # Children will only set after calling this.
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
-        self.lc_block.shuffle = True
 
         self.expected_olx = (
             '<library_content display_name="{block.display_name}" max_count="{block.max_count}"'
@@ -146,7 +145,8 @@ class TestLibraryContentExportImport(LibraryContentTest):
         assert imported_lc_block.display_name == self.lc_block.display_name
         assert imported_lc_block.source_library_id == self.lc_block.source_library_id
         assert imported_lc_block.source_library_version == self.lc_block.source_library_version
-        assert imported_lc_block.mode == self.lc_block.mode
+        assert imported_lc_block.shuffle == self.lc_block.shuffle
+        assert imported_lc_block.manual == self.lc_block.manual
         assert imported_lc_block.max_count == self.lc_block.max_count
         assert imported_lc_block.capa_type == self.lc_block.capa_type
         assert len(imported_lc_block.children) == len(self.lc_block.children)
