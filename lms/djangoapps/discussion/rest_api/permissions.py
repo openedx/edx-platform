@@ -16,6 +16,8 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
     get_user_role_names,
     has_discussion_privileges,
 )
+from openedx.core.djangoapps.course_roles.helpers import course_permissions_list_check
+from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.django_comment_common.models import (
@@ -155,10 +157,22 @@ class IsStaffOrCourseTeamOrEnrolled(permissions.BasePermission):
     def has_permission(self, request, view):
         """Returns true if the user is enrolled or is staff."""
         course_key = CourseKey.from_string(view.kwargs.get('course_id'))
+        # TODO: course roles: If the course roles feature flag is disabled the course_permissions_list_check
+        # call below will never return true.
+        # Remove the CourseStaffRole and CourseInstructorRole checks
+        # when course_roles Django app are implemented.
         return (
             GlobalStaff().has_user(request.user) or
             CourseStaffRole(course_key).has_user(request.user) or
             CourseInstructorRole(course_key).has_user(request.user) or
+            course_permissions_list_check(
+                request.user,
+                [
+                    CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value,
+                    CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.value
+                ],
+                course_key
+            ) or
             CourseEnrollment.is_enrolled(request.user, course_key) or
             has_discussion_privileges(request.user, course_key)
         )

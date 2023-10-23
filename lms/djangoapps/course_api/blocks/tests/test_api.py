@@ -222,18 +222,18 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
             self._get_blocks(
                 course,
                 expected_mongo_queries=0,
-                # TODO: course roles: expected_sql_queries increased by 5 queries
+                # TODO: course roles: expected_sql_queries increased by 6 queries
                 #       maybe we need to roll back this when course roles djangoapp are implemented
-                expected_sql_queries=19 if with_storage_backing else 18,
+                expected_sql_queries=20 if with_storage_backing else 19,
             )
 
     @ddt.data(
-        # TODO: course roles: expected_sql_queries increased by 5 queries
+        # TODO: course roles: expected_sql_queries increased by 6 queries
         #       maybe we need to roll back this when course roles djangoapp are implemented
-        (ModuleStoreEnum.Type.split, 2, True, 28),
-        # TODO: course roles: expected_sql_queries increased by 5 queries
+        (ModuleStoreEnum.Type.split, 2, True, 29),
+        # TODO: course roles: expected_sql_queries increased by 6 queries
         #       maybe we need to roll back this when course roles djangoapp are implemented
-        (ModuleStoreEnum.Type.split, 2, False, 18),
+        (ModuleStoreEnum.Type.split, 2, False, 19),
     )
     @ddt.unpack
     def test_query_counts_uncached(self, store_type, expected_mongo_queries, with_storage_backing, num_sql_queries):

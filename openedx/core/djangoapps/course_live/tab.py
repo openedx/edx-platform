@@ -11,6 +11,8 @@ from lms.djangoapps.courseware.tabs import EnrolledTab
 from openedx.core.djangoapps.course_live.config.waffle import ENABLE_COURSE_LIVE
 from openedx.core.djangoapps.course_live.models import CourseLiveConfiguration
 from openedx.core.djangoapps.course_live.providers import HasGlobalCredentials, ProviderManager
+from openedx.core.djangoapps.course_roles.helpers import course_permissions_list_check_any
+from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 from openedx.core.lib.cache_utils import request_cached
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from openedx.features.lti_course_tab.tab import LtiCourseLaunchMixin
@@ -34,7 +36,19 @@ def user_is_staff_or_instructor(user: AbstractBaseUser, course: CourseBlock) -> 
     """
     Check if the user is a staff or instructor for the course.
     """
-    return CourseStaffRole(course.id).has_user(user) or CourseInstructorRole(course.id).has_user(user)
+    permissions = [
+        CourseRolesPermission.VIEW_ALL_CONTENT.value,
+        CourseRolesPermission.VIEW_ONLY_LIVE_PUBLISHED_CONTENT.value,
+        CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.value
+    ]
+    # TODO: course roles: If the course roles feature flag is disabled the course_permissions_list_check
+    # below will never return true. Remove the CourseInstructorRole and
+    # CourseStaffRole checks when course_roles Django app are implemented.
+    return (
+        CourseStaffRole(course.id).has_user(user) or
+        CourseInstructorRole(course.id).has_user(user) or
+        course_permissions_list_check_any(user, permissions, course.id)
+    )
 
 
 class CourseLiveTab(LtiCourseLaunchMixin, TabFragmentViewMixin, EnrolledTab):

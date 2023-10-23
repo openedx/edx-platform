@@ -16,8 +16,11 @@ from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRol
 from lms.djangoapps.courseware.courses import has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
+from openedx.core.djangoapps.course_roles.helpers import (
+    course_or_organization_permission_check,
+    course_permission_check
+)
 from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
-from openedx.core.djangoapps.course_roles.helpers import course_or_organization_permission_check
 from openedx.core.lib.teams_config import TeamsetType
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -145,6 +148,11 @@ def has_course_staff_privileges(user, course_key):
     if CourseStaffRole(course_key).has_user(user):
         return True
     if CourseInstructorRole(course_key).has_user(user):
+        return True
+    # TODO: course roles: If the course roles feature flag is disabled the
+    # course_permission_check call below will never return true.
+    # Remove the CourseStaffRole and CourseInstructorRole checks when course_roles Django app are implemented.
+    if course_permission_check(user, CourseRolesPermission.MANAGE_STUDENTS.value, course_key):
         return True
     return False
 

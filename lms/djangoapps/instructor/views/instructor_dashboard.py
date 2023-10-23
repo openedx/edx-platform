@@ -51,7 +51,7 @@ from lms.djangoapps.discussion.django_comment_client.utils import has_forum_acce
 from lms.djangoapps.grades.api import is_writable_gradebook_enabled
 from lms.djangoapps.instructor.constants import INSTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
 from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, get_course_cohorts, is_course_cohorted
-from openedx.core.djangoapps.course_roles.helpers import course_permission_check
+from openedx.core.djangoapps.course_roles.helpers import course_permission_check, course_permissions_list_check
 from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
 from openedx.core.djangoapps.discussions.utils import available_division_schemes
@@ -118,14 +118,33 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
 
     course = get_course_by_id(course_key, depth=None)
 
+    permissions_list = [
+        CourseRolesPermission.MANAGE_STUDENTS.value,
+        CourseRolesPermission.ACCESS_INSTRUCTOR_DASHBOARD.value
+    ]
+    # TODO: course roles: If the course roles feature flag is disabled the course_permissions_list_check
+    # and course_permission_check calls below will never return true.
+    # Remove the role checks when course_roles Django app are implemented.
     access = {
         'admin': request.user.is_staff,
-        'instructor': bool(has_access(request.user, 'instructor', course)),
+        'instructor': (
+            bool(has_access(request.user, 'instructor', course)) or
+            course_permissions_list_check(request.user, permissions_list, course_key)
+        ),
         'finance_admin': CourseFinanceAdminRole(course_key).has_user(request.user),
         'sales_admin': CourseSalesAdminRole(course_key).has_user(request.user),
-        'staff': bool(has_access(request.user, 'staff', course)),
-        'forum_admin': has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR),
-        'data_researcher': request.user.has_perm(permissions.CAN_RESEARCH, course_key),
+        'staff': (
+            bool(has_access(request.user, 'staff', course)) or
+            course_permissions_list_check(request.user, permissions_list, course_key)
+        ),
+        'forum_admin': (
+            has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR) or
+            course_permission_check(request.user, CourseRolesPermission.MANAGE_DISCUSSION_MODERATORS.value, course_key)
+        ),
+        'data_researcher': (
+            request.user.has_perm(permissions.CAN_RESEARCH, course_key) or
+            course_permission_check(request.user, CourseRolesPermission.ACCESS_DATA_DOWNLOADS.value, course_key)
+        ),
     }
 
     if not request.user.has_perm(permissions.VIEW_DASHBOARD, course_key):
