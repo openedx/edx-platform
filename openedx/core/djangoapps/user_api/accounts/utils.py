@@ -6,7 +6,6 @@ import logging
 import random
 import re
 import string
-from urllib.parse import urlparse  # pylint: disable=import-error
 
 import waffle  # lint-amnesty, pylint: disable=invalid-django-waffle-import
 from completion.models import BlockCompletion
