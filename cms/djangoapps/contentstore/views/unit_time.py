@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie 
 from common.djangoapps.util.json_request import JsonResponse
-from cms.djangoapps.contentstore.models import CourseUnitTime
+from openedx.core.djangoapps.content.course_overviews.models import CourseUnitTime
 from .helpers import usage_key_with_run
 from .item import _get_xblock
 
