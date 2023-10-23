@@ -86,6 +86,7 @@ rules.set_perm("oel_tagging.add_taxonomy", oel_tagging.is_taxonomy_admin)
 rules.set_perm("oel_tagging.change_taxonomy", oel_tagging.can_change_taxonomy)
 rules.set_perm("oel_tagging.delete_taxonomy", oel_tagging.can_change_taxonomy)
 rules.set_perm("oel_tagging.view_taxonomy", oel_tagging.can_view_taxonomy)
+rules.set_perm("oel_tagging.export_taxonomy", oel_tagging.can_view_taxonomy)
 
 # Tag
 rules.set_perm("oel_tagging.add_tag", can_change_taxonomy_tag)

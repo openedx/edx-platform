@@ -2,7 +2,7 @@
 
 import ddt
 from django.contrib.auth import get_user_model
-from django.test.testcases import TestCase, override_settings
+from django.test import TestCase, override_settings
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from openedx_tagging.core.tagging.models import (
     Tag,
