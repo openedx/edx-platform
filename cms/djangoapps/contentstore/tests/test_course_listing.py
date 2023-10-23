@@ -56,12 +56,12 @@ class TestCourseListing(ModuleStoreTestCase):
         super().setUp()
         # create and log in a staff user.
         # create and log in a non-staff user
-        self.user = UserFactory()
+        self.user = UserFactory(password=self.TEST_PASSWORD)
         self.factory = RequestFactory()
         self.request = self.factory.get('/course')
         self.request.user = self.user
         self.client = AjaxEnabledTestClient()
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
     def _create_course_with_access_groups(self, course_location, user=None):
         """

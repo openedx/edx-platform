@@ -60,7 +60,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         self.admin_user = AdminFactory.create()
         self.data_researcher = UserFactory.create()
         CourseDataResearcherRole(self.course_key).add_users(self.data_researcher)
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course_key)
 
         # default values for url and query_params
@@ -248,7 +248,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         self.client.logout()
         self.verify_response(403, cacheable=False)
         # Verify response for a staff user.
-        self.client.login(username=self.admin_user.username, password='test')
+        self.client.login(username=self.admin_user.username, password=self.TEST_PASSWORD)
         self.verify_response(cacheable=False)
 
     def test_non_existent_course(self):
@@ -269,7 +269,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         self.verify_response(400)
 
     def test_no_user_staff_all_blocks(self):
-        self.client.login(username=self.admin_user.username, password='test')
+        self.client.login(username=self.admin_user.username, password=self.TEST_PASSWORD)
         self.query_params.pop('username')
         self.query_params['all_blocks'] = True
         self.verify_response()
@@ -319,7 +319,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
             - other_course_settings
             - course_visibility
         """
-        self.client.login(username=self.admin_user.username, password='test')
+        self.client.login(username=self.admin_user.username, password=self.TEST_PASSWORD)
         response = self.verify_response(params={
             'all_blocks': True,
             'requested_fields': ['other_course_settings', 'course_visibility'],
@@ -351,7 +351,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
             - other_course_settings
             - course_visibility
         """
-        self.client.login(username=self.admin_user.username, password='test')
+        self.client.login(username=self.admin_user.username, password=self.TEST_PASSWORD)
         response = self.verify_response(params={
             'all_blocks': True,
             'requested_fields': ['course_visibility'],
@@ -370,7 +370,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         """
         Test if data researcher has access to the api endpoint
         """
-        self.client.login(username=self.data_researcher.username, password='test')
+        self.client.login(username=self.data_researcher.username, password=self.TEST_PASSWORD)
 
         self.verify_response(params={
             'all_blocks': True,
@@ -556,7 +556,7 @@ class TestBlockMetadataView(SharedModuleStoreTestCase):  # pylint: disable=test-
     def setUp(self):
         super().setUp()
         self.admin_user = AdminFactory.create()
-        self.client.login(username=self.admin_user.username, password='test')
+        self.client.login(username=self.admin_user.username, password=self.TEST_PASSWORD)
         self.usage_key = list(self.non_orphaned_block_usage_keys)[0]
         self.url = reverse(
             'blocks_metadata',

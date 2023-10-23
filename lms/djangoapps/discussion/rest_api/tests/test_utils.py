@@ -2,29 +2,29 @@
 Tests for Discussion REST API utils.
 """
 
+import unittest
 from datetime import datetime, timedelta
 
 import ddt
 from pytz import UTC
-import unittest
-from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
-from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
-from lms.djangoapps.discussion.rest_api.tests.utils import CommentsServiceMockMixin
-from openedx.core.djangoapps.discussions.models import PostingRestriction, DiscussionsConfiguration
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
+from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
+from lms.djangoapps.discussion.rest_api.tests.utils import CommentsServiceMockMixin
 from lms.djangoapps.discussion.rest_api.utils import (
     discussion_open_for_user,
-    get_course_ta_users_list,
-    get_course_staff_users_list,
-    get_moderator_users_list,
     get_archived_topics,
-    remove_empty_sequentials,
-    is_posting_allowed
+    get_course_staff_users_list,
+    get_course_ta_users_list,
+    get_moderator_users_list,
+    is_posting_allowed,
+    remove_empty_sequentials
 )
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, PostingRestriction
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class DiscussionAPIUtilsTestCase(ModuleStoreTestCase):

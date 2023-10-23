@@ -82,8 +82,8 @@ class CoachAccessTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         super().setUp()
 
         # Create ccx coach account
-        self.coach = AdminFactory.create(password="test")
-        self.client.login(username=self.coach.username, password="test")
+        self.coach = AdminFactory.create(password=self.TEST_PASSWORD)
+        self.client.login(username=self.coach.username, password=self.TEST_PASSWORD)
 
         # assign role to coach
         role = CourseCcxCoachRole(self.course.id)
@@ -152,7 +152,7 @@ class CoachAccessTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         assert resp.status_code == 200
 
         # Assert access of a student
-        self.client.login(username=student.username, password='test')
+        self.client.login(username=student.username, password=self.TEST_PASSWORD)
         resp = self.client.get(reverse('student_progress', args=[str(ccx_locator), self.coach.id]))
         assert resp.status_code == 404
 

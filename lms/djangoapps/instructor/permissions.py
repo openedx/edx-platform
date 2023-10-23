@@ -29,6 +29,8 @@ EMAIL = 'instructor.email'
 RESCORE_EXAMS = 'instructor.rescore_exams'
 VIEW_REGISTRATION = 'instructor.view_registration'
 VIEW_DASHBOARD = 'instructor.dashboard'
+VIEW_ENROLLMENTS = 'instructor.view_enrollments'
+VIEW_FORUM_MEMBERS = 'instructor.view_forum_members'
 
 
 perms[ALLOW_STUDENT_TO_BYPASS_ENTRANCE_EXAM] = HasAccessRule('staff')
@@ -60,3 +62,5 @@ perms[VIEW_DASHBOARD] = \
         'instructor',
         'data_researcher'
 ) | HasAccessRule('staff') | HasAccessRule('instructor')
+perms[VIEW_ENROLLMENTS] = HasAccessRule('staff')
+perms[VIEW_FORUM_MEMBERS] = HasAccessRule('staff')

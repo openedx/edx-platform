@@ -18,6 +18,7 @@ from django.test import override_settings
 from six import unichr
 from six.moves import range
 
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.capa.safe_exec import safe_exec, update_hash
 from xmodule.capa.safe_exec.remote_exec import is_codejail_rest_service_enabled
 
@@ -81,17 +82,30 @@ class TestSafeExec(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-
 
 
 class TestSafeOrNot(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+
+    @skip_unless_lms
     def test_cant_do_something_forbidden(self):
         '''
         Demonstrates that running unsafe code inside the code jail
         throws SafeExecException, protecting the calling process.
+
+        This test generally is skipped in CI due to its complex setup. That said, we recommend that devs who are
+        hacking on CodeJail or advanced CAPA in any significant way take the time to make sure it passes locally.
+        See either:
+        * in-platform setup: https://github.com/openedx/edx-platform/blob/master/xmodule/capa/safe_exec/README.rst
+        * remote setup (using Tutor): https://github.com/eduNEXT/tutor-contrib-codejail
+
+        Note on @skip_unless_lms:
+        This test can also be run in a CMS context, but that's giving us trouble in CI right now (the skip logic isn't
+        working). So, if you're running this locally, feel free to remove @skip_unless_lms and run it against CMS too.
         '''
-        # Can't test for forbiddenness if CodeJail isn't configured for python.
+        # If in-platform codejail isn't configured...
         if not jail_code.is_configured("python"):
 
-            # Can't test for forbiddenness if CodeJail rest service isn't enabled.
-            # Remote codejailservice must be running, see https://github.com/eduNEXT/tutor-contrib-codejail/
+            # ...AND if remote codejail isn't configured...
             if not is_codejail_rest_service_enabled():
+
+                # ...then skip this test.
                 pytest.skip(reason="Local or remote codejail has to be configured and enabled to run this test.")
 
         g = {}

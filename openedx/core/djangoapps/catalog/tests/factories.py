@@ -236,7 +236,6 @@ class ProgramTypeFactory(DictFactoryBase):
 class ProgramTypeAttrsFactory(DictFactoryBase):
     uuid = factory.Faker('uuid4')
     slug = factory.Faker('word')
-    coaching_supported = False
 
 
 class ProgramFactory(DictFactoryBase):

@@ -55,6 +55,19 @@ COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION = CourseWaffleFl
     f'{WAFFLE_FLAG_NAMESPACE}.mfe_progress_milestones_streak_celebration', __name__
 )
 
+# .. toggle_name: courseware.mfe_courseware_search
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Enables Courseware Search on Learning MFE
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-09-28
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: KBK-20
+# .. toggle_warning: None.
+COURSEWARE_MICROFRONTEND_SEARCH_ENABLED = CourseWaffleFlag(
+    f'{WAFFLE_FLAG_NAMESPACE}.mfe_courseware_search', __name__
+)
+
 # .. toggle_name: courseware.mfe_progress_milestones_streak_discount_enabled
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
@@ -153,3 +166,10 @@ def course_is_invitation_only(courselike) -> bool:
 
 def learning_assistant_is_active(course_key):
     return COURSEWARE_LEARNING_ASSISTANT.is_enabled(course_key)
+
+
+def courseware_mfe_search_is_enabled(course_key=None):
+    """
+    Return whether the courseware.mfe_courseware_search flag is on.
+    """
+    return COURSEWARE_MICROFRONTEND_SEARCH_ENABLED.is_enabled(course_key)

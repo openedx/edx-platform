@@ -33,7 +33,7 @@ from lms.djangoapps.instructor.access import allow_access, list_with_level
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
 from openedx.core.lib.courses import get_course_by_id
 
-USER_PASSWORD = 'test'
+USER_PASSWORD = 'Password1234'
 
 
 class CcxRestApiTest(CcxTestCase, APITestCase):
@@ -760,7 +760,7 @@ class CcxDetailTest(CcxRestApiTest):
         """
         # create a staff user
         staff_user = UserFactory.create(
-            username='test_staff_user', email='test_staff_user@openedx.org', password='test',
+            username='test_staff_user', email='test_staff_user@openedx.org', password=USER_PASSWORD,
         )
         # add staff role to the staff user
         CourseStaffRole(self.master_course_key).add_users(staff_user)
@@ -779,7 +779,7 @@ class CcxDetailTest(CcxRestApiTest):
         """
         # create an instructor user
         instructor_user = UserFactory.create(
-            username='test_instructor_user', email='test_instructor_user@openedx.org', password='test',
+            username='test_instructor_user', email='test_instructor_user@openedx.org', password=USER_PASSWORD,
         )
         # add instructor role to the instructor user
         CourseInstructorRole(self.master_course_key).add_users(instructor_user)
@@ -798,7 +798,7 @@ class CcxDetailTest(CcxRestApiTest):
         """
         # create an coach user
         coach_user = UserFactory.create(
-            username='test_coach_user', email='test_coach_user@openedx.org', password='test',
+            username='test_coach_user', email='test_coach_user@openedx.org', password=USER_PASSWORD,
         )
         # add coach role to the coach user
         CourseCcxCoachRole(self.master_course_key).add_users(coach_user)

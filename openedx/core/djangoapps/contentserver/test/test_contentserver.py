@@ -156,7 +156,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         CourseEnrollment.enroll(self.non_staff_usr, self.course_key)
         assert CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key)
 
-        self.client.login(username=self.non_staff_usr, password='test')
+        self.client.login(username=self.non_staff_usr, password=self.TEST_PASSWORD)
         resp = self.client.get(self.url_locked_versioned)
         assert resp.status_code == 200
 
@@ -167,7 +167,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         CourseEnrollment.enroll(self.non_staff_usr, self.course_key)
         assert CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key)
 
-        self.client.login(username=self.non_staff_usr, password='test')
+        self.client.login(username=self.non_staff_usr, password=self.TEST_PASSWORD)
         resp = self.client.get(self.url_locked_versioned_old_style, follow=True)
         assert resp.status_code == 200
 
@@ -185,7 +185,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         Test that locked assets behave appropriately in case user is logged in
         in but not registered for the course.
         """
-        self.client.login(username=self.non_staff_usr, password='test')
+        self.client.login(username=self.non_staff_usr, password=self.TEST_PASSWORD)
         resp = self.client.get(self.url_locked)
         assert resp.status_code == 403
 
@@ -197,7 +197,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         CourseEnrollment.enroll(self.non_staff_usr, self.course_key)
         assert CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key)
 
-        self.client.login(username=self.non_staff_usr, password='test')
+        self.client.login(username=self.non_staff_usr, password=self.TEST_PASSWORD)
         resp = self.client.get(self.url_locked)
         assert resp.status_code == 200
 
@@ -205,7 +205,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         """
         Test that locked assets behave appropriately in case user is staff.
         """
-        self.client.login(username=self.staff_usr, password='test')
+        self.client.login(username=self.staff_usr, password=self.TEST_PASSWORD)
         resp = self.client.get(self.url_locked)
         assert resp.status_code == 200
 
@@ -320,7 +320,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         CourseEnrollment.enroll(self.non_staff_usr, self.course_key)
         assert CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key)
 
-        self.client.login(username=self.non_staff_usr, password='test')
+        self.client.login(username=self.non_staff_usr, password=self.TEST_PASSWORD)
         resp = self.client.get(self.url_locked)
         assert resp.status_code == 200
         assert 'Expires' not in resp
@@ -350,7 +350,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         CourseEnrollment.enroll(self.non_staff_usr, self.course_key)
         assert CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key)
 
-        self.client.login(username=self.non_staff_usr, password='test')
+        self.client.login(username=self.non_staff_usr, password=self.TEST_PASSWORD)
         resp = self.client.get(self.url_locked)
         assert resp.status_code == 200
         assert 'Expires' not in resp

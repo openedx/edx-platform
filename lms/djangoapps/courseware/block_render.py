@@ -40,8 +40,6 @@ from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
 from xblock.reference.plugins import FSService
 from xblock.runtime import KvsFieldData
 
-from lms.djangoapps.badges.service import BadgingService
-from lms.djangoapps.badges.utils import badges_enabled
 from lms.djangoapps.teams.services import TeamsService
 from openedx.core.lib.xblock_services.call_to_action import CallToActionService
 from xmodule.contentstore.django import contentstore
@@ -630,7 +628,6 @@ def prepare_runtime_for_user(
         'partitions': PartitionService(course_id=course_id, cache=DEFAULT_REQUEST_CACHE.data),
         'settings': SettingsService(),
         'user_tags': UserTagsService(user=user, course_id=course_id),
-        'badging': BadgingService(course_id=course_id, modulestore=store) if badges_enabled() else None,
         'teams': TeamsService(),
         'teams_configuration': TeamsConfigurationService(),
         'call_to_action': CallToActionService(),
