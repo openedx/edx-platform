@@ -33,6 +33,8 @@ from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup, add_user_to_cohort, get_cohort_by_name
+from openedx.core.djangoapps.course_roles.helpers import course_permission_check
+from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.enrollments import api
 from openedx.core.djangoapps.enrollments.errors import (
@@ -667,7 +669,14 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         filtered_data = []
         for enrollment in enrollment_data:
             course_key = CourseKey.from_string(enrollment["course_details"]["course_id"])
-            if user_has_role(request.user, CourseStaffRole(course_key)):
+            # TODO: course roles: If the course roles feature flag is disabled the course_permission_check
+            # below will never return true.
+            # Remove the user_has_role check when course_roles Django app are implemented.
+            if user_has_role(request.user, CourseStaffRole(course_key)) or course_permission_check(
+                request.user,
+                CourseRolesPermission.MANAGE_USERS_EXCEPT_ADMIN_AND_STAFF.value,
+                course_key
+            ):
                 filtered_data.append(enrollment)
         return Response(filtered_data)
 

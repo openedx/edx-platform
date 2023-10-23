@@ -862,15 +862,19 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
         if user_attr_name == 'user_staff' and action == 'see_exists':
             # always checks staff role, and if the course has started, check the duration configuration
             if course_attr_name == 'course_started':
-                num_queries = 2
-            else:
-                num_queries = 1
-        elif user_attr_name == 'user_normal' and action == 'see_exists':
-            if course_attr_name == 'course_started':
+                num_queries = 4
+            elif course_attr_name == 'course_not_started':
                 num_queries = 4
             else:
+                num_queries = 3
+        elif user_attr_name == 'user_normal' and action == 'see_exists':
+            if course_attr_name == 'course_started':
+                num_queries = 9
+            elif course_attr_name == 'course_not_started':
+                num_queries = 5
+            else:
                 # checks staff role and enrollment data
-                num_queries = 2
+                num_queries = 4
         elif user_attr_name == 'user_anonymous' and action == 'see_exists':
             if course_attr_name == 'course_started':
                 num_queries = 1

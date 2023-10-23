@@ -17,6 +17,8 @@ from common.djangoapps.student.roles import CourseStaffRole
 from lms.djangoapps.commerce.utils import create_zendesk_ticket
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.instructor.tasks import update_exam_completion_task
+from openedx.core.djangoapps.course_roles.helpers import course_permission_check
+from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
@@ -107,7 +109,13 @@ class InstructorService:
         Returns True if the user is the course staff
         else Returns False
         """
-        return auth.user_has_role(user, CourseStaffRole(CourseKey.from_string(course_id)))
+        # TODO: course roles: If the course roles feature flag is disabled the course_permission_check
+        # call below will never return true.
+        # Remove the Role.user_has_role check when course_roles Django app are implemented.
+        return (
+            auth.user_has_role(user, CourseStaffRole(CourseKey.from_string(course_id)))
+            or course_permission_check(user, CourseRolesPermission.MANAGE_COURSE_SETTINGS.value, course_id)
+        )
 
     def send_support_notification(self, course_id, exam_name, student_username, review_status, review_url=None):
         """

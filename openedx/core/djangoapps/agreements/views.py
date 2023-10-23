@@ -18,6 +18,8 @@ from openedx.core.djangoapps.agreements.api import (
     get_integrity_signature,
 )
 from openedx.core.djangoapps.agreements.serializers import IntegritySignatureSerializer
+from openedx.core.djangoapps.course_roles.helpers import course_permission_check
+from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 
 
 def is_user_course_or_global_staff(user, course_id):
@@ -26,7 +28,14 @@ def is_user_course_or_global_staff(user, course_id):
     or is global staff.
     """
 
-    return user.is_staff or auth.user_has_role(user, CourseStaffRole(CourseKey.from_string(course_id)))
+    # TODO: course roles: If the course roles feature flag is disabled the course_permission_check
+    # below will never return true.
+    # Remove the user_is_staff and auth.user_has_role checks when course_roles Django app are implemented.
+    return (
+        user.is_staff
+        or auth.user_has_role(user, CourseStaffRole(CourseKey.from_string(course_id)))
+        or course_permission_check(user, CourseRolesPermission.MANAGE_STUDENTS.value, course_id)
+    )
 
 
 class AuthenticatedAPIView(APIView):
