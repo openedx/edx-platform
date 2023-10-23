@@ -446,6 +446,21 @@ def get_taxonomy_list_url():
     return taxonomy_list_url
 
 
+def get_taxonomy_tags_widget_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for taxonomy tags drawer widget view.
+
+    The `content_id` needs to be appended to the end of the URL when using it.
+    """
+    taxonomy_tags_widget_url = None
+    # Uses the same waffle flag as taxonomy list page
+    if use_tagging_taxonomy_list_page():
+        mfe_base_url = get_course_authoring_url(course_locator)
+        if mfe_base_url:
+            taxonomy_tags_widget_url = f'{mfe_base_url}/tagging/components/widget/'
+    return taxonomy_tags_widget_url
+
+
 def course_import_olx_validation_is_enabled():
     """
     Check if course olx validation is enabled on course import.
