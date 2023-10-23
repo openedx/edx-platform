@@ -239,6 +239,8 @@ class TestSubmissionMetadataSerializer(TestCase):
             "submissionUuid": "a",
             "username": "foo",
             "teamName": "",
+            'email': None,
+            'fullname': None,
             "dateSubmitted": "1969-07-16 13:32:00",
             "dateGraded": "None",
             "gradedBy": "",
@@ -249,6 +251,8 @@ class TestSubmissionMetadataSerializer(TestCase):
         "b": {
             "submissionUuid": "b",
             "username": "",
+            'email': None,
+            'fullname': None,
             "teamName": "bar",
             "dateSubmitted": "1969-07-20 20:17:40",
             "dateGraded": "None",
@@ -260,6 +264,8 @@ class TestSubmissionMetadataSerializer(TestCase):
         "c": {
             "submissionUuid": "c",
             "username": "baz",
+            'email': None,
+            'fullname': None,
             "teamName": "",
             "dateSubmitted": "1969-07-21 21:35:00",
             "dateGraded": "1969-07-24 16:44:00",
@@ -291,6 +297,8 @@ class TestSubmissionMetadataSerializer(TestCase):
         submission = {
             "submissionUuid": "empty-score",
             "username": "WOPR",
+            'email': None,
+            'fullname': None,
             "dateSubmitted": "1983-06-03 00:00:00",
             "dateGraded": None,
             "gradedBy": None,
@@ -302,6 +310,8 @@ class TestSubmissionMetadataSerializer(TestCase):
         expected_output = {
             "submissionUUID": "empty-score",
             "username": "WOPR",
+            'email': None,
+            'fullname': None,
             "teamName": None,
             "dateSubmitted": "1983-06-03 00:00:00",
             "dateGraded": None,
