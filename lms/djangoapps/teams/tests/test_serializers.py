@@ -203,7 +203,7 @@ class BulkTeamCountTopicSerializerTestCase(BaseTopicSerializerTestCase):
         query.
         """
         topics = self.setup_topics(teams_per_topic=0)
-        self.assert_serializer_output(topics, num_teams_per_topic=0, num_queries=2)
+        self.assert_serializer_output(topics, num_teams_per_topic=0, num_queries=4)
 
     def test_topics_with_team_counts(self):
         """
@@ -212,7 +212,7 @@ class BulkTeamCountTopicSerializerTestCase(BaseTopicSerializerTestCase):
         """
         teams_per_topic = 10
         topics = self.setup_topics(teams_per_topic=teams_per_topic)
-        self.assert_serializer_output(topics, num_teams_per_topic=teams_per_topic, num_queries=2)
+        self.assert_serializer_output(topics, num_teams_per_topic=teams_per_topic, num_queries=4)
 
     def test_subset_of_topics(self):
         """
@@ -221,7 +221,7 @@ class BulkTeamCountTopicSerializerTestCase(BaseTopicSerializerTestCase):
         """
         teams_per_topic = 10
         topics = self.setup_topics(num_topics=self.NUM_TOPICS, teams_per_topic=teams_per_topic)
-        self.assert_serializer_output(topics, num_teams_per_topic=teams_per_topic, num_queries=2)
+        self.assert_serializer_output(topics, num_teams_per_topic=teams_per_topic, num_queries=4)
 
     def test_scoped_within_course(self):
         """Verify that team counts are scoped within a course."""
@@ -235,7 +235,7 @@ class BulkTeamCountTopicSerializerTestCase(BaseTopicSerializerTestCase):
             }),
         )
         CourseTeamFactory.create(course_id=second_course.id, topic_id=duplicate_topic['id'])
-        self.assert_serializer_output(first_course_topics, num_teams_per_topic=teams_per_topic, num_queries=2)
+        self.assert_serializer_output(first_course_topics, num_teams_per_topic=teams_per_topic, num_queries=4)
 
     def _merge_dicts(self, first, second):
         """Convenience method to merge two dicts in a single expression"""
@@ -269,4 +269,4 @@ class BulkTeamCountTopicSerializerTestCase(BaseTopicSerializerTestCase):
         with no topics.
         """
         self.course.teams_configuration = TeamsConfig({'topics': []})
-        self.assert_serializer_output([], num_teams_per_topic=0, num_queries=1)
+        self.assert_serializer_output([], num_teams_per_topic=0, num_queries=3)

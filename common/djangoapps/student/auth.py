@@ -26,9 +26,10 @@ from common.djangoapps.student.roles import (
     OrgStaffRole
 )
 from openedx.core.djangoapps.course_roles.helpers import (
-    course_permissions_list_check,
     course_or_organization_permission_check,
     course_or_organization_permission_list_check,
+    course_permission_check,
+    course_permissions_list_check,
     organization_permissions_list_check
 )
 from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
@@ -152,6 +153,7 @@ def get_user_permissions(user, course_key, org=None):
     ):
         return STUDIO_VIEW_USERS | STUDIO_EDIT_CONTENT | STUDIO_VIEW_CONTENT
     # Otherwise, for libraries, users can view only:
+
     if course_key and isinstance(course_key, LibraryLocator):
         # TODO: course roles: If the course roles feature flag is disabled the course_or_organization_permission_check
         #       call below will never return true.
@@ -284,5 +286,11 @@ def _check_caller_authority(caller, role):
     if isinstance(role, (GlobalStaff, CourseCreatorRole, OrgContentCreatorRole)):  # lint-amnesty, pylint: disable=no-else-raise
         raise PermissionDenied
     elif isinstance(role, CourseRole):  # instructors can change the roles w/in their course
-        if not user_has_role(caller, CourseInstructorRole(role.course_key)):
+        # TODO: course roles: If the course roles feature flag is disabled the course_permission_check
+        # call below will never return true.
+        # Remove the user_has_role call when course_roles Django app are implemented.
+        if not (
+            user_has_role(caller, CourseInstructorRole(role.course_key)) or
+            course_permission_check(caller, CourseRolesPermission.MANAGE_ALL_USERS.value, role.course_key)
+        ):
             raise PermissionDenied
