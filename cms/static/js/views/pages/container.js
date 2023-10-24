@@ -53,7 +53,7 @@ function($, _, Backbone, gettext, BasePage,
         initialize: function(options) {
             BasePage.prototype.initialize.call(this, options);
             this.viewClass = options.viewClass || this.defaultViewClass;
-            this.isLibraryPage = (this.model.attributes.category === 'library_content');
+            this.isLibraryPage = (this.model.attributes.category === 'library');
             this.isLibraryContentPage = (this.model.attributes.category === 'library_content');
             this.nameEditor = new XBlockStringFieldEditor({
                 el: this.$('.wrapper-xblock-field'),
@@ -109,7 +109,7 @@ function($, _, Backbone, gettext, BasePage,
                 });
                 this.unitOutlineView.render();
             }
-            if (this.isLibraryPage) {
+            if (this.isLibraryContentPage) {
                 this.selectedLibraryComponents = [];
                 this.storedSelectedLibraryComponents = [];
                 this.getSelectedLibraryComponents();
@@ -651,7 +651,6 @@ function($, _, Backbone, gettext, BasePage,
                 this.storedSelectedLibraryComponents.push(componentId);
                 this.toggleSaveButton();
             }
-            console.log(this.storedSelectedLibraryComponents);
         },
 
         toggleSaveButton: function() {
