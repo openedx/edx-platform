@@ -82,12 +82,65 @@ class CourseVideosView(DeveloperErrorViewMixin, APIView):
         **Example Response**
         ```json
         {
-            "allow_unicode_course_id": False,
-            "course_creator_status": "granted",
-            "number": "101",
-            "display_name": "new edx course",
-            "org": "edx",
-            "run": "2023",
+            image_upload_url: '/video_images/course_id',
+            video_handler_url: '/videos/course_id',
+            encodings_download_url: '/video_encodings_download/course_id',
+            default_video_image_url: '/static/studio/images/video-images/default_video_image.png',
+            previous_uploads: [
+                {
+                    edx_video_id: 'mOckID1',
+                    clientVideoId: 'mOckID1.mp4',
+                    created: '',
+                    courseVideoImageUrl: '/video',
+                    transcripts: [],
+                    status: 'Imported',
+                },
+                {
+                    edx_video_id: 'mOckID5',
+                    clientVideoId: 'mOckID5.mp4',
+                    created: '',
+                    courseVideoImageUrl: 'http:/video',
+                    transcripts: ['en'],
+                    status: 'Failed',
+                },
+                {
+                    edx_video_id: 'mOckID3',
+                    clientVideoId: 'mOckID3.mp4',
+                    created: '',
+                    courseVideoImageUrl: null,
+                    transcripts: ['en'],
+                    status: 'Ready',
+                },
+            ],
+            concurrent_upload_limit: 4,
+            video_supported_file_formats: ['.mp4', '.mov'],
+            video_upload_max_file_size: '5',
+            video_image_settings: {
+                video_image_upload_enabled: false,
+                max_size: 2097152,
+                min_size: 2048,
+                max_width: 1280,
+                max_height: 720,
+                supported_file_formats: {
+                    '.bmp': 'image/bmp',
+                    '.bmp2': 'image/x-ms-bmp',
+                    '.gif': 'image/gif',
+                    '.jpg': 'image/jpeg',
+                    '.jpeg': 'image/jpeg',
+                    '.png': 'image/png',
+                },
+            },
+            is_video_transcript_enabled: false,
+            active_transcript_preferences: null,
+            transcript_credentials: {},
+            transcript_available_languages: [{ language_code: 'ab', language_text: 'Abkhazian' }],
+            video_transcript_settings: {
+                transcript_download_handler_url: '/transcript_download/',
+                transcript_upload_handler_url: '/transcript_upload/',
+                transcript_delete_handler_url: '/transcript_delete/course_id',
+                trancript_download_file_format: 'srt',
+            },
+            pagination_context: {},
         }
         ```
         """
@@ -107,7 +160,6 @@ class CourseVideosView(DeveloperErrorViewMixin, APIView):
                 videos,
                 default_video_image_url
             )
-        del course_videos_context['context_course']
         serializer = CourseVideosSerializer(course_videos_context)
         return Response(serializer.data)
 
