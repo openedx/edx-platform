@@ -25,15 +25,6 @@ from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_f
 log = logging.getLogger(__name__)
 
 
-
-from openedx_learning.core.components.api import get_component_version_content
-from openedx_learning.core.components.models import Component, ComponentVersion, ComponentVersionRawContent
-from openedx_learning.core.contents.models import RawContent, TextContent
-from openedx_learning.core.publishing.models import Draft, LearningPackage
-from django.db.models import Q
-
-
-
 class BlockstoreXBlockRuntime(XBlockRuntime):
     """
     A runtime designed to work with Blockstore, reading and writing
@@ -42,8 +33,13 @@ class BlockstoreXBlockRuntime(XBlockRuntime):
     def parse_xml_file(self, fileobj, id_generator=None):
         raise NotImplementedError("Use parse_olx_file() instead")
 
-    def get_block_blockstore(self, usage_key, for_parent=None):
-        usage_id = usage_key
+    def get_block(self, usage_id, for_parent=None):
+        """
+        Create an XBlock instance in this runtime.
+
+        Args:
+            usage_key(OpaqueKey): identifier used to find the XBlock class and data.
+        """
         def_id = self.id_reader.get_definition_id(usage_id)
         if def_id is None:
             raise ValueError(f"Definition not found for usage {usage_id}")
@@ -84,68 +80,6 @@ class BlockstoreXBlockRuntime(XBlockRuntime):
                 block._parent_block = for_parent  # pylint: disable=protected-access
                 block._parent_block_id = for_parent.scope_ids.usage_id  # pylint: disable=protected-access
             return block
-
-    def get_block_learning_core(self, usage_key, for_parent=None):
-        # We should use the lookup table here instead of taking the lib_key directly.
-        learning_package = LearningPackage.objects.get(key=str(usage_key.lib_key))
-
-        # We can do this more efficiently in a single query later, but for now
-        # just get it the easy way.
-        component = Component.objects.get(
-            learning_package=learning_package,
-            namespace='xblock.v1',
-            type=usage_key.block_type,
-            local_key=usage_key.block_id,
-        )
-        component_version = component.versioning.draft
-        raw_content = component_version.raw_contents.get(
-            componentversionrawcontent__key="definition.xml"
-        )
-
-        xml_str = raw_content.text_content.text
-        xml_node = etree.fromstring(xml_str)
-        block_type = usage_id.block_type
-
-        # At this point, how much value do we really get out of explicitly
-        # differentiating definitions from usages?
-        def_id = self.id_reader.get_definition_id(usage_id)
-        keys = ScopeIds(self.user_id, block_type, def_id, usage_id)
-
-        if xml_node.get("url_name", None):
-            log.warning("XBlock at %s should not specify an old-style url_name attribute.", def_id.olx_path)
-        block_class = self.mixologist.mix(self.load_block_type(block_type))
-        if hasattr(block_class, 'parse_xml_new_runtime'):
-            # This is a (former) XModule with messy XML parsing code; let its parse_xml() method continue to work
-            # as it currently does in the old runtime, but let this parse_xml_new_runtime() method parse the XML in
-            # a simpler way that's free of tech debt, if defined.
-            # In particular, XmlMixin doesn't play well with this new runtime, so this is mostly about
-            # bypassing that mixin's code.
-            # When a former XModule no longer needs to support the old runtime, its parse_xml_new_runtime method
-            # should be removed and its parse_xml() method should be simplified to just call the super().parse_xml()
-            # plus some minor additional lines of code as needed.
-            block = block_class.parse_xml_new_runtime(xml_node, runtime=self, keys=keys)
-        else:
-            block = block_class.parse_xml(xml_node, runtime=self, keys=keys, id_generator=None)
-        # Update field data with parsed values. We can't call .save() because it will call save_block(), below.
-        block.force_save_fields(block._get_fields_to_save())  # pylint: disable=protected-access
-        self.system.authored_data_store.cache_fields(block)
-        # There is no way to set the parent via parse_xml, so do what
-        # HierarchyMixin would do:
-        if for_parent is not None:
-            block._parent_block = for_parent  # pylint: disable=protected-access
-            block._parent_block_id = for_parent.scope_ids.usage_id  # pylint: disable=protected-access
-        return block
-
-
-
-    def get_block(self, usage_id, for_parent=None):
-        """
-        Create an XBlock instance in this runtime.
-
-        Args:
-            usage_key(OpaqueKey): identifier used to find the XBlock class and data.
-        """
-        return self.get_block_blockstore(usage_id, for_parent=for_parent)
 
     def add_node_as_child(self, block, node, id_generator=None):
         """

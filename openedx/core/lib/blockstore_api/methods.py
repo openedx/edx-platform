@@ -363,7 +363,6 @@ def get_bundle_files_dict(bundle_uuid, use_draft=None):
     BundleFileData or DraftFileData tuples.
     """
     bundle = get_bundle(bundle_uuid)
-
     if use_draft and use_draft in bundle.drafts:  # pylint: disable=unsupported-membership-test
         draft_uuid = bundle.drafts[use_draft]  # pylint: disable=unsubscriptable-object
         return get_draft(draft_uuid).files

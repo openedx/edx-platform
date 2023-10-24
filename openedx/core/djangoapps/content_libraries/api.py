@@ -733,13 +733,7 @@ def get_library_block(usage_key):
     )
 
 
-from openedx_learning.core.components.api import get_component_version_content
-from openedx_learning.core.components.models import Component, ComponentVersion, ComponentVersionRawContent
-from openedx_learning.core.contents.models import RawContent, TextContent
-from openedx_learning.core.publishing.models import Draft, LearningPackage
-from django.db.models import Q
-
-def get_library_block_olx(usage_key: LibraryUsageLocatorV2):
+def get_library_block_olx(usage_key):
     """
     Get the OLX source of the given XBlock.
     """
@@ -751,36 +745,6 @@ def get_library_block_olx(usage_key: LibraryUsageLocatorV2):
         use_draft=DRAFT_NAME,
     ).decode('utf-8')
     return xml_str
-
-
-    #xml_str = get_component_version_content(
-    #    str(usage_key.lib_key),
-    #    # xblock.v1:problem@3e8c88ea8ec545b4b3c7066c89527d5e_cvo3nwt344t7ytqts
-    #    f"xblock.v1:{usage_key.definition_key}",
-    #    1,
-    #    "definition.xml",
-    #)
-#    cv_rc = ComponentVersionRawContent.objects.select_related(
-#        "raw_content",
-#        "raw_content__text_content"
-#        "component_version",
-#        "component_version__component",
-#        "component_version__component__learning_package",
-#    )
-    # Inefficient but simple approach first
-    learning_package = LearningPackage.objects.get(key=str(usage_key.lib_key))
-    component = Component.objects.get(
-        learning_package=learning_package,
-        namespace='xblock.v1',
-        type=usage_key.block_type,
-        local_key=usage_key.block_id,
-    )
-    component_version = component.versioning.draft
-    text_content = component_version.raw_contents.get(key="definition.xml").text_content
-
-    print("I really executed! Not a hallucination!")
-
-    return text_content.text
 
 
 def set_library_block_olx(usage_key, new_olx_str):
