@@ -531,6 +531,20 @@ class LtiGradedResource(models.Model):
 
 
 class ContentLibraryLearningPackage(models.Model):
+    """
+    Associates ContentLibrary with a LearningPackage.
+
+    This essentially maps the abstract, catalog concept of a Content Library
+    from the actual bucket of content that is stored in that library.
+
+    If the referenced ContentLibrary is deleted, this association is also
+    deleted, but the LearningPackage being referenced is _not_ deleted.
+
+    This association actively prevents the referenced LearningPackage from being
+    deleted, i.e. you cannot just remove the content that is backing a
+    ContentLibrary by mistake. You have to explicitly disassociate it from the
+    ContentLibrary first.
+    """
     content_library = models.OneToOneField(
         ContentLibrary,
         primary_key=True,
@@ -539,5 +553,5 @@ class ContentLibraryLearningPackage(models.Model):
     )
     learning_package = models.ForeignKey(
         LearningPackage,
-        on_delete=models.RESTRICT
+        on_delete=models.RESTRICT,
     )
