@@ -15,7 +15,6 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from django.utils import translation
 from django.utils.encoding import smart_str
-from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from openedx_filters.learning.filters import CertificateRenderStarted
@@ -27,8 +26,6 @@ from common.djangoapps.edxmako.template import Template
 from common.djangoapps.student.models import LinkedInAddToProfileConfiguration
 from common.djangoapps.util.date_utils import strftime_localized
 from common.djangoapps.util.views import handle_500
-from lms.djangoapps.badges.events.course_complete import get_completion_badge
-from lms.djangoapps.badges.utils import badges_enabled
 from lms.djangoapps.certificates.api import (
     certificates_viewable_for_course,
     display_date_for_certificate,
@@ -396,42 +393,6 @@ def _track_certificate_events(request, course, user, user_certificate):
     """
     Tracks web certificate view related events.
     """
-    # Badge Request Event Tracking Logic
-    course_key = course.location.course_key
-
-    if 'evidence_visit' in request.GET:
-        badge_class = get_completion_badge(course_key, user)
-        if not badge_class:
-            log.warning('Visit to evidence URL for badge, but badges not configured for course "%s"', course_key)
-            badges = []
-        else:
-            badges = badge_class.get_for_user(user)
-        if badges:
-            # There should only ever be one of these.
-            badge = badges[0]
-            tracker.emit(
-                'edx.badge.assertion.evidence_visited',
-                {
-                    'badge_name': badge.badge_class.display_name,
-                    'badge_slug': badge.badge_class.slug,
-                    'badge_generator': badge.backend,
-                    'issuing_component': badge.badge_class.issuing_component,
-                    'user_id': user.id,
-                    'course_id': str(course_key),
-                    'enrollment_mode': badge.badge_class.mode,
-                    'assertion_id': badge.id,
-                    'assertion_image_url': badge.image_url,
-                    'assertion_json_url': badge.assertion_url,
-                    'issuer': badge.data.get('issuer'),
-                }
-            )
-        else:
-            log.warning(
-                "Could not find badge for %s on course %s.",
-                user.id,
-                course_key,
-            )
-
     # track certificate evidence_visited event for analytics when certificate_user and accessing_user are different
     if request.user and request.user.id != user.id:
         emit_certificate_event('evidence_visited', user, str(course.id), event_data={
@@ -439,18 +400,6 @@ def _track_certificate_events(request, course, user, user_certificate):
             'enrollment_mode': user_certificate.mode,
             'social_network': CertificateSocialNetworks.linkedin
         })
-
-
-def _update_badge_context(context, course, user):
-    """
-    Updates context with badge info.
-    """
-    badge = None
-    if badges_enabled() and course.issue_badges:
-        badges = get_completion_badge(course.location.course_key, user).get_for_user(user)
-        if badges:
-            badge = badges[0]
-    context['badge'] = badge
 
 
 def _update_organization_context(context, course):
@@ -629,9 +578,6 @@ def render_html_view(request, course_id, certificate=None):  # pylint: disable=t
 
         # Append/Override the existing view context values with certificate specific values
         _update_certificate_context(context, course, course_overview, user_certificate, platform_name)
-
-        # Append badge info
-        _update_badge_context(context, course, user)
 
         # Add certificate header/footer data to current context
         context.update(get_certificate_header_context(is_secure=request.is_secure()))
