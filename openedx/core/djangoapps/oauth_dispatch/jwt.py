@@ -80,10 +80,11 @@ def create_jwt_token_dict(token_dict, oauth_adapter, use_asymmetric_key=None):
     # .. custom_attribute_name: create_jwt_grant_type
     # .. custom_attribute_description: The grant type of the newly created JWT.
     set_custom_attribute('create_jwt_grant_type', grant_type)
+    scopes = token_dict['scope'].split(' ')
 
     jwt_access_token = _create_jwt(
         access_token.user,
-        scopes=token_dict['scope'].split(' '),
+        scopes=scopes,
         expires_in=jwt_expires_in,
         use_asymmetric_key=use_asymmetric_key,
         is_restricted=oauth_adapter.is_client_restricted(client),
@@ -92,11 +93,11 @@ def create_jwt_token_dict(token_dict, oauth_adapter, use_asymmetric_key=None):
     )
 
     jwt_token_dict = token_dict.copy()
-    # Note: only "scope" is not overwritten at this point.
     jwt_token_dict.update({
         "access_token": jwt_access_token,
         "token_type": "JWT",
         "expires_in": jwt_expires_in,
+        "scope": ' '.join(_get_updated_scopes(scopes, grant_type)),
     })
     return jwt_token_dict
 
