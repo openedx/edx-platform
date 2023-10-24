@@ -159,7 +159,7 @@ class AssessmentReportPDFView(TemplateView):
                     footer_html.write(rendered_html)
                     footer_html.flush()
 
-            pdf = pdfkit.from_string(html, False, options, **kwargs)
+            pdf = pdfkit.from_string(html, False, options, verbose=True, **kwargs)
             return pdf
         finally:
             # Ensure temporary file is deleted after finishing work
