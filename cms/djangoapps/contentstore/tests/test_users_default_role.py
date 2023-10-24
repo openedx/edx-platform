@@ -27,7 +27,7 @@ class TestUsersDefaultRole(ModuleStoreTestCase):
         # create and log in a staff user.
         self.user = UserFactory(is_staff=True)
         self.client = AjaxEnabledTestClient()
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         # create a course via the view handler to create course
         self.course_key = self.store.make_course_key('Org_1', 'Course_1', 'Run_1')

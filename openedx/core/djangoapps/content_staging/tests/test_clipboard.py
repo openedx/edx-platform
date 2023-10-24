@@ -364,7 +364,7 @@ class ClipboardTestCase(ModuleStoreTestCase):
         response = nonstaff_client.get(olx_url)
         assert response.status_code == 403
 
-    def assertXmlEqual(self, xml_str_a: str, xml_str_b: str) -> bool:
+    def assertXmlEqual(self, xml_str_a: str, xml_str_b: str):
         """ Assert that the given XML strings are equal, ignoring attribute order and some whitespace variations. """
         a = ElementTree.canonicalize(xml_str_a, strip_text=True)
         b = ElementTree.canonicalize(xml_str_b, strip_text=True)

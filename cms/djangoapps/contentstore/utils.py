@@ -76,6 +76,7 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_video_editor,
     use_new_video_uploads_page,
     use_new_custom_pages,
+    use_tagging_taxonomy_list_page,
 )
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from xmodule.library_tools import LibraryToolsService
@@ -431,6 +432,18 @@ def get_custom_pages_url(course_locator) -> str:
         if mfe_base_url:
             custom_pages_url = course_mfe_url
     return custom_pages_url
+
+
+def get_taxonomy_list_url():
+    """
+    Gets course authoring microfrontend URL for taxonomy list page view.
+    """
+    taxonomy_list_url = None
+    if use_tagging_taxonomy_list_page():
+        mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
+        if mfe_base_url:
+            taxonomy_list_url = f'{mfe_base_url}/taxonomy-list'
+    return taxonomy_list_url
 
 
 def course_import_olx_validation_is_enabled():
@@ -1514,8 +1527,10 @@ def get_home_context(request):
         'archived_courses': archived_courses,
         'in_process_course_actions': in_process_course_actions,
         'libraries_enabled': LIBRARIES_ENABLED,
+        'taxonomies_enabled': use_tagging_taxonomy_list_page(),
         'redirect_to_library_authoring_mfe': should_redirect_to_library_authoring_mfe(),
         'library_authoring_mfe_url': LIBRARY_AUTHORING_MICROFRONTEND_URL,
+        'taxonomy_list_mfe_url': get_taxonomy_list_url(),
         'libraries': libraries,
         'show_new_library_button': user_can_create_library(user) and not should_redirect_to_library_authoring_mfe(),
         'user': user,

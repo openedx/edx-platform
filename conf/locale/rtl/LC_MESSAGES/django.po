@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-15 20:36+0000\n"
-"PO-Revision-Date: 2023-10-15 20:36:20.949198\n"
+"POT-Creation-Date: 2023-10-22 20:35+0000\n"
+"PO-Revision-Date: 2023-10-22 20:35:52.246505\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2026,68 +2026,6 @@ msgstr "Ŧɥǝ bɐdƃǝ ᴉɯɐƃǝ ɟᴉlǝ sᴉzǝ ɯnsʇ bǝ lǝss ʇɥɐn 25
 #: lms/djangoapps/badges/models.py
 msgid "This value must be all lowercase."
 msgstr "Ŧɥᴉs ʌɐlnǝ ɯnsʇ bǝ ɐll løʍǝɹɔɐsǝ."
-
-#: lms/djangoapps/badges/models.py
-msgid "The course mode for this badge image. For example, \"verified\" or \"honor\"."
-msgstr "Ŧɥǝ ɔønɹsǝ ɯødǝ ɟøɹ ʇɥᴉs bɐdƃǝ ᴉɯɐƃǝ. Føɹ ǝxɐɯdlǝ, \"ʌǝɹᴉɟᴉǝd\" øɹ \"ɥønøɹ\"."
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Badge images must be square PNG files. The file size should be under 250KB."
-msgstr ""
-"Ƀɐdƃǝ ᴉɯɐƃǝs ɯnsʇ bǝ sbnɐɹǝ ⱣNǤ ɟᴉlǝs. Ŧɥǝ ɟᴉlǝ sᴉzǝ sɥønld bǝ nndǝɹ 250ꝀɃ."
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Set this value to True if you want this image to be the default image for "
-"any course modes that do not have a specified badge image. You can have only"
-" one default image."
-msgstr ""
-"Sǝʇ ʇɥᴉs ʌɐlnǝ ʇø Ŧɹnǝ ᴉɟ ʎøn ʍɐnʇ ʇɥᴉs ᴉɯɐƃǝ ʇø bǝ ʇɥǝ dǝɟɐnlʇ ᴉɯɐƃǝ ɟøɹ "
-"ɐnʎ ɔønɹsǝ ɯødǝs ʇɥɐʇ dø nøʇ ɥɐʌǝ ɐ sdǝɔᴉɟᴉǝd bɐdƃǝ ᴉɯɐƃǝ. Ɏøn ɔɐn ɥɐʌǝ ønlʎ"
-" ønǝ dǝɟɐnlʇ ᴉɯɐƃǝ."
-
-#: lms/djangoapps/badges/models.py
-msgid "There can be only one default image."
-msgstr "Ŧɥǝɹǝ ɔɐn bǝ ønlʎ ønǝ dǝɟɐnlʇ ᴉɯɐƃǝ."
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"On each line, put the number of completed courses to award a badge for, a "
-"comma, and the slug of a badge class you have created that has the issuing "
-"component 'openedx__course'. For example: 3,enrolled_3_courses"
-msgstr ""
-"Øn ǝɐɔɥ lᴉnǝ, dnʇ ʇɥǝ nnɯbǝɹ øɟ ɔøɯdlǝʇǝd ɔønɹsǝs ʇø ɐʍɐɹd ɐ bɐdƃǝ ɟøɹ, ɐ "
-"ɔøɯɯɐ, ɐnd ʇɥǝ slnƃ øɟ ɐ bɐdƃǝ ɔlɐss ʎøn ɥɐʌǝ ɔɹǝɐʇǝd ʇɥɐʇ ɥɐs ʇɥǝ ᴉssnᴉnƃ "
-"ɔøɯdønǝnʇ 'ødǝnǝdx__ɔønɹsǝ'. Føɹ ǝxɐɯdlǝ: 3,ǝnɹøllǝd_3_ɔønɹsǝs"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"On each line, put the number of enrolled courses to award a badge for, a "
-"comma, and the slug of a badge class you have created that has the issuing "
-"component 'openedx__course'. For example: 3,enrolled_3_courses"
-msgstr ""
-"Øn ǝɐɔɥ lᴉnǝ, dnʇ ʇɥǝ nnɯbǝɹ øɟ ǝnɹøllǝd ɔønɹsǝs ʇø ɐʍɐɹd ɐ bɐdƃǝ ɟøɹ, ɐ "
-"ɔøɯɯɐ, ɐnd ʇɥǝ slnƃ øɟ ɐ bɐdƃǝ ɔlɐss ʎøn ɥɐʌǝ ɔɹǝɐʇǝd ʇɥɐʇ ɥɐs ʇɥǝ ᴉssnᴉnƃ "
-"ɔøɯdønǝnʇ 'ødǝnǝdx__ɔønɹsǝ'. Føɹ ǝxɐɯdlǝ: 3,ǝnɹøllǝd_3_ɔønɹsǝs"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Each line is a comma-separated list. The first item in each line is the slug"
-" of a badge class you have created that has an issuing component of "
-"'openedx__course'. The remaining items in each line are the course keys the "
-"learner needs to complete to be awarded the badge. For example: "
-"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
-msgstr ""
-"Ɇɐɔɥ lᴉnǝ ᴉs ɐ ɔøɯɯɐ-sǝdɐɹɐʇǝd lᴉsʇ. Ŧɥǝ ɟᴉɹsʇ ᴉʇǝɯ ᴉn ǝɐɔɥ lᴉnǝ ᴉs ʇɥǝ slnƃ"
-" øɟ ɐ bɐdƃǝ ɔlɐss ʎøn ɥɐʌǝ ɔɹǝɐʇǝd ʇɥɐʇ ɥɐs ɐn ᴉssnᴉnƃ ɔøɯdønǝnʇ øɟ "
-"'ødǝnǝdx__ɔønɹsǝ'. Ŧɥǝ ɹǝɯɐᴉnᴉnƃ ᴉʇǝɯs ᴉn ǝɐɔɥ lᴉnǝ ɐɹǝ ʇɥǝ ɔønɹsǝ ʞǝʎs ʇɥǝ "
-"lǝɐɹnǝɹ nǝǝds ʇø ɔøɯdlǝʇǝ ʇø bǝ ɐʍɐɹdǝd ʇɥǝ bɐdƃǝ. Føɹ ǝxɐɯdlǝ: "
-"slnƃ_ɟøɹ_ɔøɯdsɔᴉ_ɔønɹsǝs_ƃɹønd_bɐdƃǝ,ɔønɹsǝ-ʌ1:ȻøɯdSɔᴉ+Ȼønɹsǝ+Fᴉɹsʇ,ɔønɹsǝ-ʌ1:ȻøɯdsSɔᴉ+Ȼønɹsǝ+Sǝɔønd"
-
-#: lms/djangoapps/badges/models.py
-msgid "Please check the syntax of your entry."
-msgstr "Ᵽlǝɐsǝ ɔɥǝɔʞ ʇɥǝ sʎnʇɐx øɟ ʎønɹ ǝnʇɹʎ."
 
 #. Translators: This string is used across Open edX installations
 #. as a callback to edX. Please do not translate `edX.org`
@@ -10787,18 +10725,6 @@ msgid ""
 msgstr ""
 "Ɇdᴉʇ ʇɥǝ nɐɯǝ øɟ ʇɥǝ ʌᴉdǝø ʇɥnɯbnɐᴉl ᴉɯɐƃǝ ɟᴉlǝ. Ɏøn ɔɐn sǝʇ ʇɥǝ ʌᴉdǝø "
 "ʇɥnɯbnɐᴉl ᴉɯɐƃǝ øn ʇɥǝ Sǝʇʇᴉnƃs & Đǝʇɐᴉls dɐƃǝ."
-
-#: xmodule/course_block.py
-msgid "Issue Open Badges"
-msgstr "Ɨssnǝ Ødǝn Ƀɐdƃǝs"
-
-#: xmodule/course_block.py
-msgid ""
-"Issue Open Badges badges for this course. Badges are generated when "
-"certificates are created."
-msgstr ""
-"Ɨssnǝ Ødǝn Ƀɐdƃǝs bɐdƃǝs ɟøɹ ʇɥᴉs ɔønɹsǝ. Ƀɐdƃǝs ɐɹǝ ƃǝnǝɹɐʇǝd ʍɥǝn "
-"ɔǝɹʇᴉɟᴉɔɐʇǝs ɐɹǝ ɔɹǝɐʇǝd."
 
 #: xmodule/course_block.py
 msgid ""
@@ -21053,8 +20979,8 @@ msgid "Studio Accessibility Policy"
 msgstr "Sʇndᴉø Ⱥɔɔǝssᴉbᴉlᴉʇʎ Ᵽølᴉɔʎ"
 
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
-msgid "Files & Uploads"
-msgstr "Fᴉlǝs & Ʉdløɐds"
+msgid "Files"
+msgstr "Fᴉlǝs"
 
 #: cms/templates/certificates.html
 msgid "Course Certificates"
@@ -22984,6 +22910,10 @@ msgstr "Ⱥɹɔɥᴉʌǝd Ȼønɹsǝs"
 #: cms/templates/index.html
 msgid "Libraries"
 msgstr "Łᴉbɹɐɹᴉǝs"
+
+#: cms/templates/index.html
+msgid "Taxonomies"
+msgstr "Ŧɐxønøɯᴉǝs"
 
 #: cms/templates/index.html
 msgid "Are you staff on an existing {studio_name} course?"

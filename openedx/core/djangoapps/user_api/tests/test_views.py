@@ -33,6 +33,7 @@ class UserAPITestCase(ApiTestCase):
     Parent test case for User API workflow coverage
     """
     LIST_URI = USER_LIST_URI
+    TEST_PASSWORD = 'Password1234'
 
     def get_uri_for_user(self, target_user):
         """Given a user object, get the URI for the corresponding resource"""
