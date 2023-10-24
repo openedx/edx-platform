@@ -207,6 +207,7 @@ def container_handler(request, usage_key_string):
                 'unit': unit,
                 'is_unit_page': is_unit_page,
                 'is_collapsible': is_library_xblock,
+                'is_library_xblock': is_library_xblock,
                 'subsection': subsection,
                 'section': section,
                 'position': index,
