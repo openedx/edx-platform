@@ -55,7 +55,8 @@ from xmodule.services import ConfigurationService, SettingsService, TeamsConfigu
 from xmodule.tabs import CourseTabList  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverviewSubText
-from cms.djangoapps.contentstore.models import CourseUnitTime
+# from cms.djangoapps.contentstore.models import CourseUnitTime
+from openedx.core.djangoapps.content.course_overviews.models import CourseUnitTime
 from ..utils import (
     ancestor_has_staff_lock,
     find_release_date_source,
