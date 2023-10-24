@@ -2,7 +2,7 @@
 Tagging Org API Views
 """
 
-from openedx_tagging.core.tagging.rest_api.v1.views import TaxonomyView
+from openedx_tagging.core.tagging.rest_api.v1.views import ObjectTagView, TaxonomyView
 
 
 from ...api import (
@@ -10,8 +10,9 @@ from ...api import (
     get_taxonomies,
     get_taxonomies_for_org,
 )
+from ...rules import get_admin_orgs
 from .serializers import TaxonomyOrgListQueryParamsSerializer
-from .filters import UserOrgFilterBackend
+from .filters import ObjectTagTaxonomyOrgFilterBackend, UserOrgFilterBackend
 
 
 class TaxonomyOrgView(TaxonomyView):
@@ -57,4 +58,15 @@ class TaxonomyOrgView(TaxonomyView):
         """
         Create a new taxonomy.
         """
-        serializer.instance = create_taxonomy(**serializer.validated_data)
+        user_admin_orgs = get_admin_orgs(self.request.user)
+        serializer.instance = create_taxonomy(**serializer.validated_data, orgs=user_admin_orgs)
+
+
+class ObjectTagOrgView(ObjectTagView):
+    """
+    View to create and retrieve ObjectTags for a provided Object ID (object_id).
+    This view extends the ObjectTagView to add Organization filters for the results.
+
+    Refer to ObjectTagView docstring for usage details.
+    """
+    filter_backends = [ObjectTagTaxonomyOrgFilterBackend]

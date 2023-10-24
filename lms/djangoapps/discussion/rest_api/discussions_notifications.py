@@ -52,6 +52,7 @@ class DiscussionNotificationSender:
                 "replier_name": self.creator.username,
                 "post_title": self.thread.title,
                 "course_name": self.course.display_name,
+                "sender_id": self.creator.id,
                 **extra_context,
             },
             notification_type=notification_type,

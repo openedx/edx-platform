@@ -9,12 +9,10 @@ from unittest.mock import call, patch
 
 import ddt
 import httpretty
-from Cryptodome.PublicKey import RSA
 from django.conf import settings
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_switch
-from jwkest import jwk
 from oauth2_provider import models as dot_models
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -163,20 +161,6 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
             body['asymmetric_jwt'] = asymmetric_jwt
 
         return body
-
-    def _generate_key_pair(self):
-        """ Generates an asymmetric key pair and returns the JWK of its public keys and keypair. """
-        rsa_key = RSA.generate(2048)
-        rsa_jwk = jwk.RSAKey(kid="key_id", key=rsa_key)
-
-        public_keys = jwk.KEYS()
-        public_keys.append(rsa_jwk)
-        serialized_public_keys_json = public_keys.dump_jwks()
-
-        serialized_keypair = rsa_jwk.serialize(private=True)
-        serialized_keypair_json = json.dumps(serialized_keypair)
-
-        return serialized_public_keys_json, serialized_keypair_json
 
     def _test_jwt_access_token(self, client_attr, token_type=None, headers=None, grant_type=None, asymmetric_jwt=False):
         """
