@@ -15,6 +15,8 @@ from opaque_keys.edx.locator import (
     LibraryUsageLocatorV2,
 )
 from search.search_engine_base import SearchEngine
+from typing import Union
+from user_tasks.models import UserTaskStatus
 from xblock.fields import Scope
 
 from openedx.core.djangoapps.content_libraries import api as library_api
@@ -24,7 +26,7 @@ from common.djangoapps.student.auth import has_studio_write_access
 from xmodule.capa_block import ProblemBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from openedx.core.djangoapps.content_libraries.tasks import update_children_task, get_import_task_is_in_progress
+from openedx.core.djangoapps.content_libraries.tasks import update_children_task
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary
 
 
@@ -168,7 +170,7 @@ class LibraryToolsService:
 
     def update_children(self, dest_block, user_perms=None, version=None):
         """
-        Update xBlock's children.
+        Update xBlock's children via an asynchronous task.
 
         Re-fetch all matching blocks from the libraries, and copy them as children of dest_block.
         The children will be given new block_ids.
@@ -200,11 +202,16 @@ class LibraryToolsService:
             raise PermissionDenied()
         update_children_task.delay(self.user_id, str(dest_block.location), version)
 
-    def import_task_is_in_progress(self, location):
+    def get_update_children_task_state(self, library_content_block_key) -> Union[str, None]:
         """
-        Return task status for update_children_task.
+        Return task state for most-recently-created update_children task for specified library_content block.
+
+        Options: UserTaskState.{PENDING, IN_PROGRESS, RETRYING, SUCCEEDED, FAILED, CANCELED}
+        If no update_childen task exists, returns None.
         """
-        return get_import_task_is_in_progress(location)
+        args = {'dest_block_key': library_content_block_key}
+        name = update_children_task.__class__.generate_name(args)
+        return UserTaskStatus.objects.filter(name=name).order_by('-created').first()
 
     def list_available_libraries(self):
         """

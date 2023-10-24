@@ -32,8 +32,8 @@ from opaque_keys.edx.locator import (
     LibraryUsageLocatorV2
 )
 from search.search_engine_base import SearchEngine
-from user_tasks.models import UserTaskStatus
-from user_tasks.tasks import UserTask
+
+from user_tasks.tasks import UserTask, UserTaskStatus
 from xblock.fields import Scope
 
 from common.djangoapps.student.auth import has_studio_write_access
@@ -356,14 +356,3 @@ def update_children_task(self, user_id, dest_block_key, version=None):
             if self.status.state != UserTaskStatus.FAILED:
                 self.status.fail({'raw_error_msg': str(exception)})
             return
-
-
-def get_import_task_is_in_progress(dest_block_key):
-    """
-    Return task status for LibraryUpdateChildrenTask
-    """
-    args = {'dest_block_key': dest_block_key}
-    name = LibraryUpdateChildrenTask.generate_name(args)
-    task_status = UserTaskStatus.objects.filter(name=name).order_by('-created').first()
-    if task_status:
-        return task_status.state == UserTaskStatus.IN_PROGRESS

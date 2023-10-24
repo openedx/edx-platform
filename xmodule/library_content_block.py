@@ -18,6 +18,7 @@ from lxml.etree import XMLSyntaxError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
 from rest_framework import status
+from user_tasks.models import UserTaskStatus
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.completable import XBlockCompletionMode
@@ -418,8 +419,8 @@ class LibraryContentBlock(
         fragment = Fragment()
         root_xblock = context.get('root_xblock')
         is_root = root_xblock and root_xblock.location == self.location
-        is_loading = self.tools.import_task_is_in_progress(self.location)
-        if is_root and not is_loading:
+        is_updating = self.children_are_updating()
+        if is_root and not is_updating:
             # User has clicked the "View" link. Show a preview of all possible children:
             if self.children:  # pylint: disable=no-member
                 max_count = self.max_count
@@ -437,7 +438,7 @@ class LibraryContentBlock(
                 self.render_children(context, fragment, can_reorder=False, can_add=False)
         # else: When shown on a unit page, don't show any sort of preview -
         # just the status of this block in the validation area.
-        context['is_loading'] = is_loading
+        context['is_loading'] = is_updating
 
         # The following JS is used to make the "Update now" button work on the unit page and the container view:
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit.js'))
@@ -530,12 +531,13 @@ class LibraryContentBlock(
         return {'is_v2': is_v2}
 
     @XBlock.handler
-    def get_import_task_status(self, request, suffix=''):  # lint-amnesty, pylint: disable=unused-argument
+    def children_are_updating(self, request=None, suffix=''):  # pylint: disable=unused-argument
         """
-        Return task status for update_children_task.
+        Returns whether this block is currently having its children updated from the source library.
         """
-        task_status = self.tools.import_task_status(self.location)
-        return Response(json.dumps({'status': task_status}))
+        task_state = self.tools.get_update_children_task_state(self.location)
+        are_updating = task_state in [UserTaskStatus.SUCCEEDED, UserTaskStatus.PENDING, UserTaskStatus.RETRYING]
+        return Response(json.dumps(are_updating))
 
     # Copy over any overridden settings the course author may have applied to the blocks.
     def _copy_overrides(self, store, user_id, source, dest):
