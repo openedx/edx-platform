@@ -64,7 +64,7 @@ class TestGradebook(SharedModuleStoreTestCase):
         self.users = [UserFactory.create() for _ in range(USER_COUNT)]
 
         for user in self.users:
-            CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+            CourseEnrollmentFactory.create(user=user, course_id=self.course.id, mode="honor")
 
         for i, item in enumerate(self.items):
             for j, user in enumerate(self.users):
