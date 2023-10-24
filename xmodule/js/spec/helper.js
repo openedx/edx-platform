@@ -180,6 +180,12 @@
                 return {};
             } else if (settings.url === '/save_user_state') {
                 return {success: true};
+            } else if (settings.url.match(/.+video-transcript.+$/)) {
+                return settings.success({status: 'Completed'});
+            } else if (settings.url.match(/.+transcript-feedback.+$/) && settings.type === 'GET') {
+                return settings.success(null);
+            } else if (settings.url.match(/.+transcript-feedback.+$/) && settings.type === 'POST') {
+                return settings.success(settings.data.value !== null ? { value: settings.data.value } : null);
             } else if (settings.url.match(new RegExp(jasmine.getFixtures().fixturesPath + '.+', 'g'))) {
                 return origAjax(settings);
             } else {
