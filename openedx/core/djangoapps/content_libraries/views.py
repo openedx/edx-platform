@@ -680,9 +680,6 @@ class LibraryBlockOlxView(APIView):
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
         api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
-        
-        print("You called me!")
-        
         xml_str = api.get_library_block_olx(key)
         return Response(LibraryXBlockOlxSerializer({"olx": xml_str}).data)
 
