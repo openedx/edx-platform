@@ -300,6 +300,10 @@ CLOSEST_CLIENT_IP_FROM_HEADERS = []
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:18150'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 
+############################ AI_TRANSLATIONS ##################################
+AI_TRANSLATIONS_URL_ROOT = 'http://localhost:18760'
+AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
+
 #################### Event bus backend ########################
 # .. toggle_name: FEATURES['ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS']
 # .. toggle_implementation: DjangoSetting

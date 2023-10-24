@@ -525,6 +525,10 @@ API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
 API_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/'
 AUTH_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/authentication/index.html'
 
+############################ AI_TRANSLATIONS ##################################
+AI_TRANSLATIONS_URL_ROOT = 'http://localhost:18760'
+AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
+
 ################# New settings must go ABOVE this line #################
 ########################################################################
 # See if the developer has any local overrides.
