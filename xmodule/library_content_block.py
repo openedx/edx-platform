@@ -419,7 +419,7 @@ class LibraryContentBlock(
         fragment = Fragment()
         root_xblock = context.get('root_xblock')
         is_root = root_xblock and root_xblock.location == self.location
-        is_updating = self._are_children_updating()
+        is_updating = self.children_are_updating()
         if is_root and not is_updating:
             # User has clicked the "View" link. Show a preview of all possible children:
             if self.children:  # pylint: disable=no-member
@@ -531,17 +531,13 @@ class LibraryContentBlock(
         return {'is_v2': is_v2}
 
     @XBlock.handler
-    def children_are_updating(self, request, suffix=''):  # pylint: disable=unused-argument
+    def children_are_updating(self, request=None, suffix=''):  # pylint: disable=unused-argument
         """
         Returns whether this block is currently having its children updated from the source library.
         """
-        return Response(json.dumps(self._are_children_updating()))
-
-    def _are_children_updating(self) -> bool:
-        return (
-            self.tools.get_update_children_task_state(self.location) in
-            [UserTaskStatus.SUCCEEDED, UserTaskStatus.PENDING, UserTaskStatus.RETRYING]
-        )
+        task_state = self.tools.get_update_children_task_state(self.location)
+        are_updating = task_state in [UserTaskStatus.SUCCEEDED, UserTaskStatus.PENDING, UserTaskStatus.RETRYING]
+        return Response(json.dumps(are_updating))
 
     # Copy over any overridden settings the course author may have applied to the blocks.
     def _copy_overrides(self, store, user_id, source, dest):
