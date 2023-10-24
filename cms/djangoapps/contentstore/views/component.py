@@ -193,6 +193,8 @@ def container_handler(request, usage_key_string):
                     break
                 index += 1
 
+            flashcard_link = f'http://localhost:18000/flashcard/{course.id}/{unit.scope_ids.usage_id}'
+
             # Get the status of the user's clipboard so they can paste components if they have something to paste
             user_clipboard = content_staging_api.get_user_clipboard_json(request.user.id, request)
             return render_to_response('container.html', {
@@ -215,6 +217,7 @@ def container_handler(request, usage_key_string):
                 'xblock_info': xblock_info,
                 'draft_preview_link': preview_lms_link,
                 'published_preview_link': lms_link,
+                'flashcard_link': flashcard_link,
                 'templates': CONTAINER_TEMPLATES,
                 # Status of the user's clipboard, exactly as would be returned from the "GET clipboard" REST API.
                 'user_clipboard': user_clipboard,

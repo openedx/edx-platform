@@ -136,13 +136,13 @@ from openedx.core.djangolib.markup import HTML, Text
                 ## Hide the sequence navigation when we've browsed into a child of the unit, e.g. showing the child blocks of a problem-builder xblock
                 % if is_unit_page:
                     <li class="action-item action-view nav-item">
-                        <a href="${published_preview_link}" class="button button-view action-button is-disabled" aria-disabled="true" rel="external" title="${_('Open the courseware in the LMS')}">
-                            <span class="action-button-text">${_("View Live Version")}</span>
+                        <a href="${flashcard_link}" class="button button-view action-button is-disabled" aria-disabled="true" rel="external" title="${_('Generate Flashcards')}">
+                            <span class="action-button-text">${_("Generate Flashcards")}</span>
                         </a>
                     </li>
-                    <li class="action-item action-preview nav-item">
-                        <a href="${draft_preview_link}" class="button button-preview action-button" rel="external" title="${_('Preview the courseware in the LMS')}">
-                            <span class="action-button-text">${_("Preview")}</span>
+                    <li class="action-item action-view nav-item">
+                        <a href="${published_preview_link}" class="button button-view action-button is-disabled" aria-disabled="true" rel="external" title="${_('Open the courseware in the LMS')}">
+                            <span class="action-button-text">${_("View Live Version")}</span>
                         </a>
                     </li>
                 % else:
