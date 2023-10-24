@@ -227,8 +227,10 @@ class AssessmentReportPDFView(TemplateView):
         skills_assessment = []
         user = User.objects.get(id=user_id)
         for program in programs:
-            user_rating_qs  = UserRating.objects.filter(user=user_id, program=program.id)
-            user_response_qs  = UserResponse.objects.filter(user=user_id, program=program.id)
+            # user_rating_qs  = UserRating.objects.filter(user=user_id, program=program.id) TODO cleanup
+            user_rating_qs = UserRating.objects.none()
+            # user_response_qs  = UserResponse.objects.filter(user=user_id, program=program.id) TODO cleanup
+            user_response_qs = UserResponse.objects.none()
             text_assessment_data = TextAssessmentSerializer(user_response_qs, many=True).data
             rating_assessment_data = RatingAssessmentSerializer(user_rating_qs, many=True).data
             raw_data = text_assessment_data + rating_assessment_data
