@@ -1,13 +1,15 @@
 """
 Command to import Blockstore-backed v2 Libraries to Learning Core data models.
+
+This will hopefully be very short-lived code.
 """
 from datetime import datetime, timezone
 from xml.etree import ElementTree as ET
 import logging
 
-from django.conf import settings
 from django.db import transaction
 from django.core.management import BaseCommand, CommandError
+from django.core.exceptions import ObjectDoesNotExist
 
 from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx.core.djangoapps.content_libraries import api as lib_api
@@ -15,7 +17,6 @@ from openedx.core.djangoapps.content_libraries import models as lib_models
 from openedx.core.djangoapps.content_libraries import constants as lib_constants
 from openedx.core.lib.blockstore_api import (
     get_bundle,
-    get_bundle_file_metadata,
     get_bundle_file_data,
     get_bundle_files_dict,
 )
@@ -23,17 +24,21 @@ from openedx_learning.core.publishing import api as publishing_api
 from openedx_learning.core.components import api as components_api
 from openedx_learning.core.contents import api as contents_api
 
-# These imports should all be removed at some point.
-
-from openedx_learning.core.publishing.models import Draft
-
 
 log = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
     """
-    Create a LearningPackage and initialize with contents from Library
+    Create a new LearningPackage and initialize with contents from Library.
+
+    If you run this and specify a Library that already has a LearningPackage
+    (using -f), this command will delete that LearningPackage and create a new
+    one to associate with the Libary. It does not modify the existing one.
+
+    All the work is done in a transaction, so errors partway through the
+    process shouldn't cause state inconsistency in the database. A partly-
+    imported course *can* cause data to end up in Django Storages.
     """
 
     def add_arguments(self, parser):
@@ -45,20 +50,43 @@ class Command(BaseCommand):
             type=LibraryLocatorV2.from_string,
             help=('Content Library Key to import content from.'),
         )
+        parser.add_argument(
+            '-f',
+            '--force',
+            action='store_true',
+            default=False,
+        )
 
     def handle(self, *args, **options):
+        """
+        Does the work of parsing content from Blockstore and writing it into
+        openedx-learning core models (publishing, components, contents).
+        """
         # Search for the library.
-        lib_key = options['library-key']
-        lib_data = lib_api.get_library(lib_key)
-        lib = lib_models.ContentLibrary.objects.get_by_key(lib_key)
+        try:
+            lib_key = options['library-key']
+            lib_data = lib_api.get_library(lib_key)
+            lib = lib_models.ContentLibrary.objects.get_by_key(lib_key)
+        except ObjectDoesNotExist:
+            raise CommandError(f"Library not found: {lib_key}")
 
         COMPONENT_NAMESPACE = 'xblock.v1'
+
+        learning_package_already_exists = (
+            hasattr(lib, 'contents') and
+            lib.contents.learning_package is not None
+        )
+
+        if learning_package_already_exists and not options['force']:
+            raise CommandError(
+                f"Learning Package already exists for {lib_key} (use -f to overwrite)"
+            )
 
         with transaction.atomic():
             # This is a migration script and we're assuming there's no important
             # state attached to the LearningPackage yet. That makes it safe to
             # just wipe out everything and recreate it.
-            if hasattr(lib, 'contents'):
+            if learning_package_already_exists:
                 lp = lib.contents.learning_package
                 log.info(f"Deleting existing LearningPackage {lp.key} ({lp.uuid})")
                 lib.contents.delete()
@@ -74,22 +102,23 @@ class Command(BaseCommand):
                 content_library=lib,
                 learning_package=learning_package,
             )
-        
-            # We only really need to get the most recent version in Studio draft
-            # for now.
+
+            # We don't need the full history stored in Blockstore, just the most
+            # recently published version and the most recent draft.
             bundle = get_bundle(lib.bundle_uuid)
             published_files = get_bundle_files_dict(lib.bundle_uuid)
 
             now = datetime.now(timezone.utc)
-            
-            # First get the published version into openedx-learning models. This
-            # creates ComponentVersions and puts them as the current Draft.
+
+            # First get the published version into openedx-learning models. On
+            # the openedx-learning side, we'll create them as Drafts and then
+            # publish at the end.
             published_metadata_dict = {}
             published_component_pks = {}
             published_definition_files = {
                 file_path: metadata
                 for file_path, metadata in published_files.items()
-                if file_path.endswith('/definition.xml')
+                if file_path.endswith('/definition.xml')  # This is the OLX
             }
             for file_path, metadata in published_definition_files.items():
                 block_type, block_id, _def_xml = file_path.split('/')
@@ -126,7 +155,7 @@ class Command(BaseCommand):
                 published_at=now,
             )
 
-            # Now grab the draft versions from blockstore, and copy those...
+            # Now grab the draft version from blockstore, and copy those...
             draft_files = get_bundle_files_dict(lib.bundle_uuid, use_draft=lib_constants.DRAFT_NAME)
             draft_definition_files = {
                 file_path: metadata
@@ -136,11 +165,12 @@ class Command(BaseCommand):
             for file_path, draft_metadata in draft_definition_files.items():
                 published_metadata = published_metadata_dict.get(file_path)
                 if draft_metadata.modified:
-                    block_type, block_id, def_xml = file_path.split('/')
+                    block_type, block_id, _def_xml = file_path.split('/')
                     xml_bytes = get_bundle_file_data(bundle.uuid, file_path, use_draft=lib_constants.DRAFT_NAME)
                     display_name = extract_display_name(xml_bytes, file_path)
 
-                    # If this is newly created in the draft...
+                    # If this is newly created in the draft, we have to create a
+                    # whole new Component...
                     if published_metadata is None:
                         component = components_api.create_component(
                             learning_package_id=learning_package.id,
@@ -151,8 +181,8 @@ class Command(BaseCommand):
                             created_by=None,
                         )
                         component_pk = component.pk
-                        version_num = 1 
-                    # Otherwise, it's been modified...
+                        version_num = 1
+                    # Otherwise, it's just been modified...
                     else:
                         component_pk = published_component_pks[file_path]
                         version_num = 2
@@ -176,21 +206,23 @@ class Command(BaseCommand):
                         key="definition.xml",
                         learner_downloadable=False
                     )
-            
+
             # Now remove stuff that was present in the published set but was
             # deleted in the draft.
             deleted_definition_files = set(published_definition_files) - set(draft_definition_files)
             for deleted_definition_file in deleted_definition_files:
                 log.info(f"Deleting {deleted_definition_file} from draft")
                 component_pk = published_component_pks[deleted_definition_file]
-                draft = Draft.objects.get(entity_id=component_pk)
-                draft.version = None
-                draft.save()
+                publishing_api.set_draft_version(component_pk, None)
 
 
 def extract_display_name(xml_bytes, file_path):
-    # Do some basic parsing of the content to see if it's even well
-    # constructed enough to add (or whether we should skip/error on it).
+    """
+    Parse the display_name out of the XML.
+
+    This will return an empty string if no display_name is specified, or if
+    there is a parsing error.
+    """
     try:
         xml_str = xml_bytes.decode('utf-8')
         block_root = ET.fromstring(xml_str)
@@ -198,5 +230,5 @@ def extract_display_name(xml_bytes, file_path):
     except ET.ParseError as err:
         log.error(f"Parse error for {file_path}: {err}")
         display_name = ""
-    
+
     return display_name

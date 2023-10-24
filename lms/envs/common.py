@@ -3315,13 +3315,10 @@ INSTALLED_APPS = [
 
     'openedx_events',
 
-    # Learning Core Apps
+    # Learning Core Apps, used by v2 content libraries (content_libraries app)
     "openedx_learning.core.components.apps.ComponentsConfig",
     "openedx_learning.core.contents.apps.ContentsConfig",
     "openedx_learning.core.publishing.apps.PublishingConfig",
-
-    # Learning Contrib Apps
-    # "openedx_learning.contrib.media_server.apps.MediaServerConfig",
 ]
 
 OPENEDX_LEARNING = {
