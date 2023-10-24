@@ -985,9 +985,9 @@ def skill_reflection_individual_response(skills, likert_questions, nuance_interr
                     response[response_key].append(
                         {
                             'skill': skill,
-                            'response_text': None,
+                            'response_text': '',
                             'question': question,
-                            'point': None,
+                            'point': 0,
                             'choices': list(choices.values())
                         }
                     )
