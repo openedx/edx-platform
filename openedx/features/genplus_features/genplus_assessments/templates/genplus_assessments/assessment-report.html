@@ -233,7 +233,7 @@
         if (likert.data.labels.indexOf(intro.skill) === -1) {
           likert.data.labels.push(intro.skill);
         }
-        likert.data.datasets[index].data.push(intro.point < 3 ? intro.point - 3 : intro.point - 2);
+        likert.data.datasets[index].data.push((intro.point === 1 || intro.point === 2) ? intro.point - 3 : intro.point - 2);
       });
     };
 
