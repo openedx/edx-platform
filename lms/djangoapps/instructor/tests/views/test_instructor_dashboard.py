@@ -560,7 +560,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         for i in range(2):
             username = "user_%d" % i
             student = UserFactory.create(username=username)
-            CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
+            CourseEnrollmentFactory.create(user=student, course_id=self.course.id, mode="honor")
         url = reverse(
             'spoc_gradebook',
             kwargs={'course_id': self.course.id}
@@ -652,7 +652,7 @@ class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTes
         for i in range(20):
             username = "user_%d" % i
             student = UserFactory.create(username=username)
-            CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
+            CourseEnrollmentFactory.create(user=student, course_id=self.course.id, mode="honor")
             students.append(student)
 
         chapter = ItemFactory.create(

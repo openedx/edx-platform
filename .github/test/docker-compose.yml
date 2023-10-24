@@ -10,13 +10,13 @@ services:
     restart: unless-stopped
 
   lms:
-    image: eoluchile/edx-platform:testing-koa
+    image: ghcr.io/eol-uchile/edx-platform:testing-koa
     depends_on:
       - memcached
       - mongodb
   
   cms:
-    image: eoluchile/edx-platform:testing-koa
+    image: ghcr.io/eol-uchile/edx-platform:testing-koa
     depends_on:
       - memcached
       - mongodb
