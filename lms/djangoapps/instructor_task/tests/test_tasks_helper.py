@@ -2643,7 +2643,7 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
             course_id_string = quote(text_type(self.course.id).replace('/', '_'))
             filename = u'{}_ORA_data_{}.csv'.format(course_id_string, timestamp_str)
 
-            self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)
+            self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, return_val)
             mock_store_rows.assert_called_once_with(self.course.id, filename, [test_header] + test_rows)
 
 
