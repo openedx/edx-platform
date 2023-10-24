@@ -865,12 +865,16 @@ def skill_reflection_response(skills, likert_questions, nuance_interrogation_que
     }
     store = modulestore()
 
+    gen_class = Class.objects.prefetch_related('students').get(pk=class_id)
+    users = gen_class.students.select_related('gen_user__user').values('gen_user__user').all()
+    common_filters = {'user__in': users}
+
     def process_question_responses(questions, response_key, location_key):
         for question in questions:
             skill = question.skill.name
             usage_key = getattr(question, location_key)
-            submissions = list(question.submissions.filter(problem_location=usage_key).all())
-            total_submissions = question.submissions.filter(problem_location=usage_key).count()
+            submissions = list(question.submissions.filter(problem_location=usage_key, **common_filters).all())
+            total_submissions = question.submissions.filter(problem_location=usage_key, **common_filters).count()
             stats = defaultdict(int)
 
             question_stats = {
@@ -930,7 +934,6 @@ def skill_reflection_response(skills, likert_questions, nuance_interrogation_que
                 question_map[intro['qid']]['outro'] = outro
         return question_map.values()
 
-    gen_class = Class.objects.prefetch_related('students').get(pk=class_id)
     total_students = gen_class.students.exclude(gen_user__user__isnull=True).count()
 
     response = {
@@ -988,7 +991,13 @@ def skill_reflection_individual_response(skills, likert_questions, nuance_interr
                             'response_text': '',
                             'question': question,
                             'point': 0,
-                            'choices': list(choices.values())
+                            'choices': [
+                                {
+                                    'text': choice.get('statement') or choice.get('text'),
+                                    'correct': choice.get('correct'),
+                                    'points': int(choice.get('point') or '0')
+                                } for choice in choices.values()
+                            ]
                         }
                     )
                 except ItemNotFoundError as e:
