@@ -27,7 +27,7 @@ runs:
 
     - name: save pytest warnings json file
       if: success()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: pytest-warnings-json
         path: |
