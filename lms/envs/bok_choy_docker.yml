@@ -16,6 +16,7 @@ CACHES:
       no_delay: true
       ignore_exc: true
       use_pooling: true
+      connect_timeout: 0.5
   default:
     BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
     KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
@@ -25,6 +26,7 @@ CACHES:
       no_delay: true
       ignore_exc: true
       use_pooling: true
+      connect_timeout: 0.5
   general:
     BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
     KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
@@ -34,6 +36,7 @@ CACHES:
       no_delay: true
       ignore_exc: true
       use_pooling: true
+      connect_timeout: 0.5
   mongo_metadata_inheritance:
     BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
     KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
@@ -43,6 +46,7 @@ CACHES:
       no_delay: true
       ignore_exc: true
       use_pooling: true
+      connect_timeout: 0.5
   staticfiles:
     BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
     KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
@@ -52,6 +56,7 @@ CACHES:
       no_delay: true
       ignore_exc: true
       use_pooling: true
+      connect_timeout: 0.5
 CELERY_BROKER_HOSTNAME: localhost
 CELERY_BROKER_PASSWORD: celery
 CELERY_BROKER_TRANSPORT: amqp
