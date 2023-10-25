@@ -132,6 +132,12 @@ def log_python_warnings():
         '.*You can remove default_app_config.*',
         category=PendingDeprecationWarning
     )
+    warnings.filterwarnings(
+        'ignore',
+        'Instead access HTTPResponse.headers directly.*',
+        category=DeprecationWarning,
+        module='elasticsearch'
+    )
     # try:
     #     # There are far too many of these deprecation warnings in startup to output for every management command;
     #     # suppress them until we've fixed at least the most common ones as reported by the test suite
