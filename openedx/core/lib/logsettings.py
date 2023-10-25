@@ -144,6 +144,16 @@ def log_python_warnings():
         category=DeprecationWarning,
         module="sass",
     )
+    warnings.filterwarnings(
+        'ignore',
+        'Deprecated call to `pkg_resources.declare_namespace.*',
+        category=DeprecationWarning,
+    )
+    warnings.filterwarnings(
+        'ignore',
+        '.*pkg_resources is deprecated as an API.*',
+        category=DeprecationWarning,
+    )
     # try:
     #     # There are far too many of these deprecation warnings in startup to output for every management command;
     #     # suppress them until we've fixed at least the most common ones as reported by the test suite
