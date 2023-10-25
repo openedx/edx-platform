@@ -253,60 +253,6 @@ def get_video_usage_path(request, course_key, edx_video_id):
     return {'usage_locations': usage_locations}
 
 
-def generate_video_download_link(request, edx_video_id):
-    """
-    API for fetching a video download link. Returns an url that can be used to download a video.
-    """
-    try:
-        import edxval.api as edxval_api
-    except ImportError:
-        edxval_api = None
-
-    from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
-
-    download_video_link = ''
-
-    # Determine if there is an alternative source for this video
-    # based on user locale.  This exists to support cases where
-    # we leverage a geography specific CDN, like China.
-    default_cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get('default')
-    user = DjangoXBlockUserService(request.user)
-    user_location = user.get_current_user().opt_attrs[ATTR_KEY_REQUEST_COUNTRY_CODE]
-    cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(user_location, default_cdn_url)
-
-    if edx_video_id and edxval_api:  # lint-amnesty, pylint: disable=too-many-nested-blocks
-        # code partially taken from xmodule/video_block/video_block.py -> get_html()
-        try:
-            val_profiles = ["youtube", "desktop_webm", "desktop_mp4"]
-
-            # strip edx_video_id to prevent ValVideoNotFoundError error if unwanted spaces are there. TNL-5769
-            val_video_urls = edxval_api.get_urls_for_profiles(edx_video_id.strip(), val_profiles)
-
-            # VAL will always give us the keys for the profiles we asked for, but
-            # if it doesn't have an encoded video entry for that Video + Profile, the
-            # value will map to `None`
-
-            # add the non-youtube urls to the list of alternative sources
-            # use the last non-None non-youtube non-hls url as the link to download the video
-            for url in [val_video_urls[p] for p in val_profiles if p != "youtube"]:
-                if url:
-                    # don't include hls urls for download
-                    if not url.endswith('.m3u8'):
-                        # function returns None when the url cannot be re-written
-                        rewritten_link = rewrite_video_url(cdn_url, url)
-                        if rewritten_link:
-                            download_video_link = rewritten_link
-                        else:
-                            download_video_link = url
-
-        except (edxval_api.ValInternalError, edxval_api.ValVideoNotFoundError):
-            # VAL raises this exception if it can't find data for the edx video ID. This can happen if the
-            # course data is ported to a machine that does not have the VAL data. So for now, pass on this
-            # exception and fallback to whatever we find in the VideoBlock.
-            LOGGER.warning("Could not retrieve information from VAL for edx Video ID: %s.", edx_video_id)
-    return {"download_link": download_video_link}
-
-
 def handle_generate_video_upload_link(request, course_key_string):
     """
     API for creating a video upload.  Returns an edx_video_id and a presigned URL that can be used
@@ -669,7 +615,7 @@ def _get_index_videos(course, pagination_conf=None):
     course_id = str(course.id)
     attrs = [
         'edx_video_id', 'client_video_id', 'created', 'duration',
-        'status', 'courses', 'transcripts', 'transcription_status',
+        'status', 'courses', 'encoded_videos', 'transcripts', 'transcription_status',
         'transcript_urls', 'error_description'
     ]
 
@@ -682,9 +628,15 @@ def _get_index_videos(course, pagination_conf=None):
             if attr == 'courses':
                 course = [c for c in video['courses'] if course_id in c]
                 (__, values['course_video_image_url']), = list(course[0].items())
+            if attr == 'encoded_videos':
+                values['download_link'] = ''
+                values['file_size'] = 0
+                for encoding in video['encoded_videos']:
+                    if encoding['profile'] == 'desktop_mp4':
+                        values['download_link'] = encoding['url']
+                        values['file_size'] = encoding['file_size']
             else:
                 values[attr] = video[attr]
-
         return values
 
     videos, pagination_context = _get_videos(course, pagination_conf)

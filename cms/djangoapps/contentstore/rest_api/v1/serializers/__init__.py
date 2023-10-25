@@ -18,7 +18,6 @@ from .videos import (
     CourseVideosSerializer,
     VideoUploadSerializer,
     VideoImageSerializer,
-    VideoDownloadSerializer,
     VideoUsageSerializer
 )
 from .transcripts import TranscriptSerializer

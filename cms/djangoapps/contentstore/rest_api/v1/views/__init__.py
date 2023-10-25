@@ -17,7 +17,6 @@ from .videos import (
     VideoImagesView,
     VideoEncodingsDownloadView,
     VideoFeaturesView,
-    VideoDownloadView,
     VideoUsageView,
 )
 from .help_urls import HelpUrlsView

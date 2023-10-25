@@ -20,7 +20,6 @@ from .views import (
     videos,
     transcripts,
     HelpUrlsView,
-    VideoDownloadView,
     VideoUsageView
 )
 
@@ -38,11 +37,6 @@ urlpatterns = [
         fr'^videos/{COURSE_ID_PATTERN}$',
         CourseVideosView.as_view(),
         name="course_videos"
-    ),
-    re_path(
-        fr'^videos/{COURSE_ID_PATTERN}/{VIDEO_ID_PATTERN}$',
-        VideoDownloadView.as_view(),
-        name="video_download"
     ),
     re_path(
         fr'^videos/{COURSE_ID_PATTERN}/{VIDEO_ID_PATTERN}/usage$',

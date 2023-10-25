@@ -47,6 +47,8 @@ class VideoModelSerializer(serializers.Serializer):
     edx_video_id = serializers.CharField()
     error_description = serializers.CharField()
     status = serializers.CharField()
+    file_size = serializers.IntegerField()
+    download_link = serializers.CharField()
     transcript_urls = serializers.DictField(
         child=serializers.CharField()
     )
@@ -85,11 +87,6 @@ class CourseVideosSerializer(serializers.Serializer):
         required=False,
         allow_null=True,
     )
-
-
-class VideoDownloadSerializer(serializers.Serializer):
-    """Serializer for video download"""
-    download_link = serializers.CharField()
 
 
 class VideoUsageSerializer(serializers.Serializer):

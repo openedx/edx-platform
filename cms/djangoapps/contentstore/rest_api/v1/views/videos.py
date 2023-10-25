@@ -34,14 +34,12 @@ from cms.djangoapps.contentstore.video_storage_handlers import (
     handle_video_images,
     enabled_video_features,
     _get_index_videos,
-    generate_video_download_link,
     get_video_usage_path
 )
 from cms.djangoapps.contentstore.rest_api.v1.serializers import (
     CourseVideosSerializer,
     VideoUploadSerializer,
     VideoImageSerializer,
-    VideoDownloadSerializer,
     VideoUsageSerializer,
 )
 from cms.djangoapps.contentstore.video_storage_handlers import get_all_transcript_languages
@@ -94,6 +92,8 @@ class CourseVideosView(DeveloperErrorViewMixin, APIView):
                     courseVideoImageUrl: '/video',
                     transcripts: [],
                     status: 'Imported',
+                    file_size: 123,
+                    download_link: 'http:/download_video.com'
                 },
                 {
                     edx_video_id: 'mOckID5',
@@ -102,6 +102,8 @@ class CourseVideosView(DeveloperErrorViewMixin, APIView):
                     courseVideoImageUrl: 'http:/video',
                     transcripts: ['en'],
                     status: 'Failed',
+                    file_size: 0,
+                    download_link: ''
                 },
                 {
                     edx_video_id: 'mOckID3',
@@ -110,6 +112,8 @@ class CourseVideosView(DeveloperErrorViewMixin, APIView):
                     courseVideoImageUrl: null,
                     transcripts: ['en'],
                     status: 'Ready',
+                    file_size: 123,
+                    download_link: 'http:/download_video.com'
                 },
             ],
             concurrent_upload_limit: 4,
@@ -161,50 +165,6 @@ class CourseVideosView(DeveloperErrorViewMixin, APIView):
                 default_video_image_url
             )
         serializer = CourseVideosSerializer(course_videos_context)
-        return Response(serializer.data)
-
-
-@view_auth_classes(is_authenticated=True)
-class VideoDownloadView(DeveloperErrorViewMixin, APIView):
-    """
-    View for course video download.
-    """
-    @apidocs.schema(
-        parameters=[
-            apidocs.string_parameter("course_id", apidocs.ParameterLocation.PATH, description="Course ID"),
-            apidocs.string_parameter("edx_video_id", apidocs.ParameterLocation.PATH, description="edX Video ID"),
-        ],
-        responses={
-            200: VideoDownloadSerializer,
-            401: "The requester is not authenticated",
-            403: "The requester cannot access the specified course",
-            404: "The requested course does not exist",
-        },
-    )
-    @verify_course_exists()
-    def get(self, request: Request, course_id: str, edx_video_id: str):
-        """
-        Get an object containing course videos.
-        **Example Request**
-            GET /api/contentstore/v1/videos/{course_id}/{edx_video_id}
-        **Response Values**
-        If the request is successful, an HTTP 200 "OK" response is returned.
-        The HTTP 200 response contains a single dict that contains keys that
-        are the course's videos.
-        **Example Response**
-        ```json
-        {
-            "download_link": "http://test-download.com/id",
-        }
-        ```
-        """
-        course_key = CourseKey.from_string(course_id)
-
-        if not has_studio_read_access(request.user, course_key):
-            self.permission_denied(request)
-
-        download_link = generate_video_download_link(request, edx_video_id)
-        serializer = VideoDownloadSerializer(download_link)
         return Response(serializer.data)
 
 
