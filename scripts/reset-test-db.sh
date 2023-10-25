@@ -31,7 +31,7 @@ if [[ -z "$BOK_CHOY_HOSTNAME" ]]; then
     MYSQL_HOST=""
     SETTINGS="bok_choy"
 else
-    MYSQL_HOST="--host=edx.devstack.mysql57"
+    MYSQL_HOST="--host=edx.devstack.mysql80"
     SETTINGS="bok_choy_docker"
 fi
 

@@ -6,7 +6,6 @@ AWS_ACCESS_KEY_ID: ''
 AWS_SECRET_ACCESS_KEY: ''
 BUGS_EMAIL: bugs@example.com
 BULK_EMAIL_DEFAULT_FROM_EMAIL: no-reply@example.com
-BADGING_BACKEND: 'lms.djangoapps.badges.backends.tests.dummy_backend.DummyBackend'
 BLOCK_STRUCTURES_SETTINGS:
   # We have CELERY_ALWAYS_EAGER set to True, so there's no asynchronous
   # code running and the celery routing is unimportant.
@@ -24,6 +23,7 @@ CACHES:
       no_delay: true
       ignore_exc: true
       use_pooling: true
+      connect_timeout: 0.5
     KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
     KEY_PREFIX: integration_celery
     LOCATION: ['localhost:11211']
@@ -33,6 +33,7 @@ CACHES:
       no_delay: true
       ignore_exc: true
       use_pooling: true
+      connect_timeout: 0.5
     KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
     KEY_PREFIX: sandbox_default
     LOCATION: ['localhost:11211']
@@ -42,6 +43,7 @@ CACHES:
       no_delay: true
       ignore_exc: true
       use_pooling: true
+      connect_timeout: 0.5
     KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
     KEY_PREFIX: sandbox_general
     LOCATION: ['localhost:11211']
@@ -51,6 +53,7 @@ CACHES:
       no_delay: true
       ignore_exc: true
       use_pooling: true
+      connect_timeout: 0.5
     KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
     KEY_PREFIX: integration_mongo_metadata_inheritance
     LOCATION: ['localhost:11211']
@@ -60,6 +63,7 @@ CACHES:
       no_delay: true
       ignore_exc: true
       use_pooling: true
+      connect_timeout: 0.5
     KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
     KEY_PREFIX: integration_static_files
     LOCATION: ['localhost:11211']
@@ -157,8 +161,6 @@ FEATURES:
   ENABLE_DASHBOARD_SEARCH: True
   # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
   ENABLE_DISCUSSION_HOME_PANEL: True
-  # Enable support for OpenBadges accomplishments
-  ENABLE_OPENBADGES: True
   ENABLE_LTI_PROVIDER: True
   # Enable milestones app
   MILESTONES_APP: True

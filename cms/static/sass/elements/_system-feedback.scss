@@ -401,6 +401,14 @@
     }
   }
 
+  &.wrapper-notification-info {
+    box-shadow: 0 -1px 3px $shadow, inset 0 3px 1px $blue;
+
+    .feedback-symbol {
+      color: $blue;
+    }
+  }
+
   &.wrapper-notification-mini {
     box-shadow: 0 -1px 3px $shadow, inset 0 3px 1px $pink;
   }
@@ -554,15 +562,35 @@
     }
 
     .action-primary {
-      @include blue-button();
+      @extend %btn-primary-blue;
+      @extend %sizing;
 
-      @extend %t-strong;
+      .action-button-text {
+        display: inline-block;
+        vertical-align: baseline;
+      }
 
-      border-color: $blue-d2;
+      .icon {
+        display: inline-block;
+        vertical-align: baseline;
+      }
+
+      // CASE: new/create button
+      &.new-button,
+      &.button-new {
+        @extend %btn-primary-green;
+        @extend %sizing;
+      }
     }
 
     .action-secondary {
       @extend %t-action4;
+      color: $white;
+      cursor: pointer;
+
+      &:hover {
+        color: $gray-l3;
+      }
     }
   }
 

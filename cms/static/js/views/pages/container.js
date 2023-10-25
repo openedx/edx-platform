@@ -48,6 +48,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             BasePage.prototype.initialize.call(this, options);
             this.viewClass = options.viewClass || this.defaultViewClass;
             this.isLibraryPage = (this.model.attributes.category === 'library');
+            this.isLibraryContentPage = (this.model.attributes.category === 'library_content');
             this.nameEditor = new XBlockStringFieldEditor({
                 el: this.$('.wrapper-xblock-field'),
                 model: this.model
@@ -154,7 +155,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     self.delegateEvents();
 
                     // Show/hide the paste button
-                    if (!self.isLibraryPage) {
+                    if (!self.isLibraryPage && !self.isLibraryContentPage) {
                         self.initializePasteButton();
                     }
                 },
@@ -208,32 +209,36 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
          * Given the latest information about the user's clipboard, hide or show the Paste button as appropriate.
          */
         refreshPasteButton(data) {
-            // 'data' is the same data returned by the "get clipboard status" API endpoint
-            // i.e. /api/content-staging/v1/clipboard/
-            if (this.options.canEdit && data.content) {
-                if (["vertical", "sequential", "chapter", "course"].includes(data.content.block_type)) {
-                    // This is not suitable for pasting into a unit.
-                    this.$(".paste-component").hide();
-                } else if (data.content.status === "expired") {
-                    // This has expired and can no longer be pasted.
-                    this.$(".paste-component").hide();
-                } else {
-                    // The thing in the clipboard can be pasted into this unit:
-                    const detailsPopupEl = this.$(".clipboard-details-popup")[0];
-                    detailsPopupEl.querySelector(".detail-block-name").innerText = data.content.display_name;
-                    detailsPopupEl.querySelector(".detail-block-type").innerText = data.content.block_type_display;
-                    detailsPopupEl.querySelector(".detail-course-name").innerText = data.source_context_title;
-                    if (data.source_edit_url) {
-                        detailsPopupEl.setAttribute("href", data.source_edit_url);
-                        detailsPopupEl.classList.remove("no-edit-link");
+            // Do not perform any changes on paste button since they are not
+            // rendered on Library or LibraryContent pages
+            if (!this.isLibraryPage && !this.isLibraryContentPage) {
+                // 'data' is the same data returned by the "get clipboard status" API endpoint
+                // i.e. /api/content-staging/v1/clipboard/
+                if (this.options.canEdit && data.content) {
+                    if (["vertical", "sequential", "chapter", "course"].includes(data.content.block_type)) {
+                        // This is not suitable for pasting into a unit.
+                        this.$(".paste-component").hide();
+                    } else if (data.content.status === "expired") {
+                        // This has expired and can no longer be pasted.
+                        this.$(".paste-component").hide();
                     } else {
-                        detailsPopupEl.setAttribute("href", "#");
-                        detailsPopupEl.classList.add("no-edit-link");
+                        // The thing in the clipboard can be pasted into this unit:
+                        const detailsPopupEl = this.$(".clipboard-details-popup")[0];
+                        detailsPopupEl.querySelector(".detail-block-name").innerText = data.content.display_name;
+                        detailsPopupEl.querySelector(".detail-block-type").innerText = data.content.block_type_display;
+                        detailsPopupEl.querySelector(".detail-course-name").innerText = data.source_context_title;
+                        if (data.source_edit_url) {
+                            detailsPopupEl.setAttribute("href", data.source_edit_url);
+                            detailsPopupEl.classList.remove("no-edit-link");
+                        } else {
+                            detailsPopupEl.setAttribute("href", "#");
+                            detailsPopupEl.classList.add("no-edit-link");
+                        }
+                        this.$(".paste-component").show();
                     }
-                    this.$(".paste-component").show();
+                } else {
+                    this.$(".paste-component").hide();
                 }
-            } else {
-                this.$(".paste-component").hide();
             }
         },
 
@@ -293,13 +298,29 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     }));
                 }
                 if (newFiles.length) {
-                    notices.push(() => new NotificationView.Confirmation({
-                        title: gettext("New files were added to this course's Files & Uploads"),
+                    notices.push(() => new NotificationView.Info({
+                        title: gettext("New file(s) added to Files & Uploads."),
                         message: (
                             gettext("The following required files were imported to this course:") +
                             " "  + newFiles.join(", ")
                         ),
-                        closeIcon: true,
+                        actions: {
+                            primary: {
+                                text: gettext('View files'),
+                                click: function(notification) {
+                                    const section = document.querySelector('[data-course-assets]');
+                                    const assetsUrl = $(section).attr('data-course-assets');
+                                    window.location.href = assetsUrl;
+                                    return;
+                                }
+                            },
+                            secondary: {
+                                text: gettext('Dismiss'),
+                                click: function(notification) {
+                                    return notification.hide();
+                                }
+                            }
+                        }
                     }));
                 }
                 if (notices.length) {

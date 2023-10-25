@@ -81,7 +81,7 @@
 # Saman Ismael <saman.2791@gmail.com>, 2013
 # Saman Ismael <saman.2791@gmail.com>, 2013
 # Sarina Canelake <sarina@tcril.org>, 2014
-# SeyedMahdi Saeid <saeid@edspirit.com>, 2022
+# SeyedMahdi Saeid <saeid@edspirit.com>, 2022-2023
 # Siavash Kavousi <siavash.kavousi.sk@gmail.com>, 2016
 # matata <sina_meftah@yahoo.com>, 2014
 # Sina Shirinpour <sshirinpoor@gmail.com>, 2015
@@ -101,7 +101,7 @@
 # Reza Amini <reza.amini234@gmail.com>, 2014
 # Saman Ismael <saman.2791@gmail.com>, 2013
 # Sarina Canelake <sarina@tcril.org>, 2014
-# SeyedMahdi Saeid <saeid@edspirit.com>, 2022
+# SeyedMahdi Saeid <saeid@edspirit.com>, 2022-2023
 # Siavash Kavousi <siavash.kavousi.sk@gmail.com>, 2016
 # Sina Shirinpour <sshirinpoor@gmail.com>, 2015
 # Somaye Joolaee, 2022
@@ -134,7 +134,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-23 20:42+0000\n"
+"POT-Creation-Date: 2023-10-15 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Somaye Joolaee, 2022\n"
 "Language-Team: Persian (Iran) (https://app.transifex.com/open-edx/teams/6205/fa_IR/)\n"
@@ -235,8 +235,8 @@ msgid "Video"
 msgstr "ویدیو"
 
 #: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr "مساله پیشرفته خالی"
+msgid "Blank Problem"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -340,8 +340,8 @@ msgstr "تحصیلات حرفه‌ای"
 #: common/djangoapps/course_modes/models.py xmodule/annotatable_block.py
 #: xmodule/capa_block.py xmodule/conditional_block.py
 #: xmodule/discussion_block.py xmodule/html_block.py
-#: xmodule/library_content_block.py xmodule/library_sourced_block.py
-#: xmodule/lti_block.py xmodule/split_test_block.py xmodule/unit_block.py
+#: xmodule/library_content_block.py xmodule/lti_block.py
+#: xmodule/split_test_block.py xmodule/unit_block.py
 #: xmodule/word_cloud_block.py xmodule/x_module.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
@@ -3120,6 +3120,12 @@ msgid "Open Response Assessment"
 msgstr "سنجش باز پاسخ"
 
 #: lms/djangoapps/courseware/courses.py
+msgid ""
+"This Open Response Assessment's due dates are set by your instructor and "
+"can't be shifted."
+msgstr ""
+
+#: lms/djangoapps/courseware/courses.py
 msgid "Self Assessment"
 msgstr "خودآزمایی"
 
@@ -3134,13 +3140,6 @@ msgstr "ارزیابی کارکنان"
 #: lms/djangoapps/courseware/courses.py
 msgid "Submission"
 msgstr "تأکید"
-
-#: lms/djangoapps/courseware/courses.py
-msgid ""
-"Open Response Assessment due dates are set by your instructor and can't be "
-"shifted."
-msgstr ""
-"تاریخ تأیید ارزیابی پاسخ باز توسط مربی شما تعیین می شود و قابل تغییر نیست."
 
 #. Translators: 'absolute' is a date such as "Jan 01,
 #. 2020". 'relative' is a fuzzy description of the time until
@@ -3663,6 +3662,16 @@ msgstr ""
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Good"
 msgstr "خوب"
+
+#. Translators: Replier commented on "your" response to your post
+#: lms/djangoapps/discussion/rest_api/discussions_notifications.py
+msgid "your"
+msgstr ""
+
+#. Translators: Replier commented on "their" response to your post
+#: lms/djangoapps/discussion/rest_api/discussions_notifications.py
+msgid "their"
+msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #, python-format
@@ -4598,12 +4607,12 @@ msgstr "تمدید تاریخ مقرر"
 #: lms/djangoapps/instructor/views/tools.py
 #, python-brace-format
 msgid "Users with due date extensions for {0}"
-msgstr "کاربران با افزونه‌های موعد مقرر برای {0}"
+msgstr "کاربران با تمدید سررسید برای {0}"
 
 #: lms/djangoapps/instructor/views/tools.py
 #, python-brace-format
 msgid "Due date extensions for {0} {1} ({2})"
-msgstr "افزونه‌های موعد مقرر برای {0} {1} ({2})"
+msgstr "تمدید سررسید برای {0} {1} ( {2} )"
 
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "Requested task is already running"
@@ -5855,7 +5864,6 @@ msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
 #: openedx/core/djangoapps/user_api/admin.py
-#: xmodule/templates/library-sourced-block-studio-view.html
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/videos_index_pagination.html
@@ -6315,13 +6323,11 @@ msgid "Quotes"
 msgstr "نقل‌قول‌ها"
 
 #: lms/templates/wiki/includes/editor_widget.html
-#, python-format
+#, python-brace-format
 msgid ""
-"Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for"
-" help."
+"Markdown syntax is allowed. See the {start_link}cheatsheet{end_link} for "
+"help."
 msgstr ""
-"به کار بردن Markdown syntax مجاز است. برای راهنمایی %(start_link)sبرگه‌های "
-"آماده%(end_link)s را بببنید"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
@@ -7062,6 +7068,19 @@ msgstr ""
 msgid "Original usage key/ID of the thing that is in the clipboard."
 msgstr "استفاده اصلی کلید/شناسه از چیزی که در کلیپ بورد است."
 
+#: openedx/core/djangoapps/content_tagging/models/base.py
+#: wiki/models/article.py
+msgid "owner"
+msgstr "مالک"
+
+#: openedx/core/djangoapps/content_tagging/models/base.py
+msgid ""
+"Organization that is related to this taxonomy.If None, then this taxonomy is"
+" related to all organizations."
+msgstr ""
+"سازمانی که به این طبقه بندی مربوط می شود. اگر هیچ کدام، پس این طبقه بندی به "
+"همه سازمان ها مربوط می شود."
+
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
 "List of domains that are allowed to make cross-domain requests to this site."
@@ -7357,11 +7376,9 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
-"The Posting availabilty in discussions whether it will be enabled, scheduled"
-" or indefinitely disabled."
+"The Posting availability in discussions whether it will be enabled, "
+"scheduled or indefinitely disabled."
 msgstr ""
-"در دسترس بودن ارسال در بحث فعال، برنامه ریزی شده یا به طور نامحدود غیرفعال "
-"می شود."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "The LTI configuration data for this context/provider."
@@ -7531,6 +7548,14 @@ msgstr "فهرست سیاه {country}  برای {course}"
 msgid "Learner Pathways"
 msgstr "مسیرهای یادگیرنده"
 
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification App"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification Type"
+msgstr ""
+
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
 msgid ""
@@ -7544,12 +7569,9 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "<{p}><{strong}>{replier_name}</{strong}> commented on "
-"<{strong}>{author_name}'s</{strong}> response to your post "
+"<{strong}>{author_name}</{strong}> response to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
-"<{p}><{strong}>{replier_name}</{strong}> در مورد پاسخ "
-"<{strong}>{author_name}</{strong}> به پست شما نظر داد "
-"<{strong}>{post_title}</{strong}></{p}>"
 
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
@@ -7559,6 +7581,40 @@ msgid ""
 msgstr ""
 "<{p}><{strong}>{replier_name}</{strong}> به پست شما پاسخ داد "
 "<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> posted "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{username}</{strong}> asked "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> responded to a post you’re "
+"following: <{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> commented on {author_name}'s "
+"response in a post you’re following <{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+msgid ""
+"Notifications for responses and comments on your posts, and the ones you’re "
+"following, including endorsements to your responses and on your posts."
+msgstr ""
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "The notification preference config version is not up to date."
@@ -9056,18 +9112,6 @@ msgid ""
 msgstr ""
 "شما با موفقیت برنامۀ آموزشی خود را تغییر داده‌اید و تقویم شما روزآمد است."
 
-#: openedx/features/content_tagging/models/base.py wiki/models/article.py
-msgid "owner"
-msgstr "مالک"
-
-#: openedx/features/content_tagging/models/base.py
-msgid ""
-"Organization that is related to this taxonomy.If None, then this taxonomy is"
-" related to all organizations."
-msgstr ""
-"سازمانی که به این طبقه بندی مربوط می شود. اگر هیچ کدام، پس این طبقه بندی به "
-"همه سازمان ها مربوط می شود."
-
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
 #: lms/templates/support/feature_based_enrollments.html
@@ -9391,8 +9435,7 @@ msgstr "داده های XML برای یادداشت"
 #: xmodule/annotatable_block.py xmodule/capa_block.py
 #: xmodule/conditional_block.py xmodule/discussion_block.py
 #: xmodule/html_block.py xmodule/library_content_block.py
-#: xmodule/library_root_xblock.py xmodule/library_sourced_block.py
-#: xmodule/poll_block.py xmodule/unit_block.py
+#: xmodule/library_root_xblock.py xmodule/poll_block.py xmodule/unit_block.py
 #: xmodule/video_block/video_xfields.py xmodule/word_cloud_block.py
 #: xmodule/x_module.py
 msgid "The display name for this component."
@@ -11637,35 +11680,6 @@ msgstr "نام نمایشی کتابخانه"
 msgid "Enter the names of the advanced components to use in your library."
 msgstr "نام مولفه‌های پیشرفته را برای استفاده در کتابخانه خود وارد کنید."
 
-#: xmodule/library_sourced_block.py
-msgid "Library Blocks List"
-msgstr "فهرست بلوک‌های کتابخانه"
-
-#: xmodule/library_sourced_block.py
-msgid "Enter the IDs of the library XBlocks that you wish to use."
-msgstr "شناسه‌های XBlocks کتابخانه‌ای را وارد کنید که مایلید استفاده کنید."
-
-#: xmodule/library_sourced_block.py
-#, python-brace-format
-msgid "A maximum of {0} components may be added."
-msgstr "ممکن است بیشینه {0} مؤلفه اضافه شود."
-
-#: xmodule/library_sourced_block.py
-msgid ""
-"No XBlock has been configured for this component. Use the editor to select "
-"the target blocks."
-msgstr ""
-"هیچ XBlock برای این مؤلفه پیکربندی نشده‌است. برای انتخاب بلوک‌های هدف از "
-"ویرایشگر استفاده کنید."
-
-#: xmodule/library_sourced_block.py
-msgid "Open Editor"
-msgstr "گشودن ویرایشگر"
-
-#: xmodule/library_sourced_block.py
-msgid "Importing Library Block failed - are the IDs valid and readable?"
-msgstr "ورود بلوک کتابخانه موفق نبود- آیا شناسه‌ها معتبر و قابل‌خواندن هستند؟"
-
 #: xmodule/lti_block.py
 msgid ""
 "The display name for this component. Analytics reports may also use the "
@@ -12373,10 +12387,6 @@ msgstr ""
 #: xmodule/tabs.py
 msgid "External Discussion"
 msgstr "گفتگوی خارجی"
-
-#: xmodule/templates/library-sourced-block-studio-view.html
-msgid "Save and Import"
-msgstr "ذخیره و ورود"
 
 #: xmodule/vertical_block.py
 msgid "Enable in-context discussions for the Unit"
@@ -14072,7 +14082,7 @@ msgstr "نشانه‌گذاری این صفحه"
 
 #: lms/templates/conditional_block.html
 msgid "You do not have access to this dependency block."
-msgstr ""
+msgstr "شما به این بلوک وابستگی دسترسی ندارید."
 
 #: lms/templates/course.html
 msgid "LEARN MORE"
@@ -14357,24 +14367,6 @@ msgid "The keys are valid for a limited amount of time. Has the key expired?"
 msgstr ""
 "این کلیدها برای مدت زمان محدودی فعال هستند، آیا این کلید منقضی شده است؟"
 
-#: lms/templates/library-block-author-preview-header.html
-msgid ""
-"Showing all matching content eligible to be added into {display_name}. Each "
-"student will be assigned {max_count} component drawn randomly from this "
-"list."
-msgid_plural ""
-"Showing all matching content eligible to be added into {display_name}. Each "
-"student will be assigned {max_count} components drawn randomly from this "
-"list."
-msgstr[0] ""
-"نمایش همه محتوا منطبق که به {display_name} اضافه شود. به هر یادگیرنده "
-"{max_count} مولفه‌‌ای اختصاص داده می‌شود که به‌طور تصادفی از این فهرست اخذ "
-"شده‌اند."
-msgstr[1] ""
-"نمایش همه محتوا منطبق که به {display_name} اضافه شود. به هر یادگیرنده "
-"{max_count} مولفه‌‌هایی اختصاص داده می‌شود که به‌طور تصادفی از این فهرست اخذ"
-" شده‌اند."
-
 #. Translators:  "External resource" means that this learning module is hosted
 #. on a platform external to the edX LMS
 #: lms/templates/lti.html
@@ -14599,15 +14591,15 @@ msgstr "بازگشت به %s"
 
 #: lms/templates/public_video.html
 msgid "Learn more about this course"
-msgstr ""
+msgstr "درباره این دوره بیشتر بدانید"
 
 #: lms/templates/public_video.html
 msgid "Go to course"
-msgstr ""
+msgstr "برو به دوره"
 
 #: lms/templates/public_video.html
 msgid "Enroll in this course"
-msgstr ""
+msgstr "در این دوره ثبت نام کنید"
 
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
@@ -14865,15 +14857,15 @@ msgstr "صفحه بعدی"
 
 #: lms/templates/studio_render_children_view.html
 msgid "Paste Component"
-msgstr ""
+msgstr "چسباندن مولفه"
 
 #: lms/templates/studio_render_children_view.html
 msgid "From:"
-msgstr ""
+msgstr "از جانب:"
 
 #: lms/templates/studio_render_children_view.html
 msgid "What's in my clipboard?"
-msgstr ""
+msgstr "در کلیپ بورد من چیست؟"
 
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
@@ -15003,15 +14995,15 @@ msgstr "بارگیری پرونده تصویری"
 
 #: lms/templates/video.html
 msgid "Share this video"
-msgstr ""
+msgstr "این ویدئو را به اشتراک بگذارید"
 
 #: lms/templates/video.html
 msgid "Share on {site}"
-msgstr ""
+msgstr "در {site} به اشتراک بگذارید"
 
 #: lms/templates/video.html
 msgid "Copy"
-msgstr ""
+msgstr "کپی "
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -16325,10 +16317,6 @@ msgstr "بارگذاری نمرات یادگیرنده"
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Print or share your certificate:"
 msgstr "تهیه نسخه چاپی یا  اشتراک‌گذاری گواهی‌نامه:"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-msgid "Click the link to see my certificate."
-msgstr "روی پیوند کلیک کنید تا گواهی‌نامه مرا ببینید."
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
@@ -18403,7 +18391,7 @@ msgstr "مدارس"
 
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Register for free"
-msgstr ""
+msgstr "عضویت رایگان"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Profile"
@@ -19362,7 +19350,7 @@ msgstr "افزودن همکار"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Limited Staff"
-msgstr ""
+msgstr "پرسنل محدود"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -19371,10 +19359,15 @@ msgid ""
 "grades and access all course data. Limited Staff don't have access to your "
 "course in Studio. You can only give course team roles to enrolled users."
 msgstr ""
+"اعضای تیم دوره با نقش کارکنان محدود به شما در مدیریت دوره کمک می کنند. "
+"کارکنان محدود می توانند یادگیرندگان را ثبت نام کنند و از ثبت نام خارج کنند، "
+"همچنین نمرات آنها را تغییر دهند و به همه داده های دوره دسترسی داشته باشند. "
+"کارکنان محدود به دوره شما در استودیو دسترسی ندارند. شما فقط می توانید نقش "
+"های تیم دوره را به کاربران ثبت نام شده بدهید."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Limited Staff"
-msgstr ""
+msgstr "کارکنان محدود را اضافه کنید"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Admin"
@@ -19599,6 +19592,8 @@ msgid ""
 "You can include keywords in your messages. For list of available keywords "
 "see the {start_link}documentation{end_link}."
 msgstr ""
+"می توانید کلمات کلیدی را در پیام های خود قرار دهید. برای فهرست کلمات کلیدی "
+"موجود به {start_link}مستندات {end_link} مراجعه کنید."
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"
@@ -21382,6 +21377,8 @@ msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
 "{unit_link} as the URL value."
 msgstr ""
+"برای ایجاد پیوند به این واحد از یک جزء HTML در این دوره، {unit_link} به "
+"عنوان مقدار URL وارد کنید."
 
 #: cms/templates/course-create-rerun.html
 msgid "Create a Course Rerun of:"
@@ -21570,14 +21567,16 @@ msgid ""
 "order to display the discussions sidebar, discussions xBlocks will no longer"
 " be visible to learners."
 msgstr ""
+"این دوره از نسخه ارتقا یافته انجمن گفتگوی edx استفاده می کند. برای نمایش "
+"نوار کناری بحث‌ها، xBlocks بحث دیگر برای فراگیران قابل مشاهده نخواهد بود."
 
 #: cms/templates/course_outline.html
 msgid " Learn more"
-msgstr ""
+msgstr "بیشتر بدانید"
 
 #: cms/templates/course_outline.html
 msgid "Share feedback"
-msgstr ""
+msgstr "اشتراک‌گذاری بازخورد"
 
 #: cms/templates/course_outline.html
 #: cms/templates/widgets/deprecated-course-key-warning.html
@@ -23277,6 +23276,24 @@ msgstr ""
 "هرزنامه‌ها را بررسی کنید، اگر باز هم آن را نیافتید از طریق پیوند زیر درخواست"
 " راهنمایی نمایید."
 
+#: cms/templates/library-block-author-preview-header.html
+msgid ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} component drawn randomly from this "
+"list."
+msgid_plural ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} components drawn randomly from this "
+"list."
+msgstr[0] ""
+"نمایش همه محتوای منطبق که واجد شرایط اضافه شدن به {display_name} هستند. به "
+"هر دانش آموز جزء {max_count} اختصاص داده می شود که به طور تصادفی از این لیست"
+" گرفته شده است."
+msgstr[1] ""
+"نمایش همه محتوای منطبق که واجد شرایط اضافه شدن به {display_name} هستند. به "
+"هر دانش آموز مولفه های {max_count} اختصاص داده می شود که به طور تصادفی از "
+"این لیست گرفته شده اند."
+
 #: cms/templates/library.html
 msgid "Content Library"
 msgstr "کتابخانه محتوا"
@@ -24267,20 +24284,12 @@ msgid "Expand or Collapse"
 msgstr "گسترده یا فشرده"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Access Settings"
-msgstr "تنظیمات دسترسی"
-
-#: cms/templates/studio_xblock_wrapper.html
-msgid "Set Access"
-msgstr "تنظیم دسترسی"
-
-#: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"
-msgstr ""
+msgstr "کپی به کلیپ بورد"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"
-msgstr ""
+msgstr "مدیریت دسترسی"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
@@ -24638,10 +24647,6 @@ msgstr "پیمایش دوره آموزشی"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "طرح کلی"
-
-#: cms/templates/widgets/header.html
-msgid "Files & Media"
-msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

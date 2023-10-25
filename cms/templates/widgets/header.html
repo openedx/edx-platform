@@ -56,7 +56,6 @@
                 certificates_url = reverse('certificates_list_handler', kwargs={'course_key_string': str(course_key)})
             checklists_url = reverse('checklists_handler', kwargs={'course_key_string': str(course_key)})
             pages_and_resources_mfe_enabled = ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND.is_enabled(context_course.id)
-            studio_home_mfe_enabled = toggles.use_new_home_page()
             course_outline_mfe_enabled = toggles.use_new_course_outline_page(context_course.id)
             updates_mfe_enabled = toggles.use_new_updates_page(context_course.id)
             files_uploads_mfe_enabled = toggles.use_new_files_uploads_page(context_course.id)
@@ -126,12 +125,12 @@
                   % endif
                   %if not files_uploads_mfe_enabled:
                   <li class="nav-item nav-course-courseware-uploads">
-                    <a href="${assets_url}">${_("Files & Uploads")}</a>
+                    <a href="${assets_url}">${_("Files")}</a>
                   </li>
                   %endif
                   %if files_uploads_mfe_enabled:
                   <li class="nav-item nav-course-courseware-uploads">
-                    <a href="${get_files_uploads_url(course_key)}">${_("Files & Media")}</a>
+                    <a href="${get_files_uploads_url(course_key)}">${_("Files")}</a>
                   </li>
                   %endif
                   % if not pages_and_resources_mfe_enabled:
@@ -245,7 +244,7 @@
                   % endif
                   % if export_mfe_enabled:
                   <li class="nav-item nav-course-tools-import">
-                    <a href="${get_export_url(course_key)}">${_("Import")}</a>
+                    <a href="${get_export_url(course_key)}">${_("Export")}</a>
                   </li>
                   % endif
                   % if toggles.EXPORT_GIT.is_enabled() and context_course.giturl:
@@ -364,7 +363,7 @@
           <li class="nav-item nav-not-signedin-help">
             <a href="${get_online_help_info(online_help_token)['doc_url']}" title="${_('Contextual Online Help')}" rel="noopener" target="_blank">${_("Help")}</a>
           </li>
-          % if static.get_value('ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION')):
+          % if static.get_value('ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION')) and settings.FEATURES.get('SHOW_REGISTRATION_LINKS', True):
               <li class="nav-item nav-not-signedin-signup">
                 <a class="action action-signup" href="${settings.FRONTEND_REGISTER_URL}?next=${quote_plus(request.build_absolute_uri(settings.LOGIN_URL))}">${_("Sign Up")}</a>
               </li>

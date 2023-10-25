@@ -120,8 +120,11 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
                 'welcomePageRedirectUrl': None,
                 'pipelineUserDetails': self.pipeline_user_details,
             },
-            'registrationFields': {},
+            'registrationFields': {
+                'fields': {},
+            },
             'optionalFields': {
+                'fields': {},
                 'extended_profile': [],
             },
         }
@@ -418,9 +421,9 @@ class SendAccountActivationEmail(UserAPITestCase):
         Create a user, then log in.
         """
         super().setUp()
-        self.user = UserFactory()
+        self.user = UserFactory(password=self.TEST_PASSWORD)
         Registration().register(self.user)
-        result = self.client.login(username=self.user.username, password="test")
+        result = self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         assert result, 'Could not log in'
         self.path = reverse('send_account_activation_email')
 

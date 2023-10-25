@@ -26,8 +26,6 @@ from simple_history.models import HistoricalRecords
 from common.djangoapps.student import models_api as student_api
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
-from lms.djangoapps.badges.events.course_complete import course_badge_check
-from lms.djangoapps.badges.events.course_meta import completion_check, course_group_check
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.instructor_task.models import InstructorTask
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED, COURSE_CERT_CHANGED, COURSE_CERT_REVOKED
@@ -378,6 +376,10 @@ class GeneratedCertificate(models.Model):
 
         if not grade:
             grade = ''
+        # the grade can come through revocation as a float, so we must convert it to a string to be compatible with the
+        # `CERTIFICATE_REVOKED` event definition
+        elif isinstance(grade, float):
+            grade = str(grade)
 
         if not mode:
             mode = self.mode
@@ -1239,31 +1241,6 @@ class CertificateTemplateAsset(TimeStampedModel):
     class Meta:
         get_latest_by = 'created'
         app_label = "certificates"
-
-
-@receiver(COURSE_CERT_AWARDED, sender=GeneratedCertificate)
-# pylint: disable=unused-argument
-def create_course_badge(sender, user, course_key, status, **kwargs):
-    """
-    Standard signal hook to create course badges when a certificate has been generated.
-    """
-    course_badge_check(user, course_key)
-
-
-@receiver(COURSE_CERT_AWARDED, sender=GeneratedCertificate)
-def create_completion_badge(sender, user, course_key, status, **kwargs):  # pylint: disable=unused-argument
-    """
-    Standard signal hook to create 'x courses completed' badges when a certificate has been generated.
-    """
-    completion_check(user)
-
-
-@receiver(COURSE_CERT_AWARDED, sender=GeneratedCertificate)
-def create_course_group_badge(sender, user, course_key, status, **kwargs):  # pylint: disable=unused-argument
-    """
-    Standard signal hook to create badges when a user has completed a prespecified set of courses.
-    """
-    course_group_check(user, course_key)
 
 
 class CertificateGenerationCommandConfiguration(ConfigurationModel):

@@ -2,6 +2,7 @@
 Test batch_get_or_create in ExternalId model
 """
 
+import django
 from django.test import TransactionTestCase
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.external_user_ids.models import ExternalId
@@ -19,7 +20,7 @@ class TestBatchGenerateExternalIds(TransactionTestCase):
     # 3 - Get external ids that already exists
     # 4 - BEGIN (from bulk_create)
     # 5 - Create new external ids
-    EXPECTED_NUM_OF_QUERIES = 5
+    EXPECTED_NUM_OF_QUERIES = 5 if django.VERSION < (4, 2) else 6
 
     def test_batch_get_or_create_user_ids(self):
         """

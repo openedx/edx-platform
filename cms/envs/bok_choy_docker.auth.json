@@ -24,7 +24,7 @@
     "DATABASES": {
         "default": {
             "ENGINE": "django.db.backends.mysql",
-            "HOST": "edx.devstack.mysql57",
+            "HOST": "edx.devstack.mysql80",
             "NAME": "edxtest",
             "PASSWORD": "",
             "PORT": "3306",
@@ -32,7 +32,7 @@
         },
         "student_module_history": {
             "ENGINE": "django.db.backends.mysql",
-            "HOST": "edx.devstack.mysql57",
+            "HOST": "edx.devstack.mysql80",
             "NAME": "student_module_history_test",
             "PASSWORD": "",
             "PORT": "3306",

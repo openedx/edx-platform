@@ -7,13 +7,6 @@ name: Consistent Python dependencies
 
 on:
   pull_request:
-    paths:
-      - 'requirements/**'
-  push:
-    branches:
-      - master
-    paths:
-      - 'requirements/**'
 
 defaults:
   run:
@@ -25,16 +18,37 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
+      # Only run remaining steps if there are changes to requirements/**
+      - name: "Decide whether to short-circuit"
+        env:
+          GH_TOKEN: "${{ github.token }}"
+          PR_URL: "${{ github.event.pull_request.html_url }}"
+        run: |
+          paths=$(gh pr diff "$PR_URL" --name-only)
+          echo $'Paths touched in PR:\n'"$paths"
+
+          # The ^"? is because git may quote weird file paths
+          matched="$(echo "$paths" | grep -P '^"?requirements/' || true)"
+          echo $'Relevant paths:\n'"$matched"
+          if [[ -n "$matched" ]]; then
+              echo "RELEVANT=true" >> "$GITHUB_ENV"
+          fi
+
       - uses: actions/checkout@v3
+        if: ${{ env.RELEVANT == 'true' }}
 
       - uses: actions/setup-python@v4
+        if: ${{ env.RELEVANT == 'true' }}
         with:
           python-version: '3.8'
 
-      - run: |
+      - name: "Recompile requirements"
+        if: ${{ env.RELEVANT == 'true' }}
+        run: |
           make compile-requirements
 
       - name: Fail if compiling requirements caused changes
+        if: ${{ env.RELEVANT == 'true' }}
         run: |
           SUMMARY_HELP=$(cat <<'EOMARKDOWN'
           # Inconsistent Python dependencies

@@ -97,7 +97,7 @@ class GradeViewTestMixin(SharedModuleStoreTestCase):
 
     def setUp(self):
         super().setUp()
-        self.password = 'test'
+        self.password = self.TEST_PASSWORD
         self.global_staff = GlobalStaffFactory.create()
         self.student = UserFactory(password=self.password, username='student', email='student@example.com')
         self.other_student = UserFactory(

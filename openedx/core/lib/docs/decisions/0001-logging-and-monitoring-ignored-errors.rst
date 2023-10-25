@@ -4,7 +4,7 @@ Logging and monitoring ignored errors
 Status
 ------
 
-Accepted
+Partially Superseded (see 0002-logging-and-monitoring-expected-errors-removed.rst)
 
 Context
 -------
@@ -14,7 +14,7 @@ We had two recent Production issues that took longer than necessary to diagnose 
 Decision
 ________
 
-Add a capability for logging and monitoring ignored errors and expected errors. The feature will be configurable, the monitoring will be available by default, and the logging will be opt-in as needed.
+Add a capability for logging and monitoring ignored errors. The feature will be configurable, the monitoring will be available by default, and the logging will be opt-in as needed.
 
 Note: This feature is being added to edx-platform to start, but could be moved to edx-django-utils monitoring for use in other IDAs.
 
@@ -23,6 +23,13 @@ Consequence
 
 The new capabilities have been built in edx-platform, although they could be moved to edx-django-utils monitoring in the future for use in other IDAs.
 
-The new feature adds the ability to mark errors as expected, temporarily or permanently, even without "ignoring" them everywhere. For example, the errors and stacktraces would still appear, but it would be possible for alert conditions to ignore expected errors.
+The new feature adds the ability to mark errors as ignored, temporarily or permanently, even without "ignoring" them everywhere. For example, the errors and stacktraces would still appear, but it would be possible for alert conditions to ignore errors.
 
-See how_tos/logging-and-monitoring-expected-errors.rst for more information.
+See how_tos/logging-and-monitoring-ignored-errors.rst for more information.
+
+Changelog
+---------
+
+* **2023-09-28** - Changed status to "Partially Superseded", because expected errors will no longer be handled. See 0002-logging-and-monitoring-expected-errors-removed.rst for details.
+
+* **2021-03-17** - Original "Accepted" ADR

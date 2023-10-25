@@ -729,7 +729,9 @@ def videos_post(course, request):
     """
 
     if use_mock_video_uploads():
-        return {'files': [{'file_name': 'video.mp4', 'upload_url': 'http://example.com/put_video'}]}, 200
+        return {'files': [{
+            'file_name': 'video.mp4', 'upload_url': 'http://example.com/put_video', 'edx_video_id': '1234'
+        }]}, 200
 
     error = None
     data = request.json

@@ -9,6 +9,7 @@ else:
 %>
 </%def>
 <%!
+from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from cms.djangoapps.contentstore.helpers import xblock_studio_url, xblock_type_display_name
@@ -166,7 +167,10 @@ from openedx.core.djangolib.markup import HTML, Text
 
             <article class="content-primary">
                 <div class="container-message wrapper-message"></div>
-                <section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" data-locator="${xblock_locator}" data-course-key="${xblock_locator.course_key}">
+                <%
+                    assets_url = reverse('assets_handler', kwargs={'course_key_string': str(xblock_locator.course_key)})
+                %>
+                <section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" data-locator="${xblock_locator}" data-course-key="${xblock_locator.course_key}" data-course-assets="${assets_url}">
                 </section>
                 <div class="ui-loading">
                     <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Loading")}</span></p>
