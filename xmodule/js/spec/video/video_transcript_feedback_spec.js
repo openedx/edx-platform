@@ -7,10 +7,9 @@
         var videoId = "365b710a-6dd6-11ee-b962-0242ac120002";
         var userId = 1;
         var currentLanguage = "en";
-        var aiTranslationsUrl = "http://localhost:18760/api/v1";
-        var getAITranscriptUrl = aiTranslationsUrl + '/video-transcript' + '?transcript_language=' + currentLanguage + '&video_uuid=' + videoId;
-        var getTranscriptFeedbackUrl = aiTranslationsUrl + '/transcript-feedback' + '?transcript_language=' + currentLanguage + '&video_uuid=' + videoId + '&user_id=' + userId;
-        var sendTranscriptFeedbackUrl = aiTranslationsUrl + '/transcript-feedback/';
+        var getAITranscriptUrl = '/video-transcript' + '?transcript_language=' + currentLanguage + '&video_uuid=' + videoId;
+        var getTranscriptFeedbackUrl = '/transcript-feedback' + '?transcript_language=' + currentLanguage + '&video_uuid=' + videoId + '&user_id=' + userId;
+        var sendTranscriptFeedbackUrl = '/transcript-feedback/';
 
         beforeEach(function() {
             state = jasmine.initializePlayer('video_transcript_feedback.html');
@@ -52,7 +51,7 @@
                 });
 
                 expect(state.videoTranscriptFeedback.shouldShowWidget).toHaveBeenCalled();
-                expect(getAITranscriptCall.args[0].url).toEqual(getAITranscriptUrl);
+                expect(getAITranscriptCall.args[0].url).toEqual(state.videoTranscriptFeedback.aiTranslationsUrl + getAITranscriptUrl);
                 expect(getAITranscriptCall.args[0].type).toEqual('GET');
                 expect(getAITranscriptCall.args[0].async).toEqual(false);
                 expect(getAITranscriptCall.args[0].success).toEqual(jasmine.any(Function));
@@ -79,7 +78,7 @@
                 });
 
                 expect(state.videoTranscriptFeedback.getFeedbackForCurrentTranscript).toHaveBeenCalled();
-                expect(getTranscriptFeedbackCall.args[0].url).toEqual(getTranscriptFeedbackUrl);
+                expect(getTranscriptFeedbackCall.args[0].url).toEqual(state.videoTranscriptFeedback.aiTranslationsUrl + getTranscriptFeedbackUrl);
                 expect(getTranscriptFeedbackCall.args[0].type).toEqual('GET');
                 expect(getTranscriptFeedbackCall.args[0].success).toEqual(jasmine.any(Function));
                 expect(getTranscriptFeedbackCall.args[0].error).toEqual(jasmine.any(Function));
@@ -166,7 +165,7 @@
                     return call.args[0].url.match(/.+transcript-feedback.+$/) && call.args[0].type === 'POST';
                 });
 
-                expect(sendTranscriptFeedbackCall.args[0].url).toEqual(sendTranscriptFeedbackUrl);
+                expect(sendTranscriptFeedbackCall.args[0].url).toEqual(state.videoTranscriptFeedback.aiTranslationsUrl + sendTranscriptFeedbackUrl);
                 expect(sendTranscriptFeedbackCall.args[0].type).toEqual('POST');
                 expect(sendTranscriptFeedbackCall.args[0].dataType).toEqual('json');
                 expect(sendTranscriptFeedbackCall.args[0].data).toEqual({
