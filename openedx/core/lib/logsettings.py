@@ -138,6 +138,12 @@ def log_python_warnings():
         category=DeprecationWarning,
         module='elasticsearch'
     )
+    warnings.filterwarnings(
+        'ignore',
+        'Using or importing the ABCs from \'collections\' instead of from \'collections.abc\' is deprecated.*',
+        category=DeprecationWarning,
+        module="sass",
+    )
     # try:
     #     # There are far too many of these deprecation warnings in startup to output for every management command;
     #     # suppress them until we've fixed at least the most common ones as reported by the test suite
