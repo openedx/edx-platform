@@ -261,6 +261,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         assert 'expires_in' in data
         assert data['expires_in'] > 0
         assert data['token_type'] == 'JWT'
+
         self.assert_valid_jwt_access_token(
             data['access_token'],
             self.user,
