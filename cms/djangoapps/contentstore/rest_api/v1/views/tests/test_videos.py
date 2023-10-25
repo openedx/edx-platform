@@ -18,7 +18,6 @@ from rest_framework import status
 from cms.djangoapps.contentstore.video_storage_handlers import get_all_transcript_languages
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
-from xmodule.video_block.transcripts_utils import Transcript
 
 from ...mixins import PermissionAccessMixin
 
@@ -89,7 +88,6 @@ class CourseVideosViewTest(CourseTestCase, PermissionAccessMixin):
         imageSettings = response.data["video_image_settings"]
         self.assertIn("video_image_upload_enabled", imageSettings)
         self.assertTrue(imageSettings["video_image_upload_enabled"])
-
 
     def test_VideoTranscriptEnabledFlag_enabled(self):
         """
