@@ -123,9 +123,6 @@ FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
 # shown in Studio in a separate list.
 FEATURES['ENABLE_SEPARATE_ARCHIVED_COURSES'] = True
 
-# Enable support for OpenBadges accomplishments
-FEATURES['ENABLE_OPENBADGES'] = True
-
 # Enable partner support link in Studio footer
 PARTNER_SUPPORT_EMAIL = 'partner-support@example.com'
 

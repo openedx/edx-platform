@@ -141,7 +141,7 @@ class RuntimeShim:
         warnings.warn(
             "Use of runtime.render_template is deprecated. "
             "For template files included with your XBlock (which is preferable), use "
-            "xblockutils.resources.ResourceLoader.render_mako_template to render them, or use a JavaScript-based "
+            "xblock.utils.resources.ResourceLoader.render_mako_template to render them, or use a JavaScript-based "
             "template instead. For template files that are part of the LMS/Studio, use the 'mako' XBlock service.",
             DeprecationWarning, stacklevel=2,
         )

@@ -9,7 +9,12 @@ from common.djangoapps.util.password_policy_validators import DEFAULT_MAX_PASSWO
 INVALID_NAMES = [
     None,
     '',
-    ''
+    'http://',
+    'https://',
+    '<html_name>',
+    'https://www.example.com',
+    'Valid name http://www.example.com',
+    'Valid name <tag>',
 ]
 
 INVALID_USERNAMES_ASCII = [

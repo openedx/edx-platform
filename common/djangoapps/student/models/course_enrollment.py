@@ -449,7 +449,7 @@ class CourseEnrollment(models.Model):
 
         if activation_changed or mode_changed:
             self.save()
-            self._update_enrollment_in_request_cache(
+            self._update_enrollment_state_in_request_cache(
                 self.user,
                 self.course_id,
                 CourseEnrollmentState(self.mode, self.is_active),
@@ -1337,7 +1337,7 @@ class CourseEnrollment(models.Model):
                 enrollment_state = CourseEnrollmentState(record.mode, record.is_active)
             except cls.DoesNotExist:
                 enrollment_state = CourseEnrollmentState(None, None)
-            cls._update_enrollment_in_request_cache(user, course_key, enrollment_state)
+            cls._update_enrollment_state_in_request_cache(user, course_key, enrollment_state)
         return enrollment_state
 
     @classmethod
@@ -1354,7 +1354,7 @@ class CourseEnrollment(models.Model):
         cache = cls._get_mode_active_request_cache()  # lint-amnesty, pylint: disable=redefined-outer-name
         for record in records:
             enrollment_state = CourseEnrollmentState(record.mode, record.is_active)
-            cls._update_enrollment(cache, record.user.id, course_key, enrollment_state)
+            cls._update_enrollment_state_in_cache(cache, record.user.id, course_key, enrollment_state)
 
     @classmethod
     def _get_mode_active_request_cache(cls):
@@ -1372,15 +1372,16 @@ class CourseEnrollment(models.Model):
         return cls._get_mode_active_request_cache().get((user.id, course_key))
 
     @classmethod
-    def _update_enrollment_in_request_cache(cls, user, course_key, enrollment_state):
+    def _update_enrollment_state_in_request_cache(cls, user, course_key, enrollment_state):
         """
         Updates the cached value for the user's enrollment in the
         request cache.
         """
-        cls._update_enrollment(cls._get_mode_active_request_cache(), user.id, course_key, enrollment_state)
+        cls._update_enrollment_state_in_cache(cls._get_mode_active_request_cache(),
+                                              user.id, course_key, enrollment_state)
 
     @classmethod
-    def _update_enrollment(cls, cache, user_id, course_key, enrollment_state):  # lint-amnesty, pylint: disable=redefined-outer-name
+    def _update_enrollment_state_in_cache(cls, cache, user_id, course_key, enrollment_state):  # lint-amnesty, pylint: disable=redefined-outer-name
         """
         Updates the cached value for the user's enrollment in the
         given cache.

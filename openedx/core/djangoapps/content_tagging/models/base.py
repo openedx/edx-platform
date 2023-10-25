@@ -3,12 +3,12 @@ Content Tagging models
 """
 from __future__ import annotations
 
+from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Exists, OuterRef, Q, QuerySet
+from django.db.models import Q, QuerySet
 from django.utils.translation import gettext as _
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import LearningContextKey
-from opaque_keys.edx.locator import BlockUsageLocator
+from opaque_keys.edx.keys import LearningContextKey, UsageKey
 from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
 from organizations.models import Organization
 
@@ -91,7 +91,7 @@ class ContentObjectTag(ObjectTag):
         proxy = True
 
     @property
-    def object_key(self) -> BlockUsageLocator | LearningContextKey:
+    def object_key(self) -> UsageKey | LearningContextKey:
         """
         Returns the object ID parsed as a UsageKey or LearningContextKey.
         Raises InvalidKeyError object_id cannot be parse into one of those key types.
@@ -99,75 +99,14 @@ class ContentObjectTag(ObjectTag):
         Returns None if there's no object_id.
         """
         try:
-            return LearningContextKey.from_string(str(self.object_id))
+            return LearningContextKey.from_string(self.object_id)
         except InvalidKeyError:
-            return BlockUsageLocator.from_string(str(self.object_id))
+            return UsageKey.from_string(self.object_id)
 
-
-class ContentTaxonomyMixin:
-    """
-    Taxonomy which can only tag Content objects (e.g. XBlocks or Courses) via ContentObjectTag.
-
-    Also ensures a valid TaxonomyOrg owner relationship with the content object.
-    """
-
-    @classmethod
-    def taxonomies_for_org(
-        cls,
-        queryset: QuerySet,
-        org: Organization | None = None,
-    ) -> QuerySet:
-        """
-        Filters the given QuerySet to those ContentTaxonomies which are available for the given organization.
-
-        If no `org` is provided, then only ContentTaxonomies available to all organizations are returned.
-        If `org` is provided, then ContentTaxonomies available to this organizations are also returned.
-        """
-        org_short_name = org.short_name if org else None
-        return queryset.filter(
-            Exists(
-                TaxonomyOrg.get_relationships(
-                    taxonomy=OuterRef("pk"),
-                    rel_type=TaxonomyOrg.RelType.OWNER,
-                    org_short_name=org_short_name,
-                )
-            )
-        )
-
-    def _check_object(self, object_tag: ObjectTag) -> bool:
-        """
-        Returns True if this ObjectTag has a valid object_id.
-        """
-        content_tag = ContentObjectTag.cast(object_tag)
+    def clean(self):
+        super().clean()
+        # Make sure that object_id is a valid key
         try:
-            content_tag.object_key
-        except InvalidKeyError:
-            return False
-        return super()._check_object(content_tag)
-
-    def _check_taxonomy(self, object_tag: ObjectTag) -> bool:
-        """
-        Returns True if this taxonomy is owned by the tag's org.
-        """
-        content_tag = ContentObjectTag.cast(object_tag)
-        try:
-            object_key = content_tag.object_key
-        except InvalidKeyError:
-            return False
-        if not TaxonomyOrg.get_relationships(
-            taxonomy=self,
-            rel_type=TaxonomyOrg.RelType.OWNER,
-            org_short_name=object_key.org,
-        ).exists():
-            return False
-        return super()._check_taxonomy(content_tag)
-
-
-class ContentTaxonomy(ContentTaxonomyMixin, Taxonomy):
-    """
-    Taxonomy that accepts ContentTags,
-    and ensures a valid TaxonomyOrg owner relationship with the content object.
-    """
-
-    class Meta:
-        proxy = True
+            self.object_key
+        except InvalidKeyError as err:
+            raise ValidationError("object_id is not a valid opaque key string.") from err
