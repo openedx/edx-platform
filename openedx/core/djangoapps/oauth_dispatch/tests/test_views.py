@@ -258,10 +258,10 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         response = self._post_request(self.user, self.restricted_dot_app, token_type='jwt')
         assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
+
         assert 'expires_in' in data
         assert data['expires_in'] > 0
         assert data['token_type'] == 'JWT'
-
         self.assert_valid_jwt_access_token(
             data['access_token'],
             self.user,
