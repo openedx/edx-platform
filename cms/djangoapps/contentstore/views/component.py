@@ -193,7 +193,7 @@ def container_handler(request, usage_key_string):
                     break
                 index += 1
 
-            flashcard_link = f'http://localhost:18000/flashcard/{course.id}/{unit.scope_ids.usage_id}'
+            flashcard_link = f'http://localhost:8491/api/v1/cards/{course.id}/{unit.scope_ids.usage_id}'
 
             # Get the status of the user's clipboard so they can paste components if they have something to paste
             user_clipboard = content_staging_api.get_user_clipboard_json(request.user.id, request)
