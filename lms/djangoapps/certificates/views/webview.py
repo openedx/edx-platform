@@ -441,6 +441,195 @@ def render_preview_certificate(request, course_id):
     """
     return render_html_view(request, str(course_id))
 
+@login_required
+def render_upsell_preview(request, course_id):
+    """
+    This view renders the course certificate for upselling the learner with a limited preview
+    """
+    user = request.user
+    user_id = user.id
+    platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
+    configuration = CertificateHtmlViewConfiguration.get_config()
+
+    # Kick the user back to the "Invalid" screen if the feature is disabled globally
+    if not settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
+        log.info(
+            "Invalid cert: HTML certificates platform SETTING disabled")
+        return _render_invalid_certificate(request, course_id, platform_name, configuration)
+
+    # Load the course and user objects
+    try:
+        course_key = CourseKey.from_string(course_id)
+        course = get_course_by_id(course_key)
+
+    # For any course or user exceptions, kick the user back to the "Invalid" screen
+    except (InvalidKeyError, Http404) as exception:
+        error_str = (
+            "Invalid cert: error finding course %s "
+            "Specific error: %s"
+        )
+        log.info(error_str, course_id, str(exception))
+        return _render_invalid_certificate(request, course_id, platform_name, configuration)
+
+    course_overview = get_course_overview_or_none(course_key)
+
+    # Kick the user back to the "Invalid" screen if the feature is disabled for the course
+    if not course.cert_html_view_enabled:
+        log.info(
+            "Invalid cert: HTML certificates disabled for %s. User id: %d",
+            course_id,
+            user_id,
+        )
+        return _render_invalid_certificate(request, course_id, platform_name, configuration)
+
+    # Get the active certificate configuration for this course
+    # If we do not have an active certificate, we'll need to send the user to the "Invalid" screen
+    # Passing in the 'preview' parameter, if specified, will return a configuration, if defined
+    active_configuration = get_active_web_certificate(course, is_preview_mode=True)
+    if active_configuration is None:
+        log.info(
+            "Invalid cert: course %s does not have an active configuration. User id: %d",
+            course_id,
+            user_id,
+        )
+        return _render_invalid_certificate(request, course_id, platform_name, configuration)
+    # Load user's certificate
+    if not settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS"):
+        if course_overview.certificate_available_date and not course_overview.self_paced:
+            modified_date = course_overview.certificate_available_date
+        else:
+            modified_date = datetime.now().date()
+    else:
+        if (
+            course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE
+            and course_overview.certificate_available_date
+            and not course_overview.self_paced
+        ):
+            modified_date = course_overview.certificate_available_date
+        elif course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END:
+            modified_date = course_overview.end
+        else:
+            modified_date = datetime.now().date()
+    user_certificate = GeneratedCertificate(
+        mode='verified', # TODO: We need a better encoding here
+        verify_uuid=str(uuid4().hex),
+        modified_date=modified_date,
+        created_date=datetime.now().date(),
+    )
+    if not user_certificate:
+        log.info(
+            "Invalid cert: User %d does not have eligible cert for %s.",
+            user_id,
+            course_id,
+        )
+        return _render_invalid_certificate(request, course_id, platform_name, configuration)
+
+    # Get data from Discovery service that will be necessary for rendering this Certificate.
+    catalog_data = _get_catalog_data_for_course(course_key)
+
+    # Determine whether to use the standard or custom template to render the certificate.
+    custom_template = None
+    custom_template_language = None
+    if settings.FEATURES.get('CUSTOM_CERTIFICATE_TEMPLATES_ENABLED', False):
+        log.info("Custom certificate for course %s", course_id)
+        custom_template, custom_template_language = _get_custom_template_and_language(
+            course.id,
+            user_certificate.mode,
+            catalog_data.pop('content_language', None)
+        )
+
+    # Determine the language that should be used to render the certificate.
+    # For the standard certificate template, use the user language. For custom templates, use
+    # the language associated with the template.
+    user_language = translation.get_language()
+    certificate_language = custom_template_language if custom_template else user_language
+
+    log.info(
+        "certificate language is: %s for the course: %s",
+        certificate_language,
+        course_key
+    )
+
+    # Generate the certificate context in the correct language, then render the template.
+    with translation.override(certificate_language):
+        context = {'user_language': user_language}
+
+        _update_context_with_basic_info(context, course_id, platform_name, configuration)
+
+        context['certificate_data'] = active_configuration
+
+        # Append/Override the existing view context values with any mode-specific ConfigurationModel values
+        context.update(configuration.get(user_certificate.mode, {}))
+
+        # Append organization info
+        _update_organization_context(context, course)
+
+        # Append course info
+        _update_course_context(request, context, course, platform_name)
+
+        # Append course run info from discovery
+        context.update(catalog_data)
+
+        # Append user info
+        _update_context_with_user_info(context, user, user_certificate)
+
+        # Append social sharing info
+        _update_social_context(request, context, course, user_certificate, platform_name)
+
+        # Append/Override the existing view context values with certificate specific values
+        _update_certificate_context(context, course, course_overview, user_certificate, platform_name)
+
+        # Add certificate header/footer data to current context
+        context.update(get_certificate_header_context(is_secure=request.is_secure()))
+        context.update(get_certificate_footer_context())
+
+        # Append/Override the existing view context values with any course-specific static values from Advanced Settings
+        context.update(course.cert_html_view_overrides)
+
+        context.update({
+            'disable_header': True,
+            'disable_footer': True,
+        })
+
+        # Track certificate view events
+        _track_certificate_events(request, course, user, user_certificate)
+
+        try:
+            # .. filter_implemented_name: CertificateRenderStarted
+            # .. filter_type: org.openedx.learning.certificate.render.started.v1
+            context, custom_template = CertificateRenderStarted.run_filter(
+                context=context,
+                custom_template=custom_template,
+            )
+        except CertificateRenderStarted.RenderAlternativeInvalidCertificate as exc:
+            response = _render_invalid_certificate(
+                request,
+                course_id,
+                platform_name,
+                configuration,
+                cert_path=exc.template_name or INVALID_CERTIFICATE_TEMPLATE_PATH,
+            )
+        except CertificateRenderStarted.RedirectToPage as exc:
+            response = HttpResponseRedirect(exc.redirect_to)
+        except CertificateRenderStarted.RenderCustomResponse as exc:
+            response = exc.response
+        else:
+            if custom_template:
+                template = Template(
+                    custom_template.template,
+                    output_encoding='utf-8',
+                    input_encoding='utf-8',
+                    default_filters=['decode.utf8'],
+                    encoding_errors='replace',
+                )
+                context = RequestContext(request, context)
+                response = HttpResponse(template.render(context))
+            else:
+                response = render_to_response("certificates/upsell-preview.html", context)
+
+        response['X-Frame-Options'] = "ALLOWALL"
+        # Render the certificate
+        return response
 
 def render_cert_by_uuid(request, certificate_uuid):
     """

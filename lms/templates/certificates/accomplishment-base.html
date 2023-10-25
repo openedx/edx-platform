@@ -46,15 +46,19 @@ course_mode_class = course_mode if course_mode else ''
 
     <div class="wrapper-view" dir="${dir_rtl}">
 
-        <%include file="_accomplishment-header.html" />
+        % if not disable_header:
+            <%include file="_accomplishment-header.html" />
 
-        <hr class="divider sr-only">
+            <hr class="divider sr-only">
+        % endif
 
         ${self.body()}
 
-        <hr class="divider sr-only">
+        % if not disable_footer:
+            <hr class="divider sr-only">
 
-        <%include file="_accomplishment-footer.html" />
+            <%include file="_accomplishment-footer.html" />
+        % endif
     </div>
 
     <%include file="_assets-secondary.html" />

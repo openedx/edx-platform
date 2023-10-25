@@ -23,6 +23,12 @@ urlpatterns = [
         name='preview_cert'
     ),
 
+    re_path(
+        fr'^upsell/course/{settings.COURSE_ID_PATTERN}',
+        views.render_upsell_preview,
+        name='upsell_cert'
+    ),
+
     # Certificates HTML view end point to render web certs by certificate_uuid
     re_path(
         r'^(?P<certificate_uuid>[0-9a-f]{32})$',

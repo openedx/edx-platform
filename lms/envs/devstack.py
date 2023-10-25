@@ -113,7 +113,7 @@ DEBUG_TOOLBAR_CONFIG = {
 def should_show_debug_toolbar(request):  # lint-amnesty, pylint: disable=missing-function-docstring
     # We always want the toolbar on devstack unless running tests from another Docker container
     hostname = request.get_host()
-    if hostname.startswith('edx.devstack.lms:') or hostname.startswith('lms.devstack.edx:'):
+    if hostname.startswith('edx.devstack.lms:') or hostname.startswith('lms.devstack.edx:') or hostname.startswith('localhost'):
         return False
     return True
 
@@ -476,13 +476,16 @@ DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = True
 # in it's path. Re-calling derive_settings doesn't work because the settings was already
 # changed from a function to a list, and it can't be derived again.
 
-# from .common import _make_mako_template_dirs
-# ENABLE_COMPREHENSIVE_THEMING = True
-# COMPREHENSIVE_THEME_DIRS = [
-#     "/edx/app/edxapp/edx-platform/themes/"
-# ]
-# TEMPLATES[1]["DIRS"] = _make_mako_template_dirs
-# derive_settings(__name__)
+PLATFORM_DESCRIPTION = "edx.org"
+PLATFORM_NAME = "edx.org"
+
+from .common import _make_mako_template_dirs
+ENABLE_COMPREHENSIVE_THEMING = True
+COMPREHENSIVE_THEME_DIRS = [
+    "/edx/app/edxapp/edx-platform/themes/"
+]
+TEMPLATES[1]["DIRS"] = _make_mako_template_dirs
+derive_settings(__name__)
 
 # Uncomment the lines below if you'd like to see SQL statements in your devstack LMS log.
 # LOGGING['handlers']['console']['level'] = 'DEBUG'
