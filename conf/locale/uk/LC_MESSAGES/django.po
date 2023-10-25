@@ -18,6 +18,7 @@
 # IvanPrimachenko <jastudent1@gmail.com>, 2014
 # Martin Horst <horst.mr@gmail.com>, 2018
 # Mykhailo Parfeniuk <sopyer@gmail.com>, 2016
+# Mykola Melnyk, 2023
 # Natalia Vynogradenko <tannaha@gmail.com>, 2017-2018
 # Nikolai Belochub, 2014
 # cc322e8fc6cc292f0f00d8b7420e7410_e468d09 <95dee59251c2de5d1d21e213a66df19d_243275>, 2014
