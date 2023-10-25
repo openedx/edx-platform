@@ -67,6 +67,8 @@ urlpatterns = oauth2_urlpatterns + [
     path('not_found', contentstore_views.not_found, name='not_found'),
     path('server_error', contentstore_views.server_error, name='server_error'),
     path('organizations', OrganizationListView.as_view(), name='organizations'),
+    path('api/toggles/', include('openedx.core.djangoapps.waffle_utils.urls')),
+
 
     # noop to squelch ajax errors
     path('event', contentstore_views.event, name='event'),
