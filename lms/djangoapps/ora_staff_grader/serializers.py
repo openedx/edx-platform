@@ -167,7 +167,9 @@ class SubmissionMetadataSerializer(serializers.Serializer):
 
 class AssessmentScoresSerializer(serializers.Serializer):
     """
-    Assessment Score for displaying assessment table in Enhanced Staff Grader (ESG)
+    Score information associated with a specific assessment.
+
+    This serializer was intended for displaying assessment information in the Enhanced Staff Grader (ESG).
     """
     criterion_name = serializers.CharField()
     score_earned = serializers.IntegerField()
@@ -184,9 +186,9 @@ class AssessmentScoresSerializer(serializers.Serializer):
 
 class AssessmentSerializer(serializers.Serializer):
     """
-    Assessment metadata for displaying assessment table in Enhanced Staff Grader (ESG)
+    Data for displaying Assessment objects in a table in Enhanced Staff Grader (ESG)
     """
-    id_assessment = serializers.CharField()
+    assessment_id = serializers.CharField()
     scorer_name = serializers.CharField(allow_null=True)
     scorer_username = serializers.CharField(allow_null=True)
     scorer_email = serializers.CharField(allow_null=True)
@@ -197,7 +199,7 @@ class AssessmentSerializer(serializers.Serializer):
 
     class Meta:
         fields = [
-            "id_assessment",
+            "assessment_id",
             "scorer_name",
             "scorer_username",
             "scorer_email",
@@ -236,7 +238,7 @@ class InitializeSerializer(serializers.Serializer):
 
 class AssessmentFeedbackSerializer(serializers.Serializer):
     """
-    Serialize info for the initialize call. Packages ORA, course, submission, and rubric data.
+    Serialize info for every assessment for a table in Enhanced Staff Grader (ESG)
     """
 
     assessments = serializers.ListField(child=AssessmentSerializer())

@@ -12,6 +12,7 @@ Other handlers return status OK even for an error, but contain error info in the
 These are checked (usually by checking for a {"success":false} response) and raise errors, possibly with extra context.
 """
 import json
+from http import HTTPStatus
 from lms.djangoapps.ora_staff_grader.errors import (
     LockContestedError,
     XBlockInternalError,
@@ -33,12 +34,12 @@ def get_submissions(request, usage_id):
     return json.loads(response.content)
 
 
-def get_assessments(request, usage_id, submission_uuid, assessment_type):
+def get_assessments(request, usage_id, submission_uuid, assessment_filter):
     """
     Get a list of assessments from the ORA's 'list_assessments_grades' XBlock.json_handler
     """
     handler_name = "list_assessments"
-    body = {"item_id": usage_id, "submission_uuid": submission_uuid, "assessment_type": assessment_type}
+    body = {"item_id": usage_id, "submission_uuid": submission_uuid, "assessment_filter": assessment_filter}
 
     response = call_xblock_json_handler(request, usage_id, handler_name, body)
 
@@ -183,5 +184,5 @@ def batch_delete_submission_locks(request, usage_id, submission_uuids):
     response = call_xblock_json_handler(request, usage_id, handler_name, body)
 
     # Errors should raise a blanket exception. Otherwise body is empty, 200 is implicit success
-    if response.status_code != 200:
+    if response.status_code != HTTPStatus.OK:
         raise XBlockInternalError(context={"handler": handler_name})

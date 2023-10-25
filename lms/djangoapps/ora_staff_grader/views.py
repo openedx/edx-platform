@@ -24,7 +24,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from lms.djangoapps.ora_staff_grader.constants import (
     PARAM_ORA_LOCATION,
     PARAM_SUBMISSION_ID,
-    PARAM_ASSESSMENT_TYPE,
+    PARAM_ASSESSMENT_FILTER,
 )
 from lms.djangoapps.ora_staff_grader.errors import (
     BadOraLocationResponse,
@@ -152,13 +152,10 @@ class InitializeView(StaffGraderBaseView):
 
 class AssessmentFeedbackView(StaffGraderBaseView):
     """
-    GET course metadata
+    GET data about Assessments by submission_uuid and ora_location
 
     Response: {
-        courseMetadata
-        oraMetadata
-        submissions
-        isEnabled
+        assessments
     }
 
     Errors:
@@ -168,18 +165,21 @@ class AssessmentFeedbackView(StaffGraderBaseView):
     - UnknownError (HTTP 500) for other errors
     """
 
-    @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID, PARAM_ASSESSMENT_TYPE])
-    def get(self, request, ora_location, submission_uuid, assessment_type=None, *args, **kwargs):
+    @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID, PARAM_ASSESSMENT_FILTER])
+    def get(self, request, ora_location, submission_uuid, assessment_filter=None, *args, **kwargs):
 
         try:
             assessments_data = {}
 
-            # Get list of submissions for this ORA
-            assessments_data["assessments"] = get_assessments(request, ora_location, submission_uuid, assessment_type)
+            assessments_data["assessments"] = get_assessments(request, ora_location, submission_uuid, assessment_filter)
 
             response_data = AssessmentFeedbackSerializer(assessments_data).data
-            log.info(response_data)
             return Response(response_data)
+
+        # Catch bad ORA location
+        except (InvalidKeyError, ItemNotFoundError):
+            log.error(f"Bad ORA location provided: {ora_location}")
+            return BadOraLocationResponse()
 
         # Issues with the XBlock handlers
         except XBlockInternalError as ex:
