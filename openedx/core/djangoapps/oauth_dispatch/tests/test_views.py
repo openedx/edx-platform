@@ -174,21 +174,15 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         expected_default_expires_in = 60 * 60
         assert data['expires_in'] == expected_default_expires_in
         assert data['token_type'] == 'JWT'
-        expected_scopes = data['scope'].split(' ')
-        self._update_expected_scopes_with_user_id(expected_scopes, grant_type)
         self.assert_valid_jwt_access_token(
             data['access_token'],
             self.user,
-            expected_scopes,
+            data['scope'].split(' '),
             grant_type=grant_type,
             should_be_restricted=False,
             expires_in=expected_default_expires_in,
             should_be_asymmetric_key=asymmetric_jwt
         )
-
-    def _update_expected_scopes_with_user_id(self, expected_scopes, grant_type):
-        if grant_type == 'password' and 'user_id' not in expected_scopes:
-            expected_scopes.append('user_id')
 
     @ddt.data('dot_app')
     def test_access_token_fields(self, client_attr):
@@ -264,20 +258,17 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         response = self._post_request(self.user, self.restricted_dot_app, token_type='jwt')
         assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
-        grant_type = 'password'
-        expected_scopes = data['scope'].split(' ')
-        self._update_expected_scopes_with_user_id(expected_scopes, grant_type)
         assert 'expires_in' in data
         assert data['expires_in'] > 0
         assert data['token_type'] == 'JWT'
         self.assert_valid_jwt_access_token(
             data['access_token'],
             self.user,
-            expected_scopes,
+            data['scope'].split(' '),
             should_be_expired=False,
             should_be_asymmetric_key=True,
             should_be_restricted=True,
-            grant_type=grant_type
+            grant_type='password'
         )
 
     def test_restricted_access_token(self):
@@ -330,11 +321,10 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         response = self._post_request(self.user, dot_app, token_type='jwt', scope=scopes)
         assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
-        self._update_expected_scopes_with_user_id(scopes, grant_type)
         self.assert_valid_jwt_access_token(
             data['access_token'],
             self.user,
-            scopes,
+            data['scope'].split(' '),
             filters=filters,
             grant_type=grant_type,
         )
@@ -436,19 +426,13 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
         assert data['expires_in'] > 0
         assert data['token_type'] == 'JWT'
 
-        expected_scopes = data['scope'].split(' ')
-        self._update_expected_scopes_with_user_id(expected_scopes, grant_type)
         self.assert_valid_jwt_access_token(
             data['access_token'],
             self.user,
-            expected_scopes,
+            data['scope'].split(' '),
             grant_type=grant_type,
             should_be_asymmetric_key=asymmetric_jwt
         )
-
-    def _update_expected_scopes_with_user_id(self, expected_scopes, grant_type):
-        if grant_type == 'password' and 'user_id' not in expected_scopes:
-            expected_scopes.append('user_id')
 
     @ddt.data('dot_app')
     def test_access_token_exchange_calls_dispatched_view(self, client_attr):
@@ -466,14 +450,11 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
         response = self._post_request(self.user, client, token_type='jwt')
         assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
-        grant_type = 'password'
-        expected_scopes = data['scope'].split(' ')
-        self._update_expected_scopes_with_user_id(expected_scopes, grant_type)
         self.assert_valid_jwt_access_token(
             data['access_token'],
             self.user,
-            expected_scopes,
-            grant_type=grant_type
+            data['scope'].split(' '),
+            grant_type='password'
         )
 
         assert 'expires_in' in data
@@ -488,14 +469,11 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
         response = self._post_request(self.user, client, token_type='jwt', asymmetric_jwt=True)
         assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
-        grant_type = 'password'
-        expected_scopes = data['scope'].split(' ')
-        self._update_expected_scopes_with_user_id(expected_scopes, grant_type)
         self.assert_valid_jwt_access_token(
             data['access_token'],
             self.user,
-            expected_scopes,
-            grant_type=grant_type,
+            data['scope'].split(' '),
+            grant_type='password',
             should_be_asymmetric_key=True
         )
 

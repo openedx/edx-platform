@@ -81,6 +81,7 @@ def create_jwt_token_dict(token_dict, oauth_adapter, use_asymmetric_key=None):
     # .. custom_attribute_description: The grant type of the newly created JWT.
     set_custom_attribute('create_jwt_grant_type', grant_type)
     scopes = token_dict['scope'].split(' ')
+    scopes = _get_updated_scopes(scopes, grant_type)
 
     jwt_access_token = _create_jwt(
         access_token.user,
@@ -97,7 +98,7 @@ def create_jwt_token_dict(token_dict, oauth_adapter, use_asymmetric_key=None):
         "access_token": jwt_access_token,
         "token_type": "JWT",
         "expires_in": jwt_expires_in,
-        "scope": ' '.join(_get_updated_scopes(scopes, grant_type)),
+        "scope": ' '.join(scopes),
     })
     return jwt_token_dict
 
@@ -169,7 +170,8 @@ def _create_jwt(
     else:
         increment('create_symmetric_jwt_count')
 
-    scopes = _get_updated_scopes(scopes, grant_type)
+    # Scopes `email` and `profile` are included for legacy compatibility.
+    scopes = scopes or ['email', 'profile']
     iat, exp = _compute_time_fields(expires_in)
 
     payload = {
