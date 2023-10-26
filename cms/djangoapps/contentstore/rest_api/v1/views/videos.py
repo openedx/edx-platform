@@ -13,8 +13,6 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.parsers import (MultiPartParser, FormParser)
-from django.conf import settings
-from django.contrib.staticfiles.storage import staticfiles_storage
 from django.views.decorators.csrf import csrf_exempt
 from django.http import Http404
 
@@ -27,13 +25,11 @@ from xmodule.modulestore.django import modulestore
 from ....api import course_author_access_required
 from ....utils import get_course_videos_context
 
-
 from cms.djangoapps.contentstore.video_storage_handlers import (
     handle_videos,
     get_video_encodings_download,
     handle_video_images,
     enabled_video_features,
-    _get_index_videos,
     get_video_usage_path
 )
 from cms.djangoapps.contentstore.rest_api.v1.serializers import (
@@ -42,7 +38,6 @@ from cms.djangoapps.contentstore.rest_api.v1.serializers import (
     VideoImageSerializer,
     VideoUsageSerializer,
 )
-from cms.djangoapps.contentstore.video_storage_handlers import get_all_transcript_languages
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
 from .utils import validate_request_with_serializer
 
