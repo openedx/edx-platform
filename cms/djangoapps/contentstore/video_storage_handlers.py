@@ -43,7 +43,6 @@ from rest_framework.response import Response
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.auth import has_course_author_access
-from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE
 from common.djangoapps.util.json_request import JsonResponse
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
@@ -53,8 +52,6 @@ from openedx.core.djangoapps.video_pipeline.config.waffle import (
 )
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.video_block.video_utils import rewrite_video_url  # lint-amnesty, pylint: disable=wrong-import-order
-
 
 from .models import VideoUploadConfig
 from .toggles import use_new_video_uploads_page, use_mock_video_uploads
@@ -628,7 +625,7 @@ def _get_index_videos(course, pagination_conf=None):
             if attr == 'courses':
                 course = [c for c in video['courses'] if course_id in c]
                 (__, values['course_video_image_url']), = list(course[0].items())
-            if attr == 'encoded_videos':
+            elif attr == 'encoded_videos':
                 values['download_link'] = ''
                 values['file_size'] = 0
                 for encoding in video['encoded_videos']:
