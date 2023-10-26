@@ -54,7 +54,9 @@ from xmodule.modulestore.inheritance import own_metadata  # lint-amnesty, pylint
 from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.tabs import CourseTabList  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
-
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverviewSubText
+# from cms.djangoapps.contentstore.models import CourseUnitTime
+from openedx.core.djangoapps.content.course_overviews.models import CourseUnitTime
 from ..utils import (
     ancestor_has_staff_lock,
     find_release_date_source,
@@ -118,6 +120,7 @@ def _is_library_component_limit_reached(usage_key):
 @login_required
 @expect_json
 def xblock_handler(request, usage_key_string=None):
+    
     """
     The restful handler for xblock requests.
 
@@ -168,9 +171,11 @@ def xblock_handler(request, usage_key_string=None):
                      if duplicate_source_locator is not present
               The locator (unicode representation of a UsageKey) for the created xblock (minus children) is returned.
     """
-    if usage_key_string:
-        usage_key = usage_key_with_run(usage_key_string)
 
+    if usage_key_string:
+
+        usage_key = usage_key_with_run(usage_key_string)
+        
         access_check = has_studio_read_access if request.method == 'GET' else has_studio_write_access
         if not access_check(request.user, usage_key.course_key):
             raise PermissionDenied()
@@ -180,6 +185,7 @@ def xblock_handler(request, usage_key_string=None):
 
             if 'application/json' in accept_header:
                 fields = request.GET.get('fields', '').split(',')
+                
                 if 'graderType' in fields:
                     # right now can't combine output of this w/ output of _get_module_info, but worthy goal
                     return JsonResponse(CourseGradingModel.get_section_grader_type(usage_key))
@@ -195,9 +201,12 @@ def xblock_handler(request, usage_key_string=None):
                 return HttpResponse(status=406)
 
         elif request.method == 'DELETE':
+           
+
             _delete_item(usage_key, request.user)
             return JsonResponse()
         else:  # Since we have a usage_key, we are updating an existing xblock.
+            
             return _save_xblock(
                 request.user,
                 _get_xblock(usage_key, request.user),
@@ -214,7 +223,9 @@ def xblock_handler(request, usage_key_string=None):
                 fields=request.json.get('fields'),
             )
     elif request.method in ('PUT', 'POST'):
+        
         if 'duplicate_source_locator' in request.json:
+            
             parent_usage_key = usage_key_with_run(request.json['parent_locator'])
             duplicate_source_usage_key = usage_key_with_run(request.json['duplicate_source_locator'])
 
@@ -237,7 +248,7 @@ def xblock_handler(request, usage_key_string=None):
                     },
                     status=400
                 )
-
+            
             dest_usage_key = _duplicate_item(
                 parent_usage_key,
                 duplicate_source_usage_key,
@@ -249,6 +260,7 @@ def xblock_handler(request, usage_key_string=None):
                 'courseKey': str(dest_usage_key.course_key)
             })
         else:
+            
             return _create_item(request)
     elif request.method == 'PATCH':
         if 'move_source_locator' in request.json:
@@ -512,6 +524,7 @@ def xblock_container_handler(request, usage_key_string):
 
 
 def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
+  
     """
     Updates the xblock in the modulestore.
     But before doing so, it calls the xblock's editor_saved callback function.
@@ -523,7 +536,7 @@ def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
             old_content = xblock.get_explicitly_set_fields_by_scope(Scope.content)
         xblock.xmodule_runtime = StudioEditModuleRuntime(user)
         xblock.editor_saved(user, old_metadata, old_content)
-
+    
     # Update after the callback so any changes made in the callback will get persisted.
     return modulestore().update_item(xblock, user.id)
 
@@ -537,10 +550,11 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
     to default).
 
     """
+    
     store = modulestore()
     # Perform all xblock changes within a (single-versioned) transaction
     with store.bulk_operations(xblock.location.course_key):
-
+        
         # Don't allow updating an xblock and discarding changes in a single operation (unsupported by UI).
         if publish == "discard_changes":
             store.revert_to_published(xblock.location, user.id)
@@ -550,12 +564,13 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
 
         old_metadata = own_metadata(xblock)
         old_content = xblock.get_explicitly_set_fields_by_scope(Scope.content)
-
+    
         if data:
             # TODO Allow any scope.content fields not just "data" (exactly like the get below this)
             xblock.data = data
         else:
             data = old_content['data'] if 'data' in old_content else None
+            
 
         if fields:
             for field_name in fields:
@@ -592,6 +607,7 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
             # into another parent, then that child would have been deleted from this parent on the server. However,
             # this is error could occur in modulestores (such as Draft) that do not support atomic write-transactions
             old_children = set(xblock.children) - set(children)
+            
             if any(
                     store.get_parent_location(old_child) == xblock.location
                     for old_child in old_children
@@ -630,11 +646,11 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
                             return JsonResponse({"error": reason}, 400)
 
                         field.write_to(xblock, value)
-
         validate_and_update_xblock_due_date(xblock)
+       
         # update the xblock and call any xblock callbacks
         xblock = _update_with_callback(xblock, user, old_metadata, old_content)
-
+        
         # for static tabs, their containing course also records their display name
         course = store.get_course(xblock.location.course_key)
         if xblock.location.block_type == 'static_tab':
@@ -710,6 +726,8 @@ def _create_item(request):
     """View for create items."""
     parent_locator = request.json['parent_locator']
     usage_key = usage_key_with_run(parent_locator)
+    # print('=========', usage_key)
+    # print('===========', request.json) =========== {'parent_locator': 'block-v1:bcd+cde+asd222+type@course+block@course', 'category': 'chapter', 'display_name': 'Section'}
     if not has_studio_write_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
@@ -730,7 +748,7 @@ def _create_item(request):
                 },
                 status=400
             )
-
+    # print('======json===', request.json)
     created_block = create_xblock(
         parent_locator=parent_locator,
         user=request.user,
@@ -738,10 +756,32 @@ def _create_item(request):
         display_name=request.json.get('display_name'),
         boilerplate=request.json.get('boilerplate'),
     )
-
+    # print('=====created_blockcreated_block===', created_block)
     return JsonResponse(
         {'locator': str(created_block.location), 'courseKey': str(created_block.location.course_key)}
     )
+
+
+@login_required
+@expect_json
+def create_item_import (request,parent_locator, category,display_name=None , boilerplate=None):
+   
+    usage_key = usage_key_with_run(parent_locator)
+    # print('=============',category,display_name )
+    created_block = create_xblock(
+        parent_locator=parent_locator,
+        user=request.user,
+        category=category,
+        display_name=display_name,
+        boilerplate=boilerplate,
+    )
+
+    return created_block
+    
+
+
+
+
 
 
 def _get_source_index(source_usage_key, source_parent):
@@ -977,6 +1017,13 @@ def _delete_item(usage_key, user):
     If the xblock is a Static Tab, removes it from course.tabs as well.
     """
     store = modulestore()
+    CourseOverviewSubText.removeSubText(sequence_id=str(usage_key))
+    CourseUnitTime.remove_unit_time_seuqe(block_id = str(usage_key))
+
+    block = _get_xblock(usage_key=usage_key, user=user)
+    for a in block.children :
+        CourseOverviewSubText.removeSubText(sequence_id=str(a))
+        CourseUnitTime.remove_unit_time_seuqe(block_id = str(a))
 
     with store.bulk_operations(usage_key.course_key):
         # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
@@ -1011,6 +1058,7 @@ def orphan_handler(request, course_key_string):
             raise PermissionDenied()
     if request.method == 'DELETE':
         if request.user.is_staff:
+            # print('====usage_key=========', course_usage_key)
             deleted_items = _delete_orphans(course_usage_key, request.user.id, commit=True)
             return JsonResponse({'deleted': deleted_items})
         else:

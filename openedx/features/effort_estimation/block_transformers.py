@@ -14,7 +14,7 @@ from openedx.core.djangoapps.content.block_structure.transformer import BlockStr
 from openedx.core.djangoapps.content.block_structure.block_structure import BlockStructureModulestoreData
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.effort_estimation.estimate_regex.estimate_time_by_regex import estimate_time_by_regex
-
+from openedx.core.djangoapps.content.course_overviews.models import CourseUnitTime
 from .toggles import EFFORT_ESTIMATION_DISABLED_FLAG
 
 
@@ -233,13 +233,22 @@ class EffortEstimationTransformer(BlockStructureTransformer):
     def _estimate_sequential_effort_by_regex(self, _usage_info, block_structure, block_key):
         """Returns an expected time to view the video, at the user's preferred speed."""
         time = None
-        cls = EffortEstimationTransformer
-        vertical_childs = block_structure.get_children(block_key)
-        if len(vertical_childs) > 0:
-            first_html = block_structure.get_children(vertical_childs[0])[0]
-            time = block_structure.get_transformer_block_field(first_html, cls, self.TIME_BY_REGEX)
-
+        time_course = CourseUnitTime.get_unit_time(block_id=block_key)
+        if time_course is not None :
+            time = time_course.total
+        else :
+            time = None
+        # cls = EffortEstimationTransformer
+        # vertical_childs = block_structure.get_children(block_key)
+        # if len(vertical_childs) > 0:
+        #     child_list = block_structure.get_children(vertical_childs[0])
+        #     if len(child_list) > 0:
+        #         first_html = child_list[0]
+        #         time = block_structure.get_transformer_block_field(first_html, cls, self.TIME_BY_REGEX)
+        #     else:
+        #         time = 0
+        # else:
+        #     time = 0
         activities = self._gather_child_values(block_structure, block_key, self.EFFORT_ACTIVITIES, default=1)
         time = time * 60 if time is not None else None
-
         return time, activities

@@ -4,7 +4,8 @@ Models for contentstore
 
 
 from config_models.models import ConfigurationModel
-from django.db.models.fields import IntegerField, TextField
+from django.db.models.fields import IntegerField, TextField,CharField
+from django.db import models
 
 
 class VideoUploadConfig(ConfigurationModel):
@@ -63,3 +64,44 @@ class CleanStaleCertificateAvailabilityDatesConfig(ConfigurationModel):
             "`clean_stale_certificate_available_dates` management command.' See the management command for options."
         )
     )
+
+# model course unit time
+
+# class CourseUnitTime (models.Model):
+#     block_id =  CharField(max_length=255)
+#     course_id = CharField(max_length=255)
+#     display_name = CharField(max_length=255)
+#     total = IntegerField(default=0)
+
+#     def __str__(self):
+#         return self.block_id
+    
+#     @classmethod
+#     def create_unit_time(self, course_id, block_id, display_name, total ):
+#         return CourseUnitTime.objects.create(course_id=course_id, block_id=block_id, display_name=display_name, total=total)
+    
+#     @classmethod
+#     def get_unit_time (self,  block_id) :
+#         try:
+#             return CourseUnitTime.objects.filter( block_id=block_id)[0]
+#         except :
+#             return None
+
+    
+#     @classmethod
+#     def set_unit_time (self, block_id, total , course_id, display_name):
+#         try:
+   
+#             total_obj = CourseUnitTime.objects.get(block_id=block_id , course_id = course_id)
+#             total_obj.total = total
+#             total_obj.save()
+#         except CourseUnitTime.DoesNotExist:
+#             return CourseUnitTime.objects.create(block_id=block_id, total=total, course_id=course_id, display_name=display_name)
+        
+#     @classmethod
+#     def remove_unit_time_seuqe (self, block_id):
+#         try:
+#             return CourseUnitTime.objects.filter(block_id=block_id).delete()
+#         except:
+#             return None
+    

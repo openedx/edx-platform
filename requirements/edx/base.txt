@@ -1207,3 +1207,5 @@ zipp==3.9.0
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
+
+openpyxl==3.1.2

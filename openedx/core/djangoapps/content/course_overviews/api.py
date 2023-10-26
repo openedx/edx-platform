@@ -119,6 +119,7 @@ def set_course_subtext (request) :
         sub_text = request.data.get('subtext')
         sequence_id = request.data.get('suquence_id')
         course_id = request.data.get('courseId')
+        title = request.data.get('title')
        
-        CourseOverviewSubText.setSubTextSequence(sequence_id=sequence_id, sub_text=sub_text, course_id=course_id)
+        CourseOverviewSubText.setSubTextSequence(sequence_id=sequence_id, sub_text=sub_text, course_id=course_id ,title=title)
     return JsonResponse({'a':'a'})

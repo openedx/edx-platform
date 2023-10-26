@@ -24,6 +24,8 @@ from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdm
 from openedx.core import toggles as core_toggles
 from openedx.core.djangoapps.content.course_overviews.api import get_course_subtext ,set_course_subtext
 from openedx.features.funix_specialization.views import funix_specialization_view , setting_specialization , remove_specialization,specialization_course
+from cms.djangoapps.contentstore.views.import_excel import viewImportExcel
+from cms.djangoapps.contentstore.views.unit_time import get_time_course_unit, set_course_time_unit
 
 django_autodiscover()
 admin.site.site_header = _('Studio Administration')
@@ -344,8 +346,6 @@ urlpatterns += [
 
 # funix Specialization view
 
-
-
 urlpatterns += [
     path('specialization/<str:course_id>', funix_specialization_view, name='funix_specialization'),
 # api
@@ -353,4 +353,15 @@ urlpatterns += [
     path('api/remove_specialization_course', remove_specialization , name='remove_specialization'),
     path('api/specialization_course/<str:course_id>', specialization_course, name ='specialization_course')
 
+]
+
+# funix import excel
+urlpatterns +=[
+    path('import_excel/<str:course_id>' ,viewImportExcel, name='import_excel')
+]
+
+# api course unit time
+urlpatterns +=[
+    path ('api/course_unit_time/<str:block_id>', get_time_course_unit , name='get_time_course_unit'),
+    path('api/set_course_unit_time',set_course_time_unit, name='set_course_time_unit' )
 ]
