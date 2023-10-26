@@ -175,6 +175,9 @@ class PaginationTestCase(AssetsTestCase):
         self.assert_correct_asset_response(self.url + "?page_size=2", 0, 2, 4)
         self.assert_correct_asset_response(
             self.url + "?page_size=2&page=1", 2, 2, 4)
+        self.assert_correct_asset_response(self.url + '?display_name=asset-1.txt', 0, 1, 1)
+        self.assert_correct_asset_response(self.url + '?display_name=asset-1.txt&display_name=asset-2.txt', 0, 2, 2)
+        self.assert_correct_asset_response(self.url + '?display_name=asset-1.txt&display_name=asset-0.txt', 0, 1, 1)
         self.assert_correct_sort_response(self.url, 'date_added', 'asc')
         self.assert_correct_sort_response(self.url, 'date_added', 'desc')
         self.assert_correct_sort_response(self.url, 'display_name', 'asc')
