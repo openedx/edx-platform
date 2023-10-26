@@ -515,16 +515,12 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
     """
     @ddt.data(
         # split mongo: 3 queries, regardless of thread response size.
-        # TODO: course roles: number of querys increased from 21 to 26
         (False, 1, 2, 2, 26, 8),
-        # TODO: course roles: number of querys increased from 21 to 26
         (False, 50, 2, 2, 26, 8),
 
         # Enabling Enterprise integration should have no effect on the number of mongo queries made.
         # split mongo: 3 queries, regardless of thread response size.
-        # TODO: course roles: number of querys increased from 21 to 26
         (True, 1, 2, 2, 26, 8),
-        # TODO: course roles: number of querys increased from 21 to 26
         (True, 50, 2, 2, 26, 8),
     )
     @ddt.unpack

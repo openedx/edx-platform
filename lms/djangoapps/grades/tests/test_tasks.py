@@ -152,7 +152,6 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             self._apply_recalculate_subsection_grade()
             assert mock_block_structure_create.call_count == 1
 
-    # TODO: course roles: number of querys increased from 41 to 46
     @ddt.data(
         (ModuleStoreEnum.Type.split, 2, 46, True),
         (ModuleStoreEnum.Type.split, 2, 46, False),
@@ -165,7 +164,6 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
                 with self.assertNumQueries(num_sql_calls):
                     self._apply_recalculate_subsection_grade()
 
-    # TODO: course roles: number of querys increased from 41 to 46
     @ddt.data(
         (ModuleStoreEnum.Type.split, 2, 46),
     )
@@ -211,7 +209,6 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             {self.sequential.location, accessible_seq.location},
         )
 
-    # TODO: course roles: number of querys increased from 41 to 46
     @ddt.data(
         (ModuleStoreEnum.Type.split, 2, 46),
     )

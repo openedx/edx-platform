@@ -74,7 +74,6 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         user = self.user
         course_key = self.course_overview.id  # lint-amnesty, pylint: disable=unused-variable
 
-        # TODO: course roles: number of querys increased from 7 to 12
         query_count = 12
 
         with self.assertNumQueries(query_count):
