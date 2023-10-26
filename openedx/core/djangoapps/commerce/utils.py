@@ -4,7 +4,7 @@
 import requests
 from django.conf import settings
 from edx_rest_api_client.auth import SuppliedJwtAuth
-from edx_rest_api_client.client import EdxRestApiClient
+from edx_rest_api_client.client import DeprecatedRestApiClient
 from eventtracking import tracker
 
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
@@ -53,7 +53,7 @@ def ecommerce_api_client(user, session=None):
     ]
     jwt = create_jwt_for_user(user, additional_claims=claims, scopes=scopes)
 
-    return EdxRestApiClient(
+    return DeprecatedRestApiClient(
         configuration_helpers.get_value('ECOMMERCE_API_URL', settings.ECOMMERCE_API_URL),
         jwt=jwt,
         session=session

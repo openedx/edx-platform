@@ -25,7 +25,7 @@ TEST_PAYMENT_DATA = {
 }
 
 
-class EdxRestApiClientTest(TestCase):
+class DeprecatedRestApiClientTest(TestCase):
     """
     Tests to ensure the client is initialized properly.
     """
