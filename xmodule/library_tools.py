@@ -5,6 +5,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
 import hashlib
+import logging
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import (
@@ -26,7 +27,12 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from openedx.core.djangoapps.content_libraries.tasks import update_children_task, get_import_task_is_in_progress
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary
+from openedx.core.djangoapps.content_libraries.toggles import (
+    MAP_V1_LIBRARIES_TO_V2_LIBRARIES,
+)
 
+
+logger = logging.getLogger(__name__)
 
 def normalize_key_for_search(library_key):
     """ Normalizes library key for use with search indexing """
@@ -45,14 +51,32 @@ class LibraryToolsService:
         self.store = modulestore
         self.user_id = user_id
 
+
+    def _map_v1_to_v2_library(self, v1_library_key):
+        """
+        Helper method to convert a v1 library key into a v2 library key
+        """
+        if not isinstance(v1_library_key, LibraryLocator):
+            raise ValueError("Input must be an instance of LibraryLocator")
+
+        v2_library_key = LibraryLocatorV2(v1_library_key.org,v1_library_key.library)
+        logger.info(f'Mapped V1 Key {v1_library_key} to v2 key {v2_key}')
+
+        return v2_library_key
+
     def _get_library(self, library_key):
         """
         Helper method to get either V1 or V2 library.
 
         Given a library key like "library-v1:ProblemX+PR0B" (V1) or "lib:RG:rg-1" (v2), return the 'library'.
 
+        If the relevant key is a V1 key, and waffle flag MAP_V1_LIBRARIES_TO_V2_LIBRARIES is True, a 'v2 library' will be returned.
+
         Returns None on error.
         """
+
+        if not isinstance(library_key, LibraryLocatorV2) and MAP_V1_LIBRARIES_TO_V2_LIBRARIES:
+            library_key = self._map_v1_to_v2_library(library_key)
 
         if isinstance(library_key, LibraryLocatorV2):
             try:
