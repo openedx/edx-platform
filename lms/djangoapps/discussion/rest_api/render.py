@@ -7,10 +7,10 @@ implemented in Markdown.Sanitizer.js.
 import bleach
 import markdown
 
-ALLOWED_TAGS = bleach.ALLOWED_TAGS | {
+ALLOWED_TAGS = list(bleach.ALLOWED_TAGS) + [
     'br', 'dd', 'del', 'dl', 'dt', 'h1', 'h2', 'h3', 'h4', 'hr', 'img', 'kbd', 'p', 'pre', 's',
     'strike', 'sub', 'sup'
-}
+]
 ALLOWED_PROTOCOLS = ["http", "https", "ftp", "mailto"]
 ALLOWED_ATTRIBUTES = {
     "a": ["href", "title", "target", "rel"],

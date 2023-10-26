@@ -1761,11 +1761,12 @@ def get_student_progress_url(request, course_id):
     return JsonResponse(response_payload)
 
 
+# uuuuv bỏ check pẻmission staff để cho phép học viên tự reset attemps
 @transaction.non_atomic_requests
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.GIVE_STUDENT_EXTENSION)
+# @require_course_permission(permissions.GIVE_STUDENT_EXTENSION) uuuuv
 @require_post_params(
     problem_to_reset="problem urlname to reset"
 )
@@ -1788,14 +1789,22 @@ def reset_student_attempts(request, course_id):
             requires instructor access
             mutually exclusive with all_students
     """
+
+    if not request.user.is_authenticated: 
+        return HttpResponseForbidden("Forbidden")
+
     course_id = CourseKey.from_string(course_id)
-    course = get_course_with_access(
-        request.user, 'staff', course_id, depth=None
-    )
+
+    # uuuuv
+    # course = get_course_with_access(
+    #     request.user, 'staff', course_id, depth=None
+    # )
+
     all_students = _get_boolean_param(request, 'all_students')
 
-    if all_students and not has_access(request.user, 'instructor', course):
-        return HttpResponseForbidden("Requires instructor access.")
+    # uuuuv
+    # if all_students and not has_access(request.user, 'instructor', course):
+    #     return HttpResponseForbidden("Requires instructor access.")
 
     problem_to_reset = strip_if_string(request.POST.get('problem_to_reset'))
     student_identifier = request.POST.get('unique_student_identifier', None)
