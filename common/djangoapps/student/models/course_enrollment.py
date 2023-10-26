@@ -225,12 +225,6 @@ class CourseEnrollmentManager(models.Manager):
         enroll_dict['total'] = total
         return enroll_dict
 
-    def enrolled_and_dropped_out_users(self, course_id):
-        """Return a queryset of Users in the course."""
-        return User.objects.filter(
-            courseenrollment__course_id=course_id
-        )
-
 
 # Named tuple for fields pertaining to the state of
 # CourseEnrollment for a user in a course.  This type
@@ -287,7 +281,7 @@ class CourseEnrollment(models.Model):
     objects = CourseEnrollmentManager()
 
     # cache key format e.g enrollment.<username>.<course_key>.mode = 'honor'
-    COURSE_ENROLLMENT_CACHE_KEY = "enrollment.{}.{}.mode"  # TODO Can this be removed?  It doesn't seem to be used.
+    COURSE_ENROLLMENT_CACHE_KEY = "enrollment.{}.{}.mode"
 
     MODE_CACHE_NAMESPACE = 'CourseEnrollment.mode_and_active'
 
@@ -330,7 +324,7 @@ class CourseEnrollment(models.Model):
                attribute), this method will automatically save it before
                adding an enrollment for it.
 
-        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+        `course_key` must be a opaque_keys CourseKey object.
 
         It is expected that this method is called from a method which has already
         verified the user authentication and access.
