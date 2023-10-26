@@ -92,12 +92,15 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     course_key = CourseKey.from_string(course_key)
     if not ENABLE_NOTIFICATIONS.is_enabled(course_key):
         return
+
     user_ids = list(set(user_ids))
     batch_size = settings.NOTIFICATION_CREATION_BATCH_SIZE
 
     notifications_generated = False
     notification_content = ''
-    default_web_config = get_default_values_of_preference(app_name, notification_type).get('web', True)
+    sender_id = context.pop('sender_id', None)
+    default_web_config = get_default_values_of_preference(app_name, notification_type).get('web', False)
+    generated_notification_audience = []
     for batch_user_ids in get_list_in_batches(user_ids, batch_size):
         # check if what is preferences of user and make decision to send notification or not
         preferences = CourseNotificationPreference.objects.filter(
@@ -110,7 +113,7 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
             preferences = create_notification_pref_if_not_exists(batch_user_ids, preferences, course_key)
 
         if not preferences:
-            return
+            continue
 
         for preference in preferences:
             preference = update_user_preference(preference, preference.user_id, course_key)
@@ -137,16 +140,19 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
                     course_id=course_key,
                 )
             )
+            generated_notification_audience.append(user_id)
+
         # send notification to users but use bulk_create
         notification_objects = Notification.objects.bulk_create(notifications)
         if notification_objects and not notifications_generated:
             notifications_generated = True
             notification_content = notification_objects[0].content
 
-        if notifications_generated:
-            notification_generated_event(
-                batch_user_ids, app_name, notification_type, course_key, content_url, notification_content,
-            )
+    if notifications_generated:
+        notification_generated_event(
+            generated_notification_audience, app_name, notification_type, course_key, content_url,
+            notification_content, sender_id=sender_id
+        )
 
 
 def update_user_preference(preference: CourseNotificationPreference, user_id, course_id):
