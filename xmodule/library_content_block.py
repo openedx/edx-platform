@@ -767,12 +767,17 @@ class LibraryContentBlock(
     def editor_saved(self, user, old_metadata, old_content):  # lint-amnesty, pylint: disable=unused-argument
         """
         If source_library_id is empty, clear source_library_version and children.
+        If source_library_id has chnaged, clear the candidate pool,
+        as selections should not be preserved across libraries unwittingly
         """
         if not self.source_library_id:
             self.children = []  # lint-amnesty, pylint: disable=attribute-defined-outside-init
             self.source_library_version = ""
         else:
             self.source_library_version = str(self.tools.get_library_version(self.source_library_id))
+
+        if self.source_library_id != old_metadata.source_library_id:
+            self.candidates = []
 
     def post_editor_saved(self):
         """
