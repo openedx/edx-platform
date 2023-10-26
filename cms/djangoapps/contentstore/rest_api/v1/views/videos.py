@@ -20,7 +20,6 @@ from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_c
 from openedx.core.lib.api.parsers import TypedFileUploadParser
 from common.djangoapps.student.auth import has_studio_read_access
 from common.djangoapps.util.json_request import expect_json_in_class_view
-from xmodule.modulestore.django import modulestore
 
 from ....api import course_author_access_required
 from ....utils import get_course_videos_context
@@ -148,12 +147,11 @@ class CourseVideosView(DeveloperErrorViewMixin, APIView):
         if not has_studio_read_access(request.user, course_key):
             self.permission_denied(request)
 
-        with modulestore().bulk_operations(course_key):
-            course_block = modulestore().get_course(course_key)
-            course_videos_context = get_course_videos_context(
-                course_block,
-                None,
-            )
+        course_videos_context = get_course_videos_context(
+            None,
+            None,
+            course_key,
+        )
         serializer = CourseVideosSerializer(course_videos_context)
         return Response(serializer.data)
 

@@ -1568,7 +1568,7 @@ def get_course_rerun_context(course_key, course_block, user):
     return course_rerun_context
 
 
-def get_course_videos_context(course_block, pagination_conf):
+def get_course_videos_context(course_block, pagination_conf, course_key=None):
     """
     Utils is used to get contest of course videos.
     It is used for both DRF and django views.
@@ -1598,14 +1598,19 @@ def get_course_videos_context(course_block, pagination_conf):
     VIDEO_IMAGE_UPLOAD_ENABLED = WaffleSwitch(  # lint-amnesty, pylint: disable=toggle-missing-annotation
         'videos.video_image_upload_enabled', __name__
     )
+    
+    course = course_block
+    if not course:
+        with modulestore().bulk_operations(course_key):
+            course = modulestore().get_course(course_key)
 
-    is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course_block.id)
-    previous_uploads, pagination_context = _get_index_videos(course_block, pagination_conf)
+    is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course.id)
+    previous_uploads, pagination_context = _get_index_videos(course, pagination_conf)
     course_video_context = {
-        'context_course': course_block,
-        'image_upload_url': reverse_course_url('video_images_handler', str(course_block.id)),
-        'video_handler_url': reverse_course_url('videos_handler', str(course_block.id)),
-        'encodings_download_url': reverse_course_url('video_encodings_download', str(course_block.id)),
+        'context_course': course,
+        'image_upload_url': reverse_course_url('video_images_handler', str(course.id)),
+        'video_handler_url': reverse_course_url('videos_handler', str(course.id)),
+        'encodings_download_url': reverse_course_url('video_encodings_download', str(course.id)),
         'default_video_image_url': _get_default_video_image_url(),
         'previous_uploads': previous_uploads,
         'concurrent_upload_limit': settings.VIDEO_UPLOAD_PIPELINE.get('CONCURRENT_UPLOAD_LIMIT', 0),
@@ -1626,7 +1631,7 @@ def get_course_videos_context(course_block, pagination_conf):
         'video_transcript_settings': {
             'transcript_download_handler_url': reverse('transcript_download_handler'),
             'transcript_upload_handler_url': reverse('transcript_upload_handler'),
-            'transcript_delete_handler_url': reverse_course_url('transcript_delete_handler', str(course_block.id)),
+            'transcript_delete_handler_url': reverse_course_url('transcript_delete_handler', str(course.id)),
             'trancript_download_file_format': Transcript.SRT
         },
         'pagination_context': pagination_context
@@ -1635,17 +1640,17 @@ def get_course_videos_context(course_block, pagination_conf):
         course_video_context['video_transcript_settings'].update({
             'transcript_preferences_handler_url': reverse_course_url(
                 'transcript_preferences_handler',
-                str(course_block.id)
+                str(course.id)
             ),
             'transcript_credentials_handler_url': reverse_course_url(
                 'transcript_credentials_handler',
-                str(course_block.id)
+                str(course.id)
             ),
             'transcription_plans': get_3rd_party_transcription_plans(),
         })
-        course_video_context['active_transcript_preferences'] = get_transcript_preferences(str(course_block.id))
+        course_video_context['active_transcript_preferences'] = get_transcript_preferences(str(course.id))
         # Cached state for transcript providers' credentials (org-specific)
-        course_video_context['transcript_credentials'] = get_transcript_credentials_state_for_org(course_block.id.org)
+        course_video_context['transcript_credentials'] = get_transcript_credentials_state_for_org(course.id.org)
     return course_video_context
 
 
