@@ -1598,7 +1598,7 @@ def get_course_videos_context(course_block, pagination_conf, course_key=None):
     VIDEO_IMAGE_UPLOAD_ENABLED = WaffleSwitch(  # lint-amnesty, pylint: disable=toggle-missing-annotation
         'videos.video_image_upload_enabled', __name__
     )
-    
+
     course = course_block
     if not course:
         with modulestore().bulk_operations(course_key):
