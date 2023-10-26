@@ -73,7 +73,7 @@ def course_or_organization_permission_check(user, permission_name, course_id, or
     if organization_name is None:
         course = modulestore().get_course(course_id)
         if course:
-            organization_name = modulestore().get_course(course_id).org
+            organization_name = course.org
         else:
             return course_permission_check(user, permission_name, course_id)
     return (course_permission_check(user, permission_name, course_id) or
