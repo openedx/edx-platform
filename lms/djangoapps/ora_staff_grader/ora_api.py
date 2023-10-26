@@ -43,7 +43,7 @@ def get_assessments(request, usage_id, submission_uuid, assessment_filter):
 
     response = call_xblock_json_handler(request, usage_id, handler_name, body)
 
-    if response.status_code != 200:
+    if response.status_code != HTTPStatus.OK:
         raise XBlockInternalError(context={"handler": handler_name})
 
     return json.loads(response.content)
