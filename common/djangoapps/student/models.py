@@ -3794,7 +3794,13 @@ class SurveyCourseDAO():
             return isCheck
        except:
            return None
-    
+    @classmethod
+    def checkSurveyDashboard (self):
+        try:
+            isCheck = SurveyCourse.objects.filter(course_id__isnull=True)
+            return isCheck
+        except:
+            return None
     @classmethod
     def checkUserEnroll (self, enrollment, user_id) :
         try:

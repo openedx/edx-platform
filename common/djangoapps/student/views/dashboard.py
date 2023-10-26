@@ -889,10 +889,12 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     # context.update({
     #     'resume_button_urls': resume_button_urls
     # })
-    check_form = SurveyUserDAO.checkSuccess(user_id=user.id)
+
     
-    if check_form == False:
-        return redirect('survey_form')
+    # check_form = SurveyUserDAO.checkSuccess(user_id=user.id)
+    
+    # if check_form == False:
+    #     return redirect('survey_form')
     
     
     dashboard_template = 'dashboard.html'
@@ -956,8 +958,10 @@ def form_begin_login (request, course_id=None) :
     
     check_form = SurveyUserDAO.checkSuccess(user_id=user.id)
     checkSurveyCourse = SurveyCourseDAO.checkSurveyCourse(course_id=course_id, user_id=user.id)
-    
-    if check_form and course_id is None :
+    check_dashboard = SurveyCourseDAO.checkSurveyDashboard()
+
+        
+    if check_form and course_id is None  or len(check_dashboard) == 0:
         return redirect('dashboard')
     if checkSurveyCourse and course_id is not None:
         return redirect(urlCourse)
