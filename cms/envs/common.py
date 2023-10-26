@@ -321,9 +321,6 @@ FEATURES = {
     # Show video bumper in Studio
     'ENABLE_VIDEO_BUMPER': False,
 
-    # Show issue open badges in Studio
-    'ENABLE_OPENBADGES': False,
-
     # How many seconds to show the bumper again, default is 7 days:
     'SHOW_BUMPER_PERIODICITY': 7 * 24 * 3600,
 
@@ -2185,6 +2182,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'course_structure_cache': {
@@ -2197,6 +2195,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'celery': {
@@ -2209,6 +2208,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'mongo_metadata_inheritance': {
@@ -2221,6 +2221,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'staticfiles': {
@@ -2232,6 +2233,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'default': {
@@ -2244,6 +2246,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'configuration': {
@@ -2255,6 +2258,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'general': {
@@ -2266,6 +2270,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
 }

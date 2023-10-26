@@ -13,6 +13,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      # This has to happen after checkout in order for gh to work.
+      - name: "Cancel scheduled job on forks"
+        if: github.repository != 'openedx/edx-platform' && github.event_name == 'schedule'
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        run: |
+          gh run cancel "${{ github.run_id }}"
+          gh run watch "${{ github.run_id }}"
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:

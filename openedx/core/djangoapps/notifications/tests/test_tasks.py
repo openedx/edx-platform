@@ -124,7 +124,12 @@ class SendNotificationsTest(ModuleStoreTestCase):
         content_url = 'https://example.com/'
 
         # Call the `send_notifications` function.
-        send_notifications([self.user.id], str(self.course_1.id), app_name, notification_type, context, content_url)
+        with patch('openedx.core.djangoapps.notifications.tasks.notification_generated_event') as event_mock:
+            send_notifications([self.user.id], str(self.course_1.id), app_name, notification_type, context, content_url)
+            assert event_mock.called
+            assert event_mock.call_args[0][0] == [self.user.id]
+            assert event_mock.call_args[0][1] == app_name
+            assert event_mock.call_args[0][2] == notification_type
 
         # Assert that `Notification` objects have been created for the users.
         notification = Notification.objects.filter(user_id=self.user.id).first()
