@@ -770,7 +770,7 @@ openedx-filters==0.8.0
     #   lti-consumer-xblock
 optimizely-sdk==4.1.0
     # via -r requirements/edx/base.in
-funixora2==0.1.6.dev0
+funixora2
     # via -r requirements/edx/base.in
 oscrypto==1.3.0
     # via snowflake-connector-python
