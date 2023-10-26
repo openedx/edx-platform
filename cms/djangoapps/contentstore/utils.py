@@ -1568,7 +1568,7 @@ def get_course_rerun_context(course_key, course_block, user):
     return course_rerun_context
 
 
-def get_course_videos_context(course_block, transcript_languages, videos, default_video_image_url):
+def get_course_videos_context(course_block, pagination_conf):
     """
     Utils is used to get contest of course videos.
     It is used for both DRF and django views.
@@ -1583,6 +1583,12 @@ def get_course_videos_context(course_block, transcript_languages, videos, defaul
     from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
     from xmodule.video_block.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
 
+    from .video_storage_handlers import (
+        get_all_transcript_languages,
+        _get_index_videos,
+        _get_default_video_image_url
+    )
+
     VIDEO_SUPPORTED_FILE_FORMATS = {
         '.mp4': 'video/mp4',
         '.mov': 'video/quicktime',
@@ -1594,13 +1600,13 @@ def get_course_videos_context(course_block, transcript_languages, videos, defaul
     )
 
     is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course_block.id)
-    previous_uploads, pagination_context = videos
+    previous_uploads, pagination_context = _get_index_videos(course_block, pagination_conf)
     course_video_context = {
         'context_course': course_block,
         'image_upload_url': reverse_course_url('video_images_handler', str(course_block.id)),
         'video_handler_url': reverse_course_url('videos_handler', str(course_block.id)),
         'encodings_download_url': reverse_course_url('video_encodings_download', str(course_block.id)),
-        'default_video_image_url': default_video_image_url,
+        'default_video_image_url': _get_default_video_image_url(),
         'previous_uploads': previous_uploads,
         'concurrent_upload_limit': settings.VIDEO_UPLOAD_PIPELINE.get('CONCURRENT_UPLOAD_LIMIT', 0),
         'video_supported_file_formats': list(VIDEO_SUPPORTED_FILE_FORMATS.keys()),
@@ -1616,7 +1622,7 @@ def get_course_videos_context(course_block, transcript_languages, videos, defaul
         'is_video_transcript_enabled': is_video_transcript_enabled,
         'active_transcript_preferences': None,
         'transcript_credentials': None,
-        'transcript_available_languages': transcript_languages,
+        'transcript_available_languages': get_all_transcript_languages(),
         'video_transcript_settings': {
             'transcript_download_handler_url': reverse('transcript_download_handler'),
             'transcript_upload_handler_url': reverse('transcript_upload_handler'),

@@ -669,14 +669,9 @@ def videos_index_html(course, pagination_conf=None):
     """
     Returns an HTML page to display previous video uploads and allow new ones
     """
-    videos = _get_index_videos(course, pagination_conf)
-    transcript_languages = get_all_transcript_languages()
-    default_video_image_url = _get_default_video_image_url()
     context = get_course_videos_context(
         course,
-        transcript_languages,
-        videos,
-        default_video_image_url,
+        pagination_conf,
     )
     if use_new_video_uploads_page(course.id):
         return redirect(get_video_uploads_url(course.id))

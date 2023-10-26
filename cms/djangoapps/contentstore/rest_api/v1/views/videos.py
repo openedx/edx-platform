@@ -153,16 +153,11 @@ class CourseVideosView(DeveloperErrorViewMixin, APIView):
         if not has_studio_read_access(request.user, course_key):
             self.permission_denied(request)
 
-        transcript_languages = get_all_transcript_languages()
-        default_video_image_url = staticfiles_storage.url(settings.VIDEO_IMAGE_DEFAULT_FILENAME)
         with modulestore().bulk_operations(course_key):
             course_block = modulestore().get_course(course_key)
-            videos = _get_index_videos(course_block)
             course_videos_context = get_course_videos_context(
                 course_block,
-                transcript_languages,
-                videos,
-                default_video_image_url
+                None,
             )
         serializer = CourseVideosSerializer(course_videos_context)
         return Response(serializer.data)
