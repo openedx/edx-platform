@@ -95,7 +95,9 @@ def course_or_organization_permission_list_check(user, permission_names, course_
 
 def get_all_user_permissions_for_a_course(user_id, course_id):
     """
-    Get all of a user's permissions for a course, including, if applicable, organization-level permissions
+    Get all of a user's permissions for a course,
+    including, if applicable, organization-level permissions
+    and instance-level permissions.
     """
     if user_id is None or course_id is None:
         raise ValueError(_('user_id and course_id must not be None'))
@@ -114,4 +116,10 @@ def get_all_user_permissions_for_a_course(user_id, course_id):
         org__name=organization_name,
     ).values_list('role__permissions__name', flat=True))
     permissions = course_permissions.union(organization_permissions)
+    instance_permissions = set(CourseRolesUserRole.objects.filter(
+        user__id=user_id,
+        course__isnull=True,
+        org__isnull=True,
+    ).values_list('role__permissions__name', flat=True))
+    permissions = permissions.union(instance_permissions)
     return permissions
