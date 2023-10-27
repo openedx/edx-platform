@@ -97,7 +97,7 @@ def get_all_user_permissions_for_a_course(user_id, course_id):
     Get all of a user's permissions for a course, including, if applicable, organization-level permissions
     """
     if user_id is None or course_id is None:
-        raise ValueError('user_id and course_id must not be None')
+        raise ValueError(_('user_id and course_id must not be None'))
     course_permissions = set(CourseRolesUserRole.objects.filter(
         user__id=user_id,
         course=course_id,
