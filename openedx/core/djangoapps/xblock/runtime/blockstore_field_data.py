@@ -140,6 +140,19 @@ class BlockstoreFieldData(FieldData):
             # it's mostly relevant as Scope.preferences(UserScope.ONE, BlockScope.TYPE)
             # Which would be handled by a user-aware FieldData implementation
 
+    def _get_active_block(self, block):
+        """
+        Get the ActiveBlock entry for the specified block, creating it if
+        necessary.
+        """
+        key = get_weak_key_for_block(block)
+        if key not in self.active_blocks:
+            self.active_blocks[key] = ActiveBlock(
+                olx_hash=get_olx_hash_for_definition_key(block.scope_ids.def_id),
+                changed_fields={},
+            )
+        return self.active_blocks[key]
+
     def get(self, block, name):
         """
         Get the given field value from Blockstore

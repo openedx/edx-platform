@@ -122,35 +122,9 @@ class LearningCoreFieldData(FieldData):
                 block.scope_ids.usage_id,
                 name,
             )
+            # If 'name' is not found, this will raise KeyError, which means to use the default value
             raise
 
-        # Otherwise, check to see if it
-        entry = self._get_active_block(block)
-        if name in entry.changed_fields:
-            value = entry.changed_fields[name]
-            if value == DELETED:
-                raise KeyError  # KeyError means use the default value, since this field was deliberately set to default
-            return value
-        try:
-            saved_fields = self.loaded_definitions[entry.olx_hash]
-        except KeyError:
-            if name == CHILDREN_INCLUDES:
-                # Special case: parse_xml calls add_node_as_child which calls 'block.children.append()'
-                # BEFORE parse_xml is done, and .append() needs to read the value of children. So
-                return []  # start with an empty list, it will get filled in.
-            # Otherwise, this is an anomalous get() before the XML was fully loaded:
-            # This could happen if an XBlock's parse_xml() method tried to read a field before setting it,
-            # if an XBlock read field data in its constructor (forbidden), or if an XBlock was loaded via
-            # some means other than runtime.get_block(). One way this can happen is if you log/print an XBlock during
-            # XML parsing, because ScopedStorageMixin.__repr__ will try to print all field values, and any fields which
-            # aren't mentioned in the XML (which are left at their default) will be "not loaded yet."
-            log.exception(
-                "XBlock %s tried to read from field data (%s) that wasn't loaded from Blockstore!",
-                block.scope_ids.usage_id, name,
-            )
-            raise  # Just use the default value for now; any exception raised here is caught anyways
-        return saved_fields[name]
-        # If 'name' is not found, this will raise KeyError, which means to use the default value
 
     def has_changes(self, block):
         usage_key = block.scope_ids.usage_id
@@ -197,6 +171,12 @@ class LearningCoreFieldData(FieldData):
 
 
 class LearningCoreDefinitionLocator(CheckFieldMixin, DefinitionKey):
+    """
+    Skeleton of a new definition locator, in case we need it.
+
+    Hopefully this isn't necessary at all. So far just passing Nones for def
+    keys and ignoring the def key elsewhere seems to be working out.
+    """
     CANONICAL_NAMESPACE = 'oel-cv'  # openedx-learning component version
     KEY_FIELDS = ('uuid',)
     #uuid = UUID
@@ -208,17 +188,11 @@ class LearningCoreDefinitionLocator(CheckFieldMixin, DefinitionKey):
 
 class LearningCoreOpaqueKeyReader(OpaqueKeyReader):
     def get_definition_id(self, usage_id):
+        """
+        This is mostly here to make sure LearningCore-based things *don't* call
+        it. By making it explode if it's called.
+        """
         1/0
-        if not isinstance(usage_id, UsageKeyV2):
-            raise TypeError(
-                f"This version of get_definition_id doesn't support the key type for {usage_id}."
-            )
-
-        return get_learning_context_impl(usage_id).definition_for_usage(usage_id)
-
-class NullDefinitionKey(DefinitionKey):
-    """This isn't really used."""
-
 
 
 class LearningCoreXBlockRuntime(BlockstoreXBlockRuntime):

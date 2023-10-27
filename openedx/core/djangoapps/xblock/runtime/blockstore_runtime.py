@@ -33,14 +33,13 @@ class BlockstoreXBlockRuntime(XBlockRuntime):
     def parse_xml_file(self, fileobj, id_generator=None):
         raise NotImplementedError("Use parse_olx_file() instead")
 
-    def get_block(self, usage_key, for_parent=None):
+    def get_block(self, usage_id, for_parent=None):
         """
         Create an XBlock instance in this runtime.
 
         Args:
             usage_key(OpaqueKey): identifier used to find the XBlock class and data.
         """
-        usage_id = usage_key
         def_id = self.id_reader.get_definition_id(usage_id)
         if def_id is None:
             raise ValueError(f"Definition not found for usage {usage_id}")
