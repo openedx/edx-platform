@@ -77,7 +77,9 @@ class Env:
     PRINT_SETTINGS_LOG_FILE = GEN_LOG_DIR / "print_settings.log"
 
     # Detect if in a Docker container, and if so which one
-    DEVSTACK_SETTINGS = 'devstack'
+    SERVER_HOST = os.environ.get('SERVER_HOSTNAME', '0.0.0.0')
+    USING_DOCKER = SERVER_HOST != '0.0.0.0'
+    DEVSTACK_SETTINGS = 'devstack_docker' if USING_DOCKER else 'devstack'
     TEST_SETTINGS = 'test'
 
     # Mongo databases that will be dropped before/after the tests run
@@ -87,7 +89,11 @@ class Env:
     TEST_DIR = REPO_ROOT / ".testids"
 
     # Configured browser to use for the js test suites
-    KARMA_BROWSER = 'FirefoxNoUpdates'
+    SELENIUM_BROWSER = os.environ.get('SELENIUM_BROWSER', 'firefox')
+    if USING_DOCKER:
+        KARMA_BROWSER = 'ChromeDocker' if SELENIUM_BROWSER == 'chrome' else 'FirefoxDocker'
+    else:
+        KARMA_BROWSER = 'FirefoxNoUpdates'
 
     # Files used to run each of the js test suites
     # TODO:  Store this as a dict. Order seems to matter for some
