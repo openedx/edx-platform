@@ -16,6 +16,7 @@ from openedx_learning.core.publishing.models import Draft, LearningPackage
 from lxml import etree
 from opaque_keys.edx.keys import UsageKeyV2
 
+from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError, NoSuchDefinition
 from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope, Sentinel
 from xblock.field_data import FieldData
@@ -113,17 +114,24 @@ class LearningCoreFieldData(FieldData):
             if value == DELETED:
                 raise KeyError  # KeyError means use the default value, since this field was deliberately set to default
 
-        loaded_fields = self.usage_keys_to_loaded_fields.get(usage_key, {})
         try:
-            return loaded_fields[name]
+            loaded_fields = self.usage_keys_to_loaded_fields[usage_key]
         except KeyError:
+            # If there's no entry for that usage key, then we're trying to read
+            # field data from a block that was never loaded, which we don't
+            # expect to happen. Log an exception for this.
             log.exception(
                 "XBlock %s tried to read from field data (%s) that wasn't loaded from Learning Core!",
                 block.scope_ids.usage_id,
                 name,
             )
-            # If 'name' is not found, this will raise KeyError, which means to use the default value
             raise
+
+        # If 'name' is not found, this will raise KeyError, which means to use
+        # the default value. This is expected–it means that we did load a block
+        # for it, but the block data didn't specify a value for this particular
+        # field.
+        return loaded_fields[name]
 
 
     def has_changes(self, block):
@@ -214,6 +222,33 @@ class LearningCoreXBlockRuntime(BlockstoreXBlockRuntime):
             local_key=usage_key.block_id,
         )
         return component
+
+    def _lookup_asset_url(self, block: XBlock, asset_path: str):  # pylint: disable=unused-argument
+        """
+        Return an absolute URL for the specified static asset file that may
+        belong to this XBlock.
+
+        e.g. if the XBlock settings have a field value like "/static/foo.png"
+        then this method will be called with asset_path="foo.png" and should
+        return a URL like https://cdn.none/xblock/f843u89789/static/foo.png
+
+        If the asset file is not recognized, return None
+
+        This is called by the XBlockRuntime superclass in the .runtime module.
+
+        CURRENT STATUS
+
+        Right now we're not recognizing anything. We'd need to hook up something
+        to serve the static assets, and the biggest issue around that is
+        figuring out the permissions that need to be applied.
+
+        Idea: Have openedx-learning provide a simple view that will stream the
+        content, but have apps explicitly subclass or wrap it with permissions
+        checks and such. That way the actual logic of figuring out the
+        permissions stays out of openedx-learning, since it requires access to
+        tables that don't exist there.
+        """
+        return None
 
     def get_block(self, usage_key, for_parent=None):
         log.info("Executing get_block from Learning Core")
