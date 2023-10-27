@@ -94,6 +94,10 @@ def create_jwt_token_dict(token_dict, oauth_adapter, use_asymmetric_key=None):
 
     jwt_token_dict = token_dict.copy()
     # Note: only "refresh_token" is not overwritten at this point.
+    # At this time, the user_id scope added for grant type password is only added to the
+    # JWT, and is not added for the DOT access token or refresh token, so we must override
+    # here. If this inconsistency becomes an issue, then the user_id scope should be
+    # added earlier with the DOT tokens, and we would no longer need to override "scope".
     jwt_token_dict.update({
         "access_token": jwt_access_token,
         "token_type": "JWT",
