@@ -40,6 +40,7 @@ User = get_user_model()
 
 TAXONOMY_ORG_LIST_URL = "/api/content_tagging/v1/taxonomies/"
 TAXONOMY_ORG_DETAIL_URL = "/api/content_tagging/v1/taxonomies/{pk}/"
+TAXONOMY_ORG_UPDATE_ORG_URL = "/api/content_tagging/v1/taxonomies/{pk}/orgs/"
 OBJECT_TAG_UPDATE_URL = "/api/content_tagging/v1/object_tags/{object_id}/?taxonomy={taxonomy_id}"
 TAXONOMY_TEMPLATE_URL = "/api/content_tagging/v1/taxonomies/import/{filename}"
 
@@ -1042,6 +1043,121 @@ class TestTaxonomyDeleteViewSet(TestTaxonomyChangeMixin, APITestCase):
         if status.is_success(response.status_code):
             response = self.client.get(url)
             assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+@skip_unless_cms
+@ddt.ddt
+class TestTaxonomyUpdateOrg(TestTaxonomyObjectsMixin, APITestCase):
+    """
+    Test cases for updating orgs from taxonomies
+    """
+
+    def test_update_org(self) -> None:
+        """
+        Tests that taxonomy admin can add/remove orgs from a taxonomy
+        """
+        url = TAXONOMY_ORG_UPDATE_ORG_URL.format(pk=self.tA1.pk)
+        self.client.force_authenticate(user=self.staff)
+
+        response = self.client.put(url, {"orgs": [self.orgB.short_name, self.orgX.short_name]}, format="json")
+        assert response.status_code == status.HTTP_200_OK
+
+        # Check that the orgs were updated
+        taxonomy_orgs = TaxonomyOrg.objects.filter(taxonomy=self.tA1)
+        assert taxonomy_orgs.count() == 2
+        assert taxonomy_orgs[0].org == self.orgB
+        assert taxonomy_orgs[1].org == self.orgX
+
+    def test_update_all_org(self) -> None:
+        """
+        Tests that taxonomy admin can associate a taxonomy to all orgs
+        """
+        url = TAXONOMY_ORG_UPDATE_ORG_URL.format(pk=self.tA1.pk)
+        self.client.force_authenticate(user=self.staff)
+
+        response = self.client.put(url, {"all_orgs": True}, format="json")
+        assert response.status_code == status.HTTP_200_OK
+
+        # Check that the orgs were updated
+        taxonomy_orgs = TaxonomyOrg.objects.filter(taxonomy=self.tA1)
+        assert taxonomy_orgs.count() == 1
+        assert taxonomy_orgs[0].org is None
+
+    def test_update_no_org(self) -> None:
+        """
+        Tests that taxonomy admin can associate a taxonomy no orgs
+        """
+        url = TAXONOMY_ORG_UPDATE_ORG_URL.format(pk=self.tA1.pk)
+        self.client.force_authenticate(user=self.staff)
+
+        response = self.client.put(url, {"orgs": []}, format="json")
+
+        assert response.status_code == status.HTTP_200_OK
+
+        # Check that the orgs were updated
+        taxonomy_orgs = TaxonomyOrg.objects.filter(taxonomy=self.tA1)
+        assert taxonomy_orgs.count() == 0
+
+    @ddt.data(
+        (True, ["orgX"], "Using both all_orgs and orgs parameters should throw error"),
+        (False, None, "Using neither all_orgs or orgs parameter should throw error"),
+        (None, None, "Using neither all_orgs or orgs parameter should throw error"),
+        (False, 'InvalidOrg', "Passing an invalid org should throw error"),
+    )
+    @ddt.unpack
+    def test_update_org_invalid_inputs(self, all_orgs: bool, orgs: list[str], reason: str) -> None:
+        """
+        Tests if passing both or none of all_orgs and orgs parameters throws error
+        """
+        url = TAXONOMY_ORG_UPDATE_ORG_URL.format(pk=self.tA1.pk)
+        self.client.force_authenticate(user=self.staff)
+
+        # Set body cleaning empty values
+        body = {k: v for k, v in {"all_orgs": all_orgs, "orgs": orgs}.items() if v is not None}
+        response = self.client.put(url, body, format="json")
+        assert response.status_code == status.HTTP_400_BAD_REQUEST, reason
+
+        # Check that the orgs didn't change
+        taxonomy_orgs = TaxonomyOrg.objects.filter(taxonomy=self.tA1)
+        assert taxonomy_orgs.count() == 1
+        assert taxonomy_orgs[0].org == self.orgA
+
+    def test_update_org_system_defined(self) -> None:
+        """
+        Tests that is not possible to change the orgs associated with a system defined taxonomy
+        """
+        url = TAXONOMY_ORG_UPDATE_ORG_URL.format(pk=self.st1.pk)
+        self.client.force_authenticate(user=self.staff)
+
+        response = self.client.put(url, {"orgs": [self.orgA.short_name]}, format="json")
+        assert response.status_code in [status.HTTP_403_FORBIDDEN, status.HTTP_400_BAD_REQUEST]
+
+        # Check that the orgs didn't change
+        taxonomy_orgs = TaxonomyOrg.objects.filter(taxonomy=self.st1)
+        assert taxonomy_orgs.count() == 1
+        assert taxonomy_orgs[0].org is None
+
+    @ddt.data(
+        "staffA",
+        "content_creatorA",
+        "instructorA",
+        "library_staffA",
+        "course_instructorA",
+        "course_staffA",
+        "library_userA",
+    )
+    def test_update_org_no_perm(self, user_attr: str) -> None:
+        url = TAXONOMY_ORG_UPDATE_ORG_URL.format(pk=self.tA1.pk)
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+
+        response = self.client.put(url, {"orgs": []}, format="json")
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+        # Check that the orgs didn't change
+        taxonomy_orgs = TaxonomyOrg.objects.filter(taxonomy=self.tA1)
+        assert taxonomy_orgs.count() == 1
+        assert taxonomy_orgs[0].org == self.orgA
 
 
 class TestObjectTagMixin(TestTaxonomyObjectsMixin):

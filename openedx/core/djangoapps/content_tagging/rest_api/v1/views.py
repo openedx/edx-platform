@@ -3,15 +3,18 @@ Tagging Org API Views
 """
 
 from openedx_tagging.core.tagging.rest_api.v1.views import ObjectTagView, TaxonomyView
-
+from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.response import Response
 
 from ...api import (
     create_taxonomy,
     get_taxonomies,
     get_taxonomies_for_org,
+    set_taxonomy_orgs,
 )
 from ...rules import get_admin_orgs
-from .serializers import TaxonomyOrgListQueryParamsSerializer
+from .serializers import TaxonomyOrgListQueryParamsSerializer, TaxonomyUpdateOrgBodySerializer
 from .filters import ObjectTagTaxonomyOrgFilterBackend, UserOrgFilterBackend
 
 
@@ -60,6 +63,26 @@ class TaxonomyOrgView(TaxonomyView):
         """
         user_admin_orgs = get_admin_orgs(self.request.user)
         serializer.instance = create_taxonomy(**serializer.validated_data, orgs=user_admin_orgs)
+
+    @action(detail=True, methods=["put"])
+    def orgs(self, request, **_kwargs) -> Response:
+        """
+        Export a taxonomy.
+        """
+        taxonomy = self.get_object()
+        perm = "oel_tagging.update_orgs"
+        if not request.user.has_perm(perm, taxonomy):
+            raise PermissionDenied("You do not have permission to update the orgs associated with this taxonomy.")
+        body = TaxonomyUpdateOrgBodySerializer(
+            data=request.data,
+        )
+        body.is_valid(raise_exception=True)
+        orgs = body.validated_data.get("orgs")
+        all_orgs: bool = body.validated_data.get("all_orgs", False)
+
+        set_taxonomy_orgs(taxonomy=taxonomy, all_orgs=all_orgs, orgs=orgs)
+
+        return Response()
 
 
 class ObjectTagOrgView(ObjectTagView):
