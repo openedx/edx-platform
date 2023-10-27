@@ -595,3 +595,13 @@ class DiscussionTopicLink(models.Model):
             f'enabled_in_context={self.enabled_in_context}'
             f')'
         )
+
+
+class DiscussionReport (models.Model):
+    thread_id = models.CharField(max_length=255)
+    user_id = models.IntegerField()
+    report_type = models.CharField(max_length=255)
+    report_details = models.TextField()
+
+    def __str__(self):
+        return f'{self.thread_id} '
