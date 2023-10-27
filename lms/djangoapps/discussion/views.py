@@ -50,7 +50,7 @@ from lms.djangoapps.discussion.exceptions import TeamDiscussionHiddenFromUserExc
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.teams import api as team_api
-from openedx.core.djangoapps.course_roles.helpers import course_permission_check
+from openedx.core.djangoapps.course_roles.helpers import course_permission_check, course_permissions_list_check_any
 from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 from openedx.core.djangoapps.discussions.utils import (
     available_division_schemes,
@@ -778,7 +778,15 @@ def is_privileged_user(course_key: CourseKey, user: User):
         FORUM_ROLE_ADMINISTRATOR,
     ]
     has_course_role = Role.user_has_role_for_course(user, course_key, forum_roles)
-    return GlobalStaff().has_user(user) or has_course_role
+    # TODO: course roles: If the course roles feature flag is disabled the course_permissions_list_check_any
+    #       call below will never return true.
+    #       Remove the has_course_role validation when course_roles Django app are implemented.
+    permissions = [
+        CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value,
+        CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.value,
+    ]
+    has_moderate_discussion_permissions = course_permissions_list_check_any(user, permissions, course_key)
+    return GlobalStaff().has_user(user) or has_course_role or has_moderate_discussion_permissions
 
 
 class DiscussionBoardFragmentView(EdxFragmentView):

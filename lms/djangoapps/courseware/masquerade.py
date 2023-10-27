@@ -20,6 +20,8 @@ from web_fragments.fragment import Fragment
 from xblock.runtime import KeyValueStore
 
 from common.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
+from openedx.core.djangoapps.course_roles.helpers import course_permission_check, course_permissions_list_check_any
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID
@@ -98,8 +100,20 @@ class MasqueradeView(View):
         Retrieve data on the active and available masquerade options
         """
         course_key = CourseKey.from_string(course_key_string)
+        # TODO: course roles: If the course roles feature flag is disabled the course_permissions_list_check_any
+        #       call below will never return true.
+        #       Remove the has_staff_roles call when course_roles Django app are implemented.
+        masquerade_permissions = [
+            CourseRolesPermission.GENERAL_MASQUERADING.value,
+            CourseRolesPermission.SPECIFIC_MASQUERADING.value,
+        ]
+        has_masquerade_permissions = course_permissions_list_check_any(
+            request.user,
+            masquerade_permissions,
+            course_key,
+        )
         is_staff = has_staff_roles(request.user, course_key)
-        if not is_staff:
+        if not is_staff and not has_masquerade_permissions:
             return JsonResponse({
                 'success': False,
             })
@@ -165,8 +179,20 @@ class MasqueradeView(View):
         to CourseMasquerade objects.
         """
         course_key = CourseKey.from_string(course_key_string)
+        # TODO: course roles: If the course roles feature flag is disabled the course_permissions_list_check_any
+        #       call below will never return true.
+        #       Remove the has_staff_roles call when course_roles Django app are implemented.
+        masquerade_permissions = [
+            CourseRolesPermission.GENERAL_MASQUERADING.value,
+            CourseRolesPermission.SPECIFIC_MASQUERADING.value,
+        ]
+        has_masquerade_permissions = course_permissions_list_check_any(
+            request.user,
+            masquerade_permissions,
+            course_key,
+        )
         is_staff = has_staff_roles(request.user, course_key)
-        if not is_staff:
+        if not is_staff and not has_masquerade_permissions:
             return JsonResponse({
                 'success': False,
             })
@@ -395,8 +421,23 @@ def check_content_start_date_for_masquerade_user(course_key, user, request, cour
     if now < most_future_date and _is_masquerading:
         group_masquerade = is_masquerading_as_student(user, course_key)
         specific_student_masquerade = is_masquerading_as_specific_student(user, course_key)
+        # TODO: course roles: If the course roles feature flag is disabled the course_permissions_list_check_any
+        #       call and the course_permission_check call below will never return true.
+        #       Remove the has_staff_roles call when course_roles Django app are implemented.
+        has_specific_masquerade = course_permission_check(
+            user,
+            CourseRolesPermission.SPECIFIC_MASQUERADING.value,
+            course_key,
+        )
+        permissions = [
+            CourseRolesPermission.MANAGE_CONTENT.value,
+            CourseRolesPermission.VIEW_ALL_CONTENT.value,
+            CourseRolesPermission.VIEW_ONLY_LIVE_PUBLISHED_CONTENT.value,
+            CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.value,
+        ]
+        has_permissions = has_specific_masquerade and course_permissions_list_check_any(user, permissions, course_key)
         is_staff = has_staff_roles(user, course_key)
-        if group_masquerade or (specific_student_masquerade and not is_staff):
+        if group_masquerade or (specific_student_masquerade and (not is_staff and not has_permissions)):
             PageLevelMessages.register_warning_message(
                 request,
                 HTML(_('This user does not have access to this content because \

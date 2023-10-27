@@ -33,6 +33,8 @@ from common.djangoapps.util.model_utils import truncate_fields
 from lms.djangoapps.courseware.courses import get_course_with_access, has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
+from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
+from openedx.core.djangoapps.course_roles.helpers import course_or_organization_permission_check
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser, BearerAuthentication
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.permissions import IsCourseStaffInstructor, IsStaffOrReadOnly
@@ -1070,7 +1072,13 @@ def _filter_hidden_private_teamsets(user, teamsets, course_block):
     Return a filtered list of teamsets, removing any private teamsets that a user doesn't have access to.
     Follows the same logic as `has_specific_teamset_access` but in bulk rather than for one teamset at a time
     """
-    if has_course_staff_privileges(user, course_block.id):
+    # TODO: course roles: If the course roles feature flag is disabled the course_or_organization_permission_check
+    #       below will never return true.
+    #       Remove the has_course_staff_privileges when course_roles Django app are implemented.
+    user_has_manage_student_permission = course_or_organization_permission_check(
+        user, CourseRolesPermission.MANAGE_STUDENTS.value, course_block.id
+    )
+    if has_course_staff_privileges(user, course_block.id) or user_has_manage_student_permission:
         return teamsets
     private_teamset_ids = [teamset.teamset_id for teamset in course_block.teamsets if teamset.is_private_managed]
     teamset_ids_user_has_access_to = set(
@@ -1384,7 +1392,14 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                     status=status.HTTP_404_NOT_FOUND
                 )
             teamset_teams = CourseTeam.objects.filter(course_id=requested_course_key, topic_id=teamset_id)
-            if has_course_staff_privileges(request.user, requested_course_key):
+            # TODO: course roles: If the course roles feature flag
+            #       is disabled the course_or_organization_permission_check
+            #       below will never return true.
+            #       Remove the has_course_staff_privileges when course_roles Django app are implemented.
+            user_has_manage_student_permission = course_or_organization_permission_check(
+                request.user, CourseRolesPermission.MANAGE_STUDENTS.value, requested_course_key
+            )
+            if has_course_staff_privileges(request.user, requested_course_key) or user_has_manage_student_permission:
                 teams_with_access = list(teamset_teams)
             else:
                 teams_with_access = [
@@ -1689,7 +1704,13 @@ class MembershipBulkManagementView(GenericAPIView):
         """
         Raises 403 if user does not have access to this endpoint.
         """
-        if not has_course_staff_privileges(self.request.user, self.course.id):
+        # TODO: course roles: If the course roles feature flag is disabled the course_or_organization_permission_check
+        #       below will never return true.
+        #       Remove the has_course_staff_privileges when course_roles Django app are implemented.
+        user_has_manage_student_permission = course_or_organization_permission_check(
+            self.request.user, CourseRolesPermission.MANAGE_STUDENTS.value, self.course.id
+        )
+        if not has_course_staff_privileges(self.request.user, self.course.id) or user_has_manage_student_permission:
             raise PermissionDenied(
                 "To manage team membership of {}, you must be course staff.".format(
                     self.course.id
