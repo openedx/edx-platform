@@ -136,6 +136,7 @@ build
 \#*\#
 .env/
 openedx/core/djangoapps/django_comment_common/comment_client/python
+openedx/core/djangoapps/cache_toolbox/__pycache__
 autodeploy.properties
 .ws_migrations_complete
 dist

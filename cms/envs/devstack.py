@@ -309,6 +309,7 @@ CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 # .. toggle_creation_date: 2023-02-21
 # .. toggle_warning: For consistency in user experience, keep the value in sync with the setting of the same name
 #   in the LMS and CMS.
+#   This will be deprecated in favor of ENABLE_SEND_XBLOCK_LIFECYCLE_EVENTS_OVER_BUS
 # .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/31813'
 FEATURES['ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS'] = True
 FEATURES['ENABLE_SEND_ENROLLMENT_EVENTS_OVER_BUS'] = True

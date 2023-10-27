@@ -121,6 +121,9 @@ from lms.envs.common import (
     # Methods to derive settings
     _make_mako_template_dirs,
     _make_locale_paths,
+
+    # Password Validator Settings
+    AUTH_PASSWORD_VALIDATORS
 )
 from path import Path as path
 from django.urls import reverse_lazy
@@ -317,9 +320,6 @@ FEATURES = {
 
     # Show video bumper in Studio
     'ENABLE_VIDEO_BUMPER': False,
-
-    # Show issue open badges in Studio
-    'ENABLE_OPENBADGES': False,
 
     # How many seconds to show the bumper again, default is 7 days:
     'SHOW_BUMPER_PERIODICITY': 7 * 24 * 3600,
@@ -531,6 +531,19 @@ FEATURES = {
     # .. toggle_creation_date: 2023-03-31
     # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/32015
     'DISABLE_ADVANCED_SETTINGS': False,
+
+    # .. toggle_name: FEATURES['ENABLE_SEND_XBLOCK_LIFECYCLE_EVENTS_OVER_BUS']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Enables sending xblock lifecycle events over the event bus. Used to create the
+    #   EVENT_BUS_PRODUCER_CONFIG setting
+    # .. toggle_use_cases: opt_in
+    # .. toggle_creation_date: 2023-10-10
+    # .. toggle_target_removal_date: 2023-10-12
+    # .. toggle_warning: The default may be changed in a later release. See
+    #   https://github.com/openedx/openedx-events/issues/265
+    # .. toggle_tickets: https://github.com/edx/edx-arch-experiments/issues/381
+    'ENABLE_SEND_XBLOCK_LIFECYCLE_EVENTS_OVER_BUS': False,
 }
 
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE
@@ -831,6 +844,7 @@ CSRF_COOKIE_SECURE = False
 CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ''
 CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
 CSRF_TRUSTED_ORIGINS = []
+CSRF_TRUSTED_ORIGINS_WITH_SCHEME = []
 
 #################### CAPA External Code Evaluation #############################
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
@@ -1085,8 +1099,8 @@ DATABASES = {
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+# This will be overridden through CMS config
 DEFAULT_HASHING_ALGORITHM = 'sha1'
-
 #################### Python sandbox ############################################
 
 CODE_JAIL = {
@@ -1794,6 +1808,7 @@ INSTALLED_APPS = [
 
     # alternative swagger generator for CMS API
     'drf_spectacular',
+    'openedx_events',
 ]
 
 
@@ -1878,24 +1893,6 @@ EVENT_TRACKING_PROCESSORS = []
 EVENT_TRACKING_SEGMENTIO_EMIT_WHITELIST = []
 
 #### PASSWORD POLICY SETTINGS #####
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "common.djangoapps.util.password_policy_validators.MinimumLengthValidator",
-        "OPTIONS": {
-            "min_length": 2
-        }
-    },
-    {
-        "NAME": "common.djangoapps.util.password_policy_validators.MaximumLengthValidator",
-        "OPTIONS": {
-            "max_length": 75
-        }
-    },
-]
-
 PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG = {
     'ENFORCE_COMPLIANCE_ON_LOGIN': False
 }
@@ -2185,6 +2182,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'course_structure_cache': {
@@ -2197,6 +2195,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'celery': {
@@ -2209,6 +2208,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'mongo_metadata_inheritance': {
@@ -2221,6 +2221,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'staticfiles': {
@@ -2232,6 +2233,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'default': {
@@ -2244,6 +2246,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'configuration': {
@@ -2255,6 +2258,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'general': {
@@ -2266,6 +2270,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
 }
@@ -2787,3 +2792,67 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
     'PREPROCESSING_HOOKS': ['cms.lib.spectacular.cms_api_filter'],  # restrict spectacular to CMS API endpoints
 }
+
+
+#### Event bus producing ####
+def _should_send_xblock_events(settings):
+    return settings.FEATURES['ENABLE_SEND_XBLOCK_LIFECYCLE_EVENTS_OVER_BUS']
+
+# .. setting_name: EVENT_BUS_PRODUCER_CONFIG
+# .. setting_default: all events disabled
+# .. setting_description: Dictionary of event_types mapped to dictionaries of topic to topic-related configuration.
+#    Each topic configuration dictionary contains
+#    * `enabled`: a toggle denoting whether the event will be published to the topic. These should be annotated
+#       according to
+#       https://edx.readthedocs.io/projects/edx-toggles/en/latest/how_to/documenting_new_feature_toggles.html
+#    * `event_key_field` which is a period-delimited string path to event data field to use as event key.
+#    Note: The topic names should not include environment prefix as it will be dynamically added based on
+#    EVENT_BUS_TOPIC_PREFIX setting.
+
+EVENT_BUS_PRODUCER_CONFIG = {
+    'org.openedx.content_authoring.course.catalog_info.changed.v1': {
+        'course-catalog-info-changed':
+            {'event_key_field': 'catalog_info.course_key',
+             # .. toggle_name: EVENT_BUS_PRODUCER_CONFIG['org.openedx.content_authoring.course.catalog_info.changed.v1']
+             #    ['course-catalog-info-changed']['enabled']
+             # .. toggle_implementation: DjangoSetting
+             # .. toggle_default: False
+             # .. toggle_description: if enabled, will publish COURSE_CATALOG_INFO_CHANGED events to the event bus on
+             #    the course-catalog-info-changed topics
+             # .. toggle_warning: The default may be changed in a later release. See
+             #    https://github.com/openedx/openedx-events/issues/265
+             # .. toggle_use_cases: opt_in
+             # .. toggle_creation_date: 2023-10-10
+             'enabled': False},
+    },
+    'org.openedx.content_authoring.xblock.published.v1': {
+        'course-authoring-xblock-lifecycle':
+            {'event_key_field': 'xblock_info.usage_key', 'enabled': _should_send_xblock_events},
+    },
+    'org.openedx.content_authoring.xblock.deleted.v1': {
+        'course-authoring-xblock-lifecycle':
+            {'event_key_field': 'xblock_info.usage_key', 'enabled': _should_send_xblock_events},
+    },
+    'org.openedx.content_authoring.xblock.duplicated.v1': {
+        'course-authoring-xblock-lifecycle':
+            {'event_key_field': 'xblock_info.usage_key', 'enabled': _should_send_xblock_events},
+    },
+    # LMS events. These have to be copied over here because lms.common adds some derived entries as well,
+    # and the derivation fails if the keys are missing. If we ever remove the import of lms.common, we can remove these.
+    'org.openedx.learning.certificate.created.v1': {
+        'learning-certificate-lifecycle':
+            {'event_key_field': 'certificate.course.course_key', 'enabled': False},
+    },
+    'org.openedx.learning.certificate.revoked.v1': {
+        'learning-certificate-lifecycle':
+            {'event_key_field': 'certificate.course.course_key', 'enabled': False},
+    },
+}
+
+
+derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.content_authoring.xblock.published.v1',
+                         'course-authoring-xblock-lifecycle', 'enabled')
+derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.content_authoring.xblock.duplicated.v1',
+                         'course-authoring-xblock-lifecycle', 'enabled')
+derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.content_authoring.xblock.deleted.v1',
+                         'course-authoring-xblock-lifecycle', 'enabled')

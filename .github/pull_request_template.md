@@ -1,10 +1,13 @@
 <!--
 
-🌴🌴
-🌴🌴🌴🌴         🌴 Note: Palm is in support. Fixes you make on master may still be needed on Palm.
-    🌴🌴🌴🌴     If so, make another pull request against the open-release/palm.master branch,
-🌴🌴🌴🌴         or ask in the #wg-build-test-release Slack channel if you have any questions or need help.
-🌴🌴
+🌳🌳
+🌳🌳🌳🌳         🌳 Note: Quince is in support. Fixes you make on master may still be needed on Quince.
+    🌳🌳🌳🌳     If so, make another pull request against the open-release/quince.master branch,
+🌳🌳🌳🌳         or ask in the #wg-build-test-release Slack channel if you have any questions or need help.
+🌳🌳
+
+🌴🌴🌴🌴🌴🌴     🌴 Note: the Palm release is still supported.
+                Please consider whether your change should be applied to Palm as well.
 
 Please give your pull request a short but descriptive title.
 Use conventional commits to separate and summarize commits logically:

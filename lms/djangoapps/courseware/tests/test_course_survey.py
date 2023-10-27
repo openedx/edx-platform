@@ -22,7 +22,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
     """
     All tests for the views.py file
     """
-    STUDENT_INFO = [('view@test.com', 'foo')]
+    STUDENT_INFO = [('view@test.com', 'Password1234')]
 
     @classmethod
     def setUpClass(cls):

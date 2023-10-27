@@ -132,7 +132,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-09-10 20:42+0000\n"
+"POT-Creation-Date: 2023-10-01 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2021\n"
 "Language-Team: Turkish (Turkey) (https://app.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -3708,12 +3708,12 @@ msgid "Good"
 msgstr "İyi"
 
 #. Translators: Replier commented on "your" response to your post
-#: lms/djangoapps/discussion/rest_api/utils.py
+#: lms/djangoapps/discussion/rest_api/discussions_notifications.py
 msgid "your"
 msgstr "size"
 
 #. Translators: Replier commented on "their" response to your post
-#: lms/djangoapps/discussion/rest_api/utils.py
+#: lms/djangoapps/discussion/rest_api/discussions_notifications.py
 msgid "their"
 msgstr "onlara"
 
@@ -7152,6 +7152,17 @@ msgstr ""
 msgid "Original usage key/ID of the thing that is in the clipboard."
 msgstr ""
 
+#: openedx/core/djangoapps/content_tagging/models/base.py
+#: wiki/models/article.py
+msgid "owner"
+msgstr "sahip"
+
+#: openedx/core/djangoapps/content_tagging/models/base.py
+msgid ""
+"Organization that is related to this taxonomy.If None, then this taxonomy is"
+" related to all organizations."
+msgstr ""
+
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
 "List of domains that are allowed to make cross-domain requests to this site."
@@ -7628,6 +7639,14 @@ msgstr "{course} dersi için {country} kara listede"
 msgid "Learner Pathways"
 msgstr "Öğrenci Patikaları"
 
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification App"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification Type"
+msgstr ""
+
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
 msgid ""
@@ -7669,6 +7688,20 @@ msgid ""
 msgstr ""
 "<{p}><{strong}>{username}</{strong}> sordu "
 "<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> responded to a post you’re "
+"following: <{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> commented on {author_name}'s "
+"response in a post you’re following <{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
 
 #: openedx/core/djangoapps/notifications/base_notification.py
 msgid ""
@@ -9181,16 +9214,6 @@ msgid ""
 "You have successfully shifted your course schedule and your calendar is up "
 "to date."
 msgstr "Ders programınızı başarıyla değiştirdiniz ve takviminiz güncel. "
-
-#: openedx/features/content_tagging/models/base.py wiki/models/article.py
-msgid "owner"
-msgstr "sahip"
-
-#: openedx/features/content_tagging/models/base.py
-msgid ""
-"Organization that is related to this taxonomy.If None, then this taxonomy is"
-" related to all organizations."
-msgstr ""
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
