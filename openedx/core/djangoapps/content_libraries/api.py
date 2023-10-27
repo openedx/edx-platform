@@ -638,8 +638,51 @@ def delete_library(library_key):
         log.exception("Failed to delete blockstore bundle %s when deleting library. Delete it manually.", bundle_uuid)
         raise
 
-
 def get_library_blocks(library_key, text_search=None, block_types=None):
+    return get_library_blocks_learning_core(
+    #return get_library_blocks_blockstore(
+        library_key,
+        text_search=text_search,
+        block_types=block_types,
+    )
+
+
+from openedx_learning.core.publishing.models import Draft, LearningPackage
+from .models import ContentLibraryLearningPackage
+
+def get_library_blocks_learning_core(library_key, text_search=None, block_types=None):
+    """
+    We are absolutely ignoring the optional args in the first pass.
+    """
+    lib = ContentLibrary.objects.get_by_key(library_key)
+    learning_package = ContentLibraryLearningPackage.objects.get(pk=lib.pk).learning_package
+    drafts = Draft.objects \
+                 .select_related(
+                     'version',
+                     'version__componentversion',
+                     'entity',
+                     'entity__component',
+                 ).filter(
+                     entity__learning_package=learning_package,
+                     version__isnull=False,
+                 ).all()
+    return [
+        LibraryXBlockMetadata(
+            usage_key=LibraryUsageLocatorV2(
+                library_key,
+                draft.entity.component.type,
+                draft.entity.component.local_key,
+            ),
+            def_key=None,
+            display_name=draft.version.title,
+            has_unpublished_changes=False,
+        )
+        for draft in drafts
+    ]
+
+
+
+def get_library_blocks_blockstore(library_key, text_search=None, block_types=None):
     """
     Get the list of top-level XBlocks in the specified library.
 
@@ -717,6 +760,30 @@ def _lookup_usage_key(usage_key):
 
 
 def get_library_block(usage_key):
+    return get_library_block_learning_core(usage_key)
+
+
+def get_library_block_learning_core(usage_key):
+    library_key = usage_key.lib_key
+    lib = ContentLibrary.objects.get_by_key(library_key)
+    learning_package = ContentLibraryLearningPackage.objects.get(pk=lib.pk).learning_package
+    entity = PublishableEntity.objects.select_related('published', 'draft').get(
+        learning_package=learning_package,
+        component__type=usage_key.block_type,
+        component__local_key=usage_key.block_id,
+    )
+    draft_version = entity.draft.version
+    published_version = entity.published.version
+
+    return LibraryXBlockMetadata(
+        usage_key=usage_key,
+        def_key=None,
+        display_name=draft_version.title,
+        has_unpublished_changes=(draft_version != published_version),
+    )
+
+
+def get_library_block_blockstore(usage_key):
     """
     Get metadata (LibraryXBlockMetadata) about one specific XBlock in a library
 
@@ -736,7 +803,7 @@ def get_library_block(usage_key):
 from openedx_learning.core.components.api import get_component_version_content
 from openedx_learning.core.components.models import Component, ComponentVersion, ComponentVersionRawContent
 from openedx_learning.core.contents.models import RawContent, TextContent
-from openedx_learning.core.publishing.models import Draft, LearningPackage
+from openedx_learning.core.publishing.models import Draft, LearningPackage, PublishableEntity
 from django.db.models import Q
 
 def get_library_block_olx(usage_key: LibraryUsageLocatorV2):

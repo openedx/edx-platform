@@ -23,6 +23,14 @@ from xblock.exceptions import NoSuchViewError
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
 from openedx.core.djangoapps.xblock.runtime.blockstore_runtime import BlockstoreXBlockRuntime, xml_for_definition
+
+from openedx.core.djangoapps.xblock.runtime.learning_core_runtime import (
+    LearningCoreFieldData,
+    LearningCoreOpaqueKeyReader,
+    LearningCoreXBlockRuntime,
+)
+
+
 from openedx.core.djangoapps.xblock.runtime.runtime import XBlockRuntimeSystem as _XBlockRuntimeSystem
 from openedx.core.djangolib.blockstore_cache import BundleCache
 from .utils import get_secure_token_for_xblock_handler, get_xblock_id_for_anonymous_user
@@ -69,6 +77,21 @@ def get_runtime_system():
         setattr(get_runtime_system, cache_name, _XBlockRuntimeSystem(**params))
     return getattr(get_runtime_system, cache_name)
 
+from datetime import datetime
+
+def get_runtime_system():
+    params = get_xblock_app_config().get_runtime_system_params()
+    params.update(
+        runtime_class=LearningCoreXBlockRuntime,
+        handler_url=get_handler_url,
+        authored_data_store=LearningCoreFieldData(),
+    )
+    start = datetime.now()
+    runtime = _XBlockRuntimeSystem(**params)
+    end = datetime.now()
+    log.info(f"Runtime initiated in {end - start}")
+
+    return runtime
 
 def load_block(usage_key, user):
     """
@@ -172,7 +195,42 @@ def xblock_type_display_name(block_type):
         return block_type  # Just use the block type as the name
 
 
+def use_learning_core(block_or_key):
+    pass
+
+from openedx_learning.core.publishing.models import Draft, LearningPackage
+from openedx_learning.core.components.models import Component, ComponentVersion, ComponentVersionRawContent
+
+
+def _get_component_from_usage_key(self, usage_key):
+    learning_package = LearningPackage.objects.get(key=str(usage_key.lib_key))
+    component = Component.objects.get(
+        learning_package=learning_package,
+        namespace='xblock.v1',
+        type=usage_key.block_type,
+        local_key=usage_key.block_id,
+    )
+    return component
+
+
 def get_block_display_name(block_or_key):
+    return get_block_display_name_learning_core(block_or_key)
+
+def get_block_display_name_learning_core(block_or_key):
+    if isinstance(block_or_key, XBlock):
+        return block_or_key.display_name
+    elif isinstance(block_or_key, UsageKeyV2):
+        component = _get_component_from_usage_key(block_or_key)
+        return component.draft.title if component.draft else ""
+
+    raise TypeError(
+        "display_name lookup expects a UsageKeyV2 or XBlock, " +
+        f"got {type(block_or_key)}: {block_or_key} instead"
+    )
+
+
+
+def get_block_display_name_blockstore(block_or_key):
     """
     Efficiently get the display name of the specified block. This is done in a
     way that avoids having to load and parse the block's entire XML field data
@@ -186,8 +244,11 @@ def get_block_display_name(block_or_key):
 
     Returns the display name as a string
     """
+    log.info("CALLING get_block_display_name")
+
     def_key = resolve_definition(block_or_key)
     use_draft = get_xblock_app_config().get_learning_context_params().get('use_draft')
+
     cache = BundleCache(def_key.bundle_uuid, draft_name=use_draft)
     cache_key = ('block_display_name', str(def_key))
     display_name = cache.get(cache_key)
