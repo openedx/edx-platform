@@ -773,7 +773,10 @@ def get_library_block_learning_core(usage_key):
         component__local_key=usage_key.block_id,
     )
     draft_version = entity.draft.version
-    published_version = entity.published.version
+    if hasattr(entity, 'published'):
+        published_version = entity.published.version
+    else:
+        published_version = None
 
     return LibraryXBlockMetadata(
         usage_key=usage_key,
