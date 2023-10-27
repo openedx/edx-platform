@@ -99,15 +99,15 @@ def get_all_user_permissions_for_a_course(user_id, course_id):
     """
     if user_id is None or course_id is None:
         raise ValueError(_('user_id and course_id must not be None'))
-    course_permissions = set(CourseRolesUserRole.objects.filter(
-        user__id=user_id,
-        course=course_id,
-    ).values_list('role__permissions__name', flat=True))
     course = modulestore().get_course(course_id)
     if course:
+        course_permissions = set(CourseRolesUserRole.objects.filter(
+            user__id=user_id,
+            course=course_id,
+        ).values_list('role__permissions__name', flat=True))
         organization_name = course.org
     else:
-        return course_permissions
+        return ValueError(_('course_id is not valid'))
     organization_permissions = set(CourseRolesUserRole.objects.filter(
         user__id=user_id,
         course__isnull=True,
