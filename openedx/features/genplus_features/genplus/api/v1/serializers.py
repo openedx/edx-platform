@@ -8,13 +8,21 @@ from django.contrib.auth.hashers import check_password
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(source='profile.name')
+    name = serializers.SerializerMethodField()
     role = serializers.CharField(source='gen_user.role')
     school = serializers.CharField(source='gen_user.school.name')
     school_type = serializers.CharField(source='gen_user.school.type')
     is_school_active = serializers.BooleanField(source='gen_user.school.is_active')
     csrf_token = serializers.SerializerMethodField('get_csrf_token')
     has_changed_password = serializers.SerializerMethodField('get_password_changed')
+
+    def get_name(self, instance):
+        name = ''
+        if instance.profile and (instance.profile.name or '').strip():
+            name = instance.profile.name
+        elif (instance.first_name or '').strip() or (instance.last_name or '').strip():
+            name = f'{instance.first_name} {instance.last_name}'.strip()
+        return name
 
     def to_representation(self, instance):
         user_info = super(UserInfoSerializer, self).to_representation(instance)
@@ -71,11 +79,13 @@ class TeacherSerializer(serializers.ModelSerializer):
     def get_user_id(self, obj):
         return obj.gen_user.user.id
 
-    def get_name(self, obj):
-        profile = UserProfile.objects.filter(user=obj.gen_user.user).first()
-        if profile:
-            return profile.name
-        return None
+    def get_name(self, instance):
+        name = ''
+        if instance.profile and (instance.profile.name or '').strip():
+            name = instance.profile.name
+        elif (instance.first_name or '').strip() or (instance.last_name or '').strip():
+            name = f'{instance.first_name} {instance.last_name}'.strip()
+        return name
 
 
 class SkillSerializer(serializers.ModelSerializer):
