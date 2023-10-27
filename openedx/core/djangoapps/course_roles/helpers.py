@@ -31,6 +31,14 @@ def course_permissions_list_check(user, permission_names, course_id):
 
 
 @request_cached()
+def course_permissions_list_check_any(user, permission_names, course_id):
+    """
+    Check if a user has ANY of the given permissions in a course.
+    """
+    return any(course_permission_check(user, permission_name, course_id) for permission_name in permission_names)
+
+
+@request_cached()
 def organization_permission_check(user, permission_name, organization_name):
     """
     Check if a user has a permission in an organization.
@@ -63,7 +71,11 @@ def course_or_organization_permission_check(user, permission_name, course_id, or
     if isinstance(user, AnonymousUser):
         return False
     if organization_name is None:
-        organization_name = modulestore().get_course(course_id).org
+        course = modulestore().get_course(course_id)
+        if course:
+            organization_name = course.org
+        else:
+            return course_permission_check(user, permission_name, course_id)
     return (course_permission_check(user, permission_name, course_id) or
             organization_permission_check(user, permission_name, organization_name)
             )
