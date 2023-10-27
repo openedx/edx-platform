@@ -315,27 +315,6 @@ def modify_xblock(usage_key, request):
     )
 
 
-class StudioPermissionsService:
-    """
-    Service that can provide information about a user's permissions.
-
-    Deprecated. To be replaced by a more general authorization service.
-
-    Only used by LibraryContentBlock (and library_tools.py).
-    """
-
-    def __init__(self, user):
-        self._user = user
-
-    def can_read(self, course_key):
-        """Does the user have read access to the given course/library?"""
-        return has_studio_read_access(self._user, course_key)
-
-    def can_write(self, course_key):
-        """Does the user have read access to the given course/library?"""
-        return has_studio_write_access(self._user, course_key)
-
-
 def load_services_for_studio(runtime, user):
     """
     Function to set some required services used for XBlock edits and studio_view.
