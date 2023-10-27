@@ -21,6 +21,7 @@ from django.utils.translation import gettext as _
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from openedx.core.lib.api.authentication import BearerAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomerUser, PendingEnterpriseCustomerUser
 from integrated_channels.degreed.models import DegreedLearnerDataTransmissionAudit
@@ -56,7 +57,6 @@ from openedx.core.djangoapps.ace_common.template_context import get_base_templat
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
 from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments
 from openedx.core.djangoapps.credit.models import CreditRequest, CreditRequirementStatus
-from openedx.core.djangoapps.external_user_ids.models import ExternalId, ExternalIdType
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.profile_images.images import remove_profile_images
 from openedx.core.djangoapps.user_api import accounts
@@ -91,11 +91,6 @@ from .serializers import (
 )
 from .signals import USER_RETIRE_LMS_CRITICAL, USER_RETIRE_LMS_MISC, USER_RETIRE_MAILINGS
 from .utils import create_retirement_request_and_deactivate_account, username_suffix_generator
-
-try:
-    from coaching.api import has_ever_consented_to_coaching
-except ImportError:
-    has_ever_consented_to_coaching = None
 
 log = logging.getLogger(__name__)
 
@@ -248,9 +243,6 @@ class AccountViewSet(ViewSet):
               profile. Possible values are "all_users", "private", or "custom".
               If "custom", the user has selectively chosen a subset of shareable
               fields to make visible to others via the User Preferences API.
-
-            * accomplishments_shared: Signals whether badges are enabled on the
-              platform and should be fetched.
 
             * phone_number: The phone number for the user. String of numbers with
               an optional `+` sign at the start.
@@ -567,7 +559,10 @@ class DeactivateLogoutView(APIView):
     -  Log the user out
     - Create a row in the retirement table for that user
     """
-    authentication_classes = (JwtAuthentication, SessionAuthentication,)
+    # BearerAuthentication is added here to support account deletion
+    # from the mobile app until it moves to JWT Auth.
+    # See mobile roadmap issue https://github.com/openedx/edx-platform/issues/33307.
+    authentication_classes = (JwtAuthentication, SessionAuthentication, BearerAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
     def post(self, request):
@@ -742,48 +737,7 @@ class AccountRetirementPartnerReportView(ViewSet):
             'created': retirement_status.created,
         }
 
-        # Some orgs have a custom list of headings and content for the partner report. Add this, if applicable.
-        self._add_orgs_config_for_user(retirement, retirement_status.user)
-
         return retirement
-
-    def _add_orgs_config_for_user(self, retirement, user):
-        """
-        Check to see if the user's info was sent to any partners (orgs) that have a a custom list of headings and
-        content for the partner report. If so, add this.
-        """
-        # See if the MicroBachelors coaching provider needs to be notified of this user's retirement
-        if has_ever_consented_to_coaching is not None and has_ever_consented_to_coaching(user):
-            # See if the user has a MicroBachelors external id. If not, they were never sent to the
-            # coaching provider.
-            external_ids = ExternalId.objects.filter(
-                user=user,
-                external_id_type__name=ExternalIdType.MICROBACHELORS_COACHING
-            )
-            if external_ids.exists():
-                # User has an external id. Add the additional info.
-                external_id = str(external_ids[0].external_user_id)
-                self._add_coaching_orgs_config(retirement, external_id)
-
-    def _add_coaching_orgs_config(self, retirement, external_id):
-        """
-        Add the orgs configuration for MicroBachelors coaching
-        """
-        # Add the custom field headings
-        retirement[AccountRetirementPartnerReportView.ORGS_CONFIG_KEY] = [
-            {
-                AccountRetirementPartnerReportView.ORGS_CONFIG_ORG_KEY: 'mb_coaching',
-                AccountRetirementPartnerReportView.ORGS_CONFIG_FIELD_HEADINGS_KEY: [
-                    AccountRetirementPartnerReportView.STUDENT_ID_KEY,
-                    AccountRetirementPartnerReportView.ORIGINAL_EMAIL_KEY,
-                    AccountRetirementPartnerReportView.ORIGINAL_NAME_KEY,
-                    AccountRetirementPartnerReportView.DELETION_COMPLETED_KEY
-                ]
-            }
-        ]
-
-        # Add the custom field value
-        retirement[AccountRetirementPartnerReportView.STUDENT_ID_KEY] = external_id
 
     @request_requires_username
     def retirement_partner_status_create(self, request):

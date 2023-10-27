@@ -46,11 +46,6 @@ It is collected into the static root, and then linked to from XBlock fragments b
 .. _annotatable/_display.scss: https://github.com/openedx/edx-platform/tree/master/xmodule/assets/annotatable/_display.scss
 .. _simplify things: https://github.com/openedx/edx-platform/issues/32621
 
-Static CSS (.css)
-*****************
-
-Non-themable, ready-to-seve CSS may also be added to the any block type's
-subdirectory. For example, see `library_source_block/style.css`_.
 
 JavaScript (.js)
 ****************
@@ -72,7 +67,7 @@ Currently, edx-platform XBlock JS is defined both here in `xmodule/assets`_ and 
 * For other "purer" blocks, the JS is used as a standard XBlock fragment. Example blocks:
 
   * `VerticalBlock`_
-  * `LibrarySourcedBlock`_
+  * `LibraryContentBlock`_
 
 As part of an `active build refactoring`_, we will soon consolidate all edx-platform XBlock JS here in `xmodule/assets`_.
 
@@ -82,7 +77,7 @@ As part of an `active build refactoring`_, we will soon consolidate all edx-plat
 .. _HtmlBlock: https://github.com/openedx/edx-platform/blob/master/xmodule/html_block.py
 .. _AnnotatableBlock: https://github.com/openedx/edx-platform/blob/master/xmodule/annotatable_block.py
 .. _VerticalBlock: https://github.com/openedx/edx-platform/blob/master/xmodule/vertical_block.py
-.. _LibrarySourcedBlock: https://github.com/openedx/edx-platform/blob/master/xmodule/library_sourced_block.py
+.. _LibraryContentBlock: https://github.com/openedx/edx-platform/blob/master/xmodule/library_content_block.py
 .. _active build refactoring: https://github.com/openedx/edx-platform/issues/31624
 .. _builtin_assets.py: https://github.com/openedx/edx-platform/tree/master/xmodule/util/builtin_assets.py
 .. _static_content.py: https://github.com/openedx/edx-platform/blob/master/xmodule/static_content.py

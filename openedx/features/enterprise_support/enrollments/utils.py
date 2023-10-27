@@ -22,51 +22,6 @@ from openedx.features.enterprise_support.enrollments.exceptions import (
 log = logging.getLogger(__name__)
 
 
-def lms_enroll_user_in_course(
-    username,
-    course_id,
-    mode,
-    enterprise_uuid,
-    is_active=True,
-):
-    """
-    Temporarily keeping the original enrollment function to help with deployment
-    """
-    user = _validate_enrollment_inputs(username, course_id)
-
-    with transaction.atomic():
-        try:
-            response = enrollment_api.add_enrollment(
-                username,
-                str(course_id),
-                mode=mode,
-                is_active=is_active,
-                enrollment_attributes=None,
-                enterprise_uuid=enterprise_uuid,
-            )
-            log.info('The user [%s] has been enrolled in course run [%s].', username, course_id)
-            return response
-        except CourseEnrollmentExistsError as error:  # pylint: disable=unused-variable
-            log.warning('An enrollment already exists for user [%s] in course run [%s].', username, course_id)
-            return None
-        except CourseEnrollmentError as error:
-            log.exception("An error occurred while creating the new course enrollment for user "
-                          "[%s] in course run [%s]", username, course_id)
-            raise error
-        finally:
-            # Assumes that the ecommerce service uses an API key to authenticate.
-            current_enrollment = enrollment_api.get_enrollment(username, str(course_id))
-            audit_log(
-                'enrollment_change_requested',
-                course_id=str(course_id),
-                requested_mode=mode,
-                actual_mode=current_enrollment['mode'] if current_enrollment else None,
-                requested_activation=is_active,
-                actual_activation=current_enrollment['is_active'] if current_enrollment else None,
-                user_id=user.id
-            )
-
-
 def lms_update_or_create_enrollment(
     username,
     course_id,

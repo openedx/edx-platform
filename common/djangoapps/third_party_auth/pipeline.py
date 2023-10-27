@@ -854,7 +854,7 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
     This step is controlled by the `sync_learner_profile_data` flag on the provider's configuration.
     """
     current_provider = provider.Registry.get_from_pipeline({'backend': strategy.request.backend.name, 'kwargs': kwargs})
-    if user and current_provider.sync_learner_profile_data:
+    if user and current_provider and current_provider.sync_learner_profile_data:
         # Keep track of which incoming values get applied.
         changed = {}
 
@@ -931,7 +931,7 @@ def set_id_verification_status(auth_entry, strategy, details, user=None, *args, 
     Use the user's authentication with the provider, if configured, as evidence of their identity being verified.
     """
     current_provider = provider.Registry.get_from_pipeline({'backend': strategy.request.backend.name, 'kwargs': kwargs})
-    if user and current_provider.enable_sso_id_verification:
+    if user and current_provider and current_provider.enable_sso_id_verification:
         # Get previous valid, non expired verification attempts for this SSO Provider and user
         verifications = SSOVerification.objects.filter(
             user=user,
@@ -1024,6 +1024,11 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):  # lin
             )
     else:
         final_username = storage.user.get_username(user)
+    logger.info(
+        '[THIRD_PARTY_AUTH] get_username complete: '
+        f'details={details}, '
+        f'final_username={final_username}'
+    )
     return {'username': final_username}
 
 

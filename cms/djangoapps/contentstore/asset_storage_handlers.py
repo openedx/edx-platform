@@ -32,7 +32,7 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .exceptions import AssetNotFoundException, AssetSizeTooLargeException
-from .utils import reverse_course_url, get_files_uploads_url
+from .utils import reverse_course_url, get_files_uploads_url, get_response_format, request_response_format_is_json
 from .toggles import use_new_files_uploads_page
 
 
@@ -43,6 +43,7 @@ REQUEST_DEFAULTS = {
     'direction': '',
     'asset_type': '',
     'text_search': '',
+    'display_name': '',
 }
 
 
@@ -61,7 +62,9 @@ def handle_assets(request, course_key_string=None, asset_key_string=None):
             sort: the asset field to sort by (defaults to 'date_added')
             direction: the sort direction (defaults to 'descending')
             asset_type: the file type to filter items to (defaults to All)
-            text_search: string to filter results by file name (defaults to '')
+            text_search: string to perform a search on filenames (defaults to '')
+            display_name: string to filter results by exact display name (defaults to '').
+                Use the display_name parameter multiple times to filter by multiple filenames.
     POST
         json: create or update an asset. The only updating that can be done is changing the lock state.
     PUT
@@ -73,8 +76,8 @@ def handle_assets(request, course_key_string=None, asset_key_string=None):
     if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
 
-    response_format = _get_response_format(request)
-    if _request_response_format_is_json(request, response_format):
+    response_format = get_response_format(request)
+    if request_response_format_is_json(request, response_format):
         if request.method == 'GET':
             return _assets_json(request, course_key)
 
@@ -88,12 +91,49 @@ def handle_assets(request, course_key_string=None, asset_key_string=None):
     return HttpResponseNotFound()
 
 
-def _get_response_format(request):
-    return request.GET.get('format') or request.POST.get('format') or 'html'
+def get_asset_usage_path(request, course_key, asset_key_string):
+    """
+    Get a list of units with ancestors that use given asset.
+    """
+    course_key = CourseKey.from_string(course_key)
+    if not has_course_author_access(request.user, course_key):
+        raise PermissionDenied()
+    asset_location = AssetKey.from_string(asset_key_string) if asset_key_string else None
+    store = modulestore()
+    usage_locations = []
+    static_path = StaticContent.get_static_path_from_location(asset_location)
+    verticals = store.get_items(
+        course_key,
+        qualifiers={
+            'category': 'vertical'
+        },
+    )
+    blocks = []
 
+    for vertical in verticals:
+        blocks.extend(vertical.get_children())
 
-def _request_response_format_is_json(request, response_format):
-    return response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json')
+    for block in blocks:
+        is_video_block = getattr(block, 'category', '') == 'video'
+        if is_video_block:
+            handout = getattr(block, 'handout', '')
+            if handout and str(asset_location) in handout:
+                unit = block.get_parent()
+                subsection = unit.get_parent()
+                subsection_display_name = getattr(subsection, 'display_name', '')
+                unit_display_name = getattr(unit, 'display_name', '')
+                xblock_display_name = getattr(block, 'display_name', '')
+                usage_locations.append(f'{subsection_display_name} - {unit_display_name} / {xblock_display_name}')
+        else:
+            data = getattr(block, 'data', '')
+            if static_path in data or str(asset_location) in data:
+                unit = block.get_parent()
+                subsection = unit.get_parent()
+                subsection_display_name = getattr(subsection, 'display_name', '')
+                unit_display_name = getattr(unit, 'display_name', '')
+                xblock_display_name = getattr(block, 'display_name', '')
+                usage_locations.append(f'{subsection_display_name} - {unit_display_name} / {xblock_display_name}')
+    return JsonResponse({'usage_locations': usage_locations})
 
 
 def _asset_index(request, course_key):
@@ -134,6 +174,9 @@ def _assets_json(request, course_key):
             return filters_are_invalid_error
 
         filter_parameters.update(_get_content_type_filter_for_mongo(request_options['requested_asset_type']))
+
+    if request_options['requested_display_names']:
+        filter_parameters.update(_get_displayname_filter_for_mongo(request_options['requested_display_names']))
 
     if request_options['requested_text_search']:
         filter_parameters.update(_get_displayname_search_filter_for_mongo(request_options['requested_text_search']))
@@ -186,11 +229,16 @@ def _parse_request_to_dictionary(request):
         'requested_sort_direction': _get_requested_attribute(request, 'direction'),
         'requested_asset_type': _get_requested_attribute(request, 'asset_type'),
         'requested_text_search': _get_requested_attribute(request, 'text_search'),
+        'requested_display_names': _get_requested_attribute_list(request, 'display_name'),
     }
 
 
 def _get_requested_attribute(request, attribute):
     return request.GET.get(attribute, REQUEST_DEFAULTS.get(attribute))
+
+
+def _get_requested_attribute_list(request, attribute):
+    return request.GET.getlist(attribute, REQUEST_DEFAULTS.get(attribute))
 
 
 def _get_error_if_invalid_parameters(requested_filter):
@@ -263,6 +311,24 @@ def _get_mongo_expression_for_type_filter(requested_file_types):
         'contentType': {
             '$in': content_types
         }
+    }
+
+
+def _get_displayname_filter_for_mongo(displaynames):
+    """
+    Construct and return pymongo query dict, filtering for the given list of displaynames.
+    """
+    filters = []
+
+    for displayname in displaynames:
+        filters.append({
+            'displayname': {
+                '$eq': displayname,
+            },
+        })
+
+    return {
+        '$or': filters,
     }
 
 
@@ -352,6 +418,7 @@ def _get_assets_in_json_format(assets, course_key):
     for asset in assets:
         thumbnail_asset_key = _get_thumbnail_asset_key(asset, course_key)
         asset_is_locked = asset.get('locked', False)
+        asset_file_size = asset.get('length', None)
 
         asset_in_json = get_asset_json(
             asset['displayname'],
@@ -361,6 +428,7 @@ def _get_assets_in_json_format(assets, course_key):
             thumbnail_asset_key,
             asset_is_locked,
             course_key,
+            asset_file_size,
         )
 
         assets_in_json_format.append(asset_in_json)
@@ -426,6 +494,7 @@ def _upload_asset(request, course_key):
     # readback the saved content - we need the database timestamp
     readback = contentstore().find(content.location)
     locked = getattr(content, 'locked', False)
+    length = getattr(content, 'length', None)
     return JsonResponse({
         'asset': get_asset_json(
             content.name,
@@ -435,6 +504,7 @@ def _upload_asset(request, course_key):
             content.thumbnail_location,
             locked,
             course_key,
+            length,
         ),
         'msg': _('Upload completed')
     })
@@ -491,12 +561,13 @@ def _get_file_too_large_error_message(filename):
 def _get_file_content_and_path(file_metadata, course_key):
     """returns contents of the uploaded file and path for temporary uploaded file"""
     content_location = StaticContent.compute_location(course_key, file_metadata['filename'])
+    upload_file_size = str(file_metadata['upload_file_size'])
     upload_file = file_metadata['upload_file']
 
     file_can_be_chunked = upload_file.multiple_chunks()
 
     static_content_partial = partial(StaticContent, content_location, file_metadata['filename'],
-                                     file_metadata['mime_type'])
+                                     file_metadata['mime_type'], length=upload_file_size)
 
     if file_can_be_chunked:
         content = static_content_partial(upload_file.chunks())
@@ -525,7 +596,7 @@ def _get_thumbnail_asset_key(asset, course_key):
 
 
 # TODO: this method needs improvement. These view decorators should be at the top in an actual view method,
-#  but this is just a method called by the asset_handler. The asset_handler used by the public studio content API
+#  but this is just a method called by the asset_handler. The asset_handler used by the public CMS API
 # just ignores all of this stuff.
 @require_http_methods(('DELETE', 'POST', 'PUT'))
 @login_required
@@ -599,7 +670,7 @@ def _delete_thumbnail(thumbnail_location, course_key, asset_key):  # lint-amnest
             logging.warning('Could not delete thumbnail: %s', thumbnail_location)
 
 
-def get_asset_json(display_name, content_type, date, location, thumbnail_location, locked, course_key):
+def get_asset_json(display_name, content_type, date, location, thumbnail_location, locked, course_key, file_size=None):
     '''
     Helper method for formatting the asset information to send to client.
     '''
@@ -617,5 +688,6 @@ def get_asset_json(display_name, content_type, date, location, thumbnail_locatio
         'locked': locked,
         'static_full_url': StaticContent.get_canonicalized_asset_path(course_key, portable_url, '', []),
         # needed for Backbone delete/update.
-        'id': str(location)
+        'id': str(location),
+        'file_size': file_size,
     }

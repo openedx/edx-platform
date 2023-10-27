@@ -83,19 +83,8 @@ Test Locations
 Running Tests
 =============
 
-You can run all of the unit-level tests using this command::
+**Unless otherwise mentioned, all the following commands should be run from inside the lms docker container.**
 
-    paver test
-
-This includes python, JavaScript, and documentation tests.
-
-Note -
-`paver` is a scripting tool. To get information about various options, you can run the this command::
-
-    paver -h
-
-Note -
-Unless otherwise mentioned, all the following commands should be run from inside lms docker container.
 
 Running Python Unit tests
 -------------------------
@@ -107,8 +96,8 @@ Pytest (and all of the plugins we use with it) has a lot of options. Use `pytest
 .. _pytest: https://pytest.org/
 
 
-Running a Single Test
-~~~~~~~~~~~~~~~~~~~~~
+Running Python Test Subsets
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When developing tests, it is often helpful to be able to really just run one single test without the overhead of PIP installs, UX builds, etc.
 
@@ -125,9 +114,15 @@ For example, this command runs a single python unit test file::
     pytest xmodule/tests/test_stringify.py
 
 Note -
-edx-platorm has multiple services (lms, cms) in it. The environment for each service is different enough that we run some tests in both environments in jenkins. To make sure tests will pass in each of these environments (especially for tests in "common" directory), you will need to test in each seperately. Add --rootdir flag at end of your pytest call and specify the env you are testing in::
+edx-platorm has multiple services (lms, cms) in it. The environment for each service is different enough that we run some tests in both environments in Github Actions. 
+To test in each of these environments (especially for tests in "common" and "xmodule" directories), you will need to test in each seperately.
+To specify that the tests are run with the relevant service as root, Add --rootdir flag at end of your pytest call and specify the env to test in::
 
     pytest test --rootdir <lms or cms>
+
+Or, if you need django settings from a particular enviroment, add --ds flag to the end of your pytest call and specify the django settings object::
+
+    pytest test --ds=<lms.envs.test or cms.envs.test>
 
 Various tools like ddt create tests with very complex names, rather than figuring out the name yourself, you can:
 

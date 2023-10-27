@@ -85,7 +85,7 @@ class CookieTests(TestCase):
         If can_recreate is False, verifies that a JWT cannot be recreated.
         """
         self._copy_cookies_to_request(response, self.request)
-        JwtAuthCookieMiddleware().process_view(self.request, None, None, None)
+        JwtAuthCookieMiddleware(get_response=lambda request: None).process_view(self.request, None, None, None)
         assert (cookies_api.jwt_cookies.jwt_cookie_name() in self.request.COOKIES) == can_recreate
         if can_recreate:
             jwt_string = self.request.COOKIES[cookies_api.jwt_cookies.jwt_cookie_name()]

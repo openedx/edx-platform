@@ -7,7 +7,7 @@
   from openedx.core.djangolib.markup import HTML, Text
   from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_json
 %>
-<%block name="title">${_("Files & Uploads")}</%block>
+<%block name="title">${_("Files")}</%block>
 <%block name="bodyclass">is-signedin course uploads view-uploads</%block>
 
 <%namespace name='static' file='static_content.html'/>
@@ -25,7 +25,7 @@
     <header class="mast has-actions has-subtitle">
         <h2 class="page-header">
             <small class="subtitle">${_("Content")}</small>
-            <span class="sr">- </span>${_("Files & Uploads")}
+            <span class="sr">- </span>${_("Files")}
         </h2>
     </header>
 </div>

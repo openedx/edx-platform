@@ -145,10 +145,18 @@ FEATURES['LICENSING'] = True
 XBLOCK_SETTINGS.update({'VideoBlock': {'licensing_enabled': True}})
 
 ################################ SEARCH INDEX ################################
-FEATURES['ENABLE_COURSEWARE_INDEX'] = False
+FEATURES['ENABLE_COURSEWARE_INDEX'] = True
 FEATURES['ENABLE_LIBRARY_INDEX'] = False
 FEATURES['ENABLE_CONTENT_LIBRARY_INDEX'] = False
 SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
+
+ELASTIC_SEARCH_CONFIG = [
+    {
+        'use_ssl': False,
+        'host': 'edx.devstack.elasticsearch710',
+        'port': 9200
+    }
+]
 
 ################################ COURSE DISCUSSIONS ###########################
 FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
@@ -301,13 +309,16 @@ CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 # .. toggle_creation_date: 2023-02-21
 # .. toggle_warning: For consistency in user experience, keep the value in sync with the setting of the same name
 #   in the LMS and CMS.
+#   This will be deprecated in favor of ENABLE_SEND_XBLOCK_LIFECYCLE_EVENTS_OVER_BUS
 # .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/31813'
 FEATURES['ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS'] = True
+FEATURES['ENABLE_SEND_ENROLLMENT_EVENTS_OVER_BUS'] = True
 EVENT_BUS_PRODUCER = 'edx_event_bus_redis.create_producer'
 EVENT_BUS_REDIS_CONNECTION_URL = 'redis://:password@edx.devstack.redis:6379/'
 EVENT_BUS_TOPIC_PREFIX = 'dev'
 EVENT_BUS_CONSUMER = 'edx_event_bus_redis.RedisEventConsumer'
 EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC = 'course-authoring-xblock-lifecycle'
+EVENT_BUS_ENROLLMENT_LIFECYCLE_TOPIC = 'course-authoring-enrollment-lifecycle'
 
 ################# New settings must go ABOVE this line #################
 ########################################################################

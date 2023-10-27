@@ -136,6 +136,7 @@ def test_secure_token(param_delta: dict, expected_validation: bool):
         SECRET_KEY=params["generation_secret_key"],
         XBLOCK_HANDLER_TOKEN_KEYS=params["generation_xblock_handler_token_keys"],
     ):
+        assert isinstance(reference_time, datetime.datetime)
         with freeze_time(reference_time):
             token = get_secure_token_for_xblock_handler(
                 params["generation_user_id"], params["generation_block_key_str"]
@@ -145,7 +146,9 @@ def test_secure_token(param_delta: dict, expected_validation: bool):
         SECRET_KEY=params["validation_secret_key"],
         XBLOCK_HANDLER_TOKEN_KEYS=params["validation_xblock_handler_token_keys"],
     ):
-        with freeze_time(reference_time + datetime.timedelta(seconds=params["validation_time_delta_s"])):
+        assert isinstance(params["validation_time_delta_s"], int)
+        new_reference_time = reference_time + datetime.timedelta(seconds=float(params["validation_time_delta_s"]))
+        with freeze_time(new_reference_time):
             assert (
                 validate_secure_token_for_xblock_handler(
                     params["validation_user_id"], params["validation_block_key_str"], token

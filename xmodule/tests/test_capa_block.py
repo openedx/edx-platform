@@ -19,7 +19,7 @@ import webob
 from codejail.safe_exec import SafeExecException
 from django.test import override_settings
 from django.utils.encoding import smart_str
-from edx_user_state_client.interface import XBlockUserState
+from lms.djangoapps.courseware.user_state_client import XBlockUserState
 from lxml import etree
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC
@@ -29,6 +29,7 @@ from xblock.fields import ScopeIds
 from xblock.scorable import Score
 
 import xmodule
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.capa import responsetypes
 from xmodule.capa.correctmap import CorrectMap
 from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
@@ -182,6 +183,7 @@ if submission[0] == '':
 
 
 @ddt.ddt
+@skip_unless_lms
 class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
@@ -2898,6 +2900,7 @@ class ComplexEncoderTest(unittest.TestCase):  # lint-amnesty, pylint: disable=mi
         # ignore quotes
 
 
+@skip_unless_lms
 class ProblemCheckTrackingTest(unittest.TestCase):
     """
     Ensure correct tracking information is included in events emitted during problem checks.
