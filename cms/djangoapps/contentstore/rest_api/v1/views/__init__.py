@@ -11,10 +11,12 @@ from .settings import CourseSettingsView
 from .xblock import XblockView, XblockCreateView
 from .assets import AssetsCreateRetrieveView, AssetsUpdateDestroyView
 from .videos import (
+    CourseVideosView,
     VideosUploadsView,
     VideosCreateUploadView,
     VideoImagesView,
     VideoEncodingsDownloadView,
-    VideoFeaturesView
+    VideoFeaturesView,
+    VideoUsageView,
 )
 from .help_urls import HelpUrlsView
