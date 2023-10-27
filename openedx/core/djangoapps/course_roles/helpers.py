@@ -2,6 +2,7 @@
 Helpers for the course roles app.
 """
 from django.contrib.auth.models import AnonymousUser
+from django.utils.translation import gettext as _
 
 from openedx.core.djangoapps.course_roles.models import CourseRolesUserRole
 from openedx.core.lib.cache_utils import request_cached
