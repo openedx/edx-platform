@@ -213,7 +213,7 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         # lis email different from logged in user
         request = build_launch_request({
             'oauth_consumer_key': 'consumer_key_2',
-            'lis_person_contact_email_primary':  'random_email@test.com'
+            'lis_person_contact_email_primary': 'random_email@test.com'
         })
 
         views.lti_launch(request, str(COURSE_KEY), str(USAGE_KEY))
