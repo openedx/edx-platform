@@ -35,6 +35,7 @@ from openedx.features.genplus_features.genplus_assessments.utils import (
     skill_reflection_individual_response,
 )
 from openedx.features.genplus_features.genplus_learning.models import Unit, Program
+from openedx.features.genplus_features.utils import get_full_name
 from .serializers import (
     ClassSerializer,
     TextAssessmentSerializer,
@@ -210,7 +211,7 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
             for student in students:
                 user_id = 'user_' + str(student.gen_user.user_id)
                 response['student_response'][user_id] = {
-                    'full_name': student.gen_user.user.profile.name,
+                    'full_name': get_full_name(student.gen_user.user),
                     'score_start_of_year': 0,
                     'score_end_of_year': 0,
                     'total_score': TOTAL_PROBLEM_SCORE

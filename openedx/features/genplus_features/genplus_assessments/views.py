@@ -47,6 +47,8 @@ from openedx.features.genplus_features.genplus_learning.constants import Program
 from openedx.features.genplus_features.genplus_badges.models import BoosterBadgeAward
 from openedx.features.genplus_features.genplus.constants import JournalTypes
 from openedx.features.genplus_features.genplus_assessments.api.v1.serializers import RatingAssessmentSerializer, TextAssessmentSerializer
+from ..utils import get_full_name
+
 
 class AssessmentReportPDFView(TemplateView):
     filename = None
@@ -203,7 +205,7 @@ class AssessmentReportPDFView(TemplateView):
         name = ''
         if self.filename is None:
             if user:
-                name = f'{user.profile.name}'.replace(' ', '')
+                name = get_full_name(user).strip()
             if not name:
                 name = splitext(basename(self.template_path))[0]
             return f'{name}.pdf'
@@ -270,7 +272,7 @@ class AssessmentReportPDFView(TemplateView):
         student_name = ''
         school_name = ''
         if student.user:
-            student_name = student.user.profile.name
+            student_name = get_full_name(student.user)
             class_name = student.active_class.name
             school_name = student.gen_user.school.name
 
@@ -306,7 +308,7 @@ class AssessmentReportPDFView(TemplateView):
             if teacher_id not in teacher_feedbacks.keys():
                 teacher_name = ''
                 if feedback.teacher.user:
-                    teacher_name = feedback.teacher.user.profile.name
+                    teacher_name = get_full_name(feedback.teacher.user)
 
                 teacher_feedbacks[teacher_id] = {
                     'teacher_name': teacher_name,
