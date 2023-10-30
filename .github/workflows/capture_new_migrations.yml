@@ -121,9 +121,9 @@ jobs:
 
     - name: Verify executed migrations on master.
       run: |
-        query_result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  count(*)  from django_migrations;" edxapp; | tail -n 1)
+        query_result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  count(*)  from django_migrations;" edxapp;)
         echo "Query Result: $query_result"
-        echo "::set-env name=MYSQL_QUERY_RESULT::$query_result"
+        echo "$query_result"
       shell: bash
 
     - name: Checkout branch repo
@@ -153,9 +153,9 @@ jobs:
 
     - name: Verify executed migrations on branch.
       run: |
-        query_result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  count(*)  from django_migrations;" edxapp; | tail -n 1)
+        query_result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  count(*)  from django_migrations;" edxapp;)
         echo "Query Result: $query_result"
-        echo "::set-env name=MYSQL_QUERY_RESULT::$query_result"
+        echo "$query_result"
       shell: bash
 
 
