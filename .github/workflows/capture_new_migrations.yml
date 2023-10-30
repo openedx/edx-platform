@@ -119,9 +119,9 @@ jobs:
         echo "Running the CMS migrations."
         ./manage.py cms migrate
 
-      - name: Verify executed migrations on master.
-        run: |
-          mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select count(*) from django_migrations ;" edxapp
+    - name: Verify executed migrations on master.
+      run: |
+        mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select count(*) from django_migrations ;" edxapp
 
     - name: Checkout branch repo
       uses: actions/checkout@v2
