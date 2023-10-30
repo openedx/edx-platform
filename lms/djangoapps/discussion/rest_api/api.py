@@ -118,6 +118,9 @@ from .utils import (
     set_attribute
 )
 
+from openedx.core.djangoapps.discussions.models import DiscussionReport
+
+
 User = get_user_model()
 
 ThreadType = Literal["discussion", "question"]
@@ -724,6 +727,7 @@ def _serialize_discussion_entities(request, context, discussion_entities, reques
 
         A list of serialized discussion entities
     """
+    
     results = []
     usernames = []
     include_profile_image = _include_profile_image(requested_fields)
@@ -747,6 +751,21 @@ def _serialize_discussion_entities(request, context, discussion_entities, reques
     results = _add_additional_response_fields(
         request, results, usernames, discussion_entity_type, include_profile_image
     )
+
+    for e in results :
+        arr = []
+        if e['abuse_flagged'] :
+            reports = []
+            if request.user.is_superuser :    
+                reports = DiscussionReport.getReport(id=e['id'])
+            else :
+                reports = DiscussionReport.getReportUser(id=e['id'] , user_id=request.user.id)
+
+            for r in reports :
+                arr.append(r.report_type)
+
+        e['reports'] = list(set(arr))
+
     return results
 
 
@@ -1400,6 +1419,17 @@ def update_thread(request, thread_id, update_data):
         The updated thread; see discussion.rest_api.views.ThreadViewSet for more
         detail.
     """
+    report_data = update_data.pop('report', None)
+    try:
+        if update_data['abuse_flagged']  :
+            report_type = report_data['type']
+            report_details = report_data['details']
+            DiscussionReport.createReport(id=thread_id, type='thread', user_id=request.user.id, report_type=report_type , report_details= report_details)
+        else  :
+            DiscussionReport.removeReport(id=thread_id, type='thread', user_id=request.user.id )
+    except:
+        None
+    
     cc_thread, context = _get_thread_and_context(request, thread_id, retrieve_kwargs={"with_responses": True})
     _check_editable_fields(cc_thread, update_data, context)
     serializer = ThreadSerializer(cc_thread, data=update_data, partial=True, context=context)
@@ -1418,6 +1448,10 @@ def update_thread(request, thread_id, update_data):
     # accurate shortcut, rather than adding additional processing.
     api_thread['read'] = True
     api_thread['unread_comment_count'] = 0
+    # if update_data['']
+
+
+
     return api_thread
 
 
@@ -1450,6 +1484,17 @@ def update_comment(request, comment_id, update_data):
         ValidationError: if there is an error applying the update (e.g. raw_body
           is empty or thread_id is included)
     """
+    report_data = update_data.pop('report', None)
+    try:
+        if update_data['abuse_flagged']  :
+            report_type = report_data['type']
+            report_details = report_data['details']
+            DiscussionReport.createReport(id=comment_id, type='comment', user_id=request.user.id, report_type=report_type , report_details= report_details)
+        else  :
+            DiscussionReport.removeReport(id=comment_id, type='comment', user_id=request.user.id )
+    except:
+        None
+
     cc_comment, context = _get_comment_and_context(request, comment_id)
     _check_editable_fields(cc_comment, update_data, context)
     serializer = CommentSerializer(cc_comment, data=update_data, partial=True, context=context)
@@ -1462,6 +1507,7 @@ def update_comment(request, comment_id, update_data):
         comment_edited.send(sender=None, user=request.user, post=cc_comment)
     api_comment = serializer.data
     _do_extra_actions(api_comment, cc_comment, list(update_data.keys()), actions_form, context, request)
+
     return api_comment
 
 
@@ -1493,6 +1539,7 @@ def get_thread(request, thread_id, requested_fields=None, course_id=None):
     )
     if course_id and course_id != cc_thread.course_id:
         raise ThreadNotFoundError("Thread not found.")
+
     return _serialize_discussion_entities(request, context, [cc_thread], requested_fields, DiscussionEntity.thread)[0]
 
 

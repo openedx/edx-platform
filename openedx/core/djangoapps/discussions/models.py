@@ -598,10 +598,27 @@ class DiscussionTopicLink(models.Model):
 
 
 class DiscussionReport (models.Model):
-    thread_id = models.CharField(max_length=255)
+    id_type = models.CharField(max_length=255)
+    type = models.CharField(max_length=255)
     user_id = models.IntegerField()
     report_type = models.CharField(max_length=255)
     report_details = models.TextField()
 
     def __str__(self):
-        return f'{self.thread_id} '
+        return f'{self.id} '
+    
+    @classmethod
+    def createReport (self, id, type, user_id, report_type , report_details):
+        return DiscussionReport.objects.create(id_type=id, type=type, user_id=user_id, report_type=report_type, report_details=report_details)
+    
+    @classmethod
+    def removeReport (self, id, type, user_id) :
+        return DiscussionReport.objects.filter(id_type=id, type=type , user_id=user_id).delete()
+    
+    @classmethod
+    def getReport (self, id) :
+        return DiscussionReport.objects.filter(id_type = id)
+    
+    @classmethod
+    def getReportUser (self, id,user_id) : 
+        return DiscussionReport.objects.filter(id_type = id, user_id = user_id)

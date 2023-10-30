@@ -13,7 +13,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='discussionreport',
            fields=[
-            ("thread_id", models.CharField(max_length=255)),
+            ("id_type", models.CharField(max_length=255)),
+            ('type', models.CharField(max_length=255) ),
             ("user_id", models.IntegerField()),
             ("report_type", models.CharField(max_length=255)),
             ("report_details", models.TextField()),  
