@@ -37,8 +37,8 @@ class UserAccountSettingsTest(TestCase):
 
     @ddt.data(
         ('facebook', 'www.facebook.com/edX', 'https://www.facebook.com/edX', True),
-        ('facebook', 'facebook.com/edX', 'https://www.facebook.com/edX', True),
-        ('facebook', 'HTTP://facebook.com/edX', 'https://www.facebook.com/edX', True),
+        ('facebook', 'facebook.com/edX/', 'https://www.facebook.com/edX', True),
+        ('facebook', 'HTTP://facebook.com/edX/', 'https://www.facebook.com/edX', True),
         ('facebook', 'www.evilwebsite.com/123', None, False),
         ('twitter', 'https://www.twiter.com/edX/', None, False),
         ('twitter', 'https://www.twitter.com/edX/123s', None, False),
