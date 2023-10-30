@@ -77,8 +77,8 @@ class Env:
     PRINT_SETTINGS_LOG_FILE = GEN_LOG_DIR / "print_settings.log"
 
     # Detect if in a Docker container, and if so which one
-    SERVER_HOST = os.environ.get('SERVER_HOSTNAME', '0.0.0.0')
-    USING_DOCKER = SERVER_HOST != '0.0.0.0'
+    FRONTEND_TEST_SERVER_HOST = os.environ.get('FRONTEND_TEST_SERVER_HOSTNAME', '0.0.0.0')
+    USING_DOCKER = FRONTEND_TEST_SERVER_HOST != '0.0.0.0'
     DEVSTACK_SETTINGS = 'devstack_docker' if USING_DOCKER else 'devstack'
     TEST_SETTINGS = 'test'
 
