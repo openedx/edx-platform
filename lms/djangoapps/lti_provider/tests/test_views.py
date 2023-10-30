@@ -5,6 +5,7 @@ Tests for the LTI provider views
 
 from unittest.mock import MagicMock, patch
 
+from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
@@ -58,7 +59,7 @@ def build_launch_request(extra_post_data=None, param_to_delete=None):
         del post_data[param_to_delete]
     request = RequestFactory().post('/', data=post_data)
     request.user = UserFactory.create()
-    request.session = {}
+    request.session = MagicMock()
     return request
 
 
@@ -81,6 +82,14 @@ class LtiTestMixin:
             consumer_secret='secret'
         )
         self.consumer.save()
+
+        self.auto_link_consumer = models.LtiConsumer(
+            consumer_name='auto-link-consumer',
+            consumer_key='consumer_key_2',
+            consumer_secret='secret_2',
+            auto_link_users_using_email=True
+        )
+        self.auto_link_consumer.save()
 
 
 class LtiLaunchTest(LtiTestMixin, TestCase):
@@ -188,6 +197,27 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
             consumer_key=LTI_DEFAULT_PARAMS['oauth_consumer_key']
         )
         assert consumer.instance_guid == 'consumer instance guid'
+
+    @patch('lms.djangoapps.lti_provider.views.render_to_response')
+    def test_unauthenticated_user_shown_error_when_auto_linking_is_enabled(self, render_error):
+        request = build_launch_request({'oauth_consumer_key': 'consumer_key_2'})
+        request.user = AnonymousUser()
+
+        views.lti_launch(request, str(COURSE_KEY), str(USAGE_KEY))
+
+        render_error.assert_called()
+        assert render_error.call_args[0][0] == "lti_provider/user-auth-error.html"
+
+    @patch('lms.djangoapps.lti_provider.views.render_to_response')
+    def test_auth_error_shown_when_lis_email_is_different_from_user_email(self, render_error):
+        # lis email different from logged in user
+        request = build_launch_request({
+            'oauth_consumer_key': 'consumer_key_2',
+            'lis_person_contact_email_primary':  'random_email@test.com'
+        })
+
+        views.lti_launch(request, str(COURSE_KEY), str(USAGE_KEY))
+        render_error.assert_called()
 
 
 class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCase):

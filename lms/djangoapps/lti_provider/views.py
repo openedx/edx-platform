@@ -8,6 +8,7 @@ import logging
 from django.conf import settings
 from django.http import Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
@@ -85,6 +86,18 @@ def lti_launch(request, course_id, usage_id):
         raise Http404()  # lint-amnesty, pylint: disable=raise-missing-from
     params['course_key'] = course_key
     params['usage_key'] = usage_key
+
+    # Verify that the email from the LTI Launch and the logged-in user are the same.
+    if lti_consumer.auto_link_users_using_email:
+        lis_email = request.POST.get("lis_person_contact_email_primary")
+        if not request.user.is_authenticated or (lis_email and request.user.email != lis_email):
+            context = {
+                "login_link": request.build_absolute_uri(settings.LOGIN_URL),
+                "allow_iframing": True,
+                "disable_header": True,
+                "disable_footer": True,
+            }
+            return render_to_response("lti_provider/user-auth-error.html", context)
 
     # Create an edX account if the user identifed by the LTI launch doesn't have
     # one already, and log the edX account into the platform.

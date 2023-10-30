@@ -153,6 +153,17 @@ class AuthenticateLtiUserTest(TestCase):
         users.authenticate_lti_user(request, self.lti_user_id, self.lti_consumer)
         create_user.assert_called_with(self.lti_user_id, self.lti_consumer, self.old_user.email)
 
+    def test_switch_the_associated_edx_user_when_auto_linking_existing_user(self, create_user, switch_user):
+        lti_user = self.create_lti_user_model()
+        new_user = UserFactory.create()
+        self.lti_consumer.auto_link_users_using_email = True
+        self.lti_consumer.save()
+        request = RequestFactory().post("/", {"lis_person_contact_email_primary": new_user.email})
+        request.user = new_user
+
+        users.authenticate_lti_user(request, self.lti_user_id, self.lti_consumer)
+        assert LtiUser.objects.get(pk=lti_user.id).edx_user == new_user
+
 
 class CreateLtiUserTest(TestCase):
     """
