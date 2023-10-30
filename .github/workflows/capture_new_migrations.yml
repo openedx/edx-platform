@@ -153,9 +153,17 @@ jobs:
 
     - name: Verify executed migrations on branch.
       run: |
-        query_result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  count(*)  from django_migrations;" edxapp;)
-        echo "Query Result: $query_result"
-        echo "$query_result"
+        query_result1=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  count(*)  from django_migrations;" edxapp;)
+        echo "Query Result: $query_result1"
+        echo "$query_result1"
+      shell: bash
+
+    - name: Verify difference
+      run: |
+        diff = $query_result1 - $query_result
+        result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  * from django_migrations ORDER by -id limit $diff ;" edxapp;)
+        echo "Query Result: result"
+        echo "result"
       shell: bash
 
 
