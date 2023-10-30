@@ -23,6 +23,7 @@ AUTO_CERTIFICATE_GENERATION = WaffleSwitch(f"{WAFFLE_NAMESPACE}.auto_certificate
 # .. toggle_description: When True, the system will publish `CERTIFICATE_CREATED` signals to the event bus. The
 #   `CERTIFICATE_CREATED` signal is emit when a certificate has been awarded to a learner and the creation process has
 #   completed.
+# .. toggle_warning: Will be deprecated in favor of SEND_LEARNING_CERTIFICATE_LIFECYCLE_EVENTS_TO_BUS
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2023-04-11
 # .. toggle_target_removal_date: 2023-07-31
@@ -36,6 +37,7 @@ SEND_CERTIFICATE_CREATED_SIGNAL = SettingToggle('SEND_CERTIFICATE_CREATED_SIGNAL
 # .. toggle_description: When True, the system will publish `CERTIFICATE_REVOKED` signals to the event bus. The
 #   `CERTIFICATE_REVOKED` signal is emit when a certificate has been revoked from a learner and the revocation process
 #   has completed.
+# .. toggle_warning: Will be deprecated in favor of SEND_LEARNING_CERTIFICATE_LIFECYCLE_EVENTS_TO_BUS
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2023-09-15
 # .. toggle_target_removal_date: 2024-01-01

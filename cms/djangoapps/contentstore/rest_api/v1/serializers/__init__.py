@@ -14,6 +14,11 @@ from .proctoring import (
 )
 from .settings import CourseSettingsSerializer
 from .xblock import XblockSerializer
-from .videos import VideoUploadSerializer, VideoImageSerializer
+from .videos import (
+    CourseVideosSerializer,
+    VideoUploadSerializer,
+    VideoImageSerializer,
+    VideoUsageSerializer
+)
 from .transcripts import TranscriptSerializer
 from .assets import AssetSerializer

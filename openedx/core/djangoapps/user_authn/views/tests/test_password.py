@@ -99,8 +99,8 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
 
     USERNAME = "heisenberg"
     ALTERNATE_USERNAME = "walt"
-    OLD_PASSWORD = "ḅḷüëṡḳÿ"
-    NEW_PASSWORD = "B🄸🄶B🄻🅄🄴"
+    OLD_PASSWORD = "ḅḷüëṡḳÿ1"
+    NEW_PASSWORD = "B🄸🄶B🄻🅄🄴1"
     OLD_EMAIL = "walter@graymattertech.com"
     NEW_EMAIL = "walt@savewalterwhite.com"
 
@@ -192,11 +192,11 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
         UserFactory.create(
             username='edx',
             email='edx@example.com',
-            password='edx',
+            password='Password1234',
             is_superuser=is_superuser,
             is_staff=is_staff,
         )
-        self.client.login(username='edx', password='edx')
+        self.client.login(username='edx', password='Password1234')
 
         response = self._change_password_from_support(email_from_support_tools=self.OLD_EMAIL)
         assert response.status_code == 200

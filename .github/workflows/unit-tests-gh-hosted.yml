@@ -26,15 +26,16 @@ jobs:
           - "lms-4"
           - "lms-5"
           - "lms-6"
-          - "openedx-1"
-          - "openedx-2"
-          - "openedx-3"
-          - "openedx-4"
+          - "openedx-1-with-lms"
+          - "openedx-2-with-lms"
+          - "openedx-1-with-cms"
+          - "openedx-2-with-cms"
           - "cms-1"
           - "cms-2"
-          - "common-1"
-          - "common-2"
-          - "xmodule-1"
+          - "common-with-lms"
+          - "common-with-cms"
+          - "xmodule-with-lms"
+          - "xmodule-with-cms"
     name: gh-hosted-python-${{ matrix.python-version }},django-${{ matrix.django-version }},${{ matrix.shard_name }}
     steps:
       - uses: actions/checkout@v2
