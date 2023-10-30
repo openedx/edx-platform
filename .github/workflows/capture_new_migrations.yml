@@ -162,8 +162,8 @@ jobs:
       run: |
         diff = $query_result1 - $query_result
         result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  * from django_migrations ORDER by -id limit $diff ;" edxapp;)
-        echo "Query Result: result"
-        echo "result"
+        echo "Query Result: $result"
+        echo "$result"
       shell: bash
 
 
