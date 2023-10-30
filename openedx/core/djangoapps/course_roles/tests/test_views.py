@@ -1,3 +1,6 @@
+"""
+Tests for the course_roles views.
+"""
 import ddt
 from django.urls import reverse
 from django.utils.http import urlencode
@@ -18,6 +21,9 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 @ddt.ddt
 class UserPermissionsViewTestCase(SharedModuleStoreTestCase):
+    """
+    Tests for the UserPermissionsView.
+    """
     def setUp(self):
         self.client = APIClient()
         self.user_1 = UserFactory(username="test_user_1")
@@ -44,6 +50,7 @@ class UserPermissionsViewTestCase(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_user_permissions_view(self):
+        # Test get user permissions view with valid queryargs.
         querykwargs = {'course_id': self.course_1.id, 'user_id': self.user_1.id}
         url = f'{reverse("course_roles_api:user_permissions")}?{urlencode(querykwargs)}'
         expected_api_response = {'permissions': {self.permission_1.name, self.permission_2.name}}
