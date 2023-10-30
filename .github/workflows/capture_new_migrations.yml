@@ -119,9 +119,13 @@ jobs:
         STUDIO_CFG: lms/envs/minimal.yml
       run: |
         echo "Running the LMS migrations."
-        ./manage.py lms showmigrations
+        ./manage.py lms migrate
         echo "Running the CMS migrations."
-        ./manage.py cms showmigrations
+        ./manage.py cms migrate
+
+      - name: Verify executed migrations on master.
+        run: |
+          mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select count(*) from django_migrations ;" edxapp
 
     - name: Checkout branch repo
       uses: actions/checkout@v2
@@ -147,6 +151,11 @@ jobs:
         ./manage.py lms showmigrations
         echo "Running the CMS migrations."
         ./manage.py cms showmigrations
+
+    - name: Verify executed migrations on branch.
+      run: |
+        mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select count(*) from django_migrations ;" edxapp
+
 
   # This job aggregates test results. It's the required check for branch protection.
   # https://github.com/marketplace/actions/alls-green#why
