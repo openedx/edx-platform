@@ -1246,6 +1246,7 @@ OAUTH2_PROVIDER = {
         'certificates:read': _('Retrieve your course certificates'),
         'grades:read': _('Retrieve your grades for your enrolled courses'),
         'tpa:read': _('Retrieve your third-party authentication username mapping'),
+        # user_id is added in code as a default scope for JWT cookies and all password grant_type JWTs
         'user_id': _('Know your user identifier'),
     }),
     'DEFAULT_SCOPES': OAUTH2_DEFAULT_SCOPES,
