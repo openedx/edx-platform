@@ -27,7 +27,7 @@ class UserPermissionsViewTestCase(SharedModuleStoreTestCase):
     def setUp(self):
         super().setUp()
         self.client = APIClient()
-        self.user_1 = UserFactory(username="test_user_1")
+        self.user_1 = UserFactory(username="test_user_1", password="test")
         self.organization_1 = OrganizationFactory(name="test_organization_1")
         self.course_1 = CourseFactory.create(
             display_name="test course 1", run="Testing_course_1", org=self.organization_1.name
