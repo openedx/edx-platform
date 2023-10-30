@@ -157,7 +157,7 @@ class GenUser(models.Model):
 
     @property
     def name(self):
-        if self.type == SchoolTypes.XPORTER:
+        if self.school.type == SchoolTypes.XPORTER:
             first_name = getattr(self.user, 'first_name', '').strip()
             last_name = getattr(self.user, 'last_name', '').strip()
             if first_name or last_name:
