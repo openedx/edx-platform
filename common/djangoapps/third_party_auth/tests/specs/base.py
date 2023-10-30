@@ -481,7 +481,7 @@ class IntegrationTestMixin(testutil.TestCase, test.TestCase, HelperMixin):
         # The AJAX on the page will log them in:
         ajax_login_response = self.client.post(
             reverse('user_api_login_session', kwargs={'api_version': 'v1'}),
-            {'email': self.user.email, 'password': 'test'}
+            {'email': self.user.email, 'password': 'Password1234'}
         )
         assert ajax_login_response.status_code == 200
         # Then the AJAX will finish the third party auth:

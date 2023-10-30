@@ -8,7 +8,7 @@ from datetime import datetime
 from common.djangoapps.student.tests.factories import UserFactory, CourseEnrollmentFactory, CourseAccessRoleFactory
 from xmodule.modulestore.tests.factories import ToyCourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
-TEST_PASSWORD = 'edx'
+TEST_PASSWORD = 'Password1234'
 
 
 class CourseApiFactoryMixin:

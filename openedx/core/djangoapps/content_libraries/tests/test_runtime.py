@@ -546,14 +546,14 @@ class ContentLibraryXBlockUserStateTestMixin(ContentLibraryContentTestMixin):
 
 
 @requires_blockstore
-class ContentLibraryXBlockUserStateBServiceTest(ContentLibraryXBlockUserStateTestMixin, TestCase):
+class ContentLibraryXBlockUserStateBServiceTest(ContentLibraryXBlockUserStateTestMixin, TestCase):  # type: ignore[misc]
     """
     Tests XBlock user state for XBlocks in a content library using the standalone Blockstore service.
     """
 
 
 @requires_blockstore_app
-class ContentLibraryXBlockUserStateTest(
+class ContentLibraryXBlockUserStateTest(  # type: ignore[misc]
     ContentLibraryXBlockUserStateTestMixin,
     BlockstoreAppTestMixin,
     LiveServerTestCase,

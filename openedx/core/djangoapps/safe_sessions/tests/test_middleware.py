@@ -36,6 +36,7 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
         self.user = UserFactory.create()
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request()
+        self.TEST_PASSWORD = 'Password1234'
 
     def assert_response(self, safe_cookie_data=None, success=True):
         """
@@ -79,7 +80,7 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
     @patch("openedx.core.djangoapps.safe_sessions.middleware.LOG_REQUEST_USER_CHANGES", False)
     @patch("openedx.core.djangoapps.safe_sessions.middleware.track_request_user_changes")
     def test_success(self, mock_log_request_user_changes):
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         session_id = self.client.session.session_key
         safe_cookie_data = SafeCookieData.create(session_id, self.user.id)
 
@@ -106,7 +107,7 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
     @patch("openedx.core.djangoapps.safe_sessions.middleware.LOG_REQUEST_USER_CHANGES", True)
     @patch("openedx.core.djangoapps.safe_sessions.middleware.track_request_user_changes")
     def test_log_request_user_on(self, mock_log_request_user_changes):
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         session_id = self.client.session.session_key
         safe_cookie_data = SafeCookieData.create(session_id, self.user.id)
 
@@ -134,7 +135,7 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
         self.assert_no_session()
 
     def test_invalid_user_at_step_4(self):
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         safe_cookie_data = SafeCookieData.create(self.client.session.session_key, 'no_such_user')
         self.request.META['HTTP_ACCEPT'] = 'text/html'
         with self.assert_incorrect_user_logged():
@@ -225,6 +226,16 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
         assert safe_cookie_data.session_id == 'some_session_id'
         assert safe_cookie_data.verify(self.user.id)
 
+    def test_update_cookie_data_at_step_3_with_sha256(self):
+        """ first encode cookie with default algo sha1 and then check with sha256"""
+        self.assert_response(set_request_user=True, set_session_cookie=True)
+        serialized_cookie_data = self.client.response.cookies[settings.SESSION_COOKIE_NAME].value
+        safe_cookie_data = SafeCookieData.parse(serialized_cookie_data)
+        assert safe_cookie_data.version == SafeCookieData.CURRENT_VERSION
+        assert safe_cookie_data.session_id == 'some_session_id'
+        with self.settings(DEFAULT_HASHING_ALGORITHM='sha256'):
+            assert safe_cookie_data.verify(self.user.id)
+
     def test_cant_update_cookie_at_step_3_error(self):
         self.client.response.cookies[settings.SESSION_COOKIE_NAME] = None
         with self.assert_invalid_session_id():
@@ -250,7 +261,8 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, CacheIsolationTestCase
 
     def setUp(self):
         super().setUp()
-        self.user = UserFactory.create()
+        self.TEST_PASSWORD = 'Password1234'
+        self.user = UserFactory.create(password=self.TEST_PASSWORD)
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request()
         self.client.response = HttpResponse()
@@ -270,7 +282,7 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, CacheIsolationTestCase
         """
         Set up request for success path -- everything up until process_response().
         """
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         session_id = self.client.session.session_key
         safe_cookie_data = SafeCookieData.create(session_id, self.user.id)

@@ -8,7 +8,7 @@ from opaque_keys.edx.locator import CourseKey
 from lms.djangoapps.courseware.courses import get_course_with_access
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
-from lms.djangoapps.discussion.rest_api.utils import DiscussionNotificationSender
+from lms.djangoapps.discussion.rest_api.discussions_notifications import DiscussionNotificationSender
 
 
 User = get_user_model()
@@ -46,3 +46,4 @@ def send_response_notifications(thread_id, course_key_str, user_id, parent_id=No
     notification_sender.send_new_comment_notification()
     notification_sender.send_new_response_notification()
     notification_sender.send_new_comment_on_response_notification()
+    notification_sender.send_response_on_followed_post_notification()

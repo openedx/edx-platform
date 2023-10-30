@@ -2,11 +2,13 @@
 Tests tagging rest api views
 """
 
+from __future__ import annotations
+
 from urllib.parse import parse_qs, urlparse
 
+import abc
 import ddt
 from django.contrib.auth import get_user_model
-from django.test.testcases import override_settings
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from openedx_tagging.core.tagging.models import Tag, Taxonomy
 from openedx_tagging.core.tagging.models.system_defined import SystemDefinedTaxonomy
@@ -16,15 +18,30 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from common.djangoapps.student.auth import add_users, update_org_role
-from common.djangoapps.student.roles import CourseStaffRole, OrgContentCreatorRole
+from common.djangoapps.student.roles import (
+    CourseInstructorRole,
+    CourseStaffRole,
+    OrgContentCreatorRole,
+    OrgInstructorRole,
+    OrgLibraryUserRole,
+    OrgStaffRole,
+)
+from openedx.core.djangoapps.content_libraries.api import (
+    AccessLevel,
+    create_library,
+    COMPLEX,
+    set_library_user_permissions,
+)
 from openedx.core.djangoapps.content_tagging.models import TaxonomyOrg
 from openedx.core.djangolib.testing.utils import skip_unless_cms
+from openedx.core.lib import blockstore_api
 
 User = get_user_model()
 
 TAXONOMY_ORG_LIST_URL = "/api/content_tagging/v1/taxonomies/"
 TAXONOMY_ORG_DETAIL_URL = "/api/content_tagging/v1/taxonomies/{pk}/"
 OBJECT_TAG_UPDATE_URL = "/api/content_tagging/v1/object_tags/{object_id}/?taxonomy={taxonomy_id}"
+TAXONOMY_TEMPLATE_URL = "/api/content_tagging/v1/taxonomies/import/{filename}"
 
 
 def check_taxonomy(
@@ -56,29 +73,102 @@ class TestTaxonomyObjectsMixin:
     """
     Sets up data for testing Content Taxonomies.
     """
+    def _setUp_orgs(self):
+        """
+        Create orgs for testing
+        """
+        self.orgA = Organization.objects.create(name="Organization A", short_name="orgA")
+        self.orgB = Organization.objects.create(name="Organization B", short_name="orgB")
+        self.orgX = Organization.objects.create(name="Organization X", short_name="orgX")
 
-    def setUp(self):
-        super().setUp()
+    def _setUp_courses(self):
+        """
+        Create courses for testing
+        """
+        self.courseA = CourseLocator("orgA", "101", "test")
+        self.courseB = CourseLocator("orgB", "101", "test")
+
+    def _setUp_library(self):
+        """
+        Create library for testing
+        """
+        self.collection = blockstore_api.create_collection("Test library collection")
+        self.content_libraryA = create_library(
+            collection_uuid=self.collection.uuid,
+            org=self.orgA,
+            slug="lib_a",
+            library_type=COMPLEX,
+            title="Library Org A",
+            description="This is a library from Org A",
+            allow_public_learning=False,
+            allow_public_read=False,
+            library_license="",
+        )
+
+    def _setUp_users(self):
+        """
+        Create users for testing
+        """
         self.user = User.objects.create(
             username="user",
             email="user@example.com",
         )
-        self.userS = User.objects.create(
+        self.staff = User.objects.create(
             username="staff",
             email="staff@example.com",
             is_staff=True,
         )
 
-        self.orgA = Organization.objects.create(name="Organization A", short_name="orgA")
-        self.orgB = Organization.objects.create(name="Organization B", short_name="orgB")
-        self.orgX = Organization.objects.create(name="Organization X", short_name="orgX")
-
-        self.userA = User.objects.create(
-            username="userA",
+        self.staffA = User.objects.create(
+            username="staffA",
             email="userA@example.com",
         )
-        update_org_role(self.userS, OrgContentCreatorRole, self.userA, [self.orgA.short_name])
+        update_org_role(self.staff, OrgStaffRole, self.staffA, [self.orgA.short_name])
 
+        self.content_creatorA = User.objects.create(
+            username="content_creatorA",
+            email="content_creatorA@example.com",
+        )
+        update_org_role(self.staff, OrgContentCreatorRole, self.content_creatorA, [self.orgA.short_name])
+
+        self.instructorA = User.objects.create(
+            username="instructorA",
+            email="instructorA@example.com",
+        )
+        update_org_role(self.staff, OrgInstructorRole, self.instructorA, [self.orgA.short_name])
+
+        self.library_staffA = User.objects.create(
+            username="library_staffA",
+            email="library_staffA@example.com",
+        )
+        update_org_role(self.staff, OrgLibraryUserRole, self.library_staffA, [self.orgA.short_name])
+
+        self.course_instructorA = User.objects.create(
+            username="course_instructorA",
+            email="course_instructorA@example.com",
+        )
+        add_users(self.staff, CourseInstructorRole(self.courseA), self.course_instructorA)
+
+        self.course_staffA = User.objects.create(
+            username="course_staffA",
+            email="course_staffA@example.com",
+        )
+        add_users(self.staff, CourseStaffRole(self.courseA), self.course_staffA)
+
+        self.library_userA = User.objects.create(
+            username="library_userA",
+            email="library_userA@example.com",
+        )
+        set_library_user_permissions(
+            self.content_libraryA.key,
+            self.library_userA,
+            AccessLevel.READ_LEVEL
+        )
+
+    def _setUp_taxonomies(self):
+        """
+        Create taxonomies for testing
+        """
         # Orphaned taxonomy
         self.ot1 = Taxonomy.objects.create(name="ot1", enabled=True)
         self.ot2 = Taxonomy.objects.create(name="ot2", enabled=False)
@@ -116,9 +206,7 @@ class TestTaxonomyObjectsMixin:
         self.tA1 = Taxonomy.objects.create(name="tA1", enabled=True)
         TaxonomyOrg.objects.create(
             taxonomy=self.tA1,
-            org=self.orgA,
-            rel_type=TaxonomyOrg.RelType.OWNER,
-        )
+            org=self.orgA, rel_type=TaxonomyOrg.RelType.OWNER,)
         self.tA2 = Taxonomy.objects.create(name="tA2", enabled=False)
         TaxonomyOrg.objects.create(
             taxonomy=self.tA2,
@@ -141,92 +229,139 @@ class TestTaxonomyObjectsMixin:
         )
 
         # OrgA and OrgB taxonomy
-        self.tC1 = Taxonomy.objects.create(name="tC1", enabled=True)
+        self.tBA1 = Taxonomy.objects.create(name="tBA1", enabled=True)
         TaxonomyOrg.objects.create(
-            taxonomy=self.tC1,
+            taxonomy=self.tBA1,
             org=self.orgA,
             rel_type=TaxonomyOrg.RelType.OWNER,
         )
         TaxonomyOrg.objects.create(
-            taxonomy=self.tC1,
+            taxonomy=self.tBA1,
             org=self.orgB,
             rel_type=TaxonomyOrg.RelType.OWNER,
         )
-        self.tC2 = Taxonomy.objects.create(name="tC2", enabled=False)
+        self.tBA2 = Taxonomy.objects.create(name="tBA2", enabled=False)
         TaxonomyOrg.objects.create(
-            taxonomy=self.tC2,
+            taxonomy=self.tBA2,
             org=self.orgA,
             rel_type=TaxonomyOrg.RelType.OWNER,
         )
         TaxonomyOrg.objects.create(
-            taxonomy=self.tC2,
+            taxonomy=self.tBA2,
             org=self.orgB,
             rel_type=TaxonomyOrg.RelType.OWNER,
         )
+
+    def setUp(self):
+
+        super().setUp()
+
+        self._setUp_orgs()
+        self._setUp_courses()
+        self._setUp_library()
+        self._setUp_users()
+        self._setUp_taxonomies()
 
 
 @skip_unless_cms
 @ddt.ddt
-@override_settings(FEATURES={"ENABLE_CREATOR_GROUP": True})
-class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
+class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
     """
-    Test cases for TaxonomyViewSet when ENABLE_CREATOR_GROUP is True
+    Test cases for TaxonomyViewSet for list and create actions
     """
 
-    @ddt.data(
-        ("user", None, None, ("ot1", "st1", "t1", "tA1", "tB1", "tC1")),
-        ("userA", None, None, ("ot1", "st1", "t1", "tA1", "tB1", "tC1")),
-        ("userS", None, None, ("ot1", "ot2", "st1", "st2", "t1", "t2", "tA1", "tA2", "tB1", "tB2")),
-        # Default page_size=10, and so "tC1" and "tC2" appear on the second page
-        ("user", True, None, ("ot1", "st1", "t1", "tA1", "tB1", "tC1")),
-        ("userA", True, None, ("ot1", "st1", "t1", "tA1", "tB1", "tC1")),
-        ("userS", True, None, ("ot1", "st1", "t1", "tA1", "tB1", "tC1")),
-        ("user", False, None, ()),
-        ("userA", False, None, ()),
-        ("userS", False, None, ("ot2", "st2", "t2", "tA2", "tB2", "tC2")),
-        ("user", None, "orgA", ("st1", "t1", "tA1", "tC1")),
-        ("userA", None, "orgA", ("st1", "t1", "tA1", "tC1")),
-        ("userS", None, "orgA", ("st1", "st2", "t1", "t2", "tA1", "tA2", "tC1", "tC2")),
-        ("user", True, "orgA", ("st1", "t1", "tA1", "tC1")),
-        ("userA", True, "orgA", ("st1", "t1", "tA1", "tC1")),
-        ("userS", True, "orgA", ("st1", "t1", "tA1", "tC1")),
-        ("user", False, "orgA", ()),
-        ("userA", False, "orgA", ()),
-        ("userS", False, "orgA", ("st2", "t2", "tA2", "tC2")),
-        ("user", None, "orgX", ("st1", "t1")),
-        ("userA", None, "orgX", ("st1", "t1")),
-        ("userS", None, "orgX", ("st1", "st2", "t1", "t2")),
-        ("user", True, "orgX", ("st1", "t1")),
-        ("userA", True, "orgX", ("st1", "t1")),
-        ("userS", True, "orgX", ("st1", "t1")),
-        ("user", False, "orgX", ()),
-        ("userA", False, "orgX", ()),
-        ("userS", False, "orgX", ("st2", "t2")),
-    )
-    @ddt.unpack
-    def test_list_taxonomy(self, user_attr, enabled_parameter, org_name, expected_taxonomies):
+    def _test_list_taxonomy(
+            self,
+            user_attr: str,
+            expected_taxonomies: list[str],
+            enabled_parameter: bool | None = None,
+            org_parameter: str | None = None
+    ) -> None:
+        """
+        Helper function to call the list endpoint and check the response
+        """
         url = TAXONOMY_ORG_LIST_URL
 
-        if user_attr:
-            user = getattr(self, user_attr)
-            self.client.force_authenticate(user=user)
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
 
         # Set parameters cleaning empty values
-        query_params = {k: v for k, v in {"enabled": enabled_parameter, "org": org_name}.items() if v is not None}
+        query_params = {k: v for k, v in {"enabled": enabled_parameter, "org": org_parameter}.items() if v is not None}
 
         response = self.client.get(url, query_params, format="json")
 
         assert response.status_code == status.HTTP_200_OK
         self.assertEqual(set(t["name"] for t in response.data["results"]), set(expected_taxonomies))
 
-    def test_list_taxonomy_invalid_org(
-        self,
-    ):
+    def test_list_taxonomy_staff(self) -> None:
+        """
+        Tests that staff users see all taxonomies
+        """
+        # Default page_size=10, and so "tBA1" and "tBA2" appear on the second page
+        expected_taxonomies = ["ot1", "ot2", "st1", "st2", "t1", "t2", "tA1", "tA2", "tB1", "tB2"]
+        self._test_list_taxonomy(
+            user_attr="staff",
+            expected_taxonomies=expected_taxonomies,
+        )
+
+    @ddt.data(
+        "content_creatorA",
+        "instructorA",
+        "library_staffA",
+        "course_instructorA",
+        "course_staffA",
+        "library_userA",
+    )
+    def test_list_taxonomy_orgA(self, user_attr: str) -> None:
+        """
+        Tests that non staff users from orgA can see only enabled taxonomies from orgA and global taxonomies
+        """
+        expected_taxonomies = ["st1", "t1", "tA1", "tBA1"]
+        self._test_list_taxonomy(
+            user_attr=user_attr,
+            enabled_parameter=True,
+            expected_taxonomies=expected_taxonomies,
+        )
+
+    @ddt.data(
+        (True, ["ot1", "st1", "t1", "tA1", "tB1", "tBA1"]),
+        (False, ["ot2", "st2", "t2", "tA2", "tB2", "tBA2"]),
+    )
+    @ddt.unpack
+    def test_list_taxonomy_enabled_filter(self, enabled_parameter: bool, expected_taxonomies: list[str]) -> None:
+        """
+        Tests that the enabled filter works as expected
+        """
+        self._test_list_taxonomy(
+            user_attr="staff",
+            enabled_parameter=enabled_parameter,
+            expected_taxonomies=expected_taxonomies
+        )
+
+    @ddt.data(
+        ("orgA", ["st1", "st2", "t1", "t2", "tA1", "tA2", "tBA1", "tBA2"]),
+        ("orgB", ["st1", "st2", "t1", "t2", "tB1", "tB2", "tBA1", "tBA2"]),
+        ("orgX", ["st1", "st2", "t1", "t2"]),
+    )
+    @ddt.unpack
+    def test_list_taxonomy_org_filter(self, org_parameter: str, expected_taxonomies: list[str]) -> None:
+        """
+        Tests that the org filter works as expected
+        """
+        self._test_list_taxonomy(
+            user_attr="staff",
+            org_parameter=org_parameter,
+            expected_taxonomies=expected_taxonomies,
+        )
+
+    def test_list_taxonomy_invalid_org(self) -> None:
+        """
+        Tests that using an invalid org in the filter will raise BAD_REQUEST
+        """
         url = TAXONOMY_ORG_LIST_URL
 
-        self.client.force_authenticate(user=self.userS)
+        self.client.force_authenticate(user=self.staff)
 
-        # Set parameters cleaning empty values
         query_params = {"org": "invalidOrg"}
 
         response = self.client.get(url, query_params, format="json")
@@ -234,30 +369,38 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @ddt.data(
-        ("user", ("tA1", "tB1", "tC1"), None),
-        ("userA", ("tA1", "tB1", "tC1"), None),
-        ("userS", ("st2", "t1", "t2"), "3"),
+        ("user", (), None),
+        ("staffA", ["tA2", "tBA1", "tBA2"], None),
+        ("staff", ["st2", "t1", "t2"], "3"),
     )
     @ddt.unpack
-    def test_list_taxonomy_pagination(self, user_attr, expected_taxonomies, expected_next_page):
+    def test_list_taxonomy_pagination(
+        self, user_attr: str, expected_taxonomies: list[str], expected_next_page: str | None
+    ) -> None:
+        """
+        Tests that the pagination works as expected
+        """
         url = TAXONOMY_ORG_LIST_URL
 
-        if user_attr:
-            user = getattr(self, user_attr)
-            self.client.force_authenticate(user=user)
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
 
         query_params = {"page_size": 3, "page": 2}
 
         response = self.client.get(url, query_params, format="json")
 
-        assert response.status_code == status.HTTP_200_OK
-        self.assertEqual(set(t["name"] for t in response.data["results"]), set(expected_taxonomies))
-        parsed_url = urlparse(response.data["next"])
+        assert response.status_code == status.HTTP_200_OK if len(expected_taxonomies) > 0 else status.HTTP_404_NOT_FOUND
+        if status.is_success(response.status_code):
+            self.assertEqual(set(t["name"] for t in response.data["results"]), set(expected_taxonomies))
+            parsed_url = urlparse(response.data["next"])
 
-        next_page = parse_qs(parsed_url.query).get("page", [None])[0]
-        assert next_page == expected_next_page
+            next_page = parse_qs(parsed_url.query).get("page", [None])[0]
+            assert next_page == expected_next_page
 
-    def test_list_invalid_page(self):
+    def test_list_invalid_page(self) -> None:
+        """
+        Tests that using an invalid page will raise NOT_FOUND
+        """
         url = TAXONOMY_ORG_LIST_URL
 
         self.client.force_authenticate(user=self.user)
@@ -269,79 +412,22 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     @ddt.data(
-        (None, "ot1", status.HTTP_403_FORBIDDEN),
-        (None, "ot2", status.HTTP_403_FORBIDDEN),
-        (None, "st1", status.HTTP_403_FORBIDDEN),
-        (None, "st2", status.HTTP_403_FORBIDDEN),
-        (None, "t1", status.HTTP_403_FORBIDDEN),
-        (None, "t2", status.HTTP_403_FORBIDDEN),
-        (None, "tA1", status.HTTP_403_FORBIDDEN),
-        (None, "tA2", status.HTTP_403_FORBIDDEN),
-        (None, "tB1", status.HTTP_403_FORBIDDEN),
-        (None, "tB2", status.HTTP_403_FORBIDDEN),
-        (None, "tC1", status.HTTP_403_FORBIDDEN),
-        (None, "tC2", status.HTTP_403_FORBIDDEN),
-        ("user", "ot1", status.HTTP_200_OK),
-        ("user", "ot2", status.HTTP_404_NOT_FOUND),
-        ("user", "st1", status.HTTP_200_OK),
-        ("user", "st2", status.HTTP_404_NOT_FOUND),
-        ("user", "t1", status.HTTP_200_OK),
-        ("user", "t2", status.HTTP_404_NOT_FOUND),
-        ("user", "tA1", status.HTTP_200_OK),
-        ("user", "tA2", status.HTTP_404_NOT_FOUND),
-        ("user", "tB1", status.HTTP_200_OK),
-        ("user", "tB2", status.HTTP_404_NOT_FOUND),
-        ("user", "tC1", status.HTTP_200_OK),
-        ("user", "tC2", status.HTTP_404_NOT_FOUND),
-        ("userA", "ot1", status.HTTP_200_OK),
-        ("userA", "ot2", status.HTTP_404_NOT_FOUND),
-        ("userA", "st1", status.HTTP_200_OK),
-        ("userA", "st2", status.HTTP_404_NOT_FOUND),
-        ("userA", "t1", status.HTTP_200_OK),
-        ("userA", "t2", status.HTTP_404_NOT_FOUND),
-        ("userA", "tA1", status.HTTP_200_OK),
-        ("userA", "tA2", status.HTTP_404_NOT_FOUND),
-        ("userA", "tB1", status.HTTP_200_OK),
-        ("userA", "tB2", status.HTTP_404_NOT_FOUND),
-        ("userA", "tC1", status.HTTP_200_OK),
-        ("userA", "tC2", status.HTTP_404_NOT_FOUND),
-        ("userS", "ot1", status.HTTP_200_OK),
-        ("userS", "ot2", status.HTTP_200_OK),
-        ("userS", "st1", status.HTTP_200_OK),
-        ("userS", "st2", status.HTTP_200_OK),
-        ("userS", "t1", status.HTTP_200_OK),
-        ("userS", "t2", status.HTTP_200_OK),
-        ("userS", "tA1", status.HTTP_200_OK),
-        ("userS", "tA2", status.HTTP_200_OK),
-        ("userS", "tB1", status.HTTP_200_OK),
-        ("userS", "tB2", status.HTTP_200_OK),
-        ("userS", "tC1", status.HTTP_200_OK),
-        ("userS", "tC2", status.HTTP_200_OK),
-    )
-    @ddt.unpack
-    def test_detail_taxonomy(self, user_attr, taxonomy_attr, expected_status):
-        taxonomy = getattr(self, taxonomy_attr)
-
-        url = TAXONOMY_ORG_DETAIL_URL.format(pk=taxonomy.pk)
-
-        if user_attr:
-            user = getattr(self, user_attr)
-            self.client.force_authenticate(user=user)
-
-        response = self.client.get(url)
-        assert response.status_code == expected_status
-
-        if status.is_success(expected_status):
-            check_taxonomy(response.data, taxonomy.pk, **(TaxonomySerializer(taxonomy.cast()).data))
-
-    @ddt.data(
-        (None, status.HTTP_403_FORBIDDEN),
+        (None, status.HTTP_401_UNAUTHORIZED),
         ("user", status.HTTP_403_FORBIDDEN),
-        ("userA", status.HTTP_403_FORBIDDEN),
-        ("userS", status.HTTP_201_CREATED),
+        ("content_creatorA", status.HTTP_403_FORBIDDEN),
+        ("instructorA", status.HTTP_403_FORBIDDEN),
+        ("library_staffA", status.HTTP_403_FORBIDDEN),
+        ("course_instructorA", status.HTTP_403_FORBIDDEN),
+        ("course_staffA", status.HTTP_403_FORBIDDEN),
+        ("library_userA", status.HTTP_403_FORBIDDEN),
+        ("staffA", status.HTTP_201_CREATED),
+        ("staff", status.HTTP_201_CREATED),
     )
     @ddt.unpack
-    def test_create_taxonomy(self, user_attr, expected_status):
+    def test_create_taxonomy(self, user_attr: str, expected_status: int) -> None:
+        """
+        Tests that only Taxonomy admins and org level admins can create taxonomies
+        """
         url = TAXONOMY_ORG_LIST_URL
 
         create_data = {
@@ -366,73 +452,514 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
             response = self.client.get(url)
             check_taxonomy(response.data, response.data["id"], **create_data)
 
+            # Also checks if the taxonomy was associated with the org
+            if user_attr == "staffA":
+                assert TaxonomyOrg.objects.filter(taxonomy=response.data["id"], org=self.orgA).exists()
+
+
+@ddt.ddt
+class TestTaxonomyDetailExportMixin(TestTaxonomyObjectsMixin):
+    """
+    Test cases to be used with detail and export actions
+    """
+
+    @abc.abstractmethod
+    def _test_api_call(self, **_kwargs) -> None:
+        """
+        Helper function to call the detail/export endpoint and check the response
+        """
+
     @ddt.data(
-        (None, "ot1", status.HTTP_403_FORBIDDEN),
-        (None, "ot2", status.HTTP_403_FORBIDDEN),
-        (None, "st1", status.HTTP_403_FORBIDDEN),
-        (None, "st2", status.HTTP_403_FORBIDDEN),
-        (None, "t1", status.HTTP_403_FORBIDDEN),
-        (None, "t2", status.HTTP_403_FORBIDDEN),
-        (None, "tA1", status.HTTP_403_FORBIDDEN),
-        (None, "tA2", status.HTTP_403_FORBIDDEN),
-        (None, "tB1", status.HTTP_403_FORBIDDEN),
-        (None, "tB2", status.HTTP_403_FORBIDDEN),
-        (None, "tC1", status.HTTP_403_FORBIDDEN),
-        (None, "tC2", status.HTTP_403_FORBIDDEN),
-        ("user", "ot1", status.HTTP_403_FORBIDDEN),
-        ("user", "ot2", status.HTTP_403_FORBIDDEN),
-        ("user", "st1", status.HTTP_403_FORBIDDEN),
-        ("user", "st2", status.HTTP_403_FORBIDDEN),
-        ("user", "t1", status.HTTP_403_FORBIDDEN),
-        ("user", "t2", status.HTTP_403_FORBIDDEN),
-        ("user", "tA1", status.HTTP_403_FORBIDDEN),
-        ("user", "tA2", status.HTTP_403_FORBIDDEN),
-        ("user", "tB1", status.HTTP_403_FORBIDDEN),
-        ("user", "tB2", status.HTTP_403_FORBIDDEN),
-        ("user", "tC1", status.HTTP_403_FORBIDDEN),
-        ("user", "tC2", status.HTTP_403_FORBIDDEN),
-        ("userA", "ot1", status.HTTP_403_FORBIDDEN),
-        ("userA", "ot2", status.HTTP_403_FORBIDDEN),
-        ("userA", "st1", status.HTTP_403_FORBIDDEN),
-        ("userA", "st2", status.HTTP_403_FORBIDDEN),
-        ("userA", "t1", status.HTTP_403_FORBIDDEN),
-        ("userA", "t2", status.HTTP_403_FORBIDDEN),
-        ("userA", "tA1", status.HTTP_403_FORBIDDEN),
-        ("userA", "tA2", status.HTTP_403_FORBIDDEN),
-        ("userA", "tB1", status.HTTP_403_FORBIDDEN),
-        ("userA", "tB2", status.HTTP_403_FORBIDDEN),
-        ("userA", "tC1", status.HTTP_403_FORBIDDEN),
-        ("userA", "tC2", status.HTTP_403_FORBIDDEN),
-        ("userS", "ot1", status.HTTP_200_OK),
-        ("userS", "ot2", status.HTTP_200_OK),
-        ("userS", "st1", status.HTTP_403_FORBIDDEN),
-        ("userS", "st2", status.HTTP_403_FORBIDDEN),
-        ("userS", "t1", status.HTTP_200_OK),
-        ("userS", "t2", status.HTTP_200_OK),
-        ("userS", "t1", status.HTTP_200_OK),
-        ("userS", "t2", status.HTTP_200_OK),
-        ("userS", "tA1", status.HTTP_200_OK),
-        ("userS", "tA2", status.HTTP_200_OK),
-        ("userS", "tB1", status.HTTP_200_OK),
-        ("userS", "tB2", status.HTTP_200_OK),
-        ("userS", "tC1", status.HTTP_200_OK),
-        ("userS", "tC2", status.HTTP_200_OK),
+        "user",
+        "content_creatorA",
+        "instructorA",
+        "library_staffA",
+        "course_instructorA",
+        "course_staffA",
+        "library_userA",
+    )
+    def test_detail_taxonomy_all_org_enabled(self, user_attr: str) -> None:
+        """
+        Tests that everyone can see enabled global taxonomies
+        """
+        self._test_api_call(
+            user_attr=user_attr,
+            taxonomy_attr="t1",
+            expected_status=status.HTTP_200_OK,
+            reason="Everyone should see enabled global taxonomies",
+        )
+
+    @ddt.data(
+        ("content_creatorA", "tA1", "User with OrgContentCreatorRole(orgA) should see an enabled taxonomy from orgA"),
+        ("content_creatorA", "tBA1", "User with OrgContentCreatorRole(orgA) should see an enabled taxonomy from orgA"),
+        ("content_creatorA", "t1", "User with OrgContentCreatorRole(orgA) should see an enabled global taxonomy"),
+        ("instructorA", "tA1", "User with OrgInstructorRole(orgA) should see an enabled taxonomy from orgA"),
+        ("instructorA", "tBA1", "User with OrgInstructorRole(orgA) should see an enabled taxonomy from orgA"),
+        ("instructorA", "t1", "User with OrgInstructorRole(orgA) should see an enabled global taxonomy"),
+        ("library_staffA", "tA1", "User with OrgLibraryUserRole(orgA) should see an enabled taxonomy from orgA"),
+        ("library_staffA", "tBA1", "User with OrgLibraryUserRole(orgA) should see an enabled taxonomy from orgA"),
+        ("library_staffA", "t1", "User with OrgInstructorRole(orgA) should see an enabled global taxonomy"),
+        (
+            "course_instructorA",
+            "tA1",
+            "User with CourseInstructorRole in a course from orgA should see an enabled taxonomy from orgA"
+        ),
+        (
+            "course_instructorA",
+            "tBA1",
+            "User with CourseInstructorRole in a course from orgA should see an enabled taxonomy from orgA"
+        ),
+        (
+            "course_instructorA",
+            "t1",
+            "User with CourseInstructorRole in a course from orgA should see an enabled global taxonomy"
+        ),
+        (
+            "course_staffA",
+            "tA1",
+            "User with CourseStaffRole in a course from orgA should see an enabled taxonomy from orgA"
+        ),
+        (
+            "course_staffA",
+            "tBA1",
+            "User with CourseStaffRole in a course from orgA should see an enabled taxonomy from orgA"
+        ),
+        (
+            "course_staffA",
+            "t1",
+            "User with CourseStaffRole in a course from orgA should see an enabled global taxonomy"
+        ),
+        (
+            "library_userA",
+            "tA1",
+            "User with permission on a library from orgA should see an enabled taxonomy from orgA"
+        ),
+        (
+            "library_userA",
+            "tBA1",
+            "User with permission on a library from orgA should see an enabled taxonomy from orgA"
+        ),
+        (
+            "library_userA",
+            "t1",
+            "User with permission on a library from orgA should see an enabled global taxonomy"
+        ),
     )
     @ddt.unpack
-    def test_update_taxonomy(self, user_attr, taxonomy_attr, expected_status):
+    def test_detail_taxonomy_org_user_see_enabled(self, user_attr: str, taxonomy_attr: str, reason: str) -> None:
+        """
+        Tests that org users (content creators and instructors) can see enabled global taxonomies and taxonomies
+        from their orgs
+        """
+        self._test_api_call(
+            user_attr=user_attr,
+            taxonomy_attr=taxonomy_attr,
+            expected_status=status.HTTP_200_OK,
+            reason=reason,
+        )
+
+    @ddt.data(
+        "tA2",
+        "tBA2",
+    )
+    def test_detail_taxonomy_org_admin_see_disabled(self, taxonomy_attr: str) -> None:
+        """
+        Tests that org admins can see disabled taxonomies from their orgs
+        """
+        self._test_api_call(
+            user_attr="staffA",
+            taxonomy_attr=taxonomy_attr,
+            expected_status=status.HTTP_200_OK,
+            reason="User with OrgContentCreatorRole(orgA) should see a disabled taxonomy from orgA",
+        )
+
+    @ddt.data(
+        "st2",
+        "t2",
+    )
+    def test_detail_taxonomy_org_admin_dont_see_disabled_global(self, taxonomy_attr: str) -> None:
+        """
+        Tests that org admins can't see disabled global taxonomies
+        """
+        self._test_api_call(
+            user_attr="staffA",
+            taxonomy_attr=taxonomy_attr,
+            expected_status=status.HTTP_404_NOT_FOUND,
+            reason="User with OrgContentCreatorRole(orgA) shouldn't see a disabled global taxonomy",
+        )
+
+    @ddt.data(
+        ("content_creatorA", "t2", "User with OrgContentCreatorRole(orgA) shouldn't see a disabled global taxonomy"),
+        ("instructorA", "tA2", "User with OrgInstructorRole(orgA) shouldn't see a disabled taxonomy from orgA"),
+        ("instructorA", "tBA2", "User with OrgInstructorRole(orgA) shouldn't see a disabled taxonomy from orgA"),
+        ("instructorA", "t2", "User with OrgInstructorRole(orgA) shouldn't see a disabled global taxonomy"),
+        ("library_staffA", "tA2", "User with OrgLibraryUserRole(orgA) shouldn't see a disabled taxonomy from orgA"),
+        ("library_staffA", "tBA2", "User with OrgLibraryUserRole(orgA) shouldn't see a disabled taxonomy from orgA"),
+        ("library_staffA", "t2", "User with OrgInstructorRole(orgA) shouldn't see a disabled global taxonomy"),
+        (
+            "course_instructorA",
+            "tA2",
+            "User with CourseInstructorRole in a course from orgA shouldn't see a disabled taxonomy from orgA"
+        ),
+        (
+            "course_instructorA",
+            "tBA2",
+            "User with CourseInstructorRole in a course from orgA shouldn't see a disabled taxonomy from orgA"
+        ),
+        (
+            "course_instructorA",
+            "t2",
+            "User with CourseInstructorRole in a course from orgA shouldn't see a disabled global taxonomy"
+        ),
+        (
+            "course_staffA",
+            "tA2",
+            "User with CourseStaffRole in a course from orgA shouldn't see a disabled taxonomy from orgA"
+        ),
+        (
+            "course_staffA",
+            "tBA2",
+            "User with CourseStaffRole in a course from orgA shouldn't see a disabled taxonomy from orgA"
+        ),
+        (
+            "course_staffA",
+            "t2",
+            "User with CourseStaffRole in a course from orgA should't see a disabled global taxonomy"
+        ),
+        (
+            "library_userA",
+            "tA2",
+            "User with permission on a library from orgA shouldn't see an disabled taxonomy from orgA"
+        ),
+        (
+            "library_userA",
+            "tBA2",
+            "User with permission on a library from orgA shouldn't see an disabled taxonomy from orgA"
+        ),
+        (
+            "library_userA",
+            "t2",
+            "User with permission on a library from orgA shouldn't see an disabled global taxonomy"
+        ),
+    )
+    @ddt.unpack
+    def test_detail_taxonomy_org_user_dont_see_disabled(self, user_attr: str, taxonomy_attr: str, reason: str) -> None:
+        """
+        Tests that org users (content creators and instructors) can't see disabled global taxonomies and taxonomies
+        from their orgs
+        """
+        self._test_api_call(
+            user_attr=user_attr,
+            taxonomy_attr=taxonomy_attr,
+            expected_status=status.HTTP_404_NOT_FOUND,
+            reason=reason,
+        )
+
+    @ddt.data(
+        ("staff", "ot1", "Staff should see an enabled no org taxonomy"),
+        ("staff", "ot2", "Staff should see a disabled no org taxonomy"),
+    )
+    @ddt.unpack
+    def test_detail_taxonomy_staff_see_no_org(self, user_attr: str, taxonomy_attr: str, reason: str) -> None:
+        """
+        Tests that staff can see taxonomies with no org
+        """
+        self._test_api_call(
+            user_attr=user_attr,
+            taxonomy_attr=taxonomy_attr,
+            expected_status=status.HTTP_200_OK,
+            reason=reason,
+        )
+
+    @ddt.data(
+        "staffA",
+        "content_creatorA",
+        "instructorA",
+        "library_staffA",
+        "course_instructorA",
+        "course_staffA",
+        "library_userA"
+    )
+    def test_detail_taxonomy_other_dont_see_no_org(self, user_attr: str) -> None:
+        """
+        Tests that org users can't see taxonomies with no org
+        """
+        self._test_api_call(
+            user_attr=user_attr,
+            taxonomy_attr="ot1",
+            expected_status=status.HTTP_404_NOT_FOUND,
+            reason="Only staff should see taxonomies with no org",
+        )
+
+    @ddt.data(
+        "staffA",
+        "content_creatorA",
+        "instructorA",
+        "library_staffA",
+        "course_instructorA",
+        "course_staffA",
+        "library_userA"
+    )
+    def test_detail_taxonomy_dont_see_other_org(self, user_attr: str) -> None:
+        """
+        Tests that org users can't see taxonomies from other orgs
+        """
+        self._test_api_call(
+            user_attr=user_attr,
+            taxonomy_attr="tB1",
+            expected_status=status.HTTP_404_NOT_FOUND,
+            reason="Users shouldn't see taxonomies from other orgs",
+        )
+
+    @ddt.data(
+        "ot1",
+        "ot2",
+        "st1",
+        "st2",
+        "t1",
+        "t2",
+        "tA1",
+        "tA2",
+        "tB1",
+        "tB2",
+        "tBA1",
+        "tBA2",
+    )
+    def test_detail_taxonomy_staff_see_all(self, taxonomy_attr: str) -> None:
+        """
+        Tests that staff can see all taxonomies
+        """
+        self._test_api_call(
+            user_attr="staff",
+            taxonomy_attr=taxonomy_attr,
+            expected_status=status.HTTP_200_OK,
+            reason="Staff should see all taxonomies",
+        )
+
+
+@skip_unless_cms
+class TestTaxonomyDetailViewSet(TestTaxonomyDetailExportMixin, APITestCase):
+    """
+    Test cases for TaxonomyViewSet with detail action
+    """
+
+    def _test_api_call(self, **kwargs) -> None:
+        """
+        Helper function to call the retrieve endpoint and check the response
+        """
+        user_attr = kwargs.get("user_attr")
+        taxonomy_attr = kwargs.get("taxonomy_attr")
+        expected_status = kwargs.get("expected_status")
+        reason = kwargs.get("reason", "Unexpected response status")
+
+        assert taxonomy_attr is not None, "taxonomy_attr is required"
+        assert user_attr is not None, "user_attr is required"
+        assert expected_status is not None, "expected_status is required"
+
         taxonomy = getattr(self, taxonomy_attr)
 
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=taxonomy.pk)
 
-        if user_attr:
-            user = getattr(self, user_attr)
-            self.client.force_authenticate(user=user)
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+
+        response = self.client.get(url)
+        assert response.status_code == expected_status, reason
+
+        if status.is_success(expected_status):
+            check_taxonomy(response.data, taxonomy.pk, **(TaxonomySerializer(taxonomy.cast()).data))
+
+
+@skip_unless_cms
+class TestTaxonomyExportViewSet(TestTaxonomyDetailExportMixin, APITestCase):
+    """
+    Test cases for TaxonomyViewSet with export action
+    """
+
+    def _test_api_call(self, **kwargs) -> None:
+        """
+        Helper function to call the export endpoint and check the response
+        """
+        user_attr = kwargs.get("user_attr")
+        taxonomy_attr = kwargs.get("taxonomy_attr")
+        expected_status = kwargs.get("expected_status")
+        reason = kwargs.get("reason", "Unexpected response status")
+
+        assert taxonomy_attr is not None, "taxonomy_attr is required"
+        assert user_attr is not None, "user_attr is required"
+        assert expected_status is not None, "expected_status is required"
+
+        taxonomy = getattr(self, taxonomy_attr)
+
+        url = TAXONOMY_ORG_DETAIL_URL.format(pk=taxonomy.pk)
+
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+
+        response = self.client.get(url)
+        assert response.status_code == expected_status, reason
+        assert len(response.data) > 0
+
+
+@ddt.ddt
+class TestTaxonomyChangeMixin(TestTaxonomyObjectsMixin):
+    """
+    Test cases to be used with update, patch and delete actions
+    """
+
+    @abc.abstractmethod
+    def _test_api_call(self, **_kwargs) -> None:
+        """
+        Helper function to call the update/patch/delete endpoint and check the response
+        """
+
+    @ddt.data(
+        "ot1",
+        "ot2",
+        "st1",
+        "st2",
+        "t1",
+        "t2",
+        "tA1",
+        "tA2",
+        "tB1",
+        "tB2",
+        "tBA1",
+        "tBA2",
+    )
+    def test_regular_user_cant_edit_taxonomies(self, taxonomy_attr: str) -> None:
+        """
+        Tests that regular users can't edit taxonomies
+        """
+        self._test_api_call(
+            user_attr="user",
+            taxonomy_attr=taxonomy_attr,
+            expected_status=[status.HTTP_403_FORBIDDEN, status.HTTP_404_NOT_FOUND],
+            reason="Regular users shouldn't be able to edit taxonomies",
+        )
+
+    @ddt.data(
+        "content_creatorA",
+        "instructorA",
+        "library_staffA",
+        "course_instructorA",
+        "course_staffA",
+        "library_userA",
+    )
+    def test_org_user_cant_edit_org_taxonomies(self, user_attr: str) -> None:
+        """
+        Tests that content creators and instructors from orgA can't edit taxonomies from orgA
+        """
+        self._test_api_call(
+            user_attr=user_attr,
+            taxonomy_attr="tA1",
+            expected_status=[status.HTTP_403_FORBIDDEN],
+            reason="Content creators and instructors shouldn't be able to edit taxonomies",
+        )
+
+    @ddt.data(
+        "tA1",
+        "tA2",
+        "tBA1",
+        "tBA2",
+    )
+    def test_org_staff_can_edit_org_taxonomies(self, taxonomy_attr: str) -> None:
+        """
+        Tests that org staff can edit taxonomies from their orgs
+        """
+        self._test_api_call(
+            user_attr="staffA",
+            taxonomy_attr=taxonomy_attr,
+            # Check both status: 200 for update and 204 for delete
+            expected_status=[status.HTTP_200_OK, status.HTTP_204_NO_CONTENT],
+            reason="Org staff should be able to edit taxonomies from their orgs",
+        )
+
+    @ddt.data(
+        "tB1",
+        "tB2",
+    )
+    def test_org_staff_cant_edit_other_org_taxonomies(self, taxonomy_attr: str) -> None:
+        """
+        Tests that org staff can't edit taxonomies from other orgs
+        """
+        self._test_api_call(
+            user_attr="staffA",
+            taxonomy_attr=taxonomy_attr,
+            expected_status=[status.HTTP_403_FORBIDDEN, status.HTTP_404_NOT_FOUND],
+            reason="Org staff shouldn't be able to edit taxonomies from other orgs",
+        )
+
+    @ddt.data(
+        "ot1",
+        "ot2",
+        "t1",
+        "t2",
+        "tA1",
+        "tA2",
+        "tB1",
+        "tB2",
+        "tBA1",
+        "tBA2",
+
+    )
+    def test_staff_can_edit_almost_all_taxonomies(self, taxonomy_attr: str) -> None:
+        """
+        Tests that staff can edit all but system defined taxonomies
+        """
+        self._test_api_call(
+            user_attr="staff",
+            taxonomy_attr=taxonomy_attr,
+            # Check both status: 200 for update and 204 for delete
+            expected_status=[status.HTTP_200_OK, status.HTTP_204_NO_CONTENT],
+            reason="Staff should be able to edit all but system defined taxonomies",
+        )
+
+    @ddt.data(
+        "st1",
+        "st2",
+    )
+    def test_staff_cant_edit_system_defined_taxonomies(self, taxonomy_attr: str) -> None:
+        """
+        Tests that staff can't edit system defined taxonomies
+        """
+        self._test_api_call(
+            user_attr="staff",
+            taxonomy_attr=taxonomy_attr,
+            # Check both status: 200 for update and 204 for delete
+            expected_status=[status.HTTP_403_FORBIDDEN],
+            reason="Staff shouldn't be able to edit system defined ",
+        )
+
+
+@skip_unless_cms
+class TestTaxonomyUpdateViewSet(TestTaxonomyChangeMixin, APITestCase):
+    """
+    Test cases for TaxonomyViewSet with PUT method
+    """
+
+    def _test_api_call(self, **kwargs) -> None:
+        user_attr = kwargs.get("user_attr")
+        taxonomy_attr = kwargs.get("taxonomy_attr")
+        expected_status = kwargs.get("expected_status")
+        reason = kwargs.get("reason", "Unexpected response status")
+
+        assert taxonomy_attr is not None, "taxonomy_attr is required"
+        assert user_attr is not None, "user_attr is required"
+        assert expected_status is not None, "expected_status is required"
+
+        taxonomy = getattr(self, taxonomy_attr)
+
+        url = TAXONOMY_ORG_DETAIL_URL.format(pk=taxonomy.pk)
+
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
 
         response = self.client.put(url, {"name": "new name"}, format="json")
-        assert response.status_code == expected_status
+        assert response.status_code in expected_status, reason
 
         # If we were able to update the taxonomy, check if the name changed
-        if status.is_success(expected_status):
+        if status.is_success(response.status_code):
             response = self.client.get(url)
             check_taxonomy(
                 response.data,
@@ -444,90 +971,35 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
                 },
             )
 
-    @ddt.data(
-        (False, status.HTTP_403_FORBIDDEN),
-        (True, status.HTTP_403_FORBIDDEN),
-    )
-    @ddt.unpack
-    def test_update_taxonomy_system_defined(self, update_value, expected_status):
-        """
-        Test that we can't update system_defined field
-        """
-        url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.st1.pk)
 
-        self.client.force_authenticate(user=self.userS)
-        response = self.client.put(url, {"name": "new name", "system_defined": update_value}, format="json")
-        assert response.status_code == expected_status
+@skip_unless_cms
+class TestTaxonomyPatchViewSet(TestTaxonomyChangeMixin, APITestCase):
+    """
+    Test cases for TaxonomyViewSet with PATCH method
+    """
 
-        # Verify that system_defined has not changed
-        response = self.client.get(url)
-        assert response.data["system_defined"] is True
+    def _test_api_call(self, **kwargs) -> None:
+        user_attr = kwargs.get("user_attr")
+        taxonomy_attr = kwargs.get("taxonomy_attr")
+        expected_status = kwargs.get("expected_status")
+        reason = kwargs.get("reason", "Unexpected response status")
 
-    @ddt.data(
-        (None, "ot1", status.HTTP_403_FORBIDDEN),
-        (None, "ot2", status.HTTP_403_FORBIDDEN),
-        (None, "st1", status.HTTP_403_FORBIDDEN),
-        (None, "st2", status.HTTP_403_FORBIDDEN),
-        (None, "t1", status.HTTP_403_FORBIDDEN),
-        (None, "t2", status.HTTP_403_FORBIDDEN),
-        (None, "tA1", status.HTTP_403_FORBIDDEN),
-        (None, "tA2", status.HTTP_403_FORBIDDEN),
-        (None, "tB1", status.HTTP_403_FORBIDDEN),
-        (None, "tB2", status.HTTP_403_FORBIDDEN),
-        (None, "tC1", status.HTTP_403_FORBIDDEN),
-        (None, "tC2", status.HTTP_403_FORBIDDEN),
-        ("user", "ot1", status.HTTP_403_FORBIDDEN),
-        ("user", "ot2", status.HTTP_403_FORBIDDEN),
-        ("user", "st1", status.HTTP_403_FORBIDDEN),
-        ("user", "st2", status.HTTP_403_FORBIDDEN),
-        ("user", "t1", status.HTTP_403_FORBIDDEN),
-        ("user", "t2", status.HTTP_403_FORBIDDEN),
-        ("user", "tA1", status.HTTP_403_FORBIDDEN),
-        ("user", "tA2", status.HTTP_403_FORBIDDEN),
-        ("user", "tB1", status.HTTP_403_FORBIDDEN),
-        ("user", "tB2", status.HTTP_403_FORBIDDEN),
-        ("user", "tC1", status.HTTP_403_FORBIDDEN),
-        ("user", "tC2", status.HTTP_403_FORBIDDEN),
-        ("userA", "ot1", status.HTTP_403_FORBIDDEN),
-        ("userA", "ot2", status.HTTP_403_FORBIDDEN),
-        ("userA", "st1", status.HTTP_403_FORBIDDEN),
-        ("userA", "st2", status.HTTP_403_FORBIDDEN),
-        ("userA", "t1", status.HTTP_403_FORBIDDEN),
-        ("userA", "t2", status.HTTP_403_FORBIDDEN),
-        ("userA", "tA1", status.HTTP_403_FORBIDDEN),
-        ("userA", "tA2", status.HTTP_403_FORBIDDEN),
-        ("userA", "tB1", status.HTTP_403_FORBIDDEN),
-        ("userA", "tB2", status.HTTP_403_FORBIDDEN),
-        ("userA", "tC1", status.HTTP_403_FORBIDDEN),
-        ("userA", "tC2", status.HTTP_403_FORBIDDEN),
-        ("userS", "ot1", status.HTTP_200_OK),
-        ("userS", "ot2", status.HTTP_200_OK),
-        ("userS", "st1", status.HTTP_403_FORBIDDEN),
-        ("userS", "st2", status.HTTP_403_FORBIDDEN),
-        ("userS", "t1", status.HTTP_200_OK),
-        ("userS", "t2", status.HTTP_200_OK),
-        ("userS", "tA1", status.HTTP_200_OK),
-        ("userS", "tA2", status.HTTP_200_OK),
-        ("userS", "tB1", status.HTTP_200_OK),
-        ("userS", "tB2", status.HTTP_200_OK),
-        ("userS", "tC1", status.HTTP_200_OK),
-        ("userS", "tC2", status.HTTP_200_OK),
-    )
-    @ddt.unpack
-    def test_patch_taxonomy(self, user_attr, taxonomy_attr, expected_status):
+        assert taxonomy_attr is not None, "taxonomy_attr is required"
+        assert user_attr is not None, "user_attr is required"
+        assert expected_status is not None, "expected_status is required"
+
         taxonomy = getattr(self, taxonomy_attr)
 
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=taxonomy.pk)
 
-        if user_attr:
-            user = getattr(self, user_attr)
-            self.client.force_authenticate(user=user)
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
 
         response = self.client.patch(url, {"name": "new name"}, format="json")
-        assert response.status_code == expected_status
+        assert response.status_code in expected_status, reason
 
         # If we were able to patch the taxonomy, check if the name changed
-        if status.is_success(expected_status):
+        if status.is_success(response.status_code):
             response = self.client.get(url)
             check_taxonomy(
                 response.data,
@@ -539,123 +1011,53 @@ class TestTaxonomyViewSet(TestTaxonomyObjectsMixin, APITestCase):
                 },
             )
 
-    @ddt.data(
-        (False, status.HTTP_403_FORBIDDEN),
-        (True, status.HTTP_403_FORBIDDEN),
-    )
-    @ddt.unpack
-    def test_patch_taxonomy_system_defined(self, update_value, expected_status):
-        """
-        Test that we can't patch system_defined field
-        """
-        url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.st1.pk)
 
-        self.client.force_authenticate(user=self.userS)
-        response = self.client.patch(url, {"name": "new name", "system_defined": update_value}, format="json")
-        assert response.status_code == expected_status
+@skip_unless_cms
+class TestTaxonomyDeleteViewSet(TestTaxonomyChangeMixin, APITestCase):
+    """
+    Test cases for TaxonomyViewSet with DELETE method
+    """
 
-        # Verify that system_defined has not changed
-        response = self.client.get(url)
-        assert response.data["system_defined"] is True
+    def _test_api_call(self, **kwargs) -> None:
+        user_attr = kwargs.get("user_attr")
+        taxonomy_attr = kwargs.get("taxonomy_attr")
+        expected_status = kwargs.get("expected_status")
+        reason = kwargs.get("reason", "Unexpected response status")
 
-    @ddt.data(
-        (None, "ot1", status.HTTP_403_FORBIDDEN),
-        (None, "ot2", status.HTTP_403_FORBIDDEN),
-        (None, "st1", status.HTTP_403_FORBIDDEN),
-        (None, "st2", status.HTTP_403_FORBIDDEN),
-        (None, "t1", status.HTTP_403_FORBIDDEN),
-        (None, "t2", status.HTTP_403_FORBIDDEN),
-        (None, "tA1", status.HTTP_403_FORBIDDEN),
-        (None, "tA2", status.HTTP_403_FORBIDDEN),
-        (None, "tB1", status.HTTP_403_FORBIDDEN),
-        (None, "tB2", status.HTTP_403_FORBIDDEN),
-        (None, "tC1", status.HTTP_403_FORBIDDEN),
-        (None, "tC2", status.HTTP_403_FORBIDDEN),
-        ("user", "ot1", status.HTTP_403_FORBIDDEN),
-        ("user", "ot2", status.HTTP_403_FORBIDDEN),
-        ("user", "st1", status.HTTP_403_FORBIDDEN),
-        ("user", "st2", status.HTTP_403_FORBIDDEN),
-        ("user", "t1", status.HTTP_403_FORBIDDEN),
-        ("user", "t2", status.HTTP_403_FORBIDDEN),
-        ("user", "tA1", status.HTTP_403_FORBIDDEN),
-        ("user", "tA2", status.HTTP_403_FORBIDDEN),
-        ("user", "tB1", status.HTTP_403_FORBIDDEN),
-        ("user", "tB2", status.HTTP_403_FORBIDDEN),
-        ("user", "tC1", status.HTTP_403_FORBIDDEN),
-        ("user", "tC2", status.HTTP_403_FORBIDDEN),
-        ("userA", "ot1", status.HTTP_403_FORBIDDEN),
-        ("userA", "ot2", status.HTTP_403_FORBIDDEN),
-        ("userA", "st1", status.HTTP_403_FORBIDDEN),
-        ("userA", "st2", status.HTTP_403_FORBIDDEN),
-        ("userA", "t1", status.HTTP_403_FORBIDDEN),
-        ("userA", "t2", status.HTTP_403_FORBIDDEN),
-        ("userA", "tA1", status.HTTP_403_FORBIDDEN),
-        ("userA", "tA2", status.HTTP_403_FORBIDDEN),
-        ("userA", "tB1", status.HTTP_403_FORBIDDEN),
-        ("userA", "tB2", status.HTTP_403_FORBIDDEN),
-        ("userA", "tC1", status.HTTP_403_FORBIDDEN),
-        ("userA", "tC2", status.HTTP_403_FORBIDDEN),
-        ("userS", "ot1", status.HTTP_204_NO_CONTENT),
-        ("userS", "ot2", status.HTTP_204_NO_CONTENT),
-        ("userS", "st1", status.HTTP_403_FORBIDDEN),
-        ("userS", "st2", status.HTTP_403_FORBIDDEN),
-        ("userS", "t1", status.HTTP_204_NO_CONTENT),
-        ("userS", "t2", status.HTTP_204_NO_CONTENT),
-        ("userS", "tA1", status.HTTP_204_NO_CONTENT),
-        ("userS", "tA2", status.HTTP_204_NO_CONTENT),
-        ("userS", "tB1", status.HTTP_204_NO_CONTENT),
-        ("userS", "tB2", status.HTTP_204_NO_CONTENT),
-        ("userS", "tC1", status.HTTP_204_NO_CONTENT),
-        ("userS", "tC2", status.HTTP_204_NO_CONTENT),
-    )
-    @ddt.unpack
-    def test_delete_taxonomy(self, user_attr, taxonomy_attr, expected_status):
+        assert taxonomy_attr is not None, "taxonomy_attr is required"
+        assert user_attr is not None, "user_attr is required"
+        assert expected_status is not None, "expected_status is required"
+
         taxonomy = getattr(self, taxonomy_attr)
 
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=taxonomy.pk)
 
-        if user_attr:
-            user = getattr(self, user_attr)
-            self.client.force_authenticate(user=user)
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
 
         response = self.client.delete(url)
-        assert response.status_code == expected_status
+        assert response.status_code in expected_status, reason
 
         # If we were able to delete the taxonomy, check that it's really gone
-        if status.is_success(expected_status):
+        if status.is_success(response.status_code):
             response = self.client.get(url)
             assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-@skip_unless_cms
-@ddt.ddt
-@override_settings(FEATURES={"ENABLE_CREATOR_GROUP": False})
-class TestTaxonomyViewSetNoCreatorGroup(TestTaxonomyViewSet):  # pylint: disable=test-inherits-tests
+class TestObjectTagMixin(TestTaxonomyObjectsMixin):
     """
-    Test cases for TaxonomyViewSet when ENABLE_CREATOR_GROUP is False
-
-    The permissions are the same for when ENABLED_CREATOR_GRUP is True
-    """
-
-
-@skip_unless_cms
-@ddt.ddt
-class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
-    """
-    Testing various cases for the ObjectTagView.
+    Sets up data for testing ObjectTags.
     """
     def setUp(self):
         """
         Setup the test cases
         """
         super().setUp()
-        self.courseA = CourseLocator("orgA", "101", "test")
         self.xblockA = BlockUsageLocator(
             course_key=self.courseA,
             block_type='problem',
             block_id='block_id'
         )
-        self.courseB = CourseLocator("orgB", "101", "test")
         self.xblockB = BlockUsageLocator(
             course_key=self.courseB,
             block_type='problem',
@@ -690,37 +1092,41 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
             rel_type=TaxonomyOrg.RelType.OWNER,
         )
 
-        add_users(self.userS, CourseStaffRole(self.courseA), self.userA)
+        add_users(self.staff, CourseStaffRole(self.courseA), self.staffA)
+
+
+@skip_unless_cms
+@ddt.ddt
+class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
+    """
+    Testing various cases for the ObjectTagView.
+    """
+
+    def test_get_tags(self):
+        pass
 
     @ddt.data(
         # userA and userS are staff in courseA and can tag using enabled taxonomies
-        (None, "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
         ("user", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
-        ("userA", "tA1", ["Tag 1"], status.HTTP_200_OK),
-        ("userS", "tA1", ["Tag 1"], status.HTTP_200_OK),
-        (None, "tA1", [], status.HTTP_403_FORBIDDEN),
+        ("staffA", "tA1", ["Tag 1"], status.HTTP_200_OK),
+        ("staff", "tA1", ["Tag 1"], status.HTTP_200_OK),
         ("user", "tA1", [], status.HTTP_403_FORBIDDEN),
-        ("userA", "tA1", [], status.HTTP_200_OK),
-        ("userS", "tA1", [], status.HTTP_200_OK),
-        (None, "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_403_FORBIDDEN),
+        ("staffA", "tA1", [], status.HTTP_200_OK),
+        ("staff", "tA1", [], status.HTTP_200_OK),
         ("user", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_403_FORBIDDEN),
-        ("userA", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
-        ("userS", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
-        (None, "open_taxonomy", ["tag1"], status.HTTP_403_FORBIDDEN),
+        ("staffA", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
+        ("staff", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
         ("user", "open_taxonomy", ["tag1"], status.HTTP_403_FORBIDDEN),
-        ("userA", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
-        ("userS", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
-        # Only userS is Tagging Admin and can tag objects using disabled taxonomies
-        (None, "tA2", ["Tag 1"], status.HTTP_403_FORBIDDEN),
-        ("user", "tA2", ["Tag 1"], status.HTTP_403_FORBIDDEN),
-        ("userA", "tA2", ["Tag 1"], status.HTTP_403_FORBIDDEN),
-        ("userS", "tA2", ["Tag 1"], status.HTTP_200_OK),
+        ("staffA", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
+        ("staff", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
     )
     @ddt.unpack
     def test_tag_course(self, user_attr, taxonomy_attr, tag_values, expected_status):
-        if user_attr:
-            user = getattr(self, user_attr)
-            self.client.force_authenticate(user=user)
+        """
+        Tests that only staff and org level users can tag courses
+        """
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
 
         taxonomy = getattr(self, taxonomy_attr)
 
@@ -733,62 +1139,72 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
             assert len(response.data) == len(tag_values)
             assert set(t["value"] for t in response.data) == set(tag_values)
 
+            # Check that re-fetching the tags returns what we set
+            response = self.client.get(url, format="json")
+            assert status.is_success(response.status_code)
+            assert set(t["value"] for t in response.data) == set(tag_values)
+
     @ddt.data(
-        # Can't add invalid tags to a object using a closed taxonomy
-        (None, "tA1", ["invalid"], status.HTTP_403_FORBIDDEN),
-        ("user", "tA1", ["invalid"], status.HTTP_403_FORBIDDEN),
-        ("userA", "tA1", ["invalid"], status.HTTP_400_BAD_REQUEST),
-        ("userS", "tA1", ["invalid"], status.HTTP_400_BAD_REQUEST),
-        (None, "multiple_taxonomy", ["invalid"], status.HTTP_403_FORBIDDEN),
-        ("user", "multiple_taxonomy", ["invalid"], status.HTTP_403_FORBIDDEN),
-        ("userA", "multiple_taxonomy", ["invalid"], status.HTTP_400_BAD_REQUEST),
-        ("userS", "multiple_taxonomy", ["invalid"], status.HTTP_400_BAD_REQUEST),
-        # Staff can't add invalid tags to a object using a closed taxonomy
-        ("userS", "tA2", ["invalid"], status.HTTP_400_BAD_REQUEST),
+        "staffA",
+        "staff",
+    )
+    def test_tag_course_disabled_taxonomy(self, user_attr):
+        """
+        Nobody can use disable taxonomies to tag objects
+        """
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+
+        disabled_taxonomy = self.tA2
+        assert disabled_taxonomy.enabled is False
+
+        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.courseA, taxonomy_id=disabled_taxonomy.pk)
+        response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    @ddt.data(
+        ("staffA", "tA1"),
+        ("staff", "tA1"),
+        ("staffA", "multiple_taxonomy"),
+        ("staff", "multiple_taxonomy"),
     )
     @ddt.unpack
-    def test_tag_course_invalid(self, user_attr, taxonomy_attr, tag_values, expected_status):
-        if user_attr:
-            user = getattr(self, user_attr)
-            self.client.force_authenticate(user=user)
+    def test_tag_course_invalid(self, user_attr, taxonomy_attr):
+        """
+        Tests that nobody can add invalid tags to a course using a closed taxonomy
+        """
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
 
         taxonomy = getattr(self, taxonomy_attr)
 
         url = OBJECT_TAG_UPDATE_URL.format(object_id=self.courseA, taxonomy_id=taxonomy.pk)
 
-        response = self.client.put(url, {"tags": tag_values}, format="json")
-        assert response.status_code == expected_status
-        assert not status.is_success(expected_status)  # No success cases here
+        response = self.client.put(url, {"tags": ["invalid"]}, format="json")
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @ddt.data(
-        # userA and userS are staff in courseA (owner of xblockA) and can tag using enabled taxonomies
-        (None, "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
+        # userA and userS are staff in courseA (owner of xblockA) and can tag using any taxonomies
         ("user", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
-        ("userA", "tA1", ["Tag 1"], status.HTTP_200_OK),
-        ("userS", "tA1", ["Tag 1"], status.HTTP_200_OK),
-        (None, "tA1", [], status.HTTP_403_FORBIDDEN),
-        ("user", "tA1", [], status.HTTP_403_FORBIDDEN),
-        ("userA", "tA1", [], status.HTTP_200_OK),
-        ("userS", "tA1", [], status.HTTP_200_OK),
-        (None, "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_403_FORBIDDEN),
+        ("staffA", "tA1", ["Tag 1"], status.HTTP_200_OK),
+        ("staff", "tA1", ["Tag 1"], status.HTTP_200_OK),
         ("user", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_403_FORBIDDEN),
-        ("userA", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
-        ("userS", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
-        (None, "open_taxonomy", ["tag1"], status.HTTP_403_FORBIDDEN),
+        ("staffA", "tA1", [], status.HTTP_200_OK),
+        ("staff", "tA1", [], status.HTTP_200_OK),
+        ("staffA", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
+        ("staff", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
         ("user", "open_taxonomy", ["tag1"], status.HTTP_403_FORBIDDEN),
-        ("userA", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
-        ("userS", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
-        # Only userS is Tagging Admin and can tag objects using disabled taxonomies
-        (None, "tA2", ["Tag 1"], status.HTTP_403_FORBIDDEN),
-        ("user", "tA2", ["Tag 1"], status.HTTP_403_FORBIDDEN),
-        ("userA", "tA2", ["Tag 1"], status.HTTP_403_FORBIDDEN),
-        ("userS", "tA2", ["Tag 1"], status.HTTP_200_OK),
+        ("staffA", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
+        ("staff", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
     )
     @ddt.unpack
     def test_tag_xblock(self, user_attr, taxonomy_attr, tag_values, expected_status):
-        if user_attr:
-            user = getattr(self, user_attr)
-            self.client.force_authenticate(user=user)
+        """
+        Tests that only staff and org level users can tag xblocks
+        """
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
 
         taxonomy = getattr(self, taxonomy_attr)
 
@@ -801,32 +1217,67 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
             assert len(response.data) == len(tag_values)
             assert set(t["value"] for t in response.data) == set(tag_values)
 
+            # Check that re-fetching the tags returns what we set
+            response = self.client.get(url, format="json")
+            assert status.is_success(response.status_code)
+            assert set(t["value"] for t in response.data) == set(tag_values)
+
     @ddt.data(
-        # Can't add invalid tags to a object using a closed taxonomy
-        (None, "tA1", ["invalid"], status.HTTP_403_FORBIDDEN),
-        ("user", "tA1", ["invalid"], status.HTTP_403_FORBIDDEN),
-        ("userA", "tA1", ["invalid"], status.HTTP_400_BAD_REQUEST),
-        ("userS", "tA1", ["invalid"], status.HTTP_400_BAD_REQUEST),
-        (None, "multiple_taxonomy", ["invalid"], status.HTTP_403_FORBIDDEN),
-        ("user", "multiple_taxonomy", ["invalid"], status.HTTP_403_FORBIDDEN),
-        ("userA", "multiple_taxonomy", ["invalid"], status.HTTP_400_BAD_REQUEST),
-        ("userS", "multiple_taxonomy", ["invalid"], status.HTTP_400_BAD_REQUEST),
-        # Staff can't add invalid tags to a object using a closed taxonomy
-        ("userS", "tA2", ["invalid"], status.HTTP_400_BAD_REQUEST),
+        "staffA",
+        "staff",
+    )
+    def test_tag_xblock_disabled_taxonomy(self, user_attr):
+        """
+        Tests that nobody can use disabled taxonomies to tag xblocks
+        """
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+
+        disabled_taxonomy = self.tA2
+        assert disabled_taxonomy.enabled is False
+
+        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.xblockA, taxonomy_id=disabled_taxonomy.pk)
+        response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    @ddt.data(
+        ("staffA", "tA1"),
+        ("staff", "tA1"),
+        ("staffA", "multiple_taxonomy"),
+        ("staff", "multiple_taxonomy"),
     )
     @ddt.unpack
-    def test_tag_xblock_invalid(self, user_attr, taxonomy_attr, tag_values, expected_status):
-        if user_attr:
-            user = getattr(self, user_attr)
-            self.client.force_authenticate(user=user)
+    def test_tag_xblock_invalid(self, user_attr, taxonomy_attr):
+        """
+        Tests that staff can't add invalid tags to a xblock using a closed taxonomy
+        """
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
 
         taxonomy = getattr(self, taxonomy_attr)
 
         url = OBJECT_TAG_UPDATE_URL.format(object_id=self.xblockA, taxonomy_id=taxonomy.pk)
 
-        response = self.client.put(url, {"tags": tag_values}, format="json")
-        assert response.status_code == expected_status
-        assert not status.is_success(expected_status)  # No success cases here
+        response = self.client.put(url, {"tags": ["invalid"]}, format="json")
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    @ddt.data(
+        "courseB",
+        "xblockB",
+    )
+    def test_tag_no_permission(self, objectid_attr):
+        """
+        Test that a user without access to courseB can't apply tags to it
+        """
+        self.client.force_authenticate(user=self.staffA)
+        object_id = getattr(self, objectid_attr)
+
+        url = OBJECT_TAG_UPDATE_URL.format(object_id=object_id, taxonomy_id=self.tA1.pk)
+
+        response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @ddt.data(
         "courseB",
@@ -836,11 +1287,40 @@ class TestObjectTagViewSet(TestTaxonomyObjectsMixin, APITestCase):
         """
         Test that a user without access to courseB can't apply tags to it
         """
-        self.client.force_authenticate(user=self.userA)
         object_id = getattr(self, objectid_attr)
 
         url = OBJECT_TAG_UPDATE_URL.format(object_id=object_id, taxonomy_id=self.tA1.pk)
 
         response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
 
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+@skip_unless_cms
+@ddt.ddt
+class TestDownloadTemplateView(APITestCase):
+    """
+    Tests the taxonomy template downloads.
+    """
+    @ddt.data(
+        ("template.csv", "text/csv"),
+        ("template.json", "application/json"),
+    )
+    @ddt.unpack
+    def test_download(self, filename, content_type):
+        url = TAXONOMY_TEMPLATE_URL.format(filename=filename)
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.headers['Content-Type'] == content_type
+        assert response.headers['Content-Disposition'] == f'attachment; filename="{filename}"'
+        assert int(response.headers['Content-Length']) > 0
+
+    def test_download_not_found(self):
+        url = TAXONOMY_TEMPLATE_URL.format(filename="template.txt")
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_download_method_not_allowed(self):
+        url = TAXONOMY_TEMPLATE_URL.format(filename="template.txt")
+        response = self.client.post(url)
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED

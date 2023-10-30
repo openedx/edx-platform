@@ -282,9 +282,9 @@ class XBlockStudentTestCaseMixin:
     Creates a default set of students for XBlock tests
     '''
     student_list = [
-        {'email': 'alice@test.edx.org', 'password': 'foo'},
-        {'email': 'bob@test.edx.org', 'password': 'foo'},
-        {'email': 'eve@test.edx.org', 'password': 'foo'},
+        {'email': 'alice@test.edx.org', 'password': 'Password1234'},
+        {'email': 'bob@test.edx.org', 'password': 'Password1234'},
+        {'email': 'eve@test.edx.org', 'password': 'Password1234'},
     ]
 
     def setUp(self):
