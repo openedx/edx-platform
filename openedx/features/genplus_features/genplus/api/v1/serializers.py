@@ -77,7 +77,7 @@ class TeacherSerializer(serializers.ModelSerializer):
         return obj.gen_user.user.id
 
     def get_name(self, instance):
-        return get_full_name(instance)
+        return get_full_name(instance.gen_user.user, default=instance.gen_user.email)
 
 
 class SkillSerializer(serializers.ModelSerializer):
