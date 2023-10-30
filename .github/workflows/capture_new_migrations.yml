@@ -125,29 +125,6 @@ jobs:
     - name: Checkout branch repo
       uses: actions/checkout@v2
 
-    - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Install system Packages
-      run: |
-        sudo apt-get update
-        make ubuntu-requirements
-
-    - name: Get pip cache dir
-      id: pip-cache-dir
-      run: |
-        echo "::set-output name=dir::$(pip cache dir)"
-
-    - name: Cache pip dependencies
-      id: cache-dependencies
-      uses: actions/cache@v3
-      with:
-        path: ${{ steps.pip-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
-        restore-keys: ${{ runner.os }}-pip-
-
     - name: Install Python dependencies
       run: |
         make dev-requirements
@@ -155,10 +132,6 @@ jobs:
           pip install "django~=${{ matrix.django-version }}.0"
           pip check # fail if this test-reqs/Django combination is broken
         fi
-
-    - name: list installed package versions
-      run: |
-        sudo pip freeze
 
     - name: Run Tests
       env:
