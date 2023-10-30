@@ -1,7 +1,7 @@
 """
 Helpers for the course roles app.
 """
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.utils.translation import gettext as _
 
 from openedx.core.djangoapps.course_roles.models import CourseRolesUserRole
@@ -101,15 +101,21 @@ def get_all_user_permissions_for_a_course(user_id, course_id):
     """
     if user_id is None or course_id is None:
         raise ValueError(_('user_id and course_id must not be None'))
-    course = modulestore().get_course(course_id)
-    if course:
-        course_permissions = set(CourseRolesUserRole.objects.filter(
-            user__id=user_id,
-            course=course_id,
-        ).values_list('role__permissions__name', flat=True))
-        organization_name = course.org
-    else:
-        return ValueError(_('course_id is not valid'))
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        raise ValueError(_('user not exist'))
+    try:
+        course = modulestore().get_course(course_id)
+    except AssertionError:
+        raise ValueError(_('course_id is not valid'))
+    if not course:
+        raise ValueError(_('course not exist'))
+    course_permissions = set(CourseRolesUserRole.objects.filter(
+        user__id=user_id,
+        course=course_id,
+    ).values_list('role__permissions__name', flat=True))
+    organization_name = course.org
     organization_permissions = set(CourseRolesUserRole.objects.filter(
         user__id=user_id,
         course__isnull=True,
