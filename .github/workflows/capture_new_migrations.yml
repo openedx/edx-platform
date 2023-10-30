@@ -108,10 +108,6 @@ jobs:
           pip check # fail if this test-reqs/Django combination is broken
         fi
 
-    - name: list installed package versions
-      run: |
-        pip freeze
-
     - name: Run Tests
       env:
         LMS_CFG: lms/envs/minimal.yml
