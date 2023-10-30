@@ -34,6 +34,32 @@ disable+ =
     no-name-in-module,
     unnecessary-lambda-assignment,
 
+    # unused-import,
+    # yield-outside-function,
+    # return-outside-function,
+    # line-too-long,
+    # bare-except,
+    # syntax-error,
+    # trailing-whitespace,
+    # empty-docstring,
+    # unnecessary-pass,
+    # return-in-init,
+    # continue-in-finally,
+    # duplicate-bases,
+    # unexpected-special-method-signature,
+    # invalid-all-object,
+    # misplaced-bare-raise,
+    # logging-too-many-args,
+    # logging-too-few-args,
+    # bad-str-strip-call,
+    # too-many-statements,
+    # too-many-boolean-expressions,
+    # useless-else-on-loop,
+    # import-self,
+    # global-variable-not-assigned,
+    # global-at-module-level,
+    # binary-op-exception,
+
 [BASIC]
 attr-rgx = [a-z_][a-z0-9_]{2,40}$
 argument-rgx = [a-z_][a-z0-9_]{2,40}$
