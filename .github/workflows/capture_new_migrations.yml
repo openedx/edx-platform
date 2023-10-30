@@ -1,4 +1,4 @@
-name: Check Django Migrations
+name: Check any new django Migrations
 
 on:
   workflow_dispatch:
