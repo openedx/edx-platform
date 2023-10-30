@@ -68,3 +68,19 @@ class UserPermissionsViewTestCase(SharedModuleStoreTestCase):
         self.client.login(username=self.user_1, password='test')
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_get_user_permission_view_with_invalid_queryargs(self):
+        # Test get user permissions with invalid queryargs.
+        self.client.login(username=self.user_1, password='test')
+        org = 'org1'
+        number = 'course1'
+        run = 'run1'
+        course_id = self.store.make_course_key(org, number, run)
+        querykwargs = {'course_id': course_id, 'user_id': self.user_1.id}
+        url = f'{reverse("course_roles_api:user_permissions")}?{urlencode(querykwargs)}'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        querykwargs = {'course_id': self.course_1.id, 'user_id': 999}
+        url = f'{reverse("course_roles_api:user_permissions")}?{urlencode(querykwargs)}'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
