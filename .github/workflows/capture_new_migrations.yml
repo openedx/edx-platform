@@ -77,7 +77,6 @@ jobs:
       with:
         ref: master
 
-
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
@@ -136,6 +135,9 @@ jobs:
           pip check # fail if this test-reqs/Django combination is broken
         fi
 
+    - name: list installed package versions
+      run: |
+        sudo pip freeze
     - name: Run Tests
       env:
         LMS_CFG: lms/envs/minimal.yml
