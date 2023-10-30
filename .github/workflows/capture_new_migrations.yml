@@ -110,7 +110,7 @@ jobs:
 
     - name: list installed package versions
       run: |
-        sudo pip freeze
+        pip freeze
 
     - name: Run Tests
       env:
@@ -122,7 +122,6 @@ jobs:
         ./manage.py lms showmigrations
         echo "Running the CMS migrations."
         ./manage.py cms showmigrations
-
 
     - name: Checkout branch repo
       uses: actions/checkout@v2
@@ -137,7 +136,7 @@ jobs:
 
     - name: list installed package versions
       run: |
-        sudo pip freeze
+        pip freeze
     - name: Run Tests
       env:
         LMS_CFG: lms/envs/minimal.yml
@@ -148,7 +147,6 @@ jobs:
         ./manage.py lms showmigrations
         echo "Running the CMS migrations."
         ./manage.py cms showmigrations
-
 
   # This job aggregates test results. It's the required check for branch protection.
   # https://github.com/marketplace/actions/alls-green#why
