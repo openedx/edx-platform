@@ -35,6 +35,7 @@ from six import text_type
 from six.moves import filter
 
 from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
+from openedx.features.edly.utils import add_default_image_to_course_assets
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from cms.djangoapps.models.settings.encoder import CourseSettingsEncoder
@@ -986,6 +987,7 @@ def create_new_course_in_store(store, user, org, number, run, fields):
     fields.update({
         'language': getattr(settings, 'DEFAULT_COURSE_LANGUAGE', 'en'),
         'cert_html_view_enabled': True,
+        'start': datetime(2023, 1, 1),
     })
 
     with modulestore().default_store(store):
@@ -1003,6 +1005,8 @@ def create_new_course_in_store(store, user, org, number, run, fields):
 
     # Initialize permissions for user in the new course
     initialize_permissions(new_course.id, user)
+
+    add_default_image_to_course_assets(new_course.id)
     return new_course
 
 
