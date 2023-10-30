@@ -193,6 +193,23 @@ class BlocksInfoInCourseView(BlocksInCourseView):
             &student_view_data=video
             &block_types_filter=problem,html
 
+    **Parameters:**
+
+            username (str): The username of the specified user for whom the course data
+                is being accessed.
+            depth (integer, str, None): Optional number of blocks you receive in response
+                course nesting depth, you can get only sections, sections and subsections,
+                or provide string 'all' to receive all blocks of the course.
+            requested_field (list): Optional list of names of additional fields to return for each block.
+                Supported fields can be found in transformers.SUPPORTED_FIELDS.
+            block_counts (list): Optional list of names of block types for which an aggregated count
+                of blocks is returned.
+            student_view_data (list): Optional list of names of block types for
+                which student_view_data is returned.
+            block_types_filter (list): Filter by block types:
+                'video', 'discussion', 'html', 'chapter', 'sequential', 'vertical'.
+            return_type (list, dict): Optional list or dictionary of block's fields based on 'return_type'.
+
     **Response example**
 
         Body consists of the following fields:
@@ -246,8 +263,36 @@ class BlocksInfoInCourseView(BlocksInCourseView):
                 }
         return {}
 
-    # pylint: disable=arguments-differ
-    def list(self, request, **kwargs):
+    @staticmethod
+    def compose_course_info(course_overview):
+        """
+        Method for obtaining additional information about the course.
+
+        Arguments:
+            request - Django request object
+        """
+
+        course_data = {
+            # identifiers
+            'name': course_overview.display_name,
+            'number': course_overview.display_number_with_default,
+            'org': course_overview.display_org_with_default,
+
+            # dates
+            'start': course_overview.start,
+            'start_display': course_overview.start_display,
+            'start_type': course_overview.start_type,
+            'end': course_overview.end,
+
+            # various URLs
+            'media': {
+                'image': course_overview.image_urls,
+            },
+            'is_self_paced': course_overview.self_paced
+        }
+        return course_data
+
+    def list(self, request, **kwargs):  # pylint: disable=W0221
         """
         REST API endpoint for listing all the blocks information in the course and
         information about the course while regarding user access and roles.
@@ -262,27 +307,11 @@ class BlocksInfoInCourseView(BlocksInCourseView):
             course_id = request.query_params.get('course_id', None)
             course_key = CourseKey.from_string(course_id)
             course_overview = CourseOverview.get_from_id(course_key)
-
             course_data = {
-                # identifiers
                 'id': course_id,
-                'name': course_overview.display_name,
-                'number': course_overview.display_number_with_default,
-                'org': course_overview.display_org_with_default,
-
-                # dates
-                'start': course_overview.start,
-                'start_display': course_overview.start_display,
-                'start_type': course_overview.start_type,
-                'end': course_overview.end,
-
-                # various URLs
-                'media': {
-                    'image': course_overview.image_urls,
-                },
                 'certificate': self.get_certificate(request, course_key),
-                'is_self_paced': course_overview.self_paced
             }
 
+            course_data.update(BlocksInfoInCourseView.compose_course_info(course_overview))
             response.data.update(course_data)
         return response
