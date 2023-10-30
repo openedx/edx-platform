@@ -155,6 +155,20 @@ class GenUser(models.Model):
     def from_private_school(self):
         return self.school.type == SchoolTypes.PRIVATE
 
+    @property
+    def name(self):
+        profile_name = getattr(self.profile, 'name', '').strip()
+        if profile_name:
+            return profile_name
+
+        first_name = getattr(self.first_name, '').strip()
+        last_name = getattr(self.last_name, '').strip()
+
+        if first_name or last_name:
+            return f'{first_name} {last_name}'.strip()
+
+        return ''
+
     def __str__(self):
         return self.email
 
