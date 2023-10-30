@@ -670,7 +670,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             serializer = StudentGradebookEntrySerializer(entries, many=True)
             return self.get_paginated_response(serializer.data, **users_counts)
 
-    def _get_user_count(self, query_args, cache_time=3600, annotations=None):
+    def _get_user_count(self, query_args, annotations=None):
         """
         Return the user count for the given query arguments to CourseEnrollment.
 
@@ -681,11 +681,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             queryset = queryset.annotate(**annotations)
         queryset = queryset.filter(*query_args)
 
-        cache_key = 'usercount.%s' % queryset.query
-        user_count = cache.get(cache_key, None)
-        if user_count is None:
-            user_count = queryset.count()
-            cache.set(cache_key, user_count, cache_time)
+        user_count = queryset.count()
 
         return user_count
 
