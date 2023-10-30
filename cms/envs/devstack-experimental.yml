@@ -57,6 +57,7 @@ CACHES:
             no_delay: true
             ignore_exc: true
             use_pooling: true
+            connect_timeout: 0.5
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: celery
         LOCATION:
@@ -68,6 +69,7 @@ CACHES:
             no_delay: true
             ignore_exc: true
             use_pooling: true
+            connect_timeout: 0.5
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: 78f87108afce
         LOCATION:
@@ -78,6 +80,7 @@ CACHES:
             no_delay: true
             ignore_exc: true
             use_pooling: true
+            connect_timeout: 0.5
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: course_structure
         LOCATION:
@@ -89,6 +92,7 @@ CACHES:
             ignore_exc: true
             no_delay: true
             use_pooling: true
+            connect_timeout: 0.5
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: default
         LOCATION:
@@ -100,6 +104,7 @@ CACHES:
             no_delay: true
             ignore_exc: true
             use_pooling: true
+            connect_timeout: 0.5
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: general
         LOCATION:
@@ -110,6 +115,7 @@ CACHES:
             no_delay: true
             ignore_exc: true
             use_pooling: true
+            connect_timeout: 0.5
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: mongo_metadata_inheritance
         LOCATION:
@@ -121,6 +127,7 @@ CACHES:
             no_delay: true
             ignore_exc: true
             use_pooling: true
+            connect_timeout: 0.5
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: 78f87108afce_general
         LOCATION:

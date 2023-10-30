@@ -26,7 +26,7 @@ django-storages==1.14
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==4.6.7
+edx-enterprise==4.6.9
 
 # django-oauth-toolkit version >=2.0.0 has breaking changes. More details
 # mentioned on this issue https://github.com/openedx/edx-platform/issues/32884
@@ -121,7 +121,7 @@ libsass==0.10.0
 click==8.1.6
 
 # pinning this version to avoid updates while the library is being developed
-openedx-learning==0.2.5
+openedx-learning==0.3.0
 
 # lti-consumer-xblock 9.6.2 contains a breaking change that makes
 # existing custom parameter configurations unusable.
