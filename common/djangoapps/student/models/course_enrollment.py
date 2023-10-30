@@ -1277,31 +1277,6 @@ class CourseEnrollment(models.Model):
         """
         return CourseMode.is_verified_slug(self.mode)
 
-    def is_professional_enrollment(self):
-        """
-        Check the course enrollment mode is professional or not
-        """
-        return CourseMode.is_professional_slug(self.mode)
-
-    @classmethod
-    def is_enrolled_as_verified(cls, user, course_key):
-        """
-        Check whether the course enrollment is for a verified mode.
-
-        Arguments:
-            user (User): The user object.
-            course_key (CourseKey): The identifier for the course.
-
-        Returns: bool
-
-        """
-        enrollment = cls.get_enrollment(user, course_key)
-        return (
-            enrollment is not None and
-            enrollment.is_active and
-            enrollment.is_verified_enrollment()
-        )
-
     @classmethod
     def cache_key_name(cls, user_id, course_key):
         """Return cache key name to be used to cache current configuration.
