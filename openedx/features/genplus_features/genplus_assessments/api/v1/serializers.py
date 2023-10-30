@@ -16,6 +16,7 @@ from openedx.features.genplus_features.genplus_learning.models import (
     ClassLesson,
     ClassUnit
 )
+from openedx.features.genplus_features.utils import get_full_name
 
 
 # TODO: remove this serializer
@@ -49,7 +50,7 @@ class ClassStudentSerializer(serializers.ModelSerializer):
         return obj.gen_user.user.email if obj.gen_user.user else obj.gen_user.email
 
     def get_full_name(self, obj):
-        return obj.gen_user.user.profile.name if obj.gen_user.user else ''
+        return get_full_name(obj.gen_user.user)
 
     def get_profile_pic_url(self, obj):
         if obj.character is not None and obj.character.profile_pic is not None:
@@ -82,7 +83,7 @@ class TextAssessmentSerializer(serializers.ModelSerializer):
                   'assessment_time', 'skill', 'full_name', 'student_response', 'score')
 
     def get_full_name(self, obj):
-        return get_user_model().objects.get(pk=obj.user_id).profile.name
+        return get_full_name(get_user_model().objects.get(pk=obj.user_id))
 
 
 class RatingAssessmentSerializer(serializers.ModelSerializer):
@@ -95,7 +96,7 @@ class RatingAssessmentSerializer(serializers.ModelSerializer):
                   'assessment_time', 'skill', 'full_name', 'rating')
 
     def get_full_name(self, obj):
-        return get_user_model().objects.get(pk=obj.user_id).profile.name
+        return get_full_name(get_user_model().objects.get(pk=obj.user_id))
 
 
 class SkillAssessmentQuestionSerializer(serializers.ModelSerializer):
@@ -124,7 +125,7 @@ class SkillAssessmentResponseSerializer(serializers.ModelSerializer):
                   'skill_assessment_type', 'question_response', 'full_name')
 
     def get_full_name(self, obj):
-        return get_user_model().objects.get(pk=obj.user_id).profile.name
+        return get_full_name(get_user_model().objects.get(pk=obj.user_id))
 
 
 class SkillReflectionQuestionSerializer(serializers.ModelSerializer):
@@ -156,7 +157,7 @@ class SkillReflectionQuestionSerializer(serializers.ModelSerializer):
         map_response = lambda i: {
             **i.question_response['student_response'],
             'username': i.user.username,
-            'name': i.user.profile.name,
+            'name': get_full_name(i.user),
             'sid': i.id
         }
 

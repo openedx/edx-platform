@@ -27,6 +27,7 @@ from openedx.features.genplus_features.genplus_assessments.utils import (
     get_student_program_skills_assessment,
     get_student_unit_skills_assessment,
 )
+from openedx.features.genplus_features.utils import get_full_name
 
 
 class UnitSerializer(serializers.ModelSerializer):
@@ -202,15 +203,8 @@ class ClassStudentSerializer(serializers.ModelSerializer):
 
     def get_username(self, obj):
         user = obj.gen_user.user
-        profile = UserProfile.objects.filter(user=user).first() if user else None
-        name = ''
-        if profile and (profile.name or '').strip():
-            name = profile.name
-        elif (user.first_name or '').strip() or (user.last_name or '').strip():
-            name = f'{user.first_name} {user.last_name}'.strip()
-        else:
-            name = obj.gen_user.email
-        return name
+        name = get_full_name(user)
+        return name or obj.gen_user.email
 
     def get_has_first_logon(self, obj):
         if obj.gen_user.from_private_school:

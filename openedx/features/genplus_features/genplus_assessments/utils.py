@@ -23,6 +23,7 @@ from openedx.features.genplus_features.genplus_assessments.constants import Prob
     TOTAL_PROBLEM_SCORE, SkillAssessmentTypes, SkillAssessmentResponseTime
 from openedx.features.genplus_features.genplus_assessments.models import SkillAssessmentQuestion, \
     SkillAssessmentResponse
+from openedx.features.genplus_features.utils import get_full_name
 
 loggger = logging.getLogger(__name__)
 class StudentResponse:
@@ -578,7 +579,7 @@ def get_students_short_answer_response(user_state, user):
     user_answer = user_state['Answer']
     student_response_dict = {
         'username': user.username,
-        'full_name': user.profile.name,
+        'full_name': get_full_name(user),
         'answer': user_answer,
     }
 
@@ -605,7 +606,7 @@ def students_multiple_choice_response(user_states, user):
         correct_answer_list = [x.strip() for x in correct_answer.split("||")]
         student_response_dict = {
             'username': user.username,
-            'full_name': user.profile.name,
+            'full_name': get_full_name(user),
             'answer': user_answer,
             'correct_answer': correct_answer,
             'earned_score': len(list(set(correct_answer_list).intersection(set(user_answer_list)))),

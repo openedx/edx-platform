@@ -11,7 +11,7 @@ from django.utils.html import strip_tags
 from tinymce.models import HTMLField
 from openedx.features.genplus_features.genplus.models import Skill, Teacher
 from .constants import AcademicYears
-
+from ..utils import get_full_name
 
 logger = logging.getLogger(__name__)
 
@@ -153,7 +153,7 @@ class ArticleRating(TimeStampedModel):
 
     def __str__(self):
         return '{} has rated {} stars to article {}'.format(
-            self.teacher.gen_user.user.profile.name,
+            get_full_name(self.teacher.gen_user.user),
             self.rating,
             self.article.title
         )
@@ -232,7 +232,7 @@ class HelpGuideRating(TimeStampedModel):
 
     def __str__(self):
         return '{} has rated {} stars to guide {}'.format(
-            self.teacher.gen_user.user.profile.name,
+            get_full_name(self.teacher.gen_user.user),
             self.rating,
             self.help_guide.title
         )

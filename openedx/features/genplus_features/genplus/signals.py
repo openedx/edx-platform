@@ -5,6 +5,7 @@ from django.conf import settings
 from django.db.models.signals import post_save, pre_save
 from .models import GenUser, Student, Teacher, Class, JournalPost, Activity, GenLog
 from .constants import JournalTypes, ActivityTypes, GenLogTypes, SchoolTypes
+from ..utils import get_full_name
 
 USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
@@ -22,7 +23,7 @@ def create_user_profile(sender, instance, created, **kwargs):
             # update the user profile name in case of xporter school
             try:
                 _user = instance.user
-                _user.profile.name = f'{_user.first_name} {_user.last_name}'
+                _user.profile.name = get_full_name(_user)
                 _user.profile.save()
             except Exception as e:
                 logger.exception(str(e))

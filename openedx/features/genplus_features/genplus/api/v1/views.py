@@ -25,6 +25,8 @@ from openedx.features.genplus_features.common.display_messages import SuccessMes
 from openedx.features.genplus_features.genplus_badges.api.v1.serializers import JournalBoosterBadgeSerializer
 from openedx.features.genplus_features.genplus_badges.models import BoosterBadgeAward
 from django.views.decorators.debug import sensitive_post_parameters
+
+from openedx.features.genplus_features.utils import get_full_name
 from .serializers import (
     CharacterSerializer,
     ClassListSerializer,
@@ -355,7 +357,7 @@ class ContactAPIView(views.APIView):
 
             data = {
                 'first_name': request.user.first_name,
-                'full_name': request.user.profile.name,
+                'full_name': get_full_name(request.user),
                 'school': request.user.gen_user.school.name,
                 'message': message,
                 'date_time': record.created.strftime("%d %B %Y %-I:%M %p"),

@@ -6,6 +6,8 @@ from django.contrib.auth import get_user_model, logout
 from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.hashers import check_password
 
+from openedx.features.genplus_features.utils import get_full_name
+
 
 class UserInfoSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
@@ -17,12 +19,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
     has_changed_password = serializers.SerializerMethodField('get_password_changed')
 
     def get_name(self, instance):
-        name = ''
-        if instance.profile and (instance.profile.name or '').strip():
-            name = instance.profile.name
-        elif (instance.first_name or '').strip() or (instance.last_name or '').strip():
-            name = f'{instance.first_name} {instance.last_name}'.strip()
-        return name
+        return get_full_name(instance)
 
     def to_representation(self, instance):
         user_info = super(UserInfoSerializer, self).to_representation(instance)
@@ -80,12 +77,7 @@ class TeacherSerializer(serializers.ModelSerializer):
         return obj.gen_user.user.id
 
     def get_name(self, instance):
-        name = ''
-        if instance.profile and (instance.profile.name or '').strip():
-            name = instance.profile.name
-        elif (instance.first_name or '').strip() or (instance.last_name or '').strip():
-            name = f'{instance.first_name} {instance.last_name}'.strip()
-        return name
+        return get_full_name(instance)
 
 
 class SkillSerializer(serializers.ModelSerializer):
