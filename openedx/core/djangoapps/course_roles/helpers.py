@@ -104,13 +104,13 @@ def get_all_user_permissions_for_a_course(user_id, course_id):
     try:
         user = User.objects.get(pk=user_id)
     except User.DoesNotExist:
-        raise ValueError(_('user not exist'))
+        raise ValueError(_('user does not exist'))
     try:
         course = modulestore().get_course(course_id)
     except AssertionError:
         raise ValueError(_('course_id is not valid'))
     if not course:
-        raise ValueError(_('course not exist'))
+        raise ValueError(_('course does not exist'))
     course_permissions = set(CourseRolesUserRole.objects.filter(
         user__id=user_id,
         course=course_id,
