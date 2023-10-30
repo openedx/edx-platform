@@ -3442,7 +3442,7 @@ SOCIAL_MEDIA_FOOTER_NAMES = [
 # to URLs defined in configuration.
 SOCIAL_MEDIA_FOOTER_ACE_URLS = {
     'reddit': 'http://www.reddit.com/r/edx',
-    'twitter': 'https://twitter.com/edXOnline',
+    'twitter': 'https://x.com/edXOnline',
     'linkedin': 'http://www.linkedin.com/company/edx',
     'facebook': 'http://www.facebook.com/EdxOnline',
 }
@@ -4247,7 +4247,7 @@ SOCIAL_PLATFORMS = {
     },
     'twitter': {
         'display_name': 'Twitter',
-        'url_stub': 'twitter.com/',
+        'url_stub': 'x.com/',
         'example': 'https://www.twitter.com/username'
     },
     'linkedin': {

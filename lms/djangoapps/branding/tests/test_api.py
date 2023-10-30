@@ -88,7 +88,7 @@ class TestFooter(TestCase):
         business_url = 'https://business.edx.org/?utm_campaign=edX.org+Referral&utm_source=edX.org&utm_medium=Footer'
         facebook_url = 'http://www.facebook.com/EdxOnline'
         linkedin_url = 'http://www.linkedin.com/company/edx'
-        twitter_url = 'https://twitter.com/edXOnline'
+        twitter_url = 'https://x.com/edXOnline'
         reddit_url = 'http://www.reddit.com/r/edx'
         expected_footer = {
             'copyright': '\xa9 \xe9dX.  All rights reserved except where noted. '
