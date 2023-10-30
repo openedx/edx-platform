@@ -163,15 +163,18 @@ class GenUser(models.Model):
             if first_name or last_name:
                 return f'{first_name} {last_name}'.strip()
         else:
-            profile_name = getattr(self.profile, 'name', '').strip()
-            if profile_name:
-                return profile_name
+            if self.user:
+                profile_name = getattr(self.user.profile, 'name', '').strip()
+                if profile_name:
+                    return profile_name
+            else:
+                return self.email
             first_name = getattr(self.user, 'first_name', '').strip()
             last_name = getattr(self.user, 'last_name', '').strip()
             if first_name or last_name:
                 return f'{first_name} {last_name}'.strip()
 
-        return ''
+        return self.email
 
     def __str__(self):
         return self.email
