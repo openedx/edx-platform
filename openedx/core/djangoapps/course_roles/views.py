@@ -39,12 +39,12 @@ class UserPermissionsView(APIView):
             raise ParseError('Required course_id parameter is missing')
         try:
             course_key = CourseKey.from_string(course_id)
-        except InvalidKeyError:
-            raise ParseError('Invalid course_id parameter')
+        except InvalidKeyError as exc:
+            raise ParseError('Invalid course_id parameter') from exc
         try:
             permissions = {
                 'permissions': get_all_user_permissions_for_a_course(user_id, course_key),
             }
-        except ValueError as e:
-            raise NotFound(str(e))
+        except ValueError as exc:
+            raise NotFound(str(exc)) from exc
         return Response(permissions)
