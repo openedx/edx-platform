@@ -850,7 +850,6 @@ CSRF_COOKIE_SECURE = False
 CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ''
 CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
 CSRF_TRUSTED_ORIGINS = []
-CSRF_TRUSTED_ORIGINS_WITH_SCHEME = []
 
 #################### CAPA External Code Evaluation #############################
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
@@ -1106,7 +1105,8 @@ DATABASES = {
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 # This will be overridden through CMS config
-DEFAULT_HASHING_ALGORITHM = 'sha1'
+DEFAULT_HASHING_ALGORITHM = 'sha256'
+
 #################### Python sandbox ############################################
 
 CODE_JAIL = {

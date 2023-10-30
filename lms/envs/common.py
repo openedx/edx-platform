@@ -1759,7 +1759,8 @@ DATABASES = {
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 # This will be overridden through LMS config
-DEFAULT_HASHING_ALGORITHM = 'sha1'
+DEFAULT_HASHING_ALGORITHM = 'sha256'
+
 #################### Python sandbox ############################################
 
 CODE_JAIL = {
@@ -3342,7 +3343,6 @@ CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
 # end users
 CSRF_COOKIE_SECURE = False
 CSRF_TRUSTED_ORIGINS = []
-CSRF_TRUSTED_ORIGINS_WITH_SCHEME = []
 CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ''
 CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
 
