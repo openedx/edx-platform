@@ -14,9 +14,6 @@ ENROLLMENT_TRACK_UPDATED = Signal()
 # providing_args=["course_enrollment", "skip_refund"]
 UNENROLL_DONE = Signal()
 
-# providing_args=["event", "user", "course_id", "mode", "cost", "currency"]
-ENROLL_STATUS_CHANGE = Signal()
-
 # providing_args=["course_enrollment"]
 REFUND_ORDER = Signal()
 

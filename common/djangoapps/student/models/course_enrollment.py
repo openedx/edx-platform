@@ -34,7 +34,7 @@ from requests.exceptions import HTTPError, RequestException
 from simple_history.models import HistoricalRecords
 
 from common.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
-from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
+from common.djangoapps.student.signals import ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
 from common.djangoapps.track import contexts, segment
 from common.djangoapps.util.query import use_read_replica_if_available
 from lms.djangoapps.certificates.data import CertificateStatuses
@@ -54,26 +54,6 @@ from openedx.core.djangolib.model_mixins import DeletableByUserValue
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
-
-
-# ENROLL signal used for free enrollment only
-class EnrollStatusChange:
-    """
-    Possible event types for ENROLL_STATUS_CHANGE signal
-    """
-    # enroll for a course
-    enroll = 'enroll'
-    # unenroll for a course
-    unenroll = 'unenroll'
-    # add an upgrade to cart
-    upgrade_start = 'upgrade_start'
-    # complete an upgrade purchase
-    upgrade_complete = 'upgrade_complete'
-    # add a paid course to the cart
-    paid_start = 'paid_start'
-    # complete a paid course purchase
-    paid_complete = 'paid_complete'
-
 
 UNENROLLED_TO_ALLOWEDTOENROLL = 'from unenrolled to allowed to enroll'
 ALLOWEDTOENROLL_TO_ENROLLED = 'from allowed to enroll to enrolled'
@@ -474,7 +454,6 @@ class CourseEnrollment(models.Model):
             else:
                 UNENROLL_DONE.send(sender=None, course_enrollment=self, skip_refund=skip_refund)
                 self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED, enterprise_uuid=enterprise_uuid)
-                self.send_signal(EnrollStatusChange.unenroll)
 
                 # .. event_implemented_name: COURSE_UNENROLLMENT_COMPLETED
                 COURSE_UNENROLLMENT_COMPLETED.send_event(
@@ -520,24 +499,6 @@ class CourseEnrollment(models.Model):
                 mode=self.mode,
                 countdown=SCORE_RECALCULATION_DELAY_ON_ENROLLMENT_UPDATE,
             )
-
-    def send_signal(self, event, cost=None, currency=None):
-        """
-        Sends a signal announcing changes in course enrollment status.
-        """
-        ENROLL_STATUS_CHANGE.send(sender=None, event=event, user=self.user,
-                                  mode=self.mode, course_id=self.course_id,
-                                  cost=cost, currency=currency)
-
-    @classmethod
-    def send_signal_full(cls, event, user=user, mode=mode, course_id=None, cost=None, currency=None):
-        """
-        Sends a signal announcing changes in course enrollment status.
-        This version should be used if you don't already have a CourseEnrollment object
-        """
-        ENROLL_STATUS_CHANGE.send(sender=None, event=event, user=user,
-                                  mode=mode, course_id=course_id,
-                                  cost=cost, currency=currency)
 
     def emit_event(self, event_name, enterprise_uuid=None):
         """
@@ -709,7 +670,6 @@ class CourseEnrollment(models.Model):
         # User is allowed to enroll if they've reached this point.
         enrollment = cls.get_or_create_enrollment(user, course_key)
         enrollment.update_enrollment(is_active=True, mode=mode, enterprise_uuid=enterprise_uuid)
-        enrollment.send_signal(EnrollStatusChange.enroll)
 
         # .. event_implemented_name: COURSE_ENROLLMENT_CREATED
         COURSE_ENROLLMENT_CREATED.send_event(
