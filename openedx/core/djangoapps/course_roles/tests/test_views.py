@@ -25,6 +25,7 @@ class UserPermissionsViewTestCase(SharedModuleStoreTestCase):
     Tests for the UserPermissionsView.
     """
     def setUp(self):
+        super().setUp()
         self.client = APIClient()
         self.user_1 = UserFactory(username="test_user_1")
         self.organization_1 = OrganizationFactory(name="test_organization_1")
