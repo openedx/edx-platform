@@ -121,7 +121,7 @@ jobs:
 
     - name: Verify executed migrations on master.
       run: |
-        mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select 1 ;" edxapp; "select   app,name  from django_migrations;";
+        mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select   app,name  from django_migrations; ;" edxapp;
 
     - name: Checkout branch repo
       uses: actions/checkout@v2
@@ -150,7 +150,7 @@ jobs:
 
     - name: Verify executed migrations on branch.
       run: |
-        mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select 1 ;" edxapp; "select   app,name  from django_migrations;";
+        mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  app,name  from django_migrations; ;" edxapp;
 
 
   # This job aggregates test results. It's the required check for branch protection.
