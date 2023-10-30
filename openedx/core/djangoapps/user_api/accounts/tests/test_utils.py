@@ -40,7 +40,7 @@ class UserAccountSettingsTest(TestCase):
         ('facebook', 'facebook.com/edX/', 'https://www.facebook.com/edX', True),
         ('facebook', 'HTTP://facebook.com/edX/', 'https://www.facebook.com/edX', True),
         ('facebook', 'www.evilwebsite.com/123', None, False),
-        ('twitter', 'https://www.x.com/edX/', None, False),
+        ('twitter', 'https://www.x.com/edX/', 'https://www.x.com/edX', True),
         ('twitter', 'https://www.x.com/edX/123s', None, False),
         ('twitter', 'x.com/edX', 'https://www.x.com/edX', True),
         ('twitter', 'x.com/edX?foo=bar', 'https://www.x.com/edX', True),
