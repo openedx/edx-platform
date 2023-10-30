@@ -203,7 +203,7 @@ class ClassStudentSerializer(serializers.ModelSerializer):
 
     def get_username(self, obj):
         user = obj.gen_user.user
-        name = get_full_name(user)
+        name = get_full_name(user, default=obj.gen_user.email)
         return name or obj.gen_user.email
 
     def get_has_first_logon(self, obj):
