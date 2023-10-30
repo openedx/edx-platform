@@ -13,10 +13,23 @@ from openedx.core.djangoapps.course_roles.helpers import get_all_user_permission
 
 @view_auth_classes()
 class UserPermissionsView(APIView):
-
+    """
+    View for getting all permissions for a user in a course.
+    """
     def get(self, request):
         """
         Get all permissions for a user in a course.
+
+        **Permissions**: User must be authenticated.
+        **Response Format**:
+        ```json
+        {
+            "permissions": [(str) permission_name, ...]
+        }
+        ```
+        **Response Error Codes**:
+        - 400: If the user_id or course_id parameters are missing or are invalid.
+        - 404: If the user or course does not exist.
         """
         user_id = self.request.query_params.get('user_id', None)
         if user_id is None:
