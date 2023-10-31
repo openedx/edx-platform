@@ -1148,7 +1148,7 @@ pylint==3.0.2
     #   pylint-pytest
 pylint-celery==0.3
     # via edx-lint
-pylint-django==2.5.3
+pylint-django==2.5.5
     # via edx-lint
 pylint-plugin-utils==0.8.2
     # via
