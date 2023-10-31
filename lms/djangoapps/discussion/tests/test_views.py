@@ -515,13 +515,13 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
     """
     @ddt.data(
         # split mongo: 3 queries, regardless of thread response size.
-        (False, 1, 2, 2, 26, 8),
-        (False, 50, 2, 2, 26, 8),
+        (False, 1, 2, 2, 21, 8),
+        (False, 50, 2, 2, 21, 8),
 
         # Enabling Enterprise integration should have no effect on the number of mongo queries made.
         # split mongo: 3 queries, regardless of thread response size.
-        (True, 1, 2, 2, 26, 8),
-        (True, 50, 2, 2, 26, 8),
+        (True, 1, 2, 2, 21, 8),
+        (True, 50, 2, 2, 21, 8),
     )
     @ddt.unpack
     def test_number_of_mongo_queries(
