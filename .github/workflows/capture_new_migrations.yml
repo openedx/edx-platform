@@ -122,7 +122,7 @@ jobs:
     - name: "Setup env vars"
       id: envvars
       run: |
-        echo "TEST_VAR=$TEST_VAR" >> $GITHUB_OUTPUT
+        echo "TEST_VAR='aaaa'" >> $GITHUB_OUTPUT
         echo "SERVICE_NAME=$SERVICE_NAME" >> $GITHUB_OUTPUT
       env:
         TEST_VAR: "test variable value"
