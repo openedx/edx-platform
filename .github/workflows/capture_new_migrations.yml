@@ -195,8 +195,9 @@ jobs:
         number2=${{ env.FIRST_QUERY }}
         diff=$((number1 - number2))
         result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select app, name from django_migrations  ORDER by -id limit $diff;" edxapp;)
-        echo "Query Result: $result"
-        echo "CUSTOM_MESSAGE=$result" >> $GITHUB_ENV
+        formatted_data=$(echo "$data" | tr '\t' ' ')
+        echo "Query Result: formatted_data"
+        echo "CUSTOM_MESSAGE=formatted_data" >> $GITHUB_ENV
       shell: bash
 
     - name: Comment PR
