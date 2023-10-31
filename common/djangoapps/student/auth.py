@@ -152,6 +152,7 @@ def get_user_permissions(user, course_key, org=None):
     ):
         return STUDIO_VIEW_USERS | STUDIO_EDIT_CONTENT | STUDIO_VIEW_CONTENT
     # Otherwise, for libraries, users can view only:
+    LIBRARY_USER_ROLE_PERMISSION = "view_library"
     if course_key and isinstance(course_key, LibraryLocator):
         # TODO: course roles: If the course roles feature flag is disabled the course_or_organization_permission_check
         #       call below will never return true.

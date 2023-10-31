@@ -1,7 +1,9 @@
 """
 Tests of the course_roles.helpers module
 """
+import ddt
 from organizations.tests.factories import OrganizationFactory
+import pytest
 
 from common.djangoapps.student.tests.factories import AnonymousUserFactory, UserFactory
 from openedx.core.djangoapps.course_roles.helpers import (
@@ -10,7 +12,8 @@ from openedx.core.djangoapps.course_roles.helpers import (
     course_permission_check,
     course_permissions_list_check,
     organization_permission_check,
-    organization_permissions_list_check
+    organization_permissions_list_check,
+    get_all_user_permissions_for_a_course,
 )
 from openedx.core.djangoapps.course_roles.models import (
     CourseRolesPermission,
@@ -453,3 +456,105 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         assert not course_or_organization_permission_list_check(
             self.user_1, test_permissions, self.course_1.id, self.organization_1.name
         )
+
+
+@ddt.ddt
+class GetAllUserPermissionsTestcase(SharedModuleStoreTestCase):
+    """
+    Tests of get_all_user_permissions_for_a_course function in course_roles.helpers module
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.user_1 = UserFactory(username="test_user_1")
+        self.user_2 = UserFactory(username="test_user_2")
+        self.organization_1 = OrganizationFactory(name="test_organization_1")
+        self.course_1 = CourseFactory.create(
+            display_name="test course 1", run="Testing_course_1", org=self.organization_1.name
+        )
+        self.role_1 = CourseRolesRole.objects.create(name="test_role_1")
+        self.role_2 = CourseRolesRole.objects.create(name="test_role_2")
+        self.role_3 = CourseRolesRole.objects.create(name="test_role_3")
+        self.role_4 = CourseRolesRole.objects.create(name="test_role_4")
+        self.role_5 = CourseRolesRole.objects.create(name="test_role_5")
+        self.service = CourseRolesService.objects.create(name="test_service")
+        self.role_1.services.add(self.service)
+        self.role_2.services.add(self.service)
+        self.role_3.services.add(self.service)
+        self.role_4.services.add(self.service)
+        self.role_5.services.add(self.service)
+        self.permission_1 = CourseRolesPermission.objects.create(name="test_permission_1")
+        self.permission_2 = CourseRolesPermission.objects.create(name="test_permission_2")
+        self.permission_3 = CourseRolesPermission.objects.create(name="test_permission_3")
+        self.permission_4 = CourseRolesPermission.objects.create(name="test_permission_4")
+        self.permission_5 = CourseRolesPermission.objects.create(name="test_permission_5")
+        self.role_1.permissions.add(self.permission_1)
+        self.role_2.permissions.add(self.permission_2)
+        self.role_3.permissions.add(self.permission_3)
+        self.role_4.permissions.add(self.permission_4)
+        self.role_5.permissions.add(self.permission_5)
+
+    def test_get_all_user_permissions_for_a_course(self):
+        """
+        Test that get_all_user_permissions_for_a_course returns the correct permissions for the user and course
+        """
+        CourseRolesUserRole.objects.create(
+            user=self.user_1, role=self.role_1, course_id=self.course_1.id, org=self.organization_1
+        )
+        CourseRolesUserRole.objects.create(
+            user=self.user_2, role=self.role_4, course_id=self.course_1.id, org=self.organization_1
+        )
+        # Test that the correct permissions are returned for user_1
+        assert get_all_user_permissions_for_a_course(self.user_1.id, self.course_1.id) == {self.permission_1.name}
+        CourseRolesUserRole.objects.create(
+            user=self.user_1, role=self.role_2, course_id=self.course_1.id, org=self.organization_1
+        )
+        # Test that the correct permissions are returned for user_1
+        assert get_all_user_permissions_for_a_course(self.user_1.id, self.course_1.id) == {
+            self.permission_1.name, self.permission_2.name}
+
+        CourseRolesUserRole.objects.create(
+            user=self.user_1, role=self.role_3, org=self.organization_1
+        )
+        # Test that the correct permissions are returned for user_1, including org level permissions
+        assert get_all_user_permissions_for_a_course(self.user_1.id, self.course_1.id) == {
+            self.permission_1.name, self.permission_2.name, self.permission_3.name}
+        CourseRolesUserRole.objects.create(
+            user=self.user_1, role=self.role_5
+        )
+        # Test that the correct permissions are returned for user_1, including instance level permissions
+        assert get_all_user_permissions_for_a_course(self.user_1.id, self.course_1.id) == {
+            self.permission_1.name, self.permission_2.name, self.permission_3.name, self.permission_5.name}
+
+    def test_get_all_user_permissions_for_a_course_with_no_permissions(self):
+        """
+        Test that get_all_user_permissions_for_a_course returns an empty list when the user has no permissions
+        """
+        assert not get_all_user_permissions_for_a_course(self.user_1.id, self.course_1.id)
+
+    @ddt.data(
+        (None, 'course_id'),
+        (1, None),
+        (None, None),
+    )
+    @ddt.unpack
+    def test_get_all_user_permissions_for_a_course_with_none_values(self, user_id, course_id):
+        """
+        Test that get_all_user_permissions_for_a_course raises value error when the user has no permissions
+        """
+        with pytest.raises(ValueError):
+            get_all_user_permissions_for_a_course(user_id, course_id)
+
+    def test_get_all_user_permissions_for_a_course_with_invalid_user(self):
+        """
+        Test that get_all_user_permissions_for_a_course raises value error when the user not exist
+        """
+        with pytest.raises(ValueError):
+            get_all_user_permissions_for_a_course(999, 999)
+
+    def test_get_all_user_permissions_for_a_course_with_invalid_course(self):
+        """
+        Test that get_all_user_permissions_for_a_course raises value error when the course not exist
+        """
+        with pytest.raises(ValueError):
+            get_all_user_permissions_for_a_course(self.user_1.id, 999)
