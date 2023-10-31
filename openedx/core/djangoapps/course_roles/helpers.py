@@ -6,7 +6,6 @@ from django.utils.translation import gettext as _
 
 from edx_toggles.toggles import WaffleFlag
 from openedx.core.djangoapps.course_roles.models import CourseRolesUserRole
-from openedx.core.lib.cache_utils import request_cached
 from xmodule.modulestore.django import modulestore
 
 
@@ -29,7 +28,6 @@ def use_permission_checks():
     return USE_PERMISSION_CHECKS_FLAG.is_enabled()
 
 
-@request_cached()
 def course_permission_check(user, permission_name, course_id):
     """
     Check if a user has a permission in a course.
@@ -45,7 +43,6 @@ def course_permission_check(user, permission_name, course_id):
     ).exists()
 
 
-@request_cached()
 def course_permissions_list_check(user, permission_names, course_id):
     """
     Check if a user has ALL of the given permissions in a course.
@@ -55,7 +52,6 @@ def course_permissions_list_check(user, permission_names, course_id):
     return all(course_permission_check(user, permission_name, course_id) for permission_name in permission_names)
 
 
-@request_cached()
 def course_permissions_list_check_any(user, permission_names, course_id):
     """
     Check if a user has ANY of the given permissions in a course.
@@ -63,7 +59,6 @@ def course_permissions_list_check_any(user, permission_names, course_id):
     return any(course_permission_check(user, permission_name, course_id) for permission_name in permission_names)
 
 
-@request_cached()
 def organization_permission_check(user, permission_name, organization_name):
     """
     Check if a user has a permission in an organization.
@@ -80,7 +75,6 @@ def organization_permission_check(user, permission_name, organization_name):
     ).exists()
 
 
-@request_cached()
 def organization_permissions_list_check(user, permission_names, organization_name):
     """
     Check if a user has ALL of the given permissions in an organization.
@@ -92,7 +86,6 @@ def organization_permissions_list_check(user, permission_names, organization_nam
     )
 
 
-@request_cached()
 def course_or_organization_permission_check(user, permission_name, course_id, organization_name=None):
     """
     Check if a user has a permission in an organization or a course.
@@ -112,7 +105,6 @@ def course_or_organization_permission_check(user, permission_name, course_id, or
             )
 
 
-@request_cached()
 def course_or_organization_permission_list_check(user, permission_names, course_id, organization_name=None):
     """
     Check if a user has all of the given permissions in an organization or a course.
