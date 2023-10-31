@@ -82,93 +82,123 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install system Packages
-      run: |
-        sudo apt-get update
-        make ubuntu-requirements
+#    - name: Install system Packages
+#      run: |
+#        sudo apt-get update
+#        make ubuntu-requirements
+#
+#    - name: Get pip cache dir
+#      id: pip-cache-dir
+#      run: |
+#        echo "::set-output name=dir::$(pip cache dir)"
 
-    - name: Get pip cache dir
-      id: pip-cache-dir
-      run: |
-        echo "::set-output name=dir::$(pip cache dir)"
+#    - name: Cache pip dependencies
+#      id: cache-dependencies
+#      uses: actions/cache@v3
+#      with:
+#        path: ${{ steps.pip-cache-dir.outputs.dir }}
+#        key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
+#        restore-keys: ${{ runner.os }}-pip-
+#
+#    - name: Install Python dependencies
+#      run: |
+#        make dev-requirements
+#        if [[ "${{ matrix.django-version }}" != "pinned" ]]; then
+#          pip install "django~=${{ matrix.django-version }}.0"
+#          pip check # fail if this test-reqs/Django combination is broken
+#        fi
 
-    - name: Cache pip dependencies
-      id: cache-dependencies
-      uses: actions/cache@v3
-      with:
-        path: ${{ steps.pip-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
-        restore-keys: ${{ runner.os }}-pip-
+#    - name: Run Tests
+#      env:
+#        LMS_CFG: lms/envs/minimal.yml
+#        # This is from the LMS dir on purpose since we don't need anything different for the CMS yet.
+#        STUDIO_CFG: lms/envs/minimal.yml
+#      run: |
+#        echo "Running the LMS migrations."
+#        ./manage.py lms migrate
+#        echo "Running the CMS migrations."
+#        ./manage.py cms migrate
 
-    - name: Install Python dependencies
+    - name: "Setup env vars"
+      id: envvars
       run: |
-        make dev-requirements
-        if [[ "${{ matrix.django-version }}" != "pinned" ]]; then
-          pip install "django~=${{ matrix.django-version }}.0"
-          pip check # fail if this test-reqs/Django combination is broken
-        fi
+        number1=10
+        number2=5
+        echo "Number 1: $number1"
+        echo "Number 2: $number2"
+        result=$((number1 - number2))
+        echo "Result: $result"
+        echo "SUBTRACTION_RESULT=$result" >> $GITHUB_ENV
+      shell: bash
 
-    - name: Run Tests
-      env:
-        LMS_CFG: lms/envs/minimal.yml
-        # This is from the LMS dir on purpose since we don't need anything different for the CMS yet.
-        STUDIO_CFG: lms/envs/minimal.yml
+    - name: Use subtraction result
       run: |
-        echo "Running the LMS migrations."
-        ./manage.py lms migrate
-        echo "Running the CMS migrations."
-        ./manage.py cms migrate
+        subtraction_result=${{ env.SUBTRACTION_RESULT }}
+        echo "Subtraction Result: $subtraction_result"
 
     - name: Verify executed migrations on master.
-      id: capture12
+      id: capture1
       shell: bash
       run: |
-        query_result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select count(*) from django_migrations;" edxapp;)
-        numeric_result=$(echo "$query_result" | sed 's/[^0-9]*//g')
-        echo "Numeric Result: $numeric_result"
+        query_result1=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  1;" edxapp;)
+        numeric_result = $(echo "$query_result" | tr -d '[:space:]')
         echo "FIRST_QUERY=$numeric_result" >> $GITHUB_ENV
+
+    - name: Step 12
+      run: |
+        subtraction_result=${{ env.FIRST_QUERY }}
+        echo "State is: subtraction_result"
 
     - name: Checkout branch repo
       uses: actions/checkout@v2
 
-    - name: Install Python dependencies
-      run: |
-        make dev-requirements
-        if [[ "${{ matrix.django-version }}" != "pinned" ]]; then
-          pip install "django~=${{ matrix.django-version }}.0"
-          pip check # fail if this test-reqs/Django combination is broken
-        fi
+#    - name: Install Python dependencies
+#      run: |
+#        make dev-requirements
+#        if [[ "${{ matrix.django-version }}" != "pinned" ]]; then
+#          pip install "django~=${{ matrix.django-version }}.0"
+#          pip check # fail if this test-reqs/Django combination is broken
+#        fi
+#
+#    - name: list installed package versions
+#      run: |
+#        pip freeze
 
-    - name: Run Tests
-      env:
-        LMS_CFG: lms/envs/minimal.yml
-        # This is from the LMS dir on purpose since we don't need anything different for the CMS yet.
-        STUDIO_CFG: lms/envs/minimal.yml
-      run: |
-        echo "Running the LMS migrations."
-        ./manage.py lms migrate
-        echo "Running the CMS migrations."
-        ./manage.py cms migrate
+#    - name: Run Tests
+#      env:
+#        LMS_CFG: lms/envs/minimal.yml
+#        # This is from the LMS dir on purpose since we don't need anything different for the CMS yet.
+#        STUDIO_CFG: lms/envs/minimal.yml
+#      run: |
+#        echo "Running the LMS migrations."
+#        ./manage.py lms migrate
+#        echo "Running the CMS migrations."
+#        ./manage.py cms migrate
 
     - name: Verify executed migrations on branch.
       shell: bash
-      id: capture23
+      id: capture2
       run: |
-        query_result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select count(*) from django_migrations;" edxapp;)
-        numeric_result=$(echo "$query_result" | sed 's/[^0-9]*//g')
-        echo "Numeric Result: $numeric_result"
-        echo "SECOND_QUERY=$numeric_result" >> $GITHUB_ENV
+        captured_result="${{ env.query_r }}"
+        echo "Captured Output: $captured_result"
+#        query_result1=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  1;" edxapp;)
+#        echo "Query Result: query_result1"
+#        echo "query_result1=${query_result1}" >> $GITHUB_ENV
+#      shell: bash
 
     - name: Verify difference
       run: |
-        echo "echo ${{env.FIRST_QUERY}}"
-        echo "echo ${{env.SECOND_QUERY}}"
-        number1=${{ env.FIRST_QUERY }}
-        number2=${{ env.SECOND_QUERY }}
-  #        # Perform subtraction
-        diff=$((SECOND_QUERY - FIRST_QUERY))
-        result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select * from django_migrations  ORDER by -id limit 3;" edxapp;)
+        echo "echo ${{env.query_result}}"
+        echo "echo ${{env.query_result1}}"
+        number1=${{ env.query_result1 }}
+        number2=${{ env.query_result1 }}
+        # Perform subtraction
+        diff=$((number1 - number2))
+        result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  1 ;" edxapp;)
+        echo "Query Result: $result"
         echo "$result"
+      shell: bash
+
 
   # This job aggregates test results. It's the required check for branch protection.
   # https://github.com/marketplace/actions/alls-green#why
