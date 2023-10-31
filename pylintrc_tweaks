@@ -33,6 +33,9 @@ disable+ =
     c-extension-no-member,
     no-name-in-module,
     unnecessary-lambda-assignment,
+    superfluous-parens,
+    use-dict-literal,
+    no-else-raise
 
 [BASIC]
 attr-rgx = [a-z_][a-z0-9_]{2,40}$
