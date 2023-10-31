@@ -127,11 +127,7 @@ jobs:
         echo "Query Result: $query_result"
         echo "VALUE1=$query_result" >> $GITHUB_ENV
 
-#    - name: Step 1
-#      run: |
-#        echo "action_state=yellow" >> $GITHUB_ENV
-#        echo "State is: '${{ env.action_state }}'"
-    - name: Step 2
+    - name: Step 1
       run: |
         echo "State is: '${{ env.VALUE1 }}'"
 
