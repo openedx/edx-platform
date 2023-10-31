@@ -124,24 +124,24 @@ jobs:
       run: |
         query_result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  1;" edxapp;)
         echo "Query Result: $query_result"
-        echo "query_result=${query_result}" >> $GITHUB_ENV
+        echo "query_result=$query_result" >> $GITHUB_ENV
         echo "echo ${{env.query_result}}"
       shell: bash
 
     - name: Checkout branch repo
       uses: actions/checkout@v2
 
-    - name: Install Python dependencies
-      run: |
-        make dev-requirements
-        if [[ "${{ matrix.django-version }}" != "pinned" ]]; then
-          pip install "django~=${{ matrix.django-version }}.0"
-          pip check # fail if this test-reqs/Django combination is broken
-        fi
-
-    - name: list installed package versions
-      run: |
-        pip freeze
+#    - name: Install Python dependencies
+#      run: |
+#        make dev-requirements
+#        if [[ "${{ matrix.django-version }}" != "pinned" ]]; then
+#          pip install "django~=${{ matrix.django-version }}.0"
+#          pip check # fail if this test-reqs/Django combination is broken
+#        fi
+#
+#    - name: list installed package versions
+#      run: |
+#        pip freeze
 
 #    - name: Run Tests
 #      env:
