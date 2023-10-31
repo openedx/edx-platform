@@ -123,9 +123,8 @@ jobs:
       id: capture1
       run: |
         query_result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  count(*)  from django_migrations;" edxapp;)
-        echo "Query Result: $query_result"
-        echo "query_result=${query_result}" >> $GITHUB_ENV
-        echo "echo ${{env.query_result}}"
+        echo "Query Result: query_result"
+        echo "query_result=query_result" >> $GITHUB_ENV
       shell: bash
 
     - name: Checkout branch repo
@@ -157,9 +156,8 @@ jobs:
       id: capture2
       run: |
         query_result1=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  count(*)  from django_migrations;" edxapp;)
-        echo "Query Result: query_result1"
-        echo "query_result1=${query_result1}" >> $GITHUB_ENV
-        echo "echo ${{env.query_result1}}"
+        echo "Query Result: $query_result1"
+        echo "query_result1=$query_result1" >> $GITHUB_ENV
       shell: bash
 
     - name: Verify difference
