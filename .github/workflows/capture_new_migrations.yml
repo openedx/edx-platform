@@ -187,7 +187,7 @@ jobs:
         echo "Numeric Result: $numeric_result"
         echo "SECOND_QUERY=$numeric_result" >> $GITHUB_ENV
 
-    - name: Verify difference
+    - name: Process Data
       run: |
         echo "echo ${{ env.SECOND_QUERY }}"
         echo "echo ${{ env.FIRST_QUERY }}"
@@ -203,7 +203,7 @@ jobs:
     - name: Comment PR
       uses: thollander/actions-comment-pull-request@v2
       with:
-        message: ${{ env.CUSTOM_MESSAGE }}
+        message: ${{ steps.process-data.outputs.formatted_data }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # This job aggregates test results. It's the required check for branch protection.
