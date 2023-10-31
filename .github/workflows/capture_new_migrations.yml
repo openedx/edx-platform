@@ -108,50 +108,24 @@ jobs:
           pip check # fail if this test-reqs/Django combination is broken
         fi
 
-    - name: Verify executed migrations on branch.
-      id: capture2
-      run: |
-        query_result1=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select 1;" edxapp;)
-        echo "Query Result: $query_result1"
-        echo "query_result1=$query_result1" >> $GITHUB_ENV
-
-    - name: Verify executed migrations on branch2.
-      id: capture2
-      run: |
-        query_result1=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select 1;" edxapp;)
-        echo "Query Result: $query_result1"
-        echo "query_result1=$query_result1" >> $GITHUB_ENV
-
-    - name: Verify difference
-      run: |
-        echo "echo ${{env.query_result}}"
-        echo "echo ${{env.query_result1}}"
-        number1=${{ env.query_result1 }}
-        number2=${{ env.query_result1 }}
-        # Perform subtraction
-        diff=$((number1 - number2))
-        result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  * from django_migrations ORDER by -id limit $diff ;" edxapp;)
-        echo "Query Result: $result"
-        echo "$result"
-
-
-    - name: Run Tests
-      env:
-        LMS_CFG: lms/envs/minimal.yml
-        # This is from the LMS dir on purpose since we don't need anything different for the CMS yet.
-        STUDIO_CFG: lms/envs/minimal.yml
-      run: |
-        echo "Running the LMS migrations."
-        ./manage.py lms migrate
-        echo "Running the CMS migrations."
-        ./manage.py cms migrate
+#    - name: Run Tests
+#      env:
+#        LMS_CFG: lms/envs/minimal.yml
+#        # This is from the LMS dir on purpose since we don't need anything different for the CMS yet.
+#        STUDIO_CFG: lms/envs/minimal.yml
+#      run: |
+#        echo "Running the LMS migrations."
+#        ./manage.py lms migrate
+#        echo "Running the CMS migrations."
+#        ./manage.py cms migrate
 
     - name: Verify executed migrations on master.
       id: capture1
       run: |
         query_result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  count(*)  from django_migrations;" edxapp;)
-        echo "Query Result: query_result"
-        echo "query_result=query_result" >> $GITHUB_ENV
+        echo "Query Result: $query_result"
+        echo "query_result=${query_result}" >> $GITHUB_ENV
+        echo "echo ${{env.query_result}}"
       shell: bash
 
     - name: Checkout branch repo
@@ -169,23 +143,23 @@ jobs:
       run: |
         pip freeze
 
-    - name: Run Tests
-      env:
-        LMS_CFG: lms/envs/minimal.yml
-        # This is from the LMS dir on purpose since we don't need anything different for the CMS yet.
-        STUDIO_CFG: lms/envs/minimal.yml
-      run: |
-        echo "Running the LMS migrations."
-        ./manage.py lms migrate
-        echo "Running the CMS migrations."
-        ./manage.py cms migrate
+#    - name: Run Tests
+#      env:
+#        LMS_CFG: lms/envs/minimal.yml
+#        # This is from the LMS dir on purpose since we don't need anything different for the CMS yet.
+#        STUDIO_CFG: lms/envs/minimal.yml
+#      run: |
+#        echo "Running the LMS migrations."
+#        ./manage.py lms migrate
+#        echo "Running the CMS migrations."
+#        ./manage.py cms migrate
 
     - name: Verify executed migrations on branch.
       id: capture2
       run: |
         query_result1=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  count(*)  from django_migrations;" edxapp;)
-        echo "Query Result: $query_result1"
-        echo "query_result1=$query_result1" >> $GITHUB_ENV
+        echo "Query Result: query_result1"
+        echo "query_result1=${query_result1}" >> $GITHUB_ENV
       shell: bash
 
     - name: Verify difference
