@@ -9,4 +9,5 @@ overrides don't exist
 import os
 
 MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
-MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
+MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST',
+                            'edx.devstack.mongo' if 'BOK_CHOY_HOSTNAME' in os.environ else 'localhost')

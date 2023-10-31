@@ -13,6 +13,7 @@ not possible to have this LTI multiple times on a single page in LMS.
 import base64
 import hashlib
 import logging
+import os
 import textwrap
 from unittest import mock
 from uuid import uuid4
@@ -77,7 +78,7 @@ class StubLtiHandler(StubHttpRequestHandler):
                         'callback_url': self.post_dict.get('lis_outcome_service_url').replace('https', 'http'),
                         'sourcedId': self.post_dict.get('lis_result_sourcedid')
                     }
-                host = self.server.server_address[0]
+                host = os.environ.get('BOK_CHOY_HOSTNAME', self.server.server_address[0])
                 submit_url = f'//{host}:{self.server.server_address[1]}'
                 content = self._create_content(status_message, submit_url)
                 self.send_response(200, content)
@@ -295,7 +296,7 @@ class StubLtiHandler(StubHttpRequestHandler):
 
         """
         client_secret = str(self.server.config.get('client_secret', self.DEFAULT_CLIENT_SECRET))
-        host = '127.0.0.1'
+        host = os.environ.get('BOK_CHOY_HOSTNAME', '127.0.0.1')
         port = self.server.server_address[1]
         lti_base = self.DEFAULT_LTI_ADDRESS.format(host=host, port=port)
         lti_endpoint = self.server.config.get('lti_endpoint', self.DEFAULT_LTI_ENDPOINT)

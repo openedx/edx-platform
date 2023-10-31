@@ -61,6 +61,18 @@ class Env:
     # Python unittest dirs
     PYTHON_COVERAGERC = REPO_ROOT / ".coveragerc"
 
+    # Bok_choy dirs
+    BOK_CHOY_DIR = REPO_ROOT / "common" / "test" / "acceptance"
+    BOK_CHOY_LOG_DIR = GEN_LOG_DIR
+    BOK_CHOY_REPORT_DIR = REPORT_DIR / "bok_choy"
+    BOK_CHOY_A11Y_REPORT_DIR = REPORT_DIR / "a11y"
+    BOK_CHOY_COVERAGERC = BOK_CHOY_DIR / ".coveragerc"
+    BOK_CHOY_A11Y_COVERAGERC = BOK_CHOY_DIR / ".a11ycoveragerc"
+    BOK_CHOY_A11Y_CUSTOM_RULES_FILE = (
+        REPO_ROOT / "node_modules" / "edx-custom-a11y-rules" /
+        "lib" / "custom_a11y_rules.js"
+    )
+
     # Which Python version should be used in xdist workers?
     PYTHON_VERSION = os.environ.get("PYTHON_VERSION", "2.7")
 
@@ -70,20 +82,94 @@ class Env:
     # build steps. For local development/testing, this shouldn't be needed.
     if os.environ.get("SHARD", None):
         shard_str = "shard_{}".format(os.environ.get("SHARD"))
+        BOK_CHOY_REPORT_DIR = BOK_CHOY_REPORT_DIR / shard_str
+        BOK_CHOY_LOG_DIR = BOK_CHOY_LOG_DIR / shard_str
+
+    # The stubs package is currently located in the Django app called "terrain"
+    # from when they were used by both the bok-choy and lettuce (deprecated) acceptance tests
+    BOK_CHOY_STUB_DIR = REPO_ROOT / "common" / "djangoapps" / "terrain"
 
     # Directory that videos are served from
     VIDEO_SOURCE_DIR = REPO_ROOT / "test_root" / "data" / "video"
 
-    PRINT_SETTINGS_LOG_FILE = GEN_LOG_DIR / "print_settings.log"
+    PRINT_SETTINGS_LOG_FILE = BOK_CHOY_LOG_DIR / "print_settings.log"
 
     # Detect if in a Docker container, and if so which one
-    FRONTEND_TEST_SERVER_HOST = os.environ.get('FRONTEND_TEST_SERVER_HOSTNAME', '0.0.0.0')
-    USING_DOCKER = FRONTEND_TEST_SERVER_HOST != '0.0.0.0'
+    SERVER_HOST = os.environ.get('BOK_CHOY_HOSTNAME', '0.0.0.0')
+    USING_DOCKER = SERVER_HOST != '0.0.0.0'
+    SETTINGS = 'bok_choy_docker' if USING_DOCKER else 'bok_choy'
     DEVSTACK_SETTINGS = 'devstack_docker' if USING_DOCKER else 'devstack'
     TEST_SETTINGS = 'test'
 
+    BOK_CHOY_SERVERS = {
+        'lms': {
+            'host': SERVER_HOST,
+            'port': os.environ.get('BOK_CHOY_LMS_PORT', '8003'),
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_lms.log"
+        },
+        'cms': {
+            'host': SERVER_HOST,
+            'port': os.environ.get('BOK_CHOY_CMS_PORT', '8031'),
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_studio.log"
+        }
+    }
+
+    BOK_CHOY_STUBS = {
+
+        'xqueue': {
+            'port': 8040,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_xqueue.log",
+            'config': 'register_submission_url=http://0.0.0.0:8041/test/register_submission',
+        },
+
+        'ora': {
+            'port': 8041,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_ora.log",
+            'config': '',
+        },
+
+        'comments': {
+            'port': 4567,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_comments.log",
+        },
+
+        'video': {
+            'port': 8777,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_video_sources.log",
+            'config': f"root_dir={VIDEO_SOURCE_DIR}",
+        },
+
+        'youtube': {
+            'port': 9080,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_youtube.log",
+        },
+
+        'edxnotes': {
+            'port': 8042,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_edxnotes.log",
+        },
+
+        'ecommerce': {
+            'port': 8043,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_ecommerce.log",
+        },
+
+        'catalog': {
+            'port': 8091,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_catalog.log",
+        },
+
+        'lti': {
+            'port': 8765,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_lti.log",
+        },
+    }
+
     # Mongo databases that will be dropped before/after the tests run
-    MONGO_HOST = 'localhost'
+    MONGO_HOST = 'edx.devstack.mongo' if USING_DOCKER else 'localhost'
+    BOK_CHOY_MONGO_DATABASE = "test"
+    BOK_CHOY_CACHE_HOST = 'edx.devstack.memcached' if USING_DOCKER else '0.0.0.0'
+    BOK_CHOY_CACHE = memcache.Client([f'{BOK_CHOY_CACHE_HOST}:11211'], debug=0)
 
     # Test Ids Directory
     TEST_DIR = REPO_ROOT / ".testids"
