@@ -125,7 +125,6 @@ jobs:
         query_result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  1;" edxapp;)
         echo "Query Result: $query_result"
         echo "query_result=$query_result" >> $GITHUB_ENV
-        echo "echo ${{env.query_result}}"
       shell: bash
 
     - name: Checkout branch repo
@@ -157,10 +156,11 @@ jobs:
     - name: Verify executed migrations on branch.
       id: capture2
       run: |
-        query_result1=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  1;" edxapp;)
-        echo "Query Result: query_result1"
-        echo "query_result1=${query_result1}" >> $GITHUB_ENV
-      shell: bash
+        echo "  ${{env.query_result}}"
+#        query_result1=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  1;" edxapp;)
+#        echo "Query Result: query_result1"
+#        echo "query_result1=${query_result1}" >> $GITHUB_ENV
+#      shell: bash
 
     - name: Verify difference
       run: |
