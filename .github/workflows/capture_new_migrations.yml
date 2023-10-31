@@ -188,8 +188,8 @@ jobs:
 
     - name: Verify difference
       run: |
-        echo "echo ${{env.SECOND_QUERY}}"
-        echo "echo ${{env.FIRST_QUERY}}"
+        echo "echo ${{ env.SECOND_QUERY }}"
+        echo "echo ${{ env.FIRST_QUERY }}"
         number1=${{ env.SECOND_QUERY }}
         number2=${{ env.FIRST_QUERY }}
 #        # Perform subtraction
