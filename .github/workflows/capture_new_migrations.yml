@@ -194,11 +194,18 @@ jobs:
         number1=${{ env.SECOND_QUERY }}
         number2=${{ env.FIRST_QUERY }}
         diff=$((number1 - number2))
-        result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select   * from django_migrations  ORDER by -id limit $diff;" edxapp;)
+        result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select app, name from django_migrations  ORDER by -id limit $diff;" edxapp;)
         echo "Query Result: $result"
+        echo "new_migrations=$numeric_result" >> $GITHUB_ENV
 #        echo "$result"
       shell: bash
 
+    - name: Comment PR
+      uses: thollander/actions-comment-pull-request@v2
+      with:
+        message: |
+          Few migraions added on your PR ${{ env.new_migrations }}.
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # This job aggregates test results. It's the required check for branch protection.
   # https://github.com/marketplace/actions/alls-green#why
