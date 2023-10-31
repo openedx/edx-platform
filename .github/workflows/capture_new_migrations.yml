@@ -116,8 +116,8 @@ jobs:
       run: |
         echo "Running the LMS migrations."
         ./manage.py lms migrate
-        echo "Running the CMS migrations."
-        ./manage.py cms migrate
+#        echo "Running the CMS migrations."
+#        ./manage.py cms migrate
 
 #    - name: "Setup env vars"
 #      id: envvars
@@ -141,7 +141,7 @@ jobs:
       shell: bash
       run: |
         query_result1=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select count(*) from django_migrations;;" edxapp;)
-        numeric_result=$(echo "$query_result" | sed 's/[^0-9]*//g')
+        numeric_result=$(echo "query_result1" | sed 's/[^0-9]*//g')
         echo "Numeric Result: $numeric_result"
         echo "FIRST_QUERY=$numeric_result" >> $GITHUB_ENV
 
