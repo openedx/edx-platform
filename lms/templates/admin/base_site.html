@@ -20,3 +20,35 @@
 
 
 {% endblock %}
+
+{% block test%}
+{% if show_message %}
+<div id="originalContent">
+  <div  style="background-color: rgb(6, 64, 93); color: rgb(151, 49, 49); padding: 15px;">
+    <h1 style="color: white">Join the Open edX Data Sharing Initiative and shape the future of learning</h1>
+</div>
+<div style="background-color: white; color: black; padding: 15px;">
+    <p>The Open edX Project relies on the collective strength of its community to be a thriving platform for online education.</p> 
+    <p>Open edX is a dynamic ecosystem and it is used in diverse learning environments. By sharing anonymized reports of aggregated data, you can contribute to the collective knowledge of the community. This data can help us all understand the reach of our project, make better decisions and ultimately support innovation in lifelong learning and advance next generation learning experience platforms.</p>
+    <p>We invite you to join the Open edX Data Sharing Initiative by sharing an anonymized reports of aggregated data from your institution's usage of the platform. The report data will be sent to Axim Collaborative, the non-profit behind the Open edX project.</p>
+    <p>If you agree and want to send a report you can click the button below. You can always send reports and see the status of reports you have sent in the past at <a>admin/survey_report/surveyreport/</a> .</p>
+</div>
+<div style="display: flex; justify-content: flex-end; padding: 15px;">
+    <button id="dismissButton" type="button" style="background-color: #6c757d; color: white; border: none; padding: 10px 20px; margin-right: 10px;">Dismiss</button>
+    <form id='survey_report_form' method="POST" action="/survey_report/generate_report" style="margin: 0; padding: 0;">
+        {% csrf_token %}
+        <button type="submit" style="background-color: rgb(13, 125, 77); color: white; border: none; padding: 10px 20px;">Send Report</button>
+    </form>
+</div>
+</div>
+<div id="thankYouMessage" style="display: none; width: 100%; background-color: rgb(242,250,247); padding: 15px; border-top: 1px solid black;">
+    <div style="display: inline-block; width: 30px; height: 30px; background-color: green; border-radius: 50%; text-align: center; line-height: 30px; font-size: 20px; color: white; vertical-align: middle;">
+        ✓
+    </div>
+    Thank you for your collaboration and support! Your contribution is greatly appreciated and will help us continue to improve.
+</div>
+{% endif %}
+
+    <!-- The original content of the block -->
+    
+{% endblock %}

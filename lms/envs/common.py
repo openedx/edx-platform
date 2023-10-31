@@ -1332,7 +1332,12 @@ CONTEXT_PROCESSORS = [
     'openedx.core.djangoapps.site_configuration.context_processors.configuration_context',
 
     # Mobile App processor (Detects if request is from the mobile app)
-    'lms.djangoapps.mobile_api.context_processor.is_from_mobile_app'
+    'lms.djangoapps.mobile_api.context_processor.is_from_mobile_app',
+
+    # Context processor necesarry for the survey report message appear on the admin site 
+    'openedx.features.survey_report.contex_processors.admin_extra_context'
+    
+
 ]
 
 # Django templating
