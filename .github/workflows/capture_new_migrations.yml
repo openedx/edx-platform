@@ -181,7 +181,8 @@ jobs:
       shell: bash
       id: capture2
       run: |
-        query_result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select count(*) from django_migrations;" edxapp;)
+        query_result1=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select count(*) from django_migrations;" edxapp;)
+        echo "echo $query_result1"
         numeric_result=$(echo "$query_result1" | tr -d '\n' | sed -E 's/[^0-9]+//g')
         echo "Numeric Result: $numeric_result"
         echo "SECOND_QUERY=$numeric_result" >> $GITHUB_ENV
@@ -192,7 +193,6 @@ jobs:
         echo "echo ${{ env.FIRST_QUERY }}"
         number1=${{ env.SECOND_QUERY }}
         number2=${{ env.FIRST_QUERY }}
-#        # Perform subtraction
         diff=$((number1 - number2))
 #        result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  1 ;" edxapp;)
 #        echo "Query Result: $result"
