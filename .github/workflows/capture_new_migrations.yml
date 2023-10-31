@@ -123,9 +123,7 @@ jobs:
       id: capture1
       shell: bash
       run: |
-        query_result="yellow"
-        echo "Query Result: $query_result"
-        echo "VALUE1=$query_result" >> $GITHUB_ENV
+        echo "$query_result=yellow" >> $GITHUB_ENV
 
     - name: Step 1
       run: |
