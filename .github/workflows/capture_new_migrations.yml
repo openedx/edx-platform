@@ -141,11 +141,11 @@ jobs:
       shell: bash
       run: |
         query_result1=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  1;" edxapp;)
-        echo "query_result=${query_result1}" >> $GITHUB_ENV
+        echo "FIRST_QUERY=query_result1" >> $GITHUB_ENV
 
-    - name: Step 1
+    - name: Step 12
       run: |
-        echo "State is: '${{ env.query_result }}'"
+        echo "State is: '${{ env.FIRST_QUERY }}'"
 
     - name: Checkout branch repo
       uses: actions/checkout@v2
