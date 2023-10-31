@@ -128,9 +128,8 @@ jobs:
         echo "Number 2: $number2"
         result=$((number1 - number2))
         echo "Result: $result"
-        echo "::set-env name=SUBTRACTION_RESULT::$result"
+        echo "SUBTRACTION_RESULT=$result" >> $GITHUB_ENV
       shell: bash
-
 
     - name: Use subtraction result
       run: |
