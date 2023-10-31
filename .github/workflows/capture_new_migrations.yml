@@ -141,6 +141,34 @@ jobs:
     - name: list installed package versions
       run: |
         pip freeze
+
+    - name: Verify executed migrations on branch.
+      id: capture2
+      run: |
+        query_result1=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select 1;" edxapp;)
+        echo "Query Result: $query_result1"
+        echo "query_result1=$query_result1" >> $GITHUB_ENV
+
+    - name: Verify executed migrations on branch2.
+        id: capture2
+        run: |
+          query_result1=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select 1;" edxapp;)
+          echo "Query Result: $query_result1"
+          echo "query_result1=$query_result1" >> $GITHUB_ENV
+
+    - name: Verify difference
+      run: |
+        echo "echo ${{env.query_result}}"
+        echo "echo ${{env.query_result1}}"
+        number1=${{ env.query_result1 }}
+        number2=${{ env.query_result1 }}
+        # Perform subtraction
+        diff=$((number1 - number2))
+        result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  * from django_migrations ORDER by -id limit $diff ;" edxapp;)
+        echo "Query Result: $result"
+        echo "$result"
+
+
     - name: Run Tests
       env:
         LMS_CFG: lms/envs/minimal.yml
