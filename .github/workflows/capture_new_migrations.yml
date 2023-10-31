@@ -196,10 +196,15 @@ jobs:
         diff=$((number1 - number2))
         data=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select app, name from django_migrations  ORDER by -id limit $diff;" edxapp;)
         formatted_data=$(echo "$data" | tr '\t' ' ')
+        echo "CUSTOM_MESSAGE=$formatted_data" >> $GITHUB_ENV
       shell: bash
+
+    - name: Comment PR
       uses: thollander/actions-comment-pull-request@v2
       with:
-        message: ${{ formatted_data }}
+        message: |
+          Here is the data:
+          ${{ secrets.CUSTOM_MESSAGE }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # This job aggregates test results. It's the required check for branch protection.
