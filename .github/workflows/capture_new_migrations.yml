@@ -162,8 +162,8 @@ jobs:
 
     - name: Verify difference
       run: |
-        number1=${{ steps.capture2.outputs.query_result1 }}
-        number2=${{ steps.capture1.outputs.query_result }}
+        number1=${{ steps.capture2.query_result1 }}
+        number2=${{ steps.capture1.query_result }}
         # Perform subtraction
         diff=$((number1 - number2))
         result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  * from django_migrations ORDER by -id limit $diff ;" edxapp;)
