@@ -125,7 +125,7 @@ jobs:
       run: |
         query_result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  1;" edxapp;)
         echo "Query Result: $query_result"
-        echo "query_r=$query_result" >> $GITHUB_ENV
+        echo "VALUE1=$query_result" >> $GITHUB_ENV
 
 #    - name: Step 1
 #      run: |
@@ -133,7 +133,7 @@ jobs:
 #        echo "State is: '${{ env.action_state }}'"
     - name: Step 2
       run: |
-        echo "State is: '${{ env.query_r }}'"
+        echo "State is: '${{ env.VALUE1 }}'"
 
     - name: Checkout branch repo
       uses: actions/checkout@v2
