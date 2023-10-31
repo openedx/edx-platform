@@ -123,7 +123,8 @@ jobs:
       id: capture1
       shell: bash
       run: |
-        echo "query_result=yellow" >> $GITHUB_ENV
+        query_result1=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  1;" edxapp;)
+        echo "query_result=query_result1" >> $GITHUB_ENV
 
     - name: Step 1
       run: |
