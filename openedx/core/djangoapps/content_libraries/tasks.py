@@ -87,7 +87,7 @@ def normalize_key_for_search(library_key):
 
 def _import_block(store, user_id, source_block, dest_parent_key):
     """
-    Recursively import a blockstore block and its children. See import_from_blockstore.
+    Recursively import a blockstore block and its children.`
     """
     def generate_block_key(source_key, dest_parent_key):
         """
@@ -211,13 +211,12 @@ def _problem_type_filter(store, library, capa_type):
         return [key for key in library.children if _filter_child(store, key, capa_type)]
 
 
-def import_from_blockstore(user_id, store, dest_block, blockstore_block_ids):
+def _import_from_blockstore(user_id, store, dest_block, blockstore_block_ids):
     """
     Imports a block from a blockstore-based learning context (usually a
     content library) into modulestore, as a new child of dest_block.
     Any existing children of dest_block are replaced.
     """
-    ensure_cms("import_from_blockstore may only be executed in a CMS context")
     dest_key = dest_block.scope_ids.usage_id
     if not isinstance(dest_key, BlockUsageLocator):
         raise TypeError(f"Destination {dest_key} should be a modulestore course.")
@@ -348,7 +347,7 @@ def update_children_task(self, user_id, dest_block_key, version=None):
         try:
             source_blocks = library_api.get_library_blocks(library_key, block_types=None)
             source_block_ids = [str(block.usage_key) for block in source_blocks]
-            import_from_blockstore(user_id, store, dest_block, source_block_ids)
+            _import_from_blockstore(user_id, store, dest_block, source_block_ids)
             dest_block.source_library_version = str(library.version)
             store.update_item(dest_block, user_id)
         except Exception as exception:  # pylint: disable=broad-except
