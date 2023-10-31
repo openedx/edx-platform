@@ -124,7 +124,8 @@ jobs:
       run: |
         query_result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  count(*)  from django_migrations;" edxapp;)
         echo "Query Result: $query_result"
-        echo "$query_result"
+        echo "query_result=${query_result}" >> $GITHUB_ENV
+        echo "echo ${{env.query_result}}"
       shell: bash
 
     - name: Checkout branch repo
@@ -156,14 +157,17 @@ jobs:
       id: capture2
       run: |
         query_result1=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  count(*)  from django_migrations;" edxapp;)
-        echo "Query Result: $query_result1"
-        echo "$query_result1"
+        echo "Query Result: query_result1"
+        echo "query_result1=${query_result1}" >> $GITHUB_ENV
+        echo "echo ${{env.query_result1}}"
       shell: bash
 
     - name: Verify difference
       run: |
-        number1=${{ steps.capture2.query_result1 }}
-        number2=${{ steps.capture1.query_result }}
+        echo "echo ${{env.query_result}}"
+        echo "echo ${{env.query_result1}}"
+        number1=${{ env.query_result1 }}
+        number2=${{ env.query_result1 }}
         # Perform subtraction
         diff=$((number1 - number2))
         result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  * from django_migrations ORDER by -id limit $diff ;" edxapp;)
