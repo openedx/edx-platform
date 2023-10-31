@@ -16,6 +16,7 @@ from django.urls import reverse
 from eventtracking.processors.exceptions import EventEmissionExit
 from mock import ANY, Mock, patch
 from opaque_keys.edx.keys import CourseKey
+from openedx_events.learning.signals import FORUM_THREAD_CREATED, FORUM_THREAD_RESPONSE_CREATED, FORUM_RESPONSE_COMMENT_CREATED
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -406,7 +407,7 @@ class ViewsQueryCountTestCase(
         return inner
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 3, 8, 42),
+        (ModuleStoreEnum.Type.split, 3, 8, 43),
     )
     @ddt.unpack
     @count_queries
@@ -1735,6 +1736,8 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
         """
         Check to make sure an event is fired when a user responds to a thread.
         """
+        event_receiver = Mock()
+        FORUM_THREAD_RESPONSE_CREATED.connect(event_receiver)
         self._set_mock_request_data(mock_request, {
             "closed": False,
             "commentable_id": 'test_commentable_id',
@@ -1754,12 +1757,29 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
         assert event['discussion']['id'] == 'test_thread_id'
         assert event['options']['followed'] is True
 
+        event_receiver.assert_called_once()
+
+        self.assertDictContainsSubset(
+            {
+                "signal": FORUM_THREAD_RESPONSE_CREATED,
+                "sender": None,
+            },
+            event_receiver.call_args.kwargs
+        )
+
+        self.assertIn(
+            "thread",
+            event_receiver.call_args.kwargs
+        )
+
     @patch('eventtracking.tracker.emit')
     @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
     def test_comment_event(self, mock_request, mock_emit):
         """
         Ensure an event is fired when someone comments on a response.
         """
+        event_receiver = Mock()
+        FORUM_RESPONSE_COMMENT_CREATED.connect(event_receiver)
         self._set_mock_request_data(mock_request, {
             "closed": False,
             "depth": 1,
@@ -1780,6 +1800,19 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
         assert event['user_forums_roles'] == ['Student']
         assert event['user_course_roles'] == ['Wizard']
         assert event['options']['followed'] is False
+
+        self.assertDictContainsSubset(
+            {
+                "signal": FORUM_RESPONSE_COMMENT_CREATED,
+                "sender": None,
+            },
+            event_receiver.call_args.kwargs
+        )
+
+        self.assertIn(
+            "thread",
+            event_receiver.call_args.kwargs
+        )
 
     @patch('eventtracking.tracker.emit')
     @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
@@ -1809,6 +1842,10 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
         team = CourseTeamFactory.create(discussion_topic_id=TEAM_COMMENTABLE_ID)
         CourseTeamMembershipFactory.create(team=team, user=user)
 
+        event_receiver = Mock()
+        forum_event = views.TRACKING_LOG_TO_EVENT_MAPS.get(event_name)
+        forum_event.connect(event_receiver)
+
         self._set_mock_request_data(mock_request, {
             'closed': False,
             'commentable_id': TEAM_COMMENTABLE_ID,
@@ -1824,6 +1861,19 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
         name, event = mock_emit.call_args[0]
         assert name == event_name
         assert event['team_id'] == team.team_id
+
+        self.assertDictContainsSubset(
+            {
+                "signal": forum_event,
+                "sender": None,
+            },
+            event_receiver.call_args.kwargs
+        )
+
+        self.assertIn(
+            "thread",
+            event_receiver.call_args.kwargs
+        )
 
     @ddt.data(
         ('vote_for_thread', 'thread_id', 'thread'),
@@ -1863,6 +1913,10 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
     @patch('eventtracking.tracker.emit')
     @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
     def test_thread_followed_event(self, view_name, mock_request, mock_emit):
+        event_receiver = Mock()
+        for signal in views.TRACKING_LOG_TO_EVENT_MAPS.values():
+            signal.connect(event_receiver)
+
         self._set_mock_request_data(mock_request, {
             'closed': False,
             'commentable_id': 'test_commentable_id',
@@ -1886,6 +1940,11 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
         assert event_data['followed'] == expected_action_value
         assert event_data['user_forums_roles'] == ['Student']
         assert event_data['user_course_roles'] == ['Wizard']
+
+        # In case of events that doesn't have a correspondig Open edX events signal
+        # we need to check that none of the openedx signals is called.
+        # This is tested for all the events that are not tested above.
+        event_receiver.assert_not_called()
 
 
 class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRequestSetupMixin):
