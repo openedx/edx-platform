@@ -145,7 +145,8 @@ jobs:
 
     - name: Step 12
       run: |
-        echo "State is: '${{ env.FIRST_QUERY }}'"
+        subtraction_result=${{ env.FIRST_QUERY }}
+        echo "State is: subtraction_result"
 
     - name: Checkout branch repo
       uses: actions/checkout@v2
