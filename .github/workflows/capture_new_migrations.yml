@@ -120,6 +120,7 @@ jobs:
         ./manage.py cms migrate
 
     - name: Verify executed migrations on master.
+      id: capture1
       run: |
         query_result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  count(*)  from django_migrations;" edxapp;)
         echo "Query Result: $query_result"
@@ -152,6 +153,7 @@ jobs:
         ./manage.py cms migrate
 
     - name: Verify executed migrations on branch.
+      id: capture2
       run: |
         query_result1=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  count(*)  from django_migrations;" edxapp;)
         echo "Query Result: $query_result1"
@@ -160,8 +162,8 @@ jobs:
 
     - name: Verify difference
       run: |
-        number1=$query_result1
-        number2=$query_result
+        number1=${{ steps.capture2.outputs.query_result1 }}
+        number2=${{ steps.capture1.outputs.query_result }}
         # Perform subtraction
         diff=$((number1 - number2))
         result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  * from django_migrations ORDER by -id limit $diff ;" edxapp;)
