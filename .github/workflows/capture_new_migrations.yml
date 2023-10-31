@@ -204,8 +204,9 @@ jobs:
       uses: thollander/actions-comment-pull-request@v2
       with:
         message: |
-          Few migraions added on your PR ${{ env.new_migrations }}.
+          Few migraions added on your PR ${{ env.new_migrations }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      shell: bash
 
   # This job aggregates test results. It's the required check for branch protection.
   # https://github.com/marketplace/actions/alls-green#why
