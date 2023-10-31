@@ -53,13 +53,13 @@ jobs:
           --health-timeout 5s
           --health-retries 3
     steps:
-      - name: Step 1
-        run: |
-          echo "action_state=yellow" >> $GITHUB_ENV
-          echo "State is: '${{ env.action_state }}'"
-      - name: Step 2
-        run: |
-          echo "State is: '${{ env.action_state }}'"
+    - name: Step 1
+      run: |
+        echo "action_state=yellow" >> $GITHUB_ENV
+        echo "State is: '${{ env.action_state }}'"
+    - name: Step 2
+      run: |
+        echo "State is: '${{ env.action_state }}'"
 
     - name: Setup mongodb user
       run: |
