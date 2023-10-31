@@ -354,3 +354,13 @@ def install_prereqs():
 def log_installed_python_prereqs():
     """  Logs output of pip freeze for debugging. """
     sh("pip freeze > {}".format(Env.GEN_LOG_DIR + "/pip_freeze.log"))
+
+
+def print_devstack_warning():  # lint-amnesty, pylint: disable=missing-function-docstring
+    if Env.USING_DOCKER:  # pragma: no cover
+        print("********************************************************************************")
+        print("* WARNING: Mac users should run this from both the lms and studio shells")
+        print("* in docker devstack to avoid startup errors that kill your CPU.")
+        print("* For more details, see:")
+        print("* https://github.com/openedx/devstack#docker-is-using-lots-of-cpu-time-when-it-should-be-idle")
+        print("********************************************************************************")
