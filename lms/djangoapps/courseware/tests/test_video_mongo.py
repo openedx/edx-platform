@@ -124,6 +124,7 @@ class TestVideoYouTube(TestVideo):  # lint-amnesty, pylint: disable=missing-clas
                 'lmsRootURL': settings.LMS_ROOT_URL,
                 'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
                 'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
+                'aiTranslationsUrl': settings.AI_TRANSLATIONS_API_URL,
                 'autohideHtml5': False,
                 'recordedYoutubeIsAvailable': True,
                 'completionEnabled': False,
@@ -138,7 +139,8 @@ class TestVideoYouTube(TestVideo):  # lint-amnesty, pylint: disable=missing-clas
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
-            'transcript_feedback_enabled': True,
+            'transcript_feedback_enabled': False,
+            'video_id': '',
         }
 
         mako_service = self.block.runtime.service(self.block, 'mako')
@@ -210,6 +212,7 @@ class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
                 'lmsRootURL': settings.LMS_ROOT_URL,
                 'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
                 'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
+                'aiTranslationsUrl': settings.AI_TRANSLATIONS_API_URL,
                 'autohideHtml5': False,
                 'recordedYoutubeIsAvailable': True,
                 'completionEnabled': False,
@@ -224,7 +227,8 @@ class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
-            'transcript_feedback_enabled': True,
+            'transcript_feedback_enabled': False,
+            'video_id': '',
         }
 
         mako_service = self.block.runtime.service(self.block, 'mako')
@@ -367,6 +371,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'lmsRootURL': settings.LMS_ROOT_URL,
             'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
             'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
+            'aiTranslationsUrl': settings.AI_TRANSLATIONS_API_URL,
             'autohideHtml5': False,
             'recordedYoutubeIsAvailable': True,
             'completionEnabled': False,
@@ -467,7 +472,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
-            'transcript_feedback_enabled': True,
+            'transcript_feedback_enabled': False,
+            'video_id': '',
         }
 
         for data in cases:
@@ -598,7 +604,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
-            'transcript_feedback_enabled': True,
+            'transcript_feedback_enabled': False,
+            'video_id': '',
         }
         initial_context['metadata']['duration'] = None
 
@@ -711,6 +718,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         metadata = self.default_metadata_dict
         metadata['autoplay'] = False
         metadata['sources'] = ""
+
         initial_context = {
             'autoadvance_enabled': False,
             'branding_info': None,
@@ -734,7 +742,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             ],
             'poster': 'null',
             'metadata': metadata,
-            'transcript_feedback_enabled': True,
+            'transcript_feedback_enabled': False,
+            'video_id': 'mock item',
         }
 
         DATA = SOURCE_XML.format(  # lint-amnesty, pylint: disable=invalid-name
@@ -889,6 +898,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         # Video found for edx_video_id
         metadata = self.default_metadata_dict
         metadata['sources'] = ""
+
         initial_context = {
             'autoadvance_enabled': False,
             'branding_info': None,
@@ -912,7 +922,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             ],
             'poster': 'null',
             'metadata': metadata,
-            'transcript_feedback_enabled': True,
+            'transcript_feedback_enabled': False,
+            'video_id': data['edx_video_id'].replace('\t', ' '),
         }
 
         # pylint: disable=invalid-name
@@ -1030,7 +1041,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
-            'transcript_feedback_enabled': True,
+            'transcript_feedback_enabled': False,
+            'video_id': 'vid-v1:12345',
         }
         initial_context['metadata']['duration'] = None
 
@@ -1129,7 +1141,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
-            'transcript_feedback_enabled': True,
+            'transcript_feedback_enabled': False,
+            'video_id': 'vid-v1:12345',
         }
         initial_context['metadata']['duration'] = None
 
@@ -2344,6 +2357,7 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
 
         content = self.block.student_view(None).content
         sources = ['example.mp4', 'example.webm']
+
         expected_context = {
             'autoadvance_enabled': False,
             'branding_info': None,
@@ -2399,6 +2413,7 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
                 'lmsRootURL': settings.LMS_ROOT_URL,
                 'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
                 'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
+                'aiTranslationsUrl': settings.AI_TRANSLATIONS_API_URL,
                 'autohideHtml5': False,
                 'recordedYoutubeIsAvailable': True,
                 'completionEnabled': False,
@@ -2416,7 +2431,8 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
                 'url': 'http://img.youtube.com/vi/ZwkTiUPN0mg/0.jpg',
                 'type': 'youtube'
             })),
-            'transcript_feedback_enabled': True,
+            'transcript_feedback_enabled': False,
+            'video_id': '',
         }
 
         mako_service = self.block.runtime.service(self.block, 'mako')
@@ -2440,6 +2456,7 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
         Build a dictionary with data expected by some operations in this test.
         Only parameters related to auto-advance are variable, rest is fixed.
         """
+
         context = {
             'autoadvance_enabled': autoadvanceenabled_flag,
             'branding_info': None,
@@ -2483,6 +2500,7 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
                 'transcriptAvailableTranslationsUrl': self.block.runtime.handler_url(
                     self.block, 'transcript', 'available_translations'
                 ).rstrip('/?'),
+                'aiTranslationsUrl': settings.AI_TRANSLATIONS_API_URL,
                 'autohideHtml5': False,
                 'recordedYoutubeIsAvailable': True,
                 'completionEnabled': False,
@@ -2497,7 +2515,8 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
-            'transcript_feedback_enabled': True,
+            'transcript_feedback_enabled': False,
+            'video_id': '',
         }
         return context
 
