@@ -119,10 +119,18 @@ jobs:
 #        echo "Running the CMS migrations."
 #        ./manage.py cms migrate
 
-    - id: step1
-      run: echo "stepOutput=value" >> "$GITHUB_OUTPUT"
-    - id: step2
-      run: echo "${{ steps.step1.stepOutput }}"
+    - name: "Setup env vars"
+      id: envvars
+      run: |
+        echo "TEST_VAR=$TEST_VAR" >> $GITHUB_OUTPUT
+        echo "SERVICE_NAME=$SERVICE_NAME" >> $GITHUB_OUTPUT
+      env:
+        TEST_VAR: "test variable value"
+
+    - name: "Var is "
+      run: |
+        echo "${{ steps.envvars.outputs.TEST_VAR }}"
+        echo "${{ steps.envvars.outputs.SERVICE_NAME }}"
 
     - name: Verify executed migrations on master.
       id: capture1
