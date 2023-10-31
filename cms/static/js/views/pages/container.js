@@ -355,11 +355,13 @@ function($, _, Backbone, gettext, BasePage,
                 var useNewTextEditor = primaryHeader.attr('use-new-editor-text'),
                     useNewVideoEditor = primaryHeader.attr('use-new-editor-video'),
                     useNewProblemEditor = primaryHeader.attr('use-new-editor-problem'),
+                    useNewLibraryEditor = primaryHeader.attr('use-new-editor-library'),
                     blockType = primaryHeader.attr('data-block-type');
 
                 if((useNewTextEditor === 'True' && blockType === 'html')
                         || (useNewVideoEditor === 'True' && blockType === 'video')
                         || (useNewProblemEditor === 'True' && blockType === 'problem')
+                        || (useNewLibraryEditor === 'True' && blockType === 'library_content')
                 ) {
                     var destinationUrl = primaryHeader.attr('authoring_MFE_base_url') + '/' + blockType + '/' + encodeURI(primaryHeader.attr('data-usage-id'));
                     window.location.href = destinationUrl;

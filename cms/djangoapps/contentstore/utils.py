@@ -71,6 +71,7 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_import_page,
     use_new_schedule_details_page,
     use_new_text_editor,
+    use_new_library_editor,
     use_new_unit_page,
     use_new_updates_page,
     use_new_video_editor,
