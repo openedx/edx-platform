@@ -53,14 +53,6 @@ jobs:
           --health-timeout 5s
           --health-retries 3
     steps:
-    - name: Step 1
-      run: |
-        echo "action_state=yellow" >> $GITHUB_ENV
-        echo "State is: '${{ env.action_state }}'"
-    - name: Step 2
-      run: |
-        echo "State is: '${{ env.action_state }}'"
-
     - name: Setup mongodb user
       run: |
         mongosh edxapp --eval '
@@ -134,6 +126,14 @@ jobs:
         query_result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  1;" edxapp;)
         echo "Query Result: $query_result"
         echo "query_r=$query_result" >> $GITHUB_ENV
+
+#    - name: Step 1
+#      run: |
+#        echo "action_state=yellow" >> $GITHUB_ENV
+#        echo "State is: '${{ env.action_state }}'"
+    - name: Step 2
+      run: |
+        echo "State is: '${{ env.query_r }}'"
 
     - name: Checkout branch repo
       uses: actions/checkout@v2
