@@ -1,0 +1,41 @@
+select = [
+    "F704",  # yield-outside-function
+    "F706",  # return-outside-function
+    "E999",  # syntax-error
+    "W291",  # trailing-whitespace
+    "D419",  # empty-docstring
+    "PLE0101",  # return-in-init
+    "PLE0116",  # continue-in-finally
+    "PLE0241",  # duplicate-bases
+    "PLE0302",  # unexpected-special-method-signature
+    "PLE0604",  # invalid-all-object
+    "PLE0704",  # misplaced-bare-raise
+    "PLE1205",  # logging-too-many-args
+    "PLE1206",  # logging-too-few-args
+    "PLE1310",  # bad-str-strip-call
+    "PLR0916",  # too-many-boolean-expressions
+    "PLW0120",  # useless-else-on-loop
+    "PLW0406",  # import-self
+    "PLW0602",  # global-variable-not-assigned
+    "PLW0604",  # global-at-module-level
+    "PLW0711",  # binary-op-exception
+
+]
+
+ignore = [
+    "F841",  # unused-variable
+    "UP004",  # useless-object-inheritance
+    "PLR0904",  # too-many-public-methods
+    "PLR0911",  # too-many-return-statements
+    "PLR0912",  # too-many-branches
+    "PLR0913",  # too-many-arguments
+    "PLW0603",  # global-statement
+    "PLW1514",  # unspecified-encoding
+
+    # enabled in pylint but failing in ruff because of too many inline suppressions
+    "E501",  # line-too-long
+    "E722",  # bare-except
+    "F401",  # unused-import
+    "PIE790",  # unnecessary-pass
+    "PLR0915",  # too-many-statements
+]

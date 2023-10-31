@@ -97,7 +97,7 @@ class DeveloperErrorViewMixin:
         elif isinstance(exc, ValidationError):
             return self._make_validation_error_response(exc)
         else:
-            raise  # lint-amnesty, pylint: disable=misplaced-bare-raise
+            raise  # lint-amnesty, pylint: disable=misplaced-bare-raise # noqa: PLE0704
 
 
 class ExpandableFieldViewMixin:
