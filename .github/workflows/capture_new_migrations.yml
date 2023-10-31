@@ -53,6 +53,14 @@ jobs:
           --health-timeout 5s
           --health-retries 3
     steps:
+      - name: Step 1
+        run: |
+          echo "action_state=yellow" >> $GITHUB_ENV
+          echo "State is: '${{ env.action_state }}'"
+      - name: Step 2
+        run: |
+          echo "State is: '${{ env.action_state }}'"
+
     - name: Setup mongodb user
       run: |
         mongosh edxapp --eval '
@@ -121,11 +129,11 @@ jobs:
 
     - name: Verify executed migrations on master.
       id: capture1
+      shell: bash
       run: |
         query_result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  1;" edxapp;)
         echo "Query Result: $query_result"
         echo "query_r=$query_result" >> $GITHUB_ENV
-      shell: bash
 
     - name: Checkout branch repo
       uses: actions/checkout@v2
@@ -154,6 +162,7 @@ jobs:
 #        ./manage.py cms migrate
 
     - name: Verify executed migrations on branch.
+      shell: bash
       id: capture2
       run: |
         captured_result="${{ env.query_r }}"
