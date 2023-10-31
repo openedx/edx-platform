@@ -184,13 +184,13 @@ jobs:
         captured_result="${{ env.query_r }}"
         echo "Captured Output: $captured_result"
         query_result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select count(*) from django_migrations;" edxapp;)
-        numeric_result=$(echo "$query_result" | tr -d '[:space:]')
+        numeric_result=$(echo "$query_result1" | tr -d '\n' | sed -E 's/[^0-9]+//g')
         echo "Numeric Result: $numeric_result"
-        echo "FIRST_QUERY=$numeric_result" >> $GITHUB_ENV
+        echo "SECOND_QUERY=$numeric_result" >> $GITHUB_ENV
 
     - name: Verify difference
       run: |
-        echo "echo ${{env.FIRST_QUERY}}"
+        echo "echo ${{env.SECOND_QUERY}}"
 #        echo "echo ${{env.query_result1}}"
 #        number1=${{ env.query_result1 }}
 #        number2=${{ env.query_result1 }}
