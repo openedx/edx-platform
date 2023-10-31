@@ -119,23 +119,6 @@ jobs:
         echo "Running the CMS migrations."
         ./manage.py cms migrate
 
-#    - name: "Setup env vars"
-#      id: envvars
-#      run: |
-#        number1=10
-#        number2=5
-#        echo "Number 1: $number1"
-#        echo "Number 2: $number2"
-#        result=$((number1 - number2))
-#        echo "Result: $result"
-#        echo "SUBTRACTION_RESULT=$result" >> $GITHUB_ENV
-#      shell: bash
-#
-#    - name: Use subtraction result
-#      run: |
-#        subtraction_result=${{ env.SUBTRACTION_RESULT }}
-#        echo "Subtraction Result: $subtraction_result"
-
     - name: Verify executed migrations on master.
       id: capture12
       shell: bash
@@ -155,10 +138,6 @@ jobs:
           pip install "django~=${{ matrix.django-version }}.0"
           pip check # fail if this test-reqs/Django combination is broken
         fi
-
-    - name: list installed package versions
-      run: |
-        pip freeze
 
     - name: Run Tests
       env:
@@ -186,11 +165,10 @@ jobs:
         echo "echo ${{env.SECOND_QUERY}}"
         number1=${{ env.FIRST_QUERY }}
         number2=${{ env.SECOND_QUERY }}
-#        # Perform subtraction
+  #        # Perform subtraction
         diff=$((SECOND_QUERY - FIRST_QUERY))
         result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select * from django_migrations  ORDER by -id limit 3;" edxapp;)
         echo "$result"
-      shell: bash
 
   # This job aggregates test results. It's the required check for branch protection.
   # https://github.com/marketplace/actions/alls-green#why
