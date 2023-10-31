@@ -123,11 +123,11 @@ jobs:
       id: capture1
       shell: bash
       run: |
-        echo "$query_result=yellow" >> $GITHUB_ENV
+        echo "query_result=yellow" >> $GITHUB_ENV
 
     - name: Step 1
       run: |
-        echo "State is: '${{ env.VALUE1 }}'"
+        echo "State is: '${{ env.query_result }}'"
 
     - name: Checkout branch repo
       uses: actions/checkout@v2
