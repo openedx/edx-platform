@@ -119,6 +119,11 @@ jobs:
 #        echo "Running the CMS migrations."
 #        ./manage.py cms migrate
 
+    - id: step1
+      run: echo "stepOutput=value" >> "$GITHUB_OUTPUT"
+    - id: step2
+      run: echo "${{ steps.step1.stepOutput }}"
+
     - name: Verify executed migrations on master.
       id: capture1
       shell: bash
