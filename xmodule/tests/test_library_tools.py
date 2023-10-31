@@ -187,7 +187,7 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         )
 
         assert len(content_block.children) == 0
-        self.tools.update_children(content_block)
+        self.tools.trigger_update_children_task(content_block)
         content_block = self.store.get_item(content_block.location)
         assert len(content_block.children) == 1
 
@@ -208,6 +208,6 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         )
 
         assert len(content_block.children) == 0
-        self.tools.update_children(content_block)
+        self.tools.trigger_update_children_task(content_block)
         content_block = self.store.get_item(content_block.location)
         assert len(content_block.children) == 1

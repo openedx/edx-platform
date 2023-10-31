@@ -900,7 +900,7 @@ def _update_and_import_block(
             try:
                 # Update library content block's children on draft branch
                 with store.branch_setting(branch_setting=ModuleStoreEnum.Branch.draft_preferred):
-                    LibraryToolsService(store, user_id).update_children(
+                    LibraryToolsService(store, user_id).trigger_update_children_task(
                         block,
                         version=block.source_library_version,
                     )
