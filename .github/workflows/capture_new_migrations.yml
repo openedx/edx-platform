@@ -196,7 +196,7 @@ jobs:
         diff=$((number1 - number2))
         result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select app, name from django_migrations  ORDER by -id limit $diff;" edxapp;)
         echo "Query Result: $result"
-        echo "new_migrations=$numeric_result" >> $GITHUB_ENV
+        echo "new_migrations=$result" >> $GITHUB_ENV
 #        echo "$result"
       shell: bash
 
