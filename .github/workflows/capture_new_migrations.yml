@@ -92,20 +92,20 @@ jobs:
       run: |
         echo "::set-output name=dir::$(pip cache dir)"
 
-    - name: Cache pip dependencies
-      id: cache-dependencies
-      uses: actions/cache@v3
-      with:
-        path: ${{ steps.pip-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
-        restore-keys: ${{ runner.os }}-pip-
-
-    - name: Install Python dependencies
-      run: |
-        make dev-requirements
-        if [[ "${{ matrix.django-version }}" != "pinned" ]]; then
-          pip install "django~=${{ matrix.django-version }}.0"
-          pip check # fail if this test-reqs/Django combination is broken
+#    - name: Cache pip dependencies
+#      id: cache-dependencies
+#      uses: actions/cache@v3
+#      with:
+#        path: ${{ steps.pip-cache-dir.outputs.dir }}
+#        key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
+#        restore-keys: ${{ runner.os }}-pip-
+#
+#    - name: Install Python dependencies
+#      run: |
+#        make dev-requirements
+#        if [[ "${{ matrix.django-version }}" != "pinned" ]]; then
+#          pip install "django~=${{ matrix.django-version }}.0"
+#          pip check # fail if this test-reqs/Django combination is broken
         fi
 
 #    - name: Run Tests
@@ -156,7 +156,8 @@ jobs:
     - name: Verify executed migrations on branch.
       id: capture2
       run: |
-        echo "  ${{env.query_result}}"
+        captured_result="${{ env.query_result }}"
+        echo "Captured Output: $captured_result"
 #        query_result1=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  1;" edxapp;)
 #        echo "Query Result: query_result1"
 #        echo "query_result1=${query_result1}" >> $GITHUB_ENV
