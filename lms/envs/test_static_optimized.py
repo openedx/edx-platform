@@ -1,6 +1,10 @@
 """
 Settings used when generating static assets for use in tests.
 
+For example, Bok Choy uses two different settings files:
+1. test_static_optimized is used when invoking collectstatic
+2. bok_choy is used when running CMS and LMS
+
 Note: it isn't possible to have a single settings file, because Django doesn't
 support both generating static assets to a directory and also serving static
 from the same directory.

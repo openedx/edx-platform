@@ -71,7 +71,7 @@ class XBlockEventTestMixin:
     2. assert_event_published verifies that an event of a given search
         specification was published.
 
-    The Mongo event tests in cohorts have nice examplars for
+    The Mongo/bok_choy event tests in cohorts have nice examplars for
     how such functionality might look.
 
     In the future, we would like to expand both search
