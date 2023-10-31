@@ -181,8 +181,6 @@ jobs:
       shell: bash
       id: capture2
       run: |
-        captured_result="${{ env.query_r }}"
-        echo "Captured Output: $captured_result"
         query_result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select count(*) from django_migrations;" edxapp;)
         numeric_result=$(echo "$query_result1" | tr -d '\n' | sed -E 's/[^0-9]+//g')
         echo "Numeric Result: $numeric_result"
