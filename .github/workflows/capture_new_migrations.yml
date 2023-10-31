@@ -199,13 +199,12 @@ jobs:
         echo "new_migrations=$result" >> $GITHUB_ENV
       shell: bash
 
-#    - name: Comment PR
-#      uses: thollander/actions-comment-pull-request@v2
-#      with:
-#        message: |
-#          Few migraions added on your
-#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#      shell: bash
+    - name: Comment PR
+      uses: thollander/actions-comment-pull-request@v2
+      with:
+        message: |
+          New migrations added "${{ env.SECOND_QUERY }}".
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # This job aggregates test results. It's the required check for branch protection.
   # https://github.com/marketplace/actions/alls-green#why
