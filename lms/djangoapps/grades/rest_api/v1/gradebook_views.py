@@ -9,7 +9,6 @@ from contextlib import contextmanager
 from functools import wraps
 
 from django.contrib.auth import get_user_model
-from django.core.cache import cache
 from django.db.models import Case, Exists, F, OuterRef, Q, When
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
