@@ -188,8 +188,7 @@ jobs:
         number2=${{ env.SECOND_QUERY }}
 #        # Perform subtraction
         diff=$((SECOND_QUERY - FIRST_QUERY))
-        result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select * from django_migrations  ORDER by -id limit 3 ; ;" edxapp;)
-        echo "Query Result: $result"
+        result=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select * from django_migrations  ORDER by -id limit 3;" edxapp;)
         echo "$result"
       shell: bash
 
