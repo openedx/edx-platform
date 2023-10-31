@@ -122,15 +122,20 @@ jobs:
     - name: "Setup env vars"
       id: envvars
       run: |
-        echo "TEST_VAR='aaaa'" >> $GITHUB_OUTPUT
-        echo "SERVICE_NAME=$SERVICE_NAME" >> $GITHUB_OUTPUT
-      env:
-        TEST_VAR: "test variable value"
+        number1=10
+        number2=5
+        echo "Number 1: $number1"
+        echo "Number 2: $number2"
+        result=$((number1 - number2))
+        echo "Result: $result"
+        echo "::set-env name=SUBTRACTION_RESULT::$result"
+      shell: bash
 
-    - name: "Var is "
+
+    - name: Use subtraction result
       run: |
-        echo "${{ steps.envvars.outputs.TEST_VAR }}"
-        echo "${{ steps.envvars.outputs.SERVICE_NAME }}"
+        subtraction_result=${{ env.SUBTRACTION_RESULT }}
+        echo "Subtraction Result: $subtraction_result"
 
     - name: Verify executed migrations on master.
       id: capture1
