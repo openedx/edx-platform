@@ -142,7 +142,7 @@ jobs:
       run: |
         query_result1=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select  1;" edxapp;)
         numeric_result = $(echo "$query_result" | tr -d '[:space:]')
-        echo "FIRST_QUERY=numeric_result" >> $GITHUB_ENV
+        echo "FIRST_QUERY=$numeric_result" >> $GITHUB_ENV
 
     - name: Step 12
       run: |
