@@ -51,7 +51,7 @@ class WithoutClassStudents(SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == "yes":
-            return queryset.filter(gen_user__role=GenUserRoles.STUDENT, gen_user__student__isnull=True)
+            return queryset.filter(gen_user__role=GenUserRoles.STUDENT, gen_user__student__active_class__isnull=True)
         return queryset.all()
 
 
