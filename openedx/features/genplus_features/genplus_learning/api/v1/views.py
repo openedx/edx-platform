@@ -87,7 +87,9 @@ class ClassStudentViewSet(mixins.ListModelMixin,
             gen_class = Class.objects.prefetch_related('students').get(pk=class_id)
         except Class.DoesNotExist:
             return Student.objects.none()
-        return gen_class.students.select_related('gen_user__user').all()
+        return gen_class.students.filter(gen_user__school=self.request.user.gen_user.school).select_related(
+            'gen_user__user'
+        ).all()
 
 
 class ClassSummaryViewSet(viewsets.ModelViewSet):
