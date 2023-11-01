@@ -182,7 +182,7 @@ jobs:
     - name: Comment PR
       uses: thollander/actions-comment-pull-request@v2
       with:
-        message: "Testing"
+        message:  $(cat cleaned_data.txt)
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # This job aggregates test results. It's the required check for branch protection.
