@@ -203,9 +203,7 @@ jobs:
 
     - name: Comment PR
       uses: thollander/actions-comment-pull-request@v2
-      with:
-        with:
-          filePath: /path/to/file.txt
+      filePath: multi_line_data.txt
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # This job aggregates test results. It's the required check for branch protection.
