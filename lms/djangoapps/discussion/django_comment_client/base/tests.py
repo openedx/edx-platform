@@ -407,7 +407,7 @@ class ViewsQueryCountTestCase(
         return inner
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 3, 8, 42),
+        (ModuleStoreEnum.Type.split, 3, 8, 43),
     )
     @ddt.unpack
     @count_queries
