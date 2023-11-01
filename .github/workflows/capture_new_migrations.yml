@@ -179,14 +179,17 @@ jobs:
 #        formatted_data=$(echo "$data" | tr '\t' ' ')
 #        echo "$data" > multi_line_data.txt
 #        echo "echo $data"
-#        echo "CUSTOM_MESSAGE=$formatted_data" >> $GITHUB_ENV
+        echo "CUSTOM_MESSAGE=$data" >> $GITHUB_ENV
 #        echo "$formatted_data" > multi_line_data.txt
       shell: bash
 #
     - name: Comment PR
       uses: thollander/actions-comment-pull-request@v2
+      with:
+        message: |
+          ${{ env.CUSTOM_MESSAGE }}
 #      filePath: multi_line_data.txt
-#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # This job aggregates test results. It's the required check for branch protection.
   # https://github.com/marketplace/actions/alls-green#why
