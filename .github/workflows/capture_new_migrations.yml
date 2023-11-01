@@ -177,7 +177,7 @@ jobs:
         diff=$((number1 - number2))
         data=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select app, name from django_migrations ORDER by -id limit $diff;" edxapp;)
 #        formatted_data=$(echo "$data" | tr '\t' ' ')
-        echo "$data" > multi_line_data.txt
+#        echo "$data" > multi_line_data.txt
         echo "echo $data"
 #        echo "CUSTOM_MESSAGE=$formatted_data" >> $GITHUB_ENV
 #        echo "$formatted_data" > multi_line_data.txt
