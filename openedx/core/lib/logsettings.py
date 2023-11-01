@@ -154,6 +154,10 @@ def log_python_warnings():
         '.*pkg_resources is deprecated as an API.*',
         category=DeprecationWarning,
     )
+    warnings.filterwarnings(
+        'ignore', "'etree' is deprecated. Use 'xml.etree.ElementTree' instead.",
+        category=DeprecationWarning, module='wiki'
+    )
     # try:
     #     # There are far too many of these deprecation warnings in startup to output for every management command;
     #     # suppress them until we've fixed at least the most common ones as reported by the test suite
