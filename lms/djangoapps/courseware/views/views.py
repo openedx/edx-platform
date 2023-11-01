@@ -18,8 +18,8 @@ from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pyli
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Q, prefetch_related_objects
-from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect
+from django.http import JsonResponse, Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.template.context_processors import csrf
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -38,8 +38,8 @@ from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx_filters.learning.filters import CourseAboutRenderStarted
-from pytz import UTC
 from requests.exceptions import ConnectionError, Timeout  # pylint: disable=redefined-builtin
+from pytz import UTC
 from rest_framework import status
 from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.response import Response
@@ -87,7 +87,7 @@ from lms.djangoapps.courseware.masquerade import is_masquerading_as_specific_stu
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
 from lms.djangoapps.courseware.permissions import MASQUERADE_AS_STUDENT, VIEW_COURSE_HOME, VIEW_COURSEWARE
-from lms.djangoapps.courseware.toggles import course_is_invitation_only
+from lms.djangoapps.courseware.toggles import course_is_invitation_only, courseware_mfe_search_is_enabled
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.courseware.utils import (
     _use_new_financial_assistance_flow,
@@ -1521,7 +1521,7 @@ def _check_sequence_exam_access(request, location):
 @xframe_options_exempt
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
-def render_xblock(request, usage_key_string, check_if_enrolled=True):
+def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_staff_debug_info=False):
     """
     Returns an HttpResponse with HTML content for the xBlock with the given usage_key.
     The returned HTML is a chromeless rendering of the xBlock (excluding content of the containing courseware).
@@ -1571,8 +1571,12 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
         # get the block, which verifies whether the user has access to the block.
         recheck_access = request.GET.get('recheck_access') == '1'
         block, _ = get_block_by_usage_id(
-            request, str(course_key), str(usage_key), disable_staff_debug_info=True, course=course,
-            will_recheck_access=recheck_access
+            request,
+            str(course_key),
+            str(usage_key),
+            disable_staff_debug_info=disable_staff_debug_info,
+            course=course,
+            will_recheck_access=recheck_access,
         )
 
         student_view_context = request.GET.dict()
@@ -1632,6 +1636,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
         context = {
             'fragment': fragment,
             'course': course,
+            'block': block,
             'disable_accordion': True,
             'allow_iframing': True,
             'disable_header': True,
@@ -2270,3 +2275,15 @@ def get_learner_username(learner_identifier):
     learner = User.objects.filter(Q(username=learner_identifier) | Q(email=learner_identifier)).first()
     if learner:
         return learner.username
+
+
+@api_view(['GET'])
+def courseware_mfe_search_enabled(request, course_id=None):
+    """
+    Simple GET endpoint to expose whether the course may use Courseware Search.
+    """
+
+    course_key = CourseKey.from_string(course_id) if course_id else None
+
+    payload = {"enabled": courseware_mfe_search_is_enabled(course_key)}
+    return JsonResponse(payload)

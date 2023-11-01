@@ -1,21 +1,26 @@
 """
 Helper functions for XBlock serialization
 """
+from __future__ import annotations
 import logging
 import re
 from contextlib import contextmanager
 
+from django.conf import settings
 from fs.memoryfs import MemoryFS
 from fs.wrapfs import WrapFS
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, CourseKey
+
+from common.djangoapps.static_replace import replace_static_urls
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.util.sandboxing import DEFAULT_PYTHON_LIB_FILENAME
 from xmodule.xml_block import XmlMixin
 
-from common.djangoapps.static_replace import replace_static_urls
+from .data import StaticFile
 
 log = logging.getLogger(__name__)
 
@@ -40,7 +45,8 @@ def rewrite_absolute_static_urls(text, course_id):
         /static/SCI_1.2_Image_.png
     format for consistency and portability.
     """
-    assert isinstance(course_id, CourseKey)
+    if not course_id.is_course:
+        return text  # We can't rewrite URLs for libraries, which don't have "Files & Uploads".
     asset_full_url_re = r'https?://[^/]+/(?P<maybe_asset_key>[^\s\'"&]+)'
 
     def check_asset_key(match_obj):
@@ -87,6 +93,94 @@ def collect_assets_from_text(text, course_id, include_content=False):
             else:
                 info['content'] = content
         yield info
+
+
+def get_python_lib_zip_if_using(olx: str, course_id: CourseKey) -> StaticFile | None:
+    """
+    When python_lib is in use, capa problems that contain python code should be assumed to depend on it.
+
+    Note: for any given problem that uses python, there is no way to tell if it
+    actually uses any imports from python_lib.zip because the imports could be
+    named anything. So we just have to assume that any python problems may be
+    using python_lib.zip
+    """
+    if _has_python_script(olx):
+        python_lib_filename = getattr(settings, 'PYTHON_LIB_FILENAME', DEFAULT_PYTHON_LIB_FILENAME)
+        asset_key = StaticContent.get_asset_key_from_path(course_id, python_lib_filename)
+        # Now, it seems like this capa problem uses python_lib.zip - but does it exist in the course?
+        if AssetManager.find(asset_key, throw_on_not_found=False):
+            url = '/' + str(StaticContent.compute_location(course_id, python_lib_filename))
+            return StaticFile(name=python_lib_filename, url=url, data=None)
+    return None
+
+
+def _has_python_script(olx: str) -> bool:
+    """
+    Check if the given OLX <problem> block string seems to contain any python
+    code. (If it does, we know that it may be using python_lib.zip.)
+    """
+    match_strings = (
+        '<script type="text/python">',
+        "<script type='text/python'>",
+        '<script type="loncapa/python">',
+        "<script type='loncapa/python'>",
+    )
+    for check in match_strings:
+        if check in olx:
+            return True
+    return False
+
+
+def get_js_input_files_if_using(olx: str, course_id: CourseKey) -> [StaticFile]:
+    """
+    When a problem uses JSInput and references an html file uploaded to the course (i.e. uses /static/),
+    all the other related static asset files that it depends on should also be included.
+    """
+    static_files = []
+    html_file_fullpath = _extract_local_html_path(olx)
+    if html_file_fullpath:
+        html_filename = html_file_fullpath.split('/')[-1]
+        asset_key = StaticContent.get_asset_key_from_path(course_id, html_filename)
+        html_file_content = AssetManager.find(asset_key, throw_on_not_found=False)
+        if html_file_content:
+            static_assets = _extract_static_assets(str(html_file_content.data))
+            for static_asset in static_assets:
+                url = '/' + str(StaticContent.compute_location(course_id, static_asset))
+                static_files.append(StaticFile(name=static_asset, url=url, data=None))
+
+    return static_files
+
+
+def _extract_static_assets(html_file_content_data: str) -> [str]:
+    """
+    Extracts all the static assets with relative paths that are present in the html content
+    """
+    # Regular expression that looks for URLs that are inside HTML tag
+    # attributes (src or href) with relative paths.
+    # The pattern looks for either src or href, followed by an equals sign
+    # and then captures everything until it finds the closing quote (single or double)
+    assets_re = r'\b(?:src|href)\s*=\s*(?![\'"]?(?:https?://))["\']([^\'"]*?\.[^\'"]*?)["\']'
+
+    # Find all matches in the HTML code
+    matches = re.findall(assets_re, html_file_content_data)
+
+    return matches
+
+
+def _extract_local_html_path(olx: str) -> str | None:
+    """
+    Check if the given OlX <problem> block string contains a `jsinput` tag and the `html_file` attribute
+    is referencing a file in `/static/`. If so, extract the relative path of the html file in the OLX
+    """
+    if "<jsinput" in olx:
+        # Regular expression to match html_file="/static/[anything].html" in both single and double quotes and
+        # extract the "/static/[anything].html" part from the input strings.
+        local_html_file_re = r'html_file=([\"\'])(?P<url>\/static\/[^\"\']*\.html)\1'
+        matches = re.search(local_html_file_re, olx)
+        if matches:
+            return matches.group('url')  # Output example: /static/question.html
+
+    return None
 
 
 @contextmanager

@@ -242,6 +242,7 @@ define([
             var collection, injector, mockGettext, initializeGroupModel, cleanUp;
 
             mockGettext = function(returnedValue) {
+                // eslint-disable-next-line no-shadow
                 var injector = new Squire();
 
                 injector.mock('gettext', function() {
@@ -258,6 +259,7 @@ define([
 
                 injector = mockGettext(dict);
                 injector.require(['js/collections/group'],
+                    // eslint-disable-next-line no-shadow
                     function(GroupCollection) {
                         collection = new GroupCollection();
                         deferred.resolve(collection);
@@ -273,6 +275,7 @@ define([
             };
 
             it('returns correct ids', function() {
+                // eslint-disable-next-line no-shadow
                 var collection = new GroupCollection();
 
                 expect(collection.getGroupId(0)).toBe('A');
@@ -287,6 +290,7 @@ define([
 
             it('just 1 character in the dictionary', function(done) {
                 initializeGroupModel('1')
+                    // eslint-disable-next-line no-shadow
                     .then(function(collection) {
                         expect(collection.getGroupId(0)).toBe('1');
                         expect(collection.getGroupId(1)).toBe('11');
@@ -300,6 +304,7 @@ define([
 
             it('allow to use unicode characters in the dict', function(done) {
                 initializeGroupModel('ö诶úeœ')
+                    // eslint-disable-next-line no-shadow
                     .then(function(collection) {
                         expect(collection.getGroupId(0)).toBe('ö');
                         expect(collection.getGroupId(1)).toBe('诶');
@@ -316,6 +321,7 @@ define([
 
             it('return initial value if dictionary is empty', function(done) {
                 initializeGroupModel('')
+                    // eslint-disable-next-line no-shadow
                     .then(function(collection) {
                         expect(collection.getGroupId(0)).toBe('0');
                         expect(collection.getGroupId(5)).toBe('5');

@@ -6,6 +6,7 @@ Signal handler for invalidating cached course overviews
 import logging
 
 from django.db import transaction
+from django.db.models.signals import post_save
 from django.dispatch import Signal
 from django.dispatch.dispatcher import receiver
 
@@ -20,6 +21,10 @@ LOG = logging.getLogger(__name__)
 COURSE_START_DATE_CHANGED = Signal()
 # providing_args=["updated_course_overview", "previous_self_paced"]
 COURSE_PACING_CHANGED = Signal()
+# providing_args=["courserun_key"]
+IMPORT_COURSE_DETAILS = Signal()
+# providing_args=["courserun_key"]
+DELETE_COURSE_DETAILS = Signal()
 
 
 @receiver(SignalHandler.course_published)
@@ -43,6 +48,27 @@ def _listen_for_course_delete(sender, course_key, **kwargs):  # pylint: disable=
     invalidates the corresponding CourseOverview cache entry if one exists.
     """
     CourseOverview.objects.filter(id=course_key).delete()
+    courserun_key = str(course_key)
+    LOG.info(f'DELETE_COURSE_DETAILS triggered upon course_deleted signal. Key: [{courserun_key}]')
+    # This signal will be handled in `federated_content_connector` plugin
+    DELETE_COURSE_DETAILS.send(
+        sender=None,
+        courserun_key=courserun_key,
+    )
+
+
+@receiver(post_save, sender=CourseOverview)
+def trigger_import_course_details_signal(sender, instance, created, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+    """
+    Triggers the `IMPORT_COURSE_DETAILS` signal which will be handled in `federated_content_connector` plugin
+    """
+    if created:
+        courserun_key = str(instance.id)
+        LOG.info(f'IMPORT_COURSE_DETAILS triggered upon CourseOverview.post_save signal. Key: [{courserun_key}]')
+        IMPORT_COURSE_DETAILS.send(
+            sender=None,
+            courserun_key=courserun_key,
+        )
 
 
 def _check_for_course_changes(previous_course_overview, updated_course_overview):

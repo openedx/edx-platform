@@ -14,11 +14,12 @@ import warnings
 import yaml
 
 from corsheaders.defaults import default_headers as corsheaders_default_headers
+import django
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse_lazy
 from edx_django_utils.plugins import add_plugins
+from openedx_events.event_bus import merge_producer_configs
 from path import Path as path
-
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 
@@ -84,6 +85,7 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
         'MKTG_URL_LINK_MAP',
         'MKTG_URL_OVERRIDES',
         'REST_FRAMEWORK',
+        'EVENT_BUS_PRODUCER_CONFIG',
     ]
     for key in KEYS_WITH_MERGED_VALUES:
         if key in __config_copy__:
@@ -154,7 +156,8 @@ if STATIC_ROOT_BASE:
     WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = STATIC_ROOT / "webpack-stats.json"
     WEBPACK_LOADER['WORKERS']['STATS_FILE'] = STATIC_ROOT / "webpack-worker-stats.json"
 
-EMAIL_FILE_PATH = ENV_TOKENS.get('EMAIL_FILE_PATH', None)
+DATA_DIR = path(ENV_TOKENS.get('DATA_DIR', DATA_DIR))
+EMAIL_FILE_PATH = ENV_TOKENS.get('EMAIL_FILE_PATH', DATA_DIR / "emails" / "studio")
 
 
 # CMS_BASE: Public domain name of Studio (should be resolvable from the end-user's browser)
@@ -166,6 +169,14 @@ ENTERPRISE_API_URL = ENV_TOKENS.get('ENTERPRISE_API_URL', LMS_INTERNAL_ROOT_URL 
 ENTERPRISE_CONSENT_API_URL = ENV_TOKENS.get('ENTERPRISE_CONSENT_API_URL', LMS_INTERNAL_ROOT_URL + '/consent/api/v1/')
 # Note that FEATURES['PREVIEW_LMS_BASE'] gets read in from the environment file.
 
+OPENAI_API_KEY = ENV_TOKENS.get('OPENAI_API_KEY', '')
+LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT = ENV_TOKENS.get('LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT', '')
+LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT = ENV_TOKENS.get(
+    'LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT',
+    ''
+)
+LEARNER_PROGRESS_PROMPT_FOR_ACTIVE_CONTRACT = ENV_TOKENS.get('LEARNER_PROGRESS_PROMPT_FOR_ACTIVE_CONTRACT', '')
+LEARNER_PROGRESS_PROMPT_FOR_NON_ACTIVE_CONTRACT = ENV_TOKENS.get('LEARNER_PROGRESS_PROMPT_FOR_NON_ACTIVE_CONTRACT', '')
 
 # List of logout URIs for each IDA that the learner should be logged out of when they logout of
 # Studio. Only applies to IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
@@ -180,7 +191,6 @@ ALLOWED_HOSTS = [
 ]
 
 LOG_DIR = ENV_TOKENS.get('LOG_DIR', LOG_DIR)
-DATA_DIR = path(ENV_TOKENS.get('DATA_DIR', DATA_DIR))
 
 CACHES = ENV_TOKENS.get('CACHES', CACHES)
 # Cache used for location mapping -- called many times with the same key/value
@@ -227,6 +237,11 @@ SHARED_COOKIE_DOMAIN = ENV_TOKENS.get('SHARED_COOKIE_DOMAIN', SESSION_COOKIE_DOM
 # but it is highly recommended that this is True for environments accessed
 # by end users.
 CSRF_COOKIE_SECURE = ENV_TOKENS.get('CSRF_COOKIE_SECURE', False)
+
+# values are already updated above with default CSRF_TRUSTED_ORIGINS values but in
+# case of new django version these values will override.
+if django.VERSION[0] >= 4:  # for greater than django 3.2 use schemes.
+    CSRF_TRUSTED_ORIGINS = ENV_TOKENS.get('CSRF_TRUSTED_ORIGINS_WITH_SCHEME', [])
 
 #Email overrides
 MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
@@ -332,13 +347,14 @@ AWS_QUERYSTRING_AUTH = AUTH_TOKENS.get('AWS_QUERYSTRING_AUTH', True)
 
 AWS_DEFAULT_ACL = 'private'
 AWS_BUCKET_ACL = AWS_DEFAULT_ACL
+# The number of seconds that a generated URL is valid for.
 AWS_QUERYSTRING_EXPIRE = 7 * 24 * 60 * 60  # 7 days
 AWS_S3_CUSTOM_DOMAIN = AUTH_TOKENS.get('AWS_S3_CUSTOM_DOMAIN', 'edxuploads.s3.amazonaws.com')
 
 if AUTH_TOKENS.get('DEFAULT_FILE_STORAGE'):
     DEFAULT_FILE_STORAGE = AUTH_TOKENS.get('DEFAULT_FILE_STORAGE')
 elif AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 else:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
@@ -655,3 +671,7 @@ COURSE_LIVE_GLOBAL_CREDENTIALS["BIG_BLUE_BUTTON"] = {
 }
 
 INACTIVE_USER_URL = f'http{"s" if HTTPS == "on" else ""}://{CMS_BASE}'
+
+############## Event bus producer ##############
+EVENT_BUS_PRODUCER_CONFIG = merge_producer_configs(EVENT_BUS_PRODUCER_CONFIG,
+                                                   ENV_TOKENS.get('EVENT_BUS_PRODUCER_CONFIG', {}))

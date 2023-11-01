@@ -18,6 +18,7 @@ class ProgramDetailsSidebarView extends Backbone.View {
                 'click .pathway-button': 'trackPathwayClicked',
             },
         };
+        // eslint-disable-next-line prefer-object-spread
         super(Object.assign({}, defaults, options));
     }
 
@@ -37,6 +38,7 @@ class ProgramDetailsSidebarView extends Backbone.View {
     }
 
     render() {
+        // eslint-disable-next-line no-undef
         const data = $.extend(
             {},
             this.model.toJSON(),
@@ -114,7 +116,9 @@ class ProgramDetailsSidebarView extends Backbone.View {
             // Credentials uses the uuid without dashes so we are converting here for consistency
             program_uuid: this.programModel.attributes.uuid.replace(/-/g, ''),
             program_name: this.programModel.attributes.title,
+            // eslint-disable-next-line no-undef
             pathway_link_uuid: $(button).data('pathwayUuid').replace(/-/g, ''),
+            // eslint-disable-next-line no-undef
             pathway_name: $(button).data('pathwayName'),
         });
     }

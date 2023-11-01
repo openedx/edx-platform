@@ -7,6 +7,7 @@ $(document).ajaxError(function(event, jXHR) {
             + '(you must log in again to save your work).'
         );
 
+        // eslint-disable-next-line no-alert
         if (window.confirm(message)) {
             var currentLocation = window.location.pathname;
             window.location.href = '/login?next=' + encodeURIComponent(currentLocation);

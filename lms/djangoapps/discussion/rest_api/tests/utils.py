@@ -425,6 +425,18 @@ class CommentsServiceMockMixin:
             status=200
         )
 
+    def register_get_subscriptions(self, thread_id, response):
+        """
+        Register a mock response for GET on the CS comment active threads endpoint
+        """
+        assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
+        httpretty.register_uri(
+            httpretty.GET,
+            f"http://localhost:4567/api/v1/threads/{thread_id}/subscriptions",
+            body=json.dumps(response),
+            status=200
+        )
+
     def assert_query_params_equal(self, httpretty_request, expected_params):
         """
         Assert that the given mock request had the expected query parameters
@@ -656,3 +668,19 @@ def querystring(request):
     # This could just be HTTPrettyRequest.querystring, but that method double-decodes '%2B' -> '+' -> ' '.
     # You can just remove this method when this issue is fixed: https://github.com/gabrielfalcao/HTTPretty/issues/240
     return parse_qs(request.path.split('?', 1)[-1])
+
+
+class ThreadMock(object):
+    """
+    A mock thread object
+    """
+
+    def __init__(self, thread_id, creator, title, parent_id=None):
+        self.id = thread_id
+        self.user_id = str(creator.id)
+        self.username = creator.username
+        self.title = title
+        self.parent_id = parent_id
+
+    def url_with_id(self, params):
+        return f"http://example.com/{params['id']}"

@@ -128,6 +128,23 @@ def node_prereqs_installation():
     """
     Configures npm and installs Node prerequisites
     """
+    # Before July 2023, these directories were created and written to
+    # as root. Afterwards, they are created as being owned by the
+    # `app` user -- but also need to be deleted by that user (due to
+    # how npm runs post-install scripts.) Developers with an older
+    # devstack installation who are reprovisioning will see errors
+    # here if the files are still owned by root. Deleting the files in
+    # advance prevents this error.
+    #
+    # This hack should probably be left in place for at least a year.
+    # See ADR 17 for more background on the transition.
+    sh("rm -rf common/static/common/js/vendor/ common/static/common/css/vendor/")
+    # At the time of this writing, the js dir has git-versioned files
+    # but the css dir does not, so the latter would have been created
+    # as root-owned (in the process of creating the vendor
+    # subdirectory). Delete it only if empty, just in case
+    # git-versioned files are added later.
+    sh("rmdir common/static/common/css || true")
 
     # NPM installs hang sporadically. Log the installation process so that we
     # determine if any packages are chronic offenders.
@@ -137,7 +154,7 @@ def node_prereqs_installation():
     else:
         npm_log_file_path = f'{Env.GEN_LOG_DIR}/npm-install.log'
     npm_log_file = open(npm_log_file_path, 'wb')  # lint-amnesty, pylint: disable=consider-using-with
-    npm_command = 'npm clean-install --verbose'.split()
+    npm_command = 'npm ci --verbose'.split()
 
     # The implementation of Paver's `sh` function returns before the forked
     # actually returns. Using a Popen object so that we can ensure that
@@ -145,14 +162,7 @@ def node_prereqs_installation():
     proc = subprocess.Popen(npm_command, stderr=npm_log_file)  # lint-amnesty, pylint: disable=consider-using-with
     retcode = proc.wait()
     if retcode == 1:
-        # Error handling around a race condition that produces "cb() never called" error. This
-        # evinces itself as `cb_error_text` and it ought to disappear when we upgrade
-        # npm to 3 or higher. TODO: clean this up when we do that.
-        print("npm clean-install error detected. Retrying...")
-        proc = subprocess.Popen(npm_command, stderr=npm_log_file)  # lint-amnesty, pylint: disable=consider-using-with
-        retcode = proc.wait()
-        if retcode == 1:
-            raise Exception(f"npm install failed: See {npm_log_file_path}")
+        raise Exception(f"npm install failed: See {npm_log_file_path}")
     print("Successfully clean-installed NPM packages. Log found at {}".format(
         npm_log_file_path
     ))
@@ -184,7 +194,7 @@ def install_node_prereqs():
         print(NO_PREREQ_MESSAGE)
         return
 
-    prereq_cache("Node prereqs", ["package.json"], node_prereqs_installation)
+    prereq_cache("Node prereqs", ["package.json", "package-lock.json"], node_prereqs_installation)
 
 
 # To add a package to the uninstall list, just add it to this list! No need

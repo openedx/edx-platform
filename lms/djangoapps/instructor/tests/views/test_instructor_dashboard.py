@@ -85,7 +85,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         self.course_mode.save()
         # Create instructor account
         self.instructor = AdminFactory.create()
-        self.client.login(username=self.instructor.username, password="test")
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
 
         # URL for instructor dash
         self.url = reverse('instructor_dashboard', kwargs={'course_id': str(self.course.id)})
@@ -169,7 +169,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
                     org=self.course.id.org
                 )
                 set_course_cohorted(self.course.id, True)
-                self.client.login(username=self.user.username, password='test')
+                self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
                 response = self.client.get(self.url).content.decode('utf-8')
                 self.assertEqual(discussion_section in response, is_discussion_tab_available)
 
@@ -192,7 +192,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             with override_waffle_flag(OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG, is_legacy_discussion_setting_enabled):
                 user = UserFactory.create(is_staff=True)
                 set_course_cohorted(self.course.id, True)
-                self.client.login(username=user.username, password='test')
+                self.client.login(username=user.username, password=self.TEST_PASSWORD)
                 response = self.client.get(self.url).content.decode('utf-8')
                 self.assertEqual(discussion_section in response, is_discussion_tab_available)
 
@@ -224,7 +224,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
                 role=access_role,
                 org=self.course.id.org
             )
-            self.client.login(username=user.username, password="test")
+            self.client.login(username=user.username, password=self.TEST_PASSWORD)
             response = self.client.get(self.url)
             if can_access:
                 self.assertContains(response, download_section)
@@ -244,7 +244,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             role='data_researcher',
             org=self.course.id.org
         )
-        self.client.login(username=user.username, password="test")
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
         response = self.client.get(self.url)
         matches = re.findall(
             rb'<li class="nav-item"><button type="button" class="btn-link .*" data-section=".*">.*',
@@ -320,7 +320,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
         # But staff user can only see specific grades
         staff = StaffFactory(course_key=self.course.id)
-        self.client.login(username=staff.username, password="test")
+        self.client.login(username=staff.username, password=self.TEST_PASSWORD)
         response = self.client.get(self.url)
         self.assertNotContains(response, '<h4 class="hd hd-4">Adjust all enrolled learners')
         self.assertContains(response, '<h4 class="hd hd-4">View a specific learner&#39;s grades and progress')
@@ -620,7 +620,7 @@ class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTes
         self.course_mode.save()
         # Create instructor account
         self.instructor = AdminFactory.create()
-        self.client.login(username=self.instructor.username, password="test")
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
 
     def test_spoc_gradebook_mongo_calls(self):
         """

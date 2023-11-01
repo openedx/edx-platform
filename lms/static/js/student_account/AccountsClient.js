@@ -19,5 +19,6 @@ const deactivate = (password) => fetch('/api/user/v1/accounts/deactivate_logout/
 });
 
 export {
+    // eslint-disable-next-line import/prefer-default-export
     deactivate,
 };

@@ -189,12 +189,14 @@
                 && (target.draggableList.length === 1)
                 && (target.draggableList[0].uniqueId !== this.uniqueId)
                     ) {
+                        // eslint-disable-next-line no-continue
                         continue;
                     }
 
                     // If the target is on a draggable (from target field), we must make sure that
                     // this draggable is not the same as "this" one.
                     if ((target.type === 'on_drag') && (target.draggableObj.uniqueId === this.uniqueId)) {
+                        // eslint-disable-next-line no-continue
                         continue;
                     }
 
@@ -206,6 +208,7 @@
                 || (positionIE.left + this.iconWidth * 0.5 < target.offset.left)
                 || (positionIE.left + this.iconWidth * 0.5 > target.offset.left + target.w)
                     ) {
+                        // eslint-disable-next-line no-continue
                         continue;
                     }
 

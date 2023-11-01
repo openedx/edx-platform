@@ -21,7 +21,7 @@ from edxval.api import create_external_video, create_or_update_video_transcript
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 
-from cms.djangoapps.contentstore.views.videos import TranscriptProvider
+from cms.djangoapps.contentstore.video_storage_handlers import TranscriptProvider
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.util.json_request import JsonResponse
 from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order

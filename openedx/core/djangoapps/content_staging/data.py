@@ -1,12 +1,13 @@
 """
 Public python data types for content staging
 """
+from __future__ import annotations
 from attrs import field, frozen, validators
 from datetime import datetime
 
 from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.keys import UsageKey, AssetKey
 
 
 class StagedContentStatus(TextChoices):
@@ -44,7 +45,22 @@ class StagedContentData:
 
 
 @frozen
+class StagedContentFileData:
+    """Read-only data model for a single file used by some staged content."""
+    filename: str = field(validator=validators.instance_of(str))
+    # Everything below is optional:
+    data: bytes | None = field(validator=validators.optional(validators.instance_of(bytes)))
+    # If this asset came from Files & Uploads in a course, this is an AssetKey
+    # as a string. If this asset came from an XBlock's filesystem, this is the
+    # UsageKey of the XBlock.
+    source_key: AssetKey | UsageKey | None = field(
+        validator=validators.optional(validators.instance_of((AssetKey, UsageKey)))
+    )
+    md5_hash: str | None = field(validator=validators.optional(validators.instance_of(str)))
+
+
+@frozen
 class UserClipboardData:
     """ Read-only data model for User Clipboard data (copied OLX) """
     content: StagedContentData = field(validator=validators.instance_of(StagedContentData))
-    source_usage_key: UsageKey = field(validator=validators.instance_of(UsageKey))
+    source_usage_key: UsageKey = field(validator=validators.instance_of(UsageKey))  # type: ignore[type-abstract]

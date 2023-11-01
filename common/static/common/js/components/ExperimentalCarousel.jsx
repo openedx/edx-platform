@@ -20,6 +20,7 @@ function NextArrow(props) {
     }
 
     return (
+        // eslint-disable-next-line react/button-has-type
         <button {...opts}>
             <span>Next </span>
             <span className="icon fa fa-chevron-right" aria-hidden="true" />
@@ -41,6 +42,7 @@ function PrevArrow(props) {
     }
 
     return (
+        // eslint-disable-next-line react/button-has-type
         <button {...opts}>
             <span className="icon fa fa-chevron-left" aria-hidden="true" />
             <span> Prev</span>
@@ -64,6 +66,7 @@ export default class ExperimentalCarousel extends React.Component {
         this.getCarouselContent = this.getCarouselContent.bind(this);
     }
 
+    // eslint-disable-next-line react/sort-comp
     afterChange(activeIndex) {
         this.setState({activeIndex});
     }
@@ -121,5 +124,6 @@ export default class ExperimentalCarousel extends React.Component {
 }
 
 ExperimentalCarousel.propTypes = {
+    // eslint-disable-next-line react/forbid-prop-types
     slides: PropTypes.array.isRequired
 };

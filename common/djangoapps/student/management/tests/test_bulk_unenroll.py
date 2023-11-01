@@ -2,7 +2,6 @@
 
 from tempfile import NamedTemporaryFile
 
-import six
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from testfixtures import LogCapture
@@ -48,7 +47,7 @@ class BulkUnenrollTests(SharedModuleStoreTestCase):
         """Write a test csv file with the lines provided"""
         csv.write(b"username,course_id\n")
         for line in lines:
-            csv.write(six.b(line))
+            csv.write(line.encode())
         csv.seek(0)
         return csv
 

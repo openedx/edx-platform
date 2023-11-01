@@ -1,9 +1,9 @@
 """
 Common utility functions useful throughout the contentstore
 """
-
-from collections import defaultdict
+import configparser
 import logging
+from collections import defaultdict
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from uuid import uuid4
@@ -13,6 +13,7 @@ from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils import translation
 from django.utils.translation import gettext as _
+from help_tokens.core import HelpUrlExpert
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocator
@@ -23,10 +24,11 @@ from pytz import UTC
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.toggles import exam_setting_view_enabled
+from common.djangoapps.course_action_state.models import CourseRerunUIStateManager
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.student import auth
-from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
+from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access, STUDIO_EDIT_ROLES
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
@@ -58,6 +60,7 @@ from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from cms.djangoapps.contentstore.toggles import (
+    split_library_view_on_dashboard,
     use_new_advanced_settings_page,
     use_new_course_outline_page,
     use_new_export_page,
@@ -67,11 +70,15 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_home_page,
     use_new_import_page,
     use_new_schedule_details_page,
+    use_new_text_editor,
     use_new_unit_page,
     use_new_updates_page,
+    use_new_video_editor,
     use_new_video_uploads_page,
+    use_new_custom_pages,
+    use_tagging_taxonomy_list_page,
 )
-from cms.djangoapps.contentstore.toggles import use_new_text_editor, use_new_video_editor
+from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -401,17 +408,42 @@ def get_course_outline_url(course_locator) -> str:
     return course_outline_url
 
 
-def get_unit_url(course_locator) -> str:
+def get_unit_url(course_locator, unit_locator) -> str:
     """
     Gets course authoring microfrontend URL for unit page view.
     """
     unit_url = None
     if use_new_unit_page(course_locator):
         mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/container/'
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/container/{unit_locator}'
         if mfe_base_url:
             unit_url = course_mfe_url
     return unit_url
+
+
+def get_custom_pages_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for custom pages view.
+    """
+    custom_pages_url = None
+    if use_new_custom_pages(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/custom-pages'
+        if mfe_base_url:
+            custom_pages_url = course_mfe_url
+    return custom_pages_url
+
+
+def get_taxonomy_list_url():
+    """
+    Gets course authoring microfrontend URL for taxonomy list page view.
+    """
+    taxonomy_list_url = None
+    if use_tagging_taxonomy_list_page():
+        mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
+        if mfe_base_url:
+            taxonomy_list_url = f'{mfe_base_url}/taxonomy-list'
+    return taxonomy_list_url
 
 
 def course_import_olx_validation_is_enabled():
@@ -957,13 +989,12 @@ def get_subsections_by_assignment_type(course_key):
     return subsections_by_assignment_type
 
 
-def update_course_discussions_settings(course_key):
+def update_course_discussions_settings(course):
     """
     Updates course provider_type when new course is created
     """
-    provider = DiscussionsConfiguration.get(context_key=course_key).provider_type
+    provider = DiscussionsConfiguration.get(context_key=course.id).provider_type
     store = modulestore()
-    course = store.get_course(course_key)
     course.discussions_settings['provider_type'] = provider
     store.update_item(course, course.published_by)
 
@@ -1309,6 +1340,320 @@ def get_course_settings(request, course_key, course_block):
     return settings_context
 
 
+def get_course_team(auth_user, course_key, user_perms):
+    """
+    Utils is used to get context of all CMS users who are editors for the specified course.
+    It is used for both DRF and django views.
+    """
+
+    from cms.djangoapps.contentstore.views.user import user_with_role
+
+    course_block = modulestore().get_course(course_key)
+    instructors = set(CourseInstructorRole(course_key).users_with_role())
+    # the page only lists staff and assumes they're a superset of instructors. Do a union to ensure.
+    staff = set(CourseStaffRole(course_key).users_with_role()).union(instructors)
+
+    formatted_users = []
+    for user in instructors:
+        formatted_users.append(user_with_role(user, 'instructor'))
+    for user in staff - instructors:
+        formatted_users.append(user_with_role(user, 'staff'))
+
+    course_team_context = {
+        'context_course': course_block,
+        'show_transfer_ownership_hint': auth_user in instructors and len(instructors) == 1,
+        'users': formatted_users,
+        'allow_actions': bool(user_perms & STUDIO_EDIT_ROLES),
+    }
+
+    return course_team_context
+
+
+def get_course_grading(course_key):
+    """
+    Utils is used to get context of course grading.
+    It is used for both DRF and django views.
+    """
+
+    course_block = modulestore().get_course(course_key)
+    course_details = CourseGradingModel.fetch(course_key)
+    course_assignment_lists = get_subsections_by_assignment_type(course_key)
+    grading_context = {
+        'context_course': course_block,
+        'course_locator': course_key,
+        'course_details': course_details,
+        'grading_url': reverse_course_url('grading_handler', course_key),
+        'is_credit_course': is_credit_course(course_key),
+        'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_key),
+        'course_assignment_lists': dict(course_assignment_lists)
+    }
+
+    return grading_context
+
+
+def get_help_urls():
+    """
+    Utils is used to get help tokens urls.
+    """
+    ini = HelpUrlExpert.the_one()
+    ini.config = configparser.ConfigParser()
+    ini.config.read(ini.ini_file_name)
+    tokens = list(ini.config['pages'].keys())
+    help_tokens = {token: HelpUrlExpert.the_one().url_for_token(token) for token in tokens}
+    return help_tokens
+
+
+def get_response_format(request):
+    return request.GET.get('format') or request.POST.get('format') or 'html'
+
+
+def request_response_format_is_json(request, response_format):
+    return response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json')
+
+
+def get_library_context(request, request_is_json=False):
+    """
+    Utils is used to get context of course home library tab.
+    It is used for both DRF and django views.
+    """
+    from cms.djangoapps.contentstore.views.course import (
+        get_allowed_organizations,
+        get_allowed_organizations_for_libraries,
+        user_can_create_organizations,
+        _accessible_libraries_iter,
+        _get_course_creator_status,
+        _format_library_for_view,
+    )
+    from cms.djangoapps.contentstore.views.library import (
+        LIBRARIES_ENABLED,
+    )
+
+    libraries = _accessible_libraries_iter(request.user) if LIBRARIES_ENABLED else []
+    data = {
+        'libraries': [_format_library_for_view(lib, request) for lib in libraries],
+    }
+
+    if not request_is_json:
+        return {
+            **data,
+            'in_process_course_actions': [],
+            'courses': [],
+            'libraries_enabled': LIBRARIES_ENABLED,
+            'show_new_library_button': LIBRARIES_ENABLED and request.user.is_active,
+            'user': request.user,
+            'request_course_creator_url': reverse('request_course_creator'),
+            'course_creator_status': _get_course_creator_status(request.user),
+            'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
+            'archived_courses': True,
+            'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
+            'rerun_creator_status': GlobalStaff().has_user(request.user),
+            'split_studio_home': split_library_view_on_dashboard(),
+            'active_tab': 'libraries',
+            'allowed_organizations_for_libraries': get_allowed_organizations_for_libraries(request.user),
+            'allowed_organizations': get_allowed_organizations(request.user),
+            'can_create_organizations': user_can_create_organizations(request.user),
+        }
+
+    return data
+
+
+def get_home_context(request):
+    """
+    Utils is used to get context of course home.
+    It is used for both DRF and django views.
+    """
+
+    from cms.djangoapps.contentstore.views.course import (
+        get_allowed_organizations,
+        get_allowed_organizations_for_libraries,
+        get_courses_accessible_to_user,
+        user_can_create_organizations,
+        _accessible_libraries_iter,
+        _get_course_creator_status,
+        _format_library_for_view,
+        _process_courses_list,
+        ENABLE_GLOBAL_STAFF_OPTIMIZATION,
+    )
+    from cms.djangoapps.contentstore.views.library import (
+        LIBRARY_AUTHORING_MICROFRONTEND_URL,
+        LIBRARIES_ENABLED,
+        should_redirect_to_library_authoring_mfe,
+        user_can_create_library,
+    )
+
+    optimization_enabled = GlobalStaff().has_user(request.user) and ENABLE_GLOBAL_STAFF_OPTIMIZATION.is_enabled()
+
+    org = request.GET.get('org', '') if optimization_enabled else None
+    courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
+    user = request.user
+    libraries = []
+    response_format = get_response_format(request)
+
+    if not split_library_view_on_dashboard() and LIBRARIES_ENABLED:
+        accessible_libraries = _accessible_libraries_iter(user)
+        libraries = [_format_library_for_view(lib, request) for lib in accessible_libraries]
+
+    if split_library_view_on_dashboard() and request_response_format_is_json(request, response_format):
+        libraries = get_library_context(request, True)['libraries']
+
+    def format_in_process_course_view(uca):
+        """
+        Return a dict of the data which the view requires for each unsucceeded course
+        """
+        return {
+            'display_name': uca.display_name,
+            'course_key': str(uca.course_key),
+            'org': uca.course_key.org,
+            'number': uca.course_key.course,
+            'run': uca.course_key.run,
+            'is_failed': uca.state == CourseRerunUIStateManager.State.FAILED,
+            'is_in_progress': uca.state == CourseRerunUIStateManager.State.IN_PROGRESS,
+            'dismiss_link': reverse_course_url(
+                'course_notifications_handler',
+                uca.course_key,
+                kwargs={
+                    'action_state_id': uca.id,
+                },
+            ) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
+        }
+
+    split_archived = settings.FEATURES.get('ENABLE_SEPARATE_ARCHIVED_COURSES', False)
+    active_courses, archived_courses = _process_courses_list(courses_iter, in_process_course_actions, split_archived)
+    in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
+
+    home_context = {
+        'courses': active_courses,
+        'split_studio_home': split_library_view_on_dashboard(),
+        'archived_courses': archived_courses,
+        'in_process_course_actions': in_process_course_actions,
+        'libraries_enabled': LIBRARIES_ENABLED,
+        'taxonomies_enabled': use_tagging_taxonomy_list_page(),
+        'redirect_to_library_authoring_mfe': should_redirect_to_library_authoring_mfe(),
+        'library_authoring_mfe_url': LIBRARY_AUTHORING_MICROFRONTEND_URL,
+        'taxonomy_list_mfe_url': get_taxonomy_list_url(),
+        'libraries': libraries,
+        'show_new_library_button': user_can_create_library(user) and not should_redirect_to_library_authoring_mfe(),
+        'user': user,
+        'request_course_creator_url': reverse('request_course_creator'),
+        'course_creator_status': _get_course_creator_status(user),
+        'rerun_creator_status': GlobalStaff().has_user(user),
+        'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
+        'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
+        'optimization_enabled': optimization_enabled,
+        'active_tab': 'courses',
+        'allowed_organizations': get_allowed_organizations(user),
+        'allowed_organizations_for_libraries': get_allowed_organizations_for_libraries(user),
+        'can_create_organizations': user_can_create_organizations(user),
+    }
+
+    return home_context
+
+
+def get_course_rerun_context(course_key, course_block, user):
+    """
+    Utils is used to get context of course rerun.
+    It is used for both DRF and django views.
+    """
+
+    from cms.djangoapps.contentstore.views.course import _get_course_creator_status
+
+    course_rerun_context = {
+        'source_course_key': course_key,
+        'display_name': course_block.display_name,
+        'user': user,
+        'course_creator_status': _get_course_creator_status(user),
+        'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False)
+    }
+
+    return course_rerun_context
+
+
+def get_course_videos_context(course_block, pagination_conf, course_key=None):
+    """
+    Utils is used to get contest of course videos.
+    It is used for both DRF and django views.
+    """
+
+    from edx_toggles.toggles import WaffleSwitch
+    from edxval.api import (
+        get_3rd_party_transcription_plans,
+        get_transcript_credentials_state_for_org,
+        get_transcript_preferences,
+    )
+    from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
+    from xmodule.video_block.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
+
+    from .video_storage_handlers import (
+        get_all_transcript_languages,
+        _get_index_videos,
+        _get_default_video_image_url
+    )
+
+    VIDEO_SUPPORTED_FILE_FORMATS = {
+        '.mp4': 'video/mp4',
+        '.mov': 'video/quicktime',
+    }
+    VIDEO_UPLOAD_MAX_FILE_SIZE_GB = 5
+    # Waffle switch for enabling/disabling video image upload feature
+    VIDEO_IMAGE_UPLOAD_ENABLED = WaffleSwitch(  # lint-amnesty, pylint: disable=toggle-missing-annotation
+        'videos.video_image_upload_enabled', __name__
+    )
+
+    course = course_block
+    if not course:
+        with modulestore().bulk_operations(course_key):
+            course = modulestore().get_course(course_key)
+
+    is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course.id)
+    previous_uploads, pagination_context = _get_index_videos(course, pagination_conf)
+    course_video_context = {
+        'context_course': course,
+        'image_upload_url': reverse_course_url('video_images_handler', str(course.id)),
+        'video_handler_url': reverse_course_url('videos_handler', str(course.id)),
+        'encodings_download_url': reverse_course_url('video_encodings_download', str(course.id)),
+        'default_video_image_url': _get_default_video_image_url(),
+        'previous_uploads': previous_uploads,
+        'concurrent_upload_limit': settings.VIDEO_UPLOAD_PIPELINE.get('CONCURRENT_UPLOAD_LIMIT', 0),
+        'video_supported_file_formats': list(VIDEO_SUPPORTED_FILE_FORMATS.keys()),
+        'video_upload_max_file_size': VIDEO_UPLOAD_MAX_FILE_SIZE_GB,
+        'video_image_settings': {
+            'video_image_upload_enabled': VIDEO_IMAGE_UPLOAD_ENABLED.is_enabled(),
+            'max_size': settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MAX_BYTES'],
+            'min_size': settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MIN_BYTES'],
+            'max_width': settings.VIDEO_IMAGE_MAX_WIDTH,
+            'max_height': settings.VIDEO_IMAGE_MAX_HEIGHT,
+            'supported_file_formats': settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS
+        },
+        'is_video_transcript_enabled': is_video_transcript_enabled,
+        'active_transcript_preferences': None,
+        'transcript_credentials': None,
+        'transcript_available_languages': get_all_transcript_languages(),
+        'video_transcript_settings': {
+            'transcript_download_handler_url': reverse('transcript_download_handler'),
+            'transcript_upload_handler_url': reverse('transcript_upload_handler'),
+            'transcript_delete_handler_url': reverse_course_url('transcript_delete_handler', str(course.id)),
+            'trancript_download_file_format': Transcript.SRT
+        },
+        'pagination_context': pagination_context
+    }
+    if is_video_transcript_enabled:
+        course_video_context['video_transcript_settings'].update({
+            'transcript_preferences_handler_url': reverse_course_url(
+                'transcript_preferences_handler',
+                str(course.id)
+            ),
+            'transcript_credentials_handler_url': reverse_course_url(
+                'transcript_credentials_handler',
+                str(course.id)
+            ),
+            'transcription_plans': get_3rd_party_transcription_plans(),
+        })
+        course_video_context['active_transcript_preferences'] = get_transcript_preferences(str(course.id))
+        # Cached state for transcript providers' credentials (org-specific)
+        course_video_context['transcript_credentials'] = get_transcript_credentials_state_for_org(course.id.org)
+    return course_video_context
+
+
 class StudioPermissionsService:
     """
     Service that can provide information about a user's permissions.
@@ -1317,6 +1662,7 @@ class StudioPermissionsService:
 
     Only used by LibraryContentBlock (and library_tools.py).
     """
+
     def __init__(self, user):
         self._user = user
 

@@ -23,7 +23,7 @@ from edx_proctoring.exceptions import ProctoredExamNotFoundException, ProctoredE
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from .views.helpers import is_item_in_course_tree
+from .helpers import is_item_in_course_tree
 
 log = logging.getLogger(__name__)
 

@@ -13,6 +13,7 @@
  * ~ Chinese Proverb
  */
 
+// eslint-disable-next-line no-shadow-restricted-names
 window.ImageInput = (function($, undefined) {
     var ImageInput = ImageInputConstructor;
 

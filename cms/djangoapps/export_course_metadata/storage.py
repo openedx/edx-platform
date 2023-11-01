@@ -15,6 +15,6 @@ class CourseMetadataExportS3Storage(S3Boto3Storage):  # pylint: disable=abstract
 
     def __init__(self):
         bucket = settings.COURSE_METADATA_EXPORT_BUCKET
-        super().__init__(bucket=bucket, custom_domain=None, querystring_auth=True)
+        super().__init__(bucket_name=bucket, custom_domain=None, querystring_auth=True)
 
 course_metadata_export_storage = get_storage_class(settings.COURSE_METADATA_EXPORT_STORAGE)()

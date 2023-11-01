@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-shadow-restricted-names
 (function(undefined) {
     describe('Video FocusGrabber', function() {
         var state;

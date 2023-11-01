@@ -68,6 +68,7 @@
                 // to use regular expressions within Backbone
                 // routes, allowing us to capture which tab
                 // name is being routed to.
+                // eslint-disable-next-line no-multi-assign
                 router = this.router = new Backbone.Router();
                 _.each([
                     [':default', _.bind(this.routeNotFound, this)],
@@ -81,10 +82,14 @@
                     ['topics/:topic_id/search(/)', _.bind(this.searchTeams, this)],
                     ['topics/:topic_id/create-team(/)', _.bind(this.newTeam, this)],
                     ['teams/:topic_id/:team_id(/)', _.bind(this.browseTeam, this)],
+                    // eslint-disable-next-line prefer-regex-literals
                     [new RegExp('^(browse)/?$'), _.bind(this.goToTab, this)],
+                    // eslint-disable-next-line prefer-regex-literals
                     [new RegExp('^(my-teams)/?$'), _.bind(this.goToTab, this)],
+                    // eslint-disable-next-line prefer-regex-literals
                     [new RegExp('^(manage)/?$'), _.bind(this.goToTab, this)]
                 ], function(route) {
+                    // eslint-disable-next-line prefer-spread
                     router.route.apply(router, route);
                 });
 
@@ -95,6 +100,7 @@
                             _.bind(this.editTeamMembers, this)
                         ]
                     ], function(route) {
+                        // eslint-disable-next-line prefer-spread
                         router.route.apply(router, route);
                     });
                 }
@@ -162,6 +168,7 @@
                     });
                 }
 
+                // eslint-disable-next-line no-multi-assign
                 this.mainView = this.tabbedView = this.createViewWithHeader({
                     title: gettext('Teams'),
                     description: this.getTeamsTabViewDescription(),
@@ -218,6 +225,7 @@
             browseTopic: function(topicID) {
                 var self = this;
                 this.getTeamsView(topicID).done(function(teamsView) {
+                    // eslint-disable-next-line no-multi-assign
                     self.teamsView = self.mainView = teamsView;
                     self.render();
                     TeamAnalytics.emitPageViewed('single-topic', topicID, null);

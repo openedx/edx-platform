@@ -160,22 +160,6 @@ class TestPaverServerTasks(PaverTestCase):
         assert self.task_messages == [EXPECTED_CELERY_COMMAND.format(settings=settings)]
 
     @ddt.data(
-        [{}],
-        [{"settings": "aws"}],
-    )
-    @ddt.unpack
-    def test_update_db(self, options):
-        """
-        Test the "update_db" task.
-        """
-        settings = options.get("settings", Env.DEVSTACK_SETTINGS)
-        call_task("pavelib.servers.update_db", options=options)
-        # pylint: disable=line-too-long
-        db_command = "NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{server} --traceback --pythonpath=. "
-        assert self.task_messages == [db_command.format(server='lms', settings=settings),
-                                      db_command.format(server='cms', settings=settings)]
-
-    @ddt.data(
         ["lms", {}],
         ["lms", {"settings": "aws"}],
         ["cms", {}],
@@ -230,7 +214,6 @@ class TestPaverServerTasks(PaverTestCase):
             expected_asset_settings = "test_static_optimized"
         expected_collect_static = not is_fast and expected_settings != Env.DEVSTACK_SETTINGS
         if not is_fast:
-            expected_messages.append("xmodule_assets common/static/xmodule")
             expected_messages.append("install npm_assets")
             expected_messages.extend(
                 [c.format(settings=expected_asset_settings,
@@ -275,7 +258,6 @@ class TestPaverServerTasks(PaverTestCase):
         expected_collect_static = not is_fast and expected_settings != Env.DEVSTACK_SETTINGS
         expected_messages = []
         if not is_fast:
-            expected_messages.append("xmodule_assets common/static/xmodule")
             expected_messages.append("install npm_assets")
             expected_messages.extend(
                 [c.format(settings=expected_asset_settings,

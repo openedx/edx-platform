@@ -6,6 +6,7 @@ class CourseCardCollection extends Backbone.Collection {
         const defaults = {
             model: CourseCard,
         };
+        // eslint-disable-next-line prefer-object-spread
         super(models, Object.assign({}, defaults, options));
     }
 }

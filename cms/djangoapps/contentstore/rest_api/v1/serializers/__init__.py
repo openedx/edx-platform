@@ -1,11 +1,24 @@
 """
 Serializers for v1 contentstore API.
 """
-from .settings import CourseSettingsSerializer
+from .home import CourseHomeSerializer
 from .course_details import CourseDetailsSerializer
+from .course_team import CourseTeamSerializer
+from .course_rerun import CourseRerunSerializer
+from .grading import CourseGradingModelSerializer, CourseGradingSerializer
 from .proctoring import (
     LimitedProctoredExamSettingsSerializer,
     ProctoredExamConfigurationSerializer,
     ProctoredExamSettingsSerializer,
-    ProctoringErrorsSerializer,
+    ProctoringErrorsSerializer
 )
+from .settings import CourseSettingsSerializer
+from .xblock import XblockSerializer
+from .videos import (
+    CourseVideosSerializer,
+    VideoUploadSerializer,
+    VideoImageSerializer,
+    VideoUsageSerializer
+)
+from .transcripts import TranscriptSerializer
+from .assets import AssetSerializer

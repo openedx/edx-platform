@@ -188,8 +188,8 @@ class TestDashboard(SharedModuleStoreTestCase):
         response = self.client.get(bad_team_url)
         assert 404 == response.status_code
 
-    def get_user_course_specific_teams_list(self):
-        """Gets the list of user course specific teams."""
+    def test_team_dashboard_user_course_specific_team_list(self):
+        """Verifies team dashboard is accurate after user is added to a specific course team."""
 
         # Create a course two
         course_two = CourseFactory.create(
@@ -205,7 +205,7 @@ class TestDashboard(SharedModuleStoreTestCase):
             })
         )
 
-        # Login and enroll user in both course course
+        # Login and enroll user in both courses
         self.client.login(username=self.user.username, password=self.test_password)
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
         CourseEnrollmentFactory.create(user=self.user, course_id=course_two.id)
@@ -219,17 +219,17 @@ class TestDashboard(SharedModuleStoreTestCase):
         # Check that initially list of user teams in course one is empty
         course_one_teams_url = reverse('teams_dashboard', args=[self.course.id])
         response = self.client.get(course_one_teams_url)
-        self.assertContains(response, '"teams": {"count": 0')
+        self.assertContains(response, '"teams": {"next": null, "previous": null, "count": 0')
         # Add user to a course one team
         course_one_team.add_user(self.user)
 
         # Check that list of user teams in course one is not empty, it is one now
         response = self.client.get(course_one_teams_url)
-        self.assertContains(response, '"teams": {"count": 1')
+        self.assertContains(response, '"teams": {"next": null, "previous": null, "count": 1')
         # Check that list of user teams in course two is still empty
         course_two_teams_url = reverse('teams_dashboard', args=[course_two.id])
         response = self.client.get(course_two_teams_url)
-        self.assertContains(response, '"teams": {"count": 0')
+        self.assertContains(response, '"teams": {"next": null, "previous": null, "count": 0')
 
     @ddt.unpack
     @ddt.data(
@@ -673,32 +673,6 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             data.update({'course_id': str(self.test_course_1.id)})
         return self.make_call(reverse('teams_list'), expected_status, 'get', data, **kwargs)
 
-    def get_user_course_specific_teams_list(self):
-        """Gets the list of user course specific teams."""
-
-        # Create and enroll user in both courses
-        user = self.create_and_enroll_student(
-            courses=[self.test_course_1, self.test_course_2],
-            username='test_user_enrolled_both_courses'
-        )
-        course_one_data = {'course_id': str(self.test_course_1.id), 'username': user}
-        course_two_data = {'course_id': str(self.test_course_2.id), 'username': user}
-
-        # Check that initially list of user teams in course one is empty
-        team_list = self.get_teams_list(user=user, expected_status=200, data=course_one_data)
-        assert team_list['count'] == 0
-
-        # Add user to a course one team
-        self.solar_team.add_user(self.users[user])
-
-        # Check that list of user teams in course one is not empty now
-        team_list = self.get_teams_list(user=user, expected_status=200, data=course_one_data)
-        assert team_list['count'] == 1
-
-        # Check that list of user teams in course two is still empty
-        team_list = self.get_teams_list(user=user, expected_status=200, data=course_two_data)
-        assert team_list['count'] == 0
-
     def build_team_data(
         self,
         name="Test team",
@@ -1114,6 +1088,32 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         team_names = [team['name'] for team in teams['results']]
         team_names.sort()
         assert team_names == [self.solar_team.name, self.masters_only_team.name]
+
+    def test_teams_list_for_user_for_specific_course(self):
+        """Verifies teams list for user for specific course."""
+
+        # Create and enroll user in both courses
+        user = self.create_and_enroll_student(
+            courses=[self.test_course_1, self.test_course_2],
+            username='test_user_enrolled_both_courses'
+        )
+        course_one_data = {'course_id': str(self.test_course_1.id), 'username': user}
+        course_two_data = {'course_id': str(self.test_course_2.id), 'username': user}
+
+        # Check that initially list of user teams in course one is empty
+        team_list = self.get_teams_list(user=user, expected_status=200, data=course_one_data)
+        assert team_list['count'] == 0
+
+        # Add user to a course one team
+        self.solar_team.add_user(self.users[user])
+
+        # Check that list of user teams in course one is not empty now
+        team_list = self.get_teams_list(user=user, expected_status=200, data=course_one_data)
+        assert team_list['count'] == 1
+
+        # Check that list of user teams in course two is still empty
+        team_list = self.get_teams_list(user=user, expected_status=200, data=course_two_data)
+        assert team_list['count'] == 0
 
     def _add_missing_user(self, missing_user):
         """

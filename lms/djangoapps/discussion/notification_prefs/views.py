@@ -7,7 +7,6 @@ from base64 import urlsafe_b64decode, urlsafe_b64encode
 from binascii import Error
 from hashlib import sha256
 
-import six
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.ciphers import Cipher
 from cryptography.hazmat.primitives.ciphers.algorithms import AES
@@ -53,7 +52,7 @@ class UsernameCipher:
     @staticmethod
     def _get_aes_cipher(initialization_vector):
         hash_ = sha256()
-        hash_.update(six.b(settings.SECRET_KEY))
+        hash_.update(settings.SECRET_KEY.encode())
         return Cipher(AES(hash_.digest()), CBC(initialization_vector), backend=default_backend())
 
     @staticmethod

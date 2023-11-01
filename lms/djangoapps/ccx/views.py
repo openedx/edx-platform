@@ -1,8 +1,6 @@
 """
 Views related to the Custom Courses feature.
 """
-
-
 import csv
 import datetime
 import functools
@@ -11,7 +9,6 @@ import logging
 from copy import deepcopy
 
 import pytz
-import six
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib import messages
@@ -538,8 +535,7 @@ def ccx_grades_csv(request, course, ccx=None):
                 if not header:
                     # Encode the header row in utf-8 encoding in case there are
                     # unicode characters
-                    header = [section['label'].encode('utf-8') if six.PY2 else section['label']
-                              for section in course_grade.summary['section_breakdown']]
+                    header = [section['label'] for section in course_grade.summary['section_breakdown']]
                     rows.append(["id", "email", "username", "grade"] + header)
 
                 percents = {

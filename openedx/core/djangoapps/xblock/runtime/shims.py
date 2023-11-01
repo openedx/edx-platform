@@ -11,7 +11,6 @@ from django.utils.functional import cached_property
 from fs.memoryfs import MemoryFS
 
 from common.djangoapps.edxmako.shortcuts import render_to_string
-from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.student.models import anonymous_id_for_user
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 
@@ -142,7 +141,7 @@ class RuntimeShim:
         warnings.warn(
             "Use of runtime.render_template is deprecated. "
             "For template files included with your XBlock (which is preferable), use "
-            "xblockutils.resources.ResourceLoader.render_mako_template to render them, or use a JavaScript-based "
+            "xblock.utils.resources.ResourceLoader.render_mako_template to render them, or use a JavaScript-based "
             "template instead. For template files that are part of the LMS/Studio, use the 'mako' XBlock service.",
             DeprecationWarning, stacklevel=2,
         )
@@ -161,39 +160,6 @@ class RuntimeShim:
         # The older ImportSystem runtime could do this because it stored the course_id
         # as part of the runtime.
         raise NotImplementedError("This newer runtime does not support process_xml()")
-
-    def replace_urls(self, html_str):
-        """
-        Deprecated in favor of the replace_urls service.
-        """
-        warnings.warn(
-            'replace_urls is deprecated. Please use ReplaceURLService instead.',
-            DeprecationWarning, stacklevel=3,
-        )
-        return ReplaceURLService(
-            xblock=self._active_block,
-            lookup_asset_url=self._lookup_asset_url
-        ).replace_urls(html_str)
-
-    def replace_course_urls(self, html_str):
-        """
-        Deprecated in favor of the replace_urls service.
-        """
-        warnings.warn(
-            'replace_course_urls is deprecated. Please use ReplaceURLService instead.',
-            DeprecationWarning, stacklevel=3,
-        )
-        return html_str
-
-    def replace_jump_to_id_urls(self, html_str):
-        """
-        Deprecated in favor of the replace_urls service.
-        """
-        warnings.warn(
-            'replace_jump_to_id_urls is deprecated. Please use ReplaceURLService instead.',
-            DeprecationWarning, stacklevel=3,
-        )
-        return html_str
 
     @property
     def resources_fs(self):

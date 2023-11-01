@@ -4,7 +4,6 @@
 from django.utils.translation import gettext as _
 from openedx.core.djangolib.markup import HTML
 from openedx.core.djangolib.js_utils import js_escaped_string
-from six import text_type
 %>
 
 ## The JS for this is defined in xqa_interface.html
@@ -100,7 +99,7 @@ ${block_content | n, decode.utf8}
 
     <div class="staff_info" style="display:block">
       is_released = ${is_released}
-      location = ${text_type(location)}
+      location = ${str(location)}
 
       <table summary="${_('Module Fields')}">
         <tr><th>${_('Module Fields')}</th></tr>

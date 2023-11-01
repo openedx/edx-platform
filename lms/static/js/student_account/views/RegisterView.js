@@ -87,7 +87,8 @@
                         requiredStr: this.requiredStr,
                         optionalStr: fields[i].name === 'marketing_emails_opt_in' ? '' : this.optionalStr,
                         supplementalText: fields[i].supplementalText || '',
-                        supplementalLink: fields[i].supplementalLink || ''
+                        supplementalLink: fields[i].supplementalLink || '',
+                        showRegisterLinks: this.showRegisterLinks
                     })));
                 }
                 html.push('</div>');
@@ -134,7 +135,9 @@
 
                 html = this.renderFields(requiredFields, 'required-fields');
 
+                // eslint-disable-next-line prefer-spread
                 html.push.apply(html, this.renderFields(exposedOptionalFields, 'exposed-optional-fields'));
+                // eslint-disable-next-line prefer-spread
                 html.push.apply(html, this.renderFields(
                     optionalFields, `optional-fields ${!this.enableCoppaCompliance ? '' : 'full-length-fields'}`
                 ));

@@ -493,6 +493,7 @@
                                 hintbody = hintbody.replace('&lf;', '\n').trim();
                                 // xss-lint: disable=javascript-concat-html
                                 endHints += '    <compoundhint value="' + abhint[1].trim() + '">' + hintbody + '</compoundhint>\n';
+                                // eslint-disable-next-line no-continue
                                 continue; // bail
                             }
 
@@ -627,6 +628,7 @@
                                     if (isNaN(parseFloat(orMatch[1]))
                                         || isRangeToleranceCase(orMatch[1])
                                         || hasTolerance) {
+                                        // eslint-disable-next-line no-continue
                                         continue;
                                     }
 
@@ -682,6 +684,7 @@
                                     // xss-lint: disable=javascript-concat-html
                                     string += '  <stringequalhint answer="' + notMatch[1] + '"' + textHint.labelassign + '>' + textHint.hint + '</stringequalhint>\n';
 
+                                    // eslint-disable-next-line no-continue
                                     continue;
                                 }
                                 orMatch = /^or\=\s*(.*)/.exec(textHint.nothint);

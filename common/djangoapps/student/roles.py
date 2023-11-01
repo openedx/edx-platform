@@ -7,6 +7,7 @@ adding users, removing users, and listing members
 import logging
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
+from contextlib import contextmanager
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from opaque_keys.edx.django.models import CourseKeyField
@@ -19,13 +20,17 @@ log = logging.getLogger(__name__)
 # A list of registered access roles.
 REGISTERED_ACCESS_ROLES = {}
 
+# A mapping of roles to the roles that they inherit permissions from.
+ACCESS_ROLES_INHERITANCE = {}
+
 
 def register_access_role(cls):
     """
     Decorator that allows access roles to be registered within the roles module and referenced by their
     string values.
 
-    Assumes that the decorated class has a "ROLE" attribute, defining its type.
+    Assumes that the decorated class has a "ROLE" attribute, defining its type and an optional "BASE_ROLE" attribute,
+    defining the role that it inherits permissions from.
 
     """
     try:
@@ -33,7 +38,26 @@ def register_access_role(cls):
         REGISTERED_ACCESS_ROLES[role_name] = cls
     except AttributeError:
         log.exception("Unable to register Access Role with attribute 'ROLE'.")
+
+    if base_role := getattr(cls, "BASE_ROLE", None):
+        ACCESS_ROLES_INHERITANCE.setdefault(base_role, set()).add(cls.ROLE)
+
     return cls
+
+
+@contextmanager
+def strict_role_checking():
+    """
+    Context manager that temporarily disables role inheritance.
+
+    You may want to use it to check if a user has a base role. For example, if a user has `CourseLimitedStaffRole`,
+    by enclosing `has_role` call with this context manager, you can check it has the `CourseStaffRole` too. This is
+    useful when derived roles have less permissions than their base roles, but users can have both roles at the same.
+    """
+    OLD_ACCESS_ROLES_INHERITANCE = ACCESS_ROLES_INHERITANCE.copy()
+    ACCESS_ROLES_INHERITANCE.clear()
+    yield
+    ACCESS_ROLES_INHERITANCE.update(OLD_ACCESS_ROLES_INHERITANCE)
 
 
 class BulkRoleCache:  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -69,12 +93,20 @@ class RoleCache:
                 CourseAccessRole.objects.filter(user=user).all()
             )
 
+    @staticmethod
+    def get_roles(role):
+        """
+        Return the roles that should have the same permissions as the specified role.
+        """
+        return ACCESS_ROLES_INHERITANCE.get(role, set()) | {role}
+
     def has_role(self, role, course_id, org):
         """
-        Return whether this RoleCache contains a role with the specified role, course_id, and org
+        Return whether this RoleCache contains a role with the specified role
+        or a role that inherits from the specified role, course_id and org.
         """
         return any(
-            access_role.role == role and
+            access_role.role in self.get_roles(role) and
             access_role.course_id == course_id and
             access_role.org == org
             for access_role in self._roles
@@ -186,9 +218,10 @@ class RoleBase(AccessRole):
         # legit get updated.
         from common.djangoapps.student.models import CourseAccessRole  # lint-amnesty, pylint: disable=redefined-outer-name, reimported
         for user in users:
-            if user.is_authenticated and user.is_active and not self.has_user(user):
-                entry = CourseAccessRole(user=user, role=self._role_name, course_id=self.course_key, org=self.org)
-                entry.save()
+            if user.is_authenticated and user.is_active:
+                CourseAccessRole.objects.get_or_create(
+                    user=user, role=self._role_name, course_id=self.course_key, org=self.org
+                )
                 if hasattr(user, '_roles'):
                     del user._roles
 
@@ -259,6 +292,14 @@ class CourseStaffRole(CourseRole):
 
     def __init__(self, *args, **kwargs):
         super().__init__(self.ROLE, *args, **kwargs)
+
+
+@register_access_role
+class CourseLimitedStaffRole(CourseStaffRole):
+    """A Staff member of a course without access to Studio."""
+
+    ROLE = 'limited_staff'
+    BASE_ROLE = CourseStaffRole.ROLE
 
 
 @register_access_role
@@ -438,11 +479,11 @@ class UserBasedRole:
 
     def courses_with_role(self):
         """
-        Return a django QuerySet for all of the courses with this user x role. You can access
+        Return a django QuerySet for all of the courses with this user x (or derived from x) role. You can access
         any of these properties on each result record:
         * user (will be self.user--thus uninteresting)
         * org
         * course_id
         * role (will be self.role--thus uninteresting)
         """
-        return CourseAccessRole.objects.filter(role=self.role, user=self.user)
+        return CourseAccessRole.objects.filter(role__in=RoleCache.get_roles(self.role), user=self.user)

@@ -7,13 +7,13 @@ import json
 import logging
 import os
 import re
+import warnings
 import sys
 from collections import defaultdict
 from contextlib import contextmanager
 from importlib import import_module
 
 from fs.osfs import OSFS
-from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator
@@ -37,7 +37,7 @@ from xmodule.x_module import (  # lint-amnesty, pylint: disable=unused-import
 )
 
 from .exceptions import ItemNotFoundError
-from .inheritance import InheritanceKeyValueStore, compute_inherited_metadata, inheriting_field_data
+from .inheritance import compute_inherited_metadata, inheriting_field_data
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False, remove_blank_text=True)
 
@@ -238,6 +238,24 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
             id_reader=id_manager,
             **kwargs
         )
+
+    # pylint: disable=keyword-arg-before-vararg
+    def construct_xblock_from_class(self, cls, scope_ids, field_data=None, *args, **kwargs):
+        """
+        Construct a new xblock of type cls, mixing in the mixins
+        defined for this application.
+        """
+        if field_data:
+            # Currently, *some* XBlocks (those with XmlMixin) use XmlMixin.parse_xml() which instantiates
+            # its own key value store for field data. That is something which should be left to the runtime, for
+            # consistent behavior across all XBlocks, not controlled by individual XBlock implementations.
+            # We cannot just ignore field_data here though, because parse_xml may have pre-loaded data into it that we
+            # would otherwise lose.
+            warnings.warn(
+                'XBlocks should not instantiate their own field_data store during parse_xml()',
+                DeprecationWarning, stacklevel=2,
+            )
+        return super().construct_xblock_from_class(cls, scope_ids, field_data, *args, **kwargs)
 
     # id_generator is ignored, because each ImportSystem is already local to
     # a course, and has it's own id_generator already in place
@@ -899,26 +917,10 @@ class LibraryXMLModuleStore(XMLModuleStore):
         """
         return LibraryLocator(org=org, library=library)
 
-    @staticmethod
-    def patch_block_kvs(library_block):
-        """
-        Metadata inheritance can be done purely through XBlocks, but in the import phase
-        a root block with an InheritanceKeyValueStore is assumed to be at the top of the hierarchy.
-        This should change in the future, but as XBlocks don't have this KVS, we have to patch it
-        here manually.
-        """
-        init_dict = {key: getattr(library_block, key) for key in library_block.fields.keys()}
-        # if set, invalidate '_unwrapped_field_data' so it will be reset
-        # the next time it will be called
-        lazy.invalidate(library_block, '_unwrapped_field_data')
-        # pylint: disable=protected-access
-        library_block._field_data = inheriting_field_data(InheritanceKeyValueStore(init_dict))
-
     def content_importers(self, system, course_block, course_dir, url_name):
         """
         Handle Metadata inheritance for Libraries.
         """
-        self.patch_block_kvs(course_block)
         compute_inherited_metadata(course_block)
 
     def get_library(self, library_id, depth=0, **kwargs):  # pylint: disable=unused-argument

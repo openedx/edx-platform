@@ -183,15 +183,18 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
                 type: 'POST',
                 maxChunkSize: self.uploadChunkSizeInBytes,
                 autoUpload: true,
+                // eslint-disable-next-line no-shadow
                 progressall: function(event, data) {
                     var percentComplete = parseInt((100 * data.loaded) / data.total, 10);
                     self.showUploadFeedback(event, percentComplete);
                 },
                 maxFileSize: self.maxFileSizeInBytes,
                 maxNumberofFiles: 100,
+                // eslint-disable-next-line no-shadow
                 done: function(event, data) {
                     self.displayFinishedUpload(data.result);
                 },
+                // eslint-disable-next-line no-shadow
                 processfail: function(event, data) {
                     var filename = data.files[data.index].name;
                     var error = gettext('File {filename} exceeds maximum size of {maxFileSizeInMBs} MB')
@@ -216,6 +219,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
                         msg: gettext('Max file size exceeded')
                     });
                 },
+                // eslint-disable-next-line no-shadow
                 processdone: function(event, data) {
                     self.largeFileErrorMsg = null;
                 }

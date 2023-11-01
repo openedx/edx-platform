@@ -9,16 +9,17 @@ from elasticsearch.exceptions import ConnectionError as ElasticConnectionError
 from search.elastic import _translate_hits, RESERVED_CHARACTERS
 from search.search_engine_base import SearchEngine
 from opaque_keys.edx.locator import LibraryUsageLocatorV2
+from openedx_events.content_authoring.data import ContentLibraryData, LibraryBlockData
+from openedx_events.content_authoring.signals import (
+    CONTENT_LIBRARY_CREATED,
+    CONTENT_LIBRARY_DELETED,
+    CONTENT_LIBRARY_UPDATED,
+    LIBRARY_BLOCK_CREATED,
+    LIBRARY_BLOCK_DELETED,
+    LIBRARY_BLOCK_UPDATED,
+)
 
 from openedx.core.djangoapps.content_libraries.constants import DRAFT_NAME
-from openedx.core.djangoapps.content_libraries.signals import (
-    CONTENT_LIBRARY_CREATED,
-    CONTENT_LIBRARY_UPDATED,
-    CONTENT_LIBRARY_DELETED,
-    LIBRARY_BLOCK_CREATED,
-    LIBRARY_BLOCK_UPDATED,
-    LIBRARY_BLOCK_DELETED,
-)
 from openedx.core.djangoapps.content_libraries.library_bundle import LibraryBundle
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary
 from openedx.core.lib.blockstore_api import get_bundle
@@ -242,17 +243,21 @@ class LibraryBlockIndexer(SearchIndexerBase):
 
 @receiver(CONTENT_LIBRARY_CREATED)
 @receiver(CONTENT_LIBRARY_UPDATED)
-@receiver(LIBRARY_BLOCK_CREATED)
-@receiver(LIBRARY_BLOCK_UPDATED)
-@receiver(LIBRARY_BLOCK_DELETED)
-def index_library(sender, library_key, **kwargs):  # pylint: disable=unused-argument
+def index_library(**kwargs):
     """
     Index library when created or updated, or when its blocks are modified.
     """
+    content_library = kwargs.get('content_library', None)
+    if not content_library or not isinstance(content_library, ContentLibraryData):
+        log.error('Received null or incorrect data for event')
+        return
+
+    library_key = content_library.library_key
+    update_blocks = content_library.update_blocks
     if ContentLibraryIndexer.indexing_is_enabled():
         try:
             ContentLibraryIndexer.index_items([library_key])
-            if kwargs.get('update_blocks', False):
+            if update_blocks:
                 blocks = LibraryBlockIndexer.get_items(filter_terms={
                     'library_key': str(library_key)
                 })
@@ -262,12 +267,38 @@ def index_library(sender, library_key, **kwargs):  # pylint: disable=unused-argu
             log.exception(e)
 
 
+@receiver(LIBRARY_BLOCK_CREATED)
+@receiver(LIBRARY_BLOCK_DELETED)
+@receiver(LIBRARY_BLOCK_UPDATED)
+def index_library_block(**kwargs):
+    """
+    Index library when its blocks are created, modified, or deleted.
+    """
+    library_block = kwargs.get('library_block', None)
+    if not library_block or not isinstance(library_block, LibraryBlockData):
+        log.error('Received null or incorrect data for event')
+        return
+
+    library_key = library_block.library_key
+    if ContentLibraryIndexer.indexing_is_enabled():
+        try:
+            ContentLibraryIndexer.index_items([library_key])
+        except ElasticConnectionError as e:
+            log.exception(e)
+
+
 @receiver(CONTENT_LIBRARY_DELETED)
-def remove_library_index(sender, library_key, **kwargs):  # pylint: disable=unused-argument
+def remove_library_index(**kwargs):
     """
     Remove from index when library is deleted
     """
+    content_library = kwargs.get('content_library', None)
+    if not content_library or not isinstance(content_library, ContentLibraryData):
+        log.error('Received null or incorrect data for event')
+        return
+
     if ContentLibraryIndexer.indexing_is_enabled():
+        library_key = content_library.library_key
         try:
             ContentLibraryIndexer.remove_items([library_key])
             blocks = LibraryBlockIndexer.get_items(filter_terms={
@@ -280,10 +311,16 @@ def remove_library_index(sender, library_key, **kwargs):  # pylint: disable=unus
 
 @receiver(LIBRARY_BLOCK_CREATED)
 @receiver(LIBRARY_BLOCK_UPDATED)
-def index_block(sender, usage_key, **kwargs):  # pylint: disable=unused-argument
+def index_block(**kwargs):
     """
-    Index block metadata when created
+    Index block metadata when created or updated
     """
+    library_block = kwargs.get('library_block', None)
+    if not library_block or not isinstance(library_block, LibraryBlockData):
+        log.error('Received null or incorrect data for event')
+        return
+
+    usage_key = library_block.usage_key
     if LibraryBlockIndexer.indexing_is_enabled():
         try:
             LibraryBlockIndexer.index_items([usage_key])
@@ -292,10 +329,16 @@ def index_block(sender, usage_key, **kwargs):  # pylint: disable=unused-argument
 
 
 @receiver(LIBRARY_BLOCK_DELETED)
-def remove_block_index(sender, usage_key, **kwargs):  # pylint: disable=unused-argument
+def remove_block_index(**kwargs):
     """
     Remove the block from the index when deleted
     """
+    library_block = kwargs.get('library_block', None)
+    if not library_block or not isinstance(library_block, LibraryBlockData):
+        log.error('Received null or incorrect data for LIBRARY_BLOCK_DELETED')
+        return
+
+    usage_key = library_block.usage_key
     if LibraryBlockIndexer.indexing_is_enabled():
         try:
             LibraryBlockIndexer.remove_items([usage_key])

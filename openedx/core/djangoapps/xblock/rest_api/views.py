@@ -1,25 +1,28 @@
 """
 Views that implement a RESTful API for interacting with XBlocks.
-
-Note that these views are only for interacting with existing blocks. Other
-Studio APIs cover use cases like adding/deleting/editing blocks.
 """
 
+from common.djangoapps.util.json_request import JsonResponse
 from corsheaders.signals import check_request_enabled
 from django.contrib.auth import get_user_model
+from django.db.transaction import atomic
 from django.http import Http404
+from django.utils.translation import gettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import permissions
 from rest_framework.decorators import api_view, permission_classes  # lint-amnesty, pylint: disable=unused-import
 from rest_framework.exceptions import PermissionDenied, AuthenticationFailed, NotFound
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from xblock.django.request import DjangoWebobRequest, webob_to_django_response
+from xblock.fields import Scope
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.lib.api.view_utils import view_auth_classes
 from ..api import (
+    get_block_display_name,
     get_block_metadata,
     get_handler_url as _get_handler_url,
     load_block,
@@ -168,3 +171,86 @@ def cors_allow_xblock_handler(sender, request, **kwargs):  # lint-amnesty, pylin
 
 
 check_request_enabled.connect(cors_allow_xblock_handler)
+
+
+@view_auth_classes()
+class BlockFieldsView(APIView):
+    """
+    View to get/edit the field values of an XBlock as JSON (in the v2 runtime)
+
+    This class mimics the functionality of xblock_handler in block.py (for v1 xblocks), but for v2 xblocks.
+    However, it only implements the exact subset of functionality needed to support the v2 editors (from
+    the frontend-lib-content-components project). As such, it only supports GET and POST, and only the
+    POSTing of data/metadata fields.
+    """
+
+    @atomic
+    def get(self, request, usage_key_str):
+        """
+        retrieves the xblock, returning display_name, data, and metadata
+        """
+        try:
+            usage_key = UsageKey.from_string(usage_key_str)
+        except InvalidKeyError as e:
+            raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
+
+        block = load_block(usage_key, request.user)
+        block_dict = {
+            "display_name": get_block_display_name(block),  # potentially duplicated from metadata
+            "data": block.data,
+            "metadata": block.get_explicitly_set_fields_by_scope(Scope.settings),
+        }
+        return Response(block_dict)
+
+    @atomic
+    def post(self, request, usage_key_str):
+        """
+        edits the xblock, saving changes to data and metadata only (display_name included in metadata)
+        """
+        try:
+            usage_key = UsageKey.from_string(usage_key_str)
+        except InvalidKeyError as e:
+            raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
+
+        user = request.user
+        block = load_block(usage_key, user)
+        data = request.data.get("data")
+        metadata = request.data.get("metadata")
+
+        old_metadata = block.get_explicitly_set_fields_by_scope(Scope.settings)
+        old_content = block.get_explicitly_set_fields_by_scope(Scope.content)
+
+        block.data = data
+
+        # update existing metadata with submitted metadata (which can be partial)
+        # IMPORTANT NOTE: if the client passed 'null' (None) for a piece of metadata that means 'remove it'.
+        if metadata is not None:
+            for metadata_key, value in metadata.items():
+                field = block.fields[metadata_key]
+
+                if value is None:
+                    field.delete_from(block)
+                else:
+                    try:
+                        value = field.from_json(value)
+                    except ValueError as verr:
+                        reason = _("Invalid data")
+                        if str(verr):
+                            reason = _("Invalid data ({details})").format(
+                                details=str(verr)
+                            )
+                        return JsonResponse({"error": reason}, 400)
+
+                    field.write_to(block, value)
+
+        if callable(getattr(block, "editor_saved", None)):
+            block.editor_saved(user, old_metadata, old_content)
+
+        # Save after the callback so any changes made in the callback will get persisted.
+        block.save()
+
+        return Response({
+            "id": str(block.location),
+            "data": data,
+            "metadata": block.get_explicitly_set_fields_by_scope(Scope.settings),
+        })

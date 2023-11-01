@@ -16,6 +16,8 @@ from common.djangoapps.xblock_django.user_service import (
     ATTR_KEY_ANONYMOUS_USER_ID,
     ATTR_KEY_REQUEST_COUNTRY_CODE,
     ATTR_KEY_USER_ID,
+    ATTR_KEY_USER_IS_BETA_TESTER,
+    ATTR_KEY_USER_IS_GLOBAL_STAFF,
     ATTR_KEY_USER_IS_STAFF,
     ATTR_KEY_USER_PREFERENCES,
     ATTR_KEY_USER_ROLE,
@@ -49,11 +51,15 @@ class UserServiceTestCase(TestCase):
         self.assertListEqual(xb_user.emails, [])
 
     def assert_xblock_user_matches_django(
-        self, xb_user, dj_user,
+        self,
+        xb_user,
+        dj_user,
         user_is_staff=False,
         user_role=None,
         anonymous_user_id=None,
         request_country_code=None,
+        user_is_global_staff=False,
+        user_is_beta_tester=False,
     ):
         """
         A set of assertions for comparing a XBlockUser to a django User
@@ -63,7 +69,9 @@ class UserServiceTestCase(TestCase):
         assert xb_user.full_name == dj_user.profile.name
         assert xb_user.opt_attrs[ATTR_KEY_USERNAME] == dj_user.username
         assert xb_user.opt_attrs[ATTR_KEY_USER_ID] == dj_user.id
+        assert xb_user.opt_attrs[ATTR_KEY_USER_IS_BETA_TESTER] == user_is_beta_tester
         assert xb_user.opt_attrs[ATTR_KEY_USER_IS_STAFF] == user_is_staff
+        assert xb_user.opt_attrs[ATTR_KEY_USER_IS_GLOBAL_STAFF] == user_is_global_staff
         assert xb_user.opt_attrs[ATTR_KEY_USER_ROLE] == user_role
         assert xb_user.opt_attrs[ATTR_KEY_ANONYMOUS_USER_ID] == anonymous_user_id
         assert xb_user.opt_attrs[ATTR_KEY_REQUEST_COUNTRY_CODE] == request_country_code
@@ -80,14 +88,24 @@ class UserServiceTestCase(TestCase):
         self.assert_is_anon_xb_user(xb_user, request_country_code=country_code)
 
     @ddt.data(
-        (False, None, None, None),
-        (True, 'instructor', None, None),
-        (True, 'staff', None, None),
-        (False, 'student', 'abcdef0123', None),
-        (True, 'student', 'abcdef0123', 'uk'),
+        (False, None, None, None, False, False),
+        (True, 'instructor', None, None, False, False),
+        (True, 'staff', None, None, False, False),
+        (False, 'student', 'abcdef0123', None, False, False),
+        (True, 'student', 'abcdef0123', 'uk', False, False),
+        (False, None, None, None, True, False),
+        (False, None, None, None, False, True),
     )
     @ddt.unpack
-    def test_convert_authenticate_user(self, user_is_staff, user_role, anonymous_user_id, request_country_code):
+    def test_convert_authenticate_user(
+        self,
+        user_is_staff,
+        user_role,
+        anonymous_user_id,
+        request_country_code,
+        user_is_global_staff,
+        user_is_beta_tester,
+    ):
         """
         Tests for convert_django_user_to_xblock_user behavior when django user is User.
         """
@@ -97,15 +115,20 @@ class UserServiceTestCase(TestCase):
             user_role=user_role,
             anonymous_user_id=anonymous_user_id,
             request_country_code=request_country_code,
+            user_is_global_staff=user_is_global_staff,
+            user_is_beta_tester=user_is_beta_tester,
         )
         xb_user = django_user_service.get_current_user()
         assert xb_user.is_current_user
         self.assert_xblock_user_matches_django(
-            xb_user, self.user,
+            xb_user,
+            self.user,
             user_is_staff,
             user_role,
             anonymous_user_id,
             request_country_code,
+            user_is_global_staff,
+            user_is_beta_tester,
         )
 
     def test_get_anonymous_user_id_returns_none_for_non_staff_users(self):

@@ -10,7 +10,10 @@ on:
          required: true
          default: 'master'
 jobs:
-   call-upgrade-python-requirements-workflow:
+  call-upgrade-python-requirements-workflow:
+    # Don't run the weekly upgrade job on forks -- it will send a weekly failure email.
+    if: github.repository == 'openedx/edx-platform' || github.event_name != 'schedule'
+    uses: openedx/.github/.github/workflows/upgrade-python-requirements.yml@master
     with:
        branch: ${{ github.event.inputs.branch }}
        team_reviewers: "arbi-bom"
@@ -21,5 +24,4 @@ jobs:
        requirements_bot_github_email: ${{ secrets.REQUIREMENTS_BOT_GITHUB_EMAIL }}
        edx_smtp_username: ${{ secrets.EDX_SMTP_USERNAME }}
        edx_smtp_password: ${{ secrets.EDX_SMTP_PASSWORD }}
-    uses: openedx/.github/.github/workflows/upgrade-python-requirements.yml@master
 

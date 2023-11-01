@@ -1,5 +1,6 @@
 import { errorActions, entitlementActions } from '../constants/actionTypes';
 
+// eslint-disable-next-line default-param-last
 const error = (state = '', action) => {
     switch (action.type) {
     case errorActions.DISPLAY_ERROR:

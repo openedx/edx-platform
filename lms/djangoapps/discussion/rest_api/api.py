@@ -44,7 +44,6 @@ from openedx.core.djangoapps.discussions.models import (
     DiscussionsConfiguration,
     DiscussionTopicLink,
     Provider,
-    PostingRestriction
 )
 from openedx.core.djangoapps.discussions.utils import get_accessible_discussion_xblocks
 from openedx.core.djangoapps.django_comment_common import comment_client
@@ -94,7 +93,7 @@ from ..django_comment_client.base.views import (
     track_voted_event,
     track_discussion_reported_event,
     track_discussion_unreported_event,
-    track_forum_search_event
+    track_forum_search_event, track_thread_followed_event
 )
 from ..django_comment_client.utils import (
     get_group_id_for_user,
@@ -128,7 +127,8 @@ from .utils import (
     discussion_open_for_user,
     get_usernames_for_course,
     get_usernames_from_search_string,
-    set_attribute
+    set_attribute,
+    is_posting_allowed
 )
 
 
@@ -323,25 +323,6 @@ def get_course(request, course_key):
         client parsing of the dates as well. :-P
         """
         return dt.isoformat().replace('+00:00', 'Z')
-
-    def is_posting_allowed(posting_restrictions, blackout_schedules):
-        """
-        Check if posting is allowed based on the given posting restrictions and blackout schedules.
-
-        Args:
-            posting_restrictions (str): Values would be  "disabled", "scheduled" or "enabled".
-            blackout_schedules (List[Dict[str, datetime]]): The list of blackout schedules
-
-        Returns:
-            bool: True if posting is allowed, False otherwise.
-        """
-        now = datetime.now(UTC)
-        if posting_restrictions == PostingRestriction.DISABLED:
-            return True
-        elif posting_restrictions == PostingRestriction.SCHEDULED:
-            return not any(schedule["start"] <= now <= schedule["end"] for schedule in blackout_schedules)
-        else:
-            return False
 
     course = _get_course(course_key, request.user)
     user_roles = get_user_role_names(request.user, course_key)
@@ -1352,7 +1333,7 @@ def _do_extra_actions(api_content, cc_content, request_fields, actions_form, con
         if field in request_fields and field in api_content and form_value != api_content[field]:
             api_content[field] = form_value
             if field == "following":
-                _handle_following_field(form_value, context["cc_requester"], cc_content)
+                _handle_following_field(form_value, context["cc_requester"], cc_content, request)
             elif field == "abuse_flagged":
                 _handle_abuse_flagged_field(form_value, context["cc_requester"], cc_content, request)
             elif field == "voted":
@@ -1365,12 +1346,15 @@ def _do_extra_actions(api_content, cc_content, request_fields, actions_form, con
                 raise ValidationError({field: ["Invalid Key"]})
 
 
-def _handle_following_field(form_value, user, cc_content):
+def _handle_following_field(form_value, user, cc_content, request):
     """follow/unfollow thread for the user"""
+    course_key = CourseKey.from_string(cc_content.course_id)
+    course = get_course_with_access(request.user, 'load', course_key)
     if form_value:
         user.follow(cc_content)
     else:
         user.unfollow(cc_content)
+    track_thread_followed_event(request, course, cc_content, form_value)
 
 
 def _handle_abuse_flagged_field(form_value, user, cc_content, request):
@@ -1532,7 +1516,6 @@ def create_comment(request, comment_data):
 
     track_comment_created_event(request, course, cc_comment, cc_thread["commentable_id"], followed=False,
                                 from_mfe_sidebar=from_mfe_sidebar)
-
     return api_comment
 
 

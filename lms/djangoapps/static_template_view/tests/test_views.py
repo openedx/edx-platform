@@ -67,16 +67,16 @@ class MarketingSiteViewTests(TestCase):
         """
         Test the 404 view.
         """
-        url = reverse('static_template_view.views.render_404')
+        url = reverse('render_404')
         resp = self.client.get(url)
-        assert resp.status_code == 200
-        assert resp['Content-Type'] == 'text/html'
+        assert resp.status_code == 404
+        assert resp['Content-Type'] == 'text/html; charset=utf-8'
 
     def test_500(self):
         """
         Test the 500 view.
         """
-        url = reverse('static_template_view.views.render_500')
+        url = reverse('render_500')
         resp = self.client.get(url)
         assert resp.status_code == 500
         assert resp['Content-Type'] == 'text/html; charset=utf-8'

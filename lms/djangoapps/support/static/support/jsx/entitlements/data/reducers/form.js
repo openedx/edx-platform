@@ -7,6 +7,7 @@ const clearFormState = {
     activeEntitlement: null,
 };
 
+// eslint-disable-next-line default-param-last
 const form = (state = {}, action) => {
     switch (action.type) {
     case formActions.OPEN_REISSUE_FORM:

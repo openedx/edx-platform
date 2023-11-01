@@ -1,20 +1,23 @@
 """
 Utils for discussion API.
 """
-from typing import List, Dict
+from datetime import datetime
+from typing import Dict, List
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.paginator import Paginator
 from django.db.models.functions import Length
+from pytz import UTC
 
-from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, PostingRestriction
 from openedx.core.djangoapps.django_comment_common.models import (
-    Role,
     FORUM_ROLE_ADMINISTRATOR,
-    FORUM_ROLE_MODERATOR,
-    FORUM_ROLE_GROUP_MODERATOR,
     FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_GROUP_MODERATOR,
+    FORUM_ROLE_MODERATOR,
+    Role
 )
 
 
@@ -29,13 +32,18 @@ class AttributeDict(dict):
 
 def discussion_open_for_user(course, user):
     """
-    Check if course discussion are open or not for user.
+    Check if the course discussion are open or not for user.
 
     Arguments:
             course: Course to check discussions for
             user: User to check for privileges in course
     """
-    return course.forum_posts_allowed or has_discussion_privileges(user, course.id)
+    discussions_posting_restrictions = DiscussionsConfiguration.get(course.id).posting_restrictions
+    blackout_dates = course.get_discussion_blackout_datetimes()
+    return (
+        is_posting_allowed(discussions_posting_restrictions, blackout_dates) or
+        has_discussion_privileges(user, course.id)
+    )
 
 
 def set_attribute(threads, attribute, value):
@@ -351,3 +359,23 @@ def get_archived_topics(filtered_topic_ids: List[str], topics: List[Dict[str, st
             if topic['id'] == topic_id and topic['usage_key'] is not None:
                 archived_topics.append(topic)
     return archived_topics
+
+
+def is_posting_allowed(posting_restrictions: str, blackout_schedules: List):
+    """
+    Check if posting is allowed based on the given posting restrictions and blackout schedules.
+
+    Args:
+        posting_restrictions (str): Values would be  "disabled", "scheduled" or "enabled".
+        blackout_schedules (List[Dict[str, datetime]]): The list of blackout schedules
+
+    Returns:
+        bool: True if posting is allowed, False otherwise.
+    """
+    now = datetime.now(UTC)
+    if posting_restrictions == PostingRestriction.DISABLED:
+        return True
+    elif posting_restrictions == PostingRestriction.SCHEDULED:
+        return not any(schedule["start"] <= now <= schedule["end"] for schedule in blackout_schedules)
+    else:
+        return False

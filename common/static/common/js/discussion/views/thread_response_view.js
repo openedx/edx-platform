@@ -228,6 +228,7 @@
                 if (!this.model.can('can_delete')) {
                     return;
                 }
+                // eslint-disable-next-line no-alert
                 if (!confirm(gettext('Are you sure you want to delete this response?'))) {
                     return;
                 }
@@ -328,6 +329,7 @@
                 url = DiscussionUtil.urlFor('update_comment', this.model.id);
                 return DiscussionUtil.safeAjax({
                     $elem: $(event.target),
+                    // eslint-disable-next-line no-void
                     $loading: event ? $(event.target) : void 0,
                     url: url,
                     type: 'POST',

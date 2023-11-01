@@ -8,7 +8,8 @@ from datetime import datetime
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.core.files.storage import DefaultStorage, get_valid_filename
+from django.core.files.storage import DefaultStorage
+from django.utils.text import get_valid_filename
 from django.utils.translation import gettext as _
 from django.utils.translation import ngettext
 from pytz import UTC

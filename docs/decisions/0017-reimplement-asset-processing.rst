@@ -5,13 +5,15 @@ Overview
 ********
 
 * edx-platform has a complicated process for managing its static frontend assets. It slows down both developers and site operators.
-* We will deprecate the current Python+paver asset processing system in favor of a new Bash implementation.
+* We will deprecate the current paver-based asset processing system in favor of a new implementation based primarily on frontend tools and bash.
 * After one named release, the deprecated paver system will be removed.
 
 Status
 ******
 
 **Provisional**
+
+This was `originally authored <https://github.com/openedx/edx-platform/pull/31790>`_ in March 2023. We `modified it in July 2023 <https://github.com/openedx/edx-platform/pull/32804>`_ based on learnings from the implementation process.
 
 The status will be moved to *Accepted* upon completion of reimplementation. Related work:
 
@@ -23,8 +25,8 @@ The status will be moved to *Accepted* upon completion of reimplementation. Rela
 Context
 *******
 
-State of edx-platform frontends
-===============================
+State of edx-platform frontends (early 2023)
+============================================
 
 New Open edX frontend development has largely moved to React-based micro-frontends (MFEs). However, edx-platform still has a few categories of important static frontend assets:
 
@@ -98,7 +100,7 @@ We will largely reimplement edx-platform's asset processing system. We will aim 
 
 * Use well-known, npm-installed frontend tooling wherever possible.
 * When bespoke processing is required, use standard POSIX tools like Bash.
-* When Django/Python is absolutely required, contain its impact so that the rest of the system remains Python-free.
+* When Python is absolutely required, minimize the scope of its usage and the set of required Python libraries.
 * Avoid unnecessary indirection or abstraction. For this task, extensibility is a non-goal, and simplicity is a virtue.
 * Provide a clear migration path from the old system to the new one.
 * Enable the future removal of as much legacy frontend tooling code as possible.
@@ -128,20 +130,22 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        A Python-defined task that calls out to each build stage.
 
-     - ``scripts/build-assets.sh``
+     - ``npm clean-install && npm run build``
 
-       A Bash script that contains all build stages, with subcommands available for running each stage separately. Its command-line interface inspired by Tutor's ``openedx-assets`` script. The script will be runnable on any POSIX system, including macOS and Ubuntu and it will linted for common shell scripting mistakes using `shellcheck <https://www.shellcheck.net>`_.
-     
+       Simple NPM wrappers around the build stages. The wrappers will be written in Bash and tested on both GNU+Linux and macOS.
+
+       These commands are a "one stop shop" for building assets, but more efficiency-oriented users may choose to run build stages individually.
+
    * - + **Build stage 1: Copy npm-installed assets** from node_modules to other folders in edx-platform. They are used by certain especially-old legacy LMS & CMS frontends that are not set up to work with npm directly.
 
      - ``paver update_assets --skip-collect``
 
        Implemented in Python within update_assets. There is no standalone command for it.
 
-     - ``scripts/build-assets.sh npm``
+     - ``npm install``
 
-       Pure Bash reimplementation. See *Rejected Alternatives* for a note about this.
- 
+       An NPM post-install hook will automatically call scripts/copy-node-modules.sh, a pure Bash reimplementation of the node_modules asset copying, whenever ``npm install`` is invoked.
+
    * - + **Build stage 2: Copy XModule fragments** from the xmodule source tree over to input directories for Webpack and SCSS compilation. This is required for a hard-coded list of old XModule-style XBlocks. This is not required for new pure XBlocks, which include (or pip-install) their assets into edx-platform as ready-to-serve JS/CSS/etc fragments.
 
      - ``paver process_xmodule_assets``, or
@@ -150,55 +154,50 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        Equivalent paver task and console script, both pointing at to an application-level Python module. That module inspects attributes from legacy XModule-style XBlock classes in order to determine which static assets to copy and what to name them.
 
-     - ``scripts/build-assets.sh xmodule``
+     - (step no longer needed)
 
-       Initially, this command will just call out to the existing ``xmodule_assets`` command. Eventually, in order to make this step Python-free, we will need do either one or both of the following:
+       We will `remove the need for this step entirely <https://github.com/openedx/edx-platform/issues/31624>`_.
 
-       + `Reimplement this step in Bash <https://github.com/openedx/edx-platform/issues/31611>`_.
-       + `Remove the need for this step entirely <https://github.com/openedx/edx-platform/issues/31624>`_.
-   
    * - + **Build stage 3: Run Webpack** in order to to shim, minify, otherwise process, and bundle JS modules. This requires a call to the npm-installed ``webpack`` binary.
 
      - ``paver webpack``
 
        Python wrapper around a call to webpack. Invokes the ``./manage.py [lms|cms] print_setting`` multiple times in order to determine Django settings, adding which can add 20+ seconds to the build.
 
-     - ``scripts/build-assets.sh webpack --static-root "$(./manage.py lms print_setting STATIC_ROOT)"``.
+     - ``npm run webpack``
 
-       Bash wrapper around a call to webpack. The script will accept parameters rather than looking up Django settings itself.
+       Simple shell script defined in package.json to invoke Webpack in prod or dev mode. The script will look for several environment variables, with a default defined for each one. See **Build Configuration** for details. The script will NOT invoke ``print_setting``; we leave to distributions the tasking of setting environment variables appropriately.
 
-       The print_setting command will still be available for distributions to use to extract ``STATIC_ROOT`` from Django settings, but it will only need to be run once. As described in **Build Configuration** below, unnecessary Django settings will be removed. Some distributions may not even need to look up ``STATIC_ROOT``; Tutor, for example, will probably render ``STATIC_ROOT`` directly into the environment variable ``OPENEDX_BUILD_ASSETS_OPTS`` variable, described in the **Build Configuration**.
-   
+       To continue using ``print_setting``, one could run: ``STATIC_ROOT_LMS="$(./manage.py lms print_setting STATIC_ROOT_LMS)" npm run webpack``
+
    * - + **Build stage 4: Compile default SCSS** into CSS for legacy LMS/CMS frontends.
 
      - ``paver compile_sass``
 
        Paver task that invokes ``sass.compile`` (from the libsass Python package) and ``rtlcss`` (installed by npm) for several different directories of SCSS.
 
-       Note: libsass is pinned to a 2015 version with a non-trivial upgrade path. Installing it requires compiling a large C extension, noticeably affecting Docker image build time.
+       Note: We compile SCSS using ``libsass-python==0.10.0``, a deprecated library from 2015. Installing it requires compiling a large C extension, noticeably affecting Docker image build time. The upgrade path is non-trivial and would require updating many SCSS file in edx-platform.
 
-     - ``scripts/build-assets.sh css``
+     - ``npm run compile-sass``
 
-       Bash reimplementation, calling ``node-sass`` and ``rtlcss``.
-   
-       The initial implementation of build-assets.sh may use ``sassc``, a CLI provided by libsass, instead of node-sass. Then, ``sassc`` can be replaced by ``node-sass`` as part of a subsequent `edx-platform frontend framework upgrade effort <https://github.com/openedx/edx-platform/issues/31616>`_.
+       A functionally equivalent reimplementation, wrapped as an ``npm run`` command in package.json. Due to our SCSS version, the underlying script will be written in Python, although its only Python library requirements will be ``libsass-python`` and ``click``, which will be specified in a new separate edx-platform requirements file. This will be an improvement because the script will not rely on the presence of paver, base Python requirements, or any other edx-platform Python code.
+
+       If and when `we upgrade from libsass-python <https://github.com/openedx/edx-platform/issues/31616>`_ to a more modern tool like ``node-sass`` or ``dart-sass``, this underlying script could opaquely be rewritten in Bash, removing the Python requirement altogether.
 
    * - + **Build stage 5: Compile themes' SCSS** into CSS for legacy LMS/CMS frontends. The default SCSS is used as a base, and theme-provided SCSS files are used as overrides. Themes are searched for from some number of operator-specified theme directories.
 
      - ``./manage.py [lms|cms] compile_sass``, or
 
-       ``paver compile_sass --theme-dirs ...``
+       ``paver compile_sass --theme-dirs X Y --themes A B``
 
        The management command is a wrapper around the paver task. The former looks up the list of theme search directories from Django settings and site configuration; the latter requires them to be supplied as arguments.
 
      - ``./manage.py [lms|cms] compile_sass``, or
 
-       ``scripts/build-assets.sh themes --theme-dirs ...``
+       ``npm run compile-sass -- --theme-dir X --theme-dir Y --theme A --theme B``
 
-       The management command will remain available, but it will need to be updated to point at the Bash script, which will replace the paver task (see build stage 4 for details).
+       The management command will remain available, but it will be updated to point at ``npm run compile-sass``, which will replace the paver task (see build stage 4 for details).
 
-       The overall asset *build* action will use the Bash script; this means that list of theme directories will need to be provided as arguments, but it ensures that the build can remain Python-free.
-   
    * - **Collect** the built static assets from edx-platform to another location (the ``STATIC_ROOT``) so that they can be efficiently served *without* Django's webserver. This step, by nature, requires Python and Django in order to find and organize the assets, which may come from edx-platform itself or from its many installed Python and NPM packages. This is only needed for **production** environments, where it is usually desirable to serve assets with something efficient like NGINX.
 
      - ``paver update_assets``
@@ -210,68 +209,64 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
      - ``./manage.py lms collectstatic --noinput && ./manage.py cms collectstatic --noinput``
 
        The standard Django interface will be used without a wrapper. The ignore patterns will be added to edx-platform's `staticfiles app configuration <https://docs.djangoproject.com/en/4.1/ref/contrib/staticfiles/#customizing-the-ignored-pattern-list>`_ so that they do not need to be supplied as part of the command.
-   
+
    * - **Watch** static assets for changes in the background. When a change occurs, rebuild them automatically, so that the Django webserver picks up the changes. This is only necessary in **development** environments. A few different sets of assets may be watched: XModule fragments, Webpack assets, default SCSS, and theme SCSS.
 
      - ``paver watch_assets``
 
        Paver task that invokes ``webpack --watch`` for Webpack assets and watchdog (a Python library) for other assets.
 
-     - ``scripts/build-assets.sh --watch <stage>``
+     - ``npm run watch``
 
-       (where ``<stage>`` is optionally one of the build stages described above. If provided, only that stage's assets will be watched.)
+       Bash wrappers around invocations of the `watchdog library <https://pypi.org/project/watchdog/>`_ for themable/themed assets, and `webpack --watch <https://webpack.js.org/configuration/watch/>`_ for Webpack-managed assets. Both of these tools are available via dependencies that are already installed into edx-platform.
 
-       Bash wrappers around invocation(s) of `watchman <https://facebook.github.io/watchman/>`_, a popular file-watching library maintained by Meta. Watchman is already installed into edx-platform (and other services) via the pywatchman pip wrapper package.
+       We considered using `watchman <https://facebook.github.io/watchman/>`_, a popular file-watching library maintained by Meta, but found that the Python release of the library is poorly maintained (latest release 2017) and the documentation is difficult to follow. `Django uses pywatchman but is planning to migrate off of it <https://code.djangoproject.com/ticket/34479>`_ and onto `watchfiles <https://pypi.org/project/watchfiles/>`_. We considered watchfiles, but decided against adding another developer dependency to edx-platform. Future developers could consider migrating to watchfiles if it seemed worthwile.
 
-       Note: This adds a Python dependency to build-assets.sh. However, we could be clear that watchman is an *optional* dependency of build-assets.sh which enables the optional ``--watch`` feature. This would keep the *build* action Python-free. Alternatively, watchman is also available Python-free via apt and homebrew.
 
 Build Configuration
 -------------------
 
-``scripts/build-assets.sh`` will accept various command-line options to configure the build. It will also accept the same options in the form of the ``OPENEDX_BUILD_ASSETS_OPTS`` enviroment variable. Options from the environment variable will be processed first, and then overridden by options provided on the command line. The environment variable allows distributions like Tutor to seed the build script with "defaults" in the event that the upstream defaults are not sufficient, while still allowing individual operators to run the script with whichever options they like.
+To facilitate a generally Python-free build reimplementation, we will require that certain Django settings now be specified as environment variables, which can be passed to the build like so::
 
-As a concrete example, the default value of ``--theme-dirs`` will be ``''`` (that is: no themes) and the default value of ``--static-root`` will be ``./test_root/static``. Neither of those are suitable for Tutor. Instead, Tutor will set the environment variable in its Dockerfile::
+  MY_ENV_VAR="my value" npm run build    # Set for the whole build.
+  MY_ENV_VAR="my value" npm run webpack  # Set for just a single step, like webpack.
 
-  ...
-  ENV OPENEDX_BUILD_ASSETS_OPTS '--theme-dirs /openedx/themes --static-root /openedx/staticfiles'
-  ...
+For Docker-based distributions like Tutor, these environment variables can instead be set in the Dockerfile.
 
-Later, in the container, a user might run::
-
-  # This would search for themes in /openedx/themes
-  # and use /openedx/staticfiles as the static root:
-  scripts/build-assets.sh
-
-  # This would search for themes in ./mythemes
-  # but use /openedx/staticfiles as the static root:
-  scripts/build-assets.sh --theme-dirs ./mythemes
-
-Furthermore, to facilitate a Python-free build reimplementation, we will remove two Django settings related to assets. These settings have never worked in Tutor, and 2U states that edx.org does not use them. However, on the off chance that some community operators rely on them, there exist alternative configuration methods for each, which will work both with and without Tutor:
+Some of these options will remain as Django settings because they are used in edx-platform application code. Others will be removed, as they were only read by the asset build.
 
 .. list-table::
    :header-rows: 1
 
-   * - Setting
+   * - Django Setting (Before)
      - Description
-     - New configuration method
+     - Django Setting (After)
+     - Environment Variable (After)
 
-   * - WEBPACK_CONFIG_PATH
+   * - ``WEBPACK_CONFIG_PATH``
+     - Path to Webpack config file. Defaults to ``webpack.prod.config.js``.
+     - *removed*
+     - ``WEBPACK_CONFIG_PATH``
 
-     - Path to Webpack config file. Defaults to ``webpack.[dev|prod].config.js``.
+   * - ``STATIC_ROOT`` (LMS)
+     - Path to which LMS's static assets will be collected. Defaults to ``test_root/staticfiles``.
+     - ``STATIC_ROOT`` (LMS)
+     - ``STATIC_ROOT_LMS``
 
-     - Set an environment variable before calling build-assets.sh::
+   * - ``STATIC_ROOT`` (CMS)
+     - Path to which CMS's static assets will be collected. Defaults to ``$STATIC_ROOT_CMS/studio``.
+     - ``STATIC_ROOT`` (CMS)
+     - ``STATIC_ROOT_CMS``
 
-         OPENEDX_BUILD_ASSETS_OPTS=\
-         '--webpack-config path/to/webpack.my.config.js'
+   * - ``JS_ENV_EXTRA_CONFIG``
+     - Global configuration object available to edx-platform JS modules. Specified as a JSON string. Defaults to the empty object (``"{}"``). Only known use as of writing is to add configuration and plugins for the TinyMCE editor.
+     - *removed*
+     - ``JS_ENV_EXTRA_CONFIG``
 
-   * - JS_ENV_EXTRA_CONFIG
-
-     - Global configuration object available to edx-platform JS modules. Defaults empty. Only known use is to add configuration and plugins for the TinyMCE editor.
-
-     - Set an environment variable before calling build-assets.sh::
-
-         JS_ENV_EXTRA_CONFIG=\
-         '{"MYKEY": "myvalue", "MYKEY2", ["myvalue2"]}'``
+   * - ``COMPREHENSIVE_THEME_DIRS``
+     - Directories that will be searched when compiling themes.
+     - ``COMPREHENSIVE_THEME_DIRS``
+     - ``EDX_PLATFORM_THEME_DIRS``
 
 Migration
 =========
@@ -298,19 +293,21 @@ Either way, the migration path is straightforward:
    * - Existing Tutor-provided command
      - New upstream command
    * - ``openedx-assets build``
-     - ``scripts/build-assets.sh``
+     - ``npm run build``
    * - ``openedx-assets npm``
-     - ``scripts/build-assets.sh npm``
+     - ``scripts/copy-node-modules.sh  # (automatically invoked by 'npm install'!)``
    * - ``openedx-assets xmodule``
-     - ``scripts/build-assets.sh xmodule``
+     - (no longer needed)
    * - ``openedx-assets common``
-     - ``scripts/build-assets.sh css``
+     - ``npm run compile-sass -- --skip-themes``
    * - ``openedx-assets themes``
-     - ``scripts/build-assets.sh themes``
+     - ``npm run compile-sass -- --skip-default``
+   * - ``openedx-assets webpack``
+     - ``npm run webpack``
    * - ``openedx-assets collect``
      - ``./manage.py [lms|cms] collectstatic --noinput``
    * - ``openedx-assets watch-themes``
-     - ``scripts/build-assets.sh --watch themes``
+     - ``npm run watch``
 
 The options accepted by ``openedx-assets`` will all be valid inputs to ``scripts/build-assets.sh``.
 
@@ -328,27 +325,15 @@ OpenCraft has also performed a discovery on a `modernized system for static asse
 Rejected Alternatives
 *********************
 
-Copy node_modules via npm post-install
-======================================
-
-It was noted that `npm supports lifecycle scripts <https://docs.npmjs.com/cli/v6/using-npm/scripts#pre--post-scripts>`_ in package.json, including ``postinstall``. We could use a post-install script to copy assets out of node_modules; this would occurr automatically after ``npm install``. Arguably, this would be more idiomatic than this ADR's proposal of ``scripts/build-assets.sh npm``.
-
-For now, we decided against this. While it seems like a good potential future improvement, we are currently unsure how it would interact with `moving node_modules out of edx-platform in Tutor <https://github.com/openedx/wg-developer-experience/issues/150>`_, which is a motivation behind this ADR. For example, if node_modules could be located anywhere on the image, then we are not sure how the post-install script could know its target directory without us hard-coding Tutor's directory structure into the script.
-
 Live with the problem
 ======================
 
 We could avoid committing any work to edx-platform asset tooling, and instead just wait until all frontends have been replatformed into MFEs. See the *Context* section above for why this was rejected.
 
 Improve existing system
-=======================
+==========================
 
-Rather than replace it, we could try to improve the existing Paver-based asset processing system. However, the effort required to do this seemed comparable to the effort required to perform a full rewrite, and it would not yield any caching benefits of a Python-free asset pipeline.
-
-Rewrite asset processing in Python
-==================================
-
-Some of the benefits of dropping Paver could still be achieved even if we re-wrote the asset processing system using, for example, Python and Click. However, entirely dropping Python from the asset build in favor of Bash has promising benefits:
+Rather than replace it, we could try to improve the existing Paver-based asset processing system. However, entirely dropping Paver and mostly dropping Python has promising benefits:
 
 Asset build independence
 ------------------------
@@ -362,10 +347,8 @@ The asset pipeline only needs to perform a handful of simple tasks, primarily co
 
 However, Python (like any modern application language) encourages developers to modularize, build abstractions, use clever control flow, and employ indirection. This is particularly noticeable with the Paver assets build, which is a thousand lines long and difficult to understand.
 
-Ease of transition to standard tools
-------------------------------------
+Better interop with standard tools
+----------------------------------
 
-Ideally, the entire asset build would stem from a call to ``npm build`` rather than a call to a bespoke script (whether Paver or Bash). Generally speaking, the more edx-platform can work with standard frontend tooling, the easier it'll be for folks to use, understand, and maintain it.
-
-When bespoke asset building logic is implemented in Bash, it is easier to integrate or replace that logic with a standard tool. Standard JS tools often can run hooks written in JS or Shell. On the other hand, frontend tools typically do not integrate with Python scripts.
+It is best if the build can stem from a single call to ``npm install && npm run build`` rather than a call to a bespoke script (whether Paver or Bash). Generally speaking, the more edx-platform can work with standard frontend tooling, the easier it'll be for folks to use, understand, and maintain it.
 

@@ -59,7 +59,7 @@ class LibraryContentTest(MixedSplitTestCase):
         Bind a block (part of self.course) so we can access student-specific data.
         """
         prepare_block_runtime(block.runtime, course_id=block.location.course_key)
-        block.runtime._runtime_services.update({'library_tools': self.tools})  # lint-amnesty, pylint: disable=protected-access
+        block.runtime._services.update({'library_tools': self.tools})  # lint-amnesty, pylint: disable=protected-access
 
         def get_block(descriptor):
             """Mocks module_system get_block function"""

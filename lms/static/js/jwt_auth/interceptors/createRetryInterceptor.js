@@ -57,6 +57,7 @@ const createRetryInterceptor = (options = {}) => {
             try {
                 const backoffDelay = getBackoffMilliseconds(nthRetry);
                 // Delay (wrapped in a promise so we can await the setTimeout)
+                // eslint-disable-next-line no-promise-executor-return
                 await new Promise(resolve => setTimeout(resolve, backoffDelay));
                 // Make retry request
                 retryResponse = await httpClient.request(config);

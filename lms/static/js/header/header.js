@@ -118,6 +118,7 @@ $('.mobile-menu, .global-header').on('keydown', function(e) {
 
     // Enable arrow functionality within the menu.
     if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && (isDropdownOption || isMobileOption
+        // eslint-disable-next-line no-mixed-operators
         || (isHamburgerMenu && $hamburgerMenu.hasClass('open')) || isToggle && $toggleUserDropdown.hasClass('open'))) {
         isNext = e.key === 'ArrowDown';
         if (isNext && !isHamburgerMenu && !isToggle && isLastItem) {

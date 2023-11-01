@@ -6,10 +6,12 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
     'common/js/components/utils/view_utils', 'js/views/container', 'js/views/xblock',
     'js/views/components/add_xblock', 'js/views/modals/edit_xblock', 'js/views/modals/move_xblock_modal',
     'js/models/xblock_info', 'js/views/xblock_string_field_editor', 'js/views/xblock_access_editor',
-    'js/views/pages/container_subviews', 'js/views/unit_outline', 'js/views/utils/xblock_utils'],
+    'js/views/pages/container_subviews', 'js/views/unit_outline', 'js/views/utils/xblock_utils',
+    'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
+],
 function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView, AddXBlockComponent,
     EditXBlockModal, MoveXBlockModal, XBlockInfo, XBlockStringFieldEditor, XBlockAccessEditor,
-    ContainerSubviews, UnitOutlineView, XBlockUtils) {
+    ContainerSubviews, UnitOutlineView, XBlockUtils, NotificationView, PromptView) {
     'use strict';
 
     var XBlockContainerPage = BasePage.extend({
@@ -46,6 +48,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             BasePage.prototype.initialize.call(this, options);
             this.viewClass = options.viewClass || this.defaultViewClass;
             this.isLibraryPage = (this.model.attributes.category === 'library');
+            this.isLibraryContentPage = (this.model.attributes.category === 'library_content');
             this.nameEditor = new XBlockStringFieldEditor({
                 el: this.$('.wrapper-xblock-field'),
                 model: this.model
@@ -152,7 +155,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     self.delegateEvents();
 
                     // Show/hide the paste button
-                    if (!self.isLibraryPage) {
+                    if (!self.isLibraryPage && !self.isLibraryContentPage) {
                         self.initializePasteButton();
                     }
                 },
@@ -206,32 +209,36 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
          * Given the latest information about the user's clipboard, hide or show the Paste button as appropriate.
          */
         refreshPasteButton(data) {
-            // 'data' is the same data returned by the "get clipboard status" API endpoint
-            // i.e. /api/content-staging/v1/clipboard/
-            if (this.options.canEdit && data.content) {
-                if (["vertical", "sequential", "chapter", "course"].includes(data.content.block_type)) {
-                    // This is not suitable for pasting into a unit.
-                    this.$(".paste-component").hide();
-                } else if (data.content.status === "expired") {
-                    // This has expired and can no longer be pasted.
-                    this.$(".paste-component").hide();
-                } else {
-                    // The thing in the clipboard can be pasted into this unit:
-                    const detailsPopupEl = this.$(".clipboard-details-popup")[0];
-                    detailsPopupEl.querySelector(".detail-block-name").innerText = data.content.display_name;
-                    detailsPopupEl.querySelector(".detail-block-type").innerText = data.content.block_type_display;
-                    detailsPopupEl.querySelector(".detail-course-name").innerText = data.source_context_title;
-                    if (data.source_edit_url) {
-                        detailsPopupEl.setAttribute("href", data.source_edit_url);
-                        detailsPopupEl.classList.remove("no-edit-link");
+            // Do not perform any changes on paste button since they are not
+            // rendered on Library or LibraryContent pages
+            if (!this.isLibraryPage && !this.isLibraryContentPage) {
+                // 'data' is the same data returned by the "get clipboard status" API endpoint
+                // i.e. /api/content-staging/v1/clipboard/
+                if (this.options.canEdit && data.content) {
+                    if (["vertical", "sequential", "chapter", "course"].includes(data.content.block_type)) {
+                        // This is not suitable for pasting into a unit.
+                        this.$(".paste-component").hide();
+                    } else if (data.content.status === "expired") {
+                        // This has expired and can no longer be pasted.
+                        this.$(".paste-component").hide();
                     } else {
-                        detailsPopupEl.setAttribute("href", "#");
-                        detailsPopupEl.classList.add("no-edit-link");
+                        // The thing in the clipboard can be pasted into this unit:
+                        const detailsPopupEl = this.$(".clipboard-details-popup")[0];
+                        detailsPopupEl.querySelector(".detail-block-name").innerText = data.content.display_name;
+                        detailsPopupEl.querySelector(".detail-block-type").innerText = data.content.block_type_display;
+                        detailsPopupEl.querySelector(".detail-course-name").innerText = data.source_context_title;
+                        if (data.source_edit_url) {
+                            detailsPopupEl.setAttribute("href", data.source_edit_url);
+                            detailsPopupEl.classList.remove("no-edit-link");
+                        } else {
+                            detailsPopupEl.setAttribute("href", "#");
+                            detailsPopupEl.classList.add("no-edit-link");
+                        }
+                        this.$(".paste-component").show();
                     }
-                    this.$(".paste-component").show();
+                } else {
+                    this.$(".paste-component").hide();
                 }
-            } else {
-                this.$(".paste-component").hide();
             }
         },
 
@@ -255,10 +262,76 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     staged_content: "clipboard",
                 }).then((data) => {
                     this.onNewXBlock(placeholderElement, scrollOffset, false, data);
+                    return data;
                 }).fail(() => {
                     // Remove the placeholder if the paste failed
                     placeholderElement.remove();
                 });
+            }).done((data) => {
+                const {
+                    conflicting_files: conflictingFiles,
+                    error_files: errorFiles,
+                    new_files: newFiles,
+                } = data.static_file_notices;
+
+                const notices = [];
+                if (errorFiles.length) {
+                    notices.push((next) => new PromptView.Error({
+                        title: gettext("Some errors occurred"),
+                        message: (
+                            gettext("The following required files could not be added to the course:") +
+                            " " + errorFiles.join(", ")
+                        ),
+                        actions: {primary: {text: gettext("OK"), click: (x) => { x.hide(); next(); }}},
+                    }));
+                }
+                if (conflictingFiles.length) {
+                    notices.push((next) => new PromptView.Warning({
+                        title: gettext("You may need to update a file(s) manually"),
+                        message: (
+                            gettext(
+                                "The following files already exist in this course but don't match the " +
+                                "version used by the component you pasted:"
+                            ) + " " + conflictingFiles.join(", ")
+                        ),
+                        actions: {primary: {text: gettext("OK"), click: (x) => { x.hide(); next(); }}},
+                    }));
+                }
+                if (newFiles.length) {
+                    notices.push(() => new NotificationView.Info({
+                        title: gettext("New file(s) added to Files & Uploads."),
+                        message: (
+                            gettext("The following required files were imported to this course:") +
+                            " "  + newFiles.join(", ")
+                        ),
+                        actions: {
+                            primary: {
+                                text: gettext('View files'),
+                                click: function(notification) {
+                                    const section = document.querySelector('[data-course-assets]');
+                                    const assetsUrl = $(section).attr('data-course-assets');
+                                    window.location.href = assetsUrl;
+                                    return;
+                                }
+                            },
+                            secondary: {
+                                text: gettext('Dismiss'),
+                                click: function(notification) {
+                                    return notification.hide();
+                                }
+                            }
+                        }
+                    }));
+                }
+                if (notices.length) {
+                    // Show the notices, one at a time:
+                    const showNext = () => {
+                        const view = notices.shift()(showNext);
+                        view.show();
+                    }
+                    // Delay to avoid conflict with the "Pasting..." notification.
+                    setTimeout(showNext, 1250);
+                }
             });
         },
 
@@ -304,6 +377,15 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
         showXBlockActionsMenu: function(event) {
             const showActionsButton = event.currentTarget;
             const subMenu = showActionsButton.parentElement.querySelector('.wrapper-nav-sub');
+
+            // Close all open dropdowns
+            const elements = document.querySelectorAll("li.action-item.action-actions-menu.nav-item");
+            elements.forEach(element => {
+                if (element !== showActionsButton.parentElement) {
+                    element.querySelector('.wrapper-nav-sub').classList.remove('is-shown');
+                }
+            });
+
             // Code in 'base.js' normally handles toggling these dropdowns but since this one is
             // not present yet during the domReady event, we have to handle displaying it ourselves.
             subMenu.classList.toggle('is-shown');

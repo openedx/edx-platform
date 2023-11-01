@@ -283,15 +283,17 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
     # Define a simple mapping to relate SAPSF values to Open edX-compatible values for
     # any given field. By default, this only contains the Country field, as SAPSF supplies
     # a country name, which has to be translated to a country code.
-    default_value_mapping = {
-        'country': {name: code for code, name in countries}
-    }
+    country_mapping = {name: code for code, name in countries}
 
     # Unfortunately, not everything has a 1:1 name mapping between Open edX and SAPSF, so
     # we need some overrides. TODO: Fill in necessary mappings
-    default_value_mapping.update({
+    country_mapping.update({
         'United States': 'US',
     })
+
+    default_value_mapping = {
+        'country': country_mapping
+    }
 
     def get_registration_fields(self, response):
         """

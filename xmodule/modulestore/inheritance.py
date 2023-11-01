@@ -3,11 +3,13 @@ Support for inheritance of fields down an XBlock hierarchy.
 """
 
 
+import warnings
 from django.utils import timezone
 from xblock.core import XBlockMixin
 from xblock.fields import Boolean, Dict, Float, Integer, List, Scope, String
 from xblock.runtime import KeyValueStore, KvsFieldData
 
+from xmodule.error_block import ErrorBlock
 from xmodule.fields import Date, Timedelta
 from xmodule.partitions.partitions import UserPartition
 
@@ -280,7 +282,10 @@ def compute_inherited_metadata(block):
     NOTE: This means that there is no such thing as lazy loading at the
     moment--this accesses all the children."""
     if block.has_children:
-        parent_metadata = block.xblock_kvs.inherited_settings.copy()
+        if isinstance(block.xblock_kvs, InheritanceKeyValueStore):
+            parent_metadata = block.xblock_kvs.inherited_settings.copy()
+        else:
+            parent_metadata = {}
         # add any of block's explicitly set fields to the inheriting list
         for field in InheritanceMixin.fields.values():  # lint-amnesty, pylint: disable=no-member
             if field.is_set_on(block):
@@ -301,10 +306,23 @@ def inherit_metadata(block, inherited_data):
     `inherited_data`: A dictionary mapping field names to the values that
         they should inherit
     """
-    try:
+    if isinstance(block, ErrorBlock):
+        return
+
+    block_type = block.scope_ids.block_type
+    if isinstance(block.xblock_kvs, InheritanceKeyValueStore):
+        # This XBlock's field_data is backed by InheritanceKeyValueStore, which supports pre-computed inherited fields
         block.xblock_kvs.inherited_settings = inherited_data
-    except AttributeError:  # the kvs doesn't have inherited_settings probably b/c it's an error block
-        pass
+    else:
+        # We cannot apply pre-computed field data to this XBlock during import, but inheritance should still work
+        # normally when it's used in Studio/LMS, which use a different runtime.
+        # Though if someone ever needs a hacky temporary fix here, it's possible here to force it with:
+        #     init_dict = {key: getattr(block, key) for key in block.fields.keys()}
+        #     block._field_data = InheritanceKeyValueStore(init_dict)
+        warnings.warn(
+            f'Cannot inherit metadata to {block_type} block with KVS {block.xblock_kvs}',
+            stacklevel=2,
+        )
 
 
 def own_metadata(block):
@@ -316,7 +334,17 @@ def own_metadata(block):
 
 
 class InheritingFieldData(KvsFieldData):
-    """A `FieldData` implementation that can inherit value from parents to children."""
+    """
+    A `FieldData` implementation that can inherit value from parents to children.
+
+    This wraps a KeyValueStore, and will work fine with any KVS implementation.
+    Sometimes this wraps a subclass of InheritanceKeyValueStore, but that's not
+    a requirement.
+
+    This class is the way that inheritance "normally" works in modulestore.
+    During XML import/export, however, a different mechanism is used:
+    InheritanceKeyValueStore.
+    """
 
     def __init__(self, inheritable_names, **kwargs):
         """
@@ -379,6 +407,15 @@ class InheritanceKeyValueStore(KeyValueStore):
     dict-based storage of fields and lookup of inherited values.
 
     Note: inherited_settings is a dict of key to json values (internal xblock field repr)
+
+    Using this KVS is an alternative to using InheritingFieldData(). That one works with any KVS, like
+    DictKeyValueStore, and doesn't require any special behavior. On the other hand, this InheritanceKeyValueStore only
+    does inheritance properly if you first use compute_inherited_metadata() to walk the tree of XBlocks and pre-compute
+    the inherited metadata for the whole tree, storing it in the inherited_settings field of each instance of this KVS.
+
+    🟥 Warning: Unlike the base class, this KVS makes the assumption that you're using a completely separate KVS
+       instance for every XBlock, so that we only have to look at the "field_name" part of the key. You cannot use this
+       as a drop-in replacement for DictKeyValueStore for this reason.
     """
     def __init__(self, initial_values=None, inherited_settings=None):
         super().__init__()

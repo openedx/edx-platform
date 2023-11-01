@@ -9,7 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from common.djangoapps.student.models import User
+from common.djangoapps.student.models import User, UserProfile
 from openedx.core.djangoapps.user_api import errors
 
 LOGGER = logging.getLogger(__name__)
@@ -66,10 +66,12 @@ class Command(BaseCommand):
         Helper method to return the user profile object based on username.
         """
         try:
-            user = User.objects.filter(username=username).select_related('profile').first()
+            existing_user = User.objects.get(username=username)
         except ObjectDoesNotExist:
             raise errors.UserNotFound()  # lint-amnesty, pylint: disable=raise-missing-from
-        return user.profile
+
+        existing_user_profile, _ = UserProfile.objects.get_or_create(user=existing_user)
+        return existing_user_profile
 
     def _update_current_job_of_learner(self, username, current_job):
         """

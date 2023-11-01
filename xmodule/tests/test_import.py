@@ -276,12 +276,6 @@ class ImportTestCase(BaseCourseTestCase):  # lint-amnesty, pylint: disable=missi
         )
         block = system.process_xml(start_xml)
 
-        # pylint: disable=protected-access
-        original_unwrapped = block._unwrapped_field_data
-        LibraryXMLModuleStore.patch_block_kvs(block)
-        # '_unwrapped_field_data' is reset in `patch_block_kvs`
-        # pylint: disable=protected-access
-        assert original_unwrapped is not block._unwrapped_field_data
         compute_inherited_metadata(block)
         # Check the course block, since it has inheritance
         block = block.get_children()[0]
@@ -322,7 +316,6 @@ class ImportTestCase(BaseCourseTestCase):  # lint-amnesty, pylint: disable=missi
             </course>
         </library>'''.format(org=ORG, course=COURSE, url_name=url_name)
         block = system.process_xml(start_xml)
-        LibraryXMLModuleStore.patch_block_kvs(block)
         compute_inherited_metadata(block)
         # Run the checks on the course node instead.
         block = block.get_children()[0]
@@ -390,7 +383,6 @@ class ImportTestCase(BaseCourseTestCase):  # lint-amnesty, pylint: disable=missi
             </course>
         </library>'''.format(due=course_due, org=ORG, course=COURSE, url_name=url_name)
         block = system.process_xml(start_xml)
-        LibraryXMLModuleStore.patch_block_kvs(block)
         # Chapter is two levels down here.
         child = block.get_children()[0].get_children()[0]
         # pylint: disable=protected-access

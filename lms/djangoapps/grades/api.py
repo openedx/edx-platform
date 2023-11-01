@@ -9,7 +9,6 @@ from datetime import datetime
 import pytz
 from django.core.exceptions import ObjectDoesNotExist
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from six import text_type
 
 from common.djangoapps.track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
 # Public Grades Modules

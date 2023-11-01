@@ -9,20 +9,20 @@ class SubscriptionUpsellView extends Backbone.View {
         const defaults = {
             el: '.js-subscription-upsell',
         };
+        // eslint-disable-next-line prefer-object-spread
         super(Object.assign({}, defaults, options));
     }
 
     initialize(options) {
         this.tpl = HtmlUtils.template(subscriptionUpsellTpl);
-        this.data = options.context;
+        this.subscriptionUpsellModel = new Backbone.Model(
+            options.subscriptionUpsellData,
+        );
         this.render();
     }
 
     render() {
-        const data = $.extend(this.context, {
-            minSubscriptionPrice: '$39',
-            trialLength: 7,
-        });
+        const data = this.subscriptionUpsellModel.toJSON();
         HtmlUtils.setHtml(this.$el, this.tpl(data));
     }
 }

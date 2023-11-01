@@ -35,6 +35,7 @@
 
                 it('When Initialize without required parameters, log message is shown',
                     function() {
+                        // eslint-disable-next-line no-new
                         new Resizer({ });
                         expect(console.log).toHaveBeenCalled();
                     }

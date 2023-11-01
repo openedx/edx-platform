@@ -82,6 +82,7 @@ function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUt
                 var stringValue = $.trim(mirror.getValue());
                 // update CodeMirror to show the trimmed value.
                 mirror.setValue(stringValue);
+                // eslint-disable-next-line no-undef-init
                 var JSONValue = undefined;
                 try {
                     JSONValue = JSON.parse(stringValue);

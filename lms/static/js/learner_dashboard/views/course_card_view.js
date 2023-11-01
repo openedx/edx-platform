@@ -18,6 +18,7 @@ class CourseCardView extends Backbone.View {
         const defaults = {
             className: 'program-course-card',
         };
+        // eslint-disable-next-line prefer-object-spread
         super(Object.assign({}, defaults, options));
     }
 
@@ -40,6 +41,7 @@ class CourseCardView extends Backbone.View {
     }
 
     render() {
+        // eslint-disable-next-line no-undef
         const data = $.extend(this.model.toJSON(), {
             enrolled: this.context.enrolled || '',
         });

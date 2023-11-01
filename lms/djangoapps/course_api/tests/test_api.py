@@ -107,7 +107,8 @@ class CourseListTestMixin(CourseApiTestMixin):
                        specified_user,
                        org=None,
                        filter_=None,
-                       permissions=None):
+                       permissions=None,
+                       course_keys=None):
         """
         Call the list_courses api endpoint to get information about
         `specified_user` on behalf of `requesting_user`.
@@ -121,6 +122,7 @@ class CourseListTestMixin(CourseApiTestMixin):
                 org=org,
                 filter_=filter_,
                 permissions=permissions,
+                course_keys=course_keys,
             )
 
     def verify_courses(self, courses):
@@ -243,6 +245,39 @@ class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase)
             permissions={'instructor'})
 
         self.assertEqual({c.id for c in filtered_courses}, {self.course.id})
+
+    def test_filter_by_keys(self):
+        """
+        Verify that courses are filtered by the provided course keys.
+        """
+
+        # Create alternative courses to be included in the `course_keys` filter.
+        alternative_course_1 = self.create_course(course='alternative-course-1')
+        alternative_course_2 = self.create_course(course='alternative-course-2')
+
+        # No filtering.
+        unfiltered_expected_courses = [
+            self.course,
+            alternative_course_1,
+            alternative_course_2,
+        ]
+        unfiltered_courses = self._make_api_call(self.honor_user, self.honor_user)
+        assert {course.id for course in unfiltered_courses} == {course.id for course in unfiltered_expected_courses}
+
+        # With filtering.
+        filtered_expected_courses = [
+            alternative_course_1,
+            alternative_course_2,
+        ]
+        filtered_courses = self._make_api_call(
+            self.honor_user,
+            self.honor_user,
+            course_keys={
+                alternative_course_1.id,
+                alternative_course_2.id
+            }
+        )
+        assert {course.id for course in filtered_courses} == {course.id for course in filtered_expected_courses}
 
 
 class TestGetCourseListExtras(CourseListTestMixin, ModuleStoreTestCase):

@@ -71,7 +71,8 @@ from lms.djangoapps.discussion.rest_api.tests.utils import (
 )
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
-from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider, \
+    PostingRestriction
 from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course_task
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
@@ -151,6 +152,9 @@ def _set_course_discussion_blackout(course, user_id):
         datetime.now(UTC) - timedelta(days=3),
         datetime.now(UTC) + timedelta(days=3)
     ]
+    configuration = DiscussionsConfiguration.get(course.id)
+    configuration.posting_restrictions = PostingRestriction.SCHEDULED
+    configuration.save()
     modulestore().update_item(course, user_id)
 
 
@@ -2152,6 +2156,7 @@ class CreateThreadTest(
 @disable_signal(api, 'comment_created')
 @disable_signal(api, 'comment_voted')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+@mock.patch("lms.djangoapps.discussion.signals.handlers.send_response_notifications", new=mock.Mock())
 class CreateCommentTest(
         ForumsEnableMixin,
         CommentsServiceMockMixin,
@@ -2189,6 +2194,17 @@ class CreateCommentTest(
             "thread_id": "test_thread",
             "raw_body": "Test body",
         }
+
+        mock_response = {
+            'collection': [],
+            'page': 1,
+            'num_pages': 1,
+            'subscriptions_count': 1,
+            'corrected_text': None
+
+        }
+        self.register_get_subscriptions('cohort_thread', mock_response)
+        self.register_get_subscriptions('test_thread', mock_response)
 
     @ddt.data(None, "test_parent")
     @mock.patch("eventtracking.tracker.emit")
@@ -2243,13 +2259,16 @@ class CreateCommentTest(
             "/api/v1/threads/test_thread/comments"
         )
         assert urlparse(httpretty.last_request().path).path == expected_url  # lint-amnesty, pylint: disable=no-member
-        assert parsed_body(httpretty.last_request()) == {
+
+        data = httpretty.latest_requests()
+        assert parsed_body(data[len(data) - 2]) == {
             'course_id': [str(self.course.id)],
             'body': ['Test body'],
             'user_id': [str(self.user.id)],
             'anonymous': ['False'],
             'anonymous_to_peers': ['False'],
         }
+
         expected_event_name = (
             "edx.forum.comment.created" if parent_id else
             "edx.forum.response.created"
@@ -2340,7 +2359,8 @@ class CreateCommentTest(
             "/api/v1/threads/test_thread/comments"
         )
         assert urlparse(httpretty.last_request().path).path == expected_url  # pylint: disable=no-member
-        assert parsed_body(httpretty.last_request()) == {
+        data = httpretty.latest_requests()
+        assert parsed_body(data[len(data) - 2]) == {
             "course_id": [str(self.course.id)],
             "body": ["Test body"],
             "user_id": [str(self.user.id)],
@@ -2689,7 +2709,8 @@ class UpdateThreadTest(
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
-    def test_following(self, old_following, new_following):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_following(self, old_following, new_following, mock_emit):
         """
         Test attempts to edit the "following" field.
 
@@ -2719,6 +2740,13 @@ class UpdateThreadTest(
             )
             request_data.pop("request_id", None)
             assert request_data == {'source_type': ['thread'], 'source_id': ['test_thread']}
+            event_name, event_data = mock_emit.call_args[0]
+            expected_event_action = 'followed' if new_following else 'unfollowed'
+            assert event_name == f'edx.forum.thread.{expected_event_action}'
+            assert event_data['commentable_id'] == 'original_topic'
+            assert event_data['id'] == 'test_thread'
+            assert event_data['followed'] == new_following
+            assert event_data['user_forums_roles'] == ['Student']
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack

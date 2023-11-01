@@ -102,6 +102,7 @@
                 if (!this.model.can('can_delete')) {
                     return;
                 }
+                // eslint-disable-next-line no-alert
                 if (!confirm(gettext('Are you sure you want to delete this comment?'))) {
                     return;
                 }

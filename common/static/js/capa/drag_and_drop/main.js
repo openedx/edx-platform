@@ -14,6 +14,7 @@
                 // Array.prototype.every is a recent addition to the ECMA-262 standard; as such it may not be present in
                 // other implementations of the standard.
                 if (!Array.prototype.every) {
+                    // eslint-disable-next-line no-extend-native
                     Array.prototype.every = function(fun /* , thisp */) {
                         var thisp, t, len, i;
 
@@ -22,6 +23,7 @@
                         }
 
                         t = Object(this);
+                        // eslint-disable-next-line no-bitwise
                         len = t.length >>> 0;
                         if (typeof fun !== 'function') {
                             throw new TypeError();

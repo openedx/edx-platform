@@ -2,9 +2,13 @@
 
 export class CourseSock { // eslint-disable-line import/prefer-default-export
     constructor() {
+        // eslint-disable-next-line no-undef
         const $toggleActionButton = $('.action-toggle-verification-sock');
+        // eslint-disable-next-line no-undef
         const $verificationSock = $('.verification-sock .verification-main-panel');
+        // eslint-disable-next-line no-undef
         const $upgradeToVerifiedButton = $('.verification-sock .action-upgrade-certificate');
+        // eslint-disable-next-line no-undef
         const $miniCert = $('.mini-cert');
         const pageLocation = window.location.href.indexOf('courseware') > -1
             ? 'Course Content Page' : 'Home Page';
@@ -14,6 +18,7 @@ export class CourseSock { // eslint-disable-line import/prefer-default-export
             if (!$upgradeToVerifiedButton.is(':visible')) { return; }
 
             // Grab the current scroll location
+            // eslint-disable-next-line no-undef
             const documentBottom = $(window).scrollTop() + $(window).height();
 
             // Establish a sliding window in which the button is fixed
@@ -25,6 +30,7 @@ export class CourseSock { // eslint-disable-line import/prefer-default-export
 
             // Update positioning when scrolling is in fixed window and screen width is sufficient
             if ((documentBottom > startFixed && documentBottom < endFixed
+          // eslint-disable-next-line no-undef
           && $(window).width() > 960)) {
                 $upgradeToVerifiedButton.addClass('attached');
                 $upgradeToVerifiedButton.css('right', `${distRight}px`);
@@ -46,6 +52,7 @@ export class CourseSock { // eslint-disable-line import/prefer-default-export
 
         // Fix the sock to the screen on scroll and resize events
         if ($upgradeToVerifiedButton.length) {
+            // eslint-disable-next-line no-undef
             $(window).scroll(fixUpgradeButton).resize(fixUpgradeButton);
         }
 

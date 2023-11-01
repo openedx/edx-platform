@@ -22,6 +22,7 @@ var onCertificatesReady = null;
                 confirmMessage = gettext('Prevent students from generating certificates in this course?');
             }
 
+            // eslint-disable-next-line no-alert
             if (!confirm(confirmMessage)) {
                 event.preventDefault();
             }
@@ -40,6 +41,7 @@ var onCertificatesReady = null;
          */
         var $section = $('section#certificates');
         $section.on('click', '#btn-start-generating-certificates', function(event) {
+            // eslint-disable-next-line no-alert
             if (!confirm(gettext('Start generating certificates for all students in this course?'))) {
                 event.preventDefault();
                 return;
@@ -65,6 +67,7 @@ var onCertificatesReady = null;
          * Start regenerating certificates for students.
          */
         $section.on('click', '#btn-start-regenerating-certificates', function(event) {
+            // eslint-disable-next-line no-alert
             if (!confirm(gettext('Start regenerating certificates for students in this course?'))) {
                 event.preventDefault();
                 return;
@@ -104,6 +107,7 @@ var onCertificatesReady = null;
     $(onCertificatesReady);
 
     var Certificates = (function() {
+        // eslint-disable-next-line no-shadow
         function Certificates($section) {
             $section.data('wrapper', this);
             this.instructor_tasks = new window.InstructorDashboard.util.PendingInstructorTasks($section);

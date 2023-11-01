@@ -32,6 +32,7 @@ from lms.djangoapps.courseware.models import LastSeenCoursewareTimezone
 from lms.djangoapps.courseware.tabs import ExternalLinkCourseTab
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.djangoapps.courseware.toggles import (
+    COURSEWARE_LEARNING_ASSISTANT,
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES,
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION,
 )
@@ -428,6 +429,18 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         courseware_data = response.json()
         assert 'can_access_proctored_exams' in courseware_data
         assert courseware_data['can_access_proctored_exams'] == result
+
+    @override_waffle_flag(COURSEWARE_LEARNING_ASSISTANT, active=False)
+    def test_learning_assistant_enabled_disabled_waffle_flag(self):
+        response = self.client.get(self.url)
+        learning_assistant_enabled = response.json()['learning_assistant_enabled']
+        self.assertFalse(learning_assistant_enabled)
+
+    @override_waffle_flag(COURSEWARE_LEARNING_ASSISTANT, active=True)
+    def test_learning_assistant_enabled_enabled_waffle_flag(self):
+        response = self.client.get(self.url)
+        learning_assistant_enabled = response.json()['learning_assistant_enabled']
+        self.assertTrue(learning_assistant_enabled)
 
 
 @ddt.ddt

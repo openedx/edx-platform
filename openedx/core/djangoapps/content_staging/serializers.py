@@ -3,7 +3,7 @@ Serializers for the content libraries REST API
 """
 from rest_framework import serializers
 
-from cms.djangoapps.contentstore.views.helpers import xblock_studio_url, xblock_type_display_name
+from cms.djangoapps.contentstore.helpers import xblock_studio_url, xblock_type_display_name
 from common.djangoapps.student.auth import has_studio_read_access
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError

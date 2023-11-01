@@ -159,7 +159,7 @@ class TestFooter(TestCase):
                  'name': 'reddit', 'icon-class': 'fa-reddit-square', 'title': 'Reddit'}
             ],
             'mobile_links': [],
-            'logo_image': 'https://edx.org/static/images/logo.png',
+            'logo_image': '/static/images/logo.png',
             'openedx_link': {
                 'url': 'https://open.edx.org',
                 'image': 'https://logos.openedx.org/open-edx-logo-tag.png',

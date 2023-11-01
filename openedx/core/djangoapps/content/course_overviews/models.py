@@ -23,6 +23,7 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from simple_history.models import HistoricalRecords
 
+from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.discussion import django_comment_client
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
@@ -64,7 +65,7 @@ class CourseOverview(TimeStampedModel):
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 18
+    VERSION = 19
 
     # Cache entry versioning.
     version = models.IntegerField()
@@ -143,6 +144,9 @@ class CourseOverview(TimeStampedModel):
     entrance_exam_enabled = models.BooleanField(default=False)
     entrance_exam_id = models.CharField(max_length=255, blank=True)
     entrance_exam_minimum_score_pct = models.FloatField(default=0.65)
+
+    # Open Response Assessment configuration
+    force_on_flexible_peer_openassessments = models.BooleanField(default=False)
 
     external_id = models.CharField(max_length=128, null=True, blank=True)
 
@@ -267,6 +271,8 @@ class CourseOverview(TimeStampedModel):
             course_overview.entrance_exam_minimum_score_pct = course.entrance_exam_minimum_score_pct / 100
         else:
             course_overview.entrance_exam_minimum_score_pct = course.entrance_exam_minimum_score_pct
+
+        course_overview.force_on_flexible_peer_openassessments = course.force_on_flexible_peer_openassessments
 
         if not CatalogIntegration.is_enabled():
             course_overview.language = course.language
@@ -657,7 +663,7 @@ class CourseOverview(TimeStampedModel):
         log.info('Finished generating course overviews.')
 
     @classmethod
-    def get_all_courses(cls, orgs=None, filter_=None, active_only=False):
+    def get_all_courses(cls, orgs=None, filter_=None, active_only=False, course_keys=None):
         """
         Return a queryset containing all CourseOverview objects in the database.
 
@@ -666,11 +672,16 @@ class CourseOverview(TimeStampedModel):
                 filtering by organization.
             filter_ (dict): Optional parameter that allows custom filtering.
             active_only (bool): If provided, only the courses that have not ended will be returned.
+            course_keys (list[string]): Optional parameter that allows case-insensitive
+                filter by course ids
         """
         # Note: If a newly created course is not returned in this QueryList,
         # make sure the "publish" signal was emitted when the course was
         # created. For tests using CourseFactory, use emit_signals=True.
         course_overviews = CourseOverview.objects.all()
+
+        if course_keys:
+            course_overviews = course_overviews.filter(id__in=course_keys)
 
         if orgs:
             # In rare cases, courses belonging to the same org may be accidentally assigned
@@ -833,6 +844,23 @@ class CourseOverview(TimeStampedModel):
         Returns the course from the modulestore.
         """
         return modulestore().get_course(self.id)
+
+    def bind_course_for_student(self, request):
+        """
+        Bind user-specific field data to the Course XBlock.
+
+        By default, the retrieved course XBlock is "unbound" - it means that any field from the `user_info` scope
+        (like `edxnotes_visibility`) returns its default value.
+        """
+        # Delay import until here to avoid circular dependency.
+        from lms.djangoapps.courseware.block_render import get_block_for_descriptor
+        get_block_for_descriptor(
+            request.user,
+            request,
+            self._original_course,
+            FieldDataCache([self._original_course], self._original_course.id, request.user),
+            self._original_course.id,
+        )
 
     @property
     def allow_public_wiki_access(self):

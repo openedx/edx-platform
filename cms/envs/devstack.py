@@ -49,6 +49,11 @@ LMS_ROOT_URL = f'http://{LMS_BASE}'
 FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
 FRONTEND_REGISTER_URL = LMS_ROOT_URL + '/register'
+
+################################## Video Pipeline Settings #########################
+
+FEATURES['ENABLE_VIDEO_UPLOAD_PIPELINE'] = True
+
 ########################### PIPELINE #################################
 
 # Skip packaging and optimization in development
@@ -99,7 +104,6 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.request.RequestPanel',
     'debug_toolbar.panels.sql.SQLPanel',
     'debug_toolbar.panels.signals.SignalsPanel',
-    'debug_toolbar.panels.logging.LoggingPanel',
     'debug_toolbar.panels.profiling.ProfilingPanel',
     'debug_toolbar.panels.history.HistoryPanel',
 )
@@ -141,10 +145,18 @@ FEATURES['LICENSING'] = True
 XBLOCK_SETTINGS.update({'VideoBlock': {'licensing_enabled': True}})
 
 ################################ SEARCH INDEX ################################
-FEATURES['ENABLE_COURSEWARE_INDEX'] = False
+FEATURES['ENABLE_COURSEWARE_INDEX'] = True
 FEATURES['ENABLE_LIBRARY_INDEX'] = False
 FEATURES['ENABLE_CONTENT_LIBRARY_INDEX'] = False
 SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
+
+ELASTIC_SEARCH_CONFIG = [
+    {
+        'use_ssl': False,
+        'host': 'edx.devstack.elasticsearch710',
+        'port': 9200
+    }
+]
 
 ################################ COURSE DISCUSSIONS ###########################
 FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
@@ -156,7 +168,10 @@ CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
 FEATURES['CERTIFICATES_HTML_VIEW'] = True
 
 ########################## AUTHOR PERMISSION #######################
-FEATURES['ENABLE_CREATOR_GROUP'] = False
+FEATURES['ENABLE_CREATOR_GROUP'] = True
+
+########################## Library creation organizations restriction #######################
+FEATURES['ENABLE_ORGANIZATION_STAFF_ACCESS_FOR_CONTENT_LIBRARIES'] = True
 
 ################### FRONTEND APPLICATION PUBLISHER URL ###################
 FEATURES['FRONTEND_APP_PUBLISHER_URL'] = 'http://localhost:18400'
@@ -294,12 +309,16 @@ CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 # .. toggle_creation_date: 2023-02-21
 # .. toggle_warning: For consistency in user experience, keep the value in sync with the setting of the same name
 #   in the LMS and CMS.
+#   This will be deprecated in favor of ENABLE_SEND_XBLOCK_LIFECYCLE_EVENTS_OVER_BUS
 # .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/31813'
 FEATURES['ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS'] = True
+FEATURES['ENABLE_SEND_ENROLLMENT_EVENTS_OVER_BUS'] = True
 EVENT_BUS_PRODUCER = 'edx_event_bus_redis.create_producer'
 EVENT_BUS_REDIS_CONNECTION_URL = 'redis://:password@edx.devstack.redis:6379/'
 EVENT_BUS_TOPIC_PREFIX = 'dev'
 EVENT_BUS_CONSUMER = 'edx_event_bus_redis.RedisEventConsumer'
+EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC = 'course-authoring-xblock-lifecycle'
+EVENT_BUS_ENROLLMENT_LIFECYCLE_TOPIC = 'course-authoring-enrollment-lifecycle'
 
 ################# New settings must go ABOVE this line #################
 ########################################################################

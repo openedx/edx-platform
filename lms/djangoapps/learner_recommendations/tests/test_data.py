@@ -48,10 +48,12 @@ mock_course_data = [
 mock_cross_product_data = [
     {
         "title": "Title 0",
+        "courseRunKey": "course-v1:Test+2023_T0",
+        "marketingUrl": "https://www.marketing_url0.com",
+        "courseType": "executive-education",
         "image": {
             "src": "https://www.logo_image_url0.com"
         },
-        "prospectusPath": "course/https://www.marketing_url0.com",
         "owners": [
             {
                 "key": "org-0",
@@ -59,14 +61,15 @@ mock_cross_product_data = [
                 "logoImageUrl": "https://discovery.com/organization/logos/org-0.png"
             }
         ],
-        "courseType": "executive-education"
     },
     {
         "title": "Title 1",
+        "courseRunKey": "course-v1:Test+2023_T1",
+        "marketingUrl": "https://www.marketing_url1.com",
+        "courseType": "executive-education",
         "image": {
             "src": "https://www.logo_image_url1.com"
         },
-        "prospectusPath": "course/https://www.marketing_url1.com",
         "owners": [
             {
                 "key": "org-1",
@@ -74,7 +77,6 @@ mock_cross_product_data = [
                 "logoImageUrl": "https://discovery.com/organization/logos/org-1.png"
             }
         ],
-        "courseType": "executive-education"
     },
 ]
 
@@ -82,10 +84,12 @@ mock_amplitude_data = [
     *mock_cross_product_data,
     {
         "title": "Title 2",
+        "courseRunKey": "course-v1:Test+2023_T2",
+        "marketingUrl": "https://www.marketing_url2.com",
+        "courseType": "executive-education",
         "image": {
             "src": "https://www.logo_image_url2.com"
         },
-        "prospectusPath": "course/https://www.marketing_url2.com",
         "owners": [
             {
                 "key": "org-2",
@@ -93,14 +97,15 @@ mock_amplitude_data = [
                 "logoImageUrl": "https://discovery.com/organization/logos/org-2.png"
             }
         ],
-        "courseType": "executive-education"
     },
     {
         "title": "Title 3",
+        "courseRunKey": "course-v1:Test+2023_T3",
+        "marketingUrl": "https://www.marketing_url3.com",
+        "courseType": "executive-education",
         "image": {
             "src": "https://www.logo_image_url3.com"
         },
-        "prospectusPath": "course/https://www.marketing_url3.com",
         "owners": [
             {
                 "key": "org-3",
@@ -108,7 +113,6 @@ mock_amplitude_data = [
                 "logoImageUrl": "https://discovery.com/organization/logos/org-3.png"
             }
         ],
-        "courseType": "executive-education"
     }
 ]
 
@@ -125,6 +129,11 @@ def get_general_recommendations():
         "course_type": "credit-verified-audit",
         "logo_image_url": "https://discovery.com/organization/logos/org-1.png",
         "marketing_url": "https://www.marketing_url.com",
+        "course_runs": [
+            {
+                "key": "course-v1:MITx+6.00.1x+2T2023",
+            }
+        ],
         "owners": [
             {
                 "key": "MITx",

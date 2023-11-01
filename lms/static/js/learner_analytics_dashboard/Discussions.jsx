@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
 class Discussions extends React.Component {
+    // eslint-disable-next-line no-useless-constructor
     constructor(props) {
         super(props);
     }
@@ -44,6 +45,7 @@ class Discussions extends React.Component {
                         'chart-icon',
                         {'fa fa-graduation-cap': !img}
                     )}
+                    // eslint-disable-next-line no-extra-boolean-cast
                     style={{backgroundImage: !!img ? `url(${img})` : 'none'}}
                     aria-hidden="true"
                 />

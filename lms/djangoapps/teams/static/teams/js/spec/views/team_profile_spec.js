@@ -174,6 +174,7 @@ define([
                     options = {
                         assignments: mockAssignments,
                         membership: DEFAULT_MEMBERSHIP,
+                        // eslint-disable-next-line prefer-object-spread
                         context: Object.assign({}, TeamSpecHelpers.testContext)
                     },
                     requests = AjaxHelpers.requests(this),

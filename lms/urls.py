@@ -164,7 +164,7 @@ urlpatterns = [
                              namespace='catalog')),
 
     # Update session view
-    path('lang_pref/session_language', lang_pref_views.update_session_language, name='session_language'),
+    path('lang_pref/update_language', lang_pref_views.update_language, name='update_language'),
 
     # Multiple course modes and identity verification
     path(
@@ -214,20 +214,17 @@ urlpatterns = [
     ),
     path('api/discounts/', include(('openedx.features.discounts.urls', 'openedx.features.discounts'),
                                    namespace='api_discounts')),
-    path('403', handler403),
-    path('404', handler404),
-    path('429', handler429),
-    path('500', handler500),
+
+    # Provide URLs where we can see the rendered error pages without having to force an error.
+    path('403', handler403, name='render_403'),
+    path('404', handler404, name='render_404'),
+    path('429', handler429, name='render_429'),
+    path('500', handler500, name='render_500'),
 ]
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
     urlpatterns += [
         re_path(r'^api/mobile/(?P<api_version>v(2|1|0.5))/', include('lms.djangoapps.mobile_api.urls')),
-    ]
-
-if settings.FEATURES.get('ENABLE_OPENBADGES'):
-    urlpatterns += [
-        path('api/badges/v1/', include(('lms.djangoapps.badges.api.urls', 'badges'), namespace='badges_api')),
     ]
 
 urlpatterns += [
@@ -752,6 +749,16 @@ urlpatterns += [
 
 urlpatterns += [
     re_path(
+        r'^courses/{}/courseware-search/enabled/$'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        courseware_views.courseware_mfe_search_enabled,
+        name='courseware_search_enabled_view',
+    ),
+]
+
+urlpatterns += [
+    re_path(
         r'^courses/{}/lti_tab/(?P<provider_uuid>[^/]+)/$'.format(
             settings.COURSE_ID_PATTERN,
         ),
@@ -1027,12 +1034,6 @@ if getattr(settings, 'PROVIDER_STATES_URL', None):
             courseware_xblock_handler_provider_state,
             name='courseware_xblock_handler_provider_state',
         )
-    ]
-
-# save_for_later API urls
-if settings.ENABLE_SAVE_FOR_LATER:
-    urlpatterns += [
-        path('', include('lms.djangoapps.save_for_later.urls')),
     ]
 
 # Enhanced Staff Grader (ESG) URLs

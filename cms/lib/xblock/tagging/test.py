@@ -180,11 +180,11 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
         self.assertEqual(option_values2, ['Learned a few things', 'Learned everything', 'Learned nothing'])
 
         # Now ensure the acid_aside is not in the result
-        self.assertNotRegexpMatches(problem_html, r"data-block-type=[\"\']acid_aside[\"\']")  # lint-amnesty, pylint: disable=deprecated-method
+        self.assertNotRegex(problem_html, r"data-block-type=[\"\']acid_aside[\"\']")
 
         # Ensure about video don't have asides
         video_html = get_preview_fragment(request, self.video, context).content
-        self.assertNotRegexpMatches(video_html, "<select")  # lint-amnesty, pylint: disable=deprecated-method
+        self.assertNotRegex(video_html, "<select")
 
     @ddt.data(AsideUsageKeyV1, AsideUsageKeyV2)
     def test_handle_requests(self, aside_key_class):

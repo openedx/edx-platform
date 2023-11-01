@@ -40,7 +40,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
 
         # Create instructor account
         instructor = AdminFactory.create()
-        self.client.login(username=instructor.username, password="test")
+        self.client.login(username=instructor.username, password=self.TEST_PASSWORD)
 
     def tearDown(self):
         super().tearDown()
@@ -148,7 +148,7 @@ class TestNewInstructorDashboardEmailViewXMLBacked(SharedModuleStoreTestCase):
 
         # Create instructor account
         instructor = AdminFactory.create()
-        self.client.login(username=instructor.username, password="test")
+        self.client.login(username=instructor.username, password=self.TEST_PASSWORD)
 
         # URL for instructor dash
         self.url = reverse('instructor_dashboard', kwargs={'course_id': str(self.course_key)})

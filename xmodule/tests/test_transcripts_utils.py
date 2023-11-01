@@ -7,10 +7,11 @@ These tests follow the following nomenclature:
  - among the fields found in a track descriptor is a caption URL (aka caption link)
         - use this link to obtain the track's caption data
 '''
-from ..video_block.transcripts_utils import get_transcript_link_from_youtube
-
 from unittest import mock, TestCase
 
+import ddt
+
+from ..video_block.transcripts_utils import get_transcript_link_from_youtube
 
 YOUTUBE_VIDEO_ID = "z-LoKnweV6w"
 
@@ -102,42 +103,33 @@ class YoutubeVideoHTMLResponse:
             self.content = bytearray(youtube_html, 'UTF-8')
 
 
+@ddt.ddt
 class TranscriptsUtilsTest(TestCase):
     """
     Tests utility fucntions for transcripts (in video_block)
     """
 
     @mock.patch('requests.get')
-    def test_get_transcript_link_from_youtube(self, mock_get):
+    @ddt.data("en", "en-US", "en-GB")
+    def test_get_transcript_link_from_youtube(self, language_code, mock_get):
         """
         Happy path test: english caption link returned when video page HTML has one english caption
         """
-        language_code = 'en'
         mock_get.return_value = YoutubeVideoHTMLResponse.with_caption_track(language_code)
 
         language_specific_caption_link = get_transcript_link_from_youtube(YOUTUBE_VIDEO_ID)
         self.assertEqual(language_specific_caption_link, CAPTION_URL_UTF8_DECODED_TEMPLATE.format(language_code))
 
     @ mock.patch('requests.get')
-    def test_get_caption_no_english_caption(self, mock_get):
+    @ddt.data("fr", None)
+    def test_get_caption_no_english_caption(self, language_code, mock_get):
         """
         No caption link returned when video page HTML contains no caption in English
         """
-        language_code = 'fr'
         mock_get.return_value = YoutubeVideoHTMLResponse.with_caption_track(language_code)
 
         english_language_caption_link = get_transcript_link_from_youtube(YOUTUBE_VIDEO_ID)
         self.assertIsNone(english_language_caption_link)
-
-    @ mock.patch('requests.get')
-    def test_get_caption_no_captions_in_HTML(self, mock_get):
-        """
-        No caption link returned when video page HTML contains no captions at all
-        """
-        mock_get.return_value = YoutubeVideoHTMLResponse.with_no_caption_tracks()
-
-        english_language_caption_link = get_transcript_link_from_youtube(YOUTUBE_VIDEO_ID)
-        self.assertEqual(english_language_caption_link, None)
 
     @ mock.patch('requests.get')
     def test_get_caption_malformed_caption_locator(self, mock_get):

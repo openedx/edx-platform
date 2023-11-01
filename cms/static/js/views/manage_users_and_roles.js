@@ -105,6 +105,7 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
                 var role_name = self.options.roles[i].key;
                 var role_selector = 'click .user-actions .make-' + role_name;
 
+                // eslint-disable-next-line no-loop-func
                 (function(role) {
                     roleEvents[role_selector] = function(event) { self.handleRoleButtonClick(event.target, role); };
                 }(role_name));
@@ -169,6 +170,7 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
 
         getPossibleRoleChangesForRole: function(role, adminRoleCount) {
             var result = [],
+                // eslint-disable-next-line no-shadow
                 role_names = _.map(this.roles, function(role) { return role.key; });
             if (role === this.admin_role.key && adminRoleCount === 1) {
                 result.push({notoggle: true});
@@ -177,6 +179,7 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
                 // in reverse order to show "Add" buttons to the left, "Remove" to the right
                 for (var i = this.roles.length - 1; i >= 0; i--) {
                     var other_role = this.roles[i];
+                    // eslint-disable-next-line no-continue
                     if (Math.abs(currentRoleIdx - i) !== 1) { continue; } // allows moving only to adjacent roles
                     result.push({
                         to_role: other_role.key,

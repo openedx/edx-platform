@@ -97,7 +97,9 @@
 
             it('initializes children', function() {
                 XBlock.initializeBlocks($('#jasmine-fixtures'));
+                // eslint-disable-next-line no-void
                 expect(XBlock.initializeBlock).toHaveBeenCalledWith(this.vANode, void 0);
+                // eslint-disable-next-line no-void
                 expect(XBlock.initializeBlock).toHaveBeenCalledWith(this.vZNode, void 0);
             });
 

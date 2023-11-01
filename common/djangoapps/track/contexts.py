@@ -5,7 +5,6 @@ import logging
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, LearningContextKey
-from six import text_type  # lint-amnesty, pylint: disable=unused-import
 
 from openedx.core.lib.request_utils import COURSE_REGEX
 

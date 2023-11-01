@@ -41,6 +41,7 @@ describe('Progress Circle View', () => {
     });
 
     const initView = (progress) => {
+        // eslint-disable-next-line no-undef
         const data = $.extend({}, context, {
             progress,
         });

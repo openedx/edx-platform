@@ -2,6 +2,7 @@
 
 import logging
 import sys
+import weakref
 
 from fs.osfs import OSFS
 from lazy import lazy
@@ -13,6 +14,7 @@ from xmodule.error_block import ErrorBlock
 from xmodule.errortracker import exc_info_to_str
 from xmodule.library_tools import LibraryToolsService
 from xmodule.mako_block import MakoDescriptorSystem
+from xmodule.modulestore import BlockData
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import InheritanceMixin, inheriting_field_data
@@ -73,6 +75,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
         self.default_class = default_class
         self.local_modules = {}
         self._services['library_tools'] = LibraryToolsService(modulestore, user_id=None)
+        # Cache of block field datas, keyed by the XBlock instance (since the ScopeId changes!)
+        self.block_field_datas = weakref.WeakKeyDictionary()
 
     @lazy
     def _parent_map(self):  # lint-amnesty, pylint: disable=missing-function-docstring
@@ -159,7 +163,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
     # is the intended one when not given a course_entry_override; thus, the caching of the last branch/course id.
     def xblock_from_json(self, class_, course_key, block_key, block_data, course_entry_override=None, **kwargs):
         """
-        Load and return block info.
+        Instantiate an XBlock of the specified class, using the provided data.
         """
         if course_entry_override is None:
             course_entry_override = self.course_entry
@@ -167,35 +171,91 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
             # most recent retrieval is most likely the right one for next caller (see comment above fn)
             self.course_entry = CourseEnvelope(course_entry_override.course_key, self.course_entry.structure)
 
-        definition_id = block_data.definition
-
         # If no usage id is provided, generate an in-memory id
         if block_key is None:
             block_key = BlockKey(block_data.block_type, LocalId())
 
+        # Construct the Block Usage Locator:
+        block_locator = course_key.make_usage_key(block_type=block_key.type, block_id=block_key.id)
+
+        # If no definition id is provided, generate an in-memory id
+        definition_id = block_data.definition or LocalId()
+
+        try:
+            block = self.construct_xblock_from_class(
+                class_,
+                ScopeIds(None, block_key.type, definition_id, block_locator),
+                for_parent=kwargs.get('for_parent'),
+                # Pass this tuple on for use by _init_field_data_for_block() when field data is initialized.
+                cds_init_args=(block_data, definition_id, kwargs.get("field_decorator")),
+                # Passing field_data here is deprecated, so we don't. Get it via block.service(block, "field-data").
+                # https://github.com/openedx/XBlock/blob/e89cbc5/xblock/mixins.py#L200-L207
+            )
+        except Exception:  # pylint: disable=broad-except
+            log.warning("Failed to load descriptor", exc_info=True)
+            return ErrorBlock.from_json(
+                block_data,
+                self,
+                course_entry_override.course_key.make_usage_key(
+                    block_type='error',
+                    block_id=block_key.id
+                ),
+                error_msg=exc_info_to_str(sys.exc_info())
+            )
+
+        edit_info = block_data.edit_info
+        block._edited_by = edit_info.edited_by  # pylint: disable=protected-access
+        block._edited_on = edit_info.edited_on  # pylint: disable=protected-access
+        block.previous_version = edit_info.previous_version
+        block.update_version = edit_info.update_version
+        block.source_version = edit_info.source_version
+        block.definition_locator = DefinitionLocator(block_key.type, definition_id)
+
+        # If this is an in-memory block, store it in this system
+        if isinstance(block_locator.block_id, LocalId):
+            self.local_modules[block_locator] = block
+
+        return block
+
+    def service(self, block, service_name):
+        """
+        Return a service, or None.
+        Services are objects implementing arbitrary other interfaces.
+        """
+        # Implement field data service:
+        if service_name in ('field-data', 'field-data-unbound'):
+            if hasattr(block, "_bound_field_data") and service_name != "field-data-unbound":
+                # Return the user-specific wrapped field data that gets set onto the block during XModule.bind_for_user
+                # This complexity is due to XModule heritage. If we didn't load the block as one step, then sometimes
+                # "rebind" it to be user-specific as a later step, we could load the field data and overrides at once.
+                return block._bound_field_data  # pylint: disable=protected-access
+            if block not in self.block_field_datas:
+                try:
+                    self._init_field_data_for_block(block)
+                except:
+                    # Don't try again pointlessly every time another field is accessed
+                    self.block_field_datas[block] = None
+                    raise
+            return self.block_field_datas[block]
+        return super().service(block, service_name)
+
+    def _init_field_data_for_block(self, block):
+        """
+        Initialize the field-data service for the given block.
+        """
+        block_key = BlockKey.from_usage_key(block.scope_ids.usage_id)
+        course_key = block.scope_ids.usage_id.context_key
+        try:
+            (block_data, definition_id, field_decorator) = block.get_cds_init_args()
+        except KeyError:
+            # This block was not instantiate via xblock_from_json()/modulestore but rather via the "direct" XBlock API
+            # such as using construct_xblock_from_class(). It probably doesn't yet exist in modulestore.
+            block_data = BlockData()
+            definition_id = LocalId()
+            field_decorator = None
+        class_ = self.load_block_type(block.scope_ids.block_type)
         convert_fields = lambda field: self.modulestore.convert_references_to_keys(
             course_key, class_, field, self.course_entry.structure['blocks'],
-        )
-
-        if definition_id is not None and not block_data.definition_loaded:
-            definition_loader = DefinitionLazyLoader(
-                self.modulestore,
-                course_key,
-                block_key.type,
-                definition_id,
-                convert_fields,
-            )
-        else:
-            definition_loader = None
-
-        # If no definition id is provide, generate an in-memory id
-        if definition_id is None:
-            definition_id = LocalId()
-
-        # Construct the Block Usage Locator:
-        block_locator = course_key.make_usage_key(
-            block_type=block_key.type,
-            block_id=block_key.id,
         )
 
         converted_fields = convert_fields(block_data.fields)
@@ -218,58 +278,42 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
         except AttributeError:
             pass
 
-        try:
-            kvs = SplitMongoKVS(
-                definition_loader,
-                converted_fields,
-                converted_defaults,
-                parent=parent,
-                aside_fields=aside_fields,
-                field_decorator=kwargs.get('field_decorator')
+        if not isinstance(definition_id, LocalId) and not block_data.definition_loaded:
+            definition_loader = DefinitionLazyLoader(
+                self.modulestore,
+                course_key,
+                block_key.type,
+                definition_id,
+                convert_fields,
             )
+        else:
+            definition_loader = None
 
-            if InheritanceMixin in self.modulestore.xblock_mixins:
-                field_data = inheriting_field_data(kvs)
-            else:
-                field_data = KvsFieldData(kvs)
+        kvs = SplitMongoKVS(
+            definition_loader,
+            converted_fields,
+            converted_defaults,
+            parent=parent,
+            aside_fields=aside_fields,
+            field_decorator=field_decorator,
+        )
 
-            block = self.construct_xblock_from_class(
-                class_,
-                ScopeIds(None, block_key.type, definition_id, block_locator),
-                field_data,
-                for_parent=kwargs.get('for_parent')
-            )
-        except Exception:  # pylint: disable=broad-except
-            log.warning("Failed to load descriptor", exc_info=True)
-            return ErrorBlock.from_json(
-                block_data,
-                self,
-                course_entry_override.course_key.make_usage_key(
-                    block_type='error',
-                    block_id=block_key.id
-                ),
-                error_msg=exc_info_to_str(sys.exc_info())
-            )
+        if InheritanceMixin in self.modulestore.xblock_mixins:
+            field_data = inheriting_field_data(kvs)
+        else:
+            field_data = KvsFieldData(kvs)
 
-        edit_info = block_data.edit_info
-        block._edited_by = edit_info.edited_by  # pylint: disable=protected-access
-        block._edited_on = edit_info.edited_on  # pylint: disable=protected-access
-        block.previous_version = edit_info.previous_version
-        block.update_version = edit_info.update_version
-        block.source_version = edit_info.source_version
-        block.definition_locator = DefinitionLocator(block_key.type, definition_id)
-
+        # Save the field_data now, because some of the wrappers will try to read fields from the block while they
+        # determine if they want to wrap the field_data or not.
+        self.block_field_datas[block] = field_data
+        # Now add in any wrappers that want to be added:
         for wrapper in self.modulestore.xblock_field_data_wrappers:
-            block._field_data = wrapper(block, block._field_data)  # pylint: disable=protected-access
+            self.block_field_datas[block] = wrapper(block, self.block_field_datas[block])
 
-        # decache any pending field settings
-        block.save()
-
-        # If this is an in-memory block, store it in this system
-        if isinstance(block_locator.block_id, LocalId):
-            self.local_modules[block_locator] = block
-
-        return block
+        # Note: user-specific wrappers like LmsFieldData or OverrideFieldData do not get set here. They get set later
+        # during bind_for_student(), which wraps the field-data and sets block._bound_field_data. Calling
+        # runtime.service(block, "field-data") or block._field_data (deprecated) will load block._bound_field_data if
+        # the block has been bound to a user, otherwise it returns the wrapped field data we just created above.
 
     def get_edited_by(self, xblock):
         """

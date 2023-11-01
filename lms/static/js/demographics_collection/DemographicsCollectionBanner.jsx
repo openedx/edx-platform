@@ -3,6 +3,7 @@ import React from 'react';
 import Cookies from 'js-cookie';
 import {DemographicsCollectionModal} from './DemographicsCollectionModal';
 
+// eslint-disable-next-line import/prefer-default-export
 export class DemographicsCollectionBanner extends React.Component {
     constructor(props) {
         super(props);
@@ -51,6 +52,7 @@ export class DemographicsCollectionBanner extends React.Component {
         if (!(this.state.hideBanner)) {
             return (
                 <div>
+                    {/* eslint-disable-next-line jsx-a11y/anchor-is-valid, jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
                     <a id="demographics-banner-link" className="btn" onClick={() => this.setState({modalOpen: true})}>
                         <div
                             className="demographics-banner d-flex justify-content-lg-between flex-row py-1 px-2 mb-2 mb-lg-4"
@@ -63,6 +65,7 @@ export class DemographicsCollectionBanner extends React.Component {
                                 <div className="demographics-banner-prompt d-inline-block font-weight-bold text-white mr-4 py-3 px-2 px-lg-3">
                                     {gettext('Want to make edX better for everyone?')}
                                 </div>
+                                {/* eslint-disable-next-line react/button-has-type */}
                                 <button className="demographics-banner-btn d-flex align-items-center bg-white font-weight-bold border-0 py-2 px-3 mx-2 mb-3 m-lg-0 shadow justify-content-center">
                                     <span className="fa fa-thumbs-up px-2" aria-hidden="true" />
                                     {gettext('Get started')}

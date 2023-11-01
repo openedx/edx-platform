@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-shadow-restricted-names
 (function(undefined) {
     describe('Video HTML5Video', function() {
         var STATUS = window.STATUS;
@@ -213,6 +214,7 @@
                     });
 
                     it('set new incorrect values', function() {
+                        // eslint-disable-next-line no-shadow
                         var seek = state.videoPlayer.player.video.currentTime;
                         state.videoPlayer.player.seekTo(-50);
                         expect(state.videoPlayer.player.getCurrentTime()).toBe(seek);
@@ -264,6 +266,7 @@
                 });
 
                 it('getVolume', function() {
+                    // eslint-disable-next-line no-multi-assign
                     volume = state.videoPlayer.player.video.volume = 0.5;
                     expect(state.videoPlayer.player.getVolume()).toBe(volume);
                 });

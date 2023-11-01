@@ -13,6 +13,43 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
 
     var expandedLocators, CourseOutlinePage;
 
+    /**
+     * On the course outline page, many different UI elements (for now, every unit on the page) need to know the status
+     * of the user's clipboard. This singleton manages the state of the user's clipboard and can emit events whenever
+     * the clipboard is changed, whether from another tab or some action the user took on this page.
+     */
+    class ClipboardManager extends EventTarget {
+        constructor(initialUserClipboard) {
+            super();
+            this._userClipboard = initialUserClipboard;
+            // Refresh the status when something is copied on another tab:
+            this.clipboardBroadcastChannel = new BroadcastChannel("studio_clipboard_channel");
+            this.clipboardBroadcastChannel.onmessage = (event) => {
+                this.updateUserClipboard(event.data, false);
+            };
+        }
+
+        /**
+         * Get the data about the user's clipboard. This is exactly the same as
+         * what would be returned from the "get clipboard" REST API.
+         */
+        get userClipboard() {
+          return this._userClipboard;
+        }
+
+        updateUserClipboard(newUserClipboard, broadcast = true) {
+            this._userClipboard = newUserClipboard;
+            // Emit an "updated" event so listeners can subscribe. This is different than the broadcast channel
+            // because this only works within the DOM of a single tab, not across all open tabs that the user has.
+            // In other words, this event trickles down to each section, subsection, and unit view on the outline page.
+            this.dispatchEvent(new CustomEvent("update", {detail: newUserClipboard}));
+            // But also notify listeners on other tabs:
+            if (broadcast) {
+                this.clipboardBroadcastChannel.postMessage(newUserClipboard); // And notify any other open tabs
+            }
+        }
+    }
+
     CourseOutlinePage = BasePage.extend({
         // takes XBlockInfo as a model
 
@@ -33,7 +70,8 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
         pollingDelay: 100,
 
         options: {
-            collapsedClass: 'is-collapsed'
+            collapsedClass: 'is-collapsed',
+            initialUserClipboard: {content: null},
         },
 
         // Extracting this to a variable allows comprehensive themes to replace or extend `CourseOutlineView`.
@@ -53,6 +91,7 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
             $('.dismiss-button').bind('click', ViewUtils.deleteNotificationHandler(function() {
                 $('.wrapper-alert-announcement').removeClass('is-shown').addClass('is-hidden');
             }));
+            this.clipboardManager = new ClipboardManager(this.options.initialUserClipboard);
         },
 
         setCollapseExpandVisibility: function() {
@@ -66,6 +105,7 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
         },
 
         renderPage: function() {
+            // eslint-disable-next-line no-shadow
             var setInitialExpandState = function(xblockInfo, expandedLocators) {
                 if (xblockInfo.isCourse() || xblockInfo.isChapter()) {
                     expandedLocators.add(xblockInfo.get('id'));
@@ -109,7 +149,8 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
                 model: this.model,
                 isRoot: true,
                 initialState: this.initialState,
-                expandedLocators: this.expandedLocators
+                expandedLocators: this.expandedLocators,
+                clipboardManager: this.clipboardManager,
             });
             this.outlineView.render();
             this.outlineView.setViewState(this.initialState || {});

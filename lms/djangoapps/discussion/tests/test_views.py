@@ -463,7 +463,7 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):  # lint-amne
         CourseTeamFactory.create(discussion_topic_id=discussion_topic_id)
         user_not_in_team = UserFactory.create()
         CourseEnrollmentFactory.create(user=user_not_in_team, course_id=self.course.id)
-        self.client.login(username=user_not_in_team.username, password='test')
+        self.client.login(username=user_not_in_team.username, password=self.TEST_PASSWORD)
 
         mock_request.side_effect = make_mock_request_impl(
             course=self.course,
@@ -624,7 +624,7 @@ class SingleCohortedThreadTestCase(CohortedTestCase):  # lint-amnesty, pylint: d
     def test_html(self, mock_request):
         _mock_text, mock_thread_id = self._create_mock_cohorted_thread(mock_request)
 
-        self.client.login(username=self.student.username, password='test')
+        self.client.login(username=self.student.username, password=self.TEST_PASSWORD)
         response = self.client.get(
             reverse('single_thread', kwargs={
                 'course_id': str(self.course.id),
@@ -758,7 +758,7 @@ class SingleThreadGroupIdTestCase(CohortedTestCase, GroupIdAssertionMixin):  # l
         if is_ajax:
             headers['HTTP_X_REQUESTED_WITH'] = "XMLHttpRequest"
 
-        self.client.login(username=user.username, password='test')
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
 
         return self.client.get(
             reverse('single_thread', args=[str(self.course.id), commentable_id, "dummy_thread_id"]),
@@ -824,7 +824,7 @@ class ForumFormDiscussionContentGroupTestCase(ForumsEnableMixin, ContentGroupTes
             text="dummy content",
             thread_list=self.thread_list
         )
-        self.client.login(username=user.username, password='test')
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
         return self.client.get(
             reverse("forum_form_discussion", args=[str(self.course.id)]),
             HTTP_X_REQUESTED_WITH="XMLHttpRequest"
@@ -889,7 +889,7 @@ class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, Content
         verify that the user does not have access to that thread.
         """
         def call_single_thread():
-            self.client.login(username=user.username, password='test')
+            self.client.login(username=user.username, password=self.TEST_PASSWORD)
             return self.client.get(
                 reverse('single_thread', args=[str(self.course.id), discussion_id, thread_id])
             )
@@ -1113,7 +1113,7 @@ class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdT
         if is_ajax:
             headers['HTTP_X_REQUESTED_WITH'] = "XMLHttpRequest"
 
-        self.client.login(username=user.username, password='test')
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
         return self.client.get(
             reverse("forum_form_discussion", args=[str(self.course.id)]),
             data=request_data,
@@ -1165,7 +1165,7 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
         if is_ajax:
             headers['HTTP_X_REQUESTED_WITH'] = "XMLHttpRequest"
 
-        self.client.login(username=requesting_user.username, password='test')
+        self.client.login(username=requesting_user.username, password=self.TEST_PASSWORD)
         return self.client.get(
             reverse('user_profile', args=[str(self.course.id), profiled_user.id]),
             data=request_data,
@@ -1414,7 +1414,7 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
         mock_request.side_effect = make_mock_request_impl(
             course=self.course, text=self.TEST_THREAD_TEXT, thread_id=self.TEST_THREAD_ID
         )
-        self.client.login(username=self.student.username, password='test')
+        self.client.login(username=self.student.username, password=self.TEST_PASSWORD)
 
         response = self.client.get(
             reverse('user_profile', kwargs={
@@ -1635,7 +1635,8 @@ class ForumFormDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTes
         mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
         request = RequestFactory().get("dummy_url")
         request.user = self.student
-        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
+        # so (request.headers.get('x-requested-with') == 'XMLHttpRequest') == True
+        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"
 
         response = views.forum_form_discussion(request, str(self.course.id))
         assert response.status_code == 200
@@ -1723,7 +1724,8 @@ class ForumDiscussionSearchUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreT
         }
         request = RequestFactory().get("dummy_url", data)
         request.user = self.student
-        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
+        # so (request.headers.get('x-requested-with') == 'XMLHttpRequest') == True
+        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"
 
         response = views.forum_form_discussion(request, str(self.course.id))
         assert response.status_code == 200
@@ -1753,7 +1755,8 @@ class SingleThreadUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, 
         mock_request.side_effect = make_mock_request_impl(course=self.course, text=text, thread_id=thread_id)
         request = RequestFactory().get("dummy_url")
         request.user = self.student
-        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
+        # so (request.headers.get('x-requested-with') == 'XMLHttpRequest') == True
+        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"
 
         response = views.single_thread(request, str(self.course.id), "dummy_discussion_id", thread_id)
         assert response.status_code == 200
@@ -1782,7 +1785,8 @@ class UserProfileUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, U
         mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
         request = RequestFactory().get("dummy_url")
         request.user = self.student
-        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
+        # so (request.headers.get('x-requested-with') == 'XMLHttpRequest') == True
+        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"
 
         response = views.user_profile(request, str(self.course.id), str(self.student.id))
         assert response.status_code == 200
@@ -1811,7 +1815,8 @@ class FollowedThreadsUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCas
         mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
         request = RequestFactory().get("dummy_url")
         request.user = self.student
-        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
+        # so (request.headers.get('x-requested-with') == 'XMLHttpRequest') == True
+        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"
 
         response = views.followed_threads(request, str(self.course.id), str(self.student.id))
         assert response.status_code == 200
@@ -2295,7 +2300,7 @@ class ForumMFETestCase(ForumsEnableMixin, SharedModuleStoreTestCase):
         """
 
         with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True):
-            self.client.login(username=self.user.username, password='test')
+            self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
             url = reverse("forum_form_discussion", args=[self.course.id])
             response = self.client.get(url)
             assert response.status_code == 302
@@ -2310,7 +2315,7 @@ class ForumMFETestCase(ForumsEnableMixin, SharedModuleStoreTestCase):
         """
 
         with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True):
-            self.client.login(username=self.user.username, password='test')
+            self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
             url = reverse("user_profile", args=[self.course.id, self.user.id])
             response = self.client.get(url)
             assert response.status_code == 302
@@ -2325,7 +2330,7 @@ class ForumMFETestCase(ForumsEnableMixin, SharedModuleStoreTestCase):
         """
 
         with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True):
-            self.client.login(username=self.user.username, password='test')
+            self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
             url = reverse("single_thread", args=[self.course.id, "test_discussion", "test_thread"])
             response = self.client.get(url)
             assert response.status_code == 302
