@@ -178,10 +178,11 @@ jobs:
         data=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select app, name from django_migrations ORDER by -id limit $diff;" edxapp;)
         echo "CUSTOM_MESSAGE=$data" >> $GITHUB_ENV
       shell: bash
+
     - name: Comment PR
       uses: thollander/actions-comment-pull-request@v2
       with:
-        message: ${{ env.CUSTOM_MESSAGE }}
+        message: "Testing"
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # This job aggregates test results. It's the required check for branch protection.
