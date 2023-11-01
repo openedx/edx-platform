@@ -93,7 +93,7 @@ def contains_url(value):
     """
     Validator method to check whether full name contains url
     """
-    regex = re.findall(r'https|http?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', value)
+    regex = re.findall(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))*', value)
     return bool(regex)
 
 

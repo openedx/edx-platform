@@ -296,7 +296,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-09-10 20:42+0000\n"
+"POT-Creation-Date: 2023-10-01 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://app.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -3969,12 +3969,12 @@ msgid "Good"
 msgstr "Bien"
 
 #. Translators: Replier commented on "your" response to your post
-#: lms/djangoapps/discussion/rest_api/utils.py
+#: lms/djangoapps/discussion/rest_api/discussions_notifications.py
 msgid "your"
 msgstr "su"
 
 #. Translators: Replier commented on "their" response to your post
-#: lms/djangoapps/discussion/rest_api/utils.py
+#: lms/djangoapps/discussion/rest_api/discussions_notifications.py
 msgid "their"
 msgstr "su"
 
@@ -7970,6 +7970,14 @@ msgstr "Incluir en lista negra a {country} para el curso {course}"
 msgid "Learner Pathways"
 msgstr "Rutas de aprendizaje"
 
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification App"
+msgstr "Aplicación de notificación"
+
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification Type"
+msgstr "Tipo de notificación"
+
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
 msgid ""
@@ -8015,6 +8023,25 @@ msgid ""
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
 "<{p}><{strong}>{username}</{strong}> preguntó "
+"<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> responded to a post you’re "
+"following: <{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> respondió a su publicación "
+"<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> commented on {author_name}'s "
+"response in a post you’re following <{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> respondió el "
+"<{strong}>{author_name}</{strong}> respuesta a su publicación "
 "<{strong}>{post_title}</{strong}></{p}>"
 
 #: openedx/core/djangoapps/notifications/base_notification.py

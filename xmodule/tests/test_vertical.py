@@ -5,24 +5,26 @@ Tests for vertical block.
 # pylint: disable=protected-access
 
 
+import json
 from collections import namedtuple
 from datetime import datetime, timedelta
-import json
 from unittest.mock import Mock, patch
 
-import pytz
 import ddt
-from fs.memoryfs import MemoryFS
+import pytz
 from django.contrib.auth.models import AnonymousUser
 from django.test import override_settings
+from edx_toggles.toggles.testutils import override_waffle_switch
+from fs.memoryfs import MemoryFS
 from openedx_filters import PipelineStep
 from openedx_filters.learning.filters import VerticalBlockChildRenderStarted, VerticalBlockRenderCompleted
 
+from ..vertical_block import XBLOCK_SKILL_TAG_VERIFICATION_SWITCH
+from ..x_module import AUTHOR_VIEW, PUBLIC_VIEW, STUDENT_VIEW
 from . import prepare_block_runtime
 from .helpers import StubUserService
 from .xml import XModuleXmlImportTest
 from .xml import factories as xml
-from ..x_module import STUDENT_VIEW, AUTHOR_VIEW, PUBLIC_VIEW
 
 COMPLETION_DELAY = 9876
 
@@ -360,6 +362,7 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
             },
         },
     )
+    @override_waffle_switch(XBLOCK_SKILL_TAG_VERIFICATION_SWITCH, True)
     def test_vertical_block_child_render_started_filter_execution(self):
         """
         Test the VerticalBlockChildRenderStarted filter's effects on student view.
@@ -382,6 +385,7 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
             },
         },
     )
+    @override_waffle_switch(XBLOCK_SKILL_TAG_VERIFICATION_SWITCH, True)
     def test_vertical_block_child_render_is_skipped_on_filter_exception(self):
         """
         Test VerticalBlockChildRenderStarted filter can be used to skip child blocks.
@@ -405,6 +409,7 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
             },
         },
     )
+    @override_waffle_switch(XBLOCK_SKILL_TAG_VERIFICATION_SWITCH, True)
     def test_vertical_block_render_completed_filter_execution(self):
         """
         Test the VerticalBlockRenderCompleted filter's execution.
@@ -427,6 +432,7 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
             },
         },
     )
+    @override_waffle_switch(XBLOCK_SKILL_TAG_VERIFICATION_SWITCH, True)
     def test_vertical_block_render_output_is_changed_on_filter_exception(self):
         """
         Test VerticalBlockRenderCompleted filter can be used to prevent vertical block from rendering.

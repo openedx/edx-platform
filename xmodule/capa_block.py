@@ -504,6 +504,11 @@ class ProblemBlock(
             ProblemBlock.markdown,
             ProblemBlock.use_latex_compiler,
             ProblemBlock.show_correctness,
+
+            # Temporarily remove the ability to see MATLAB API key in Studio, as
+            # a pre-cursor to removing it altogether.
+            #   https://github.com/openedx/public-engineering/issues/192
+            ProblemBlock.matlab_api_key,
         ])
         return non_editable_fields
 

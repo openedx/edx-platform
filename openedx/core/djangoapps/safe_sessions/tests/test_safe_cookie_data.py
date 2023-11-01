@@ -10,6 +10,7 @@ from unittest.mock import patch
 
 import pytest
 import ddt
+import django
 from django.test import TestCase
 
 from ..middleware import SafeCookieData, SafeCookieError
@@ -204,6 +205,7 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
 
     #---- Test roundtrip with pinned values ----#
 
+    @pytest.mark.skipif(django.VERSION[0] >= 4, reason="For django32 default algorithm is sha1. No need for django42.")
     def test_pinned_values(self):
         """
         Compute a cookie with all inputs held constant and assert that the
@@ -235,4 +237,38 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
             "|ImExZWZiNzVlZGFmM2FkZWZmYjM4YjI0ZmZkOWU4MzExODU0MTk4NmVlNGRiYzBlODdhYWUzOGM5MzVlNzk4NjUi"
             ":1m6Hve"
             ":OMhY2FL2pudJjSSXChtI-zR8QVA"
+        )
+
+    @pytest.mark.skipif(django.VERSION[0] < 4, reason="For django42 default algorithm is sha256. No need for django32.")
+    def test_pinned_values_django42(self):
+        """
+        Compute a cookie with all inputs held constant and assert that the
+        exact output never changes. This protects against unintentional
+        changes to the algorithm.
+        """
+        user_id = '8523'
+        session_id = 'SSdtIGEgc2Vzc2lvbiE'
+        a_random_string = 'HvGnjXf1b3jU'
+        timestamp = 1626895850
+
+        module = 'openedx.core.djangoapps.safe_sessions.middleware'
+        with patch(f"{module}.signing.time.time", return_value=timestamp):
+            with patch(f"{module}.get_random_string", return_value=a_random_string):
+                safe_cookie_data = SafeCookieData.create(session_id, user_id)
+        serialized_value = str(safe_cookie_data)
+
+        # **IMPORTANT**: If a change to the algorithm causes this test
+        # to start failing, you will either need to allow both the old
+        # and new format or all users will become logged out upon
+        # deploy of the changes.
+        #
+        # Also assumes SECRET_KEY is '85920908f28904ed733fe576320db18cabd7b6cd'
+        # (set in lms or cms.envs.test)
+        assert serialized_value == (
+            "1"
+            "|SSdtIGEgc2Vzc2lvbiE"
+            "|HvGnjXf1b3jU"
+            "|ImExZWZiNzVlZGFmM2FkZWZmYjM4YjI0ZmZkOWU4MzExODU0MTk4NmVlNGRiYzBlODdhYWUzOGM5MzVlNzk4NjUi"
+            ":1m6Hve"
+            ":Pra4iochviPvKUoIV33gdVZFDgG-cMDlIYfl8iFIMaY"
         )
