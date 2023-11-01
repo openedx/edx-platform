@@ -79,6 +79,7 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_video_editor,
     use_new_video_uploads_page,
     use_new_custom_pages,
+    use_tagging_taxonomy_list_page,
 )
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
@@ -436,6 +437,18 @@ def get_custom_pages_url(course_locator) -> str:
         if mfe_base_url:
             custom_pages_url = course_mfe_url
     return custom_pages_url
+
+
+def get_taxonomy_list_url():
+    """
+    Gets course authoring microfrontend URL for taxonomy list page view.
+    """
+    taxonomy_list_url = None
+    if use_tagging_taxonomy_list_page():
+        mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
+        if mfe_base_url:
+            taxonomy_list_url = f'{mfe_base_url}/taxonomy-list'
+    return taxonomy_list_url
 
 
 def course_import_olx_validation_is_enabled():
@@ -1395,9 +1408,63 @@ def get_help_urls():
     return help_tokens
 
 
+def get_response_format(request):
+    return request.GET.get('format') or request.POST.get('format') or 'html'
+
+
+def request_response_format_is_json(request, response_format):
+    return response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json')
+
+
+def get_library_context(request, request_is_json=False):
+    """
+    Utils is used to get context of course home library tab.
+    It is used for both DRF and django views.
+    """
+    from cms.djangoapps.contentstore.views.course import (
+        get_allowed_organizations,
+        get_allowed_organizations_for_libraries,
+        user_can_create_organizations,
+        _accessible_libraries_iter,
+        _get_course_creator_status,
+        _format_library_for_view,
+    )
+    from cms.djangoapps.contentstore.views.library import (
+        LIBRARIES_ENABLED,
+    )
+
+    libraries = _accessible_libraries_iter(request.user) if LIBRARIES_ENABLED else []
+    data = {
+        'libraries': [_format_library_for_view(lib, request) for lib in libraries],
+    }
+
+    if not request_is_json:
+        return {
+            **data,
+            'in_process_course_actions': [],
+            'courses': [],
+            'libraries_enabled': LIBRARIES_ENABLED,
+            'show_new_library_button': LIBRARIES_ENABLED and request.user.is_active,
+            'user': request.user,
+            'request_course_creator_url': reverse('request_course_creator'),
+            'course_creator_status': _get_course_creator_status(request.user),
+            'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
+            'archived_courses': True,
+            'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
+            'rerun_creator_status': GlobalStaff().has_user(request.user),
+            'split_studio_home': split_library_view_on_dashboard(),
+            'active_tab': 'libraries',
+            'allowed_organizations_for_libraries': get_allowed_organizations_for_libraries(request.user),
+            'allowed_organizations': get_allowed_organizations(request.user),
+            'can_create_organizations': user_can_create_organizations(request.user),
+        }
+
+    return data
+
+
 def get_home_context(request):
     """
-    Utils is used to get context of course grading.
+    Utils is used to get context of course home.
     It is used for both DRF and django views.
     """
 
@@ -1425,8 +1492,14 @@ def get_home_context(request):
     courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
     user = request.user
     libraries = []
+    response_format = get_response_format(request)
+
     if not split_library_view_on_dashboard() and LIBRARIES_ENABLED:
-        libraries = _accessible_libraries_iter(request.user)
+        accessible_libraries = _accessible_libraries_iter(user)
+        libraries = [_format_library_for_view(lib, request) for lib in accessible_libraries]
+
+    if split_library_view_on_dashboard() and request_response_format_is_json(request, response_format):
+        libraries = get_library_context(request, True)['libraries']
 
     def format_in_process_course_view(uca):
         """
@@ -1459,9 +1532,11 @@ def get_home_context(request):
         'archived_courses': archived_courses,
         'in_process_course_actions': in_process_course_actions,
         'libraries_enabled': LIBRARIES_ENABLED,
+        'taxonomies_enabled': use_tagging_taxonomy_list_page(),
         'redirect_to_library_authoring_mfe': should_redirect_to_library_authoring_mfe(),
         'library_authoring_mfe_url': LIBRARY_AUTHORING_MICROFRONTEND_URL,
-        'libraries': [_format_library_for_view(lib, request) for lib in libraries],
+        'taxonomy_list_mfe_url': get_taxonomy_list_url(),
+        'libraries': libraries,
         'show_new_library_button': user_can_create_library(user) and not should_redirect_to_library_authoring_mfe(),
         'user': user,
         'request_course_creator_url': reverse('request_course_creator'),
@@ -1574,6 +1649,92 @@ def get_course_index_context(request, course_key, course_block):
     }
 
     return course_index_context
+
+
+def get_course_videos_context(course_block, pagination_conf, course_key=None):
+    """
+    Utils is used to get contest of course videos.
+    It is used for both DRF and django views.
+    """
+
+    from edx_toggles.toggles import WaffleSwitch
+    from edxval.api import (
+        get_3rd_party_transcription_plans,
+        get_transcript_credentials_state_for_org,
+        get_transcript_preferences,
+    )
+    from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
+    from xmodule.video_block.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
+
+    from .video_storage_handlers import (
+        get_all_transcript_languages,
+        _get_index_videos,
+        _get_default_video_image_url
+    )
+
+    VIDEO_SUPPORTED_FILE_FORMATS = {
+        '.mp4': 'video/mp4',
+        '.mov': 'video/quicktime',
+    }
+    VIDEO_UPLOAD_MAX_FILE_SIZE_GB = 5
+    # Waffle switch for enabling/disabling video image upload feature
+    VIDEO_IMAGE_UPLOAD_ENABLED = WaffleSwitch(  # lint-amnesty, pylint: disable=toggle-missing-annotation
+        'videos.video_image_upload_enabled', __name__
+    )
+
+    course = course_block
+    if not course:
+        with modulestore().bulk_operations(course_key):
+            course = modulestore().get_course(course_key)
+
+    is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course.id)
+    previous_uploads, pagination_context = _get_index_videos(course, pagination_conf)
+    course_video_context = {
+        'context_course': course,
+        'image_upload_url': reverse_course_url('video_images_handler', str(course.id)),
+        'video_handler_url': reverse_course_url('videos_handler', str(course.id)),
+        'encodings_download_url': reverse_course_url('video_encodings_download', str(course.id)),
+        'default_video_image_url': _get_default_video_image_url(),
+        'previous_uploads': previous_uploads,
+        'concurrent_upload_limit': settings.VIDEO_UPLOAD_PIPELINE.get('CONCURRENT_UPLOAD_LIMIT', 0),
+        'video_supported_file_formats': list(VIDEO_SUPPORTED_FILE_FORMATS.keys()),
+        'video_upload_max_file_size': VIDEO_UPLOAD_MAX_FILE_SIZE_GB,
+        'video_image_settings': {
+            'video_image_upload_enabled': VIDEO_IMAGE_UPLOAD_ENABLED.is_enabled(),
+            'max_size': settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MAX_BYTES'],
+            'min_size': settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MIN_BYTES'],
+            'max_width': settings.VIDEO_IMAGE_MAX_WIDTH,
+            'max_height': settings.VIDEO_IMAGE_MAX_HEIGHT,
+            'supported_file_formats': settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS
+        },
+        'is_video_transcript_enabled': is_video_transcript_enabled,
+        'active_transcript_preferences': None,
+        'transcript_credentials': None,
+        'transcript_available_languages': get_all_transcript_languages(),
+        'video_transcript_settings': {
+            'transcript_download_handler_url': reverse('transcript_download_handler'),
+            'transcript_upload_handler_url': reverse('transcript_upload_handler'),
+            'transcript_delete_handler_url': reverse_course_url('transcript_delete_handler', str(course.id)),
+            'trancript_download_file_format': Transcript.SRT
+        },
+        'pagination_context': pagination_context
+    }
+    if is_video_transcript_enabled:
+        course_video_context['video_transcript_settings'].update({
+            'transcript_preferences_handler_url': reverse_course_url(
+                'transcript_preferences_handler',
+                str(course.id)
+            ),
+            'transcript_credentials_handler_url': reverse_course_url(
+                'transcript_credentials_handler',
+                str(course.id)
+            ),
+            'transcription_plans': get_3rd_party_transcription_plans(),
+        })
+        course_video_context['active_transcript_preferences'] = get_transcript_preferences(str(course.id))
+        # Cached state for transcript providers' credentials (org-specific)
+        course_video_context['transcript_credentials'] = get_transcript_credentials_state_for_org(course.id.org)
+    return course_video_context
 
 
 class StudioPermissionsService:

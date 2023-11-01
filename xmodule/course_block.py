@@ -619,14 +619,6 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
         # Ensure that courses imported from XML keep their image
         default="images_course_image.jpg"
     )
-    issue_badges = Boolean(
-        display_name=_("Issue Open Badges"),
-        help=_(
-            "Issue Open Badges badges for this course. Badges are generated when certificates are created."
-        ),
-        scope=Scope.settings,
-        default=True
-    )
     ## Course level Certificate Name overrides.
     cert_name_short = String(
         help=_(

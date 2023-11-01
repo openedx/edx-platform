@@ -313,7 +313,8 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'selected_groups_label': selected_groups_label,
             'can_add': context.get('can_add', True),
             'can_move': context.get('can_move', is_course),
-            'language': getattr(course, 'language', None)
+            'language': getattr(course, 'language', None),
+            'is_course': is_course
         }
 
         add_webpack_js_to_fragment(frag, "js/factories/xblock_validation")

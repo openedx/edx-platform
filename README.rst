@@ -25,6 +25,11 @@ platform.  Functionally, the edx-platform repository provides two services:
 * CMS (Content Management Service), which powers Open edX Studio, the platform's learning content authoring environment; and
 * LMS (Learning Management Service), which delivers learning content.
 
+Documentation
+*************
+
+Documentation can be found at https://docs.openedx.org/projects/edx-platform.
+
 Getting Started
 ***************
 
@@ -81,11 +86,6 @@ and other rich community resources.
 
 .. _Open edX site: https://openedx.org
 
-Documentation
-*************
-
-Documentation can be found at https://docs.openedx.org.
-
 
 Getting Help
 ************
@@ -134,7 +134,7 @@ Reporting Security Issues
 *************************
 
 Please do not report security issues in public. Please email
-security@edx.org.
+security@openedx.org.
 
 .. _individual contributor agreement: https://openedx.org/cla
 .. _CONTRIBUTING: https://github.com/openedx/.github/blob/master/CONTRIBUTING.md

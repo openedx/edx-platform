@@ -18,6 +18,7 @@
 # IvanPrimachenko <jastudent1@gmail.com>, 2014
 # Martin Horst <horst.mr@gmail.com>, 2018
 # Mykhailo Parfeniuk <sopyer@gmail.com>, 2016
+# Mykola Melnyk, 2023
 # Natalia Vynogradenko <tannaha@gmail.com>, 2017-2018
 # Nikolai Belochub, 2014
 # cc322e8fc6cc292f0f00d8b7420e7410_e468d09 <95dee59251c2de5d1d21e213a66df19d_243275>, 2014
@@ -125,7 +126,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-08-27 20:43+0000\n"
+"POT-Creation-Date: 2023-10-08 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Danylo Shcherbak <danylo.shcherbak@raccoongang.com>, 2020\n"
 "Language-Team: Ukrainian (https://app.transifex.com/open-edx/teams/6205/uk/)\n"
@@ -224,8 +225,8 @@ msgid "Video"
 msgstr "Відео"
 
 #: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr "Звичайне завдання"
+msgid "Blank Problem"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -330,8 +331,8 @@ msgstr "Професійна освіта"
 #: common/djangoapps/course_modes/models.py xmodule/annotatable_block.py
 #: xmodule/capa_block.py xmodule/conditional_block.py
 #: xmodule/discussion_block.py xmodule/html_block.py
-#: xmodule/library_content_block.py xmodule/library_sourced_block.py
-#: xmodule/lti_block.py xmodule/split_test_block.py xmodule/unit_block.py
+#: xmodule/library_content_block.py xmodule/lti_block.py
+#: xmodule/split_test_block.py xmodule/unit_block.py
 #: xmodule/word_cloud_block.py xmodule/x_module.py
 msgid "Display Name"
 msgstr "Назва, що відображається"
@@ -3046,6 +3047,12 @@ msgid "Open Response Assessment"
 msgstr ""
 
 #: lms/djangoapps/courseware/courses.py
+msgid ""
+"This Open Response Assessment's due dates are set by your instructor and "
+"can't be shifted."
+msgstr ""
+
+#: lms/djangoapps/courseware/courses.py
 msgid "Self Assessment"
 msgstr ""
 
@@ -3059,12 +3066,6 @@ msgstr ""
 
 #: lms/djangoapps/courseware/courses.py
 msgid "Submission"
-msgstr ""
-
-#: lms/djangoapps/courseware/courses.py
-msgid ""
-"Open Response Assessment due dates are set by your instructor and can't be "
-"shifted."
 msgstr ""
 
 #. Translators: 'absolute' is a date such as "Jan 01,
@@ -3572,12 +3573,12 @@ msgid "Good"
 msgstr "Добре"
 
 #. Translators: Replier commented on "your" response to your post
-#: lms/djangoapps/discussion/rest_api/utils.py
+#: lms/djangoapps/discussion/rest_api/discussions_notifications.py
 msgid "your"
 msgstr ""
 
 #. Translators: Replier commented on "their" response to your post
-#: lms/djangoapps/discussion/rest_api/utils.py
+#: lms/djangoapps/discussion/rest_api/discussions_notifications.py
 msgid "their"
 msgstr ""
 
@@ -5723,7 +5724,6 @@ msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
 #: openedx/core/djangoapps/user_api/admin.py
-#: xmodule/templates/library-sourced-block-studio-view.html
 msgid "Cancel"
 msgstr "Відмінити"
 
@@ -6168,13 +6168,11 @@ msgid "Quotes"
 msgstr "Цитати"
 
 #: lms/templates/wiki/includes/editor_widget.html
-#, python-format
+#, python-brace-format
 msgid ""
-"Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for"
-" help."
+"Markdown syntax is allowed. See the {start_link}cheatsheet{end_link} for "
+"help."
 msgstr ""
-" Синтаксис Markdown дозволений. Дивіться "
-"%(start_link)scheatsheet%(end_link)sдля допомоги."
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
@@ -6877,6 +6875,16 @@ msgstr ""
 msgid "Original usage key/ID of the thing that is in the clipboard."
 msgstr ""
 
+#: wiki/models/article.py
+msgid "owner"
+msgstr "власник"
+
+#: openedx/core/djangoapps/content_tagging/models/base.py
+msgid ""
+"Organization that is related to this taxonomy.If None, then this taxonomy is"
+" related to all organizations."
+msgstr ""
+
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
 "List of domains that are allowed to make cross-domain requests to this site."
@@ -7167,8 +7175,8 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
-"The Posting availabilty in discussions whether it will be enabled, scheduled"
-" or indefinitely disabled."
+"The Posting availability in discussions whether it will be enabled, "
+"scheduled or indefinitely disabled."
 msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
@@ -7332,6 +7340,14 @@ msgstr "Занести до чорного списку країну {country}  
 msgid "Learner Pathways"
 msgstr ""
 
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification App"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/admin.py
+msgid "Notification Type"
+msgstr ""
+
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
 msgid ""
@@ -7366,6 +7382,20 @@ msgstr ""
 msgid ""
 "<{p}><{strong}>{username}</{strong}> asked "
 "<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> responded to a post you’re "
+"following: <{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> commented on {author_name}'s "
+"response in a post you’re following <{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
 
 #: openedx/core/djangoapps/notifications/base_notification.py
@@ -8786,16 +8816,6 @@ msgid ""
 "to date."
 msgstr ""
 
-#: wiki/models/article.py
-msgid "owner"
-msgstr "власник"
-
-#: openedx/features/content_tagging/models/base.py
-msgid ""
-"Organization that is related to this taxonomy.If None, then this taxonomy is"
-" related to all organizations."
-msgstr ""
-
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
 msgid "Enabled As Of"
@@ -9090,8 +9110,7 @@ msgstr "XML-дані для анотації"
 #: xmodule/annotatable_block.py xmodule/capa_block.py
 #: xmodule/conditional_block.py xmodule/discussion_block.py
 #: xmodule/html_block.py xmodule/library_content_block.py
-#: xmodule/library_root_xblock.py xmodule/library_sourced_block.py
-#: xmodule/poll_block.py xmodule/unit_block.py
+#: xmodule/library_root_xblock.py xmodule/poll_block.py xmodule/unit_block.py
 #: xmodule/video_block/video_xfields.py xmodule/word_cloud_block.py
 #: xmodule/x_module.py
 msgid "The display name for this component."
@@ -11309,33 +11328,6 @@ msgid "Enter the names of the advanced components to use in your library."
 msgstr ""
 "Введіть назви додаткових компонентів для використання у вашій бібліотеці."
 
-#: xmodule/library_sourced_block.py
-msgid "Library Blocks List"
-msgstr ""
-
-#: xmodule/library_sourced_block.py
-msgid "Enter the IDs of the library XBlocks that you wish to use."
-msgstr ""
-
-#: xmodule/library_sourced_block.py
-#, python-brace-format
-msgid "A maximum of {0} components may be added."
-msgstr ""
-
-#: xmodule/library_sourced_block.py
-msgid ""
-"No XBlock has been configured for this component. Use the editor to select "
-"the target blocks."
-msgstr ""
-
-#: xmodule/library_sourced_block.py
-msgid "Open Editor"
-msgstr ""
-
-#: xmodule/library_sourced_block.py
-msgid "Importing Library Block failed - are the IDs valid and readable?"
-msgstr ""
-
 #: xmodule/lti_block.py
 msgid ""
 "The display name for this component. Analytics reports may also use the "
@@ -12028,10 +12020,6 @@ msgstr ""
 #: xmodule/tabs.py
 msgid "External Discussion"
 msgstr "Зовнішнє обговорення"
-
-#: xmodule/templates/library-sourced-block-studio-view.html
-msgid "Save and Import"
-msgstr ""
 
 #: xmodule/vertical_block.py
 msgid "Enable in-context discussions for the Unit"
@@ -15654,10 +15642,6 @@ msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Print or share your certificate:"
-msgstr ""
-
-#: lms/templates/certificates/_accomplishment-banner.html
-msgid "Click the link to see my certificate."
 msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
@@ -19952,15 +19936,15 @@ msgstr ""
 
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Put your Honor Code here!"
-msgstr "Додати свій Кодекс честі сюди!"
+msgstr "Додайте текст Політики Доброчесності сюди!"
 
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Put your Copyright Text here!"
-msgstr ""
+msgstr "Додайте текст Авторського Права сюди!"
 
 #: xmodule/capa/templates/codeinput.html
 msgid "Code Editor"
-msgstr ""
+msgstr "Редактор коду"
 
 #: cms/templates/404.html
 msgid "The page that you were looking for was not found."

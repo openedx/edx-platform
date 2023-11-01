@@ -258,7 +258,6 @@ class TestCsrfCrossDomainCookieMiddleware(TestCase):
             del request.META['HTTP_REFERER']
 
         if csrf_cookie_used:
-            request.META['CSRF_COOKIE_USED'] = True
             request.META['CSRF_COOKIE'] = self.COOKIE_VALUE
 
         if cross_domain_decorator:

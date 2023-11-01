@@ -9,12 +9,10 @@ from unittest.mock import call, patch
 
 import ddt
 import httpretty
-from Cryptodome.PublicKey import RSA
 from django.conf import settings
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_switch
-from jwkest import jwk
 from oauth2_provider import models as dot_models
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -86,8 +84,9 @@ class _DispatchingViewTestCase(TestCase):
     """
     def setUp(self):
         super().setUp()
+        self.TEST_PASSWORD = 'Password1234'
         self.dot_adapter = adapters.DOTAdapter()
-        self.user = UserFactory()
+        self.user = UserFactory(password=self.TEST_PASSWORD)
         self.dot_app = self.dot_adapter.create_public_client(
             name='test dot application',
             user=self.user,
@@ -148,7 +147,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
 
         if grant_type == dot_models.Application.GRANT_PASSWORD:
             body['username'] = user.username
-            body['password'] = 'test'
+            body['password'] = self.TEST_PASSWORD
         elif grant_type == dot_models.Application.GRANT_CLIENT_CREDENTIALS:
             body['client_secret'] = client.client_secret
 
@@ -162,20 +161,6 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
             body['asymmetric_jwt'] = asymmetric_jwt
 
         return body
-
-    def _generate_key_pair(self):
-        """ Generates an asymmetric key pair and returns the JWK of its public keys and keypair. """
-        rsa_key = RSA.generate(2048)
-        rsa_jwk = jwk.RSAKey(kid="key_id", key=rsa_key)
-
-        public_keys = jwk.KEYS()
-        public_keys.append(rsa_jwk)
-        serialized_public_keys_json = public_keys.dump_jwks()
-
-        serialized_keypair = rsa_jwk.serialize(private=True)
-        serialized_keypair_json = json.dumps(serialized_keypair)
-
-        return serialized_public_keys_json, serialized_keypair_json
 
     def _test_jwt_access_token(self, client_attr, token_type=None, headers=None, grant_type=None, asymmetric_jwt=False):
         """
@@ -330,17 +315,21 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
             scopes=['grades:read'],
             filters=['test:filter'],
         )
-        scopes = dot_app_access.scopes
+        requested_scopes = dot_app_access.scopes
         filters = self.dot_adapter.get_authorization_filters(dot_app)
         assert 'test:filter' in filters
 
-        response = self._post_request(self.user, dot_app, token_type='jwt', scope=scopes)
+        response = self._post_request(self.user, dot_app, token_type='jwt', scope=requested_scopes)
         assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
+        scopes_in_response = data['scope'].split(' ')
+        for requested_scope in requested_scopes:
+            assert requested_scope in scopes_in_response
+
         self.assert_valid_jwt_access_token(
             data['access_token'],
             self.user,
-            scopes,
+            scopes_in_response,
             filters=filters,
             grant_type=grant_type,
         )
@@ -598,7 +587,7 @@ class TestAuthorizationView(_DispatchingViewTestCase):
     @ddt.unpack
     def test_post_authorization_view(self, client_type, allow_field):
         oauth_application = getattr(self, f'{client_type}_app')
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         response = self.client.post(
             '/oauth2/authorize/',
             {
@@ -620,7 +609,7 @@ class TestAuthorizationView(_DispatchingViewTestCase):
         Make sure we get the overridden Authorization page - not
         the default django-oauth-toolkit when we perform a page load
         """
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         response = self.client.get(
             '/oauth2/authorize/',
             {
@@ -787,7 +776,7 @@ class TestRevokeTokenView(AccessTokenLoginMixin, _DispatchingViewTestCase):  # p
             'client_id': self.dot_app.client_id,
             'grant_type': 'password',
             'username': self.user.username,
-            'password': 'test',
+            'password': self.TEST_PASSWORD,
         }
 
     def access_token_post_body_with_refresh_token(self, refresh_token):

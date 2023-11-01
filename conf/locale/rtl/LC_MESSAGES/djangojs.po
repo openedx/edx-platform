@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-09-05 15:59+0000\n"
-"PO-Revision-Date: 2023-09-05 15:59:41.261194\n"
+"POT-Creation-Date: 2023-10-22 20:35+0000\n"
+"PO-Revision-Date: 2023-10-22 20:35:52.488124\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -42,16 +42,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.8.0\n"
-
-#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
-#: cms/static/js/views/video_transcripts.js
-#: xmodule/assets/library_source_block/public/js/library_source_block.js
-msgid ""
-"This may be happening because of an error with our server or your internet "
-"connection. Try refreshing the page or making sure you are online."
-msgstr ""
-"Ŧɥᴉs ɯɐʎ bǝ ɥɐddǝnᴉnƃ bǝɔɐnsǝ øɟ ɐn ǝɹɹøɹ ʍᴉʇɥ ønɹ sǝɹʌǝɹ øɹ ʎønɹ ᴉnʇǝɹnǝʇ "
-"ɔønnǝɔʇᴉøn. Ŧɹʎ ɹǝɟɹǝsɥᴉnƃ ʇɥǝ dɐƃǝ øɹ ɯɐʞᴉnƃ snɹǝ ʎøn ɐɹǝ ønlᴉnǝ."
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -64,7 +54,6 @@ msgstr ""
 #: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/tabs.js
 #: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
 #: lms/static/js/views/fields.js
-#: xmodule/assets/library_source_block/public/js/library_source_block.js
 msgid "Saving"
 msgstr "Sɐʌᴉnƃ"
 
@@ -143,7 +132,6 @@ msgstr "Ʉdløɐdᴉnƃ"
 #: cms/templates/js/course-video-settings.underscore
 #: common/static/common/templates/discussion/templates.underscore
 #: common/static/common/templates/image-modal.underscore
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Close"
 msgstr "Ȼløsǝ"
 
@@ -4021,10 +4009,6 @@ msgstr ""
 "Ŧǝll øʇɥǝɹ lǝɐɹnǝɹs ɐ lᴉʇʇlǝ ɐbønʇ ʎønɹsǝlɟ: ʍɥǝɹǝ ʎøn lᴉʌǝ, ʍɥɐʇ ʎønɹ "
 "ᴉnʇǝɹǝsʇs ɐɹǝ, ʍɥʎ ʎøn'ɹǝ ʇɐʞᴉnƃ ɔønɹsǝs, øɹ ʍɥɐʇ ʎøn ɥødǝ ʇø lǝɐɹn."
 
-#: openedx/features/learner_profile/static/learner_profile/js/views/badge_list_container.js
-msgid "Accomplishments Pagination"
-msgstr "Ⱥɔɔøɯdlᴉsɥɯǝnʇs Ᵽɐƃᴉnɐʇᴉøn"
-
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
 msgid "Account Settings page."
 msgstr "Ⱥɔɔønnʇ Sǝʇʇᴉnƃs dɐƃǝ."
@@ -4058,10 +4042,6 @@ msgid "About Me"
 msgstr "Ⱥbønʇ Mǝ"
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
-msgid "Accomplishments"
-msgstr "Ⱥɔɔøɯdlᴉsɥɯǝnʇs"
-
-#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "Profile"
 msgstr "Ᵽɹøɟᴉlǝ"
 
@@ -4069,18 +4049,6 @@ msgstr "Ᵽɹøɟᴉlǝ"
 #: xmodule/js/public/js/library_content_edit.js
 msgid "Updating with latest library content"
 msgstr "Ʉddɐʇᴉnƃ ʍᴉʇɥ lɐʇǝsʇ lᴉbɹɐɹʎ ɔønʇǝnʇ"
-
-#: xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
-msgid "Loading..."
-msgstr "Łøɐdᴉnƃ..."
-
-#: xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
-msgid "Selected blocks"
-msgstr "Sǝlǝɔʇǝd bløɔʞs"
-
-#: xmodule/assets/library_source_block/public/js/library_source_block.js
-msgid "Unable to update settings"
-msgstr "Ʉnɐblǝ ʇø nddɐʇǝ sǝʇʇᴉnƃs"
 
 #: xmodule/assets/split_test/public/js/split_test_author_view.js
 #: xmodule/js/public/js/split_test_author_view.js
@@ -5741,6 +5709,15 @@ msgstr "Ŧnɹn øn ʇɹɐnsɔɹᴉdʇs"
 msgid "Turn off transcripts"
 msgstr "Ŧnɹn øɟɟ ʇɹɐnsɔɹᴉdʇs"
 
+#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
+#: cms/static/js/views/video_transcripts.js
+msgid ""
+"This may be happening because of an error with our server or your internet "
+"connection. Try refreshing the page or making sure you are online."
+msgstr ""
+"Ŧɥᴉs ɯɐʎ bǝ ɥɐddǝnᴉnƃ bǝɔɐnsǝ øɟ ɐn ǝɹɹøɹ ʍᴉʇɥ ønɹ sǝɹʌǝɹ øɹ ʎønɹ ᴉnʇǝɹnǝʇ "
+"ɔønnǝɔʇᴉøn. Ŧɹʎ ɹǝɟɹǝsɥᴉnƃ ʇɥǝ dɐƃǝ øɹ ɯɐʞᴉnƃ snɹǝ ʎøn ɐɹǝ ønlᴉnǝ."
+
 #: cms/static/cms/js/main.js
 msgid "Studio's having trouble saving your work"
 msgstr "Sʇndᴉø's ɥɐʌᴉnƃ ʇɹønblǝ sɐʌᴉnƃ ʎønɹ ʍøɹʞ"
@@ -6302,13 +6279,23 @@ msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
-msgid "New files were added to this course's Files & Uploads"
-msgstr "Nǝʍ ɟᴉlǝs ʍǝɹǝ ɐddǝd ʇø ʇɥᴉs ɔønɹsǝ's Fᴉlǝs & Ʉdløɐds"
+msgid "New file(s) added to Files & Uploads."
+msgstr "Nǝʍ ɟᴉlǝ(s) ɐddǝd ʇø Fᴉlǝs & Ʉdløɐds."
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
 msgid "The following required files were imported to this course:"
 msgstr "Ŧɥǝ ɟølløʍᴉnƃ ɹǝbnᴉɹǝd ɟᴉlǝs ʍǝɹǝ ᴉɯdøɹʇǝd ʇø ʇɥᴉs ɔønɹsǝ:"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "View files"
+msgstr "Vᴉǝʍ ɟᴉlǝs"
+
+#: cms/static/js/views/course_outline.js
+#: cms/static/js/views/pages/container.js
+msgid "Dismiss"
+msgstr "Đᴉsɯᴉss"
 
 #: cms/static/js/views/course_rerun.js
 msgid "Create Re-run"
@@ -9852,32 +9839,6 @@ msgstr[1] "Łøɐd nǝxʇ {num_items} ɹǝsnlʇs"
 msgid "Sorry, no results were found."
 msgstr "Søɹɹʎ, nø ɹǝsnlʇs ʍǝɹǝ ɟønnd."
 
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-#, python-format
-msgid "Share your \"%(display_name)s\" award"
-msgstr "Sɥɐɹǝ ʎønɹ \"%(display_name)s\" ɐʍɐɹd"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-msgid "Share"
-msgstr "Sɥɐɹǝ"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-#, python-format
-msgid "Earned %(created)s."
-msgstr "Ɇɐɹnǝd %(created)s."
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "What's Your Next Accomplishment?"
-msgstr "Wɥɐʇ's Ɏønɹ Nǝxʇ Ⱥɔɔøɯdlᴉsɥɯǝnʇ?"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "Start working toward your next learning goal."
-msgstr "Sʇɐɹʇ ʍøɹʞᴉnƃ ʇøʍɐɹd ʎønɹ nǝxʇ lǝɐɹnᴉnƃ ƃøɐl."
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "Find a course"
-msgstr "Fᴉnd ɐ ɔønɹsǝ"
-
 #: openedx/features/learner_profile/static/learner_profile/templates/section_two.underscore
 msgid "You are currently sharing a limited profile."
 msgstr "Ɏøn ɐɹǝ ɔnɹɹǝnʇlʎ sɥɐɹᴉnƃ ɐ lᴉɯᴉʇǝd dɹøɟᴉlǝ."
@@ -9885,38 +9846,6 @@ msgstr "Ɏøn ɐɹǝ ɔnɹɹǝnʇlʎ sɥɐɹᴉnƃ ɐ lᴉɯᴉʇǝd dɹøɟᴉl
 #: openedx/features/learner_profile/static/learner_profile/templates/section_two.underscore
 msgid "This learner is currently sharing a limited profile."
 msgstr "Ŧɥᴉs lǝɐɹnǝɹ ᴉs ɔnɹɹǝnʇlʎ sɥɐɹᴉnƃ ɐ lᴉɯᴉʇǝd dɹøɟᴉlǝ."
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid "Share on Mozilla Backpack"
-msgstr "Sɥɐɹǝ øn Møzᴉllɐ Ƀɐɔʞdɐɔʞ"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"To share your certificate on Mozilla Backpack, you must first have a "
-"Backpack account. Complete the following steps to add your certificate to "
-"Backpack."
-msgstr ""
-"Ŧø sɥɐɹǝ ʎønɹ ɔǝɹʇᴉɟᴉɔɐʇǝ øn Møzᴉllɐ Ƀɐɔʞdɐɔʞ, ʎøn ɯnsʇ ɟᴉɹsʇ ɥɐʌǝ ɐ "
-"Ƀɐɔʞdɐɔʞ ɐɔɔønnʇ. Ȼøɯdlǝʇǝ ʇɥǝ ɟølløʍᴉnƃ sʇǝds ʇø ɐdd ʎønɹ ɔǝɹʇᴉɟᴉɔɐʇǝ ʇø "
-"Ƀɐɔʞdɐɔʞ."
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"Create a {link_start}Mozilla Backpack{link_end} account, or log in to your "
-"existing account"
-msgstr ""
-"Ȼɹǝɐʇǝ ɐ {link_start}Møzᴉllɐ Ƀɐɔʞdɐɔʞ{link_end} ɐɔɔønnʇ, øɹ løƃ ᴉn ʇø ʎønɹ "
-"ǝxᴉsʇᴉnƃ ɐɔɔønnʇ"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"{download_link_start}Download this image (right-click or option-click, save "
-"as){link_end} and then {upload_link_start}upload{link_end} it to your "
-"backpack."
-msgstr ""
-"{download_link_start}Đøʍnløɐd ʇɥᴉs ᴉɯɐƃǝ (ɹᴉƃɥʇ-ɔlᴉɔʞ øɹ ødʇᴉøn-ɔlᴉɔʞ, sɐʌǝ "
-"ɐs){link_end} ɐnd ʇɥǝn {upload_link_start}ndløɐd{link_end} ᴉʇ ʇø ʎønɹ "
-"bɐɔʞdɐɔʞ."
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"

@@ -32,7 +32,7 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .exceptions import AssetNotFoundException, AssetSizeTooLargeException
-from .utils import reverse_course_url, get_files_uploads_url
+from .utils import reverse_course_url, get_files_uploads_url, get_response_format, request_response_format_is_json
 from .toggles import use_new_files_uploads_page
 
 
@@ -43,6 +43,7 @@ REQUEST_DEFAULTS = {
     'direction': '',
     'asset_type': '',
     'text_search': '',
+    'display_name': '',
 }
 
 
@@ -61,7 +62,9 @@ def handle_assets(request, course_key_string=None, asset_key_string=None):
             sort: the asset field to sort by (defaults to 'date_added')
             direction: the sort direction (defaults to 'descending')
             asset_type: the file type to filter items to (defaults to All)
-            text_search: string to filter results by file name (defaults to '')
+            text_search: string to perform a search on filenames (defaults to '')
+            display_name: string to filter results by exact display name (defaults to '').
+                Use the display_name parameter multiple times to filter by multiple filenames.
     POST
         json: create or update an asset. The only updating that can be done is changing the lock state.
     PUT
@@ -73,8 +76,8 @@ def handle_assets(request, course_key_string=None, asset_key_string=None):
     if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
 
-    response_format = _get_response_format(request)
-    if _request_response_format_is_json(request, response_format):
+    response_format = get_response_format(request)
+    if request_response_format_is_json(request, response_format):
         if request.method == 'GET':
             return _assets_json(request, course_key)
 
@@ -133,14 +136,6 @@ def get_asset_usage_path(request, course_key, asset_key_string):
     return JsonResponse({'usage_locations': usage_locations})
 
 
-def _get_response_format(request):
-    return request.GET.get('format') or request.POST.get('format') or 'html'
-
-
-def _request_response_format_is_json(request, response_format):
-    return response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json')
-
-
 def _asset_index(request, course_key):
     '''
     Display an editable asset library.
@@ -179,6 +174,9 @@ def _assets_json(request, course_key):
             return filters_are_invalid_error
 
         filter_parameters.update(_get_content_type_filter_for_mongo(request_options['requested_asset_type']))
+
+    if request_options['requested_display_names']:
+        filter_parameters.update(_get_displayname_filter_for_mongo(request_options['requested_display_names']))
 
     if request_options['requested_text_search']:
         filter_parameters.update(_get_displayname_search_filter_for_mongo(request_options['requested_text_search']))
@@ -231,11 +229,16 @@ def _parse_request_to_dictionary(request):
         'requested_sort_direction': _get_requested_attribute(request, 'direction'),
         'requested_asset_type': _get_requested_attribute(request, 'asset_type'),
         'requested_text_search': _get_requested_attribute(request, 'text_search'),
+        'requested_display_names': _get_requested_attribute_list(request, 'display_name'),
     }
 
 
 def _get_requested_attribute(request, attribute):
     return request.GET.get(attribute, REQUEST_DEFAULTS.get(attribute))
+
+
+def _get_requested_attribute_list(request, attribute):
+    return request.GET.getlist(attribute, REQUEST_DEFAULTS.get(attribute))
 
 
 def _get_error_if_invalid_parameters(requested_filter):
@@ -308,6 +311,24 @@ def _get_mongo_expression_for_type_filter(requested_file_types):
         'contentType': {
             '$in': content_types
         }
+    }
+
+
+def _get_displayname_filter_for_mongo(displaynames):
+    """
+    Construct and return pymongo query dict, filtering for the given list of displaynames.
+    """
+    filters = []
+
+    for displayname in displaynames:
+        filters.append({
+            'displayname': {
+                '$eq': displayname,
+            },
+        })
+
+    return {
+        '$or': filters,
     }
 
 
@@ -575,7 +596,7 @@ def _get_thumbnail_asset_key(asset, course_key):
 
 
 # TODO: this method needs improvement. These view decorators should be at the top in an actual view method,
-#  but this is just a method called by the asset_handler. The asset_handler used by the public studio content API
+#  but this is just a method called by the asset_handler. The asset_handler used by the public CMS API
 # just ignores all of this stuff.
 @require_http_methods(('DELETE', 'POST', 'PUT'))
 @login_required

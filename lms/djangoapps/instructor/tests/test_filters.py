@@ -99,7 +99,7 @@ class InstructorDashboardFiltersTest(ModuleStoreTestCase):
         """
         super().setUp()
         self.instructor = AdminFactory.create()
-        self.client.login(username=self.instructor.username, password="test")
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
         self.course = CourseFactory.create(
             org="test1", course="course1", display_name="run1",
         )

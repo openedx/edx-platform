@@ -42,3 +42,12 @@ def get_show_notifications_tray(user):
             break
 
     return show_notifications_tray
+
+
+def get_list_in_batches(input_list, batch_size):
+    """
+    Divides the list of objects into list of list of objects each of length batch_size.
+    """
+    list_length = len(input_list)
+    for index in range(0, list_length, batch_size):
+        yield input_list[index: index + batch_size]
