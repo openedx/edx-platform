@@ -1021,9 +1021,11 @@ def _delete_item(usage_key, user):
     CourseUnitTime.remove_unit_time_seuqe(block_id = str(usage_key))
 
     block = _get_xblock(usage_key=usage_key, user=user)
-    for a in block.children :
-        CourseOverviewSubText.removeSubText(sequence_id=str(a))
-        CourseUnitTime.remove_unit_time_seuqe(block_id = str(a))
+    
+    if hasattr(block, 'children') :
+        for a in block.children :
+            CourseOverviewSubText.removeSubText(sequence_id=str(a))
+            CourseUnitTime.remove_unit_time_seuqe(block_id = str(a))
 
     with store.bulk_operations(usage_key.course_key):
         # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
