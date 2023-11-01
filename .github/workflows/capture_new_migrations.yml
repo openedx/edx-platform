@@ -158,6 +158,7 @@ jobs:
         echo "Running the LMS migrations."
         ./manage.py lms makemigrations
         ./manage.py lms migrate social_django
+
         echo "Running the CMS migrations."
         ./manage.py cms makemigrations
 #        ./manage.py cms migrate

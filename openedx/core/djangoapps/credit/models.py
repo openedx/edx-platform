@@ -142,6 +142,7 @@ class CreditProvider(TimeStampedModel):
     )
 
     display_name_testing = models.CharField(
+        null=True,
         max_length=255,
         help_text=gettext_lazy("Name of the credit provider displayed to users")
     )
