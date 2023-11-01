@@ -265,8 +265,13 @@ class DeprecatedRestApiClient(slumber.API):
     @classmethod
     def get_oauth_access_token(cls, url, client_id, client_secret, token_type='bearer',
                                timeout=(REQUEST_CONNECT_TIMEOUT, REQUEST_READ_TIMEOUT)):
-        #     'To help transition to OAuthAPIClient, use DeprecatedRestApiClient.get_and_cache_jwt_oauth_access_token instead'
-        #     'of DeprecatedRestApiClient.get_oauth_access_token to share cached jwt token used by OAuthAPIClient.'
+        """
+        To help transition to OAuthAPIClient, use DeprecatedRestApiClient.
+        get_and_cache_jwt_oauth_access_token instead'
+
+        'of DeprecatedRestApiClient.get_oauth_access_token to share cached jwt token used by OAuthAPIClient.'
+
+        """
         return get_oauth_access_token(url, client_id, client_secret, token_type=token_type, timeout=timeout)
 
     @classmethod
