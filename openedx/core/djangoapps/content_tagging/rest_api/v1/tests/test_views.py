@@ -1147,6 +1147,9 @@ class TestTaxonomyUpdateOrg(TestTaxonomyObjectsMixin, APITestCase):
         "library_userA",
     )
     def test_update_org_no_perm(self, user_attr: str) -> None:
+        """
+        Tests that only taxonomy admins can associate orgs to taxonomies
+        """
         url = TAXONOMY_ORG_UPDATE_ORG_URL.format(pk=self.tA1.pk)
         user = getattr(self, user_attr)
         self.client.force_authenticate(user=user)
@@ -1159,7 +1162,10 @@ class TestTaxonomyUpdateOrg(TestTaxonomyObjectsMixin, APITestCase):
         assert taxonomy_orgs.count() == 1
         assert taxonomy_orgs[0].org == self.orgA
 
-    def test_update_org_check_permissions(self) -> None:
+    def test_update_org_check_permissions_orgA(self) -> None:
+        """
+        Tests that adding an org to a taxonomy allow org level admins to edit it
+        """
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.tB1.pk)
         self.client.force_authenticate(user=self.staffA)
 
@@ -1181,6 +1187,60 @@ class TestTaxonomyUpdateOrg(TestTaxonomyObjectsMixin, APITestCase):
 
         # Now staffA can change the metadata from a tB1 because it's associated with orgA
         assert response.status_code == status.HTTP_200_OK
+
+    def test_update_org_check_permissions_all_orgs(self) -> None:
+        """
+        Tests that adding an org to all orgs only let taxonomy global admins to edit it
+        """
+        url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.tA1.pk)
+        self.client.force_authenticate(user=self.staffA)
+
+        response = self.client.put(url, {"name": "new name"}, format="json")
+
+        # User staffA can update metadata from a taxonomy from orgA
+        assert response.status_code == status.HTTP_200_OK
+
+        url = TAXONOMY_ORG_UPDATE_ORG_URL.format(pk=self.tB1.pk)
+        self.client.force_authenticate(user=self.staff)
+
+        # Add the taxonomy tA1 to all orgs
+        response = self.client.put(url, {"all_orgs": True}, format="json")
+
+        url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.tB1.pk)
+        self.client.force_authenticate(user=self.staffA)
+
+        response = self.client.put(url, {"name": "new name"}, format="json")
+
+        # Now staffA can't change the metadata from a tA1 because only global taxonomy admins can edit all orgs
+        # taxonomies
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_update_org_check_permissions_no_orgs(self) -> None:
+        """
+        Tests that remove all orgs from a taxonomy only let taxonomy global admins to edit it
+        """
+        url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.tA1.pk)
+        self.client.force_authenticate(user=self.staffA)
+
+        response = self.client.put(url, {"name": "new name"}, format="json")
+
+        # User staffA can update metadata from a taxonomy from orgA
+        assert response.status_code == status.HTTP_200_OK
+
+        url = TAXONOMY_ORG_UPDATE_ORG_URL.format(pk=self.tB1.pk)
+        self.client.force_authenticate(user=self.staff)
+
+        # Remove all orgs from tA1
+        response = self.client.put(url, {"orgs": []}, format="json")
+
+        url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.tB1.pk)
+        self.client.force_authenticate(user=self.staffA)
+
+        response = self.client.put(url, {"name": "new name"}, format="json")
+
+        # Now staffA can't change the metadata from a tA1 because only global taxonomy admins can edit no orgs
+        # taxonomies
+        assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 class TestObjectTagMixin(TestTaxonomyObjectsMixin):
