@@ -4428,6 +4428,9 @@ MOBILE_APP_USER_AGENT_REGEXES = [
     r'edX/org.edx.mobile',
 ]
 
+# set course limit for mobile search
+MOBILE_SEARCH_COURSE_LIMIT = 100
+
 # cache timeout in seconds for Mobile App Version Upgrade
 APP_UPGRADE_CACHE_TIMEOUT = 3600
 
