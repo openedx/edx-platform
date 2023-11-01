@@ -156,8 +156,10 @@ jobs:
         STUDIO_CFG: lms/envs/minimal.yml
       run: |
         echo "Running the LMS migrations."
+        ./manage.py lms makemigrations
         ./manage.py lms migrate social_django
-#        echo "Running the CMS migrations."
+        echo "Running the CMS migrations."
+        ./manage.py cms makemigrations
 #        ./manage.py cms migrate
 
     - name: Verify executed migrations on branch.
