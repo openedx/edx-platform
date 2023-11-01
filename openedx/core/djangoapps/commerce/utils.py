@@ -3,17 +3,29 @@
 
 import requests
 import slumber
+import datetime
+import json
+import os
+import socket
 from django.conf import settings
 from edx_rest_api_client.auth import BearerAuth, JwtAuth, SuppliedJwtAuth
 from edx_rest_api_client.__version__ import __version__
+from edx_django_utils.cache import TieredCache
 from eventtracking import tracker
 
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from edx_django_utils.monitoring import set_custom_attribute
 
+# When caching tokens, use this value to err on expiring tokens a little early so they are
+# sure to be valid at the time they are used.
+ACCESS_TOKEN_EXPIRED_THRESHOLD_SECONDS = 5
+
+# How long should we wait to connect to the auth service.
+# https://requests.readthedocs.io/en/master/user/advanced/#timeouts
 REQUEST_CONNECT_TIMEOUT = 3.05
 REQUEST_READ_TIMEOUT = 5
+
 ECOMMERCE_DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 
 
