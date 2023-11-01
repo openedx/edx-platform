@@ -1159,6 +1159,29 @@ class TestTaxonomyUpdateOrg(TestTaxonomyObjectsMixin, APITestCase):
         assert taxonomy_orgs.count() == 1
         assert taxonomy_orgs[0].org == self.orgA
 
+    def test_update_org_check_permissions(self) -> None:
+        url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.tB1.pk)
+        self.client.force_authenticate(user=self.staffA)
+
+        response = self.client.put(url, {"name": "new name"}, format="json")
+
+        # User staffA can't update metadata from a taxonomy from orgB
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+        url = TAXONOMY_ORG_UPDATE_ORG_URL.format(pk=self.tB1.pk)
+        self.client.force_authenticate(user=self.staff)
+
+        # Add the taxonomy tB1 to orgA
+        response = self.client.put(url, {"orgs": [self.orgA.short_name]}, format="json")
+
+        url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.tB1.pk)
+        self.client.force_authenticate(user=self.staffA)
+
+        response = self.client.put(url, {"name": "new name"}, format="json")
+
+        # Now staffA can change the metadata from a tB1 because it's associated with orgA
+        assert response.status_code == status.HTTP_200_OK
+
 
 class TestObjectTagMixin(TestTaxonomyObjectsMixin):
     """
