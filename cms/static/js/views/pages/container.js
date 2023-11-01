@@ -91,6 +91,12 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                 });
                 this.publishHistory.render();
 
+                this.tagList = new ContainerSubviews.TagList({
+                    el: this.$('#tag-list'),
+                    model: this.model
+                });
+                this.tagList.render();
+
                 this.viewLiveActions = new ContainerSubviews.ViewLiveButtonController({
                     el: this.$('.nav-actions'),
                     model: this.model

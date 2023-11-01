@@ -25,7 +25,10 @@ from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.xblock_django.api import authorable_xblocks, disabled_xblocks
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
-from cms.djangoapps.contentstore.toggles import use_new_problem_editor
+from cms.djangoapps.contentstore.toggles import (
+    use_new_problem_editor,
+    use_tagging_taxonomy_list_page,
+)
 from openedx.core.lib.xblock_utils import get_aside_from_xblock, is_xblock_aside
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.content_staging import api as content_staging_api
@@ -61,7 +64,7 @@ CONTAINER_TEMPLATES = [
     "editor-mode-button", "upload-dialog",
     "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu",
     "add-xblock-component-support-legend", "add-xblock-component-support-level", "add-xblock-component-menu-problem",
-    "xblock-string-field-editor", "xblock-access-editor", "publish-xblock", "publish-history",
+    "xblock-string-field-editor", "xblock-access-editor", "publish-xblock", "publish-history", "tag-list",
     "unit-outline", "container-message", "container-access", "license-selector", "copy-clipboard-button",
     "edit-title-button",
 ]
@@ -216,6 +219,7 @@ def container_handler(request, usage_key_string):
                 'draft_preview_link': preview_lms_link,
                 'published_preview_link': lms_link,
                 'templates': CONTAINER_TEMPLATES,
+                'show_unit_tags': use_tagging_taxonomy_list_page(),
                 # Status of the user's clipboard, exactly as would be returned from the "GET clipboard" REST API.
                 'user_clipboard': user_clipboard,
             })
