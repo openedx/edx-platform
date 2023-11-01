@@ -68,6 +68,12 @@ class CreditProvider(TimeStampedModel):
         help_text=gettext_lazy("Name of the credit provider displayed to users")
     )
 
+    display_name_dummy = models.CharField(
+        null=True,
+        max_length=255,
+        help_text=gettext_lazy("Name of the credit provider displayed to users")
+    )
+
     enable_integration = models.BooleanField(
         default=False,
         help_text=gettext_lazy(
