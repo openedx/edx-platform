@@ -108,7 +108,7 @@ jobs:
           pip check # fail if this test-reqs/Django combination is broken
         fi
 
-    - name: Run Tests
+    - name: Run migrations on master branch
       env:
         LMS_CFG: lms/envs/minimal.yml
         # This is from the LMS dir on purpose since we don't need anything different for the CMS yet.
@@ -118,23 +118,6 @@ jobs:
         ./manage.py lms migrate social_django
 #        echo "Running the CMS migrations."
 #        ./manage.py cms migrate
-
-#    - name: "Setup env vars"
-#      id: envvars
-#      run: |
-#        number1=10
-#        number2=5
-#        echo "Number 1: $number1"
-#        echo "Number 2: $number2"
-#        result=$((number1 - number2))
-#        echo "Result: $result"
-#        echo "SUBTRACTION_RESULT=$result" >> $GITHUB_ENV
-#      shell: bash
-#
-#    - name: Use subtraction result
-#      run: |
-#        subtraction_result=${{ env.SUBTRACTION_RESULT }}
-#        echo "Subtraction Result: $subtraction_result"
 
     - name: Verify executed migrations on master.
       id: capture1
@@ -193,13 +176,15 @@ jobs:
         number2=${{ env.FIRST_QUERY }}
         diff=$((number1 - number2))
         data=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select app, name from django_migrations ORDER by -id limit $diff;" edxapp;)
-        formatted_data=$(echo "$data" | tr '\t' ' ')
-        echo "CUSTOM_MESSAGE=$formatted_data" >> $GITHUB_ENV
+#        formatted_data=$(echo "$data" | tr '\t' ' ')
+        echo "$data" > multi_line_data.txt
+        echo "echo $data"
+#        echo "CUSTOM_MESSAGE=$formatted_data" >> $GITHUB_ENV
 #        echo "$formatted_data" > multi_line_data.txt
       shell: bash
 #
-#    - name: Comment PR
-#      uses: thollander/actions-comment-pull-request@v2
+    - name: Comment PR
+      uses: thollander/actions-comment-pull-request@v2
 #      filePath: multi_line_data.txt
 #        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
