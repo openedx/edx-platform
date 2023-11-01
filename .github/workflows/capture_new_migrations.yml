@@ -172,11 +172,13 @@ jobs:
 
     - name: Process Data
       run: |
-        number1=${{ env.SECOND_QUERY }}
-        number2=${{ env.FIRST_QUERY }}
-        diff=$((number1 - number2))
-        data=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select name from django_migrations ORDER by -id limit $diff;" edxapp;)
-        echo "$data" > cleaned_data.txt
+        number2=${{ env.SECOND_QUERY }}
+        number1=${{ env.FIRST_QUERY }}
+        diff=$((number2 - number1))
+        if [ $number2 -gt $number1 ]; then
+          data=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select name from django_migrations ORDER by -id limit $diff;" edxapp;)
+          echo "$data" > cleaned_data.txt
+        fi
       shell: bash
 
     - name: Comment PR
