@@ -186,8 +186,7 @@ jobs:
     - name: Comment PR
       uses: thollander/actions-comment-pull-request@v2
       with:
-        message: |
-          ${{ env.CUSTOM_MESSAGE }}
+        message: ${{ env.CUSTOM_MESSAGE }}
 #      filePath: multi_line_data.txt
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
