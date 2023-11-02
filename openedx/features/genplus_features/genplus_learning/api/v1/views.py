@@ -38,7 +38,7 @@ class ProgramViewSet(viewsets.ModelViewSet):
         else:
             program_ids = ProgramAccessRole.objects.filter(user=gen_user.user).values_list('program', flat=True).distinct()
 
-        qs = qs.filter(id__in=program_ids)
+        qs = qs.filter(id__in=program_ids).order_by('start_date')
         return qs
 
     def get_serializer_context(self):
@@ -87,7 +87,9 @@ class ClassStudentViewSet(mixins.ListModelMixin,
             gen_class = Class.objects.prefetch_related('students').get(pk=class_id)
         except Class.DoesNotExist:
             return Student.objects.none()
-        return gen_class.students.select_related('gen_user__user').all()
+        return gen_class.students.filter(gen_user__school=self.request.user.gen_user.school).select_related(
+            'gen_user__user'
+        ).all()
 
 
 class ClassSummaryViewSet(viewsets.ModelViewSet):
