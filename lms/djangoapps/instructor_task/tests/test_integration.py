@@ -273,7 +273,7 @@ class TestRescoringTask(TestIntegrationTask):
         self.submit_student_answer('u1', problem_url_name, [OPTION_1, OPTION_1])
 
         expected_message = "bad things happened"
-        with patch('xmodule.capa.capa_problem.LoncapaProblem.get_grade_from_current_answers') as mock_rescore:
+        with patch('xmodule.capa.capa_problem.LoncapaProblem.get_grade_from_answers') as mock_rescore:
             mock_rescore.side_effect = ZeroDivisionError(expected_message)
             instructor_task = self.submit_rescore_all_student_answers('instructor', problem_url_name)
         self._assert_task_failure(
@@ -293,7 +293,7 @@ class TestRescoringTask(TestIntegrationTask):
 
         # return an input error as if it were a numerical response, with an embedded unicode character:
         expected_message = "Could not interpret '2/3\u03a9' as a number"
-        with patch('xmodule.capa.capa_problem.LoncapaProblem.get_grade_from_current_answers') as mock_rescore:
+        with patch('xmodule.capa.capa_problem.LoncapaProblem.get_grade_from_answers') as mock_rescore:
             mock_rescore.side_effect = StudentInputError(expected_message)
             instructor_task = self.submit_rescore_all_student_answers('instructor', problem_url_name)
 

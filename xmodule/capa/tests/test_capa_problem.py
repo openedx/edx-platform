@@ -8,8 +8,9 @@ import pytest
 import ddt
 from lxml import etree
 from markupsafe import Markup
-from mock import patch
+from mock import patch, MagicMock
 
+from xmodule.capa.correctmap import CorrectMap
 from xmodule.capa.responsetypes import LoncapaProblemError
 from xmodule.capa.tests.helpers import new_loncapa_problem
 from openedx.core.djangolib.markup import HTML
@@ -732,3 +733,84 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
         # Ensure that the answer is a string so that the dict returned from this
         # function can eventualy be serialized to json without issues.
         assert isinstance(problem.get_question_answers()['1_solution_1'], str)
+
+    def test_get_grade_from_answers_with_student_answers(self):
+        student_answers = {'1_2_1': 'over-suspicious'}
+        correct_map = CorrectMap()
+        problem = new_loncapa_problem(
+            """
+            <problem>
+                <multiplechoiceresponse>
+                    <choicegroup>
+                        <choice correct="true">Answer1</choice>
+                        <choice correct="false">Answer2</choice>
+                        <choice correct="false">Answer3</choice>
+                        <choice correct="false">Answer4</choice>
+                    </choicegroup>
+                </multiplechoiceresponse>
+            </problem>
+            """
+        )
+        responder_mock = MagicMock()
+
+        with patch.object(problem, 'responders', {'responder1': responder_mock}):
+            responder_mock.allowed_inputfields = ['choicegroup']
+            responder_mock.evaluate_answers.return_value = correct_map
+
+            result = problem.get_grade_from_answers(student_answers, correct_map)
+
+            self.assertEqual(result.get_dict(), correct_map.get_dict())
+            responder_mock.evaluate_answers.assert_called_once_with(student_answers, correct_map)
+
+    def test_get_grade_from_answers_without_student_answers(self):
+        correct_map = CorrectMap()
+        problem = new_loncapa_problem(
+            """
+            <problem>
+                <multiplechoiceresponse>
+                    <choicegroup>
+                        <choice correct="true">Answer1</choice>
+                        <choice correct="false">Answer2</choice>
+                        <choice correct="false">Answer3</choice>
+                        <choice correct="false">Answer4</choice>
+                    </choicegroup>
+                </multiplechoiceresponse>
+            </problem>
+            """
+        )
+        responder_mock = MagicMock()
+
+        with patch.object(problem, 'responders', {'responder1': responder_mock}):
+            problem.responders['responder1'].allowed_inputfields = ['choicegroup']
+            problem.responders['responder1'].evaluate_answers.return_value = correct_map
+
+            result = problem.get_grade_from_answers(None, correct_map)
+
+            self.assertEqual(result.get_dict(), correct_map.get_dict())
+            responder_mock.evaluate_answers.assert_called_once_with({}, correct_map)
+
+    def test_get_grade_from_answers_with_filesubmission(self):
+        correct_map = CorrectMap()
+        problem = new_loncapa_problem(
+            """
+            <problem>
+                <multiplechoiceresponse>
+                    <choicegroup>
+                        <choice correct="true">Answer1</choice>
+                        <choice correct="false">Answer2</choice>
+                        <choice correct="false">Answer3</choice>
+                        <choice correct="false">Answer4</choice>
+                    </choicegroup>
+                </multiplechoiceresponse>
+            </problem>
+            """
+        )
+        responder_mock = MagicMock()
+
+        with patch.object(problem, 'responders', {'responder1': responder_mock}):
+            responder_mock.allowed_inputfields = ['filesubmission']
+            responder_mock.evaluate_answers.return_value = correct_map
+
+            with self.assertRaises(Exception):
+                problem.get_grade_from_answers(None, correct_map)
+            responder_mock.evaluate_answers.assert_not_called()

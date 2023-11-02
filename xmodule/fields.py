@@ -7,7 +7,7 @@ import time
 
 import dateutil.parser
 from pytz import UTC
-from xblock.fields import JSONField
+from xblock.fields import JSONField, List
 from xblock.scorable import Score
 
 log = logging.getLogger(__name__)
@@ -298,5 +298,28 @@ class ScoreField(JSONField):
             )
 
         return Score(raw_earned, raw_possible)
+
+    enforce_type = from_json
+
+
+class ListScoreField(ScoreField, List):
+    """
+    Field for blocks that need to store a list of Scores.
+    """
+
+    MUTABLE = True
+    _default = []
+
+    def from_json(self, value):
+        if value is None:
+            return value
+        if isinstance(value, list):
+            scores = []
+            for score_json in value:
+                score = super().from_json(score_json)
+                scores.append(score)
+            return scores
+
+        raise TypeError("Value must be a list of Scores. Got {}".format(type(value)))
 
     enforce_type = from_json

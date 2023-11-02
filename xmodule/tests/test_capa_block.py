@@ -725,6 +725,111 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # and that this was considered attempt number 2 for grading purposes
         assert block.lcp.context['attempt'] == 2
 
+    @patch('xmodule.capa.correctmap.CorrectMap.is_correct')
+    @patch('xmodule.capa_block.ProblemBlock.get_problem_html')
+    def test_submit_problem_correct_last_score(self, mock_html: Mock, mock_is_correct: Mock):
+        # default grading method is last_score
+        block = CapaFactory.create(attempts=0, max_attempts=2)
+        mock_html.return_value = "Test HTML"
+
+        # First Attempt
+        mock_is_correct.return_value = True
+
+        get_request_dict = {CapaFactory.input_key(): '3.14'}
+        block.submit_problem(get_request_dict)
+
+        assert block.attempts == 1
+        assert block.lcp.context['attempt'] == 1
+        assert block.score == Score(raw_earned=1, raw_possible=1)
+
+        # Second Attempt
+        mock_is_correct.return_value = False
+        get_request_dict = {CapaFactory.input_key(): '3.54'}
+
+        block.submit_problem(get_request_dict)
+
+        assert block.attempts == 2
+        assert block.lcp.context['attempt'] == 2
+        assert block.score == Score(raw_earned=0, raw_possible=1)
+
+    @patch('xmodule.capa.correctmap.CorrectMap.is_correct')
+    @patch('xmodule.capa_block.ProblemBlock.get_problem_html')
+    def test_submit_problem_correct_highest_score(self, mock_html: Mock, mock_is_correct: Mock):
+        block = CapaFactory.create(attempts=0, max_attempts=2, grading_method='highest_score')
+        mock_html.return_value = "Test HTML"
+
+        # First Attempt
+        mock_is_correct.return_value = True
+
+        get_request_dict = {CapaFactory.input_key(): '3.14'}
+        block.submit_problem(get_request_dict)
+
+        assert block.attempts == 1
+        assert block.lcp.context['attempt'] == 1
+        assert block.score == Score(raw_earned=1, raw_possible=1)
+
+        # Second Attempt
+        mock_is_correct.return_value = False
+        get_request_dict = {CapaFactory.input_key(): '3.54'}
+
+        block.submit_problem(get_request_dict)
+
+        assert block.attempts == 2
+        assert block.lcp.context['attempt'] == 2
+        assert block.score == Score(raw_earned=1, raw_possible=1)
+
+    @patch('xmodule.capa.correctmap.CorrectMap.is_correct')
+    @patch('xmodule.capa_block.ProblemBlock.get_problem_html')
+    def test_submit_problem_correct_first_score(self, mock_html: Mock, mock_is_correct: Mock):
+        block = CapaFactory.create(attempts=0, max_attempts=2, grading_method='first_score')
+        mock_html.return_value = "Test HTML"
+
+        # First Attempt
+        mock_is_correct.return_value = False
+
+        get_request_dict = {CapaFactory.input_key(): '3.14'}
+        block.submit_problem(get_request_dict)
+
+        assert block.attempts == 1
+        assert block.lcp.context['attempt'] == 1
+        assert block.score == Score(raw_earned=0, raw_possible=1)
+
+        # Second Attempt
+        mock_is_correct.return_value = True
+        get_request_dict = {CapaFactory.input_key(): '3.54'}
+
+        block.submit_problem(get_request_dict)
+
+        assert block.attempts == 2
+        assert block.lcp.context['attempt'] == 2
+        assert block.score == Score(raw_earned=0, raw_possible=1)
+
+    @patch('xmodule.capa.correctmap.CorrectMap.is_correct')
+    @patch('xmodule.capa_block.ProblemBlock.get_problem_html')
+    def test_submit_problem_correct_average_score(self, mock_html: Mock, mock_is_correct: Mock):
+        block = CapaFactory.create(attempts=0, max_attempts=2, grading_method='average_score')
+        mock_html.return_value = "Test HTML"
+
+        # First Attempt
+        mock_is_correct.return_value = False
+
+        get_request_dict = {CapaFactory.input_key(): '3.14'}
+        block.submit_problem(get_request_dict)
+
+        assert block.attempts == 1
+        assert block.lcp.context['attempt'] == 1
+        assert block.score == Score(raw_earned=0, raw_possible=1)
+
+        # Second Attempt
+        mock_is_correct.return_value = True
+        get_request_dict = {CapaFactory.input_key(): '3.54'}
+
+        block.submit_problem(get_request_dict)
+
+        assert block.attempts == 2
+        assert block.lcp.context['attempt'] == 2
+        assert block.score == Score(raw_earned=0.5, raw_possible=1)
+
     def test_submit_problem_incorrect(self):
 
         block = CapaFactory.create(attempts=0)
@@ -1218,6 +1323,40 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # and that this is treated as the first attempt for grading purposes
         assert block.lcp.context['attempt'] == 1
 
+    def test_rescore_problem_update_grading_method(self):
+        block = CapaFactory.create(attempts=0, max_attempts=3)
+
+        get_request_dict = {CapaFactory.input_key(): '3.21'}
+        block.submit_problem(get_request_dict)
+
+        get_request_dict = {CapaFactory.input_key(): '3.45'}
+        block.submit_problem(get_request_dict)
+
+        get_request_dict = {CapaFactory.input_key(): '3.14'}
+        block.submit_problem(get_request_dict)
+
+        # Grading method is 'last_score'
+        assert block.grading_method == 'last_score'
+        assert block.score == Score(raw_earned=1, raw_possible=1)
+
+        # Change grading method to 'first_score'
+        block.grading_method = 'first_score'
+        block.rescore(only_if_higher=False)
+
+        assert block.score == Score(raw_earned=0, raw_possible=1)
+
+        # Change grading method to 'highest_score'
+        block.grading_method = 'highest_score'
+        block.rescore(only_if_higher=False)
+
+        assert block.score == Score(raw_earned=1, raw_possible=1)
+
+        # Change grading method to 'average_score'
+        block.grading_method = 'average_score'
+        block.rescore(only_if_higher=False)
+
+        assert block.score == Score(raw_earned=0.33, raw_possible=1)
+
     def test_rescore_problem_not_done(self):
         # Simulate that the problem is NOT done
         block = CapaFactory.create(done=False)
@@ -1234,6 +1373,113 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             mock_supports_rescoring.return_value = False
             with pytest.raises(NotImplementedError):
                 block.rescore(only_if_higher=False)
+
+    def test_calculate_score_list(self):
+        block = CapaFactory.create(correct=True)
+        correct_map = CorrectMap(answer_id='1_2_1', correctness="correct", npoints=1)
+        block.lcp.correct_map_history = [correct_map, correct_map]
+
+        with patch.object(block.lcp, 'calculate_score', return_value={'score': 1, 'total': 2}):
+            result = block.calculate_score_list()
+            expected_result = [Score(raw_earned=1, raw_possible=2), Score(raw_earned=1, raw_possible=2)]
+            self.assertEqual(result, expected_result)
+
+    def test_calculate_score_list_empty(self):
+        block = CapaFactory.create(correct=True)
+        block.lcp.correct_map_history = []
+
+        with patch.object(block.lcp, 'calculate_score', return_value=Mock()):
+            result = block.calculate_score_list()
+            self.assertEqual(result, [])
+            block.lcp.calculate_score.assert_not_called()
+
+    def test_update_correctness_updates_attempt(self):
+        block = CapaFactory.create(correct=True, attempts=0)
+
+        block.update_correctness()
+
+        self.assertEqual(block.lcp.context['attempt'], 1)
+
+    def test_update_correctness_with_history(self):
+        block = CapaFactory.create(correct=True, attempts=2)
+        correct_map = CorrectMap(answer_id='1_2_1', correctness="correct", npoints=1)
+        student_answers = {'1_2_1': 'abcd'}
+        block.correct_map_history = [correct_map]
+        block.student_answers_history = [student_answers]
+
+        with patch.object(block.lcp, 'get_grade_from_answers', return_value=correct_map):
+            block.update_correctness()
+            self.assertEqual(block.lcp.context['attempt'], 2)
+            block.lcp.get_grade_from_answers.assert_called_once_with(student_answers, correct_map)
+            self.assertEqual(block.lcp.correct_map_history, [correct_map])
+            self.assertEqual(block.lcp.correct_map.get_dict(), correct_map.get_dict())
+
+    def test_update_correctness_without_history(self):
+        block = CapaFactory.create(correct=True, attempts=1)
+        block.correct_map_history = []
+        block.student_answers_history = []
+
+        with patch.object(block.lcp, 'get_grade_from_answers', return_value=Mock()):
+            block.update_correctness()
+            self.assertEqual(block.lcp.context['attempt'], 1)
+            block.lcp.get_grade_from_answers.assert_not_called()
+
+    def test_get_rescore(self):
+        block = CapaFactory.create(done=True, attempts=0, max_attempts=2)
+        get_request_dict = {CapaFactory.input_key(): '3.21'}
+        block.submit_problem(get_request_dict)
+        get_request_dict = {CapaFactory.input_key(): '3.14'}
+        block.submit_problem(get_request_dict)
+
+        result = block.get_rescore()
+
+        self.assertEqual(result, Score(raw_earned=1, raw_possible=1))
+
+    def test_set_score(self):
+        block = CapaFactory.create(done=True, attempts=0, max_attempts=2)
+        get_request_dict = {CapaFactory.input_key(): '3.21'}
+        block.submit_problem(get_request_dict)
+        get_request_dict = {CapaFactory.input_key(): '3.14'}
+        block.submit_problem(get_request_dict)
+
+        block.set_score(block.score_from_lcp(block.lcp))
+
+        self.assertEqual(block.score, Score(raw_earned=1, raw_possible=1))
+
+    @patch('xmodule.capa_block.ProblemBlock.score_from_lcp')
+    def test_set_score_updates_score(self, mock_score_from_lcp: Mock):
+        block = CapaFactory.create(attempts=1)
+        current_score = Score(raw_earned=1, raw_possible=1)
+        mock_score_from_lcp.return_value = current_score
+
+        block._set_score()  # pylint: disable=protected-access
+
+        self.assertEqual(block.score, current_score)
+        self.assertEqual(block.score_history, [current_score])
+
+    def test_set_score_calls_grading_method_handler(self):
+        block = CapaFactory.create(attempts=1)
+        current_score = Score(raw_earned=0, raw_possible=1)
+
+        with patch('xmodule.capa_block.GradingMethodHandler') as mock_handler:
+            mock_handler.return_value.get_score.return_value = current_score
+            block._set_score()  # pylint: disable=protected-access
+            mock_handler.assert_called_once_with(
+                Score(raw_earned=0, raw_possible=1),
+                "last_score",
+                block.score_history,
+                current_score.raw_possible,
+            )
+
+    def test_set_score_sets_calculated_score(self):
+        block = CapaFactory.create(attempts=1)
+        current_score = Score(raw_earned=1, raw_possible=1)
+
+        with patch('xmodule.capa_block.GradingMethodHandler') as mock_handler:
+            with patch.object(block, 'set_score') as mock_set_score:
+                mock_handler.return_value.get_score.return_value = current_score
+                block._set_score()  # pylint: disable=protected-access
+                mock_set_score.assert_called_once_with(current_score)
 
     def capa_factory_for_problem_xml(self, xml):  # lint-amnesty, pylint: disable=missing-function-docstring
         class CustomCapaFactory(CapaFactory):
@@ -1263,10 +1509,15 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
     def _rescore_problem_error_helper(self, exception_class):
         """Helper to allow testing all errors that rescoring might return."""
         # Create the block
-        block = CapaFactory.create(attempts=1, done=True)
+        block = CapaFactory.create(attempts=0)
+        CapaFactory.answer_key()
+
+        # Check the problem
+        get_request_dict = {CapaFactory.input_key(): '1'}
+        block.submit_problem(get_request_dict)
 
         # Simulate answering a problem that raises the exception
-        with patch('xmodule.capa.capa_problem.LoncapaProblem.get_grade_from_current_answers') as mock_rescore:
+        with patch('xmodule.capa.capa_problem.LoncapaProblem.get_grade_from_answers') as mock_rescore:
             mock_rescore.side_effect = exception_class('test error \u03a9')
             with pytest.raises(exception_class):
                 block.rescore(only_if_higher=False)

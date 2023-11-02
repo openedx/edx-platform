@@ -1,6 +1,7 @@
 """
 Implements the Problem XBlock, which is built on top of the CAPA subsystem.
 """
+from __future__ import annotations
 
 import copy
 import datetime
@@ -22,7 +23,7 @@ from lxml import etree
 from pytz import utc
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
-from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString
+from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString, List
 from xblock.scorable import ScorableXBlockMixin, Score
 
 from xmodule.capa import responsetypes
@@ -52,7 +53,7 @@ from common.djangoapps.xblock_django.constants import (
 from openedx.core.djangolib.markup import HTML, Text
 from .capa.xqueue_interface import XQueueService
 
-from .fields import Date, ScoreField, Timedelta
+from .fields import Date, ListScoreField, ScoreField, Timedelta
 from .progress import Progress
 
 log = logging.getLogger("edx.courseware")
@@ -90,6 +91,16 @@ class SHOWANSWER:
     AFTER_ALL_ATTEMPTS = "after_all_attempts"
     AFTER_ALL_ATTEMPTS_OR_CORRECT = "after_all_attempts_or_correct"
     ATTEMPTED_NO_PAST_DUE = "attempted_no_past_due"
+
+
+class GRADING_METHOD:
+    """
+    Constants for grading method options.
+    """
+    LAST_SCORE = "last_score"
+    FIRST_SCORE = "first_score"
+    HIGHEST_SCORE = "highest_score"
+    AVERAGE_SCORE = "average_score"
 
 
 class RANDOMIZATION:
@@ -181,6 +192,21 @@ class ProblemBlock(
                "If the value is not set, infinite attempts are allowed."),
         values={"min": 0}, scope=Scope.settings
     )
+    grading_method = String(
+        display_name=_("Grading Method"),
+        help=_(
+            "Define the grading method for this problem. By default, "
+            "it's the score of the last submission made by the student."
+        ),
+        scope=Scope.settings,
+        default=GRADING_METHOD.LAST_SCORE,
+        values=[
+            {"display_name": _("Last Score"), "value": GRADING_METHOD.LAST_SCORE},
+            {"display_name": _("First Score"), "value": GRADING_METHOD.FIRST_SCORE},
+            {"display_name": _("Highest Score"), "value": GRADING_METHOD.HIGHEST_SCORE},
+            {"display_name": _("Average Score"), "value": GRADING_METHOD.AVERAGE_SCORE},
+        ],
+    )
     due = Date(help=_("Date that this problem is due by"), scope=Scope.settings)
     graceperiod = Timedelta(
         help=_("Amount of time after the due date that submissions will be accepted"),
@@ -263,11 +289,20 @@ class ProblemBlock(
     )
     correct_map = Dict(help=_("Dictionary with the correctness of current student answers"),
                        scope=Scope.user_state, default={})
+    correct_map_history = List(
+        help=_("List of correctness maps for each attempt"), scope=Scope.user_state, default=[]
+    )
     input_state = Dict(help=_("Dictionary for maintaining the state of inputtypes"), scope=Scope.user_state)
     student_answers = Dict(help=_("Dictionary with the current student responses"), scope=Scope.user_state)
+    student_answers_history = List(
+        help=_("List of student answers for each attempt"), scope=Scope.user_state, default=[]
+    )
 
     # enforce_type is set to False here because this field is saved as a dict in the database.
     score = ScoreField(help=_("Dictionary with the current student score"), scope=Scope.user_state, enforce_type=False)
+    score_history = ListScoreField(
+        help=_("List of scores for each attempt"), scope=Scope.user_state, default=[], enforce_type=False
+    )
     has_saved_answers = Boolean(help=_("Whether or not the answers have been saved since last submit"),
                                 scope=Scope.user_state, default=False)
     done = Boolean(help=_("Whether the student has answered the problem"), scope=Scope.user_state, default=False)
@@ -455,6 +490,17 @@ class ProblemBlock(
             return self.location.block_type
 
         return self.display_name
+
+    def grading_method_display_name(self) -> str:
+        """Return the display name for the grading method."""
+        _ = self.runtime.service(self, "i18n").gettext
+        display_name = {
+            GRADING_METHOD.LAST_SCORE: _("Last Score"),
+            GRADING_METHOD.FIRST_SCORE: _("First Score"),
+            GRADING_METHOD.HIGHEST_SCORE: _("Highest Score"),
+            GRADING_METHOD.AVERAGE_SCORE: _("Average Score"),
+        }
+        return display_name[self.grading_method]
 
     @property
     def debug(self):
@@ -832,6 +878,7 @@ class ProblemBlock(
         return {
             'done': self.done,
             'correct_map': self.correct_map,
+            'correct_map_history': self.correct_map_history,
             'student_answers': self.student_answers,
             'has_saved_answers': self.has_saved_answers,
             'input_state': self.input_state,
@@ -845,6 +892,7 @@ class ProblemBlock(
         lcp_state = self.lcp.get_state()
         self.done = lcp_state['done']
         self.correct_map = lcp_state['correct_map']
+        self.correct_map_history = lcp_state['correct_map_history']
         self.input_state = lcp_state['input_state']
         self.student_answers = lcp_state['student_answers']
         self.has_saved_answers = lcp_state['has_saved_answers']
@@ -1241,6 +1289,7 @@ class ProblemBlock(
             'reset_button': self.should_show_reset_button(),
             'save_button': self.should_show_save_button(),
             'answer_available': self.answer_available(),
+            'grading_method': self.grading_method_display_name(),
             'attempts_used': self.attempts,
             'attempts_allowed': self.max_attempts,
             'demand_hint_possible': demand_hint_possible,
@@ -1687,6 +1736,7 @@ class ProblemBlock(
         self.lcp.has_saved_answers = False
         answers = self.make_dict_of_responses(data)
         answers_without_files = convert_files_to_filenames(answers)
+        self.student_answers_history.append(answers_without_files)
         event_info['answers'] = answers_without_files
 
         metric_name = 'xmodule.capa.check_problem.{}'.format  # lint-amnesty, pylint: disable=unused-variable
@@ -1753,7 +1803,7 @@ class ProblemBlock(
             self.attempts = self.attempts + 1
             self.lcp.done = True
             self.set_state_from_lcp()
-            self.set_score(self.score_from_lcp(self.lcp))
+            self._set_score()
             self.set_last_submission_time()
 
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
@@ -1826,6 +1876,27 @@ class ProblemBlock(
             'contents': html
         }
     # pylint: enable=too-many-statements
+
+    def _set_score(self) -> None:
+        """
+        Calculate and set the current score based on the grading method.
+
+        In this method:
+            - The current score is obtained from the LON-CAPA problem.
+            - The score history is updated adding the current score.
+            - The calculated score is obtained based on the grading method.
+            - The calculated score is set as the current score.
+        """
+        current_score = self.score_from_lcp(self.lcp)
+        self.score_history.append(current_score)
+        grading_method_handler = GradingMethodHandler(
+            current_score,
+            self.grading_method,
+            self.score_history,
+            self.max_score(),
+        )
+        calculated_score = grading_method_handler.get_score()
+        self.set_score(calculated_score)
 
     def publish_unmasked(self, title, event_info):
         """
@@ -2144,8 +2215,7 @@ class ProblemBlock(
         event_info['orig_score'] = orig_score.raw_earned
         event_info['orig_total'] = orig_score.raw_possible
         try:
-            self.update_correctness()
-            calculated_score = self.calculate_score()
+            calculated_score = self.get_rescore()
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:  # lint-amnesty, pylint: disable=unused-variable
             log.warning("Input error in capa_block:problem_rescore", exc_info=True)
             event_info['failure'] = 'input_error'
@@ -2160,6 +2230,7 @@ class ProblemBlock(
         # rescoring should have no effect on attempts, so don't
         # need to increment here, or mark done.  Just save.
         self.set_state_from_lcp()
+        self.set_score(calculated_score)
         self.publish_grade(score=calculated_score, only_if_higher=only_if_higher)
 
         event_info['new_score'] = calculated_score.raw_earned
@@ -2177,6 +2248,28 @@ class ProblemBlock(
         event_info['success'] = success
         event_info['attempts'] = self.attempts
         self.publish_unmasked('problem_rescore', event_info)
+
+    def get_rescore(self) -> Score:
+        """
+        Calculate and return the rescored score based on the grading method.
+
+        In this method:
+            - The list with the correctness maps is updated.
+            - The list with the score history is updated based on the correctness maps.
+            - The final score is calculated based on the grading method.
+
+        Returns:
+            Score: The score calculated based on the grading method.
+        """
+        self.update_correctness()
+        self.score_history = self.calculate_score_list()
+        grading_method_handler = GradingMethodHandler(
+            self.score,
+            self.grading_method,
+            self.score_history,
+            self.max_score(),
+        )
+        return grading_method_handler.get_score()
 
     def has_submitted_answer(self):
         return self.done
@@ -2196,15 +2289,21 @@ class ProblemBlock(
 
     def update_correctness(self):
         """
-        Updates correct map of the LCP.
+        Updates the `correct_map_history` and the `correct_map` of the LCP.
+
         Operates by creating a new correctness map based on the current
         state of the LCP, and updating the old correctness map of the LCP.
         """
         # Make sure that the attempt number is always at least 1 for grading purposes,
         # even if the number of attempts have been reset and this problem is regraded.
         self.lcp.context['attempt'] = max(self.attempts, 1)
-        new_correct_map = self.lcp.get_grade_from_current_answers(None)
-        self.lcp.correct_map.update(new_correct_map)
+        new_correct_map_list = []
+        for student_answers, correct_map in zip(self.student_answers_history, self.correct_map_history):
+            new_correct_map = self.lcp.get_grade_from_answers(student_answers, correct_map)
+            new_correct_map_list.append(new_correct_map)
+        self.lcp.correct_map_history = new_correct_map_list
+        if new_correct_map_list:
+            self.lcp.correct_map.update(new_correct_map_list[-1])
 
     def calculate_score(self):
         """
@@ -2213,6 +2312,17 @@ class ProblemBlock(
         new_score = self.lcp.calculate_score()
         return Score(raw_earned=new_score['score'], raw_possible=new_score['total'])
 
+    def calculate_score_list(self):
+        """
+        Returns the score calculated from the current problem state.
+        """
+        new_score_list = []
+
+        for correct_map in self.lcp.correct_map_history:
+            new_score = self.lcp.calculate_score(correct_map)
+            new_score_list.append(Score(raw_earned=new_score['score'], raw_possible=new_score['total']))
+        return new_score_list
+
     def score_from_lcp(self, lcp):
         """
         Returns the score associated with the correctness map
@@ -2220,6 +2330,102 @@ class ProblemBlock(
         """
         lcp_score = lcp.calculate_score()
         return Score(raw_earned=lcp_score['score'], raw_possible=lcp_score['total'])
+
+
+class GradingMethodHandler:
+    """
+    A class for handling grading method and calculating scores.
+
+    This class allows for flexible handling of grading methods, including options
+    such as considering the last score, the first score, the highest score,
+    or the average score.
+
+    Attributes:
+        - score (Score): The current score.
+        - grading_method (str): The chosen grading method.
+        - score_history (list[Score]): A list to store the history of scores.
+        - max_score (int): The maximum possible score.
+        - mapping_method (dict): A dictionary mapping the grading
+            method to the corresponding handler.
+
+    Methods:
+        - get_score(): Retrieves the updated score based on the grading method.
+        - handle_last_score(): Handles the last score method.
+        - handle_first_score(): Handles the first score method.
+        - handle_highest_score(): Handles the highest score method.
+        - handle_average_score(): Handles the average score method.
+    """
+
+    def __init__(
+        self,
+        score: Score,
+        grading_method: str,
+        score_history: list[Score],
+        max_score: int,
+    ):
+        self.score = score
+        self.grading_method = grading_method
+        self.score_history = score_history
+        if not self.score_history:
+            self.score_history.append(score)
+        self.max_score = max_score
+        self.mapping_method = {
+            GRADING_METHOD.LAST_SCORE: self.handle_last_score,
+            GRADING_METHOD.FIRST_SCORE: self.handle_first_score,
+            GRADING_METHOD.HIGHEST_SCORE: self.handle_highest_score,
+            GRADING_METHOD.AVERAGE_SCORE: self.handle_average_score,
+        }
+
+    def get_score(self) -> Score:
+        """
+        Retrieves the updated score based on the grading method.
+
+        Returns:
+            - Score: The updated score based on the chosen grading method.
+        """
+        return self.mapping_method[self.grading_method]()
+
+    def handle_last_score(self) -> Score:
+        """
+        Retrieves the score based on the last score.
+        It is the last score in the score history.
+
+        Returns:
+            - Score: The score based on the last score.
+        """
+        return self.score_history[-1]
+
+    def handle_first_score(self) -> Score:
+        """
+        Retrieves the score based on the first score.
+        It is the first score in the score history.
+
+        Returns:
+            - Score: The score based on the first score.
+        """
+        return self.score_history[0]
+
+    def handle_highest_score(self) -> Score:
+        """
+        Retrieves the score based on the highest score.
+        It is the highest score in the score history.
+
+        Returns:
+            - Score: The score based on the highest score.
+        """
+        return max(self.score_history)
+
+    def handle_average_score(self) -> Score:
+        """
+        Calculates the average score based on all attempts. The average score is
+        the sum of all scores divided by the number of scores.
+
+        Returns:
+            - Score: The average score based on all attempts.
+        """
+        total = sum(score.raw_earned for score in self.score_history)
+        average_score = round(total / len(self.score_history), 2)
+        return Score(raw_earned=average_score, raw_possible=self.max_score)
 
 
 class ComplexEncoder(json.JSONEncoder):

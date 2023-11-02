@@ -543,7 +543,10 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
             'attempts': 1,
             'saved_files_descriptions': ['summary', 'proposal', 'diagrams'],
             'saved_files_sizes': [1364677, 958418],
-            'saved_files_names': ['case_study_abstract.txt', 'design_prop.pdf', 'diagram1.png']
+            'saved_files_names': ['case_study_abstract.txt', 'design_prop.pdf', 'diagram1.png'],
+            'score_history': [],
+            'correct_map_history': [],
+            'student_answers_history': [],
         }
         team_state = json.dumps(self.team_state_dict)
 
