@@ -508,8 +508,16 @@ EVENT_BUS_PRODUCER = 'edx_event_bus_redis.create_producer'
 EVENT_BUS_REDIS_CONNECTION_URL = 'redis://:password@edx.devstack.redis:6379/'
 EVENT_BUS_TOPIC_PREFIX = 'dev'
 EVENT_BUS_CONSUMER = 'edx_event_bus_redis.RedisEventConsumer'
-EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.certificate.revoked.v1']['learning-certificate-lifecycle']['enabled']=True
-EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.certificate.created.v1']['learning-certificate-lifecycle']['enabled']=True
+
+# use 'get' instead of [] access to break up long lines better
+EVENT_BUS_PRODUCER_CONFIG\
+    .get('org.openedx.learning.certificate.revoked.v1')\
+    .get('learning-certificate-lifecycle')\
+    .set('enabled', True)
+EVENT_BUS_PRODUCER_CONFIG\
+    .get('org.openedx.learning.certificate.created.v1')\
+    .get('learning-certificate-lifecycle')\
+    .set('enabled', True)
 
 ######################## Subscriptions API SETTINGS ########################
 SUBSCRIPTIONS_ROOT_URL = "http://host.docker.internal:18750"

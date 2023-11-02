@@ -306,11 +306,24 @@ EVENT_BUS_PRODUCER = 'edx_event_bus_redis.create_producer'
 EVENT_BUS_REDIS_CONNECTION_URL = 'redis://:password@edx.devstack.redis:6379/'
 EVENT_BUS_TOPIC_PREFIX = 'dev'
 EVENT_BUS_CONSUMER = 'edx_event_bus_redis.RedisEventConsumer'
-EVENT_BUS_PRODUCER_CONFIG['org.openedx.content_authoring.course.catalog_info.changed.v1']['course-catalog-info-changed']['enabled']=True
-EVENT_BUS_PRODUCER_CONFIG['org.openedx.content_authoring.xblock.published.v1']['course-authoring-xblock-lifecycle']['enabled']=True
-EVENT_BUS_PRODUCER_CONFIG['org.openedx.content_authoring.xblock.deleted.v1']['course-authoring-xblock-lifecycle']['enabled']=True
-EVENT_BUS_PRODUCER_CONFIG['org.openedx.content_authoring.xblock.duplicated.v1']['course-authoring-xblock-lifecycle']['enabled']=True
 
+# use 'get' instead of [] access to break up long lines better
+EVENT_BUS_PRODUCER_CONFIG\
+    .get('org.openedx.content_authoring.course.catalog_info.changed.v1')\
+    .get('course-catalog-info-changed')\
+    .set('enabled', True)
+EVENT_BUS_PRODUCER_CONFIG\
+    .get('org.openedx.content_authoring.xblock.published.v1')\
+    .get(['course-authoring-xblock-lifecycle'])\
+    .set('enabled', True)
+EVENT_BUS_PRODUCER_CONFIG\
+    .get('org.openedx.content_authoring.xblock.deleted.v1')\
+    .get('course-authoring-xblock-lifecycle')\
+    .set('enabled', True)
+EVENT_BUS_PRODUCER_CONFIG\
+    .get('org.openedx.content_authoring.xblock.duplicated.v1')\
+    .get('course-authoring-xblock-lifecycle')\
+    .set('enabled', True)
 
 ################# New settings must go ABOVE this line #################
 ########################################################################
