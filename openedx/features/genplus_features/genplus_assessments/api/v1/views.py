@@ -565,6 +565,7 @@ class SkillReflectionApiView(ProgramFilterMixin):
             likert_questions,
             nuance_interogation_questions,
             class_id,
+            request.user
         )
 
         return Response(response)
