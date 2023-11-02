@@ -47,7 +47,8 @@ define([
                     start: '1970-01-01T05:00:00+00:00',
                     image_url: '/c4x/edX/DemoX/asset/images_course_image.jpg',
                     org: 'edX',
-                    id: 'edX/DemoX/Demo_Course'
+                    id: 'edX/DemoX/Demo_Course',
+                    language: 'en'
                 }
             }
         ],
@@ -197,5 +198,17 @@ define([
             $('.search-facets li [data-value="edX1"]').trigger('click');
             expect($('.active-filter [data-value="edX1"]').length).toBe(0);
         });
+
+        it('filters by default language', function() {
+            DiscoveryFactory(MEANINGS, '', 'en', 'Asia/Kolkata', true);
+            var requests = AjaxHelpers.requests(this);
+            $('.discovery-submit').trigger('click');
+            AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
+            expect($('.courses-listing article').length).toEqual(1);
+            expect($('.courses-listing .course-title')).toContainHtml('edX Demonstration Course');
+            expect($('.active-filter').length).toBe(1);
+            expect($('.active-filter .query')).toContainHtml("English");
+        });
+
     });
 });

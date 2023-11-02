@@ -276,6 +276,7 @@ def courses(request):
     """
     courses_list = []
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
+    set_default_filter = settings.FEATURES.get('ENABLE_COURSE_DISCOVERY_DEFAULT_LANGUAGE_FILTER')
     if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
         courses_list = get_courses(request.user)
 
@@ -293,6 +294,7 @@ def courses(request):
         {
             'courses': courses_list,
             'course_discovery_meanings': course_discovery_meanings,
+            'set_default_filter': set_default_filter,
             'programs_list': programs_list,
         }
     )

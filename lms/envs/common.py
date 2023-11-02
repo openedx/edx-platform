@@ -659,6 +659,17 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/7845
     'ENABLE_COURSE_DISCOVERY': False,
 
+    # .. toggle_name: FEATURES['ENABLE_COURSE_DISCOVERY_DEFAULT_LANGUAGE_FILTER']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Enable courses to be filtered by user language by default.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2023-11-02
+    # .. toggle_target_removal_date: None
+    # .. toggle_warning: The ENABLE_COURSE_DISCOVERY setting should be enabled.
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/33647
+    'ENABLE_COURSE_DISCOVERY_DEFAULT_LANGUAGE_FILTER': False,
+
     # .. toggle_name: FEATURES['ENABLE_COURSE_FILENAME_CCX_SUFFIX']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
