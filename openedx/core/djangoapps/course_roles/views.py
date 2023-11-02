@@ -8,7 +8,10 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.lib.api.view_utils import view_auth_classes
-from openedx.core.djangoapps.course_roles.helpers import get_all_user_permissions_for_a_course
+from openedx.core.djangoapps.course_roles.helpers import (
+    get_all_user_permissions_for_a_course,
+    use_permission_checks
+)
 
 
 @view_auth_classes()
@@ -48,3 +51,24 @@ class UserPermissionsView(APIView):
         except ValueError as exc:
             raise NotFound(str(exc)) from exc
         return Response(permissions)
+
+
+@view_auth_classes()
+class UserPermissionsFlagView(APIView):
+    """
+    View for getting the permission_checks waffle flag value
+    """
+
+    def get(self, request):
+        """
+        Get endpoint to explose whether the permission_check_flag is enabled
+        **Permissions**: User must be authenticated.
+        **Response Format**:
+        ```json
+        {
+            "enabled": bool
+        }
+        ```
+        """
+        payload = {'enabled': use_permission_checks()}
+        return Response(payload)
