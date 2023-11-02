@@ -219,7 +219,6 @@
                         type: 'GET',
                         async: false,
                         success: function(data) {
-                            console.log(data);
                             if (data && data.status === 'Completed') {
                                 self.showWidget();
                                 self.getFeedbackForCurrentTranscript();
