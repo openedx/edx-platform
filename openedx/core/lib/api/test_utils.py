@@ -64,6 +64,10 @@ class ApiTestCase(TestCase):
         """Assert that the given response has the status code 201"""
         assert response.status_code == 201
 
+    def assertHttpNotAuthorized(self, response):
+        """Assert that the given response has the status code 401"""
+        assert response.status_code == 401
+
     def assertHttpForbidden(self, response):
         """Assert that the given response has the status code 403"""
         assert response.status_code == 403
