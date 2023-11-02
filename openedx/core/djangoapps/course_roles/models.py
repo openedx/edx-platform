@@ -15,7 +15,7 @@ class CourseRolesRole(models.Model):
     Model for a course roles role.
 
     A role is a collection of permissions that can be assigned to a user.
-    The services field defines for which service UI the role is intended, such as CMS and/or LMS.
+    The services field defines in which service UI the role is intended to be assigned, such as CMS and/or LMS.
 
     """
     name = models.CharField(max_length=255)
@@ -57,8 +57,9 @@ class CourseRolesUserRole(models.Model):
     Model for a course roles user role.
 
     A user role is a mapping between a user, a role, a course and an organization.
-    If the course is null, the user role is for the organization.
-    If the course and the organization are null the role is for the instance.
+    If the course is null, the user role assignment is in use for all courses that belong to the organization.
+    If the course and the organization are null,
+    the user role assignment is in use for all courses that belong to the instance.
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     role = models.ForeignKey('CourseRolesRole', on_delete=models.CASCADE)

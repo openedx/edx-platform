@@ -12,17 +12,20 @@ The status will be updated to *Accepted* upon completion of reimplementation.
 Context
 *******
 
-There is currently no single functionality being used by the majority of the codebases that are a part of Open edX
-that allows for adding roles (permission sets) for a user at the course and organization level
-that provides the flexibility to allow users to edit or create new roles (permission sets) that can be assigned to users.
+There is currently no single functionality being used by the majority of the codebases that are a part of the Open edX ecosystem
+that allows for adding roles (permission sets) that grant course related access for a user and can:
+- be assigned at the course level 
+- be assigned as an org-wide role (granting access to all courses within the org)
+- be assigned as an instance-wide role (granting access to all courses that are within the instance)
+- provide the flexibility to allow users to edit or create new roles (permission sets) that can be assigned to users
 
 
 Decision
 ********
 
-Modified LMS table and solution - within LMS/CMS
+New LMS tables and solution - within LMS/CMS
 ------------------------------------------------
-- We will add new tables to manage roles, permission, and groups of users that are assigned to roles.
+- We will add new tables to manage roles, permission, and users that are assigned to roles.
 - We will add additional tables, if necessary, to manage custom roles.
 - We will create the new tables within the current DB schema and LMS/CMS repo.
 
