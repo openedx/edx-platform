@@ -39,7 +39,8 @@ TEST_PAYMENT_DATA = {
 }
 
 
-class DeprecatedRestApiClientTest(TestCase):
+@ddt.ddt
+class DeprecatedRestApiClientTests(TestCase):
     """
     Tests for the edX Rest API client.
     """
@@ -76,7 +77,7 @@ class DeprecatedRestApiClientTest(TestCase):
         self.assertRaises(ValueError, DeprecatedRestApiClient, **kwargs)
 
     @mock.patch('edx_rest_api_client.auth.JwtAuth.__init__', return_value=None)
-    def test_tracking_contexts(self, mock_auth):
+    def test_tracking_context(self, mock_auth):
         """
         Ensure the tracking context is included with API requests if specified.
         """
@@ -117,7 +118,11 @@ class DeprecatedRestApiClientTest(TestCase):
 
         self.assertEqual(user_agent(), DeprecatedRestApiClient.user_agent())
 
-    # Tests to ensure the client is initialized properly.
+
+class DeprecatedRestApiClientTest(TestCase):
+    """
+    Tests to ensure the client is initialized properly.
+    """
     SCOPES = [
         'user_id',
         'email',
