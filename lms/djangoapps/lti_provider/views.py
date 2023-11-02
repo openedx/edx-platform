@@ -93,6 +93,7 @@ def lti_launch(request, course_id, usage_id):
     try:
         authenticate_lti_user(request, params['user_id'], lti_consumer)
     except PermissionDenied:
+        request.session.flush()
         context = {
             "login_link": request.build_absolute_uri(settings.LOGIN_URL),
             "allow_iframing": True,
