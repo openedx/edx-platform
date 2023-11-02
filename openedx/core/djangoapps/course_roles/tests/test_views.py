@@ -9,11 +9,13 @@ from rest_framework.test import APIClient
 from organizations.tests.factories import OrganizationFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
+from edx_toggles.toggles.testutils import override_waffle_flag
+from openedx.core.djangoapps.course_roles.helpers import USE_PERMISSION_CHECKS_FLAG
 from openedx.core.djangoapps.course_roles.models import (
     CourseRolesPermission,
     CourseRolesRole,
     CourseRolesService,
-    CourseRolesUserRole,
+    CourseRolesUserRole
 )
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -92,3 +94,52 @@ class UserPermissionsViewTestCase(SharedModuleStoreTestCase):
         url = f'{reverse("course_roles_api:user_permissions")}?{urlencode(querykwargs)}'
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class UserPermissionsFlagViewTestCase(SharedModuleStoreTestCase):
+    """
+    Tests for the UserPermissionsFlagView.
+    """
+    def setUp(self):
+        super().setUp()
+        self.client = APIClient()
+        self.user_1 = UserFactory(username="test_user_1", password="test")
+
+    def test_get_permission_check_flag_without_login(self):
+        # user not logged in
+        url = f'{reverse("course_roles_api:permission_check_flag")}'
+        # request waffle flag value
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_get_permission_check_flag_view_no_waffle_created(self):
+        url = f'{reverse("course_roles_api:permission_check_flag")}'
+        expected_api_response = {'enabled': False}
+        # login user
+        self.client.login(username=self.user_1, password='test')
+        # request waffle flag value
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['enabled'], expected_api_response['enabled'])
+
+    @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=False)
+    def test_get_permission_check_flag_view_waffle_is_false(self):
+        url = f'{reverse("course_roles_api:permission_check_flag")}'
+        expected_api_response = {'enabled': False}
+        # login user
+        self.client.login(username=self.user_1, password='test')
+        # request waffle flag value
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['enabled'], expected_api_response['enabled'])
+
+    @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=True)
+    def test_get_permission_check_flag_view_waffle_is_true(self):
+        url = f'{reverse("course_roles_api:permission_check_flag")}'
+        expected_api_response = {'enabled': True}
+        # login user
+        self.client.login(username=self.user_1, password='test')
+        # request waffle flag value
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['enabled'], expected_api_response['enabled'])
