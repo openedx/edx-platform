@@ -7,13 +7,10 @@ from django.conf import settings
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from openedx_events.event_bus import get_producer
-from edx_django_utils.monitoring import set_custom_attribute
 
 from common.djangoapps.course_modes import api as modes_api
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.signals import ENROLLMENT_TRACK_UPDATED
-from lms.djangoapps.certificates.config import SEND_CERTIFICATE_CREATED_SIGNAL, SEND_CERTIFICATE_REVOKED_SIGNAL
 from lms.djangoapps.certificates.generation_handler import (
     CertificateGenerationNotAllowed,
     generate_allowlist_certificate_task,
@@ -29,13 +26,11 @@ from lms.djangoapps.certificates.models import (
 from lms.djangoapps.certificates.api import auto_certificate_generation_enabled
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.content.course_overviews.signals import COURSE_PACING_CHANGED
-from openedx.core.lib.events import determine_producer_config_for_signal_and_topic
 from openedx.core.djangoapps.signals.signals import (
     COURSE_GRADE_NOW_FAILED,
     COURSE_GRADE_NOW_PASSED,
     LEARNER_NOW_VERIFIED
 )
-from openedx_events.learning.signals import CERTIFICATE_CREATED, CERTIFICATE_REVOKED
 
 log = logging.getLogger(__name__)
 
