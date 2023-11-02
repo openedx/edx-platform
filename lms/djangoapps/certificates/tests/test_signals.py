@@ -25,9 +25,6 @@ from lms.djangoapps.certificates.tests.factories import CertificateAllowlistFact
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from openedx_events.data import EventsMetadata
-from openedx_events.learning.signals import CERTIFICATE_CREATED, CERTIFICATE_REVOKED
-from openedx_events.learning.data import CourseData, UserData, UserPersonalData, CertificateData
 
 
 class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
