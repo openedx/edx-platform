@@ -493,19 +493,10 @@ class LibraryContentBlockTestMixin:
             assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
-@patch('xmodule.library_tools.SearchEngine.get_search_engine', Mock(return_value=None, autospec=True))
-class TestLibraryContentBlockNoSearchIndex(LibraryContentBlockTestMixin, LibraryContentTest):
-    """
-    Tests for library container when no search index is available.
-    Tests fallback low-level CAPA problem introspection
-    """
-    pass  # pylint:disable=unnecessary-pass
-
-
 search_index_mock = Mock(spec=SearchEngine)  # pylint: disable=invalid-name
 
 
-@patch('xmodule.library_tools.SearchEngine.get_search_engine', Mock(return_value=search_index_mock, autospec=True))
+@patch.object(SearchEngine, 'get_search_engine', Mock(return_value=None, autospec=True))
 class TestLibraryContentBlockWithSearchIndex(LibraryContentBlockTestMixin, LibraryContentTest):
     """
     Tests for library container with mocked search engine response.

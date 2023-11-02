@@ -14,6 +14,7 @@ Architecture note:
     A longer-term solution to this issue would be to move the content_libraries app to cms:
     https://github.com/openedx/edx-platform/issues/33428
 """
+from __future__ import annotations
 
 import logging
 import hashlib
@@ -27,7 +28,6 @@ from edx_django_utils.monitoring import set_code_owner_attribute, set_code_owner
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import (
     BlockUsageLocator,
-    LibraryLocatorV2,
     LibraryUsageLocator,
     LibraryUsageLocatorV2
 )
@@ -39,14 +39,14 @@ from xblock.fields import Scope
 from common.djangoapps.student.auth import has_studio_write_access
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content_libraries import api as library_api
-from openedx.core.djangoapps.content_libraries.models import ContentLibrary
 from openedx.core.djangoapps.xblock.api import load_block
 from openedx.core.lib import ensure_cms, blockstore_api
 from xmodule.capa_block import ProblemBlock
-from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE
-from xmodule.modulestore import ModuleStoreEnum
+from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE, LibraryContentBlock
+from xmodule.library_root_xblock import LibraryRoot as LibraryRootV1
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.mixed import MixedModuleStore
 
 from . import api
 from .models import ContentLibraryBlockImportTask
@@ -80,7 +80,7 @@ def import_blocks_from_course(import_task_id, course_key_str):
         )
 
 
-def normalize_key_for_search(library_key):
+def _normalize_key_for_search(library_key):
     """ Normalizes library key for use with search indexing """
     return library_key.replace(version_guid=None, branch=None)
 
@@ -166,32 +166,6 @@ def _filter_child(store, usage_key, capa_type):
     return capa_type in descriptor.problem_types
 
 
-def _get_library(store, library_key):
-    """
-    Helper method to get either V1 or V2 library.
-
-    Given a library key like "library-v1:ProblemX+PR0B" (V1) or "lib:RG:rg-1" (v2), return the 'library'.
-
-    is_v2_lib (bool) indicates which library storage should be requested:
-        True - blockstore (V2 library);
-        False - modulestore (V1 library).
-
-    Returns None on error.
-    """
-    if isinstance(library_key, LibraryLocatorV2):
-        try:
-            return library_api.get_library(library_key)
-        except ContentLibrary.DoesNotExist:
-            return None
-    else:
-        try:
-            return store.get_library(
-                library_key, remove_version=False, remove_branch=False, head_validation=False
-            )
-        except ItemNotFoundError:
-            return None
-
-
 def _problem_type_filter(store, library, capa_type):
     """ Filters library children by capa type."""
     try:
@@ -200,7 +174,7 @@ def _problem_type_filter(store, library, capa_type):
         search_engine = None
     if search_engine:
         filter_clause = {
-            "library": str(normalize_key_for_search(library.location.library_key)),
+            "library": str(_normalize_key_for_search(library.location.library_key)),
             "content_type": ProblemBlock.INDEX_CONTENT_TYPE,
             "problem_types": capa_type
         }
@@ -256,102 +230,132 @@ def _import_from_blockstore(user_id, store, dest_block, blockstore_block_ids):
 
 class LibraryUpdateChildrenTask(UserTask):  # pylint: disable=abstract-method
     """
-    Base class for course and library export tasks.
+    Base class for tasks which operate upon library_content children.
     """
 
-    @staticmethod
-    def calculate_total_steps(arguments_dict):
-        """
-        Get the number of in-progress steps in the export process, as shown in the UI.
-
-        For reference, these are:
-
-        1. Importing
-        """
-        return 1
-
     @classmethod
-    def generate_name(cls, arguments_dict):
+    def generate_name(cls, arguments_dict) -> str:
         """
         Create a name for this particular import task instance.
 
+        Should be both:
+        a. semi human-friendly
+        b. something we can query in order to determine whether the dest block has a task in progress
+
         Arguments:
             arguments_dict (dict): The arguments given to the task function
-
-        Returns:
-            text_type: The generated name
         """
-        key = arguments_dict['dest_block_key']
-        return f'Import of {key}'
+        key = arguments_dict['dest_block_id']
+        return f'Updating {key} from library'
+
+
+# Note: The decorator @set_code_owner_attribute cannot be used here because the UserTaskMixin does stack
+# inspection and can't handle additional decorators. So, wet set the code_owner attribute in the tasks' bodies instead.
+
+@shared_task(base=LibraryUpdateChildrenTask, bind=True)
+def refresh_children(
+    self: LibraryUpdateChildrenTask,
+    user_id: int,
+    dest_block_id: str,
+) -> None:
+    """
+    Celery task to update the children of the library_content block at `dest_block_id`.
+    """
+    set_code_owner_attribute_from_module(__name__)
+    store = modulestore()
+    dest_block = store.get_item(BlockUsageLocator.from_string(dest_block_id))
+    _update_children(task=self, store=store, user_id=user_id, dest_block=dest_block)
 
 
 @shared_task(base=LibraryUpdateChildrenTask, bind=True)
-# Note: The decorator @set_code_owner_attribute cannot be used here because the UserTaskMixin
-#       does stack inspection and can't handle additional decorators.
-#       So, wet set the code_owner attribute in the task's body instead.
-def update_children_task(self, user_id, dest_block_key, version=None):
+def duplicate_children(
+    self: LibraryUpdateChildrenTask,
+    user_id: int,
+    source_block_id: str,
+    dest_block_id: str,
+) -> None:
     """
-    Update xBlock's children.
-
-    Re-fetch all matching blocks from the libraries, and copy them as children of dest_block.
-    The children will be given new block_ids.
-
-    This method will update dest_block's 'source_library_version' field to
-    store the version number of the libraries used, so we easily determine
-    if dest_block is up to date or not.
+    Celery task to duplicate the children from `source_block_id` to `dest_block_id`.
     """
     set_code_owner_attribute_from_module(__name__)
-    ensure_cms("library_content block children may only be updated in a CMS context")
     store = modulestore()
-    dest_block_id = BlockUsageLocator.from_string(dest_block_key)
-    dest_block = store.get_item(dest_block_id)
+    # First, populate the destination block with children imported from the library.
+    # It's important that _update_children does this at the currently-set version of the dest library
+    # (someone may be duplicating an out of date block).
+    dest_block = store.get_item(BlockUsageLocator.from_string(dest_block_id))
+    _update_children(task=self, store=store, user_id=user_id, dest_block=dest_block)
+    # Then, copy over any overridden settings the course author may have applied to the blocks.
+    source_block = store.get_item(BlockUsageLocator.from_string(source_block_id))
+    with store.bulk_operations(source_block.scope_ids.usage_id.context_key):
+        _copy_overrides(store=store, user_id=user_id, source_block=source_block, dest_block=dest_block)
+
+
+def _update_children(
+    task: LibraryUpdateChildrenTask,
+    store: MixedModuleStore,
+    user_id: int,
+    dest_block: LibraryContentBlock,
+) -> None:
+    """
+    Implementation helper for `refresh_children` and `duplicate_children` Celery tasks.
+    """
     source_blocks = []
     library_key = dest_block.source_library_key
-    is_v2_lib = isinstance(library_key, LibraryLocatorV2)
-
-    if version and not is_v2_lib:
-        library_key = library_key.replace(branch=ModuleStoreEnum.BranchName.library, version_guid=version)
-
-    library = _get_library(store, library_key)
-    if library is None:
-        self.status.fail(f"Requested library {library_key} not found.")
-        return
-
-    if hasattr(dest_block, 'capa_type'):
-        filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)
-    else:
-        filter_children = None
-    if not is_v2_lib:
+    filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)
+    library = library_api.get_v1_or_v2_library(library_key)
+    if not library:
+        task.status.fail(f"Requested library {library_key} not found.")
+    elif isinstance(library, LibraryRootV1):
         if filter_children:
             # Apply simple filtering based on CAPA problem types:
             source_blocks.extend(_problem_type_filter(store, library, dest_block.capa_type))
         else:
             source_blocks.extend(library.children)
-        with store.bulk_operations(dest_block.location.course_key):
+        with store.bulk_operations(dest_block.scope_ids.usage_id.context_key):
             try:
                 dest_block.source_library_version = str(library.location.library_key.version_guid)
                 store.update_item(dest_block, user_id)
-                head_validation = not version
                 dest_block.children = store.copy_from_template(
-                    source_blocks, dest_block.location, user_id, head_validation=head_validation
+                    source_blocks, dest_block.location, user_id, head_validation=True
                 )
                 # ^-- copy_from_template updates the children in the DB
                 # but we must also set .children here to avoid overwriting the DB again
             except Exception as exception:  # pylint: disable=broad-except
-                TASK_LOGGER.exception('Error importing children for %s', dest_block_key, exc_info=True)
-                if self.status.state != UserTaskStatus.FAILED:
-                    self.status.fail({'raw_error_msg': str(exception)})
-                return
-    else:
+                TASK_LOGGER.exception('Error importing children for %s', dest_block.scope_ids.usage_id, exc_info=True)
+                if task.status.state != UserTaskStatus.FAILED:
+                    task.status.fail({'raw_error_msg': str(exception)})
+    elif isinstance(library, library_api.ContentLibraryMetadata):
         # TODO: add filtering by capa_type when V2 library will support different problem types
         try:
-            source_blocks = library_api.get_library_blocks(library_key, block_types=None)
+            source_blocks = library_api.get_library_blocks(library_key)
             source_block_ids = [str(block.usage_key) for block in source_blocks]
             _import_from_blockstore(user_id, store, dest_block, source_block_ids)
             dest_block.source_library_version = str(library.version)
             store.update_item(dest_block, user_id)
         except Exception as exception:  # pylint: disable=broad-except
-            TASK_LOGGER.exception('Error importing children for %s', dest_block_key, exc_info=True)
-            if self.status.state != UserTaskStatus.FAILED:
-                self.status.fail({'raw_error_msg': str(exception)})
-            return
+            TASK_LOGGER.exception('Error importing children for %s', dest_block.scope_ids.usage_id, exc_info=True)
+            if task.status.state != UserTaskStatus.FAILED:
+                task.status.fail({'raw_error_msg': str(exception)})
+
+
+def _copy_overrides(
+    store: MixedModuleStore,
+    user_id: int,
+    source_block: LibraryContentBlock,
+    dest_block: LibraryContentBlock
+) -> None:
+    """
+    Copy any overrides the user has made on children of `source` over to the children of `dest_block`, recursively.
+    """
+    for field in source_block.fields.values():
+        if field.scope == Scope.settings and field.is_set_on(source_block):
+            setattr(dest_block, field.name, field.read_from(source_block))
+    if source_block.has_children:
+        for source_child_key, dest_child_key in zip(source_block.children, dest_block.children):
+            _copy_overrides(
+                store=store,
+                user_id=user_id,
+                source_block=source_block.runtime.get_block(source_child_key),
+                dest_block=dest_block.runtime.get_block(dest_child_key),
+            )
+    store.update_item(dest_block, user_id)

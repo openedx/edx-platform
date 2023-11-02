@@ -1,25 +1,19 @@
 """
 XBlock runtime services for LibraryContentBlock
 """
+from __future__ import annotations
+
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locator import (
-    LibraryLocator,
-    LibraryLocatorV2,
-    LibraryUsageLocator,
-)
-from search.search_engine_base import SearchEngine
-from typing import Union
 from user_tasks.models import UserTaskStatus
 
+from openedx.core.lib import ensure_cms
 from openedx.core.djangoapps.content_libraries import api as library_api
-from xmodule.capa_block import ProblemBlock
-from xmodule.modulestore import ModuleStoreEnum
+from openedx.core.djangoapps.content_libraries import tasks as library_tasks
+from xmodule.library_content_block import LibraryContentBlock
+from xmodule.library_root_xblock import LibraryRoot as LibraryRootV1
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from openedx.core.djangoapps.content_libraries.tasks import update_children_task
-from openedx.core.djangoapps.content_libraries.models import ContentLibrary
 
 
 def normalize_key_for_search(library_key):
@@ -39,29 +33,7 @@ class LibraryToolsService:
         self.store = modulestore
         self.user_id = user_id
 
-    def _get_library(self, library_key):
-        """
-        Helper method to get either V1 or V2 library.
-
-        Given a library key like "library-v1:ProblemX+PR0B" (V1) or "lib:RG:rg-1" (v2), return the 'library'.
-
-        Returns None on error.
-        """
-
-        if isinstance(library_key, LibraryLocatorV2):
-            try:
-                return library_api.get_library(library_key)
-            except ContentLibrary.DoesNotExist:
-                return None
-        else:
-            try:
-                return self.store.get_library(
-                    library_key, remove_version=False, remove_branch=False, head_validation=False
-                )
-            except ItemNotFoundError:
-                return None
-
-    def get_library_version(self, lib_key):
+    def get_library_version(self, lib_key) -> str | int | None:
         """
         Get the version of the given library.
 
@@ -70,25 +42,15 @@ class LibraryToolsService:
             int      - for V2 library.
             None     - if the library does not exist.
         """
-        if not isinstance(lib_key, (LibraryLocator, LibraryLocatorV2)):
-            try:
-                lib_key = LibraryLocator.from_string(lib_key)
-                is_v2_lib = False
-            except InvalidKeyError:
-                lib_key = LibraryLocatorV2.from_string(lib_key)
-                is_v2_lib = True
-        else:
-            is_v2_lib = isinstance(lib_key, LibraryLocatorV2)
-
-        library = self._get_library(lib_key)
-
-        if library:
-            if isinstance(lib_key, LibraryLocatorV2):
-                return library.version
+        library = library_api.get_v1_or_v2_library(lib_key)
+        if not library:
+            return None
+        elif isinstance(library, LibraryRootV1):
             # We need to know the library's version so ensure it's set in library.location.library_key.version_guid
             assert library.location.library_key.version_guid is not None
             return library.location.library_key.version_guid
-        return None
+        elif isinstance(library, library_api.ContentLibraryMetadata):
+            return library.version
 
     def create_block_analytics_summary(self, course_key, block_keys):
         """
@@ -128,82 +90,88 @@ class LibraryToolsService:
             result_json.append(info)
         return result_json
 
-    def _problem_type_filter(self, library, capa_type):
-        """ Filters library children by capa type"""
-        search_engine = SearchEngine.get_search_engine(index="library_index")
-        if search_engine:
-            filter_clause = {
-                "library": str(normalize_key_for_search(library.location.library_key)),
-                "content_type": ProblemBlock.INDEX_CONTENT_TYPE,
-                "problem_types": capa_type
-            }
-            search_result = search_engine.search(field_dictionary=filter_clause)
-            results = search_result.get('results', [])
-            return [LibraryUsageLocator.from_string(item['data']['id']) for item in results]
-        else:
-            return [key for key in library.children if self._filter_child(key, capa_type)]
-
-    def _filter_child(self, usage_key, capa_type):
-        """
-        Return the "capa_type" if the block is a problem, otherwise return None.
-        """
-        if usage_key.block_type != "problem":
-            return False
-
-        block = self.store.get_item(usage_key, depth=0)
-        assert isinstance(block, ProblemBlock)
-        return capa_type in block.problem_types
-
     def can_use_library_content(self, block):
         """
         Determines whether a modulestore holding a course_id supports libraries.
         """
         return self.store.check_supports(block.location.course_key, 'copy_from_template')
 
-    def trigger_update_children_task(self, dest_block, user_perms=None, version=None):
+    def trigger_refresh_children(self, dest_block: LibraryContentBlock, user_perms=None) -> None:
         """
-        Update xBlock's children via an asynchronous task.
+        Queue a task to update the children of `dest_block`.
 
-        Re-fetch all matching blocks from the libraries, and copy them as children of dest_block.
-        The children will be given new block_ids.
-
-        NOTE: V1 libraies blocks definition ID should be the
-        exact same definition ID used in the copy block.
-
+        The task will:
+        * Ensure that `dest_block` has children corresponding to all matching source library blocks.
+          * Considered fields of `dest_block` include: `source_library_id`, `source_library_version`, `capa_type`.
+          * If `dest_block.source_library_version` is set, use that. Otherwise, use latest available
+            library version, and upate `dest_block.source_library_version` to match.
+        * Derive each child block id as a function of `dest_block`'s id and the library block's definition id.
+        * Follow these important create/update/delete semantics for children:
+          * When a matching library child DOES NOT EXIT in `dest_block.children`: import it in as a new block.
+          * When a matching library child ALREADY EXISTS in `dest_block.children`: re-import its definition, clobbering
+            any content updates in this existing child, but preserving any settings overrides in the existing child.
+          * When a block in `dest_block.children` DOES NOT MATCH any library children: delete it from
+            `dest_block.children`.
         """
+        ensure_cms("library_content block children may only be updated in a CMS context")
+        if not isinstance(dest_block, LibraryContentBlock):
+            raise ValueError(f"Can only refresh children for library_content blocks, not {dest_block.tag} blocks.")
         if user_perms and not user_perms.can_write(dest_block.location.course_key):
             raise PermissionDenied()
-
         if not dest_block.source_library_id:
             dest_block.source_library_version = ""
             return
-
-        source_blocks = []
-
         library_key = dest_block.source_library_key
-        is_v2_lib = isinstance(library_key, LibraryLocatorV2)
-
-        if version and not is_v2_lib:
-            library_key = library_key.replace(branch=ModuleStoreEnum.BranchName.library, version_guid=version)
-
-        library = self._get_library(library_key)
-
-        if library is None:
+        if not library_api.get_v1_or_v2_library(library_key):
             raise ValueError(f"Requested library {library_key} not found.")
         if user_perms and not user_perms.can_read(library_key):
             raise PermissionDenied()
-        update_children_task.delay(self.user_id, str(dest_block.location), version)
+        library_tasks.refresh_children.delay(
+            user_id=self.user_id,
+            dest_block_id=str(dest_block.scope_ids.usage_id),
+        )
 
-    def get_update_children_task_state(self, library_content_block_key) -> Union[str, None]:
+    def trigger_duplicate_children(
+        self,
+        source_block: LibraryContentBlock,
+        dest_block: LibraryContentBlock,
+        user_perms=None,
+    ) -> None:
         """
-        Return task state for most-recently-created update_children task for specified library_content block.
+        Queue a task to duplicate the children of `source_block` to `dest_block`.
+        """
+        ensure_cms("library_content block children may only be duplicated in a CMS context")
+        if not isinstance(dest_block, LibraryContentBlock):
+            raise ValueError(f"Can only refresh children for library_content blocks, not {dest_block.tag} blocks.")
+        if source_block.scope_ids.usage_id.context_key != source_block.scope_ids.usage_id.context_key:
+            raise ValueError(
+                "Cannot duplicate_children across different learning contexts "
+                f"(source={source_block.scope_ids.usage_id}, dest={dest_block.scope_ids.usage_id})"
+            )
+        if source_block.source_library_key != dest_block.source_library_key:
+            raise ValueError(
+                "Cannot duplicate_children across different source libraries or versions thereof "
+                f"({source_block.source_library_key=}, {dest_block.source_library_key=})."
+            )
+        library_tasks.duplicate_children.delay(
+            user_id=self.user_id,
+            source_block_id=str(source_block.scope_ids.usage_id),
+            dest_block_id=str(dest_block.scope_ids.usage_id),
+        )
 
-        Options: UserTaskState.{PENDING, IN_PROGRESS, RETRYING, SUCCEEDED, FAILED, CANCELED}
-        If no update_childen task exists, returns None.
+    def are_children_updating(self, library_content_block: LibraryContentBlock) -> bool:
         """
-        args = {'dest_block_key': library_content_block_key}
-        name = update_children_task.__class__.generate_name(args)
-        return UserTaskStatus.objects.filter(name=name).order_by('-created').first()
+        Is a task currently running to update the children of `library_content_block`?
+
+        Only checks the latest task (so that this block's state can't get permanently messed up by
+        some older task that's stuck in PENDING).
+        """
+        args = {'dest_block_id': library_content_block.scope_ids.usage_id}
+        name = library_tasks.LibraryUpdateChildrenTask.generate_name(args)
+        status = UserTaskStatus.objects.filter(name=name).order_by('-created').first()
+        return status and status.state in [
+            UserTaskStatus.IN_PROGRESS, UserTaskStatus.PENDING, UserTaskStatus.RETRYING
+        ]
 
     def list_available_libraries(self):
         """
@@ -212,7 +180,6 @@ class LibraryToolsService:
         Collects Only V2 Libaries if the FEATURES[ENABLE_LIBRARY_AUTHORING_MICROFRONTEND] setting is True.
         Otherwise, return all v1 and v2 libraries.
         Returns tuples of (library key, display_name).
-
         """
         user = User.objects.get(id=self.user_id)
         v1_libs = [

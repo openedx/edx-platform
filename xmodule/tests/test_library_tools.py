@@ -124,7 +124,7 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         assert len(content_block.children) == 0
 
         # Populate children from library
-        self.tools.trigger_update_children_task(content_block)
+        self.tools.trigger_refresh_children(content_block)
 
         # The updates happen in a Celery task, so this particular content_block instance is no updated.
         # We must re-instantiate it from modulstore in order to see the updated children list.
@@ -161,7 +161,7 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         )
 
         # Import the unit block from the library to the course
-        self.tools.trigger_update_children_task(lc_block)
+        self.tools.trigger_refresh_children(lc_block)
         lc_block = self.store.get_item(lc_block.location)
 
         # Verify imported block with its children
@@ -182,7 +182,7 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
 
         # Check that reimporting updates the target block
         self._set_library_block_olx(html_block_id, '<html><a href="/static/test.txt">Foo bar</a></html>')
-        self.tools.trigger_update_children_task(lc_block)
+        self.tools.trigger_refresh_children(lc_block)
         lc_block = self.store.get_item(lc_block.location)
 
         assert len(lc_block.children) == 1
@@ -209,6 +209,6 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         )
 
         assert len(content_block.children) == 0
-        self.tools.trigger_update_children_task(content_block)
+        self.tools.trigger_refresh_children(content_block)
         content_block = self.store.get_item(content_block.location)
         assert len(content_block.children) == 1
