@@ -6,6 +6,7 @@ LTI Provider view functions
 import logging
 
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from common.djangoapps.edxmako.shortcuts import render_to_response
@@ -101,7 +102,16 @@ def lti_launch(request, course_id, usage_id):
 
     # Create an edX account if the user identifed by the LTI launch doesn't have
     # one already, and log the edX account into the platform.
-    authenticate_lti_user(request, params['user_id'], lti_consumer)
+    try:
+        authenticate_lti_user(request, params['user_id'], lti_consumer)
+    except PermissionDenied:
+        context = {
+            "login_link": request.build_absolute_uri(settings.LOGIN_URL),
+            "allow_iframing": True,
+            "disable_header": True,
+            "disable_footer": True,
+        }
+        return render_to_response("lti_provider/user-auth-error.html", context)
 
     # Store any parameters required by the outcome service in order to report
     # scores back later. We know that the consumer exists, since the record was

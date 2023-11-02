@@ -7,7 +7,7 @@ import string
 from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from django.db.utils import IntegrityError
 from django.test import TestCase
@@ -93,15 +93,22 @@ class AuthenticateLtiUserTest(TestCase):
         self.old_user = UserFactory.create()
         self.request = RequestFactory().post('/')
         self.request.user = self.old_user
+        self.auto_linking_consumer = LtiConsumer(
+            consumer_name='AutoLinkingConsumer',
+            consumer_key='AutoLinkingKey',
+            consumer_secret='AutoLinkingSecret',
+            auto_link_users_using_email=True
+        )
+        self.auto_linking_consumer.save()
 
-    def create_lti_user_model(self):
+    def create_lti_user_model(self, consumer=None):
         """
         Generate and save a User and an LTI user model
         """
         edx_user = User(username=self.edx_user_id)
         edx_user.save()
         lti_user = LtiUser(
-            lti_consumer=self.lti_consumer,
+            lti_consumer=consumer or self.lti_consumer,
             lti_user_id=self.lti_user_id,
             edx_user=edx_user
         )
@@ -148,21 +155,31 @@ class AuthenticateLtiUserTest(TestCase):
         users.authenticate_lti_user(request, self.lti_user_id, self.lti_consumer)
         create_user.assert_called_with(self.lti_user_id, self.lti_consumer)
 
-        self.lti_consumer.auto_link_users_using_email = True
-        self.lti_consumer.save()
-        users.authenticate_lti_user(request, self.lti_user_id, self.lti_consumer)
-        create_user.assert_called_with(self.lti_user_id, self.lti_consumer, self.old_user.email)
+        users.authenticate_lti_user(request, self.lti_user_id, self.auto_linking_consumer)
+        create_user.assert_called_with(self.lti_user_id, self.auto_linking_consumer, self.old_user.email)
 
     def test_switch_the_associated_edx_user_when_auto_linking_existing_user(self, create_user, switch_user):
-        lti_user = self.create_lti_user_model()
+        lti_user = self.create_lti_user_model(self.auto_linking_consumer)
         new_user = UserFactory.create()
-        self.lti_consumer.auto_link_users_using_email = True
-        self.lti_consumer.save()
         request = RequestFactory().post("/", {"lis_person_contact_email_primary": new_user.email})
         request.user = new_user
 
-        users.authenticate_lti_user(request, self.lti_user_id, self.lti_consumer)
-        assert LtiUser.objects.get(pk=lti_user.id).edx_user == new_user
+        users.authenticate_lti_user(request, self.lti_user_id, self.auto_linking_consumer)
+        assert LtiUser.objects.get(id=lti_user.id).edx_user == new_user
+
+    def test_raise_exception_trying_to_auto_link_unauthenticate_user(self, create_user, switch_user):
+        request = RequestFactory().post("/")
+        request.user = AnonymousUser()
+
+        with self.assertRaises(PermissionDenied):
+            users.authenticate_lti_user(request, self.lti_user_id, self.auto_linking_consumer)
+
+    def test_raise_exception_on_mismatched_user_and_lis_email(self, create_user, switch_user):
+        request = RequestFactory().post("/", {"lis_person_contact_email_primary": "wrong_email@example.com"})
+        request.user = self.old_user
+
+        with self.assertRaises(PermissionDenied):
+            users.authenticate_lti_user(request, self.lti_user_id, self.auto_linking_consumer)
 
 
 class CreateLtiUserTest(TestCase):
