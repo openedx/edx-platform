@@ -6,6 +6,7 @@ from urllib.parse import urljoin
 
 import httpretty
 import ddt
+import os
 import requests
 from django.conf import settings
 from django.test import TestCase
@@ -75,7 +76,7 @@ class DeprecatedRestApiClientTest(TestCase):
         self.assertRaises(ValueError, DeprecatedRestApiClient, **kwargs)
 
     @mock.patch('edx_rest_api_client.auth.JwtAuth.__init__', return_value=None)
-    def test_tracking_context(self, mock_auth):
+    def test_tracking_contexts(self, mock_auth):
         """
         Ensure the tracking context is included with API requests if specified.
         """
