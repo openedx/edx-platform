@@ -4415,3 +4415,6 @@ OPENAI_SECRET_KEY = 'set-secret-key'
 DEFAULT_SITE_CREATION_COURSE_ID = None
 
 PANEL_ADMIN_LOGOUT_REDIRECT_URL = 'http://panel.edx.devstack.lms:9999'
+
+############### Fernet Encryption Key For Auto Login ####################
+AUTO_LOGIN_ENCRYPTION_KEY = 'AUTO_LOGIN_ENCRYPTION_KEY'
