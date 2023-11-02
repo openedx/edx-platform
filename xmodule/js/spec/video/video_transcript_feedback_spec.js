@@ -25,7 +25,7 @@
 
         describe('initialize', function() {
             it('instantiates widget and handlers along with necessary data', function() {
-                spyOn(state.videoTranscriptFeedback, 'shouldShowWidget').and.callFake(function() {
+                spyOn(state.videoTranscriptFeedback, 'loadAndSetVisibility').and.callFake(function() {
                     return true;
                 });
                 spyOn(state.videoTranscriptFeedback, 'bindHandlers').and.callFake(function() {
@@ -36,21 +36,21 @@
                 expect(state.videoTranscriptFeedback.videoId).toEqual(videoId);
                 expect(state.videoTranscriptFeedback.userId).toEqual(userId);
                 expect(state.videoTranscriptFeedback.currentTranscriptLanguage).toEqual(currentLanguage);
-                expect(state.videoTranscriptFeedback.shouldShowWidget).toHaveBeenCalled();
+                expect(state.videoTranscriptFeedback.loadAndSetVisibility).toHaveBeenCalled();
                 expect(state.videoTranscriptFeedback.bindHandlers).toHaveBeenCalled();
             });
         });
 
         describe('should show widget', function() {
             it('checks if transcript was AI generated', function() {
-                spyOn(state.videoTranscriptFeedback, 'shouldShowWidget').and.callThrough();
-                state.videoTranscriptFeedback.shouldShowWidget();
+                spyOn(state.videoTranscriptFeedback, 'loadAndSetVisibility').and.callThrough();
+                state.videoTranscriptFeedback.loadAndSetVisibility();
 
                 var getAITranscriptCall = $.ajax.calls.all().find(function(call) {
                     return call.args[0].url.match(/.+video-transcript.+$/);
                 });
 
-                expect(state.videoTranscriptFeedback.shouldShowWidget).toHaveBeenCalled();
+                expect(state.videoTranscriptFeedback.loadAndSetVisibility).toHaveBeenCalled();
                 expect(getAITranscriptCall.args[0].url).toEqual(state.videoTranscriptFeedback.aiTranslationsUrl + getAITranscriptUrl);
                 expect(getAITranscriptCall.args[0].type).toEqual('GET');
                 expect(getAITranscriptCall.args[0].async).toEqual(false);
@@ -58,30 +58,30 @@
                 expect(getAITranscriptCall.args[0].error).toEqual(jasmine.any(Function));
             });
             it('shows widget if transcript is AI generated', function() {
-                state.videoTranscriptFeedback.shouldShowWidget();
+                state.videoTranscriptFeedback.loadAndSetVisibility();
                 expect($('.wrapper-transcript-feedback')[0]).toExist();
             });
             it('hides widget if transcript is not AI generated', function() {
                 state.videoTranscriptFeedback.videoId = 'notAIGenerated';
-                state.videoTranscriptFeedback.shouldShowWidget();
+                state.videoTranscriptFeedback.loadAndSetVisibility();
                 expect($('.wrapper-transcript-feedback')[0]).toExist();
                 expect($('.wrapper-transcript-feedback')[0].style.display).toEqual('none');
             });
             it('hides widget if transcript is AI generated but is still in progress', function() {
                 state.videoTranscriptFeedback.videoId = 'inProgress';
-                state.videoTranscriptFeedback.shouldShowWidget();
+                state.videoTranscriptFeedback.loadAndSetVisibility();
                 expect($('.wrapper-transcript-feedback')[0]).toExist();
                 expect($('.wrapper-transcript-feedback')[0].style.display).toEqual('none');
             });
             it('hides widget if query for transcript AI generated fails', function() {
                 state.videoTranscriptFeedback.videoId = 'error';
-                state.videoTranscriptFeedback.shouldShowWidget();
+                state.videoTranscriptFeedback.loadAndSetVisibility();
                 expect($('.wrapper-transcript-feedback')[0]).toExist();
                 expect($('.wrapper-transcript-feedback')[0].style.display).toEqual('none');
             });
             it('checks if feedback exists for AI generated transcript', function() {
                 spyOn(state.videoTranscriptFeedback, 'getFeedbackForCurrentTranscript').and.callThrough();
-                state.videoTranscriptFeedback.shouldShowWidget();
+                state.videoTranscriptFeedback.loadAndSetVisibility();
 
                 var getTranscriptFeedbackCall = $.ajax.calls.all().find(function(call) {
                     return call.args[0].url.match(/.+transcript-feedback.+$/);
@@ -142,33 +142,33 @@
         });
 
         describe('onHideLanguageMenu', function() {
-            it('calls shouldShowWidget if language changed', function() {
+            it('calls loadAndSetVisibility if language changed', function() {
                 state.videoTranscriptFeedback.currentTranscriptLanguage = 'es';
-                spyOn(state.videoTranscriptFeedback, 'shouldShowWidget').and.callThrough();
+                spyOn(state.videoTranscriptFeedback, 'loadAndSetVisibility').and.callThrough();
                 state.el.trigger('language_menu:hide', {
                     id: 'id',
                     code: 'code',
                     language: 'en',
                     duration: 10
                 });
-                expect(state.videoTranscriptFeedback.shouldShowWidget).toHaveBeenCalled();
+                expect(state.videoTranscriptFeedback.loadAndSetVisibility).toHaveBeenCalled();
             });
-            it('does not call shouldShowWidget if language did not change', function() {
+            it('does not call loadAndSetVisibility if language did not change', function() {
                 state.videoTranscriptFeedback.currentTranscriptLanguage = 'en';
-                spyOn(state.videoTranscriptFeedback, 'shouldShowWidget').and.callThrough();
+                spyOn(state.videoTranscriptFeedback, 'loadAndSetVisibility').and.callThrough();
                 state.el.trigger('language_menu:hide', {
                     id: 'id',
                     code: 'code',
                     language: 'en',
                     duration: 10
                 });
-                expect(state.videoTranscriptFeedback.shouldShowWidget).not.toHaveBeenCalled();
+                expect(state.videoTranscriptFeedback.loadAndSetVisibility).not.toHaveBeenCalled();
             });
         });
 
         describe('clicking on thumbs up button', function() {
             it('sends positive feedback if there is no current feedback', function() {
-                state.videoTranscriptFeedback.shouldShowWidget();
+                state.videoTranscriptFeedback.loadAndSetVisibility();
                 state.videoTranscriptFeedback.currentFeedback = undefined;
                 spyOn(state.videoTranscriptFeedback, 'sendFeedbackForCurrentTranscript').and.callFake(function() {
                     return true;
@@ -178,7 +178,7 @@
                 expect(state.videoTranscriptFeedback.sendFeedbackForCurrentTranscript).toHaveBeenCalledWith(true);
             });
             it('sends empty feedback if there is a current positive feedback', function() {
-                state.videoTranscriptFeedback.shouldShowWidget();
+                state.videoTranscriptFeedback.loadAndSetVisibility();
                 state.videoTranscriptFeedback.currentFeedback = true;
                 spyOn(state.videoTranscriptFeedback, 'sendFeedbackForCurrentTranscript').and.callFake(function() {
                     return true;
@@ -191,7 +191,7 @@
 
         describe('clicking on thumbs down button', function() {
             it('sends negative feedback if there is no current feedback', function() {
-                state.videoTranscriptFeedback.shouldShowWidget();
+                state.videoTranscriptFeedback.loadAndSetVisibility();
                 state.videoTranscriptFeedback.currentFeedback = undefined;
                 spyOn(state.videoTranscriptFeedback, 'sendFeedbackForCurrentTranscript').and.callFake(function() {
                     return true;
@@ -201,7 +201,7 @@
                 expect(state.videoTranscriptFeedback.sendFeedbackForCurrentTranscript).toHaveBeenCalledWith(false);
             });
             it('sends empty feedback if there is a current negative feedback', function() {
-                state.videoTranscriptFeedback.shouldShowWidget();
+                state.videoTranscriptFeedback.loadAndSetVisibility();
                 state.videoTranscriptFeedback.currentFeedback = false;
                 spyOn(state.videoTranscriptFeedback, 'sendFeedbackForCurrentTranscript').and.callFake(function() {
                     return true;
@@ -214,7 +214,7 @@
 
         describe('calling send transcript feedback', function() {
             it('sends proper request to ai translation service', function() {
-                state.videoTranscriptFeedback.shouldShowWidget();
+                state.videoTranscriptFeedback.loadAndSetVisibility();
                 state.videoTranscriptFeedback.currentFeedback = undefined;
                 state.videoTranscriptFeedback.sendFeedbackForCurrentTranscript(true);
                 var sendTranscriptFeedbackCall = $.ajax.calls.all().find(function(call) {
@@ -234,7 +234,7 @@
                 expect(sendTranscriptFeedbackCall.args[0].error).toEqual(jasmine.any(Function));
             });
             it('marks thumbs up button as selected if response is positive', function() {
-                state.videoTranscriptFeedback.shouldShowWidget();
+                state.videoTranscriptFeedback.loadAndSetVisibility();
                 state.videoTranscriptFeedback.currentFeedback = undefined;
                 state.videoTranscriptFeedback.sendFeedbackForCurrentTranscript(true);
                 var thumbsUpIcon = $('.thumbs-up-icon')[0];
@@ -245,7 +245,7 @@
                 expect(state.videoTranscriptFeedback.currentFeedback).toEqual(true);
             });
             it('marks thumbs down button as selected if response is negative', function() {
-                state.videoTranscriptFeedback.shouldShowWidget();
+                state.videoTranscriptFeedback.loadAndSetVisibility();
                 state.videoTranscriptFeedback.currentFeedback = undefined;
                 state.videoTranscriptFeedback.sendFeedbackForCurrentTranscript(false);
                 var thumbsUpIcon = $('.thumbs-up-icon')[0];
@@ -256,7 +256,7 @@
                 expect(state.videoTranscriptFeedback.currentFeedback).toEqual(false);
             });
             it('unselects thumbs buttons if response is empty', function() {
-                state.videoTranscriptFeedback.shouldShowWidget();
+                state.videoTranscriptFeedback.loadAndSetVisibility();
                 state.videoTranscriptFeedback.currentFeedback = true;
                 state.videoTranscriptFeedback.sendFeedbackForCurrentTranscript(null);
                 var thumbsUpIcon = $('.thumbs-up-icon')[0];
