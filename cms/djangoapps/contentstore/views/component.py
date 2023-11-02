@@ -32,6 +32,7 @@ from cms.djangoapps.contentstore.toggles import (
 from openedx.core.lib.xblock_utils import get_aside_from_xblock, is_xblock_aside
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.content_staging import api as content_staging_api
+from openedx.core.djangoapps.content_tagging.api import get_content_tags
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from ..toggles import use_new_unit_page
@@ -196,6 +197,11 @@ def container_handler(request, usage_key_string):
                     break
                 index += 1
 
+            show_unit_tags = use_tagging_taxonomy_list_page()
+            unit_tags = {}
+            if show_unit_tags and is_unit_page:
+                unit_tags = get_unit_tags(usage_key)
+
             # Get the status of the user's clipboard so they can paste components if they have something to paste
             user_clipboard = content_staging_api.get_user_clipboard_json(request.user.id, request)
             return render_to_response('container.html', {
@@ -219,7 +225,8 @@ def container_handler(request, usage_key_string):
                 'draft_preview_link': preview_lms_link,
                 'published_preview_link': lms_link,
                 'templates': CONTAINER_TEMPLATES,
-                'show_unit_tags': use_tagging_taxonomy_list_page(),
+                'show_unit_tags': show_unit_tags,
+                'unit_tags': unit_tags,
                 # Status of the user's clipboard, exactly as would be returned from the "GET clipboard" REST API.
                 'user_clipboard': user_clipboard,
             })
@@ -602,3 +609,63 @@ def component_handler(request, usage_key_string, handler, suffix=''):
         )
 
     return webob_to_django_response(resp)
+
+
+def get_unit_tags(usage_key):
+    """
+    Get the tags of a Unit and build a json to be read by the UI
+    """
+    # Get content tags from content tagging API
+    content_tags = get_content_tags(usage_key)
+    
+    # Group content tags by taxonomy
+    taxonomy_dict = {}
+    for content_tag in content_tags:
+        taxonomy_name = content_tag.name
+        if taxonomy_name not in taxonomy_dict:
+            taxonomy_dict[taxonomy_name] = []
+        taxonomy_dict[taxonomy_name].append(content_tag)
+    
+    taxonomy_list = []
+    total_count = 0
+
+    # Build a tag tree for each taxonomy
+    for taxonomy_name, content_tag_list in taxonomy_dict.items():
+        tags = {}
+        root_ids = []
+
+        def handle_tag(tag, child_tag_id=None):
+            # Group each tag by parent to build a tree
+            if tag.id not in tags:
+                tags[tag.id] = {
+                    'value': tag.value,
+                    'children': [],
+                }
+            if child_tag_id:
+                # Add a child into the children list
+                tags[tag.id].get('children').append(tags[child_tag_id])
+            if tag.parent_id is None:
+                if tag.id not in root_ids:
+                    root_ids.append(tag.id)
+            else:
+                # Group all the lineage of this tag
+                handle_tag(tag.parent, tag.id)
+
+        for content_tag in content_tag_list:
+            handle_tag(content_tag.tag)
+
+        count = len(tags)
+        # Add the tree to the taxonomy list
+        taxonomy_list.append({
+            'value': taxonomy_name,
+            'tags': [tags[tag_id] for tag_id in root_ids],
+            'count': count,
+        })
+        total_count += count
+
+    unit_tags = {
+        'count': total_count,
+        'taxonomies': taxonomy_list,
+    }
+
+    return unit_tags
