@@ -1136,13 +1136,19 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
 
         assert response.status_code == expected_status
         if status.is_success(expected_status):
-            assert len(response.data) == len(tag_values)
-            assert set(t["value"] for t in response.data) == set(tag_values)
+            tags_by_taxonomy = response.data[str(self.courseA)]["taxonomies"]
+            if tag_values:
+                response_taxonomy = tags_by_taxonomy[0]
+                assert response_taxonomy["name"] == taxonomy.name
+                response_tags = response_taxonomy["tags"]
+                assert [t["value"] for t in response_tags] == tag_values
+            else:
+                assert tags_by_taxonomy == []  # No tags are set from any taxonomy
 
             # Check that re-fetching the tags returns what we set
-            response = self.client.get(url, format="json")
-            assert status.is_success(response.status_code)
-            assert set(t["value"] for t in response.data) == set(tag_values)
+            new_response = self.client.get(url, format="json")
+            assert status.is_success(new_response.status_code)
+            assert new_response.data == response.data
 
     @ddt.data(
         "staffA",
@@ -1214,13 +1220,19 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
 
         assert response.status_code == expected_status
         if status.is_success(expected_status):
-            assert len(response.data) == len(tag_values)
-            assert set(t["value"] for t in response.data) == set(tag_values)
+            tags_by_taxonomy = response.data[str(self.xblockA)]["taxonomies"]
+            if tag_values:
+                response_taxonomy = tags_by_taxonomy[0]
+                assert response_taxonomy["name"] == taxonomy.name
+                response_tags = response_taxonomy["tags"]
+                assert [t["value"] for t in response_tags] == tag_values
+            else:
+                assert tags_by_taxonomy == []  # No tags are set from any taxonomy
 
             # Check that re-fetching the tags returns what we set
-            response = self.client.get(url, format="json")
-            assert status.is_success(response.status_code)
-            assert set(t["value"] for t in response.data) == set(tag_values)
+            new_response = self.client.get(url, format="json")
+            assert status.is_success(new_response.status_code)
+            assert new_response.data == response.data
 
     @ddt.data(
         "staffA",
