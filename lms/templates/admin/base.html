@@ -31,9 +31,9 @@
 
     {% if not is_popup %}
     <!-- Header -->
-    {% block header %}
-      <header id="header" >
-        <div id="branding" >
+        {% block header %}
+    <div id="header">
+        <div id="branding">
         {% block branding %}{% endblock %}
         </div>
         {% block usertools %}
@@ -66,7 +66,7 @@
         {% endif %}
         {% endblock %}
         {% block nav-global %}{% endblock %}
-      </header>
+    </div>
     {% endblock %}
     <!-- END Header -->
     {% block nav-breadcrumbs %}
