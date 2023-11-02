@@ -2656,7 +2656,6 @@ REGISTRATION_EXTRA_FIELDS = {
 EDXAPP_PARSE_KEYS = {}
 
 ############################ AI_TRANSLATIONS ##################################
-AI_TRANSLATIONS_URL_ROOT = 'http://localhost:18760'
 AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
 
 ###################### DEPRECATED URLS ##########################

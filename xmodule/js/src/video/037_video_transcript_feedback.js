@@ -26,8 +26,7 @@
 
                 _.bindAll(this,  'destroy', 'getFeedbackForCurrentTranscript', 'markAsPositiveFeedback', 'markAsNegativeFeedback', 'markAsEmptyFeedback',
                     'selectThumbsUp', 'selectThumbsDown', 'unselectThumbsUp', 'unselectThumbsDown', 'thumbsUpClickHandler', 'thumbsDownClickHandler',
-                    'sendFeedbackForCurrentTranscript', 'onHideLanguageMenu', 'getCurrentLanguage', 'instantiateWidget', 'shouldShowWidget',
-                    'showWidget', 'hideWidget'
+                    'sendFeedbackForCurrentTranscript', 'onHideLanguageMenu', 'getCurrentLanguage', 'shouldShowWidget', 'showWidget', 'hideWidget'
                 );
 
                 this.state = state;
@@ -65,7 +64,7 @@
                         'language_menu:hide': this.onHideLanguageMenu,
                         destroy: this.destroy
                     };
-                    this.instantiateWidget();
+                    this.shouldShowWidget();
                     this.bindHandlers();
                 },
 
@@ -94,7 +93,7 @@
                                 }
                             }
                         },
-                        error: function() {
+                        error: function(error) {
                             self.markAsEmptyFeedback();
                             self.currentFeedback = null;
                         }
@@ -202,7 +201,7 @@
                     var newLanguageSelected = this.getCurrentLanguage();
                     if (this.currentTranscriptLanguage !== newLanguageSelected) {
                         this.currentTranscriptLanguage = this.getCurrentLanguage();
-                        this.instantiateWidget();
+                        this.shouldShowWidget();
                     }
                 },
 
@@ -211,30 +210,25 @@
                     return language;
                 },
 
-                instantiateWidget: function() {
-                    var self = this;
-                    $.when(this.shouldShowWidget()).done(function(shouldShowWidget) {
-                        if (shouldShowWidget) {
-                            self.showWidget();
-                            self.getFeedbackForCurrentTranscript();
-                        } else {
-                            self.hideWidget();
-                        }
-                    })
-                },
-
                 shouldShowWidget: function() {
+                    var self = this;
                     var url = this.aiTranslationsUrl + '/video-transcript' + '?transcript_language=' + this.currentTranscriptLanguage + '&video_uuid=' + this.videoId;
 
-                    return $.ajax({
+                    $.ajax({
                         url: url,
                         type: 'GET',
                         async: false,
                         success: function(data) {
-                            return (data && data.status === 'Completed');
+                            console.log(data);
+                            if (data && data.status === 'Completed') {
+                                self.showWidget();
+                                self.getFeedbackForCurrentTranscript();
+                            } else {
+                                self.hideWidget();
+                            }
                         },
-                        error: function() {
-                            return false;
+                        error: function(error) {
+                            self.hideWidget();
                         }
                     });
                 },

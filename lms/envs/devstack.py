@@ -526,7 +526,6 @@ API_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/late
 AUTH_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/authentication/index.html'
 
 ############################ AI_TRANSLATIONS ##################################
-AI_TRANSLATIONS_URL_ROOT = 'http://localhost:18760'
 AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
 
 ################# New settings must go ABOVE this line #################
