@@ -13,5 +13,4 @@ class LtiConsumerAdmin(admin.ModelAdmin):
     search_fields = ('consumer_name', 'consumer_key', 'instance_guid')
     list_display = ('id', 'consumer_name', 'consumer_key', 'instance_guid')
 
-
 admin.site.register(LtiConsumer, LtiConsumerAdmin)
