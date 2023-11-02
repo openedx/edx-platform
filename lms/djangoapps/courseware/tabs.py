@@ -16,7 +16,7 @@ from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.features.course_experience import default_course_url
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from common.djangoapps.student.models import CourseEnrollment
-
+from openedx.features.toggle_feature.toggle_feature import featureCourse
 
 class EnrolledTab(CourseTab):
     """
@@ -327,7 +327,10 @@ def get_course_tab_list(user, course):
     # "Courseware" tab. The tab is then renamed as "Entrance Exam".
     course_tab_list = []
     must_complete_ee = not user_can_skip_entrance_exam(user, course)
+    
+    toggle_feature = featureCourse(course.id)
     for tab in xmodule_tab_list:
+
         if must_complete_ee:
             # Hide all of the tabs except for 'Courseware'
             # Rename 'Courseware' tab to 'Entrance Exam'
@@ -338,7 +341,11 @@ def get_course_tab_list(user, course):
         if tab.type == 'static_tab' and tab.course_staff_only and \
                 not bool(user and has_access(user, 'staff', course, course.id)):
             continue
+        if (tab.title == 'Dates' or tab.title == 'Discussion') and (tab.title.lower() not in toggle_feature):
+            continue
+
         course_tab_list.append(tab)
+        
 
     # Add in any dynamic tabs, i.e. those that are not persisted
     course_tab_list += _get_dynamic_tabs(course, user)
