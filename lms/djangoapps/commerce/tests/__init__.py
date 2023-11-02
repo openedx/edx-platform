@@ -77,7 +77,7 @@ class DeprecatedRestApiClientTests(TestCase):
         self.assertRaises(ValueError, DeprecatedRestApiClient, **kwargs)
 
     @mock.patch('edx_rest_api_client.auth.JwtAuth.__init__', return_value=None)
-    def test_tracking_contexts(self, mock_auth):
+    def test_tracking_context(self, mock_auth):
         """
         Ensure the tracking context is included with API requests if specified.
         """
