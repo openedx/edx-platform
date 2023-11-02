@@ -152,6 +152,7 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
     # Send to a signal for catalog info changes as well, but only once we know the transaction is committed.
     transaction.on_commit(lambda: emit_catalog_info_changed_signal(course_key))
 
+
 @receiver(SignalHandler.course_deleted)
 def listen_for_course_delete(sender, course_key, **kwargs):  # pylint: disable=unused-argument
     """
