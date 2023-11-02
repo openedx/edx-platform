@@ -5,9 +5,14 @@ from unittest import mock
 from urllib.parse import urljoin
 
 import httpretty
+import ddt
+import requests
 from django.conf import settings
 from django.test import TestCase
 from freezegun import freeze_time
+from edx_rest_api_client import __version__
+from edx_rest_api_client.auth import JwtAuth
+from openedx.core.djangoapps.commerce.utils import DeprecatedRestApiClient
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
@@ -26,6 +31,83 @@ TEST_PAYMENT_DATA = {
 
 
 class DeprecatedRestApiClientTest(TestCase):
+    """
+    Tests for the edX Rest API client.
+    """
+
+    @ddt.unpack
+    @ddt.data(
+        ({'url': URL, 'signing_key': SIGNING_KEY, 'username': USERNAME,
+          'full_name': FULL_NAME, 'email': EMAIL}, JwtAuth),
+        ({'url': URL, 'signing_key': SIGNING_KEY, 'username': USERNAME, 'full_name': None, 'email': EMAIL}, JwtAuth),
+        ({'url': URL, 'signing_key': SIGNING_KEY, 'username': USERNAME,
+          'full_name': FULL_NAME, 'email': None}, JwtAuth),
+        ({'url': URL, 'signing_key': SIGNING_KEY, 'username': USERNAME, 'full_name': None, 'email': None}, JwtAuth),
+        ({'url': URL, 'signing_key': SIGNING_KEY, 'username': USERNAME}, JwtAuth),
+        ({'url': URL, 'signing_key': None, 'username': USERNAME}, type(None)),
+        ({'url': URL, 'signing_key': SIGNING_KEY, 'username': None}, type(None)),
+        ({'url': URL, 'signing_key': None, 'username': None, 'oauth_access_token': None}, type(None))
+    )
+    def test_valid_configuration(self, kwargs, auth_type):
+        """
+        The constructor should return successfully if all arguments are valid.
+        We also check that the auth type of the api is what we expect.
+        """
+        api = DeprecatedRestApiClient(**kwargs)
+        self.assertIsInstance(api._store['session'].auth, auth_type)  # pylint: disable=protected-access
+
+    @ddt.data(
+        {'url': None, 'signing_key': SIGNING_KEY, 'username': USERNAME},
+        {'url': None, 'signing_key': None, 'username': None, 'oauth_access_token': None},
+    )
+    def test_invalid_configuration(self, kwargs):
+        """
+        If the constructor arguments are invalid, an InvalidConfigurationError should be raised.
+        """
+        self.assertRaises(ValueError, DeprecatedRestApiClient, **kwargs)
+
+    @mock.patch('edx_rest_api_client.auth.JwtAuth.__init__', return_value=None)
+    def test_tracking_context(self, mock_auth):
+        """
+        Ensure the tracking context is included with API requests if specified.
+        """
+        DeprecatedRestApiClient(URL, SIGNING_KEY, USERNAME, FULL_NAME, EMAIL, tracking_context=TRACKING_CONTEXT)
+        self.assertIn(TRACKING_CONTEXT, mock_auth.call_args[1].values())
+
+    def test_oauth2(self):
+        """
+        Ensure OAuth2 authentication is used when an access token is supplied to the constructor.
+        """
+
+        with mock.patch('edx_rest_api_client.auth.BearerAuth.__init__', return_value=None) as mock_auth:
+            DeprecatedRestApiClient(URL, oauth_access_token=ACCESS_TOKEN)
+            mock_auth.assert_called_with(ACCESS_TOKEN)
+
+    def test_supplied_jwt(self):
+        """Ensure JWT authentication is used when a JWT is supplied to the constructor."""
+        with mock.patch('edx_rest_api_client.auth.SuppliedJwtAuth.__init__', return_value=None) as mock_auth:
+            DeprecatedRestApiClient(URL, jwt=JWT)
+            mock_auth.assert_called_with(JWT)
+
+    def test_user_agent(self):
+        """Make sure our custom User-Agent is getting built correctly."""
+        with mock.patch('socket.gethostbyname', return_value='test_hostname'):
+            default_user_agent = user_agent()
+            self.assertIn('python-requests', default_user_agent)
+            self.assertIn(f'edx-rest-api-client/{__version__}', default_user_agent)
+            self.assertIn('test_hostname', default_user_agent)
+
+        with mock.patch('socket.gethostbyname') as mock_gethostbyname:
+            mock_gethostbyname.side_effect = ValueError()
+            default_user_agent = user_agent()
+            self.assertIn('unknown_client_name', default_user_agent)
+
+        with mock.patch.dict(os.environ, {'EDX_REST_API_CLIENT_NAME': "awesome_app"}):
+            uagent = user_agent()
+            self.assertIn('awesome_app', uagent)
+
+        self.assertEqual(user_agent(), DeprecatedRestApiClient.user_agent())
+
     """
     Tests to ensure the client is initialized properly.
     """
