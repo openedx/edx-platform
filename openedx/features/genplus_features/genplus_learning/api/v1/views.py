@@ -38,7 +38,7 @@ class ProgramViewSet(viewsets.ModelViewSet):
         else:
             program_ids = ProgramAccessRole.objects.filter(user=gen_user.user).values_list('program', flat=True).distinct()
 
-        qs = qs.filter(id__in=program_ids)
+        qs = qs.filter(id__in=program_ids).order_by('start_date')
         return qs
 
     def get_serializer_context(self):

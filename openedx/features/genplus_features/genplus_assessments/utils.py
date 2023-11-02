@@ -850,7 +850,7 @@ def get_user_assessment_result(user, raw_data, program):
     return aggregate_result
 
 
-def skill_reflection_response(skills, likert_questions, nuance_interrogation_questions, class_id):
+def skill_reflection_response(skills, likert_questions, nuance_interrogation_questions, class_id, user):
     """
     This is to prepare a response for skill reflection combined view
     :param skills:
@@ -867,7 +867,9 @@ def skill_reflection_response(skills, likert_questions, nuance_interrogation_que
     store = modulestore()
 
     gen_class = Class.objects.prefetch_related('students').get(pk=class_id)
-    users = gen_class.students.select_related('gen_user__user').values('gen_user__user').all()
+    users = gen_class.students.select_related('gen_user__user').filter(
+        gen_user__school_id=user.gen_user.school_id
+    ).values('gen_user__user').all()
     common_filters = {'user__in': users}
 
     def process_question_responses(questions, response_key, location_key):
