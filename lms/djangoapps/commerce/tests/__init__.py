@@ -18,6 +18,14 @@ from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 
+URL = 'http://example.com/api/v2'
+SIGNING_KEY = 'edx'
+USERNAME = 'edx'
+FULL_NAME = 'édx äpp'
+EMAIL = 'edx@example.com'
+TRACKING_CONTEXT = {'foo': 'bar'}
+ACCESS_TOKEN = 'abc123'
+JWT = 'abc.123.doremi'
 JSON = 'application/json'
 TEST_PUBLIC_URL_ROOT = 'http://www.example.com'
 TEST_API_URL = 'http://www-internal.example.com/api'
