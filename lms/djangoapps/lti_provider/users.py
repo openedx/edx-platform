@@ -32,8 +32,8 @@ def authenticate_lti_user(request, lti_user_id, lti_consumer):
 
     # Verify that the email from the LTI Launch and the logged-in user are the same.
     if lti_consumer.auto_link_users_using_email and (
-       not request.user.is_authenticated or
-       (lis_email and request.user.email != lis_email)
+        not request.user.is_authenticated or
+        (lis_email and request.user.email != lis_email)
     ):
         raise PermissionDenied()
 
