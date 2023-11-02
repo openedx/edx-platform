@@ -3,12 +3,9 @@ Unit tests for enabling self-generated certificates for self-paced courses
 and disabling for instructor-paced courses.
 """
 
-from datetime import datetime, timezone
 from unittest import mock
-from uuid import uuid4
 
 import ddt
-from django.test.utils import override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
