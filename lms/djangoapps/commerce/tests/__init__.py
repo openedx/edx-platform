@@ -12,7 +12,7 @@ from django.test import TestCase
 from freezegun import freeze_time
 from edx_rest_api_client import __version__
 from edx_rest_api_client.auth import JwtAuth
-from openedx.core.djangoapps.commerce.utils import DeprecatedRestApiClient, user_agent 
+from openedx.core.djangoapps.commerce.utils import DeprecatedRestApiClient, user_agent
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
