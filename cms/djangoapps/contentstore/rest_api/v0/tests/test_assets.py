@@ -21,6 +21,7 @@ from cms.djangoapps.contentstore.tests.test_utils import AuthorizeStaffTestCase
 ASSET_KEY_STRING = "asset-v1:dede+aba+weagi+type@asset+block@_0e37192a-42c4-441e-a3e1-8e40ec304e2e.jpg"
 mock_image = MagicMock(file=File)
 mock_image.name = "test.jpg"
+VERSION = "v0"
 
 
 class AssetsViewTestCase(AuthorizeStaffTestCase):
@@ -44,7 +45,7 @@ class AssetsViewTestCase(AuthorizeStaffTestCase):
 
     def get_url(self, _course_id=None):
         return reverse(
-            "cms.djangoapps.contentstore:v1:cms_api_update_destroy_assets",
+            f"cms.djangoapps.contentstore:{VERSION}:cms_api_update_destroy_assets",
             kwargs=self.get_url_params(),
         )
 
@@ -52,7 +53,7 @@ class AssetsViewTestCase(AuthorizeStaffTestCase):
         raise NotImplementedError("send_request must be implemented by subclasses")
 
     @patch(
-        "cms.djangoapps.contentstore.rest_api.v1.views.assets.handle_assets",
+        f"cms.djangoapps.contentstore.rest_api.{VERSION}.views.assets.handle_assets",
         return_value=JsonResponse(
             {
                 "locator": ASSET_KEY_STRING,
@@ -61,7 +62,7 @@ class AssetsViewTestCase(AuthorizeStaffTestCase):
         ),
     )
     @patch(
-        "cms.djangoapps.contentstore.rest_api.v1.views.xblock.toggles.use_studio_content_api",
+        f"cms.djangoapps.contentstore.rest_api.{VERSION}.views.xblock.toggles.use_studio_content_api",
         return_value=True,
     )
     def make_request(
@@ -104,7 +105,7 @@ class AssetsViewGetTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
 
     def get_url(self, _course_id=None):
         return reverse(
-            "cms.djangoapps.contentstore:v1:cms_api_create_retrieve_assets",
+            f"cms.djangoapps.contentstore:{VERSION}:cms_api_create_retrieve_assets",
             kwargs=self.get_url_params(),
         )
 
@@ -156,7 +157,7 @@ class AssetsViewPostTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
 
     def get_url(self, _course_id=None):
         return reverse(
-            "cms.djangoapps.contentstore:v1:cms_api_create_retrieve_assets",
+            f"cms.djangoapps.contentstore:{VERSION}:cms_api_create_retrieve_assets",
             kwargs=self.get_url_params(),
         )
 
