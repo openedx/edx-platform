@@ -67,7 +67,7 @@ class TaxonomyOrgView(TaxonomyView):
     @action(detail=True, methods=["put"])
     def orgs(self, request, **_kwargs) -> Response:
         """
-        Export a taxonomy.
+        Update the orgs associated with taxonomies.
         """
         taxonomy = self.get_object()
         perm = "oel_tagging.update_orgs"
