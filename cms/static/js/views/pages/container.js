@@ -358,6 +358,9 @@ function($, _, Backbone, gettext, BasePage,
                     useNewLibraryEditor = primaryHeader.attr('use-new-editor-library'),
                     blockType = primaryHeader.attr('data-block-type');
 
+                console.log(useNewLibraryEditor);
+                console.log(blockType);
+
                 if((useNewTextEditor === 'True' && blockType === 'html')
                         || (useNewVideoEditor === 'True' && blockType === 'video')
                         || (useNewProblemEditor === 'True' && blockType === 'problem')
