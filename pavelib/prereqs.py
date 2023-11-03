@@ -348,7 +348,6 @@ def install_prereqs():
         install_node_prereqs()
     install_python_prereqs()
     log_installed_python_prereqs()
-    print_devstack_warning()
 
 
 def log_installed_python_prereqs():

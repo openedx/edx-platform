@@ -3332,7 +3332,14 @@ CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
 REST_FRAMEWORK = {
     # These default classes add observability around endpoints using defaults, and should
     # not be used anywhere else.
+    # Notes on Order:
+    # 1. `JwtAuthentication` does not check `is_active`, so email validation does not affect it. However,
+    #    `SessionAuthentication` does. These work differently, and order changes in what way, which really stinks. See
+    #    https://github.com/openedx/public-engineering/issues/165 for details.
+    # 2. `JwtAuthentication` may also update the database based on contents. Since the LMS creates these JWTs, this
+    #    shouldn't have any affect at this time. But it could, when and if another service started creating the JWTs.
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'openedx.core.djangolib.default_auth_classes.DefaultJwtAuthentication',
         'openedx.core.djangolib.default_auth_classes.DefaultSessionAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'edx_rest_framework_extensions.paginators.DefaultPagination',
@@ -5305,6 +5312,10 @@ EXEC_ED_LANDING_PAGE = "https://www.getsmarter.com/account"
 ENTERPRISE_PLOTLY_SECRET = "I am a secret"
 
 ############## PLOTLY ##############
+
+############ Internal Enterprise Settings ############
+ENTERPRISE_VSF_UUID = "e815503343644ac7845bc82325c34460"
+############ Internal Enterprise Settings ############
 
 ENTERPRISE_MANUAL_REPORTING_CUSTOMER_UUIDS = []
 
