@@ -13,7 +13,7 @@ from django.http import Http404
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from common.djangoapps.util.json_request import expect_json_in_class_view
 
-from ....api import course_author_access_required
+from cms.djangoapps.contentstore.api import course_author_access_required
 
 from cms.djangoapps.contentstore.transcript_storage_handlers import (
     upload_transcript,
@@ -21,11 +21,11 @@ from cms.djangoapps.contentstore.transcript_storage_handlers import (
     handle_transcript_download,
 )
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
-from cms.djangoapps.contentstore.rest_api.v1.serializers import TranscriptSerializer
+from ..serializers import TranscriptSerializer
 from rest_framework.parsers import (MultiPartParser, FormParser)
 from openedx.core.lib.api.parsers import TypedFileUploadParser
 
-from .utils import validate_request_with_serializer
+from cms.djangoapps.contentstore.rest_api.v0.views.utils import validate_request_with_serializer
 
 log = logging.getLogger(__name__)
 toggles = contentstore_toggles
