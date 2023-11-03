@@ -1,3 +1,6 @@
+"""
+django-rules and Bridgekeeper rules for course_roles related features
+"""
 from bridgekeeper.rules import Rule
 
 from opaque_keys.edx.keys import CourseKey
