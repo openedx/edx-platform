@@ -15,6 +15,7 @@ from cms.djangoapps.contentstore.tests.test_utils import AuthorizeStaffTestCase
 
 
 TEST_LOCATOR = "block-v1:dede+aba+weagi+type@problem+block@ba6327f840da49289fb27a9243913478"
+VERSION = "v0"
 
 
 class XBlockViewTestCase(AuthorizeStaffTestCase):
@@ -38,7 +39,7 @@ class XBlockViewTestCase(AuthorizeStaffTestCase):
 
     def get_url(self, _course_id=None):
         return reverse(
-            "cms.djangoapps.contentstore:v1:cms_api_xblock",
+            f"cms.djangoapps.contentstore:{VERSION}:cms_api_xblock",
             kwargs=self.get_url_params(),
         )
 
@@ -46,7 +47,7 @@ class XBlockViewTestCase(AuthorizeStaffTestCase):
         raise NotImplementedError("send_request must be implemented by subclasses")
 
     @patch(
-        "cms.djangoapps.contentstore.rest_api.v1.views.xblock.handle_xblock",
+        f"cms.djangoapps.contentstore.rest_api.{VERSION}.views.xblock.handle_xblock",
         return_value=JsonResponse(
             {
                 "locator": TEST_LOCATOR,
@@ -55,7 +56,7 @@ class XBlockViewTestCase(AuthorizeStaffTestCase):
         ),
     )
     @patch(
-        "cms.djangoapps.contentstore.rest_api.v1.views.xblock.toggles.use_studio_content_api",
+        f"cms.djangoapps.contentstore.rest_api.{VERSION}.views.xblock.toggles.use_studio_content_api",
         return_value=True,
     )
     def make_request(
@@ -134,13 +135,14 @@ class XBlockViewPostTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
     """
     Test POST operation on xblocks - Create a new xblock for a parent xblock
     """
+    VERSION = "v0"
 
     def get_url_params(self):
         return {"course_id": self.get_course_key_string()}
 
     def get_url(self, _course_id=None):
         return reverse(
-            "cms.djangoapps.contentstore:v1:cms_api_create_xblock",
+            f"cms.djangoapps.contentstore:{VERSION}:cms_api_create_xblock",
             kwargs=self.get_url_params(),
         )
 

@@ -2788,7 +2788,7 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Experimental API to edit xblocks and course content. Danger: Do not use on running courses!',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
-    'PREPROCESSING_HOOKS': ['cms.lib.spectacular.cms_api_filter'],  # restrict spectacular to CMS API endpoints
+    'PREPROCESSING_HOOKS': ['cms.lib.spectacular.cms_api_filter'],  # restrict spectacular to CMS API endpoints. (cms/lib/spectacular.py)
 }
 
 
