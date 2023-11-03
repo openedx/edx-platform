@@ -117,6 +117,43 @@ def course_or_organization_permission_list_check(user, permission_names, course_
     )
 
 
+def instance_permission_check(user, permission_name):
+    """
+    Check if a user has a permission at the instance wide.
+    """
+    if not use_permission_checks():
+        return False
+    elif isinstance(user, AnonymousUser):
+        return False
+    return CourseRolesUserRole.objects.filter(
+        user=user,
+        role__permissions__name=permission_name,
+        course__isnull=True,
+        org__isnull=True,
+    ).exists()
+
+
+def course_or_organization_or_instance_permission_check(user, permission_name, course_id, organization_name=None):
+    """
+    Check if a user has a permission in a course or an organization wide or at the instance wide.
+    """
+    if not use_permission_checks():
+        return False
+    elif isinstance(user, AnonymousUser):
+        return False
+    if organization_name is None:
+        course = modulestore().get_course(course_id)
+        if course:
+            organization_name = course.org
+        else:
+            return (course_permission_check(user, permission_name, course_id) or
+                    instance_permission_check(user, permission_name))
+    return (course_permission_check(user, permission_name, course_id) or
+            organization_permission_check(user, permission_name, organization_name) or
+            instance_permission_check(user, permission_name)
+            )
+
+
 def get_all_user_permissions_for_a_course(user_id, course_id):
     """
     Get all of a user's permissions for a course,
