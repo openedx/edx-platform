@@ -65,7 +65,7 @@ CONTAINER_TEMPLATES = [
     "editor-mode-button", "upload-dialog",
     "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu",
     "add-xblock-component-support-legend", "add-xblock-component-support-level", "add-xblock-component-menu-problem",
-    "xblock-string-field-editor", "xblock-access-editor", "publish-xblock", "publish-history", "tag-list",
+    "xblock-string-field-editor", "xblock-access-editor", "publish-xblock", "publish-history",
     "unit-outline", "container-message", "container-access", "license-selector", "copy-clipboard-button",
     "edit-title-button",
 ]
@@ -621,16 +621,17 @@ def get_unit_tags(usage_key):
     # Group content tags by taxonomy
     taxonomy_dict = {}
     for content_tag in content_tags:
-        taxonomy_name = content_tag.name
-        if taxonomy_name not in taxonomy_dict:
-            taxonomy_dict[taxonomy_name] = []
-        taxonomy_dict[taxonomy_name].append(content_tag)
+        taxonomy_id = content_tag.taxonomy_id
+        if taxonomy_id:
+            if taxonomy_id not in taxonomy_dict:
+                taxonomy_dict[taxonomy_id] = []
+            taxonomy_dict[taxonomy_id].append(content_tag)
     
     taxonomy_list = []
     total_count = 0
 
     # Build a tag tree for each taxonomy
-    for taxonomy_name, content_tag_list in taxonomy_dict.items():
+    for content_tag_list in taxonomy_dict.values():
         tags = {}
         root_ids = []
 
@@ -654,10 +655,13 @@ def get_unit_tags(usage_key):
         for content_tag in content_tag_list:
             handle_tag(content_tag.tag)
 
+        taxonomy = content_tag_list[0].taxonomy
+
         count = len(tags)
         # Add the tree to the taxonomy list
         taxonomy_list.append({
-            'value': taxonomy_name,
+            'id': taxonomy.id,
+            'value': taxonomy.name,
             'tags': [tags[tag_id] for tag_id in root_ids],
             'count': count,
         })

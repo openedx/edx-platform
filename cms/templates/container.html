@@ -215,9 +215,38 @@ from openedx.core.djangolib.markup import HTML, Text
                         </div>
                     </div>
                     % if show_unit_tags:
-                        <div id="tag-list"></div>
-                        <div> 
-                            ${unit_tags}
+                        <div class="unit-tags is-hidden">
+                            <div class="wrapper wrapper-tags">
+                                <div class="wrapper-tag-header">
+                                    <span>
+                                        <span class="tag-title label">
+                                            ${_("Tags")}
+                                        </span>
+                                        <span class="count-badge">
+                                            ${unit_tags['count']}
+                                        </span>
+                                    </span>
+                                    <span class="icon fa fa-caret-down" aria-hidden="true"></span>
+                                </div>
+                                <div class="wrapper wrapper-tag-content is-hidden">
+                                    <div class="content-taxonomies">
+                                        % for taxonomy in unit_tags['taxonomies']:
+                                            <div class="taxonomy-label taxonomy-${taxonomy['id']}">
+                                                <a id="${taxonomy['id']}">
+                                                    ${taxonomy['value']} (${taxonomy['count']})
+                                                </a>
+                                                <span class="icon fa fa-caret-down" aria-hidden="true" id="${taxonomy['id']}"></span>
+                                            </div>
+                                            <div class="content-tags-${taxonomy['id']} is-hidden"> 
+                                                ${taxonomy['tags']}
+                                            </div>
+                                        % endfor
+                                    </div>
+                                    <a class="action-primary">
+                                        ${_("Manage tags")}
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     % endif
                 % endif

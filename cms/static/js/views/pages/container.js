@@ -27,6 +27,8 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             'click .show-actions-menu-button': 'showXBlockActionsMenu',
             'click .new-component-button': 'scrollToNewComponentButtons',
             'click .paste-component-button': 'pasteComponent',
+            'click .wrapper-tag-header': 'expandTagContainer',
+            'click .taxonomy-label': 'expandContentTag',
         },
 
         options: {
@@ -91,12 +93,6 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                 });
                 this.publishHistory.render();
 
-                this.tagList = new ContainerSubviews.TagList({
-                    el: this.$('#tag-list'),
-                    model: this.model
-                });
-                this.tagList.render();
-
                 this.viewLiveActions = new ContainerSubviews.ViewLiveButtonController({
                     el: this.$('.nav-actions'),
                     model: this.model
@@ -112,6 +108,37 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
 
             this.listenTo(Backbone, 'move:onXBlockMoved', this.onXBlockMoved);
             this.clipboardBroadcastChannel = new BroadcastChannel("studio_clipboard_channel");
+        },
+
+        expandTagContainer: function() {
+            var $content = this.$('.wrapper-tags .wrapper-tag-content'),
+                $icon = this.$('.wrapper-tags .wrapper-tag-header .icon');
+
+            if ($content.hasClass('is-hidden')) {
+                $content.removeClass('is-hidden');
+                $icon.addClass('fa-caret-up');
+                $icon.removeClass('fa-caret-down');
+            } else {
+                $content.addClass('is-hidden');
+                $icon.removeClass('fa-caret-up');
+                $icon.addClass('fa-caret-down');
+            }
+        },
+
+        expandContentTag: function(event) {
+            var taxonomyValue = event.target.id,
+                $content = this.$(`.wrapper-tags .content-tags-${taxonomyValue}`),
+                $icon = this.$(`.wrapper-tags .taxonomy-${taxonomyValue} .icon`);
+
+            if ($content.hasClass('is-hidden')) {
+                $content.removeClass('is-hidden');
+                $icon.addClass('fa-caret-up');
+                $icon.removeClass('fa-caret-down');
+            } else {
+                $content.addClass('is-hidden');
+                $icon.removeClass('fa-caret-up');
+                $icon.addClass('fa-caret-down');
+            }
         },
 
         getViewParameters: function() {
@@ -131,6 +158,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                 xblockView = this.xblockView,
                 loadingElement = this.$('.ui-loading'),
                 unitLocationTree = this.$('.unit-location'),
+                unitTags = this.$('.unit-tags'),
                 hiddenCss = 'is-hidden';
 
             loadingElement.removeClass(hiddenCss);
@@ -156,6 +184,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     // Refresh the views now that the xblock is visible
                     self.onXBlockRefresh(xblockView);
                     unitLocationTree.removeClass(hiddenCss);
+                    unitTags.removeClass(hiddenCss);
 
                     // Re-enable Backbone events for any updated DOM elements
                     self.delegateEvents();

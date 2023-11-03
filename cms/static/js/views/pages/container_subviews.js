@@ -295,42 +295,11 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
         }
     });
 
-    /**
-         * TagList displays a tree-shaped list of tags.
-         */
-    var TagList = BaseView.extend({
-        // takes XBlockInfo as a model
-
-        initialize: function() {
-            BaseView.prototype.initialize.call(this);
-            this.template = this.loadTemplate('tag-list');
-            this.model.on('sync', this.onSync, this);
-        },
-
-        onSync: function(model) {
-
-        },
-
-        render: function() {
-            HtmlUtils.setHtml(
-                this.$el,
-                HtmlUtils.HTML(
-                    this.template({
-
-                    })
-                )
-            );
-
-            return this;
-        }
-    });
-
     return {
         MessageView: MessageView,
         ViewLiveButtonController: ViewLiveButtonController,
         Publisher: Publisher,
         PublishHistory: PublishHistory,
-        ContainerAccess: ContainerAccess,
-        TagList: TagList
+        ContainerAccess: ContainerAccess
     };
 }); // end define();
