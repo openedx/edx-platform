@@ -4,9 +4,10 @@ FROM ubuntu:focal as base
 ARG EDX_PLATFORM_VERSION=undefined
 
 # Install system requirements
+ENV DEBIAN_FRONTEND noninteractive
 RUN apt update \
     # Global requirements
-    && apt install -yq language-pack-en git build-essential software-properties-common curl git-core libxml2-dev libxslt1-dev libmysqlclient-dev libxmlsec1-dev libfreetype6-dev libssl-dev swig gcc g++ \
+    && apt install --no-install-recommends -yq language-pack-en git build-essential software-properties-common curl git-core libxml2-dev libxslt1-dev libmysqlclient-dev libxmlsec1-dev libfreetype6-dev libssl-dev swig gcc g++ \
     # openedx requirements
     gettext gfortran graphviz libgraphviz-dev libffi-dev libfreetype6-dev libgeos-dev libjpeg8-dev liblapack-dev libpng-dev libsqlite3-dev libxml2-dev libxmlsec1-dev libxslt1-dev ntp pkg-config python3 python3-dev python3-pip lynx sudo python3-venv \
     # Our requirements
@@ -25,7 +26,7 @@ ENV LC_ALL en_US.UTF-8
 ENV SETUPTOOLS_USE_DISTUTILS stdlib
 
 # Dockerize will be useful to wait for mysql DB availability
-ARG DOCKERIZE_VERSION=v0.6.1
+ARG DOCKERIZE_VERSION=v0.7.0
 RUN curl -L -o /tmp/dockerize.tar.gz https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && tar -C /usr/local/bin -xzvf /tmp/dockerize.tar.gz \
     && rm /tmp/dockerize.tar.gz
@@ -68,7 +69,7 @@ RUN pip install pip==20.0.2 \
 RUN pip install pytz --upgrade
 
 # Install a recent version of nodejs
-RUN nodeenv /openedx/nodeenv --node=12.13.0 --prebuilt
+RUN nodeenv /openedx/nodeenv --node=12.22.12 --prebuilt
 ENV PATH /openedx/nodeenv/bin:${PATH}
 
 # Install nodejs requirements
@@ -121,16 +122,3 @@ FROM base as testing
 RUN grep -v -x -f /openedx/edx-platform/requirements/edx/base.txt /openedx/edx-platform/requirements/edx/development.txt > /tmp/requirements.txt \
     && pip install -r /tmp/requirements.txt \
     && rm /tmp/requirements.txt
-
-## Update sqlite3 to prevent segfaults on tests
-RUN cd /tmp \
-    && curl -O https://sqlite.org/2016/sqlite-autoconf-3140100.tar.gz \
-    && tar -xzvf sqlite-autoconf-3140100.tar.gz \
-    && cd sqlite-autoconf-3140100 \
-    && ./configure --prefix=/usr --disable-static CFLAGS="-g" \
-    && make \
-    && make install \
-    && cd \
-    && rm -rf /tmp/sqlite-autoconf-3140100.tar.gz /tmp/sqlite-autoconf-3140100
-
-ENV LD_LIBRARY_PATH /usr/lib
