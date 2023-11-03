@@ -25,8 +25,10 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.core.exceptions import PermissionDenied
 from edx_django_utils.monitoring import set_code_owner_attribute, set_code_owner_attribute_from_module
 from opaque_keys.edx.keys import UsageKey
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import (
     BlockUsageLocator,
+    LibraryLocator,
     LibraryLocatorV2,
     LibraryUsageLocator,
     LibraryUsageLocatorV2
@@ -290,11 +292,11 @@ class LibraryUpdateChildrenTask(UserTask):  # pylint: disable=abstract-method
 # Note: The decorator @set_code_owner_attribute cannot be used here because the UserTaskMixin
 #       does stack inspection and can't handle additional decorators.
 #       So, wet set the code_owner attribute in the task's body instead.
-def update_children_task(self, user_id, dest_block_key, version=None):
+def update_children_task(self, user_id, dest_block_key, library_key_string, version=None):
     """
     Update xBlock's children.
 
-    Re-fetch all matching blocks from the libraries, and copy them as children of dest_block.
+    Re-fetch all matching blocks from the library whose key is an input, and copy them as children of dest_block.
     The children will be given new block_ids.
 
     This method will update dest_block's 'source_library_version' field to
@@ -307,7 +309,11 @@ def update_children_task(self, user_id, dest_block_key, version=None):
     dest_block_id = BlockUsageLocator.from_string(dest_block_key)
     dest_block = store.get_item(dest_block_id)
     source_blocks = []
-    library_key = dest_block.source_library_key
+    try:
+        library_key = LibraryLocatorV2.from_string(library_key_string)
+    except InvalidKeyError:
+        library_key = dest_block.source_library_key
+
     is_v2_lib = isinstance(library_key, LibraryLocatorV2)
 
     if version and not is_v2_lib:

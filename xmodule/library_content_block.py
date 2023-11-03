@@ -599,7 +599,8 @@ class LibraryContentBlock(
         """
         Return task status for update_children_task.
         """
-        task_status = self.tools.import_task_status(self.location)
+        task_status = self.tools.import_task_is_in_progress(self.location)
+        print(f"task_status {task_status}")
         return Response(json.dumps({'status': task_status}))
 
     # Copy over any overridden settings the course author may have applied to the blocks.
@@ -640,24 +641,11 @@ class LibraryContentBlock(
 
     def _validate_library_version(self, validation, lib_tools, version, library_key):
         """
-        Validates library version
+        Verify the version stored in the block is the latest version of the Library
         """
         latest_version = lib_tools.get_library_version(library_key)
-        if latest_version is not None:
-            if version is None or version != str(latest_version):
-                validation.set_summary(
-                    StudioValidationMessage(
-                        StudioValidationMessage.WARNING,
-                        _('This component is out of date. The library has new content.'),
-                        # TODO: change this to action_runtime_event='...' once the unit page supports that feature.
-                        # See https://openedx.atlassian.net/browse/TNL-993
-                        action_class='library-update-btn',
-                        # Translators: {refresh_icon} placeholder is substituted to "↻" (without double quotes)
-                        action_label=_("{refresh_icon} Update now.").format(refresh_icon="↻")
-                    )
-                )
-                return False
-        else:
+
+        if latest_version is None:
             validation.set_summary(
                 StudioValidationMessage(
                     StudioValidationMessage.ERROR,
@@ -667,6 +655,21 @@ class LibraryContentBlock(
                 )
             )
             return False
+
+        if (version is None or version != str(latest_version)) :
+            validation.set_summary(
+                StudioValidationMessage(
+                    StudioValidationMessage.WARNING,
+                    _('This component is out of date. The library has new content.'),
+                    # TODO: change this to action_runtime_event='...' once the unit page supports that feature.
+                    # See https://openedx.atlassian.net/browse/TNL-993
+                    action_class='library-update-btn',
+                    # Translators: {refresh_icon} placeholder is substituted to "↻" (without double quotes)
+                    action_label=_("{refresh_icon} Update now.").format(refresh_icon="↻")
+                )
+            )
+            return False
+
         return True
 
     def _set_validation_error_if_empty(self, validation, summary):
@@ -771,18 +774,29 @@ class LibraryContentBlock(
         if not self.source_library_id:
             self.children = []  # lint-amnesty, pylint: disable=attribute-defined-outside-init
             self.source_library_version = ""
-        else:
-            self.source_library_version = str(self.tools.get_library_version(self.source_library_id))
 
-    def post_editor_saved(self):
+
+    def post_editor_saved(self, old_metadata):
         """
-        If xblock has been edited, refresh_children automatically.
+        If source_library_id or capa_type has been edited, refresh_children automatically.
         """
-        try:
-            if self.source_library_id:
+        print("_post_editor_saved ?.?.?.1")
+        old_source_library_id = old_metadata.get('source_library_id', [])
+        if (
+            self.source_library_id and
+            old_source_library_id != self.source_library_id or
+                old_metadata.get('capa_type', ANY_CAPA_TYPE_VALUE) != self.capa_type):
+            try:
+                print("CALLING REFRESH CHILDREN \n ")
                 self.refresh_children()
-        except ValueError:
-            pass  # The validation area will display an error message, no need to do anything now.
+                #Set the version based on the library we just pulled in.
+                print(self.source_library_version)
+                print("calling: SET LIBRARY_VERSION \n ")
+                self.source_library_version = str(self.tools.get_library_version(self.source_library_id))
+                print(self.source_library_version)
+            except ValueError:
+                pass  # The validation area will display an error message, no need to do anything now.
+
 
     def has_dynamic_children(self):
         """

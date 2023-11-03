@@ -219,8 +219,9 @@ def handle_xblock(request, usage_key_string=None):
             _delete_item(usage_key, request.user)
             return JsonResponse()
         else:  # Since we have a usage_key, we are updating an existing xblock.
+            xblock_to_be_modified = get_xblock(usage_key, request.user)
             modified_xblock = modify_xblock(usage_key, request)
-            _post_editor_saved_callback(get_xblock(usage_key, request.user))
+            _post_editor_saved_callback(get_xblock(usage_key, request.user), own_metadata(xblock_to_be_modified))
             return modified_xblock
 
     elif request.method in ("PUT", "POST"):
@@ -249,14 +250,14 @@ def handle_xblock(request, usage_key_string=None):
                     status=400,
                 )
 
+            unmodified_xblock = get_xblock(duplicate_source_usage_key, request.user)
             dest_usage_key = _duplicate_block(
                 parent_usage_key,
                 duplicate_source_usage_key,
                 request.user,
                 request.json.get("display_name"),
             )
-            _post_editor_saved_callback(get_xblock(dest_usage_key, request.user))
-
+            _post_editor_saved_callback(get_xblock(dest_usage_key, request.user), own_metadata(unmodified_xblock))
             return JsonResponse(
                 {
                     "locator": str(dest_usage_key),
@@ -375,13 +376,12 @@ def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
     return modulestore().update_item(xblock, user.id)
 
 
-def _post_editor_saved_callback(xblock):
+def _post_editor_saved_callback(xblock, old_metadata):
     """
     Updates the xblock in the modulestore after saving xblock.
     """
     if callable(getattr(xblock, "post_editor_saved", None)):
-        xblock.post_editor_saved()
-
+        xblock.post_editor_saved(old_metadata)
 
 def _save_xblock(
     user,

@@ -60,7 +60,7 @@ class LibraryToolsService:
             raise ValueError("Input must be an instance of LibraryLocator")
 
         v2_library_key = LibraryLocatorV2(v1_library_key.org,v1_library_key.library)
-        logger.info(f'Mapped V1 Key {v1_library_key} to v2 key {v2_key}')
+        logger.info(f'Mapped V1 Key {v1_library_key} to v2 key {v2_library_key}')
 
         return v2_library_key
 
@@ -75,7 +75,7 @@ class LibraryToolsService:
         Returns None on error.
         """
 
-        if not isinstance(library_key, LibraryLocatorV2) and MAP_V1_LIBRARIES_TO_V2_LIBRARIES:
+        if (not isinstance(library_key, LibraryLocatorV2)) and MAP_V1_LIBRARIES_TO_V2_LIBRARIES.is_enabled():
             library_key = self._map_v1_to_v2_library(library_key)
 
         if isinstance(library_key, LibraryLocatorV2):
@@ -100,22 +100,19 @@ class LibraryToolsService:
             int      - for V2 library.
             None     - if the library does not exist.
         """
+
         if not isinstance(lib_key, (LibraryLocator, LibraryLocatorV2)):
             try:
                 lib_key = LibraryLocator.from_string(lib_key)
-                is_v2_lib = False
             except InvalidKeyError:
                 lib_key = LibraryLocatorV2.from_string(lib_key)
-                is_v2_lib = True
-        else:
-            is_v2_lib = isinstance(lib_key, LibraryLocatorV2)
 
         library = self._get_library(lib_key)
 
         if library:
-            if isinstance(lib_key, LibraryLocatorV2):
+            # Return the correct value based on V1/V2
+            if hasattr(library,'version'):
                 return library.version
-            # We need to know the library's version so ensure it's set in library.location.library_key.version_guid
             assert library.location.library_key.version_guid is not None
             return library.location.library_key.version_guid
         return None
@@ -222,7 +219,12 @@ class LibraryToolsService:
             raise ValueError(f"Requested library {library_key} not found.")
         if user_perms and not user_perms.can_read(library_key):
             raise PermissionDenied()
-        update_children_task.delay(self.user_id, str(dest_block.location), version)
+        update_children_task.delay(
+            self.user_id,
+            str(dest_block.location),
+            str(library.key) if hasattr(library,'key') else str(library.location),
+            version
+        )
 
     def import_task_is_in_progress(self, location):
         """
