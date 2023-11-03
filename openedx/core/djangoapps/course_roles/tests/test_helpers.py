@@ -10,9 +10,11 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.course_roles.helpers import (
     course_or_organization_permission_check,
     course_or_organization_permission_list_check,
+    course_or_organization_or_instance_permission_check,
     course_permission_check,
     course_permissions_list_check,
     course_permissions_list_check_any,
+    instance_permission_check,
     organization_permission_check,
     organization_permissions_list_check,
     get_all_user_permissions_for_a_course,
@@ -104,6 +106,45 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
             user=self.user_1, role=self.role_1, course_id=self.course_2.id, org=self.organization_1
         )
         assert not course_permission_check(self.user_1, self.permission_1.name, self.course_1.id)
+
+    def test_instance_permission_check_with_anonymous_user(self):
+        """
+        Test that instance_permission_check returns False when the user is anonymous
+        """
+        assert not instance_permission_check(self.anonymous_user, self.permission_1.name)
+
+    def test_instance_permission_check_with_instance_level_permission(self):
+        """
+        Test that instance_permission_check returns True when the user has the correct permission at the instance
+        level
+        """
+        CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1)
+        assert instance_permission_check(self.user_1, self.permission_1.name)
+
+    def test_instance_permission_check_without_instance_level_permission(self):
+        """
+        Test that instance_permission_check returns False when the user does not have the correct permission at the
+        instance level
+        """
+        assert not instance_permission_check(self.user_1, self.permission_1.name)
+
+    def test_instance_permission_check_with_course_level_permission(self):
+        """
+        Test that instance_permission_check returns False when the user has the permission but at the course level,
+        and has not been granted the permission at the instance level
+        """
+        CourseRolesUserRole.objects.create(
+            user=self.user_1, role=self.role_1, course_id=self.course_1.id, org=self.organization_1
+        )
+        assert not instance_permission_check(self.user_1, self.permission_1.name)
+
+    def test_instance_permission_check_with_organization_level_permission(self):
+        """
+        Test that instance_permission_check returns False when the user has the permission but at the organization
+        level, and has not been granted the permission at the instance level
+        """
+        CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1, org=self.organization_1)
+        assert not instance_permission_check(self.user_1, self.permission_1.name)
 
     def test_organization_permission_check_with_anonymous_user(self):
         """
@@ -494,6 +535,55 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
             self.user_1, test_permissions, self.course_1.id, self.organization_1.name
         )
 
+    def test_course_or_organization_or_instance_permission_check_with_anonymous_user(self):
+        """
+        Test that course_or_organization_or_instance_permission_check returns False when the user is anonymous
+        """
+        assert not course_or_organization_or_instance_permission_check(
+            self.anonymous_user, self.permission_1.name, self.course_1.id, self.organization_1.name
+        )
+
+    def test_course_or_organization_or_instance_permission_check_with_course_level_permission(self):
+        """
+        Test that course_or_organization_or_instance_permission_check returns True when the user has the correct
+        permission at the course level
+        """
+        CourseRolesUserRole.objects.create(
+            user=self.user_1, role=self.role_1, course_id=self.course_1.id, org=self.organization_1
+        )
+        assert course_or_organization_or_instance_permission_check(
+            self.user_1, self.permission_1.name, self.course_1.id, self.organization_1.name
+        )
+
+    def test_course_or_organization_or_instance_permission_check_without_course_level_permission(self):
+        """
+        Test that course_or_organization_or_instance_permission_check returns False when the user does not have the
+        correct permission at the course level
+        """
+        assert not course_or_organization_or_instance_permission_check(
+            self.user_1, self.permission_1.name, self.course_1.id, self.organization_1.name
+        )
+
+    def test_course_or_organization_or_instance_permission_check_with_organization_level_permission(self):
+        """
+        Test that course_or_organization_or_instance_permission_check returns True when the user has the correct
+        permission at the organization level
+        """
+        CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1, org=self.organization_1)
+        assert course_or_organization_or_instance_permission_check(
+            self.user_1, self.permission_1.name, self.course_1.id, self.organization_1.name
+        )
+
+    def test_course_or_organization_or_instance_permission_check_with_instance_level_permission(self):
+        """
+        Test that course_or_organization_or_instance_permission_check returns True when the user has the correct
+        permission at the instance level
+        """
+        CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1)
+        assert course_or_organization_or_instance_permission_check(
+            self.user_1, self.permission_1.name, self.course_1.id, self.organization_1.name
+        )
+
     @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=False)
     def test_course_permission_check_with_waffle_flag_disabled(self):
         """
@@ -558,6 +648,25 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         test_permissions = [self.permission_1.name, self.permission_2.name]
         assert not course_or_organization_permission_list_check(
             self.user_1, test_permissions, self.course_1.id, self.organization_1.name
+        )
+
+    @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=False)
+    def test_instance_permission_check_with_waffle_flag_disabled(self):
+        """
+        Tests that the helper function returns false if the USE_PERMISSION_CHECKS_FLAG is not enabled
+        Uses the same data as the earlier test, with the only difference being the waffle flag value
+        """
+        assert not instance_permission_check(self.user_1, self.permission_1.name)
+
+    @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=False)
+    def test_course_or_organization_or_instance_permission_check_with_waffle_flag_disabled(self):
+        """
+        Tests that the helper function returns false if the USE_PERMISSION_CHECKS_FLAG is not enabled
+        Uses the same data as the earlier test, with the only difference being the waffle flag value
+        """
+        CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1)
+        assert not course_or_organization_or_instance_permission_check(
+            self.user_1, self.permission_1.name, self.course_1.id, self.organization_1.name
         )
 
 
