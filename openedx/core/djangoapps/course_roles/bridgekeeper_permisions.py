@@ -1,4 +1,6 @@
-# Bridgekeeper permissions for course roles
+"""
+Bridgekeeper permissions for course roles
+"""
 
 from bridgekeeper import perms
 
