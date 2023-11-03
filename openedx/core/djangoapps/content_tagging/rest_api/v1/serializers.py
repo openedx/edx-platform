@@ -8,6 +8,7 @@ from rest_framework import serializers, fields
 
 from openedx_tagging.core.tagging.rest_api.v1.serializers import (
     TaxonomyListQueryParamsSerializer,
+    TaxonomySerializer,
 )
 
 from organizations.models import Organization
@@ -49,3 +50,28 @@ class TaxonomyUpdateOrgBodySerializer(serializers.Serializer):
             )
 
         return attrs
+
+
+class OrgListField(serializers.RelatedField):
+    """
+    Serializer to return the list of orgs for a taxonomy
+    """
+    def to_representation(self, value):
+        """
+        Return the Organization short_name, not the TaxonomyOrg object
+        """
+        return value.org.short_name if value.org else None
+
+
+class TaxonomyOrgSerializer(TaxonomySerializer):
+    """
+    Serializer for Taxonomy objects inclusing the associated orgs
+    """
+
+    orgs = OrgListField(many=True, read_only=True, source="taxonomyorg_set")
+
+    class Meta:
+        model = TaxonomySerializer.Meta.model
+        fields = TaxonomySerializer.Meta.fields + ["orgs"]
+        read_only_fields = ["orgs"]
+

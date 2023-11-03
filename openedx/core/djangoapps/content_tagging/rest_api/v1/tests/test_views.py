@@ -455,7 +455,7 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
 
             # Also checks if the taxonomy was associated with the org
             if user_attr == "staffA":
-                assert TaxonomyOrg.objects.filter(taxonomy=response.data["id"], org=self.orgA).exists()
+                assert response.data["orgs"] == [self.orgA.short_name]
 
 
 @ddt.ddt
@@ -1063,10 +1063,9 @@ class TestTaxonomyUpdateOrg(TestTaxonomyObjectsMixin, APITestCase):
         assert response.status_code == status.HTTP_200_OK
 
         # Check that the orgs were updated
-        taxonomy_orgs = TaxonomyOrg.objects.filter(taxonomy=self.tA1)
-        assert taxonomy_orgs.count() == 2
-        assert taxonomy_orgs[0].org == self.orgB
-        assert taxonomy_orgs[1].org == self.orgX
+        url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.tA1.pk)
+        response = self.client.get(url)
+        assert response.data["orgs"] == [self.orgB.short_name, self.orgX.short_name]
 
     def test_update_all_org(self) -> None:
         """
@@ -1079,9 +1078,9 @@ class TestTaxonomyUpdateOrg(TestTaxonomyObjectsMixin, APITestCase):
         assert response.status_code == status.HTTP_200_OK
 
         # Check that the orgs were updated
-        taxonomy_orgs = TaxonomyOrg.objects.filter(taxonomy=self.tA1)
-        assert taxonomy_orgs.count() == 1
-        assert taxonomy_orgs[0].org is None
+        url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.tA1.pk)
+        response = self.client.get(url)
+        assert response.data["orgs"] == [None]
 
     def test_update_no_org(self) -> None:
         """
@@ -1095,8 +1094,9 @@ class TestTaxonomyUpdateOrg(TestTaxonomyObjectsMixin, APITestCase):
         assert response.status_code == status.HTTP_200_OK
 
         # Check that the orgs were updated
-        taxonomy_orgs = TaxonomyOrg.objects.filter(taxonomy=self.tA1)
-        assert taxonomy_orgs.count() == 0
+        url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.tA1.pk)
+        response = self.client.get(url)
+        assert response.data["orgs"] == []
 
     @ddt.data(
         (True, ["orgX"], "Using both all_orgs and orgs parameters should throw error"),
@@ -1118,9 +1118,9 @@ class TestTaxonomyUpdateOrg(TestTaxonomyObjectsMixin, APITestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST, reason
 
         # Check that the orgs didn't change
-        taxonomy_orgs = TaxonomyOrg.objects.filter(taxonomy=self.tA1)
-        assert taxonomy_orgs.count() == 1
-        assert taxonomy_orgs[0].org == self.orgA
+        url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.tA1.pk)
+        response = self.client.get(url)
+        assert response.data["orgs"] == [self.orgA.short_name]
 
     def test_update_org_system_defined(self) -> None:
         """
@@ -1133,9 +1133,9 @@ class TestTaxonomyUpdateOrg(TestTaxonomyObjectsMixin, APITestCase):
         assert response.status_code in [status.HTTP_403_FORBIDDEN, status.HTTP_400_BAD_REQUEST]
 
         # Check that the orgs didn't change
-        taxonomy_orgs = TaxonomyOrg.objects.filter(taxonomy=self.st1)
-        assert taxonomy_orgs.count() == 1
-        assert taxonomy_orgs[0].org is None
+        url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.st1.pk)
+        response = self.client.get(url)
+        assert response.data["orgs"] == [None]
 
     @ddt.data(
         "staffA",
@@ -1158,9 +1158,9 @@ class TestTaxonomyUpdateOrg(TestTaxonomyObjectsMixin, APITestCase):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
         # Check that the orgs didn't change
-        taxonomy_orgs = TaxonomyOrg.objects.filter(taxonomy=self.tA1)
-        assert taxonomy_orgs.count() == 1
-        assert taxonomy_orgs[0].org == self.orgA
+        url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.tA1.pk)
+        response = self.client.get(url)
+        assert response.data["orgs"] == [self.orgA.short_name]
 
     def test_update_org_check_permissions_orgA(self) -> None:
         """

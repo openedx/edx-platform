@@ -14,7 +14,7 @@ from ...api import (
     set_taxonomy_orgs,
 )
 from ...rules import get_admin_orgs
-from .serializers import TaxonomyOrgListQueryParamsSerializer, TaxonomyUpdateOrgBodySerializer
+from .serializers import TaxonomyOrgListQueryParamsSerializer, TaxonomyOrgSerializer, TaxonomyUpdateOrgBodySerializer
 from .filters import ObjectTagTaxonomyOrgFilterBackend, UserOrgFilterBackend
 
 
@@ -39,6 +39,7 @@ class TaxonomyOrgView(TaxonomyView):
     """
 
     filter_backends = [UserOrgFilterBackend]
+    serializer_class = TaxonomyOrgSerializer
 
     def get_queryset(self):
         """
@@ -53,9 +54,11 @@ class TaxonomyOrgView(TaxonomyView):
         enabled = query_params.validated_data.get("enabled", None)
         org = query_params.validated_data.get("org", None)
         if org:
-            return get_taxonomies_for_org(enabled, org)
+            queryset = get_taxonomies_for_org(enabled, org)
         else:
-            return get_taxonomies(enabled)
+            queryset = get_taxonomies(enabled)
+
+        return queryset.prefetch_related("taxonomyorg_set")
 
     def perform_create(self, serializer):
         """
