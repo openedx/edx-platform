@@ -487,7 +487,7 @@ function(
             $(drawerCover).css('display', 'block');
             // xss-lint: disable=javascript-jquery-html
             $(drawer).html(
-                `<iframe src="${taxonomyTagsWidgetUrl}${contentId}" frameborder="0" style="width: 100%; height: 100%;"></iframe>`
+                `<iframe src="${taxonomyTagsWidgetUrl}${contentId}" onload="this.contentWindow.focus()" frameborder="0" style="width: 100%; height: 100%;"></iframe>`
             );
             $(drawer).css('display', 'block');
 
