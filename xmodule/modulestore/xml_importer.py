@@ -900,10 +900,7 @@ def _update_and_import_block(
             try:
                 # Update library content block's children on draft branch
                 with store.branch_setting(branch_setting=ModuleStoreEnum.Branch.draft_preferred):
-                    LibraryToolsService(store, user_id).update_children(
-                        block,
-                        version=block.source_library_version,
-                    )
+                    LibraryToolsService(store, user_id).trigger_refresh_children(block)
             except ValueError as err:
                 # The specified library version does not exist.
                 log.error(err)

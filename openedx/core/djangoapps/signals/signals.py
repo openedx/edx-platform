@@ -11,7 +11,7 @@ COURSE_GRADE_CHANGED = Signal()
 
 # Signal that fires when a user is awarded a certificate in a course (in the certificates django app)
 # TODO: runtime coupling between apps will be reduced if this event is changed to carry a username
-# rather than a User object; however, this will require changes to the milestones and badges APIs
+# rather than a User object; however, this will require changes to the milestones
 # Same providing_args=["user", "course_key", "mode", "status"] for next 3 signals.
 COURSE_CERT_CHANGED = Signal()
 COURSE_CERT_AWARDED = Signal()

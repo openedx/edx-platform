@@ -142,8 +142,6 @@ bleach[css]==6.1.0
     #   ora2
     #   xblock-drag-and-drop-v2
     #   xblock-poll
-bok-choy==2.0.2
-    # via -r requirements/edx/testing.txt
 boto==2.39.0
     # via
     #   -c requirements/edx/../constraints.txt
@@ -754,7 +752,7 @@ edx-drf-extensions==8.12.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.6.6
+edx-enterprise==4.6.10
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -1118,7 +1116,6 @@ lazy==1.6
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   acid-xblock
-    #   bok-choy
     #   lti-consumer-xblock
     #   ora2
     #   xblock
@@ -1307,7 +1304,7 @@ openedx-django-wiki==2.0.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openedx-events==9.0.0
+openedx-events==9.0.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1318,7 +1315,7 @@ openedx-filters==1.6.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
-openedx-learning==0.2.4
+openedx-learning==0.3.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -1806,10 +1803,6 @@ scipy==1.7.3
     #   -r requirements/edx/testing.txt
     #   chem
     #   openedx-calc
-selenium==3.141.0
-    # via
-    #   -r requirements/edx/testing.txt
-    #   bok-choy
 semantic-version==2.10.0
     # via
     #   -r requirements/edx/doc.txt
@@ -2120,7 +2113,6 @@ urllib3==1.26.17
     #   pact-python
     #   py2neo
     #   requests
-    #   selenium
     #   snowflake-connector-python
 user-util==1.0.0
     # via
