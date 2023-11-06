@@ -18,7 +18,6 @@ from lxml.etree import XMLSyntaxError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
 from rest_framework import status
-from user_tasks.models import UserTaskStatus
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.completable import XBlockCompletionMode
@@ -419,7 +418,7 @@ class LibraryContentBlock(
         fragment = Fragment()
         root_xblock = context.get('root_xblock')
         is_root = root_xblock and root_xblock.location == self.location
-        is_updating = self._are_children_updating()
+        is_updating = self.tools and self.tools.are_children_updating(self)
         if is_root and not is_updating:
             # User has clicked the "View" link. Show a preview of all possible children:
             if self.children:  # pylint: disable=no-member
@@ -511,7 +510,7 @@ class LibraryContentBlock(
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         if not self.tools:
             return Response("Library Tools unavailable in current runtime.", status=400)
-        self.tools.trigger_update_children_task(self, user_perms)
+        self.tools.trigger_refresh_children(self, user_perms)
         return Response()
 
     @XBlock.json_handler
@@ -535,28 +534,11 @@ class LibraryContentBlock(
         """
         Returns whether this block is currently having its children updated from the source library.
         """
-        return Response(json.dumps(self._are_children_updating()))
-
-    def _are_children_updating(self) -> bool:
-        return (
-            self.tools.get_update_children_task_state(self.location) in
-            [UserTaskStatus.SUCCEEDED, UserTaskStatus.PENDING, UserTaskStatus.RETRYING]
+        return Response(
+            json.dumps(
+                self.tools and self.tools.are_children_updating(self)
+            )
         )
-
-    # Copy over any overridden settings the course author may have applied to the blocks.
-    def _copy_overrides(self, store, user_id, source, dest):
-        """
-        Copy any overrides the user has made on blocks in this library.
-        """
-        for field in source.fields.values():
-            if field.scope == Scope.settings and field.is_set_on(source):
-                setattr(dest, field.name, field.read_from(source))
-        if source.has_children:
-            source_children = [self.runtime.get_block(source_key) for source_key in source.children]
-            dest_children = [self.runtime.get_block(dest_key) for dest_key in dest.children]
-            for source_child, dest_child in zip(source_children, dest_children):
-                self._copy_overrides(store, user_id, source_child, dest_child)
-        store.update_item(dest, user_id)
 
     def studio_post_duplicate(self, store, source_block):
         """
@@ -565,16 +547,13 @@ class LibraryContentBlock(
 
         Otherwise we'll end up losing data on the next refresh.
         """
-        # The first task will be to refresh our copy of the library to generate the children.
-        # We must do this at the currently set version of the library block. Otherwise we may not have
-        # exactly the same children-- someone may be duplicating an out of date block, after all.
         user_id = self.get_user_id()
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         if not self.tools:
             raise RuntimeError("Library tools unavailable, duplication will not be sane!")
-        self.tools.trigger_update_children_task(self, user_perms, version=self.source_library_version)
-
-        self._copy_overrides(store, user_id, source_block, self)
+        self.tools.trigger_duplicate_children(
+            user_id=user_id, user_perms=user_perms, source_block=source_block, dest_block=self
+        )
 
         # Children have been handled.
         return True
