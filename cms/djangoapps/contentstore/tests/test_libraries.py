@@ -1006,9 +1006,9 @@ class TestOverrides(LibraryTestCase):
             duplicate_block(self.course.location, self.lc_block.location, self.user)
         )
         # The duplicate should have identical children to the original:
-        self.assertEqual(len(duplicate.children), 1)
         self.assertTrue(self.lc_block.source_library_version)
         self.assertEqual(self.lc_block.source_library_version, duplicate.source_library_version)
+        self.assertEqual(len(duplicate.children), 1)
         problem2_in_course = store.get_item(duplicate.children[0])
         self.assertEqual(problem2_in_course.display_name, self.original_display_name)
 
