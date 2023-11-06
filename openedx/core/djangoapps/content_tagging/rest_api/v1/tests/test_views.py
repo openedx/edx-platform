@@ -1066,6 +1066,7 @@ class TestTaxonomyUpdateOrg(TestTaxonomyObjectsMixin, APITestCase):
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.tA1.pk)
         response = self.client.get(url)
         assert response.data["orgs"] == [self.orgB.short_name, self.orgX.short_name]
+        assert not response.data["all_orgs"]
 
     def test_update_all_org(self) -> None:
         """
@@ -1080,7 +1081,8 @@ class TestTaxonomyUpdateOrg(TestTaxonomyObjectsMixin, APITestCase):
         # Check that the orgs were updated
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.tA1.pk)
         response = self.client.get(url)
-        assert response.data["orgs"] == [None]
+        assert response.data["orgs"] == []
+        assert response.data["all_orgs"]
 
     def test_update_no_org(self) -> None:
         """
@@ -1097,6 +1099,7 @@ class TestTaxonomyUpdateOrg(TestTaxonomyObjectsMixin, APITestCase):
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.tA1.pk)
         response = self.client.get(url)
         assert response.data["orgs"] == []
+        assert not response.data["all_orgs"]
 
     @ddt.data(
         (True, ["orgX"], "Using both all_orgs and orgs parameters should throw error"),
@@ -1135,7 +1138,8 @@ class TestTaxonomyUpdateOrg(TestTaxonomyObjectsMixin, APITestCase):
         # Check that the orgs didn't change
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.st1.pk)
         response = self.client.get(url)
-        assert response.data["orgs"] == [None]
+        assert response.data["orgs"] == []
+        assert response.data["all_orgs"]
 
     @ddt.data(
         "staffA",

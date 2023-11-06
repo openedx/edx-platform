@@ -52,25 +52,27 @@ class TaxonomyUpdateOrgBodySerializer(serializers.Serializer):
         return attrs
 
 
-class OrgListField(serializers.RelatedField):
-    """
-    Serializer to return the list of orgs for a taxonomy
-    """
-    def to_representation(self, value):
-        """
-        Return the Organization short_name, not the TaxonomyOrg object
-        """
-        return value.org.short_name if value.org else None
-
-
 class TaxonomyOrgSerializer(TaxonomySerializer):
     """
     Serializer for Taxonomy objects inclusing the associated orgs
     """
 
-    orgs = OrgListField(many=True, read_only=True, source="taxonomyorg_set")
+    orgs = serializers.SerializerMethodField()
+    all_orgs = serializers.SerializerMethodField()
+
+    def get_orgs(self, obj) -> list[str]:
+        """
+        Return the list of orgs for the taxonomy.
+         """
+        return [taxonomy_org.org.short_name for taxonomy_org in obj.taxonomyorg_set.all() if taxonomy_org.org]
+
+    def get_all_orgs(self, obj) -> bool:
+        """
+        Return True if the taxonomy is associated with all orgs.
+        """
+        return obj.taxonomyorg_set.filter(org__isnull=True).exists()
 
     class Meta:
         model = TaxonomySerializer.Meta.model
-        fields = TaxonomySerializer.Meta.fields + ["orgs"]
-        read_only_fields = ["orgs"]
+        fields = TaxonomySerializer.Meta.fields + ["orgs", "all_orgs"]
+        read_only_fields = ["orgs", "all_orgs"]
