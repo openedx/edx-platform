@@ -12,6 +12,7 @@ from openedx_tagging.core.tagging.rest_api.v1 import (
 )
 
 from . import views
+from . import views_import
 
 router = DefaultRouter()
 router.register("taxonomies", views.TaxonomyOrgView, basename="taxonomy")
@@ -27,6 +28,11 @@ urlpatterns = [
         "taxonomies/import/template.<str:file_ext>",
         oel_tagging_views_import.TemplateView.as_view(),
         name="taxonomy-import-template",
+    ),
+    path(
+        "taxonomies/import/",
+        views_import.ImportView.as_view(),
+        name="taxonomy-import",
     ),
     path('', include(router.urls))
 ]
