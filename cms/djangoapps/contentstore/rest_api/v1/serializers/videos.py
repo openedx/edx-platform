@@ -60,16 +60,16 @@ class VideoModelSerializer(serializers.Serializer):
 
 class VideoActiveTranscriptPreferencesSerializer(serializers.Serializer):
     """Serializer for a videos active transcript preferences"""
-    course_id = serializers.CharField(),
-    provider = serializers.CharField(),
-    cielo24_fidelity = serializers.CharField(),
-    cielo24_turnaround = serializers.CharField(),
-    three_play_turnaround = serializers.CharField(),
+    course_id = serializers.CharField()
+    provider = serializers.CharField()
+    cielo24_fidelity = serializers.CharField()
+    cielo24_turnaround = serializers.CharField()
+    three_play_turnaround = serializers.CharField()
     preferred_languages = serializers.ListField(
-        child=serializers.CharField(),
+        child=serializers.CharField()
     ),
-    video_source_language = serializers.CharField(),
-    modified = serializers.CharField(),
+    video_source_language = serializers.CharField()
+    modified = serializers.CharField()
 
 
 class CourseVideosSerializer(serializers.Serializer):
