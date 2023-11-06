@@ -552,7 +552,7 @@ class LibraryContentBlock(
         if not self.tools:
             raise RuntimeError("Library tools unavailable, duplication will not be sane!")
         self.tools.trigger_duplicate_children(
-            user_id=user_id, user_perms=user_perms, source_block=source_block, dest_block=self
+            user_perms=user_perms, source_block=source_block, dest_block=self
         )
 
         # Children have been handled.
