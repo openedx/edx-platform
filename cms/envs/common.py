@@ -1739,6 +1739,7 @@ INSTALLED_APPS = [
     'openedx.features.discounts',
     'openedx.features.effort_estimation',
     'openedx.features.funix_relative_date',
+    'openedx.features.toggle_feature',
     'openedx.features.funix_goal',
     'openedx.features.funix_specialization',
     'lms.djangoapps.experiments',

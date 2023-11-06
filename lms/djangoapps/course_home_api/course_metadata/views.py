@@ -21,7 +21,7 @@ from lms.djangoapps.courseware.context_processor import user_timezone_locale_pre
 from lms.djangoapps.courseware.courses import check_course_access
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.tabs import get_course_tab_list
-
+from openedx.features.toggle_feature.toggle_feature import featureCourse , featureUser , toggleFeature
 
 class CourseHomeMetadataView(RetrieveAPIView):
     """
@@ -130,10 +130,12 @@ class CourseHomeMetadataView(RetrieveAPIView):
             'celebrations': celebrations,
             'user_timezone': user_timezone,
             'can_view_certificate': certificates_viewable_for_course(course),
+            "toggle_feature" : toggleFeature(user_id = request.user.id , course_id =course.id)
         }
         context = self.get_serializer_context()
         context['course'] = course
         context['course_overview'] = course
         context['enrollment'] = enrollment
         serializer = self.get_serializer_class()(data, context=context)
+        # toggleFeature(user_id = request.user.id , course_id =course.id)
         return Response(serializer.data)
