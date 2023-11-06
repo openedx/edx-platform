@@ -83,13 +83,13 @@ select option:hover {
               <!-- Body form -->
 
             <div class="">
-                <form > 
-                   
+            <form method="post" enctype="multipart/form-data" action="/feedback/" id="technical_error_form"> 
+                    <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
                 <div class="d-flex flex-column p-3 bg-white">
                     <div class="d-flex flex-column ">
                         <label><b>What's your feedback?</b></label>
                         <div>
-                            <select  name="category">
+                            <select value="Content contains outdated information" onchange="handlerCategory(this)"  name="category" id="feedback-category">
                                 <option>
                                     Content contains outdated information
                                 </option>
@@ -125,7 +125,7 @@ select option:hover {
                     <div class="d-flex flex-column pt-2">
                       <span><b>${_("Error snapshot")}</b></span>
                       <p style="font-size: 10px; margin-bottom: 0;">${_("Image files: jpg, jpeg, png. Maximum size 5MB")}</p>
-                      <input type="file" accept=".jpg,.jpeg,.png,.gif" name="attachment" style="font-size: 12px; border: 1px solid #e7e7e7;
+                      <input type="file" accept=".jpg,.jpeg,.png,.gif" id="fileInput" name="attachment" style="font-size: 12px; border: 1px solid #e7e7e7;
   border-radius: 5px; padding: 5px; margin: 5px 0; width: 90%;">
                     </div>
                 </div>
@@ -134,7 +134,7 @@ select option:hover {
 
                   <div class="pt-1 border-top " style="background-color: #F6F6F6;">
                         <div class="p-3">
-                            <button id="submit-feedback" disabled   type="submit"  class="btn-item-submit" >${_("Submit")}</button>
+                            <button id="submit-feedback"     type="submit"  class="btn-item-submit" >${_("Submit")}</button>
                         </div>
                   </div>
               </form>
