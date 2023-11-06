@@ -1091,6 +1091,7 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
     course=None,
     is_concise=False,
     summary_configuration=None,
+    tags=None,
 ):
     """
     Creates the information needed for client-side XBlockInfo.
@@ -1383,6 +1384,8 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             )
         else:
             xblock_info["ancestor_has_staff_lock"] = False
+        if tags is not None:
+            xblock_info["tags"] = tags
 
         if course_outline:
             if xblock_info["has_explicit_staff_lock"]:

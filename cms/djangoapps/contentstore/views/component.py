@@ -65,7 +65,7 @@ CONTAINER_TEMPLATES = [
     "editor-mode-button", "upload-dialog",
     "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu",
     "add-xblock-component-support-legend", "add-xblock-component-support-level", "add-xblock-component-menu-problem",
-    "xblock-string-field-editor", "xblock-access-editor", "publish-xblock", "publish-history",
+    "xblock-string-field-editor", "xblock-access-editor", "publish-xblock", "publish-history", "tag-list",
     "unit-outline", "container-message", "container-access", "license-selector", "copy-clipboard-button",
     "edit-title-button",
 ]
@@ -182,9 +182,14 @@ def container_handler(request, usage_key_string):
             prev_url = quote_plus(prev_url) if prev_url else None
             next_url = quote_plus(next_url) if next_url else None
 
+            show_unit_tags = use_tagging_taxonomy_list_page()
+            unit_tags = None
+            if show_unit_tags and is_unit_page:
+                unit_tags = get_unit_tags(usage_key)
+
             # Fetch the XBlock info for use by the container page. Note that it includes information
             # about the block's ancestors and siblings for use by the Unit Outline.
-            xblock_info = create_xblock_info(xblock, include_ancestor_info=is_unit_page)
+            xblock_info = create_xblock_info(xblock, include_ancestor_info=is_unit_page, tags=unit_tags)
 
             if is_unit_page:
                 add_container_page_publishing_info(xblock, xblock_info)
@@ -196,11 +201,6 @@ def container_handler(request, usage_key_string):
                 if child.location == unit.location:
                     break
                 index += 1
-
-            show_unit_tags = use_tagging_taxonomy_list_page()
-            unit_tags = {}
-            if show_unit_tags and is_unit_page:
-                unit_tags = get_unit_tags(usage_key)
 
             # Get the status of the user's clipboard so they can paste components if they have something to paste
             user_clipboard = content_staging_api.get_user_clipboard_json(request.user.id, request)
@@ -225,8 +225,7 @@ def container_handler(request, usage_key_string):
                 'draft_preview_link': preview_lms_link,
                 'published_preview_link': lms_link,
                 'templates': CONTAINER_TEMPLATES,
-                'show_unit_tags': show_unit_tags,
-                'unit_tags': unit_tags,
+                'show_unit_tags': show_unit_tags,                
                 # Status of the user's clipboard, exactly as would be returned from the "GET clipboard" REST API.
                 'user_clipboard': user_clipboard,
             })

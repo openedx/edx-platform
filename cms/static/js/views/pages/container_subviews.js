@@ -295,11 +295,78 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
         }
     });
 
+    /**
+         * PublishHistory displays the tags of a unit.
+         */
+    var TagList = BaseView.extend({
+        // takes XBlockInfo as a model
+
+        events: {
+            'click .wrapper-tag-header': 'expandTagContainer',
+            'click .tagging-label': 'expandContentTag',
+        },
+
+        initialize: function() {
+            BaseView.prototype.initialize.call(this);
+            this.template = this.loadTemplate('tag-list');
+            this.model.on('sync', this.onSync, this);
+        },
+
+        onSync: function(model) {
+            
+        },
+
+        expandTagContainer: function() {
+            var $content = this.$('.wrapper-tags .wrapper-tag-content'),
+                $icon = this.$('.wrapper-tags .wrapper-tag-header .icon');
+
+            if ($content.hasClass('is-hidden')) {
+                $content.removeClass('is-hidden');
+                $icon.addClass('fa-caret-up');
+                $icon.removeClass('fa-caret-down');
+            } else {
+                $content.addClass('is-hidden');
+                $icon.removeClass('fa-caret-up');
+                $icon.addClass('fa-caret-down');
+            }
+        },
+
+        expandContentTag: function(event) {
+            var taxonomyValue = event.target.id,
+                $content = this.$(`.wrapper-tags .content-tags-${taxonomyValue}`),
+                $icon = this.$(`.wrapper-tags .label-${taxonomyValue} .icon`);
+
+            if ($content.hasClass('is-hidden')) {
+                $content.removeClass('is-hidden');
+                $icon.addClass('fa-caret-up');
+                $icon.removeClass('fa-caret-down');
+            } else {
+                $content.addClass('is-hidden');
+                $icon.removeClass('fa-caret-up');
+                $icon.addClass('fa-caret-down');
+            }
+        },
+
+        render: function() {
+            HtmlUtils.setHtml(
+                this.$el,
+                HtmlUtils.HTML(
+                    this.template({
+                        tags: this.model.get('tags'),
+                    })
+                )
+            );
+
+            return this;
+        }
+    });
+
     return {
         MessageView: MessageView,
         ViewLiveButtonController: ViewLiveButtonController,
         Publisher: Publisher,
         PublishHistory: PublishHistory,
-        ContainerAccess: ContainerAccess
+        ContainerAccess: ContainerAccess,
+        TagList: TagList
     };
 }); // end define();

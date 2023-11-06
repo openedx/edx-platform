@@ -1,0 +1,35 @@
+<% if (tags !== null) { %>
+    <div class="wrapper wrapper-tags">
+        <div class="wrapper-tag-header">
+            <span>
+                <span class="tag-title label">
+                    <%- gettext("Tags") %>
+                </span>
+                <span class="count-badge">
+                    <%- tags.count %>
+                </span>
+            </span>
+            <span class="icon fa fa-caret-down" aria-hidden="true"></span>
+        </div>
+        <div class="wrapper wrapper-tag-content is-hidden">
+            <div class="content-taxonomies">
+                <% for (var i = 0; i < tags.taxonomies.length; i++) {
+                    var taxonomy = tags.taxonomies[i];
+                %>
+                    <div class="taxonomy-label tagging-label label-tax-<%- taxonomy.id %>">
+                        <a id="tax-<%- taxonomy.id %>">
+                            <%- taxonomy.value %> (<%- taxonomy.count %>)
+                        </a>
+                        <span class="icon fa fa-caret-down" aria-hidden="true" id="tax-<%- taxonomy.id %>"></span>
+                    </div>
+                    <div class="content-tags-tax-<%- taxonomy.id %> is-hidden">
+                        <%- taxonomy.tags %>
+                    </div>
+                <% } %>
+            </div>
+            <a class="action-primary">
+                <%- gettext("Manage tags") %>
+            </a>
+        </div>
+    </div>
+<% } %>
