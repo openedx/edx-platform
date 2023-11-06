@@ -315,17 +315,21 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
             scopes=['grades:read'],
             filters=['test:filter'],
         )
-        scopes = dot_app_access.scopes
+        requested_scopes = dot_app_access.scopes
         filters = self.dot_adapter.get_authorization_filters(dot_app)
         assert 'test:filter' in filters
 
-        response = self._post_request(self.user, dot_app, token_type='jwt', scope=scopes)
+        response = self._post_request(self.user, dot_app, token_type='jwt', scope=requested_scopes)
         assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
+        scopes_in_response = data['scope'].split(' ')
+        for requested_scope in requested_scopes:
+            assert requested_scope in scopes_in_response
+
         self.assert_valid_jwt_access_token(
             data['access_token'],
             self.user,
-            scopes,
+            scopes_in_response,
             filters=filters,
             grant_type=grant_type,
         )

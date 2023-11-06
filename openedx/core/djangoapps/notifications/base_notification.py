@@ -95,7 +95,7 @@ COURSE_NOTIFICATION_TYPES = {
             'replier_name': 'replier name',
         },
         'email_template': '',
-        'filter': [FILTER_AUDIT_EXPIRED]
+        'filters': [FILTER_AUDIT_EXPIRED]
     },
     'comment_on_followed_post': {
         'notification_app': 'discussion',
@@ -111,7 +111,7 @@ COURSE_NOTIFICATION_TYPES = {
             'replier_name': 'replier name',
         },
         'email_template': '',
-        'filter': [FILTER_AUDIT_EXPIRED]
+        'filters': [FILTER_AUDIT_EXPIRED]
     },
 }
 
