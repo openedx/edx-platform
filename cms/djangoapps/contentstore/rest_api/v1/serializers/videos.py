@@ -67,7 +67,7 @@ class VideoActiveTranscriptPreferencesSerializer(serializers.Serializer):
     three_play_turnaround = serializers.CharField()
     preferred_languages = serializers.ListField(
         child=serializers.CharField()
-    ),
+    )
     video_source_language = serializers.CharField()
     modified = serializers.CharField()
 
