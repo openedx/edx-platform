@@ -300,6 +300,9 @@ CLOSEST_CLIENT_IP_FROM_HEADERS = []
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:18150'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 
+############################ AI_TRANSLATIONS ##################################
+AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
+
 #################### Event bus backend ########################
 
 EVENT_BUS_PRODUCER = 'edx_event_bus_redis.create_producer'
