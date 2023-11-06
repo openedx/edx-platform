@@ -4,7 +4,6 @@ XBlock runtime services for LibraryContentBlock
 from __future__ import annotations
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from django.core.exceptions import PermissionDenied
 from django.conf import settings
 from user_tasks.models import UserTaskStatus
 
@@ -33,7 +32,7 @@ class LibraryToolsService:
         self.store = modulestore
         self.user_id = user_id
 
-    def get_library_version(self, lib_key) -> str | int | None:
+    def get_latest_library_version(self, lib_key) -> str | int | None:
         """
         Get the version of the given library.
 
@@ -42,7 +41,7 @@ class LibraryToolsService:
             int      - for V2 library.
             None     - if the library does not exist.
         """
-        library = library_api.get_v1_or_v2_library(lib_key)
+        library = library_api.get_v1_or_v2_library(lib_key, version=None)
         if not library:
             return None
         elif isinstance(library, LibraryRootV1):
@@ -96,14 +95,16 @@ class LibraryToolsService:
         """
         return self.store.check_supports(block.location.course_key, 'copy_from_template')
 
-    def trigger_refresh_children(self, dest_block: LibraryContentBlock, user_perms=None) -> None:
+    def trigger_refresh_children(self, dest_block: LibraryContentBlock, library_version: str | int | None) -> None:
         """
         Queue a task to update the children of `dest_block`.
 
         The task will:
+        * Load that library at `dest_block.source_library_id` and `library_version`.
+          * If `library_version` is None, load the latest.
+          * Update `dest_block.source_library_version` based on what is loaded.
         * Ensure that `dest_block` has children corresponding to all matching source library blocks.
           * Considered fields of `dest_block` include: `source_library_id`, `source_library_version`, `capa_type`.
-          * If `dest_block.source_library_version` is set, use that. Otherwise, use latest available
             library version, and upate `dest_block.source_library_version` to match.
         * Derive each child block id as a function of `dest_block`'s id and the library block's definition id.
         * Follow these important create/update/delete semantics for children:
@@ -116,27 +117,19 @@ class LibraryToolsService:
         ensure_cms("library_content block children may only be updated in a CMS context")
         if not isinstance(dest_block, LibraryContentBlock):
             raise ValueError(f"Can only refresh children for library_content blocks, not {dest_block.tag} blocks.")
-        if user_perms and not user_perms.can_write(dest_block.location.course_key):
-            raise PermissionDenied()
         if not dest_block.source_library_id:
             dest_block.source_library_version = ""
             return
         library_key = dest_block.source_library_key
-        if not library_api.get_v1_or_v2_library(library_key):
+        if not library_api.get_v1_or_v2_library(library_key, version=dest_block.source_library_version):
             raise ValueError(f"Requested library {library_key} not found.")
-        if user_perms and not user_perms.can_read(library_key):
-            raise PermissionDenied()
         library_tasks.refresh_children.delay(
             user_id=self.user_id,
             dest_block_id=str(dest_block.scope_ids.usage_id),
+            library_version=library_version,
         )
 
-    def trigger_duplicate_children(
-        self,
-        source_block: LibraryContentBlock,
-        dest_block: LibraryContentBlock,
-        user_perms=None,
-    ) -> None:
+    def trigger_duplicate_children(self, source_block: LibraryContentBlock, dest_block: LibraryContentBlock) -> None:
         """
         Queue a task to duplicate the children of `source_block` to `dest_block`.
         """

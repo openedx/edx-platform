@@ -1175,17 +1175,27 @@ def revert_changes(library_key):
 
 def get_v1_or_v2_library(
     library_id: str | LibraryLocatorV1 | LibraryLocatorV2,
+    version: str | int | None,
 ) -> LibraryRootV1 | ContentLibraryMetadata | None:
     """
-    Fetch either a V1 or V2 content library from a V1/V2 key (or key string).
+    Fetch either a V1 or V2 content library from a V1/V2 key (or key string) and version.
+
+    V1 library versions are Mongo ObjectID strings.
+    V2 library versions can be positive ints, or strings of positive ints.
+    Passing version=None will return the latest version the library.
 
     Returns None if not found.
     If key is invalid, raises InvalidKeyError.
+    For V1, if key has a version, it must match `version`, otherwise we raise a ValueError.
+    For V2, if version is provided but it isn't an int or parseable to one, we raise a ValueError.
 
     Examples:
-    * get_v1_or_v2_library("library-v1:ProblemX+PR0B") -> <LibraryRootV1>
-    * get_v1_or_v2_library("lib:RG:rg-1")              -> <ContentLibraryMetadata>
-    * get_v1_or_v2_library("fail")                     -> <InvalidKeyError>
+    * get_v1_or_v2_library("library-v1:ProblemX+PR0B", None)       -> <LibraryRootV1>
+    * get_v1_or_v2_library("library-v1:ProblemX+PR0B", "65ff...")  -> <LibraryRootV1>
+    * get_v1_or_v2_library("lib:RG:rg-1", None)                    -> <ContentLibraryMetadata>
+    * get_v1_or_v2_library("lib:RG:rg-1", "36")                    -> <ContentLibraryMetadata>
+    * get_v1_or_v2_library("lib:RG:rg-1", "xyz")                   -> <ValueError>
+    * get_v1_or_v2_library("notakey", "xyz")                       -> <InvalidKeyError>
 
     If you just want to get a V2 library, use `get_library` instead.
     """
@@ -1198,12 +1208,27 @@ def get_v1_or_v2_library(
     else:
         library_key = library_id
     if isinstance(library_key, LibraryLocatorV2):
+        if version is not None:
+            version = int(version)
         try:
-            return get_library(library_key)
+            library = get_library(library_key)
+            if version is not None and library.version != version:
+                raise NotImplementedError(
+                    f"Tried to load version {version} of blockstore-based library {library_key}. "
+                    f"Currently, only the latest version ({library.version}) may be loaded. "
+                    "This is a known issue. "
+                    "It will be fixed before the production release of blockstore-based (V2) content libraries. "
+                )
+            return library
         except ContentLibrary.DoesNotExist:
             return None
     elif isinstance(library_key, LibraryLocatorV1):
         store = modulestore()
+        if library_key.version:
+            if library_key.version != version:
+                raise ValueError(f"Requested library version {version!r} conflicts with version in key: {library_key}")
+        else:
+            library_key = library_key.for_version(version)
         try:
             return store.get_library(library_key, remove_version=False, remove_branch=False, head_validation=False)
         except ItemNotFoundError:

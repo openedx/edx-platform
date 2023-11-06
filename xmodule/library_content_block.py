@@ -11,6 +11,7 @@ from gettext import ngettext, gettext
 
 import bleach
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.utils.functional import classproperty
 from lazy import lazy
 from lxml import etree
@@ -494,24 +495,39 @@ class LibraryContentBlock(
         return user_id
 
     @XBlock.handler
-    def refresh_children(self, request=None, suffix=None):  # lint-amnesty, pylint: disable=unused-argument
+    def refresh_children(self, request=None, suffix=None, library_version=None):  # pylint: disable=unused-argument
         """
-        Refresh children:
-        This method is to be used when any of the libraries that this block
-        references have been updated. It will re-fetch all matching blocks from
-        the libraries, and copy them as children of this block. The children
-        will be given new block_ids, but the definition ID used should be the
-        exact same definition ID used in the library.
+        HTTP handler allowing Studio users to update to latest version of source library.
 
-        This method will update this block's 'source_library_id' field to store
-        the version number of the libraries used, so we easily determine if
-        this block is up to date or not.
+        See `LibraryToolsService.trigger_refresh_children` for details.
         """
-        user_perms = self.runtime.service(self, 'studio_user_permissions')
         if not self.tools:
             return Response("Library Tools unavailable in current runtime.", status=400)
-        self.tools.trigger_refresh_children(self, user_perms)
+        user_perms = self.runtime.service(self, 'studio_user_permissions')
+        if not user_perms.can_read(self.source_library_key):
+            raise PermissionDenied()
+        if not user_perms.can_write(self.scope_ids.usage_id.context_key):
+            raise PermissionDenied()
+        self.refresh_children_from_latest_library()
         return Response()
+
+    def refresh_children_from_latest_library(self) -> None:
+        """
+        Refresh children from latest version of source library.
+
+        See `LibraryToolsService.trigger_refresh_children` for details.
+        """
+        self.tools.trigger_refresh_children(self, library_version=None)
+
+    def refresh_children_from_current_library(self) -> None:
+        """
+        Refresh children from library using `self.source_library_version`.
+
+        If `self.source_library_version` is unset, will use latest.
+
+        See `LibraryToolsService.trigger_refresh_children` for details.
+        """
+        self.tools.trigger_refresh_children(self, library_version=self.source_library_version)
 
     @XBlock.json_handler
     def is_v2_library(self, data, suffix=''):  # lint-amnesty, pylint: disable=unused-argument
@@ -562,7 +578,7 @@ class LibraryContentBlock(
         """
         Validates library version
         """
-        latest_version = lib_tools.get_library_version(library_key)
+        latest_version = lib_tools.get_latest_library_version(library_key)
         if latest_version is not None:
             if version is None or version != str(latest_version):
                 validation.set_summary(

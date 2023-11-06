@@ -42,7 +42,6 @@ from common.djangoapps.util.monitoring import monitor_import_failure
 from xmodule.assetstore import AssetMetadata
 from xmodule.contentstore.content import StaticContent
 from xmodule.errortracker import make_error_tracker
-from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import ASSET_IGNORE_REGEX
 from xmodule.modulestore.exceptions import DuplicateCourseError
@@ -900,7 +899,7 @@ def _update_and_import_block(
             try:
                 # Update library content block's children on draft branch
                 with store.branch_setting(branch_setting=ModuleStoreEnum.Branch.draft_preferred):
-                    LibraryToolsService(store, user_id).trigger_refresh_children(block)
+                    block.refresh_children_from_current_library()
             except ValueError as err:
                 # The specified library version does not exist.
                 log.error(err)

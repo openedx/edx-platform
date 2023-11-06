@@ -997,6 +997,7 @@ class TestOverrides(LibraryTestCase):
         self.assertEqual(len(self.library.children), 2)
 
         # But the block hasn't.
+        self.lc_block = store.get_item(self.lc_block.location)
         self.assertEqual(len(self.lc_block.children), 1)
         self.assertEqual(self.problem_in_course.location, self.lc_block.children[0])
         self.assertEqual(self.problem_in_course.display_name, self.original_display_name)
