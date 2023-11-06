@@ -6,7 +6,7 @@ from rest_framework import serializers
 
 from openedx.core.lib.api.serializers import CourseKeyField
 
-from .common import CourseCommonSerializer
+from cms.djangoapps.contentstore.rest_api.serializers.common import CourseCommonSerializer
 
 
 class UnsucceededCourseSerializer(serializers.Serializer):

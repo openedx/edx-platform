@@ -2,7 +2,7 @@
 API Serializers for assets
 """
 from rest_framework import serializers
-from .common import StrictSerializer
+from cms.djangoapps.contentstore.rest_api.serializers.common import StrictSerializer
 
 
 class AssetSerializer(StrictSerializer):
