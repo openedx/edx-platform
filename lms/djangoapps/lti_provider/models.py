@@ -14,6 +14,7 @@ import logging
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import models
+from django.utils.translation import gettext as _
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 
 from openedx.core.djangolib.fields import CharNullField
@@ -34,7 +35,11 @@ class LtiConsumer(models.Model):
     consumer_key = models.CharField(max_length=32, unique=True, db_index=True, default=short_token)
     consumer_secret = models.CharField(max_length=32, unique=True, default=short_token)
     instance_guid = CharNullField(max_length=255, blank=True, null=True, unique=True)
-    auto_link_users_using_email = models.BooleanField(blank=True, default=False)
+    require_user_account = models.BooleanField(blank=True, default=False, help_text=_(
+        "When checked, the LTI content will load only for learners who have an account "
+        "in this instance. This is required only for linking learner accounts with "
+        "the LTI consumer. See the Open edX LTI Provider documentation for more details."
+    ))
 
     @staticmethod
     def get_or_supplement(instance_guid, consumer_key):

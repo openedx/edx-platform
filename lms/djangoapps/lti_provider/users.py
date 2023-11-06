@@ -31,7 +31,7 @@ def authenticate_lti_user(request, lti_user_id, lti_consumer):
     lis_email = request.POST.get("lis_person_contact_email_primary")
 
     # Verify that the email from the LTI Launch and the logged-in user are the same.
-    if lti_consumer.auto_link_users_using_email and (
+    if lti_consumer.require_user_account and (
         not request.user.is_authenticated or
         (lis_email and request.user.email != lis_email)
     ):
@@ -44,14 +44,14 @@ def authenticate_lti_user(request, lti_user_id, lti_consumer):
         )
     except LtiUser.DoesNotExist:
         # This is the first time that the user has been here. Create an account.
-        if lti_consumer.auto_link_users_using_email:
+        if lti_consumer.require_user_account:
             lti_user = create_lti_user(lti_user_id, lti_consumer, lis_email)
         else:
             lti_user = create_lti_user(lti_user_id, lti_consumer)
 
     # If auto-linking is enabled, the lti_user should be linked to the logged-in user
     if (
-        lti_consumer.auto_link_users_using_email and
+        lti_consumer.require_user_account and
         request.user.is_authenticated and
         lti_user.edx_user != request.user
     ):

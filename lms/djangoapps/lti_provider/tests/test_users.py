@@ -97,7 +97,7 @@ class AuthenticateLtiUserTest(TestCase):
             consumer_name='AutoLinkingConsumer',
             consumer_key='AutoLinkingKey',
             consumer_secret='AutoLinkingSecret',
-            auto_link_users_using_email=True
+            require_user_account=True
         )
         self.auto_linking_consumer.save()
 

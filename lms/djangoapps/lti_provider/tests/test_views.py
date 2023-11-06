@@ -87,7 +87,7 @@ class LtiTestMixin:
             consumer_name='auto-link-consumer',
             consumer_key='consumer_key_2',
             consumer_secret='secret_2',
-            auto_link_users_using_email=True
+            require_user_account=True
         )
         self.auto_link_consumer.save()
 
@@ -199,7 +199,7 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         assert consumer.instance_guid == 'consumer instance guid'
 
     @patch('lms.djangoapps.lti_provider.views.render_to_response')
-    def test_unauthenticated_user_shown_error_when_auto_linking_is_enabled(self, render_error):
+    def test_unauthenticated_user_shown_error_when_require_user_account_is_enabled(self, render_error):
         request = build_launch_request({'oauth_consumer_key': 'consumer_key_2'})
         request.user = AnonymousUser()
 

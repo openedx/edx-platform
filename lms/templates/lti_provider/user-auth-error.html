@@ -14,7 +14,7 @@ from openedx.core.djangolib.markup import HTML, Text
     ${Text(_("This module is available only for users who are signed into {platform}. "
         "Kindly sign in and refresh this page to load the content."
       )).format(
-        platform=HTML(u"<em>{}</em>").format(static.get_platform_name())
+        platform=HTML("<em>{}</em>").format(static.get_platform_name())
       )}
   </p>
 
