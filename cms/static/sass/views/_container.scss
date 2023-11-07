@@ -279,8 +279,12 @@
             flex-direction: column;
             padding-top: 10px;
 
-            .taxonomy-label {
-              padding: 8px 0px;
+            .tagging-label {
+              padding: 4px 0px;
+            }
+
+            .icon {
+              margin-left: 5px;
             }
           }
         }

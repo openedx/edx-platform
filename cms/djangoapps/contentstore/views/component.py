@@ -638,6 +638,7 @@ def get_unit_tags(usage_key):
             # Group each tag by parent to build a tree
             if tag.id not in tags:
                 tags[tag.id] = {
+                    'id': tag.id,
                     'value': tag.value,
                     'children': [],
                 }

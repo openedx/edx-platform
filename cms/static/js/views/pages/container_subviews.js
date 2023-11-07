@@ -296,7 +296,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
     });
 
     /**
-         * PublishHistory displays the tags of a unit.
+         * TagList displays the tags of a unit.
          */
     var TagList = BaseView.extend({
         // takes XBlockInfo as a model
@@ -313,7 +313,9 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
         },
 
         onSync: function(model) {
-            
+            if (ViewUtils.hasChangedAttributes(model, ['tags'])) {
+                this.render();
+            }
         },
 
         expandTagContainer: function() {
@@ -332,9 +334,9 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
         },
 
         expandContentTag: function(event) {
-            var taxonomyValue = event.target.id,
-                $content = this.$(`.wrapper-tags .content-tags-${taxonomyValue}`),
-                $icon = this.$(`.wrapper-tags .label-${taxonomyValue} .icon`);
+            var contentId = event.target.id,
+                $content = this.$(`.wrapper-tags .content-tags-${contentId}`),
+                $icon = this.$(`.wrapper-tags .tagging-label-${contentId} .icon`);
 
             if ($content.hasClass('is-hidden')) {
                 $content.removeClass('is-hidden');
@@ -347,6 +349,53 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
             }
         },
 
+        renderTagElements: function(tags, depth, parentId) {
+            const tagListElement = this;
+            tags.forEach(function(tag) {
+                const parentElement = document.querySelector(`.content-tags-${parentId}`);
+                var tagContentElement = document.createElement('div'),
+                    tagValueElement = document.createElement('span');
+
+                // Element that contains the tag value and the arrow icon
+                tagContentElement.style.marginLeft = `${depth}em`;
+                tagContentElement.className = 'tagging-label';
+
+                // Element that contains the tag value
+                tagValueElement.textContent = tag.value;
+                tagValueElement.id = `tag-${tag.id}`;
+
+                tagContentElement.appendChild(tagValueElement);
+                parentElement.appendChild(tagContentElement);
+
+                if (tag.children.length > 0) {
+                    var tagIconElement = document.createElement('span'),
+                        tagChildrenElement = document.createElement('div');
+
+                    // Arrow icon
+                    tagIconElement.className = 'icon fa fa-caret-down';
+                    tagIconElement.ariaHidden = 'true';
+                    tagIconElement.id = `tag-${tag.id}`;
+
+                    // Element that contains the children of this tag
+                    tagChildrenElement.className = `content-tags-tag-${tag.id} is-hidden`;
+
+                    tagContentElement.appendChild(tagIconElement);
+                    parentElement.appendChild(tagChildrenElement);
+
+                    // Render children
+                    tagListElement.renderTagElements(tag.children, depth + 1, `tag-${tag.id}`);
+                }
+            });
+        },
+
+        renderTags: function() {
+            const taxonomies = this.model.get('tags').taxonomies;
+            const tagListElement = this;
+            taxonomies.forEach(function(taxonomy) {
+                tagListElement.renderTagElements(taxonomy.tags, 1, `tax-${taxonomy.id}`);
+            });
+        },
+
         render: function() {
             HtmlUtils.setHtml(
                 this.$el,
@@ -356,6 +405,8 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
                     })
                 )
             );
+
+            this.renderTags();
 
             return this;
         }
