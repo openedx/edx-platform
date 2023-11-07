@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='lticonsumer',
             name='require_user_account',
-            field=models.BooleanField(blank=True, default=False, help_text='When checked, the LTI content will load only for learners who have an account in this instance. This is required only for linking leaner accounts with the LTI consumer. See the Open edX LTI Provider documentation for more details.'),
+            field=models.BooleanField(blank=True, default=False, help_text='When checked, the LTI content will load only for learners who have an account in this instance. This is required only for linking learner accounts with the LTI consumer. See the Open edX LTI Provider documentation for more details.'),
         ),
         migrations.AlterField(
             model_name='ltiuser',
