@@ -617,9 +617,8 @@ class LibraryContentBlock(
         if not self.tools:
             raise RuntimeError("Library tools unavailable, duplication will not be sane!")
         self.tools.trigger_duplicate_children(
-            user_id=user_id, user_perms=user_perms, source_block=source_block, dest_block=self
+            user_perms=user_perms, source_block=source_block, dest_block=self
         )
-
         # Children have been handled.
         return True
 
@@ -640,7 +639,7 @@ class LibraryContentBlock(
             )
             return False
 
-        if (version is None or version != str(latest_version)) :
+        if (version is None or version != str(latest_version)):
             validation.set_summary(
                 StudioValidationMessage(
                     StudioValidationMessage.WARNING,
@@ -754,13 +753,16 @@ class LibraryContentBlock(
     def editor_saved(self, user, old_metadata, old_content):  # lint-amnesty, pylint: disable=unused-argument
         """
         If source_library_id is empty, clear source_library_version and children.
-        If source_library_id has chnaged, clear the candidate pool,
+        If source_library_id has changed, clear the candidate pool,
         as selections should not be preserved across libraries unwittingly
         """
         if not self.source_library_id:
             self.children = []  # lint-amnesty, pylint: disable=attribute-defined-outside-init
             self.source_library_version = ""
-        if self.source_library_id != old_metadata.source_library_id:
+
+        print(f"CARDIOVASCULAR {old_metadata}")
+
+        if "source_library_id" in old_metadata and self.source_library_id != old_metadata['source_library_id']:
             self.candidates = []
 
     def post_editor_saved(self, old_metadata):
@@ -783,7 +785,6 @@ class LibraryContentBlock(
                 print(self.source_library_version)
             except ValueError:
                 pass  # The validation area will display an error message, no need to do anything now.
-
 
     def has_dynamic_children(self):
         """

@@ -100,6 +100,9 @@ from openedx.core.djangoapps.content_libraries.models import (
     ContentLibraryPermission,
     ContentLibraryBlockImportTask,
 )
+from openedx.core.djangoapps.content_libraries.toggles import (
+    MAP_V1_LIBRARIES_TO_V2_LIBRARIES,
+)
 
 from openedx.core.djangoapps.xblock.api import (
     get_block_display_name,
@@ -1175,6 +1178,7 @@ def revert_changes(library_key):
 
 def get_v1_or_v2_library(
     library_id: str | LibraryLocatorV1 | LibraryLocatorV2,
+    store=None
 ) -> LibraryRootV1 | ContentLibraryMetadata | None:
     """
     Fetch either a V1 or V2 content library from a V1/V2 key (or key string).
@@ -1197,17 +1201,37 @@ def get_v1_or_v2_library(
             library_key = LibraryLocatorV2.from_string(library_id)
     else:
         library_key = library_id
+
+    # If migration mapping is enabled, map the V1 key to a V2 key.
+    if (not isinstance(library_key, LibraryLocatorV2)) and MAP_V1_LIBRARIES_TO_V2_LIBRARIES.is_enabled():
+        library_key = _map_v1_to_v2_library(library_key)
+
     if isinstance(library_key, LibraryLocatorV2):
         try:
             return get_library(library_key)
         except ContentLibrary.DoesNotExist:
             return None
     elif isinstance(library_key, LibraryLocatorV1):
-        store = modulestore()
+        if store is None:
+            store = modulestore()
         try:
             return store.get_library(library_key, remove_version=False, remove_branch=False, head_validation=False)
         except ItemNotFoundError:
             return None
+
+
+def _map_v1_to_v2_library(v1_library_key) -> LibraryLocatorV2:
+    """
+    Helper method to convert a v1 library key into a v2 library key using a strict string mapping.
+    ex: library-v1:edx+Lib1 -> lib:edx:Lib1
+    """
+    if not isinstance(v1_library_key, LibraryLocatorV1):
+        raise ValueError("Input must be an instance of LibraryLocator")
+
+    v2_library_key = LibraryLocatorV2(v1_library_key.org, v1_library_key.library)
+    log.info(f'Mapped V1 Key {v1_library_key} to v2 key {v2_library_key}')
+
+    return v2_library_key
 
 
 # Import from Courseware

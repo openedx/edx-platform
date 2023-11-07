@@ -383,6 +383,7 @@ def _post_editor_saved_callback(xblock, old_metadata):
     if callable(getattr(xblock, "post_editor_saved", None)):
         xblock.post_editor_saved(old_metadata)
 
+
 def _save_xblock(
     user,
     xblock,

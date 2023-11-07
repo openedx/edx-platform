@@ -267,6 +267,7 @@ def refresh_children(
     dest_block = store.get_item(BlockUsageLocator.from_string(dest_block_id))
     _update_children(task=self, store=store, user_id=user_id, dest_block=dest_block)
 
+
 @shared_task(base=LibraryUpdateChildrenTask, bind=True)
 def duplicate_children(
     self: LibraryUpdateChildrenTask,
@@ -303,6 +304,8 @@ def _update_children(
     library_key = dest_block.source_library_key
     filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)
     library = library_api.get_v1_or_v2_library(library_key)
+    #update the key to match the library on account of the runtime mapping.
+    library_key = library.key if hasattr(library, 'key') else library.location
     if not library:
         task.status.fail(f"Requested library {library_key} not found.")
     elif isinstance(library, LibraryRootV1):
@@ -332,6 +335,8 @@ def _update_children(
             _import_from_blockstore(user_id, store, dest_block, source_block_ids)
             dest_block.source_library_version = str(library.version)
             store.update_item(dest_block, user_id)
+            print("RALIEGH")
+            print(store.get_item(dest_block, user_id).__dict__)
         except Exception as exception:  # pylint: disable=broad-except
             TASK_LOGGER.exception('Error importing children for %s', dest_block.scope_ids.usage_id, exc_info=True)
             if task.status.state != UserTaskStatus.FAILED:

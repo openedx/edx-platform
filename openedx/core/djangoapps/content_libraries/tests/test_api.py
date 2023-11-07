@@ -8,13 +8,56 @@ from unittest import mock
 
 from django.test import TestCase
 
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import (
     CourseKey,
     UsageKey,
 )
-from opaque_keys.edx.locator import LibraryLocatorV2
+from opaque_keys.edx.locator import (
+    LibraryLocatorV2,
+    LibraryLocator as LibraryLocatorV1
+)
+from openedx.core.djangoapps.content_libraries.toggles import (
+    MAP_V1_LIBRARIES_TO_V2_LIBRARIES,
+)
 
 from .. import api
+
+
+class GetLibraryV1ToV2Test(TestCase):
+    """
+    Tests for getting Libraries behavior, given the MAP_V1_LIBRARIES_TO_V2_LIBRARIES flag.
+
+    TODO: tests need to be made for more of the methods in this API.
+    """
+    def setUp(self):
+        """
+        Set Up Mocks
+        """
+        super().setUp()
+        self.v1_library_key = LibraryLocatorV1(org='SomeOrg', library='stuff')
+
+    @override_waffle_flag(MAP_V1_LIBRARIES_TO_V2_LIBRARIES, active=False)
+    def test_get_v1_or_v2_library_without_mapping(self):
+        """
+        If the flag is not enabled, V1 Keys retrieve a library from the modulestore.
+        """
+
+        mock_library = 'A Library'
+        mock_store = mock.MagicMock()
+        mock_store.get_library.return_value = mock_library
+
+        library = api.get_v1_or_v2_library(self.v1_library_key, store=mock_store)
+        assert library == mock_library
+
+    @override_waffle_flag(MAP_V1_LIBRARIES_TO_V2_LIBRARIES, active=True)
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.get_library')
+    def test_get_v1_or_v2_library_with_mapping(self, mock_get_v2_library):
+        """
+        If the flag is enabled, V1 Keys return V2 Libs.
+        """
+        library = api.get_v1_or_v2_library(self.v1_library_key)
+        mock_get_v2_library.assert_called_once()
 
 
 class EdxModulestoreImportClientTest(TestCase):
