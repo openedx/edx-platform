@@ -23,14 +23,6 @@ def create_taxonomy_and_import_tags(
     """
     Create a taxonomy and import the tags from `file`, associating them with the provided `orgs`.
     """
-    taxonomy = taxonomy_api.create_taxonomy(taxonomy_name, taxonomy_description, orgs=orgs)
-
-    import_success = oel_tagging_import_export_api.import_tags(taxonomy, file, parser_format)
-
-    if not import_success:
-        taxonomy.delete()
-
-    return import_success
 
 
 
