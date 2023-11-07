@@ -653,19 +653,21 @@ def get_unit_tags(usage_key):
         root_ids = []
 
         for content_tag in content_tag_list:
-            handle_tag(tags, root_ids, content_tag.tag)
+            if content_tag.tag:
+                handle_tag(tags, root_ids, content_tag.tag)
 
         taxonomy = content_tag_list[0].taxonomy
 
-        count = len(tags)
-        # Add the tree to the taxonomy list
-        taxonomy_list.append({
-            'id': taxonomy.id,
-            'value': taxonomy.name,
-            'tags': [tags[tag_id] for tag_id in root_ids],
-            'count': count,
-        })
-        total_count += count
+        if tags:
+            count = len(tags)
+            # Add the tree to the taxonomy list
+            taxonomy_list.append({
+                'id': taxonomy.id,
+                'value': taxonomy.name,
+                'tags': [tags[tag_id] for tag_id in root_ids],
+                'count': count,
+            })
+            total_count += count
 
     unit_tags = {
         'count': total_count,
