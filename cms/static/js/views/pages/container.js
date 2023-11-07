@@ -27,6 +27,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             'click .show-actions-menu-button': 'showXBlockActionsMenu',
             'click .new-component-button': 'scrollToNewComponentButtons',
             'click .paste-component-button': 'pasteComponent',
+            'click .tags-button': 'openManageTags',
         },
 
         options: {
@@ -415,6 +416,10 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
         duplicateXBlock: function(event) {
             event.preventDefault();
             this.duplicateComponent(this.findXBlockElement(event.target));
+        },
+
+        openManageTags: function() {
+            // TODO open manage tags drawer
         },
 
         showMoveXBlockModal: function(event) {

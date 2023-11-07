@@ -389,11 +389,13 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
         },
 
         renderTags: function() {
-            const taxonomies = this.model.get('tags').taxonomies;
-            const tagListElement = this;
-            taxonomies.forEach(function(taxonomy) {
-                tagListElement.renderTagElements(taxonomy.tags, 1, `tax-${taxonomy.id}`);
-            });
+            if (this.model.get('tags') !== null) {
+                const taxonomies = this.model.get('tags').taxonomies;
+                const tagListElement = this;
+                taxonomies.forEach(function(taxonomy) {
+                    tagListElement.renderTagElements(taxonomy.tags, 1, `tax-${taxonomy.id}`);
+                });
+            }
         },
 
         render: function() {
