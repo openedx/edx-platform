@@ -617,7 +617,7 @@ class LibraryContentBlock(
         if not self.tools:
             raise RuntimeError("Library tools unavailable, duplication will not be sane!")
         self.tools.trigger_duplicate_children(
-            user_id=user_id, user_perms=user_perms, source_block=source_block, dest_block=self
+            user_perms=user_perms, source_block=source_block, dest_block=self
         )
 
         # Children have been handled.
@@ -760,9 +760,8 @@ class LibraryContentBlock(
             self.source_library_version = ""
         else:
             self.source_library_version = str(self.tools.get_library_version(self.source_library_id))
-
-        if self.source_library_id != old_metadata.source_library_id:
-            self.candidates = []
+            if old_metadata and 'source_library_id' in old_metadata and self.source_library_id != old_metadata['source_library_id']:
+                self.candidates = []
 
     def post_editor_saved(self):
         """
