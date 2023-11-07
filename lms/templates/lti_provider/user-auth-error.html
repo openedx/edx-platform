@@ -17,6 +17,14 @@ from openedx.core.djangolib.markup import HTML, Text
         platform=HTML("<em>{}</em>").format(static.get_platform_name())
       )}
   </p>
+  <p class="my-3">
+    <strong>${_("NOTE:")}</strong>
+    ${Text(_(
+      "The email used to sign into this platform and {platform} should be the same."
+    )).format(
+      platform=HTML("<em>{}</em>").format(static.get_platform_name())
+    )}
+  </p>
 
   <p class="mt-3">
     <a class="btn btn-primary" href="${login_link}" target="_blank">${_("Sign in")}</a>
