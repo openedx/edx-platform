@@ -4,9 +4,8 @@ API Serializers for proctoring
 
 from rest_framework import serializers
 
+from cms.djangoapps.contentstore.rest_api.serializers.common import ProctoringErrorListSerializer
 from xmodule.course_block import get_available_providers
-
-from .common import ProctoringErrorListSerializer
 
 
 class ProctoredExamSettingsSerializer(serializers.Serializer):

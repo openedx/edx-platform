@@ -4,7 +4,7 @@ API Serializers for course index
 
 from rest_framework import serializers
 
-from .common import ProctoringErrorListSerializer
+from cms.djangoapps.contentstore.rest_api.serializers.common import ProctoringErrorListSerializer
 
 
 class InitialIndexStateSerializer(serializers.Serializer):
