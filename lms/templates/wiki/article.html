@@ -33,7 +33,7 @@
 
       {% if urlpath %}
       <div class="see-children">
-        <a href="{% url 'wiki:dir' path=urlpath.path %}">{% trans "See all children" as tmsg %} | {{ tmsg | force_escape}}</a>
+        <a href="{% url 'wiki:dir' path=urlpath.path %}">{% trans "See all children" as tmsg %} {{ tmsg | force_escape}}</a>
       </div>
       {% endif %}
     </div>
