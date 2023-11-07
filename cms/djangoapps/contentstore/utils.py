@@ -1766,6 +1766,7 @@ def get_course_index_context(request, course_key, course_block):
         'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_block.id),
         'advance_settings_url': reverse_course_url('advanced_settings_handler', course_block.id),
         'proctoring_errors': proctoring_errors,
+        'taxonomy_tags_widget_url': get_taxonomy_tags_widget_url(course_block.id),
     }
 
     return course_index_context

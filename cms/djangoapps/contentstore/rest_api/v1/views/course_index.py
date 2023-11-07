@@ -2,14 +2,13 @@
 
 import edx_api_doc_tools as apidocs
 from django.conf import settings
-from django.http import Http404
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from cms.djangoapps.contentstore.utils import get_course_index_context
 from cms.djangoapps.contentstore.rest_api.v1.serializers import CourseIndexSerializer
+from cms.djangoapps.contentstore.utils import get_course_index_context
 from common.djangoapps.student.auth import has_studio_read_access
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, verify_course_exists, view_auth_classes
 from xmodule.modulestore.django import modulestore
@@ -93,9 +92,6 @@ class CourseIndexView(DeveloperErrorViewMixin, APIView):
 
         with modulestore().bulk_operations(course_key):
             course_block = modulestore().get_course(course_key)
-
-            if not course_block:
-                raise Http404
 
             course_index_context = get_course_index_context(request, course_key, course_block)
             course_index_context.update({

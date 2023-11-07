@@ -103,7 +103,6 @@ from ..utils import (
     get_lms_link_for_item,
     get_proctored_exam_settings_url,
     get_course_outline_url,
-    get_taxonomy_tags_widget_url,
     get_studio_home_url,
     get_updates_url,
     get_advanced_settings_url,
