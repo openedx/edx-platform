@@ -8,8 +8,8 @@ from xblock.core import XBlock
 
 from openedx.core.djangoapps.course_roles.helpers import course_or_organization_or_instance_permission_check
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from xmodule.course_block import CourseBlock  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.error_block import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_block import CourseBlock
+from xmodule.error_block import ErrorBlock
 
 
 class HasPermissionRule(Rule):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
