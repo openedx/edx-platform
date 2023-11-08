@@ -32,14 +32,14 @@ class LibraryToolsService:
         self.store = modulestore
         self.user_id = user_id
 
-    def get_latest_library_version(self, lib_key) -> str | int | None:
+    def get_latest_library_version(self, lib_key) -> str | None:
         """
-        Get the version of the given library.
+        Get the version of the given library as string.
 
         The return value (library version) could be:
-            ObjectID - for V1 library;
-            int      - for V2 library.
-            None     - if the library does not exist.
+            str(<ObjectID>) - for V1 library;
+            str(<int>)      - for V2 library.
+            None            - if the library does not exist.
         """
         library = library_api.get_v1_or_v2_library(lib_key, version=None)
         if not library:
@@ -47,9 +47,9 @@ class LibraryToolsService:
         elif isinstance(library, LibraryRootV1):
             # We need to know the library's version so ensure it's set in library.location.library_key.version_guid
             assert library.location.library_key.version_guid is not None
-            return library.location.library_key.version_guid
+            return str(library.location.library_key.version_guid)
         elif isinstance(library, library_api.ContentLibraryMetadata):
-            return library.version
+            return str(library.version)
 
     def create_block_analytics_summary(self, course_key, block_keys):
         """

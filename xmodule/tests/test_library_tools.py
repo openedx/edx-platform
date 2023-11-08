@@ -80,14 +80,12 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         assert isinstance(lib_key, LibraryLocator)
         result = self.tools.get_latest_library_version(lib_key)
         assert result
-        assert isinstance(result, ObjectId)
-        assert result == lib.location.library_key.version_guid
+        assert result == str(lib.location.library_key.version_guid)
         # the same check for string representation of the LibraryLocator
         str_key = str(lib_key)
         result = self.tools.get_latest_library_version(str_key)
         assert result
-        assert isinstance(result, ObjectId)
-        assert result == lib.location.library_key.version_guid
+        assert result == str(lib.location.library_key.version_guid)
 
     @ddt.data(
         'library-v1:Fake+Key',  # V1 library key

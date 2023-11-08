@@ -599,7 +599,7 @@ class LibraryContentBlock(
         """
         latest_version = lib_tools.get_latest_library_version(library_key)
         if latest_version is not None:
-            if version is None or version != str(latest_version):
+            if version is None or version != latest_version:
                 validation.set_summary(
                     StudioValidationMessage(
                         StudioValidationMessage.WARNING,

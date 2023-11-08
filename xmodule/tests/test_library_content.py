@@ -105,9 +105,11 @@ class LibraryContentGeneralTest(LibraryContentTest):
         """
         Test that a lc block starts without children, but is correctly populated upon first sync.
         """
+        source_library_key = self.library.location.library_key
+
         # Normally the children get added when the "source_libraries" setting
         # is updated, but the way we do it through a factory doesn't do that.
-        assert self.lc_block.source_library_id == self.library.location.library_key
+        assert self.lc_block.source_library_key == source_library_key
         assert self.lc_block.source_library_version is None
         assert len(self.lc_block.children) == 0
 
@@ -116,8 +118,8 @@ class LibraryContentGeneralTest(LibraryContentTest):
         self.lc_block = self.store.get_item(self.lc_block.location)
 
         # Check that all blocks from the library are now children of the block:
-        assert self.lc_block.source_library_id == self.library.location.library_key  # Unchanged
-        assert self.lc_block.source_library_version == self.tools.get_latest_library_version(self.library.library_key)
+        assert self.lc_block.source_library_key == source_library_key  # Unchanged
+        assert self.lc_block.source_library_version == self.tools.get_latest_library_version(source_library_key)
         assert len(self.lc_block.children) == len(self.lib_blocks)
 
 
