@@ -60,7 +60,7 @@ class TestExamService(ModuleStoreTestCase):
     @ddt.data(
         (False, False, False, 'timed'),
         (True, False, False, 'proctored'),
-        (True, True, False, 'practice_proctored'),
+        (True, True, False, 'practice'),
         (True, True, True, 'onboarding'),
     )
     @ddt.unpack

@@ -36,7 +36,7 @@ from .serializers import (
     UserCourseNotificationPreferenceSerializer,
     UserNotificationPreferenceUpdateSerializer
 )
-from .utils import get_show_notifications_tray
+from .utils import filter_course_wide_preferences, get_show_notifications_tray
 
 
 @allow_any_authenticated_user()
@@ -183,7 +183,8 @@ class UserNotificationPreferenceView(APIView):
         user_preference = CourseNotificationPreference.get_updated_user_course_preferences(request.user, course_id)
         serializer = UserCourseNotificationPreferenceSerializer(user_preference)
         notification_preferences_viewed_event(request, course_id)
-        return Response(serializer.data)
+        preferences = filter_course_wide_preferences(course_id, serializer.data)
+        return Response(preferences)
 
     def patch(self, request, course_key_string):
         """
