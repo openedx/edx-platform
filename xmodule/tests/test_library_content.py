@@ -110,7 +110,7 @@ class TestLibraryContentExportImport(LibraryContentTest):
         super().setUp()
 
         # Children will only set after calling this.
-        self.lc_block.refresh_children()
+        self.lc_block.upgrade_library()
         self.lc_block = self.store.get_item(self.lc_block.location)
 
         self.expected_olx = (
@@ -236,7 +236,7 @@ class LibraryContentBlockTestMixin:
         # is updated, but the way we do it through a factory doesn't do that.
         assert len(self.lc_block.children) == 0
         # Update the LibraryContent block:
-        self.lc_block.refresh_children()
+        self.lc_block.upgrade_library()
         self.lc_block = self.store.get_item(self.lc_block.location)
         # Check that all blocks from the library are now children of the block:
         assert len(self.lc_block.children) == len(self.lib_blocks)
@@ -245,7 +245,7 @@ class LibraryContentBlockTestMixin:
         """
         Test that each student sees only one block as a child of the LibraryContent block.
         """
-        self.lc_block.refresh_children()
+        self.lc_block.upgrade_library()
         self.lc_block = self.store.get_item(self.lc_block.location)
         self._bind_course_block(self.lc_block)
         # Make sure the runtime knows that the block's children vary per-user:
@@ -292,7 +292,7 @@ class LibraryContentBlockTestMixin:
         # Now if we update the block, all validation should pass:
         self._bind_course_block(self.lc_block)
         self.store.update_item(self.lc_block, self.user_id)
-        self.lc_block.refresh_children()
+        self.lc_block.upgrade_library()
         self.lc_block = self.store.get_item(self.lc_block.location)
 
         assert self.lc_block.validate()
@@ -309,9 +309,9 @@ class LibraryContentBlockTestMixin:
         """
         # Set max_count to higher value than exists in library
         self.lc_block.max_count = 50
-        # In the normal studio editing process, editor_saved() calls refresh_children at this point
+        # In the normal studio editing process, editor_saved() calls upgrade_library() at this point
         self.store.update_item(self.lc_block, self.user_id)
-        self.lc_block.refresh_children()
+        self.lc_block.upgrade_library()
         self.lc_block = self.store.get_item(self.lc_block.location)
         result = self.lc_block.validate()
         assert not result
@@ -323,7 +323,7 @@ class LibraryContentBlockTestMixin:
         self.lc_block.max_count = 1
         self._create_capa_problems()
         self.store.update_item(self.lc_block, self.user_id)
-        self.lc_block.refresh_children()
+        self.lc_block.upgrade_library()
         self.lc_block = self.store.get_item(self.lc_block.location)
         assert self.lc_block.validate()
         assert len(self.lc_block.selected_children()) == 1
@@ -332,7 +332,7 @@ class LibraryContentBlockTestMixin:
         self.lc_block.max_count = 1
         self.lc_block.capa_type = 'multiplechoiceresponse'
         self.store.update_item(self.lc_block, self.user_id)
-        self.lc_block.refresh_children()
+        self.lc_block.upgrade_library()
         self.lc_block = self.store.get_item(self.lc_block.location)
         assert self.lc_block.validate()
         assert len(self.lc_block.selected_children()) == 1
@@ -341,7 +341,7 @@ class LibraryContentBlockTestMixin:
         self.lc_block.max_count = 10
         self.lc_block.capa_type = 'multiplechoiceresponse'
         self.store.update_item(self.lc_block, self.user_id)
-        self.lc_block.refresh_children()
+        self.lc_block.upgrade_library()
         self.lc_block = self.store.get_item(self.lc_block.location)
         result = self.lc_block.validate()
         assert not result
@@ -353,7 +353,7 @@ class LibraryContentBlockTestMixin:
         self.lc_block.max_count = 1
         self.lc_block.capa_type = 'customresponse'
         self.store.update_item(self.lc_block, self.user_id)
-        self.lc_block.refresh_children()
+        self.lc_block.upgrade_library()
         self.lc_block = self.store.get_item(self.lc_block.location)
         result = self.lc_block.validate()
         assert not result
@@ -367,7 +367,7 @@ class LibraryContentBlockTestMixin:
         self.lc_block.max_count = -1
         self.lc_block.capa_type = ANY_CAPA_TYPE_VALUE
         self.store.update_item(self.lc_block, self.user_id)
-        self.lc_block.refresh_children()
+        self.lc_block.upgrade_library()
         self.lc_block = self.store.get_item(self.lc_block.location)
         assert self.lc_block.validate()
         assert len(self.lc_block.selected_children()) == len(self.lc_block.children)
@@ -381,31 +381,31 @@ class LibraryContentBlockTestMixin:
         # precondition check
         self.lc_block.capa_type = "multiplechoiceresponse"
         self.store.update_item(self.lc_block, self.user_id)
-        self.lc_block.refresh_children()
+        self.lc_block.upgrade_library()
         self.lc_block = self.store.get_item(self.lc_block.location)
         assert len(self.lc_block.children) == 1
 
         self.lc_block.capa_type = "optionresponse"
         self.store.update_item(self.lc_block, self.user_id)
-        self.lc_block.refresh_children()
+        self.lc_block.upgrade_library()
         self.lc_block = self.store.get_item(self.lc_block.location)
         assert len(self.lc_block.children) == 3
 
         self.lc_block.capa_type = "coderesponse"
         self.store.update_item(self.lc_block, self.user_id)
-        self.lc_block.refresh_children()
+        self.lc_block.upgrade_library()
         self.lc_block = self.store.get_item(self.lc_block.location)
         assert len(self.lc_block.children) == 2
 
         self.lc_block.capa_type = "customresponse"
         self.store.update_item(self.lc_block, self.user_id)
-        self.lc_block.refresh_children()
+        self.lc_block.upgrade_library()
         self.lc_block = self.store.get_item(self.lc_block.location)
         assert len(self.lc_block.children) == 0
 
         self.lc_block.capa_type = ANY_CAPA_TYPE_VALUE
         self.store.update_item(self.lc_block, self.user_id)
-        self.lc_block.refresh_children()
+        self.lc_block.upgrade_library()
         self.lc_block = self.store.get_item(self.lc_block.location)
         assert len(self.lc_block.children) == (len(self.lib_blocks) + 4)
 
@@ -425,7 +425,7 @@ class LibraryContentBlockTestMixin:
         blocks_seen = set()
         total_tries, max_tries = 0, 100
 
-        self.lc_block.refresh_children()
+        self.lc_block.upgrade_library()
         self.lc_block = self.store.get_item(self.lc_block.location)
         self._bind_course_block(self.lc_block)
 
@@ -473,7 +473,7 @@ class LibraryContentBlockTestMixin:
         # Add some capa blocks
         self._create_capa_problems()
         self.store.update_item(self.lc_block, self.user_id)
-        self.lc_block.refresh_children()
+        self.lc_block.upgrade_library()
         self.lc_block = self.store.get_item(self.lc_block.location)
         # Mock the student view to return an empty dict to be returned as response
         self.lc_block.student_view = MagicMock()
@@ -533,7 +533,7 @@ class TestLibraryContentRender(LibraryContentTest):
 
     def test_preview_view(self):
         """ Test preview view rendering """
-        self.lc_block.refresh_children()
+        self.lc_block.upgrade_library()
         self.lc_block = self.store.get_item(self.lc_block.location)
         assert len(self.lc_block.children) == len(self.lib_blocks)
         self._bind_course_block(self.lc_block)
@@ -542,7 +542,7 @@ class TestLibraryContentRender(LibraryContentTest):
 
     def test_author_view(self):
         """ Test author view rendering """
-        self.lc_block.refresh_children()
+        self.lc_block.upgrade_library()
         self.lc_block = self.store.get_item(self.lc_block.location)
         assert len(self.lc_block.children) == len(self.lib_blocks)
         self._bind_course_block(self.lc_block)
@@ -561,7 +561,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
     def setUp(self):
         super().setUp()
         self.publisher = Mock()
-        self.lc_block.refresh_children()
+        self.lc_block.upgrade_library()
         self.lc_block = self.store.get_item(self.lc_block.location)
         self._bind_course_block(self.lc_block)
         self.lc_block.runtime.publish = self.publisher
@@ -632,7 +632,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
             inner_vertical = self.make_block("vertical", main_vertical)
             html_block = self.make_block("html", inner_vertical)
             problem_block = self.make_block("problem", inner_vertical)
-            self.lc_block.refresh_children()
+            self.lc_block.upgrade_library()
 
         # Reload lc_block and set it up for a student:
         self.lc_block = self.store.get_item(self.lc_block.location)
@@ -714,7 +714,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         self.store.update_item(self.library, self.user_id)
         self.store.update_item(self.lc_block, self.user_id)
         old_selected = self.lc_block.selected
-        self.lc_block.refresh_children()
+        self.lc_block.upgrade_library()
         self.lc_block = self.store.get_item(self.lc_block.location)
         self.lc_block.selected = old_selected
         self.lc_block.runtime.publish = self.publisher

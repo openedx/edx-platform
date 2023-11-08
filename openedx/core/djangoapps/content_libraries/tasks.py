@@ -228,7 +228,7 @@ def _import_from_blockstore(user_id, store, dest_block, blockstore_block_ids):
         dest_block.children = store.get_item(dest_key).children
 
 
-class LibraryUpdateChildrenTask(UserTask):  # pylint: disable=abstract-method
+class LibrarySyncChildrenTask(UserTask):  # pylint: disable=abstract-method
     """
     Base class for tasks which operate upon library_content children.
     """
@@ -252,9 +252,9 @@ class LibraryUpdateChildrenTask(UserTask):  # pylint: disable=abstract-method
 # Note: The decorator @set_code_owner_attribute cannot be used here because the UserTaskMixin does stack
 # inspection and can't handle additional decorators. So, wet set the code_owner attribute in the tasks' bodies instead.
 
-@shared_task(base=LibraryUpdateChildrenTask, bind=True)
-def refresh_children(
-    self: LibraryUpdateChildrenTask,
+@shared_task(base=LibrarySyncChildrenTask, bind=True)
+def sync_from_library(
+    self: LibrarySyncChildrenTask,
     user_id: int,
     dest_block_id: str,
     library_version: str | int | None,
@@ -265,7 +265,7 @@ def refresh_children(
     set_code_owner_attribute_from_module(__name__)
     store = modulestore()
     dest_block = store.get_item(BlockUsageLocator.from_string(dest_block_id))
-    _update_children(
+    _sync_children(
         task=self,
         store=store,
         user_id=user_id,
@@ -274,9 +274,9 @@ def refresh_children(
     )
 
 
-@shared_task(base=LibraryUpdateChildrenTask, bind=True)
+@shared_task(base=LibrarySyncChildrenTask, bind=True)
 def duplicate_children(
-    self: LibraryUpdateChildrenTask,
+    self: LibrarySyncChildrenTask,
     user_id: int,
     source_block_id: str,
     dest_block_id: str,
@@ -287,10 +287,10 @@ def duplicate_children(
     set_code_owner_attribute_from_module(__name__)
     store = modulestore()
     # First, populate the destination block with children imported from the library.
-    # It's important that _update_children does this at the currently-set version of the dest library
+    # It's important that _sync_children does this at the currently-set version of the dest library
     # (someone may be duplicating an out-of-date block).
     dest_block = store.get_item(BlockUsageLocator.from_string(dest_block_id))
-    _update_children(
+    _sync_children(
         task=self,
         store=store,
         user_id=user_id,
@@ -303,15 +303,15 @@ def duplicate_children(
         _copy_overrides(store=store, user_id=user_id, source_block=source_block, dest_block=dest_block)
 
 
-def _update_children(
-    task: LibraryUpdateChildrenTask,
+def _sync_children(
+    task: LibrarySyncChildrenTask,
     store: MixedModuleStore,
     user_id: int,
     dest_block: LibraryContentBlock,
     library_version: int | str | None,
 ) -> None:
     """
-    Implementation helper for `refresh_children` and `duplicate_children` Celery tasks.
+    Implementation helper for `sync_from_library` and `duplicate_children` Celery tasks.
 
     Can update children with a specific library `library_version`, or latest (`library_version=None`).
     """

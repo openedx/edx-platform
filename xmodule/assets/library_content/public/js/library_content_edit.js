@@ -17,7 +17,7 @@ window.LibraryContentAuthorView = function(runtime, element) {
             element: element,
             message: gettext('Updating with latest library content')
         });
-        $.post(runtime.handlerUrl(element, 'refresh_children')).done(function() {
+        $.post(runtime.handlerUrl(element, 'upgrade_library')).done(function() {
             runtime.notify('save', {
                 state: 'end',
                 element: element
@@ -38,7 +38,7 @@ window.LibraryContentAuthorView = function(runtime, element) {
     var $xblockHeader = $wrapper.find('.xblock-header');
     if (!$loader.hasClass('is-hidden')) {
         var timer = setInterval(function() {
-            $.get(runtime.handlerUrl(element, 'children_are_updating'), function( data ) {
+            $.get(runtime.handlerUrl(element, 'children_are_syncing'), function( data ) {
                 if (data !== true) {
                     $loader.addClass('is-hidden');
                     $xblockHeader.removeClass('is-hidden');

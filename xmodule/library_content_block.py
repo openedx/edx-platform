@@ -427,7 +427,7 @@ class LibraryContentBlock(
         root_xblock = context.get('root_xblock')
         is_root = root_xblock and root_xblock.location == self.location
         try:
-            is_updating = self.get_tools().are_children_updating(self)
+            is_updating = self.get_tools().are_children_syncing(self)
         except LibraryToolsUnavailable:
             is_updating = False
         if is_root and not is_updating:
@@ -507,11 +507,12 @@ class LibraryContentBlock(
         return user_id
 
     @XBlock.handler
-    def refresh_children(self, request=None, suffix=None):  # pylint: disable=unused-argument
+    def upgrade_library(self, request=None, suffix=None):  # pylint: disable=unused-argument
         """
         HTTP handler allowing Studio users to update to latest version of source library.
+        This also synchronizes children with library.
 
-        See `LibraryToolsService.trigger_refresh_children` for details.
+        See `LibraryToolsService.trigger_sync_library` for details.
         """
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         if not user_perms.can_read(self.source_library_key):
@@ -519,26 +520,18 @@ class LibraryContentBlock(
         if not user_perms.can_write(self.scope_ids.usage_id.context_key):
             raise PermissionDenied()
         try:
-            self.refresh_children_from_latest_library()
+            self.trigger_library_sync(self, library_version=None)
         except LibraryToolsUnavailable:
             return Response("Library Tools unavailable in current runtime.", status=400)
         return Response()
 
-    def refresh_children_from_latest_library(self) -> None:
+    def sync_from_library(self) -> None:
         """
-        Refresh children from latest version of source library.
+        Synchronize children with source library using `self.source_library_version` (if set) or latest (if unset).
 
-        See `LibraryToolsService.trigger_refresh_children` for details.
+        See `LibraryToolsService.trigger_sync_library` for details.
         """
-        self.get_tools().trigger_refresh_children(self, library_version=None)
-
-    def refresh_children_from_current_library(self) -> None:
-        """
-        Refresh children from library using `self.source_library_version`.
-
-        If `self.source_library_version` is unset, will use latest.
-        """
-        self.get_tools().trigger_refresh_children(self, library_version=self.source_library_version)
+        self.get_tools().trigger_library_sync(self, library_version=self.source_library_version)
 
     @XBlock.json_handler
     def is_v2_library(self, data, suffix=''):  # pylint: disable=unused-argument
@@ -557,12 +550,12 @@ class LibraryContentBlock(
         return {'is_v2': is_v2}
 
     @XBlock.handler
-    def children_are_updating(self, request, suffix=''):  # pylint: disable=unused-argument
+    def children_are_syncing(self, request, suffix=''):  # pylint: disable=unused-argument
         """
         Returns whether this block is currently having its children updated from the source library.
         """
         try:
-            is_updating = self.get_tools().are_children_updating(self)
+            is_updating = self.get_tools().are_children_syncing(self)
         except LibraryToolsUnavailable:
             is_updating = False
         return Response(json.dumps(is_updating))
@@ -576,7 +569,7 @@ class LibraryContentBlock(
         """
         user_id = self.get_user_id()
         user_perms = self.runtime.service(self, 'studio_user_permissions')
-        self.get_tools().trigger_duplicate_children(
+        self.get_tools().trigger_duplication(
             user_perms=user_perms, source_block=source_block, dest_block=self
         )
 
@@ -653,7 +646,7 @@ class LibraryContentBlock(
         lib_tools = self.runtime.service(self, 'library_tools')
         self._validate_library_version(validation, lib_tools, self.source_library_version, self.source_library_key)
 
-        # Note: we assume refresh_children() has been called
+        # Note: we assume children have been synced
         # since the last time fields like source_library_id or capa_types were changed.
         matching_children_count = len(self.children)  # pylint: disable=no-member
         if matching_children_count == 0:
@@ -729,11 +722,11 @@ class LibraryContentBlock(
 
     def post_editor_saved(self):
         """
-        If xblock has been edited, refresh_children automatically.
+        If xblock has been edited, upgrade library & sync automatically.
         """
         try:
             if self.source_library_id:
-                self.refresh_children()
+                self.upgrade_library()
         except ValueError:
             pass  # The validation area will display an error message, no need to do anything now.
 

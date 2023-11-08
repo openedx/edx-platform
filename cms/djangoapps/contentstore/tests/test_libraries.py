@@ -96,9 +96,9 @@ class LibraryTestCase(ModuleStoreTestCase):
             user_id=self.user.id, publish_item=False
         )
 
-    def _refresh_children(self, lib_content_block, status_code_expected=200):
+    def _upgrade_library(self, lib_content_block, status_code_expected=200):
         """
-        Helper method: Uses the REST API to call the 'refresh_children' handler
+        Helper method: Uses the REST API to call the 'upgrade_library' handler
         of a LibraryContent block
         """
         if 'user' not in lib_content_block.runtime._services:  # pylint: disable=protected-access
@@ -108,7 +108,7 @@ class LibraryTestCase(ModuleStoreTestCase):
         handler_url = reverse_usage_url(
             'preview_handler',
             lib_content_block.location,
-            kwargs={'handler': 'refresh_children'}
+            kwargs={'handler': 'upgrade_library'}
         )
         response = self.client.ajax_post(handler_url)
         self.assertEqual(response.status_code, status_code_expected)
@@ -171,7 +171,7 @@ class TestLibraries(LibraryTestCase):
 
         lc_block = self._add_library_content_block(course, self.lib_key, other_settings={'max_count': num_to_select})
         self.assertEqual(len(lc_block.children), 0)
-        lc_block = self._refresh_children(lc_block)
+        lc_block = self._upgrade_library(lc_block)
 
         # Now, we want to make sure that .children has the total # of potential
         # children, and that get_child_blocks() returns the actual children
@@ -198,7 +198,7 @@ class TestLibraries(LibraryTestCase):
 
         lc_block = self._add_library_content_block(course, self.lib_key, {'max_count': 1})
         lc_block_key = lc_block.location
-        lc_block = self._refresh_children(lc_block)
+        lc_block = self._upgrade_library(lc_block)
 
         def get_child_of_lc_block(block):
             """
@@ -231,7 +231,7 @@ class TestLibraries(LibraryTestCase):
 
         check()
         # Refresh the children:
-        lc_block = self._refresh_children(lc_block)
+        lc_block = self._upgrade_library(lc_block)
         # Now re-load the block and try yet again, in case refreshing the children changed anything:
         check()
 
@@ -251,7 +251,7 @@ class TestLibraries(LibraryTestCase):
 
         # Add a LibraryContent block to the course:
         lc_block = self._add_library_content_block(course, self.lib_key)
-        lc_block = self._refresh_children(lc_block)
+        lc_block = self._upgrade_library(lc_block)
         for child_key in lc_block.children:
             child = modulestore().get_item(child_key)
             def_id = child.definition_locator.definition_id
@@ -281,7 +281,7 @@ class TestLibraries(LibraryTestCase):
 
         # Add a LibraryContent block to the course:
         lc_block = self._add_library_content_block(course, self.lib_key)
-        lc_block = self._refresh_children(lc_block)
+        lc_block = self._upgrade_library(lc_block)
         course_block = modulestore().get_item(lc_block.children[0])
 
         self.assertEqual(course_block.data, data_value)
@@ -317,7 +317,7 @@ class TestLibraries(LibraryTestCase):
 
         # Add a LibraryContent block to the course:
         lc_block = self._add_library_content_block(course, self.lib_key)
-        lc_block = self._refresh_children(lc_block)
+        lc_block = self._upgrade_library(lc_block)
         self.assertEqual(len(lc_block.children), 1)
         course_vert_block = modulestore().get_item(lc_block.children[0])
         self.assertEqual(len(course_vert_block.children), 1)
@@ -348,7 +348,7 @@ class TestLibraries(LibraryTestCase):
 
         # Add a LibraryContent block to the course:
         lc_block = self._add_library_content_block(course, self.lib_key)
-        lc_block = self._refresh_children(lc_block)
+        lc_block = self._upgrade_library(lc_block)
         self.assertEqual(len(lc_block.children), 1)
 
         # Now, change the block settings to have an invalid library key:
@@ -389,7 +389,7 @@ class TestLibraries(LibraryTestCase):
 
         # Add a LibraryContent block to the course:
         lc_block = self._add_library_content_block(course, self.lib_key)
-        lc_block = self._refresh_children(lc_block)
+        lc_block = self._upgrade_library(lc_block)
         self.assertEqual(len(lc_block.children), 1)
 
         # Now, change the block settings to have an invalid library key:
@@ -434,7 +434,7 @@ class TestLibraries(LibraryTestCase):
 
         # Add a LibraryContent block to the course:
         lc_block = self._add_library_content_block(course, self.lib_key)
-        lc_block = self._refresh_children(lc_block)
+        lc_block = self._upgrade_library(lc_block)
         self.assertEqual(len(lc_block.children), 2)
 
         resp = self._update_block(
@@ -467,7 +467,7 @@ class TestLibraries(LibraryTestCase):
 
         # Add a LibraryContent block to the course:
         lc_block = self._add_library_content_block(course, self.lib_key)
-        lc_block = self._refresh_children(lc_block)
+        lc_block = self._upgrade_library(lc_block)
         self.assertEqual(len(lc_block.children), 0)
 
         # Now, change the block settings to have an invalid library key:
@@ -477,7 +477,7 @@ class TestLibraries(LibraryTestCase):
         )
         self.assertEqual(resp.status_code, 200)
         with self.assertRaises(ValueError):
-            self._refresh_children(lc_block, status_code_expected=400)
+            self._upgrade_library(lc_block, status_code_expected=400)
 
     def test_library_filters(self):
         """
@@ -743,9 +743,9 @@ class TestLibraryAccess(LibraryTestCase):
         (LibraryUserRole, None, False),
     )
     @ddt.unpack
-    def test_refresh_library_content_permissions(self, library_role, course_role, expected_result):
+    def test_upgrade_library_content_permissions(self, library_role, course_role, expected_result):
         """
-        Test that the LibraryContent block's 'refresh_children' handler will correctly
+        Test that the LibraryContent block's 'upgrade_library' handler will correctly
         handle permissions and allow/refuse when updating its content with the latest
         version of a library. We try updating from a library with (write, read, or no)
         access to a course with (write or no) access.
@@ -768,7 +768,7 @@ class TestLibraryAccess(LibraryTestCase):
         lc_block = self._add_library_content_block(course, self.lib_key)
         # We must use the CMS's module system in order to get permissions checks.
         self._bind_block(lc_block, user=self.non_staff_user)
-        lc_block = self._refresh_children(lc_block, status_code_expected=200 if expected_result else 403)
+        lc_block = self._upgrade_library(lc_block, status_code_expected=200 if expected_result else 403)
         self.assertEqual(len(lc_block.children), 1 if expected_result else 0)
 
     def test_studio_user_permissions(self):
@@ -861,7 +861,7 @@ class TestOverrides(LibraryTestCase):
 
         # Add a LibraryContent block to the course:
         self.lc_block = self._add_library_content_block(self.course, self.lib_key)
-        self.lc_block = self._refresh_children(self.lc_block)
+        self.lc_block = self._upgrade_library(self.lc_block)
         self.problem_in_course = modulestore().get_item(self.lc_block.children[0])
 
     def test_overrides(self):
@@ -876,7 +876,7 @@ class TestOverrides(LibraryTestCase):
 
         # Add a second LibraryContent block to the course, with no override:
         lc_block2 = self._add_library_content_block(self.course, self.lib_key)
-        lc_block2 = self._refresh_children(lc_block2)
+        lc_block2 = self._upgrade_library(lc_block2)
         # Re-load the two problem blocks - one with and one without an override:
         self.problem_in_course = modulestore().get_item(self.lc_block.children[0])
         problem2_in_course = modulestore().get_item(lc_block2.children[0])
@@ -926,7 +926,7 @@ class TestOverrides(LibraryTestCase):
         self.problem.weight = 20
         self.problem.display_name = "NEW"
         modulestore().update_item(self.problem, self.user.id)
-        self.lc_block = self._refresh_children(self.lc_block)
+        self.lc_block = self._upgrade_library(self.lc_block)
         self.problem_in_course = modulestore().get_item(self.problem_in_course.location)
 
         self.assertEqual(self.problem.definition_locator.definition_id, definition_id)
@@ -963,7 +963,7 @@ class TestOverrides(LibraryTestCase):
         self.problem.data = new_data_value
         modulestore().update_item(self.problem, self.user.id)
 
-        self.lc_block = self._refresh_children(self.lc_block)
+        self.lc_block = self._upgrade_library(self.lc_block)
         self.problem_in_course = modulestore().get_item(self.problem_in_course.location)
 
         self.assertEqual(self.problem_in_course.display_name, new_display_name)
@@ -1014,7 +1014,7 @@ class TestOverrides(LibraryTestCase):
         self.assertEqual(problem2_in_course.display_name, self.original_display_name)
 
         # Refresh our reference to the block
-        self.lc_block = self._refresh_children(self.lc_block)
+        self.lc_block = self._upgrade_library(self.lc_block)
         self.problem_in_course = store.get_item(self.problem_in_course.location)
 
         # and the block has changed too.

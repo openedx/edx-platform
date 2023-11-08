@@ -879,7 +879,7 @@ def _update_and_import_block(
         # according to this existing library and library content block.
         if block.source_library_id and store.get_library(block.source_library_key):
             # If the library content block is already in the course, then don't
-            # refresh the children when we re-import it. This lets us address
+            # sync the children when we re-import it. This lets us address
             # TNL-7507 (Randomized Content Block Settings Lost in Course Import)
             # while still avoiding AA-310, where the IDs of the children for an
             # existing library_content block might be altered, losing student
@@ -899,7 +899,7 @@ def _update_and_import_block(
             try:
                 # Update library content block's children on draft branch
                 with store.branch_setting(branch_setting=ModuleStoreEnum.Branch.draft_preferred):
-                    block.refresh_children_from_current_library()
+                    block.sync_from_library()
             except ValueError as err:
                 # The specified library version does not exist.
                 log.error(err)

@@ -95,9 +95,9 @@ class LibraryToolsService:
         """
         return self.store.check_supports(block.location.course_key, 'copy_from_template')
 
-    def trigger_refresh_children(self, dest_block: LibraryContentBlock, library_version: str | int | None) -> None:
+    def trigger_library_sync(self, dest_block: LibraryContentBlock, library_version: str | int | None) -> None:
         """
-        Queue a task to update the children of `dest_block`.
+        Queue task to synchronize the children of `dest_block` with it source library (at `library_version` or latest).
 
         The task will:
         * Load that library at `dest_block.source_library_id` and `library_version`.
@@ -114,28 +114,28 @@ class LibraryToolsService:
           * When a block in `dest_block.children` DOES NOT MATCH any library children: delete it from
             `dest_block.children`.
         """
-        ensure_cms("library_content block children may only be updated in a CMS context")
+        ensure_cms("library_content block children may only be synced in a CMS context")
         if not isinstance(dest_block, LibraryContentBlock):
-            raise ValueError(f"Can only refresh children for library_content blocks, not {dest_block.tag} blocks.")
+            raise ValueError(f"Can only sync children for library_content blocks, not {dest_block.tag} blocks.")
         if not dest_block.source_library_id:
             dest_block.source_library_version = ""
             return
         library_key = dest_block.source_library_key
         if not library_api.get_v1_or_v2_library(library_key, version=dest_block.source_library_version):
             raise ValueError(f"Requested library {library_key} not found.")
-        library_tasks.refresh_children.delay(
+        library_tasks.sync_from_library.delay(
             user_id=self.user_id,
             dest_block_id=str(dest_block.scope_ids.usage_id),
             library_version=library_version,
         )
 
-    def trigger_duplicate_children(self, source_block: LibraryContentBlock, dest_block: LibraryContentBlock) -> None:
+    def trigger_duplication(self, source_block: LibraryContentBlock, dest_block: LibraryContentBlock) -> None:
         """
         Queue a task to duplicate the children of `source_block` to `dest_block`.
         """
         ensure_cms("library_content block children may only be duplicated in a CMS context")
         if not isinstance(dest_block, LibraryContentBlock):
-            raise ValueError(f"Can only refresh children for library_content blocks, not {dest_block.tag} blocks.")
+            raise ValueError(f"Can only duplicate children for library_content blocks, not {dest_block.tag} blocks.")
         if source_block.scope_ids.usage_id.context_key != source_block.scope_ids.usage_id.context_key:
             raise ValueError(
                 "Cannot duplicate_children across different learning contexts "
@@ -152,15 +152,15 @@ class LibraryToolsService:
             dest_block_id=str(dest_block.scope_ids.usage_id),
         )
 
-    def are_children_updating(self, library_content_block: LibraryContentBlock) -> bool:
+    def are_children_syncing(self, library_content_block: LibraryContentBlock) -> bool:
         """
-        Is a task currently running to update the children of `library_content_block`?
+        Is a task currently running to sync the children of `library_content_block`?
 
         Only checks the latest task (so that this block's state can't get permanently messed up by
         some older task that's stuck in PENDING).
         """
         args = {'dest_block_id': library_content_block.scope_ids.usage_id}
-        name = library_tasks.LibraryUpdateChildrenTask.generate_name(args)
+        name = library_tasks.LibrarySyncChildrenTask.generate_name(args)
         status = UserTaskStatus.objects.filter(name=name).order_by('-created').first()
         return status and status.state in [
             UserTaskStatus.IN_PROGRESS, UserTaskStatus.PENDING, UserTaskStatus.RETRYING
