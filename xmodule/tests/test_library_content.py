@@ -60,6 +60,13 @@ class LibraryContentTest(MixedSplitTestCase):
         self.lc_block.runtime._services.update({'library_tools': self.tools})  # pylint: disable=protected-access
 
     def _sync_lc_block_from_library(self, upgrade_to_latest=False):
+        """
+        Save the lc_block, then sync its children with the library, and then re-load it.
+
+        We must re-load it because the syncing happens in a Celery task, so that original self.lc_block instance will
+        not have changes manifested on it, but the re-loaded instance will.
+        """
+        self.store.update_item(self.lc_block, self.user_id)
         self.lc_block.sync_from_library(upgrade_to_latest=upgrade_to_latest)
         self.lc_block = self.store.get_item(self.lc_block.location)
 
@@ -68,7 +75,7 @@ class LibraryContentTest(MixedSplitTestCase):
         Bind a block (part of self.course) so we can access student-specific data.
         """
         prepare_block_runtime(block.runtime, course_id=block.location.course_key)
-        block.runtime._services.update({'library_tools': self.tools})  # lint-amnesty, pylint: disable=protected-access
+        block.runtime._services.update({'library_tools': self.tools})  # pylint: disable=protected-access
 
         def get_block(descriptor):
             """Mocks module_system get_block function"""
@@ -241,7 +248,7 @@ class LibraryContentBlockTestMixin:
         problem += "</problem>"
         return problem
 
-    def _add_capa_problems_to_library(self):
+    def _add_problems_to_library(self):
         """
         Helper function to create a set of capa problems to test against.
 
@@ -274,35 +281,52 @@ class LibraryContentBlockTestMixin:
         """
         # When source_library_id is blank, the validation summary should say this block needs to be configured:
         self.lc_block.source_library_id = ""
+        self.lc_block.source_library_version = None
         result = self.lc_block.validate()
         assert not result
-        # Validation fails due to the library not being configured
         assert result.summary
         assert StudioValidationMessage.NOT_CONFIGURED == result.summary.type
 
         # When source_library_id references a non-existent library, we should get an error:
         self.lc_block.source_library_id = "library-v1:BAD+WOLF"
+        self.lc_block.source_library_version = None
         result = self.lc_block.validate()
         assert not result
-        # Validation fails due to the library being invalid
         assert result.summary
         assert StudioValidationMessage.ERROR == result.summary.type
         assert 'invalid' in result.summary.text
 
-        # When source_library_id is set but the block needs to be updated, the summary should say so:
+        # When source_library_id is set but the block hasn't been synced, the summary should say so:
         self.lc_block.source_library_id = str(self.library.location.library_key)
+        self.lc_block.source_library_version = None
         result = self.lc_block.validate()
         assert not result
-        # Validation fails due to the library being out of date.
         assert result.summary
         assert StudioValidationMessage.WARNING == result.summary.type
         assert 'out of date' in result.summary.text
 
         # Now if we update the block, all validation should pass:
-        self._bind_course_block(self.lc_block)
-        self.store.update_item(self.lc_block, self.user_id)
-        self._sync_lc_block_from_library(upgrade_to_latest=True)
+        self._sync_lc_block_from_library()
+        assert self.lc_block.validate()
 
+        # But updating the library will cause it to fail again as out-of-date:
+        self._add_problems_to_library()
+        result = self.lc_block.validate()
+        assert not result
+        assert result.summary
+        assert StudioValidationMessage.WARNING == result.summary.type
+        assert 'out of date' in result.summary.text
+
+        # And a regular sync will not fix that:
+        self._sync_lc_block_from_library()
+        result = self.lc_block.validate()
+        assert not result
+        assert result.summary
+        assert StudioValidationMessage.WARNING == result.summary.type
+        assert 'out of date' in result.summary.text
+
+        # But a upgrade_to_latest sync will:
+        self._sync_lc_block_from_library(upgrade_to_latest=True)
         assert self.lc_block.validate()
 
     def _assert_has_only_N_matching_problems(self, result, n):
@@ -315,43 +339,43 @@ class LibraryContentBlockTestMixin:
         Test that the validation method of LibraryContent blocks can warn
         the user about problems with other settings (max_count and capa_type).
         """
+        # Ensure we're starting wtih clean validation
+        assert self.lc_block.validate()
+
         # Set max_count to higher value than exists in library
         self.lc_block.max_count = 50
-        self.lc_block = self.store.get_item(self.lc_block.location)
         result = self.lc_block.validate()
         assert not result
-
         self._assert_has_only_N_matching_problems(result, 4)
         assert len(self.lc_block.selected_children()) == 4
 
         # Add some capa problems so we can check problem type validation messages
-        self.lc_block.max_count = 1
-        self._add_capa_problems_to_library()
+        self._add_problems_to_library()
         self._sync_lc_block_from_library(upgrade_to_latest=True)
+        self.lc_block.max_count = 1
         assert self.lc_block.validate()
         assert len(self.lc_block.selected_children()) == 1
 
         # Existing problem type should pass validation
-        self.lc_block.max_count = 1
         self.lc_block.capa_type = 'multiplechoiceresponse'
-        self.store.update_item(self.lc_block, self.user_id)
+        self._sync_lc_block_from_library()
+        self.lc_block.max_count = 1
         assert self.lc_block.validate()
         assert len(self.lc_block.selected_children()) == 1
 
         # ... unless requested more blocks than exists in library
-        self.lc_block.max_count = 10
         self.lc_block.capa_type = 'multiplechoiceresponse'
-        self.store.update_item(self.lc_block, self.user_id)
+        self._sync_lc_block_from_library()
+        self.lc_block.max_count = 10
         result = self.lc_block.validate()
         assert not result
-
         self._assert_has_only_N_matching_problems(result, 1)
         assert len(self.lc_block.selected_children()) == 1
 
         # Missing problem type should always fail validation
-        self.lc_block.max_count = 1
         self.lc_block.capa_type = 'customresponse'
-        self.store.update_item(self.lc_block, self.user_id)
+        self._sync_lc_block_from_library()
+        self.lc_block.max_count = 1
         result = self.lc_block.validate()
         assert not result
         # Validation fails due to at least one warning/message
@@ -361,9 +385,9 @@ class LibraryContentBlockTestMixin:
         assert len(self.lc_block.selected_children()) == 0
 
         # -1 selects all blocks from the library.
-        self.lc_block.max_count = -1
         self.lc_block.capa_type = ANY_CAPA_TYPE_VALUE
-        self.store.update_item(self.lc_block, self.user_id)
+        self._sync_lc_block_from_library()
+        self.lc_block.max_count = -1
         assert self.lc_block.validate()
         assert len(self.lc_block.selected_children()) == len(self.lc_block.children)
 
@@ -371,11 +395,11 @@ class LibraryContentBlockTestMixin:
         """
         Test that the capa type filter is actually filtering children
         """
-        self._add_capa_problems_to_library()
+        self._add_problems_to_library()
         self._sync_lc_block_from_library(upgrade_to_latest=True)
+        assert self.lc_block.children
+        assert len(self.lc_block.children) == len(self.library.children)
 
-        assert len(self.lc_block.children) == 0
-        # precondition check
         self.lc_block.capa_type = "multiplechoiceresponse"
         self.store.update_item(self.lc_block, self.user_id)
         self._sync_lc_block_from_library()
@@ -460,7 +484,7 @@ class LibraryContentBlockTestMixin:
         self.lc_block.allow_resetting_children = allow_resetting_children
         self.lc_block.max_count = max_count
         # Add some capa blocks
-        self._create_capa_problems()
+        self._add_problems_to_library()
         self._sync_lc_block_from_library(upgrade_to_latest=True)
         self.store.update_item(self.lc_block, self.user_id)
         # Mock the student view to return an empty dict to be returned as response
