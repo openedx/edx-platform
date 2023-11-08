@@ -11,7 +11,6 @@ import requests
 from django.conf import settings
 from django.test import TestCase
 from freezegun import freeze_time
-from edx_rest_api_client import __version__
 from edx_rest_api_client.auth import JwtAuth
 from openedx.core.djangoapps.commerce.utils import DeprecatedRestApiClient, user_agent
 
@@ -19,6 +18,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 
+__version__ = '5.6.1'
 URL = 'http://example.com/api/v2'
 SIGNING_KEY = 'edx'
 USERNAME = 'edx'
