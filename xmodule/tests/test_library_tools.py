@@ -9,7 +9,6 @@ block type in mind.
 from unittest import mock
 
 import ddt
-from bson.objectid import ObjectId
 from django.conf import settings
 from django.test import override_settings
 from opaque_keys.edx.keys import UsageKey

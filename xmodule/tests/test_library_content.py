@@ -59,6 +59,10 @@ class LibraryContentTest(MixedSplitTestCase):
         )
         self.lc_block.runtime._services.update({'library_tools': self.tools})  # pylint: disable=protected-access
 
+    def _sync_lc_block_from_library(self, upgrade_to_latest=False):
+        self.lc_block.sync_from_library(upgrade_to_latest=upgrade_to_latest)
+        self.lc_block = self.store.get_item(self.lc_block.location)
+
     def _bind_course_block(self, block):
         """
         Bind a block (part of self.course) so we can access student-specific data.
@@ -114,8 +118,7 @@ class LibraryContentGeneralTest(LibraryContentTest):
         assert len(self.lc_block.children) == 0
 
         # Update the LibraryContent block's children:
-        self.lc_block.sync_from_library()
-        self.lc_block = self.store.get_item(self.lc_block.location)
+        self._sync_lc_block_from_library()
 
         # Check that all blocks from the library are now children of the block:
         assert self.lc_block.source_library_key == source_library_key  # Unchanged
@@ -129,10 +132,7 @@ class TestLibraryContentExportImport(LibraryContentTest):
     """
     def setUp(self):
         super().setUp()
-
-        # Children will only set after calling this.
-        self.lc_block.sync_from_library()
-        self.lc_block = self.store.get_item(self.lc_block.location)
+        self._sync_lc_block_from_library()
 
         self.expected_olx = (
             '<library_content display_name="{block.display_name}" max_count="{block.max_count}"'
@@ -231,9 +231,7 @@ class LibraryContentBlockTestMixin:
 
     def setUp(self):
         super().setUp()
-        # Sync children for all tests
-        self.lc_block.sync_from_library()
-        self.lc_block = self.store.get_item(self.lc_block.location)
+        self._sync_lc_block_from_library()
 
     def _get_capa_problem_type_xml(self, *args):
         """ Helper function to create empty CAPA problem definition """
@@ -243,7 +241,7 @@ class LibraryContentBlockTestMixin:
         problem += "</problem>"
         return problem
 
-    def _create_capa_problems(self):
+    def _add_capa_problems_to_library(self):
         """
         Helper function to create a set of capa problems to test against.
 
@@ -303,8 +301,7 @@ class LibraryContentBlockTestMixin:
         # Now if we update the block, all validation should pass:
         self._bind_course_block(self.lc_block)
         self.store.update_item(self.lc_block, self.user_id)
-        self.lc_block.upgrade_and_sync_from_library()
-        self.lc_block = self.store.get_item(self.lc_block.location)
+        self._sync_lc_block_from_library(upgrade_to_latest=True)
 
         assert self.lc_block.validate()
 
@@ -329,8 +326,8 @@ class LibraryContentBlockTestMixin:
 
         # Add some capa problems so we can check problem type validation messages
         self.lc_block.max_count = 1
-        self._create_capa_problems()
-        self.store.update_item(self.lc_block, self.user_id)
+        self._add_capa_problems_to_library()
+        self._sync_lc_block_from_library(upgrade_to_latest=True)
         assert self.lc_block.validate()
         assert len(self.lc_block.selected_children()) == 1
 
@@ -374,37 +371,33 @@ class LibraryContentBlockTestMixin:
         """
         Test that the capa type filter is actually filtering children
         """
-        self._create_capa_problems()
+        self._add_capa_problems_to_library()
+        self._sync_lc_block_from_library(upgrade_to_latest=True)
+
         assert len(self.lc_block.children) == 0
         # precondition check
         self.lc_block.capa_type = "multiplechoiceresponse"
         self.store.update_item(self.lc_block, self.user_id)
-        self.lc_block.sync_from_library()
-        self.lc_block = self.store.get_item(self.lc_block.location)
+        self._sync_lc_block_from_library()
         assert len(self.lc_block.children) == 1
 
         self.lc_block.capa_type = "optionresponse"
         self.store.update_item(self.lc_block, self.user_id)
-        self.lc_block.sync_from_library()
-        self.lc_block = self.store.get_item(self.lc_block.location)
+        self._sync_lc_block_from_library()
         assert len(self.lc_block.children) == 3
 
         self.lc_block.capa_type = "coderesponse"
         self.store.update_item(self.lc_block, self.user_id)
-        self.lc_block.sync_from_library()
-        self.lc_block = self.store.get_item(self.lc_block.location)
+        self._sync_lc_block_from_library()
         assert len(self.lc_block.children) == 2
 
         self.lc_block.capa_type = "customresponse"
         self.store.update_item(self.lc_block, self.user_id)
-        self.lc_block.sync_from_library()
-        self.lc_block = self.store.get_item(self.lc_block.location)
-        assert len(self.lc_block.children) == 0
+        self._sync_lc_block_from_library()
 
         self.lc_block.capa_type = ANY_CAPA_TYPE_VALUE
         self.store.update_item(self.lc_block, self.user_id)
-        self.lc_block.sync_from_library()
-        self.lc_block = self.store.get_item(self.lc_block.location)
+        self._sync_lc_block_from_library()
         assert len(self.lc_block.children) == (len(self.lib_blocks) + 4)
 
     def test_non_editable_settings(self):
@@ -468,6 +461,7 @@ class LibraryContentBlockTestMixin:
         self.lc_block.max_count = max_count
         # Add some capa blocks
         self._create_capa_problems()
+        self._sync_lc_block_from_library(upgrade_to_latest=True)
         self.store.update_item(self.lc_block, self.user_id)
         # Mock the student view to return an empty dict to be returned as response
         self.lc_block.student_view = MagicMock()
@@ -525,6 +519,10 @@ class TestLibraryContentRender(LibraryContentTest):
     Rendering unit tests for LibraryContentBlock
     """
 
+    def setUp(self):
+        super().setUp()
+        self._sync_lc_block_from_library()
+
     def test_preview_view(self):
         """ Test preview view rendering """
         assert len(self.lc_block.children) == len(self.lib_blocks)
@@ -551,6 +549,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
     def setUp(self):
         super().setUp()
         self.publisher = Mock()
+        self._sync_lc_block_from_library()
         self._bind_course_block(self.lc_block)
         self.lc_block.runtime.publish = self.publisher
 
@@ -620,10 +619,9 @@ class TestLibraryContentAnalytics(LibraryContentTest):
             inner_vertical = self.make_block("vertical", main_vertical)
             html_block = self.make_block("html", inner_vertical)
             problem_block = self.make_block("problem", inner_vertical)
-            self.lc_block.upgrade_and_sync_from_library()
 
         # Reload lc_block and set it up for a student:
-        self.lc_block = self.store.get_item(self.lc_block.location)
+        self._sync_lc_block_from_library(upgrade_to_latest=True)
         self._bind_course_block(self.lc_block)
         self.lc_block.runtime.publish = self.publisher
 
@@ -702,8 +700,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         self.store.update_item(self.library, self.user_id)
         self.store.update_item(self.lc_block, self.user_id)
         old_selected = self.lc_block.selected
-        self.lc_block.upgrade_and_sync_from_library()
-        self.lc_block = self.store.get_item(self.lc_block.location)
+        self._sync_lc_block_from_library(upgrade_to_latest=True)
         self.lc_block.selected = old_selected
         self.lc_block.runtime.publish = self.publisher
 

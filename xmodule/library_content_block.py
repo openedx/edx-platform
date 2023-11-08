@@ -71,11 +71,11 @@ class LibraryToolsUnavailable(ValueError):
     Raised when the library_tools service is requested in a runtime that doesn't provide it.
     """
     def __init__(self):
-        super().__init__("The 'library_tools' service was requested, but it isn't available in the current runtime.")
+        super().__init__("Needed 'library_tools' features which were not available in the current runtime")
 
 
-@XBlock.wants('library_tools')  # Only needed in studio
-@XBlock.wants('studio_user_permissions')  # Only available in studio
+@XBlock.wants('library_tools')  # TODO: Split this service into its LMS and CMS parts.
+@XBlock.wants('studio_user_permissions')  # Only available in CMS.
 @XBlock.wants('user')
 @XBlock.needs('mako')
 class LibraryContentBlock(
@@ -337,7 +337,7 @@ class LibraryContentBlock(
         block_keys = self.make_selection(self.selected, self.children, max_count, "random")  # pylint: disable=no-member
 
         # Publish events for analytics purposes:
-        lib_tools = self.runtime.service(self, 'library_tools')
+        lib_tools = self.get_tools()
         format_block_keys = lambda keys: lib_tools.create_block_analytics_summary(self.location.course_key, keys)
         self.publish_selected_children_events(
             block_keys,
@@ -485,14 +485,14 @@ class LibraryContentBlock(
         ])
         return non_editable_fields
 
-    def get_tools(self) -> 'LibraryToolsService':
+    def get_tools(self, to_read_library_content: bool = False) -> 'LibraryToolsService':
         """
-        Grab the library tools service, or raise LibraryToolsUnavailable.
+        Grab the library tools service and confirm that it'll work for us. Else, raise LibraryToolsUnavailable.
         """
         if tools := self.runtime.service(self, 'library_tools'):
-            return tools
-        else:
-            raise LibraryToolsUnavailable()
+            if (not to_read_library_content) or tools.can_use_library_content(self):
+                return tools
+        raise LibraryToolsUnavailable()
 
     def get_user_id(self):
         """
@@ -525,33 +525,30 @@ class LibraryContentBlock(
         """
         HTTP handler allowing Studio users to update to latest version of source library and synchronize children.
 
-        This is a thin wrapper around `upgrade_and_sync_from_library`, plus permission checks.
+        This is a thin wrapper around `sync_from_library(upgrade_to_latest=True)`, plus permission checks.
 
         Returns 400 if libraray tools or user permission services are not available.
         Returns 403/404 if user lacks read access on source library or write access on this block.
         """
         self._validate_sync_permissions()
         try:
-            self.upgrade_and_sync_from_library()
+            self.sync_from_library(upgrade_to_latest=True)
         except LibraryToolsUnavailable:
             return Response("Content libraries are not available in the current runtime.", status=400)
         return Response()
 
-    def upgrade_and_sync_from_library(self) -> None:
+    def sync_from_library(self, upgrade_to_latest: bool = False) -> None:
         """
-        Synchronize children with latest source library. Updates `self.source_library_version`.
+        Synchronize children with source library.
 
-        See `LibraryToolsService.trigger_sync_library` for details.
-        """
-        self.get_tools().trigger_library_sync(self, library_version=None)
+        If `upgrade_to_latest==True` or if source library version is unset, update library version to latest.
 
-    def sync_from_library(self) -> None:
+        Otherwise, use current source library version.
         """
-        Synchronize children with source library using `self.source_library_version` (if set) or latest (if unset).
-
-        See `LibraryToolsService.trigger_sync_library` for details.
-        """
-        self.get_tools().trigger_library_sync(self, library_version=self.source_library_version)
+        self.get_tools(to_read_library_content=True).trigger_library_sync(
+            dest_block=self,
+            library_version=(None if upgrade_to_latest else self.source_library_version),
+        )
 
     @XBlock.json_handler
     def is_v2_library(self, data, suffix=''):  # pylint: disable=unused-argument
@@ -588,7 +585,7 @@ class LibraryContentBlock(
         Otherwise we'll end up losing data on the next refresh.
         """
         self._validate_sync_permissions()
-        self.get_tools().trigger_duplication(source_block=source_block, dest_block=self)
+        self.get_tools(to_read_library_content=True).trigger_duplication(source_block=source_block, dest_block=self)
 
         # Children have been handled.
         return True
@@ -638,8 +635,9 @@ class LibraryContentBlock(
         validation = super().validate()
         if not isinstance(validation, StudioValidation):
             validation = StudioValidation.copy(validation)
-        library_tools = self.runtime.service(self, "library_tools")
-        if not (library_tools and library_tools.can_use_library_content(self)):
+        try:
+            lib_tools = self.get_tools(to_read_library_content=True)
+        except LibraryToolsUnavailable:
             validation.set_summary(
                 StudioValidationMessage(
                     StudioValidationMessage.ERROR,
@@ -660,7 +658,6 @@ class LibraryContentBlock(
                 )
             )
             return validation
-        lib_tools = self.runtime.service(self, 'library_tools')
         self._validate_library_version(validation, lib_tools, self.source_library_version, self.source_library_key)
 
         # Note: we assume children have been synced
@@ -706,7 +703,7 @@ class LibraryContentBlock(
         """
         Return a list of possible values for self.source_library_id
         """
-        lib_tools = self.runtime.service(self, 'library_tools')
+        lib_tools = self.get_tools()
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         all_libraries = [
             (key, bleach.clean(name)) for key, name in lib_tools.list_available_libraries()
