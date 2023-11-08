@@ -431,18 +431,18 @@ class LibraryContentBlockTestMixin:
 
         # Eventually, we should see every child block selected
         while len(blocks_seen) != len(self.lib_blocks):
-            self._change_count_and_refresh_children(len(self.lib_blocks))
+            self._change_count_and_reselect_children(len(self.lib_blocks))
             # Now set the number of selections to 1
-            selected = self._change_count_and_refresh_children(1)
+            selected = self._change_count_and_reselect_children(1)
             blocks_seen.update(selected)
             total_tries += 1
             if total_tries >= max_tries:
                 assert False, "Max tries exceeded before seeing all blocks."
                 break
 
-    def _change_count_and_refresh_children(self, count):
+    def _change_count_and_reselect_children(self, count):
         """
-        Helper method that changes the max_count of self.lc_block, refreshes
+        Helper method that changes the max_count of self.lc_block, reselects
         children, and asserts that the number of selected children equals the count provided.
         """
         self.lc_block.max_count = count
