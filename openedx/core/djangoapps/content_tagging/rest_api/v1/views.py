@@ -3,7 +3,10 @@ Tagging Org API Views
 """
 from openedx_tagging.core.tagging import rules as oel_tagging_rules
 from openedx_tagging.core.tagging.import_export.api import get_last_import_log, import_tags
-from openedx_tagging.core.tagging.rest_api.v1.serializers import TaxonomyImportBodySerializer, TaxonomyImportNewBodySerializer
+from openedx_tagging.core.tagging.rest_api.v1.serializers import (
+    TaxonomyImportBodySerializer,
+    TaxonomyImportNewBodySerializer,
+)
 from openedx_tagging.core.tagging.rest_api.v1.views import ObjectTagView, TaxonomyView
 from rest_framework import status
 from rest_framework.decorators import action
