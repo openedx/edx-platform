@@ -57,6 +57,7 @@ from common.djangoapps.util.monitoring import monitor_import_failure
 from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
 from openedx.core.djangoapps.content_libraries import api as v2contentlib_api
 from openedx.core.djangoapps.course_apps.toggles import exams_ida_enabled
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.discussions.tasks import update_unit_discussion_state_from_discussion_blocks
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
 from openedx.core.lib.blockstore_api import get_collection
@@ -440,6 +441,24 @@ class CourseImportTask(UserTask):  # pylint: disable=abstract-method
         key = arguments_dict['course_key_string']
         filename = arguments_dict['archive_name']
         return f'Import of {key} from {filename}'
+
+
+def sync_discussion_settings(course_key):
+    """
+    Syncs the discussion settings for a course with the DiscussionsConfiguration model.
+    """
+    course = modulestore().get_course(course_key)
+    try:
+        discussion_config = DiscussionsConfiguration.objects.get(context_key=course_key)
+        discussion_settings = course.discussions_settings
+
+        discussion_config.provider_type = discussion_settings['provider_type']
+        discussion_config.enable_graded_units = discussion_settings['enable_graded_units']
+        discussion_config.unit_level_visibility = discussion_settings['unit_level_visibility']
+        discussion_config.save()
+        LOGGER.info(f'Course import {course.id}: DiscussionsConfiguration synced as per course')
+    except Exception as exc:  # pylint: disable=broad-except
+        LOGGER.info(f'Course import {course.id}: DiscussionsConfiguration sync failed: {exc}')
 
 
 @shared_task(base=CourseImportTask, bind=True)
