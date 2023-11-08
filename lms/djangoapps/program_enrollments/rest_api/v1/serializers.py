@@ -7,7 +7,7 @@ from rest_framework import serializers
 
 from lms.djangoapps.program_enrollments.api import is_course_staff_enrollment
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
-from openedx.core.djangoapps.course_roles.helpers import course_permission_check
+from openedx.core.djangoapps.course_roles.helpers import user_has_permission_course
 from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 
 from .constants import CourseRunProgressStatuses
@@ -107,11 +107,11 @@ class ProgramCourseEnrollmentSerializer(serializers.Serializer):
 
     def get_course_staff(self, obj):
         # TODO: course roles: If the course roles feature flag is disabled the
-        # course_permission_check call below will never return true.
+        # user_has_permission_course call below will never return true.
         # Remove the is_course_staff_enrollment check when course_roles Django app are implemented.
         return (
             is_course_staff_enrollment(obj) or
-            course_permission_check(
+            user_has_permission_course(
                 obj.program_enrollment.user,
                 CourseRolesPermission.MANAGE_STUDENTS.value,
                 obj.course_key

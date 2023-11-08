@@ -4,7 +4,7 @@ Helpers for student roles
 
 
 from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
-from openedx.core.djangoapps.course_roles.helpers import course_permissions_list_check_any
+from openedx.core.djangoapps.course_roles.helpers import user_has_permission_list_any_course
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
@@ -37,14 +37,14 @@ def has_staff_roles(user, course_key):
     is_org_staff = OrgStaffRole(course_key.org).has_user(user)
     is_org_instructor = OrgInstructorRole(course_key.org).has_user(user)
     is_global_staff = GlobalStaff().has_user(user)
-    # TODO: course roles: If the course roles feature flag is disabled the course_permissions_list_check_any
+    # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_list_any_course
     #       call below will never return true.
     #       Remove the has_forum_role validation when course_roles Django app are implemented.
     permissions = [
         CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value,
         CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.value,
     ]
-    has_moderate_discussion_permissions = course_permissions_list_check_any(user, permissions, course_key)
+    has_moderate_discussion_permissions = user_has_permission_list_any_course(user, permissions, course_key)
     has_forum_role = Role.user_has_role_for_course(user, course_key, forum_roles)
     if any([is_staff, is_instructor, is_beta_tester, is_org_staff,
             is_org_instructor, is_global_staff, has_forum_role, has_moderate_discussion_permissions]):

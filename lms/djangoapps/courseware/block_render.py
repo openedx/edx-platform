@@ -70,8 +70,8 @@ from lms.djangoapps.verify_student.services import XBlockVerificationService
 from openedx.core.djangoapps.bookmarks.api import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.course_roles.helpers import (
-    course_or_organization_permission_check,
-    course_or_organization_permission_list_check
+    user_has_permission_course_org,
+    user_has_permission_list_course_org
 )
 from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 from openedx.core.djangoapps.credit.services import CreditService
@@ -583,11 +583,11 @@ def prepare_runtime_for_user(
     ]
 
     # TODO: course roles: If the course roles feature flag is disabled the
-    # course_or_organization_permission_list_check call below will never return true.
+    # user_has_permission_list_course_org call below will never return true.
     # Remove the has_access staff check when course_roles Django app are implemented.
     user_is_staff = (
         bool(has_access(user, 'staff', course_id)) or
-        course_or_organization_permission_list_check(user, permissions, course_id)
+        user_has_permission_list_course_org(user, permissions, course_id)
     )
 
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
@@ -600,7 +600,7 @@ def prepare_runtime_for_user(
     store = modulestore()
 
     # TODO: course roles: If the course roles feature flag is disabled the
-    # course_or_organization_permission_check calls below will never return true.
+    # user_has_permission_course_org calls below will never return true.
     # The user_is_staff, user_is_beta_tester, and user_role cannot be removed until
     # all x-blocks have been updated to use permissions
     services = {
@@ -616,22 +616,22 @@ def prepare_runtime_for_user(
             # See the docstring of `DjangoXBlockUserService`.
             deprecated_anonymous_user_id=anonymous_id_for_user(user, None),
             request_country_code=user_location,
-            user_has_manage_content=course_or_organization_permission_check(
+            user_has_manage_content=user_has_permission_course_org(
                 user,
                 CourseRolesPermission.MANAGE_CONTENT.value,
                 course_id
             ),
-            user_has_manage_grades=course_or_organization_permission_check(
+            user_has_manage_grades=user_has_permission_course_org(
                 user,
                 CourseRolesPermission.MANAGE_GRADES.value,
                 course_id
             ),
-            user_has_access_data_downloads=course_or_organization_permission_check(
+            user_has_access_data_downloads=user_has_permission_course_org(
                 user,
                 CourseRolesPermission.ACCESS_DATA_DOWNLOADS.value,
                 course_id
             ),
-            user_has_view_all_content=course_or_organization_permission_check(
+            user_has_view_all_content=user_has_permission_course_org(
                 user,
                 CourseRolesPermission.VIEW_ALL_CONTENT.value,
                 course_id)

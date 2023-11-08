@@ -6,7 +6,7 @@ from rest_framework.permissions import BasePermission
 
 from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff, CourseInstructorRole
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
-from openedx.core.djangoapps.course_roles.helpers import course_permission_check
+from openedx.core.djangoapps.course_roles.helpers import user_has_permission_course
 from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 from openedx.core.lib.api.view_utils import validate_course_key
 
@@ -31,13 +31,13 @@ class IsStaffOrCourseTeam(BasePermission):
 
         if GlobalStaff().has_user(request.user):
             return True
-        # TODO: course roles: If the course roles feature flag is disabled the course_permission_check
+        # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_course
         # below will never return true. Remove the CourseInstructorRole and
         # CourseStaffRole checks when course_roles Django app are implemented.
         return (
             CourseInstructorRole(course_key).has_user(request.user) or
             CourseStaffRole(course_key).has_user(request.user) or
-            course_permission_check(
+            user_has_permission_course(
                 request.user,
                 CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value,
                 course_key

@@ -23,7 +23,7 @@ from lms.djangoapps.courseware.access_response import (
     StartDateError
 )
 from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_student
-from openedx.core.djangoapps.course_roles.helpers import course_permission_check
+from openedx.core.djangoapps.course_roles.helpers import user_has_permission_course
 from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, COURSE_PRE_START_ACCESS_FLAG
 from xmodule.course_block import COURSE_VISIBILITY_PUBLIC  # lint-amnesty, pylint: disable=wrong-import-order
@@ -57,10 +57,10 @@ def adjust_start_date(user, days_early_for_beta, start, course_key):
         # bail early if no beta testing is set up
         return start
 
-    # TODO: course roles: If the course roles feature flag is disabled the course_permission_check
+    # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_course
     # call below will never return true.
     # Remove the CourseBetaTesterRole check when course_roles Django app are implemented.
-    if CourseBetaTesterRole(course_key).has_user(user) or course_permission_check(
+    if CourseBetaTesterRole(course_key).has_user(user) or user_has_permission_course(
         user,
         CourseRolesPermission.VIEW_ONLY_LIVE_PUBLISHED_CONTENT.value,
         course_key

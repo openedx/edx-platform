@@ -53,7 +53,7 @@ from lms.djangoapps.learner_home.utils import (
     get_masquerade_user,
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.course_roles.helpers import course_or_organization_permission_check
+from openedx.core.djangoapps.course_roles.helpers import user_has_permission_course_org
 from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -330,14 +330,14 @@ def check_course_access(user, course_enrollments):
                 user, course_enrollment.course
             ),
             # TODO: course roles: If the course roles feature flag is disabled the
-            # course_or_organization_permission_check call below will never return true.
+            # user_has_permission_course_org call below will never return true.
             # administrative_access also checks global staff, once course_roles are implemented
             # switch first check to check for global staff only and leave permissions check in place
             "user_has_staff_access": any(
                 administrative_accesses_to_course_for_user(
                     user, course_enrollment.course_id
                 ) or
-                course_or_organization_permission_check(
+                user_has_permission_course_org(
                     user,
                     CourseRolesPermission.VIEW_ALL_CONTENT.value,
                     course_enrollment.course_id

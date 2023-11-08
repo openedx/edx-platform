@@ -17,8 +17,8 @@ from lms.djangoapps.courseware.courses import has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.djangoapps.course_roles.helpers import (
-    course_or_organization_permission_check,
-    course_permission_check
+    user_has_permission_course_org,
+    user_has_permission_course
 )
 from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 from openedx.core.lib.teams_config import TeamsetType
@@ -150,9 +150,9 @@ def has_course_staff_privileges(user, course_key):
     if CourseInstructorRole(course_key).has_user(user):
         return True
     # TODO: course roles: If the course roles feature flag is disabled the
-    # course_permission_check call below will never return true.
+    # user_has_permission_course call below will never return true.
     # Remove the CourseStaffRole and CourseInstructorRole checks when course_roles Django app are implemented.
-    if course_permission_check(user, CourseRolesPermission.MANAGE_STUDENTS.value, course_key):
+    if user_has_permission_course(user, CourseRolesPermission.MANAGE_STUDENTS.value, course_key):
         return True
     return False
 
@@ -170,11 +170,11 @@ def has_team_api_access(user, course_key, access_username=None):
     Returns:
       bool: True if the user has access, False otherwise.
     """
-    # TODO: course roles: If the course roles feature flag is disabled the course_or_organization_permission_check
+    # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_course_org
     #       below will never return true.
     #       Remove the has_course_staff_privileges and the has_discussion_privileges calls
     #       when course_roles Django app are implemented.
-    user_has_manage_student_permission = course_or_organization_permission_check(
+    user_has_manage_student_permission = user_has_permission_course_org(
         user, CourseRolesPermission.MANAGE_STUDENTS.value, course_key
     )
     if has_course_staff_privileges(user, course_key) or user_has_manage_student_permission:
@@ -193,10 +193,10 @@ def user_organization_protection_status(user, course_key):
     If the user is a staff of the course, we return the protection_exempt status
     else, we return the unprotected status
     """
-    # TODO: course roles: If the course roles feature flag is disabled the course_or_organization_permission_check
+    # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_course_org
     #       below will never return true.
     #       Remove the has_course_staff_privileges when course_roles Django app are implemented.
-    user_has_manage_student_permission = course_or_organization_permission_check(
+    user_has_manage_student_permission = user_has_permission_course_org(
         user, CourseRolesPermission.MANAGE_STUDENTS.value, course_key
     )
     if has_course_staff_privileges(user, course_key) or user_has_manage_student_permission:
@@ -223,10 +223,10 @@ def has_specific_team_access(user, team):
         - be in the correct bubble
         - be in the team if it is private
     """
-    # TODO: course roles: If the course roles feature flag is disabled the course_or_organization_permission_check
+    # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_course_org
     #       below will never return true.
     #       Remove the has_course_staff_privileges when course_roles Django app are implemented.
-    user_has_manage_student_permission = course_or_organization_permission_check(
+    user_has_manage_student_permission = user_has_permission_course_org(
         user, CourseRolesPermission.MANAGE_STUDENTS.value, team.course_id
     )
     return has_course_staff_privileges(user, team.course_id) or user_has_manage_student_permission or (
@@ -240,10 +240,10 @@ def has_specific_teamset_access(user, course_block, teamset_id):
     All non-staff users have access to open and public_managed teamsets.
     Non-staff users only have access to a private_managed teamset if they are in a team in that teamset
     """
-    # TODO: course roles: If the course roles feature flag is disabled the course_or_organization_permission_check
+    # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_course_org
     #       below will never return true.
     #       Remove the has_course_staff_privileges when course_roles Django app are implemented.
-    user_has_manage_student_permission = course_or_organization_permission_check(
+    user_has_manage_student_permission = user_has_permission_course_org(
         user, CourseRolesPermission.MANAGE_STUDENTS.value, course_block.id
     )
     return has_course_staff_privileges(user, course_block.id) or user_has_manage_student_permission or \
@@ -357,10 +357,10 @@ def can_user_modify_team(user, team):
 
     Assumes that user is enrolled in course run.
     """
-    # TODO: course roles: If the course roles feature flag is disabled the course_or_organization_permission_check
+    # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_course_org
     #       below will never return true.
     #       Remove the has_course_staff_privileges when course_roles Django app are implemented.
-    user_has_manage_student_permission = course_or_organization_permission_check(
+    user_has_manage_student_permission = user_has_permission_course_org(
         user, CourseRolesPermission.MANAGE_STUDENTS.value, team.course_id
     )
     return (
@@ -376,10 +376,10 @@ def can_user_create_team_in_topic(user, course_id, topic_id):
 
     Assumes that user is enrolled in course run.
     """
-    # TODO: course roles: If the course roles feature flag is disabled the course_or_organization_permission_check
+    # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_course_org
     #       below will never return true.
     #       Remove the has_course_staff_privileges when course_roles Django app are implemented.
-    user_has_manage_student_permission = course_or_organization_permission_check(
+    user_has_manage_student_permission = user_has_permission_course_org(
         user, CourseRolesPermission.MANAGE_STUDENTS.value, course_id
     )
     return (
@@ -450,10 +450,10 @@ def anonymous_user_ids_for_team(user, team):
     if not user or not team:
         raise Exception("User and team must be provided for ID lookup")
 
-    # TODO: course roles: If the course roles feature flag is disabled the course_or_organization_permission_check
+    # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_course_org
     #       below will never return true.
     #       Remove the has_course_staff_privileges when course_roles Django app are implemented.
-    user_has_manage_student_permission = course_or_organization_permission_check(
+    user_has_manage_student_permission = user_has_permission_course_org(
         user, CourseRolesPermission.MANAGE_STUDENTS.value, team.course_id
     )
     if (

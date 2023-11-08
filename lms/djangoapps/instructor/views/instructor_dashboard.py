@@ -51,7 +51,7 @@ from lms.djangoapps.discussion.django_comment_client.utils import has_forum_acce
 from lms.djangoapps.grades.api import is_writable_gradebook_enabled
 from lms.djangoapps.instructor.constants import INSTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
 from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, get_course_cohorts, is_course_cohorted
-from openedx.core.djangoapps.course_roles.helpers import course_permission_check, course_permissions_list_check
+from openedx.core.djangoapps.course_roles.helpers import user_has_permission_course, user_has_permission_list_course
 from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
 from openedx.core.djangoapps.discussions.utils import available_division_schemes
@@ -122,28 +122,32 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
         CourseRolesPermission.MANAGE_STUDENTS.value,
         CourseRolesPermission.ACCESS_INSTRUCTOR_DASHBOARD.value
     ]
-    # TODO: course roles: If the course roles feature flag is disabled the course_permissions_list_check
-    # and course_permission_check calls below will never return true.
+    # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_list_course
+    # and user_has_permission_course calls below will never return true.
     # Remove the role checks when course_roles Django app are implemented.
     access = {
         'admin': request.user.is_staff,
         'instructor': (
             bool(has_access(request.user, 'instructor', course)) or
-            course_permissions_list_check(request.user, permissions_list, course_key)
+            user_has_permission_list_course(request.user, permissions_list, course_key)
         ),
         'finance_admin': CourseFinanceAdminRole(course_key).has_user(request.user),
         'sales_admin': CourseSalesAdminRole(course_key).has_user(request.user),
         'staff': (
             bool(has_access(request.user, 'staff', course)) or
-            course_permissions_list_check(request.user, permissions_list, course_key)
+            user_has_permission_list_course(request.user, permissions_list, course_key)
         ),
         'forum_admin': (
             has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR) or
-            course_permission_check(request.user, CourseRolesPermission.MANAGE_DISCUSSION_MODERATORS.value, course_key)
+            user_has_permission_course(
+                request.user,
+                CourseRolesPermission.MANAGE_DISCUSSION_MODERATORS.value,
+                course_key
+            )
         ),
         'data_researcher': (
             request.user.has_perm(permissions.CAN_RESEARCH, course_key) or
-            course_permission_check(request.user, CourseRolesPermission.ACCESS_DATA_DOWNLOADS.value, course_key)
+            user_has_permission_course(request.user, CourseRolesPermission.ACCESS_DATA_DOWNLOADS.value, course_key)
         ),
     }
 
@@ -207,14 +211,14 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
     # Gate access to Special Exam tab depending if either timed exams or proctored exams
     # are enabled in the course
 
-    # TODO: course roles: If the course roles feature flag is disabled the course_permission_check call
+    # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_course call
     #       below will never return true.
     #       Remove .has_user() calls below when course_roles Django app are implemented.
     user_has_access = any([
         request.user.is_staff,
         CourseStaffRole(course_key).has_user(request.user),
         CourseInstructorRole(course_key).has_user(request.user),
-        course_permission_check(request.user, CourseRolesPermission.MANAGE_STUDENTS.value, course_key)
+        user_has_permission_course(request.user, CourseRolesPermission.MANAGE_STUDENTS.value, course_key)
     ])
     course_has_special_exams = course.enable_proctored_exams or course.enable_timed_exams
     can_see_special_exams = course_has_special_exams and user_has_access and settings.FEATURES.get(

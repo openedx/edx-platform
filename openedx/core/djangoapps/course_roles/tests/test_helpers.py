@@ -8,13 +8,13 @@ import pytest
 from common.djangoapps.student.tests.factories import AnonymousUserFactory, UserFactory
 from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.course_roles.helpers import (
-    course_or_organization_permission_check,
-    course_or_organization_permission_list_check,
-    course_permission_check,
-    course_permissions_list_check,
-    course_permissions_list_check_any,
-    organization_permission_check,
-    organization_permissions_list_check,
+    user_has_permission_course_org,
+    user_has_permission_list_course_org,
+    user_has_permission_course,
+    user_has_permission_list_course,
+    user_has_permission_list_any_course,
+    user_has_permission_org,
+    user_has_permission_list_org,
     get_all_user_permissions_for_a_course,
     USE_PERMISSION_CHECKS_FLAG
 )
@@ -57,163 +57,163 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         self.permission_2 = CourseRolesPermission.objects.create(name="test_permission_2")
         self.role_2.permissions.add(self.permission_2)
 
-    def test_course_permission_check_with_anonymus_user(self):
+    def test_user_has_permission_course_with_anonymus_user(self):
         """
-        Test that course_permission_check returns False when the user is anonymous
+        Test that user_has_permission_course returns False when the user is anonymous
         """
-        assert not course_permission_check(self.anonymous_user, self.permission_1.name, self.course_1.id)
+        assert not user_has_permission_course(self.anonymous_user, self.permission_1.name, self.course_1.id)
 
-    def test_course_permission_check_with_course_level_permission(self):
+    def test_user_has_permission_course_with_course_level_permission(self):
         """
-        Test that course_permission_check returns True when the user has the correct permission at the course level
+        Test that user_has_permission_course returns True when the user has the correct permission at the course level
         """
         CourseRolesUserRole.objects.create(
             user=self.user_1, role=self.role_1, course_id=self.course_1.id, org=self.organization_1
         )
-        assert course_permission_check(self.user_1, self.permission_1.name, self.course_1.id)
+        assert user_has_permission_course(self.user_1, self.permission_1.name, self.course_1.id)
 
-    def test_course_permission_check_without_course_level_permission(self):
+    def test_user_has_permission_course_without_course_level_permission(self):
         """
-        Test that course_permission_check returns False when the user does not have the correct permission at the
+        Test that user_has_permission_course returns False when the user does not have the correct permission at the
         course level
         """
-        assert not course_permission_check(self.user_1, self.permission_1.name, self.course_1.id)
+        assert not user_has_permission_course(self.user_1, self.permission_1.name, self.course_1.id)
 
     def test_course_permision_check_with_organization_level_permission(self):
         """
-        Test that course_permission_check returns False when the user has the permission but at the organization
+        Test that user_has_permission_course returns False when the user has the permission but at the organization
         level, and has not been granted the permission at the course level
         """
         CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1, org=self.organization_1)
-        assert not course_permission_check(self.user_1, self.permission_1.name, self.course_1.id)
+        assert not user_has_permission_course(self.user_1, self.permission_1.name, self.course_1.id)
 
-    def test_course_permission_check_with_instance_level_permission(self):
+    def test_user_has_permission_course_with_instance_level_permission(self):
         """
-        Test that course_permission_check returns False when the user has the permission but at the instance level,
+        Test that user_has_permission_course returns False when the user has the permission but at the instance level,
         and has not been granted the permission at the course level
         """
         CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1)
-        assert not course_permission_check(self.user_1, self.permission_1.name, self.course_1.id)
+        assert not user_has_permission_course(self.user_1, self.permission_1.name, self.course_1.id)
 
-    def test_course_permission_check_with_permission_in_another_course(self):
+    def test_user_has_permission_course_with_permission_in_another_course(self):
         """
-        Test that course_permission_check returns False when the user has the permission at the course level,
+        Test that user_has_permission_course returns False when the user has the permission at the course level,
         but in another course
         """
         CourseRolesUserRole.objects.create(
             user=self.user_1, role=self.role_1, course_id=self.course_2.id, org=self.organization_1
         )
-        assert not course_permission_check(self.user_1, self.permission_1.name, self.course_1.id)
+        assert not user_has_permission_course(self.user_1, self.permission_1.name, self.course_1.id)
 
-    def test_organization_permission_check_with_anonymous_user(self):
+    def test_user_has_permission_org_with_anonymous_user(self):
         """
-        Test that organization_permission_check returns False when the user is anonymous
+        Test that user_has_permission_org returns False when the user is anonymous
         """
-        assert not organization_permission_check(self.anonymous_user, self.permission_1.name, self.organization_1.name)
+        assert not user_has_permission_org(self.anonymous_user, self.permission_1.name, self.organization_1.name)
 
-    def test_organization_permission_check_with_organization_level_permission(self):
+    def test_user_has_permission_org_with_organization_level_permission(self):
         """
-        Test that organization_permission_check returns True when the user has the correct permission at the
+        Test that user_has_permission_org returns True when the user has the correct permission at the
         organization level
         """
         CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1, org=self.organization_1)
-        assert organization_permission_check(self.user_1, self.permission_1.name, self.organization_1.name)
+        assert user_has_permission_org(self.user_1, self.permission_1.name, self.organization_1.name)
 
-    def test_organization_permission_check_without_organization_level_permission(self):
+    def test_user_has_permission_org_without_organization_level_permission(self):
         """
-        Test that organization_permission_check returns False when the user does not have the correct permission at
+        Test that user_has_permission_org returns False when the user does not have the correct permission at
         the organization level
         """
-        assert not organization_permission_check(self.user_1, self.permission_1.name, self.organization_1.name)
+        assert not user_has_permission_org(self.user_1, self.permission_1.name, self.organization_1.name)
 
-    def test_organization_permission_check_with_course_level_permission(self):
+    def test_user_has_permission_org_with_course_level_permission(self):
         """
-        Test that organization_permission_check returns False when the user has the permission but at the course
+        Test that user_has_permission_org returns False when the user has the permission but at the course
         level, and has not been granted the permission at the organization level
         """
         CourseRolesUserRole.objects.create(
             user=self.user_1, role=self.role_1, course_id=self.course_1.id, org=self.organization_1
         )
-        assert not organization_permission_check(self.user_1, self.permission_1.name, self.organization_1.name)
+        assert not user_has_permission_org(self.user_1, self.permission_1.name, self.organization_1.name)
 
-    def test_organization_permission_check_with_instance_level_permission(self):
+    def test_user_has_permission_org_with_instance_level_permission(self):
         """
-        Test that organization_permission_check returns False when the user has the permission but at the instance
+        Test that user_has_permission_org returns False when the user has the permission but at the instance
         level, and has not been granted the permission at the organization level
         """
         CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1)
-        assert not organization_permission_check(self.user_1, self.permission_1.name, self.organization_1.name)
+        assert not user_has_permission_org(self.user_1, self.permission_1.name, self.organization_1.name)
 
-    def test_organization_permission_check_with_permission_in_another_organization(self):
+    def test_user_has_permission_org_with_permission_in_another_organization(self):
         """
-        Test that organization_permission_check returns False when the user has the permission at the
+        Test that user_has_permission_org returns False when the user has the permission at the
         organization level, but in another organization
         """
         CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1, org=self.organization_2)
-        assert not organization_permission_check(self.user_1, self.permission_1.name, self.organization_1.name)
+        assert not user_has_permission_org(self.user_1, self.permission_1.name, self.organization_1.name)
 
-    def test_course_permissions_list_check_with_anonymous_user(self):
+    def test_user_has_permission_list_course_with_anonymous_user(self):
         """
-        Test that course_permissions_list_check returns False when the user is anonymous
+        Test that user_has_permission_list_course returns False when the user is anonymous
         """
-        assert not course_permissions_list_check(self.anonymous_user, [self.permission_1.name], self.course_1.id)
+        assert not user_has_permission_list_course(self.anonymous_user, [self.permission_1.name], self.course_1.id)
 
-    def test_course_permissions_list_check_with_course_level_permission(self):
+    def test_user_has_permission_list_course_with_course_level_permission(self):
         """
-        Test that course_permissions_list_check returns True when the user has the correct list of permissions
+        Test that user_has_permission_list_course returns True when the user has the correct list of permissions
         at the course level
         """
         CourseRolesUserRole.objects.create(
             user=self.user_1, role=self.role_2, course_id=self.course_1.id, org=self.organization_1
         )
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert course_permissions_list_check(self.user_1, test_permissions, self.course_1.id)
+        assert user_has_permission_list_course(self.user_1, test_permissions, self.course_1.id)
 
-    def test_course_permissions_list_check_without_course_level_permission(self):
+    def test_user_has_permission_list_course_without_course_level_permission(self):
         """
-        Test that course_permissions_list_check returns False when the user does not have the correct list of
+        Test that user_has_permission_list_course returns False when the user does not have the correct list of
         permissions at the course level
         """
         CourseRolesUserRole.objects.create(
             user=self.user_1, role=self.role_1, course_id=self.course_1.id, org=self.organization_1
         )
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert not course_permissions_list_check(self.user_1, test_permissions, self.course_1.id)
+        assert not user_has_permission_list_course(self.user_1, test_permissions, self.course_1.id)
 
-    def test_course_permissions_list_check_with_organization_level_permission(self):
+    def test_user_has_permission_list_course_with_organization_level_permission(self):
         """
-        Test that course_permissions_list_check returns False when the user has the list of permissions but at the
+        Test that user_has_permission_list_course returns False when the user has the list of permissions but at the
         organization level, and has not been granted the permissions at the course level
         """
         CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_2, org=self.organization_1)
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert not course_permissions_list_check(self.user_1, test_permissions, self.course_1.id)
+        assert not user_has_permission_list_course(self.user_1, test_permissions, self.course_1.id)
 
-    def test_course_permissions_list_check_with_instance_level_permission(self):
+    def test_user_has_permission_list_course_with_instance_level_permission(self):
         """
-        Test that course_permissions_list_check returns False when the user has the list of permissions but at the
+        Test that user_has_permission_list_course returns False when the user has the list of permissions but at the
         instance level, and has not been granted the permissions at the course level
         """
         CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_2)
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert not course_permissions_list_check(self.user_1, test_permissions, self.course_1.id)
+        assert not user_has_permission_list_course(self.user_1, test_permissions, self.course_1.id)
 
-    def test_course_permissions_list_check_with_permission_in_another_course(self):
+    def test_user_has_permission_list_course_with_permission_in_another_course(self):
         """
-        Test that course_permissions_list_check returns False when the user has the list of permissions at the
+        Test that user_has_permission_list_course returns False when the user has the list of permissions at the
         course level, but in another course
         """
         CourseRolesUserRole.objects.create(
             user=self.user_1, role=self.role_2, course_id=self.course_2.id, org=self.organization_1
         )
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert not course_permissions_list_check(self.user_1, test_permissions, self.course_1.id)
+        assert not user_has_permission_list_course(self.user_1, test_permissions, self.course_1.id)
 
-    def test_organization_permissions_list_check_with_anonymous_user(self):
+    def test_user_has_permission_list_org_with_anonymous_user(self):
         """
-        Test that organization_permissions_list_check returns False when the user is anonymous
+        Test that user_has_permission_list_org returns False when the user is anonymous
         """
-        assert not organization_permissions_list_check(
+        assert not user_has_permission_list_org(
             self.anonymous_user, [self.permission_1.name], self.organization_1.name
         )
 
@@ -229,7 +229,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
             org=self.organization_1
         )
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert course_permissions_list_check_any(self.user_1, test_permissions, self.course_1.id)
+        assert user_has_permission_list_any_course(self.user_1, test_permissions, self.course_1.id)
 
     def test_course_permission_list_check_any_with_no_permission_in_the_course(self):
         """
@@ -237,7 +237,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         the permissions on the list at the course level
         """
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert not course_permissions_list_check_any(self.user_1, test_permissions, self.course_1.id)
+        assert not user_has_permission_list_any_course(self.user_1, test_permissions, self.course_1.id)
 
     def test_course_permission_list_check_any_with_a_permission_in_a_different_course(self):
         """
@@ -248,262 +248,262 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
             user=self.user_1, role=self.role_1, course_id=self.course_1.id, org=self.organization_1
         )
         test_permissions = [self.permission_2.name]
-        assert not course_permissions_list_check_any(self.user_1, test_permissions, self.course_1.id)
+        assert not user_has_permission_list_any_course(self.user_1, test_permissions, self.course_1.id)
 
-    def test_organization_permissions_list_check_with_organization_level_permission(self):
+    def test_user_has_permission_list_org_with_organization_level_permission(self):
         """
-        Test that organization_permissions_list_check returns True when the user has the correct list of permissions
+        Test that user_has_permission_list_org returns True when the user has the correct list of permissions
         at the organization level
         """
         CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_2, org=self.organization_1)
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert organization_permissions_list_check(self.user_1, test_permissions, self.organization_1.name)
+        assert user_has_permission_list_org(self.user_1, test_permissions, self.organization_1.name)
 
-    def test_organization_permissions_list_check_without_organization_level_permission(self):
+    def test_user_has_permission_list_org_without_organization_level_permission(self):
         """
-        Test that organization_permissions_list_check returns False when the user does not have the correct list of
+        Test that user_has_permission_list_org returns False when the user does not have the correct list of
         permissions at the organization level
         """
         CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1, org=self.organization_1)
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert not organization_permissions_list_check(self.user_1, test_permissions, self.organization_1.name)
+        assert not user_has_permission_list_org(self.user_1, test_permissions, self.organization_1.name)
 
-    def test_organization_permissions_list_check_with_course_level_permission(self):
+    def test_user_has_permission_list_org_with_course_level_permission(self):
         """
-        Test that organization_permissions_list_check returns False when the user has the list of permissions but at
+        Test that user_has_permission_list_org returns False when the user has the list of permissions but at
         the course level, and has not been granted the permissions at the organization level
         """
         CourseRolesUserRole.objects.create(
             user=self.user_1, role=self.role_2, course_id=self.course_1.id, org=self.organization_1
         )
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert not organization_permissions_list_check(self.user_1, test_permissions, self.organization_1.name)
+        assert not user_has_permission_list_org(self.user_1, test_permissions, self.organization_1.name)
 
-    def test_organization_permissions_list_check_with_instance_level_permission(self):
+    def test_user_has_permission_list_org_with_instance_level_permission(self):
         """
-        Test that organization_permissions_list_check returns False when the user has the list of permissions but at
+        Test that user_has_permission_list_org returns False when the user has the list of permissions but at
         the instance level, and has not been granted the permissions at the organization level
         """
         CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_2)
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert not organization_permissions_list_check(self.user_1, test_permissions, self.organization_1.name)
+        assert not user_has_permission_list_org(self.user_1, test_permissions, self.organization_1.name)
 
-    def test_organization_permissions_list_check_with_permission_in_another_organization(self):
+    def test_user_has_permission_list_org_with_permission_in_another_organization(self):
         """
-        Test that organization_permissions_list_check returns False when the user has the list of permissions at
+        Test that user_has_permission_list_org returns False when the user has the list of permissions at
         the organization level, but in another organization
         """
         CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_2, org=self.organization_2)
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert not organization_permissions_list_check(self.user_1, test_permissions, self.organization_1.name)
+        assert not user_has_permission_list_org(self.user_1, test_permissions, self.organization_1.name)
 
-    def test_course_or_organization_permission_check_with_anonymous_user(self):
+    def test_user_has_permission_course_org_with_anonymous_user(self):
         """
-        Test that course_or_organization_permission_check returns False when the user is anonymous
+        Test that user_has_permission_course_org returns False when the user is anonymous
         """
-        assert not course_or_organization_permission_check(
+        assert not user_has_permission_course_org(
             self.anonymous_user, self.permission_1.name, self.course_1.id, self.organization_1.name
         )
 
-    def test_course_or_organization_permission_check_with_course_level_permission(self):
+    def test_user_has_permission_course_org_with_course_level_permission(self):
         """
-        Test that course_or_organization_permission_check returns True when the user has the correct permission at
+        Test that user_has_permission_course_org returns True when the user has the correct permission at
         the course level
         """
         CourseRolesUserRole.objects.create(
             user=self.user_1, role=self.role_1, course_id=self.course_1.id, org=self.organization_1
         )
-        assert course_or_organization_permission_check(
+        assert user_has_permission_course_org(
             self.user_1, self.permission_1.name, self.course_1.id, self.organization_1.name
         )
 
-    def test_course_or_organization_permission_check_without_course_level_permission(self):
+    def test_user_has_permission_course_org_without_course_level_permission(self):
         """
-        Test that course_or_organization_permission_check returns False when the user does not have the correct
+        Test that user_has_permission_course_org returns False when the user does not have the correct
         permission at the course level
         """
-        assert not course_or_organization_permission_check(
+        assert not user_has_permission_course_org(
             self.user_1, self.permission_1.name, self.course_1.id, self.organization_1.name
         )
 
-    def test_course_or_organization_permission_check_with_organization_level_permission(self):
+    def test_user_has_permission_course_org_with_organization_level_permission(self):
         """
-        Test that course_or_organization_permission_check returns True when the user has the correct permission at
+        Test that user_has_permission_course_org returns True when the user has the correct permission at
         the organization level
         """
         CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1, org=self.organization_1)
-        assert course_or_organization_permission_check(
+        assert user_has_permission_course_org(
             self.user_1, self.permission_1.name, self.course_1.id, self.organization_1.name
         )
 
-    def test_course_or_organization_permission_check_with_organization_level_permission_without_org_param(self):
+    def test_user_has_permission_course_org_with_organization_level_permission_without_org_param(self):
         """
-        Test that course_or_organization_permission_check returns True when the user has the correct permission at
+        Test that user_has_permission_course_org returns True when the user has the correct permission at
         the organization level
         """
         CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1, org=self.organization_1)
-        assert course_or_organization_permission_check(
+        assert user_has_permission_course_org(
             self.user_1, self.permission_1.name, self.course_1.id)
 
-    def test_course_or_organization_permission_check_without_organization_level_permission(self):
+    def test_user_has_permission_course_org_without_organization_level_permission(self):
         """
-        Test that course_or_organization_permission_check returns False when the user does not have the correct
+        Test that user_has_permission_course_org returns False when the user does not have the correct
         permission at the organization level
         """
-        assert not course_or_organization_permission_check(
+        assert not user_has_permission_course_org(
             self.user_1, self.permission_1.name, self.course_1.id, self.organization_1.name
         )
 
-    def test_course_or_organization_permission_check_with_instance_level_permission(self):
+    def test_user_has_permission_course_org_with_instance_level_permission(self):
         """
-        Test that course_or_organization_permission_check returns False when the user has the permission but at the
+        Test that user_has_permission_course_org returns False when the user has the permission but at the
         instance level, and has not been granted the permission at the organization level
         """
         CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1)
-        assert not course_or_organization_permission_check(
+        assert not user_has_permission_course_org(
             self.user_1, self.permission_1.name, self.course_1.id, self.organization_1.name
         )
 
-    def test_course_or_organization_permission_check_with_permission_in_another_course(self):
+    def test_user_has_permission_course_org_with_permission_in_another_course(self):
         """
-        Test that course_or_organization_permission_check returns False when the user has the permission at the
+        Test that user_has_permission_course_org returns False when the user has the permission at the
         course level, but in another course
         """
         CourseRolesUserRole.objects.create(
             user=self.user_1, role=self.role_1, course_id=self.course_2.id, org=self.organization_1
         )
-        assert not course_or_organization_permission_check(
+        assert not user_has_permission_course_org(
             self.user_1, self.permission_1.name, self.course_1.id, self.organization_1.name
         )
 
-    def test_course_or_organization_permission_check_with_permission_in_another_organization(self):
+    def test_user_has_permission_course_org_with_permission_in_another_organization(self):
         """
-        Test that course_or_organization_permission_check returns False when the user has the permission at the
+        Test that user_has_permission_course_org returns False when the user has the permission at the
         organization level, but in another organization
         """
         CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1, org=self.organization_2)
-        assert not course_or_organization_permission_check(
+        assert not user_has_permission_course_org(
             self.user_1, self.permission_1.name, self.course_1.id, self.organization_1.name
         )
 
-    def test_course_or_organization_permission_check_with_permission_in_another_course_and_organization(self):
+    def test_user_has_permission_course_org_with_permission_in_another_course_and_organization(self):
         """
-        Test that course_or_organization_permission_check returns False when the user has the permission at the
+        Test that user_has_permission_course_org returns False when the user has the permission at the
         course level, but in another course and the organization level, but in another organization
         """
         CourseRolesUserRole.objects.create(
             user=self.user_1, role=self.role_1, course_id=self.course_2.id, org=self.organization_2
         )
-        assert not course_or_organization_permission_check(
+        assert not user_has_permission_course_org(
             self.user_1, self.permission_1.name, self.course_1.id, self.organization_1.name
         )
 
     def test_course_or_organization_list_permission_check_with_course_level_permission(self):
         """
-        Test that course_or_organization_permission_check returns True when the user has the correct list of
+        Test that user_has_permission_course_org returns True when the user has the correct list of
         permissions at the course level
         """
         CourseRolesUserRole.objects.create(
             user=self.user_1, role=self.role_2, course_id=self.course_1.id, org=self.organization_1
         )
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert course_or_organization_permission_list_check(
+        assert user_has_permission_list_course_org(
             self.user_1, test_permissions, self.course_1.id, self.organization_1.name
         )
 
     def test_course_or_organization_list_permission_check_without_course_level_permission(self):
         """
-        Test that course_or_organization_permission_check returns False when the user does not have the correct list
+        Test that user_has_permission_course_org returns False when the user does not have the correct list
         of permissions at the course level
         """
         CourseRolesUserRole.objects.create(
             user=self.user_1, role=self.role_1, course_id=self.course_1.id, org=self.organization_1
         )
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert not course_or_organization_permission_list_check(
+        assert not user_has_permission_list_course_org(
             self.user_1, test_permissions, self.course_1.id, self.organization_1.name
         )
 
     def test_course_or_organization_list_permission_check_with_organization_level_permission(self):
         """
-        Test that course_or_organization_permission_check returns True when the user has the correct list of
+        Test that user_has_permission_course_org returns True when the user has the correct list of
         permissions at the organization level
         """
         CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_2, org=self.organization_1)
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert course_or_organization_permission_list_check(
+        assert user_has_permission_list_course_org(
             self.user_1, test_permissions, self.course_1.id, self.organization_1.name
         )
 
     def test_course_or_organization_list_permission_check_without_organization_level_permission(self):
         """
-        Test that course_or_organization_permission_check returns False when the user does not have the correct list
+        Test that user_has_permission_course_org returns False when the user does not have the correct list
         of permissions at the organization level
         """
         CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1, org=self.organization_1)
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert not course_or_organization_permission_list_check(
+        assert not user_has_permission_list_course_org(
             self.user_1, test_permissions, self.course_1.id, self.organization_1.name
         )
 
     def test_course_or_organization_list_permission_check_with_instance_level_permission(self):
         """
-        Test that course_or_organization_permission_check returns False when the user has the list of permissions but
+        Test that user_has_permission_course_org returns False when the user has the list of permissions but
         at the instance level, and has not been granted the permissions at the organization level
         """
         CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_2)
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert not course_or_organization_permission_list_check(
+        assert not user_has_permission_list_course_org(
             self.user_1, test_permissions, self.course_1.id, self.organization_1.name
         )
 
     def test_course_or_organization_list_permission_check_with_permission_in_another_course(self):
         """
-        Test that course_or_organization_permission_check returns False when the user has the list of permissions at
+        Test that user_has_permission_course_org returns False when the user has the list of permissions at
         the course level, but in another course
         """
         CourseRolesUserRole.objects.create(
             user=self.user_1, role=self.role_2, course_id=self.course_2.id, org=self.organization_1
         )
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert not course_or_organization_permission_list_check(
+        assert not user_has_permission_list_course_org(
             self.user_1, test_permissions, self.course_1.id, self.organization_1.name
         )
 
     def test_course_or_organization_list_permission_check_with_permission_in_another_organization(self):
         """
-        Test that course_or_organization_permission_check returns False when the user has the list of permissions at
+        Test that user_has_permission_course_org returns False when the user has the list of permissions at
         the organization level, but in another organization
         """
         CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_2, org=self.organization_2)
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert not course_or_organization_permission_list_check(
+        assert not user_has_permission_list_course_org(
             self.user_1, test_permissions, self.course_1.id, self.organization_1.name
         )
 
     def test_course_or_organization_list_permission_check_with_permission_in_another_course_and_organization(self):
         """
-        Test that course_or_organization_permission_check returns False when the user has the list of permissions at
+        Test that user_has_permission_course_org returns False when the user has the list of permissions at
         the course level, but in another course and the organization level, but in another organization
         """
         CourseRolesUserRole.objects.create(
             user=self.user_1, role=self.role_2, course_id=self.course_2.id, org=self.organization_2
         )
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert not course_or_organization_permission_list_check(
+        assert not user_has_permission_list_course_org(
             self.user_1, test_permissions, self.course_1.id, self.organization_1.name
         )
 
     @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=False)
-    def test_course_permission_check_with_waffle_flag_disabled(self):
+    def test_user_has_permission_course_with_waffle_flag_disabled(self):
         """
         Tests that the helper function returns false if the USE_PERMISSION_CHECKS_FLAG is not enabled
         Uses the same data as the earlier test, with the only difference being the waffle flag value
         """
-        assert not course_permission_check(self.user_1, self.permission_1.name, self.course_1.id)
+        assert not user_has_permission_course(self.user_1, self.permission_1.name, self.course_1.id)
 
     @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=False)
-    def test_course_permissions_list_check_with_waffle_flag_disabled(self):
+    def test_user_has_permission_list_course_with_waffle_flag_disabled(self):
         """
         Tests that the helper function returns false if the USE_PERMISSION_CHECKS_FLAG is not enabled
         Uses the same data as the earlier test, with the only difference being the waffle flag value
@@ -512,29 +512,29 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
             user=self.user_1, role=self.role_2, course_id=self.course_1.id, org=self.organization_1
         )
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert not course_permissions_list_check(self.user_1, test_permissions, self.course_1.id)
+        assert not user_has_permission_list_course(self.user_1, test_permissions, self.course_1.id)
 
     @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=False)
-    def test_organization_permission_check_with_waffle_flag_disabled(self):
+    def test_user_has_permission_org_with_waffle_flag_disabled(self):
         """
         Tests that the helper function returns false if the USE_PERMISSION_CHECKS_FLAG is not enabled
         Uses the same data as the earlier test, with the only difference being the waffle flag value
         """
         CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_1, org=self.organization_1)
-        assert not organization_permission_check(self.user_1, self.permission_1.name, self.organization_1.name)
+        assert not user_has_permission_org(self.user_1, self.permission_1.name, self.organization_1.name)
 
     @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=False)
-    def test_organization_permissions_list_check_with_waffle_flag_disabled(self):
+    def test_user_has_permission_list_org_with_waffle_flag_disabled(self):
         """
         Tests that the helper function returns false if the USE_PERMISSION_CHECKS_FLAG is not enabled
         Uses the same data as the earlier test, with the only difference being the waffle flag value
         """
         CourseRolesUserRole.objects.create(user=self.user_1, role=self.role_2, org=self.organization_1)
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert not organization_permissions_list_check(self.user_1, test_permissions, self.organization_1.name)
+        assert not user_has_permission_list_org(self.user_1, test_permissions, self.organization_1.name)
 
     @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=False)
-    def test_course_or_organization_permission_check_with_waffle_flag_disabled(self):
+    def test_user_has_permission_course_org_with_waffle_flag_disabled(self):
         """
         Tests that the helper function returns false if the USE_PERMISSION_CHECKS_FLAG is not enabled
         Uses the same data as the earlier test, with the only difference being the waffle flag value
@@ -542,7 +542,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         CourseRolesUserRole.objects.create(
             user=self.user_1, role=self.role_1, course_id=self.course_1.id, org=self.organization_1
         )
-        assert not course_or_organization_permission_check(
+        assert not user_has_permission_course_org(
             self.user_1, self.permission_1.name, self.course_1.id, self.organization_1.name
         )
 
@@ -556,7 +556,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
             user=self.user_1, role=self.role_2, course_id=self.course_1.id, org=self.organization_1
         )
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert not course_or_organization_permission_list_check(
+        assert not user_has_permission_list_course_org(
             self.user_1, test_permissions, self.course_1.id, self.organization_1.name
         )
 

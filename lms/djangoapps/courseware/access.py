@@ -66,9 +66,9 @@ from xmodule.error_block import ErrorBlock  # lint-amnesty, pylint: disable=wron
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from openedx.core.djangoapps.course_roles.helpers import (
-    course_permission_check,
-    course_or_organization_permission_check,
-    course_permissions_list_check
+    user_has_permission_course,
+    user_has_permission_course_org,
+    user_has_permission_list_course
 )
 from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 
@@ -89,10 +89,10 @@ def has_ccx_coach_role(user, course_key):
     if hasattr(course_key, 'ccx'):
         ccx_id = course_key.ccx
         role = CourseCcxCoachRole(course_key)
-        # TODO: course roles: If the course roles feature flag is disabled the course_permission_check
+        # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_course
         # call below will never return true.
         # Remove the role.has_user call when course_roles Django app are implemented.
-        if role.has_user(user) or course_permission_check(
+        if role.has_user(user) or user_has_permission_course(
             user,
             CourseRolesPermission.MANAGE_STUDENTS.value,
             course_key
@@ -188,12 +188,12 @@ def has_staff_access_to_preview_mode(user, course_key):
     has_admin_access_to_course = any(administrative_accesses_to_course_for_user(user, course_key))
 
     # TODO: course roles: If the course roles feature flag is disabled the
-    # course_or_organization_permission_check call below will never return true.
+    # user_has_permission_course_org call below will never return true.
     # Remove the has_admin_access_to_course call when course_roles Django app are implemented.
     return (
         has_admin_access_to_course or
         is_masquerading_as_student(user, course_key) or
-        course_or_organization_permission_check(user, CourseRolesPermission.VIEW_ALL_CONTENT.value, course_key)
+        user_has_permission_course_org(user, CourseRolesPermission.VIEW_ALL_CONTENT.value, course_key)
     )
 
 
@@ -741,11 +741,11 @@ def _has_access_to_course(user, access_level, course_key):
         return ACCESS_DENIED
 
     # TODO: course roles: If the course roles feature flag is disabled the
-    # course_or_organization_permission_check call below will never return true.
+    # user_has_permission_course_org call below will never return true.
     # Remove the staff_access and instructor_access checks from the if statements
     # when course_roles Django app are implemented.
     global_staff, staff_access, instructor_access = administrative_accesses_to_course_for_user(user, course_key)
-    permissions_access = course_or_organization_permission_check(
+    permissions_access = user_has_permission_course_org(
         user,
         CourseRolesPermission.VIEW_ALL_CONTENT.value,
         course_key,
@@ -917,12 +917,12 @@ def is_mobile_available_for_user(user, block):
         CourseRolesPermission.VIEW_ONLY_LIVE_PUBLISHED_CONTENT.value,
         CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.value
     ]
-    # TODO: course roles: If the course roles feature flag is disabled the course_permissions_list_check
+    # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_list_course
     # call below will never return true.
     # Remove the auth.user_has_role checks when course_roles Django app are implemented.
     return (
         auth.user_has_role(user, CourseBetaTesterRole(block.id))
-        or course_permissions_list_check(user, permissions_list, block.id)
+        or user_has_permission_list_course(user, permissions_list, block.id)
         or _has_staff_access_to_block(user, block, block.id)
         or _is_block_mobile_available(block)
     )

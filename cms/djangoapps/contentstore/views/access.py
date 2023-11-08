@@ -3,7 +3,7 @@
 
 from common.djangoapps.student import auth
 from common.djangoapps.student.roles import CourseInstructorRole
-from openedx.core.djangoapps.course_roles.helpers import course_permission_check
+from openedx.core.djangoapps.course_roles.helpers import user_has_permission_course
 from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 
 
@@ -20,12 +20,12 @@ def get_user_role(user, course_id):
     """
     # afaik, this is only used in lti
 
-    # TODO: course roles: If the course roles feature flag is disabled the course_permission_check
+    # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_course
     # call below will never return true.
     # Remove the auth.has_user_role call when course_roles Django app are implemented.
     if (
         auth.user_has_role(user, CourseInstructorRole(course_id)) or
-        course_permission_check(user, CourseRolesPermission.MANAGE_ALL_USERS.value, course_id)
+        user_has_permission_course(user, CourseRolesPermission.MANAGE_ALL_USERS.value, course_id)
     ):
         return 'instructor'
     else:

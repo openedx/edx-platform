@@ -40,7 +40,7 @@ from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.toggles_utils import reported_content_email_notification_enabled
 from lms.djangoapps.discussion.views import is_privileged_user
-from openedx.core.djangoapps.course_roles.helpers import course_permission_check, course_permissions_list_check_any
+from openedx.core.djangoapps.course_roles.helpers import user_has_permission_course, user_has_permission_list_any_course
 from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 from openedx.core.djangoapps.discussions.models import (
     DiscussionsConfiguration,
@@ -361,17 +361,19 @@ def get_course(request, course_key):
         }),
         "is_group_ta": bool(user_roles & {FORUM_ROLE_GROUP_MODERATOR}),
         "is_user_admin": request.user.is_staff,
-        # TODO: course roles: If the course roles feature flag is disabled the calls to course_permission_check
+        # TODO: course roles: If the course roles feature flag is disabled the calls to user_has_permission_course
         #       below will never be true.
         #       Remove .has_user() calls below when course_roles Django app are implemented.
         "is_course_staff": (CourseStaffRole(course_key).has_user(request.user) or
-                            course_permission_check(request.user,
-                                                    CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value,
-                                                    course_key)),
+                            user_has_permission_course(
+                                request.user,
+                                CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value,
+                                course_key)),
         "is_course_admin": (CourseInstructorRole(course_key).has_user(request.user) or
-                            course_permission_check(request.user,
-                                                    CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value,
-                                                    course_key)),
+                            user_has_permission_course(
+                                request.user,
+                                CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value,
+                                course_key)),
         "provider": course_config.provider_type,
         "enable_in_context": course_config.enable_in_context,
         "group_at_subsection": course_config.plugin_configuration.get("group_at_subsection", False),
@@ -989,14 +991,14 @@ def get_thread_list(
     ]
 
     if request.GET.get("group_id", None):
-        # TODO: course roles: If the course roles feature flag is disabled the course_permissions_list_check_any
+        # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_list_any_course
         #       call below will never return true.
         #       Remove the Role.user_has_role_for_course validation when course_roles Django app are implemented.
         permissions = [
             CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value,
             CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.value,
         ]
-        has_moderate_discussion_permissions = course_permissions_list_check_any(request.user, permissions, course_key)
+        has_moderate_discussion_permissions = user_has_permission_list_any_course(request.user, permissions, course_key)
         if (Role.user_has_role_for_course(request.user, course_key, allowed_roles) or
                 has_moderate_discussion_permissions):
             try:

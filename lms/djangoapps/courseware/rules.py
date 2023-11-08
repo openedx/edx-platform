@@ -15,7 +15,7 @@ from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from xblock.core import XBlock
 
-from openedx.core.djangoapps.course_roles.helpers import course_or_organization_permission_check
+from openedx.core.djangoapps.course_roles.helpers import user_has_permission_course_org
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.enrollments.api import is_enrollment_valid_for_proctoring
 from common.djangoapps.student.models import CourseAccessRole
@@ -197,6 +197,6 @@ class HasPermissionRule(Rule):  # lint-amnesty, pylint: disable=abstract-method,
         else:
             course_key = CourseKey.from_string(str(instance))
 
-        if course_or_organization_permission_check(user, self.permission, course_key, course_key.org):
+        if user_has_permission_course_org(user, self.permission, course_key, course_key.org):
             return True
         return False

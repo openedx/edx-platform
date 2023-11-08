@@ -50,7 +50,7 @@ from lms.djangoapps.discussion.exceptions import TeamDiscussionHiddenFromUserExc
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.teams import api as team_api
-from openedx.core.djangoapps.course_roles.helpers import course_permission_check, course_permissions_list_check_any
+from openedx.core.djangoapps.course_roles.helpers import user_has_permission_course, user_has_permission_list_any_course
 from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 from openedx.core.djangoapps.discussions.utils import (
     available_division_schemes,
@@ -758,11 +758,11 @@ def is_course_staff(course_key: CourseKey, user: User):
     """
     Check if user has course instructor or course staff role.
     """
-    # TODO: course roles: If the course roles feature flag is disabled the course_permission_check
+    # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_course
     #       below will never return true.
     #       Remove .has_user() calls when implementing course_roles Django app.
     return ((CourseInstructorRole(course_key).has_user(user) or CourseStaffRole(course_key).has_user(user)) or
-            course_permission_check(user, CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value, course_key))
+            user_has_permission_course(user, CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value, course_key))
 
 
 def is_privileged_user(course_key: CourseKey, user: User):
@@ -778,14 +778,14 @@ def is_privileged_user(course_key: CourseKey, user: User):
         FORUM_ROLE_ADMINISTRATOR,
     ]
     has_course_role = Role.user_has_role_for_course(user, course_key, forum_roles)
-    # TODO: course roles: If the course roles feature flag is disabled the course_permissions_list_check_any
+    # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_list_any_course
     #       call below will never return true.
     #       Remove the has_course_role validation when course_roles Django app are implemented.
     permissions = [
         CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value,
         CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.value,
     ]
-    has_moderate_discussion_permissions = course_permissions_list_check_any(user, permissions, course_key)
+    has_moderate_discussion_permissions = user_has_permission_list_any_course(user, permissions, course_key)
     return GlobalStaff().has_user(user) or has_course_role or has_moderate_discussion_permissions
 
 
@@ -818,13 +818,17 @@ class DiscussionBoardFragmentView(EdxFragmentView):
         course_key = CourseKey.from_string(course_id)
         # Force using the legacy view if a user profile is requested or the URL contains a specific topic or thread
         force_legacy_view = (profile_page_context or thread_id or discussion_id)
-        # TODO: course roles: If the course roles feature flag is disabled the course_permission_check
+        # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_course
         # call below will never return true.
         # Remove the is_course_staff check when course_roles Django app are implemented.
         is_educator_or_staff = (
             is_course_staff(course_key, request.user) or
             GlobalStaff().has_user(request.user) or
-            course_permission_check(request.user, CourseRolesPermission.MANAGE_DISCUSSION_MODERATORS.value, course_key)
+            user_has_permission_course(
+                request.user,
+                CourseRolesPermission.MANAGE_DISCUSSION_MODERATORS.value,
+                course_key
+            )
         )
         try:
             base_context = _create_base_discussion_view_context(request, course_key)

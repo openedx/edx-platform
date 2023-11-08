@@ -29,7 +29,7 @@ from lms.djangoapps.discussion.django_comment_client.permissions import (
 )
 from lms.djangoapps.discussion.django_comment_client.settings import MAX_COMMENT_DEPTH
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id
-from openedx.core.djangoapps.course_roles.helpers import course_permissions_list_check
+from openedx.core.djangoapps.course_roles.helpers import user_has_permission_list_course
 from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 from openedx.core.djangoapps.discussions.utils import (
     get_accessible_discussion_xblocks,
@@ -133,10 +133,10 @@ def has_discussion_privileges(user, course_id):
     for user_ids in roles.values():
         if user.id in user_ids:
             return True
-    # TODO: course roles: If the course roles feature flag is disabled the course_permissions_list_check
+    # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_list_course
     # call below will never return true.
     # Remove the if user.id in user_ids when course_roles Django app are implemented.
-    if course_permissions_list_check(
+    if user_has_permission_list_course(
         user.id,
         [
             CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value,

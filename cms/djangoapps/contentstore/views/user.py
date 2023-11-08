@@ -19,7 +19,7 @@ from common.djangoapps.student.auth import STUDIO_EDIT_ROLES, STUDIO_VIEW_USERS,
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
 from common.djangoapps.util.json_request import JsonResponse, expect_json
-from openedx.core.djangoapps.course_roles.helpers import course_permission_check
+from openedx.core.djangoapps.course_roles.helpers import user_has_permission_course
 from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 
 from ..toggles import use_new_course_team_page
@@ -129,11 +129,11 @@ def _course_team_user(request, course_key, email):
         }
         # what's the highest role that this user has? (How should this report global staff?)
         for role in role_hierarchy:
-            # TODO: course roles: If the course roles feature flag is disabled the course_permission_check call
+            # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_course call
             #       below will never be true.
             #       Remove the .has_user call when course_roles Django app are implemented.
             if (role(course_key).has_user(user) or
-               course_permission_check(user, CourseRolesPermission.MANAGE_ALL_USERS.value, course_key)):
+               user_has_permission_course(user, CourseRolesPermission.MANAGE_ALL_USERS.value, course_key)):
                 msg["role"] = role.ROLE
                 break
         return JsonResponse(msg)
@@ -173,11 +173,11 @@ def _course_team_user(request, course_key, email):
                 role_added = True
             else:
                 return permissions_error_response
-        # TODO: course roles: If the course roles feature flag is disabled the course_permission_check call
+        # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_course call
         #       below will never return true.
         #       Remove the .has_user() call below when course_roles Django app are implemented.
         elif (role.has_user(user, check_user_activation=False) or  # pylint: disable=no-value-for-parameter
-              course_permission_check(user, CourseRolesPermission.MANAGE_ALL_USERS.value, course_key)):
+              user_has_permission_course(user, CourseRolesPermission.MANAGE_ALL_USERS.value, course_key)):
             # Remove the user from this old role:
             old_roles.add(role)
 

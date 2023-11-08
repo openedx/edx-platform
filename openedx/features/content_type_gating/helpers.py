@@ -9,7 +9,7 @@ from django.utils import timezone
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.config_model_utils.utils import is_in_holdback
 from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
-from openedx.core.djangoapps.course_roles.helpers import course_permissions_list_check_any
+from openedx.core.djangoapps.course_roles.helpers import user_has_permission_list_any_course
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.role_helpers import has_staff_roles
 from xmodule.partitions.partitions import Group  # lint-amnesty, pylint: disable=wrong-import-order
@@ -116,7 +116,7 @@ def enrollment_date_for_fbe(user, course_key=None, course=None):
     elif full_access_masquerade is False:
         user = None  # we are masquerading as a generic user, not a specific one -- avoid all user checks below
 
-    # TODO: course roles: If the course roles feature flag is disabled the course_permissions_list_check_any
+    # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_list_any_course
     #       call below will never return true.
     #       Remove the has_staff_roles call when course_roles Django app are implemented.
     permissions = [
@@ -127,7 +127,7 @@ def enrollment_date_for_fbe(user, course_key=None, course=None):
         CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.value,
     ]
     if user and user.id and (has_staff_roles(user, course_key) or
-                             course_permissions_list_check_any(user, permissions, course_key)):
+                             user_has_permission_list_any_course(user, permissions, course_key)):
         return None
 
     enrollment = user and CourseEnrollment.get_enrollment(user, course_key, ['fbeenrollmentexclusion'])

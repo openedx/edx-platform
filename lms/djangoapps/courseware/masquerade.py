@@ -21,7 +21,7 @@ from xblock.runtime import KeyValueStore
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
-from openedx.core.djangoapps.course_roles.helpers import course_permission_check, course_permissions_list_check_any
+from openedx.core.djangoapps.course_roles.helpers import user_has_permission_course, user_has_permission_list_any_course
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID
@@ -100,14 +100,14 @@ class MasqueradeView(View):
         Retrieve data on the active and available masquerade options
         """
         course_key = CourseKey.from_string(course_key_string)
-        # TODO: course roles: If the course roles feature flag is disabled the course_permissions_list_check_any
+        # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_list_any_course
         #       call below will never return true.
         #       Remove the has_staff_roles call when course_roles Django app are implemented.
         masquerade_permissions = [
             CourseRolesPermission.GENERAL_MASQUERADING.value,
             CourseRolesPermission.SPECIFIC_MASQUERADING.value,
         ]
-        has_masquerade_permissions = course_permissions_list_check_any(
+        has_masquerade_permissions = user_has_permission_list_any_course(
             request.user,
             masquerade_permissions,
             course_key,
@@ -179,14 +179,14 @@ class MasqueradeView(View):
         to CourseMasquerade objects.
         """
         course_key = CourseKey.from_string(course_key_string)
-        # TODO: course roles: If the course roles feature flag is disabled the course_permissions_list_check_any
+        # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_list_any_course
         #       call below will never return true.
         #       Remove the has_staff_roles call when course_roles Django app are implemented.
         masquerade_permissions = [
             CourseRolesPermission.GENERAL_MASQUERADING.value,
             CourseRolesPermission.SPECIFIC_MASQUERADING.value,
         ]
-        has_masquerade_permissions = course_permissions_list_check_any(
+        has_masquerade_permissions = user_has_permission_list_any_course(
             request.user,
             masquerade_permissions,
             course_key,
@@ -421,10 +421,10 @@ def check_content_start_date_for_masquerade_user(course_key, user, request, cour
     if now < most_future_date and _is_masquerading:
         group_masquerade = is_masquerading_as_student(user, course_key)
         specific_student_masquerade = is_masquerading_as_specific_student(user, course_key)
-        # TODO: course roles: If the course roles feature flag is disabled the course_permissions_list_check_any
-        #       call and the course_permission_check call below will never return true.
+        # TODO: course roles: If the course roles feature flag is disabled the user_has_permission_list_any_course
+        #       call and the user_has_permission_course call below will never return true.
         #       Remove the has_staff_roles call when course_roles Django app are implemented.
-        has_specific_masquerade = course_permission_check(
+        has_specific_masquerade = user_has_permission_course(
             user,
             CourseRolesPermission.SPECIFIC_MASQUERADING.value,
             course_key,
@@ -435,7 +435,7 @@ def check_content_start_date_for_masquerade_user(course_key, user, request, cour
             CourseRolesPermission.VIEW_ONLY_LIVE_PUBLISHED_CONTENT.value,
             CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.value,
         ]
-        has_permissions = has_specific_masquerade and course_permissions_list_check_any(user, permissions, course_key)
+        has_permissions = has_specific_masquerade and user_has_permission_list_any_course(user, permissions, course_key)
         is_staff = has_staff_roles(user, course_key)
         if group_masquerade or (specific_student_masquerade and (not is_staff and not has_permissions)):
             PageLevelMessages.register_warning_message(
