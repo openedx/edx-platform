@@ -21,6 +21,7 @@ from django.utils.translation import gettext as _
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.authentication import BearerAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomerUser, PendingEnterpriseCustomerUser
@@ -540,6 +541,9 @@ class DeactivateLogoutView(APIView):
       * password: Required. The current password of the user being deactivated.
 
     **POST Response Values**
+     
+     If account deletion is not enabled,
+     the request returns an HTTP 403 "Forbidden" response.
 
      If the request does not specify a username or submits a username
      for a non-existent user, the request returns an HTTP 404 "Not Found"
@@ -572,6 +576,14 @@ class DeactivateLogoutView(APIView):
         Marks the user as having no password set for deactivation purposes,
         and logs the user out.
         """
+
+        # Ensure that account deletion is enabled
+        enable_account_deletion = configuration_helpers.get_value(
+            'ENABLE_ACCOUNT_DELETION', settings.FEATURES.get('ENABLE_ACCOUNT_DELETION', False)
+        )
+        if enable_account_deletion is False:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
         user_model = get_user_model()
         try:
             # Get the username from the request and check that it exists
