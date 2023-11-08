@@ -1,7 +1,7 @@
 """
 LibraryContent: The XBlock used to include blocks from a library in a course.
 """
-
+from __future__ import annotations
 
 import json
 import logging
@@ -13,7 +13,6 @@ import bleach
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.utils.functional import classproperty
-from lazy import lazy
 from lxml import etree
 from lxml.etree import XMLSyntaxError
 from opaque_keys import InvalidKeyError
@@ -65,6 +64,14 @@ def _get_capa_types():
         {'value': capa_type, 'display_name': caption}
         for capa_type, caption in capa_types.items()
     ], key=lambda item: item.get('display_name'))
+
+
+class LibraryToolsUnavailable(ValueError):
+    """
+    Raised when the library_tools service is requested in a runtime that doesn't provide it.
+    """
+    def __init__(self):
+        super().__init__("The 'library_tools' service was requested, but it isn't available in the current runtime.")
 
 
 @XBlock.wants('library_tools')  # Only needed in studio
@@ -419,7 +426,10 @@ class LibraryContentBlock(
         fragment = Fragment()
         root_xblock = context.get('root_xblock')
         is_root = root_xblock and root_xblock.location == self.location
-        is_updating = self.tools and self.tools.are_children_updating(self)
+        try:
+            is_updating = self.get_tools().are_children_updating(self)
+        except LibraryToolsUnavailable:
+            is_updating = False
         if is_root and not is_updating:
             # User has clicked the "View" link. Show a preview of all possible children:
             if self.children:  # pylint: disable=no-member
@@ -475,12 +485,14 @@ class LibraryContentBlock(
         ])
         return non_editable_fields
 
-    @lazy
-    def tools(self):
+    def get_tools(self) -> 'LibraryToolsService':
         """
-        Grab the library tools service or raise an error.
+        Grab the library tools service, or raise LibraryToolsUnavailable.
         """
-        return self.runtime.service(self, 'library_tools')
+        if tools := self.runtime.service(self, 'library_tools'):
+            return tools
+        else:
+            raise LibraryToolsUnavailable()
 
     def get_user_id(self):
         """
@@ -495,20 +507,21 @@ class LibraryContentBlock(
         return user_id
 
     @XBlock.handler
-    def refresh_children(self, request=None, suffix=None, library_version=None):  # pylint: disable=unused-argument
+    def refresh_children(self, request=None, suffix=None):  # pylint: disable=unused-argument
         """
         HTTP handler allowing Studio users to update to latest version of source library.
 
         See `LibraryToolsService.trigger_refresh_children` for details.
         """
-        if not self.tools:
-            return Response("Library Tools unavailable in current runtime.", status=400)
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         if not user_perms.can_read(self.source_library_key):
             raise PermissionDenied()
         if not user_perms.can_write(self.scope_ids.usage_id.context_key):
             raise PermissionDenied()
-        self.refresh_children_from_latest_library()
+        try:
+            self.refresh_children_from_latest_library()
+        except LibraryToolsUnavailable:
+            return Response("Library Tools unavailable in current runtime.", status=400)
         return Response()
 
     def refresh_children_from_latest_library(self) -> None:
@@ -517,20 +530,18 @@ class LibraryContentBlock(
 
         See `LibraryToolsService.trigger_refresh_children` for details.
         """
-        self.tools.trigger_refresh_children(self, library_version=None)
+        self.get_tools().trigger_refresh_children(self, library_version=None)
 
     def refresh_children_from_current_library(self) -> None:
         """
         Refresh children from library using `self.source_library_version`.
 
         If `self.source_library_version` is unset, will use latest.
-
-        See `LibraryToolsService.trigger_refresh_children` for details.
         """
-        self.tools.trigger_refresh_children(self, library_version=self.source_library_version)
+        self.get_tools().trigger_refresh_children(self, library_version=self.source_library_version)
 
     @XBlock.json_handler
-    def is_v2_library(self, data, suffix=''):  # lint-amnesty, pylint: disable=unused-argument
+    def is_v2_library(self, data, suffix=''):  # pylint: disable=unused-argument
         """
         Check the library version by library_id.
 
@@ -550,11 +561,11 @@ class LibraryContentBlock(
         """
         Returns whether this block is currently having its children updated from the source library.
         """
-        return Response(
-            json.dumps(
-                self.tools and self.tools.are_children_updating(self)
-            )
-        )
+        try:
+            is_updating = self.get_tools().are_children_updating(self)
+        except LibraryToolsUnavailable:
+            is_updating = False
+        return Response(json.dumps(is_updating))
 
     def studio_post_duplicate(self, store, source_block):
         """
@@ -565,9 +576,7 @@ class LibraryContentBlock(
         """
         user_id = self.get_user_id()
         user_perms = self.runtime.service(self, 'studio_user_permissions')
-        if not self.tools:
-            raise RuntimeError("Library tools unavailable, duplication will not be sane!")
-        self.tools.trigger_duplicate_children(
+        self.get_tools().trigger_duplicate_children(
             user_perms=user_perms, source_block=source_block, dest_block=self
         )
 
@@ -700,15 +709,23 @@ class LibraryContentBlock(
         values = [{"display_name": name, "value": str(key)} for key, name in all_libraries]
         return values
 
-    def editor_saved(self, user, old_metadata, old_content):  # lint-amnesty, pylint: disable=unused-argument
+    def editor_saved(self, user, old_metadata, old_content):  # pylint: disable=unused-argument
         """
-        If source_library_id is empty, clear source_library_version and children.
+        If source library is specified and library tools are available, then set version to library's latest.
+
+        Otherwise, clear version and children.
         """
-        if not self.source_library_id:
-            self.children = []  # lint-amnesty, pylint: disable=attribute-defined-outside-init
-            self.source_library_version = ""
+        if self.source_library_id:
+            try:
+                self.source_library_version = str(
+                    self.get_tools().get_latest_library_version(self.source_library_id)
+                )
+            except LibraryToolsUnavailable:
+                self.source_library_version = ""
+                self.children = []  # pylint: disable=attribute-defined-outside-init
         else:
-            self.source_library_version = str(self.tools.get_library_version(self.source_library_id))
+            self.source_library_version = ""
+            self.children = []  # pylint: disable=attribute-defined-outside-init
 
     def post_editor_saved(self):
         """
