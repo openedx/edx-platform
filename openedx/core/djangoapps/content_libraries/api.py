@@ -86,11 +86,11 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED,
 )
-
 from organizations.models import Organization
 from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
 from edx_rest_api_client.client import OAuthAPIClient
+
 from openedx.core.djangoapps.content_libraries import permissions
 from openedx.core.djangoapps.content_libraries.constants import DRAFT_NAME, COMPLEX
 from openedx.core.djangoapps.content_libraries.library_bundle import LibraryBundle
@@ -100,7 +100,6 @@ from openedx.core.djangoapps.content_libraries.models import (
     ContentLibraryPermission,
     ContentLibraryBlockImportTask,
 )
-
 from openedx.core.djangoapps.xblock.api import (
     get_block_display_name,
     get_learning_context_impl,
@@ -126,6 +125,7 @@ from openedx.core.lib.blockstore_api import (
 from openedx.core.djangolib import blockstore_cache
 from openedx.core.djangolib.blockstore_cache import BundleCache
 from xmodule.library_root_xblock import LibraryRoot as LibraryRootV1
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -1186,7 +1186,7 @@ def get_v1_or_v2_library(
 
     Returns None if not found.
     If key is invalid, raises InvalidKeyError.
-    For V1, if key has a version, it must match `version`, otherwise we raise a ValueError.
+    For V1, if key has a version, it is ignored in favor of `version`.
     For V2, if version is provided but it isn't an int or parseable to one, we raise a ValueError.
 
     Examples:
@@ -1208,13 +1208,16 @@ def get_v1_or_v2_library(
     else:
         library_key = library_id
     if isinstance(library_key, LibraryLocatorV2):
-        if version is not None:
-            version = int(version)
+        v2_version: int
+        if version:
+            v2_version = int(version)
+        else:
+            v2_version = None
         try:
             library = get_library(library_key)
-            if version is not None and library.version != version:
+            if v2_version is not None and library.version != v2_version:
                 raise NotImplementedError(
-                    f"Tried to load version {version} of blockstore-based library {library_key}. "
+                    f"Tried to load version {v2_version} of blockstore-based library {library_key}. "
                     f"Currently, only the latest version ({library.version}) may be loaded. "
                     "This is a known issue. "
                     "It will be fixed before the production release of blockstore-based (V2) content libraries. "
@@ -1223,12 +1226,13 @@ def get_v1_or_v2_library(
         except ContentLibrary.DoesNotExist:
             return None
     elif isinstance(library_key, LibraryLocatorV1):
-        store = modulestore()
-        if library_key.version:
-            if library_key.version != version:
-                raise ValueError(f"Requested library version {version!r} conflicts with version in key: {library_key}")
+        v1_version: str
+        if version:
+            v1_version = str(version)
         else:
-            library_key = library_key.for_version(version)
+            v1_version = None
+        store = modulestore()
+        library_key = library_key.for_branch(ModuleStoreEnum.BranchName.library).for_version(v1_version)
         try:
             return store.get_library(library_key, remove_version=False, remove_branch=False, head_validation=False)
         except ItemNotFoundError:

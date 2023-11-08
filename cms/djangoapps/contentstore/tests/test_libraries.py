@@ -469,6 +469,9 @@ class TestLibraries(LibraryTestCase):
         lc_block = self._add_library_content_block(course, self.lib_key)
         lc_block = self._upgrade_and_sync(lc_block)
         self.assertEqual(len(lc_block.children), 0)
+        assert len(lc_block.children) == 0
+        assert lc_block.source_library_key == self.lib_key
+        assert lc_block.source_library_version is not None
 
         # Now, change the block settings to have an invalid library key:
         resp = self._update_block(
@@ -476,6 +479,9 @@ class TestLibraries(LibraryTestCase):
             {"source_library_id": "library-v1:NOT+FOUND"},
         )
         self.assertEqual(resp.status_code, 200)
+        lc_block = modulestore().get_item(lc_block.location)
+        assert lc_block.source_library_key == LibraryLocator(org="NOT", library="FOUND")
+        assert lc_block.source_library_version is None
         with self.assertRaises(ValueError):
             self._upgrade_and_sync(lc_block, status_code_expected=400)
 

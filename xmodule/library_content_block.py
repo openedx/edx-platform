@@ -724,9 +724,8 @@ class LibraryContentBlock(
         """
         if self.source_library_id:
             try:
-                self.source_library_version = str(
-                    self.get_tools().get_latest_library_version(self.source_library_id)
-                )
+                latest_version = self.get_tools().get_latest_library_version(self.source_library_id)
+                self.source_library_version = None if latest_version is None else str(latest_version)
             except LibraryToolsUnavailable:
                 self.source_library_version = ""
                 self.children = []  # pylint: disable=attribute-defined-outside-init
@@ -742,7 +741,7 @@ class LibraryContentBlock(
         """
         try:
             if self.source_library_id:
-                self.upgrade_and_sync_from_library()
+                self.sync_from_library(upgrade_to_latest=True)
         except ValueError:
             pass  # The validation area will display an error message, no need to do anything now.
 
