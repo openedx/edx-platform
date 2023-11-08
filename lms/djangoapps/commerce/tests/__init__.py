@@ -75,7 +75,7 @@ class DeprecatedRestApiClientTests(TestCase):
         """
         self.assertRaises(ValueError, DeprecatedRestApiClient, **kwargs)
 
-    @mock.patch('edx_rest_api_client.auth.JwtAuth.__init__', return_value=None)
+    @mock.patch('openedx.core.djangoapps.commerce.utils.JwtAuth.__init__', return_value=None)
     def test_tracking_context(self, mock_auth):
         """
         Ensure the tracking context is included with API requests if specified.
@@ -88,7 +88,7 @@ class DeprecatedRestApiClientTests(TestCase):
         Ensure OAuth2 authentication is used when an access token is supplied to the constructor.
         """
 
-        with mock.patch('edx_rest_api_client.auth.BearerAuth.__init__', return_value=None) as mock_auth:
+        with mock.patch('openedx.core.djangoapps.commerce.utils.BearerAuth.__init__', return_value=None) as mock_auth:
             DeprecatedRestApiClient(URL, oauth_access_token=ACCESS_TOKEN)
             mock_auth.assert_called_with(ACCESS_TOKEN)
 
