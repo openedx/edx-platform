@@ -33,6 +33,8 @@ from openedx.core.djangoapps.user_api.errors import (
     AccountValidationError,
     PreferenceValidationError
 )
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
+from openedx.core.djangoapps.user_api.accounts.serializers import PROFILE_IMAGE_KEY_PREFIX
 from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
 from openedx.core.djangoapps.user_authn.utils import check_pwned_password
 from openedx.core.djangoapps.user_authn.views.registration_form import validate_name, validate_username
@@ -522,6 +524,19 @@ def get_email_existence_validation_error(email):
 
     """
     return _validate(_validate_email_doesnt_exist, errors.AccountEmailAlreadyExists, email)
+
+
+def get_profile_images(user_profile, user, request=None):
+    """
+    Returns metadata about a user's profile image.
+    """
+    data = {'has_image': user_profile.has_profile_image}
+    urls = get_profile_image_urls_for_user(user, request)
+    data.update({
+        f'{PROFILE_IMAGE_KEY_PREFIX}_{size_display_name}': url
+        for size_display_name, url in urls.items()
+    })
+    return data
 
 
 def _get_user_and_profile(username):

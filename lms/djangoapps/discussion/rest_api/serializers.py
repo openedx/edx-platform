@@ -41,8 +41,8 @@ from openedx.core.djangoapps.django_comment_common.comment_client.thread import 
 from openedx.core.djangoapps.django_comment_common.comment_client.user import User as CommentClientUser
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientRequestError
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
+from openedx.core.djangoapps.user_api.accounts.api import get_profile_images
 from openedx.core.lib.api.serializers import CourseKeyField
-from openedx.core.djangoapps.user_api.accounts.serializers import AccountLegacyProfileSerializer
 
 User = get_user_model()
 
@@ -588,7 +588,7 @@ class CommentSerializer(_ContentSerializer):
 
     def get_profile_image(self, obj):
         request = self.context["request"]
-        return AccountLegacyProfileSerializer.get_profile_image(request.user.profile, request.user, request)
+        return get_profile_images(request.user.profile, request.user, request)
 
     def validate(self, attrs):
         """
