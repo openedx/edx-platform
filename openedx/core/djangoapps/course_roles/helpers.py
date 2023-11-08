@@ -28,7 +28,7 @@ def use_permission_checks():
     return USE_PERMISSION_CHECKS_FLAG.is_enabled()
 
 
-def course_permission_check(user, permission_name, course_id):
+def user_has_permission_course(user, permission_name, course_id):
     """
     Check if a user has a permission in a course.
     """
@@ -43,25 +43,25 @@ def course_permission_check(user, permission_name, course_id):
     ).exists()
 
 
-def course_permissions_list_check(user, permission_names, course_id):
+def user_has_permission_list_course(user, permission_names, course_id):
     """
     Check if a user has all of the given permissions in a course.
     """
     if not use_permission_checks():
         return False
-    return all(course_permission_check(user, permission_name, course_id) for permission_name in permission_names)
+    return all(user_has_permission_course(user, permission_name, course_id) for permission_name in permission_names)
 
 
-def course_permissions_list_check_any(user, permission_names, course_id):
+def user_has_permission_list_any_course(user, permission_names, course_id):
     """
     Check if a user has ANY of the given permissions in a course.
     """
-    return any(course_permission_check(user, permission_name, course_id) for permission_name in permission_names)
+    return any(user_has_permission_course(user, permission_name, course_id) for permission_name in permission_names)
 
 
-def organization_permission_check(user, permission_name, organization_name):
+def user_has_permission_org(user, permission_name, organization_name):
     """
-    Check if a user has a permission in an organization.
+    Check if a user has a permission for all courses in an organization.
     """
     if not use_permission_checks():
         return False
@@ -75,20 +75,20 @@ def organization_permission_check(user, permission_name, organization_name):
     ).exists()
 
 
-def organization_permissions_list_check(user, permission_names, organization_name):
+def user_has_permission_list_org(user, permission_names, organization_name):
     """
-    Check if a user has all of the given permissions in an organization.
+    Check if a user has ALL of the given permissions for all courses in an organization.
     """
     if not use_permission_checks():
         return False
     return all(
-        organization_permission_check(user, permission_name, organization_name) for permission_name in permission_names
+        user_has_permission_org(user, permission_name, organization_name) for permission_name in permission_names
     )
 
 
-def course_or_organization_permission_check(user, permission_name, course_id, organization_name=None):
+def user_has_permission_course_org(user, permission_name, course_id, organization_name=None):
     """
-    Check if a user has a permission in an organization or a course.
+    Check if a user has a permission for all courses in an organization or for a specific course.
     """
     if not use_permission_checks():
         return False
@@ -99,20 +99,20 @@ def course_or_organization_permission_check(user, permission_name, course_id, or
         if course:
             organization_name = course.org
         else:
-            return course_permission_check(user, permission_name, course_id)
-    return (course_permission_check(user, permission_name, course_id) or
-            organization_permission_check(user, permission_name, organization_name)
+            return user_has_permission_course(user, permission_name, course_id)
+    return (user_has_permission_course(user, permission_name, course_id) or
+            user_has_permission_org(user, permission_name, organization_name)
             )
 
 
-def course_or_organization_permission_list_check(user, permission_names, course_id, organization_name=None):
+def user_has_permission_list_course_org(user, permission_names, course_id, organization_name=None):
     """
-    Check if a user has all of the given permissions in an organization or a course.
+    Check if a user has all of the given permissions for all courses in an organization or for a specific course.
     """
     if not use_permission_checks():
         return False
     return all(
-        course_or_organization_permission_check(user, permission_name, course_id, organization_name)
+        user_has_permission_course_org(user, permission_name, course_id, organization_name)
         for permission_name in permission_names
     )
 
@@ -120,8 +120,8 @@ def course_or_organization_permission_list_check(user, permission_names, course_
 def get_all_user_permissions_for_a_course(user_id, course_id):
     """
     Get all of a user's permissions for a course,
-    including, if applicable, organization-level permissions
-    and instance-level permissions.
+    including, if applicable, organization-wide permissions
+    and instance-wide permissions.
     """
     if user_id is None or course_id is None:
         raise ValueError(_('user_id and course_id must not be None'))
