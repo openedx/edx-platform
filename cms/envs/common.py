@@ -2794,6 +2794,9 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     'PREPROCESSING_HOOKS': ['cms.lib.spectacular.cms_api_filter'],  # restrict spectacular to CMS API endpoints. (cms/lib/spectacular.py)
+    'SCHEMA_PATH_PREFIX': r'/api/contentstore',
+    'SCHEMA_PATH_PREFIX_TRIM': r'/api/contentstore',
+    'SERVERS': [{ 'url': 'https://api.edx.org/authoring' }, { 'url': 'http://localhost:18010/api/contentstore' }],
 }
 
 
