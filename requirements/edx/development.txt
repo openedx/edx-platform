@@ -739,7 +739,7 @@ edx-django-utils==5.7.0
     #   openedx-blockstore
     #   ora2
     #   super-csv
-edx-drf-extensions==8.12.0
+edx-drf-extensions==8.13.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -752,7 +752,7 @@ edx-drf-extensions==8.12.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.6.10
+edx-enterprise==4.6.12
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -1315,7 +1315,7 @@ openedx-filters==1.6.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
-openedx-learning==0.3.0
+openedx-learning==0.3.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -1328,7 +1328,7 @@ optimizely-sdk==4.1.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-ora2==5.5.5
+ora2==6.0.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
