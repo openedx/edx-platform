@@ -8,7 +8,7 @@ import json
 import os
 import socket
 from django.conf import settings
-from edx_rest_api_client.auth import SuppliedJwtAuth
+from edx_rest_api_client.auth import SuppliedJwtAuth, JwtAuth
 from edx_rest_api_client.__version__ import __version__
 from edx_django_utils.cache import TieredCache
 from eventtracking import tracker
@@ -28,58 +28,6 @@ REQUEST_CONNECT_TIMEOUT = 3.05
 REQUEST_READ_TIMEOUT = 5
 
 ECOMMERCE_DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
-
-
-# pylint: disable=line-too-long
-class JwtAuth(AuthBase):
-    """
-    Attaches JWT Authentication to the given Request object.
-
-    Deprecated:
-        See https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0008-use-asymmetric-jwts.rst
-
-    Todos:
-        * Remove pyjwt dependency from edx-rest-api-client when this class is
-            removed.
-        * This class is only used by ecomworker according to data supplied by
-            the `deprecated_jwt_signing` custom attribute. This class should be
-            moved to ecomworker and out of the shared library until it can be
-            removed completely. The new class should rename
-            `deprecated_jwt_signing` to `deprecated_ecomworker_jwt_signing`
-            to ensure the transition.
-
-    """
-
-    def __init__(self, username, full_name, email, signing_key, issuer=None, expires_in=30, tracking_context=None):
-        self.issuer = issuer
-        self.expires_in = expires_in
-        self.username = username
-        self.email = email
-        self.full_name = full_name
-        self.signing_key = signing_key
-        self.tracking_context = tracking_context
-
-    def __call__(self, r):
-        now = datetime.datetime.utcnow()
-        data = {
-            'username': self.username,
-            'full_name': self.full_name,
-            'email': self.email,
-            'iat': now,
-        }
-
-        if self.issuer:
-            data['iss'] = self.issuer
-
-        if self.expires_in:
-            data['exp'] = now + datetime.timedelta(seconds=self.expires_in)
-
-        if self.tracking_context is not None:
-            data['tracking_context'] = self.tracking_context
-
-        set_custom_attribute('deprecated_jwt_signing', 'JwtAuth')
-        r.headers['Authorization'] = 'JWT {jwt}'.format(jwt=jwt.encode(data, self.signing_key))
-        return r
 
 
 class BearerAuth(AuthBase):

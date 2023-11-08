@@ -12,7 +12,8 @@ from django.conf import settings
 from django.test import TestCase
 from freezegun import freeze_time
 from edx_rest_api_client import __version__
-from openedx.core.djangoapps.commerce.utils import DeprecatedRestApiClient, user_agent, JwtAuth
+from edx_rest_api_client.auth import JwtAuth
+from openedx.core.djangoapps.commerce.utils import DeprecatedRestApiClient, user_agent
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
@@ -75,7 +76,7 @@ class DeprecatedRestApiClientTests(TestCase):
         """
         self.assertRaises(ValueError, DeprecatedRestApiClient, **kwargs)
 
-    @mock.patch('openedx.core.djangoapps.commerce.utils.JwtAuth.__init__', return_value=None)
+    @mock.patch('edx_rest_api_client.auth.JwtAuth.__init__', return_value=None)
     def test_tracking_context(self, mock_auth):
         """
         Ensure the tracking context is included with API requests if specified.
