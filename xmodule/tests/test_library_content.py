@@ -401,26 +401,21 @@ class LibraryContentBlockTestMixin:
         assert len(self.lc_block.children) == len(self.library.children)
 
         self.lc_block.capa_type = "multiplechoiceresponse"
-        self.store.update_item(self.lc_block, self.user_id)
         self._sync_lc_block_from_library()
         assert len(self.lc_block.children) == 1
 
         self.lc_block.capa_type = "optionresponse"
-        self.store.update_item(self.lc_block, self.user_id)
         self._sync_lc_block_from_library()
         assert len(self.lc_block.children) == 3
 
         self.lc_block.capa_type = "coderesponse"
-        self.store.update_item(self.lc_block, self.user_id)
         self._sync_lc_block_from_library()
         assert len(self.lc_block.children) == 2
 
         self.lc_block.capa_type = "customresponse"
-        self.store.update_item(self.lc_block, self.user_id)
         self._sync_lc_block_from_library()
 
         self.lc_block.capa_type = ANY_CAPA_TYPE_VALUE
-        self.store.update_item(self.lc_block, self.user_id)
         self._sync_lc_block_from_library()
         assert len(self.lc_block.children) == (len(self.lib_blocks) + 4)
 
@@ -486,7 +481,6 @@ class LibraryContentBlockTestMixin:
         # Add some capa blocks
         self._add_problems_to_library()
         self._sync_lc_block_from_library(upgrade_to_latest=True)
-        self.store.update_item(self.lc_block, self.user_id)
         # Mock the student view to return an empty dict to be returned as response
         self.lc_block.student_view = MagicMock()
         self.lc_block.student_view.return_value.content = {}

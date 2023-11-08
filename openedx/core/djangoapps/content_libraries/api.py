@@ -1208,7 +1208,7 @@ def get_v1_or_v2_library(
     else:
         library_key = library_id
     if isinstance(library_key, LibraryLocatorV2):
-        v2_version: int
+        v2_version: int | None
         if version:
             v2_version = int(version)
         else:
@@ -1226,7 +1226,7 @@ def get_v1_or_v2_library(
         except ContentLibrary.DoesNotExist:
             return None
     elif isinstance(library_key, LibraryLocatorV1):
-        v1_version: str
+        v1_version: str | None
         if version:
             v1_version = str(version)
         else:
