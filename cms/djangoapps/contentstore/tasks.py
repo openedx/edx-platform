@@ -702,7 +702,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
                 from .views.entrance_exam import add_entrance_exam_milestone
                 add_entrance_exam_milestone(course.id, entrance_exam_chapter)
                 LOGGER.info(f'Course import {course.id}: Entrance exam imported')
-
+        sync_discussion_settings(courselike_key)
 
 @shared_task
 @set_code_owner_attribute
