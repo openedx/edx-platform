@@ -283,6 +283,7 @@ rules.set_perm("oel_tagging.delete_taxonomy", can_change_taxonomy)
 rules.set_perm("oel_tagging.view_taxonomy", can_view_taxonomy)
 rules.set_perm("oel_tagging.export_taxonomy", can_view_taxonomy)
 rules.set_perm("oel_tagging.import_taxonomy", can_create_taxonomy)
+rules.add_perm("oel_tagging.update_orgs", oel_tagging.is_taxonomy_admin)
 
 # Tag
 rules.set_perm("oel_tagging.add_tag", can_change_taxonomy_tag)

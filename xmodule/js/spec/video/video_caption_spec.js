@@ -833,7 +833,7 @@
                 });
             });
 
-            msg = 'on succes: language menu is rendered if translations available';
+            msg = 'on success: language menu is rendered if translations available';
             it(msg, function() {
                 state.config.transcriptLanguages = {
                     en: 'English',
@@ -853,7 +853,7 @@
                 });
             });
 
-            msg = 'on succes: language menu isn\'t rendered if translations unavailable';
+            msg = 'on success: language menu isn\'t rendered if translations unavailable';
             it(msg, function() {
                 state.config.transcriptLanguages = {
                     en: 'English',
