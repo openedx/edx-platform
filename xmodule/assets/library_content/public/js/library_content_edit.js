@@ -17,7 +17,7 @@ window.LibraryContentAuthorView = function(runtime, element) {
             element: element,
             message: gettext('Updating with latest library content')
         });
-        $.post(runtime.handlerUrl(element, 'upgrade_library')).done(function() {
+        $.post(runtime.handlerUrl(element, 'upgrade_and_sync')).done(function() {
             runtime.notify('save', {
                 state: 'end',
                 element: element

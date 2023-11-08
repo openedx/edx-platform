@@ -506,24 +506,44 @@ class LibraryContentBlock(
             user_id = None
         return user_id
 
-    @XBlock.handler
-    def upgrade_library(self, request=None, suffix=None):  # pylint: disable=unused-argument
+    def _validate_sync_permissions(self):
         """
-        HTTP handler allowing Studio users to update to latest version of source library.
-        This also synchronizes children with library.
+        Raises PermissionDenied() if we can't confirm that user has write on this block and read on source library.
+
+        If source library isn't set, then that's OK.
+        """
+        if not (user_perms := self.runtime.service(self, 'studio_user_permissions')):
+            raise PermissionDenied("Access cannot be validated in the current runtime.")
+        if not user_perms.can_write(self.scope_ids.usage_id.context_key):
+            raise PermissionDenied(f"Cannot write to block at {self.scope_ids.usage_id}")
+        if self.source_library_key:
+            if not user_perms.can_read(self.source_library_key):
+                raise PermissionDenied(f"Cannot read library at {self.source_library_key}")
+
+    @XBlock.handler
+    def upgrade_and_sync(self, request=None, suffix=None):  # pylint: disable=unused-argument
+        """
+        HTTP handler allowing Studio users to update to latest version of source library and synchronize children.
+
+        This is a thin wrapper around `upgrade_and_sync_from_library`, plus permission checks.
+
+        Returns 400 if libraray tools or user permission services are not available.
+        Returns 403/404 if user lacks read access on source library or write access on this block.
+        """
+        self._validate_sync_permissions()
+        try:
+            self.upgrade_and_sync_from_library()
+        except LibraryToolsUnavailable:
+            return Response("Content libraries are not available in the current runtime.", status=400)
+        return Response()
+
+    def upgrade_and_sync_from_library(self) -> None:
+        """
+        Synchronize children with latest source library. Updates `self.source_library_version`.
 
         See `LibraryToolsService.trigger_sync_library` for details.
         """
-        user_perms = self.runtime.service(self, 'studio_user_permissions')
-        if not user_perms.can_read(self.source_library_key):
-            raise PermissionDenied()
-        if not user_perms.can_write(self.scope_ids.usage_id.context_key):
-            raise PermissionDenied()
-        try:
-            self.trigger_library_sync(self, library_version=None)
-        except LibraryToolsUnavailable:
-            return Response("Library Tools unavailable in current runtime.", status=400)
-        return Response()
+        self.get_tools().trigger_library_sync(self, library_version=None)
 
     def sync_from_library(self) -> None:
         """
@@ -567,11 +587,8 @@ class LibraryContentBlock(
 
         Otherwise we'll end up losing data on the next refresh.
         """
-        user_id = self.get_user_id()
-        user_perms = self.runtime.service(self, 'studio_user_permissions')
-        self.get_tools().trigger_duplication(
-            user_perms=user_perms, source_block=source_block, dest_block=self
-        )
+        self._validate_sync_permissions()
+        self.get_tools().trigger_duplication(source_block=source_block, dest_block=self)
 
         # Children have been handled.
         return True
@@ -723,10 +740,12 @@ class LibraryContentBlock(
     def post_editor_saved(self):
         """
         If xblock has been edited, upgrade library & sync automatically.
+
+        TODO: This shouldn't happen if only post-library settings like max_count are changed.
         """
         try:
             if self.source_library_id:
-                self.upgrade_library()
+                self.upgrade_and_sync_from_library()
         except ValueError:
             pass  # The validation area will display an error message, no need to do anything now.
 
