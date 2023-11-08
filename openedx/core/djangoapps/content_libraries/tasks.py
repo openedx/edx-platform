@@ -305,7 +305,8 @@ def _update_children(
     filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)
     library = library_api.get_v1_or_v2_library(library_key)
     #update the key to match the library on account of the runtime mapping.
-    library_key = library.key if hasattr(library, 'key') else library.location
+    if library:
+        library_key = library.key if hasattr(library, 'key') else library.location.library_key
     if not library:
         task.status.fail(f"Requested library {library_key} not found.")
     elif isinstance(library, LibraryRootV1):
