@@ -7,7 +7,6 @@ import datetime
 import json
 import os
 import socket
-import jwt
 from django.conf import settings
 from edx_rest_api_client.auth import SuppliedJwtAuth
 from edx_rest_api_client.__version__ import __version__
