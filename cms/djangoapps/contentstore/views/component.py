@@ -613,6 +613,10 @@ def component_handler(request, usage_key_string, handler, suffix=''):
 def get_unit_tags(usage_key):
     """
     Get the tags of a Unit and build a json to be read by the UI
+
+    Note: When migrating the `TagList` subview from `container_subview.js` to the course-authoring MFE,
+    this function can be simplified to use the REST API of openedx-learning,
+    which already provides this grouping + sorting logic.
     """
     # Get content tags from content tagging API
     content_tags = get_content_tags(usage_key)
