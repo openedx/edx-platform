@@ -54,7 +54,7 @@ select option:hover {
 </style>
 
  <div style="z-index: 2000000002; position: fixed; bottom: 100px; right: -25px; " id="funix-feedback">
-    <div class="dropdown">
+    <div class="dropdown">   
         <!--Button Report an error-->
         <button onclick="dropupError()" class="dropbtn btn-link"
             style="text-decoration: none; color: rgb(193,39,45); transform: rotate(-90deg);">
@@ -65,10 +65,20 @@ select option:hover {
                 ${_("Feedback")}
             </b>
         </button>
-
         <!-- Content of drop up -->
         <div id="dropupError" class="dropdown-content" style=" overflow: hidden; border-radius: 3px; box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;">
-              <!-- Header -->
+           <!-- <div class="bg-modal" style='display: none;background-color: red;position: absolute;height: 100vh;width: 100%;'>
+                <div style="display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;">
+                <button class="btn-success">
+                    ok
+                </button>
+            </div>
+           </div> -->
+           
+            <!-- Header -->
             <div style="background-color: #3a3a3a; color:white; display: flex; justify-content: space-between;
             padding: 10px 24px; align-items: center; ">
                 <span style="font-weight: bolder;">
