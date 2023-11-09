@@ -200,6 +200,10 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
 
     @patch('lms.djangoapps.lti_provider.views.render_to_response')
     def test_unauthenticated_user_shown_error_when_require_user_account_is_enabled(self, render_error):
+        """
+        Verify that an error page is shown instead of LTI Content for an unauthenticated user,
+        when the `require_user_account` flag is enabled for the LTI Consumer.
+        """
         request = build_launch_request({'oauth_consumer_key': 'consumer_key_2'})
         request.user = AnonymousUser()
 
@@ -210,6 +214,11 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
 
     @patch('lms.djangoapps.lti_provider.views.render_to_response')
     def test_auth_error_shown_when_lis_email_is_different_from_user_email(self, render_error):
+        """
+        When the `require_user_account` flag is enabled for the LTI Consumer, verify that
+        an error page is shown instead of LTI Content if the authenticated user's email
+        doesn't match the `lis_person_contact_email_primary` value from LTI Launch.
+        """
         # lis email different from logged in user
         request = build_launch_request({
             'oauth_consumer_key': 'consumer_key_2',

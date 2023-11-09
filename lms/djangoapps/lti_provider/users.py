@@ -30,13 +30,6 @@ def authenticate_lti_user(request, lti_user_id, lti_consumer):
     """
     lis_email = request.POST.get("lis_person_contact_email_primary")
 
-    # Verify that the email from the LTI Launch and the logged-in user are the same.
-    if lti_consumer.require_user_account and (
-        not request.user.is_authenticated or
-        (lis_email and request.user.email != lis_email)
-    ):
-        raise PermissionDenied()
-
     try:
         lti_user = LtiUser.objects.get(
             lti_user_id=lti_user_id,
@@ -45,7 +38,13 @@ def authenticate_lti_user(request, lti_user_id, lti_consumer):
     except LtiUser.DoesNotExist:
         # This is the first time that the user has been here. Create an account.
         if lti_consumer.require_user_account:
-            lti_user = create_lti_user(lti_user_id, lti_consumer, lis_email)
+            # Verify that the email from the LTI Launch and the logged-in user are the same
+            # before linking the LtiUser with the edx_user.
+            if request.user.is_authenticated and request.user.email == lis_email:
+                lti_user = create_lti_user(lti_user_id, lti_consumer, lis_email)
+            else:
+                # Ask the user to login before linking.
+                raise PermissionDenied()
         else:
             lti_user = create_lti_user(lti_user_id, lti_consumer)
 

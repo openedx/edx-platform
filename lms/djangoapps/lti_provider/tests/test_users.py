@@ -181,6 +181,14 @@ class AuthenticateLtiUserTest(TestCase):
         with self.assertRaises(PermissionDenied):
             users.authenticate_lti_user(request, self.lti_user_id, self.auto_linking_consumer)
 
+    def test_authenticate_unauthenticated_user_after_auto_linking_of_user_account(self, create_user, switch_user):
+        lti_user = self.create_lti_user_model(self.auto_linking_consumer)
+        self.request.user = AnonymousUser()
+
+        users.authenticate_lti_user(self.request, self.lti_user_id, self.auto_linking_consumer)
+        assert not create_user.called
+        switch_user.assert_called_with(self.request, lti_user, self.auto_linking_consumer)
+
 
 class CreateLtiUserTest(TestCase):
     """
