@@ -326,3 +326,19 @@ xblock_duplicated_event_setting['course-authoring-xblock-lifecycle']['enabled'] 
 # See if the developer has any local overrides.
 if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):
     from .private import *  # pylint: disable=import-error,wildcard-import
+
+############## Authoring API drf-spectacular openapi settings ##############
+# These fields override the spectacular settings default values.
+# Any fields not included here will use the default values.
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'CMS API',
+    'DESCRIPTION': 'Experimental API to edit xblocks and course content. Danger: Do not use on running courses!',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # restrict spectacular to CMS API endpoints (cms/lib/spectacular.py):
+    'PREPROCESSING_HOOKS': ['cms.lib.spectacular.cms_api_filter'],
+    # remove the default schema path prefix to replace it with server-specific base paths:
+    'SCHEMA_PATH_PREFIX': '/api/contentstore',
+    'SCHEMA_PATH_PREFIX_TRIM': '/api/contentstore',
+    'SERVERS': [{ 'url': AUTHORING_API_URL }, { 'url': f'http://{CMS_BASE}/api/contentstore' }],
+}

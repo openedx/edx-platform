@@ -167,6 +167,7 @@ LMS_ROOT_URL = ENV_TOKENS.get('LMS_ROOT_URL')
 LMS_INTERNAL_ROOT_URL = ENV_TOKENS.get('LMS_INTERNAL_ROOT_URL', LMS_ROOT_URL)
 ENTERPRISE_API_URL = ENV_TOKENS.get('ENTERPRISE_API_URL', LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/')
 ENTERPRISE_CONSENT_API_URL = ENV_TOKENS.get('ENTERPRISE_CONSENT_API_URL', LMS_INTERNAL_ROOT_URL + '/consent/api/v1/')
+AUTHORING_API_URL = ENV_TOKENS.get('AUTHORING_API_URL', '')
 # Note that FEATURES['PREVIEW_LMS_BASE'] gets read in from the environment file.
 
 OPENAI_API_KEY = ENV_TOKENS.get('OPENAI_API_KEY', '')
@@ -678,3 +679,19 @@ INACTIVE_USER_URL = f'http{"s" if HTTPS == "on" else ""}://{CMS_BASE}'
 ############## Event bus producer ##############
 EVENT_BUS_PRODUCER_CONFIG = merge_producer_configs(EVENT_BUS_PRODUCER_CONFIG,
                                                    ENV_TOKENS.get('EVENT_BUS_PRODUCER_CONFIG', {}))
+
+############## Authoring API drf-spectacular openapi settings ##############
+# These fields override the spectacular settings default values.
+# Any fields not included here will use the default values.
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'CMS API',
+    'DESCRIPTION': 'Experimental API to edit xblocks and course content. Danger: Do not use on running courses!',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # restrict spectacular to CMS API endpoints (cms/lib/spectacular.py):
+    'PREPROCESSING_HOOKS': ['cms.lib.spectacular.cms_api_filter'],
+    # remove the default schema path prefix to replace it with server-specific base paths:
+    'SCHEMA_PATH_PREFIX': '/api/contentstore',
+    'SCHEMA_PATH_PREFIX_TRIM': '/api/contentstore',
+    'SERVERS': [{ 'url': AUTHORING_API_URL }, { 'url': f'https://{CMS_BASE}/api/contentstore' }],
+}
