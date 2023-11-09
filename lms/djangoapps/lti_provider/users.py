@@ -35,7 +35,7 @@ def authenticate_lti_user(request, lti_user_id, lti_consumer):
             lti_user_id=lti_user_id,
             lti_consumer=lti_consumer
         )
-    except LtiUser.DoesNotExist:
+    except LtiUser.DoesNotExist as exc:
         # This is the first time that the user has been here. Create an account.
         if lti_consumer.require_user_account:
             # Verify that the email from the LTI Launch and the logged-in user are the same
@@ -44,7 +44,7 @@ def authenticate_lti_user(request, lti_user_id, lti_consumer):
                 lti_user = create_lti_user(lti_user_id, lti_consumer, lis_email)
             else:
                 # Ask the user to login before linking.
-                raise PermissionDenied()
+                raise PermissionDenied() from exc
         else:
             lti_user = create_lti_user(lti_user_id, lti_consumer)
 
