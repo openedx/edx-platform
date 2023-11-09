@@ -1,120 +1,25 @@
 /* When the user clicks on the button, 
 toggle between hiding and showing the dropdown content */
 function dropupError() {
-	document.getElementById("dropupError").classList.toggle("show");
+	const dropupElement = document.getElementById("dropupError")
+	dropupElement.classList.toggle("show");
+
+	if (dropupElement.classList.contains("show")) {
+		const btnSubmit = document.getElementById('submit-feedback')
+		const comment = document.getElementById('comments')
+		btnSubmit.setAttribute('disabled', 'disabled');
+		comment.addEventListener('input', (e)=>{
+			if (e.target.value.length > 0){
+				btnSubmit.removeAttribute('disabled')
+			}else {
+				btnSubmit.setAttribute('disabled', 'disabled');
+			}
+		})
+	  } 
 }
 
-// Technical Error
-function openTechError() {
-	document.getElementById("technicalError").classList.toggle("show");
-	document.getElementById("dropupError").classList.toggle("show");
-}
-
-function closeTechError() {
-	document.getElementById("technicalError").classList.toggle("show");
-}
-
-//Overall Content Error
-function openOverallError() {
-	document.getElementById("overallError").classList.toggle("show");
-	document.getElementById("dropupError").classList.toggle("show");
-}
-
-function closeOverallError() {
-	document.getElementById("overallError").classList.toggle("show");
-}
-
-//Quiz Content Error
-function openQuizError() {
-	document.getElementById("quizError").classList.toggle("show");
-	document.getElementById("dropupError").classList.toggle("show");
-}
-
-function closeQuizError() {
-	document.getElementById("quizError").classList.toggle("show");
-}
-
-//Ask Mentor Error
-function openMentorError() {
-	document.getElementById("mentorError").classList.toggle("show");
-	document.getElementById("dropupError").classList.toggle("show");
-}
-
-function closeMentorError() {
-	document.getElementById("mentorError").classList.toggle("show");
-}
-
-function postFeedback(e, form, closeClass) {
-	e.preventDefault()
-
-	// Popolate hidden values
-	populateForm();
 
 
-	// Change loading icon
-
-	document.querySelector(".btnSend").innerHTML = '<i class="fa fa-refresh fa-spin fa-fw"></i>';
-
-	let url = this.LMSHost + "/feedback/";
-	let formData = new FormData(form);
-	let xhttp = new XMLHttpRequest();
-	xhttp.withCredentials = true;
-	xhttp.onreadystatechange = function () {
-	if (this.readyState == 4 && this.status == 200) {
-		if (this.responseText == "success") {
-			// Hide the feedback form
-	
-			document.querySelector(".btnSend").innerHTML = 'Gửi';
-			document.querySelector('textarea[name="content"]').value = '';
-			document.querySelector('input[name="attachment"]').value = '';
-			document.querySelector('.' + closeClass).click();
-
-
-			alert('Cám ơn bạn đã gửi phản hồi lỗi!');
-		} else {
-			document.querySelector(".btnSend").innerHTML = 'Gửi';
-			alert('Xin lỗi hiện hệ thống đang chưa gửi được phản hồi. Xin bạn vui lòng báo lại hannah nhé!');
-		}
-	}
-	};
-	xhttp.open("POST", url, true);
-	xhttp.send(formData);
-}
-
-function getInstanceCode(url) {
-	let patt = new RegExp("[+][^+]*[+]");
-	let res = patt.exec(url);
-
-	return res ? res[0].substring(1, res[0].length - 1) : 'N/A';
-}
-
-function getUnitTitle() {
-	if (this.isMFE) {
-		const iframe = document.getElementById('unit-iframe');
-
-		if (!iframe) {
-			return 'N/A';
-		}
-		
-		return iframe.title;
-	} else {
-		let unit_title = document.querySelector("div.xblock-student_view h2.unit-title");
-		if (unit_title && unit_title.textContent != '') {
-			let unit_title = unit_title.textContent;
-			return unit_title;
-		} else {
-			return 'N/A';
-		}
-	}
-}
-
-function populateForm() {
-	let url = window.location;
-
-	document.querySelector("input[name='lesson_url").value = url;
-	document.querySelector("input[name='instance_code']").value = getInstanceCode(url);
-	document.querySelector("input[name='unit_title']").value = getUnitTitle();
-}
 
 const addFeedbackForm = async () => {
 	// Get form html form api and append to body using fetch
@@ -129,15 +34,7 @@ const addFeedbackForm = async () => {
 		document.body.insertAdjacentHTML('beforeend', html);
 	});
 
-	document.getElementById("technical_error_form").onsubmit = function (e) {
-		postFeedback(e, this, 'btn-technical')
-	};
-	document.getElementById("content_error_form").onsubmit = function (e) {
-		postFeedback(e, this, 'btn-content')
-	};
-	document.getElementById("quiz_error_form").onsubmit = function (e) {
-		postFeedback(e, this, 'btn-quiz')
-	};
+	
 }
 
 const initFUNiXFeedback = (LMSHost = '', isMFE = false) => {	
@@ -146,3 +43,87 @@ const initFUNiXFeedback = (LMSHost = '', isMFE = false) => {
 
 	addFeedbackForm()
 };
+
+
+
+const fetchFeedbackPortal = async (data)=>{
+	const datatext = {
+		student_email : data.student_email,
+		ticket_category : data.ticket_category,
+		course_id : data.course_code,
+		lesson_url : data.lesson_url,
+		image : data.image,
+		ticket_description: data.ticket_description
+	}
+	console.log(datatext)
+	try {
+		const res = await fetch ('https://staging-portal.funix.edu.vn/api/feedback-ticket-management/create' ,
+		{
+			headers:{"Content-Type": "application/json"},
+			method: "POST" ,
+			body : JSON.stringify(datatext)
+		})
+		const data = await res.json()
+		console.log(res, data)
+	} catch (error) {
+		console.log(error)
+	}
+}
+
+
+const fetchFeedbackLMS = async (url , formData)=>{
+	try {
+		const response = await fetch(url, {
+		  method: 'POST',
+		  headers: {
+			'X-CSRFToken': csrf_token
+		  },
+		  body: formData,
+		});
+		const data = await response.json();
+		
+		return data
+	} catch (error) {
+		console.error('API Request Error:', error);
+	  }
+}
+
+
+
+const handlerSubmit  = async (event)=>{
+	event.preventDefault()
+	let url =this.LMSHost + '/api/feedback/create'
+	const lesson_url = window.location.href
+	const csrf_token = document.getElementById('csrf_token').value
+	const feedbackcategory = document.getElementById('feedback-category').value
+	const comment = document.getElementById('comments').value
+	const email = document.getElementById('email').value
+	const formData = new FormData();
+
+	const regex = /course-v1:([^/]+)/;
+	const course_id = lesson_url.match(regex)[0]
+	const course_code = course_id.split('+')[1]
+	formData.append('attachment', fileInput.files[0]);
+	formData.append('category_id', feedbackcategory)
+	formData.append('content' , comment)
+	formData.append('email' , email)
+	formData.append('lesson_url' , lesson_url)
+	formData.append('course_code', course_code)
+
+	try {
+		const data = await fetchFeedbackLMS(url , formData)
+		await fetchFeedbackPortal(data)
+		document.getElementById('fileInput').value = null;
+		document.getElementById('comments').value = '';
+		alert('Cám ơn bạn đã gửi phản hồi lỗi!')
+	} catch (error) {
+		console.log(error)
+	}
+	
+
+
+}
+
+
+
+
