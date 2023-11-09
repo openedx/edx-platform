@@ -75,7 +75,7 @@ def create_feedback (request) :
         feedback.category_id = form.cleaned_data['category_id']
         feedback.content = form.cleaned_data['content']
         feedback.attachment = request.FILES.get('attachment', '')
-        feedback.course_id = form.cleaned_data['course_id']
+        feedback.course_code = form.cleaned_data['course_code']
         feedback.lesson_url = form.cleaned_data['lesson_url']
         feedback.save()
 
@@ -98,7 +98,7 @@ def create_feedback (request) :
         data = {
                 'ticket_category': category_id,
                 'student_email': feedback.email,
-                "course_id" : feedback.course_id,
+                "course_code" : feedback.course_code,
                 "lesson_url" : feedback.lesson_url,
                 'ticket_description': feedback.content ,
                 "image" : attachmentURL

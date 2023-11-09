@@ -12,5 +12,5 @@ class Feedback(models.Model):
     category_id = models.CharField(max_length=250, default="")
     content = models.CharField(max_length=5000)
     attachment = models.ImageField(upload_to=attachment_file_name)
-    course_id = models.CharField(max_length=255)
+    course_code = models.CharField(max_length=255)
     lesson_url = models.URLField(max_length=5000, default="")

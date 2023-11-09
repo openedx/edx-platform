@@ -50,13 +50,14 @@ const fetchFeedbackPortal = async (data)=>{
 	const datatext = {
 		student_email : data.student_email,
 		ticket_category : data.ticket_category,
-		course_id : 1,
+		course_id : data.course_code,
 		lesson_url : data.lesson_url,
 		image : data.image,
 		ticket_description: data.ticket_description
 	}
+	console.log(datatext)
 	try {
-		const res = await fetch ('http://staging-portal.funix.edu.vn/api/feedback-ticket-management/create' ,
+		const res = await fetch ('https://staging-portal.funix.edu.vn/api/feedback-ticket-management/create' ,
 		{
 			headers:{"Content-Type": "application/json"},
 			method: "POST" ,
@@ -80,7 +81,6 @@ const fetchFeedbackLMS = async (url , formData)=>{
 		  body: formData,
 		});
 		const data = await response.json();
-		console.log('API Response:', data);
 		
 		return data
 	} catch (error) {
@@ -102,14 +102,13 @@ const handlerSubmit  = async (event)=>{
 
 	const regex = /course-v1:([^/]+)/;
 	const course_id = lesson_url.match(regex)[0]
-	// const course_status = course_id.split('+')[1]
-	
+	const course_code = course_id.split('+')[1]
 	formData.append('attachment', fileInput.files[0]);
 	formData.append('category_id', feedbackcategory)
 	formData.append('content' , comment)
 	formData.append('email' , email)
 	formData.append('lesson_url' , lesson_url)
-	formData.append('course_id', course_id)
+	formData.append('course_code', course_code)
 
 	try {
 		const data = await fetchFeedbackLMS(url , formData)
