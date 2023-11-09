@@ -107,6 +107,7 @@ from xmodule.exceptions import NotFoundError, ProcessingError  # lint-amnesty, p
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from openedx.features.funix_relative_date import funix_relative_date
+from openedx.features.upload_file import upload_file
 
 
 log = logging.getLogger(__name__)
@@ -931,6 +932,10 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
         Http404: If the course is not found in the modulestore.
     """
     # In this case, we are using Session based authentication, so we need to check CSRF token.
+    if handler == 'upload':
+        upload_file.index(request , course_id, usage_id)
+        return JsonResponse({'a' : '1234'})
+    
     if request.user.is_authenticated:
         error = CsrfViewMiddleware().process_view(request, None, (), {})
         if error:
