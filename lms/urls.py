@@ -53,7 +53,7 @@ from openedx.core.djangoapps.user_authn.views.login import redirect_to_lms_login
 from openedx.features.enterprise_support.api import enterprise_enabled
 from lms.djangoapps.instructor_tools import views as instructor_tools_views
 from lms.djangoapps.instructor_tools import urls as instructor_tools_urls
-from lms.djangoapps.feedback import views as feedback_views
+from lms.djangoapps.feedback import views as feedback_views 
 from openedx.core.djangoapps.content.course_overviews.api import get_course_subtext, set_course_subtext
 
 RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
@@ -1054,6 +1054,9 @@ urlpatterns += instructor_tools_urls.urlpatterns
 # FUNiX Feedback
 urlpatterns += [
     url(r'^feedback/$', feedback_views.index, name='feedback_index')
+]
+urlpatterns += [
+    path('api/feedback/create' , feedback_views.create_feedback , name='feedback_create')
 ]
 
 # course sub-text api 
