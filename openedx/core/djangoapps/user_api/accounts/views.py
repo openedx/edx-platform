@@ -541,7 +541,7 @@ class DeactivateLogoutView(APIView):
       * password: Required. The current password of the user being deactivated.
 
     **POST Response Values**
-     
+
      If account deletion is not enabled,
      the request returns an HTTP 403 "Forbidden" response.
 
