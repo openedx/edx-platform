@@ -4,6 +4,7 @@ API Serializers for content tagging org
 
 from __future__ import annotations
 
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers, fields
 
 from openedx_tagging.core.tagging.rest_api.v1.serializers import (
@@ -14,12 +15,33 @@ from openedx_tagging.core.tagging.rest_api.v1.serializers import (
 from organizations.models import Organization
 
 
+class OptionalSlugRelatedField(serializers.SlugRelatedField):
+    """
+    Modifies the DRF serializer SlugRelatedField.
+
+    Non-existent slug values are represented internally as an empty queryset, instead of throwing a validation error.
+    """
+
+    def to_internal_value(self, data):
+        """
+        Returns the object related to the given slug value, or an empty queryset if not found.
+        """
+
+        queryset = self.get_queryset()
+        try:
+            return queryset.get(**{self.slug_field: data})
+        except ObjectDoesNotExist:
+            return queryset.none()
+        except (TypeError, ValueError):
+            self.fail('invalid')
+
+
 class TaxonomyOrgListQueryParamsSerializer(TaxonomyListQueryParamsSerializer):
     """
     Serializer for the query params for the GET view
     """
 
-    org: fields.Field = serializers.SlugRelatedField(
+    org: fields.Field = OptionalSlugRelatedField(
         slug_field="short_name",
         queryset=Organization.objects.all(),
         required=False,
