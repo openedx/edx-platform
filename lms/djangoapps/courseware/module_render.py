@@ -933,8 +933,14 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     """
     # In this case, we are using Session based authentication, so we need to check CSRF token.
     if handler == 'upload':
-        upload_file.index(request , course_id, usage_id)
-        return JsonResponse({'a' : '1234'})
+        if request.method == 'POST' :
+            print('====POST========')
+            data = upload_file.index(request , course_id, usage_id)
+            return JsonResponse(data)
+        if request.method == 'GET' :
+            data = upload_file.getFileUser(course_id = course_id , block_id = usage_id, email = request.user.email)
+            return JsonResponse(data)
+    
     
     if request.user.is_authenticated:
         error = CsrfViewMiddleware().process_view(request, None, (), {})
