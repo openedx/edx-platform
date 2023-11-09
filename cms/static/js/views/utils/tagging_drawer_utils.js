@@ -1,5 +1,12 @@
 /**
- * Provides utilities for open and close the tagging drawer to manage tags.
+ * Provides utilities to open and close the tagging drawer to manage tags.
+ * 
+ * To use this drawer you need to add the following code into your template:
+ * 
+ * ```
+ * <div id="manage-tags-drawer" class="drawer"></div>
+ * <div class="drawer-cover"></div>
+ * ```
  */
 define(['jquery'],
 function($,) {

@@ -2,8 +2,9 @@
  * Subviews (usually small side panels) for XBlockContainerPage.
  */
 define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/components/utils/view_utils',
-    'js/views/utils/xblock_utils', 'js/views/utils/move_xblock_utils', 'edx-ui-toolkit/js/utils/html-utils'],
-function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, HtmlUtils) {
+    'js/views/utils/xblock_utils', 'js/views/utils/move_xblock_utils', 'edx-ui-toolkit/js/utils/html-utils',
+    'js/views/utils/tagging_drawer_utils'],
+function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, HtmlUtils, TaggingDrawerUtils) {
     'use strict';
 
     var disabledCss = 'is-disabled';
@@ -304,6 +305,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
         events: {
             'click .wrapper-tag-header': 'expandTagContainer',
             'click .tagging-label': 'expandContentTag',
+            'click .manage-tag-button': 'openManageTagDrawer',
         },
 
         initialize: function() {
@@ -396,6 +398,13 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
                     tagListElement.renderTagElements(taxonomy.tags, 1, `tax-${taxonomy.id}`);
                 });
             }
+        },
+
+        openManageTagDrawer: function() {
+            const taxonomyTagsWidgetUrl = this.model.get('taxonomy_tags_widget_url');
+            const contentId = this.model.get('id');
+
+            TaggingDrawerUtils.openDrawer(taxonomyTagsWidgetUrl, contentId);
         },
 
         render: function() {

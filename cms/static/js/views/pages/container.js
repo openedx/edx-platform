@@ -8,10 +8,11 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
     'js/models/xblock_info', 'js/views/xblock_string_field_editor', 'js/views/xblock_access_editor',
     'js/views/pages/container_subviews', 'js/views/unit_outline', 'js/views/utils/xblock_utils',
     'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
+    'js/views/utils/tagging_drawer_utils',
 ],
 function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView, AddXBlockComponent,
     EditXBlockModal, MoveXBlockModal, XBlockInfo, XBlockStringFieldEditor, XBlockAccessEditor,
-    ContainerSubviews, UnitOutlineView, XBlockUtils, NotificationView, PromptView) {
+    ContainerSubviews, UnitOutlineView, XBlockUtils, NotificationView, PromptView, TaggingDrawerUtils) {
     'use strict';
 
     var XBlockContainerPage = BasePage.extend({
@@ -418,8 +419,11 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             this.duplicateComponent(this.findXBlockElement(event.target));
         },
 
-        openManageTags: function() {
-            // TODO open manage tags drawer
+        openManageTags: function(event) {
+            const taxonomyTagsWidgetUrl = this.model.get('taxonomy_tags_widget_url');
+            const contentId = this.findXBlockElement(event.target).data('locator');
+
+            TaggingDrawerUtils.openDrawer(taxonomyTagsWidgetUrl, contentId);
         },
 
         showMoveXBlockModal: function(event) {

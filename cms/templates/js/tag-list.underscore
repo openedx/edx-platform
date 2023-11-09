@@ -25,7 +25,7 @@
                     <div class="content-tags-tax-<%- taxonomy.id %> is-hidden"></div>
                 <% } %>
             </div>
-            <a class="action-primary">
+            <a class="action-primary manage-tag-button">
                 <%- gettext("Manage tags") %>
             </a>
         </div>
