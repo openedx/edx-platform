@@ -26,3 +26,14 @@ PUBLIC_VIDEO_SHARE = CourseWaffleFlag(
 TRANSCRIPT_FEEDBACK = CourseWaffleFlag(
     f'{WAFFLE_FLAG_NAMESPACE}.transcript_feedback', __name__
 )
+
+# .. toggle_name: video_config.xpert_translations_ui
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Gates access to the Xpert Translations UI feature.
+# .. toggle_use_cases: temporary, opt_in
+# .. toggle_creation_date: 2023-10-11
+# .. toggle_target_removal_date: None
+XPERT_TRANSLATIONS_UI = CourseWaffleFlag(
+    f'{WAFFLE_FLAG_NAMESPACE}.xpert_translations_ui', __name__
+)
