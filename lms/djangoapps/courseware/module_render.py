@@ -108,7 +108,7 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from openedx.features.funix_relative_date import funix_relative_date
 from openedx.features.upload_file import upload_file
-
+from openedx.core.djangoapps.content.course_overviews .models import CourseResultLab 
 
 log = logging.getLogger(__name__)
 
@@ -932,15 +932,23 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
         Http404: If the course is not found in the modulestore.
     """
     # In this case, we are using Session based authentication, so we need to check CSRF token.
+
     if handler == 'upload':
         if request.method == 'POST' :
-            print('====POST========')
-            data = upload_file.index(request , course_id, usage_id)
+            data = {}
+            file = upload_file.index(request , course_id, usage_id)
+            result_lab = CourseResultLab.getResultLab(course_id=course_id, block_id=usage_id)
+            data['url'] = file.get('url', '') 
+            data['result_lab'] = result_lab
             return JsonResponse(data)
         if request.method == 'GET' :
-            data = upload_file.getFileUser(course_id = course_id , block_id = usage_id, email = request.user.email)
+            data = {}
+            file = upload_file.getFileUser(course_id = course_id , block_id = usage_id, email = request.user.email)
+            result_lab = CourseResultLab.getResultLab(course_id=course_id, block_id=usage_id)
+            data['url'] = file.get('url', '') 
+            data['result_lab'] = result_lab
             return JsonResponse(data)
-    
+   
     
     if request.user.is_authenticated:
         error = CsrfViewMiddleware().process_view(request, None, (), {})

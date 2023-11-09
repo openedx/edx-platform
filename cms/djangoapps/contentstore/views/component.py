@@ -28,11 +28,11 @@ from openedx.core.lib.xblock_utils import get_aside_from_xblock, is_xblock_aside
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-
+from common.djangoapps.util.json_request import JsonResponse
 from ..utils import get_lms_link_for_item, get_sibling_urls, reverse_course_url
 from .helpers import get_parent_xblock, is_unit, xblock_type_display_name
 from .item import StudioEditModuleRuntime, add_container_page_publishing_info, create_xblock_info
-
+from openedx.core.djangoapps.content.course_overviews .models import CourseResultLab 
 __all__ = [
     'container_handler',
     'component_handler'
@@ -537,6 +537,16 @@ def component_handler(request, usage_key_string, handler, suffix=''):
             django response
     """
     usage_key = UsageKey.from_string(usage_key_string)
+    if handler == 'result_lab' :
+        if request.method == 'POST' :
+            resutl_lab = request.POST.get('result_lab')
+            CourseResultLab.createResultLab(block_id = usage_key_string , course_id=str(usage_key.course_key), result=resutl_lab)
+            return JsonResponse({"results":'success'})
+        if request.method == "GET" :
+            data = ''
+            data = CourseResultLab.getResultLab(block_id = usage_key_string , course_id=str(usage_key.course_key))
+            return JsonResponse({'result' : data})
+
 
     # Addendum:
     # TNL 101-62 studio write permission is also checked for editing content.

@@ -1230,3 +1230,35 @@ class CourseUnitTime (models.Model):
         except:
             return None
     
+# course lab resutls
+class CourseResultLab(models.Model):
+    block_id =  models.CharField(max_length=255)
+    course_id = models.CharField(max_length=255)
+    result = models.TextField(default='')
+    
+    def __str__ (self) :
+        return self.block_id
+    
+    @classmethod
+    def createResultLab (self,course_id, block_id, result) :
+        existing_result = CourseResultLab.objects.filter(course_id=course_id, block_id=block_id).first()
+
+        if existing_result:
+            existing_result.result = result
+            existing_result.save()
+        else:
+            new_result = CourseResultLab(course_id=course_id, block_id=block_id, result=result)
+            new_result.save()
+
+    @classmethod
+    def getResultLab (self, course_id, block_id) :
+
+        try:
+            return CourseResultLab.objects.filter(course_id=course_id, block_id=block_id)[0].result
+        except :
+            return ''
+
+
+        
+
+
