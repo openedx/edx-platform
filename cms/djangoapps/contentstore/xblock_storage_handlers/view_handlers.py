@@ -38,7 +38,7 @@ from xblock.core import XBlock
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
-from cms.djangoapps.contentstore.toggles import ENABLE_COPY_PASTE_UNITS
+from cms.djangoapps.contentstore.toggles import ENABLE_COPY_PASTE_UNITS, use_tagging_taxonomy_list_page
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.ai_aside_summary_config import AiAsideSummaryConfig
 from common.djangoapps.edxmako.services import MakoService
@@ -1399,6 +1399,10 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
 
             # If the ENABLE_COPY_PASTE_UNITS feature flag is enabled, we show the newer menu that allows copying/pasting
             xblock_info["enable_copy_paste_units"] = ENABLE_COPY_PASTE_UNITS.is_enabled()
+
+            # If the ENABLE_TAGGING_TAXONOMY_LIST_PAGE feature flag is enabled, we show the "Manage Tags" options
+            if use_tagging_taxonomy_list_page():
+                xblock_info["use_tagging_taxonomy_list_page"] = True
 
             xblock_info[
                 "has_partition_group_components"

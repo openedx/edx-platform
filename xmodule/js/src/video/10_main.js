@@ -65,14 +65,15 @@
             'video/09_completion.js',
             'video/10_commands.js',
             'video/095_video_context_menu.js',
-            'video/036_video_social_sharing.js'
+            'video/036_video_social_sharing.js',
+            'video/037_video_transcript_feedback.js'
         ],
         function(
             VideoStorage, initialize, FocusGrabber, VideoAccessibleMenu, VideoControl, VideoFullScreen,
             VideoQualityControl, VideoProgressSlider, VideoVolumeControl, VideoSpeedControl, VideoAutoAdvanceControl,
             VideoCaption, VideoPlayPlaceholder, VideoPlayPauseControl, VideoPlaySkipControl, VideoSkipControl,
             VideoBumper, VideoSaveStatePlugin, VideoEventsPlugin, VideoEventsBumperPlugin, VideoPoster,
-            VideoCompletionHandler, VideoCommands, VideoContextMenu, VideoSocialSharing
+            VideoCompletionHandler, VideoCommands, VideoContextMenu, VideoSocialSharing, VideoTranscriptFeedback
         ) {
             /* RequireJS */
             var youtubeXhr = null,
@@ -92,10 +93,10 @@
                         FocusGrabber, VideoControl, VideoPlayPlaceholder,
                         VideoPlayPauseControl, VideoProgressSlider, VideoSpeedControl,
                         VideoVolumeControl, VideoQualityControl, VideoFullScreen, VideoCaption, VideoCommands,
-                        VideoContextMenu, VideoSaveStatePlugin, VideoEventsPlugin, VideoCompletionHandler
+                        VideoContextMenu, VideoSaveStatePlugin, VideoEventsPlugin, VideoCompletionHandler, VideoTranscriptFeedback
                     ].concat(autoAdvanceEnabled ? [VideoAutoAdvanceControl] : []),
                     bumperVideoModules = [VideoControl, VideoPlaySkipControl, VideoSkipControl,
-                        VideoVolumeControl, VideoCaption, VideoCommands, VideoSaveStatePlugin,
+                        VideoVolumeControl, VideoCaption, VideoCommands, VideoSaveStatePlugin, VideoTranscriptFeedback,
                         VideoEventsBumperPlugin, VideoCompletionHandler],
                     state = {
                         el: el,

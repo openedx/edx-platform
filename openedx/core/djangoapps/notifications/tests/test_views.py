@@ -18,7 +18,11 @@ from rest_framework.test import APIClient, APITestCase
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, SHOW_NOTIFICATIONS_TRAY
+from openedx.core.djangoapps.notifications.config.waffle import (
+    ENABLE_COURSEWIDE_NOTIFICATIONS,
+    ENABLE_NOTIFICATIONS,
+    SHOW_NOTIFICATIONS_TRAY
+)
 from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, Notification
 from openedx.core.djangoapps.notifications.serializers import NotificationCourseEnrollmentSerializer
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -255,7 +259,8 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         Test get user notification preference.
         """
         self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
-        response = self.client.get(self.path)
+        with override_waffle_flag(ENABLE_COURSEWIDE_NOTIFICATIONS, active=True):
+            response = self.client.get(self.path)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, self._expected_api_response())
         event_name, event_data = mock_emit.call_args[0]
