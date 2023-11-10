@@ -55,8 +55,10 @@ class TaxonomyOrgView(TaxonomyView):
         query_params = TaxonomyOrgListQueryParamsSerializer(data=self.request.query_params.dict())
         query_params.is_valid(raise_exception=True)
         enabled = query_params.validated_data.get("enabled", None)
+
+        # If org filtering was requested, then use it, even if the org is invalid/None
         org = query_params.validated_data.get("org", None)
-        if org:
+        if "org" in query_params.validated_data:
             queryset = get_taxonomies_for_org(enabled, org)
         else:
             queryset = get_taxonomies(enabled)

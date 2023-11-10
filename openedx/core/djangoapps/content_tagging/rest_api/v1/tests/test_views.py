@@ -348,6 +348,8 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
         ("orgA", ["st1", "st2", "t1", "t2", "tA1", "tA2", "tBA1", "tBA2"]),
         ("orgB", ["st1", "st2", "t1", "t2", "tB1", "tB2", "tBA1", "tBA2"]),
         ("orgX", ["st1", "st2", "t1", "t2"]),
+        # Non-existent orgs are ignored
+        ("invalidOrg", ["st1", "st2", "t1", "t2"]),
     )
     @ddt.unpack
     def test_list_taxonomy_org_filter(self, org_parameter: str, expected_taxonomies: list[str]) -> None:
@@ -359,20 +361,6 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
             org_parameter=org_parameter,
             expected_taxonomies=expected_taxonomies,
         )
-
-    def test_list_taxonomy_invalid_org(self) -> None:
-        """
-        Tests that using an invalid org in the filter will raise BAD_REQUEST
-        """
-        url = TAXONOMY_ORG_LIST_URL
-
-        self.client.force_authenticate(user=self.staff)
-
-        query_params = {"org": "invalidOrg"}
-
-        response = self.client.get(url, query_params, format="json")
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @ddt.data(
         ("user", (), None),
