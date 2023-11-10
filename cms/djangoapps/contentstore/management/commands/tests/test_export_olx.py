@@ -6,7 +6,7 @@ Tests for exporting OLX content.
 import shutil
 import tarfile
 import unittest
-from io import StringIO
+from io import BytesIO
 from tempfile import mkdtemp
 
 from django.core.management import CommandError, call_command
@@ -81,18 +81,20 @@ class TestCourseExportOlx(ModuleStoreTestCase):
         with tarfile.open(filename) as tar_file:
             self.check_export_file(tar_file, test_course_key)
 
-    # There is a bug in the underlying management/base code that tries to make
-    # all manageent command output be unicode.  This management command
-    # outputs the binary tar file data and so breaks in python3.  In python2
-    # the code is happy to pass bytes back and forth and in later versions of
-    # django this is fixed.  Howevere it's not possible to get this test to
-    # pass in Python3 and django 1.11
-    @unittest.skip("Bug in django 1.11 prevents this from working in python3.  Re-enable after django 2.x upgrade.")
     def test_export_course_stdout(self):
+        """Check content of stdout."""
+
+        class BytesIOBufferWrapper:
+            """wrapper to facilitate operations with a BytesIO as a buffer"""
+
+            def __init__(self, bytes_io):
+                self.bytes_io = bytes_io
+                self.buffer = bytes_io
+
         test_course_key = self.create_dummy_course(ModuleStoreEnum.Type.split)
-        out = StringIO()
-        call_command('export_olx', str(test_course_key), stdout=out)
-        out.seek(0)
-        output = out.read()
-        with tarfile.open(fileobj=StringIO(output)) as tar_file:
+        output_wrapper = BytesIOBufferWrapper(BytesIO())
+        call_command('export_olx', str(test_course_key))
+        output_wrapper.bytes_io.seek(0)
+        output = output_wrapper.bytes_io.read()
+        with tarfile.open(fileobj=BytesIO(output), mode="r:gz") as tar_file:
             self.check_export_file(tar_file, test_course_key)
