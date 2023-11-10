@@ -1517,9 +1517,6 @@ tomlkit==0.12.2
 tox==3.28.0
     # via
     #   -r requirements/edx/testing.in
-    #   tox-battery
-tox-battery==0.6.2
-    # via -r requirements/edx/testing.in
 tqdm==4.66.1
     # via
     #   -r requirements/edx/base.txt
