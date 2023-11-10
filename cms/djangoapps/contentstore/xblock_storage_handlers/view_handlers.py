@@ -24,6 +24,7 @@ from django.utils.translation import gettext as _
 from edx_django_utils.plugins import pluggable_override
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
+from openedx_tagging.core.tagging import api as tagging_api
 from edx_proctoring.api import (
     does_backend_support_onboarding,
     get_exam_by_content_id,
@@ -1400,6 +1401,9 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             # If the ENABLE_TAGGING_TAXONOMY_LIST_PAGE feature flag is enabled, we show the "Manage Tags" options
             if use_tagging_taxonomy_list_page():
                 xblock_info["use_tagging_taxonomy_list_page"] = True
+                # Create a pattern to match the IDs of the units, e.g. "block-v1:org+course+run+type@vertical+block@*"
+                unit_key_pattern = str(xblock.location.replace(block_type="vertical")).rsplit("@", 1)[0] + "@*"
+                xblock_info["tag_counts_by_unit"] = tagging_api.get_object_tag_counts(unit_key_pattern)
 
             xblock_info[
                 "has_partition_group_components"
