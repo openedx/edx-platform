@@ -1315,7 +1315,7 @@ openedx-filters==1.6.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
-openedx-learning @ git+https://github.com/open-craft/openedx-learning@rpenido/fal-3532-import-taxonomy-bare-bones
+openedx-learning==0.3.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
