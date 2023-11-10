@@ -2,10 +2,6 @@
 Tagging Org API Views
 """
 from openedx_tagging.core.tagging import rules as oel_tagging_rules
-from openedx_tagging.core.tagging.import_export.api import get_last_import_log, import_tags
-from openedx_tagging.core.tagging.rest_api.v1.serializers import (
-    TaxonomyImportNewBodySerializer,
-)
 from openedx_tagging.core.tagging.rest_api.v1.views import ObjectTagView, TaxonomyView
 from rest_framework import status
 from rest_framework.decorators import action
@@ -15,6 +11,7 @@ from rest_framework.response import Response
 
 from ...api import (
     create_taxonomy,
+    get_taxonomy,
     get_taxonomies,
     get_taxonomies_for_org,
     set_taxonomy_orgs,
@@ -74,39 +71,30 @@ class TaxonomyOrgView(TaxonomyView):
         serializer.instance = create_taxonomy(**serializer.validated_data, orgs=user_admin_orgs)
 
     @action(detail=False, url_path="import", methods=["post"])
-    def create_import(self, request: Request, **_kwargs) -> Response:
+    def create_import(self, request: Request, **kwargs) -> Response:
         """
-        Creates a new taxonomy and imports the tags from the uploaded file.
+        Creates a new taxonomy with the given orgs and imports the tags from the uploaded file.
         """
-        body = TaxonomyImportNewBodySerializer(data=request.data)
-        body.is_valid(raise_exception=True)
+        response = super().create_import(request, **kwargs)
 
-        taxonomy_name = body.validated_data["taxonomy_name"]
-        taxonomy_description = body.validated_data["taxonomy_description"]
-        file = body.validated_data["file"].file
-        parser_format = body.validated_data["parser_format"]
-
-        # ToDo: This code is temporary
-        # In the future, the orgs parameter will be defined in the request body from the frontend
-        # See: https://github.com/openedx/modular-learning/issues/116
-        if oel_tagging_rules.is_taxonomy_admin(request.user):
-            orgs = None
-        else:
-            orgs = get_admin_orgs(request.user)
-
-        taxonomy = create_taxonomy(taxonomy_name, taxonomy_description, orgs=orgs)
-        try:
-            import_success = import_tags(taxonomy, file, parser_format)
-
-            if import_success:
-                serializer = self.get_serializer(taxonomy)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # If creation was successful, set the orgs for the new taxonomy
+        if status.is_success(response.status_code):
+            # ToDo: This code is temporary
+            # In the future, the orgs parameter will be defined in the request body from the frontend
+            # See: https://github.com/openedx/modular-learning/issues/116
+            if oel_tagging_rules.is_taxonomy_admin(request.user):
+                orgs = None
             else:
-                import_error = get_last_import_log(taxonomy)
-                taxonomy.delete()
-                return Response(import_error, status=status.HTTP_400_BAD_REQUEST)
-        except ValueError as e:
-            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+                orgs = get_admin_orgs(request.user)
+
+            taxonomy = get_taxonomy(response.data["id"])
+            assert taxonomy
+            set_taxonomy_orgs(taxonomy, all_orgs=False, orgs=orgs)
+
+            serializer = self.get_serializer(taxonomy)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return response
 
     @action(detail=True, methods=["put"])
     def orgs(self, request, **_kwargs) -> Response:
