@@ -347,6 +347,6 @@ urlpatterns += [
 # Custom settings are provided in SPECTACULAR_SETTINGS in cms/envs/common.py.
 # Filter function in cms/lib/spectacular.py determines paths that are swagger-documented.
 urlpatterns += [
-    re_path('^cms-api/ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    re_path('^cms-api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    re_path('^authoring-api/ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    re_path('^authoring-api/schema/', SpectacularAPIView.as_view(), name='schema'),
 ]
