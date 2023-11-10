@@ -48,6 +48,7 @@ from openedx.core.lib.xblock_utils import (
 from ..utils import get_visibility_partition_info
 from .access import get_user_role
 from .session_kv_store import SessionKeyValueStore
+from common.djangoapps.util.json_request import JsonResponse
 
 __all__ = ['preview_handler']
 
@@ -64,6 +65,9 @@ def preview_handler(request, usage_key_string, handler, suffix=''):
     handler: The handler to execute
     suffix: The remainder of the url to be passed to the handler
     """
+    if handler == 'upload' :
+        return JsonResponse({"a":"1"})
+    
     usage_key = UsageKey.from_string(usage_key_string)
 
     descriptor = modulestore().get_item(usage_key)
@@ -71,6 +75,7 @@ def preview_handler(request, usage_key_string, handler, suffix=''):
 
     # Let the module handle the AJAX
     req = django_to_webob_request(request)
+    
     try:
         resp = instance.handle(handler, req, suffix)
 

@@ -1742,6 +1742,7 @@ INSTALLED_APPS = [
     'openedx.features.toggle_feature',
     'openedx.features.funix_goal',
     'openedx.features.funix_specialization',
+    'openedx.features.upload_file',
     'lms.djangoapps.experiments',
 
     'openedx.core.djangoapps.external_user_ids',
