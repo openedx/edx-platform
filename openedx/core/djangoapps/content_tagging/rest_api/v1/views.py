@@ -109,30 +109,6 @@ class TaxonomyOrgView(TaxonomyView):
         except ValueError as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, url_path="tags/import", methods=["put"])
-    def update_import(self, request: Request, **_kwargs) -> Response:
-        """
-        Creates a new taxonomy and imports the tags from the uploaded file.
-        """
-        body = TaxonomyImportBodySerializer(data=request.data)
-        body.is_valid(raise_exception=True)
-
-        file = body.validated_data["file"].file
-        parser_format = body.validated_data["parser_format"]
-
-        taxonomy = self.get_object()
-        try:
-            import_success = import_tags(taxonomy, file, parser_format)
-
-            if import_success:
-                serializer = self.get_serializer(taxonomy)
-                return Response(serializer.data)
-            else:
-                import_error = get_last_import_log(taxonomy)
-                return Response(import_error, status=status.HTTP_400_BAD_REQUEST)
-        except ValueError as e:
-            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
-
     @action(detail=True, methods=["put"])
     def orgs(self, request, **_kwargs) -> Response:
         """
