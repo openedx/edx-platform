@@ -1022,7 +1022,6 @@ packaging==23.2
     #   drf-yasg
     #   gunicorn
     #   py2neo
-    #   pyproject-api
     #   pytest
     #   snowflake-connector-python
     #   tox
@@ -1508,7 +1507,6 @@ tomli==2.0.1
     #   coverage
     #   import-linter
     #   pylint
-    #   pyproject-api
     #   pytest
     #   tox
 tomlkit==0.12.2
