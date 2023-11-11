@@ -143,6 +143,11 @@ jobs:
         ./manage.py lms showmigrations > ${{ github.workspace }}/def.txt
 
 
+    - name: Debug File Paths
+      run: |
+        ls -R ${{ github.workspace }}
+
+
     - name: Process Data
       run: |
         FILE1_PATH="${{ github.workspace }}/abc.txt"
