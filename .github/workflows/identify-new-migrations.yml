@@ -115,7 +115,7 @@ jobs:
         STUDIO_CFG: lms/envs/minimal.yml
       run: |
         echo "Running the LMS migrations."
-        ./manage.py lms showmigrations
+        ./manage.py lms showmigrations > abc.txt
 
     - name: Checkout your branch repo
       uses: actions/checkout@v2
@@ -132,13 +132,13 @@ jobs:
       run: |
         pip freeze
 
-    - name: Run Tests
+    - name: Run migrations on test branch
       env:
         LMS_CFG: lms/envs/minimal.yml
         # This is from the LMS dir on purpose since we don't need anything different for the CMS yet.
         STUDIO_CFG: lms/envs/minimal.yml
       run: |
-        ./manage.py lms showmigrations
+        ./manage.py lms showmigrations > def.txt
 
     - name: Process Data
       run: |
