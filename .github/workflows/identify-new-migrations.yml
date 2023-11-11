@@ -145,8 +145,8 @@ jobs:
 
     - name: Process Data
       run: |
-        FILE1_PATH=${{ github.workspace }}/abc.txt
-        FILE2_PATH=${{ github.workspace }}def.txt
+        FILE1_PATH="${{ github.workspace }}/abc.txt"
+        FILE2_PATH="${{ github.workspace }}/def.txt"
 
         # Fetch the content of the files
         FILE1_CONTENT=$(cat $FILE1_PATH)
