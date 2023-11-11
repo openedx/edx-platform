@@ -109,6 +109,7 @@ jobs:
         fi
 
     - name: Run migrations on master branch
+      shell: bash
       env:
         LMS_CFG: lms/envs/minimal.yml
         # This is from the LMS dir on purpose since we don't need anything different for the CMS yet.
@@ -133,6 +134,7 @@ jobs:
         pip freeze
 
     - name: Run migrations on test branch
+      shell: bash
       env:
         LMS_CFG: lms/envs/minimal.yml
         # This is from the LMS dir on purpose since we don't need anything different for the CMS yet.
@@ -142,8 +144,8 @@ jobs:
 
     - name: Process Data
       run: |
-        FILE1_PATH=abc.txt
-        FILE2_PATH=def.txt
+        FILE1_PATH="abc.txt"
+        FILE2_PATH="def.txt"
 
         # Fetch the content of the files
         FILE1_CONTENT=$(cat $FILE1_PATH)
