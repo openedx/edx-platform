@@ -1,10 +1,11 @@
-name: identify any newly added or removed migrations
+name: Identify
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
     branches:
-      - check-migrations
+      - master
 
 jobs:
   identify_migrations:
@@ -114,7 +115,7 @@ jobs:
         STUDIO_CFG: lms/envs/minimal.yml
       run: |
         echo "Running the LMS migrations."
-        ./manage.py lms showmigrations > abc.txt
+        ./manage.py lms showmigrations
 
     - name: Checkout your branch repo
       uses: actions/checkout@v2
@@ -137,7 +138,7 @@ jobs:
         # This is from the LMS dir on purpose since we don't need anything different for the CMS yet.
         STUDIO_CFG: lms/envs/minimal.yml
       run: |
-        ./manage.py lms showmigrations > def.txt
+        ./manage.py lms showmigrations
 
     - name: Process Data
       run: |
