@@ -1,8 +1,10 @@
 name: identify any newly added or removed migrations
 
 on:
-  - pull_request
-
+  pull_request:
+  push:
+    branches:
+      - check-migrations
 
 jobs:
   identify_migrations:
