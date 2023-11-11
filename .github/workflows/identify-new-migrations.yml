@@ -142,6 +142,10 @@ jobs:
       run: |
         ./manage.py lms showmigrations > def.txt
 
+    - name: Access the file in the next step
+        run: cat abc.txt
+        working-directory: ${{ github.workspace }}
+
     - name: Process Data
       run: |
         FILE1_PATH="abc.txt"
