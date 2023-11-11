@@ -116,7 +116,7 @@ jobs:
         STUDIO_CFG: lms/envs/minimal.yml
       run: |
         echo "Running the LMS migrations."
-        ./manage.py lms showmigrations > abc.txt
+        ./manage.py lms showmigrations > ${{ github.workspace }}/abc.txt
 
     - name: Checkout your branch repo
       uses: actions/checkout@v2
@@ -140,7 +140,7 @@ jobs:
         # This is from the LMS dir on purpose since we don't need anything different for the CMS yet.
         STUDIO_CFG: lms/envs/minimal.yml
       run: |
-        ./manage.py lms showmigrations > def.txt
+        ./manage.py lms showmigrations > ${{ github.workspace }}/def.txt
 
     - name: Access the file in the next step
       run: cat abc.txt
@@ -148,8 +148,8 @@ jobs:
 
     - name: Process Data
       run: |
-        FILE1_PATH="abc.txt"
-        FILE2_PATH="def.txt"
+        FILE1_PATH=${{ github.workspace }}/abc.txt
+        FILE2_PATH=${{ github.workspace }}def.txt
 
         # Fetch the content of the files
         FILE1_CONTENT=$(cat $FILE1_PATH)
