@@ -115,18 +115,7 @@ jobs:
         STUDIO_CFG: lms/envs/minimal.yml
       run: |
         echo "Running the LMS migrations."
-        ./manage.py lms migrate
-        echo "Running the CMS migrations."
-        ./manage.py cms migrate
-
-    - name: Verify executed migrations on master.
-      shell: bash
-      run: |
-        query_result1=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select count(*) from django_migrations;" edxapp;)
-        echo "echo $query_result1"
-        numeric_result=$(echo "$query_result1" | tr -d '\n' | sed -E 's/[^0-9]+//g')
-        echo "Numeric Result: $numeric_result"
-        echo "FIRST_QUERY=$numeric_result" >> $GITHUB_ENV
+        ./manage.py lms showmigrations > abc.txt
 
     - name: Checkout your branch repo
       uses: actions/checkout@v2
@@ -149,34 +138,17 @@ jobs:
         # This is from the LMS dir on purpose since we don't need anything different for the CMS yet.
         STUDIO_CFG: lms/envs/minimal.yml
       run: |
-        echo "Running the LMS migrations."
-        ./manage.py lms makemigrations
-        ./manage.py lms migrate
-        echo "Running the CMS migrations."
-        ./manage.py cms makemigrations
-        ./manage.py cms migrate
-
-    - name: Verify executed migrations on your branch.
-      shell: bash
-      id: capture2
-      run: |
-        query_result1=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select count(*) from django_migrations;" edxapp;)
-        echo "echo $query_result1"
-        numeric_result=$(echo "$query_result1" | tr -d '\n' | sed -E 's/[^0-9]+//g')
-        echo "Numeric Result: $numeric_result"
-        echo "SECOND_QUERY=$numeric_result" >> $GITHUB_ENV
+        ./manage.py lms showmigrations > def.txt
 
     - name: Process Data
       run: |
-        number2=${{ env.SECOND_QUERY }}
-        number1=${{ env.FIRST_QUERY }}
-        diff=$((number2 - number1))
-        if [ $number2 -gt $number1 ]; then
-          data=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select name from django_migrations ORDER by -id limit $diff;" edxapp;)
-          echo "$data" > cleaned_data.txt
-        elif [ $number1 -gt $number2 ]; then
-           echo "Your PR removed migrations." > cleaned_data.txt
-        fi
+        FILE1_PATH="abc.txt"
+        FILE2_PATH="def.txt"
+
+        # Fetch the content of the files
+        FILE1_CONTENT=$(cat $FILE1_PATH)
+        FILE2_CONTENT=$(cat $FILE2_PATH)
+        git diff --no-index --color-words $FILE1_PATH $FILE2_PATH
       shell: bash
 
     - name: Comment PR
