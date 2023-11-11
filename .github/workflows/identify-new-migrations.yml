@@ -142,8 +142,8 @@ jobs:
 
     - name: Process Data
       run: |
-        FILE1_PATH="abc.txt"
-        FILE2_PATH="def.txt"
+        FILE1_PATH=abc.txt
+        FILE2_PATH=def.txt
 
         # Fetch the content of the files
         FILE1_CONTENT=$(cat $FILE1_PATH)
@@ -151,8 +151,8 @@ jobs:
         git diff --no-index --color-words $FILE1_PATH $FILE2_PATH
       shell: bash
 
-    - name: Comment PR
-      uses: thollander/actions-comment-pull-request@v2
-      with:
-        filePath:  cleaned_data.txt
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#    - name: Comment PR
+#      uses: thollander/actions-comment-pull-request@v2
+#      with:
+#        filePath:  cleaned_data.txt
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
