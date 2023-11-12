@@ -114,7 +114,7 @@ jobs:
         LMS_CFG: lms/envs/minimal.yml
         STUDIO_CFG: lms/envs/minimal.yml
       run: |
-        ./manage.py lms showmigrations
+        ./manage.py lms showmigrations > abcd.txt
 
     - name: Checkout your branch repo
       uses: actions/checkout@v2
