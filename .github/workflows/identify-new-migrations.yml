@@ -115,7 +115,6 @@ jobs:
         # This is from the LMS dir on purpose since we don't need anything different for the CMS yet.
         STUDIO_CFG: lms/envs/minimal.yml
       run: |
-        echo "Running the LMS migrations."
         ./manage.py lms showmigrations > ${{ github.workspace }}/abcd.txt
 
     - name: Checkout your branch repo
