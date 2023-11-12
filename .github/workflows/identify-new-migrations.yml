@@ -112,10 +112,9 @@ jobs:
       shell: bash
       env:
         LMS_CFG: lms/envs/minimal.yml
-        # This is from the LMS dir on purpose since we don't need anything different for the CMS yet.
         STUDIO_CFG: lms/envs/minimal.yml
       run: |
-        ./manage.py lms showmigrations > ${{ github.workspace }}/abcd.txt
+        ./manage.py lms showmigrations
 
     - name: Checkout your branch repo
       uses: actions/checkout@v2
@@ -136,7 +135,6 @@ jobs:
       shell: bash
       env:
         LMS_CFG: lms/envs/minimal.yml
-        # This is from the LMS dir on purpose since we don't need anything different for the CMS yet.
         STUDIO_CFG: lms/envs/minimal.yml
       run: |
         ./manage.py lms showmigrations > ${{ github.workspace }}/def.txt
