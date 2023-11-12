@@ -116,7 +116,7 @@ jobs:
         STUDIO_CFG: lms/envs/minimal.yml
       run: |
         echo "Running the LMS migrations."
-        ./manage.py lms showmigrations > ${{ github.workspace }}/abc.txt
+        ./manage.py lms showmigrations > ${{ github.workspace }}/abcd.txt
 
     - name: Checkout your branch repo
       uses: actions/checkout@v2
@@ -151,7 +151,7 @@ jobs:
     - name: Process Data
       run: |
         FILE1_PATH="${{ github.workspace }}/def.txt"
-        FILE2_PATH="${{ github.workspace }}/abc.txt"
+        FILE2_PATH="${{ github.workspace }}/abcd.txt"
 
         # Fetch the content of the files
         FILE1_CONTENT=$(cat $FILE1_PATH)
