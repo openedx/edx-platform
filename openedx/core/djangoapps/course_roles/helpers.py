@@ -5,7 +5,7 @@ from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pyli
 from django.utils.translation import gettext as _
 
 from edx_toggles.toggles import WaffleFlag
-from openedx.core.djangoapps.course_roles.models import CourseRolesUserRole
+from openedx.core.djangoapps.course_roles.models import UserRole
 from xmodule.modulestore.django import modulestore
 
 
@@ -36,7 +36,7 @@ def user_has_permission_course(user, permission_name, course_id):
         return False
     if isinstance(user, AnonymousUser) or not isinstance(user, User):
         return False
-    return CourseRolesUserRole.objects.filter(
+    return UserRole.objects.filter(
         user=user,
         role__permissions__name=permission_name,
         course=course_id,
@@ -67,7 +67,7 @@ def user_has_permission_org(user, permission_name, organization_name):
         return False
     if isinstance(user, AnonymousUser) or not isinstance(user, User):
         return False
-    return CourseRolesUserRole.objects.filter(
+    return UserRole.objects.filter(
         user=user,
         role__permissions__name=permission_name,
         course__isnull=True,
@@ -135,18 +135,18 @@ def get_all_user_permissions_for_a_course(user_id, course_id):
         raise ValueError(_('course_id is not valid')) from exc
     if not course:
         raise ValueError(_('course does not exist'))
-    course_permissions = set(CourseRolesUserRole.objects.filter(
+    course_permissions = set(UserRole.objects.filter(
         user__id=user_id,
         course=course_id,
     ).values_list('role__permissions__name', flat=True))
     organization_name = course.org
-    organization_permissions = set(CourseRolesUserRole.objects.filter(
+    organization_permissions = set(UserRole.objects.filter(
         user__id=user_id,
         course__isnull=True,
         org__name=organization_name,
     ).values_list('role__permissions__name', flat=True))
     permissions = course_permissions.union(organization_permissions)
-    instance_permissions = set(CourseRolesUserRole.objects.filter(
+    instance_permissions = set(UserRole.objects.filter(
         user__id=user_id,
         course__isnull=True,
         org__isnull=True,
