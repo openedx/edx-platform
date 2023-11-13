@@ -153,9 +153,14 @@ jobs:
         # Fetch the content of the files
         FILE1_CONTENT=$(cat $FILE1_PATH)
         FILE2_CONTENT=$(cat $FILE2_PATH)
-        git diff $FILE1_PATH $FILE2_PATH > mydiff
-        echo "mydiff = "
-        cat mydiff
+
+        if git diff --quiet $FILE1_PATH $FILE2_PATH; then
+          echo "Files are identical."
+        else
+          git diff $FILE1_PATH $FILE2_PATH > mydiff
+          echo "mydiff = "
+          cat mydiff
+        fi
       shell: bash
 #
 #    - name: Comment PR
