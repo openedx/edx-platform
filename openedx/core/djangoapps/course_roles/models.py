@@ -10,26 +10,26 @@ from organizations.models import Organization
 User = get_user_model()
 
 
-class CourseRolesRole(models.Model):
+class Role(models.Model):
     """
-    Model for a course roles role.
+    Model for a role.
 
     A role is a collection of permissions that can be assigned to a user.
     The services field defines in which service UI the role is intended to be assigned, such as CMS and/or LMS.
 
     """
     name = models.CharField(max_length=255)
-    services = models.ManyToManyField('CourseRolesService', through='CourseRolesRoleService')
-    permissions = models.ManyToManyField('CourseRolesPermission', through='CourseRolesRolePermissions')
-    users = models.ManyToManyField(User, through='CourseRolesUserRole')
+    services = models.ManyToManyField('Service', through='RoleService')
+    permissions = models.ManyToManyField('Permission', through='RolePermissions')
+    users = models.ManyToManyField(User, through='UserRole')
 
     def __str__(self):
         return self.name
 
 
-class CourseRolesPermission(models.Model):
+class Permission(models.Model):
     """
-    Model for a course roles permission.
+    Model for a permission.
 
     A permission represents what a user can do.
     """
@@ -39,22 +39,22 @@ class CourseRolesPermission(models.Model):
         return self.name
 
 
-class CourseRolesRolePermissions(models.Model):
+class RolePermissions(models.Model):
     """
-    Model for a course roles role permission.
+    Model for a role permission.
 
     A role permission is a mapping between a role and a permission.
     """
-    role = models.ForeignKey('CourseRolesRole', on_delete=models.CASCADE)
-    permission = models.ForeignKey('CourseRolesPermission', on_delete=models.CASCADE)
+    role = models.ForeignKey('Role', on_delete=models.CASCADE)
+    permission = models.ForeignKey('Permission', on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.role} - {self.permission}"
 
 
-class CourseRolesUserRole(models.Model):
+class UserRole(models.Model):
     """
-    Model for a course roles user role.
+    Model for a user role.
 
     A user role is a mapping between a user, a role, a course and an organization.
     If the course is null, the user role assignment is in use for all courses that belong to the organization.
@@ -62,7 +62,7 @@ class CourseRolesUserRole(models.Model):
     the user role assignment is in use for all courses that belong to the instance.
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    role = models.ForeignKey('CourseRolesRole', on_delete=models.CASCADE)
+    role = models.ForeignKey('Role', on_delete=models.CASCADE)
     course = models.ForeignKey(
         CourseOverview,
         db_constraint=False,
@@ -78,9 +78,9 @@ class CourseRolesUserRole(models.Model):
         return f"{self.user} - {self.course} - {self.role} - {self.org}"
 
 
-class CourseRolesService(models.Model):
+class Service(models.Model):
     """
-    Model for a course roles service.
+    Model for a service.
 
     A service is a UI that can be used to assign roles to users.
     Such as CMS or LMS.
@@ -91,14 +91,14 @@ class CourseRolesService(models.Model):
         return self.name
 
 
-class CourseRolesRoleService(models.Model):
+class RoleService(models.Model):
     """
-    Model for a course roles role service.
+    Model for a role service.
 
     A role service is a mapping between a role and a service.
     """
-    role = models.ForeignKey('CourseRolesRole', on_delete=models.CASCADE)
-    service = models.ForeignKey('CourseRolesService', on_delete=models.CASCADE)
+    role = models.ForeignKey('Role', on_delete=models.CASCADE)
+    service = models.ForeignKey('Service', on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.role} - {self.service}"
