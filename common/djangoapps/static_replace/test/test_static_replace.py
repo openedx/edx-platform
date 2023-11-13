@@ -334,7 +334,7 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
         """
         new_image = Image.new('RGB', dimensions, color)
         new_buf = BytesIO()
-        new_image.save(new_buf, image_format='png')
+        new_image.save(new_buf, format='png')
         new_buf.seek(0)
         new_name = name.format(prefix)
         new_key = StaticContent.compute_location(cls.courses[prefix].id, new_name)
