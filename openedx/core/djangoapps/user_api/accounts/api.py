@@ -33,8 +33,6 @@ from openedx.core.djangoapps.user_api.errors import (
     AccountValidationError,
     PreferenceValidationError
 )
-from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
-from openedx.core.djangoapps.user_api.accounts.serializers import PROFILE_IMAGE_KEY_PREFIX
 from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
 from openedx.core.djangoapps.user_authn.utils import check_pwned_password
 from openedx.core.djangoapps.user_authn.views.registration_form import validate_name, validate_username
@@ -529,14 +527,18 @@ def get_email_existence_validation_error(email):
 def get_profile_images(user_profile, user, request=None):
     """
     Returns metadata about a user's profile image.
+
+    The output is a dict that looks like:
+
+    {
+        "has_image": False,
+        "image_url_full": "http://testserver/static/default_500.png",
+        "image_url_large": "http://testserver/static/default_120.png",
+        "image_url_medium": "http://testserver/static/default_50.png",
+        "image_url_small": "http://testserver/static/default_30.png",
+    }
     """
-    data = {'has_image': user_profile.has_profile_image}
-    urls = get_profile_image_urls_for_user(user, request)
-    data.update({
-        f'{PROFILE_IMAGE_KEY_PREFIX}_{size_display_name}': url
-        for size_display_name, url in urls.items()
-    })
-    return data
+    return AccountLegacyProfileSerializer.get_profile_image(user_profile, user, request)
 
 
 def _get_user_and_profile(username):
