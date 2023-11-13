@@ -625,6 +625,8 @@ def get_unit_tags(usage_key):
     taxonomy_dict = {}
     for content_tag in content_tags:
         taxonomy_id = content_tag.taxonomy_id
+        # When a taxonomy is deleted, the id here is None.
+        # In that case the tag is not shown in the UI.
         if taxonomy_id:
             if taxonomy_id not in taxonomy_dict:
                 taxonomy_dict[taxonomy_id] = []
@@ -634,8 +636,11 @@ def get_unit_tags(usage_key):
     total_count = 0
 
     def handle_tag(tags, root_ids, tag, child_tag_id=None):
-        # Group each tag by parent to build a tree
-        if tag.id not in tags:
+        """
+        Group each tag by parent to build a tree.
+        """
+        tag_processed_before = tag.id in tags
+        if not tag_processed_before:
             tags[tag.id] = {
                 'id': tag.id,
                 'value': tag.value,
@@ -647,8 +652,11 @@ def get_unit_tags(usage_key):
         if tag.parent_id is None:
             if tag.id not in root_ids:
                 root_ids.append(tag.id)
-        else:
-            # Group all the lineage of this tag
+        elif not tag_processed_before:
+            # Group all the lineage of this tag.
+            #
+            # Skip this if the tag has been processed before,
+            # we don't need to process lineage again to aboid duplicates.
             handle_tag(tags, root_ids, tag.parent, tag.id)
 
     # Build a tag tree for each taxonomy
@@ -657,6 +665,8 @@ def get_unit_tags(usage_key):
         root_ids = []
 
         for content_tag in content_tag_list:
+            # When a tag is deleted from the taxonomy, the `tag` here is None.
+            # In that case the tag is not shown in the UI.
             if content_tag.tag:
                 handle_tag(tags, root_ids, content_tag.tag)
 
