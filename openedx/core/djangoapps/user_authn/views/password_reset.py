@@ -387,7 +387,17 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
         try:
             self.uid_int = base36_to_int(self.uidb36)
             if request.user.is_authenticated and request.user.id != self.uid_int:
-                raise Http404
+                context = {
+                    'validlink': False,
+                    'user_exist': True,
+                    'form': None,
+                    'title': _('password reset'),
+                    'err_msg': _('User already login on the current browser window'),
+                }
+                return TemplateResponse(
+                    request, 'registration/password_reset_confirm.html', context
+                )
+            
             self.user = User.objects.get(id=self.uid_int)
         except (ValueError, User.DoesNotExist):
             # if there's any error getting a user, just let django's
