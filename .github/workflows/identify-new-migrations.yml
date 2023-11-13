@@ -153,11 +153,11 @@ jobs:
         # Fetch the content of the files
         FILE1_CONTENT=$(cat $FILE1_PATH)
         FILE2_CONTENT=$(cat $FILE2_PATH)
-        git diff --no-index --color-words $FILE1_PATH $FILE2_PATH  > ${{ steps.pip-cache-dir.outputs.dir }}/cleaned_data.txt
+        git diff --no-index --color-words $FILE1_PATH $FILE2_PATH > ${{ github.workspace }}/git_diff_output.txt
       shell: bash
 
     - name: Comment PR
       uses: thollander/actions-comment-pull-request@v2
       with:
-        filePath:  cleaned_data.txt
+        filePath:  ${{ github.workspace }}/git_diff_output.txt
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
