@@ -114,6 +114,7 @@ jobs:
         LMS_CFG: lms/envs/minimal.yml
         STUDIO_CFG: lms/envs/minimal.yml
       run: |
+        ./manage.py lms makemigrations
         ./manage.py lms showmigrations > ${{ steps.pip-cache-dir.outputs.dir }}/abcd.txt
 
     - name: Checkout your branch repo
@@ -137,13 +138,12 @@ jobs:
         LMS_CFG: lms/envs/minimal.yml
         STUDIO_CFG: lms/envs/minimal.yml
       run: |
+        ./manage.py lms makemigrations
         ./manage.py lms showmigrations > ${{ steps.pip-cache-dir.outputs.dir }}/def.txt
-
 
     - name: Debug File Paths
       run: |
         ls -R ${{ github.workspace }}
-
 
     - name: Process Data
       run: |
@@ -153,11 +153,11 @@ jobs:
         # Fetch the content of the files
         FILE1_CONTENT=$(cat $FILE1_PATH)
         FILE2_CONTENT=$(cat $FILE2_PATH)
-        git diff --no-index --color-words $FILE1_PATH $FILE2_PATH
+        git diff --no-index --color-words $FILE1_PATH $FILE2_PATH  > ${{ steps.pip-cache-dir.outputs.dir }}/cleaned_data.txt
       shell: bash
 
-#    - name: Comment PR
-#      uses: thollander/actions-comment-pull-request@v2
-#      with:
-#        filePath:  cleaned_data.txt
-#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Comment PR
+      uses: thollander/actions-comment-pull-request@v2
+      with:
+        filePath:  cleaned_data.txt
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
