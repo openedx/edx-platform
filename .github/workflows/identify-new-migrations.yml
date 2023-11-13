@@ -153,11 +153,12 @@ jobs:
         # Fetch the content of the files
         FILE1_CONTENT=$(cat $FILE1_PATH)
         FILE2_CONTENT=$(cat $FILE2_PATH)
-        git diff $FILE1_PATH $FILE2_PATH > ${{ github.workspace }}/git_diff_output.txt
+        git diff $FILE1_PATH $FILE2_PATH
+
       shell: bash
 
     - name: Comment PR
       uses: thollander/actions-comment-pull-request@v2
       with:
-        filePath:  ${{ github.workspace }}/git_diff_output.txt
+        filePath:  git diff $FILE1_PATH $FILE2_PATH
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
