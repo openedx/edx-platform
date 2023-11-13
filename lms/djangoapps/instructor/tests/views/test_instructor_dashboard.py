@@ -26,6 +26,7 @@ from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from common.test.utils import XssTestMixin
 from lms.djangoapps.courseware.courses import get_studio_url
+from lms.djangoapps.courseware.masquerade import CourseMasquerade
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
@@ -118,6 +119,11 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
         staff = StaffFactory(course_key=self.course.id)
         assert has_instructor_tab(staff, self.course)
+
+        masquerade_staff = StaffFactory(course_key=self.course.id)
+        masquerade = CourseMasquerade(self.course.id, role='student')
+        masquerade_staff.masquerade_settings = {self.course.id: masquerade}
+        assert not has_instructor_tab(masquerade_staff, self.course)
 
         student = UserFactory.create()
         assert not has_instructor_tab(student, self.course)
