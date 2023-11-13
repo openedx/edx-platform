@@ -122,7 +122,7 @@ class LibraryToolsService:
             return
         library_key = dest_block.source_library_key
         if not library_api.get_v1_or_v2_library(library_key, version=library_version):
-            raise ValueError(f"Requested library {library_key} not found.")
+            raise ValueError(f"Version {library_version} of library {library_key} not found.")
         library_tasks.sync_from_library.delay(
             user_id=self.user_id,
             dest_block_id=str(dest_block.scope_ids.usage_id),
