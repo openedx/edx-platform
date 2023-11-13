@@ -48,15 +48,6 @@ def authenticate_lti_user(request, lti_user_id, lti_consumer):
         else:
             lti_user = create_lti_user(lti_user_id, lti_consumer)
 
-    # If auto-linking is enabled, the lti_user should be linked to the logged-in user
-    if (
-        lti_consumer.require_user_account and
-        request.user.is_authenticated and
-        lti_user.edx_user != request.user
-    ):
-        lti_user.edx_user = request.user
-        lti_user.save()
-
     if not (request.user.is_authenticated and
             request.user == lti_user.edx_user):
         # The user is not authenticated, or is logged in as somebody else.
