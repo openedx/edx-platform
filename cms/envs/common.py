@@ -2859,3 +2859,4 @@ derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.content_autho
                          'course-authoring-xblock-lifecycle', 'enabled')
 derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.content_authoring.xblock.deleted.v1',
                          'course-authoring-xblock-lifecycle', 'enabled')
+BEAMER_PRODUCT_ID = ""

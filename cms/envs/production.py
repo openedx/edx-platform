@@ -678,3 +678,4 @@ INACTIVE_USER_URL = f'http{"s" if HTTPS == "on" else ""}://{CMS_BASE}'
 ############## Event bus producer ##############
 EVENT_BUS_PRODUCER_CONFIG = merge_producer_configs(EVENT_BUS_PRODUCER_CONFIG,
                                                    ENV_TOKENS.get('EVENT_BUS_PRODUCER_CONFIG', {}))
+BEAMER_PRODUCT_ID = ENV_TOKENS.get('BEAMER_PRODUCT_ID', BEAMER_PRODUCT_ID)
