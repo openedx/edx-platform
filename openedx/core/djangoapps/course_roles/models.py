@@ -1,13 +1,11 @@
 """
 Models for course roles schema
 """
-from django.contrib.auth import get_user_model
+from django.conf import settings
 from django.db import models
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from organizations.models import Organization
-
-User = get_user_model()
 
 
 class Role(models.Model):
@@ -21,7 +19,7 @@ class Role(models.Model):
     name = models.CharField(max_length=255)
     services = models.ManyToManyField('Service', through='RoleService')
     permissions = models.ManyToManyField('Permission', through='RolePermissions')
-    users = models.ManyToManyField(User, through='UserRole')
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL, through='UserRole')
 
     def __str__(self):
         return self.name
@@ -48,6 +46,11 @@ class RolePermissions(models.Model):
     role = models.ForeignKey('Role', on_delete=models.CASCADE)
     permission = models.ForeignKey('Permission', on_delete=models.CASCADE)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['role', 'permission'], name='unique_role_permission')
+        ]
+
     def __str__(self):
         return f"{self.role} - {self.permission}"
 
@@ -61,18 +64,19 @@ class UserRole(models.Model):
     If the course and the organization are null,
     the user role assignment is in use for all courses that belong to the instance.
     """
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     role = models.ForeignKey('Role', on_delete=models.CASCADE)
     course = models.ForeignKey(
         CourseOverview,
-        db_constraint=False,
         on_delete=models.CASCADE,
         null=True,
     )
     org = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
 
     class Meta:
-        unique_together = ('user', 'role', 'course')
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'role', 'course'], name='unique_user_role_course')
+        ]
 
     def __str__(self):
         return f"{self.user} - {self.course} - {self.role} - {self.org}"
@@ -99,6 +103,11 @@ class RoleService(models.Model):
     """
     role = models.ForeignKey('Role', on_delete=models.CASCADE)
     service = models.ForeignKey('Service', on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['role', 'service'], name='unique_role_service')
+        ]
 
     def __str__(self):
         return f"{self.role} - {self.service}"
