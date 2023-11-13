@@ -2048,10 +2048,6 @@ tomlkit==0.12.2
     #   pylint
     #   snowflake-connector-python
 tox==3.28.0
-    # via
-    #   -r requirements/edx/testing.txt
-    #   tox-battery
-tox-battery==0.6.2
     # via -r requirements/edx/testing.txt
 tqdm==4.66.1
     # via
