@@ -12,10 +12,10 @@ from common.djangoapps.student.tests.factories import UserFactory
 from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.course_roles.helpers import USE_PERMISSION_CHECKS_FLAG
 from openedx.core.djangoapps.course_roles.models import (
-    CourseRolesPermission,
-    CourseRolesRole,
-    CourseRolesService,
-    CourseRolesUserRole
+    Permission,
+    Role,
+    Service,
+    UserRole
 )
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -34,14 +34,14 @@ class UserPermissionsViewTestCase(SharedModuleStoreTestCase):
         self.course_1 = CourseFactory.create(
             display_name="test course 1", run="Testing_course_1", org=self.organization_1.name
         )
-        self.role_1 = CourseRolesRole.objects.create(name="test_role_1")
-        self.service = CourseRolesService.objects.create(name="test_service")
+        self.role_1 = Role.objects.create(name="test_role_1")
+        self.service = Service.objects.create(name="test_service")
         self.role_1.services.add(self.service)
-        self.permission_1 = CourseRolesPermission.objects.create(name="test_permission_1")
-        self.permission_2 = CourseRolesPermission.objects.create(name="test_permission_2")
+        self.permission_1 = Permission.objects.create(name="test_permission_1")
+        self.permission_2 = Permission.objects.create(name="test_permission_2")
         self.role_1.permissions.add(self.permission_1)
         self.role_1.permissions.add(self.permission_2)
-        CourseRolesUserRole.objects.create(
+        UserRole.objects.create(
             user=self.user_1, role=self.role_1, course_id=self.course_1.id, org=self.organization_1
         )
 
