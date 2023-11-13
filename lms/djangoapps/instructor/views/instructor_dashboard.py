@@ -47,6 +47,7 @@ from lms.djangoapps.certificates.models import (
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_studio_url
 from lms.djangoapps.courseware.block_render import get_block_by_usage_id
+from lms.djangoapps.courseware.masquerade import get_masquerade_role
 from lms.djangoapps.discussion.django_comment_client.utils import has_forum_access
 from lms.djangoapps.grades.api import is_writable_gradebook_enabled
 from lms.djangoapps.instructor.constants import INSTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
@@ -84,7 +85,9 @@ class InstructorDashboardTab(CourseTab):
         """
         Returns true if the specified user has staff access.
         """
-        return bool(user and user.is_authenticated and user.has_perm(permissions.VIEW_DASHBOARD, course.id))
+        return bool(user and user.is_authenticated and
+                    get_masquerade_role(user, course.id) != 'student' and
+                    user.has_perm(permissions.VIEW_DASHBOARD, course.id))
 
 
 def show_analytics_dashboard_message(course_key):
