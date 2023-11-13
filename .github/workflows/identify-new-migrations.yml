@@ -154,10 +154,10 @@ jobs:
         FILE1_CONTENT=$(cat $FILE1_PATH)
         FILE2_CONTENT=$(cat $FILE2_PATH)
 
-        if git diff --quiet $FILE1_PATH $FILE2_PATH; then
+        if git diff --quiet $FILE2_PATH FILE1_PATH; then
           echo "Files are identical."
         else
-          git diff $FILE1_PATH $FILE2_PATH > ${{ steps.pip-cache-dir.outputs.dir }}/mydiff.txt
+          git diff $FILE2_PATH $FILE1_PATH > ${{ steps.pip-cache-dir.outputs.dir }}/mydiff.txt
           echo "mydiff = "
           cat mydiff.txt
         fi
