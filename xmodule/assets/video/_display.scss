@@ -161,6 +161,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
   }
 
   .wrapper-transcript-feedback {
+    display: none;
     .transcript-feedback-buttons {
       display: flex;
     }
