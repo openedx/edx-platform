@@ -1,5 +1,5 @@
-Adopt WebAssembly as an Option for Safe Code Execution
-######################################################
+4. Adopt WebAssembly as an Option for Safe Code Execution
+#########################################################
 
 Status
 ******
@@ -44,7 +44,7 @@ When the sandboxed runtime environment is just a Wasm file, it makes it much eas
 Operations
 ----------
 
-The Wasmtime library gives a more precise accounting of the resources being used by alloting computation budget "fuel" and measuring how much a given Wasm program has used. This is more precise than the limits that AppArmor uses, which can sometimes result in problems that work fine most of the time but start failing under elevated system load. The fact that we have precise measurements of how much fuel is being used also means that we can surface this information to content authors, so that they can be aware of the problem.
+The Wasmtime library gives a more precise accounting of the resources being used by allotting computation budget "fuel" and measuring how much a given Wasm program has used. This is more precise than the limits that AppArmor uses, which can sometimes result in problems that work fine most of the time but start failing under elevated system load. The fact that we have precise measurements of how much fuel is being used also means that we can surface this information to content authors, so that they can be aware of the problem.
 
 Cross-Platform Support
 ----------------------
