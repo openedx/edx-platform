@@ -130,7 +130,7 @@ class CreateUserAPIView(APIView):
             user.save()
 
             return Response(data={
-                "message":  "success",
+                "message":  "Created user",
             }, status=status.HTTP_200_OK)
         except ValidationError as e:
             logging.error(str(e))
