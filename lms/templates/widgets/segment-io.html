@@ -9,18 +9,45 @@
   !function(){
       var originalAPI = '${settings.SEGMENT_ORIGINAL_API}';
       var replicateAPI = '${settings.SEGMENT_REPLICATE_API}';
-      function replaceFetchResourceForSegmentSite(resource){
-        if (resource.substr(0, originalAPI.length) === originalAPI) {
-              resource = replicateAPI + resource.substr(originalAPI.length);
+      function replaceFetchResourceForSegmentSite(resource) {
+        // Helper function to replace the URL
+        function replaceUrl(url) {
+          if (url.substr(0, originalAPI.length) === originalAPI) {
+            return replicateAPI + url.substr(originalAPI.length);
+          }
+          return url;
         }
-        return resource;
+
+        // Check if resource is a string (a URL)
+        if (typeof resource === 'string') {
+          return replaceUrl(resource);
+        } else if (resource instanceof Request) {
+          // If resource is a Request object, create a new Request with a replaced URL
+          const newUrl = replaceUrl(resource.url);
+          return new Request(newUrl, {
+            method: resource.method,
+            headers: resource.headers,
+            body: resource.body,
+            mode: resource.mode,
+            credentials: resource.credentials,
+            cache: resource.cache,
+            redirect: resource.redirect,
+            referrer: resource.referrer,
+            integrity: resource.integrity,
+            keepalive: resource.keepalive,
+            signal: resource.signal
+          });
+        } else {
+          // If it's neither a string nor a Request object, log an error or handle as needed
+          console.error('replaceFetchResourceForSegmentSite was called with an unexpected argument type');
+          return resource;
+        }
       }
-      const { fetch: originalFetch } = window;
+      // Override the fetch function to use the replaceFetchResourceForSegmentSite function
+      const originalFetch = window.fetch;
       window.fetch = async (...args) => {
-          let [resource, config ] = args;
-          resource = replaceFetchResourceForSegmentSite(resource);
-          const response = await originalFetch(resource, config);
-          return response;
+        args[0] = replaceFetchResourceForSegmentSite(args[0]);
+        return originalFetch.apply(window, args);
       };
   }();
   </script>
