@@ -1,8 +1,8 @@
-ADR 004: New Video XBlock with React.js and Video.js Integration
-==============================================================================
+Integrate React.js and Video.js based video player into Video xBlock
+####################################################################
 
 Context
--------
+*******
 
 One of the most critical components of Open edX content delivery is the video player. The existing video player has several limitations and pain points that have been identified through partners interviews and analysis of the "Platform Map" (see `Approach Memo - React-based Video Player`_ ). These limitations include a complex video upload process, lack of modern features for video player, and insufficient support for accessibility standards like providing Audio Description track. Additionally, the current architecture does not easily allow for the integration of newer technologies or third-party services, limiting the platform's ability to evolve and meet the needs of a diverse and growing community around Open edX.
 
@@ -26,43 +26,52 @@ In summary, the context for this Architecture Decision Record (ADR) is introduct
 
 
 Decision
---------
+********
 
 1. **Move out current Video XBlock from xmodules and place it in a separate repository**
 
-   We have decided to extract the current Video XBlock from the xmodules directory and relocate it into its own dedicated repository within the github.com/openedx organization. This decision is driven by the need for improved modularity, maintainability, and the facilitation of continuous integration and deployment practices.
-   * A new repository will be created under the Open edX GitHub organization.
-   * The repository will adhere to Open edX's best practices, including code quality, testing, and documentation.
-   * The new XBlock will be hosted within the Open edX organization on GitHub, ensuring community involvement and adherence to Open edX standards.
-   * The proposed architecture for installing and using new xblock is the following:
+We have decided to extract the current Video XBlock from the xmodules directory and relocate it into its own dedicated repository within the github.com/openedx organization. This decision is driven by the need for improved modularity, maintainability, and the facilitation of continuous integration and deployment practices.
 
-     .. image:: ./Architecture.png
+* A new repository will be created under the Open edX GitHub organization.
+* The repository will adhere to Open edX's best practices, including code quality, testing, and documentation.
+* The proposed architecture for installing and using new xblock is the following:
+
+    * The xblock will have the same backend as the current video block stored in the xmodule.
+    * The xblock will have two frontend implementations, current Vanila JS version, and the new one using React.JS and Video.JS libraries. Both frontend packages will be using the same backend.
+    * In the case the changes are to the backend for React.JS frontend, they should be added in the modular way, e.g., using feature flag, providing full backward compatibility for the current Vanila JS frontend.
+    * New React.js frontend will be build with NPM into JS package which can be distributed via npm package registry for installing into Course-Authoring and Library-Authoring MFEs.
+    * The xBlock will be installed into edx-platform using PIP package manager.
+    * The package will be released using SemVer approach, the frontend and backend counterparts should be published with the same version at all times.
+
+.. image:: xmodule/docs/decisions/video_xblock_architecture.png
+   :alt: Proposed Architecture Draft
 
 2. **React.js and Video.js Integration**
-   * React.js will be used to build a responsive, accessible frontend for a new Xblock as proposed in https://github.com/openedx/XBlock/issues/635 and prototyped in https://github.com/openedx/XBlock/issues/634.
-   * Video.js will be integrated for video playback, following the official guidelines (`Video.js Docs <https://docs.videojs.com/>`_).
-   * An NPM package will be created for the frontend, and it will be versioned and published (`Issue 635 <https://github.com/openedx/XBlock/issues/635>`_).
+
+* React.js will be used to build a responsive, accessible frontend for a new xBlock as proposed in https://github.com/openedx/XBlock/issues/635 and prototyped in https://github.com/openedx/XBlock/issues/634.
+* Video.js will be integrated for video playback, following the official guidelines (`Video.js Docs <https://docs.videojs.com/>`_).
+* An NPM package will be created for the frontend, and it will be versioned and published (`Issue 635 <https://github.com/openedx/XBlock/issues/635>`_).
 
 3. **Feature Toggle in edx-platform**
-   * A feature toggle will be introduced using Django Waffle flags.
-   * This will allow for a manual rollout and the ability to quickly revert to the old player if issues arise.
+
+* A feature toggle will be introduced using Django Waffle flags.
+* This will allow for a manual rollout and the ability to quickly revert to the old player if issues arise.
+* There will be a possibility to manage a feature toggle on a course level or organization level (TBD link to doc)
 
 4. **Integration into Legacy Interface and Course Authoring**
-   * The new XBlock will be embedded in iframes in the legacy interface.
-   * In the Course Authoring MFE, the XBlock will be integrated natively using React.js components.
 
-5. **Migration Necessity**
-  * The data migration will not be required as long as the current video block backend is used.
-  * Data and metadata will be preserved during the migration.
+* The new XBlock will be embedded in iframes in the legacy interface.
+* In the Course Authoring MFE, the XBlock will be integrated natively using React.js components.
 
-6. **Default Functionality Supported by Video.js**
-   * Support for HLS, DASH, MP4, and YouTube will be provided out-of-the-box.
+5. **Default Functionality Supported by Video.js**
 
-7. **Extension with Vimeo Backend**
-   * A plugin will be developed to extend Video.js to support Vimeo videos.
+* It's necessary to achieve the feature parity with the current video xblock.
+* Support for HLS, DASH, MP4, and YouTube will be provided out-of-the-box.
+* More details regarding video.js functionality for extensibility will be included in the follow up ADR.
+
 
 Rejected Alternatives
----------------------
+*********************
 
 1. **Creating a Separate Frontend-Component**: We considered developing a standalone frontend-component for the video player, which would be integrated into the Open edX platform as an independent module. This approach was rejected for several reasons:
 
@@ -81,13 +90,13 @@ Rejected Alternatives
    * **Migration Complexity**: Eventually, a decision would need to be made about migrating from the old to the new block, which would introduce additional complexity and potential disruption for existing courses.
 
 Consequences
-------------
+************
 
 1. The new XBlock will provide a better user experience and will be easier to maintain and extend.
 2. The feature toggle will mitigate risks during the rollout.
 
 References
-----------
+**********
 
 - Video.js Documentation: https://docs.videojs.com/
 - React.js Documentation: https://reactjs.org/docs/getting-started.html
