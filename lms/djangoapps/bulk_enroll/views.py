@@ -69,7 +69,9 @@ class BulkEnrollView(APIView):
     """
 
     # authentication_classes = (JwtAuthentication, BearerAuthentication,) # uuuuv
+    authentication_classes = []
     # permission_classes = (IsStaff,) # uuuuv
+    permission_classes = []
     throttle_classes = (EnrollmentUserThrottle,)
 
     def post(self, request):  # lint-amnesty, pylint: disable=missing-function-docstring

@@ -9,6 +9,9 @@ from openedx.core.lib.api.authentication import BearerAuthentication
 from openedx.core.lib.api.permissions import IsStaff
 from openedx.core.djangoapps.enrollments.views import EnrollmentUserThrottle
 from rest_framework import status
+from openedx.core.djangoapps.user_api.accounts.api import get_password_validation_error
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
+from django.utils.decorators import method_decorator
 
 def check_missing_fields(fields, data):
     errors = {}
@@ -39,9 +42,10 @@ class UpdateUserPasswordAPIView(APIView):
         }
     """
 
-    # authentication_classes = (JwtAuthentication, BearerAuthentication,)
+    authentication_classes = []
     # permission_classes = (IsStaff,)
     # throttle_classes = (EnrollmentUserThrottle,)
+    @method_decorator(csrf_exempt)
     def post(self, request):
         data = request.data
         email = data.get("email")
@@ -54,6 +58,13 @@ class UpdateUserPasswordAPIView(APIView):
                 "message": "Missing fields",
                 "errors": missing_fields
             }, status=status.HTTP_400_BAD_REQUEST)
+
+        password_error = get_password_validation_error(new_password)
+        if password_error:
+            return Response(data={
+                "message": "Invalid new password",
+                "errors": {"new_password": [password_error]}
+            })
 
         try:
             user = User.objects.get(email=email)
