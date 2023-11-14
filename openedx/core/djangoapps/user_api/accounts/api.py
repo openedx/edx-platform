@@ -422,7 +422,7 @@ def get_name_validation_error(name):
     if name:
         # Validation for the name length
         if len(name) > 255:
-            return _("Full name can`t be longer than 255 symbols")
+            return _("Full name can't be longer than 255 symbols")
 
         return _('Enter a valid name') if (contains_html(name) or contains_url(name)) else ''
     else:
