@@ -7,6 +7,7 @@ import pytest
 
 from common.djangoapps.student.tests.factories import AnonymousUserFactory, UserFactory
 from edx_toggles.toggles.testutils import override_waffle_flag
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_roles.helpers import (
     user_has_permission_course_org,
     user_has_permission_list_course_org,
@@ -43,9 +44,11 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         self.course_1 = CourseFactory.create(
             display_name="test course 1", run="Testing_course_1", org=self.organization_1.name
         )
+        CourseOverview.load_from_module_store(self.course_1.id)
         self.course_2 = CourseFactory.create(
             display_name="test course 2", run="Testing_course_2", org=self.organization_1.name
         )
+        CourseOverview.load_from_module_store(self.course_2.id)
         self.role_1 = Role.objects.create(name="test_role_1")
         self.service = Service.objects.create(name="test_service")
         self.role_1.services.add(self.service)
@@ -575,6 +578,7 @@ class GetAllUserPermissionsTestcase(SharedModuleStoreTestCase):
         self.course_1 = CourseFactory.create(
             display_name="test course 1", run="Testing_course_1", org=self.organization_1.name
         )
+        CourseOverview.load_from_module_store(self.course_1.id)
         self.role_1 = Role.objects.create(name="test_role_1")
         self.role_2 = Role.objects.create(name="test_role_2")
         self.role_3 = Role.objects.create(name="test_role_3")
