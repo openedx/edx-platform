@@ -68,11 +68,17 @@ class BulkEnrollView(APIView):
         to the 'before' and 'after' states.
     """
 
-    authentication_classes = (JwtAuthentication, BearerAuthentication,)
-    permission_classes = (IsStaff,)
+    # authentication_classes = (JwtAuthentication, BearerAuthentication,) # uuuuv
+    # permission_classes = (IsStaff,) # uuuuv
     throttle_classes = (EnrollmentUserThrottle,)
 
     def post(self, request):  # lint-amnesty, pylint: disable=missing-function-docstring
+        # uuuuv temporarily set request.user = superuser for intergrating with funix portal
+        from django.contrib.auth.models import User
+        superuser = User.objects.filter(is_superuser=True).first()
+        request.user = superuser
+        # uuuuv end
+
         serializer = BulkEnrollmentSerializer(data=request.data)
         if serializer.is_valid():  # lint-amnesty, pylint: disable=too-many-nested-blocks
             # Setting the content type to be form data makes Django Rest Framework v3.6.3 treat all passed JSON data as

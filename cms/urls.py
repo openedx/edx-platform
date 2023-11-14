@@ -365,10 +365,3 @@ urlpatterns +=[
     path ('api/course_unit_time/<str:block_id>', get_time_course_unit , name='get_time_course_unit'),
     path('api/set_course_unit_time',set_course_time_unit, name='set_course_time_unit' )
 ]
-
-from .funix_portal.views import create_user_view, update_user_password
-
-urlpatterns +=[
-    path ('api/funix_portal/user', create_user_view , name='funix_portal_create_user'),
-    path ('api/funix_portal/user/password', update_user_password , name='funix_portal_update_password'),
-]
