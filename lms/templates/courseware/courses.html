@@ -55,9 +55,12 @@
           </div>
       </div>
 
+      <div class="search-container">
+        <div class="search-info" >
+
           <form class="wrapper-search-input">
             <label for="discovery-input" class="sr">${_('Search for a course')}</label>
-            <input id="discovery-input" class="discovery-input" placeholder="${_('Search for a course')}" type="text"/>
+            <input id="discovery-input" class="search-input" placeholder="${_('Search for a course')}" type="text"/>
             <button type="submit" class="button postfix discovery-submit" title="${_('Search')}">
               <span class="icon fa fa-search" aria-hidden="true"></span>
               <div aria-live="polite" aria-relevant="all">
@@ -68,8 +71,11 @@
               </div>
             </button>
           </form>
+
         </div>
+      </div>
         </div>
+      </div>
       </div>
 
 
@@ -173,7 +179,7 @@
             height: 24px;
         }
 
-        .discovery-input {
+        .search-input {
             width: auto;
             height: 24px;
             font-weight: 400;
