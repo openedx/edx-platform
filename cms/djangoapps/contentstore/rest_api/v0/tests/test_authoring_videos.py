@@ -4,6 +4,7 @@ not the underlying Xblock service.
 """
 from unittest.mock import patch
 from django.http import JsonResponse
+import json
 
 from django.urls import reverse
 from rest_framework import status
@@ -160,11 +161,11 @@ class VideosUploadsViewDeleteTest(
     VideosUploadsViewTestCase, ModuleStoreTestCase, APITestCase
 ):
     """
-    Test POST operation on videos
+    Test DELETE operation on videos
     """
 
     def get_test_data(self):
-        return {None}
+        return None
 
     def get_url_params(self):
         """
@@ -242,7 +243,7 @@ class VideosUploadsViewPostTest(
         assert passed_args.path == self.get_url()
 
     def send_request(self, url, data):
-        return self.client.post(url, data=data)
+        return self.client.post(url, data=json.dumps(data), content_type="application/json")
 
     def test_api_behind_feature_flag(self):
         # should return 404 if the feature flag is not enabled
