@@ -38,8 +38,8 @@
             signal: resource.signal
           });
         } else {
-          // If it's neither a string nor a Request object, log an error or handle as needed
-          console.error('replaceFetchResourceForSegmentSite was called with an unexpected argument type:', typeof resource, resource);
+          // If it's neither a string nor a Request object, log a warning or handle as needed
+          console.warn('replaceFetchResourceForSegmentSite was called with an unexpected argument type:', typeof resource, resource);
           return resource;
         }
       }
