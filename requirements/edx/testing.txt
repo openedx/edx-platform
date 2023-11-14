@@ -98,17 +98,20 @@ bleach[css]==5.0.1
     #   xblock-poll
 bok-choy==1.1.1
     # via -r requirements/edx/testing.in
-boto==2.39.0
+# boto==2.39.0
+boto==2.49.0
     # via
     #   -r requirements/edx/base.txt
     #   edxval
-boto3==1.4.8
+# boto3==1.4.8
+boto3==1.28.31
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.8.17
+# botocore==1.8.17
+botocore==1.31.31
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -1297,7 +1300,8 @@ rules==3.3
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   edx-proctoring
-s3transfer==0.1.13
+# s3transfer==0.1.13
+s3transfer
     # via
     #   -r requirements/edx/base.txt
     #   boto3
