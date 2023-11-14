@@ -276,14 +276,14 @@ def courses(request):
     """
     courses_list = []
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
-    if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-        courses_list = get_courses(request.user)
+    # if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
+    courses_list = get_courses(request.user)
 
-        if configuration_helpers.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
-                                           settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):
-            courses_list = sort_by_start_date(courses_list)
-        else:
-            courses_list = sort_by_announcement(courses_list)
+    if configuration_helpers.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
+                                        settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):
+        courses_list = sort_by_start_date(courses_list)
+    else:
+        courses_list = sort_by_announcement(courses_list)
 
     # Add marketable programs to the context.
     programs_list = get_programs_with_type(request.site, include_hidden=False)

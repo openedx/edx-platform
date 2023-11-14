@@ -36,7 +36,7 @@ CELERY_ALWAYS_EAGER = True
 # When the celery task is run eagerly, it is executed locally while sharing the
 # thread and its request cache with the active Django Request. In that case,
 # do not clear the cache.
-CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
+CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = True
 HTTPS = 'off'
 
 LMS_ROOT_URL = f'http://{LMS_BASE}'
@@ -198,7 +198,7 @@ COURSE_DISCOVERY_MEANINGS = {
     'language': LANGUAGE_MAP,
 }
 
-FEATURES['ENABLE_COURSE_DISCOVERY'] = False
+FEATURES['ENABLE_COURSE_DISCOVERY'] = True
 # Setting for overriding default filtering facets for Course discovery
 # COURSE_DISCOVERY_FILTERS = ["org", "language", "modes"]
 FEATURES['COURSES_ARE_BROWSEABLE'] = True
