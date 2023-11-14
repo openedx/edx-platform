@@ -42,6 +42,13 @@ from openedx.core.djangoapps.enrollments.views import EnrollmentUserThrottle
 from rest_framework import status
 from django.core.validators import ValidationError
 
+def check_missing_fields(fields, data):
+    errors = {}
+    for field in fields: 
+        if data.get(field) is None: 
+            errors[field] = ["This field is required"]
+    return errors
+
 class CreateUserAPIView(APIView):
     """
     **Use Case**
@@ -81,17 +88,20 @@ class CreateUserAPIView(APIView):
         username = data.get('username')
         email = data.get('email')
         password = data.get('password')
-        full_name = data.get('full_name')
+        name = data.get('name')
 
-        if username is None or email is None or password is None or full_name is None:
+        missing_fields = check_missing_fields(["username", "email", "password", "name"], data)
+        if missing_fields: 
             return Response(data={
-                "message": f"Missing field. Required fields: username, email, password, full_name"
+                "message": "Missing fields",
+                "errors": missing_fields
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             user = User.objects.get(email=email)
             return Response(data={
-                "message": f"User with email {email} already exists"
+                "message": f"User with email '{email}' already exists",
+                "errors": {"email": [ f"User with email '{email}' already exists" ]}
             }, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
             pass
@@ -104,7 +114,8 @@ class CreateUserAPIView(APIView):
         try:
             user = User.objects.get(username=username)
             return Response(data={
-                "message": f"User with username {username} already exists"
+                "message": f"User with username '{username}' already exists",
+                "errors": {"username": [ f"User with username '{username}' already exists" ]}
             }, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist: 
             pass
@@ -119,7 +130,7 @@ class CreateUserAPIView(APIView):
                 'username': username,
                 'email': email,
                 'password': password,
-                'name': full_name,
+                'name': name,
             },
             tos_required=False
         )
@@ -134,10 +145,12 @@ class CreateUserAPIView(APIView):
             }, status=status.HTTP_200_OK)
         except ValidationError as e:
             logging.error(str(e))
-            return Response(data={
-                "message": "Validation Error", 
-                "errors": e,
-            }, status=status.HTTP_400_BAD_REQUEST)
+            # shape of ValidationError: [ "field_name": ["error message"]]
+            errors = {}
+            for field_error in e:
+                errors[field_error[0]] = field_error[1]
+            response_dict.update({"errors": e})
+            return Response(data={"message": "Vaidlation Error", "errors": errors}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             logging.error(str(e))
             return Response(data={
@@ -175,9 +188,11 @@ class UpdateUserPasswordAPIView(APIView):
         password = data.get("password")
         new_password = data.get("new_password")
 
-        if email is None or password is None or new_password is None:
+        missing_fields = check_missing_fields(["email", "password", "new_password"], data)
+        if missing_fields:
             return Response(data={
-                "message": f"Missing field. Required fields: email, password, new_password"
+                "message": "Missing fields",
+                "errors": missing_fields
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -197,11 +212,13 @@ class UpdateUserPasswordAPIView(APIView):
                     }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
                 return Response(data={
-                    "message": "Wrong password."
+                    "message": "Wrong password.",
+                    "errors": {"password": ["Wrong password"]}
                 }, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
             return Response(data={
-                 "message": f"Not found user with email {email}"
+                 "message": f"Not found user with email '{email}'",
+                 "errors": {"email": [f"Not found user with email '{email}'"]}
             }, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e: 
