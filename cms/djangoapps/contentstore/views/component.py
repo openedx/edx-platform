@@ -656,7 +656,7 @@ def get_unit_tags(usage_key):
             # Group all the lineage of this tag.
             #
             # Skip this if the tag has been processed before,
-            # we don't need to process lineage again to aboid duplicates.
+            # we don't need to process lineage again to avoid duplicates.
             handle_tag(tags, root_ids, tag.parent, tag.id)
 
     # Build a tag tree for each taxonomy
