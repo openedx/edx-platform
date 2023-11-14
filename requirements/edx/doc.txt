@@ -114,13 +114,13 @@ boto==2.39.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-boto3==1.28.83
+boto3==1.28.85
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.31.83
+botocore==1.31.85
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -907,7 +907,7 @@ mysqlclient==2.2.0
     # via
     #   -r requirements/edx/base.txt
     #   openedx-blockstore
-newrelic==9.1.1
+newrelic==9.1.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -933,7 +933,7 @@ oauthlib==3.2.2
     #   social-auth-core
 olxcleaner==0.2.1
     # via -r requirements/edx/base.txt
-openai==1.2.2
+openai==1.2.4
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -969,7 +969,7 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/base.txt
 optimizely-sdk==4.1.1
     # via -r requirements/edx/base.txt
-ora2==6.0.0
+ora2==6.0.2
     # via -r requirements/edx/base.txt
 packaging==23.2
     # via
@@ -1056,11 +1056,11 @@ pycryptodomex==3.19.0
     #   edx-proctoring
     #   lti-consumer-xblock
     #   pyjwkest
-pydantic==2.4.2
+pydantic==2.5.0
     # via
     #   -r requirements/edx/base.txt
     #   openai
-pydantic-core==2.10.1
+pydantic-core==2.14.1
     # via
     #   -r requirements/edx/base.txt
     #   pydantic
@@ -1330,7 +1330,7 @@ sniffio==1.3.0
     #   httpx
 snowballstemmer==2.2.0
     # via sphinx
-snowflake-connector-python==3.4.1
+snowflake-connector-python==3.5.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -1483,7 +1483,7 @@ vine==5.1.0
     #   amqp
     #   celery
     #   kombu
-voluptuous==0.13.1
+voluptuous==0.14.0
     # via
     #   -r requirements/edx/base.txt
     #   ora2
@@ -1493,7 +1493,7 @@ walrus==0.9.3
     #   edx-event-bus-redis
 watchdog==3.0.0
     # via -r requirements/edx/base.txt
-wcwidth==0.2.9
+wcwidth==0.2.10
     # via
     #   -r requirements/edx/base.txt
     #   prompt-toolkit
