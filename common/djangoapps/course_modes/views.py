@@ -238,7 +238,7 @@ class ChooseModeView(View):
                 context["use_ecommerce_payment_flow"] = ecommerce_service.is_enabled(request.user)
                 context["ecommerce_payment_page"] = ecommerce_service.payment_page_url()
                 context["sku"] = verified_mode.sku
-                context['course_key'] = course_key
+                context['course_key'] = course_id
                 context["bulk_sku"] = verified_mode.bulk_sku
 
         # REV-2415 TODO: remove [Track Selection Check] logs introduced by REV-2355 for error handling check
