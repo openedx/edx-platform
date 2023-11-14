@@ -85,6 +85,7 @@ from common.djangoapps.third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
 from common.djangoapps.track import segment
 from common.djangoapps.util.db import outer_atomic
 from common.djangoapps.util.json_request import JsonResponse
+from common.djangoapps.student.models import UserProfile
 
 from edx_django_utils.user import generate_password  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -564,6 +565,7 @@ class RegistrationView(APIView):
                 address already exists
             HttpResponse: 403 operation not allowed
         """
+
         should_be_rate_limited = getattr(request, 'limited', False)
         if should_be_rate_limited:
             return JsonResponse({'error_code': 'forbidden-request'}, status=403)
@@ -576,7 +578,6 @@ class RegistrationView(APIView):
 
         data = request.POST.copy()
         self._handle_terms_of_service(data)
-
         try:
             data = StudentRegistrationRequested.run_filter(form_data=data)
         except StudentRegistrationRequested.PreventRegistration as exc:
@@ -601,6 +602,13 @@ class RegistrationView(APIView):
         redirect_url = get_redirect_url_with_host(root_url, redirect_to)
         response = self._create_response(request, {}, status_code=200, redirect_url=redirect_url)
         set_logged_in_cookies(request, response, user)
+        try:
+            profile =  UserProfile.objects.filter(user=user)[0]
+            profile.organization = data['organization']
+            profile.save()
+            
+        except:
+            None
         if not user.is_active and settings.SHOW_ACCOUNT_ACTIVATION_CTA and not settings.MARKETING_EMAILS_OPT_IN:
             response.set_cookie(
                 settings.SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME,

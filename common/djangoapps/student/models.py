@@ -535,6 +535,7 @@ class UserProfile(models.Model):
     this_year = datetime.now(UTC).year
     VALID_YEARS = list(range(this_year, this_year - 120, -1))
     year_of_birth = models.IntegerField(blank=True, null=True, db_index=True)
+    organization = models.CharField('max_length', max_length=255)
     GENDER_CHOICES = (
         ('m', gettext_noop('Male')),
         ('f', gettext_noop('Female')),
