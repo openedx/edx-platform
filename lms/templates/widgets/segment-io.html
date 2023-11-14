@@ -37,6 +37,9 @@
             keepalive: resource.keepalive,
             signal: resource.signal
           });
+        } else if (resource instanceof URL) {
+          // If resource is a URL object, convert it to a string and replace the URL
+          return replaceUrl(resource.href);
         } else {
           // If it's neither a string nor a Request object, log a warning or handle as needed
           console.warn('replaceFetchResourceForSegmentSite was called with an unexpected argument type:', typeof resource, resource);
