@@ -24,3 +24,8 @@ Django<4.0
 elasticsearch<7.14.0
 
 # django-simple-history>3.0.0 adds indexing and causes a lot of migrations to be affected
+
+# virtualenv latest version requires platformdirs<4.0 which conflicts with tox>4.0 version
+# This constraint can be removed once the issue 
+# https://github.com/pypa/virtualenv/issues/2666 gets resolved 
+platformdirs<4.0
