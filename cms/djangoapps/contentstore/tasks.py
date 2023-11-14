@@ -704,6 +704,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
                 LOGGER.info(f'Course import {course.id}: Entrance exam imported')
         sync_discussion_settings(courselike_key)
 
+
 @shared_task
 @set_code_owner_attribute
 def update_all_outlines_from_modulestore_task():
