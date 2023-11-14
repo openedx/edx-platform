@@ -407,7 +407,7 @@ def get_name_validation_error(name):
     if name:
         # Validation for the name length
         if len(name) > 255:
-            return _("Full name can`t be longer than 255 symbols")
+            return _("Full name can't be longer than 255 symbols")
 
         regex = re.findall(r'https|http?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', name)
         return _('Enter a valid name') if bool(regex) else ''

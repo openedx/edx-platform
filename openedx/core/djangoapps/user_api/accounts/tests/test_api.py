@@ -571,12 +571,12 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         assert account_settings['country'] is None
         assert account_settings['state'] is None
 
-    def test_get_name_validation_error_too_long():
+    def test_get_name_validation_error_too_long(self):
         """
         Test validation error when the name is too long.
         """
         result = get_name_validation_error("A" * 256)
-        assert result == 'Full name can`t be longer than 255 symbols'
+        assert result == "Full name can't be longer than 255 symbols"
 
 
 @patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
