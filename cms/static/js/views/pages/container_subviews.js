@@ -361,6 +361,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
                 // Element that contains the tag value and the arrow icon
                 tagContentElement.style.marginLeft = `${depth}em`;
                 tagContentElement.className = `tagging-label tagging-label-tag-${tag.id}`;
+                tagContentElement.id = `tag-${tag.id}`;
 
                 // Element that contains the tag value
                 tagValueElement.textContent = tag.value;
