@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='UserProfile',
-            name='organization',
+            name='student_code',
             field=models.CharField(max_length=255, default=''),
         ),
     ]

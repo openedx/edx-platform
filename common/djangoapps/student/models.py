@@ -10,7 +10,7 @@ file and check it in at the same time as your model changes. To do that,
 2. ./manage.py lms schemamigration student --auto description_of_your_change
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
-
+import random
 import hashlib  # lint-amnesty, pylint: disable=wrong-import-order
 import json  # lint-amnesty, pylint: disable=wrong-import-order
 import logging  # lint-amnesty, pylint: disable=wrong-import-order
@@ -535,7 +535,7 @@ class UserProfile(models.Model):
     this_year = datetime.now(UTC).year
     VALID_YEARS = list(range(this_year, this_year - 120, -1))
     year_of_birth = models.IntegerField(blank=True, null=True, db_index=True)
-    organization = models.CharField('max_length', max_length=255)
+    student_code = models.CharField( max_length=255, default='')
     GENDER_CHOICES = (
         ('m', gettext_noop('Male')),
         ('f', gettext_noop('Female')),
@@ -738,6 +738,15 @@ class UserProfile(models.Model):
         # There are legal implications regarding how we can contact users and what information we can make public
         # based on their age, so we must take the most conservative estimate.
         return year - year_of_birth - 1
+    
+    # student code 
+    def create_student_code (user):
+        student_code = str(random.randint(1, 100000)).zfill(6)
+        profile = UserProfile.objects.filter(user=user).first()
+        profile.student_code = student_code
+        profile.save()
+        return student_code
+        
 
     @classmethod
     def country_cache_key_name(cls, user_id):
