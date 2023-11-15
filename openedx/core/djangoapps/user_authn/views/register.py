@@ -6,7 +6,7 @@ Registration related views.
 import datetime
 import json
 import logging
-import random
+import requests
 
 from django.conf import settings
 from django.contrib.auth import login as django_login
@@ -603,15 +603,27 @@ class RegistrationView(APIView):
         redirect_url = get_redirect_url_with_host(root_url, redirect_to)
         response = self._create_response(request, {}, status_code=200, redirect_url=redirect_url)
         set_logged_in_cookies(request, response, user)
-        UserProfile.create_student_code(user=user)
-        # try:
-        #     profile =  UserProfile.objects.filter(user=user)[0]
-        #     student_code = str(random.randint(1, 100000)).zfill(6)
-        #     profile.student_code = student_code
-        #     profile.save()
+        
+        # create student_code
+        try :
+            student_code =UserProfile.create_student_code(user=user)
+        except:
+            None 
             
-        # except:
-        #     None
+            
+        url = 'https://staging-portal.funix.edu.vn/api/student/register'
+        headers = {
+                "Content-Type": "application/json"
+            }
+        response_portal=requests.post(url=url,headers=headers, data=json.dumps({
+                "name" : data.get('name'),
+                "email" : user.email,
+                "student_code" : student_code,
+                "username" : user.username
+            }))
+        
+  
+                
         if not user.is_active and settings.SHOW_ACCOUNT_ACTIVATION_CTA and not settings.MARKETING_EMAILS_OPT_IN:
             response.set_cookie(
                 settings.SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME,
