@@ -702,6 +702,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
                     self.assertNotContains(response, "Access this course")
                     self.assertContains(response, '<div class="grid-single">')
                     self.assertNotContains(response, '<div class="grid-options">')
+                    self.assertIn('course_key', response.context)
 
 
 @skip_unless_lms
