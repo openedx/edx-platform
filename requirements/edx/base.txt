@@ -1003,7 +1003,8 @@ rules==3.3
     #   -r requirements/edx/base.in
     #   edx-enterprise
     #   edx-proctoring
-s3transfer==0.1.13
+# s3transfer==0.1.13
+s3transfer
     # via boto3
 sailthru-client==2.2.3
     # via edx-ace

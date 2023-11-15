@@ -1376,7 +1376,8 @@ rules==3.3
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
     #   edx-proctoring
-s3transfer==0.1.13
+# s3transfer==0.1.13
+s3transfer
     # via
     #   -r requirements/edx/testing.txt
     #   boto3
