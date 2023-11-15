@@ -6,7 +6,7 @@ from bridgekeeper import perms
 
 from lms.djangoapps.courseware.rules import HasRolesRule
 from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
-from openedx.core.djangoapps.course_roles.rules import HasPermissionRule
+from openedx.core.djangoapps.course_roles.rules import HasPermissionRule, HasForumsRolesRule
 
 
 perms[f'course_roles.{CourseRolesPermission.MANAGE_CONTENT.value}'] = (
@@ -26,7 +26,8 @@ perms[f'course_roles.{CourseRolesPermission.VIEW_ALL_CONTENT.value}'] = (
     | HasPermissionRule(CourseRolesPermission.VIEW_ALL_CONTENT.value)
 )
 perms[f'course_roles.{CourseRolesPermission.VIEW_ONLY_LIVE_PUBLISHED_CONTENT.value}'] = (
-    HasRolesRule('beta_testers', 'ccx_coach', 'administrator')
+    HasRolesRule('beta_testers', 'ccx_coach')
+    | HasForumsRolesRule('administrator')
     | HasPermissionRule(CourseRolesPermission.VIEW_ONLY_LIVE_PUBLISHED_CONTENT.value)
 )
 perms[f'course_roles.{CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.value}'] = (
@@ -57,7 +58,8 @@ perms[f'course_roles.{CourseRolesPermission.MANAGE_USERS_EXCEPT_ADMIN_AND_STAFF.
     | HasPermissionRule(CourseRolesPermission.MANAGE_USERS_EXCEPT_ADMIN_AND_STAFF.value)
 )
 perms[f'course_roles.{CourseRolesPermission.MANAGE_DISCUSSION_MODERATORS.value}'] = (
-    HasRolesRule('staff', 'instructor', 'administrator')
+    HasRolesRule('staff', 'instructor')
+    | HasForumsRolesRule('administrator')
     | HasPermissionRule(CourseRolesPermission.MANAGE_DISCUSSION_MODERATORS.value)
 )
 perms[f'course_roles.{CourseRolesPermission.MANAGE_COHORTS.value}'] = (
@@ -69,11 +71,13 @@ perms[f'course_roles.{CourseRolesPermission.MANAGE_STUDENTS.value}'] = (
     | HasPermissionRule(CourseRolesPermission.MANAGE_STUDENTS.value)
 )
 perms[f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value}'] = (
-    HasRolesRule('staff', 'instructor', 'administrator', 'moderator', 'community_ta')
+    HasRolesRule('staff', 'instructor')
+    | HasForumsRolesRule('administrator', 'moderator', 'community_ta')
     | HasPermissionRule(CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value)
 )
 perms[f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.value}'] = (
-    HasRolesRule('staff', 'instructor', 'administrator', 'moderator', 'group_moderator', 'community_ta')
+    HasRolesRule('staff', 'instructor')
+    | HasForumsRolesRule('administrator', 'moderator', 'group_moderator', 'community_ta')
     | HasPermissionRule(CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.value)
 )
 perms[f'course_roles.{CourseRolesPermission.MANAGE_CERTIFICATES.value}'] = (
