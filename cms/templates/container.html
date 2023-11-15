@@ -53,6 +53,7 @@ from openedx.core.djangolib.markup import HTML, Text
                 clipboardData: ${user_clipboard | n, dump_js_escaped_json},
             }
         );
+
         require(["js/models/xblock_info", "js/views/xblock", "js/views/utils/xblock_utils", "common/js/components/utils/view_utils"], function (XBlockInfo, XBlockView, XBlockUtils, ViewUtils) {
             var model = new XBlockInfo({
                 id: '${subsection.location|n, decode.utf8}'
@@ -60,19 +61,63 @@ from openedx.core.djangolib.markup import HTML, Text
             var xblockView = new XBlockView({
                 model: model,
                 el: $('#sequence-nav'),
-                view: 'author_view?position=${position|n, decode.utf8}&next_url=${next_url|n, decode.utf8}&prev_url=${prev_url|n, decode.utf8}'
+                view: 'author_view?position=${position|n, decode.utf8}&next_url=${next_url|n, decode.utf8}&prev_url=${prev_url|n, decode.utf8}',
+                clipboardData: ${user_clipboard | n, dump_js_escaped_json},
             });
+
             xblockView.xblockReady = function() {
-                $('.seq_new_button').click(function(evt) {
-                    evt.preventDefault();
-                    XBlockUtils.addXBlock($(evt.target)).done(function(locator) {
-                        ViewUtils.redirect('/container/' + locator + '?action=new');
-                        return false;
-                    });
-                    return false;
+                const optionIcons = {
+                    'New Unit': 'fa-plus',
+                    'Paste as new unit': 'fa-clipboard'
+                };
+
+                if (!this.options.clipboardData && !this.options.clipboardData.source_usage_key.includes("vertical")) {
+                    $('.seq_paste_unit').hide();
+                }
+                $('.custom-dropdown .dropdown-toggle-button').on('click', function(event) {
+                    event.stopPropagation(); // Prevent the event from closing immediately when we open it
+                    $(this).next('.dropdown-options').slideToggle('fast'); // This toggles the dropdown visibility
+                    updateCheckmarks($(this).text().trim());
                 });
 
+                updateCheckmarks = function(activeOptionText) {
+                    $('.dropdown-options .checkmark').remove();
+                    $('.dropdown-options a').each(function() {
+                        if ($(this).text().trim() === activeOptionText) {
+                            $(this).append('<span class="checkmark fa fa-check"></span>'); // Checkmark icon
+                        }
+                    });
+                }
+
+                $('.dropdown-options').click(function(event) {
+                    event.preventDefault();
+                    var $target = $(event.target),
+                        newLabel = $target.text().trim(),
+                        newIconClass = optionIcons[newLabel];
+
+                    if ($target.hasClass('seq_new_unit') || $target.hasClass('seq_paste_unit')) {
+                        // Change the text of the main button
+                        $('.dropdown-toggle-button').text(newLabel);
+                        // Change the icon of the main button
+                        $('.dropdown-toggle-button').prepend('<span class="icon fa ' + newIconClass + '" aria-hidden="true"></span>');
+
+                        updateCheckmarks(newLabel);
+
+                        if ($target.hasClass('seq_new_unit')) {
+                            XBlockUtils.addXBlock($(event.target)).done(function(locator) {
+                                ViewUtils.redirect('/container/' + locator + '?action=new');
+                            });
+                        }
+
+                        if ($target.hasClass('seq_paste_unit')) {
+                            XBlockUtils.pasteXBlock($(event.target)).done(function(data) {
+                                ViewUtils.redirect('/container/' + data.locator + '?action=new');
+                            });
+                        }
+                    }
+                });
             };
+
             xblockView.render();
         });
     </%static:webpack>

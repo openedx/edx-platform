@@ -128,4 +128,13 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
             </li>
         </ul>
     </div>
+    <div class="wrapper-pub-actions bar-mod-actions">
+        <ul>
+            <li>
+                <a class="action-copy"
+                   href="#" ><%- gettext("Copy Unit") %>
+                </a>
+            </li>
+        </ul>
+    </div>
 </div>

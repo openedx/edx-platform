@@ -300,6 +300,40 @@ $seq-nav-height: 40px;
         @include border-right-style(solid);
       }
 
+      .custom-dropdown {
+        position: relative;
+        display: inline-block;
+      }
+
+      .dropdown-options {
+        position: absolute;
+        top: 100%;
+        z-index: 1000;
+        background-color: #ffffff;
+        min-width: 265px;
+        right: 0;
+
+        li {
+          padding: 0.5em 1em;
+          cursor: pointer;
+
+          a {
+            display: block;
+            width: 100%;
+            color: black;
+          }
+
+          .checkmark {
+            float: right;
+            margin-left: 10px;
+          }
+        }
+      }
+
+      .dropdown-options li:hover {
+        background-color: #f1f1f1;
+      }
+
       button {
         @extend %ui-fake-link;
         @extend %ui-clear-button;
