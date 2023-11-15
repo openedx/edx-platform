@@ -35,7 +35,7 @@
     <section class="find-courses">
       <section class="courses-container">
         % if course_discovery_enabled:
-        
+        <body>
         <div class="container">
 
 
@@ -60,15 +60,16 @@
 
           <form class="wrapper-search-input">
             <div class="magnifier-input">
+              <img src="../static/images/magnifier.png" alt="Search Icon" class="magnifier-icon">
+
             <label for="discovery-input" class="sr">${_('Search for a course')}</label>
             <input id="discovery-input" class="search-input" placeholder="${_('Search for a course')}" />
             <!-- <button type="submit" class="button postfix discovery-submit" title="${_('Search')}"> -->
               <!-- <span class="icon fa fa-search" aria-hidden="true"></span> -->
-              <img src="../static/images/magnifier.png" alt="Search Icon" class="magnifier-icon">
 
               <div aria-live="polite" aria-relevant="all">
                  <!-- <div id="loading-indicator" class="loading-spinner hidden"> -->
-                  <span class="icon fa fa-spinner fa-spin" aria-hidden="true"></span> 
+                  <!-- <span class="icon fa fa-spinner fa-spin" aria-hidden="true"></span>  -->
                   <span class="sr">${_('Loading')}</span>
                  </div> 
               </div>
@@ -77,9 +78,21 @@
 
         </div>
       </div>
+
+      <!-- Sort By Dropdown -->
+      <div class="sort-section">
+        <span class="sort-by-label">Sort by:</span>
+        <select class="sort-dropdown">
+            <!-- Add options here -->
+        </select>
+    </div>
+
+
+
         </div>
       </div>
       </div>
+    </body>
 
 
         <div id="filter-bar" class="filters hide-phone is-collapsed">
@@ -199,6 +212,10 @@
             border: none;
             padding-left: 10px;
             background: #FFFFFF;
+        }
+
+        .search-input:focus {
+            outline: none;
         }
 
     
