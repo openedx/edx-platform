@@ -36,7 +36,7 @@ CELERY_ALWAYS_EAGER = True
 # When the celery task is run eagerly, it is executed locally while sharing the
 # thread and its request cache with the active Django Request. In that case,
 # do not clear the cache.
-CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = True
+CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
 HTTPS = 'off'
 
 LMS_ROOT_URL = f'http://{LMS_BASE}'
