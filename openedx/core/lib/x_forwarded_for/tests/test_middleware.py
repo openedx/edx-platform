@@ -65,7 +65,15 @@ class TestXForwardedForMiddleware(TestCase):
         ('XXXXXXXX, 1.2.3.4, 5.5.5.5', 'XXXXXXXX, 1.2.3.4, 5.5.5.5, 127.0.0.1', 4, 'unknown-pub-pub-priv', '5.5.5.5'),
     )
     @patch("openedx.core.lib.x_forwarded_for.middleware.set_custom_attribute")
-    def test_xff_metrics(self, xff, expected_raw, expected_count, expected_types, expected_safest_client_ip, mock_set_custom_attribute):
+    def test_xff_metrics(
+        self,
+        xff,
+        expected_raw,
+        expected_count,
+        expected_types,
+        expected_safest_client_ip,
+        mock_set_custom_attribute,
+    ):
         request = RequestFactory().get('/somewhere')
         if xff is not None:
             request.META['HTTP_X_FORWARDED_FOR'] = xff
