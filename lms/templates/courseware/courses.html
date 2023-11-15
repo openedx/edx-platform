@@ -35,24 +35,19 @@
     <section class="find-courses">
       <section class="courses-container">
         % if course_discovery_enabled:
-        <body>
         <div class="container">
-
-
         <div id="discovery-form" role="search" aria-label="course" class="wrapper-search-context">
-          
-
           <div id="discovery-message" class="search-status-label"></div>
           <div class="search-bar-contents">
 
              <!-- Filter Section -->
-        <div class="buttons">
-          <!-- Filter Box with Icon and Count -->
-          <img src="../../static/images/filter_icon.png" alt="Filter Icon" class="faders">
-          <span class="filter-text">Filter</span>
-          <div style="background: #FEEBEE; padding: 4px 6px;">
-              <span style="font-weight: 600; font-size: 12px; color: #ED4338;">3</span>
-          </div>
+      <div class="buttons">
+        <!-- Filter Box with Icon and Count -->
+        <span class="material-symbols-outlined">instant_mix</span>          
+        <span class="filter-text">Filter</span>
+        <div style="background: #FEEBEE; padding: 4px 6px;">
+            <span style="font-weight: 600; font-size: 12px; color: #ED4338;">3</span>
+        </div>
       </div>
         <!-- Search Bar -->
       <div class="search-container">
@@ -60,16 +55,13 @@
 
           <form class="wrapper-search-input">
             <div class="magnifier-input">
-              <img src="../../static/images/magnifier.png" alt="Search Icon" class="magnifier-icon">
-
+              <span class="material-symbols-outlined">
+                search
+                </span>
             <label for="discovery-input" class="sr">${_('Search for a course')}</label>
             <input id="discovery-input" class="search-input" placeholder="${_('Search for a course')}" />
-            <!-- <button type="submit" class="button postfix discovery-submit" title="${_('Search')}"> -->
-              <!-- <span class="icon fa fa-search" aria-hidden="true"></span> -->
 
               <div aria-live="polite" aria-relevant="all">
-                 <!-- <div id="loading-indicator" class="loading-spinner hidden"> -->
-                  <!-- <span class="icon fa fa-spinner fa-spin" aria-hidden="true"></span>  -->
                   <span class="sr">${_('Loading')}</span>
                  </div> 
               </div>
@@ -83,18 +75,13 @@
       <div class="sort-section">
         <span class="sort-by-label">Sort by:</span>
         <select class="sort-dropdown">
-          <option value="option1">Option 1</option>
-          <option value="option2">Option 2</option>
-          <option value="option3">Option 3</option>
+          <!-- add options here -->
         </select>
-    </div>
-
-
+      </div>
 
         </div>
       </div>
       </div>
-    </body>
 
 
         <div id="filter-bar" class="filters hide-phone is-collapsed">
@@ -103,6 +90,8 @@
 
          <!-- Including the 'Inter' font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
     <style>
         body {
