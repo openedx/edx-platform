@@ -7,6 +7,7 @@ from collections import defaultdict
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from uuid import uuid4
+from typing import Optional
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -442,7 +443,7 @@ def get_taxonomy_list_url():
     return taxonomy_list_url
 
 
-def get_taxonomy_tags_widget_url(course_locator=None) -> str:
+def get_taxonomy_tags_widget_url(course_locator=None) -> Optional[str]:
     """
     Gets course authoring microfrontend URL for taxonomy tags drawer widget view.
 

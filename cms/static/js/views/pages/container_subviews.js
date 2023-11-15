@@ -297,8 +297,8 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
     });
 
     /**
-         * TagList displays the tags of a unit.
-         */
+     * TagList displays the tags of a unit.
+     */
     var TagList = BaseView.extend({
         // takes XBlockInfo as a model
 
@@ -365,6 +365,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
                 // Element that contains the tag value
                 tagValueElement.textContent = tag.value;
                 tagValueElement.id = `tag-${tag.id}`;
+                tagValueElement.className = 'tagging-label-value';
 
                 tagContentElement.appendChild(tagValueElement);
                 parentElement.appendChild(tagContentElement);

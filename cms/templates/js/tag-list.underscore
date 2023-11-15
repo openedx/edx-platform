@@ -17,9 +17,8 @@
                     var taxonomy = tags.taxonomies[i];
                 %>
                     <div class="tagging-label tagging-label-tax-<%- taxonomy.id %>">
-                        <a id="tax-<%- taxonomy.id %>">
-                            <%- taxonomy.value %> (<%- taxonomy.count %>)
-                        </a>
+                        <span class="tagging-label-value" id="tax-<%- taxonomy.id %>"><%- taxonomy.value %></span>
+                        <span class="tagging-label-count" id="tax-<%- taxonomy.id %>">(<%- taxonomy.count %>)</span>
                         <span class="icon fa fa-caret-down" aria-hidden="true" id="tax-<%- taxonomy.id %>"></span>
                     </div>
                     <div class="content-tags-tax-<%- taxonomy.id %> is-hidden"></div>

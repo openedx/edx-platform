@@ -280,7 +280,24 @@
             padding-top: 10px;
 
             .tagging-label {
+              display: flex;
               padding: 4px 0px;
+
+              .tagging-label-value {
+                display: inline-block;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+              }
+
+              .tagging-label-count {
+                display: inline-block;
+                margin: 0 0.5em;
+              }
+            }
+
+            .tagging-label:hover {
+              color: $blue;
             }
 
             .icon {
