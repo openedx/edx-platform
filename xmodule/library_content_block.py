@@ -586,9 +586,7 @@ class LibraryContentBlock(
         """
         self._validate_sync_permissions()
         self.get_tools(to_read_library_content=True).trigger_duplication(source_block=source_block, dest_block=self)
-
-        # Children have been handled.
-        return True
+        return True  # Children have been handled.
 
     def _validate_library_version(self, validation, lib_tools, version, library_key):
         """
@@ -716,7 +714,7 @@ class LibraryContentBlock(
         values = [{"display_name": name, "value": str(key)} for key, name in all_libraries]
         return values
 
-    def editor_saved(self, user, old_metadata, old_content):  # pylint: disable=unused-argument
+    def _todo_kyle_remove_editor_saved(self, user, old_metadata, old_content):  # pylint: disable=unused-argument
         """
         If source library is specified and library tools are available, then set version to library's latest.
 
@@ -733,17 +731,21 @@ class LibraryContentBlock(
             self.source_library_version = ""
             self.children = []  # pylint: disable=attribute-defined-outside-init
 
-    def post_editor_saved(self):
+    def post_editor_saved(self, user, old_metadata, old_content):  # pylint: disable=unused-argument
         """
-        If xblock has been edited, upgrade library & sync automatically.
+        If source library or capa_type have been edited, upgrade library & sync automatically.
 
-        TODO: This shouldn't happen if only post-library settings like max_count are changed.
+        TODO: capa_type doesn't really need to trigger an upgrade once we've migrated to V2.
         """
-        try:
-            if self.source_library_id:
+        source_lib_changed = (self.source_library_id, self.capa_type)
+        capa_filter_changed = (self.source_library_id, old_metadata.capa_type)
+        if source_lib_changed or capa_filter_changed:
+            try:
                 self.sync_from_library(upgrade_to_latest=True)
-        except ValueError:
-            pass  # The validation area will display an error message, no need to do anything now.
+            except (ValueError, LibraryToolsUnavailable):
+                # Fail quietly if we can't updated the library.
+                # TODO: Is this the right thing to do?
+                pass
 
     def has_dynamic_children(self):
         """

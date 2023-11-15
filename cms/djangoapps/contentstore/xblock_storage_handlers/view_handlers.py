@@ -8,7 +8,6 @@ We extracted all the logic from the `xblock_handler` endpoint that lives in
 contentstore/views/block.py to this file, because the logic is reused in another view now.
 Along with it, we moved the business logic of the other views in that file, since that is related.
 """
-
 import logging
 from datetime import datetime
 from uuid import uuid4
@@ -16,7 +15,7 @@ from uuid import uuid4
 from attrs import asdict
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import (User)  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.utils.timezone import timezone
@@ -55,37 +54,15 @@ from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.toggles import ENTRANCE_EXAMS
-from xmodule.course_block import (
-    DEFAULT_START_DATE,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.library_tools import (
-    LibraryToolsService,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore import (
-    EdxJSONEncoder,
-    ModuleStoreEnum,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.django import (
-    modulestore,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.draft_and_published import (
-    DIRECT_ONLY_CATEGORIES,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.exceptions import (
-    InvalidLocationError,
-    ItemNotFoundError,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.inheritance import (
-    own_metadata,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.services import (
-    ConfigurationService,
-    SettingsService,
-    TeamsConfigurationService,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.tabs import (
-    CourseTabList,
-)  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_block import DEFAULT_START_DATE
+from xmodule.library_tools import LibraryToolsService
+from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
+from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
+from xmodule.modulestore.inheritance import own_metadata
+from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService
+from xmodule.tabs import CourseTabList
 
 from ..utils import (
     ancestor_has_staff_lock,
@@ -220,7 +197,6 @@ def handle_xblock(request, usage_key_string=None):
             return JsonResponse()
         else:  # Since we have a usage_key, we are updating an existing xblock.
             modified_xblock = modify_xblock(usage_key, request)
-            _post_editor_saved_callback(get_xblock(usage_key, request.user))
             return modified_xblock
 
     elif request.method in ("PUT", "POST"):
@@ -255,7 +231,6 @@ def handle_xblock(request, usage_key_string=None):
                 request.user,
                 request.json.get("display_name"),
             )
-            _post_editor_saved_callback(get_xblock(dest_usage_key, request.user))
 
             return JsonResponse(
                 {
@@ -361,26 +336,24 @@ def load_services_for_studio(runtime, user):
 def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
     """
     Updates the xblock in the modulestore.
-    But before doing so, it calls the xblock's editor_saved callback function.
+    But before doing so, it calls the xblock's editor_saved callback function,
+    and after doing so, it calls the xblock's post_editor_saved callback function.
+
+    TODO: Remove getattrs from this function.
+          See https://github.com/openedx/edx-platform/issues/33715
     """
-    if callable(getattr(xblock, "editor_saved", None)):
-        if old_metadata is None:
-            old_metadata = own_metadata(xblock)
-        if old_content is None:
-            old_content = xblock.get_explicitly_set_fields_by_scope(Scope.content)
+    if old_metadata is None:
+        old_metadata = own_metadata(xblock)
+    if old_content is None:
+        old_content = xblock.get_explicitly_set_fields_by_scope(Scope.content)
+    if hasattr(xblock, "editor_saved"):
         load_services_for_studio(xblock.runtime, user)
         xblock.editor_saved(user, old_metadata, old_content)
-
-    # Update after the callback so any changes made in the callback will get persisted.
-    return modulestore().update_item(xblock, user.id)
-
-
-def _post_editor_saved_callback(xblock):
-    """
-    Updates the xblock in the modulestore after saving xblock.
-    """
-    if callable(getattr(xblock, "post_editor_saved", None)):
-        xblock.post_editor_saved()
+    xblock_updated = modulestore().update_item(xblock, user.id)
+    if hasattr(xblock_updated, "post_editor_saved"):
+        load_services_for_studio(xblock_updated.runtime, user)
+        xblock_updated.post_editor_saved(user, old_metadata, old_content)
+    return xblock_updated
 
 
 def _save_xblock(
@@ -889,6 +862,8 @@ def _duplicate_block(
             # Allow an XBlock to do anything fancy it may need to when duplicated from another block.
             # These blocks may handle their own children or parenting if needed. Let them return booleans to
             # let us know if we need to handle these or not.
+            # TODO: Make this a proper method in the base class so we don't need getattr.
+            #       See https://github.com/openedx/edx-platform/issues/33715
             load_services_for_studio(dest_block.runtime, user)
             children_handled = dest_block.studio_post_duplicate(store, source_item)
 
