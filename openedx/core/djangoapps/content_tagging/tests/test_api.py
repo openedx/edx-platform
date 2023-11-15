@@ -22,7 +22,7 @@ class TestTaxonomyMixin:
             name="Learning Objectives",
             enabled=False,
         )
-        api.set_taxonomy_orgs(self.taxonomy_disabled, all_orgs=True)
+        api.set_taxonomy_orgs(self.taxonomy_disabled, orgs=[self.org1, self.org2])
         self.taxonomy_all_orgs = api.create_taxonomy(
             name="Content Types",
             enabled=True,
@@ -121,8 +121,8 @@ class TestAPITaxonomy(TestTaxonomyMixin, TestCase):
     @ddt.data(
         # All orgs
         (None, True, ["taxonomy_all_orgs"]),
-        (None, False, ["taxonomy_disabled"]),
-        (None, None, ["taxonomy_all_orgs", "taxonomy_disabled"]),
+        (None, False, []),
+        (None, None, ["taxonomy_all_orgs"]),
         # Org 1
         ("org1", True, ["taxonomy_all_orgs", "taxonomy_one_org", "taxonomy_both_orgs"]),
         ("org1", False, ["taxonomy_disabled"]),
@@ -210,7 +210,12 @@ class TestAPITaxonomy(TestTaxonomyMixin, TestCase):
         assert valid_tags[0].id == object_tag.id
 
     def test_get_tags(self):
-        assert api.get_tags(self.taxonomy_all_orgs) == [self.tag_all_orgs]
+        result = list(api.get_tags(self.taxonomy_all_orgs))
+        assert len(result) == 1
+        assert result[0]["value"] == self.tag_all_orgs.value
+        assert result[0]["_id"] == self.tag_all_orgs.id
+        assert result[0]["parent_value"] is None
+        assert result[0]["depth"] == 0
 
     def test_cannot_tag_across_orgs(self):
         """

@@ -7,8 +7,8 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.locator import CourseKey
 from lms.djangoapps.courseware.courses import get_course_with_access
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
-from lms.djangoapps.discussion.rest_api.utils import DiscussionNotificationSender
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, ENABLE_COURSEWIDE_NOTIFICATIONS
+from lms.djangoapps.discussion.rest_api.discussions_notifications import DiscussionNotificationSender
 
 
 User = get_user_model()
@@ -21,7 +21,7 @@ def send_thread_created_notification(thread_id, course_key_str, user_id):
     Send notification when a new thread is created
     """
     course_key = CourseKey.from_string(course_key_str)
-    if not ENABLE_NOTIFICATIONS.is_enabled(course_key):
+    if not (ENABLE_NOTIFICATIONS.is_enabled(course_key) and ENABLE_COURSEWIDE_NOTIFICATIONS.is_enabled(course_key)):
         return
     thread = Thread(id=thread_id).retrieve()
     user = User.objects.get(id=user_id)
@@ -46,3 +46,4 @@ def send_response_notifications(thread_id, course_key_str, user_id, parent_id=No
     notification_sender.send_new_comment_notification()
     notification_sender.send_new_response_notification()
     notification_sender.send_new_comment_on_response_notification()
+    notification_sender.send_response_on_followed_post_notification()

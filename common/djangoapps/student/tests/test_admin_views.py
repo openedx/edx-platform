@@ -53,7 +53,7 @@ class AdminCourseRolesPageTest(SharedModuleStoreTestCase):
             'email': self.user.email
         }
 
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         # # adding new role from django admin page
         response = self.client.post(reverse('admin:student_courseaccessrole_add'), data=data)
@@ -78,7 +78,7 @@ class AdminCourseRolesPageTest(SharedModuleStoreTestCase):
             'course_id': str(self.course.id)
         }
 
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         # # adding new role from django admin page
         response = self.client.post(reverse('admin:student_courseaccessrole_add'), data=data)
@@ -96,7 +96,7 @@ class AdminCourseRolesPageTest(SharedModuleStoreTestCase):
 
         }
 
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         # # adding new role from django admin page
         response = self.client.post(reverse('admin:student_courseaccessrole_add'), data=data)
@@ -115,7 +115,7 @@ class AdminCourseRolesPageTest(SharedModuleStoreTestCase):
 
         }
 
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         # # adding new role from django admin page
         response = self.client.post(reverse('admin:student_courseaccessrole_add'), data=data)
@@ -136,7 +136,7 @@ class AdminCourseRolesPageTest(SharedModuleStoreTestCase):
             'email': email
         }
 
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         # Adding new role with invalid data
         response = self.client.post(reverse('admin:student_courseaccessrole_add'), data=data)
@@ -163,7 +163,7 @@ class AdminCourseRolesPageTest(SharedModuleStoreTestCase):
             'email': self.user.email
         }
 
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         # # adding new role from django admin page
         response = self.client.post(reverse('admin:student_courseaccessrole_add'), data=data)
@@ -230,7 +230,7 @@ class CourseEnrollmentAdminTest(SharedModuleStoreTestCase):
             user=self.user,
             course_id=self.course.id,  # pylint: disable=no-member
         )
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
     @ddt.data(*ADMIN_URLS)
     @ddt.unpack
@@ -324,13 +324,14 @@ class LoginFailuresAdminTest(TestCase):
     def setUpClass(cls):
         """Setup class"""
         super().setUpClass()
-        cls.user = UserFactory.create(username='§', is_staff=True, is_superuser=True)
+        cls.TEST_PASSWORD = 'Password1234'
+        cls.user = UserFactory.create(username='§', password=cls.TEST_PASSWORD, is_staff=True, is_superuser=True)
         cls.user.save()
 
     def setUp(self):
         """Setup."""
         super().setUp()
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         self.user2 = UserFactory.create(username='Zażółć gęślą jaźń')
         self.user_lockout_until = datetime.datetime.now(UTC)
         LoginFailures.objects.create(user=self.user, failure_count=10, lockout_until=self.user_lockout_until)

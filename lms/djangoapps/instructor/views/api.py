@@ -1661,7 +1661,7 @@ def get_anon_ids(request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_ENROLL)
+@require_course_permission(permissions.VIEW_ENROLLMENTS)
 @require_post_params(
     unique_student_identifier="email or username of student for whom to get enrollment status"
 )
@@ -2611,7 +2611,7 @@ def problem_grade_report(request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_ENROLL)
+@require_course_permission(permissions.VIEW_FORUM_MEMBERS)
 @require_post_params('rolename')
 def list_forum_members(request, course_id):
     """

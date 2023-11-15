@@ -88,7 +88,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
     This includes the specific types of error raised, and default behavior when optional arguments
     are not specified.
     """
-    password = "test"
+    password = 'Password1234'
 
     def setUp(self):
         super().setUp()
@@ -625,7 +625,6 @@ class AccountSettingsOnCreationTest(CreateAccountMixin, TestCase):
             'requires_parental_consent': True,
             'language_proficiencies': [],
             'account_privacy': PRIVATE_VISIBILITY,
-            'accomplishments_shared': False,
             'extended_profile': [],
             'secondary_email': None,
             'secondary_email_enabled': None,
