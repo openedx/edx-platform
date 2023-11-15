@@ -51,6 +51,7 @@ asgiref==3.7.2
     # via
     #   -r requirements/edx/base.txt
     #   django
+    #   django-cors-headers
     #   django-countries
 asn1crypto==1.5.1
     # via
@@ -114,13 +115,13 @@ boto==2.39.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-boto3==1.28.83
+boto3==1.29.0
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.31.83
+botocore==1.32.0
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -197,15 +198,6 @@ code-annotations==1.5.0
     #   edx-toggles
 codejail-includes==1.0.0
     # via -r requirements/edx/base.txt
-coreapi==2.3.3
-    # via
-    #   -r requirements/edx/base.txt
-    #   drf-yasg
-coreschema==0.0.4
-    # via
-    #   -r requirements/edx/base.txt
-    #   coreapi
-    #   drf-yasg
 crowdsourcehinter-xblock==0.6
     # via -r requirements/edx/base.txt
 cryptography==38.0.4
@@ -333,7 +325,7 @@ django-config-models==2.5.1
     #   edx-enterprise
     #   edx-name-affirmation
     #   lti-consumer-xblock
-django-cors-headers==4.3.0
+django-cors-headers==4.3.1
     # via -r requirements/edx/base.txt
 django-countries==7.5.1
     # via
@@ -500,9 +492,8 @@ drf-nested-routers==0.93.4
     #   openedx-blockstore
 drf-spectacular==0.26.5
     # via -r requirements/edx/base.txt
-drf-yasg==1.21.5
+drf-yasg==1.21.7
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   django-user-tasks
     #   edx-api-doc-tools
@@ -766,15 +757,10 @@ isodate==0.6.1
     # via
     #   -r requirements/edx/base.txt
     #   python3-saml
-itypes==1.2.0
-    # via
-    #   -r requirements/edx/base.txt
-    #   coreapi
 jinja2==3.1.2
     # via
     #   -r requirements/edx/base.txt
     #   code-annotations
-    #   coreschema
     #   sphinx
 jmespath==1.0.1
     # via
@@ -804,7 +790,7 @@ jsonschema==4.19.2
     #   drf-spectacular
     #   optimizely-sdk
     #   sphinxcontrib-openapi
-jsonschema-specifications==2023.7.1
+jsonschema-specifications==2023.11.1
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
@@ -907,7 +893,7 @@ mysqlclient==2.2.0
     # via
     #   -r requirements/edx/base.txt
     #   openedx-blockstore
-newrelic==9.1.1
+newrelic==9.1.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -933,7 +919,7 @@ oauthlib==3.2.2
     #   social-auth-core
 olxcleaner==0.2.1
     # via -r requirements/edx/base.txt
-openai==1.2.2
+openai==1.2.4
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -952,7 +938,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.0.3
     # via -r requirements/edx/base.txt
-openedx-events==9.0.1
+openedx-events==9.1.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-event-bus-kafka
@@ -1029,7 +1015,7 @@ polib==1.2.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-i18n-tools
-prompt-toolkit==3.0.40
+prompt-toolkit==3.0.41
     # via
     #   -r requirements/edx/base.txt
     #   click-repl
@@ -1057,11 +1043,11 @@ pycryptodomex==3.19.0
     #   edx-proctoring
     #   lti-consumer-xblock
     #   pyjwkest
-pydantic==2.4.2
+pydantic==2.5.1
     # via
     #   -r requirements/edx/base.txt
     #   openai
-pydantic-core==2.10.1
+pydantic-core==2.14.3
     # via
     #   -r requirements/edx/base.txt
     #   pydantic
@@ -1192,6 +1178,7 @@ pyyaml==6.0.1
     #   -r requirements/edx/base.txt
     #   code-annotations
     #   drf-spectacular
+    #   drf-yasg
     #   edx-django-release-util
     #   edx-i18n-tools
     #   sphinxcontrib-openapi
@@ -1204,7 +1191,7 @@ redis==5.0.1
     # via
     #   -r requirements/edx/base.txt
     #   walrus
-referencing==0.30.2
+referencing==0.31.0
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
@@ -1218,7 +1205,6 @@ requests==2.31.0
     #   -r requirements/edx/base.txt
     #   algoliasearch
     #   analytics-python
-    #   coreapi
     #   django-oauth-toolkit
     #   edx-bulk-grades
     #   edx-drf-extensions
@@ -1245,14 +1231,6 @@ rpds-py==0.12.0
     #   -r requirements/edx/base.txt
     #   jsonschema
     #   referencing
-ruamel-yaml==0.18.5
-    # via
-    #   -r requirements/edx/base.txt
-    #   drf-yasg
-ruamel-yaml-clib==0.2.8
-    # via
-    #   -r requirements/edx/base.txt
-    #   ruamel-yaml
 rules==3.3
     # via
     #   -r requirements/edx/base.txt
@@ -1331,7 +1309,7 @@ sniffio==1.3.0
     #   httpx
 snowballstemmer==2.2.0
     # via sphinx
-snowflake-connector-python==3.4.1
+snowflake-connector-python==3.5.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -1429,7 +1407,7 @@ tinycss2==1.2.1
     # via
     #   -r requirements/edx/base.txt
     #   bleach
-tomlkit==0.12.2
+tomlkit==0.12.3
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
@@ -1464,7 +1442,6 @@ unicodecsv==0.14.1
 uritemplate==4.1.1
     # via
     #   -r requirements/edx/base.txt
-    #   coreapi
     #   drf-spectacular
     #   drf-yasg
 urllib3==1.26.18
@@ -1484,7 +1461,7 @@ vine==5.1.0
     #   amqp
     #   celery
     #   kombu
-voluptuous==0.13.1
+voluptuous==0.14.0
     # via
     #   -r requirements/edx/base.txt
     #   ora2
@@ -1494,7 +1471,7 @@ walrus==0.9.3
     #   edx-event-bus-redis
 watchdog==3.0.0
     # via -r requirements/edx/base.txt
-wcwidth==0.2.9
+wcwidth==0.2.10
     # via
     #   -r requirements/edx/base.txt
     #   prompt-toolkit
