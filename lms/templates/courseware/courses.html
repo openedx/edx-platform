@@ -1,284 +1,286 @@
-<%page expression_filter="h"/>
-<%!
-  import json
-  from django.utils.translation import ugettext as _
-  from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_json
-%>
-<%inherit file="../main.html" />
-<%
-  course_discovery_enabled = settings.FEATURES.get('ENABLE_COURSE_DISCOVERY')
-%>
+<%page expression_filter="h" />
+<%! import json from django.utils.translation import ugettext as _ from openedx.core.djangolib.js_utils import
+  js_escaped_string, dump_js_escaped_json %>
+  <%inherit file="../main.html" />
+  <% course_discovery_enabled=settings.FEATURES.get('ENABLE_COURSE_DISCOVERY') %>
 
-<%namespace name='static' file='../static_content.html'/>
+    <%namespace name='static' file='../static_content.html' />
 
-% if course_discovery_enabled:
-<%block name="header_extras">
-  % for template_name in ["course_card", "filter_bar", "filter", "facet", "facet_option"]:
-  <script type="text/template" id="${template_name}-tpl">
+    % if course_discovery_enabled:
+    <%block name="header_extras">
+      % for template_name in ["course_card", "filter_bar", "filter", "facet", "facet_option"]:
+      <script type="text/template" id="${template_name}-tpl">
       <%static:include path="discovery/${template_name}.underscore" />
   </script>
-  % endfor
-  <%static:require_module module_name="js/discovery/discovery_factory" class_name="DiscoveryFactory">
-    DiscoveryFactory(
-      ${course_discovery_meanings | n, dump_js_escaped_json},
-      getParameterByName('search_query'),
-      "${user_language | n, js_escaped_string}",
-      "${user_timezone | n, js_escaped_string}"
-    );
-  </%static:require_module>
-</%block>
-% endif
+      % endfor
+      <%static:require_module module_name="js/discovery/discovery_factory" class_name="DiscoveryFactory">
+        DiscoveryFactory(
+        ${course_discovery_meanings | n, dump_js_escaped_json},
+        getParameterByName('search_query'),
+        "${user_language | n, js_escaped_string}",
+        "${user_timezone | n, js_escaped_string}"
+        );
+      </%static:require_module>
+    </%block>
+    % endif
 
-<%block name="pagetitle">${_("Courses")}</%block>
+    <%block name="pagetitle">${_("Courses")}</%block>
 
-<main id="main" aria-label="Content" tabindex="-1">
-    <section class="find-courses">
-      <section class="courses-container">
-        % if course_discovery_enabled:
-        <body>
-        <div class="container">
+    <main id="main" aria-label="Content" tabindex="-1">
+      <section class="find-courses">
+        <section class="courses-container">
+          % if course_discovery_enabled:
+
+          <body>
+            <div class="container">
 
 
-        <div id="discovery-form" role="search" aria-label="course" class="wrapper-search-context">
+              <div id="discovery-form" role="search" aria-label="course" class="wrapper-search-context">
+
+
+                <div id="discovery-message" class="search-status-label"></div>
+                <div class="search-bar-contents">
+
+                  <!-- Filter Section -->
+                  <div class="buttons">
+                    <!-- Filter Box with Icon and Count -->
+                    <img src="../../static/images/filter_icon.png" alt="Filter Icon" class="faders">
+                    <span class="filter-text">Filter</span>
+                    <div style="background: #FEEBEE; padding: 4px 6px;">
+                      <span style="font-weight: 600; font-size: 12px; color: #ED4338;">3</span>
+                    </div>
+                  </div>
+                  <!-- Search Bar -->
+                  <div class="search-container">
+                    <div class="search-info">
+
+                      <form class="wrapper-search-input">
+                        <div class="magnifier-input">
+                          <img src="../../static/images/magnifier.png" alt="Search Icon" class="magnifier-icon">
+
+                          <label for="discovery-input" class="sr">${_('Search for a course')}</label>
+                          <input id="discovery-input" class="search-input" placeholder="${_('Search for a course')}" />
+                          <!-- <button type="submit" class="button postfix discovery-submit" title="${_('Search')}"> -->
+                          <!-- <span class="icon fa fa-search" aria-hidden="true"></span> -->
+
+                          <div aria-live="polite" aria-relevant="all">
+                            <!-- <div id="loading-indicator" class="loading-spinner hidden"> -->
+                            <!-- <span class="icon fa fa-spinner fa-spin" aria-hidden="true"></span>  -->
+                            <span class="sr">${_('Loading')}</span>
+                          </div>
+                        </div>
+                        <!-- </button> -->
+                      </form>
+
+                    </div>
+                  </div>
+
+                  <!-- Sort By Dropdown -->
+                  <div class="sort-section">
+                    <span class="sort-by-label">Sort by:</span>
+                    <select class="sort-dropdown">
+                      <option value="option1">Option 1</option>
+                      <option value="option2">Option 2</option>
+                      <option value="option3">Option 3</option>
+                    </select>
+                  </div>
+
+
+
+                </div>
+              </div>
+            </div>
+          </body>
+
+
+          <div id="filter-bar" class="filters hide-phone is-collapsed">
+          </div>
+          % endif
+
+          <!-- Including the 'Inter' font -->
+          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
           
 
-          <div id="discovery-message" class="search-status-label"></div>
-          <div class="search-bar-contents">
+          <style>
+            body {
+              font-family: 'Inter', sans-serif;
+            }
 
-             <!-- Filter Section -->
-        <div class="buttons">
-          <!-- Filter Box with Icon and Count -->
-          <img src="../../static/images/filter_icon.png" alt="Filter Icon" class="faders">
-          <span class="filter-text">Filter</span>
-          <div style="background: #FEEBEE; padding: 4px 6px;">
-              <span style="font-weight: 600; font-size: 12px; color: #ED4338;">3</span>
+            .magnifier-input {
+              display: flex;
+              flex-direction: row;
+              align-items: stretch;
+
+            }
+
+            .wrapper-search-context {
+              display: flex;
+              flex-direction: column;
+              align-items: left;
+              /* To ensure children elements take full width */
+            }
+
+            .search-bar-contents {
+              display: flex;
+              flex-direction: row;
+              align-items: stretch;
+              /* To ensure children elements take full width */
+            }
+
+            .container {
+              display: flex;
+              justify-content: space-between;
+              align-items: left;
+              width: 1320px;
+            }
+
+            /* Filter Box CSS */
+            .buttons {
+              box-sizing: border-box;
+              display: flex;
+              flex-direction: row;
+              justify-content: center;
+              align-items: center;
+              padding: 0px 24px;
+              gap: 24px;
+              width: 167px;
+              height: 48px;
+              background: #FFFFFF;
+              border: 1px solid #FEEBEE;
+            }
+
+            .contents {
+              display: flex;
+              flex-direction: row;
+              justify-content: center;
+              align-items: center;
+              padding: 0px;
+              gap: 12px;
+              width: 75px;
+              height: 48px;
+            }
+
+            .faders {
+              width: 24px;
+              height: 24px;
+            }
+
+            .filter-text {
+              width: 39px;
+              height: 48px;
+              font-weight: 600;
+              font-size: 16px;
+              line-height: 48px;
+              color: #1D2026;
+            }
+
+            /* Search Bar CSS */
+            .search-container {
+              box-sizing: border-box;
+              display: flex;
+              flex-direction: row;
+              align-items: flex-start;
+              padding: 12px 18px;
+              gap: 10px;
+              width: 389px;
+              height: 48px;
+              background: #FFFFFF;
+              border: 1px solid #E9EAF0;
+            }
+
+            .search-info {
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+              padding: 0px;
+              gap: 12px;
+              width: 105px;
+              height: 24px;
+            }
+
+            .magnifier-icon {
+              width: 24px;
+              height: 24px;
+            }
+
+            .search-input {
+              width: auto;
+              height: 24px;
+              font-weight: 400;
+              font-size: 16px;
+              line-height: 24px;
+              color: #1D2026;
+              border: none;
+              padding-left: 10px;
+              background: #FFFFFF;
+            }
+
+            .search-input:focus {
+              outline: none;
+            }
+
+
+
+            .sort-by-label {
+              margin-right: 8px;
+              font-weight: 400;
+              font-size: 16px;
+              line-height: 24px;
+              color: #1D2026;
+            }
+
+            .sort-dropdown {
+
+              box-sizing: border-box;
+              display: flex;
+              flex-direction: row;
+              justify-content: center;
+              align-items: center;
+              padding: 12px 16px;
+              gap: 83px;
+
+              width: 198px;
+              height: 48px;
+
+              /* Gray/White */
+              background: #FFFFFF;
+              /* Gray/100 */
+              border: 1px solid #E9EAF0;
+
+              /* Inside auto layout */
+              flex: none;
+              order: 1;
+              flex-grow: 0;
+            }
+
+            .sort-section {
+              display: flex;
+              /* Add flex display to horizontally align Sort By text and dropdown */
+              align-items: center;
+              /* Vertically align the items in center */
+            }
+          </style>
+
+          <div class="courses${'' if course_discovery_enabled else ' no-course-discovery'}" role="region"
+            aria-label="${_('List of Courses')}">
+            <ul class="courses-listing courses-list">
+              %for course in courses:
+              <li class="courses-listing-item">
+                <%include file="../course.html" args="course=course" />
+              </li>
+              %endfor
+            </ul>
           </div>
-      </div>
-        <!-- Search Bar -->
-      <div class="search-container">
-        <div class="search-info" >
-
-          <form class="wrapper-search-input">
-            <div class="magnifier-input">
-              <img src="../../static/images/magnifier.png" alt="Search Icon" class="magnifier-icon">
-
-            <label for="discovery-input" class="sr">${_('Search for a course')}</label>
-            <input id="discovery-input" class="search-input" placeholder="${_('Search for a course')}" />
-            <!-- <button type="submit" class="button postfix discovery-submit" title="${_('Search')}"> -->
-              <!-- <span class="icon fa fa-search" aria-hidden="true"></span> -->
-
-              <div aria-live="polite" aria-relevant="all">
-                 <!-- <div id="loading-indicator" class="loading-spinner hidden"> -->
-                  <!-- <span class="icon fa fa-spinner fa-spin" aria-hidden="true"></span>  -->
-                  <span class="sr">${_('Loading')}</span>
-                 </div> 
-              </div>
-            <!-- </button> -->
-          </form>
-
-        </div>
-      </div>
-
-      <!-- Sort By Dropdown -->
-      <div class="sort-section">
-        <span class="sort-by-label">Sort by:</span>
-        <select class="sort-dropdown">
-          <option value="option1">Option 1</option>
-          <option value="option2">Option 2</option>
-          <option value="option3">Option 3</option>
-        </select>
-    </div>
 
 
+          % if course_discovery_enabled:
+          <aside aria-label="${_('Refine Your Search')}" class="search-facets phone-menu">
+            <h2 class="header-search-facets">${_('Refine Your Search')}</h2>
+            <section class="search-facets-lists">
+            </section>
+          </aside>
+          % endif
 
-        </div>
-      </div>
-      </div>
-    </body>
-
-
-        <div id="filter-bar" class="filters hide-phone is-collapsed">
-        </div>
-        % endif
-
-         <!-- Including the 'Inter' font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-
-        .magnifier-input{
-          display: flex;
-          flex-direction: row;
-          align-items: stretch; 
-
-        }
-
-        .wrapper-search-context {
-    display: flex;
-    flex-direction: column;
-    align-items: left; /* To ensure children elements take full width */
-        }
-
-        .search-bar-contents {
-          display: flex;
-          flex-direction: row;
-          align-items: stretch; /* To ensure children elements take full width */
-        }
-
-        .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: left;
-            width: 1320px;
-        }
-
-        /* Filter Box CSS */
-        .buttons {
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: center;
-            padding: 0px 24px;
-            gap: 24px;
-            width: 167px;
-            height: 48px;
-            background: #FFFFFF;
-            border: 1px solid #FEEBEE;
-        }
-
-        .contents {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: center;
-            padding: 0px;
-            gap: 12px;
-            width: 75px;
-            height: 48px;
-        }
-
-        .faders {
-            width: 24px;
-            height: 24px;
-        }
-
-        .filter-text {
-            width: 39px;
-            height: 48px;
-            font-weight: 600;
-            font-size: 16px;
-            line-height: 48px;
-            color: #1D2026;
-        }
-
-        /* Search Bar CSS */
-        .search-container {
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: row;
-            align-items: flex-start;
-            padding: 12px 18px;
-            gap: 10px;
-            width: 389px;
-            height: 48px;
-            background: #FFFFFF;
-            border: 1px solid #E9EAF0;
-        }
-
-        .search-info {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            padding: 0px;
-            gap: 12px;
-            width: 105px;
-            height: 24px;
-        }
-
-        .magnifier-icon {
-            width: 24px;
-            height: 24px;
-        }
-
-        .search-input {
-            width: auto;
-            height: 24px;
-            font-weight: 400;
-            font-size: 16px;
-            line-height: 24px;
-            color: #1D2026;
-            border: none;
-            padding-left: 10px;
-            background: #FFFFFF;
-        }
-
-        .search-input:focus {
-            outline: none;
-        }
-
-    
-
-        .sort-by-label {
-            margin-right: 8px;
-            font-weight: 400;
-            font-size: 16px;
-            line-height: 24px;
-            color: #1D2026;
-        }
-
-        .sort-dropdown {
-            
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: center;
-            padding: 12px 16px;
-            gap: 83px;
-
-            width: 198px;
-            height: 48px;
-
-            /* Gray/White */
-            background: #FFFFFF;
-            /* Gray/100 */
-            border: 1px solid #E9EAF0;
-
-            /* Inside auto layout */
-            flex: none;
-            order: 1;
-            flex-grow: 0;
-        }
-
-        .sort-section {
-            display: flex; /* Add flex display to horizontally align Sort By text and dropdown */
-            align-items: center; /* Vertically align the items in center */
-        }
-    </style>
-
-        <div class="courses${'' if course_discovery_enabled else ' no-course-discovery'}" role="region" aria-label="${_('List of Courses')}">
-          <ul class="courses-listing courses-list">
-            %for course in courses:
-            <li class="courses-listing-item">
-              <%include file="../course.html" args="course=course" />
-            </li>
-            %endfor
-          </ul>
-        </div>
-
-
-        % if course_discovery_enabled:
-        <aside aria-label="${_('Refine Your Search')}" class="search-facets phone-menu">
-          <h2 class="header-search-facets">${_('Refine Your Search')}</h2>
-          <section class="search-facets-lists">
-          </section>
-        </aside>
-        % endif
-
+        </section>
       </section>
-    </section>
-</main>
+    </main>
