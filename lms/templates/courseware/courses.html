@@ -54,22 +54,25 @@
               <span style="font-weight: 600; font-size: 12px; color: #ED4338;">3</span>
           </div>
       </div>
-
+        <!-- Search Bar -->
       <div class="search-container">
         <div class="search-info" >
 
           <form class="wrapper-search-input">
+            <div class="magnifier-input">
             <label for="discovery-input" class="sr">${_('Search for a course')}</label>
-            <input id="discovery-input" class="search-input" placeholder="${_('Search for a course')}" type="text"/>
-            <button type="submit" class="button postfix discovery-submit" title="${_('Search')}">
-              <span class="icon fa fa-search" aria-hidden="true"></span>
+            <input id="discovery-input" class="search-input" placeholder="${_('Search for a course')}" />
+            <!-- <button type="submit" class="button postfix discovery-submit" title="${_('Search')}"> -->
+              <!-- <span class="icon fa fa-search" aria-hidden="true"></span> -->
+              <img src="../static/images/magnifier.png" alt="Search Icon" class="magnifier-icon">
+
               <div aria-live="polite" aria-relevant="all">
-                <div id="loading-indicator" class="loading-spinner hidden">
-                  <span class="icon fa fa-spinner fa-spin" aria-hidden="true"></span>
+                 <!-- <div id="loading-indicator" class="loading-spinner hidden"> -->
+                  <span class="icon fa fa-spinner fa-spin" aria-hidden="true"></span> 
                   <span class="sr">${_('Loading')}</span>
-                </div>
+                 </div> 
               </div>
-            </button>
+            <!-- </button> -->
           </form>
 
         </div>
@@ -89,6 +92,13 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
+        }
+
+        .magnifier-input{
+          display: flex;
+          flex-direction: row;
+          align-items: stretch; 
+
         }
 
         .wrapper-search-context {
@@ -154,7 +164,7 @@
         .search-container {
             box-sizing: border-box;
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: flex-start;
             padding: 12px 18px;
             gap: 10px;
