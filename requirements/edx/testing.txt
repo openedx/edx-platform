@@ -49,6 +49,7 @@ asgiref==3.7.2
     # via
     #   -r requirements/edx/base.txt
     #   django
+    #   django-cors-headers
     #   django-countries
 asn1crypto==1.5.1
     # via
@@ -74,7 +75,7 @@ attrs==23.1.0
     #   openedx-events
     #   openedx-learning
     #   referencing
-babel==2.11.0
+babel==2.12.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -114,19 +115,21 @@ boto==2.39.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-boto3==1.28.83
+boto3==1.29.0
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.31.83
+botocore==1.32.0
     # via
     #   -r requirements/edx/base.txt
     #   boto3
     #   s3transfer
 bridgekeeper==0.9
     # via -r requirements/edx/base.txt
+cachetools==5.3.2
+    # via tox
 celery==5.3.5
     # via
     #   -c requirements/edx/../constraints.txt
@@ -158,6 +161,7 @@ chardet==5.2.0
     #   -r requirements/edx/coverage.txt
     #   diff-cover
     #   pysrt
+    #   tox
 charset-normalizer==2.0.12
     # via
     #   -c requirements/edx/../constraints.txt
@@ -207,6 +211,8 @@ code-annotations==1.5.0
     #   edx-toggles
 codejail-includes==1.0.0
     # via -r requirements/edx/base.txt
+colorama==0.4.6
+    # via tox
 coreapi==2.3.3
     # via
     #   -r requirements/edx/base.txt
@@ -256,7 +262,7 @@ deprecated==1.2.14
     # via
     #   -r requirements/edx/base.txt
     #   jwcrypto
-diff-cover==8.0.0
+diff-cover==8.0.1
     # via -r requirements/edx/coverage.txt
 dill==0.3.7
     # via pylint
@@ -357,7 +363,7 @@ django-config-models==2.5.1
     #   edx-enterprise
     #   edx-name-affirmation
     #   lti-consumer-xblock
-django-cors-headers==4.3.0
+django-cors-headers==4.3.1
     # via -r requirements/edx/base.txt
 django-countries==7.5.1
     # via
@@ -699,7 +705,7 @@ execnet==2.0.2
     # via pytest-xdist
 factory-boy==3.3.0
     # via -r requirements/edx/testing.in
-faker==19.13.0
+faker==20.0.3
     # via factory-boy
 fastapi==0.104.1
     # via pact-python
@@ -845,7 +851,7 @@ jsonschema==4.19.2
     #   -r requirements/edx/base.txt
     #   drf-spectacular
     #   optimizely-sdk
-jsonschema-specifications==2023.7.1
+jsonschema-specifications==2023.11.1
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
@@ -952,7 +958,7 @@ mysqlclient==2.2.0
     # via
     #   -r requirements/edx/base.txt
     #   openedx-blockstore
-newrelic==9.1.1
+newrelic==9.1.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -978,7 +984,7 @@ oauthlib==3.2.2
     #   social-auth-core
 olxcleaner==0.2.1
     # via -r requirements/edx/base.txt
-openai==1.2.2
+openai==1.2.4
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -997,7 +1003,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.0.3
     # via -r requirements/edx/base.txt
-openedx-events==9.0.1
+openedx-events==9.1.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-event-bus-kafka
@@ -1022,6 +1028,7 @@ packaging==23.2
     #   drf-yasg
     #   gunicorn
     #   py2neo
+    #   pyproject-api
     #   pytest
     #   snowflake-connector-python
     #   tox
@@ -1071,6 +1078,7 @@ platformdirs==3.11.0
     #   -r requirements/edx/base.txt
     #   pylint
     #   snowflake-connector-python
+    #   tox
     #   virtualenv
 pluggy==1.3.0
     # via
@@ -1083,7 +1091,7 @@ polib==1.2.0
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
     #   edx-i18n-tools
-prompt-toolkit==3.0.40
+prompt-toolkit==3.0.41
     # via
     #   -r requirements/edx/base.txt
     #   click-repl
@@ -1093,8 +1101,6 @@ psutil==5.9.6
     #   edx-django-utils
     #   pact-python
     #   pytest-xdist
-py==1.11.0
-    # via tox
 py2neo @ https://github.com/overhangio/py2neo/releases/download/2021.2.3/py2neo-2021.2.3.tar.gz
     # via
     #   -c requirements/edx/../constraints.txt
@@ -1119,12 +1125,12 @@ pycryptodomex==3.19.0
     #   edx-proctoring
     #   lti-consumer-xblock
     #   pyjwkest
-pydantic==2.4.2
+pydantic==2.5.1
     # via
     #   -r requirements/edx/base.txt
     #   fastapi
     #   openai
-pydantic-core==2.10.1
+pydantic-core==2.14.3
     # via
     #   -r requirements/edx/base.txt
     #   pydantic
@@ -1202,6 +1208,8 @@ pyparsing==3.1.1
     #   -r requirements/edx/base.txt
     #   chem
     #   openedx-calc
+pyproject-api==1.6.1
+    # via tox
 pyquery==2.0.0
     # via -r requirements/edx/testing.in
 pyrsistent==0.20.0
@@ -1237,7 +1245,7 @@ pytest-metadata==1.8.0
     #   pytest-json-report
 pytest-randomly==3.15.0
     # via -r requirements/edx/testing.in
-pytest-xdist[psutil]==3.3.1
+pytest-xdist[psutil]==3.4.0
     # via -r requirements/edx/testing.in
 python-dateutil==2.8.2
     # via
@@ -1311,7 +1319,7 @@ redis==5.0.1
     # via
     #   -r requirements/edx/base.txt
     #   walrus
-referencing==0.30.2
+referencing==0.31.0
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
@@ -1426,7 +1434,6 @@ six==1.16.0
     #   pyjwkest
     #   python-dateutil
     #   python-memcached
-    #   tox
 slumber==0.7.1
     # via
     #   -r requirements/edx/base.txt
@@ -1438,7 +1445,7 @@ sniffio==1.3.0
     #   -r requirements/edx/base.txt
     #   anyio
     #   httpx
-snowflake-connector-python==3.4.1
+snowflake-connector-python==3.5.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -1508,14 +1515,15 @@ tomli==2.0.1
     #   coverage
     #   import-linter
     #   pylint
+    #   pyproject-api
     #   pytest
     #   tox
-tomlkit==0.12.2
+tomlkit==0.12.3
     # via
     #   -r requirements/edx/base.txt
     #   pylint
     #   snowflake-connector-python
-tox==3.28.0
+tox==4.11.3
     # via -r requirements/edx/testing.in
 tqdm==4.66.1
     # via
@@ -1581,7 +1589,7 @@ vine==5.1.0
     #   kombu
 virtualenv==20.24.6
     # via tox
-voluptuous==0.13.1
+voluptuous==0.14.0
     # via
     #   -r requirements/edx/base.txt
     #   ora2
@@ -1591,7 +1599,7 @@ walrus==0.9.3
     #   edx-event-bus-redis
 watchdog==3.0.0
     # via -r requirements/edx/base.txt
-wcwidth==0.2.9
+wcwidth==0.2.10
     # via
     #   -r requirements/edx/base.txt
     #   prompt-toolkit

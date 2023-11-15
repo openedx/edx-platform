@@ -33,6 +33,7 @@ appdirs==1.4.4
 asgiref==3.7.2
     # via
     #   django
+    #   django-cors-headers
     #   django-countries
 asn1crypto==1.5.1
     # via snowflake-connector-python
@@ -51,7 +52,7 @@ attrs==23.1.0
     #   openedx-events
     #   openedx-learning
     #   referencing
-babel==2.11.0
+babel==2.12.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -81,13 +82,13 @@ boto==2.39.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
-boto3==1.28.83
+boto3==1.29.0
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.31.83
+botocore==1.32.0
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -271,7 +272,7 @@ django-config-models==2.5.1
     #   edx-enterprise
     #   edx-name-affirmation
     #   lti-consumer-xblock
-django-cors-headers==4.3.0
+django-cors-headers==4.3.1
     # via -r requirements/edx/kernel.in
 django-countries==7.5.1
     # via
@@ -669,7 +670,7 @@ jsonschema==4.19.2
     # via
     #   drf-spectacular
     #   optimizely-sdk
-jsonschema-specifications==2023.7.1
+jsonschema-specifications==2023.11.1
     # via jsonschema
 jwcrypto==1.5.0
     # via
@@ -755,7 +756,7 @@ mysqlclient==2.2.0
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-blockstore
-newrelic==9.1.1
+newrelic==9.1.2
     # via
     #   -r requirements/edx/bundled.in
     #   edx-django-utils
@@ -778,7 +779,7 @@ oauthlib==3.2.2
     #   social-auth-core
 olxcleaner==0.2.1
     # via -r requirements/edx/kernel.in
-openai==1.2.2
+openai==1.2.4
     # via edx-enterprise
 openedx-atlas==0.5.0
     # via -r requirements/edx/kernel.in
@@ -794,7 +795,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/kernel.in
 openedx-django-wiki==2.0.3
     # via -r requirements/edx/kernel.in
-openedx-events==9.0.1
+openedx-events==9.1.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-event-bus-kafka
@@ -857,7 +858,7 @@ platformdirs==3.11.0
     #   snowflake-connector-python
 polib==1.2.0
     # via edx-i18n-tools
-prompt-toolkit==3.0.40
+prompt-toolkit==3.0.41
     # via click-repl
 psutil==5.9.6
     # via
@@ -879,9 +880,9 @@ pycryptodomex==3.19.0
     #   edx-proctoring
     #   lti-consumer-xblock
     #   pyjwkest
-pydantic==2.4.2
+pydantic==2.5.1
     # via openai
-pydantic-core==2.10.1
+pydantic-core==2.14.3
     # via pydantic
 pygments==2.16.1
     # via
@@ -1003,7 +1004,7 @@ redis==5.0.1
     # via
     #   -r requirements/edx/kernel.in
     #   walrus
-referencing==0.30.2
+referencing==0.31.0
     # via
     #   jsonschema
     #   jsonschema-specifications
@@ -1108,7 +1109,7 @@ sniffio==1.3.0
     # via
     #   anyio
     #   httpx
-snowflake-connector-python==3.4.1
+snowflake-connector-python==3.5.0
     # via edx-enterprise
 social-auth-app-django==5.0.0
     # via
@@ -1157,7 +1158,7 @@ text-unidecode==1.3
     # via python-slugify
 tinycss2==1.2.1
     # via bleach
-tomlkit==0.12.2
+tomlkit==0.12.3
     # via snowflake-connector-python
 tqdm==4.66.1
     # via
@@ -1205,13 +1206,13 @@ vine==5.1.0
     #   amqp
     #   celery
     #   kombu
-voluptuous==0.13.1
+voluptuous==0.14.0
     # via ora2
 walrus==0.9.3
     # via edx-event-bus-redis
 watchdog==3.0.0
     # via -r requirements/edx/paver.txt
-wcwidth==0.2.9
+wcwidth==0.2.10
     # via prompt-toolkit
 web-fragments==2.1.0
     # via
