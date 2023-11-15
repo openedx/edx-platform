@@ -13,7 +13,7 @@ from cms.djangoapps.contentstore.api import course_author_access_required
 from cms.djangoapps.contentstore.xblock_storage_handlers import view_handlers
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
 
-from cms.djangoapps.contentstore.rest_api.v1.serializers import XblockSerializer
+from ..serializers import XblockSerializer
 from .utils import validate_request_with_serializer
 
 
