@@ -161,12 +161,11 @@ class CreateUserAPIView(APIView):
 
     @method_decorator(csrf_exempt)
     def post(self, request):  # lint-amnesty, pylint: disable=missing-function-docstring
-        data = request.data
-        users = data.get('users')
+        users = request.data
 
-        if users is None: 
+        if type(users) != list: 
             return Response(data={
-                "message": "Field 'users' is required.",
+                "message": "users payload must be an array.",
             }, status=status.HTTP_400_BAD_REQUEST)
 
         results = []
@@ -180,6 +179,10 @@ class CreateUserAPIView(APIView):
             })
 
         for user in users: 
+            if type(user) != dict:
+                return Response(data={
+                    "message": "Invalid data: user must be a dict.",
+                }, status=status.HTTP_400_BAD_REQUEST)
             validation_errors = funix_user_validator.validate(user)
             if validation_errors: 
                 return Response(data={
