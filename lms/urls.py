@@ -1065,9 +1065,10 @@ urlpatterns += [
    
 ]
 
-from lms.djangoapps.funix_portal_api.views import UpdateUserPasswordAPIView
+from lms.djangoapps.funix_portal_api.views import UpdateUserPasswordAPIView, CreateUserAPIView
 
 # funix portal api
 urlpatterns +=[
-    path ('api/funix_portal/user/update_password', UpdateUserPasswordAPIView.as_view() , name='funix_portal_update_password')
+    path ('api/funix_portal/user/update_password', UpdateUserPasswordAPIView.as_view() , name='funix_portal_update_password'),
+    path ('api/funix_portal/user/create_user', CreateUserAPIView.as_view() , name='funix_portal_create_user')
 ]
