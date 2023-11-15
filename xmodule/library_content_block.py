@@ -714,31 +714,14 @@ class LibraryContentBlock(
         values = [{"display_name": name, "value": str(key)} for key, name in all_libraries]
         return values
 
-    def _todo_kyle_remove_editor_saved(self, user, old_metadata, old_content):  # pylint: disable=unused-argument
-        """
-        If source library is specified and library tools are available, then set version to library's latest.
-
-        Otherwise, clear version and children.
-        """
-        if self.source_library_id:
-            try:
-                latest_version = self.get_tools().get_latest_library_version(self.source_library_id)
-                self.source_library_version = None if latest_version is None else str(latest_version)
-            except LibraryToolsUnavailable:
-                self.source_library_version = ""
-                self.children = []  # pylint: disable=attribute-defined-outside-init
-        else:
-            self.source_library_version = ""
-            self.children = []  # pylint: disable=attribute-defined-outside-init
-
     def post_editor_saved(self, user, old_metadata, old_content):  # pylint: disable=unused-argument
         """
         If source library or capa_type have been edited, upgrade library & sync automatically.
 
         TODO: capa_type doesn't really need to trigger an upgrade once we've migrated to V2.
         """
-        source_lib_changed = (self.source_library_id, self.capa_type)
-        capa_filter_changed = (self.source_library_id, old_metadata.capa_type)
+        source_lib_changed = (self.source_library_id != old_metadata.get("source_library_id", ""))
+        capa_filter_changed = (self.capa_type != old_metadata.get("capa_type", ANY_CAPA_TYPE_VALUE))
         if source_lib_changed or capa_filter_changed:
             try:
                 self.sync_from_library(upgrade_to_latest=True)
