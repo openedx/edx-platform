@@ -15,6 +15,7 @@ from django.utils.decorators import method_decorator
 from rest_framework.exceptions import ValidationError
 from openedx.core.djangoapps.user_authn.views.registration_form import AccountCreationForm
 from common.djangoapps.student.helpers import do_create_account, AccountValidationError
+from .validators import funix_user_validator
 
 def check_missing_fields(fields, data):
     errors = {}
@@ -111,22 +112,45 @@ class CreateUserAPIView(APIView):
 
         POST http://localhost:18000/api/funix_portal/user/create_user
         Content-Type: application/json
-
-        {
-            "name": "",
-            "username": "ntav0010",
-            "email": "ntav0009@@@example.com",
-            "password": "Anhvu123456!"
-        }
+        users: [
+            {
+                "name": "full name",
+                "username": "ntav0010",
+                "email": "ntav0009@@@example.com",
+                "password": "plain_text"
+            }
+        ]
 
     **Example Response**
         {
-            "message": "success/error message",
-            if message is Validation Error, extra field:
-            "errors": [ 
-                [ "email", ["A properly formatted e-mail is required"] ],
-                [ "name", ["Your legal name must be a minimum of one character long"] ]
+            "message": "+-Created successfully x users. +-Failed to create y users.",
+            "results": [
+                {
+                    "user": {
+                        "name": "full name",
+                        "username": "ntav0010",
+                        "email": "ntav0009@@@example.com",
+                        "password": "plain_text",
+                        "student_code": "student_code"
+                    },
+                    "ok": True/False,
+                    "errors": {
+                        "field1": ["error1", "error2"],
+                    }
+                }
             ]
+        }
+
+        {
+            "message": "Invalid fields",
+            "errors": {
+                "username": [
+                    "User with username 'test0006' already exists."
+                ],
+                "password": [
+                    "Password 'x!' is invalid. Password must be at least 8 characters."
+                ]
+            }
         }
 
     """
@@ -138,74 +162,85 @@ class CreateUserAPIView(APIView):
     @method_decorator(csrf_exempt)
     def post(self, request):  # lint-amnesty, pylint: disable=missing-function-docstring
         data = request.data
+        users = data.get('users')
 
-        username = data.get('username')
-        email = data.get('email')
-        password = data.get('password')
-        name = data.get('name')
-
-        missing_fields = check_missing_fields(["username", "email", "password", "name"], data)
-        if missing_fields: 
+        if users is None: 
             return Response(data={
-                "message": "Missing fields",
-                "errors": missing_fields
+                "message": "Field 'users' is required.",
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            user = User.objects.get(email=email)
-            return Response(data={
-                "message": f"User with email '{email}' already exists",
-                "errors": {"email": [ f"User with email '{email}' already exists" ]}
-            }, status=status.HTTP_400_BAD_REQUEST)
-        except User.DoesNotExist:
-            pass
-        except Exception as e: 
-            logging.error(str(e))
-            return Response(data={
-                "message": "Internal Server Error", 
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        results = []
+        users_created = 0
 
-        try:
-            user = User.objects.get(username=username)
-            return Response(data={
-                "message": f"User with username '{username}' already exists",
-                "errors": {"username": [ f"User with username '{username}' already exists" ]}
-            }, status=status.HTTP_400_BAD_REQUEST)
-        except User.DoesNotExist: 
-            pass
-        except Exception as e: 
-            logging.error(str(e))
-            return Response(data={
-                "message": "Internal Server Error", 
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        def _append_results(status, user, errors = {}): 
+            results.append({
+                "ok": status, 
+                "user": user, 
+                "errors": errors
+            })
 
-        form = AccountCreationForm(
-            data={
-                'username': username,
-                'email': email,
-                'password': password,
-                'name': name,
-            },
-            tos_required=False
-        )
+        for user in users: 
+            validation_errors = funix_user_validator.validate(user)
+            if validation_errors: 
+                return Response(data={
+                    "message": "Invalid fields",
+                    "errors": validation_errors,
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+        for user in users: 
+            username = user.get('username')
+            email = user.get('email')
+            password = user.get('password')
+            name = user.get('name')
 
-        try:
-            user, profile, reg = do_create_account(form)
-            user.is_active = True
-            user.save()
+            form = AccountCreationForm(
+                data={
+                    'username': username,
+                    'email': email,
+                    'password': password,
+                    'name': name,
+                },
+                tos_required=False
+            )
 
-            return Response(data={
-                "message":  "Created user",
-            }, status=status.HTTP_200_OK)
-        except ValidationError as e:
-            logging.error(str(e))
-            # shape of ValidationError: [ "field_name": ["error message"]]
-            errors = {}
-            for field_error in e:
-                errors[field_error[0]] = field_error[1]
-            return Response(data={"message": "Vaidlation Error", "errors": errors}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            logging.error(str(e))
-            return Response(data={
-                "message": "Internal Server Error", 
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            try:
+                new_user, profile, reg = do_create_account(form)
+                new_user.is_active = True
+                new_user.save()
+
+                student_code = ""
+                try:
+                    student_code = profile.student_code
+                except Exception as e:
+                    logging.error(str(e))
+
+                _append_results(True, 
+                    {
+                        "username": username,
+                        "email": email,
+                        "name": name,
+                        "student_code": student_code
+                    }
+                )
+                users_created += 1
+            except ValidationError as e:
+                logging.error(str(e))
+                # shape of ValidationError: [ "field_name": ["error message"]]
+                errors = {}
+                for field_error in e:
+                    errors[field_error[0]] = field_error[1]
+                _append_results(False, user, errors)
+            except Exception as e:
+                logging.error(str(e))
+                _append_results(False, user, {"message": str(e)})
+
+        response_message = ""
+        if users_created > 0: 
+            response_message += f"Created successfully {users_created} users. "
+        if len(results) > users_created:
+            response_message += f"Failed to create {len(results) - users_created} users."
+
+        return Response(data={
+            "message": response_message,
+            "results": results,
+        }, status=status.HTTP_200_OK)
