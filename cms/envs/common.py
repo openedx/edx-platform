@@ -2182,6 +2182,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'course_structure_cache': {
@@ -2194,6 +2195,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'celery': {
@@ -2206,6 +2208,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'mongo_metadata_inheritance': {
@@ -2218,6 +2221,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'staticfiles': {
@@ -2229,6 +2233,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'default': {
@@ -2241,6 +2246,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'configuration': {
@@ -2252,6 +2258,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'general': {
@@ -2263,6 +2270,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
 }
@@ -2647,6 +2655,9 @@ REGISTRATION_EXTRA_FIELDS = {
 }
 EDXAPP_PARSE_KEYS = {}
 
+############################ AI_TRANSLATIONS ##################################
+AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
+
 ###################### DEPRECATED URLS ##########################
 
 # .. toggle_name: DISABLE_DEPRECATED_SIGNIN_URL
@@ -2782,7 +2793,7 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Experimental API to edit xblocks and course content. Danger: Do not use on running courses!',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
-    'PREPROCESSING_HOOKS': ['cms.lib.spectacular.cms_api_filter'],  # restrict spectacular to CMS API endpoints
+    'PREPROCESSING_HOOKS': ['cms.lib.spectacular.cms_api_filter'],  # restrict spectacular to CMS API endpoints. (cms/lib/spectacular.py)
 }
 
 

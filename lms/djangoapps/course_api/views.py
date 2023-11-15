@@ -290,6 +290,10 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
             If specified, it fetches the `CourseOverview` objects for the
             the specified course keys
 
+        mobile_search (bool):
+            Optional parameter that limits the number of returned courses
+            to MOBILE_SEARCH_COURSE_LIMIT.
+
     **Returns**
 
         * 200 on success, with a list of course discovery objects as returned
@@ -349,6 +353,7 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
             permissions=form.cleaned_data['permissions'],
             active_only=form.cleaned_data.get('active_only', False),
             course_keys=form.cleaned_data['course_keys'],
+            mobile_search=form.cleaned_data.get('mobile_search', False),
         )
 
 

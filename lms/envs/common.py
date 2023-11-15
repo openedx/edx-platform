@@ -1127,6 +1127,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'course_structure_cache': {
@@ -1139,6 +1140,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'celery': {
@@ -1151,6 +1153,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'mongo_metadata_inheritance': {
@@ -1163,6 +1166,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'staticfiles': {
@@ -1174,6 +1178,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'default': {
@@ -1186,6 +1191,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'configuration': {
@@ -1197,6 +1203,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'general': {
@@ -1208,6 +1215,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
 }
@@ -1238,6 +1246,7 @@ OAUTH2_PROVIDER = {
         'certificates:read': _('Retrieve your course certificates'),
         'grades:read': _('Retrieve your grades for your enrolled courses'),
         'tpa:read': _('Retrieve your third-party authentication username mapping'),
+        # user_id is added in code as a default scope for JWT cookies and all password grant_type JWTs
         'user_id': _('Know your user identifier'),
     }),
     'DEFAULT_SCOPES': OAUTH2_DEFAULT_SCOPES,
@@ -3323,7 +3332,14 @@ CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
 REST_FRAMEWORK = {
     # These default classes add observability around endpoints using defaults, and should
     # not be used anywhere else.
+    # Notes on Order:
+    # 1. `JwtAuthentication` does not check `is_active`, so email validation does not affect it. However,
+    #    `SessionAuthentication` does. These work differently, and order changes in what way, which really stinks. See
+    #    https://github.com/openedx/public-engineering/issues/165 for details.
+    # 2. `JwtAuthentication` may also update the database based on contents. Since the LMS creates these JWTs, this
+    #    shouldn't have any affect at this time. But it could, when and if another service started creating the JWTs.
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'openedx.core.djangolib.default_auth_classes.DefaultJwtAuthentication',
         'openedx.core.djangolib.default_auth_classes.DefaultSessionAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'edx_rest_framework_extensions.paginators.DefaultPagination',
@@ -4419,6 +4435,9 @@ MOBILE_APP_USER_AGENT_REGEXES = [
     r'edX/org.edx.mobile',
 ]
 
+# set course limit for mobile search
+MOBILE_SEARCH_COURSE_LIMIT = 100
+
 # cache timeout in seconds for Mobile App Version Upgrade
 APP_UPGRADE_CACHE_TIMEOUT = 3600
 
@@ -5297,6 +5316,10 @@ ENTERPRISE_PLOTLY_SECRET = "I am a secret"
 
 ############## PLOTLY ##############
 
+############ Internal Enterprise Settings ############
+ENTERPRISE_VSF_UUID = "e815503343644ac7845bc82325c34460"
+############ Internal Enterprise Settings ############
+
 ENTERPRISE_MANUAL_REPORTING_CUSTOMER_UUIDS = []
 
 AVAILABLE_DISCUSSION_TOURS = []
@@ -5316,6 +5339,9 @@ SUBSCRIPTIONS_SERVICE_WORKER_USERNAME = 'subscriptions_worker'
 NOTIFICATIONS_EXPIRY = 60
 EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
 NOTIFICATION_CREATION_BATCH_SIZE = 99
+
+############################ AI_TRANSLATIONS ##################################
+AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
 
 #### django-simple-history##
 # disable indexing on date field its coming from django-simple-history.

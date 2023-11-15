@@ -9,12 +9,12 @@ from django.http import Http404
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from common.djangoapps.util.json_request import expect_json_in_class_view
 
-from ....api import course_author_access_required
+from cms.djangoapps.contentstore.api import course_author_access_required
 
 from cms.djangoapps.contentstore.asset_storage_handlers import handle_assets
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
 
-from cms.djangoapps.contentstore.rest_api.v1.serializers import AssetSerializer
+from ..serializers.assets import AssetSerializer
 from .utils import validate_request_with_serializer
 from rest_framework.parsers import (MultiPartParser, FormParser, JSONParser)
 from openedx.core.lib.api.parsers import TypedFileUploadParser
