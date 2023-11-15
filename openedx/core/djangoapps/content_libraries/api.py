@@ -1204,7 +1204,7 @@ def get_v1_or_v2_library(
 
     # If migration mapping is enabled, map the V1 key to a V2 key.
     if (not isinstance(library_key, LibraryLocatorV2)) and MAP_V1_LIBRARIES_TO_V2_LIBRARIES.is_enabled():
-        library_key = _map_v1_to_v2_library(library_key)
+        library_key = map_v1_to_v2_library(library_key)
 
     if isinstance(library_key, LibraryLocatorV2):
         try:
@@ -1220,7 +1220,7 @@ def get_v1_or_v2_library(
             return None
 
 
-def _map_v1_to_v2_library(v1_library_key) -> LibraryLocatorV2:
+def map_v1_to_v2_library(v1_library_key) -> LibraryLocatorV2:
     """
     Helper method to convert a v1 library key into a v2 library key using a strict string mapping.
     ex: library-v1:edx+Lib1 -> lib:edx:Lib1

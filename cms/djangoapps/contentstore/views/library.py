@@ -11,12 +11,16 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseForbidden, HttpResponseNotAllowed
+from django.shortcuts import redirect
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator
+from openedx.core.djangoapps.content_libraries.toggles import MAP_V1_LIBRARIES_TO_V2_LIBRARIES
+from openedx.core.djangoapps.content_libraries.api import map_v1_to_v2_library
+
 from organizations.api import ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from xmodule.modulestore import ModuleStoreEnum
@@ -61,7 +65,6 @@ def should_redirect_to_library_authoring_mfe():
     Boolean helper method, returns whether or not to redirect to the Library
     Authoring MFE based on settings and flags.
     """
-
     return (
         ENABLE_LIBRARY_AUTHORING_MICROFRONTEND and
         LIBRARY_AUTHORING_MICROFRONTEND_URL and
@@ -137,6 +140,14 @@ def _display_library(library_key_string, request):
             request.user.username, str(library_key)
         )
         raise PermissionDenied()
+    if (
+        should_redirect_to_library_authoring_mfe()
+        and MAP_V1_LIBRARIES_TO_V2_LIBRARIES.is_enabled()
+        and settings.LIBRARY_AUTHORING_MICROFRONTEND_URL
+        ):
+        v2_key_string = str(map_v1_to_v2_library(library_key))
+        redirect_url = settings.LIBRARY_AUTHORING_MICROFRONTEND_URL + '/library/' + v2_key_string
+        return redirect(redirect_url)
 
     library = modulestore().get_library(library_key)
     if library is None:
