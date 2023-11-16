@@ -539,7 +539,9 @@ class LibraryContentBlock(
             return Response(_("Content libraries are not available in the current runtime."), status=400)
         except ObjectDoesNotExist:
             return Response(
-                _("Source content library does not exist: {source_library_id}").format(self.source_library_id),
+                _("Source content library does not exist: {source_library_id}").format(
+                    source_library_id=self.source_library_id
+                ),
                 status=400,
             )
         return Response()

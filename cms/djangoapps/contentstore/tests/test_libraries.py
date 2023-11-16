@@ -418,7 +418,7 @@ class TestLibraries(LibraryTestCase):
             course = CourseFactory.create()
 
         # Add a LibraryContent block to the course.
-        lc_block = self._add_library_content_block(course, self.libkey)
+        lc_block = self._add_library_content_block(course, self.lib_key)
         lc_block = self._upgrade_and_sync(lc_block)
 
         # Sanity check the initial condition.
