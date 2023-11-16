@@ -1415,6 +1415,9 @@ ELASTIC_SEARCH_CONFIG = [
     }
 ]
 
+SEARCH_COURSEWARE_CONTENT_LOG_PARAMS = False
+
+
 # .. setting_name: ELASTIC_SEARCH_INDEX_PREFIX
 # .. setting_default: ''
 # .. setting_description: Specifies the prefix used when namixng elasticsearch indexes related to edx-search.
@@ -5421,3 +5424,4 @@ derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.cert
                          'learning-certificate-lifecycle', 'enabled')
 derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.certificate.revoked.v1',
                          'learning-certificate-lifecycle', 'enabled')
+BEAMER_PRODUCT_ID = ""

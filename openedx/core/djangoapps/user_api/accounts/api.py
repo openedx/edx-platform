@@ -524,6 +524,23 @@ def get_email_existence_validation_error(email):
     return _validate(_validate_email_doesnt_exist, errors.AccountEmailAlreadyExists, email)
 
 
+def get_profile_images(user_profile, user, request=None):
+    """
+    Returns metadata about a user's profile image.
+
+    The output is a dict that looks like:
+
+    {
+        "has_image": False,
+        "image_url_full": "http://testserver/static/default_500.png",
+        "image_url_large": "http://testserver/static/default_120.png",
+        "image_url_medium": "http://testserver/static/default_50.png",
+        "image_url_small": "http://testserver/static/default_30.png",
+    }
+    """
+    return AccountLegacyProfileSerializer.get_profile_image(user_profile, user, request)
+
+
 def _get_user_and_profile(username):
     """
     Helper method to return the legacy user and profile objects based on username.

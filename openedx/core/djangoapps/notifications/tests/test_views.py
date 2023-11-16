@@ -210,11 +210,13 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
             enrollment=enrollment_data
         )
 
-    def _expected_api_response(self):
+    def _expected_api_response(self, course=None):
         """
         Helper method to return expected API response.
         """
-        return {
+        if course is None:
+            course = self.course
+        response = {
             'id': 1,
             'course_name': 'course-v1:testorg+testcourse+testrun Course',
             'course_id': 'course-v1:testorg+testcourse+testrun',
@@ -245,6 +247,12 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                 }
             }
         }
+        if not ENABLE_COURSEWIDE_NOTIFICATIONS.is_enabled(course.id):
+            app_prefs = response['notification_preference_config']['discussion']
+            notification_types = app_prefs['notification_types']
+            for notification_type in ['new_discussion_post', 'new_question_post']:
+                notification_types.pop(notification_type)
+        return response
 
     def test_get_user_notification_preference_without_login(self):
         """
@@ -254,13 +262,13 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     @mock.patch("eventtracking.tracker.emit")
+    @override_waffle_flag(ENABLE_COURSEWIDE_NOTIFICATIONS, active=True)
     def test_get_user_notification_preference(self, mock_emit):
         """
         Test get user notification preference.
         """
         self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
-        with override_waffle_flag(ENABLE_COURSEWIDE_NOTIFICATIONS, active=True):
-            response = self.client.get(self.path)
+        response = self.client.get(self.path)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, self._expected_api_response())
         event_name, event_data = mock_emit.call_args[0]
