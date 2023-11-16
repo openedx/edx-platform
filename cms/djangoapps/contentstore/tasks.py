@@ -47,9 +47,9 @@ from cms.djangoapps.contentstore.courseware_index import (
     SearchIndexingError
 )
 from cms.djangoapps.contentstore.storage import course_import_export_storage
+from cms.djangoapps.contentstore.utils import delete_course  # lint-amnesty, pylint: disable=wrong-import-order
 from cms.djangoapps.contentstore.utils import initialize_permissions, reverse_usage_url, translation_language
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
-
 from common.djangoapps.course_action_state.models import CourseRerunState
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
@@ -57,7 +57,8 @@ from common.djangoapps.util.monitoring import monitor_import_failure
 from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
 from openedx.core.djangoapps.content_libraries import api as v2contentlib_api
 from openedx.core.djangoapps.course_apps.toggles import exams_ida_enabled
-from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
+from openedx.core.djangoapps.discussions.config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from openedx.core.djangoapps.discussions.tasks import update_unit_discussion_state_from_discussion_blocks
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
 from openedx.core.lib.blockstore_api import get_collection
@@ -65,20 +66,20 @@ from openedx.core.lib.extract_tar import safetar_extractall
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.course_block import CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.exceptions import SerializationError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.exceptions import DuplicateCourseError, InvalidProctoringProvider, ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.xml_importer import CourseImportException, import_course_from_xml, import_library_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import DuplicateCourseError, InvalidProctoringProvider
+from xmodule.modulestore.xml_exporter import export_library_to_xml  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.xml_exporter import export_course_to_xml
+from xmodule.modulestore.xml_importer import import_library_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.xml_importer import CourseImportException, import_course_from_xml
 
 from .outlines import update_outline_from_modulestore
 from .outlines_regenerate import CourseOutlineRegenerate
 from .toggles import bypass_olx_failure_enabled
 from .utils import course_import_olx_validation_is_enabled
-
-
-from cms.djangoapps.contentstore.utils import delete_course  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 
 User = get_user_model()
 
@@ -443,7 +444,7 @@ class CourseImportTask(UserTask):  # pylint: disable=abstract-method
         return f'Import of {key} from {filename}'
 
 
-def sync_discussion_settings(course_key):
+def sync_discussion_settings(course_key, user):
     """
     Syncs the discussion settings for a course with the DiscussionsConfiguration model.
     """
@@ -452,7 +453,18 @@ def sync_discussion_settings(course_key):
         discussion_config = DiscussionsConfiguration.objects.get(context_key=course_key)
         discussion_settings = course.discussions_settings
 
-        discussion_config.provider_type = discussion_settings['provider_type']
+        if (
+            ENABLE_NEW_STRUCTURE_DISCUSSIONS.is_enabled()
+            and not course.discussions_settings['provider_type'] == Provider.OPEN_EDX
+        ):
+            LOGGER.info(f"New structure is enabled, also updating {course_key} to use new provider")
+            course.discussions_settings['enable_graded_units'] = False
+            course.discussions_settings['unit_level_visibility'] = True
+            course.discussions_settings['provider'] = Provider.OPEN_EDX
+            course.discussions_settings['provider_type'] = Provider.OPEN_EDX
+            modulestore().update_item(course, user.id)
+
+        discussion_config.provider_type = Provider.OPEN_EDX
         discussion_config.enable_graded_units = discussion_settings['enable_graded_units']
         discussion_config.unit_level_visibility = discussion_settings['unit_level_visibility']
         discussion_config.save()
@@ -617,6 +629,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
                 fake_request = RequestFactory().get('/')
                 fake_request.user = user
                 from .views.entrance_exam import remove_entrance_exam_milestone_reference
+
                 # TODO: Is this really ok?  Seems dangerous for a live course
                 remove_entrance_exam_milestone_reference(fake_request, courselike_key)
                 LOGGER.info(f'{log_prefix}: entrance exam milestone content reference has been removed')
@@ -702,7 +715,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
                 from .views.entrance_exam import add_entrance_exam_milestone
                 add_entrance_exam_milestone(course.id, entrance_exam_chapter)
                 LOGGER.info(f'Course import {course.id}: Entrance exam imported')
-        sync_discussion_settings(courselike_key)
+        sync_discussion_settings(courselike_key, user)
 
 
 @shared_task
