@@ -1086,6 +1086,8 @@ psutil==5.9.6
     #   edx-django-utils
     #   pact-python
     #   pytest-xdist
+py==1.11.0
+    # via -r requirements/edx/testing.in
 py2neo @ https://github.com/overhangio/py2neo/releases/download/2021.2.3/py2neo-2021.2.3.tar.gz
     # via
     #   -c requirements/edx/../constraints.txt
