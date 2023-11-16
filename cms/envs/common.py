@@ -2784,6 +2784,8 @@ DISCUSSIONS_INCONTEXT_LEARNMORE_URL = ''
 SIMPLE_HISTORY_DATE_INDEX = False
 
 #### Event bus producing ####
+
+
 def _should_send_xblock_events(settings):
     return settings.FEATURES['ENABLE_SEND_XBLOCK_LIFECYCLE_EVENTS_OVER_BUS']
 
