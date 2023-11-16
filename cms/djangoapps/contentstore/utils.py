@@ -46,7 +46,6 @@ from common.djangoapps.util.milestones_helpers import (
 )
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from openedx.core import toggles as core_toggles
-from openedx.core.djangoapps.course_apps.toggles import proctoring_settings_modal_view_enabled
 from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
@@ -246,10 +245,7 @@ def get_proctored_exam_settings_url(course_locator) -> str:
         mfe_base_url = get_course_authoring_url(course_locator)
         course_mfe_url = f'{mfe_base_url}/course/{course_locator}'
         if mfe_base_url:
-            if proctoring_settings_modal_view_enabled(course_locator):
-                proctored_exam_settings_url = f'{course_mfe_url}/pages-and-resources/proctoring/settings'
-            else:
-                proctored_exam_settings_url = f'{course_mfe_url}/proctored-exam-settings'
+            proctored_exam_settings_url = f'{course_mfe_url}/pages-and-resources/proctoring/settings'
     return proctored_exam_settings_url
 
 
@@ -444,6 +440,21 @@ def get_taxonomy_list_url():
         if mfe_base_url:
             taxonomy_list_url = f'{mfe_base_url}/taxonomy-list'
     return taxonomy_list_url
+
+
+def get_taxonomy_tags_widget_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for taxonomy tags drawer widget view.
+
+    The `content_id` needs to be appended to the end of the URL when using it.
+    """
+    taxonomy_tags_widget_url = None
+    # Uses the same waffle flag as taxonomy list page
+    if use_tagging_taxonomy_list_page():
+        mfe_base_url = get_course_authoring_url(course_locator)
+        if mfe_base_url:
+            taxonomy_tags_widget_url = f'{mfe_base_url}/tagging/components/widget/'
+    return taxonomy_tags_widget_url
 
 
 def course_import_olx_validation_is_enabled():

@@ -1415,6 +1415,9 @@ ELASTIC_SEARCH_CONFIG = [
     }
 ]
 
+SEARCH_COURSEWARE_CONTENT_LOG_PARAMS = False
+
+
 # .. setting_name: ELASTIC_SEARCH_INDEX_PREFIX
 # .. setting_default: ''
 # .. setting_description: Specifies the prefix used when namixng elasticsearch indexes related to edx-search.
@@ -4435,6 +4438,9 @@ MOBILE_APP_USER_AGENT_REGEXES = [
     r'edX/org.edx.mobile',
 ]
 
+# set course limit for mobile search
+MOBILE_SEARCH_COURSE_LIMIT = 100
+
 # cache timeout in seconds for Mobile App Version Upgrade
 APP_UPGRADE_CACHE_TIMEOUT = 3600
 
@@ -5418,3 +5424,4 @@ derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.cert
                          'learning-certificate-lifecycle', 'enabled')
 derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.certificate.revoked.v1',
                          'learning-certificate-lifecycle', 'enabled')
+BEAMER_PRODUCT_ID = ""

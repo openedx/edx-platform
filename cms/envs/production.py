@@ -708,3 +708,5 @@ SPECTACULAR_SETTINGS = {
         {'url': f'https://{CMS_BASE}/api/contentstore', 'description': 'Local'},
     ],
 }
+
+BEAMER_PRODUCT_ID = ENV_TOKENS.get('BEAMER_PRODUCT_ID', BEAMER_PRODUCT_ID)

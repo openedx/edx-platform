@@ -2852,3 +2852,5 @@ derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.content_autho
 
 # This affects the Authoring API swagger docs but not the legacy swagger docs under /api-docs/.
 REST_FRAMEWORK['DEFAULT_SCHEMA_CLASS'] = 'drf_spectacular.openapi.AutoSchema'
+
+BEAMER_PRODUCT_ID = ""
