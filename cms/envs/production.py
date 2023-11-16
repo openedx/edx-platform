@@ -703,5 +703,8 @@ SPECTACULAR_SETTINGS = {
     # remove the default schema path prefix to replace it with server-specific base paths:
     'SCHEMA_PATH_PREFIX': '/api/contentstore',
     'SCHEMA_PATH_PREFIX_TRIM': '/api/contentstore',
-    'SERVERS': [{ 'url': AUTHORING_API_URL, 'description': 'Public' }, { 'url': f'https://{CMS_BASE}/api/contentstore', 'description': 'Local' }],
+    'SERVERS': [
+        {'url': AUTHORING_API_URL, 'description': 'Public'},
+        {'url': f'https://{CMS_BASE}/api/contentstore', 'description': 'Local'},
+    ],
 }
