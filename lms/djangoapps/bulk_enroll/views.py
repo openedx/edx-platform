@@ -21,7 +21,8 @@ from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.enrollments.views import EnrollmentUserThrottle
 from openedx.core.lib.api.authentication import BearerAuthentication
 from openedx.core.lib.api.permissions import IsStaff
-
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 @can_disable_rate_limit
 class BulkEnrollView(APIView):
@@ -68,11 +69,19 @@ class BulkEnrollView(APIView):
         to the 'before' and 'after' states.
     """
 
-    authentication_classes = (JwtAuthentication, BearerAuthentication,)
-    permission_classes = (IsStaff,)
+    # authentication_classes = (JwtAuthentication, BearerAuthentication,) # uuuuv
+    authentication_classes = []
+    # permission_classes = (IsStaff,) # uuuuv
+    permission_classes = []
     throttle_classes = (EnrollmentUserThrottle,)
-
+    @method_decorator(csrf_exempt) # uuuuv allow anonymous to call api
     def post(self, request):  # lint-amnesty, pylint: disable=missing-function-docstring
+        # uuuuv temporarily set request.user = superuser for intergrating with funix portal
+        from django.contrib.auth.models import User
+        superuser = User.objects.filter(is_superuser=True).first()
+        request.user = superuser
+        # uuuuv end
+
         serializer = BulkEnrollmentSerializer(data=request.data)
         if serializer.is_valid():  # lint-amnesty, pylint: disable=too-many-nested-blocks
             # Setting the content type to be form data makes Django Rest Framework v3.6.3 treat all passed JSON data as
