@@ -40,8 +40,10 @@
           <div id="discovery-message" class="search-status-label"></div>
           <div class="search-bar-contents">
 
+    <div class="filter-search-container">
+
              <!-- Filter Section -->
-      <div class="buttons">
+      <div class="filter-container">
         <!-- Filter Box with Icon and Count -->
         <span class="material-symbols-outlined">instant_mix</span>          
         <span class="filter-text">Filter</span>
@@ -52,24 +54,20 @@
         <!-- Search Bar -->
       <div class="search-container">
         <div class="search-info" >
-
           <form class="wrapper-search-input">
             <div class="magnifier-input">
-              <span class="material-symbols-outlined">
-                search
-                </span>
+              <span class="material-symbols-outlined">search</span>
             <label for="discovery-input" class="sr">${_('Search for a course')}</label>
             <input id="discovery-input" class="search-input" placeholder="${_('Search for a course')}" />
-
               <div aria-live="polite" aria-relevant="all">
                   <span class="sr">${_('Loading')}</span>
                  </div> 
               </div>
-            <!-- </button> -->
           </form>
-
         </div>
       </div>
+
+    </div>
 
       <!-- Sort By Dropdown -->
       <div class="sort-section">
@@ -98,6 +96,14 @@
             font-family: 'Inter', sans-serif;
         }
 
+        .courses-container {
+          max-width: 70%;
+          height:auto;
+          padding: 0px, 0px, 40px, 0px;
+          gap: 40px;
+          margin: 0 auto;
+        }
+
         .magnifier-input{
           display: flex;
           flex-direction: row;
@@ -106,26 +112,36 @@
         }
 
         .wrapper-search-context {
-    display: flex;
-    flex-direction: column;
-    align-items: left; /* To ensure children elements take full width */
+          display: flex;
+          flex-direction: column;
+          align-items: left; /* To ensure children elements take full width */
         }
 
         .search-bar-contents {
           display: flex;
           flex-direction: row;
           align-items: stretch; /* To ensure children elements take full width */
+          width: 1320px;
+          height: 48px;
+          justify-content: space-between;
         }
 
         .container {
             display: flex;
             justify-content: space-between;
             align-items: left;
-            width: 1320px;
+            max-width: 1320px;
+            width:100%;
         }
 
+        .filter-search-container {
+            display: flex;
+            gap: 24px; /* Gap between filter and search bar */
+        }
+
+
         /* Filter Box CSS */
-        .buttons {
+        .filter-container {
             box-sizing: border-box;
             display: flex;
             flex-direction: row;
