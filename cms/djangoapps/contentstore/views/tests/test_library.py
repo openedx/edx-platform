@@ -337,14 +337,7 @@ class UnitTestLibraries(CourseTestCase):
         response = self.client.get(make_url_for_lib(lib.location.library_key))
         self.assertEqual(response.status_code, 302)
 
-
-
-    @ddt.data(
-       ['LibAuthoringMFE.com', True, False],
-       [None, False, True],
-       [None, True, True],
-       [None, False, False],
-    )
+    @ddt.data(['LibAuthoringMFE.com', True, False], [None, False, True], [None, True, True], [None, False, False])
     def test_lib_does_not_redirect_v1_to_v2(self, data):
         """
         Test that if:
@@ -358,8 +351,6 @@ class UnitTestLibraries(CourseTestCase):
                     lib = LibraryFactory.create()
                     response = self.client.get(make_url_for_lib(lib.location.library_key))
                     self.assertNotEqual(response.status_code, 302)
-
-
 
     def test_get_lib_info(self):
         """

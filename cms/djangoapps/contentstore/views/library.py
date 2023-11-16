@@ -144,7 +144,7 @@ def _display_library(library_key_string, request):
         should_redirect_to_library_authoring_mfe()
         and MAP_V1_LIBRARIES_TO_V2_LIBRARIES.is_enabled()
         and settings.LIBRARY_AUTHORING_MICROFRONTEND_URL
-        ):
+    ):
         v2_key_string = str(map_v1_to_v2_library(library_key))
         redirect_url = settings.LIBRARY_AUTHORING_MICROFRONTEND_URL + '/library/' + v2_key_string
         return redirect(redirect_url)
