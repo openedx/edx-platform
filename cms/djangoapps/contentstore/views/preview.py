@@ -49,7 +49,7 @@ from ..utils import get_visibility_partition_info
 from .access import get_user_role
 from .session_kv_store import SessionKeyValueStore
 from common.djangoapps.util.json_request import JsonResponse
-
+from openedx.core.djangoapps.content.course_overviews.models import render_type_lab_xblock
 __all__ = ['preview_handler']
 
 log = logging.getLogger(__name__)
@@ -67,6 +67,9 @@ def preview_handler(request, usage_key_string, handler, suffix=''):
     """
     if handler == 'upload' :
         return JsonResponse({"a":"1"})
+    if handler == 'lab' :
+        data = render_type_lab_xblock(block_id = usage_key_string, email=request.user.email )
+        return  JsonResponse(data)
     
     usage_key = UsageKey.from_string(usage_key_string)
 

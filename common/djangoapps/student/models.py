@@ -3853,3 +3853,22 @@ class SurveyUserDAO () :
     def create_form(self,user_id, question , answer_text, course_id=None):
         
         return SurveyUser.objects.create(user_id=user_id, question=question, answer_text=answer_text, course_id = course_id)
+    
+    
+class StudentLab (models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
+    course_id = models.CharField(max_length=255)
+    block_id = models.CharField(max_length=255)
+    result_student = models.TextField()
+    
+    @classmethod
+    def create_student_result_lab (self, course_id, student , block_id, result):
+
+        return StudentLab.objects.create(course_id=course_id, student=student, block_id=block_id, result_student=result)
+    
+    
+    
+    @classmethod
+    def get_result_lab_student(self, course_id, block_id, student):
+        result = StudentLab.objects.filter(course_id=course_id, block_id=block_id, student=student)
+        return result

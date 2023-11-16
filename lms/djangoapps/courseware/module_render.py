@@ -108,8 +108,8 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from openedx.features.funix_relative_date import funix_relative_date
 from openedx.features.upload_file import upload_file
-from openedx.core.djangoapps.content.course_overviews .models import CourseResultLab 
-
+from openedx.core.djangoapps.content.course_overviews .models import CourseResultLab ,render_type_lab_xblock
+from common.djangoapps.student.models import StudentLab
 log = logging.getLogger(__name__)
 
 # TODO: course_id and course_key are used interchangeably in this file, which is wrong.
@@ -937,19 +937,34 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
         if request.method == 'POST' :
             data = {}
             file = upload_file.index(request , course_id, usage_id)
-            result_lab = CourseResultLab.getResultLab(course_id=course_id, block_id=usage_id)
+            result_lab = CourseResultLab.getResultLab( block_id=usage_id)
             data['url'] = file.get('url', '') 
-            data['result_lab'] = result_lab
+            data['result'] = result_lab.result
             return JsonResponse(data)
         if request.method == 'GET' :
             data = {}
             file = upload_file.getFileUser(course_id = course_id , block_id = usage_id, email = request.user.email)
-            result_lab = CourseResultLab.getResultLab(course_id=course_id, block_id=usage_id)
+            result_lab = CourseResultLab.getResultLab( block_id=usage_id)
             data['url'] = file.get('url', '') 
-            data['result_lab'] = result_lab
+            data['result'] = result_lab.result
             return JsonResponse(data)
-   
-    
+    if handler == 'lab':
+        if request.method == 'GET' :
+            data = render_type_lab_xblock(block_id= usage_id, email=request.user.email)
+            student = StudentLab.get_result_lab_student(block_id=usage_id, course_id=course_id, student=request.user)
+            if student :
+                data['result_student'] = student[0].result_student
+            return  JsonResponse(data)
+    if handler == 'lab_text' : 
+        if request.method == 'POST' :
+            result = request.POST.get('text')
+            student = StudentLab.create_student_result_lab(block_id=usage_id , student=request.user, course_id=course_id ,result = result)
+            result = CourseResultLab.getResultLab( block_id=usage_id).result
+            data ={
+                "result" : result,
+                "result_student" : student.result_student
+            }
+            return JsonResponse(data)
     if request.user.is_authenticated:
         error = CsrfViewMiddleware().process_view(request, None, (), {})
         if error:
