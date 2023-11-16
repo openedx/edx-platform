@@ -6,6 +6,7 @@ Registration related views.
 import datetime
 import json
 import logging
+import requests
 
 from django.conf import settings
 from django.contrib.auth import login as django_login
@@ -85,6 +86,7 @@ from common.djangoapps.third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
 from common.djangoapps.track import segment
 from common.djangoapps.util.db import outer_atomic
 from common.djangoapps.util.json_request import JsonResponse
+from common.djangoapps.student.models import UserProfile
 
 from edx_django_utils.user import generate_password  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -564,6 +566,7 @@ class RegistrationView(APIView):
                 address already exists
             HttpResponse: 403 operation not allowed
         """
+
         should_be_rate_limited = getattr(request, 'limited', False)
         if should_be_rate_limited:
             return JsonResponse({'error_code': 'forbidden-request'}, status=403)
@@ -576,7 +579,6 @@ class RegistrationView(APIView):
 
         data = request.POST.copy()
         self._handle_terms_of_service(data)
-
         try:
             data = StudentRegistrationRequested.run_filter(form_data=data)
         except StudentRegistrationRequested.PreventRegistration as exc:
@@ -601,6 +603,29 @@ class RegistrationView(APIView):
         redirect_url = get_redirect_url_with_host(root_url, redirect_to)
         response = self._create_response(request, {}, status_code=200, redirect_url=redirect_url)
         set_logged_in_cookies(request, response, user)
+        
+        # create student_code
+        try :
+            student_code =UserProfile.create_student_code(user=user)
+        except:
+            None 
+            
+        # create student portal 
+        url_create_student = 'https://staging-portal.funix.edu.vn/api/student/register'
+        headers = {
+                "Content-Type": "application/json"
+            }
+        response_portal=requests.post(url=url_create_student,headers=headers, data=json.dumps({
+                "name" : data.get('name'),
+                "email" : user.email,
+                "student_code" : student_code,
+                "username" : user.username
+            }))
+        
+     # add student org protal
+        add_student_to_organization(user.email, data.get('organization'))
+    
+                
         if not user.is_active and settings.SHOW_ACCOUNT_ACTIVATION_CTA and not settings.MARKETING_EMAILS_OPT_IN:
             response.set_cookie(
                 settings.SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME,
@@ -920,3 +945,24 @@ class RegistrationValidationView(APIView):
             response_dict['username_suggestions'] = self.username_suggestions
 
         return Response(response_dict)
+
+def add_student_to_organization(user_email, organization_name):
+    url_add_org_student = 'https://staging-portal.funix.edu.vn/api/student_organization/add_student'
+    headers = {
+        'Content-Type': 'application/json',
+    }
+    payload = {
+        "student": [user_email],
+        "organization": organization_name
+    }
+
+    try:
+        res = requests.post(url=url_add_org_student, headers=headers, json=payload)
+        if res.status_code == 200:
+            print("Thêm sinh viên vào tổ chức thành công!")
+        else:
+            print(f"Có lỗi xảy ra. Mã lỗi: {res.status_code}")
+            print(res.text)
+    except requests.RequestException as e:
+        print(f"Có lỗi trong quá trình gửi request: {str(e)}")
+        
