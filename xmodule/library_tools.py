@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from user_tasks.models import UserTaskStatus
 
 from openedx.core.lib import ensure_cms
@@ -99,6 +100,8 @@ class LibraryToolsService:
         """
         Queue task to synchronize the children of `dest_block` with it source library (at `library_version` or latest).
 
+        Raises ObjectDoesNotExist if library/version cannot be found.
+
         The task will:
         * Load that library at `dest_block.source_library_id` and `library_version`.
           * If `library_version` is None, load the latest.
@@ -122,7 +125,9 @@ class LibraryToolsService:
             return
         library_key = dest_block.source_library_key
         if not library_api.get_v1_or_v2_library(library_key, version=library_version):
-            raise ValueError(f"Version {library_version} of library {library_key} not found.")
+            if library_version:
+                raise ObjectDoesNotExist(f"Version {library_version} of library {library_key} not found.")
+            raise ObjectDoesNotExist(f"Library {library_key} not found.")
         library_tasks.sync_from_library.delay(
             user_id=self.user_id,
             dest_block_id=str(dest_block.scope_ids.usage_id),

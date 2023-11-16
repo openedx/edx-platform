@@ -11,7 +11,7 @@ from gettext import ngettext, gettext
 
 import bleach
 from django.conf import settings
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.utils.functional import classproperty
 from lxml import etree
 from lxml.etree import XMLSyntaxError
@@ -531,10 +531,17 @@ class LibraryContentBlock(
         Returns 403/404 if user lacks read access on source library or write access on this block.
         """
         self._validate_sync_permissions()
+        if not self.source_library_id:
+            return Response(_("Source content library has not been specified."), status=400)
         try:
             self.sync_from_library(upgrade_to_latest=True)
         except LibraryToolsUnavailable:
-            return Response("Content libraries are not available in the current runtime.", status=400)
+            return Response(_("Content libraries are not available in the current runtime."), status=400)
+        except ObjectDoesNotExist:
+            return Response(
+                _("Source content library does not exist: {source_library_id}").format(self.source_library_id),
+                status=400,
+            )
         return Response()
 
     def sync_from_library(self, upgrade_to_latest: bool = False) -> None:
@@ -542,8 +549,9 @@ class LibraryContentBlock(
         Synchronize children with source library.
 
         If `upgrade_to_latest==True` or if source library version is unset, update library version to latest.
-
         Otherwise, use current source library version.
+
+        Raises ObjectDoesNotExist if library or version is missing.
         """
         self.get_tools(to_read_library_content=True).trigger_library_sync(
             dest_block=self,
@@ -725,9 +733,8 @@ class LibraryContentBlock(
         if source_lib_changed or capa_filter_changed:
             try:
                 self.sync_from_library(upgrade_to_latest=True)
-            except (ValueError, LibraryToolsUnavailable):
-                # Fail quietly if we can't updated the library.
-                # TODO: Is this the right thing to do?
+            except (ObjectDoesNotExist, LibraryToolsUnavailable):
+                # The validation area will display an error message, no need to do anything now.
                 pass
 
     def has_dynamic_children(self):
