@@ -9,7 +9,6 @@ from config_models.models import cache as config_cache
 from django.conf import settings
 from django.core.cache import cache as django_cache
 from django.urls import reverse
-from edx_toggles.toggles.testutils import override_waffle_switch
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

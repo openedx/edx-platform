@@ -16,7 +16,6 @@ from django.core.cache import cache
 from django.db import connection
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from edx_toggles.toggles.testutils import override_waffle_switch
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 

@@ -5,7 +5,6 @@ Tests for rate-limiting.
 import ddt
 from django.test import TestCase
 from django.test.client import RequestFactory
-from edx_toggles.toggles.testutils import override_waffle_switch
 
 import openedx.core.djangoapps.util.ratelimit as ratelimit
 from openedx.core.lib.x_forwarded_for.middleware import XForwardedForMiddleware
