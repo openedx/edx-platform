@@ -34,6 +34,4 @@ urlpatterns = [
     path('api/survey-course/<str:course_id>', views.check_survey_user_access_course, name='access_course_survey'),
     path('survey-form/', views.form_begin_login, name='survey_form'),
     path( 'survey-form/<str:course_id>',views.form_begin_login, name='survey_form_course' ),
-    
-    
 ]
