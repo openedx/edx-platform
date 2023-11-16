@@ -42,13 +42,13 @@
                 this.$loadingIndicator.addClass('hidden');
             },
 
-            showFoundMessage: function(count) {
+            showFoundMessage: function(count,term) {
                 var msg = ngettext(
-                    'Viewing %s course',
-                    'Viewing %s courses',
+                    'Viewing %s course for "%s"',
+                    'Viewing %s courses for "%s"',
                     count
                 );
-                this.$message.html(interpolate(msg, [count]));
+                this.$message.html(interpolate(msg, [count, _.escape(term)]));
             },
 
             showNotFoundMessage: function(term) {
