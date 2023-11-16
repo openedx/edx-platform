@@ -166,10 +166,11 @@ def set_logged_in_cookies(request, response, user):
         _set_deprecated_user_info_cookie(response, request, user, cookie_settings_subdomain)
         _create_and_set_jwt_cookies(response, request, cookie_settings_subdomain, user=user)
         CREATE_LOGON_COOKIE.send(sender=None, user=user, response=response)
-        print('=================', cookie_settings_subdomain)
+        
+        
         accessToken = AccessToken.objects.filter(user_id=request.user.id).last()
-        print('====accessToken======', accessToken)
-        response.set_cookie('accessToken' , accessToken , **cookie_settings  )
+        cookie_settings['httponly'] = False
+        response.set_cookie('accessToken' , accessToken , **cookie_settings )
 
     return response
 
