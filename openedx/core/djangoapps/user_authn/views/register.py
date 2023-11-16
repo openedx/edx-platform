@@ -621,7 +621,7 @@ class RegistrationView(APIView):
                 "student_code" : student_code,
                 "username" : user.username
             }))
-        
+        print('===============', data.get('organization'))
      # add student org protal
         add_student_to_organization(user.email, data.get('organization'))
     

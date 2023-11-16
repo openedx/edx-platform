@@ -537,10 +537,11 @@ def component_handler(request, usage_key_string, handler, suffix=''):
             django response
     """
     usage_key = UsageKey.from_string(usage_key_string)
-    if handler == 'result_lab' :
+    if handler == 'lab' :
         if request.method == 'POST' :
             resutl_lab = request.POST.get('result_lab')
-            CourseResultLab.createResultLab(block_id = usage_key_string , course_id=str(usage_key.course_key), result=resutl_lab)
+            type_lab = request.POST.get('type_lab')
+            CourseResultLab.createResultLab(block_id = usage_key_string , course_id=str(usage_key.course_key), result=resutl_lab,type=type_lab)
             return JsonResponse({"results":'success'})
         if request.method == "GET" :
             data = ''

@@ -1235,19 +1235,20 @@ class CourseResultLab(models.Model):
     block_id =  models.CharField(max_length=255)
     course_id = models.CharField(max_length=255)
     result = models.TextField(default='')
-    
+    type_lab = models.CharField(max_length=20)
     def __str__ (self) :
         return self.block_id
     
     @classmethod
-    def createResultLab (self,course_id, block_id, result) :
+    def createResultLab (self,course_id, block_id, result,type) :
         existing_result = CourseResultLab.objects.filter(course_id=course_id, block_id=block_id).first()
 
         if existing_result:
             existing_result.result = result
+            existing_result.type_lab = type
             existing_result.save()
         else:
-            new_result = CourseResultLab(course_id=course_id, block_id=block_id, result=result)
+            new_result = CourseResultLab(course_id=course_id, block_id=block_id, result=result, type_lab=type)
             new_result.save()
 
     @classmethod
