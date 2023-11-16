@@ -610,19 +610,21 @@ class RegistrationView(APIView):
         except:
             None 
             
-            
-        url = 'https://staging-portal.funix.edu.vn/api/student/register'
+        # create student portal 
+        url_create_student = 'https://staging-portal.funix.edu.vn/api/student/register'
         headers = {
                 "Content-Type": "application/json"
             }
-        response_portal=requests.post(url=url,headers=headers, data=json.dumps({
+        response_portal=requests.post(url=url_create_student,headers=headers, data=json.dumps({
                 "name" : data.get('name'),
                 "email" : user.email,
                 "student_code" : student_code,
                 "username" : user.username
             }))
         
-  
+     # add student org protal
+        add_student_to_organization(user.email, data.get('organization'))
+    
                 
         if not user.is_active and settings.SHOW_ACCOUNT_ACTIVATION_CTA and not settings.MARKETING_EMAILS_OPT_IN:
             response.set_cookie(
@@ -943,3 +945,24 @@ class RegistrationValidationView(APIView):
             response_dict['username_suggestions'] = self.username_suggestions
 
         return Response(response_dict)
+
+def add_student_to_organization(user_email, organization_name):
+    url_add_org_student = 'https://staging-portal.funix.edu.vn/api/student_organization/add_student'
+    headers = {
+        'Content-Type': 'application/json',
+    }
+    payload = {
+        "student": [user_email],
+        "organization": organization_name
+    }
+
+    try:
+        res = requests.post(url=url_add_org_student, headers=headers, json=payload)
+        if res.status_code == 200:
+            print("Thêm sinh viên vào tổ chức thành công!")
+        else:
+            print(f"Có lỗi xảy ra. Mã lỗi: {res.status_code}")
+            print(res.text)
+    except requests.RequestException as e:
+        print(f"Có lỗi trong quá trình gửi request: {str(e)}")
+        
