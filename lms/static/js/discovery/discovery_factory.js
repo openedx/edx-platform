@@ -57,7 +57,6 @@
                 if (total > 0) {
                     form.showFoundMessage(total);
                     if (query) {
-                        // return total + " results find for "+ query;
                         filters.add(
                             {type: 'search_query', query: query, name: quote(query)},
                             {merge: true}
