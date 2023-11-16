@@ -3,7 +3,7 @@ Permissions for course roles app.
 """
 from enum import Enum, unique
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 @unique

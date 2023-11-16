@@ -36,6 +36,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
     """
     def setUp(self):
         super().setUp()
+        self.anonymous_user = AnonymousUserFactory()
         self.user_1 = UserFactory(username="test_user_1")
         self.organization_1 = OrganizationFactory(name="test_organization_1")
         self.organization_2 = OrganizationFactory(name="test_organization_2")

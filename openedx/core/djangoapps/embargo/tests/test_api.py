@@ -180,7 +180,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
             with self.assertNumQueries(3):
                 embargo_api.check_course_access(self.course.id, user=self.user, ip_addresses=['0.0.0.0'])
 
-            with self.assertNumQueries(3):
+            with self.assertNumQueries(0):
                 embargo_api.check_course_access(self.course.id, user=self.user, ip_addresses=['0.0.0.0'])
 
     def test_caching_no_restricted_courses(self):
