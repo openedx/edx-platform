@@ -86,7 +86,7 @@ def delete_logged_in_cookies(response):
             path='/',
             domain=settings.LMS_BASE
         )
-    response.delete_cookie('accessToken')
+    response.set_cookie('accessToken' , None)
     return response
 
 
