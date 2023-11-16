@@ -37,8 +37,20 @@ technical-docs:  ## build the technical docs
 guides:	swagger ## build the developer guide docs
 	cd docs/guides; make clean html
 
+# (IS_OPENEDX_TRANSLATIONS_WORKFLOW) is set to "yes" in the `extract-translation-source-files` GitHub actions
+# workflow on the `openedx-translations` repository. See (extract translation source files) step here:
+# https://github.com/openedx/openedx-translations/blob/main/.github/workflows/extract-translation-source-files.yml
+# Related doc: https://docs.openedx.org/en/latest/developers/how-tos/enable-translations-new-repo.html
+ifeq ($(IS_OPENEDX_TRANSLATIONS_WORKFLOW),yes)
 extract_translations: ## extract localizable strings from sources
-	i18n_tool extract -v
+	i18n_tool extract --no-segment -v
+	cd conf/locale/en/LC_MESSAGES && msgcat djangojs.po underscore.po -o djangojs.po
+	cd conf/locale/en/LC_MESSAGES && msgcat django.po wiki.po edx_proctoring_proctortrack.po mako.po -o django.po
+	cd conf/locale/en/LC_MESSAGES && rm wiki.po edx_proctoring_proctortrack.po mako.po underscore.po
+else
+extract_translations: ## extract localizable strings from sources
+	i18n_tool extract -v;
+endif
 
 push_translations: ## push source strings to Transifex for translation
 	i18n_tool transifex push
