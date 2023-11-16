@@ -219,7 +219,8 @@ class UserNotificationPreferenceView(APIView):
         updated_notification_preferences = preference_update.save()
         notification_preference_update_event(request.user, course_id, preference_update.validated_data)
         serializer = UserCourseNotificationPreferenceSerializer(updated_notification_preferences)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        preferences = filter_course_wide_preferences(course_id, serializer.data)
+        return Response(preferences, status=status.HTTP_200_OK)
 
 
 @allow_any_authenticated_user()
