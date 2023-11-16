@@ -306,6 +306,9 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
             'click .wrapper-tag-header': 'expandTagContainer',
             'click .tagging-label': 'expandContentTag',
             'click .manage-tag-button': 'openManageTagDrawer',
+            'keydown .wrapper-tag-header': 'handleKeyDownOnHeader',
+            'keydown .tagging-label': 'handleKeyDownOnContentTag',
+            'keydown .manage-tag-button': 'handleKeyDownOnTagDrawer',
         },
 
         initialize: function() {
@@ -320,34 +323,61 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
             }
         },
 
+        handleKeyDownOnHeader: function(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                this.expandTagContainer();
+            }
+        },
+
+        handleKeyDownOnContentTag: function(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                this.expandContentTag(event);
+            }
+        },
+
+        handleKeyDownOnTagDrawer: function(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                this.openManageTagDrawer();
+            }
+        },
+
         expandTagContainer: function() {
             var $content = this.$('.wrapper-tags .wrapper-tag-content'),
+                $header = this.$('.wrapper-tags .wrapper-tag-header'),
                 $icon = this.$('.wrapper-tags .wrapper-tag-header .icon');
 
             if ($content.hasClass('is-hidden')) {
                 $content.removeClass('is-hidden');
                 $icon.addClass('fa-caret-up');
                 $icon.removeClass('fa-caret-down');
+                $header.attr('aria-expanded', 'true');
             } else {
                 $content.addClass('is-hidden');
                 $icon.removeClass('fa-caret-up');
                 $icon.addClass('fa-caret-down');
+                $header.attr('aria-expanded', 'false');
             }
         },
 
         expandContentTag: function(event) {
             var contentId = event.target.id,
                 $content = this.$(`.wrapper-tags .content-tags-${contentId}`),
+                $header = this.$(`.wrapper-tags .tagging-label-${contentId}`),
                 $icon = this.$(`.wrapper-tags .tagging-label-${contentId} .icon`);
 
             if ($content.hasClass('is-hidden')) {
                 $content.removeClass('is-hidden');
                 $icon.addClass('fa-caret-up');
                 $icon.removeClass('fa-caret-down');
+                $header.attr('aria-expanded', 'true');
             } else {
                 $content.addClass('is-hidden');
                 $icon.removeClass('fa-caret-up');
                 $icon.addClass('fa-caret-down');
+                $header.attr('aria-expanded', 'false');
             }
         },
 
@@ -383,6 +413,10 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
                     // Element that contains the children of this tag
                     tagChildrenElement.className = `content-tags-tag-${tag.id} is-hidden`;
 
+                    tagContentElement.tabIndex = 0;
+                    tagContentElement.role = "button";
+                    tagContentElement.ariaExpanded = "false";
+                    tagContentElement.setAttribute('aria-controls', `content-tags-tag-${tag.id}`);
                     tagContentElement.appendChild(tagIconElement);
                     parentElement.appendChild(tagChildrenElement);
 

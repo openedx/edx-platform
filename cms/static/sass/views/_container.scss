@@ -264,6 +264,10 @@
           }
         }
 
+        .wrapper-tag-header:focus {
+          border: 1px dotted gray;
+        }
+
         .action-primary {
           @extend %btn-primary-inverse;
 
@@ -297,6 +301,10 @@
             }
 
             .tagging-label:hover {
+              color: $blue;
+            }
+
+            .tagging-label:focus {
               color: $blue;
             }
 
