@@ -10,6 +10,13 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta  # for months test
 from .models import SurveyReport
 
+"""
+This function sends extra context to every admin site
+
+The current treshhold to show the banner is one month but this can be redefined in the future
+
+"""
+
 
 def admin_extra_context(request):
     months = 1
