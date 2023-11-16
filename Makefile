@@ -153,7 +153,7 @@ upgrade:  ## update the pip requirements files to use the latest releases satisf
 	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade"
 
 upgrade-package: ## update just one package to the latest usable release
-	@test -n "$(package)" || { echo "\nUsage: make upgrade_package package=...\n"; exit 1; }
+	@test -n "$(package)" || { echo "\nUsage: make upgrade-package package=...\n"; exit 1; }
 	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade-package $(package)"
 
 check-types: ## run static type-checking tests
