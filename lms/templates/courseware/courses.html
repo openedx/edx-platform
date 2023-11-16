@@ -17,13 +17,6 @@
   <script type="text/template" id="${template_name}-tpl">
       <%static:include path="discovery/${template_name}.underscore" />
   </script>
-<!-- 
-  <script type="text/template" id="filter-tpl">
-    <div>
-        <span>Filter applied: <%= name %></span>
-    </div>
-  </script> -->
-
   % endfor
   <%static:require_module module_name="js/discovery/discovery_factory" class_name="DiscoveryFactory">
     DiscoveryFactory(
@@ -86,8 +79,6 @@
 
         </div>
       </div>
-
-      
       </div>
 
 
