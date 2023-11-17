@@ -16,6 +16,8 @@ from rest_framework.exceptions import ValidationError
 from openedx.core.djangoapps.user_authn.views.registration_form import AccountCreationForm
 from common.djangoapps.student.helpers import do_create_account, AccountValidationError
 from .validators import funix_user_validator
+from lms.djangoapps.ora_staff_grader.utils import call_xblock_json_handler, is_json
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 def check_missing_fields(fields, data):
     errors = {}
@@ -246,4 +248,158 @@ class CreateUserAPIView(APIView):
         return Response(data={
             "message": response_message,
             "results": results,
+        }, status=status.HTTP_200_OK)
+
+
+
+class PortalGradeAssignmentXblockAPIView(APIView): 
+    """
+    **Use Case**
+        Grade a student's assignment. Just grade if 'result' is 'passed' or 'did_not_pass'.
+
+    **Example Request**
+        POST http://localhost:18000/api/funix_portal/assignment/grade_assignment
+        Content-Type: application/json
+
+        {
+            "assignment_name":  "assignment1",
+            "course_code":"course-v1:o1+c1+r1",
+            "email": "edx@example.com",
+            "result": "did_not_pass"
+        }
+
+    **Example Response**
+        - 200: 
+        {
+            "message": "Graded"
+        }
+
+        - 400, 500: 
+        {
+            "message": "error message"
+        }
+    """
+
+    authentication_classes = []
+    # permission_classes = (IsStaff,)
+    # throttle_classes = (EnrollmentUserThrottle,)
+    @method_decorator(csrf_exempt)
+    def post(self, request):
+
+        data = request.data
+        course_code = data.get('course_code')
+        assignment_name = data.get('assignment_name')
+        email = data.get('email')
+        result = data.get('result')
+
+        if not course_code:
+            return Response(data={
+                 "message": "Missing course_code",
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not email:
+            return Response(data={
+                 "message": "Missing email",
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not assignment_name:
+            return Response(data={
+                 "message": "Missing assignment_name",
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not result:
+            return Response(data={
+                 "message": "Missing result",
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if result not in ['passed', 'did_not_pass']:
+            return Response(data={
+                 "message": "Result value must be 'passed' or 'did_not_pass'",
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            student = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response(data={
+                 "message": f"Not found student with email '{email}'",
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+
+        usage_id = ''
+        found_assignmentxblock = False
+        found_assignment = False
+        try:
+            course_overview = CourseOverview.get_from_id(course_code)
+            print(course_overview)
+            if not course_overview:
+                return Response(data={
+                    "message": f"Not found course with course_code '{course_code}'",
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+            course = course_overview._original_course
+            sections = course.get_children()
+
+            for section in sections:
+                subsections = section.get_children()
+                for sub in subsections:
+                    if sub.display_name == assignment_name:
+                        found_assignment = True
+                        units = sub.get_children()
+                        for unit in units:
+                            components = unit.get_children()
+                            for component in components:
+                                if type(component).__name__ == 'AssignmentXBlockWithMixins':
+                                    found_assignmentxblock = True
+                                    usage_id = str(component.scope_ids.usage_id)
+                                    break
+
+        except Exception as e:
+            logging.error(str(e))
+            return Response(data={
+                "message": f"Could not load course with course_code '{course_code}'",
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        if not found_assignment:
+            return Response(data={
+                 "message": f"Not found assignment '{assignment_name}'",
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if not found_assignmentxblock:
+            return Response(data={
+                 "message": f"Not found assignmentxblock in assignment '{assignment_name}'",
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if usage_id == '':
+            return Response(data={
+                 "message": "Not found usage_id",
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        
+        req = request
+        req.user = student
+
+        try:
+            response = call_xblock_json_handler(req, usage_id, "portal_grade", {"result": result})
+        except Exception as e:
+            logging.error(str(e))
+            error_message = str(e) if str(e) != '' else "Internal Server Error"
+            return Response(data={
+                "message": error_message,
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        if response.status_code != 200:
+            details = (
+                json.loads(response.content).get("error", "")
+                if is_json(response.content)
+                else ""
+            )
+            logging.error(details)
+            response_message = details or "Internal Server Error"
+            return Response(data={
+                "message": response_message,
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+        return Response(data={
+            "message": "Graded",
         }, status=status.HTTP_200_OK)
