@@ -126,6 +126,8 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
             assert self.modulestore.get_items_call_count > 0
         else:
             assert self.modulestore.get_items_call_count == 0
+        expected_count = 1 if expect_cache_updated else 0
+        assert self.cache.set_call_count == expected_count
 
     def test_get_transformed(self):
         with mock_registered_transformers(self.registered_transformers):
@@ -170,8 +172,8 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
 
     def test_get_collected_cached(self):
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
-        self.collect_and_verify(expect_modulestore_called=False, expect_cache_updated=False)
-        assert TestTransformer1.collect_call_count == 1
+        self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
+        assert TestTransformer1.collect_call_count == 2
 
     def test_update_collected_if_needed(self):
         with mock_registered_transformers(self.registered_transformers):
@@ -184,14 +186,14 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
             expected_count = 1
             assert TestTransformer1.collect_call_count == expected_count
 
-            self.collect_and_verify(expect_modulestore_called=False, expect_cache_updated=False)
+            self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
 
     def test_get_collected_transformer_version(self):
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
 
         # transformer code writes new schema version; data not re-collected
         TestTransformer1.WRITE_VERSION += 1
-        self.collect_and_verify(expect_modulestore_called=False, expect_cache_updated=False)
+        self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
 
         # transformer code requires new schema version; data re-collected
         TestTransformer1.READ_VERSION += 1
@@ -199,16 +201,18 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
 
         # old transformer code can read new schema version; data not re-collected
         TestTransformer1.READ_VERSION -= 1
-        self.collect_and_verify(expect_modulestore_called=False, expect_cache_updated=False)
+        self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
 
-        assert TestTransformer1.collect_call_count == 2
+        assert TestTransformer1.collect_call_count == 4
 
     def test_get_collected_structure_version(self):
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
         BlockStructureBlockData.VERSION += 1
-        self.collect_and_verify(expect_modulestore_called=False, expect_cache_updated=False)
-        assert TestTransformer1.collect_call_count == 1
+        self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
+        assert TestTransformer1.collect_call_count == 2
 
     def test_clear(self):
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
         self.bs_manager.clear()
+        self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
+        assert TestTransformer1.collect_call_count == 2
