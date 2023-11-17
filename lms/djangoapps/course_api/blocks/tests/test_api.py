@@ -3,7 +3,6 @@ Tests for Blocks api.py
 """
 
 
-from itertools import product
 from unittest.mock import patch
 
 import ddt
