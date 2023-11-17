@@ -207,7 +207,7 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
     """
 
     @ddt.data(
-            (ModuleStoreEnum.Type.split, )
+        (ModuleStoreEnum.Type.split)
     )
     @ddt.unpack
     def test_query_counts_cached(self, store_type):
