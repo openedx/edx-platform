@@ -1470,7 +1470,7 @@ from common.djangoapps.student.models import UserProfile
 def get_user_info(request):
     try:
         token = request.data.get('token')
-        user = AccessToken.objects.filter(token=token).first()
+        user = AccessToken.objects.filter(token=token).last()
 
         if user:
             try:
