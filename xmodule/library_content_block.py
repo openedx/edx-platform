@@ -156,7 +156,7 @@ class LibraryContentBlock(
         scope=Scope.settings,
     )
     candidates = List(
-        # This is a list of (block_type, block_id) tuples used to record the set of blocks
+        # This is a list of block_ids used to record the set of blocks
         # which are candidates for the selected list.
         display_name=_("Manually Selected Blocks"),
         default=[],
