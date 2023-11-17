@@ -29,6 +29,7 @@ import re
 from abc import abstractmethod
 
 import xblock
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import gettext as _
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
@@ -899,7 +900,14 @@ def _update_and_import_block(
             try:
                 # Update library content block's children on draft branch
                 with store.branch_setting(branch_setting=ModuleStoreEnum.Branch.draft_preferred):
-                    block.sync_from_library()
+                    try:
+                        block.sync_from_library()
+                    except ObjectDoesNotExist:
+                        # If the source library does not exist, that's OK, the library content will still kinda work.
+                        # Unfortunately, any setting defaults that are set in the library will be missing.
+                        # TODO save library default settings to course's OLX and then load them here if available:
+                        # https://github.com/openedx/edx-platform/issues/33742
+                        pass
             except ValueError as err:
                 # The specified library version does not exist.
                 log.error(err)
