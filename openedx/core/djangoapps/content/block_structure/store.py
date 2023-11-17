@@ -125,9 +125,7 @@ class BlockStructureStore:
             root_block = modulestore.get_item(root_block_usage_key)
             return self._version_data_of_model(bs_model) == self._version_data_of_block(root_block)
         except BlockStructureNotFound:
-            pass
-
-        return False
+            return False
 
     def _get_model(self, root_block_usage_key):
         """
@@ -176,7 +174,10 @@ class BlockStructureStore:
         """
         Returns the serialized data for the given BlockStructureModel
         from storage.
+        Raises:
+             BlockStructureNotFound if not found.
         """
+
         return bs_model.get_serialized_data()
 
     def _serialize(self, block_structure):
@@ -214,7 +215,7 @@ class BlockStructureStore:
     def _encode_root_cache_key(bs_model):
         """
         Returns the cache key to use for the given
-        BlockStructureModel.
+        BlockStructureModel or StubModel.
         """
         return str(bs_model)
 
