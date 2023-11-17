@@ -1,11 +1,14 @@
 """
 Helpers for the course roles app.
 """
+from typing import Union, List
+
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.utils.translation import gettext as _
 
 from edx_toggles.toggles import WaffleFlag
 from openedx.core.djangoapps.course_roles.models import UserRole
+from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 from xmodule.modulestore.django import modulestore
 
 
@@ -28,7 +31,11 @@ def use_permission_checks():
     return USE_PERMISSION_CHECKS_FLAG.is_enabled()
 
 
-def user_has_permission_course(user, permission_name, course_id):
+def user_has_permission_course(
+        user: Union[User, AnonymousUser],
+        permission: Union[CourseRolesPermission, str],
+        course_id: str
+):
     """
     Check if a user has a permission in a course.
     """
@@ -36,30 +43,44 @@ def user_has_permission_course(user, permission_name, course_id):
         return False
     elif isinstance(user, AnonymousUser):
         return False
+    if isinstance(permission, CourseRolesPermission):
+        permission = permission.value.name
     return UserRole.objects.filter(
         user=user,
-        role__permissions__name=permission_name,
+        role__permissions__name=permission,
         course=course_id,
     ).exists()
 
 
-def user_has_permission_list_course(user, permission_names, course_id):
+def user_has_permission_list_course(
+        user: Union[User, AnonymousUser],
+        permissions: List[CourseRolesPermission],
+        course_id: str
+):
     """
     Check if a user has all of the given permissions in a course.
     """
     if not use_permission_checks():
         return False
-    return all(user_has_permission_course(user, permission_name, course_id) for permission_name in permission_names)
+    return all(user_has_permission_course(user, permission, course_id) for permission in permissions)
 
 
-def user_has_permission_list_any_course(user, permission_names, course_id):
+def user_has_permission_list_any_course(
+        user: Union[User, AnonymousUser],
+        permissions: List[CourseRolesPermission],
+        course_id: str
+):
     """
     Check if a user has ANY of the given permissions in a course.
     """
-    return any(user_has_permission_course(user, permission_name, course_id) for permission_name in permission_names)
+    return any(user_has_permission_course(user, permission, course_id) for permission in permissions)
 
 
-def user_has_permission_org(user, permission_name, organization_name):
+def user_has_permission_org(
+        user: Union[User, AnonymousUser],
+        permission: Union[CourseRolesPermission, str],
+        organization_name: str
+):
     """
     Check if a user has a permission for all courses in an organization.
     """
@@ -67,26 +88,37 @@ def user_has_permission_org(user, permission_name, organization_name):
         return False
     elif isinstance(user, AnonymousUser):
         return False
+    if isinstance(permission, CourseRolesPermission):
+        permission = permission.value.name
     return UserRole.objects.filter(
         user=user,
-        role__permissions__name=permission_name,
+        role__permissions__name=permission,
         course__isnull=True,
         org__name=organization_name,
     ).exists()
 
 
-def user_has_permission_list_org(user, permission_names, organization_name):
+def user_has_permission_list_org(
+        user: Union[User, AnonymousUser],
+        permissions: List[CourseRolesPermission],
+        organization_name: str
+):
     """
     Check if a user has ALL of the given permissions for all courses in an organization.
     """
     if not use_permission_checks():
         return False
     return all(
-        user_has_permission_org(user, permission_name, organization_name) for permission_name in permission_names
+        user_has_permission_org(user, permission, organization_name) for permission in permissions
     )
 
 
-def user_has_permission_course_org(user, permission_name, course_id, organization_name=None):
+def user_has_permission_course_org(
+        user: Union[User, AnonymousUser],
+        permission: Union[CourseRolesPermission, str],
+        course_id: str,
+        organization_name: str = None
+):
     """
     Check if a user has a permission for all courses in an organization or for a specific course.
     """
@@ -94,30 +126,37 @@ def user_has_permission_course_org(user, permission_name, course_id, organizatio
         return False
     elif isinstance(user, AnonymousUser):
         return False
+    if isinstance(permission, CourseRolesPermission):
+        permission = permission.value.name
     if organization_name is None:
         course = modulestore().get_course(course_id)
         if course:
             organization_name = course.org
         else:
-            return user_has_permission_course(user, permission_name, course_id)
-    return (user_has_permission_course(user, permission_name, course_id) or
-            user_has_permission_org(user, permission_name, organization_name)
+            return user_has_permission_course(user, permission, course_id)
+    return (user_has_permission_course(user, permission, course_id) or
+            user_has_permission_org(user, permission, organization_name)
             )
 
 
-def user_has_permission_list_course_org(user, permission_names, course_id, organization_name=None):
+def user_has_permission_list_course_org(
+        user: Union[User, AnonymousUser],
+        permissions: List[CourseRolesPermission],
+        course_id: str,
+        organization_name: str = None
+):
     """
     Check if a user has all of the given permissions for all courses in an organization or for a specific course.
     """
     if not use_permission_checks():
         return False
     return all(
-        user_has_permission_course_org(user, permission_name, course_id, organization_name)
-        for permission_name in permission_names
+        user_has_permission_course_org(user, permission, course_id, organization_name)
+        for permission in permissions
     )
 
 
-def get_all_user_permissions_for_a_course(user_id, course_id):
+def get_all_user_permissions_for_a_course(user_id: int, course_id: str):
     """
     Get all of a user's permissions for a course,
     including, if applicable, organization-wide permissions
