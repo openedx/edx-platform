@@ -119,34 +119,6 @@
   }
 }
 
-// inverse primary button
-%btn-primary-inverse {
-  @extend %ui-btn-primary;
-
-  background: theme-color("inverse");
-  border-color: theme-color("primary");
-  color: theme-color("primary");
-
-  &:hover,
-  &:active {
-    background: theme-color("primary");
-    border-color: $uxpl-blue-hover-active;
-    color: theme-color("inverse");
-  }
-
-  &.current,
-  &.active {
-    background: theme-color("primary");
-    border-color: $uxpl-blue-hover-active;
-    color: theme-color("inverse");
-
-    &:hover,
-    &:active {
-      background: theme-color("primary");
-    }
-  }
-}
-
 // +Secondary Button - Extends
 // ====================
 // gray secondary button

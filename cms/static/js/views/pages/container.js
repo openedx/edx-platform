@@ -8,11 +8,10 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
     'js/models/xblock_info', 'js/views/xblock_string_field_editor', 'js/views/xblock_access_editor',
     'js/views/pages/container_subviews', 'js/views/unit_outline', 'js/views/utils/xblock_utils',
     'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
-    'js/views/utils/tagging_drawer_utils',
 ],
 function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView, AddXBlockComponent,
     EditXBlockModal, MoveXBlockModal, XBlockInfo, XBlockStringFieldEditor, XBlockAccessEditor,
-    ContainerSubviews, UnitOutlineView, XBlockUtils, NotificationView, PromptView, TaggingDrawerUtils) {
+    ContainerSubviews, UnitOutlineView, XBlockUtils, NotificationView, PromptView) {
     'use strict';
 
     var XBlockContainerPage = BasePage.extend({
@@ -28,7 +27,6 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             'click .show-actions-menu-button': 'showXBlockActionsMenu',
             'click .new-component-button': 'scrollToNewComponentButtons',
             'click .paste-component-button': 'pasteComponent',
-            'click .tags-button': 'openManageTags',
         },
 
         options: {
@@ -99,12 +97,6 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                 });
                 this.viewLiveActions.render();
 
-                this.tagListView = new ContainerSubviews.TagList({
-                    el: this.$('.unit-tags'),
-                    model: this.model
-                });
-                this.tagListView.render();
-
                 this.unitOutlineView = new UnitOutlineView({
                     el: this.$('.wrapper-unit-overview'),
                     model: this.model
@@ -133,7 +125,6 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                 xblockView = this.xblockView,
                 loadingElement = this.$('.ui-loading'),
                 unitLocationTree = this.$('.unit-location'),
-                unitTags = this.$('.unit-tags'),
                 hiddenCss = 'is-hidden';
 
             loadingElement.removeClass(hiddenCss);
@@ -159,7 +150,6 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     // Refresh the views now that the xblock is visible
                     self.onXBlockRefresh(xblockView);
                     unitLocationTree.removeClass(hiddenCss);
-                    unitTags.removeClass(hiddenCss);
 
                     // Re-enable Backbone events for any updated DOM elements
                     self.delegateEvents();
@@ -417,13 +407,6 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
         duplicateXBlock: function(event) {
             event.preventDefault();
             this.duplicateComponent(this.findXBlockElement(event.target));
-        },
-
-        openManageTags: function(event) {
-            const taxonomyTagsWidgetUrl = this.model.get('taxonomy_tags_widget_url');
-            const contentId = this.findXBlockElement(event.target).data('locator');
-
-            TaggingDrawerUtils.openDrawer(taxonomyTagsWidgetUrl, contentId);
         },
 
         showMoveXBlockModal: function(event) {
