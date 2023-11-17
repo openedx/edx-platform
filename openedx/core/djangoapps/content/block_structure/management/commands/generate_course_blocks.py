@@ -74,6 +74,12 @@ class Command(BaseCommand):
             default=0,
             type=int,
         )
+        parser.add_argument(
+            '--with_storage',
+            help='Store the course blocks in Storage, overriding value of the storage_backing_for_cache waffle switch',
+            action='store_true',
+            default=False,
+        )
 
     def handle(self, *args, **options):
 
