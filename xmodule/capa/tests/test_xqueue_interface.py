@@ -8,9 +8,11 @@ from django.test.utils import override_settings
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.fields import ScopeIds
 
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.capa.xqueue_interface import XQueueInterface, XQueueService
 
 
+@skip_unless_lms
 class XQueueServiceTest(TestCase):
     """Test the XQueue service methods."""
     def setUp(self):

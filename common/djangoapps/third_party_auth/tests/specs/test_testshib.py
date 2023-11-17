@@ -27,6 +27,7 @@ from common.djangoapps.third_party_auth.saml import SapSuccessFactorsIdentityPro
 from common.djangoapps.third_party_auth.saml import log as saml_log
 from common.djangoapps.third_party_auth.tasks import fetch_saml_metadata
 from common.djangoapps.third_party_auth.tests import testutil, utils
+from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context
 from openedx.core.djangoapps.user_authn.views.login import login_user
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerFactory
 
@@ -238,10 +239,12 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
     }
 
     @patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
+    @patch('openedx.core.djangoapps.user_api.accounts.settings_views.enterprise_customer_for_request')
     @patch('openedx.features.enterprise_support.utils.third_party_auth.provider.Registry.get')
     def test_full_pipeline_succeeds_for_unlinking_testshib_account(
         self,
         mock_auth_provider,
+        mock_enterprise_customer_for_request_settings_view,
         mock_enterprise_customer_for_request,
     ):
 
@@ -281,6 +284,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         }
         mock_auth_provider.return_value.backend_name = 'tpa-saml'
         mock_enterprise_customer_for_request.return_value = enterprise_customer_data
+        mock_enterprise_customer_for_request_settings_view.return_value = enterprise_customer_data
 
         # Instrument the pipeline to get to the dashboard with the full expected state.
         self.client.get(
@@ -295,7 +299,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
                                 request=request)
 
         # First we expect that we're in the linked state, with a backend entry.
-        self.assert_third_party_accounts_state(request, linked=True)
+        self.assert_account_settings_context_looks_correct(account_settings_context(request), linked=True)
         self.assert_social_auth_exists_for_user(request.user, strategy)
 
         FEATURES_WITH_ENTERPRISE_ENABLED = settings.FEATURES.copy()
@@ -323,7 +327,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
                 )
             )
             # Now we expect to be in the unlinked state, with no backend entry.
-            self.assert_third_party_accounts_state(request, linked=False)
+            self.assert_account_settings_context_looks_correct(account_settings_context(request), linked=False)
             self.assert_social_auth_does_not_exist_for_user(user, strategy)
             assert EnterpriseCustomerUser.objects\
                 .filter(enterprise_customer=enterprise_customer, user_id=user.id).count() == 0

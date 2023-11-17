@@ -18,19 +18,25 @@ def create_taxonomy(
     name: str,
     description: str | None = None,
     enabled=True,
-    allow_multiple=False,
+    allow_multiple=True,
     allow_free_text=False,
+    orgs: list[Organization] | None = None,
 ) -> Taxonomy:
     """
     Creates, saves, and returns a new Taxonomy with the given attributes.
     """
-    return oel_tagging.create_taxonomy(
+    taxonomy = oel_tagging.create_taxonomy(
         name=name,
         description=description,
         enabled=enabled,
         allow_multiple=allow_multiple,
         allow_free_text=allow_free_text,
     )
+
+    if orgs is not None:
+        set_taxonomy_orgs(taxonomy=taxonomy, all_orgs=False, orgs=orgs)
+
+    return taxonomy
 
 
 def set_taxonomy_orgs(
@@ -52,6 +58,9 @@ def set_taxonomy_orgs(
     If not `all_orgs`, the taxonomy is associated with each org in the `orgs` list. If that list is empty, the
     taxonomy is not associated with any orgs.
     """
+    if taxonomy.system_defined:
+        raise ValueError("Cannot set orgs for a system-defined taxonomy")
+
     TaxonomyOrg.objects.filter(
         taxonomy=taxonomy,
         rel_type=relationship,

@@ -1,0 +1,9 @@
+<div class="social-links">
+    <% for (var platform in socialLinks) { %>
+        <% if (socialLinks[platform]) { %>
+            <a rel="noopener" target="_blank" href= <%-socialLinks[platform]%>>
+                <span class="icon fa fa-<%-platform%>-square" data-platform=<%-platform%> aria-hidden="true"></span>
+            </a>
+        <% } %>
+    <% } %>
+</div>

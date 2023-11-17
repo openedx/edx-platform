@@ -168,6 +168,7 @@ FEATURES['LICENSING'] = True
 FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
 FEATURES['ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF'] = True
 SEARCH_ENGINE = 'search.elastic.ElasticSearchEngine'
+SEARCH_COURSEWARE_CONTENT_LOG_PARAMS = True
 
 ELASTIC_SEARCH_CONFIG = [
     {
@@ -385,7 +386,6 @@ EDXNOTES_CLIENT_NAME = 'edx_notes_api-backend-service'
 ############## Settings for Microfrontends  #########################
 LEARNING_MICROFRONTEND_URL = 'http://localhost:2000'
 ACCOUNT_MICROFRONTEND_URL = 'http://localhost:1997'
-PROFILE_MICROFRONTEND_URL = 'http://localhost:1995'
 COMMUNICATIONS_MICROFRONTEND_URL = 'http://localhost:1984'
 AUTHN_MICROFRONTEND_URL = 'http://localhost:1999'
 AUTHN_MICROFRONTEND_DOMAIN = 'localhost:1999'
@@ -510,6 +510,11 @@ EVENT_BUS_REDIS_CONNECTION_URL = 'redis://:password@edx.devstack.redis:6379/'
 EVENT_BUS_TOPIC_PREFIX = 'dev'
 EVENT_BUS_CONSUMER = 'edx_event_bus_redis.RedisEventConsumer'
 
+certificate_revoked_event_config = EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.certificate.revoked.v1']
+certificate_revoked_event_config['learning-certificate-lifecycle']['enabled'] = True
+certificate_created_event_config = EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.certificate.created.v1']
+certificate_created_event_config['learning-certificate-lifecycle']['enabled'] = True
+
 ######################## Subscriptions API SETTINGS ########################
 SUBSCRIPTIONS_ROOT_URL = "http://host.docker.internal:18750"
 SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
@@ -525,6 +530,9 @@ API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
 API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
 API_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/'
 AUTH_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/authentication/index.html'
+
+############################ AI_TRANSLATIONS ##################################
+AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
 
 ################# New settings must go ABOVE this line #################
 ########################################################################

@@ -227,11 +227,6 @@ if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
         re_path(r'^api/mobile/(?P<api_version>v(2|1|0.5))/', include('lms.djangoapps.mobile_api.urls')),
     ]
 
-if settings.FEATURES.get('ENABLE_OPENBADGES'):
-    urlpatterns += [
-        path('api/badges/v1/', include(('lms.djangoapps.badges.api.urls', 'badges'), namespace='badges_api')),
-    ]
-
 urlpatterns += [
     path('openassessment/fileupload/', include('openassessment.fileupload.urls')),
 ]
@@ -667,6 +662,12 @@ urlpatterns += [
     re_path(
         fr'^courses/{settings.COURSE_ID_PATTERN}/',
         include('openedx.features.calendar_sync.urls'),
+    ),
+
+    # Learner profile
+    path(
+        'u/',
+        include('openedx.features.learner_profile.urls'),
     ),
 
     # Survey Report

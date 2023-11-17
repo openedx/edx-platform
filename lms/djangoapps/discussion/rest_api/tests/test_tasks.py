@@ -25,7 +25,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_STUDENT,
     CourseDiscussionSettings
 )
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_COURSEWIDE_NOTIFICATIONS, ENABLE_NOTIFICATIONS
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -44,6 +44,7 @@ def _get_mfe_url(course_id, post_id):
 @httpretty.activate
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+@override_waffle_flag(ENABLE_COURSEWIDE_NOTIFICATIONS, active=True)
 class TestNewThreadCreatedNotification(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """
     Test cases related to new_discussion_post and new_question_post notification types
@@ -307,6 +308,7 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'replier_name': self.user_2.username,
             'post_title': 'test thread',
             'course_name': self.course.display_name,
+            'sender_id': self.user_2.id
         }
         self.assertDictEqual(args.context, expected_context)
         self.assertEqual(
@@ -344,6 +346,7 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'post_title': self.thread.title,
             'author_name': 'dummy\'s',
             'course_name': self.course.display_name,
+            'sender_id': self.user_3.id
         }
         self.assertDictEqual(args_comment.context, expected_context)
         self.assertEqual(
@@ -359,6 +362,7 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'replier_name': self.user_3.username,
             'post_title': self.thread.title,
             'course_name': self.course.display_name,
+            'sender_id': self.user_3.id
         }
         self.assertDictEqual(args_comment_on_response.context, expected_context)
         self.assertEqual(
@@ -404,6 +408,7 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'post_title': self.thread.title,
             'author_name': 'your',
             'course_name': self.course.display_name,
+            'sender_id': self.user_3.id,
         }
         self.assertDictEqual(args_comment.context, expected_context)
         self.assertEqual(
@@ -440,6 +445,7 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'replier_name': self.user_2.username,
             'post_title': 'test thread',
             'course_name': self.course.display_name,
+            'sender_id': self.user_2.id,
         }
         if parent_id:
             expected_context['author_name'] = 'dummy'
