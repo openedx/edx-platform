@@ -157,7 +157,6 @@ class TestLibraryContentExportImport(LibraryContentTest):
         Test the export-import cycle.
         """
         # Read back the olx.
-        print(self.export_fs.open)
         with self.export_fs.open('{dir}/{file_name}.xml'.format(
             dir=self.lc_block.scope_ids.usage_id.block_type,
             file_name=self.lc_block.scope_ids.usage_id.block_id
@@ -449,7 +448,6 @@ class LibraryContentBlockTestMixin:
         """
         self.lc_block.max_count = count
         selected = self.lc_block.get_child_blocks()
-        print(selected)
         assert len(selected) == count
         return selected
 
@@ -496,19 +494,10 @@ class LibraryContentBlockTestMixin:
             assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
-@patch('xmodule.library_tools.SearchEngine.get_search_engine', Mock(return_value=None, autospec=True))
-class TestLibraryContentBlockNoSearchIndex(LibraryContentBlockTestMixin, LibraryContentTest):
-    """
-    Tests for library container when no search index is available.
-    Tests fallback low-level CAPA problem introspection
-    """
-    pass  # pylint:disable=unnecessary-pass
-
-
 search_index_mock = Mock(spec=SearchEngine)  # pylint: disable=invalid-name
 
 
-@patch('xmodule.library_tools.SearchEngine.get_search_engine', Mock(return_value=search_index_mock, autospec=True))
+@patch.object(SearchEngine, 'get_search_engine', Mock(return_value=None, autospec=True))
 class TestLibraryContentBlockWithSearchIndex(LibraryContentBlockTestMixin, LibraryContentTest):
     """
     Tests for library container with mocked search engine response.
@@ -840,6 +829,5 @@ class TestLibraryContentSelectionInManualMode(LibraryContentTest):
         children = self.lc_block.children
         pool = [(child.block_type, child.location) for child in children[:2]]
         self.lc_block.candidates = pool
-        print(pool)
         manualy_selected_blocks = self.lc_block.get_child_blocks()
         assert manualy_selected_blocks == pool

@@ -466,8 +466,8 @@ class LibraryContentBlock(
         fragment = Fragment()
         root_xblock = context.get('root_xblock')
         is_root = root_xblock and root_xblock.location == self.location
-        is_loading = self.tools.import_task_is_in_progress(self.location)
-        if is_root and not is_loading:
+        is_updating = self.tools and self.tools.are_children_updating(self)
+        if is_root and not is_updating:
             # User has clicked the "View" link. Show a preview of all possible children:
             if self.children:  # pylint: disable=no-member
                 max_count = self.max_count
@@ -481,7 +481,7 @@ class LibraryContentBlock(
                 self.render_children(context, fragment, can_reorder=False, can_add=False)
         # else: When shown on a unit page, don't show any sort of preview -
         # just the status of this block in the validation area.
-        context['is_loading'] = is_loading
+        context['is_loading'] = is_updating
 
         # The following JS is used to make the "Update now" button work on the unit page and the container view:
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit.js'))
@@ -575,7 +575,7 @@ class LibraryContentBlock(
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         if not self.tools:
             return Response("Library Tools unavailable in current runtime.", status=400)
-        self.tools.update_children(self, user_perms)
+        self.tools.trigger_refresh_children(self, user_perms)
         return Response()
 
     @XBlock.json_handler
@@ -595,27 +595,15 @@ class LibraryContentBlock(
         return {'is_v2': is_v2}
 
     @XBlock.handler
-    def get_import_task_status(self, request, suffix=''):  # lint-amnesty, pylint: disable=unused-argument
+    def children_are_updating(self, request, suffix=''):  # pylint: disable=unused-argument
         """
-        Return task status for update_children_task.
+        Returns whether this block is currently having its children updated from the source library.
         """
-        task_status = self.tools.import_task_status(self.location)
-        return Response(json.dumps({'status': task_status}))
-
-    # Copy over any overridden settings the course author may have applied to the blocks.
-    def _copy_overrides(self, store, user_id, source, dest):
-        """
-        Copy any overrides the user has made on blocks in this library.
-        """
-        for field in source.fields.values():
-            if field.scope == Scope.settings and field.is_set_on(source):
-                setattr(dest, field.name, field.read_from(source))
-        if source.has_children:
-            source_children = [self.runtime.get_block(source_key) for source_key in source.children]
-            dest_children = [self.runtime.get_block(dest_key) for dest_key in dest.children]
-            for source_child, dest_child in zip(source_children, dest_children):
-                self._copy_overrides(store, user_id, source_child, dest_child)
-        store.update_item(dest, user_id)
+        return Response(
+            json.dumps(
+                self.tools and self.tools.are_children_updating(self)
+            )
+        )
 
     def studio_post_duplicate(self, store, source_block):
         """
@@ -624,16 +612,13 @@ class LibraryContentBlock(
 
         Otherwise we'll end up losing data on the next refresh.
         """
-        # The first task will be to refresh our copy of the library to generate the children.
-        # We must do this at the currently set version of the library block. Otherwise we may not have
-        # exactly the same children-- someone may be duplicating an out of date block, after all.
         user_id = self.get_user_id()
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         if not self.tools:
             raise RuntimeError("Library tools unavailable, duplication will not be sane!")
-        self.tools.update_children(self, user_perms, version=self.source_library_version)
-
-        self._copy_overrides(store, user_id, source_block, self)
+        self.tools.trigger_duplicate_children(
+            user_perms=user_perms, source_block=source_block, dest_block=self
+        )
 
         # Children have been handled.
         return True
@@ -775,9 +760,8 @@ class LibraryContentBlock(
             self.source_library_version = ""
         else:
             self.source_library_version = str(self.tools.get_library_version(self.source_library_id))
-
-        if self.source_library_id != old_metadata.source_library_id:
-            self.candidates = []
+            if old_metadata and 'source_library_id' in old_metadata and self.source_library_id != old_metadata['source_library_id']:
+                self.candidates = []
 
     def post_editor_saved(self):
         """

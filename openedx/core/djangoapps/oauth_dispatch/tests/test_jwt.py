@@ -21,6 +21,7 @@ class TestCreateJWTs(AccessTokenMixin, TestCase):
         super().setUp()
         self.user = UserFactory()
         self.default_scopes = ['email', 'profile']
+        self.default_scopes_password_grant_type = ['email', 'profile', 'user_id']
 
     def _create_client(self, oauth_adapter, client_restricted, grant_type=None):
         """
@@ -176,7 +177,7 @@ class TestCreateJWTs(AccessTokenMixin, TestCase):
         jwt_token_dict = jwt_api.create_jwt_token_dict(token_dict, oauth_adapter, use_asymmetric_key=False)
 
         self.assert_valid_jwt_access_token(
-            jwt_token_dict["access_token"], self.user, self.default_scopes,
+            jwt_token_dict["access_token"], self.user, self.default_scopes_password_grant_type,
             grant_type='password',
         )
 

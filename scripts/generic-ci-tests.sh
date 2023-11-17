@@ -20,11 +20,10 @@ set -e
 #       - "pavelib-unit": Run Python unit tests from the pavelib/lib directory
 #       - "pavelib-js-unit": Run the JavaScript tests and the Python unit
 #           tests from the pavelib/lib directory
-#       - "bok-choy": Run acceptance tests that use the bok-choy framework
 #
 #   `SHARD` is a number indicating which subset of the tests to build.
 #
-#       For "bok-choy" and "lms-unit", the tests are put into shard groups
+#       For "lms-unit", the tests are put into shard groups
 #       using the 'attr' decorator (e.g. "@attr(shard=1)"). Anything with
 #       the 'shard=n' attribute will run in the nth shard. If there isn't a
 #       shard explicitly assigned, the test will run in the last shard.

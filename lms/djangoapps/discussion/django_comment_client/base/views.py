@@ -16,12 +16,18 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.http import require_GET, require_POST
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
+from openedx_events.learning.data import DiscussionThreadData, UserData, UserPersonalData
+from openedx_events.learning.signals import (
+    FORUM_RESPONSE_COMMENT_CREATED,
+    FORUM_THREAD_CREATED,
+    FORUM_THREAD_RESPONSE_CREATED
+)
 
 import lms.djangoapps.discussion.django_comment_client.settings as cc_settings
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.student.roles import GlobalStaff
-from common.djangoapps.util.file import store_uploaded_file
 from common.djangoapps.track import contexts
+from common.djangoapps.util.file import store_uploaded_file
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_overview_with_access, get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
@@ -42,7 +48,7 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
     get_user_group_ids,
     is_comment_too_deep,
     prepare_content,
-    sanitize_body,
+    sanitize_body
 )
 from openedx.core.djangoapps.django_comment_common.signals import (
     comment_created,
@@ -65,6 +71,12 @@ log = logging.getLogger(__name__)
 TRACKING_MAX_FORUM_BODY = 2000
 TRACKING_MAX_FORUM_TITLE = 1000
 _EVENT_NAME_TEMPLATE = 'edx.forum.{obj_type}.{action_name}'
+
+TRACKING_LOG_TO_EVENT_MAPS = {
+    'edx.forum.thread.created': FORUM_THREAD_CREATED,
+    'edx.forum.response.created': FORUM_THREAD_RESPONSE_CREATED,
+    'edx.forum.comment.created': FORUM_RESPONSE_COMMENT_CREATED,
+}
 
 
 def track_forum_event(request, event_name, course, obj, data, id_map=None):
@@ -96,6 +108,41 @@ def track_forum_event(request, event_name, course, obj, data, id_map=None):
     context = contexts.course_context_from_course_id(course.id)
     with tracker.get_tracker().context(event_name, context):
         tracker.emit(event_name, data)
+
+    forum_event = TRACKING_LOG_TO_EVENT_MAPS.get(event_name, None)
+    if forum_event is not None:
+        forum_event.send_event(
+            thread=DiscussionThreadData(
+                anonymous=data.get('anonymous'),
+                anonymous_to_peers=data.get('anonymous_to_peers'),
+                body=data.get('body'),
+                category_id=data.get('category_id'),
+                category_name=data.get('category_name'),
+                commentable_id=data.get('commentable_id'),
+                group_id=data.get('group_id'),
+                id=data.get('id'),
+                team_id=data.get('team_id'),
+                thread_type=data.get('thread_type'),
+                title=data.get('title'),
+                title_truncated=data.get('title_truncated'),
+                truncated=data.get('truncated'),
+                url=data.get('url'),
+                discussion=data.get('discussion'),
+                user_course_roles=data.get('user_course_roles'),
+                user_forums_roles=data.get('user_forums_roles'),
+                user=UserData(
+                    pii=UserPersonalData(
+                        username=user.username,
+                        email=user.email,
+                        name=user.profile.name,
+                    ),
+                    id=user.id,
+                    is_active=user.is_active,
+                ),
+                course_id=str(course.id),
+                options=data.get('options'),
+            )
+        )
 
 
 def track_created_event(request, event_name, course, obj, data):
