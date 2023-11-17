@@ -20,7 +20,7 @@ from django.utils.functional import cached_property
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from simple_history.models import HistoricalRecords
-
+from common.djangoapps.util.json_request import JsonResponse   
 from lms.djangoapps.discussion import django_comment_client
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
@@ -32,6 +32,8 @@ from xmodule.course_module import DEFAULT_START_DATE, CourseBlock  # lint-amnest
 from xmodule.error_module import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.tabs import CourseTab  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.features.upload_file import upload_file
+# from common.djangoapps.student.models import StudentLab
 
 log = logging.getLogger(__name__)
 
@@ -1235,30 +1237,47 @@ class CourseResultLab(models.Model):
     block_id =  models.CharField(max_length=255)
     course_id = models.CharField(max_length=255)
     result = models.TextField(default='')
-    
+    type_lab = models.CharField(max_length=20)
     def __str__ (self) :
         return self.block_id
     
     @classmethod
-    def createResultLab (self,course_id, block_id, result) :
+    def createResultLab (self,course_id, block_id, result,type) :
         existing_result = CourseResultLab.objects.filter(course_id=course_id, block_id=block_id).first()
 
         if existing_result:
             existing_result.result = result
+            existing_result.type_lab = type
             existing_result.save()
         else:
-            new_result = CourseResultLab(course_id=course_id, block_id=block_id, result=result)
+            new_result = CourseResultLab(course_id=course_id, block_id=block_id, result=result, type_lab=type)
             new_result.save()
 
     @classmethod
-    def getResultLab (self, course_id, block_id) :
+    def getResultLab (self, block_id) :
 
         try:
-            return CourseResultLab.objects.filter(course_id=course_id, block_id=block_id)[0].result
+            return CourseResultLab.objects.filter( block_id=block_id)[0]
         except :
             return ''
 
 
+    
+def render_type_lab_xblock (block_id , email):
+   try:
+        lab = CourseResultLab.objects.filter(block_id=block_id)[0]
+        file = upload_file.getFileUser( block_id = block_id, email = email)
         
+        data = {
+            "result" : lab.result,
+            "type"  : lab.type_lab,
+            "block_id" : block_id
+        }
+        
+        if file :
+            data['url'] = file.get('url', '') 
 
+        return data
+   except:
+       return ''
 

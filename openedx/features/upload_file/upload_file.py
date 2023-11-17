@@ -32,15 +32,14 @@ def index (request , course_id, usage_id) :
                 print(f"Field: {field_name}, Error: {error}")
     return True
 
-def getFileUser (block_id, course_id , email):
-    file  = UploadFile.objects.filter(course_id = course_id , block_id=block_id, email=email)
+def getFileUser (block_id , email):
+    file  = UploadFile.objects.filter( block_id=block_id, email=email)
     url_lms = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
     data = {
         "url" : ''
     }
     
     if len(file) > 0:
-        print('==========', file[0].file)
         data = {
             "url" : url_lms + '/media/' + file[0].file.name
         }

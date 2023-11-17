@@ -1714,4 +1714,4 @@ zipp==3.9.0
 # setuptools
 
 openpyxl==3.1.2
-labxblock-xblock
+labxblock-xblock==0.2
