@@ -18,7 +18,7 @@ class Role(models.Model):
     """
     name = models.CharField(max_length=255)
     services = models.ManyToManyField('Service', through='RoleService')
-    permissions = models.ManyToManyField('Permission', through='RolePermissions')
+    permissions = models.ManyToManyField('Permission', through='RolePermission')
     users = models.ManyToManyField(settings.AUTH_USER_MODEL, through='UserRole')
 
     def __str__(self):
@@ -37,7 +37,7 @@ class Permission(models.Model):
         return self.name
 
 
-class RolePermissions(models.Model):
+class RolePermission(models.Model):
     """
     Model for a role permission.
 
