@@ -44,6 +44,10 @@ class TestBlockStructureStore(UsageKeyFactoryMixin, ChildrenMapTestMixin, CacheI
                 value=f'{transformer.name()} val',
             )
 
+    def test_get_none(self):
+        with pytest.raises(BlockStructureNotFound):
+            self.store.get(self.block_structure.root_block_usage_key)
+
     def test_add_and_get(self):
         self.store.add(self.block_structure)
         stored_value = self.store.get(self.block_structure.root_block_usage_key)
