@@ -87,8 +87,7 @@ from xmodule.services import (
     SettingsService,
     ConfigurationService,
     TeamsConfigurationService,
-    ShowAnswerService,
-    ShowCorrectnessService
+    ResultService
 )
 
 
@@ -1166,8 +1165,7 @@ def load_services_for_studio(runtime, user):
         "lti-configuration": ConfigurationService(CourseAllowPIISharingInLTIFlag),
         "teams_configuration": TeamsConfigurationService(),
         "library_tools": LibraryToolsService(modulestore(), user.id),
-        "show_answer": ShowAnswerService(),
-        "show_correctness": ShowCorrectnessService(),
+        "result": ResultService,
     }
 
     runtime._services.update(services)  # lint-amnesty, pylint: disable=protected-access

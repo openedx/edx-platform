@@ -17,7 +17,7 @@ from xblock.runtime import Mixologist
 
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.graders import ShowCorrectness
-from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService, ShowCorrectnessService
+from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService, ResultService
 from openedx.core.lib.teams_config import TeamsConfig
 
 
@@ -169,14 +169,14 @@ class TestTeamsConfigurationService(ConfigurationServiceBaseClass):
 
 
 @ddt.ddt
-class TestShowCorrectnessService(unittest.TestCase):
+class TestResultService(unittest.TestCase):
     """
     Tests the correctness_available method
     """
 
     def setUp(self):
         super().setUp()
-
+        self._xblock = mock.MagicMock()
         now = datetime.now(UTC)
         day_delta = timedelta(days=1)
         self.yesterday = now - day_delta
@@ -187,7 +187,7 @@ class TestShowCorrectnessService(unittest.TestCase):
         """
         Test that correctness is visible by default.
         """
-        assert ShowCorrectnessService.correctness_available()
+        assert ResultService(self._xblock).correctness_available()
 
     @ddt.data(
         (ShowCorrectness.ALWAYS, True),
@@ -203,16 +203,16 @@ class TestShowCorrectnessService(unittest.TestCase):
         """
         Test that correctness is visible when show_correctness is turned on.
         """
-        assert ShowCorrectnessService.correctness_available(
-            show_correctness=show_correctness, has_staff_access=has_staff_access)
+        self._xblock.show_correctness = show_correctness
+        assert ResultService(self._xblock, user_is_staff=has_staff_access).correctness_available()
 
     @ddt.data(True, False)
     def test_show_correctness_never(self, has_staff_access):
         """
         Test that show_correctness="never" hides correctness from learners and course staff.
         """
-        assert not ShowCorrectnessService.correctness_available(
-            show_correctness=ShowCorrectness.NEVER, has_staff_access=has_staff_access)
+        self._xblock.show_correctness = ShowCorrectness.NEVER
+        assert not ResultService(self._xblock, user_is_staff=has_staff_access).correctness_available()
 
     @ddt.data(
         # Correctness not visible to learners if due date in the future
@@ -238,9 +238,10 @@ class TestShowCorrectnessService(unittest.TestCase):
         * correctness is always visible to everyone if there is no due date
         * correctness is visible to learners after the due date, when there is a due date.
         """
+        self._xblock.show_correctness = ShowCorrectness.PAST_DUE
         if due_date_str is None:
-            due_date = None
+            self._xblock.due = None
         else:
-            due_date = getattr(self, due_date_str)
-        assert ShowCorrectnessService.correctness_available(ShowCorrectness.PAST_DUE, due_date, has_staff_access) ==\
+            self._xblock.due = getattr(self, due_date_str)
+        assert ResultService(self._xblock, user_is_staff=has_staff_access).correctness_available() ==\
                expected_result

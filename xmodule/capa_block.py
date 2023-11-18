@@ -105,8 +105,7 @@ class Randomization(String):
 @XBlock.needs('sandbox')
 @XBlock.needs('replace_urls')
 @XBlock.wants('call_to_action')
-@XBlock.wants('show_correctness')
-@XBlock.wants('show_answer')
+@XBlock.wants('result')
 class ProblemBlock(
     ScorableXBlockMixin,
     RawMixin,
@@ -1390,19 +1389,13 @@ class ProblemBlock(
         """
         Is the user allowed to see an answer?
         """
-        user_is_staff = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
-        return self.runtime.service(self, 'show_answer').answer_available(
-            show_answer=self.showanswer,
-            show_correctness=self.correctness_available(),
-            past_due=self.is_past_due(),
+        return self.runtime.service(self, 'result').answer_available(
             attempts=self.attempts,
             is_attempted=self.is_attempted(),
             is_correct=self.is_correct(),
             required_attempts=self.attempts_before_showanswer_button,
-            max_attempts=self.max_attempts,
             used_all_attempts=self.used_all_attempts(),
-            closed=self.closed(),
-            has_staff_access=user_is_staff
+            closed=self.closed()
         )
 
     def correctness_available(self):
@@ -1411,12 +1404,7 @@ class ProblemBlock(
 
         Limits access to the correct/incorrect flags, messages, and problem score.
         """
-        user_is_staff = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
-        return self.runtime.service(self, 'show_correctness').correctness_available(
-            show_correctness=self.show_correctness,
-            due_date=self.close_date,
-            has_staff_access=user_is_staff,
-        )
+        return self.runtime.service(self, 'result').correctness_available()
 
     def update_score(self, data):
         """

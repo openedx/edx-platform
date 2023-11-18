@@ -314,25 +314,48 @@ class EventPublishingService(Service):
             self.completion_service.submit_completion(block.scope_ids.usage_id, 1.0)
 
 
-class ShowAnswerService(Service):
+class ResultService(Service):
     """
-    An XBlock Service that allows XModules to define if the answers are visible.
+    An XBlock Service that allows XModules to define:
+
+    - if the answers are visible
+    - whether correctness is currently hidden. When correctness is hidden, this
+    limits the user's access to the correct/incorrect flags, messages, problem
+    scores, and aggregate subsection and course grades.
     """
-    @classmethod
+    def __init__(self, block=None, user_is_staff=False, **kwargs):
+        super().__init__(**kwargs)
+        self._user_is_staff = user_is_staff
+        # This is needed because the `Service` class initialization expects the XBlock passed as an `xblock` keyword
+        #  argument, but the `service` method from the `DescriptorSystem` passes a `block`.
+        self._xblock = self.xblock() or block
+
     def answer_available(
-            cls, show_answer='', show_correctness='', past_due=False, attempts=0,
-            is_attempted=False, is_correct=False, required_attempts=0,
-            max_attempts=0, used_all_attempts=False, closed=False,
-            has_staff_access=False):
+            self, attempts=0, is_attempted=False, is_correct=False,
+            required_attempts=0, used_all_attempts=False, closed=False):
         """
         Returns whether correctness is available now, for the given attributes.
         """
+        if self._xblock:
+            show_correctness = self._xblock.show_correctness
+            show_answer = self._xblock.showanswer
+            past_due = self._xblock.is_past_due()
+            max_attempts = self._xblock.max_attempts
+        else:
+            show_correctness = ''
+            show_answer = ''
+            past_due = False
+            max_attempts = 0
+
         if not show_correctness:
             # If correctness is being withheld, then don't show answers either.
             return False
+        elif show_correctness == ShowCorrectness.NEVER:
+            # If correctness is being hidden the answer is not shown
+            return False
         elif show_answer == ShowAnswer.NEVER:
             return False
-        elif has_staff_access:
+        elif self._user_is_staff:
             # This is after the 'never' check because course staff can see correctness
             # unless the sequence/problem explicitly prevents it
             return True
@@ -364,22 +387,20 @@ class ShowAnswerService(Service):
             return is_attempted
         return False
 
-
-class ShowCorrectnessService(Service):
-    """
-    An XBlock Service that allows XModules to define whether correctness is currently hidden.
-
-    When correctness is hidden, this limits the user's access to the correct/incorrect flags, messages, problem scores,
-    and aggregate subsection and course grades.
-    """
-    @classmethod
-    def correctness_available(cls, show_correctness='', due_date=None, has_staff_access=False):
+    def correctness_available(self):
         """
         Returns whether correctness is available now, for the given attributes.
         """
+        if self._xblock:
+            due_date = self._xblock.due
+            show_correctness = self._xblock.show_correctness
+        else:
+            due_date = None
+            show_correctness = ''
+
         if show_correctness == ShowCorrectness.NEVER:
             return False
-        elif has_staff_access:
+        elif self._user_is_staff:
             # This is after the 'never' check because course staff can see correctness
             # unless the sequence/problem explicitly prevents it
             return True
