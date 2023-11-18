@@ -330,9 +330,7 @@ class ResultService(Service):
         #  argument, but the `service` method from the `DescriptorSystem` passes a `block`.
         self._xblock = self.xblock() or block
 
-    def answer_available(
-            self, attempts=0, is_attempted=False, is_correct=False,
-            required_attempts=0, used_all_attempts=False, closed=False):
+    def answer_available(self):
         """
         Returns whether correctness is available now, for the given attributes.
         """
@@ -341,11 +339,23 @@ class ResultService(Service):
             show_answer = self._xblock.showanswer
             past_due = self._xblock.is_past_due()
             max_attempts = self._xblock.max_attempts
+            attempts = self._xblock.attempts
+            is_attempted = self._xblock.is_attempted()
+            is_correct = self._xblock.is_correct()
+            required_attempts = self._xblock.attempts_before_showanswer_button
+            used_all_attempts = self._xblock.used_all_attempts()
+            closed = self._xblock.closed()
         else:
             show_correctness = ''
             show_answer = ''
             past_due = False
             max_attempts = 0
+            attempts = 0
+            is_attempted = False
+            is_correct = False
+            required_attempts = 0
+            used_all_attempts = False
+            closed = False
 
         if not show_correctness:
             # If correctness is being withheld, then don't show answers either.

@@ -1389,14 +1389,7 @@ class ProblemBlock(
         """
         Is the user allowed to see an answer?
         """
-        return self.runtime.service(self, 'result').answer_available(
-            attempts=self.attempts,
-            is_attempted=self.is_attempted(),
-            is_correct=self.is_correct(),
-            required_attempts=self.attempts_before_showanswer_button,
-            used_all_attempts=self.used_all_attempts(),
-            closed=self.closed()
-        )
+        return self.runtime.service(self, 'result').answer_available()
 
     def correctness_available(self):
         """
