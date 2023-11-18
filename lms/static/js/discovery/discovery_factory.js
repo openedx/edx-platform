@@ -55,7 +55,7 @@
 
             dispatcher.listenTo(search, 'search', function(query, total) {
                 if (total > 0) {
-                    form.showFoundMessage(total);
+                    form.showFoundMessage(total, query);
                     if (query) {
                         filters.add(
                             {type: 'search_query', query: query, name: quote(query)},
