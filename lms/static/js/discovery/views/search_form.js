@@ -62,7 +62,7 @@
 
             showNotFoundMessage: function(term) {
                 var msg = interpolate(
-                    gettext('We couldn\'t find any results for "%s".'),
+                    gettext('We couldn\'t find results for "%s".'),
                     [_.escape(term)]
                 );
                 this.$message.html(msg);
