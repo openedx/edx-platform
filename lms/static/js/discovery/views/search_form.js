@@ -43,12 +43,21 @@
             },
 
             showFoundMessage: function(count) {
-                var msg = ngettext(
-                    'Viewing %s course',
-                    'Viewing %s courses',
-                    count
-                );
-                this.$message.html(interpolate(msg, [count]));
+                var msg;
+                if (count > 0) {
+                    msg = ngettext(
+                        'Found %s course for "%s"',
+                        'Found %s courses for "%s"',
+                        count
+                    );
+                } else {
+                    msg = ngettext(
+                        'Viewing %s course',
+                        'Viewing %s courses',
+                        count
+                    );
+                }
+                this.$message.html(interpolate(msg, [count, _.escape(term)]));
             },
 
             showNotFoundMessage: function(term) {
@@ -62,7 +71,8 @@
 
             showErrorMessage: function(error) {
                 this.$message.text(gettext(error || 'There was an error, try searching again.'));
-            }
+            },
+
 
         });
     });
