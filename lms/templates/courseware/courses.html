@@ -31,6 +31,8 @@
 
 <%block name="pagetitle">${_("Courses")}</%block>
 
+
+
 <main id="main" aria-label="Content" tabindex="-1">
     <section class="find-courses">
       <section class="courses-container">
@@ -81,6 +83,8 @@
         </div>
 
         <div id="discovery-message" class="search-status-label"></div>
+        <span id="searchQuery"></span>
+
       </div>
       </div>
 
@@ -292,6 +296,24 @@
           </section>
         </aside>
         % endif
+
+        <script>
+          document.addEventListener('DOMContentLoaded', (event) => {
+              var searchQuery = getParameterByName('search_query'); // Get the search query
+              if (searchQuery) {
+                  document.getElementById('searchQuery').textContent = searchQuery;
+              }
+          });
+  
+          function getParameterByName(name, url = window.location.href) {
+              name = name.replace(/[\[\]]/g, '\\$&');
+              var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                  results = regex.exec(url);
+              if (!results) return null;
+              if (!results[2]) return '';
+              return decodeURIComponent(results[2].replace(/\+/g, ' '));
+          }
+      </script>
 
       </section>
     </section>
