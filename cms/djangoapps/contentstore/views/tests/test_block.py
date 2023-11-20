@@ -593,7 +593,7 @@ class TestCreateItem(ItemTest):
         self.assertEqual(problem.display_name, template["metadata"]["display_name"])
         self.assertEqual(problem.markdown, template["metadata"]["markdown"])
 
-    def test_create_item_negative(self):
+    def test_create_block_negative(self):
         """
         Negative tests for create_item
         """
