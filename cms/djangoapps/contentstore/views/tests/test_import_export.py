@@ -1112,7 +1112,7 @@ class TestCourseExportImport(LibraryTestCase):
         lc_block = self._add_library_content_block(
             vertical, self.lib_key, publish_item=publish, other_settings=dict(source_library_version=version)
         )
-        lc_block.sync_from_library(upgrade_to_latest=True)
+        self._refresh_children(lc_block)
 
     def get_lib_content_block_children(self, block_location):
         """

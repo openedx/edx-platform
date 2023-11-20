@@ -458,6 +458,18 @@ module.exports = Merge.smart({
                 {
                     test: /logger/,
                     loader: 'imports-loader?this=>window'
+                },
+                {
+                    test: /\.css$/,
+                    use: [
+                        'style-loader',
+                        {
+                            loader: 'css-loader',
+                            options: {
+                                modules: true
+                            }
+                        }
+                    ]
                 }
             ]
         },

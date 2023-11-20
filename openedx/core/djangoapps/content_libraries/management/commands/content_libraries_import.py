@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     """
-    Import modulestore content references from a course into a Content Libraries
+    Import modulestore content, references by a course, into a Content Libraries
     library.
     """
 

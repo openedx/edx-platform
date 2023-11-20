@@ -17,7 +17,7 @@ window.LibraryContentAuthorView = function(runtime, element) {
             element: element,
             message: gettext('Updating with latest library content')
         });
-        $.post(runtime.handlerUrl(element, 'upgrade_and_sync')).done(function() {
+        $.post(runtime.handlerUrl(element, 'refresh_children')).done(function() {
             runtime.notify('save', {
                 state: 'end',
                 element: element
@@ -33,22 +33,4 @@ window.LibraryContentAuthorView = function(runtime, element) {
             }
         });
     });
-    // Hide loader and show element when update task finished.
-    var $loader = $wrapper.find('.ui-loading');
-    var $xblockHeader = $wrapper.find('.xblock-header');
-    if (!$loader.hasClass('is-hidden')) {
-        var timer = setInterval(function() {
-            $.get(runtime.handlerUrl(element, 'children_are_syncing'), function( data ) {
-                if (data !== true) {
-                    $loader.addClass('is-hidden');
-                    $xblockHeader.removeClass('is-hidden');
-                    clearInterval(timer);
-                    runtime.notify('save', {
-                        state: 'end',
-                        element: element
-                    });
-                }
-            })
-        }, 1000);
-    }
 };

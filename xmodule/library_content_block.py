@@ -1,28 +1,27 @@
 """
 LibraryContent: The XBlock used to include blocks from a library in a course.
 """
-from __future__ import annotations
+
 
 import json
 import logging
 import random
 from copy import copy
-from gettext import ngettext, gettext
+from gettext import ngettext
+from rest_framework import status
 
 import bleach
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.utils.functional import classproperty
+from lazy import lazy
 from lxml import etree
 from lxml.etree import XMLSyntaxError
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
-from rest_framework import status
+from opaque_keys.edx.locator import LibraryLocator
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
-from xblock.fields import Boolean, Integer, List, Scope, String
+from xblock.fields import Integer, List, Scope, String, Boolean
 
 from xmodule.capa.responsetypes import registry
 from xmodule.mako_block import MakoTemplateBlockBase
@@ -31,12 +30,13 @@ from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
-    STUDENT_VIEW,
     ResourceTemplates,
+    shim_xmodule_js,
+    STUDENT_VIEW,
     XModuleMixin,
     XModuleToXBlockMixin,
-    shim_xmodule_js,
 )
+
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
@@ -66,16 +66,8 @@ def _get_capa_types():
     ], key=lambda item: item.get('display_name'))
 
 
-class LibraryToolsUnavailable(ValueError):
-    """
-    Raised when the library_tools service is requested in a runtime that doesn't provide it.
-    """
-    def __init__(self):
-        super().__init__("Needed 'library_tools' features which were not available in the current runtime")
-
-
-@XBlock.wants('library_tools')  # TODO: Split this service into its LMS and CMS parts.
-@XBlock.wants('studio_user_permissions')  # Only available in CMS.
+@XBlock.wants('library_tools')  # Only needed in studio
+@XBlock.wants('studio_user_permissions')  # Only available in studio
 @XBlock.wants('user')
 @XBlock.needs('mako')
 class LibraryContentBlock(
@@ -177,14 +169,9 @@ class LibraryContentBlock(
     @property
     def source_library_key(self):
         """
-        Convenience method to get the library ID as a LibraryLocator and not just a string.
-
-        Supports either library v1 or library v2 locators.
+        Convenience method to get the library ID as a LibraryLocator and not just a string
         """
-        try:
-            return LibraryLocator.from_string(self.source_library_id)
-        except InvalidKeyError:
-            return LibraryLocatorV2.from_string(self.source_library_id)
+        return LibraryLocator.from_string(self.source_library_id)
 
     @classmethod
     def make_selection(cls, selected, children, max_count, mode):
@@ -337,7 +324,7 @@ class LibraryContentBlock(
         block_keys = self.make_selection(self.selected, self.children, max_count, "random")  # pylint: disable=no-member
 
         # Publish events for analytics purposes:
-        lib_tools = self.get_tools()
+        lib_tools = self.runtime.service(self, 'library_tools')
         format_block_keys = lambda keys: lib_tools.create_block_analytics_summary(self.location.course_key, keys)
         self.publish_selected_children_events(
             block_keys,
@@ -426,11 +413,8 @@ class LibraryContentBlock(
         fragment = Fragment()
         root_xblock = context.get('root_xblock')
         is_root = root_xblock and root_xblock.location == self.location
-        try:
-            is_updating = self.get_tools().are_children_syncing(self)
-        except LibraryToolsUnavailable:
-            is_updating = False
-        if is_root and not is_updating:
+
+        if is_root:
             # User has clicked the "View" link. Show a preview of all possible children:
             if self.children:  # pylint: disable=no-member
                 max_count = self.max_count
@@ -444,11 +428,9 @@ class LibraryContentBlock(
                     }))
                 context['can_edit_visibility'] = False
                 context['can_move'] = False
-                context['can_collapse'] = True
                 self.render_children(context, fragment, can_reorder=False, can_add=False)
         # else: When shown on a unit page, don't show any sort of preview -
         # just the status of this block in the validation area.
-        context['is_loading'] = is_updating
 
         # The following JS is used to make the "Update now" button work on the unit page and the container view:
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit.js'))
@@ -462,7 +444,6 @@ class LibraryContentBlock(
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
-        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit_helpers.js'))
         add_webpack_js_to_fragment(fragment, 'LibraryContentBlockEditor')
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
@@ -485,14 +466,12 @@ class LibraryContentBlock(
         ])
         return non_editable_fields
 
-    def get_tools(self, to_read_library_content: bool = False) -> 'LibraryToolsService':
+    @lazy
+    def tools(self):
         """
-        Grab the library tools service and confirm that it'll work for us. Else, raise LibraryToolsUnavailable.
+        Grab the library tools service or raise an error.
         """
-        if tools := self.runtime.service(self, 'library_tools'):
-            if (not to_read_library_content) or tools.can_use_library_content(self):
-                return tools
-        raise LibraryToolsUnavailable()
+        return self.runtime.service(self, 'library_tools')
 
     def get_user_id(self):
         """
@@ -506,86 +485,40 @@ class LibraryContentBlock(
             user_id = None
         return user_id
 
-    def _validate_sync_permissions(self):
-        """
-        Raises PermissionDenied() if we can't confirm that user has write on this block and read on source library.
-
-        If source library isn't set, then that's OK.
-        """
-        if not (user_perms := self.runtime.service(self, 'studio_user_permissions')):
-            raise PermissionDenied("Access cannot be validated in the current runtime.")
-        if not user_perms.can_write(self.scope_ids.usage_id.context_key):
-            raise PermissionDenied(f"Cannot write to block at {self.scope_ids.usage_id}")
-        if self.source_library_key:
-            if not user_perms.can_read(self.source_library_key):
-                raise PermissionDenied(f"Cannot read library at {self.source_library_key}")
-
     @XBlock.handler
-    def upgrade_and_sync(self, request=None, suffix=None):  # pylint: disable=unused-argument
+    def refresh_children(self, request=None, suffix=None):  # lint-amnesty, pylint: disable=unused-argument
         """
-        HTTP handler allowing Studio users to update to latest version of source library and synchronize children.
+        Refresh children:
+        This method is to be used when any of the libraries that this block
+        references have been updated. It will re-fetch all matching blocks from
+        the libraries, and copy them as children of this block. The children
+        will be given new block_ids, but the definition ID used should be the
+        exact same definition ID used in the library.
 
-        This is a thin wrapper around `sync_from_library(upgrade_to_latest=True)`, plus permission checks.
-
-        Returns 400 if libraray tools or user permission services are not available.
-        Returns 403/404 if user lacks read access on source library or write access on this block.
+        This method will update this block's 'source_library_id' field to store
+        the version number of the libraries used, so we easily determine if
+        this block is up to date or not.
         """
-        self._validate_sync_permissions()
-        if not self.source_library_id:
-            return Response(_("Source content library has not been specified."), status=400)
-        try:
-            self.sync_from_library(upgrade_to_latest=True)
-        except LibraryToolsUnavailable:
-            return Response(_("Content libraries are not available in the current runtime."), status=400)
-        except ObjectDoesNotExist:
-            return Response(
-                _("Source content library does not exist: {source_library_id}").format(
-                    source_library_id=self.source_library_id
-                ),
-                status=400,
-            )
+        user_perms = self.runtime.service(self, 'studio_user_permissions')
+        if not self.tools:
+            return Response("Library Tools unavailable in current runtime.", status=400)
+        self.tools.update_children(self, user_perms)
         return Response()
 
-    def sync_from_library(self, upgrade_to_latest: bool = False) -> None:
+    # Copy over any overridden settings the course author may have applied to the blocks.
+    def _copy_overrides(self, store, user_id, source, dest):
         """
-        Synchronize children with source library.
-
-        If `upgrade_to_latest==True` or if source library version is unset, update library version to latest.
-        Otherwise, use current source library version.
-
-        Raises ObjectDoesNotExist if library or version is missing.
+        Copy any overrides the user has made on blocks in this library.
         """
-        self.get_tools(to_read_library_content=True).trigger_library_sync(
-            dest_block=self,
-            library_version=(None if upgrade_to_latest else self.source_library_version),
-        )
-
-    @XBlock.json_handler
-    def is_v2_library(self, data, suffix=''):  # pylint: disable=unused-argument
-        """
-        Check the library version by library_id.
-
-        This is a temporary handler needed for hiding the Problem Type xblock editor field for V2 libraries.
-        """
-        lib_key = data.get('library_key')
-        try:
-            LibraryLocatorV2.from_string(lib_key)
-        except InvalidKeyError:
-            is_v2 = False
-        else:
-            is_v2 = True
-        return {'is_v2': is_v2}
-
-    @XBlock.handler
-    def children_are_syncing(self, request, suffix=''):  # pylint: disable=unused-argument
-        """
-        Returns whether this block is currently having its children updated from the source library.
-        """
-        try:
-            is_updating = self.get_tools().are_children_syncing(self)
-        except LibraryToolsUnavailable:
-            is_updating = False
-        return Response(json.dumps(is_updating))
+        for field in source.fields.values():
+            if field.scope == Scope.settings and field.is_set_on(source):
+                setattr(dest, field.name, field.read_from(source))
+        if source.has_children:
+            source_children = [self.runtime.get_block(source_key) for source_key in source.children]
+            dest_children = [self.runtime.get_block(dest_key) for dest_key in dest.children]
+            for source_child, dest_child in zip(source_children, dest_children):
+                self._copy_overrides(store, user_id, source_child, dest_child)
+        store.update_item(dest, user_id)
 
     def studio_post_duplicate(self, store, source_block):
         """
@@ -594,17 +527,27 @@ class LibraryContentBlock(
 
         Otherwise we'll end up losing data on the next refresh.
         """
-        self._validate_sync_permissions()
-        self.get_tools(to_read_library_content=True).trigger_duplication(source_block=source_block, dest_block=self)
-        return True  # Children have been handled.
+        # The first task will be to refresh our copy of the library to generate the children.
+        # We must do this at the currently set version of the library block. Otherwise we may not have
+        # exactly the same children-- someone may be duplicating an out of date block, after all.
+        user_id = self.get_user_id()
+        user_perms = self.runtime.service(self, 'studio_user_permissions')
+        if not self.tools:
+            raise RuntimeError("Library tools unavailable, duplication will not be sane!")
+        self.tools.update_children(self, user_perms, version=self.source_library_version)
+
+        self._copy_overrides(store, user_id, source_block, self)
+
+        # Children have been handled.
+        return True
 
     def _validate_library_version(self, validation, lib_tools, version, library_key):
         """
         Validates library version
         """
-        latest_version = lib_tools.get_latest_library_version(library_key)
+        latest_version = lib_tools.get_library_version(library_key)
         if latest_version is not None:
-            if version is None or version != latest_version:
+            if version is None or version != str(latest_version):
                 validation.set_summary(
                     StudioValidationMessage(
                         StudioValidationMessage.WARNING,
@@ -643,9 +586,8 @@ class LibraryContentBlock(
         validation = super().validate()
         if not isinstance(validation, StudioValidation):
             validation = StudioValidation.copy(validation)
-        try:
-            lib_tools = self.get_tools(to_read_library_content=True)
-        except LibraryToolsUnavailable:
+        library_tools = self.runtime.service(self, "library_tools")
+        if not (library_tools and library_tools.can_use_library_content(self)):
             validation.set_summary(
                 StudioValidationMessage(
                     StudioValidationMessage.ERROR,
@@ -666,9 +608,10 @@ class LibraryContentBlock(
                 )
             )
             return validation
+        lib_tools = self.runtime.service(self, 'library_tools')
         self._validate_library_version(validation, lib_tools, self.source_library_version, self.source_library_key)
 
-        # Note: we assume children have been synced
+        # Note: we assume refresh_children() has been called
         # since the last time fields like source_library_id or capa_types were changed.
         matching_children_count = len(self.children)  # pylint: disable=no-member
         if matching_children_count == 0:
@@ -676,8 +619,7 @@ class LibraryContentBlock(
                 validation,
                 StudioValidationMessage(
                     StudioValidationMessage.WARNING,
-                    (gettext('There are no problems in the specified library of type {capa_type}.'))
-                    .format(capa_type=self.capa_type),
+                    _('There are no matching problem types in the specified libraries.'),
                     action_class='edit-button',
                     action_label=_("Select another problem type.")
                 )
@@ -711,7 +653,7 @@ class LibraryContentBlock(
         """
         Return a list of possible values for self.source_library_id
         """
-        lib_tools = self.get_tools()
+        lib_tools = self.runtime.service(self, 'library_tools')
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         all_libraries = [
             (key, bleach.clean(name)) for key, name in lib_tools.list_available_libraries()
@@ -724,20 +666,17 @@ class LibraryContentBlock(
         values = [{"display_name": name, "value": str(key)} for key, name in all_libraries]
         return values
 
-    def post_editor_saved(self, user, old_metadata, old_content):  # pylint: disable=unused-argument
+    def editor_saved(self, user, old_metadata, old_content):  # lint-amnesty, pylint: disable=unused-argument
         """
-        If source library or capa_type have been edited, upgrade library & sync automatically.
-
-        TODO: capa_type doesn't really need to trigger an upgrade once we've migrated to V2.
+        If source_library_id or capa_type has been edited, refresh_children automatically.
         """
-        source_lib_changed = (self.source_library_id != old_metadata.get("source_library_id", ""))
-        capa_filter_changed = (self.capa_type != old_metadata.get("capa_type", ANY_CAPA_TYPE_VALUE))
-        if source_lib_changed or capa_filter_changed:
+        old_source_library_id = old_metadata.get('source_library_id', [])
+        if (old_source_library_id != self.source_library_id or
+                old_metadata.get('capa_type', ANY_CAPA_TYPE_VALUE) != self.capa_type):
             try:
-                self.sync_from_library(upgrade_to_latest=True)
-            except (ObjectDoesNotExist, LibraryToolsUnavailable):
-                # The validation area will display an error message, no need to do anything now.
-                pass
+                self.refresh_children()
+            except ValueError:
+                pass  # The validation area will display an error message, no need to do anything now.
 
     def has_dynamic_children(self):
         """

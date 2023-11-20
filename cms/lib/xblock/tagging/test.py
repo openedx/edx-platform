@@ -148,12 +148,9 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
         tree = etree.parse(StringIO(problem_html), parser)
 
         main_div_nodes = tree.xpath('/html/body/div/section/div')
-        self.assertEqual(len(main_div_nodes), 2)
+        self.assertEqual(len(main_div_nodes), 1)
 
-        loader_div_node = main_div_nodes[0]
-        self.assertIn('ui-loading', loader_div_node.get('class'))
-
-        div_node = main_div_nodes[1]
+        div_node = main_div_nodes[0]
         self.assertEqual(div_node.get('data-init'), 'StructuredTagsInit')
         self.assertEqual(div_node.get('data-runtime-class'), 'PreviewRuntime')
         self.assertEqual(div_node.get('data-block-type'), 'tagging_aside')

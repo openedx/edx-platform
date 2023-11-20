@@ -37,6 +37,7 @@ INSTALLED_APPS.extend([
     'cms.djangoapps.course_creators',
     'cms.djangoapps.xblock_config.apps.XBlockConfig',
     'lms.djangoapps.lti_provider',
+    'user_tasks',
 ])
 
 

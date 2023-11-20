@@ -43,19 +43,6 @@
     display: flex;
     align-items: center;
 
-    .header-library-checkbox {
-      margin-right: 10px;
-      width: 17px;
-      height: 17px;
-      cursor: pointer;
-      vertical-align: middle;
-    }
-
-    .header-library-checkbox-label {
-      vertical-align: middle;
-      cursor: pointer;
-    }
-
     .header-details {
       @extend %cont-truncated;
 
@@ -446,17 +433,7 @@
       border-color: $blue;
     }
 
-    &.is-collapsed {
-      .xblock-render {
-        display: none;
-      }
-
-      .collapse-button .fa {
-        transform: scale(1, -1);
-      }
-    }
-
-    .xblock-header:not(.is-hidden) {
+    .xblock-header {
       display: block;
     }
 
