@@ -204,6 +204,11 @@ FEATURES['ENABLE_COURSE_DISCOVERY'] = True
 FEATURES['COURSES_ARE_BROWSEABLE'] = True
 HOMEPAGE_COURSE_MAX = 9
 
+FEATURES['ENABLE_FILTER'] = False
+# Toggle for the "filter" feature of the search bar
+FEATURES['ENABLE_SORTBY'] = False
+# Toggle for the "sort by" feature of the search bar
+
 # Software secure fake page feature flag
 FEATURES['ENABLE_SOFTWARE_SECURE_FAKE'] = True
 
