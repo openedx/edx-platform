@@ -225,3 +225,6 @@ def update_unit_and_lesson_completions(self, user_id, course_key_str, usage_key_
                 )
 
                 return
+
+
+
