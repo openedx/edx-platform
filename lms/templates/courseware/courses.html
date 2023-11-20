@@ -7,6 +7,9 @@
 <%inherit file="../main.html" />
 <%
   course_discovery_enabled = settings.FEATURES.get('ENABLE_COURSE_DISCOVERY')
+  filter_enabled = settings.FEATURES.get('ENABLE_FILTER')
+  sortby_enabled = settings.FEATURES.get('ENABLE_SORTBY')
+
 %>
 
 <%namespace name='static' file='../static_content.html'/>
@@ -44,7 +47,7 @@
 
     <div class="filter-search-container">
 
-
+      % if filter_enabled:
              <!-- Filter Section -->
       <div class="filter-container">
         <!-- Filter Box with Icon and Count -->
@@ -54,6 +57,8 @@
             <span style="font-weight: 600; font-size: 12px; color: #ED4338;">3</span>
         </div>
       </div>
+      % endif
+
         <!-- Search Bar -->
       <div class="search-container">
         <div class="search-info" >
@@ -71,6 +76,8 @@
       </div>
 
     </div>
+    
+    % if sortby_enabled:
 
       <!-- Sort By Dropdown -->
       <div class="sort-section">
@@ -79,6 +86,7 @@
           <!-- add options here -->
         </select>
       </div>
+      % endif
 
         </div>
 
