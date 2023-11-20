@@ -167,6 +167,7 @@ LMS_ROOT_URL = ENV_TOKENS.get('LMS_ROOT_URL')
 LMS_INTERNAL_ROOT_URL = ENV_TOKENS.get('LMS_INTERNAL_ROOT_URL', LMS_ROOT_URL)
 ENTERPRISE_API_URL = ENV_TOKENS.get('ENTERPRISE_API_URL', LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/')
 ENTERPRISE_CONSENT_API_URL = ENV_TOKENS.get('ENTERPRISE_CONSENT_API_URL', LMS_INTERNAL_ROOT_URL + '/consent/api/v1/')
+AUTHORING_API_URL = ENV_TOKENS.get('AUTHORING_API_URL', '')
 # Note that FEATURES['PREVIEW_LMS_BASE'] gets read in from the environment file.
 
 OPENAI_API_KEY = ENV_TOKENS.get('OPENAI_API_KEY', '')
@@ -678,3 +679,34 @@ INACTIVE_USER_URL = f'http{"s" if HTTPS == "on" else ""}://{CMS_BASE}'
 ############## Event bus producer ##############
 EVENT_BUS_PRODUCER_CONFIG = merge_producer_configs(EVENT_BUS_PRODUCER_CONFIG,
                                                    ENV_TOKENS.get('EVENT_BUS_PRODUCER_CONFIG', {}))
+
+############## Authoring API drf-spectacular openapi settings ##############
+# These fields override the spectacular settings default values.
+# Any fields not included here will use the default values.
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Authoring API',
+    'DESCRIPTION': f'''Experimental API to edit xblocks and course content.
+    \n\nDanger: Do not use on running courses!
+    \n\n - How to gain access: Please email the owners of this openedx service.
+    \n - How to use: This API uses oauth2 authentication with the
+    access token endpoint: `{LMS_ROOT_URL}/oauth2/access_token`.
+    Please see separately provided documentation.
+    \n - How to test: You must be logged in as course author for whatever course you want to test with.
+    You can use the [Swagger UI](https://{CMS_BASE}/authoring-api/ui/) to "Try out" the API with your test course. To do this, you must select the "Local" server.
+    \n - Public vs. Local servers: The "Public" server is where you can reach the API externally. The "Local" server is
+    for development with a local edx-platform version,  and for use via the [Swagger UI](https://{CMS_BASE}/authoring-api/ui/).
+    \n - Swaggerfile: [Download link](https://{CMS_BASE}/authoring-api/schema/)''',
+    'VERSION': '0.1.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # restrict spectacular to CMS API endpoints (cms/lib/spectacular.py):
+    'PREPROCESSING_HOOKS': ['cms.lib.spectacular.cms_api_filter'],
+    # remove the default schema path prefix to replace it with server-specific base paths:
+    'SCHEMA_PATH_PREFIX': '/api/contentstore',
+    'SCHEMA_PATH_PREFIX_TRIM': '/api/contentstore',
+    'SERVERS': [
+        {'url': AUTHORING_API_URL, 'description': 'Public'},
+        {'url': f'https://{CMS_BASE}/api/contentstore', 'description': 'Local'},
+    ],
+}
+
+BEAMER_PRODUCT_ID = ENV_TOKENS.get('BEAMER_PRODUCT_ID', BEAMER_PRODUCT_ID)
