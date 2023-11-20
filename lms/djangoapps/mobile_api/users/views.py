@@ -386,8 +386,9 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
     @property
     def paginator(self):
         """
-        Overrides API View paginator property to dynamically determine pagination class 
-        based on the provided api_version. Implements solutions from the discussion at 
+        Override API View paginator property to dynamically determine pagination class
+
+        Implements solutions from the discussion at
         https://www.github.com/encode/django-rest-framework/issues/6397.
         """
         super().paginator  # pylint: disable=expression-not-assigned
