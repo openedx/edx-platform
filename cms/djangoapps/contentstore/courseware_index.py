@@ -13,6 +13,7 @@ from eventtracking import tracker
 from search.search_engine_base import SearchEngine
 
 from cms.djangoapps.contentstore.course_group_config import GroupConfiguration
+from cms.djangoapps.contentstore.toggles import debug_course_search_indexing
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.lib.courses import course_image_url
 from xmodule.annotator_mixin import html_to_text  # lint-amnesty, pylint: disable=wrong-import-order
@@ -238,6 +239,7 @@ class SearchIndexerBase(metaclass=ABCMeta):
                 item_index['content_groups'] = item_content_groups if item_content_groups else None
                 item_index.update(cls.supplemental_fields(item))
                 items_index.append(item_index)
+                cls.debug_log_item_index(structure_key, item_index)
                 indexed_count["count"] += 1
                 return item_content_groups
             except Exception as err:  # pylint: disable=broad-except
@@ -334,6 +336,16 @@ class SearchIndexerBase(metaclass=ABCMeta):
         item. Base implementation returns an empty dictionary
         """
         return {}
+
+    @classmethod
+    def debug_log_item_index(cls, structure_key, item_index):
+        """
+        Debug logging of exactly what is going into the index.
+
+        We have to use this superclass pass / subclass implement form
+        in order to protect the other subclass indexing from debug checks.
+        """
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class CoursewareSearchIndexer(SearchIndexerBase):
@@ -440,6 +452,11 @@ class CoursewareSearchIndexer(SearchIndexerBase):
             "course_name": location_path[0],
             "location": location_path[1:4]
         }
+
+    @classmethod
+    def debug_log_item_index(cls, structure_key, item_index):
+        if debug_course_search_indexing(structure_key):
+            log.info(f"elastic search full item index {item_index}")
 
 
 class LibrarySearchIndexer(SearchIndexerBase):

@@ -555,3 +555,23 @@ def use_tagging_taxonomy_list_page():
     Returns a boolean if taxonomy list page is enabled
     """
     return ENABLE_TAGGING_TAXONOMY_LIST_PAGE.is_enabled()
+
+
+# .. toggle_name: contentstore.debug_course_search_indexing
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag turns on detailed course content indexing logging
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-11-20
+# .. toggle_target_removal_date: 2024-1-1
+# .. toggle_tickets: KBK-61, KBK-73
+# .. toggle_warning:
+DEBUG_COURSE_SEARCH_INDEXING = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.debug_course_search_indexing', __name__)
+
+
+def debug_course_search_indexing(course_key):
+    """
+    Returns a boolean indicating if detailed course indexing debug is enabled
+    """
+    return DEBUG_COURSE_SEARCH_INDEXING.is_enabled(course_key)
