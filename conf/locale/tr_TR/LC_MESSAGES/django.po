@@ -132,7 +132,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-01 20:43+0000\n"
+"POT-Creation-Date: 2023-11-12 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2021\n"
 "Language-Team: Turkish (Turkey) (https://app.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -2126,69 +2126,6 @@ msgstr "Rozet görüntüsünün dosya boyutu 250KB den küçük olmalıdır."
 msgid "This value must be all lowercase."
 msgstr "Bu değer tamamen küçük harf olmalı."
 
-#: lms/djangoapps/badges/models.py
-msgid "The course mode for this badge image. For example, \"verified\" or \"honor\"."
-msgstr "Bu rozet görüntüsü için ders modu. Örneğin, \"onaylı\" ya da \"onur\"."
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Badge images must be square PNG files. The file size should be under 250KB."
-msgstr ""
-"Rozet görüntüleri kare PNG dosya şeklinde olmalıdır. Dosya boyutu 250KB'nin "
-"altında olmalıdır."
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Set this value to True if you want this image to be the default image for "
-"any course modes that do not have a specified badge image. You can have only"
-" one default image."
-msgstr ""
-"Eğer belirlenmiş bir rozet görüntüsü olmayan bir ders modu için bu "
-"görüntünün varsayılan görüntü olmasını istiyorsanız, bu değeri True olarak "
-"belirleyin. Sadece tek bir öntanımlı görseliniz olabilir."
-
-#: lms/djangoapps/badges/models.py
-msgid "There can be only one default image."
-msgstr "Burada sadece bir tane varsayılan görüntü olabilir."
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"On each line, put the number of completed courses to award a badge for, a "
-"comma, and the slug of a badge class you have created that has the issuing "
-"component 'openedx__course'. For example: 3,enrolled_3_courses"
-msgstr ""
-"Her satıra, rozet verilecek tamamlanmış derslerin sayısını, virgül ve "
-"oluşturduğunuz ve 'openedx__course' bileşenince yayınlayan bir rozet "
-"sınıfının slug bilgisini koyun. Örneğin: 3,enrolled_3_courses"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"On each line, put the number of enrolled courses to award a badge for, a "
-"comma, and the slug of a badge class you have created that has the issuing "
-"component 'openedx__course'. For example: 3,enrolled_3_courses"
-msgstr ""
-"Her satıra, rozet verilecek kayıtlı derslerin sayısını, virgül ve "
-"oluşturduğunuz ve 'openedx__course' bileşenince yayınlayan bir rozet "
-"sınıfının slug bilgisini koyun. Örneğin: 3,enrolled_3_courses"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Each line is a comma-separated list. The first item in each line is the slug"
-" of a badge class you have created that has an issuing component of "
-"'openedx__course'. The remaining items in each line are the course keys the "
-"learner needs to complete to be awarded the badge. For example: "
-"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
-msgstr ""
-"Her satır virgülle ayrılmış bir listedir. Her satırdaki ilk öğe, "
-"'openedx__course' veren bir bileşeni olan, oluşturduğunuz bir rozet "
-"sınıfının yoludur. Her satırdaki diğer öğelerse, öğrencinin rozeti kazanması"
-" için tamamlaması gereken ders anahtarlarıdır. Örneğin: "
-"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
-
-#: lms/djangoapps/badges/models.py
-msgid "Please check the syntax of your entry."
-msgstr "Lütfen girdinizin imlasını kontrol edin."
-
 #. Translators: This string is used across Open edX installations
 #. as a callback to edX. Please do not translate `edX.org`
 #: lms/djangoapps/branding/api.py
@@ -3564,6 +3501,7 @@ msgstr "{sign_in_link} ya da {register_link}."
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
 #: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/lti_provider/user-auth-error.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Sign in"
 msgstr "Giriş Yap"
@@ -5080,6 +5018,14 @@ msgid ""
 msgstr ""
 "İçerik deneylerinde bölümlere ayrılan öğrenciler için olan grup "
 "yapılandırmaları listesi."
+
+#: lms/djangoapps/lti_provider/models.py
+msgid ""
+"When checked, the LTI content will load only for learners who have an "
+"account in this instance. This is required only for linking learner accounts"
+" with the LTI consumer. See the Open edX LTI Provider documentation for more"
+" details."
+msgstr ""
 
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
@@ -10974,18 +10920,6 @@ msgstr ""
 " & Ayrıntılar sayfasından belirleyebilirsiniz."
 
 #: xmodule/course_block.py
-msgid "Issue Open Badges"
-msgstr "Open Badge Çıkar"
-
-#: xmodule/course_block.py
-msgid ""
-"Issue Open Badges badges for this course. Badges are generated when "
-"certificates are created."
-msgstr ""
-"Bu ders için Open Badges rozeti oluşturun. Rozetler sertifikalar "
-"düzenlendiğinde oluşturulur. "
-
-#: xmodule/course_block.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
 "marks, enter the short name of the type of certificate that students receive"
@@ -14467,10 +14401,10 @@ msgid "Welcome to {platform_name}"
 msgstr "{platform_name} platformuna hoş geldiniz"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See https://open.edx.org for more information.
+#. untranslated. See https://openedx.org for more information.
 #: lms/templates/index_overlay.html
-msgid "It works! Powered by Open edX{registered_trademark}"
-msgstr "Çalışıyor! İçinde Open edX{registered_trademark} Var"
+msgid "It works! Powered by the Open edX{registered_trademark} Platform"
+msgstr ""
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -15152,6 +15086,10 @@ msgstr "Kullanıcı notları"
 #: lms/templates/video.html
 msgid "Download Handout"
 msgstr "Kullanıcı Notu İndir"
+
+#: lms/templates/video.html
+msgid "How is the transcript quality ?"
+msgstr ""
 
 #: lms/templates/word_cloud.html
 msgid "{num} of {total}"
@@ -20111,6 +20049,25 @@ msgstr ""
 msgid "My Courses"
 msgstr "Derslerim"
 
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "There was an error when loading this module!"
+msgstr ""
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"This module is available only for users who are signed into {platform}. "
+"Kindly sign in and refresh this page to load the content."
+msgstr ""
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "NOTE:"
+msgstr ""
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"The email used to sign into this platform and {platform} should be the same."
+msgstr ""
+
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
 msgstr "Tercih Edilen Dili Değiştir"
@@ -21230,8 +21187,8 @@ msgid "Studio Accessibility Policy"
 msgstr "Studio Erişilebilirlik Politikası"
 
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
-msgid "Files & Uploads"
-msgstr "Dosyalar & Yüklemeler"
+msgid "Files"
+msgstr ""
 
 #: cms/templates/certificates.html
 msgid "Course Certificates"
@@ -23163,6 +23120,10 @@ msgstr "Arşivlenmiş Dersler"
 #: cms/templates/index.html
 msgid "Libraries"
 msgstr "Kütüphaneler"
+
+#: cms/templates/index.html
+msgid "Taxonomies"
+msgstr ""
 
 #: cms/templates/index.html
 msgid "Are you staff on an existing {studio_name} course?"

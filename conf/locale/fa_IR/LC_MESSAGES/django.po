@@ -134,7 +134,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-15 20:42+0000\n"
+"POT-Creation-Date: 2023-11-05 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Somaye Joolaee, 2022\n"
 "Language-Team: Persian (Iran) (https://app.transifex.com/open-edx/teams/6205/fa_IR/)\n"
@@ -2099,69 +2099,6 @@ msgstr "اندازه فایل تصویری نشان کمتر از 250 کیلوب
 msgid "This value must be all lowercase."
 msgstr "فقط از حروف کوچک استفاده کنید."
 
-#: lms/djangoapps/badges/models.py
-msgid "The course mode for this badge image. For example, \"verified\" or \"honor\"."
-msgstr "حالت دوره برای این تصویر نشان. مثلا، \"تاییدشده\" یا \"افتخاری\"."
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Badge images must be square PNG files. The file size should be under 250KB."
-msgstr ""
-"تصاویر نشان باید مربع‌شکل بوده و در قالب PNG باشد. اندازه فایل باید کمتر از "
-"250 کیلوبایت است."
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Set this value to True if you want this image to be the default image for "
-"any course modes that do not have a specified badge image. You can have only"
-" one default image."
-msgstr ""
-"اگر مایلید این تصویر برای هر حالت از دوره‌ آموزشی که تصویر پیش‌فرض ندارد، "
-"تصویر پیش‌فرض باشد، این مقدار را روی گزینه «درست» تنظیم کنید. در نظر بگیرید "
-"که فقط یک تصویر پیش‌فرض می‌توانید داشته باشید."
-
-#: lms/djangoapps/badges/models.py
-msgid "There can be only one default image."
-msgstr "فقط یک تصویر پیش‌فرض می‌تواند وجود داشته باشد."
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"On each line, put the number of completed courses to award a badge for, a "
-"comma, and the slug of a badge class you have created that has the issuing "
-"component 'openedx__course'. For example: 3,enrolled_3_courses"
-msgstr ""
-"در هر خط ، تعداد دوره های تکمیل شده را برای اعطای نشان برای ، یک کاما ، و "
-"مشخصه نشان کلاسی که ساخته اید و مؤلفه صادرکننده openx__course دارد. مثلا: 3 "
-"، ثبت نام‌شده_3_ دوره‌های آموزشی"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"On each line, put the number of enrolled courses to award a badge for, a "
-"comma, and the slug of a badge class you have created that has the issuing "
-"component 'openedx__course'. For example: 3,enrolled_3_courses"
-msgstr ""
-"در هر خط، تعداد دوره‌های ثبت‌نام‌شده را برای اعطای نشان برای، يك کاما، و "
-"مشخصه نشان یک کلاسی که شما ایجاد کرده‌اید را واردکنید، مؤلفه صادرکننده آن  "
-"openx__course  دارد. مثلا: 3، ثبت نام‌شده_3_ دوره‌های آموزشی"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Each line is a comma-separated list. The first item in each line is the slug"
-" of a badge class you have created that has an issuing component of "
-"'openedx__course'. The remaining items in each line are the course keys the "
-"learner needs to complete to be awarded the badge. For example: "
-"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
-msgstr ""
-"هر خط فهرستی است که مقادیر آن با کاما از هم جدا شده‌اند. اولین مورد در هر خط"
-" مشخصه نشان کلاس است که ایجاد کرده‌اید دارای مولفه صدور: openedx__course "
-"است. اقلام باقی‌مانده در هر خط، کلیدهای دوره آموزشی است که یادگیرنده نیاز "
-"دارد که تکمیل کند تا نشان را دریافت کند. مثلا: "
-"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
-
-#: lms/djangoapps/badges/models.py
-msgid "Please check the syntax of your entry."
-msgstr "لطفاً نحو مقدار ورودی خود را بررسی کنید."
-
 #. Translators: This string is used across Open edX installations
 #. as a callback to edX. Please do not translate `edX.org`
 #: lms/djangoapps/branding/api.py
@@ -3519,6 +3456,7 @@ msgstr "{sign_in_link} يا {register_link}."
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
 #: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/lti_provider/user-auth-error.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Sign in"
 msgstr "ورود به سامانه"
@@ -5018,6 +4956,14 @@ msgid ""
 "The list of group configurations for partitioning students in content "
 "experiments."
 msgstr "فهرست تنظیمات گروهی برای تقسیم‌بندی یادگیرندگان در محتوای آزمایشی"
+
+#: lms/djangoapps/lti_provider/models.py
+msgid ""
+"When checked, the LTI content will load only for learners who have an "
+"account in this instance. This is required only for linking learner accounts"
+" with the LTI consumer. See the Open edX LTI Provider documentation for more"
+" details."
+msgstr ""
 
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
@@ -10864,18 +10810,6 @@ msgstr ""
 " در صفحه تنظیمات و جزئیات مشخص کنید."
 
 #: xmodule/course_block.py
-msgid "Issue Open Badges"
-msgstr "گسترش صدور مدال ها "
-
-#: xmodule/course_block.py
-msgid ""
-"Issue Open Badges badges for this course. Badges are generated when "
-"certificates are created."
-msgstr ""
-"برای این دوره آموزشی نشان‌های Open Badges صادر کنید. نشان‌ها هنگام ایجاد "
-"گواهی‌ها تولید می‌شوند."
-
-#: xmodule/course_block.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
 "marks, enter the short name of the type of certificate that students receive"
@@ -14337,10 +14271,10 @@ msgid "Welcome to {platform_name}"
 msgstr "به {platform_name} خوش آمدید"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See https://open.edx.org for more information.
+#. untranslated. See https://openedx.org for more information.
 #: lms/templates/index_overlay.html
-msgid "It works! Powered by Open edX{registered_trademark}"
-msgstr "این مورد کار می کند! با استفاده از Open edX {registered_trademark}"
+msgid "It works! Powered by the Open edX{registered_trademark} Platform"
+msgstr ""
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -15024,6 +14958,10 @@ msgstr "جزوات"
 #: lms/templates/video.html
 msgid "Download Handout"
 msgstr "بارگیری جزوه"
+
+#: lms/templates/video.html
+msgid "How is the transcript quality ?"
+msgstr ""
 
 #: lms/templates/word_cloud.html
 msgid "{num} of {total}"
@@ -19470,7 +19408,7 @@ msgstr "افزودن مجری"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Group Community TA"
-msgstr "گروه کممک‌مربیان"
+msgstr "گروه کمک‌مربیان"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -20030,6 +19968,25 @@ msgstr ""
 #: lms/templates/learner_dashboard/_dashboard_navigation_courses.html
 msgid "My Courses"
 msgstr "دوره‌های آموزشی من"
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "There was an error when loading this module!"
+msgstr ""
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"This module is available only for users who are signed into {platform}. "
+"Kindly sign in and refresh this page to load the content."
+msgstr ""
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "NOTE:"
+msgstr ""
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"The email used to sign into this platform and {platform} should be the same."
+msgstr ""
 
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
@@ -21141,8 +21098,8 @@ msgid "Studio Accessibility Policy"
 msgstr "خط‌مشی دسترسی به هنرکده"
 
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
-msgid "Files & Uploads"
-msgstr "پرونده‌ها و بارگذاری‌ها"
+msgid "Files"
+msgstr ""
 
 #: cms/templates/certificates.html
 msgid "Course Certificates"
@@ -23076,6 +23033,10 @@ msgstr "دوره‌های آموزشی آرشیوشده"
 #: cms/templates/index.html
 msgid "Libraries"
 msgstr "کتابخانه‌ها"
+
+#: cms/templates/index.html
+msgid "Taxonomies"
+msgstr ""
 
 #: cms/templates/index.html
 msgid "Are you staff on an existing {studio_name} course?"

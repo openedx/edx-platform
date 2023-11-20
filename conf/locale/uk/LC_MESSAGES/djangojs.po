@@ -20,6 +20,7 @@
 # marichkafox <marichka.fox@gmail.com>, 2014
 # Maryna Holovnova <MGG-2008@yandex.ru>, 2014
 # Muhammad Adeel Khan <adeel@edx.org>, 2019
+# Mykola Melnyk, 2023
 # Natalia Vynogradenko <tannaha@gmail.com>, 2017-2018
 # Nikita Kurotschkin <nikita.kurotschkin@gmail.com>, 2020
 # Oleg Kozlovskyi <roomaroom@gmail.com>, 2020
@@ -52,6 +53,7 @@
 # IvanPrimachenko <jastudent1@gmail.com>, 2014
 # Marian Slabinoha <mslabinoha@gmail.com>, 2020
 # Muhammad Adeel Khan <adeel@edx.org>, 2019
+# Mykola Melnyk, 2023
 # Natalia Vynogradenko <tannaha@gmail.com>, 2017-2018
 # Zapadenska <oruda@ymail.com>, 2014
 # Zoriana Zaiats, 2015
@@ -80,6 +82,7 @@
 # Irene Korotkova <irca.gav@gmail.com>, 2017
 # IvanPrimachenko <jastudent1@gmail.com>, 2014
 # Mykhailo Kolianko, 2016
+# Mykola Melnyk, 2023
 # Natalia Vynogradenko <tannaha@gmail.com>, 2017-2018
 # olexiim <olexiim@gmail.com>, 2014-2015
 # Olga Filipova <chudaol@gmail.com>, 2014,2016-2017
@@ -95,6 +98,7 @@
 # Andrey Kryachko, 2018
 # Denis <prohibiti@gmail.com>, 2015
 # Irene Korotkova <irca.gav@gmail.com>, 2017
+# Mykola Melnyk, 2023
 # Natalia Vynogradenko <tannaha@gmail.com>, 2017-2018
 # Tanya Korshun, 2014
 # Ксенія Воронова <ksenya.voronova@gmail.com>, 2016
@@ -102,9 +106,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-08 20:42+0000\n"
+"POT-Creation-Date: 2023-11-19 20:43+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
-"Last-Translator: Andrey Kryachko, 2018\n"
+"Last-Translator: Mykola Melnyk, 2023\n"
 "Language-Team: Ukrainian (http://app.transifex.com/open-edx/edx-platform/language/uk/)\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
@@ -4013,10 +4017,6 @@ msgstr ""
 "Розкажіть іншим користувачам трохи про себе: де ви живете, чим цікавитесь, "
 "чому проходите курси, або що сподіваєтеся вивчити."
 
-#: openedx/features/learner_profile/static/learner_profile/js/views/badge_list_container.js
-msgid "Accomplishments Pagination"
-msgstr "Нумерація досягнень"
-
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
 msgid "Account Settings page."
 msgstr "Сторінка налаштувань облікового запису."
@@ -4050,10 +4050,6 @@ msgstr "Зображення для профілю {username}"
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "About Me"
 msgstr "Про мене"
-
-#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
-msgid "Accomplishments"
-msgstr "Досягнення"
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "Profile"
@@ -9675,32 +9671,6 @@ msgstr[3] ""
 msgid "Sorry, no results were found."
 msgstr "На жаль, жодного результату не знайдено."
 
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-#, python-format
-msgid "Share your \"%(display_name)s\" award"
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-msgid "Share"
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-#, python-format
-msgid "Earned %(created)s."
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "What's Your Next Accomplishment?"
-msgstr "Яке ваше наступне досягнення?"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "Start working toward your next learning goal."
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "Find a course"
-msgstr ""
-
 #: openedx/features/learner_profile/static/learner_profile/templates/section_two.underscore
 msgid "You are currently sharing a limited profile."
 msgstr "Наразі всі бачать ваш обмежений профіль."
@@ -9708,30 +9678,6 @@ msgstr "Наразі всі бачать ваш обмежений профіл�
 #: openedx/features/learner_profile/static/learner_profile/templates/section_two.underscore
 msgid "This learner is currently sharing a limited profile."
 msgstr "Ви бачите обмежений профіль цього учня."
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid "Share on Mozilla Backpack"
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"To share your certificate on Mozilla Backpack, you must first have a "
-"Backpack account. Complete the following steps to add your certificate to "
-"Backpack."
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"Create a {link_start}Mozilla Backpack{link_end} account, or log in to your "
-"existing account"
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"{download_link_start}Download this image (right-click or option-click, save "
-"as){link_end} and then {upload_link_start}upload{link_end} it to your "
-"backpack."
-msgstr ""
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"
@@ -10219,6 +10165,10 @@ msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Proctoring Settings"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+msgid "Manage Tags"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore
