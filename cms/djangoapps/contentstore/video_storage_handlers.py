@@ -223,13 +223,11 @@ def handle_videos(request, course_key_string, edx_video_id=None):
         return JsonResponse(data, status=status)
 
 
-def get_video_usage_path(request, course_key, edx_video_id):
+def get_video_usage_path(course_key, edx_video_id):
     """
     API for fetching the locations a specific video is used in a course.
     Returns a list of paths to a video.
     """
-    if not has_course_author_access(request.user, course_key):
-        raise PermissionDenied()
     store = modulestore()
     usage_locations = []
     videos = store.get_items(
@@ -616,15 +614,16 @@ def _get_index_videos(course, pagination_conf=None):
         'transcript_urls', 'error_description'
     ]
 
-    def _get_values(video):
+    def _get_values(video, course):
         """
         Get data for predefined video attributes.
         """
         values = {}
+        values["usage_locations"] = get_video_usage_path(course.id, video["edx_video_id"])['usage_locations']
         for attr in attrs:
             if attr == 'courses':
-                course = [c for c in video['courses'] if course_id in c]
-                (__, values['course_video_image_url']), = list(course[0].items())
+                current_course = [c for c in video['courses'] if course_id in c]
+                (__, values['course_video_image_url']), = list(current_course[0].items())
             elif attr == 'encoded_videos':
                 values['download_link'] = ''
                 values['file_size'] = 0
@@ -637,7 +636,7 @@ def _get_index_videos(course, pagination_conf=None):
         return values
 
     videos, pagination_context = _get_videos(course, pagination_conf)
-    return [_get_values(video) for video in videos], pagination_context
+    return [_get_values(video, course) for video in videos], pagination_context
 
 
 def get_all_transcript_languages():
