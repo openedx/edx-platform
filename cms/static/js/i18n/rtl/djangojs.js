@@ -1029,6 +1029,7 @@
     "Making Visible to Students": "M\u0250\u029e\u1d09n\u0183 V\u1d09s\u1d09bl\u01dd \u0287\u00f8 S\u0287nd\u01ddn\u0287s",
     "Manage": "M\u0250n\u0250\u0183\u01dd",
     "Manage Learners": "M\u0250n\u0250\u0183\u01dd \u0141\u01dd\u0250\u0279n\u01dd\u0279s",
+    "Manage Tags": "M\u0250n\u0250\u0183\u01dd \u0166\u0250\u0183s",
     "Manage my subscription": "M\u0250n\u0250\u0183\u01dd \u026f\u028e snbs\u0254\u0279\u1d09d\u0287\u1d09\u00f8n",
     "Manual": "M\u0250nn\u0250l",
     "Mark Exam As Completed": "M\u0250\u0279\u029e \u0246x\u0250\u026f \u023as \u023b\u00f8\u026fdl\u01dd\u0287\u01ddd",

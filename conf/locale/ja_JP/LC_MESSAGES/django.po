@@ -114,7 +114,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-08 20:43+0000\n"
+"POT-Creation-Date: 2023-11-05 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Japanese (Japan) (https://app.transifex.com/open-edx/teams/6205/ja_JP/)\n"
@@ -1890,63 +1890,6 @@ msgstr "バッジ画像ファイルのサイズは 250KB を超えてはいけ�
 msgid "This value must be all lowercase."
 msgstr "値は小文字でなければなりません。"
 
-#: lms/djangoapps/badges/models.py
-msgid "The course mode for this badge image. For example, \"verified\" or \"honor\"."
-msgstr "このバッジ画像の講座モード。例. \"認証付き\" または \"honor\""
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Badge images must be square PNG files. The file size should be under 250KB."
-msgstr "バッジ画像は正方形の PNG ファイルとしてください。ファイルサイズは 250KB を超えてはいけません。"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Set this value to True if you want this image to be the default image for "
-"any course modes that do not have a specified badge image. You can have only"
-" one default image."
-msgstr ""
-"バッジ画像が指定されていない講座にデフォルトとしてこの画像を使うようにしたい場合には、この値を True "
-"に設定します。デフォルトとして指定できる画像は１つだけです。"
-
-#: lms/djangoapps/badges/models.py
-msgid "There can be only one default image."
-msgstr "デフォルト画像は１つだけです。"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"On each line, put the number of completed courses to award a badge for, a "
-"comma, and the slug of a badge class you have created that has the issuing "
-"component 'openedx__course'. For example: 3,enrolled_3_courses"
-msgstr ""
-"各行に、バッジを授与した修了講座数、コンマ、発行コンポーネント "
-"'openedx__course'のあなたが作成したバッジクラスのスラグを入れてください。例: 3,enrolled_3_courses"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"On each line, put the number of enrolled courses to award a badge for, a "
-"comma, and the slug of a badge class you have created that has the issuing "
-"component 'openedx__course'. For example: 3,enrolled_3_courses"
-msgstr ""
-"各行に、バッジを授与した登録講座数、コンマ、発行コンポーネント "
-"'openedx__course'のあなたが作成したバッジクラスのスラグを入力してください。例: 3,enrolled_3_courses"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Each line is a comma-separated list. The first item in each line is the slug"
-" of a badge class you have created that has an issuing component of "
-"'openedx__course'. The remaining items in each line are the course keys the "
-"learner needs to complete to be awarded the badge. For example: "
-"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
-msgstr ""
-"各行はコンマで区切られたリストになっています。各行の最初の項目が、発行コンポーネント "
-"'openedx__course'のあなたが作成したバッジクラスのスラグです。残りの項目はバッジが授与されるために受講者が修了する必要のある講座キーです。例:"
-" "
-"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
-
-#: lms/djangoapps/badges/models.py
-msgid "Please check the syntax of your entry."
-msgstr "入力のシンタックスを確認してください。"
-
 #. Translators: This string is used across Open edX installations
 #. as a callback to edX. Please do not translate `edX.org`
 #: lms/djangoapps/branding/api.py
@@ -3180,6 +3123,7 @@ msgstr ""
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
 #: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/lti_provider/user-auth-error.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Sign in"
 msgstr "サインイン"
@@ -4565,6 +4509,14 @@ msgid ""
 "The list of group configurations for partitioning students in content "
 "experiments."
 msgstr "実験コンテンツ中で受講者を区分するためのグループ設定のリスト。"
+
+#: lms/djangoapps/lti_provider/models.py
+msgid ""
+"When checked, the LTI content will load only for learners who have an "
+"account in this instance. This is required only for linking learner accounts"
+" with the LTI consumer. See the Open edX LTI Provider documentation for more"
+" details."
+msgstr ""
 
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
@@ -9807,16 +9759,6 @@ msgid ""
 msgstr "動画サムネイル画像ファイルの名前を入力してください。設定＆詳細ページから動画サムネイル画像を設定できます。"
 
 #: xmodule/course_block.py
-msgid "Issue Open Badges"
-msgstr "オープンバッジを発行"
-
-#: xmodule/course_block.py
-msgid ""
-"Issue Open Badges badges for this course. Badges are generated when "
-"certificates are created."
-msgstr "オープンバッジを発行。修了証発行の際にバッジが発行されます。"
-
-#: xmodule/course_block.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
 "marks, enter the short name of the type of certificate that students receive"
@@ -12947,9 +12889,9 @@ msgid "Welcome to {platform_name}"
 msgstr "{platform_name}へようこそ"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See https://open.edx.org for more information.
+#. untranslated. See https://openedx.org for more information.
 #: lms/templates/index_overlay.html
-msgid "It works! Powered by Open edX{registered_trademark}"
+msgid "It works! Powered by the Open edX{registered_trademark} Platform"
 msgstr ""
 
 #: lms/templates/invalid_email_key.html
@@ -13607,6 +13549,10 @@ msgstr "ハンドアウト"
 #: lms/templates/video.html
 msgid "Download Handout"
 msgstr "ハンドアウトをダウンロード"
+
+#: lms/templates/video.html
+msgid "How is the transcript quality ?"
+msgstr ""
 
 #: lms/templates/word_cloud.html
 msgid "{num} of {total}"
@@ -17940,6 +17886,25 @@ msgstr ""
 msgid "My Courses"
 msgstr "受講登録した講座"
 
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "There was an error when loading this module!"
+msgstr ""
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"This module is available only for users who are signed into {platform}. "
+"Kindly sign in and refresh this page to load the content."
+msgstr ""
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "NOTE:"
+msgstr ""
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"The email used to sign into this platform and {platform} should be the same."
+msgstr ""
+
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
 msgstr "希望言語を変更"
@@ -18974,8 +18939,8 @@ msgid "Studio Accessibility Policy"
 msgstr ""
 
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
-msgid "Files & Uploads"
-msgstr "ファイル＆アップロード"
+msgid "Files"
+msgstr ""
 
 #: cms/templates/certificates.html
 msgid "Course Certificates"
@@ -20699,6 +20664,10 @@ msgstr "アーカイブ済の講座"
 #: cms/templates/index.html
 msgid "Libraries"
 msgstr "ライブラリ"
+
+#: cms/templates/index.html
+msgid "Taxonomies"
+msgstr ""
 
 #: cms/templates/index.html
 msgid "Are you staff on an existing {studio_name} course?"

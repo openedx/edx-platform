@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-22 20:35+0000\n"
-"PO-Revision-Date: 2023-10-22 20:35:52.246505\n"
+"POT-Creation-Date: 2023-11-20 15:29+0000\n"
+"PO-Revision-Date: 2023-11-20 15:29:35.699299\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -3390,6 +3390,7 @@ msgstr "{sign_in_link} øɹ {register_link}."
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
 #: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/lti_provider/user-auth-error.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Sign in"
 msgstr "Sᴉƃn ᴉn"
@@ -4887,6 +4888,18 @@ msgid ""
 msgstr ""
 "Ŧɥǝ lᴉsʇ øɟ ƃɹønd ɔønɟᴉƃnɹɐʇᴉøns ɟøɹ dɐɹʇᴉʇᴉønᴉnƃ sʇndǝnʇs ᴉn ɔønʇǝnʇ "
 "ǝxdǝɹᴉɯǝnʇs."
+
+#: lms/djangoapps/lti_provider/models.py
+msgid ""
+"When checked, the LTI content will load only for learners who have an "
+"account in this instance. This is required only for linking learner accounts"
+" with the LTI consumer. See the Open edX LTI Provider documentation for more"
+" details."
+msgstr ""
+"Wɥǝn ɔɥǝɔʞǝd, ʇɥǝ ŁŦƗ ɔønʇǝnʇ ʍᴉll løɐd ønlʎ ɟøɹ lǝɐɹnǝɹs ʍɥø ɥɐʌǝ ɐn "
+"ɐɔɔønnʇ ᴉn ʇɥᴉs ᴉnsʇɐnɔǝ. Ŧɥᴉs ᴉs ɹǝbnᴉɹǝd ønlʎ ɟøɹ lᴉnʞᴉnƃ lǝɐɹnǝɹ ɐɔɔønnʇs"
+" ʍᴉʇɥ ʇɥǝ ŁŦƗ ɔønsnɯǝɹ. Sǝǝ ʇɥǝ Ødǝn ǝdX ŁŦƗ Ᵽɹøʌᴉdǝɹ døɔnɯǝnʇɐʇᴉøn ɟøɹ ɯøɹǝ"
+" dǝʇɐᴉls."
 
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
@@ -14176,10 +14189,10 @@ msgid "Welcome to {platform_name}"
 msgstr "Wǝlɔøɯǝ ʇø {platform_name}"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See https://open.edx.org for more information.
+#. untranslated. See https://openedx.org for more information.
 #: lms/templates/index_overlay.html
-msgid "It works! Powered by Open edX{registered_trademark}"
-msgstr "Ɨʇ ʍøɹʞs! Ᵽøʍǝɹǝd bʎ Ødǝn ǝdX{registered_trademark}"
+msgid "It works! Powered by the Open edX{registered_trademark} Platform"
+msgstr "Ɨʇ ʍøɹʞs! Ᵽøʍǝɹǝd bʎ ʇɥǝ Ødǝn ǝdX{registered_trademark} Ᵽlɐʇɟøɹɯ"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -14858,6 +14871,10 @@ msgstr "Ħɐndønʇs"
 #: lms/templates/video.html
 msgid "Download Handout"
 msgstr "Đøʍnløɐd Ħɐndønʇ"
+
+#: lms/templates/video.html
+msgid "How is the transcript quality ?"
+msgstr "Ħøʍ ᴉs ʇɥǝ ʇɹɐnsɔɹᴉdʇ bnɐlᴉʇʎ ?"
 
 #: lms/templates/word_cloud.html
 msgid "{num} of {total}"
@@ -19855,6 +19872,28 @@ msgstr ""
 #: lms/templates/learner_dashboard/_dashboard_navigation_courses.html
 msgid "My Courses"
 msgstr "Mʎ Ȼønɹsǝs"
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "There was an error when loading this module!"
+msgstr "Ŧɥǝɹǝ ʍɐs ɐn ǝɹɹøɹ ʍɥǝn løɐdᴉnƃ ʇɥᴉs ɯødnlǝ!"
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"This module is available only for users who are signed into {platform}. "
+"Kindly sign in and refresh this page to load the content."
+msgstr ""
+"Ŧɥᴉs ɯødnlǝ ᴉs ɐʌɐᴉlɐblǝ ønlʎ ɟøɹ nsǝɹs ʍɥø ɐɹǝ sᴉƃnǝd ᴉnʇø {platform}. "
+"Ꝁᴉndlʎ sᴉƃn ᴉn ɐnd ɹǝɟɹǝsɥ ʇɥᴉs dɐƃǝ ʇø løɐd ʇɥǝ ɔønʇǝnʇ."
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "NOTE:"
+msgstr "NØŦɆ:"
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"The email used to sign into this platform and {platform} should be the same."
+msgstr ""
+"Ŧɥǝ ǝɯɐᴉl nsǝd ʇø sᴉƃn ᴉnʇø ʇɥᴉs dlɐʇɟøɹɯ ɐnd {platform} sɥønld bǝ ʇɥǝ sɐɯǝ."
 
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
