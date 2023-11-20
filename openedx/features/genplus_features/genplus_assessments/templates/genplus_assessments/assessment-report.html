@@ -28,12 +28,12 @@
           <ol>
             <li>
               <p><strong>Skills Progress Graph: </strong> This graph compares your starting answers in each unit with your answers at the end. It helps you see how you've progressed. The questions asked about your confidence in certain skills, like how comfortable you are using different tools to communicate. If there's a skill you still don't feel very sure about, it could be something to focus on and get better at.</p>
-              <ul id="likertTitles"></ul>
+              <table id="likertTitles"></table>
               <div><canvas id="likertChart" style="height: 300px;"></canvas></div>
             </li>
             <li>
               <p><strong>Skills Improvement Graph: </strong> The second graph shows how you did throughout the whole course. It's about how much you think you've improved in a skill after learning more about it. Learning to honestly see your progress is important because it lets you find areas where you can improve and also celebrate the areas where you've made great progress.</p>
-              <ul id="nuanceTitles"></ul>
+              <table id="nuanceTitles"></table>
               <div><canvas id="nuanceChart" style="height: 300px;"></canvas></div>
             </li>
           </ol>
@@ -121,9 +121,11 @@
             % endfor
           % endfor
         </section>
+          <div>
+          <h2 class="heading-default">Reflections</h2>
         % for unit in student_data.get('units'):
           % if unit.get('reflections'):
-            <div class="section-wrapper">
+            <div class="section-wrapper avoid-page-break">
               <section class="section">
                 <div class="heading">
                   <div class="image-frame">
@@ -162,21 +164,23 @@
               </div>
               <div class="content">
                 % for key, value in student_data.get('teacher_feedbacks').items():
-                <h3>Comments from ${ value.get('teacher_name') }:</h3>
-                  % for comment in value.get('comments'):
-                    <blockquote>
-                      <p><strong>${ comment.get('title') }</strong></p>
-                      <q>${ comment.get('description') }</q>
-                      <cite>${ comment.get('datetime').strftime('%d/%m/%Y') }</cite>
-                    </blockquote>
-                  % endfor
-                % endfor
+                  <div class="avoid-page-break">
+                      <h3>Comments from ${ value.get('teacher_name') }:</h3>
+                      % for comment in value.get('comments'):
+                      <blockquote>
+                          <p><strong>${ comment.get('title') }</strong></p>
+                          <q>${ comment.get('description') }</q>
+                          <cite>${ comment.get('datetime').strftime('%d/%m/%Y') }</cite>
+                      </blockquote>
+                      % endfor
+                      % endfor
+                  </div>
               </div>
             </section>
           </div>
         </section>
         % endif
-      </div>
+        </div>
     </div>
   </div>
   <script type="text/javascript">
@@ -233,7 +237,12 @@
         if (likert.data.labels.indexOf(intro.skill) === -1) {
           likert.data.labels.push(intro.skill);
         }
-        likert.data.datasets[index].data.push((intro.point === 1 || intro.point === 2) ? intro.point - 3 : intro.point - 2);
+          if (intro.point != 0) {
+              const val = intro.point === 1 || intro.point === 2 ? intro.point - 3 : intro.point - 2;
+              likert.data.datasets[index].data.push(val);
+          } else {
+              likert.data.datasets[index].data.push(0);
+          }
       });
     };
 
@@ -250,13 +259,20 @@
       });
     };
 
-    function generateTtitles(id, titles ) {
-      var html = ''
-      titles.forEach(function (title){
-        html += '<li><strong>'+ title.skill +': </strong> '+ title.title +'</li>'
-      });
-      var container = document.getElementById(id);
-      container.innerHTML = html;
+    function generateTtitles(id, titles) {
+        var container = document.getElementById(id);
+        titles.forEach(function (title) {
+            const tr = document.createElement('tr');
+            const label = document.createElement('td');
+            const value = document.createElement('td');
+            const txtLabel = document.createElement('strong');
+            txtLabel.innerHTML = title.skill + ':';
+            label.appendChild(txtLabel);
+            value.innerHTML = title.title
+            tr.appendChild(label);
+            tr.appendChild(value);
+            container.appendChild(tr);
+        });
     }
 
     function prepareIntros(lables)  {

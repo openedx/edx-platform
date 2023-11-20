@@ -73,8 +73,6 @@ class AssessmentReportPDFView(TemplateView):
         if not gen_user:
             raise PermissionDenied()
 
-        skill_reflection_data = SkillReflectionIndividualApiView.as_view()(request, user_id=self.request.user.id)
-
         if gen_user.is_student:
             user_id = self.request.user.id
             student = gen_user.student
@@ -88,6 +86,7 @@ class AssessmentReportPDFView(TemplateView):
             student = user.student
         else:
             raise PermissionDenied()
+        skill_reflection_data = SkillReflectionIndividualApiView.as_view()(request, user_id=user_id)
 
         context = self.get_context_data(user_id, student, **kwargs)
         context.update(skill_reflection_data=json.dumps(skill_reflection_data.data))
@@ -183,7 +182,7 @@ class AssessmentReportPDFView(TemplateView):
             return self.pdfkit_options
 
         return {
-            'page-size': 'A4',
+            'page-size': 'TABLOID',
             'encoding': 'UTF-8',
             "enable-local-file-access": "",
             "enable-javascript": "",
