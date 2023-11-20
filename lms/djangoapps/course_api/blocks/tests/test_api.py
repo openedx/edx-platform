@@ -209,7 +209,6 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
     @ddt.data(
         (ModuleStoreEnum.Type.split)
     )
-    @ddt.unpack
     def test_query_counts_cached(self, store_type):
         course = self._create_course(store_type)
         self._get_blocks(
