@@ -99,8 +99,8 @@ def get_asset_usage_path_json(request, course_key, asset_key_string):
     if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
     asset_location = AssetKey.from_string(asset_key_string) if asset_key_string else None
-    usage_locations = _get_asset_usage_path(course_key, [{ 'asset_key': asset_location }])
-    return JsonResponse({ 'usage_locations': usage_locations })
+    usage_locations = _get_asset_usage_path(course_key, [{'asset_key': asset_location}])
+    return JsonResponse({'usage_locations': usage_locations})
 
 
 def _get_asset_usage_path(course_key, assets):
@@ -108,7 +108,7 @@ def _get_asset_usage_path(course_key, assets):
     Get a list of units with ancestors that use given asset.
     """
     store = modulestore()
-    usage_locations = {str(asset['asset_key']):[] for asset in assets}
+    usage_locations = {str(asset['asset_key']): [] for asset in assets}
     verticals = store.get_items(
         course_key,
         qualifiers={
@@ -148,7 +148,7 @@ def _get_asset_usage_path(course_key, assets):
                     current_locations = usage_locations[asset_key_string]
                     new_location = f'{subsection_display_name} - {unit_display_name} / {xblock_display_name}'
                     usage_locations[asset_key_string] = [*current_locations, new_location]
-    return  usage_locations
+    return usage_locations
 
 
 def _asset_index(request, course_key):

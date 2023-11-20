@@ -15,7 +15,6 @@ from boto.s3.connection import S3Connection
 from boto import s3
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.exceptions import PermissionDenied
 from django.http import FileResponse, HttpResponseNotFound
 from django.shortcuts import redirect
 from django.utils.translation import gettext as _
@@ -42,7 +41,6 @@ from rest_framework import status as rest_status
 from rest_framework.response import Response
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.util.json_request import JsonResponse
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
