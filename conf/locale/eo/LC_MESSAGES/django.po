@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-15 20:36+0000\n"
-"PO-Revision-Date: 2023-10-15 20:36:20.949198\n"
+"POT-Creation-Date: 2023-11-20 15:29+0000\n"
+"PO-Revision-Date: 2023-11-20 15:29:35.699299\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -2320,90 +2320,6 @@ msgid "This value must be all lowercase."
 msgstr ""
 "Thïs välüé müst ßé äll löwérçäsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
-#: lms/djangoapps/badges/models.py
-msgid "The course mode for this badge image. For example, \"verified\" or \"honor\"."
-msgstr ""
-"Thé çöürsé mödé för thïs ßädgé ïmägé. För éxämplé, \"vérïfïéd\" ör "
-"\"hönör\". Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Badge images must be square PNG files. The file size should be under 250KB."
-msgstr ""
-"Bädgé ïmägés müst ßé sqüäré PNG fïlés. Thé fïlé sïzé shöüld ßé ündér 250KB. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Set this value to True if you want this image to be the default image for "
-"any course modes that do not have a specified badge image. You can have only"
-" one default image."
-msgstr ""
-"Sét thïs välüé tö Trüé ïf ýöü wänt thïs ïmägé tö ßé thé défäült ïmägé för "
-"äný çöürsé mödés thät dö nöt hävé ä spéçïfïéd ßädgé ïmägé. Ýöü çän hävé önlý"
-" öné défäült ïmägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
-"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
-"єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
-"αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
-"νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт "
-"σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒ#"
-
-#: lms/djangoapps/badges/models.py
-msgid "There can be only one default image."
-msgstr ""
-"Théré çän ßé önlý öné défäült ïmägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"On each line, put the number of completed courses to award a badge for, a "
-"comma, and the slug of a badge class you have created that has the issuing "
-"component 'openedx__course'. For example: 3,enrolled_3_courses"
-msgstr ""
-"Ön éäçh lïné, püt thé nümßér öf çömplétéd çöürsés tö äwärd ä ßädgé för, ä "
-"çömmä, änd thé slüg öf ä ßädgé çläss ýöü hävé çréätéd thät häs thé ïssüïng "
-"çömpönént 'öpénédx__çöürsé'. För éxämplé: 3,énrölléd_3_çöürsés Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρт#"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"On each line, put the number of enrolled courses to award a badge for, a "
-"comma, and the slug of a badge class you have created that has the issuing "
-"component 'openedx__course'. For example: 3,enrolled_3_courses"
-msgstr ""
-"Ön éäçh lïné, püt thé nümßér öf énrölléd çöürsés tö äwärd ä ßädgé för, ä "
-"çömmä, änd thé slüg öf ä ßädgé çläss ýöü hävé çréätéd thät häs thé ïssüïng "
-"çömpönént 'öpénédx__çöürsé'. För éxämplé: 3,énrölléd_3_çöürsés Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтє#"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Each line is a comma-separated list. The first item in each line is the slug"
-" of a badge class you have created that has an issuing component of "
-"'openedx__course'. The remaining items in each line are the course keys the "
-"learner needs to complete to be awarded the badge. For example: "
-"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
-msgstr ""
-"Éäçh lïné ïs ä çömmä-sépärätéd lïst. Thé fïrst ïtém ïn éäçh lïné ïs thé slüg"
-" öf ä ßädgé çläss ýöü hävé çréätéd thät häs än ïssüïng çömpönént öf "
-"'öpénédx__çöürsé'. Thé rémäïnïng ïtéms ïn éäçh lïné äré thé çöürsé kéýs thé "
-"léärnér nééds tö çömplété tö ßé äwärdéd thé ßädgé. För éxämplé: "
-"slüg_för_çömpsçï_çöürsés_gröüp_ßädgé,çöürsé-v1:ÇömpSçï+Çöürsé+Fïrst,çöürsé-v1:ÇömpsSçï+Çöürsé+Séçönd#"
-
-#: lms/djangoapps/badges/models.py
-msgid "Please check the syntax of your entry."
-msgstr ""
-"Pléäsé çhéçk thé sýntäx öf ýöür éntrý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
 #. Translators: This string is used across Open edX installations
 #. as a callback to edX. Please do not translate `edX.org`
 #: lms/djangoapps/branding/api.py
@@ -3956,6 +3872,7 @@ msgstr "{sign_in_link} ör {register_link}. Ⱡ'σяєм ιρѕυм ∂σłσя 
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
 #: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/lti_provider/user-auth-error.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Sign in"
 msgstr "Sïgn ïn Ⱡ'σяєм ιρѕυм #"
@@ -5713,6 +5630,22 @@ msgid ""
 msgstr ""
 "Thé lïst öf gröüp çönfïgürätïöns för pärtïtïönïng stüdénts ïn çöntént "
 "éxpérïménts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/djangoapps/lti_provider/models.py
+msgid ""
+"When checked, the LTI content will load only for learners who have an "
+"account in this instance. This is required only for linking learner accounts"
+" with the LTI consumer. See the Open edX LTI Provider documentation for more"
+" details."
+msgstr ""
+"Whén çhéçkéd, thé LTÌ çöntént wïll löäd önlý för léärnérs whö hävé än "
+"äççöünt ïn thïs ïnstänçé. Thïs ïs réqüïréd önlý för lïnkïng léärnér äççöünts"
+" wïth thé LTÌ çönsümér. Séé thé Öpén édX LTÌ Prövïdér döçüméntätïön för möré"
+" détäïls. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ "
+"єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм"
+" νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα "
+"¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт"
+" єѕѕє ¢ιłłυм ∂σłσя#"
 
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
@@ -12465,18 +12398,6 @@ msgstr ""
 "thümßnäïl ïmägé ön thé Séttïngs & Détäïls pägé. Ⱡ'σяєм ιρѕυм #"
 
 #: xmodule/course_block.py
-msgid "Issue Open Badges"
-msgstr "Ìssüé Öpén Bädgés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: xmodule/course_block.py
-msgid ""
-"Issue Open Badges badges for this course. Badges are generated when "
-"certificates are created."
-msgstr ""
-"Ìssüé Öpén Bädgés ßädgés för thïs çöürsé. Bädgés äré générätéd whén "
-"çértïfïçätés äré çréätéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: xmodule/course_block.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
 "marks, enter the short name of the type of certificate that students receive"
@@ -16509,12 +16430,12 @@ msgid "Welcome to {platform_name}"
 msgstr "Wélçömé tö {platform_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See https://open.edx.org for more information.
+#. untranslated. See https://openedx.org for more information.
 #: lms/templates/index_overlay.html
-msgid "It works! Powered by Open edX{registered_trademark}"
+msgid "It works! Powered by the Open edX{registered_trademark} Platform"
 msgstr ""
-"Ìt wörks! Pöwéréd ßý Öpén édX{registered_trademark} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тє#"
+"Ìt wörks! Pöwéréd ßý thé Öpén édX{registered_trademark} Plätförm Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -17257,6 +17178,10 @@ msgstr "Händöüts Ⱡ'σяєм ιρѕυм ∂#"
 #: lms/templates/video.html
 msgid "Download Handout"
 msgstr "Döwnlöäd Händöüt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/templates/video.html
+msgid "How is the transcript quality ?"
+msgstr "Höw ïs thé tränsçrïpt qüälïtý ? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/word_cloud.html
 msgid "{num} of {total}"
@@ -22909,6 +22834,31 @@ msgstr ""
 msgid "My Courses"
 msgstr "Mý Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "There was an error when loading this module!"
+msgstr ""
+"Théré wäs än érrör whén löädïng thïs mödülé! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"This module is available only for users who are signed into {platform}. "
+"Kindly sign in and refresh this page to load the content."
+msgstr ""
+"Thïs mödülé ïs äväïläßlé önlý för üsérs whö äré sïgnéd ïntö {platform}. "
+"Kïndlý sïgn ïn änd réfrésh thïs pägé tö löäd thé çöntént. Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "NOTE:"
+msgstr "NÖTÉ: Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"The email used to sign into this platform and {platform} should be the same."
+msgstr ""
+"Thé émäïl üséd tö sïgn ïntö thïs plätförm änd {platform} shöüld ßé thé sämé."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
 msgstr "Çhängé Préférréd Längüägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
@@ -24202,8 +24152,8 @@ msgid "Studio Accessibility Policy"
 msgstr "Stüdïö Àççéssïßïlïtý Pölïçý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
-msgid "Files & Uploads"
-msgstr "Fïlés & Ûplöäds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+msgid "Files"
+msgstr "Fïlés Ⱡ'σяєм ιρѕ#"
 
 #: cms/templates/certificates.html
 msgid "Course Certificates"
@@ -26515,6 +26465,10 @@ msgstr "Àrçhïvéd Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм
 #: cms/templates/index.html
 msgid "Libraries"
 msgstr "Lïßrärïés Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: cms/templates/index.html
+msgid "Taxonomies"
+msgstr "Täxönömïés Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: cms/templates/index.html
 msgid "Are you staff on an existing {studio_name} course?"

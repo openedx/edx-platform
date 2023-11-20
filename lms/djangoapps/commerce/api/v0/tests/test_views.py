@@ -307,4 +307,4 @@ class BasketOrderViewTests(UserMixin, TestCase):
         """ The view should return 403 if the user is not logged in. """
         self.client.logout()
         response = self.client.get(self.path)
-        assert response.status_code == 403
+        assert response.status_code == 401

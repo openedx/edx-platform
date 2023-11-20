@@ -53,8 +53,8 @@
 # 65971a0953e55f53f5475a3fa483ec89_9b4f7df <c1633493954e537617ecd67b590e3d56_202429>, 2014
 # 65971a0953e55f53f5475a3fa483ec89_9b4f7df <c1633493954e537617ecd67b590e3d56_202429>, 2014
 # Maíta Medeiros e Silva <moliveira.maita@gmail.com>, 2015
-# Marcelo Soares Souza <marcelo@libertais.org>, 2014
-# Marcelo Soares Souza <marcelo@libertais.org>, 2014
+# Marcelo Soares Souza <marcelo@agroecologymap.org>, 2014
+# Marcelo Soares Souza <marcelo@agroecologymap.org>, 2014
 # Marco Túlio Pires <mtrpires@outlook.com>, 2014
 # marcus vinicius oliveira martins <mbodock@gmail.com>, 2015
 # Mariana Baroni <maribaroni@gmail.com>, 2014
@@ -246,7 +246,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-08 20:42+0000\n"
+"POT-Creation-Date: 2023-11-19 20:43+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Rodrigo Rocha <prof.rodrigorocha@yahoo.com>, 2020\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -330,7 +330,6 @@ msgstr "Carregando"
 #: cms/templates/js/course-video-settings.underscore
 #: common/static/common/templates/discussion/templates.underscore
 #: common/static/common/templates/image-modal.underscore
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Close"
 msgstr "Fechar"
 
@@ -3955,10 +3954,6 @@ msgid ""
 "interests are, why you're taking courses, or what you hope to learn."
 msgstr ""
 
-#: openedx/features/learner_profile/static/learner_profile/js/views/badge_list_container.js
-msgid "Accomplishments Pagination"
-msgstr ""
-
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
 msgid "Account Settings page."
 msgstr ""
@@ -3985,10 +3980,6 @@ msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "About Me"
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
-msgid "Accomplishments"
 msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
@@ -9576,62 +9567,12 @@ msgstr[2] ""
 msgid "Sorry, no results were found."
 msgstr "Desculpe, não foram encontrados resultados."
 
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-#, python-format
-msgid "Share your \"%(display_name)s\" award"
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-msgid "Share"
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-#, python-format
-msgid "Earned %(created)s."
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "What's Your Next Accomplishment?"
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "Start working toward your next learning goal."
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "Find a course"
-msgstr ""
-
 #: openedx/features/learner_profile/static/learner_profile/templates/section_two.underscore
 msgid "You are currently sharing a limited profile."
 msgstr "Você está compartilhando um perfil limitado no momento."
 
 #: openedx/features/learner_profile/static/learner_profile/templates/section_two.underscore
 msgid "This learner is currently sharing a limited profile."
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid "Share on Mozilla Backpack"
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"To share your certificate on Mozilla Backpack, you must first have a "
-"Backpack account. Complete the following steps to add your certificate to "
-"Backpack."
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"Create a {link_start}Mozilla Backpack{link_end} account, or log in to your "
-"existing account"
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"{download_link_start}Download this image (right-click or option-click, save "
-"as){link_end} and then {upload_link_start}upload{link_end} it to your "
-"backpack."
 msgstr ""
 
 #: cms/templates/js/access-editor.underscore
@@ -10121,6 +10062,10 @@ msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Proctoring Settings"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+msgid "Manage Tags"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore

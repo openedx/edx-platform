@@ -696,19 +696,6 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/9744
     'ENABLE_SPECIAL_EXAMS': False,
 
-    # .. toggle_name: FEATURES['ENABLE_OPENBADGES']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Enables support for the creation of OpenBadges as a method of awarding credentials.
-    # .. toggle_warning: The following settings (all of which are in the same file) should be set or reviewed prior to
-    #    enabling this setting: BADGING_BACKEND, BADGR_API_TOKEN, BADGR_BASE_URL, BADGR_ISSUER_SLUG, BADGR_TIMEOUT.
-    #    Full guide for setting up OpenBadges available here:
-    #    https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/enable_badging.html  pylint: disable=line-too-long,useless-suppression
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2015-04-30
-    # .. toggle_tickets: https://openedx.atlassian.net/browse/SOL-1325
-    'ENABLE_OPENBADGES': False,
-
     # .. toggle_name: FEATURES['ENABLE_LTI_PROVIDER']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -1140,6 +1127,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'course_structure_cache': {
@@ -1152,6 +1140,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'celery': {
@@ -1164,6 +1153,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'mongo_metadata_inheritance': {
@@ -1176,6 +1166,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'staticfiles': {
@@ -1187,6 +1178,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'default': {
@@ -1199,6 +1191,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'configuration': {
@@ -1210,6 +1203,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'general': {
@@ -1221,6 +1215,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
 }
@@ -1251,6 +1246,7 @@ OAUTH2_PROVIDER = {
         'certificates:read': _('Retrieve your course certificates'),
         'grades:read': _('Retrieve your grades for your enrolled courses'),
         'tpa:read': _('Retrieve your third-party authentication username mapping'),
+        # user_id is added in code as a default scope for JWT cookies and all password grant_type JWTs
         'user_id': _('Know your user identifier'),
     }),
     'DEFAULT_SCOPES': OAUTH2_DEFAULT_SCOPES,
@@ -1418,6 +1414,9 @@ ELASTIC_SEARCH_CONFIG = [
         'port': 9200
     }
 ]
+
+SEARCH_COURSEWARE_CONTENT_LOG_PARAMS = False
+
 
 # .. setting_name: ELASTIC_SEARCH_INDEX_PREFIX
 # .. setting_default: ''
@@ -3225,6 +3224,9 @@ INSTALLED_APPS = [
     'rules.apps.AutodiscoverRulesConfig',
     'bridgekeeper',
 
+    # management of user-triggered async tasks (course import/export, etc.)
+    'user_tasks',
+
     # Customized celery tasks, including persisting failed tasks so they can
     # be retried
     'celery_utils',
@@ -3336,7 +3338,14 @@ CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
 REST_FRAMEWORK = {
     # These default classes add observability around endpoints using defaults, and should
     # not be used anywhere else.
+    # Notes on Order:
+    # 1. `JwtAuthentication` does not check `is_active`, so email validation does not affect it. However,
+    #    `SessionAuthentication` does. These work differently, and order changes in what way, which really stinks. See
+    #    https://github.com/openedx/public-engineering/issues/165 for details.
+    # 2. `JwtAuthentication` may also update the database based on contents. Since the LMS creates these JWTs, this
+    #    shouldn't have any affect at this time. But it could, when and if another service started creating the JWTs.
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'openedx.core.djangolib.default_auth_classes.DefaultJwtAuthentication',
         'openedx.core.djangolib.default_auth_classes.DefaultSessionAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'edx_rest_framework_extensions.paginators.DefaultPagination',
@@ -3665,68 +3674,6 @@ REGISTRATION_EMAIL_PATTERNS_ALLOWED = None
 ########################## CERTIFICATE NAME ########################
 CERT_NAME_SHORT = "Certificate"
 CERT_NAME_LONG = "Certificate of Achievement"
-
-#################### OpenBadges Settings #######################
-
-# .. setting_name: BADGING_BACKEND
-# .. setting_default: 'lms.djangoapps.badges.backends.badgr.BadgrBackend'
-# .. setting_description: The backend service class (or callable) for creating OpenBadges. It must implement
-#    the interface provided by lms.djangoapps.badges.backends.base.BadgeBackend
-# .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
-BADGING_BACKEND = 'lms.djangoapps.badges.backends.badgr.BadgrBackend'
-
-# .. setting_name: BADGR_BASE_URL
-# .. setting_default: 'http://localhost:8005'
-# .. setting_description: The base URL for the Badgr server.
-# .. setting_warning: DO NOT include a trailing slash. Review FEATURES['ENABLE_OPENBADGES'] for further context.
-BADGR_BASE_URL = "http://localhost:8005"
-
-# .. setting_name: BADGR_ISSUER_SLUG
-# .. setting_default: 'example-issuer'
-# .. setting_description: A string that is the slug for the Badgr issuer. The slug can be obtained from the URL of
-#    the Badgr Server page that displays the issuer. For example, in the URL
-#    http://exampleserver.com/issuer/test-issuer, the issuer slug is "test-issuer".
-# .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
-BADGR_ISSUER_SLUG = "example-issuer"
-
-# .. setting_name: BADGR_USERNAME
-# .. setting_default: None
-# .. setting_description: The username for Badgr. You should set up an issuer application with Badgr
-#    (https://badgr.org/app-developers/). The username and password will then be used to create or renew
-#    OAuth2 tokens.
-# .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
-BADGR_USERNAME = None
-
-# .. setting_name: BADGR_PASSWORD
-# .. setting_default: None
-# .. setting_description: The password for Badgr. You should set up an issuer application with Badgr
-#    (https://badgr.org/app-developers/). The username and password will then be used to create or renew
-#    OAuth2 tokens.
-# .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
-BADGR_PASSWORD = None
-
-# .. setting_name: BADGR_TOKENS_CACHE_KEY
-# .. setting_default: None
-# .. setting_description: The cache key for Badgr API tokens. Once created, the tokens will be stored in cache.
-#    Define the key here for setting and retrieveing the tokens.
-# .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
-BADGR_TOKENS_CACHE_KEY = None
-
-# .. setting_name: BADGR_TIMEOUT
-# .. setting_default: 10
-# .. setting_description: Number of seconds to wait on the badging server when contacting it before giving up.
-# .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
-BADGR_TIMEOUT = 10
-
-# .. toggle_name: BADGR_ENABLE_NOTIFICATIONS
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Optional setting for enabling email notifications. When set to "True",
-#    learners will be notified by email when they earn a badge.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2021-07-29
-# .. toggle_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
-BADGR_ENABLE_NOTIFICATIONS = False
 
 ###################### Grade Downloads ######################
 # These keys are used for all of our asynchronous downloadable files, including
@@ -4208,9 +4155,6 @@ ACCOUNT_VISIBILITY_CONFIGURATION["bulk_shareable_fields"] = (
         "level_of_education",
         'social_links',
         'time_zone',
-
-        # Not an actual field, but used to signal whether badges should be public.
-        'accomplishments_shared',
     ]
 )
 
@@ -4496,6 +4440,9 @@ REGISTRATION_EXTENSION_FORM = None
 MOBILE_APP_USER_AGENT_REGEXES = [
     r'edX/org.edx.mobile',
 ]
+
+# set course limit for mobile search
+MOBILE_SEARCH_COURSE_LIMIT = 100
 
 # cache timeout in seconds for Mobile App Version Upgrade
 APP_UPGRADE_CACHE_TIMEOUT = 3600
@@ -5375,6 +5322,10 @@ ENTERPRISE_PLOTLY_SECRET = "I am a secret"
 
 ############## PLOTLY ##############
 
+############ Internal Enterprise Settings ############
+ENTERPRISE_VSF_UUID = "e815503343644ac7845bc82325c34460"
+############ Internal Enterprise Settings ############
+
 ENTERPRISE_MANUAL_REPORTING_CUSTOMER_UUIDS = []
 
 AVAILABLE_DISCUSSION_TOURS = []
@@ -5394,6 +5345,9 @@ SUBSCRIPTIONS_SERVICE_WORKER_USERNAME = 'subscriptions_worker'
 NOTIFICATIONS_EXPIRY = 60
 EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
 NOTIFICATION_CREATION_BATCH_SIZE = 99
+
+############################ AI_TRANSLATIONS ##################################
+AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
 
 #### django-simple-history##
 # disable indexing on date field its coming from django-simple-history.
@@ -5473,3 +5427,4 @@ derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.cert
                          'learning-certificate-lifecycle', 'enabled')
 derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.certificate.revoked.v1',
                          'learning-certificate-lifecycle', 'enabled')
+BEAMER_PRODUCT_ID = ""

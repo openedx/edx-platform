@@ -7,11 +7,14 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
     'js/views/components/add_xblock', 'js/views/modals/edit_xblock', 'js/views/modals/move_xblock_modal',
     'js/models/xblock_info', 'js/views/xblock_string_field_editor', 'js/views/xblock_access_editor',
     'js/views/pages/container_subviews', 'js/views/unit_outline', 'js/views/utils/xblock_utils',
-    'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
+    'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt', 'js/utils/module',
 ],
-function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView, AddXBlockComponent,
-    EditXBlockModal, MoveXBlockModal, XBlockInfo, XBlockStringFieldEditor, XBlockAccessEditor,
-    ContainerSubviews, UnitOutlineView, XBlockUtils, NotificationView, PromptView) {
+function($, _, Backbone, gettext, BasePage,
+    ViewUtils, ContainerView, XBlockView,
+    AddXBlockComponent, EditXBlockModal, MoveXBlockModal,
+    XBlockInfo, XBlockStringFieldEditor, XBlockAccessEditor,
+    ContainerSubviews, UnitOutlineView, XBlockUtils,
+    NotificationView, PromptView,  ModuleUtils) {
     'use strict';
 
     var XBlockContainerPage = BasePage.extend({
@@ -26,7 +29,10 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             'click .delete-button': 'deleteXBlock',
             'click .show-actions-menu-button': 'showXBlockActionsMenu',
             'click .new-component-button': 'scrollToNewComponentButtons',
+            'click .save-button': 'saveSelectedLibraryComponents',
             'click .paste-component-button': 'pasteComponent',
+            'change .header-library-checkbox': 'toggleLibraryComponent',
+            'click .collapse-button': 'collapseXBlock',
         },
 
         options: {
@@ -102,6 +108,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     model: this.model
                 });
                 this.unitOutlineView.render();
+
             }
 
             this.listenTo(Backbone, 'move:onXBlockMoved', this.onXBlockMoved);
@@ -521,6 +528,78 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                 });
         },
 
+        duplicateXBlock: function(event) {
+            event.preventDefault();
+            this.duplicateComponent(this.findXBlockElement(event.target));
+        },
+
+        showMoveXBlockModal: function(event) {
+            var xblockElement = this.findXBlockElement(event.target),
+                parentXBlockElement = xblockElement.parents('.studio-xblock-wrapper'),
+                modal = new MoveXBlockModal({
+                sourceXBlockInfo: XBlockUtils.findXBlockInfo(xblockElement, this.model),
+                sourceParentXBlockInfo: XBlockUtils.findXBlockInfo(parentXBlockElement, this.model),
+                XBlockURLRoot: this.getURLRoot(),
+                outlineURL: this.options.outlineURL
+            });
+
+            event.preventDefault();
+            modal.show();
+        },
+
+        deleteXBlock: function(event) {
+            event.preventDefault();
+            this.deleteComponent(this.findXBlockElement(event.target));
+        },
+
+        createPlaceholderElement: function() {
+            return $('<div/>', {class: 'studio-xblock-wrapper'});
+        },
+
+        createComponent: function(template, target) {
+            // A placeholder element is created in the correct location for the new xblock
+            // and then onNewXBlock will replace it with a rendering of the xblock. Note that
+            // for xblocks that can't be replaced inline, the entire parent will be refreshed.
+            var parentElement = this.findXBlockElement(target),
+                parentLocator = parentElement.data('locator'),
+                buttonPanel = target.closest('.add-xblock-component'),
+                listPanel = buttonPanel.prev(),
+                scrollOffset = ViewUtils.getScrollOffset(buttonPanel),
+                $placeholderEl = $(this.createPlaceholderElement()),
+                requestData = _.extend(template, {
+                    parent_locator: parentLocator
+                }),
+                placeholderElement;
+            placeholderElement = $placeholderEl.appendTo(listPanel);
+            return $.postJSON(this.getURLRoot() + '/', requestData,
+                _.bind(this.onNewXBlock, this, placeholderElement, scrollOffset, false))
+                .fail(function() {
+                    // Remove the placeholder if the update failed
+                    placeholderElement.remove();
+            });
+        },
+
+        duplicateComponent: function(xblockElement) {
+            // A placeholder element is created in the correct location for the duplicate xblock
+            // and then onNewXBlock will replace it with a rendering of the xblock. Note that
+            // for xblocks that can't be replaced inline, the entire parent will be refreshed.
+            var self = this,
+                parentElement = self.findXBlockElement(xblockElement.parent()),
+                scrollOffset = ViewUtils.getScrollOffset(xblockElement),
+                $placeholderEl = $(self.createPlaceholderElement()),
+                placeholderElement;
+
+            placeholderElement = $placeholderEl.insertAfter(xblockElement);
+            XBlockUtils.duplicateXBlock(xblockElement, parentElement)
+                .done(function(data) {
+                    self.onNewXBlock(placeholderElement, scrollOffset, true, data);
+                })
+                .fail(function() {
+                    // Remove the placeholder if the update failed
+                    placeholderElement.remove();
+                });
+        },
+
         deleteComponent: function(xblockElement) {
             var self = this,
                 xblockInfo = new XBlockInfo({
@@ -529,6 +608,61 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             XBlockUtils.deleteXBlock(xblockInfo).done(function() {
                 self.onDelete(xblockElement);
             });
+        },
+
+        getSelectedLibraryComponents: function() {
+            var self = this;
+            var locator = this.$el.find('.studio-xblock-wrapper').data('locator');
+            console.log(ModuleUtils);
+            $.getJSON(
+                ModuleUtils.getUpdateUrl(locator) + '/handler/get_block_ids',
+                function(data) {
+                    self.selectedLibraryComponents = Array.from(data.source_block_ids);
+                    self.storedSelectedLibraryComponents = Array.from(data.source_block_ids);
+                }
+            );
+        },
+
+        saveSelectedLibraryComponents: function(e) {
+            var self = this;
+            var locator = this.$el.find('.studio-xblock-wrapper').data('locator');
+            e.preventDefault();
+            $.postJSON(
+                ModuleUtils.getUpdateUrl(locator) + '/handler/submit_studio_edits',
+                {values: {source_block_ids: self.storedSelectedLibraryComponents}},
+                function() {
+                    self.selectedLibraryComponents = Array.from(self.storedSelectedLibraryComponents);
+                    self.toggleSaveButton();
+                }
+            );
+        },
+
+        toggleLibraryComponent: function(event) {
+            var componentId = $(event.target).closest('.studio-xblock-wrapper').data('locator');
+            var storeIndex = this.storedSelectedLibraryComponents.indexOf(componentId);
+            if (storeIndex > -1) {
+                this.storedSelectedLibraryComponents.splice(storeIndex, 1);
+                this.toggleSaveButton();
+            } else {
+                this.storedSelectedLibraryComponents.push(componentId);
+                this.toggleSaveButton();
+            }
+        },
+
+        toggleSaveButton: function() {
+            var $saveButton = $('.nav-actions .save-button');
+            if (JSON.stringify(this.selectedLibraryComponents.sort()) === JSON.stringify(this.storedSelectedLibraryComponents.sort())) {
+                $saveButton.addClass('is-hidden');
+                window.removeEventListener('beforeunload', this.onBeforePageUnloadCallback);
+            } else {
+                $saveButton.removeClass('is-hidden');
+                window.addEventListener('beforeunload', this.onBeforePageUnloadCallback);
+            }
+        },
+
+        onBeforePageUnloadCallback: function (event) {
+            event.preventDefault();
+            event.returnValue = '';
         },
 
         onDelete: function(xblockElement) {
