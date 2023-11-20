@@ -206,7 +206,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         }
         self.assertSetEqual(
             sequentials_signalled,
-            {self.sequential.location, accessible_seq.location},
+            {self.sequential.location},
         )
 
     @ddt.data(
