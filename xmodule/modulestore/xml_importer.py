@@ -783,7 +783,7 @@ def import_library_from_xml(*args, **kwargs):
     return list(manager.run_imports())
 
 
-def _update_and_import_block(
+def _update_and_import_block(  # pylint: disable=too-many-statements
         block, store, user_id,
         source_course_id, dest_course_id,
         do_import_static=True, runtime=None):
