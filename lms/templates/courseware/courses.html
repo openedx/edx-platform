@@ -84,7 +84,9 @@
 
         <div id="discovery-message" class="search-status-label"></div>
         <!-- <span id="searchQuery"></span> -->
-        <span class="query" data-type="search_query"></span>
+        <div class="search-query-display">
+          <span id="searchQueryDisplay"></span> <!-- This will display the search query -->
+      </div>
       </div>
       </div>
 
@@ -299,11 +301,12 @@
 
         <script>
           document.addEventListener('DOMContentLoaded', (event) => {
-              var searchQuery = getParameterByName('search_query'); // Get the search query
-              if (searchQuery) {
-                  document.getElementById('searchQuery').textContent = searchQuery;
-              }
+          var searchQuery = getParameterByName('search_query'); // Get the search query
+          if (searchQuery) {
+              document.getElementById('searchQueryDisplay').textContent = searchQuery;
+          }
           });
+
   
           function getParameterByName(name, url = window.location.href) {
               name = name.replace(/[\[\]]/g, '\\$&');
