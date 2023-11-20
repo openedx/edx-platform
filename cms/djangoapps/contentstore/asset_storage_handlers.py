@@ -691,13 +691,15 @@ def _delete_thumbnail(thumbnail_location, course_key, asset_key):  # lint-amnest
             logging.warning('Could not delete thumbnail: %s', thumbnail_location)
 
 
-def get_asset_json(display_name, content_type, date, location, thumbnail_location, locked, course_key, file_size=None, usage_locations=[]):
+def get_asset_json(display_name, content_type, date, location, thumbnail_location,
+                   locked, course_key, file_size=None, usage=None):
     '''
     Helper method for formatting the asset information to send to client.
     '''
     asset_url = StaticContent.serialize_asset_key_with_slash(location)
     external_url = urljoin(configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL), asset_url)
     portable_url = StaticContent.get_static_path_from_location(location)
+    usage_locations = [] if usage is None else usage
     return {
         'display_name': display_name,
         'content_type': content_type,

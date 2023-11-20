@@ -244,7 +244,7 @@ class PaginationTestCase(AssetsTestCase):
                     "thumbnail_location": thumbnail_location,
                     "locked": None,
                     "static_full_url": "/assets/courseware/v1/asset-v1:org+class+run+type@asset+block@my_file_name.jpg",
-                    "usage_locations": { str(asset_key): [] }
+                    "usage_locations": {str(asset_key): []}
                 }
             ],
             1
