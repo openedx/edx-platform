@@ -4,6 +4,7 @@ Helpers for the course roles app.
 from typing import Union, List
 
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.db.models import Q
 from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import CourseKey
 
@@ -173,21 +174,8 @@ def get_all_user_permissions_for_a_course(user_id: int, course_key: CourseKey):
         raise ValueError('course_id is not valid') from exc
     if not course:
         raise ValueError('course does not exist')
-    course_permissions = set(UserRole.objects.filter(
-        user__id=user_id,
-        course=course_key,
+    permissions = set(UserRole.objects.filter(
+        Q(Q(user__id=user_id) &
+          Q(Q(course=course_key) | Q(course__isnull=True) & Q(Q(org__name=course.org) | Q(org__isnull=True))))
     ).values_list('role__permissions__name', flat=True))
-    organization_name = course.org
-    organization_permissions = set(UserRole.objects.filter(
-        user__id=user_id,
-        course__isnull=True,
-        org__name=organization_name,
-    ).values_list('role__permissions__name', flat=True))
-    permissions = course_permissions.union(organization_permissions)
-    instance_permissions = set(UserRole.objects.filter(
-        user__id=user_id,
-        course__isnull=True,
-        org__isnull=True,
-    ).values_list('role__permissions__name', flat=True))
-    permissions = permissions.union(instance_permissions)
     return permissions
