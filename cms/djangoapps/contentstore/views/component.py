@@ -113,7 +113,7 @@ def _load_mixed_class(category):
 
 @require_GET
 @login_required
-def container_handler(request, usage_key_string):
+def container_handler(request, usage_key_string):  # pylint: disable=too-many-statements
     """
     The restful handler for container xblock requests.
 
