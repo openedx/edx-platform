@@ -159,8 +159,10 @@ def get_all_user_permissions_for_a_course(user_id: int, course_key: CourseKey):
     including, if applicable, organization-wide permissions
     and instance-wide permissions.
     """
-    if user_id is None or course_key is None:
-        raise ValueError(_('user_id and course_id must not be None'))
+    if user_id is None:
+        raise ValueError('user_id must not be None')
+    if course_key is None:
+        raise ValueError('course_key must not be None')
     try:
         user = User.objects.get(pk=user_id)
     except User.DoesNotExist as exc:
