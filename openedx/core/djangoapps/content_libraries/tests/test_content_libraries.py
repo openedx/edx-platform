@@ -24,7 +24,6 @@ from openedx_events.content_authoring.signals import (
 )
 from openedx.core.djangoapps.content_libraries.libraries_index import LibraryBlockIndexer, ContentLibraryIndexer
 from openedx.core.djangoapps.content_libraries.tests.base import (
-    ContentLibrariesRestApiBlockstoreServiceTest,
     ContentLibrariesRestApiTest,
     elasticsearch_test,
     URL_BLOCK_METADATA_URL,
@@ -1230,16 +1229,6 @@ class ContentLibrariesTestMixin:
             },
             event_receiver.call_args.kwargs
         )
-
-
-@elasticsearch_test
-class ContentLibrariesBlockstoreServiceTest(
-    ContentLibrariesTestMixin,
-    ContentLibrariesRestApiBlockstoreServiceTest,
-):
-    """
-    General tests for Blockstore-based Content Libraries, using the standalone Blockstore service.
-    """
 
 
 @elasticsearch_test
