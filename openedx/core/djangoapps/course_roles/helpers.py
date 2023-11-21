@@ -117,8 +117,7 @@ def user_has_permission_list_org(
 def user_has_permission_course_org(
         user: Union[User, AnonymousUser],
         permission: Union[CourseRolesPermission, str],
-        course_key: CourseKey,
-        organization_name: str = None
+        course_key: CourseKey
 ):
     """
     Check if a user has a permission for all courses in an organization or for a specific course.
@@ -129,18 +128,15 @@ def user_has_permission_course_org(
         return False
     if isinstance(permission, CourseRolesPermission):
         permission = permission.value.name
-    if organization_name is None:
-        organization_name = course_key.org
     return (user_has_permission_course(user, permission, course_key) or
-            user_has_permission_org(user, permission, organization_name)
+            user_has_permission_org(user, permission, course_key.org)
             )
 
 
 def user_has_permission_list_course_org(
         user: Union[User, AnonymousUser],
         permissions: List[Union[CourseRolesPermission, str]],
-        course_key: CourseKey,
-        organization_name: str = None
+        course_key: CourseKey
 ):
     """
     Check if a user has all of the given permissions for all courses in an organization or for a specific course.
@@ -148,7 +144,7 @@ def user_has_permission_list_course_org(
     if not use_permission_checks():
         return False
     return all(
-        user_has_permission_course_org(user, permission, course_key, organization_name)
+        user_has_permission_course_org(user, permission, course_key)
         for permission in permissions
     )
 
