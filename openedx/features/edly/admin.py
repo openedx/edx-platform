@@ -71,8 +71,13 @@ class EdlyMultisiteAccessAdmin(admin.ModelAdmin):
     """
     Admin interface for the "EdlyMultiSiteAccess" object.
     """
-    list_display = ["user", "sub_org"]
+    list_display = ["user", "user_email", "sub_org"]
+    list_filter = ["sub_org__name"]
     search_fields = ["user__username", "user__email", "sub_org__name"]
+    autocomplete_fields = ["user", "sub_org"]
+
+    def user_email(self, obj):
+        return obj.user.email
 
 
 admin.site.register(StudentCourseProgress, StudentCourseProgressAdmin)
