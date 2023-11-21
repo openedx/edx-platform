@@ -56,9 +56,9 @@ class NotificationFilter:
 
         ).values_list('users__id', flat=True)
 
-    def filter_audit_expired(self, user_ids, course) -> list:
+    def filter_audit_expired_users_with_no_role(self, user_ids, course) -> list:
         """
-        Check if the user has access to the course
+        Check if the user has access to the course this would be true if the user has a course role or a forum role
         """
         verified_mode = CourseMode.verified_mode_for_course(course=course, include_expired=True)
         access_duration = get_expected_duration(course.id)
