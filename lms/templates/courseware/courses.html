@@ -9,7 +9,6 @@
   course_discovery_enabled = settings.FEATURES.get('ENABLE_COURSE_DISCOVERY')
   filter_enabled = settings.FEATURES.get('ENABLE_FILTER')
   sortby_enabled = settings.FEATURES.get('ENABLE_SORTBY')
-
 %>
 
 <%namespace name='static' file='../static_content.html'/>
@@ -78,7 +77,6 @@
     </div>
     
     % if sortby_enabled:
-
       <!-- Sort By Dropdown -->
       <div class="sort-section">
         <span class="sort-by-label">Sort by:</span>
