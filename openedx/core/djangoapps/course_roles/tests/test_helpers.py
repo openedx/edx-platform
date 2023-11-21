@@ -5,6 +5,8 @@ import ddt
 from organizations.tests.factories import OrganizationFactory
 import pytest
 
+from opaque_keys.edx.keys import CourseKey
+
 from common.djangoapps.student.tests.factories import AnonymousUserFactory, UserFactory
 from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -43,10 +45,12 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         self.course_1 = CourseFactory.create(
             display_name="test course 1", run="Testing_course_1", org=self.organization_1.name
         )
-        CourseOverview.load_from_module_store(self.course_1.id)
+        self.course_1_key = CourseKey.from_string(str(self.course_1.id))
+        CourseOverview.load_from_module_store(self.course_1_key)
         self.course_2 = CourseFactory.create(
             display_name="test course 2", run="Testing_course_2", org=self.organization_1.name
         )
+        self.course_2_id = CourseKey.from_string(str(self.course_2.id))
         CourseOverview.load_from_module_store(self.course_2.id)
         self.role_1 = Role.objects.create(name="test_role_1")
         self.service = Service.objects.create(name="test_service")
@@ -63,23 +67,23 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         """
         Test that user_has_permission_course returns False when the user is anonymous
         """
-        assert not user_has_permission_course(self.anonymous_user, self.permission_1.name, self.course_1.id)
+        assert not user_has_permission_course(self.anonymous_user, self.permission_1.name, self.course_1_key)
 
     def test_user_has_permission_course_with_course_level_permission(self):
         """
         Test that user_has_permission_course returns True when the user has the correct permission at the course level
         """
         UserRole.objects.create(
-            user=self.user_1, role=self.role_1, course_id=self.course_1.id, org=self.organization_1
+            user=self.user_1, role=self.role_1, course_id=self.course_1_key, org=self.organization_1
         )
-        assert user_has_permission_course(self.user_1, self.permission_1.name, self.course_1.id)
+        assert user_has_permission_course(self.user_1, self.permission_1.name, self.course_1_key)
 
     def test_user_has_permission_course_without_course_level_permission(self):
         """
         Test that user_has_permission_course returns False when the user does not have the correct permission at the
         course level
         """
-        assert not user_has_permission_course(self.user_1, self.permission_1.name, self.course_1.id)
+        assert not user_has_permission_course(self.user_1, self.permission_1.name, self.course_1_key)
 
     def test_course_permision_check_with_organization_level_permission(self):
         """
@@ -87,7 +91,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         level, and has not been granted the permission at the course level
         """
         UserRole.objects.create(user=self.user_1, role=self.role_1, org=self.organization_1)
-        assert not user_has_permission_course(self.user_1, self.permission_1.name, self.course_1.id)
+        assert not user_has_permission_course(self.user_1, self.permission_1.name, self.course_1_key)
 
     def test_user_has_permission_course_with_instance_level_permission(self):
         """
@@ -95,7 +99,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         and has not been granted the permission at the course level
         """
         UserRole.objects.create(user=self.user_1, role=self.role_1)
-        assert not user_has_permission_course(self.user_1, self.permission_1.name, self.course_1.id)
+        assert not user_has_permission_course(self.user_1, self.permission_1.name, self.course_1_key)
 
     def test_user_has_permission_course_with_permission_in_another_course(self):
         """
@@ -105,7 +109,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         UserRole.objects.create(
             user=self.user_1, role=self.role_1, course_id=self.course_2.id, org=self.organization_1
         )
-        assert not user_has_permission_course(self.user_1, self.permission_1.name, self.course_1.id)
+        assert not user_has_permission_course(self.user_1, self.permission_1.name, self.course_1_key)
 
     def test_user_has_permission_org_with_anonymous_user(self):
         """
@@ -134,7 +138,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         level, and has not been granted the permission at the organization level
         """
         UserRole.objects.create(
-            user=self.user_1, role=self.role_1, course_id=self.course_1.id, org=self.organization_1
+            user=self.user_1, role=self.role_1, course_id=self.course_1_key, org=self.organization_1
         )
         assert not user_has_permission_org(self.user_1, self.permission_1.name, self.organization_1.name)
 
@@ -158,7 +162,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         """
         Test that user_has_permission_list_course returns False when the user is anonymous
         """
-        assert not user_has_permission_list_course(self.anonymous_user, [self.permission_1.name], self.course_1.id)
+        assert not user_has_permission_list_course(self.anonymous_user, [self.permission_1.name], self.course_1_key)
 
     def test_user_has_permission_list_course_with_course_level_permission(self):
         """
@@ -166,10 +170,10 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         at the course level
         """
         UserRole.objects.create(
-            user=self.user_1, role=self.role_2, course_id=self.course_1.id, org=self.organization_1
+            user=self.user_1, role=self.role_2, course_id=self.course_1_key, org=self.organization_1
         )
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert user_has_permission_list_course(self.user_1, test_permissions, self.course_1.id)
+        assert user_has_permission_list_course(self.user_1, test_permissions, self.course_1_key)
 
     def test_user_has_permission_list_course_without_course_level_permission(self):
         """
@@ -177,10 +181,10 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         permissions at the course level
         """
         UserRole.objects.create(
-            user=self.user_1, role=self.role_1, course_id=self.course_1.id, org=self.organization_1
+            user=self.user_1, role=self.role_1, course_id=self.course_1_key, org=self.organization_1
         )
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert not user_has_permission_list_course(self.user_1, test_permissions, self.course_1.id)
+        assert not user_has_permission_list_course(self.user_1, test_permissions, self.course_1_key)
 
     def test_user_has_permission_list_course_with_organization_level_permission(self):
         """
@@ -189,7 +193,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         """
         UserRole.objects.create(user=self.user_1, role=self.role_2, org=self.organization_1)
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert not user_has_permission_list_course(self.user_1, test_permissions, self.course_1.id)
+        assert not user_has_permission_list_course(self.user_1, test_permissions, self.course_1_key)
 
     def test_user_has_permission_list_course_with_instance_level_permission(self):
         """
@@ -198,7 +202,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         """
         UserRole.objects.create(user=self.user_1, role=self.role_2)
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert not user_has_permission_list_course(self.user_1, test_permissions, self.course_1.id)
+        assert not user_has_permission_list_course(self.user_1, test_permissions, self.course_1_key)
 
     def test_user_has_permission_list_course_with_permission_in_another_course(self):
         """
@@ -209,7 +213,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
             user=self.user_1, role=self.role_2, course_id=self.course_2.id, org=self.organization_1
         )
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert not user_has_permission_list_course(self.user_1, test_permissions, self.course_1.id)
+        assert not user_has_permission_list_course(self.user_1, test_permissions, self.course_1_key)
 
     def test_user_has_permission_list_org_with_anonymous_user(self):
         """
@@ -227,11 +231,11 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         UserRole.objects.create(
             user=self.user_1,
             role=self.role_1,
-            course_id=self.course_1.id,
+            course_id=self.course_1_key,
             org=self.organization_1
         )
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert user_has_permission_list_any_course(self.user_1, test_permissions, self.course_1.id)
+        assert user_has_permission_list_any_course(self.user_1, test_permissions, self.course_1_key)
 
     def test_course_permission_list_check_any_with_no_permission_in_the_course(self):
         """
@@ -239,7 +243,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         the permissions on the list at the course level
         """
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert not user_has_permission_list_any_course(self.user_1, test_permissions, self.course_1.id)
+        assert not user_has_permission_list_any_course(self.user_1, test_permissions, self.course_1_key)
 
     def test_course_permission_list_check_any_with_a_permission_in_a_different_course(self):
         """
@@ -247,10 +251,10 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         but not on the correct course
         """
         UserRole.objects.create(
-            user=self.user_1, role=self.role_1, course_id=self.course_1.id, org=self.organization_1
+            user=self.user_1, role=self.role_1, course_id=self.course_1_key, org=self.organization_1
         )
         test_permissions = [self.permission_2.name]
-        assert not user_has_permission_list_any_course(self.user_1, test_permissions, self.course_1.id)
+        assert not user_has_permission_list_any_course(self.user_1, test_permissions, self.course_1_key)
 
     def test_user_has_permission_list_org_with_organization_level_permission(self):
         """
@@ -276,7 +280,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         the course level, and has not been granted the permissions at the organization level
         """
         UserRole.objects.create(
-            user=self.user_1, role=self.role_2, course_id=self.course_1.id, org=self.organization_1
+            user=self.user_1, role=self.role_2, course_id=self.course_1_key, org=self.organization_1
         )
         test_permissions = [self.permission_1.name, self.permission_2.name]
         assert not user_has_permission_list_org(self.user_1, test_permissions, self.organization_1.name)
@@ -304,7 +308,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         Test that user_has_permission_course_org returns False when the user is anonymous
         """
         assert not user_has_permission_course_org(
-            self.anonymous_user, self.permission_1.name, self.course_1.id, self.organization_1.name
+            self.anonymous_user, self.permission_1.name, self.course_1_key, self.organization_1.name
         )
 
     def test_user_has_permission_course_org_with_course_level_permission(self):
@@ -313,10 +317,10 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         the course level
         """
         UserRole.objects.create(
-            user=self.user_1, role=self.role_1, course_id=self.course_1.id, org=self.organization_1
+            user=self.user_1, role=self.role_1, course_id=self.course_1_key, org=self.organization_1
         )
         assert user_has_permission_course_org(
-            self.user_1, self.permission_1.name, self.course_1.id, self.organization_1.name
+            self.user_1, self.permission_1.name, self.course_1_key, self.organization_1.name
         )
 
     def test_user_has_permission_course_org_without_course_level_permission(self):
@@ -325,7 +329,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         permission at the course level
         """
         assert not user_has_permission_course_org(
-            self.user_1, self.permission_1.name, self.course_1.id, self.organization_1.name
+            self.user_1, self.permission_1.name, self.course_1_key, self.organization_1.name
         )
 
     def test_user_has_permission_course_org_with_organization_level_permission(self):
@@ -335,7 +339,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         """
         UserRole.objects.create(user=self.user_1, role=self.role_1, org=self.organization_1)
         assert user_has_permission_course_org(
-            self.user_1, self.permission_1.name, self.course_1.id, self.organization_1.name
+            self.user_1, self.permission_1.name, self.course_1_key, self.organization_1.name
         )
 
     def test_user_has_permission_course_org_with_organization_level_permission_without_org_param(self):
@@ -345,7 +349,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         """
         UserRole.objects.create(user=self.user_1, role=self.role_1, org=self.organization_1)
         assert user_has_permission_course_org(
-            self.user_1, self.permission_1.name, self.course_1.id)
+            self.user_1, self.permission_1.name, self.course_1_key)
 
     def test_user_has_permission_course_org_without_organization_level_permission(self):
         """
@@ -353,7 +357,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         permission at the organization level
         """
         assert not user_has_permission_course_org(
-            self.user_1, self.permission_1.name, self.course_1.id, self.organization_1.name
+            self.user_1, self.permission_1.name, self.course_1_key, self.organization_1.name
         )
 
     def test_user_has_permission_course_org_with_instance_level_permission(self):
@@ -363,7 +367,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         """
         UserRole.objects.create(user=self.user_1, role=self.role_1)
         assert not user_has_permission_course_org(
-            self.user_1, self.permission_1.name, self.course_1.id, self.organization_1.name
+            self.user_1, self.permission_1.name, self.course_1_key, self.organization_1.name
         )
 
     def test_user_has_permission_course_org_with_permission_in_another_course(self):
@@ -375,7 +379,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
             user=self.user_1, role=self.role_1, course_id=self.course_2.id, org=self.organization_1
         )
         assert not user_has_permission_course_org(
-            self.user_1, self.permission_1.name, self.course_1.id, self.organization_1.name
+            self.user_1, self.permission_1.name, self.course_1_key, self.organization_1.name
         )
 
     def test_user_has_permission_course_org_with_permission_in_another_organization(self):
@@ -385,7 +389,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         """
         UserRole.objects.create(user=self.user_1, role=self.role_1, org=self.organization_2)
         assert not user_has_permission_course_org(
-            self.user_1, self.permission_1.name, self.course_1.id, self.organization_1.name
+            self.user_1, self.permission_1.name, self.course_1_key, self.organization_1.name
         )
 
     def test_user_has_permission_course_org_with_permission_in_another_course_and_organization(self):
@@ -397,7 +401,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
             user=self.user_1, role=self.role_1, course_id=self.course_2.id, org=self.organization_2
         )
         assert not user_has_permission_course_org(
-            self.user_1, self.permission_1.name, self.course_1.id, self.organization_1.name
+            self.user_1, self.permission_1.name, self.course_1_key, self.organization_1.name
         )
 
     def test_course_or_organization_list_permission_check_with_course_level_permission(self):
@@ -406,11 +410,11 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         permissions at the course level
         """
         UserRole.objects.create(
-            user=self.user_1, role=self.role_2, course_id=self.course_1.id, org=self.organization_1
+            user=self.user_1, role=self.role_2, course_id=self.course_1_key, org=self.organization_1
         )
         test_permissions = [self.permission_1.name, self.permission_2.name]
         assert user_has_permission_list_course_org(
-            self.user_1, test_permissions, self.course_1.id, self.organization_1.name
+            self.user_1, test_permissions, self.course_1_key, self.organization_1.name
         )
 
     def test_course_or_organization_list_permission_check_without_course_level_permission(self):
@@ -419,11 +423,11 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         of permissions at the course level
         """
         UserRole.objects.create(
-            user=self.user_1, role=self.role_1, course_id=self.course_1.id, org=self.organization_1
+            user=self.user_1, role=self.role_1, course_id=self.course_1_key, org=self.organization_1
         )
         test_permissions = [self.permission_1.name, self.permission_2.name]
         assert not user_has_permission_list_course_org(
-            self.user_1, test_permissions, self.course_1.id, self.organization_1.name
+            self.user_1, test_permissions, self.course_1_key, self.organization_1.name
         )
 
     def test_course_or_organization_list_permission_check_with_organization_level_permission(self):
@@ -434,7 +438,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         UserRole.objects.create(user=self.user_1, role=self.role_2, org=self.organization_1)
         test_permissions = [self.permission_1.name, self.permission_2.name]
         assert user_has_permission_list_course_org(
-            self.user_1, test_permissions, self.course_1.id, self.organization_1.name
+            self.user_1, test_permissions, self.course_1_key, self.organization_1.name
         )
 
     def test_course_or_organization_list_permission_check_without_organization_level_permission(self):
@@ -445,7 +449,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         UserRole.objects.create(user=self.user_1, role=self.role_1, org=self.organization_1)
         test_permissions = [self.permission_1.name, self.permission_2.name]
         assert not user_has_permission_list_course_org(
-            self.user_1, test_permissions, self.course_1.id, self.organization_1.name
+            self.user_1, test_permissions, self.course_1_key, self.organization_1.name
         )
 
     def test_course_or_organization_list_permission_check_with_instance_level_permission(self):
@@ -456,7 +460,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         UserRole.objects.create(user=self.user_1, role=self.role_2)
         test_permissions = [self.permission_1.name, self.permission_2.name]
         assert not user_has_permission_list_course_org(
-            self.user_1, test_permissions, self.course_1.id, self.organization_1.name
+            self.user_1, test_permissions, self.course_1_key, self.organization_1.name
         )
 
     def test_course_or_organization_list_permission_check_with_permission_in_another_course(self):
@@ -469,7 +473,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         )
         test_permissions = [self.permission_1.name, self.permission_2.name]
         assert not user_has_permission_list_course_org(
-            self.user_1, test_permissions, self.course_1.id, self.organization_1.name
+            self.user_1, test_permissions, self.course_1_key, self.organization_1.name
         )
 
     def test_course_or_organization_list_permission_check_with_permission_in_another_organization(self):
@@ -480,7 +484,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         UserRole.objects.create(user=self.user_1, role=self.role_2, org=self.organization_2)
         test_permissions = [self.permission_1.name, self.permission_2.name]
         assert not user_has_permission_list_course_org(
-            self.user_1, test_permissions, self.course_1.id, self.organization_1.name
+            self.user_1, test_permissions, self.course_1_key, self.organization_1.name
         )
 
     def test_course_or_organization_list_permission_check_with_permission_in_another_course_and_organization(self):
@@ -493,7 +497,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         )
         test_permissions = [self.permission_1.name, self.permission_2.name]
         assert not user_has_permission_list_course_org(
-            self.user_1, test_permissions, self.course_1.id, self.organization_1.name
+            self.user_1, test_permissions, self.course_1_key, self.organization_1.name
         )
 
     @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=False)
@@ -502,7 +506,7 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         Tests that the helper function returns false if the USE_PERMISSION_CHECKS_FLAG is not enabled
         Uses the same data as the earlier test, with the only difference being the waffle flag value
         """
-        assert not user_has_permission_course(self.user_1, self.permission_1.name, self.course_1.id)
+        assert not user_has_permission_course(self.user_1, self.permission_1.name, self.course_1_key)
 
     @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=False)
     def test_user_has_permission_list_course_with_waffle_flag_disabled(self):
@@ -511,10 +515,10 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         Uses the same data as the earlier test, with the only difference being the waffle flag value
         """
         UserRole.objects.create(
-            user=self.user_1, role=self.role_2, course_id=self.course_1.id, org=self.organization_1
+            user=self.user_1, role=self.role_2, course_id=self.course_1_key, org=self.organization_1
         )
         test_permissions = [self.permission_1.name, self.permission_2.name]
-        assert not user_has_permission_list_course(self.user_1, test_permissions, self.course_1.id)
+        assert not user_has_permission_list_course(self.user_1, test_permissions, self.course_1_key)
 
     @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=False)
     def test_user_has_permission_org_with_waffle_flag_disabled(self):
@@ -542,10 +546,10 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         Uses the same data as the earlier test, with the only difference being the waffle flag value
         """
         UserRole.objects.create(
-            user=self.user_1, role=self.role_1, course_id=self.course_1.id, org=self.organization_1
+            user=self.user_1, role=self.role_1, course_id=self.course_1_key, org=self.organization_1
         )
         assert not user_has_permission_course_org(
-            self.user_1, self.permission_1.name, self.course_1.id, self.organization_1.name
+            self.user_1, self.permission_1.name, self.course_1_key, self.organization_1.name
         )
 
     @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=False)
@@ -555,11 +559,11 @@ class PermissionCheckTestCase(SharedModuleStoreTestCase):
         Uses the same data as the earlier test, with the only difference being the waffle flag value
         """
         UserRole.objects.create(
-            user=self.user_1, role=self.role_2, course_id=self.course_1.id, org=self.organization_1
+            user=self.user_1, role=self.role_2, course_id=self.course_1_key, org=self.organization_1
         )
         test_permissions = [self.permission_1.name, self.permission_2.name]
         assert not user_has_permission_list_course_org(
-            self.user_1, test_permissions, self.course_1.id, self.organization_1.name
+            self.user_1, test_permissions, self.course_1_key, self.organization_1.name
         )
 
 
@@ -577,7 +581,8 @@ class GetAllUserPermissionsTestcase(SharedModuleStoreTestCase):
         self.course_1 = CourseFactory.create(
             display_name="test course 1", run="Testing_course_1", org=self.organization_1.name
         )
-        CourseOverview.load_from_module_store(self.course_1.id)
+        self.course_1_key = CourseKey.from_string(str(self.course_1.id))
+        CourseOverview.load_from_module_store(self.course_1_key)
         self.role_1 = Role.objects.create(name="test_role_1")
         self.role_2 = Role.objects.create(name="test_role_2")
         self.role_3 = Role.objects.create(name="test_role_3")
@@ -611,56 +616,56 @@ class GetAllUserPermissionsTestcase(SharedModuleStoreTestCase):
             user=self.user_2, role=self.role_4, course_id=self.course_1.id, org=self.organization_1
         )
         # Test that the correct permissions are returned for user_1
-        assert get_all_user_permissions_for_a_course(self.user_1.id, self.course_1.id) == {self.permission_1.name}
+        assert get_all_user_permissions_for_a_course(self.user_1.id, self.course_1_key) == {self.permission_1.name}
         UserRole.objects.create(
             user=self.user_1, role=self.role_2, course_id=self.course_1.id, org=self.organization_1
         )
         # Test that the correct permissions are returned for user_1
-        assert get_all_user_permissions_for_a_course(self.user_1.id, self.course_1.id) == {
+        assert get_all_user_permissions_for_a_course(self.user_1.id, self.course_1_key) == {
             self.permission_1.name, self.permission_2.name}
 
         UserRole.objects.create(
             user=self.user_1, role=self.role_3, org=self.organization_1
         )
         # Test that the correct permissions are returned for user_1, including org level permissions
-        assert get_all_user_permissions_for_a_course(self.user_1.id, self.course_1.id) == {
+        assert get_all_user_permissions_for_a_course(self.user_1.id, self.course_1_key) == {
             self.permission_1.name, self.permission_2.name, self.permission_3.name}
         UserRole.objects.create(
             user=self.user_1, role=self.role_5
         )
         # Test that the correct permissions are returned for user_1, including instance level permissions
-        assert get_all_user_permissions_for_a_course(self.user_1.id, self.course_1.id) == {
+        assert get_all_user_permissions_for_a_course(self.user_1.id, self.course_1_key) == {
             self.permission_1.name, self.permission_2.name, self.permission_3.name, self.permission_5.name}
 
     def test_get_all_user_permissions_for_a_course_with_no_permissions(self):
         """
         Test that get_all_user_permissions_for_a_course returns an empty list when the user has no permissions
         """
-        assert not get_all_user_permissions_for_a_course(self.user_1.id, self.course_1.id)
+        assert not get_all_user_permissions_for_a_course(self.user_1.id, self.course_1_key)
 
     @ddt.data(
-        (None, 'course_id'),
+        (None, 1),
         (1, None),
         (None, None),
     )
     @ddt.unpack
-    def test_get_all_user_permissions_for_a_course_with_none_values(self, user_id, course_id):
+    def test_get_all_user_permissions_for_a_course_with_none_values(self, user_id, course_key):
         """
         Test that get_all_user_permissions_for_a_course raises value error when the user has no permissions
         """
         with pytest.raises(ValueError):
-            get_all_user_permissions_for_a_course(user_id, course_id)
+            get_all_user_permissions_for_a_course(user_id, course_key)
 
     def test_get_all_user_permissions_for_a_course_with_invalid_user(self):
         """
         Test that get_all_user_permissions_for_a_course raises value error when the user not exist
         """
         with pytest.raises(ValueError):
-            get_all_user_permissions_for_a_course(999, 999)
+            get_all_user_permissions_for_a_course(999, self.course_1_key)
 
     def test_get_all_user_permissions_for_a_course_with_invalid_course(self):
         """
         Test that get_all_user_permissions_for_a_course raises value error when the course not exist
         """
         with pytest.raises(ValueError):
-            get_all_user_permissions_for_a_course(self.user_1.id, 999)
+            get_all_user_permissions_for_a_course(self.user_1.id, CourseKey.from_string("course-v1:org+course+run"))

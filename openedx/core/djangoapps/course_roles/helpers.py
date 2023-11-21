@@ -5,6 +5,7 @@ from typing import Union, List
 
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.utils.translation import gettext as _
+from opaque_keys.edx.keys import CourseKey
 
 from edx_toggles.toggles import WaffleFlag
 from openedx.core.djangoapps.course_roles.models import UserRole
@@ -34,7 +35,7 @@ def use_permission_checks():
 def user_has_permission_course(
         user: Union[User, AnonymousUser],
         permission: Union[CourseRolesPermission, str],
-        course_id: str
+        course_key: CourseKey
 ):
     """
     Check if a user has a permission in a course.
@@ -48,32 +49,32 @@ def user_has_permission_course(
     return UserRole.objects.filter(
         user=user,
         role__permissions__name=permission,
-        course=course_id,
+        course=course_key,
     ).exists()
 
 
 def user_has_permission_list_course(
         user: Union[User, AnonymousUser],
         permissions: List[Union[CourseRolesPermission, str]],
-        course_id: str
+        course_key: CourseKey
 ):
     """
     Check if a user has all of the given permissions in a course.
     """
     if not use_permission_checks():
         return False
-    return all(user_has_permission_course(user, permission, course_id) for permission in permissions)
+    return all(user_has_permission_course(user, permission, course_key) for permission in permissions)
 
 
 def user_has_permission_list_any_course(
         user: Union[User, AnonymousUser],
         permissions: List[Union[CourseRolesPermission, str]],
-        course_id: str
+        course_key: CourseKey
 ):
     """
     Check if a user has ANY of the given permissions in a course.
     """
-    return any(user_has_permission_course(user, permission, course_id) for permission in permissions)
+    return any(user_has_permission_course(user, permission, course_key) for permission in permissions)
 
 
 def user_has_permission_org(
@@ -116,7 +117,7 @@ def user_has_permission_list_org(
 def user_has_permission_course_org(
         user: Union[User, AnonymousUser],
         permission: Union[CourseRolesPermission, str],
-        course_id: str,
+        course_key: CourseKey,
         organization_name: str = None
 ):
     """
@@ -129,12 +130,8 @@ def user_has_permission_course_org(
     if isinstance(permission, CourseRolesPermission):
         permission = permission.value.name
     if organization_name is None:
-        course = modulestore().get_course(course_id)
-        if course:
-            organization_name = course.org
-        else:
-            return user_has_permission_course(user, permission, course_id)
-    return (user_has_permission_course(user, permission, course_id) or
+        organization_name = course_key.org
+    return (user_has_permission_course(user, permission, course_key) or
             user_has_permission_org(user, permission, organization_name)
             )
 
@@ -142,7 +139,7 @@ def user_has_permission_course_org(
 def user_has_permission_list_course_org(
         user: Union[User, AnonymousUser],
         permissions: List[Union[CourseRolesPermission, str]],
-        course_id: str,
+        course_key: CourseKey,
         organization_name: str = None
 ):
     """
@@ -151,32 +148,32 @@ def user_has_permission_list_course_org(
     if not use_permission_checks():
         return False
     return all(
-        user_has_permission_course_org(user, permission, course_id, organization_name)
+        user_has_permission_course_org(user, permission, course_key, organization_name)
         for permission in permissions
     )
 
 
-def get_all_user_permissions_for_a_course(user_id: int, course_id: str):
+def get_all_user_permissions_for_a_course(user_id: int, course_key: CourseKey):
     """
     Get all of a user's permissions for a course,
     including, if applicable, organization-wide permissions
     and instance-wide permissions.
     """
-    if user_id is None or course_id is None:
+    if user_id is None or course_key is None:
         raise ValueError(_('user_id and course_id must not be None'))
     try:
         user = User.objects.get(pk=user_id)
     except User.DoesNotExist as exc:
         raise ValueError(_('user does not exist')) from exc
     try:
-        course = modulestore().get_course(course_id)
+        course = modulestore().get_course(course_key)
     except AssertionError as exc:
         raise ValueError(_('course_id is not valid')) from exc
     if not course:
         raise ValueError(_('course does not exist'))
     course_permissions = set(UserRole.objects.filter(
         user__id=user_id,
-        course=course_id,
+        course=course_key,
     ).values_list('role__permissions__name', flat=True))
     organization_name = course.org
     organization_permissions = set(UserRole.objects.filter(
