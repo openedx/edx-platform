@@ -54,7 +54,7 @@ def user_has_permission_course(
 
 def user_has_permission_list_course(
         user: Union[User, AnonymousUser],
-        permissions: List[CourseRolesPermission],
+        permissions: List[Union[CourseRolesPermission, str]],
         course_id: str
 ):
     """
@@ -67,7 +67,7 @@ def user_has_permission_list_course(
 
 def user_has_permission_list_any_course(
         user: Union[User, AnonymousUser],
-        permissions: List[CourseRolesPermission],
+        permissions: List[Union[CourseRolesPermission, str]],
         course_id: str
 ):
     """
@@ -100,7 +100,7 @@ def user_has_permission_org(
 
 def user_has_permission_list_org(
         user: Union[User, AnonymousUser],
-        permissions: List[CourseRolesPermission],
+        permissions: List[Union[CourseRolesPermission, str]],
         organization_name: str
 ):
     """
@@ -141,7 +141,7 @@ def user_has_permission_course_org(
 
 def user_has_permission_list_course_org(
         user: Union[User, AnonymousUser],
-        permissions: List[CourseRolesPermission],
+        permissions: List[Union[CourseRolesPermission, str]],
         course_id: str,
         organization_name: str = None
 ):
