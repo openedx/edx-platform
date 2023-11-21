@@ -167,7 +167,7 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         self.assertEqual(len(lc_block.children), 0)
 
         # Refresh children to be reflected in lc_block
-        lc_block = self._refresh_children(lc_block)
+        lc_block = self._upgrade_and_sync(lc_block)
         self.assertEqual(len(lc_block.children), 1)
 
         self.validate_preview_html(

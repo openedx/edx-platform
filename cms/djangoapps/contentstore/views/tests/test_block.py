@@ -211,7 +211,7 @@ class GetItemTest(ItemTest):
         self.assertNotRegex(html, r"wrapper-xblock[^-]+")
 
         # Verify that the header and article tags are still added
-        self.assertIn('<header class="xblock-header xblock-header-vertical">', html)
+        self.assertIn('<header class="xblock-header xblock-header-vertical ">', html)
         self.assertIn('<article class="xblock-render">', html)
 
     def test_get_container_fragment(self):
@@ -233,7 +233,7 @@ class GetItemTest(ItemTest):
 
         # Verify that the Studio nesting wrapper has been added
         self.assertIn("level-nesting", html)
-        self.assertIn('<header class="xblock-header xblock-header-vertical">', html)
+        self.assertIn('<header class="xblock-header xblock-header-vertical ">', html)
         self.assertIn('<article class="xblock-render">', html)
 
         # Verify that the Studio element wrapper has been added
@@ -949,6 +949,135 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
         destination_chapter = self.store.get_item(destination_location)
         self.assertEqual(len(destination_chapter.get_children()), 0)
         self.assertEqual(destination_chapter.display_name, "Source Chapter")
+
+    def test_duplicate_library_content_block(self):  # pylint: disable=too-many-statements
+        """
+        Test the LibraryContentBlock's special duplication process.
+        """
+        store = modulestore()
+
+        # Create a library with two blocks (HTML 1 and HTML 2).
+        # These are the "Original" version of the blocks.
+        lib = LibraryFactory()
+        BlockFactory(
+            parent=lib,
+            category="html",
+            display_name="HTML 1 Title (Original)",
+            data="HTML 1 Content (Original)",
+            publish_item=False,
+        )
+        BlockFactory(
+            parent=lib,
+            category="html",
+            display_name="HTML 2 Title (Original)",
+            data="HTML 2 Content (Original)",
+            publish_item=False,
+        )
+        original_lib_version = store.get_library(
+            lib.location.library_key, remove_version=False, remove_branch=False,
+        ).location.library_key.version_guid
+        assert original_lib_version is not None
+
+        # Create a library content block (lc), point it out our library, and sync it.
+        unit = BlockFactory(
+            parent_location=self.seq_usage_key,
+            category="vertical",
+            display_name="Parent Unit of LC and its Dupe",
+            publish_item=False,
+        )
+        lc = BlockFactory(
+            parent=unit,
+            category="library_content",
+            source_library_id=str(lib.location.library_key),
+            display_name="LC Block",
+            max_count=1,
+            publish_item=False,
+        )
+        lc.sync_from_library()
+        lc = store.get_item(lc.location)  # we must reload because sync_from_library happens out-of-thread
+        assert lc.source_library_version == str(original_lib_version)
+        lc_html_1 = store.get_item(lc.children[0])
+        lc_html_2 = store.get_item(lc.children[1])
+        assert lc_html_1.display_name == "HTML 1 Title (Original)"
+        assert lc_html_2.display_name == "HTML 2 Title (Original)"
+        assert lc_html_1.data == "HTML 1 Content (Original)"
+        assert lc_html_2.data == "HTML 2 Content (Original)"
+
+        # Override the title and data of HTML 1 under lc ("Course Override").
+        # Note that title is settings-scoped and data is content-scoped.
+        lc_html_1.display_name = "HTML 1 Title (Course Override)"
+        lc_html_1.data = "HTML 1 Content (Course Override)"
+        store.update_item(lc_html_1, self.user.id)
+
+        # Now, update the titles and contents of both HTML 1 and HTML 2 ("Lib Update").
+        # This will yield a new version of the library (updated_lib_version).
+        lib_html_1 = store.get_item(lib.children[0])
+        lib_html_2 = store.get_item(lib.children[1])
+        assert lib_html_1.display_name == "HTML 1 Title (Original)"
+        assert lib_html_2.display_name == "HTML 2 Title (Original)"
+        lib_html_1.display_name = "HTML 1 Title (Lib Update)"
+        lib_html_2.display_name = "HTML 2 Title (Lib Update)"
+        lib_html_1.data = "HTML 1 Content (Lib Update)"
+        lib_html_2.data = "HTML 2 Content (Lib Update)"
+        store.update_item(lib_html_1, self.user.id)
+        store.update_item(lib_html_2, self.user.id)
+        updated_lib_version = store.get_library(
+            lib.location.library_key, remove_version=False, remove_branch=False,
+        ).location.library_key.version_guid
+        assert updated_lib_version is not None
+        assert updated_lib_version != original_lib_version
+
+        # DUPLICATE lc.
+        # Unit should now contain both lc and dupe.
+        # All settings should match between lc and dupe.
+        dupe = store.get_item(
+            self._duplicate_item(
+                parent_usage_key=unit.location,
+                source_usage_key=lc.location,
+                display_name="Dupe LC Block",
+            )
+        )
+        lc = store.get_item(lc.location)
+        unit = store.get_item(unit.location)
+        assert unit.children == [lc.location, dupe.location]
+        assert len(lc.children) == len(dupe.children) == 2
+        assert lc.max_count == dupe.max_count == 1
+        assert lc.source_library_id == dupe.source_library_id == str(lib.location.library_key)
+        assert lc.source_library_version == dupe.source_library_version == str(original_lib_version)
+
+        # The lc block's children should remain unchanged.
+        # That is: HTML 1 has overrides, HTML 2 has originals.
+        lc_html_1 = store.get_item(lc.children[0])
+        assert lc_html_1.display_name == "HTML 1 Title (Course Override)"
+        assert lc_html_1.data == "HTML 1 Content (Course Override)"
+        lc_html_2 = store.get_item(lc.children[1])
+        assert lc_html_2.display_name == "HTML 2 Title (Original)"
+        assert lc_html_2.data == "HTML 2 Content (Original)"
+
+        # Now, the dupe's children should copy *settings* overrides over from the lc block,
+        # but we don't actually expect it to copy *content* overrides over from the lc block.
+        # (Yes, this is weird. One would expect it to copy all fields from the lc block, whether settings or content.
+        #  But that's the existing behavior, so we're going to test for it, for now at least.
+        #  We may change this in the future: https://github.com/openedx/edx-platform/issues/33739)
+        dupe_html_1 = store.get_item(dupe.children[0])
+        assert dupe_html_1.display_name == "HTML 1 Title (Course Override)"  # <- as you'd expect
+        assert dupe_html_1.data == "HTML 1 Content (Original)"  # <- weird!
+        dupe_html_2 = store.get_item(dupe.children[1])
+        assert dupe_html_2.display_name == "HTML 2 Title (Original)"  # <- as you'd expect
+        assert dupe_html_2.data == "HTML 2 Content (Original)"  # <- as you'd expect
+
+        # Finally, upgrade the dupe's library version, and make sure it pulls in updated library block *content*,
+        # whilst preserving *settings overrides* (specifically, HTML 1's title override).
+        dupe.sync_from_library(upgrade_to_latest=True)
+        dupe = store.get_item(dupe.location)
+        assert dupe.source_library_version == str(updated_lib_version)
+        assert len(dupe.children) == 2
+        dupe_html_1 = store.get_item(dupe.children[0])
+        dupe_html_2 = store.get_item(dupe.children[1])
+        assert dupe_html_1.display_name == "HTML 1 Title (Course Override)"
+        assert dupe_html_1.data == "HTML 1 Content (Lib Update)"
+        assert dupe_html_2.display_name == "HTML 2 Title (Lib Update)"
+        assert dupe_html_2.data == "HTML 2 Content (Lib Update)"
 
 
 @ddt.ddt

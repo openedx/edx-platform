@@ -106,7 +106,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-08 20:43+0000\n"
+"POT-Creation-Date: 2023-11-05 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019\n"
 "Language-Team: Indonesian (https://app.transifex.com/open-edx/teams/6205/id/)\n"
@@ -1966,68 +1966,6 @@ msgstr "Ukuran file gambar pita/emblem harus kurang dari 250KB. "
 msgid "This value must be all lowercase."
 msgstr "Nilai ini harus semuanya huruf kecil."
 
-#: lms/djangoapps/badges/models.py
-msgid "The course mode for this badge image. For example, \"verified\" or \"honor\"."
-msgstr ""
-"Mode pelatihan untuk gambar pita/emblem. Sebagai contoh, \"teruji\" atau "
-"\"terhormat\"."
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Badge images must be square PNG files. The file size should be under 250KB."
-msgstr ""
-"Gambar pita/emblem harus dalam file PNG yang berbentuk kotak. Ukuran file "
-"sebaiknya kurang dari 250KB."
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Set this value to True if you want this image to be the default image for "
-"any course modes that do not have a specified badge image. You can have only"
-" one default image."
-msgstr ""
-"Atur nilai ini ke Benar jika Anda ingin gambar ini menjadi gambar default "
-"untuk mode pelatihan apa pun yang tidak memiliki gambar pita/emblem yang "
-"ditentukan. Anda hanya dapat memiliki satu gambar default."
-
-#: lms/djangoapps/badges/models.py
-msgid "There can be only one default image."
-msgstr "Hanya boleh ada satu gambar default."
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"On each line, put the number of completed courses to award a badge for, a "
-"comma, and the slug of a badge class you have created that has the issuing "
-"component 'openedx__course'. For example: 3,enrolled_3_courses"
-msgstr ""
-"Di setiap baris, masukkan jumlah kursus yang telah diselesaikan untuk "
-"memberikan pita/emblem untuk, koma, dan slug kelas pita/emblem yang Anda "
-"buat yang memiliki komponen penerbitan 'openedx_course'. Misalnya: 3, "
-"enrolled_3_courses"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"On each line, put the number of enrolled courses to award a badge for, a "
-"comma, and the slug of a badge class you have created that has the issuing "
-"component 'openedx__course'. For example: 3,enrolled_3_courses"
-msgstr ""
-"Di setiap baris, masukkan jumlah pelatihan yang  terdaftar untuk memberikan "
-"pita/emblem kepada, koma, dan slug kelas pita/emblem yang Anda buat yang "
-"memiliki komponen 'openx__course' yang diterbitkan. Misalnya: 3, "
-"enrolled_3_courses"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Each line is a comma-separated list. The first item in each line is the slug"
-" of a badge class you have created that has an issuing component of "
-"'openedx__course'. The remaining items in each line are the course keys the "
-"learner needs to complete to be awarded the badge. For example: "
-"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
-msgstr ""
-
-#: lms/djangoapps/badges/models.py
-msgid "Please check the syntax of your entry."
-msgstr "Tolong periksa kembali sintaksis dari catatan Anda."
-
 #. Translators: This string is used across Open edX installations
 #. as a callback to edX. Please do not translate `edX.org`
 #: lms/djangoapps/branding/api.py
@@ -3331,6 +3269,7 @@ msgstr ""
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
 #: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/lti_provider/user-auth-error.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Sign in"
 msgstr "Masuk"
@@ -4760,6 +4699,14 @@ msgid ""
 "The list of group configurations for partitioning students in content "
 "experiments."
 msgstr "Daftar Konfigurasi Grup untuk membagi siswa dalam percobaan konten."
+
+#: lms/djangoapps/lti_provider/models.py
+msgid ""
+"When checked, the LTI content will load only for learners who have an "
+"account in this instance. This is required only for linking learner accounts"
+" with the LTI consumer. See the Open edX LTI Provider documentation for more"
+" details."
+msgstr ""
 
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
@@ -10277,18 +10224,6 @@ msgstr ""
 "video pada halaman Pengaturan & Detail."
 
 #: xmodule/course_block.py
-msgid "Issue Open Badges"
-msgstr "Issue Open Badges"
-
-#: xmodule/course_block.py
-msgid ""
-"Issue Open Badges badges for this course. Badges are generated when "
-"certificates are created."
-msgstr ""
-"Terbitkan badge Open Badges untuk kursus ini. Badge diberikan setelah "
-"sertifikat dibuat."
-
-#: xmodule/course_block.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
 "marks, enter the short name of the type of certificate that students receive"
@@ -13635,10 +13570,10 @@ msgid "Welcome to {platform_name}"
 msgstr "Selamat datang di {platform_name}"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See https://open.edx.org for more information.
+#. untranslated. See https://openedx.org for more information.
 #: lms/templates/index_overlay.html
-msgid "It works! Powered by Open edX{registered_trademark}"
-msgstr "Berhasil! Dipersembahkan oleh Open edX {registered_trademark}"
+msgid "It works! Powered by the Open edX{registered_trademark} Platform"
+msgstr ""
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -14317,6 +14252,10 @@ msgstr "Handouts"
 #: lms/templates/video.html
 msgid "Download Handout"
 msgstr "Unduh Materi"
+
+#: lms/templates/video.html
+msgid "How is the transcript quality ?"
+msgstr ""
 
 #: lms/templates/word_cloud.html
 msgid "{num} of {total}"
@@ -19289,6 +19228,25 @@ msgstr ""
 msgid "My Courses"
 msgstr "Kursus Saya"
 
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "There was an error when loading this module!"
+msgstr ""
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"This module is available only for users who are signed into {platform}. "
+"Kindly sign in and refresh this page to load the content."
+msgstr ""
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "NOTE:"
+msgstr ""
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"The email used to sign into this platform and {platform} should be the same."
+msgstr ""
+
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
 msgstr "Ubah Pilihan Bahasa "
@@ -20391,8 +20349,8 @@ msgid "Studio Accessibility Policy"
 msgstr ""
 
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
-msgid "Files & Uploads"
-msgstr "Berkas & Unggahan"
+msgid "Files"
+msgstr ""
 
 #: cms/templates/certificates.html
 msgid "Course Certificates"
@@ -22079,6 +22037,10 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid "Libraries"
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Taxonomies"
 msgstr ""
 
 #: cms/templates/index.html
