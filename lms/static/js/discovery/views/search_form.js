@@ -42,6 +42,7 @@
                 this.$loadingIndicator.addClass('hidden');
             },
 
+<<<<<<< HEAD
             // showFoundMessage: function(count) {
             //     var msg;
             //     if (count > 0) {
@@ -59,6 +60,16 @@
             //     }
             //     this.$message.html(interpolate(msg, [count, _.escape(term)]));
             // },
+=======
+            showFoundMessage: function(count) {
+                var msg = ngettext(
+                    'Viewing %s course',
+                    'Viewing %s courses',
+                    count
+                );
+                this.$message.html(interpolate(msg, [count]));
+            },
+>>>>>>> parent of 4a0cae0bfe9 (Update search_form.js)
 
             // showNotFoundMessage: function(term) {
             //     var msg = interpolate(
@@ -71,8 +82,7 @@
 
             showErrorMessage: function(error) {
                 this.$message.text(gettext(error || 'There was an error, try searching again.'));
-            },
-
+            }
 
         });
     });
