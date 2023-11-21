@@ -1011,7 +1011,7 @@ openedx-filters==1.6.0
     # via
     #   -r requirements/edx/base.txt
     #   lti-consumer-xblock
-openedx-learning==0.3.4
+openedx-learning==0.3.5
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
