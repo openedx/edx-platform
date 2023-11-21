@@ -16,5 +16,5 @@ markupsafe==2.1.3
     # via jinja2
 pluggy==1.3.0
     # via diff-cover
-pygments==2.16.1
+pygments==2.17.1
     # via diff-cover

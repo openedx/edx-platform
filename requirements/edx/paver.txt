@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-certifi==2023.7.22
+certifi==2023.11.17
     # via requests
 charset-normalizer==2.0.12
     # via

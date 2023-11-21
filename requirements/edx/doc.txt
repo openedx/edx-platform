@@ -10,7 +10,7 @@ accessible-pygments==0.0.4
     # via pydata-sphinx-theme
 acid-xblock==0.2.1
     # via -r requirements/edx/base.txt
-aiohttp==3.8.6
+aiohttp==3.9.0
     # via
     #   -r requirements/edx/base.txt
     #   geoip2
@@ -115,13 +115,13 @@ boto==2.39.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-boto3==1.29.2
+boto3==1.29.4
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.32.2
+botocore==1.32.4
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -138,7 +138,7 @@ celery==5.3.5
     #   edx-enterprise
     #   event-tracking
     #   openedx-learning
-certifi==2023.7.22
+certifi==2023.11.17
     # via
     #   -r requirements/edx/base.txt
     #   elasticsearch
@@ -161,7 +161,6 @@ charset-normalizer==2.0.12
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-    #   aiohttp
     #   requests
     #   snowflake-connector-python
 chem==1.2.0
@@ -314,7 +313,7 @@ django==3.2.23
     #   ora2
     #   super-csv
     #   xss-utils
-django-appconf==1.0.5
+django-appconf==1.0.6
     # via
     #   -r requirements/edx/base.txt
     #   django-statici18n
@@ -357,7 +356,7 @@ django-fernet-fields-v2==0.9
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-django-filter==23.3
+django-filter==23.4
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -933,7 +932,7 @@ oauthlib==3.2.2
     #   social-auth-core
 olxcleaner==0.2.1
     # via -r requirements/edx/base.txt
-openai==1.3.2
+openai==1.3.3
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -952,7 +951,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.0.3
     # via -r requirements/edx/base.txt
-openedx-events==9.1.0
+openedx-events==9.2.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-event-bus-kafka
@@ -1005,7 +1004,7 @@ pgpy==0.6.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-picobox==3.0.0
+picobox==4.0.0
     # via sphinxcontrib-openapi
 piexif==1.1.3
     # via -r requirements/edx/base.txt
@@ -1041,7 +1040,7 @@ py2neo @ https://github.com/overhangio/py2neo/releases/download/2021.2.3/py2neo-
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-pyasn1==0.5.0
+pyasn1==0.5.1
     # via
     #   -r requirements/edx/base.txt
     #   pgpy
@@ -1067,7 +1066,7 @@ pydantic-core==2.14.3
     #   pydantic
 pydata-sphinx-theme==0.14.3
     # via sphinx-book-theme
-pygments==2.16.1
+pygments==2.17.1
     # via
     #   -r requirements/edx/base.txt
     #   accessible-pygments
@@ -1240,7 +1239,7 @@ requests-oauthlib==1.3.1
     # via
     #   -r requirements/edx/base.txt
     #   social-auth-core
-rpds-py==0.13.0
+rpds-py==0.13.1
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
@@ -1555,7 +1554,7 @@ xmlsec==1.3.13
     #   python3-saml
 xss-utils==0.5.0
     # via -r requirements/edx/base.txt
-yarl==1.9.2
+yarl==1.9.3
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
