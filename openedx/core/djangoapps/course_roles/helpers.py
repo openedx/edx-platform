@@ -5,7 +5,6 @@ from typing import Union, List
 
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db.models import Q
-from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import CourseKey
 
 from edx_toggles.toggles import WaffleFlag
