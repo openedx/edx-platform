@@ -82,7 +82,10 @@ def _get_dynamic_partitions(course):
     for generator in dynamic_partition_generators:
         generated_partition = generator(course)
         if generated_partition:
-            generated_partitions.append(generated_partition)
+            if isinstance(generated_partition, list):
+                generated_partitions.extend(generated_partition)
+            else:
+                generated_partitions.append(generated_partition)
 
     return generated_partitions
 

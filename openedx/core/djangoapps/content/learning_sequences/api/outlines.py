@@ -16,6 +16,7 @@ from opaque_keys import OpaqueKey
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from openedx.core import types
+from openedx.core.djangoapps.content.learning_sequences.api.processors.team_partition_groups import TeamPartitionGroupsOutlineProcessor
 
 from ..data import (
     ContentErrorData,
@@ -330,6 +331,7 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,  # lint-amnes
         ('enrollment', EnrollmentOutlineProcessor),
         ('enrollment_track_partitions', EnrollmentTrackPartitionGroupsOutlineProcessor),
         ('cohorts_partitions', CohortPartitionGroupsOutlineProcessor),
+        ('teams_partitions', TeamPartitionGroupsOutlineProcessor),
     ]
 
     # Run each OutlineProcessor in order to figure out what items we have to

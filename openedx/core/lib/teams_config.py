@@ -190,7 +190,7 @@ class TeamsetConfig:
         """
         Return developer-helpful string.
         """
-        attrs = ['teamset_id', 'name', 'description', 'max_team_size', 'teamset_type']
+        attrs = ['teamset_id', 'name', 'description', 'max_team_size', 'teamset_type', 'dynamic_user_partition_id']
         return "<{} {}>".format(
             self.__class__.__name__,
             " ".join(
@@ -230,6 +230,7 @@ class TeamsetConfig:
             'description': self.description,
             'max_team_size': self.max_team_size,
             'type': self.teamset_type.value,
+            'dynamic_user_partition_id': self.dynamic_user_partition_id,
         }
 
     @cached_property
@@ -287,6 +288,13 @@ class TeamsetConfig:
         """
         return self.teamset_type == TeamsetType.private_managed
 
+    @cached_property
+    def dynamic_user_partition_id(self):
+        """
+        The ID of the dynamic user partition for this team-set,
+        falling back to None.
+        """
+        return self._data.get('dynamic_user_partition_id')
 
 class TeamsetType(Enum):
     """
