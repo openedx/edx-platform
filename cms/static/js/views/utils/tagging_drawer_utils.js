@@ -9,7 +9,7 @@
  * ```
  */
 define(['jquery'],
-function($,) {
+function($) {
     'use strict';
 
     var closeDrawer, openDrawer;
