@@ -23,53 +23,53 @@
             };
             listing = new CoursesListing({model: courseListingModel});
 
-            // dispatcher.listenTo(form, 'search', function(query) {
-            //     filters.reset();
-            //     form.showLoadingIndicator();
-            //     search.performSearch(query, filters.getTerms());
-            // });
+            dispatcher.listenTo(form, 'search', function(query) {
+                filters.reset();
+                form.showLoadingIndicator();
+                search.performSearch(query, filters.getTerms());
+            });
 
-            // dispatcher.listenTo(refineSidebar, 'selectOption', function(type, query, name) {
-            //     form.showLoadingIndicator();
-            //     if (filters.get(type)) {
-            //         removeFilter(type);
-            //     } else {
-            //         filters.add({type: type, query: query, name: name});
-            //         search.refineSearch(filters.getTerms());
-            //     }
-            // });
+            dispatcher.listenTo(refineSidebar, 'selectOption', function(type, query, name) {
+                form.showLoadingIndicator();
+                if (filters.get(type)) {
+                    removeFilter(type);
+                } else {
+                    filters.add({type: type, query: query, name: name});
+                    search.refineSearch(filters.getTerms());
+                }
+            });
 
-            // dispatcher.listenTo(filterBar, 'clearFilter', removeFilter);
+            dispatcher.listenTo(filterBar, 'clearFilter', removeFilter);
 
-            // dispatcher.listenTo(filterBar, 'clearAll', function() {
-            //     form.doSearch('');
-            // });
+            dispatcher.listenTo(filterBar, 'clearAll', function() {
+                form.doSearch('');
+            });
 
-            // dispatcher.listenTo(listing, 'next', function() {
-            //     search.loadNextPage();
-            // });
+            dispatcher.listenTo(listing, 'next', function() {
+                search.loadNextPage();
+            });
 
-            // dispatcher.listenTo(search, 'next', function() {
-            //     listing.renderNext();
-            // });
+            dispatcher.listenTo(search, 'next', function() {
+                listing.renderNext();
+            });
 
-            // dispatcher.listenTo(search, 'search', function(query, total) {
-            //     if (total > 0) {
-            //         form.showFoundMessage(total, query);
-            //         if (query) {
-            //             filters.add(
-            //                 {type: 'search_query', query: query, name: quote(query)},
-            //                 {merge: true}
-            //             );
-            //         }
-            //     } else {
-            //         form.showNotFoundMessage(query);
-            //         filters.reset();
-            //     }
-            //     form.hideLoadingIndicator();
-            //     listing.render();
-            //     refineSidebar.render();
-            // });
+            dispatcher.listenTo(search, 'search', function(query, total) {
+                if (total > 0) {
+                    form.showFoundMessage(total, query);
+                    if (query) {
+                        filters.add(
+                            {type: 'search_query', query: query, name: quote(query)},
+                            {merge: true}
+                        );
+                    }
+                } else {
+                    form.showNotFoundMessage(query);
+                    filters.reset();
+                }
+                form.hideLoadingIndicator();
+                listing.render();
+                refineSidebar.render();
+            });
 
             dispatcher.listenTo(search, 'error', function() {
                 form.showErrorMessage(search.errorMessage);
