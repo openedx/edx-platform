@@ -3224,6 +3224,9 @@ INSTALLED_APPS = [
     'rules.apps.AutodiscoverRulesConfig',
     'bridgekeeper',
 
+    # management of user-triggered async tasks (course import/export, etc.)
+    'user_tasks',
+
     # Customized celery tasks, including persisting failed tasks so they can
     # be retried
     'celery_utils',

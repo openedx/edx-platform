@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-22 20:35+0000\n"
-"PO-Revision-Date: 2023-10-22 20:35:52.488124\n"
+"POT-Creation-Date: 2023-11-20 15:29+0000\n"
+"PO-Revision-Date: 2023-11-20 15:29:35.863393\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -10355,6 +10355,10 @@ msgstr "Đᴉsɔnssᴉøns ǝnɐblǝd"
 #: cms/templates/js/course-outline.underscore
 msgid "Proctoring Settings"
 msgstr "Ᵽɹøɔʇøɹᴉnƃ Sǝʇʇᴉnƃs"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Manage Tags"
+msgstr "Mɐnɐƃǝ Ŧɐƃs"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Configure"

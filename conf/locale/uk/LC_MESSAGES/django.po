@@ -41,6 +41,7 @@
 # Andrey Kryachko, 2018
 # Dmytro Halko <dgalko@edpro.com.ua>, 2018
 # Irene Korotkova <irca.gav@gmail.com>, 2017
+# Mykola Melnyk, 2023
 # Natalia Vynogradenko <tannaha@gmail.com>, 2017
 # Oleksandr Prodanyuk, 2015
 # olexiim <olexiim@gmail.com>, 2014,2016
@@ -68,6 +69,7 @@
 # IvanPrimachenko <jastudent1@gmail.com>, 2014-2015
 # aed7ad9d75d010b63d79e2c3891aea63_fb18719 <8b0617f0cc0569340367bf1571e18cac_188092>, 2014
 # Mykhailo Kolianko, 2016
+# Mykola Melnyk, 2023
 # Natalia Vynogradenko <tannaha@gmail.com>, 2017-2018
 # 557b934119df08e2e59a177854f0e6ac, 2014
 # cc322e8fc6cc292f0f00d8b7420e7410_e468d09 <95dee59251c2de5d1d21e213a66df19d_243275>, 2014
@@ -91,6 +93,7 @@
 # Andrii Parkhomenko <andriy.parhomenko@gmail.com>, 2017
 # annburdyliak <annburdyliak@ya.ru>, 2014
 # Irene Korotkova <irca.gav@gmail.com>, 2017
+# Mykola Melnyk, 2023
 # Natalia Vynogradenko <tannaha@gmail.com>, 2017-2018
 # olexiim <olexiim@gmail.com>, 2014-2015
 # Olga Filipova <chudaol@gmail.com>, 2015
@@ -126,7 +129,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-08 20:43+0000\n"
+"POT-Creation-Date: 2023-11-05 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Danylo Shcherbak <danylo.shcherbak@raccoongang.com>, 2020\n"
 "Language-Team: Ukrainian (https://app.transifex.com/open-edx/teams/6205/uk/)\n"
@@ -2074,71 +2077,6 @@ msgstr "Розмір зображення значка не повинен пе�
 #: lms/djangoapps/badges/models.py
 msgid "This value must be all lowercase."
 msgstr "Дане значення повинно бути в нижньому регістрі."
-
-#: lms/djangoapps/badges/models.py
-msgid "The course mode for this badge image. For example, \"verified\" or \"honor\"."
-msgstr ""
-"Статус сертифіката для значка. Наприклад, «Підтверджений сертифікат» або "
-"«Сертифікат Кодексу честі»."
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Badge images must be square PNG files. The file size should be under 250KB."
-msgstr ""
-"Завантажте квадратне зображення у форматі PNG. Його розмір не повинен "
-"перевищувати 250 КБ."
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Set this value to True if you want this image to be the default image for "
-"any course modes that do not have a specified badge image. You can have only"
-" one default image."
-msgstr ""
-"Якщо ви хочете, щоб це зображення використовувалося для курсів без "
-"спеціальних значків, встановіть значення true. За замовчуванням Значок може "
-"бути тільки один."
-
-#: lms/djangoapps/badges/models.py
-msgid "There can be only one default image."
-msgstr "Може використовуватися тільки одне зображення за замовчуванням."
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"On each line, put the number of completed courses to award a badge for, a "
-"comma, and the slug of a badge class you have created that has the issuing "
-"component 'openedx__course'. For example: 3,enrolled_3_courses"
-msgstr ""
-"В кожному рядку, зазначте кількість пройденних курсів для отримання в "
-"нагороду значок, кома, потім клас значка, який Ви створили компонентом "
-"видачі 'openedx__course'. Наприклад: 3,enrolled_3_courses"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"On each line, put the number of enrolled courses to award a badge for, a "
-"comma, and the slug of a badge class you have created that has the issuing "
-"component 'openedx__course'. For example: 3,enrolled_3_courses"
-msgstr ""
-"В кожному рядку зазначте кількість пройденних курсів для отримання в "
-"нагороду значок, кома, потім клас значка, який Ви створили компонентом "
-"видачі 'openedx__course'. Наприклад: 3,enrolled_3_courses"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Each line is a comma-separated list. The first item in each line is the slug"
-" of a badge class you have created that has an issuing component of "
-"'openedx__course'. The remaining items in each line are the course keys the "
-"learner needs to complete to be awarded the badge. For example: "
-"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
-msgstr ""
-"Кожен рядок є список через кому. Перший елемент в кожному рядку - це клас "
-"значка, який Ви створили з компонентом 'openedx__course'.. Інші елементи в "
-"кожному рядку - це ключі курсу, які учень повинен виконати, щоб бути "
-"нагородженим знаком. Наприклад: "
-"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
-
-#: lms/djangoapps/badges/models.py
-msgid "Please check the syntax of your entry."
-msgstr "Будь ласка, перевірте синтаксис запису."
 
 #. Translators: This string is used across Open edX installations
 #. as a callback to edX. Please do not translate `edX.org`
@@ -4897,6 +4835,14 @@ msgid ""
 msgstr ""
 "Списки груп, на які будуть поділені студенти для вивчення експериментальних "
 "матеріалів."
+
+#: lms/djangoapps/lti_provider/models.py
+msgid ""
+"When checked, the LTI content will load only for learners who have an "
+"account in this instance. This is required only for linking learner accounts"
+" with the LTI consumer. See the Open edX LTI Provider documentation for more"
+" details."
+msgstr ""
 
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
@@ -10534,18 +10480,6 @@ msgstr ""
 "мініатюрне зображення відео за допомогою сторінки Налаштування і Деталі."
 
 #: xmodule/course_block.py
-msgid "Issue Open Badges"
-msgstr "Видача відкритих відзнак"
-
-#: xmodule/course_block.py
-msgid ""
-"Issue Open Badges badges for this course. Badges are generated when "
-"certificates are created."
-msgstr ""
-"Видайте відкриті відзнаки для цього курсу. Значки генеруються при створенні "
-"сертифікатів."
-
-#: xmodule/course_block.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
 "marks, enter the short name of the type of certificate that students receive"
@@ -13970,9 +13904,9 @@ msgid "Welcome to {platform_name}"
 msgstr ""
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See https://open.edx.org for more information.
+#. untranslated. See https://openedx.org for more information.
 #: lms/templates/index_overlay.html
-msgid "It works! Powered by Open edX{registered_trademark}"
+msgid "It works! Powered by the Open edX{registered_trademark} Platform"
 msgstr ""
 
 #: lms/templates/invalid_email_key.html
@@ -14626,6 +14560,10 @@ msgstr ""
 
 #: lms/templates/video.html
 msgid "Download Handout"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "How is the transcript quality ?"
 msgstr ""
 
 #: lms/templates/word_cloud.html
@@ -18967,6 +18905,25 @@ msgstr ""
 msgid "My Courses"
 msgstr "Мої курси"
 
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "There was an error when loading this module!"
+msgstr ""
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"This module is available only for users who are signed into {platform}. "
+"Kindly sign in and refresh this page to load the content."
+msgstr ""
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "NOTE:"
+msgstr ""
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"The email used to sign into this platform and {platform} should be the same."
+msgstr ""
+
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
 msgstr "Змінити бажану мову"
@@ -19981,8 +19938,8 @@ msgid "Studio Accessibility Policy"
 msgstr ""
 
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
-msgid "Files & Uploads"
-msgstr "Файли і завантаження"
+msgid "Files"
+msgstr ""
 
 #: cms/templates/certificates.html
 msgid "Course Certificates"
@@ -21727,6 +21684,10 @@ msgstr ""
 #: cms/templates/index.html
 msgid "Libraries"
 msgstr "Бібліотеки"
+
+#: cms/templates/index.html
+msgid "Taxonomies"
+msgstr ""
 
 #: cms/templates/index.html
 msgid "Are you staff on an existing {studio_name} course?"
