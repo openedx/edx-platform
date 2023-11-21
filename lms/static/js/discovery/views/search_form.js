@@ -18,6 +18,8 @@
 
             submitForm: function(event) {
                 event.preventDefault();
+                var query = this.$searchField.val();
+                $('#search-query-display').text('Search Query: ' + query);
                 this.doSearch();
             },
 
