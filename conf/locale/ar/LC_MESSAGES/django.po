@@ -16825,7 +16825,7 @@ msgstr "استعراض عملية التقييم في Studio"
 
 #: lms/templates/courseware/progress.html
 msgid "Course Progress for '{username}' ({email})"
-msgstr "تقدم الدورة ل '{اسم المستخدم}' ({عنوان البريد الالكتروني})"
+msgstr "تقدم الدورة ل '{username}' ({email})"
 
 #: lms/templates/courseware/progress.html
 msgid "View Certificate"
