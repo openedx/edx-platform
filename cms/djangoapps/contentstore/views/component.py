@@ -34,14 +34,14 @@ from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.content_staging import api as content_staging_api
 from openedx.core.djangoapps.content_tagging.api import get_content_tags
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.services import load_services_for_studio  # lint-amnesty, pylint: disable=wrong-import-order
 from ..toggles import use_new_unit_page
 from ..utils import get_lms_link_for_item, get_sibling_urls, reverse_course_url, get_unit_url
 from ..helpers import get_parent_xblock, is_unit, xblock_type_display_name
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
     add_container_page_publishing_info,
     create_xblock_info,
-    load_services_for_studio,
 )
 
 __all__ = [

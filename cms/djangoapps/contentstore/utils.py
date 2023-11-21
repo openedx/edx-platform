@@ -15,7 +15,6 @@ from django.urls import reverse
 from django.utils import translation
 from django.utils.translation import gettext as _
 from help_tokens.core import HelpUrlExpert
-from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocator
 from openedx_events.content_authoring.data import DuplicatedXBlockData
@@ -27,9 +26,7 @@ from xblock.fields import Scope
 from cms.djangoapps.contentstore.toggles import exam_setting_view_enabled
 from common.djangoapps.course_action_state.models import CourseRerunUIStateManager
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.student import auth
-from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access, STUDIO_EDIT_ROLES
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
@@ -45,7 +42,6 @@ from common.djangoapps.util.milestones_helpers import (
     get_namespace_choices,
     generate_milestone_namespace
 )
-from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from openedx.core import toggles as core_toggles
 from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
@@ -79,12 +75,12 @@ from cms.djangoapps.contentstore.toggles import (
     use_tagging_taxonomy_list_page,
 )
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
-from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.partitions.partitions_service import get_all_partitions_for_course  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.services import SettingsService, ConfigurationService, TeamsConfigurationService
+from xmodule.partitions.partitions_service import get_all_partitions_for_course
+from xmodule.services import load_services_for_studio
+from xmodule.util.duplicate import handle_children_duplication  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 log = logging.getLogger(__name__)
@@ -1055,23 +1051,17 @@ def duplicate_block(
         )
 
         children_handled = False
-
-        if hasattr(dest_block, 'studio_post_duplicate'):
+        if hasattr(dest_block, "studio_post_duplicate"):
             # Allow an XBlock to do anything fancy it may need to when duplicated from another block.
-            # These blocks may handle their own children or parenting if needed. Let them return booleans to
-            # let us know if we need to handle these or not.
-            load_services_for_studio(dest_block.runtime, user)
-            children_handled = dest_block.studio_post_duplicate(store, source_item)
+            load_services_for_studio(source_item.runtime, user)
+            children_handled = dest_block.studio_post_duplicate(
+                store, source_item, store, user, duplication_function=duplicate_block, shallow=shallow
+            )
 
-        # Children are not automatically copied over (and not all xblocks have a 'children' attribute).
-        # Because DAGs are not fully supported, we need to actually duplicate each child as well.
-        if source_item.has_children and not shallow and not children_handled:
-            dest_block.children = dest_block.children or []
-            for child in source_item.children:
-                dupe = duplicate_block(dest_block.location, child, user=user, is_child=True)
-                if dupe not in dest_block.children:  # _duplicate_block may add the child for us.
-                    dest_block.children.append(dupe)
-            store.update_item(dest_block, user.id)
+        if not children_handled:
+            handle_children_duplication(
+                store, source_item, store, user, duplication_function=duplicate_block, shallow=shallow
+            )
 
         # pylint: disable=protected-access
         if 'detached' not in source_item.runtime.load_block_type(category)._class_tags:
@@ -1171,25 +1161,6 @@ def gather_block_attributes(source_item, display_name=None, is_child=False):
             if field.scope not in (Scope.settings, Scope.content,):
                 field.delete_from(aside)
     return duplicate_metadata, asides_to_create
-
-
-def load_services_for_studio(runtime, user):
-    """
-    Function to set some required services used for XBlock edits and studio_view.
-    (i.e. whenever we're not loading _prepare_runtime_for_preview.) This is required to make information
-    about the current user (especially permissions) available via services as needed.
-    """
-    services = {
-        "user": DjangoXBlockUserService(user),
-        "studio_user_permissions": StudioPermissionsService(user),
-        "mako": MakoService(),
-        "settings": SettingsService(),
-        "lti-configuration": ConfigurationService(CourseAllowPIISharingInLTIFlag),
-        "teams_configuration": TeamsConfigurationService(),
-        "library_tools": LibraryToolsService(modulestore(), user.id)
-    }
-
-    runtime._services.update(services)  # lint-amnesty, pylint: disable=protected-access
 
 
 def update_course_details(request, course_key, payload, course_block):
@@ -1666,24 +1637,3 @@ def get_course_videos_context(course_block, pagination_conf, course_key=None):
         # Cached state for transcript providers' credentials (org-specific)
         course_video_context['transcript_credentials'] = get_transcript_credentials_state_for_org(course.id.org)
     return course_video_context
-
-
-class StudioPermissionsService:
-    """
-    Service that can provide information about a user's permissions.
-
-    Deprecated. To be replaced by a more general authorization service.
-
-    Only used by LibraryContentBlock (and library_tools.py).
-    """
-
-    def __init__(self, user):
-        self._user = user
-
-    def can_read(self, course_key):
-        """ Does the user have read access to the given course/library? """
-        return has_studio_read_access(self._user, course_key)
-
-    def can_write(self, course_key):
-        """ Does the user have read access to the given course/library? """
-        return has_studio_write_access(self._user, course_key)

@@ -21,7 +21,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore.django import XBlockI18nService, modulestore
 from xmodule.partitions.partitions_service import PartitionService
-from xmodule.services import SettingsService, TeamsConfigurationService
+from xmodule.services import SettingsService, StudioPermissionsService, TeamsConfigurationService
 from xmodule.studio_editable import has_author_view
 from xmodule.util.sandboxing import SandboxService
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment
@@ -45,7 +45,7 @@ from openedx.core.lib.xblock_utils import (
     wrap_xblock_aside
 )
 
-from ..utils import get_visibility_partition_info, StudioPermissionsService
+from ..utils import get_visibility_partition_info
 from .access import get_user_role
 from .session_kv_store import SessionKeyValueStore
 

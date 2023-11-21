@@ -8,6 +8,7 @@ import logging
 import random
 from copy import copy
 from gettext import ngettext, gettext
+from typing import Callable
 
 import bleach
 from django.conf import settings
@@ -587,7 +588,11 @@ class LibraryContentBlock(
             is_updating = False
         return Response(json.dumps(is_updating))
 
-    def studio_post_duplicate(self, store, source_block):
+    def studio_post_duplicate(
+        self,
+        source_item,
+        *_,
+    ) -> None:  # pylint: disable=unused-argument
         """
         Used by the studio after basic duplication of a source block. We handle the children
         ourselves, because we have to properly reference the library upstream and set the overrides.
@@ -595,7 +600,7 @@ class LibraryContentBlock(
         Otherwise we'll end up losing data on the next refresh.
         """
         self._validate_sync_permissions()
-        self.get_tools(to_read_library_content=True).trigger_duplication(source_block=source_block, dest_block=self)
+        self.get_tools(to_read_library_content=True).trigger_duplication(source_block=source_item, dest_block=self)
         return True  # Children have been handled.
 
     def _validate_library_version(self, validation, lib_tools, version, library_key):

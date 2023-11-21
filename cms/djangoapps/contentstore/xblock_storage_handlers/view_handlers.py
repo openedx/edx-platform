@@ -31,7 +31,6 @@ from edx_proctoring.api import (
 )
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from help_tokens.core import HelpUrlExpert
-from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from opaque_keys.edx.locator import LibraryUsageLocator
 from pytz import UTC
 from xblock.core import XBlock
@@ -41,7 +40,6 @@ from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 from cms.djangoapps.contentstore.toggles import ENABLE_COPY_PASTE_UNITS, use_tagging_taxonomy_list_page
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.ai_aside_summary_config import AiAsideSummaryConfig
-from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.static_replace import replace_static_urls
 from common.djangoapps.student.auth import (
     has_studio_read_access,
@@ -49,7 +47,6 @@ from common.djangoapps.student.auth import (
 )
 from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.json_request import JsonResponse, expect_json
-from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from openedx.core.djangoapps.bookmarks import api as bookmarks_api
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
@@ -63,8 +60,9 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
-from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService
+from xmodule.services import load_services_for_studio
 from xmodule.tabs import CourseTabList
+from xmodule.util.duplicate import handle_children_duplication
 
 from ..utils import (
     ancestor_has_staff_lock,
@@ -294,46 +292,6 @@ def modify_xblock(usage_key, request):
         fields=request_data.get("fields"),
         summary_configuration_enabled=request_data.get("summary_configuration_enabled"),
     )
-
-
-class StudioPermissionsService:
-    """
-    Service that can provide information about a user's permissions.
-
-    Deprecated. To be replaced by a more general authorization service.
-
-    Only used by LibraryContentBlock (and library_tools.py).
-    """
-
-    def __init__(self, user):
-        self._user = user
-
-    def can_read(self, course_key):
-        """Does the user have read access to the given course/library?"""
-        return has_studio_read_access(self._user, course_key)
-
-    def can_write(self, course_key):
-        """Does the user have read access to the given course/library?"""
-        return has_studio_write_access(self._user, course_key)
-
-
-def load_services_for_studio(runtime, user):
-    """
-    Function to set some required services used for XBlock edits and studio_view.
-    (i.e. whenever we're not loading _prepare_runtime_for_preview.) This is required to make information
-    about the current user (especially permissions) available via services as needed.
-    """
-    services = {
-        "user": DjangoXBlockUserService(user),
-        "studio_user_permissions": StudioPermissionsService(user),
-        "mako": MakoService(),
-        "settings": SettingsService(),
-        "lti-configuration": ConfigurationService(CourseAllowPIISharingInLTIFlag),
-        "teams_configuration": TeamsConfigurationService(),
-        "library_tools": LibraryToolsService(modulestore(), user.id),
-    }
-
-    runtime._services.update(services)  # lint-amnesty, pylint: disable=protected-access
 
 
 def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
@@ -860,29 +818,17 @@ def _duplicate_block(
         )
 
         children_handled = False
-
         if hasattr(dest_block, "studio_post_duplicate"):
             # Allow an XBlock to do anything fancy it may need to when duplicated from another block.
-            # These blocks may handle their own children or parenting if needed. Let them return booleans to
-            # let us know if we need to handle these or not.
-            # TODO: Make this a proper method in the base class so we don't need getattr.
-            #       See https://github.com/openedx/edx-platform/issues/33715
-            load_services_for_studio(dest_block.runtime, user)
-            children_handled = dest_block.studio_post_duplicate(store, source_item)
+            load_services_for_studio(source_item.runtime, user)
+            children_handled = dest_block.studio_post_duplicate(
+                source_item, store, user, duplication_function=_duplicate_block, shallow=False
+            )
 
-        # Children are not automatically copied over (and not all xblocks have a 'children' attribute).
-        # Because DAGs are not fully supported, we need to actually duplicate each child as well.
-        if source_item.has_children and not children_handled:
-            dest_block.children = dest_block.children or []
-            for child in source_item.children:
-                dupe = _duplicate_block(
-                    dest_block.location, child, user=user, is_child=True
-                )
-                if (
-                    dupe not in dest_block.children
-                ):  # _duplicate_block may add the child for us.
-                    dest_block.children.append(dupe)
-            store.update_item(dest_block, user.id)
+        if not children_handled:
+            handle_children_duplication(
+                dest_block, source_item, store, user, duplication_function=_duplicate_block, shallow=False
+            )
 
         # pylint: disable=protected-access
         if "detached" not in source_item.runtime.load_block_type(category)._class_tags:

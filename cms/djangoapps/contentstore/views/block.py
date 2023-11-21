@@ -27,7 +27,8 @@ from openedx.core.lib.xblock_utils import (
 )
 from xmodule.modulestore.django import (
     modulestore,
-)  # lint-amnesty, pylint: disable=wrong-import-order
+)
+from xmodule.services import load_services_for_studio  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 from xmodule.x_module import (
@@ -46,7 +47,6 @@ from .preview import get_preview_fragment
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
     handle_xblock,
     create_xblock_info,
-    load_services_for_studio,
     get_block_info,
     get_xblock,
     delete_orphans,

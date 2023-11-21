@@ -6,15 +6,23 @@ Module contains various XModule/XBlock services
 import inspect
 import logging
 from functools import partial
+from common.djangoapps.edxmako.services import MakoService
+from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from eventtracking import tracker
 from edx_when.field_data import DateLookupFieldData
+from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from xblock.reference.plugins import Service
 from xblock.runtime import KvsFieldData
 
+import xmodule
 from common.djangoapps.track import contexts
+from common.djangoapps.student.auth import (
+    has_studio_read_access,
+    has_studio_write_access,
+)
 from lms.djangoapps.courseware.masquerade import is_masquerading_as_specific_student
 from xmodule.modulestore.django import modulestore
 
@@ -308,3 +316,43 @@ class EventPublishingService(Service):
         # in order to avoid duplicate work and possibly conflicting semantics.
         if not getattr(block, 'has_custom_completion', False):
             self.completion_service.submit_completion(block.scope_ids.usage_id, 1.0)
+
+
+def load_services_for_studio(runtime, user):
+    """
+    Function to set some required services used for XBlock edits and studio_view.
+    (i.e. whenever we're not loading _prepare_runtime_for_preview.) This is required to make information
+    about the current user (especially permissions) available via services as needed.
+    """
+    services = {
+        "user": DjangoXBlockUserService(user),
+        "studio_user_permissions": StudioPermissionsService(user),
+        "mako": MakoService(),
+        "settings": SettingsService(),
+        "lti-configuration": ConfigurationService(CourseAllowPIISharingInLTIFlag),
+        "teams_configuration": TeamsConfigurationService(),
+        "library_tools": xmodule.library_tools.LibraryToolsService(modulestore(), user.id),
+    }
+
+    runtime._services.update(services)  # lint-amnesty, pylint: disable=protected-access
+
+
+class StudioPermissionsService:
+    """
+    Service that can provide information about a user's permissions.
+
+    Deprecated. To be replaced by a more general authorization service.
+
+    Only used by LibraryContentBlock (and library_tools.py).
+    """
+
+    def __init__(self, user):
+        self._user = user
+
+    def can_read(self, course_key):
+        """Does the user have read access to the given course/library?"""
+        return has_studio_read_access(self._user, course_key)
+
+    def can_write(self, course_key):
+        """Does the user have read access to the given course/library?"""
+        return has_studio_write_access(self._user, course_key)
