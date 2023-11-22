@@ -143,26 +143,26 @@ jobs:
         ./manage.py lms makemigrations
         ./manage.py lms showmigrations > /data/files/def.txt
 
-    - name: Debug File Paths
-      run: |
-        ls -R ${{ github.workspace }}
-
     - name: Process Data
       run: |
         cd /data/files/
         ls
-        FILE1_PATH="/data/files/def.txt"
-        FILE2_PATH="/data/files/abcd.txt"
+        FILE1_PATH="/data/files/abcd.txt"
+        FILE2_PATH="/data/files/def.txt"
 
         # Fetch the content of the files
         FILE1_CONTENT=$(cat $FILE1_PATH)
         FILE2_CONTENT=$(cat $FILE2_PATH)
-        git diff $FILE1_PATH $FILE2_PATH
+        if git diff --quiet $FILE1_CONTENT $FILE2_CONTENT; then
+          echo "Files are identical."
+        else
+          git diff $FILE1_PATH $FILE2_PATH > /data/files/mydiff.txt
+        fi
         cat mydiff.txt
       shell: bash
-#
-#    - name: Comment PR
-#      uses: thollander/actions-comment-pull-request@v2
-#      with:
-#        filePath:  git diff $FILE1_PATH $FILE2_PATH
-#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Comment PR
+      uses: thollander/actions-comment-pull-request@v2
+      with:
+        filePath:  /data/files/mydiff.txt
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
