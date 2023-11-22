@@ -153,13 +153,7 @@ jobs:
         # Fetch the content of the files
         FILE1_CONTENT=$(cat $FILE1_PATH)
         FILE2_CONTENT=$(cat $FILE2_PATH)
-
-#        if cmp -s <(echo "$FILE1_CONTENT") <(echo "$FILE2_CONTENT"); then
-#          echo "Files are identical."
-#        else
         git diff $FILE1_PATH $FILE2_PATH > /data/files/mydiff.txt
-#        fi
-
         cat /data/files/mydiff.txt
 
     - name: Comment PR
