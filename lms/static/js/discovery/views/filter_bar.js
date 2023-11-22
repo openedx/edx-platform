@@ -40,30 +40,30 @@
 
             addFilter: function(filter) {
                 var label = new FilterLabel({model: filter});
-                // this.$ul.append(label.render().el);
+                this.$ul.append(label.render().el);
                 this.show();
             },
 
-            // hideIfEmpty: function() {
-            //     if (this.collection.isEmpty()) {
-            //         this.hide();
-            //     }
-            // },
+            hideIfEmpty: function() {
+                if (this.collection.isEmpty()) {
+                    this.hide();
+                }
+            },
 
-            // resetFilters: function() {
-            //     this.$ul.empty();
-            //     this.hide();
-            // },
+            resetFilters: function() {
+                this.$ul.empty();
+                this.hide();
+            },
 
-            // clearFilter: function(event) {
-            //     var $target = $(event.currentTarget);
-            //     var filter = this.collection.get($target.data('type'));
-            //     this.trigger('clearFilter', filter.id);
-            // },
+            clearFilter: function(event) {
+                var $target = $(event.currentTarget);
+                var filter = this.collection.get($target.data('type'));
+                this.trigger('clearFilter', filter.id);
+            },
 
-            // clearAll: function(event) {
-            //     this.trigger('clearAll');
-            // },
+            clearAll: function(event) {
+                this.trigger('clearAll');
+            },
 
             show: function() {
                 this.$el.removeClass('is-collapsed');
