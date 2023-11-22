@@ -81,7 +81,6 @@ boto==2.39.0
 social-auth-core==4.3.0
 babel==2.11.0
 social-auth-app-django==5.0.0
-algoliasearch==2.6.3
 
 # urllib3>=2.0.0 conflicts with elastic search && snowflake-connector-python packages
 # which require urllib3<2 for now.
