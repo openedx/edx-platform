@@ -220,7 +220,10 @@ from openedx.core.djangolib.markup import HTML, Text
                                 )}</span>
                             </p>
                         </div>
-                     </div>
+                    </div>
+                    % if show_unit_tags:
+                        <div class="unit-tags is-hidden"></div>
+                    % endif
                 % endif
             </aside>
         </section>
@@ -245,4 +248,7 @@ from openedx.core.djangolib.markup import HTML, Text
         </div>
     </div>
 </div>
+
+<div id="manage-tags-drawer" class="drawer"></div>
+<div class="drawer-cover"></div>
 </%block>

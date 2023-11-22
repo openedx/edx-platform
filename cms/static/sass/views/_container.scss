@@ -242,6 +242,77 @@
       }
     }
 
+    .unit-tags {
+      .wrapper-tags {
+        margin-bottom: $baseline;
+        padding: ($baseline*0.75);
+        background-color: $white;
+
+        .wrapper-tag-header {
+          display: flex;
+          justify-content: space-between;
+
+          .tag-title {
+            font-weight: bold;
+          }
+
+          .count-badge {
+            background-color: $gray-l5;
+            border-radius: 50%;
+            display: inline-block;
+            padding: 0px 8px;
+          }
+        }
+
+        .wrapper-tag-header:focus {
+          border: 1px dotted gray;
+        }
+
+        .action-primary {
+          @extend %btn-primary-inverse;
+
+          width: 100%;
+          margin: 16px 2px 8px 2px;
+        }
+
+        .wrapper-tag-content {
+          background-color: $white;
+
+          .content-taxonomies {
+            display: flex;
+            flex-direction: column;
+            padding-top: 10px;
+
+            .tagging-label {
+              display: flex;
+              padding: 4px 0px;
+
+              .tagging-label-value {
+                display: inline-block;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+              }
+
+              .tagging-label-count {
+                display: inline-block;
+                margin: 0 0.5em;
+              }
+            }
+
+            .tagging-label:hover,
+            .tagging-label:focus {
+              color: $blue;
+            }
+
+            .icon {
+              margin-left: 5px;
+            }
+          }
+        }
+      }
+    }
+
     // versioning widget
     .unit-publish-history {
       .wrapper-last-publish {

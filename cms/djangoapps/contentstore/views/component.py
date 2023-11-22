@@ -25,10 +25,14 @@ from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.xblock_django.api import authorable_xblocks, disabled_xblocks
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
-from cms.djangoapps.contentstore.toggles import use_new_problem_editor
+from cms.djangoapps.contentstore.toggles import (
+    use_new_problem_editor,
+    use_tagging_taxonomy_list_page,
+)
 from openedx.core.lib.xblock_utils import get_aside_from_xblock, is_xblock_aside
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.content_staging import api as content_staging_api
+from openedx.core.djangoapps.content_tagging.api import get_content_tags
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from ..toggles import use_new_unit_page
@@ -61,7 +65,7 @@ CONTAINER_TEMPLATES = [
     "editor-mode-button", "upload-dialog",
     "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu",
     "add-xblock-component-support-legend", "add-xblock-component-support-level", "add-xblock-component-menu-problem",
-    "xblock-string-field-editor", "xblock-access-editor", "publish-xblock", "publish-history",
+    "xblock-string-field-editor", "xblock-access-editor", "publish-xblock", "publish-history", "tag-list",
     "unit-outline", "container-message", "container-access", "license-selector", "copy-clipboard-button",
     "edit-title-button",
 ]
@@ -109,7 +113,7 @@ def _load_mixed_class(category):
 
 @require_GET
 @login_required
-def container_handler(request, usage_key_string):
+def container_handler(request, usage_key_string):  # pylint: disable=too-many-statements
     """
     The restful handler for container xblock requests.
 
@@ -178,9 +182,14 @@ def container_handler(request, usage_key_string):
             prev_url = quote_plus(prev_url) if prev_url else None
             next_url = quote_plus(next_url) if next_url else None
 
+            show_unit_tags = use_tagging_taxonomy_list_page()
+            unit_tags = None
+            if show_unit_tags and is_unit_page:
+                unit_tags = get_unit_tags(usage_key)
+
             # Fetch the XBlock info for use by the container page. Note that it includes information
             # about the block's ancestors and siblings for use by the Unit Outline.
-            xblock_info = create_xblock_info(xblock, include_ancestor_info=is_unit_page)
+            xblock_info = create_xblock_info(xblock, include_ancestor_info=is_unit_page, tags=unit_tags)
 
             if is_unit_page:
                 add_container_page_publishing_info(xblock, xblock_info)
@@ -220,6 +229,7 @@ def container_handler(request, usage_key_string):
                 'draft_preview_link': preview_lms_link,
                 'published_preview_link': lms_link,
                 'templates': CONTAINER_TEMPLATES,
+                'show_unit_tags': show_unit_tags,
                 # Status of the user's clipboard, exactly as would be returned from the "GET clipboard" REST API.
                 'user_clipboard': user_clipboard,
                 'is_fullwidth_content': is_library_xblock,
@@ -603,3 +613,84 @@ def component_handler(request, usage_key_string, handler, suffix=''):
         )
 
     return webob_to_django_response(resp)
+
+
+def get_unit_tags(usage_key):
+    """
+    Get the tags of a Unit and build a json to be read by the UI
+
+    Note: When migrating the `TagList` subview from `container_subview.js` to the course-authoring MFE,
+    this function can be simplified to use the REST API of openedx-learning,
+    which already provides this grouping + sorting logic.
+    """
+    # Get content tags from content tagging API
+    content_tags = get_content_tags(usage_key)
+
+    # Group content tags by taxonomy
+    taxonomy_dict = {}
+    for content_tag in content_tags:
+        taxonomy_id = content_tag.taxonomy_id
+        # When a taxonomy is deleted, the id here is None.
+        # In that case the tag is not shown in the UI.
+        if taxonomy_id:
+            if taxonomy_id not in taxonomy_dict:
+                taxonomy_dict[taxonomy_id] = []
+            taxonomy_dict[taxonomy_id].append(content_tag)
+
+    taxonomy_list = []
+    total_count = 0
+
+    def handle_tag(tags, root_ids, tag, child_tag_id=None):
+        """
+        Group each tag by parent to build a tree.
+        """
+        tag_processed_before = tag.id in tags
+        if not tag_processed_before:
+            tags[tag.id] = {
+                'id': tag.id,
+                'value': tag.value,
+                'children': [],
+            }
+        if child_tag_id:
+            # Add a child into the children list
+            tags[tag.id].get('children').append(tags[child_tag_id])
+        if tag.parent_id is None:
+            if tag.id not in root_ids:
+                root_ids.append(tag.id)
+        elif not tag_processed_before:
+            # Group all the lineage of this tag.
+            #
+            # Skip this if the tag has been processed before,
+            # we don't need to process lineage again to avoid duplicates.
+            handle_tag(tags, root_ids, tag.parent, tag.id)
+
+    # Build a tag tree for each taxonomy
+    for content_tag_list in taxonomy_dict.values():
+        tags = {}
+        root_ids = []
+
+        for content_tag in content_tag_list:
+            # When a tag is deleted from the taxonomy, the `tag` here is None.
+            # In that case the tag is not shown in the UI.
+            if content_tag.tag:
+                handle_tag(tags, root_ids, content_tag.tag)
+
+        taxonomy = content_tag_list[0].taxonomy
+
+        if tags:
+            count = len(tags)
+            # Add the tree to the taxonomy list
+            taxonomy_list.append({
+                'id': taxonomy.id,
+                'value': taxonomy.name,
+                'tags': [tags[tag_id] for tag_id in root_ids],
+                'count': count,
+            })
+            total_count += count
+
+    unit_tags = {
+        'count': total_count,
+        'taxonomies': taxonomy_list,
+    }
+
+    return unit_tags

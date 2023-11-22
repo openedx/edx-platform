@@ -76,6 +76,7 @@ from ..utils import (
     has_children_visible_to_specific_partition_groups,
     is_currently_visible_to_students,
     is_self_paced,
+    get_taxonomy_tags_widget_url,
 )
 
 from .create_xblock import create_xblock
@@ -1078,6 +1079,7 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
     course=None,
     is_concise=False,
     summary_configuration=None,
+    tags=None,
 ):
     """
     Creates the information needed for client-side XBlockInfo.
@@ -1370,6 +1372,10 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             )
         else:
             xblock_info["ancestor_has_staff_lock"] = False
+        if tags is not None:
+            xblock_info["tags"] = tags
+        if use_tagging_taxonomy_list_page():
+            xblock_info["taxonomy_tags_widget_url"] = get_taxonomy_tags_widget_url()
 
         if course_outline:
             if xblock_info["has_explicit_staff_lock"]:

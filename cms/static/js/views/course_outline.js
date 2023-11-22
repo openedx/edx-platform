@@ -11,10 +11,12 @@
 define(['jquery', 'underscore', 'js/views/xblock_outline', 'edx-ui-toolkit/js/utils/string-utils',
     'common/js/components/utils/view_utils', 'js/views/utils/xblock_utils',
     'js/models/xblock_outline_info', 'js/views/modals/course_outline_modals', 'js/utils/drag_and_drop',
-    'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',],
+    'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
+    'js/views/utils/tagging_drawer_utils',],
 function(
     $, _, XBlockOutlineView, StringUtils, ViewUtils, XBlockViewUtils,
-    XBlockOutlineInfo, CourseOutlineModalsFactory, ContentDragger, NotificationView, PromptView
+    XBlockOutlineInfo, CourseOutlineModalsFactory, ContentDragger, NotificationView, PromptView,
+    TaggingDrawerUtils
 ) {
     var CourseOutlineView = XBlockOutlineView.extend({
         // takes XBlockOutlineInfo as a model
@@ -458,41 +460,12 @@ function(
             event.stopPropagation();
         },
 
-        closeManageTagsDrawer(drawer, drawerCover) {
-            $(drawerCover).css('display', 'none');
-            $(drawer).empty();
-            $(drawer).css('display', 'none');
-            $('body').removeClass('drawer-open');
-        },
-
-        openManageTagsDrawer(event) {
-            const drawer = document.querySelector("#manage-tags-drawer");
-            const drawerCover = document.querySelector(".drawer-cover")
+        openManageTagsDrawer() {
             const article = document.querySelector('[data-taxonomy-tags-widget-url]');
             const taxonomyTagsWidgetUrl = $(article).attr('data-taxonomy-tags-widget-url');
             const contentId = this.model.get('id');
 
-            // Add handler to close drawer when dark background is clicked
-            $(drawerCover).click(function() {
-                this.closeManageTagsDrawer(drawer, drawerCover);
-            }.bind(this));
-
-            // Add event listen to close drawer when close button is clicked from within the Iframe
-            window.addEventListener("message", function (event) {
-                if (event.data === 'closeManageTagsDrawer') {
-                    this.closeManageTagsDrawer(drawer, drawerCover)
-                }
-            }.bind(this));
-
-            $(drawerCover).css('display', 'block');
-            // xss-lint: disable=javascript-jquery-html
-            $(drawer).html(
-                `<iframe src="${taxonomyTagsWidgetUrl}${contentId}" onload="this.contentWindow.focus()" frameborder="0" style="width: 100%; height: 100%;"></iframe>`
-            );
-            $(drawer).css('display', 'block');
-
-            // Prevent background from being scrollable when drawer is open
-            $('body').addClass('drawer-open');
+            TaggingDrawerUtils.openDrawer(taxonomyTagsWidgetUrl, contentId);
         },
 
         addButtonActions: function(element) {
