@@ -45,14 +45,22 @@
             },
 
            
-            showFoundMessage: function(count) {
-                var msg = ngettext(
-                    'Viewing %s course',
-                    'Viewing %s courses',
-                    count
-                );
-                this.$message.html(interpolate(msg, [count]));
+            showFoundMessage: function(count, query) {
+                var msg;
+                if (count === 1) {
+                    msg = interpolate(
+                        gettext('1 result found for "%s"'),
+                        [_.escape(query)]
+                    );
+                } else {
+                    msg = interpolate(
+                        gettext('%s results found for "%s"'),
+                        [count, _.escape(query)]
+                    );
+                }
+                this.$message.html(msg);
             },
+            
 
             showNotFoundMessage: function(term) {
                 var msg = interpolate(
