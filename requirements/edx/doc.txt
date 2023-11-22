@@ -1009,7 +1009,7 @@ picobox==3.0.0
     # via sphinxcontrib-openapi
 piexif==1.1.3
     # via -r requirements/edx/base.txt
-pillow==10.1.0
+pillow==10.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
