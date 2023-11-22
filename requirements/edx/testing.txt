@@ -75,9 +75,8 @@ attrs==23.1.0
     #   openedx-events
     #   openedx-learning
     #   referencing
-babel==2.11.0
+babel==2.13.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   enmerkar
     #   enmerkar-underscore
