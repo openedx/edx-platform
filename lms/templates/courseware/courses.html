@@ -93,7 +93,7 @@
         <div id="discovery-message" class="search-status-label" style="display: none;"></div>
 
         <div class="search-results-count" style="display: none;">
-          <span id="results-count"></span> results find for "<span id="search-term"></span>"
+          <span id="results-count"></span> find for "<span id="search-term"></span>"
       </div>
 
       </div>
@@ -327,38 +327,40 @@
         % endif
 
         <script>
-          document.addEventListener('DOMContentLoaded', function() {
-              var searchForm = document.getElementById('discovery-form');
-              var resultsCountContainer = document.querySelector('.search-results-count');
-              var resultsCount = document.getElementById('results-count');
-              var searchTermDisplay = document.getElementById('search-term');
-              var discoveryMessage = document.getElementById('discovery-message');
+    document.addEventListener('DOMContentLoaded', function() {
+        var searchForm = document.getElementById('discovery-form');
+        var resultsCountContainer = document.querySelector('.search-results-count');
+        var resultsCount = document.getElementById('results-count');
+        var searchTermDisplay = document.getElementById('search-term');
+        var discoveryMessage = document.getElementById('discovery-message');
 
-              searchForm.addEventListener('submit', function(event) {
-                  event.preventDefault(); // Prevents the form from submitting traditionally
+        searchForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevents the form from submitting traditionally
 
-                  var searchTerm = document.getElementById('discovery-input').value.trim();
+            var searchTerm = document.getElementById('discovery-input').value.trim();
 
-                  // Delay the execution to wait for discovery-message to update
-                  setTimeout(function() {
-                      var messageText = discoveryMessage.textContent || '';
-                      var numberOfResults;
+            setTimeout(function() {
+                var messageText = discoveryMessage.textContent || '';
+                var numberOfResults;
+                var resultTerm;
 
-                      if (messageText.includes("any results")) {
-                          numberOfResults = 0;
-                      } else {
-                          numberOfResults = parseInt(messageText.match(/\d+/)[0]) || 0;
-                      }
+                if (messageText.includes("any results")) {
+                    numberOfResults = 0;
+                    resultTerm = 'results'; // Plural, as "0 results" is the conventional expression
+                } else {
+                    numberOfResults = parseInt(messageText.match(/\d+/)[0]) || 0;
+                    resultTerm = (numberOfResults === 1) ? 'result' : 'results'; // Singular for 1, plural otherwise
+                }
 
-                      // Update the display inside the setTimeout function
-                      resultsCountContainer.style.display = 'block';
-                      resultsCount.textContent = numberOfResults;
-                      searchTermDisplay.textContent = searchTerm;
-                  }, 200); // Adjust the delay time as needed
-              });
-          });
+                // Update the display inside the setTimeout function
+                resultsCountContainer.style.display = 'block';
+                resultsCount.textContent = numberOfResults + ' ' + resultTerm;
+                searchTermDisplay.textContent = searchTerm;
+            }, 500); // Adjust the delay time as needed
+        });
+    });
+</script>
 
-      </script>
 
       </section>
     </section>
