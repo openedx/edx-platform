@@ -485,7 +485,6 @@ djangorestframework-xml==2.0.0
     #   edx-enterprise
 docutils==0.19
     # via
-    #   -c requirements/edx/../constraints.txt
     #   pydata-sphinx-theme
     #   sphinx
     #   sphinx-mdinclude
