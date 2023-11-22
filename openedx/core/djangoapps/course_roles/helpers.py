@@ -165,8 +165,16 @@ def get_all_user_permissions_for_a_course(user_id: int, course_key: CourseKey):
         raise ValueError('user does not exist') from exc
     if not CourseOverview.course_exists(course_key):
         raise ValueError('course does not exist')
-    permissions = set(UserRole.objects.filter(
-        Q(Q(user__id=user_id) &
-          Q(Q(course=course_key) | Q(course__isnull=True) & Q(Q(org__name=course_key.org) | Q(org__isnull=True))))
-    ).values_list('role__permissions__name', flat=True))
+    permissions_qset = UserRole.objects.filter(
+        Q(user__id=user_id),
+        (
+            # Course-specific roles
+            Q(course=course_key) |
+            # Org-wide roles that apply to this course
+            (Q(course__isnull=True) & Q(org__name=course_key.org)) |
+            # Instance-wide roles
+            Q(org__isnull=True)
+        )
+    )
+    permissions = set(permissions_qset.values_list('role__permissions__name', flat=True))
     return permissions
