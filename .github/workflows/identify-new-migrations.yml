@@ -143,16 +143,12 @@ jobs:
         ./manage.py lms makemigrations
         ./manage.py lms showmigrations > /data/files/def.txt
 
-    - name: Process Data
-      run: |
-        cd /data/files/
-        ls
-        FILE1_PATH="/data/files/abcd.txt"
-        FILE2_PATH="/data/files/def.txt"
-
-        # Fetch the content of the files
-        FILE1_CONTENT=$(cat $FILE1_PATH)
-        FILE2_CONTENT=$(cat $FILE2_PATH)
+#    - name: Process Data
+#      run: |
+#        cd /data/files/
+#        ls
+#        FILE1_PATH="/data/files/abcd.txt"
+#        FILE2_PATH="/data/files/def.txt"
 
     - name: Comment PR
     - uses: LouisBrunner/diff-action@v0.2.0
