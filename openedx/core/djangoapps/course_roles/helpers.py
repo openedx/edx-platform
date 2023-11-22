@@ -8,9 +8,9 @@ from django.db.models import Q
 from opaque_keys.edx.keys import CourseKey
 
 from edx_toggles.toggles import WaffleFlag
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_roles.models import UserRole
 from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
-from xmodule.modulestore.django import modulestore
 
 
 # .. toggle_name: FLAG_USE_PERMISSION_CHECKS
@@ -163,14 +163,10 @@ def get_all_user_permissions_for_a_course(user_id: int, course_key: CourseKey):
         user = User.objects.get(pk=user_id)
     except User.DoesNotExist as exc:
         raise ValueError('user does not exist') from exc
-    try:
-        course = modulestore().get_course(course_key)
-    except AssertionError as exc:
-        raise ValueError('course_id is not valid') from exc
-    if not course:
+    if not CourseOverview.course_exists(course_key):
         raise ValueError('course does not exist')
     permissions = set(UserRole.objects.filter(
         Q(Q(user__id=user_id) &
-          Q(Q(course=course_key) | Q(course__isnull=True) & Q(Q(org__name=course.org) | Q(org__isnull=True))))
+          Q(Q(course=course_key) | Q(course__isnull=True) & Q(Q(org__name=course_key.org) | Q(org__isnull=True))))
     ).values_list('role__permissions__name', flat=True))
     return permissions
