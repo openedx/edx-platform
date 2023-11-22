@@ -54,22 +54,20 @@
             });
 
             dispatcher.listenTo(search, 'search', function(query, total) {
+            
                 if (total > 0) {
                     form.showFoundMessage(total, query);
-                    if (query) {
-                        filters.add(
-                            {type: 'search_query', query: query, name: quote(query)},
-                            {merge: true}
-                        );
-                    }
+                    
                 } else {
                     form.showNotFoundMessage(query);
                     filters.reset();
                 }
+            
                 form.hideLoadingIndicator();
                 listing.render();
                 refineSidebar.render();
             });
+            
 
             dispatcher.listenTo(search, 'error', function() {
                 form.showErrorMessage(search.errorMessage);
