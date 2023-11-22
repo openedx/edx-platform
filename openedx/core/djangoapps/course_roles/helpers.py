@@ -11,6 +11,7 @@ from edx_toggles.toggles import WaffleFlag
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_roles.models import UserRole
 from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
+from openedx.core.lib.cache_utils import request_cached
 
 
 # .. toggle_name: FLAG_USE_PERMISSION_CHECKS
@@ -32,6 +33,7 @@ def use_permission_checks():
     return USE_PERMISSION_CHECKS_FLAG.is_enabled()
 
 
+@request_cached()
 def user_has_permission_course(
         user: Union[User, AnonymousUser],
         permission: Union[CourseRolesPermission, str],
@@ -53,6 +55,7 @@ def user_has_permission_course(
     ).exists()
 
 
+@request_cached()
 def user_has_permission_list_course(
         user: Union[User, AnonymousUser],
         permissions: List[Union[CourseRolesPermission, str]],
@@ -66,6 +69,7 @@ def user_has_permission_list_course(
     return all(user_has_permission_course(user, permission, course_key) for permission in permissions)
 
 
+@request_cached()
 def user_has_permission_list_any_course(
         user: Union[User, AnonymousUser],
         permissions: List[Union[CourseRolesPermission, str]],
@@ -77,6 +81,7 @@ def user_has_permission_list_any_course(
     return any(user_has_permission_course(user, permission, course_key) for permission in permissions)
 
 
+@request_cached()
 def user_has_permission_org(
         user: Union[User, AnonymousUser],
         permission: Union[CourseRolesPermission, str],
@@ -99,6 +104,7 @@ def user_has_permission_org(
     ).exists()
 
 
+@request_cached()
 def user_has_permission_list_org(
         user: Union[User, AnonymousUser],
         permissions: List[Union[CourseRolesPermission, str]],
@@ -114,6 +120,7 @@ def user_has_permission_list_org(
     )
 
 
+@request_cached()
 def user_has_permission_course_org(
         user: Union[User, AnonymousUser],
         permission: Union[CourseRolesPermission, str],
@@ -133,6 +140,7 @@ def user_has_permission_course_org(
             )
 
 
+@request_cached()
 def user_has_permission_list_course_org(
         user: Union[User, AnonymousUser],
         permissions: List[Union[CourseRolesPermission, str]],
@@ -149,6 +157,7 @@ def user_has_permission_list_course_org(
     )
 
 
+@request_cached()
 def get_all_user_permissions_for_a_course(user_id: int, course_key: CourseKey):
     """
     Get all of a user's permissions for a course,
