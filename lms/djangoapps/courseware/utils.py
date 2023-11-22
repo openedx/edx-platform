@@ -183,7 +183,6 @@ def create_financial_assistance_application(form_data):
     {
         "lms_user_id": <user_id>,
         "course_id": <course_run_id>,
-        "income": <income_from_range>,
         "learner_reasons": <TEST_LONG_STRING>,
         "learner_goals": <TEST_LONG_STRING>,
         "learner_plans": <TEST_LONG_STRING>,

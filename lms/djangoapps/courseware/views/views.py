@@ -1982,7 +1982,6 @@ def _get_fa_header(header):
                platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)).split('\n')
 
 
-FA_INCOME_LABEL = gettext_noop('Annual Household Income')
 FA_REASON_FOR_APPLYING_LABEL = gettext_noop('Tell us about your current financial situation. Why do you need assistance?')  # lint-amnesty, pylint: disable=line-too-long
 FA_GOALS_LABEL = gettext_noop('Tell us about your learning or professional goals. How will a Verified Certificate in this course help you achieve these goals?')  # lint-amnesty, pylint: disable=line-too-long
 
@@ -2024,7 +2023,6 @@ def financial_assistance_request(request):
         legal_name = data['name']
         email = data['email']
         country = data['country']
-        income = data['income']
         reason_for_applying = data['reason_for_applying']
         goals = data['goals']
         effort = data['effort']
@@ -2057,7 +2055,6 @@ def financial_assistance_request(request):
             ('Username', username),
             ('Full Name', legal_name),
             ('Course ID', course_id),
-            (FA_INCOME_LABEL, income),
             ('Country', country),
             ('Allowed for marketing purposes', 'Yes' if marketing_permission else 'No'),
             (FA_REASON_FOR_APPLYING_LABEL, '\n' + reason_for_applying + '\n\n'),
@@ -2094,7 +2091,6 @@ def financial_assistance_request_v2(request):
         if course_id and course_id not in request.META.get('HTTP_REFERER'):
             return HttpResponseBadRequest('Invalid Course ID provided.')
         lms_user_id = request.user.id
-        income = data['income']
         learner_reasons = data['reason_for_applying']
         learner_goals = data['goals']
         learner_plans = data['effort']
@@ -2110,7 +2106,6 @@ def financial_assistance_request_v2(request):
     form_data = {
         'lms_user_id': lms_user_id,
         'course_id': course_id,
-        'income': income,
         'learner_reasons': learner_reasons,
         'learner_goals': learner_goals,
         'learner_plans': learner_plans,
@@ -2127,13 +2122,7 @@ def financial_assistance_form(request, course_id=None):
     if course_id:
         disabled = True
     enrolled_courses = get_financial_aid_courses(user, course_id)
-    incomes = ['Less than $5,000', '$5,000 - $10,000', '$10,000 - $15,000', '$15,000 - $20,000', '$20,000 - $25,000',
-               '$25,000 - $40,000', '$40,000 - $55,000', '$55,000 - $70,000', '$70,000 - $85,000',
-               '$85,000 - $100,000', 'More than $100,000']
 
-    annual_incomes = [
-        {'name': _(income), 'value': income} for income in incomes  # lint-amnesty, pylint: disable=translation-of-non-string
-    ]
     if course_id and _use_new_financial_assistance_flow(course_id):
         submit_url = 'submit_financial_assistance_request_v2'
     else:
@@ -2166,16 +2155,6 @@ def financial_assistance_form(request, course_id=None):
                     ' the course does not appear in the list, make sure that you have enrolled'
                     ' in the audit track for the course.'
                 )
-            },
-            {
-                'name': 'income',
-                'type': 'select',
-                'label': _(FA_INCOME_LABEL),  # lint-amnesty, pylint: disable=translation-of-non-string
-                'placeholder': '',
-                'defaultValue': '',
-                'required': True,
-                'options': annual_incomes,
-                'instructions': _('Specify your annual household income in US Dollars.')
             },
             {
                 'name': 'reason_for_applying',

@@ -938,7 +938,6 @@ class ViewsTestCase(BaseViewsTestCase):
         course = str(self.course_key)
         legal_name = 'Jesse Pinkman'
         country = 'United States'
-        income = '1234567890'
         reason_for_applying = "It's just basic chemistry, yo."
         goals = "I don't know if it even matters, but... work with my hands, I guess."
         effort = "I'm done, okay? You just give me my money, and you and I, we're done."
@@ -948,7 +947,6 @@ class ViewsTestCase(BaseViewsTestCase):
             'name': legal_name,
             'email': self.user.email,
             'country': country,
-            'income': income,
             'reason_for_applying': reason_for_applying,
             'goals': goals,
             'effort': effort,
@@ -964,7 +962,7 @@ class ViewsTestCase(BaseViewsTestCase):
         additional_info = mocked_kwargs['additional_info']
 
         private_comment = '\n'.join(list(additional_info.values()))
-        for info in (country, income, reason_for_applying, goals, effort, username, legal_name, course):
+        for info in (country, reason_for_applying, goals, effort, username, legal_name, course):
             assert info in private_comment
 
         assert additional_info['Allowed for marketing purposes'] == 'No'
@@ -982,7 +980,6 @@ class ViewsTestCase(BaseViewsTestCase):
             'name': '',
             'email': '',
             'country': '',
-            'income': '',
             'reason_for_applying': '',
             'goals': '',
             'effort': '',
@@ -1002,7 +999,6 @@ class ViewsTestCase(BaseViewsTestCase):
         form_data = {
             'username': self.user.username,
             'course': 'course-v1:test+TestX+Test_Course',
-            'income': '$25,000 - $40,000',
             'reason_for_applying': "It's just basic chemistry, yo.",
             'goals': "I don't know if it even matters, but... work with my hands, I guess.",
             'effort': "I'm done, okay? You just give me my money, and you and I, we're done.",
