@@ -144,7 +144,6 @@ jobs:
         ./manage.py lms showmigrations > /data/files/def.txt
 
     - name: Process Data
-    - uses: LouisBrunner/diff-action@v0.2.0
       run: |
         cd /data/files/
         ls
@@ -154,7 +153,9 @@ jobs:
         # Fetch the content of the files
         FILE1_CONTENT=$(cat $FILE1_PATH)
         FILE2_CONTENT=$(cat $FILE2_PATH)
-        git diff --no-index /data/files/abcd.txt /data/files/def.txt
+
+    - name: Comment PR
+    - uses: LouisBrunner/diff-action@v0.2.0
       with:
         old: /data/files/abcd.txt
         new: /data/files/def.txt
