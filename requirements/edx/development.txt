@@ -771,7 +771,7 @@ edx-drf-extensions==8.13.1
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.6.9
+edx-enterprise==4.7.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -1340,7 +1340,7 @@ openedx-filters==1.6.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
-openedx-learning==0.3.0
+openedx-learning==0.3.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
