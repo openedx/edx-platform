@@ -2141,7 +2141,6 @@ def financial_assistance_form(request, course_id=None):
 
     return render_to_response('financial-assistance/apply.html', {
         'header_text': _get_fa_header(FINANCIAL_ASSISTANCE_HEADER),
-        'student_faq_url': marketing_link('FAQ'),
         'dashboard_url': reverse('dashboard'),
         'account_settings_url': reverse('account_settings'),
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),

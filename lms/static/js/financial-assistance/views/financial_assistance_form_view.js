@@ -52,7 +52,6 @@
                     dashboard_url: context.dashboard_url,
                     header_text: context.header_text,
                     platform_name: context.platform_name,
-                    student_faq_url: context.student_faq_url,
                     account_settings_url: context.account_settings_url
                 };
 

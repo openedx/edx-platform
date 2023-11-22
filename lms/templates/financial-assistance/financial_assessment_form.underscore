@@ -38,10 +38,6 @@
 	<%= fields %> 
 
 	<div class="cta-wrapper clearfix">
-		<a href="<%- student_faq_url %>" class="nav-link"><%- interpolate_text(
-			gettext('Back to {platform} FAQs'),
-    		{platform: platform_name}
-    	) %></a>
 		<button type="submit" class="action action-primary action-update js-submit-form submit-form"><%- gettext("Submit Application") %></button>
 	</div>
 </form>
