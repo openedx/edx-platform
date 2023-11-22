@@ -1966,13 +1966,13 @@ class PublicVideoXBlockEmbedView(BasePublicVideoXBlockView):
 # Translators: "percent_sign" is the symbol "%". "platform_name" is a
 # string identifying the name of this installation, such as "edX".
 FINANCIAL_ASSISTANCE_HEADER = _(
-    '{platform_name} now offers financial assistance for learners who want to earn Verified Certificates but'
-    ' who may not be able to pay the Verified Certificate fee. Eligible learners may receive up to 90{percent_sign} off'  # lint-amnesty, pylint: disable=line-too-long
-    ' the Verified Certificate fee for a course.\nTo apply for financial assistance, enroll in the'
-    ' audit track for a course that offers Verified Certificates, and then complete this application.'
-    ' Note that you must complete a separate application for each course you take.\n We plan to use this'
-    ' information to evaluate your application for financial assistance and to further develop our'
-    ' financial assistance program.'
+    'We plan to use this information to evaluate your application for financial assistance and to further develop our'
+    ' financial assistance program. Please note that while \nassistance is available in most courses that offer'
+    ' verified certificates, a few courses and programs are not eligible. You must complete a separate application'
+    ' \nfor each course you take. You may be approved for financial assistance five (5) times each year'
+    ' (based on 12-month period from you first approval). \nTo apply for financial assistance: \n'
+    '1. Enroll in the audit track for an eligible course that offers Verified Certificates \n2. Complete this'
+    '  application \n3. Check your email, your application will be reviewed in 3-4 business days'
 )
 
 
@@ -2215,17 +2215,46 @@ def financial_assistance_form(request, course_id=None):
                     'max_length': settings.FINANCIAL_ASSISTANCE_MAX_LENGTH
                 },
                 'instructions': FA_SHORT_ANSWER_INSTRUCTIONS
+                'name': 'certify-heading',
+                'label': _('I certify that: '),
+                'type': 'plaintext',
             },
             {
                 'placeholder': '',
-                'name': 'mktg-permission',
+                'name': 'certify-economic-hardship',
                 'label': _(
-                    'I allow {platform_name} to use the information provided in this application '
-                    '(except for financial information) for {platform_name} marketing purposes.'
-                ).format(platform_name=settings.PLATFORM_NAME),
+                    'Paying the verified certificate fee for the above course would cause me economic hardship'
+                ),
                 'defaultValue': '',
                 'type': 'checkbox',
-                'required': False,
+                'required': True,
+                'instructions': '',
+                'restrictions': {}
+            },
+            {
+                'placeholder': '',
+                'name': 'certify-complete-certificate',
+                'label': _(
+                    'I will work diligently to complete the course work and receive a certificate'
+                ),
+                'defaultValue': '',
+                'type': 'checkbox',
+                'required': True,
+                'instructions': '',
+                'restrictions': {}
+            },
+            {
+                'placeholder': '',
+                'name': 'certify-honor-code',
+                'label': Text(_(
+                    'I have read, understand, and will abide by the {honor_code_link} for the edX Site'
+                )).format(honor_code_link=HTML('<a href="{honor_code_url}">{honor_code_label}</a>').format(
+                    honor_code_label=_("Honor Code"),
+                    honor_code_url=marketing_link('TOS') + "#honor",
+                )),
+                'defaultValue': '',
+                'type': 'checkbox',
+                'required': True,
                 'instructions': '',
                 'restrictions': {}
             }

@@ -11,11 +11,11 @@
   </div>
 
 	<div class="user-info">
-		<h2><%- gettext('About You') %></h2>
+		<h2><%- gettext('Profile Information') %></h2>
 		<p><%- interpolate_text(
-			gettext("The following information is already a part of your {platform} profile. We've included it here for your application."),
+			gettext("The following information is already a part of your {platform} profile and is required for your application. To edit this information go to "),
 			{platform: platform_name}
-		) %></p>
+		) %><a href="<%- account_settings_url %>"><%- gettext("Account Settings") %></a>.</p>
 		<div class="info-column">
 			<div class="title"><%- gettext('Username') %></div>
 			<div class="data"><%- username %></div>
@@ -33,6 +33,7 @@
 			<div class="data"><%- country %></div>
 		</div>
 	</div>
+	<h2><%- gettext('Application Details') %></h2>
 
     <% // xss-lint: disable=underscore-not-escaped %>
 	<%= fields %> 
