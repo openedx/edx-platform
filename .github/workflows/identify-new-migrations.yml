@@ -159,8 +159,8 @@ jobs:
         else
           git diff $FILE1_PATH $FILE2_PATH > /data/files/mydiff.txt
         fi
+
         cat /data/files/mydiff.txt
-      shell: bash
 
     - name: Comment PR
       uses: thollander/actions-comment-pull-request@v2
