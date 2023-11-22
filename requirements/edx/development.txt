@@ -30,9 +30,8 @@ alabaster==0.7.13
     # via
     #   -r requirements/edx/doc.txt
     #   sphinx
-algoliasearch==2.6.3
+algoliasearch==3.0.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
 amqp==5.2.0
