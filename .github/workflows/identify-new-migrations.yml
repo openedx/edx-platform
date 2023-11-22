@@ -149,13 +149,15 @@ jobs:
 
     - name: Process Data
       run: |
+        cd /data/files/
+        ls
         FILE1_PATH="/data/files/def.txt"
         FILE2_PATH="/data/files/abcd.txt"
 
         # Fetch the content of the files
         FILE1_CONTENT=$(cat $FILE1_PATH)
         FILE2_CONTENT=$(cat $FILE2_PATH)
-        git diff $FILE1_PATH $FILE2_PATH > /data/files/mydiff.txt
+        git diff $FILE1_PATH $FILE2_PATH
         cat mydiff.txt
       shell: bash
 #
