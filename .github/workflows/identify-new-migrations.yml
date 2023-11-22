@@ -153,7 +153,7 @@ jobs:
         # Fetch the content of the files
         FILE1_CONTENT=$(cat $FILE1_PATH)
         FILE2_CONTENT=$(cat $FILE2_PATH)
-        git diff --no-index /data/files/abcd.txt /data/files/def.txt > /data/files/mydiff.txt
+        git diff --no-index /data/files/abcd.txt /data/files/def.txt
         cat /data/files/mydiff.txt
 
     - name: Comment PR
