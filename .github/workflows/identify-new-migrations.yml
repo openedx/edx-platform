@@ -114,8 +114,10 @@ jobs:
         LMS_CFG: lms/envs/minimal.yml
         STUDIO_CFG: lms/envs/minimal.yml
       run: |
+        sudo mkdir -p /data/files
+        sudo chmod -R a+rw /data/files
         ./manage.py lms makemigrations
-        ./manage.py lms showmigrations > ${{ steps.pip-cache-dir.outputs.dir }}/abcd.txt
+        ./manage.py lms showmigrations > /data/files/abcd.txt
 
     - name: Checkout your branch repo
       uses: actions/checkout@v2
@@ -139,7 +141,7 @@ jobs:
         STUDIO_CFG: lms/envs/minimal.yml
       run: |
         ./manage.py lms makemigrations
-        ./manage.py lms showmigrations > ${{ steps.pip-cache-dir.outputs.dir }}/def.txt
+        ./manage.py lms showmigrations > /data/files/def.txt
 
     - name: Debug File Paths
       run: |
@@ -147,20 +149,14 @@ jobs:
 
     - name: Process Data
       run: |
-        FILE1_PATH="${{ steps.pip-cache-dir.outputs.dir }}/def.txt"
-        FILE2_PATH="${{ steps.pip-cache-dir.outputs.dir }}/abcd.txt"
+        FILE1_PATH="/data/files/def.txt"
+        FILE2_PATH="/data/files/abcd.txt"
 
         # Fetch the content of the files
         FILE1_CONTENT=$(cat $FILE1_PATH)
         FILE2_CONTENT=$(cat $FILE2_PATH)
-
-        if git diff --quiet ${{ steps.pip-cache-dir.outputs.dir }}/def.txt ${{ steps.pip-cache-dir.outputs.dir }}/abcd.txt; then
-          echo "Files are identical."
-        else
-          git diff ${{ steps.pip-cache-dir.outputs.dir }}/def.txt ${{ steps.pip-cache-dir.outputs.dir }}/abcd.txt > ${{ steps.pip-cache-dir.outputs.dir }}/mydiff.txt
-          echo "mydiff = "
-          cat mydiff.txt
-        fi
+        git diff FILE1_PATH FILE2_PATH > /data/files/mydiff.txt
+        cat mydiff.txt
       shell: bash
 #
 #    - name: Comment PR
