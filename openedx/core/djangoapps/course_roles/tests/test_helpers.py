@@ -611,6 +611,7 @@ class GetAllUserPermissionsTestcase(SharedModuleStoreTestCase):
         UserRole.objects.create(
             user=self.user_1, role=self.role_2, course_id=self.course_1.id, org=self.organization_1
         )
+        self.clear_caches()
         # Test that the correct permissions are returned for user_1
         assert get_all_user_permissions_for_a_course(self.user_1.id, self.course_1_key) == {
             self.permission_1.name, self.permission_2.name}
@@ -618,12 +619,14 @@ class GetAllUserPermissionsTestcase(SharedModuleStoreTestCase):
         UserRole.objects.create(
             user=self.user_1, role=self.role_3, org=self.organization_1
         )
+        self.clear_caches()
         # Test that the correct permissions are returned for user_1, including org level permissions
         assert get_all_user_permissions_for_a_course(self.user_1.id, self.course_1_key) == {
             self.permission_1.name, self.permission_2.name, self.permission_3.name}
         UserRole.objects.create(
             user=self.user_1, role=self.role_5
         )
+        self.clear_caches()
         # Test that the correct permissions are returned for user_1, including instance level permissions
         assert get_all_user_permissions_for_a_course(self.user_1.id, self.course_1_key) == {
             self.permission_1.name, self.permission_2.name, self.permission_3.name, self.permission_5.name}
