@@ -489,7 +489,7 @@ edx-drf-extensions==8.13.1
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.6.9
+edx-enterprise==4.7.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -803,7 +803,7 @@ openedx-filters==1.6.0
     # via
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
-openedx-learning==0.3.0
+openedx-learning==0.3.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
