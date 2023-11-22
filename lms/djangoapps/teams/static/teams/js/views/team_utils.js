@@ -83,10 +83,7 @@
                     return topicType.toLowerCase() !== 'open';
                 },
 
-                canJoinTeam: function(userInfo, topicType) {
-                    if (topicType === undefined) {
-                        return false;
-                    }
+                canJoinTeam: function(userInfo, topicType = '') {
                     return userInfo.privileged || userInfo.staff || topicType.includes("open");
                 },
 
