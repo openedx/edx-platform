@@ -364,9 +364,8 @@ django-statici18n==2.4.0
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
     #   xblock-drag-and-drop-v2
-django-storages==1.14
+django-storages==1.14.2
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   edxval
 django-user-tasks==3.1.0
@@ -489,7 +488,7 @@ edx-drf-extensions==8.13.1
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.7.0
+edx-enterprise==4.7.6
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -811,7 +810,7 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/kernel.in
 optimizely-sdk==4.1.1
     # via -r requirements/edx/bundled.in
-ora2==6.0.3
+ora2==6.0.5
     # via -r requirements/edx/bundled.in
 packaging==23.2
     # via
@@ -962,9 +961,8 @@ python3-openid==3.2.0 ; python_version >= "3"
     #   social-auth-core
 python3-saml==1.16.0
     # via -r requirements/edx/kernel.in
-pytz==2022.7.1
+pytz==2023.3.post1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   babel
     #   django

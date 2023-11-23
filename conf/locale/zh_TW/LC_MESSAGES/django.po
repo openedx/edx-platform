@@ -177,7 +177,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-08 20:43+0000\n"
+"POT-Creation-Date: 2023-11-05 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Chinese (Taiwan) (https://app.transifex.com/open-edx/teams/6205/zh_TW/)\n"
@@ -1933,59 +1933,6 @@ msgstr "該徽章圖像文件大小必須小於250KB。"
 msgid "This value must be all lowercase."
 msgstr "此值必須全部為小寫字母。"
 
-#: lms/djangoapps/badges/models.py
-msgid "The course mode for this badge image. For example, \"verified\" or \"honor\"."
-msgstr "該課程模式的徽章圖像。例如，“合格”或“榮譽”。"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Badge images must be square PNG files. The file size should be under 250KB."
-msgstr "徽章圖檔必須為正方形的PNG檔案。檔案大小應在250KB以內。"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Set this value to True if you want this image to be the default image for "
-"any course modes that do not have a specified badge image. You can have only"
-" one default image."
-msgstr "對於沒有特定徽章圖片的課程模式，如果您想將此圖片設定為預設，請將該值設置為 true。您只能有一個預設的圖片。"
-
-#: lms/djangoapps/badges/models.py
-msgid "There can be only one default image."
-msgstr "這裡只能有一張預設圖片。"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"On each line, put the number of completed courses to award a badge for, a "
-"comma, and the slug of a badge class you have created that has the issuing "
-"component 'openedx__course'. For example: 3,enrolled_3_courses"
-msgstr ""
-"在每一行依序列出要頒發獎章的完成課程數、逗號，然後是您建立的獎章類別嵌條，包含發出要件 "
-"'openedx__course'。例如：3,enrolled_3_courses"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"On each line, put the number of enrolled courses to award a badge for, a "
-"comma, and the slug of a badge class you have created that has the issuing "
-"component 'openedx__course'. For example: 3,enrolled_3_courses"
-msgstr ""
-"在每一行依序列出要頒發獎章的註冊課程數、逗號，然後是您建立的獎章類別嵌條，包含發行要件 "
-"'openedx__course'。例如：3,enrolled_3_courses"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Each line is a comma-separated list. The first item in each line is the slug"
-" of a badge class you have created that has an issuing component of "
-"'openedx__course'. The remaining items in each line are the course keys the "
-"learner needs to complete to be awarded the badge. For example: "
-"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
-msgstr ""
-"每一行都是一份逗號分隔的清單。每一行的第一個項目是您建立的獎章類別嵌條，包含發行要件 "
-"'openedx__course'。每一行的其餘項目為學習者需完成才能獲頒獎章的課程要點。例如：slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
-
-#: lms/djangoapps/badges/models.py
-msgid "Please check the syntax of your entry."
-msgstr "請檢查輸入內容的語法。"
-
 #. Translators: This string is used across Open edX installations
 #. as a callback to edX. Please do not translate `edX.org`
 #: lms/djangoapps/branding/api.py
@@ -3211,6 +3158,7 @@ msgid "{sign_in_link} or {register_link}."
 msgstr ""
 
 #: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/lti_provider/user-auth-error.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Sign in"
 msgstr "登入"
@@ -4596,6 +4544,14 @@ msgid ""
 "The list of group configurations for partitioning students in content "
 "experiments."
 msgstr "內容實驗中學生的分組名單設定。"
+
+#: lms/djangoapps/lti_provider/models.py
+msgid ""
+"When checked, the LTI content will load only for learners who have an "
+"account in this instance. This is required only for linking learner accounts"
+" with the LTI consumer. See the Open edX LTI Provider documentation for more"
+" details."
+msgstr ""
 
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
@@ -9811,16 +9767,6 @@ msgid ""
 msgstr "編輯影片縮圖圖片檔的名稱。您可以在 [設定和詳細資訊] 頁面上設定影片縮圖圖片。"
 
 #: xmodule/course_block.py
-msgid "Issue Open Badges"
-msgstr "Issue Open Badges"
-
-#: xmodule/course_block.py
-msgid ""
-"Issue Open Badges badges for this course. Badges are generated when "
-"certificates are created."
-msgstr "為此課程頒發徽章。建立證書時會產生徽章。"
-
-#: xmodule/course_block.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
 "marks, enter the short name of the type of certificate that students receive"
@@ -12925,9 +12871,9 @@ msgid "Welcome to {platform_name}"
 msgstr "歡迎來到{platform_name}"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See https://open.edx.org for more information.
+#. untranslated. See https://openedx.org for more information.
 #: lms/templates/index_overlay.html
-msgid "It works! Powered by Open edX{registered_trademark}"
+msgid "It works! Powered by the Open edX{registered_trademark} Platform"
 msgstr ""
 
 #: lms/templates/invalid_email_key.html
@@ -13579,6 +13525,10 @@ msgstr "講義"
 #: lms/templates/video.html
 msgid "Download Handout"
 msgstr "下載課程講義"
+
+#: lms/templates/video.html
+msgid "How is the transcript quality ?"
+msgstr ""
 
 #: lms/templates/word_cloud.html
 msgid "{num} of {total}"
@@ -17856,6 +17806,25 @@ msgstr ""
 msgid "My Courses"
 msgstr "我的課程"
 
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "There was an error when loading this module!"
+msgstr ""
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"This module is available only for users who are signed into {platform}. "
+"Kindly sign in and refresh this page to load the content."
+msgstr ""
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "NOTE:"
+msgstr ""
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"The email used to sign into this platform and {platform} should be the same."
+msgstr ""
+
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
 msgstr "更改偏好的語言"
@@ -18868,7 +18837,7 @@ msgid "Studio Accessibility Policy"
 msgstr ""
 
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
-msgid "Files & Uploads"
+msgid "Files"
 msgstr ""
 
 #: cms/templates/certificates.html
@@ -20540,6 +20509,10 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid "Libraries"
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Taxonomies"
 msgstr ""
 
 #: cms/templates/index.html

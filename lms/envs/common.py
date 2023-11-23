@@ -1597,6 +1597,9 @@ BRANCH_IO_KEY = ''
 OPTIMIZELY_PROJECT_ID = None
 OPTIMIZELY_FULLSTACK_SDK_KEY = None
 
+######################## HOTJAR ###########################
+HOTJAR_SITE_ID = 00000
+
 ######################## ALGOLIA SEARCH ###########################
 ALGOLIA_APP_ID = None
 ALGOLIA_SEARCH_API_KEY = None
@@ -3223,6 +3226,9 @@ INSTALLED_APPS = [
     # rule-based authorization
     'rules.apps.AutodiscoverRulesConfig',
     'bridgekeeper',
+
+    # management of user-triggered async tasks (course import/export, etc.)
+    'user_tasks',
 
     # Customized celery tasks, including persisting failed tasks so they can
     # be retried
