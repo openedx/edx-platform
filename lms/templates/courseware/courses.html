@@ -46,25 +46,25 @@
 
     <div class="filter-search-container">
 
-      % if filter_enabled:
+      <!-- % if filter_enabled: -->
              <!-- Filter Section -->
       <div class="filter-container">
         <!-- Filter Box with Icon and Count -->
-        <span class="material-symbols-outlined">instant_mix</span>          
+        <span class="mdi mdi-tune-vertical"></span>   
         <span class="filter-text">Filter</span>
         <div style="background: #FEEBEE; padding: 4px 6px;">
             <span style="font-weight: 600; font-size: 12px; color: #ED4338;">3</span>
         </div>
       </div>
-      % endif
+      <!-- % endif -->
 
         <!-- Search Bar -->
       <div class="search-container">
         <div class="search-info" >
           <form class="wrapper-search-input">
             <div class="magnifier-input">
-              <span class="material-symbols-outlined">search</span>
-            <label for="discovery-input" class="sr">${_('Search for a course')}</label>
+              <span class="mdi mdi-magnify"></span>
+              <label for="discovery-input" class="sr">${_('Search for a course')}</label>
             <input id="discovery-input" class="search-input" placeholder="${_('Search for a course')}" />
             
           
@@ -103,13 +103,21 @@
 
          <!-- Including the 'Inter' font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link href="https://cdn.materialdesignicons.com/5.4.55/css/materialdesignicons.min.css" rel="stylesheet">
+
+    <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" /> -->
 
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
+        .mdi {
+          font-size: 24px; /* Set the size of the icon */
+          color: black;    /* Set the color of the icon */
+
+        }
+
 
         .find-courses .wrapper-search-context {
             width: 100%;
