@@ -156,7 +156,10 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
         assert resp.status_code == 200
         pre_requisite_courses = get_prerequisite_courses_display(course)
         pre_requisite_course_about_url = reverse('about_course', args=[str(pre_requisite_courses[0]['key'])])
-        assert '<span class="important-dates-item-text pre-requisite"><a href="{}">{}</a></span>'.format(pre_requisite_course_about_url, pre_requisite_courses[0]['display']) in resp.content.decode(resp.charset).strip('\n')  # pylint: disable=line-too-long
+        assert (
+            f'You must successfully complete <a href="{pre_requisite_course_about_url}">'
+            f'{pre_requisite_courses[0]["display"]}</a> before you begin this course.'
+        ) in resp.content.decode(resp.charset).strip('\n')
 
     @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True})
     def test_about_page_unfulfilled_prereqs(self):
@@ -190,7 +193,10 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
         assert resp.status_code == 200
         pre_requisite_courses = get_prerequisite_courses_display(course)
         pre_requisite_course_about_url = reverse('about_course', args=[str(pre_requisite_courses[0]['key'])])
-        assert '<span class="important-dates-item-text pre-requisite"><a href="{}">{}</a></span>'.format(pre_requisite_course_about_url, pre_requisite_courses[0]['display']) in resp.content.decode(resp.charset).strip('\n')  # pylint: disable=line-too-long
+        assert (
+            f'You must successfully complete <a href="{pre_requisite_course_about_url}">'
+            f'{pre_requisite_courses[0]["display"]}</a> before you begin this course.'
+        ) in resp.content.decode(resp.charset).strip('\n')
 
         url = reverse('about_course', args=[str(pre_requisite_course.id)])
         resp = self.client.get(url)
