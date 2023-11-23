@@ -408,6 +408,7 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
         """
         If this enrollment is the fulfillment of an entitlement, include information about the entitlement
         """
+        
         entitlement = self.context["fulfilled_entitlements"].get(
             str(instance.course_id)
         )
@@ -558,6 +559,7 @@ class LearnerDashboardSerializer(serializers.Serializer):
         courses = []
 
         for enrollment in instance.get("enrollments", []):
+            
             courses.append(
                 LearnerEnrollmentSerializer(enrollment, context=self.context).data
             )
@@ -565,5 +567,5 @@ class LearnerDashboardSerializer(serializers.Serializer):
             courses.append(
                 UnfulfilledEntitlementSerializer(entitlement, context=self.context).data
             )
-
+       
         return courses
