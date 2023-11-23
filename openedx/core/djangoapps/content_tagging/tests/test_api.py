@@ -2,7 +2,7 @@
 import ddt
 from django.test.testcases import TestCase
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from openedx_tagging.core.tagging.models import ObjectTag, Tag
+from openedx_tagging.core.tagging.models import Tag
 from organizations.models import Organization
 
 from .. import api
@@ -20,28 +20,23 @@ class TestTaxonomyMixin:
         # Taxonomies
         self.taxonomy_disabled = api.create_taxonomy(
             name="Learning Objectives",
-            enabled=False,
+            # We will disable this taxonomy below, after we have used it to tag some objects.
+            # Note: "disabled" taxonomies are not a supported nor user-exposed feature at the moment, so it's not
+            # actually that important to test them.
         )
-        api.set_taxonomy_orgs(self.taxonomy_disabled, all_orgs=True)
-        self.taxonomy_all_orgs = api.create_taxonomy(
-            name="Content Types",
-            enabled=True,
-        )
+        api.set_taxonomy_orgs(self.taxonomy_disabled, orgs=[self.org1, self.org2])
+
+        self.taxonomy_all_orgs = api.create_taxonomy(name="Content Types")
         api.set_taxonomy_orgs(self.taxonomy_all_orgs, all_orgs=True)
-        self.taxonomy_both_orgs = api.create_taxonomy(
-            name="OpenedX/Axim Content Types",
-            enabled=True,
-        )
+
+        self.taxonomy_both_orgs = api.create_taxonomy(name="OpenedX/Axim Content Types")
         api.set_taxonomy_orgs(self.taxonomy_both_orgs, orgs=[self.org1, self.org2])
-        self.taxonomy_one_org = api.create_taxonomy(
-            name="OpenedX Content Types",
-            enabled=True,
-        )
+
+        self.taxonomy_one_org = api.create_taxonomy(name="OpenedX Content Types")
         api.set_taxonomy_orgs(self.taxonomy_one_org, orgs=[self.org1])
-        self.taxonomy_no_orgs = api.create_taxonomy(
-            name="No orgs",
-            enabled=True,
-        )
+
+        self.taxonomy_no_orgs = api.create_taxonomy(name="No orgs")
+
         # Tags
         self.tag_disabled = Tag.objects.create(
             taxonomy=self.taxonomy_disabled,
@@ -65,58 +60,44 @@ class TestTaxonomyMixin:
         )
         # ObjectTags
         self.all_orgs_course_tag = api.tag_content_object(
+            object_key=CourseKey.from_string("course-v1:OeX+DemoX+Demo_Course"),
             taxonomy=self.taxonomy_all_orgs,
-            tags=[self.tag_all_orgs.id],
-            object_id=CourseKey.from_string("course-v1:OeX+DemoX+Demo_Course"),
+            tags=[self.tag_all_orgs.value],
         )[0]
         self.all_orgs_block_tag = api.tag_content_object(
-            taxonomy=self.taxonomy_all_orgs,
-            tags=[self.tag_all_orgs.id],
-            object_id=UsageKey.from_string(
+            object_key=UsageKey.from_string(
                 "block-v1:Ax+DemoX+Demo_Course+type@vertical+block@abcde"
             ),
+            taxonomy=self.taxonomy_all_orgs,
+            tags=[self.tag_all_orgs.value],
         )[0]
         self.both_orgs_course_tag = api.tag_content_object(
+            object_key=CourseKey.from_string("course-v1:Ax+DemoX+Demo_Course"),
             taxonomy=self.taxonomy_both_orgs,
-            tags=[self.tag_both_orgs.id],
-            object_id=CourseKey.from_string("course-v1:Ax+DemoX+Demo_Course"),
+            tags=[self.tag_both_orgs.value],
         )[0]
         self.both_orgs_block_tag = api.tag_content_object(
-            taxonomy=self.taxonomy_both_orgs,
-            tags=[self.tag_both_orgs.id],
-            object_id=UsageKey.from_string(
+            object_key=UsageKey.from_string(
                 "block-v1:OeX+DemoX+Demo_Course+type@video+block@abcde"
             ),
+            taxonomy=self.taxonomy_both_orgs,
+            tags=[self.tag_both_orgs.value],
         )[0]
         self.one_org_block_tag = api.tag_content_object(
-            taxonomy=self.taxonomy_one_org,
-            tags=[self.tag_one_org.id],
-            object_id=UsageKey.from_string(
+            object_key=UsageKey.from_string(
                 "block-v1:OeX+DemoX+Demo_Course+type@html+block@abcde"
             ),
+            taxonomy=self.taxonomy_one_org,
+            tags=[self.tag_one_org.value],
         )[0]
         self.disabled_course_tag = api.tag_content_object(
+            object_key=CourseKey.from_string("course-v1:Ax+DemoX+Demo_Course"),
             taxonomy=self.taxonomy_disabled,
-            tags=[self.tag_disabled.id],
-            object_id=CourseKey.from_string("course-v1:Ax+DemoX+Demo_Course"),
+            tags=[self.tag_disabled.value],
         )[0]
-
-        # Invalid object tags must be manually created
-        self.all_orgs_invalid_tag = ObjectTag.objects.create(
-            taxonomy=self.taxonomy_all_orgs,
-            tag=self.tag_all_orgs,
-            object_id="course-v1_OpenedX_DemoX_Demo_Course",
-        )
-        self.one_org_invalid_org_tag = ObjectTag.objects.create(
-            taxonomy=self.taxonomy_one_org,
-            tag=self.tag_one_org,
-            object_id="block-v1_OeX_DemoX_Demo_Course_type_html_block@abcde",
-        )
-        self.no_orgs_invalid_tag = ObjectTag.objects.create(
-            taxonomy=self.taxonomy_no_orgs,
-            tag=self.tag_no_orgs,
-            object_id=CourseKey.from_string("course-v1:Ax+DemoX+Demo_Course"),
-        )
+        self.taxonomy_disabled.enabled = False
+        self.taxonomy_disabled.save()
+        self.disabled_course_tag.refresh_from_db()  # Update its cached .taxonomy
 
 
 @ddt.ddt
@@ -138,8 +119,8 @@ class TestAPITaxonomy(TestTaxonomyMixin, TestCase):
     @ddt.data(
         # All orgs
         (None, True, ["taxonomy_all_orgs"]),
-        (None, False, ["taxonomy_disabled"]),
-        (None, None, ["taxonomy_all_orgs", "taxonomy_disabled"]),
+        (None, False, []),
+        (None, None, ["taxonomy_all_orgs"]),
         # Org 1
         ("org1", True, ["taxonomy_all_orgs", "taxonomy_one_org", "taxonomy_both_orgs"]),
         ("org1", False, ["taxonomy_disabled"]),
@@ -190,52 +171,73 @@ class TestAPITaxonomy(TestTaxonomyMixin, TestCase):
     ):
         taxonomy_id = getattr(self, taxonomy_attr).id
         object_tag = getattr(self, object_tag_attr)
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(1):
             valid_tags = list(
                 api.get_content_tags(
+                    object_key=object_tag.object_key,
                     taxonomy_id=taxonomy_id,
-                    object_id=object_tag.object_id,
                 )
             )
         assert len(valid_tags) == 1
         assert valid_tags[0].id == object_tag.id
 
     @ddt.data(
-        ("taxonomy_disabled", "disabled_course_tag"),
         ("taxonomy_all_orgs", "all_orgs_course_tag"),
         ("taxonomy_all_orgs", "all_orgs_block_tag"),
-        ("taxonomy_all_orgs", "all_orgs_invalid_tag"),
         ("taxonomy_both_orgs", "both_orgs_course_tag"),
         ("taxonomy_both_orgs", "both_orgs_block_tag"),
         ("taxonomy_one_org", "one_org_block_tag"),
-        ("taxonomy_one_org", "one_org_invalid_org_tag"),
     )
     @ddt.unpack
-    def test_get_content_tags_include_invalid(
+    def test_get_content_tags(
         self,
         taxonomy_attr,
         object_tag_attr,
     ):
         taxonomy_id = getattr(self, taxonomy_attr).id
         object_tag = getattr(self, object_tag_attr)
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(1):
             valid_tags = list(
                 api.get_content_tags(
+                    object_key=object_tag.object_key,
                     taxonomy_id=taxonomy_id,
-                    object_id=object_tag.object_id,
                 )
             )
         assert len(valid_tags) == 1
         assert valid_tags[0].id == object_tag.id
 
-    @ddt.data(
-        "all_orgs_invalid_tag",
-        "one_org_invalid_org_tag",
-        "no_orgs_invalid_tag",
-    )
-    def test_object_tag_not_valid_check_object(self, tag_attr):
-        object_tag = getattr(self, tag_attr)
-        assert not object_tag.is_valid()
-
     def test_get_tags(self):
-        assert api.get_tags(self.taxonomy_all_orgs) == [self.tag_all_orgs]
+        result = list(api.get_tags(self.taxonomy_all_orgs))
+        assert len(result) == 1
+        assert result[0]["value"] == self.tag_all_orgs.value
+        assert result[0]["_id"] == self.tag_all_orgs.id
+        assert result[0]["parent_value"] is None
+        assert result[0]["depth"] == 0
+
+    def test_cannot_tag_across_orgs(self):
+        """
+        Ensure that I cannot apply tags from a taxonomy that's linked to another
+        org.
+        """
+        # This taxonomy is only linked to the "OpenedX org", so it can't be used for "Axim" content.
+        taxonomy = self.taxonomy_one_org
+        tags = [self.tag_one_org.value]
+        with self.assertRaises(ValueError) as exc:
+            api.tag_content_object(
+                object_key=CourseKey.from_string("course-v1:Ax+DemoX+Demo_Course"),
+                taxonomy=taxonomy,
+                tags=tags,
+            )
+        assert "The specified Taxonomy is not enabled for the content object's org (Ax)" in str(exc.exception)
+        # But this will work fine:
+        api.tag_content_object(
+            object_key=CourseKey.from_string("course-v1:OeX+DemoX+Demo_Course"),
+            taxonomy=taxonomy,
+            tags=tags,
+        )
+        # As will this:
+        api.tag_content_object(
+            object_key=CourseKey.from_string("course-v1:Ax+DemoX+Demo_Course"),
+            taxonomy=self.taxonomy_both_orgs,
+            tags=[self.tag_both_orgs.value],
+        )

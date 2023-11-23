@@ -14,11 +14,12 @@ import warnings
 import yaml
 
 from corsheaders.defaults import default_headers as corsheaders_default_headers
+import django
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse_lazy
 from edx_django_utils.plugins import add_plugins
+from openedx_events.event_bus import merge_producer_configs
 from path import Path as path
-
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 
@@ -84,6 +85,7 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
         'MKTG_URL_LINK_MAP',
         'MKTG_URL_OVERRIDES',
         'REST_FRAMEWORK',
+        'EVENT_BUS_PRODUCER_CONFIG',
     ]
     for key in KEYS_WITH_MERGED_VALUES:
         if key in __config_copy__:
@@ -165,6 +167,7 @@ LMS_ROOT_URL = ENV_TOKENS.get('LMS_ROOT_URL')
 LMS_INTERNAL_ROOT_URL = ENV_TOKENS.get('LMS_INTERNAL_ROOT_URL', LMS_ROOT_URL)
 ENTERPRISE_API_URL = ENV_TOKENS.get('ENTERPRISE_API_URL', LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/')
 ENTERPRISE_CONSENT_API_URL = ENV_TOKENS.get('ENTERPRISE_CONSENT_API_URL', LMS_INTERNAL_ROOT_URL + '/consent/api/v1/')
+AUTHORING_API_URL = ENV_TOKENS.get('AUTHORING_API_URL', '')
 # Note that FEATURES['PREVIEW_LMS_BASE'] gets read in from the environment file.
 
 OPENAI_API_KEY = ENV_TOKENS.get('OPENAI_API_KEY', '')
@@ -235,6 +238,11 @@ SHARED_COOKIE_DOMAIN = ENV_TOKENS.get('SHARED_COOKIE_DOMAIN', SESSION_COOKIE_DOM
 # but it is highly recommended that this is True for environments accessed
 # by end users.
 CSRF_COOKIE_SECURE = ENV_TOKENS.get('CSRF_COOKIE_SECURE', False)
+
+# values are already updated above with default CSRF_TRUSTED_ORIGINS values but in
+# case of new django version these values will override.
+if django.VERSION[0] >= 4:  # for greater than django 3.2 use schemes.
+    CSRF_TRUSTED_ORIGINS = ENV_TOKENS.get('CSRF_TRUSTED_ORIGINS_WITH_SCHEME', [])
 
 #Email overrides
 MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
@@ -653,6 +661,9 @@ DISCUSSIONS_MICROFRONTEND_URL = ENV_TOKENS.get('DISCUSSIONS_MICROFRONTEND_URL', 
 ################### Discussions micro frontend Feedback URL###################
 DISCUSSIONS_MFE_FEEDBACK_URL = ENV_TOKENS.get('DISCUSSIONS_MFE_FEEDBACK_URL', DISCUSSIONS_MFE_FEEDBACK_URL)
 
+############################ AI_TRANSLATIONS URL ##################################
+AI_TRANSLATIONS_API_URL = ENV_TOKENS.get('AI_TRANSLATIONS_API_URL', AI_TRANSLATIONS_API_URL)
+
 ############## DRF overrides ##############
 REST_FRAMEWORK.update(ENV_TOKENS.get('REST_FRAMEWORK', {}))
 
@@ -664,3 +675,38 @@ COURSE_LIVE_GLOBAL_CREDENTIALS["BIG_BLUE_BUTTON"] = {
 }
 
 INACTIVE_USER_URL = f'http{"s" if HTTPS == "on" else ""}://{CMS_BASE}'
+
+############## Event bus producer ##############
+EVENT_BUS_PRODUCER_CONFIG = merge_producer_configs(EVENT_BUS_PRODUCER_CONFIG,
+                                                   ENV_TOKENS.get('EVENT_BUS_PRODUCER_CONFIG', {}))
+
+############## Authoring API drf-spectacular openapi settings ##############
+# These fields override the spectacular settings default values.
+# Any fields not included here will use the default values.
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Authoring API',
+    'DESCRIPTION': f'''Experimental API to edit xblocks and course content.
+    \n\nDanger: Do not use on running courses!
+    \n\n - How to gain access: Please email the owners of this openedx service.
+    \n - How to use: This API uses oauth2 authentication with the
+    access token endpoint: `{LMS_ROOT_URL}/oauth2/access_token`.
+    Please see separately provided documentation.
+    \n - How to test: You must be logged in as course author for whatever course you want to test with.
+    You can use the [Swagger UI](https://{CMS_BASE}/authoring-api/ui/) to "Try out" the API with your test course. To do this, you must select the "Local" server.
+    \n - Public vs. Local servers: The "Public" server is where you can reach the API externally. The "Local" server is
+    for development with a local edx-platform version,  and for use via the [Swagger UI](https://{CMS_BASE}/authoring-api/ui/).
+    \n - Swaggerfile: [Download link](https://{CMS_BASE}/authoring-api/schema/)''',
+    'VERSION': '0.1.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # restrict spectacular to CMS API endpoints (cms/lib/spectacular.py):
+    'PREPROCESSING_HOOKS': ['cms.lib.spectacular.cms_api_filter'],
+    # remove the default schema path prefix to replace it with server-specific base paths:
+    'SCHEMA_PATH_PREFIX': '/api/contentstore',
+    'SCHEMA_PATH_PREFIX_TRIM': '/api/contentstore',
+    'SERVERS': [
+        {'url': AUTHORING_API_URL, 'description': 'Public'},
+        {'url': f'https://{CMS_BASE}/api/contentstore', 'description': 'Local'},
+    ],
+}
+
+BEAMER_PRODUCT_ID = ENV_TOKENS.get('BEAMER_PRODUCT_ID', BEAMER_PRODUCT_ID)

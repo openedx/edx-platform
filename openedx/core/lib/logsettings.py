@@ -126,6 +126,38 @@ def log_python_warnings():
     warnings.filterwarnings('ignore', 'Setting _field_data is deprecated')
     warnings.filterwarnings('ignore', 'Setting _field_data via the constructor is deprecated')
     warnings.filterwarnings('ignore', '.*unclosed.*', category=ResourceWarning)
+    # Remove default_app_config warning after updating Django to 4.2
+    warnings.filterwarnings(
+        'ignore',
+        '.*You can remove default_app_config.*',
+        category=PendingDeprecationWarning
+    )
+    warnings.filterwarnings(
+        'ignore',
+        'Instead access HTTPResponse.headers directly.*',
+        category=DeprecationWarning,
+        module='elasticsearch'
+    )
+    warnings.filterwarnings(
+        'ignore',
+        'Using or importing the ABCs from \'collections\' instead of from \'collections.abc\' is deprecated.*',
+        category=DeprecationWarning,
+        module="sass",
+    )
+    warnings.filterwarnings(
+        'ignore',
+        'Deprecated call to `pkg_resources.declare_namespace.*',
+        category=DeprecationWarning,
+    )
+    warnings.filterwarnings(
+        'ignore',
+        '.*pkg_resources is deprecated as an API.*',
+        category=DeprecationWarning,
+    )
+    warnings.filterwarnings(
+        'ignore', "'etree' is deprecated. Use 'xml.etree.ElementTree' instead.",
+        category=DeprecationWarning, module='wiki'
+    )
     # try:
     #     # There are far too many of these deprecation warnings in startup to output for every management command;
     #     # suppress them until we've fixed at least the most common ones as reported by the test suite

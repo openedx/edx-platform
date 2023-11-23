@@ -56,6 +56,7 @@ class AssetsTestCase(CourseTestCase):
         Post to the asset upload url
         """
         asset = self.get_sample_asset(name, asset_type)
+        print(asset)
         response = self.client.post(self.url, {"name": name, "file": asset})
         return response
 
@@ -175,6 +176,9 @@ class PaginationTestCase(AssetsTestCase):
         self.assert_correct_asset_response(self.url + "?page_size=2", 0, 2, 4)
         self.assert_correct_asset_response(
             self.url + "?page_size=2&page=1", 2, 2, 4)
+        self.assert_correct_asset_response(self.url + '?display_name=asset-1.txt', 0, 1, 1)
+        self.assert_correct_asset_response(self.url + '?display_name=asset-1.txt&display_name=asset-2.txt', 0, 2, 2)
+        self.assert_correct_asset_response(self.url + '?display_name=asset-1.txt&display_name=asset-0.txt', 0, 1, 1)
         self.assert_correct_sort_response(self.url, 'date_added', 'asc')
         self.assert_correct_sort_response(self.url, 'date_added', 'desc')
         self.assert_correct_sort_response(self.url, 'display_name', 'asc')
@@ -239,7 +243,8 @@ class PaginationTestCase(AssetsTestCase):
                     "thumbnail": None,
                     "thumbnail_location": thumbnail_location,
                     "locked": None,
-                    "static_full_url": "/assets/courseware/v1/asset-v1:org+class+run+type@asset+block@my_file_name.jpg"
+                    "static_full_url": "/assets/courseware/v1/asset-v1:org+class+run+type@asset+block@my_file_name.jpg",
+                    "usage_locations": {str(asset_key): []}
                 }
             ],
             1

@@ -85,8 +85,6 @@
     "Access to some content in this {blockType} is restricted to specific groups of learners.": "Truy c\u1eadp v\u00e0o m\u1ed9t s\u1ed1 n\u1ed9i dung trong {blockType} n\u00e0y ch\u1ec9 d\u00e0nh cho nh\u1eefng nh\u00f3m ng\u01b0\u1eddi h\u1ecdc c\u1ee5 th\u1ec3.",
     "Access to this unit is restricted to: {selectedGroupsLabel}": "Truy c\u1eadp v\u00e0o \u0111\u01a1n v\u1ecb n\u00e0y \u0111\u01b0\u1ee3c gi\u1edbi h\u1ea1n \u1edf: {selectedGroupsLabel}",
     "Access to this {blockType} is restricted to: {selectedGroupsLabel}": "Truy c\u1eadp v\u00e0o {blockType} n\u00e0y \u0111\u01b0\u1ee3c gi\u1edbi h\u1ea1n \u1edf: {selectedGroupsLabel}",
-    "Accomplishments": "Nh\u1eefng th\u00e0nh qu\u1ea3",
-    "Accomplishments Pagination": "Ph\u00e2n trang Th\u00e0nh qu\u1ea3",
     "Account": "T\u00e0i kho\u1ea3n",
     "Account Information": "Th\u00f4ng tin T\u00e0i kho\u1ea3n",
     "Account Settings": "Thi\u1ebft l\u1eadp t\u00e0i kho\u1ea3n",

@@ -71,7 +71,7 @@ class XBlockEventTestMixin:
     2. assert_event_published verifies that an event of a given search
         specification was published.
 
-    The Mongo/bok_choy event tests in cohorts have nice examplars for
+    The Mongo event tests in cohorts have nice examplars for
     how such functionality might look.
 
     In the future, we would like to expand both search
@@ -282,9 +282,9 @@ class XBlockStudentTestCaseMixin:
     Creates a default set of students for XBlock tests
     '''
     student_list = [
-        {'email': 'alice@test.edx.org', 'password': 'foo'},
-        {'email': 'bob@test.edx.org', 'password': 'foo'},
-        {'email': 'eve@test.edx.org', 'password': 'foo'},
+        {'email': 'alice@test.edx.org', 'password': 'Password1234'},
+        {'email': 'bob@test.edx.org', 'password': 'Password1234'},
+        {'email': 'eve@test.edx.org', 'password': 'Password1234'},
     ]
 
     def setUp(self):
