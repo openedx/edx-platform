@@ -93,7 +93,7 @@ class TestCourseExportOlx(ModuleStoreTestCase):
 
         test_course_key = self.create_dummy_course(ModuleStoreEnum.Type.split)
         output_wrapper = BytesIOBufferWrapper(BytesIO())
-        call_command('export_olx', str(test_course_key))
+        call_command('export_olx', str(test_course_key), stdout=output_wrapper)
         output_wrapper.bytes_io.seek(0)
         output = output_wrapper.bytes_io.read()
         with tarfile.open(fileobj=BytesIO(output), mode="r:gz") as tar_file:
