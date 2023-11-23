@@ -305,7 +305,8 @@ def get_complate_course(response_data_course, request):
             course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
             blocks = FunixRelativeDateLibary.get_course_date_blocks(course=course,user=request.user,request=request)
             print('========blocks=======', blocks)
-            completed_blocks = [block for block in blocks if getattr(block, 'complate', False) == True]
+            completed_blocks = [block for block in blocks if getattr(block, 'complete', False) == True]
+            # print('=================', [block for block in blocks if blocks.get( 'complate') == True])
             print('====completed_blocks=====', completed_blocks)
             num_completed_blocks = len(completed_blocks)
             print('====num_completed_blocks=====', num_completed_blocks)
