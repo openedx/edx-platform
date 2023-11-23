@@ -80,6 +80,7 @@ class FunixRelativeDatesTabView(RetrieveAPIView):
 		if not CourseEnrollment.is_enrolled(user_data, course_key) and not is_staff:
 			return Response('User not enrolled.', status=401)
 
+		print('=============', course , user_data)
 		blocks = FunixRelativeDateLibary.get_course_date_blocks(course=course,user=user_data, request=request)
 
 		learner_is_full_access = not ContentTypeGatingConfig.enabled_for_enrollment(

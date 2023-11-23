@@ -1,6 +1,7 @@
 """
 Views for the learner dashboard.
 """
+from opaque_keys.edx.keys import CourseKey
 import logging
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -43,6 +44,9 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.djangoapps.catalog.utils import get_course_data
+from lms.djangoapps.courseware.date_summary import TodaysDate
+from openedx.features.funix_relative_date.funix_relative_date import FunixRelativeDateLibary
+from lms.djangoapps.courseware.courses import  get_course_with_access
 from openedx.features.enterprise_support.api import (
     enterprise_customer_from_session_or_learner_data,
     get_enterprise_learner_data_from_db,
@@ -295,6 +299,25 @@ def get_suggested_courses():
         or empty_course_suggestions
     )
 
+def get_complate_course(response_data_course, request):
+    for a in response_data_course:
+            course_key = CourseKey.from_string(a['courseRun']['courseId'])
+            course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
+            blocks = FunixRelativeDateLibary.get_course_date_blocks(course=course,user=request.user,request=request)
+            completed_blocks = [block for block in blocks if getattr(block, 'complate', False) == True]
+            num_completed_blocks = len(completed_blocks)
+
+            total_blocks = len(blocks)
+
+            if total_blocks > 0:
+                percentage_completed = (num_completed_blocks / total_blocks) * 100
+            else:
+                percentage_completed = 0
+                
+            # print(f"Phần trăm block hoàn thành: {percentage_completed:.2f}%")
+            a['complate'] = percentage_completed
+
+
 
 class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
     """List of courses a user is enrolled in or entitled to"""
@@ -325,19 +348,20 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
                 f"{masquerade_user.username} - {masquerade_user.email}"
             )
             logger.info(success_msg)
-            return self._initialize(masquerade_user, True)
+            return self._initialize(masquerade_user, True,request=request)
         else:
-            return self._initialize(request.user, False)
+            return self._initialize(request.user, False,request=request)
 
-    def _initialize(self, user, is_masquerade):
+    def _initialize(self, user, is_masquerade,request):
         """
         Load information required for displaying the learner home
         """
         # Determine if user needs to confirm email account
+        
         email_confirmation = get_user_account_confirmation_info(user)
 
         # Gather info for enterprise dashboard
-        enterprise_customer = get_enterprise_customer(user, self.request, is_masquerade)
+        # enterprise_customer = get_enterprise_customer(user, self.request, is_masquerade)
 
         # Get the org whitelist or the org blacklist for the current site
         site_org_whitelist, site_org_blacklist = get_org_black_and_whitelist_for_site()
@@ -359,21 +383,21 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
         )
 
         # Get email opt-outs for student
-        show_email_settings_for, course_optouts = get_email_settings_info(
-            user, course_enrollments
-        )
+        # show_email_settings_for, course_optouts = get_email_settings_info(
+        #     user, course_enrollments
+        # )
 
         # Get cert status by course
-        cert_statuses = get_cert_statuses(user, course_enrollments)
+        # cert_statuses = get_cert_statuses(user, course_enrollments)
 
         # Determine view access for course, (for showing courseware link) involves:
-        course_access_checks = check_course_access(user, course_enrollments)
+        # course_access_checks = check_course_access(user, course_enrollments)
 
         # Get programs related to the courses the user is enrolled in
         programs = get_course_programs(user, course_enrollments, self.request.site)
 
         # e-commerce info
-        ecommerce_payment_page = get_ecommerce_payment_page(user)
+        # ecommerce_payment_page = get_ecommerce_payment_page(user)
 
         # Gather urls for course card resume buttons.
         resume_button_urls = get_resume_urls_for_enrollments(user, course_enrollments)
@@ -383,31 +407,37 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
 
         learner_dash_data = {
             "emailConfirmation": email_confirmation,
-            "enterpriseDashboard": enterprise_customer,
+            # "enterpriseDashboard": enterprise_customer,
             "platformSettings": get_platform_settings(),
             "enrollments": course_enrollments,
-            "unfulfilledEntitlements": unfulfilled_entitlements,
+            # "unfulfilledEntitlements": unfulfilled_entitlements,
             "suggestedCourses": suggested_courses,
+  
         }
 
         context = {
-            "ecommerce_payment_page": ecommerce_payment_page,
-            "cert_statuses": cert_statuses,
+            # "ecommerce_payment_page": ecommerce_payment_page,
+            # "cert_statuses": cert_statuses,
             "course_mode_info": course_mode_info,
-            "course_optouts": course_optouts,
-            "course_access_checks": course_access_checks,
+            # "course_optouts": course_optouts,
+            # "course_access_checks": course_access_checks,
             "resume_course_urls": resume_button_urls,
-            "show_email_settings_for": show_email_settings_for,
+            # "show_email_settings_for": show_email_settings_for,
             "fulfilled_entitlements": fulfilled_entitlements_by_course_key,
-            "course_entitlement_available_sessions": course_entitlement_available_sessions,
-            "unfulfilled_entitlement_pseudo_sessions": unfulfilled_entitlement_pseudo_sessions,
-            "pseudo_session_course_overviews": pseudo_session_course_overviews,
+            # "course_entitlement_available_sessions": course_entitlement_available_sessions,
+            # "unfulfilled_entitlement_pseudo_sessions": unfulfilled_entitlement_pseudo_sessions,
+            # "pseudo_session_course_overviews": pseudo_session_course_overviews,
             "programs": programs,
         }
 
         response_data = LearnerDashboardSerializer(
             learner_dash_data, context=context
         ).data
+        
+    # add complate block
+        get_complate_course(response_data_course=response_data['courses'],request=request)
+        
+            
         return Response(response_data)
 
 
