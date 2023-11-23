@@ -304,9 +304,11 @@ def get_complate_course(response_data_course, request):
             course_key = CourseKey.from_string(a['courseRun']['courseId'])
             course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
             blocks = FunixRelativeDateLibary.get_course_date_blocks(course=course,user=request.user,request=request)
+            print('========blocks=======', blocks)
             completed_blocks = [block for block in blocks if getattr(block, 'complate', False) == True]
+            print('====completed_blocks=====', completed_blocks)
             num_completed_blocks = len(completed_blocks)
-
+            print('====num_completed_blocks=====', num_completed_blocks)
             total_blocks = len(blocks)
 
             if total_blocks > 0:
@@ -315,7 +317,7 @@ def get_complate_course(response_data_course, request):
                 percentage_completed = 0
                 
             # print(f"Phần trăm block hoàn thành: {percentage_completed:.2f}%")
-            a['complate'] = percentage_completed
+            a['complete'] = percentage_completed
 
 
 
