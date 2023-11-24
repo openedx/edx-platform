@@ -66,56 +66,88 @@ from openedx.core.djangolib.markup import HTML, Text
             });
 
             xblockView.xblockReady = function() {
-                const optionIcons = {
-                    'New Unit': 'fa-plus',
-                    'Paste as new unit': 'fa-clipboard'
+                this.clipboardBroadcastChannel = new BroadcastChannel("studio_clipboard_channel");
+                this.clipboardBroadcastChannel.onmessage = (event) => {
+                    if (!event.data.source_usage_key?.includes("vertical")) {
+                        $('.seq_paste_unit').closest('li').hide();
+                    } else {
+                        $('.seq_paste_unit').closest('li').show();
+                    }
+                };
+                var currentAction = "new_unit";
+                var actionIcons = {
+                    'new_unit': 'fa fa-plus',
+                    'paste_unit': 'fa fa-clipboard'
+                };
+                var actionLabels = {
+                    'new_unit': 'New Unit',
+                    'paste_unit': 'Paste Unit'
                 };
 
-                if (!this.options.clipboardData && !this.options.clipboardData.source_usage_key.includes("vertical")) {
-                    $('.seq_paste_unit').hide();
+                if (!this.options.clipboardData.content || !this.options.clipboardData.source_usage_key?.includes("vertical")) {
+                    $('.seq_paste_unit').closest('li').hide();
                 }
+
+                var updateButtonAndCheckmarks = function(selectedAction) {
+                    var iconName = actionIcons[selectedAction];
+                    var buttonIconSpan = $('.dropdown-main-button .icon');
+
+                    // Update the button icon
+                    buttonIconSpan.removeClass('fa-plus fa-clipboard').addClass(iconName);
+
+                    $('.dropdown-options a').each(function() {
+                        $(this).find('.checkmark').remove();
+                        if ($(this).data('action') === selectedAction) {
+                            $(this).append('<span class="checkmark fa fa-check"></span>');
+                        }
+                    });
+                };
+
                 $('.custom-dropdown .dropdown-toggle-button').on('click', function(event) {
                     event.stopPropagation(); // Prevent the event from closing immediately when we open it
                     $(this).next('.dropdown-options').slideToggle('fast'); // This toggles the dropdown visibility
-                    updateCheckmarks($(this).text().trim());
+                    var isExpanded = $(this).attr('aria-expanded') === 'true';
+                    $(this).attr('aria-expanded', !isExpanded);
                 });
 
-                updateCheckmarks = function(activeOptionText) {
-                    $('.dropdown-options .checkmark').remove();
-                    $('.dropdown-options a').each(function() {
-                        if ($(this).text().trim() === activeOptionText) {
-                            $(this).append('<span class="checkmark fa fa-check"></span>'); // Checkmark icon
-                        }
-                    });
-                }
-
-                $('.dropdown-options').click(function(event) {
+                $('.dropdown-options a').click(function(event) {
                     event.preventDefault();
-                    var $target = $(event.target),
-                        newLabel = $target.text().trim(),
-                        newIconClass = optionIcons[newLabel];
+                    var $option = $(this);
+                    var newAction = $option.data('action')
 
-                    if ($target.hasClass('seq_new_unit') || $target.hasClass('seq_paste_unit')) {
-                        // Change the text of the main button
-                        $('.dropdown-toggle-button').text(newLabel);
-                        // Change the icon of the main button
-                        $('.dropdown-toggle-button').prepend('<span class="icon fa ' + newIconClass + '" aria-hidden="true"></span>');
+                    var newLabel = actionLabels[newAction];
+                    $('.custom-dropdown .dropdown-main-button .button-label').text(newLabel);
+                    currentAction = newAction;
 
-                        updateCheckmarks(newLabel);
+                    updateButtonAndCheckmarks(currentAction);
+                    $('.custom-dropdown .dropdown-options').slideUp('fast');
+                });
 
-                        if ($target.hasClass('seq_new_unit')) {
-                            XBlockUtils.addXBlock($(event.target)).done(function(locator) {
+                $('#execute-action-button').on('click', function(event) {
+                    event.preventDefault();
+                    var $button = $(this);
+                    switch (currentAction) {
+                        case 'new_unit':
+                            XBlockUtils.addXBlock($button).done(function(locator) {
                                 ViewUtils.redirect('/container/' + locator + '?action=new');
                             });
-                        }
-
-                        if ($target.hasClass('seq_paste_unit')) {
-                            XBlockUtils.pasteXBlock($(event.target)).done(function(data) {
+                            break;
+                        case 'paste_unit':
+                            XBlockUtils.pasteXBlock($button).done(function(data) {
                                 ViewUtils.redirect('/container/' + data.locator + '?action=new');
                             });
-                        }
+                            break;
+                        default:
+                            console.error('Unknown action');
+                            break;
                     }
                 });
+
+                if ($('.seq_paste_unit').is(':visible')) {
+                    updateButtonAndCheckmarks(currentAction);
+                } else {
+                    updateButtonAndCheckmarks('new_unit');
+                }
             };
 
             xblockView.render();

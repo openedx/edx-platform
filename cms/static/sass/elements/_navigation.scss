@@ -288,6 +288,11 @@ $seq-nav-height: 40px;
   ol {
     display: flex;
 
+    .custom-dropdown {
+      position: relative;
+      display: inline-flex;
+    }
+
     li {
       box-sizing: border-box;
       min-width: 40px;
@@ -300,9 +305,16 @@ $seq-nav-height: 40px;
         @include border-right-style(solid);
       }
 
-      .custom-dropdown {
-        position: relative;
-        display: inline-block;
+      .dropdown-main-button {
+        border-right: 1px solid #e7e7e7 !important;
+      }
+
+      .dropdown-toggle-button {
+        width: 15% !important;
+
+        &:hover {
+          border-bottom: 1px solid #e7e7e7 !important;
+        }
       }
 
       .dropdown-options {

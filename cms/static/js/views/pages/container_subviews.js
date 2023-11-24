@@ -178,6 +178,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
 
         copyToClipboard: function(e) {
             e.preventDefault();
+            e.stopPropagation();
             const clipboardEndpoint = "/api/content-staging/v1/clipboard/";
             const usageKeyToCopy = this.model.get('id');
             // Start showing a "Copying" notification:

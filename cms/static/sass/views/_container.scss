@@ -239,6 +239,15 @@
             color: $gray-l1;
           }
         }
+
+        .action-copy {
+          width: 100%;
+          border-color: #0075b4;
+
+          &:hover {
+            @extend %btn-primary-blue;
+          }
+        }
       }
     }
 
