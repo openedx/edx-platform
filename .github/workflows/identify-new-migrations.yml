@@ -145,7 +145,7 @@ jobs:
 
     - name: Comment PR
       uses: LouisBrunner/diff-action@v0.2.0
-        with:
+      with:
         old: /data/files/abcd.txt
         new: /data/files/def.txt
         mode: addition
