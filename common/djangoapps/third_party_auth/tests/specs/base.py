@@ -11,7 +11,7 @@ from unittest import mock
 import pytest
 from django import test
 from django.conf import settings
-from django.contrib import auth
+from django.contrib import auth, messages
 from django.contrib.auth import models as auth_models
 from django.contrib.messages.storage import fallback
 from django.contrib.sessions.backends import cache
@@ -116,6 +116,7 @@ class HelperMixin:
     def assert_third_party_accounts_state(self, request, duplicate=False, linked=None):
         """
         Asserts the user's third party account in the expected state.
+
         If duplicate is True, we expect data['duplicate_provider'] to contain
         the duplicate provider backend name. If linked is passed, we conditionally
         check that the provider is included in data['auth']['providers'] and
@@ -133,6 +134,7 @@ class HelperMixin:
             ][0]
             assert expected_provider is not None
             assert expected_provider['connected'] == linked
+
     def assert_register_form_populates_unicode_username_correctly(self, request):  # lint-amnesty, pylint: disable=invalid-name
         """
         Check the registration form username field behaviour with unicode values.
@@ -494,7 +496,7 @@ class IntegrationTestMixin(testutil.TestCase, test.TestCase, HelperMixin):
         # The AJAX on the page will log them in:
         ajax_login_response = self.client.post(
             reverse('user_api_login_session', kwargs={'api_version': 'v1'}),
-            {'email': self.user.email, 'password': 'Password1234'}
+            {'email': self.user.email, 'password': 'test'}
         )
         assert ajax_login_response.status_code == 200
         # Then the AJAX will finish the third party auth:
@@ -624,6 +626,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
 
         # First we expect that we're in the unlinked state, and that there
         # really is no association in the backend.
+        self.assert_third_party_accounts_state(get_request, linked=False)
         self.assert_social_auth_does_not_exist_for_user(get_request.user, strategy)
 
         # We should be redirected back to the complete page, setting
@@ -642,6 +645,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
 
         # Now we expect to be in the linked state, with a backend entry.
         self.assert_social_auth_exists_for_user(get_request.user, strategy)
+        self.assert_third_party_accounts_state(get_request, linked=True)
 
     def test_full_pipeline_succeeds_for_unlinking_account(self):
         # First, create, the GET request and strategy that store pipeline state,
@@ -673,6 +677,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         get_request.user = post_request.user
 
         # First we expect that we're in the linked state, with a backend entry.
+        self.assert_third_party_accounts_state(get_request, linked=True)
         self.assert_social_auth_exists_for_user(get_request.user, strategy)
 
         # Fire off the disconnect pipeline to unlink.
@@ -686,6 +691,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         )
 
         # Now we expect to be in the unlinked state, with no backend entry.
+        self.assert_third_party_accounts_state(get_request, linked=False)
         self.assert_social_auth_does_not_exist_for_user(user, strategy)
 
     def test_linking_already_associated_account_raises_auth_already_associated(self):
@@ -742,6 +748,9 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         middleware.ExceptionMiddleware(get_response=lambda request: None).process_exception(
             post_request,
             exceptions.AuthAlreadyAssociated(self.provider.backend_name, 'account is already in use.'))
+
+        self.assert_third_party_accounts_state(
+            post_request, duplicate=True, linked=True)
 
     @mock.patch('common.djangoapps.third_party_auth.pipeline.segment.track')
     def test_full_pipeline_succeeds_for_signing_in_to_existing_active_account(self, _mock_segment_track):
@@ -801,6 +810,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         self.assert_redirect_after_pipeline_completes(
             self.do_complete(strategy, get_request, partial_pipeline_token, partial_data, user)
         )
+        self.assert_third_party_accounts_state(get_request)
 
     def test_signin_fails_if_account_not_active(self):
         _, strategy = self.get_request_and_strategy(
@@ -942,6 +952,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         )
         # Now the user has been redirected to the dashboard. Their third party account should now be linked.
         self.assert_social_auth_exists_for_user(created_user, strategy)
+        self.assert_third_party_accounts_state(request, linked=True)
 
     def test_new_account_registration_assigns_distinct_username_on_collision(self):
         original_username = self.get_username()
