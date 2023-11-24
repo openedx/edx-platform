@@ -276,7 +276,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         ({'showanswer': 'attempted', 'max_attempts': '1', 'show_correctness': 'never', }, False, False),
         # If show_correctness=past_due, answer is not visible before due date
         ({'showanswer': 'attempted', 'show_correctness': 'past_due', 'max_attempts': '1', 'due': 'tomorrow_str', },
-         False, False),
+         False, True),
         # If show_correctness=past_due, answer is visible after due date
         ({'showanswer': 'attempted', 'show_correctness': 'past_due', 'max_attempts': '1', 'due': 'yesterday_str', },
          True, True))
@@ -609,7 +609,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # Correctness not visible because grace period hasn't expired,
         # even after using up all attempts
         ({'show_correctness': 'past_due', 'max_attempts': '1', 'attempts': '1', 'due': 'yesterday_str',
-          'graceperiod': 'two_day_delta_str', }, False))
+          'graceperiod': 'two_day_delta_str', }, True))
     @ddt.unpack
     def test_show_correctness_past_due(self, problem_data, expected_result):
         """

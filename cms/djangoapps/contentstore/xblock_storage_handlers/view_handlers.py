@@ -82,7 +82,7 @@ from xmodule.services import (
     ConfigurationService,
     SettingsService,
     TeamsConfigurationService,
-    ResultService
+    ProblemFeedbackService
 )  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.tabs import (
     CourseTabList,
@@ -351,7 +351,7 @@ def load_services_for_studio(runtime, user):
         "lti-configuration": ConfigurationService(CourseAllowPIISharingInLTIFlag),
         "teams_configuration": TeamsConfigurationService(),
         "library_tools": LibraryToolsService(modulestore(), user.id),
-        "result": ResultService,
+        "problem_feedback": ProblemFeedbackService,
     }
 
     runtime._services.update(services)  # lint-amnesty, pylint: disable=protected-access

@@ -56,7 +56,7 @@ from xmodule.services import (
     RebindUserService,
     SettingsService,
     TeamsConfigurationService,
-    ResultService
+    ProblemFeedbackService
 )
 from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.static_replace.wrapper import replace_urls_wrapper
@@ -641,7 +641,7 @@ def prepare_runtime_for_user(
         'teams_configuration': TeamsConfigurationService(),
         'call_to_action': CallToActionService(),
         'publish': EventPublishingService(user, course_id, track_function),
-        'result': partial(ResultService, user_is_staff=user_is_staff)
+        'problem_feedback': partial(ProblemFeedbackService, user_is_staff=user_is_staff)
     }
 
     runtime.get_block_for_descriptor = inner_get_block

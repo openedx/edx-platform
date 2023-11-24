@@ -74,6 +74,9 @@ except ImproperlyConfigured:
     FEATURES = {}
 
 
+# Left for backwards compatibility
+SHOWANSWER = ShowAnswer
+
 class RANDOMIZATION:
     """
     Constants for problem randomization
@@ -104,8 +107,8 @@ class Randomization(String):
 @XBlock.needs('cache')
 @XBlock.needs('sandbox')
 @XBlock.needs('replace_urls')
+@XBlock.needs('problem_feedback')
 @XBlock.wants('call_to_action')
-@XBlock.wants('result')
 class ProblemBlock(
     ScorableXBlockMixin,
     RawMixin,
@@ -1389,7 +1392,7 @@ class ProblemBlock(
         """
         Is the user allowed to see an answer?
         """
-        return self.runtime.service(self, 'result').answer_available()
+        return self.runtime.service(self, 'problem_feedback').answer_available()
 
     def correctness_available(self):
         """
@@ -1397,7 +1400,7 @@ class ProblemBlock(
 
         Limits access to the correct/incorrect flags, messages, and problem score.
         """
-        return self.runtime.service(self, 'result').correctness_available()
+        return self.runtime.service(self, 'problem_feedback').correctness_available()
 
     def update_score(self, data):
         """

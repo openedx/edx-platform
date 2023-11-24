@@ -314,7 +314,7 @@ class EventPublishingService(Service):
             self.completion_service.submit_completion(block.scope_ids.usage_id, 1.0)
 
 
-class ResultService(Service):
+class ProblemFeedbackService(Service):
     """
     An XBlock Service that allows XModules to define:
 
