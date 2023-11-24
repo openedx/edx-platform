@@ -143,6 +143,15 @@ jobs:
         ./manage.py lms makemigrations
         ./manage.py lms showmigrations > /data/files/def.txt
 
+    - name: Comment PR
+      uses: actions/checkout@v1
+      with:
+        old: /data/files/abcd.txt
+        new: /data/files/def.txt
+        mode: addition
+        output: /data/files/out.txt
+        - run: /data/files/out.txt
+
 #    - name: Process Data
 #      run: |
 #        cd /data/files/
@@ -151,9 +160,11 @@ jobs:
 #        FILE2_PATH="/data/files/def.txt"
 
     - name: Comment PR
-      uses: LouisBrunner/diff-action@v0.2.0
-      with:
-        old: /data/files/abcd.txt
-        new: /data/files/def.txt
-        mode: addition
-        tolerance: better
+      run: cat /data/files/out.txt
+
+#      uses: LouisBrunner/diff-action@v0.2.0
+#      with:
+#        old: /data/files/abcd.txt
+#        new: /data/files/def.txt
+#        mode: addition
+#        tolerance: better
