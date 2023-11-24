@@ -144,8 +144,8 @@ jobs:
         ./manage.py lms showmigrations > /data/files/def.txt
 
     - name: Comment PR
-      uses: actions/checkout@v1
-      with:
+      uses: LouisBrunner/diff-action@v0.2.0
+        with:
         old: /data/files/abcd.txt
         new: /data/files/def.txt
         mode: addition
