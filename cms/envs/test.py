@@ -39,6 +39,7 @@ from lms.envs.test import (  # pylint: disable=wrong-import-order
     MEDIA_URL,
     PLATFORM_DESCRIPTION,
     PLATFORM_NAME,
+    PROFILE_MICROFRONTEND_URL, # pylint: disable=unused-import
     REGISTRATION_EXTRA_FIELDS,
     GRADES_DOWNLOAD,
     SITE_NAME,
