@@ -152,4 +152,4 @@ jobs:
         output: /data/files/out.txt
 
     - name: Run a command with the output file
-        run: cat /data/files/out.txt
+      run: cat /data/files/out.txt
