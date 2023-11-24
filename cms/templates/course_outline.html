@@ -281,7 +281,7 @@ from django.urls import reverse
                 assets_url = reverse('assets_handler', kwargs={'course_key_string': str(course_locator.course_key)})
                 %>
                 <h2 class="sr">${_("Course Outline")}</h2>
-                <article class="outline outline-complex outline-course" data-locator="${course_locator}" data-course-key="${course_locator.course_key}" data-course-assets="${assets_url}">
+                <article class="outline outline-complex outline-course" data-locator="${course_locator}" data-course-key="${course_locator.course_key}" data-course-assets="${assets_url}" data-taxonomy-tags-widget-url="${taxonomy_tags_widget_url}">
                 </article>
             </div>
             <div class="ui-loading">
@@ -321,4 +321,7 @@ from django.urls import reverse
         </aside>
     </section>
 </div>
+
+<div id="manage-tags-drawer" class="drawer"></div>
+<div class="drawer-cover"></div>
 </%block>

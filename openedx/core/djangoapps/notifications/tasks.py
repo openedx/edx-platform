@@ -14,8 +14,9 @@ from pytz import UTC
 
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.notifications.base_notification import get_default_values_of_preference
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, ENABLE_NOTIFICATIONS_FILTERS
 from openedx.core.djangoapps.notifications.events import notification_generated_event
+from openedx.core.djangoapps.notifications.filters import NotificationFilter
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
     Notification,
@@ -91,14 +92,22 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     course_key = CourseKey.from_string(course_key)
     if not ENABLE_NOTIFICATIONS.is_enabled(course_key):
         return
+
     user_ids = list(set(user_ids))
     batch_size = settings.NOTIFICATION_CREATION_BATCH_SIZE
 
-    audience = []
     notifications_generated = False
     notification_content = ''
-    default_web_config = get_default_values_of_preference(app_name, notification_type).get('web', True)
+    sender_id = context.pop('sender_id', None)
+    default_web_config = get_default_values_of_preference(app_name, notification_type).get('web', False)
+    generated_notification_audience = []
+
     for batch_user_ids in get_list_in_batches(user_ids, batch_size):
+        if ENABLE_NOTIFICATIONS_FILTERS.is_enabled(course_key):
+            logger.info(f'Sending notifications to {len(batch_user_ids)} users in {course_key}')
+            batch_user_ids = NotificationFilter().apply_filters(batch_user_ids, course_key, notification_type)
+            logger.info(f'After applying filters, sending notifications to {len(batch_user_ids)} users in {course_key}')
+
         # check if what is preferences of user and make decision to send notification or not
         preferences = CourseNotificationPreference.objects.filter(
             user_id__in=batch_user_ids,
@@ -109,9 +118,13 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
         if default_web_config:
             preferences = create_notification_pref_if_not_exists(batch_user_ids, preferences, course_key)
 
+        if not preferences:
+            continue
+
         notifications = []
         for preference in preferences:
-            preference = update_user_preference(preference, preference.user_id, course_key)
+            user_id = preference.user_id
+            preference = update_user_preference(preference, user_id, course_key)
             if (
                 preference and
                 preference.get_web_config(app_name, notification_type) and
@@ -119,7 +132,7 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
             ):
                 notifications.append(
                     Notification(
-                        user_id=preference.user_id,
+                        user_id=user_id,
                         app_name=app_name,
                         notification_type=notification_type,
                         content_context=context,
@@ -127,7 +140,8 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
                         course_id=course_key,
                     )
                 )
-                audience.append(preference.user_id)
+                generated_notification_audience.append(user_id)
+
         # send notification to users but use bulk_create
         notification_objects = Notification.objects.bulk_create(notifications)
         if notification_objects and not notifications_generated:
@@ -135,8 +149,11 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
             notification_content = notification_objects[0].content
 
     if notifications_generated:
+        logger.info(f'Temp: Notifications generated for {len(generated_notification_audience)} out of '
+                    f'{len(user_ids)} users - {app_name} - {notification_type} - {course_key}.')
         notification_generated_event(
-            audience, app_name, notification_type, course_key, content_url, notification_content,
+            generated_notification_audience, app_name, notification_type, course_key, content_url,
+            notification_content, sender_id=sender_id
         )
 
 

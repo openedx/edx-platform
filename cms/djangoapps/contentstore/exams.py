@@ -109,7 +109,7 @@ def get_exam_type(is_proctored, is_practice, is_onboarding):
         if is_onboarding:
             exam_type = 'onboarding'
         elif is_practice:
-            exam_type = 'practice_proctored'
+            exam_type = 'practice'
         else:
             exam_type = 'proctored'
     else:

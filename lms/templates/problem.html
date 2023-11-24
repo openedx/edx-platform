@@ -40,7 +40,7 @@ from openedx.core.djangolib.markup import HTML
           </button>
       </span>
       % endif
-      % if reset_button:
+      % if attempts_used and reset_button:
       <span class="problem-action-button-wrapper">
           <button type="button" class="reset problem-action-btn btn-link btn-small" data-value="${_('Reset')}"><span aria-hidden="true">${_('Reset')}</span><span class="sr">${_("Reset your answer")}</span></button>
       </span>

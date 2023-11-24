@@ -195,15 +195,18 @@ def delete_collection(collection_uuid):
 @toggle_blockstore_api
 def get_bundles(uuids=None, text_search=None):
     """
-    Get the details of all bundles
+    Get the details of all bundles.
     """
     query_params = {}
+    data = {}
     if uuids:
-        query_params['uuid'] = ','.join(map(str, uuids))
+        # Potentially we could have a lot of libraries which will lead to 414 error (Request-URI Too Long)
+        # if sending uuids in the query_params. So we have to use the request data instead.
+        data = {'uuid': ','.join(map(str, uuids))}
     if text_search:
         query_params['text_search'] = text_search
     version_url = api_url('bundles') + '?' + urlencode(query_params)
-    response = api_request('get', version_url)
+    response = api_request('get', version_url, json=data)
     # build bundle from response, convert map object to list and return
     return [_bundle_from_response(item) for item in response]
 

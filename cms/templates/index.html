@@ -360,6 +360,9 @@ from openedx.core.djangolib.js_utils import (
              </li>
             % endif
         % endif
+        % if taxonomies_enabled:
+            <li><a href="${taxonomy_list_mfe_url}">${_("Taxonomies")}</li>
+        % endif
       </ul>
       % endif
 

@@ -12,9 +12,8 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from pytz import UTC
 
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.milestones_helpers import milestones_achieved_by_user, set_prerequisite_courses
-from lms.djangoapps.badges.tests.factories import CourseCompleteImageConfigurationFactory
 from lms.djangoapps.certificates.api import certificate_info_for_user, certificate_status_for_student
 from lms.djangoapps.certificates.models import (
     CertificateStatuses,
@@ -204,20 +203,3 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         completed_milestones = milestones_achieved_by_user(student, str(pre_requisite_course.id))
         assert len(completed_milestones) == 1
         assert completed_milestones[0]['namespace'] == str(pre_requisite_course.id)
-
-    @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
-    @patch('lms.djangoapps.badges.backends.badgr.BadgrBackend', spec=True)
-    def test_badge_callback(self, handler):
-        student = UserFactory()
-        course = CourseFactory.create(org='edx', number='998', display_name='Test Course', issue_badges=True)
-        CourseCompleteImageConfigurationFactory()
-        CourseEnrollmentFactory(user=student, course_id=course.location.course_key, mode='honor')
-        cert = GeneratedCertificateFactory.create(
-            user=student,
-            course_id=course.id,
-            status=CertificateStatuses.generating,
-            mode='verified'
-        )
-        cert.status = CertificateStatuses.downloadable
-        cert.save()
-        assert handler.return_value.award.called

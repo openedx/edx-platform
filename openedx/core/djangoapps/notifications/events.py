@@ -62,7 +62,8 @@ def notification_preferences_viewed_event(request, course_id):
         )
 
 
-def notification_generated_event(user_ids, app_name, notification_type, course_key, content_url, content):
+def notification_generated_event(user_ids, app_name, notification_type, course_key,
+                                 content_url, content, sender_id=None):
     """
     Emit an event when a notification is generated.
     """
@@ -78,6 +79,7 @@ def notification_generated_event(user_ids, app_name, notification_type, course_k
         'notification_app': app_name,
         'content_url': content_url,
         'notification_content': content,
+        'sender_id': sender_id,
     }
     with tracker.get_tracker().context(NOTIFICATION_GENERATED, context):
         tracker.emit(

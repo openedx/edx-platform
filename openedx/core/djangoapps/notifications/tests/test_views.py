@@ -18,7 +18,11 @@ from rest_framework.test import APIClient, APITestCase
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, SHOW_NOTIFICATIONS_TRAY
+from openedx.core.djangoapps.notifications.config.waffle import (
+    ENABLE_COURSEWIDE_NOTIFICATIONS,
+    ENABLE_NOTIFICATIONS,
+    SHOW_NOTIFICATIONS_TRAY
+)
 from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, Notification
 from openedx.core.djangoapps.notifications.serializers import NotificationCourseEnrollmentSerializer
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -73,7 +77,7 @@ class CourseEnrollmentListViewTest(ModuleStoreTestCase):
         """
         Test the CourseEnrollmentListView.
         """
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         # Enable or disable the waffle flag based on the test case data
         with override_waffle_flag(SHOW_NOTIFICATIONS_TRAY, active=show_notifications_tray):
             url = reverse('enrollment-list')
@@ -206,18 +210,26 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
             enrollment=enrollment_data
         )
 
-    def _expected_api_response(self):
+    def _expected_api_response(self, course=None):
         """
         Helper method to return expected API response.
         """
-        return {
+        if course is None:
+            course = self.course
+        response = {
             'id': 1,
             'course_name': 'course-v1:testorg+testcourse+testrun Course',
             'course_id': 'course-v1:testorg+testcourse+testrun',
             'notification_preference_config': {
                 'discussion': {
                     'enabled': True,
-                    'core_notification_types': ['new_comment_on_response', 'new_comment', 'new_response'],
+                    'core_notification_types': [
+                        'new_comment_on_response',
+                        'new_comment',
+                        'new_response',
+                        'response_on_followed_post',
+                        'comment_on_followed_post'
+                    ],
                     'notification_types': {
                         'core': {
                             'web': True,
@@ -227,7 +239,7 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                                     'following, including endorsements to your responses and on your posts.'
                         },
                         'new_discussion_post': {'web': False, 'email': False, 'push': False, 'info': ''},
-                        'new_question_post': {'web': False, 'email': False, 'push': False, 'info': ''}
+                        'new_question_post': {'web': False, 'email': False, 'push': False, 'info': ''},
                     },
                     'non_editable': {
                         'core': ['web']
@@ -235,6 +247,12 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                 }
             }
         }
+        if not ENABLE_COURSEWIDE_NOTIFICATIONS.is_enabled(course.id):
+            app_prefs = response['notification_preference_config']['discussion']
+            notification_types = app_prefs['notification_types']
+            for notification_type in ['new_discussion_post', 'new_question_post']:
+                notification_types.pop(notification_type)
+        return response
 
     def test_get_user_notification_preference_without_login(self):
         """
@@ -244,11 +262,12 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     @mock.patch("eventtracking.tracker.emit")
+    @override_waffle_flag(ENABLE_COURSEWIDE_NOTIFICATIONS, active=True)
     def test_get_user_notification_preference(self, mock_emit):
         """
         Test get user notification preference.
         """
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, self._expected_api_response())
@@ -274,7 +293,7 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         """
         Test update of user notification preference.
         """
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         payload = {
             'notification_app': notification_app,
             'value': value,
@@ -319,7 +338,8 @@ class NotificationListAPIViewTest(APITestCase):
     """
 
     def setUp(self):
-        self.user = UserFactory()
+        self.TEST_PASSWORD = 'Password1234'
+        self.user = UserFactory(password=self.TEST_PASSWORD)
         self.url = reverse('notifications-list')
 
     def test_list_notifications(self):
@@ -336,7 +356,7 @@ class NotificationListAPIViewTest(APITestCase):
                 'post_title': 'This is a test post.',
             }
         )
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         # Make a request to the view.
         response = self.client.get(self.url)
@@ -373,7 +393,7 @@ class NotificationListAPIViewTest(APITestCase):
             app_name='app2',
             notification_type='info',
         )
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         # Make a request to the view with the app_name query parameter set to 'app1'.
         response = self.client.get(self.url + "?app_name=discussion")
@@ -396,7 +416,7 @@ class NotificationListAPIViewTest(APITestCase):
         """
         Test event emission with tray_opened param is provided.
         """
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         # Make a request to the view with the tray_opened query parameter set to True.
         response = self.client.get(self.url + "?tray_opened=True")
@@ -436,7 +456,7 @@ class NotificationListAPIViewTest(APITestCase):
             notification_type='info',
             created=today - timedelta(days=settings.NOTIFICATIONS_EXPIRY)
         )
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         # Make a request to the view
         response = self.client.get(self.url)
@@ -463,7 +483,7 @@ class NotificationListAPIViewTest(APITestCase):
             user=self.user,
             notification_type='info',
         )
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         # Make a request to the view
         response = self.client.get(self.url)
@@ -517,7 +537,7 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
         """
         Test that the endpoint returns the correct count of unseen notifications and show_notifications_tray value.
         """
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         # Enable or disable the waffle flag based on the test case data
         with override_waffle_flag(SHOW_NOTIFICATIONS_TRAY, active=show_notifications_tray_enabled):
@@ -544,7 +564,7 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
         """
         # Create a user with no notifications.
         user = UserFactory()
-        self.client.login(username=user.username, password='test')
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
@@ -556,7 +576,7 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
         Tests if "notification_expiry_days" exists in API response
         """
         user = UserFactory()
-        self.client.login(username=user.username, password='test')
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['notification_expiry_days'], 60)
@@ -568,7 +588,8 @@ class MarkNotificationsSeenAPIViewTestCase(APITestCase):
     """
 
     def setUp(self):
-        self.user = UserFactory()
+        self.TEST_PASSWORD = 'Password1234'
+        self.user = UserFactory(password=self.TEST_PASSWORD)
 
         # Create some sample notifications for the user
         Notification.objects.create(user=self.user, app_name='App Name 1', notification_type='Type A')
@@ -580,7 +601,7 @@ class MarkNotificationsSeenAPIViewTestCase(APITestCase):
         # Create a POST request to mark notifications as seen for 'App Name 1'
         app_name = 'App Name 1'
         url = reverse('mark-notifications-seen', kwargs={'app_name': app_name})
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         response = self.client.put(url)
         # Assert the response status code is 200 (OK)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -600,9 +621,10 @@ class NotificationReadAPIViewTestCase(APITestCase):
     """
 
     def setUp(self):
-        self.user = UserFactory()
+        self.TEST_PASSWORD = 'Password1234'
+        self.user = UserFactory(password=self.TEST_PASSWORD)
         self.url = reverse('notifications-read')
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         # Create some sample notifications for the user with already existing apps and with invalid app name
         Notification.objects.create(user=self.user, app_name='app_name_2', notification_type='Type A')
@@ -659,7 +681,7 @@ class NotificationReadAPIViewTestCase(APITestCase):
         # Create a PATCH request to mark notification as read for notification_id: 2 through a different user
         self.client.logout()
         self.user = UserFactory()
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         notification_id = 2
         data = {'notification_id': notification_id}
