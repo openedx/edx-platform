@@ -321,9 +321,6 @@ FEATURES = {
     # Show video bumper in Studio
     'ENABLE_VIDEO_BUMPER': False,
 
-    # Show issue open badges in Studio
-    'ENABLE_OPENBADGES': False,
-
     # How many seconds to show the bumper again, default is 7 days:
     'SHOW_BUMPER_PERIODICITY': 7 * 24 * 3600,
 
@@ -1997,8 +1994,6 @@ ADVANCED_PROBLEM_TYPES = [
 ]
 
 LIBRARY_BLOCK_TYPES = [
-    # Per https://github.com/openedx/build-test-release-wg/issues/231
-    # we removed the library source content block from defaults until complete.
     {
         'component': 'library_content',
         'boilerplate_name': None
@@ -2185,6 +2180,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'course_structure_cache': {
@@ -2197,6 +2193,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'celery': {
@@ -2209,6 +2206,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'mongo_metadata_inheritance': {
@@ -2221,6 +2219,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'staticfiles': {
@@ -2232,6 +2231,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'default': {
@@ -2244,6 +2244,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'configuration': {
@@ -2255,6 +2256,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
     'general': {
@@ -2266,6 +2268,7 @@ CACHES = {
             'no_delay': True,
             'ignore_exc': True,
             'use_pooling': True,
+            'connect_timeout': 0.5
         }
     },
 }
@@ -2650,6 +2653,9 @@ REGISTRATION_EXTRA_FIELDS = {
 }
 EDXAPP_PARSE_KEYS = {}
 
+############################ AI_TRANSLATIONS ##################################
+AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
+
 ###################### DEPRECATED URLS ##########################
 
 # .. toggle_name: DISABLE_DEPRECATED_SIGNIN_URL
@@ -2775,23 +2781,12 @@ DISCUSSIONS_INCONTEXT_LEARNMORE_URL = ''
 # disable indexing on date field its coming django-simple-history.
 SIMPLE_HISTORY_DATE_INDEX = False
 
-# This affects the CMS API swagger docs but not the legacy swagger docs under /api-docs/.
-REST_FRAMEWORK['DEFAULT_SCHEMA_CLASS'] = 'drf_spectacular.openapi.AutoSchema'
-
-# These fields override the spectacular settings default values.
-# Any fields not included here will use the default values.
-SPECTACULAR_SETTINGS = {
-    'TITLE': 'CMS API',
-    'DESCRIPTION': 'Experimental API to edit xblocks and course content. Danger: Do not use on running courses!',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
-    'PREPROCESSING_HOOKS': ['cms.lib.spectacular.cms_api_filter'],  # restrict spectacular to CMS API endpoints
-}
-
-
 #### Event bus producing ####
+
+
 def _should_send_xblock_events(settings):
     return settings.FEATURES['ENABLE_SEND_XBLOCK_LIFECYCLE_EVENTS_OVER_BUS']
+
 
 # .. setting_name: EVENT_BUS_PRODUCER_CONFIG
 # .. setting_default: all events disabled
@@ -2851,3 +2846,11 @@ derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.content_autho
                          'course-authoring-xblock-lifecycle', 'enabled')
 derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.content_authoring.xblock.deleted.v1',
                          'course-authoring-xblock-lifecycle', 'enabled')
+
+
+################### Authoring API ######################
+
+# This affects the Authoring API swagger docs but not the legacy swagger docs under /api-docs/.
+REST_FRAMEWORK['DEFAULT_SCHEMA_CLASS'] = 'drf_spectacular.openapi.AutoSchema'
+
+BEAMER_PRODUCT_ID = ""

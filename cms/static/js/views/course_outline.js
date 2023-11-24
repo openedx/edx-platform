@@ -458,6 +458,43 @@ function(
             event.stopPropagation();
         },
 
+        closeManageTagsDrawer(drawer, drawerCover) {
+            $(drawerCover).css('display', 'none');
+            $(drawer).empty();
+            $(drawer).css('display', 'none');
+            $('body').removeClass('drawer-open');
+        },
+
+        openManageTagsDrawer(event) {
+            const drawer = document.querySelector("#manage-tags-drawer");
+            const drawerCover = document.querySelector(".drawer-cover")
+            const article = document.querySelector('[data-taxonomy-tags-widget-url]');
+            const taxonomyTagsWidgetUrl = $(article).attr('data-taxonomy-tags-widget-url');
+            const contentId = this.model.get('id');
+
+            // Add handler to close drawer when dark background is clicked
+            $(drawerCover).click(function() {
+                this.closeManageTagsDrawer(drawer, drawerCover);
+            }.bind(this));
+
+            // Add event listen to close drawer when close button is clicked from within the Iframe
+            window.addEventListener("message", function (event) {
+                if (event.data === 'closeManageTagsDrawer') {
+                    this.closeManageTagsDrawer(drawer, drawerCover)
+                }
+            }.bind(this));
+
+            $(drawerCover).css('display', 'block');
+            // xss-lint: disable=javascript-jquery-html
+            $(drawer).html(
+                `<iframe src="${taxonomyTagsWidgetUrl}${contentId}" onload="this.contentWindow.focus()" frameborder="0" style="width: 100%; height: 100%;"></iframe>`
+            );
+            $(drawer).css('display', 'block');
+
+            // Prevent background from being scrollable when drawer is open
+            $('body').addClass('drawer-open');
+        },
+
         addButtonActions: function(element) {
             XBlockOutlineView.prototype.addButtonActions.apply(this, arguments);
             element.find('.configure-button').click(function(event) {
@@ -477,6 +514,10 @@ function(
             element.find('.copy-button').click((event) => {
                 event.preventDefault();
                 this.copyXBlock();
+            });
+            element.find('.manage-tags-button').click((event) => {
+                event.preventDefault();
+                this.openManageTagsDrawer();
             });
             element.find('.paste-component-button').click((event) => {
                 event.preventDefault();
