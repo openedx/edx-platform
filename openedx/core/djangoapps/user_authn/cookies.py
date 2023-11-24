@@ -244,7 +244,7 @@ def _get_user_info_cookie_data(request, user):
     # External sites will need to have fallback mechanisms to handle this case
     # (most likely just hiding the links).
     try:
-        header_urls['account_settings'] = reverse('account_settings')
+        header_urls['account_settings'] = settings.ACCOUNT_MICROFRONTEND_URL
         header_urls['learner_profile'] = reverse('learner_profile', kwargs={'username': user.username})
     except NoReverseMatch:
         pass

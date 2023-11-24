@@ -26,7 +26,8 @@ from xmodule.modulestore.modulestore_settings import update_module_store_setting
 from .common import *
 
 # import settings from LMS for consistent behavior with CMS
-from lms.envs.test import (  # pylint: disable=wrong-import-order
+from lms.envs.test import (  # pylint: disable=wrong-import-order, disable=unused-import
+    ACCOUNT_MICROFRONTEND_URL,
     BLOCKSTORE_USE_BLOCKSTORE_APP_API,
     BLOCKSTORE_API_URL,
     COMPREHENSIVE_THEME_DIRS,  # unimport:skip

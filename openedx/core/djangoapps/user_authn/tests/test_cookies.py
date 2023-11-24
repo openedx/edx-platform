@@ -57,7 +57,7 @@ class CookieTests(TestCase):
     def _get_expected_header_urls(self):
         expected_header_urls = {
             'logout': reverse('logout'),
-            'account_settings': reverse('account_settings'),
+            'account_settings': settings.ACCOUNT_MICROFRONTEND_URL,
             'learner_profile': reverse('learner_profile', kwargs={'username': self.user.username}),
         }
         block_url = retrieve_last_sitewide_block_completed(self.user)
