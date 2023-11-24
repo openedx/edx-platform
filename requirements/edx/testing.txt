@@ -1057,6 +1057,7 @@ pkgutil-resolve-name==1.3.10
     #   jsonschema
 platformdirs==3.11.0
     # via
+    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.txt
     #   pylint
     #   snowflake-connector-python
@@ -1433,9 +1434,8 @@ snowflake-connector-python==3.2.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-social-auth-app-django==5.3.0
+social-auth-app-django==5.1.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-auth-backends
 social-auth-core==4.3.0
@@ -1508,7 +1508,6 @@ tomlkit==0.12.1
     #   snowflake-connector-python
 tox==3.28.0
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/testing.in
     #   tox-battery
 tox-battery==0.6.2
