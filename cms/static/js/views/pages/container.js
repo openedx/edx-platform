@@ -145,7 +145,6 @@ function($, _, Backbone, gettext, BasePage,
                 hiddenCss = 'is-hidden';
 
             loadingElement.removeClass(hiddenCss);
-            self.initializePasteActionButton();
 
             // Hide both blocks until we know which one to show
             xblockView.$el.addClass(hiddenCss);
@@ -181,10 +180,6 @@ function($, _, Backbone, gettext, BasePage,
                 },
                 block_added: options && options.block_added
             });
-        },
-
-        initializePasteActionButton() {
-            // logic to hide/show paste button
         },
 
         findXBlockElement: function(target) {

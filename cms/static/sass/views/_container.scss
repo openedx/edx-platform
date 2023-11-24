@@ -243,6 +243,8 @@
         .action-copy {
           width: 100%;
           border-color: #0075b4;
+          padding-top: 12px;
+          padding-bottom: 12px;
 
           &:hover {
             @extend %btn-primary-blue;
