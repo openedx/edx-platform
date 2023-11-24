@@ -31,10 +31,11 @@
 </%block>
 % endif
 
+
 <%block name="pagetitle">${_("Courses")}</%block>
 
 
-
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
 <main id="main" aria-label="Content" tabindex="-1">
     <section class="find-courses">
       <section class="courses-container">
@@ -50,8 +51,8 @@
              <!-- Filter Section -->
       <div class="filter-container">
         <!-- Filter Box with Icon and Count -->
-        <span class="mdi mdi-tune-vertical"></span>   
-        <span class="filter-text">Filter</span>
+        <iconify-icon icon="material-symbols:instant-mix" class="mid"></iconify-icon>        
+        span class="filter-text">Filter</span>
         <div style="background: #FEEBEE; padding: 4px 6px;">
             <span style="font-weight: 600; font-size: 12px; color: #ED4338;">3</span>
         </div>
@@ -63,7 +64,7 @@
         <div class="search-info" >
           <form class="wrapper-search-input">
             <div class="magnifier-input">
-              <span class="mdi mdi-magnify"></span>
+              <iconify-icon icon="mdi-light:magnify" class="mdi"></iconify-icon>
               <label for="discovery-input" class="sr">${_('Search for a course')}</label>
             <input id="discovery-input" class="search-input" placeholder="${_('Search for a course')}" />
             
