@@ -143,28 +143,13 @@ jobs:
         ./manage.py lms makemigrations
         ./manage.py lms showmigrations > /data/files/def.txt
 
-    - name: Comment PR
+    - name: Diff files
       uses: LouisBrunner/diff-action@v0.2.0
       with:
         old: /data/files/abcd.txt
         new: /data/files/def.txt
         mode: addition
         output: /data/files/out.txt
-        - run: /data/files/out.txt
 
-#    - name: Process Data
-#      run: |
-#        cd /data/files/
-#        ls
-#        FILE1_PATH="/data/files/abcd.txt"
-#        FILE2_PATH="/data/files/def.txt"
-
-    - name: Comment PR
-      run: cat /data/files/out.txt
-
-#      uses: LouisBrunner/diff-action@v0.2.0
-#      with:
-#        old: /data/files/abcd.txt
-#        new: /data/files/def.txt
-#        mode: addition
-#        tolerance: better
+    - name: Run a command with the output file
+        run: cat /data/files/out.txt
