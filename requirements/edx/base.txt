@@ -54,7 +54,6 @@ attrs==23.1.0
     #   referencing
 babel==2.13.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   enmerkar
     #   enmerkar-underscore
