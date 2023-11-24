@@ -151,5 +151,8 @@ jobs:
         mode: addition
         output: /data/files/out.txt
 
-    - name: Run a command with the output file
-      run: cat /data/files/out.txt
+    - name: Comment PR
+      uses: thollander/actions-comment-pull-request@v2
+      with:
+        filePath: /data/files/out.txt
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
