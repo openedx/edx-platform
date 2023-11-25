@@ -35,7 +35,6 @@
 <%block name="pagetitle">${_("Courses")}</%block>
 
 
-<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
 <main id="main" aria-label="Content" tabindex="-1">
     <section class="find-courses">
       <section class="courses-container">
@@ -51,7 +50,7 @@
              <!-- Filter Section -->
       <div class="filter-container">
         <!-- Filter Box with Icon and Count -->
-        <iconify-icon icon="material-symbols:instant-mix" class="mdi"></iconify-icon>        
+        <span class="mdi mdi-tune-vertical"></span>
         <span class="filter-text">Filter</span>
         <div style="background: #FEEBEE; padding: 4px 6px;">
             <span style="font-weight: 600; font-size: 12px; color: #ED4338;">3</span>
@@ -64,7 +63,7 @@
         <div class="search-info" >
           <form class="wrapper-search-input">
             <div class="magnifier-input">
-              <iconify-icon icon="mdi-light:magnify" class="mdi"></iconify-icon>
+              <span class="mdi mdi-magnify"></span>
               <label for="discovery-input" class="sr">${_('Search for a course')}</label>
             <input id="discovery-input" class="search-input" placeholder="${_('Search for a course')}" />
             
@@ -104,6 +103,8 @@
 
          <!-- Including the 'Inter' font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.3.67/css/materialdesignicons.min.css" rel="stylesheet">
+
 
     <style>
         body {
@@ -112,6 +113,8 @@
         .mdi {
           font-size: 1.5em; /* Set the size of the icon */
           color: black;    /* Set the color of the icon */
+          display: flex;
+          align-items: center;
 
         }
 
@@ -328,15 +331,6 @@
             %endfor
           </ul>
         </div>
-
-
-        % if course_discovery_enabled:
-        <!-- <aside aria-label="${_('Refine Your Search')}" class="search-facets phone-menu">
-          <h2 class="header-search-facets">${_('Refine Your Search')}</h2>
-          <section class="search-facets-lists">
-          </section>
-        </aside> -->
-        % endif
 
         <script>
           document.addEventListener('DOMContentLoaded', function() {
