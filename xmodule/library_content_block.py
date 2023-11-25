@@ -8,7 +8,6 @@ import logging
 import random
 from copy import copy
 from gettext import ngettext, gettext
-from typing import Callable
 
 import bleach
 from django.conf import settings

@@ -1,9 +1,13 @@
+"""
+Utility to aid xblock duplication
+"""
 from typing import Callable
 
 
 def handle_children_duplication(
     xblock, source_item, store, user, duplication_function: Callable[..., None], shallow: bool
 ):
+    """Implements default behaviour to handle children duplication."""
     if not source_item.has_children or shallow:
         return
 

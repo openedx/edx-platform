@@ -1059,7 +1059,12 @@ def duplicate_block(
 
         if not children_handled:
             handle_children_duplication(
-                dest_block, store, source_item, store, user, duplication_function=duplicate_block, shallow=shallow
+                dest_block,
+                source_item,
+                store,
+                user,
+                duplication_function=duplicate_block,
+                shallow=shallow,
             )
 
         # pylint: disable=protected-access

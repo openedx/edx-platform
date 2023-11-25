@@ -54,7 +54,6 @@ from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.toggles import ENTRANCE_EXAMS
 from xmodule.course_block import DEFAULT_START_DATE
-from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
