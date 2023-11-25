@@ -118,7 +118,6 @@
 
         }
 
-
         .find-courses .wrapper-search-context {
             width: 100%;
             margin-left: auto;
@@ -216,11 +215,6 @@
             height: 48px;
         }
 
-        .faders {
-            width: 24px;
-            height: 24px;
-        }
-
         .filter-text {
             width: 39px;
             height: 48px;
@@ -251,11 +245,6 @@
             padding: 0px;
             gap: 12px;
             width: 105px;
-            height: 24px;
-        }
-
-        .magnifier-icon {
-            width: 24px;
             height: 24px;
         }
 
@@ -315,9 +304,10 @@
         }
 
         .courses{
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(312px, 1fr));
-            gap: 27px; /* Gap between items */
+          display: flex;
+          flex-wrap: wrap;
+          gap: 27px; 
+          width: 312px;
         }
 
     </style>
