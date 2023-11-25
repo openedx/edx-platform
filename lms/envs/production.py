@@ -732,6 +732,8 @@ ECOMMERCE_ORDERS_API_CACHE_TIMEOUT = ENV_TOKENS.get('ECOMMERCE_ORDERS_API_CACHE_
 if FEATURES.get('ENABLE_COURSEWARE_SEARCH') or \
    FEATURES.get('ENABLE_DASHBOARD_SEARCH') or \
    FEATURES.get('ENABLE_COURSE_DISCOVERY') or \
+   FEATURES.get('ENABLE_FILTER') or \
+   FEATURES.get('ENABLE_SORTBY') or \
    FEATURES.get('ENABLE_TEAMS'):
     # Use ElasticSearch as the search engine herein
     SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
