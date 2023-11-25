@@ -657,7 +657,7 @@ FEATURES = {
     # .. toggle_target_removal_date: None
     # .. toggle_warning: The COURSE_DISCOVERY_MEANINGS setting should be properly defined.
     # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/7845
-    'ENABLE_COURSE_DISCOVERY': False,
+    'ENABLE_COURSE_DISCOVERY': True,
 
     # .. toggle_name: FEATURES['ENABLE_COURSE_FILENAME_CCX_SUFFIX']
     # .. toggle_implementation: DjangoSetting
@@ -683,7 +683,7 @@ FEATURES = {
     'ENABLE_FILTER': True,
 
     #sort by feature of the filter bar
-    'ENABLE_SORTBY': True,
+    'ENABLE_SORTBY': False,
 
     # Show video bumper in LMS
     'ENABLE_VIDEO_BUMPER': False,
