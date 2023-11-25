@@ -818,12 +818,11 @@ def _duplicate_block(
         )
 
         children_handled = False
-        if hasattr(dest_block, "studio_post_duplicate"):
-            # Allow an XBlock to do anything fancy it may need to when duplicated from another block.
-            load_services_for_studio(source_item.runtime, user)
-            children_handled = dest_block.studio_post_duplicate(
-                source_item, store, user, duplication_function=_duplicate_block, shallow=False
-            )
+        # Allow an XBlock to do anything fancy it may need to when duplicated from another block.
+        load_services_for_studio(source_item.runtime, user)
+        children_handled = dest_block.studio_post_duplicate(
+            source_item, store, user, duplication_function=_duplicate_block, shallow=False
+        )
 
         if not children_handled:
             handle_children_duplication(

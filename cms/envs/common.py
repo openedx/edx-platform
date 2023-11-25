@@ -959,6 +959,7 @@ P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
 # Import after sys.path fixup
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
+from xmodule.studio_editable import StudioEditableBlock
 
 # These are the Mixins that should be added to every XBlock.
 # This should be moved into an XBlock Runtime/Application object
@@ -969,6 +970,7 @@ XBLOCK_MIXINS = (
     XModuleMixin,
     EditInfoMixin,
     AuthoringMixin,
+    StudioEditableBlock,
 )
 XBLOCK_EXTRA_MIXINS = ()
 
