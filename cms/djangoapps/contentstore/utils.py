@@ -1054,12 +1054,12 @@ def duplicate_block(
         # Allow an XBlock to do anything fancy it may need to when duplicated from another block.
         load_services_for_studio(source_item.runtime, user)
         children_handled = dest_block.studio_post_duplicate(
-            store, source_item, store, user, duplication_function=duplicate_block, shallow=shallow
+            source_item, store, user, duplication_function=duplicate_block, shallow=shallow
         )
 
         if not children_handled:
             handle_children_duplication(
-                store, source_item, store, user, duplication_function=duplicate_block, shallow=shallow
+                dest_block, store, source_item, store, user, duplication_function=duplicate_block, shallow=shallow
             )
 
         # pylint: disable=protected-access
@@ -1347,7 +1347,7 @@ def get_course_team(auth_user, course_key, user_perms):
         'context_course': course_block,
         'show_transfer_ownership_hint': auth_user in instructors and len(instructors) == 1,
         'users': formatted_users,
-        'allow_actions': bool(user_perms & STUDIO_EDIT_ROLES),
+        'allow_actions': bool(user_perms & auth.STUDIO_EDIT_ROLES),
     }
 
     return course_team_context

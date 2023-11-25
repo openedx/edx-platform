@@ -592,6 +592,7 @@ class LibraryContentBlock(
         self,
         source_item,
         *_,
+        **__,
     ) -> None:  # pylint: disable=unused-argument
         """
         Used by the studio after basic duplication of a source block. We handle the children
