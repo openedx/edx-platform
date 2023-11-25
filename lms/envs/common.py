@@ -680,7 +680,7 @@ FEATURES = {
     'ENABLE_TEAMS': True,
 
     #filter feature of the filter bar
-    'ENABLE_FILTER': True,
+    'ENABLE_FILTER': False,
 
     #sort by feature of the filter bar
     'ENABLE_SORTBY': False,
