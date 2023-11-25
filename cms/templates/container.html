@@ -54,7 +54,7 @@ from openedx.core.djangolib.markup import HTML, Text
             }
         );
 
-        require(["js/models/xblock_info", "js/views/xblock", "js/views/utils/xblock_utils", "common/js/components/utils/view_utils"], function (XBlockInfo, XBlockView, XBlockUtils, ViewUtils) {
+        require(["js/models/xblock_info", "js/views/xblock", "js/views/utils/xblock_utils", "common/js/components/utils/view_utils", "gettext"], function (XBlockInfo, XBlockView, XBlockUtils, ViewUtils, gettext) {
             var model = new XBlockInfo({
                 id: '${subsection.location|n, decode.utf8}'
             });
@@ -66,27 +66,15 @@ from openedx.core.djangolib.markup import HTML, Text
             });
 
             xblockView.xblockReady = function() {
-                this.clipboardBroadcastChannel = new BroadcastChannel("studio_clipboard_channel");
-                this.clipboardBroadcastChannel.onmessage = (event) => {
-                    if (!event.data.source_usage_key?.includes("vertical")) {
-                        $('.seq_paste_unit').closest('li').hide();
-                    } else {
-                        $('.seq_paste_unit').closest('li').show();
-                    }
-                };
                 var currentAction = "new_unit";
                 var actionIcons = {
                     'new_unit': 'fa fa-plus',
                     'paste_unit': 'fa fa-clipboard'
                 };
                 var actionLabels = {
-                    'new_unit': 'New Unit',
-                    'paste_unit': 'Paste Unit'
+                    'new_unit': gettext('New Unit'),
+                    'paste_unit': gettext('Paste Unit')
                 };
-
-                if (!this.options.clipboardData.content || !this.options.clipboardData.source_usage_key?.includes("vertical")) {
-                    $('.seq_paste_unit').closest('li').hide();
-                }
 
                 var updateButtonAndCheckmarks = function(selectedAction) {
                     var iconName = actionIcons[selectedAction];
@@ -102,6 +90,36 @@ from openedx.core.djangolib.markup import HTML, Text
                         }
                     });
                 };
+
+                var resetToDefaultAction = function() {
+                    // Set the current action to "new unit"
+                    currentAction = 'new_unit';
+
+                    // Update the button label and icon to "new unit"
+                    var defaultLabel = actionLabels[currentAction];
+                    var defaultIconName = actionIcons[currentAction];
+                    $('.dropdown-main-button .button-label').text(defaultLabel);
+                    $('.dropdown-main-button .icon').removeClass('fa-plus fa-clipboard').addClass(defaultIconName);
+
+                    // Ensure that the checkmarks are updated to reflect the default state
+                    updateButtonAndCheckmarks(currentAction);
+
+                    // Hide the "Paste as new unit" option
+                    $('.seq_paste_unit').closest('li').hide();
+                };
+
+                this.clipboardBroadcastChannel = new BroadcastChannel("studio_clipboard_channel");
+                this.clipboardBroadcastChannel.onmessage = (event) => {
+                    if (!event.data.source_usage_key?.includes("vertical")) {
+                        resetToDefaultAction();
+                    } else {
+                        $('.seq_paste_unit').closest('li').show();
+                    }
+                };
+
+                if (!this.options.clipboardData.content || !this.options.clipboardData.source_usage_key?.includes("vertical")) {
+                    resetToDefaultAction();
+                }
 
                 $('.custom-dropdown .dropdown-toggle-button').on('click', function(event) {
                     event.stopPropagation(); // Prevent the event from closing immediately when we open it
