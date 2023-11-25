@@ -314,6 +314,13 @@
             display: flex; /* Add flex display to horizontally align Sort By text and dropdown */
             align-items: center; /* Vertically align the items in center */
         }
+
+        .courses{
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(312px, 1fr));
+            gap: 27px; /* Gap between items */
+        }
+
     </style>
 
         <div class="courses${'' if course_discovery_enabled else ' no-course-discovery'}" role="region" aria-label="${_('List of Courses')}" style="margin-right: 0px;">
@@ -328,47 +335,57 @@
 
 
         % if course_discovery_enabled:
-        <aside aria-label="${_('Refine Your Search')}" class="search-facets phone-menu">
+        <!-- <aside aria-label="${_('Refine Your Search')}" class="search-facets phone-menu">
           <h2 class="header-search-facets">${_('Refine Your Search')}</h2>
           <section class="search-facets-lists">
           </section>
-        </aside>
+        </aside> -->
         % endif
 
         <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var searchForm = document.getElementById('discovery-form');
-        var resultsCountContainer = document.querySelector('.search-results-count');
-        var resultsCount = document.getElementById('results-count');
-        var searchTermDisplay = document.getElementById('search-term');
-        var discoveryMessage = document.getElementById('discovery-message');
-
-        searchForm.addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevents the form from submitting traditionally
-
-            var searchTerm = document.getElementById('discovery-input').value.trim();
-
-            setTimeout(function() {
-                var messageText = discoveryMessage.textContent || '';
-                var numberOfResults;
-                var resultTerm;
-
-                if (messageText.includes("any results")) {
-                    numberOfResults = 0;
-                    resultTerm = 'results'; // Plural, as "0 results" is the conventional expression
-                } else {
-                    numberOfResults = parseInt(messageText.match(/\d+/)[0]) || 0;
-                    resultTerm = (numberOfResults === 1) ? 'result' : 'results'; // Singular for 1, plural otherwise
-                }
-
-                // Update the display inside the setTimeout function
-                resultsCountContainer.style.display = 'block';
-                resultsCount.textContent = numberOfResults + ' ' + resultTerm;
-                searchTermDisplay.textContent = searchTerm;
-            }, 500); // Adjust the delay time as needed
-        });
-    });
-</script>
+          document.addEventListener('DOMContentLoaded', function() {
+              var searchForm = document.getElementById('discovery-form');
+              var coursesList = document.querySelector('.courses-list');
+              var courseItems = coursesList.querySelectorAll('.courses-listing-item');
+          
+              searchForm.addEventListener('submit', function(event) {
+                  event.preventDefault(); // Prevents the form from submitting traditionally
+          
+                  var searchTerm = document.getElementById('discovery-input').value.trim().toLowerCase();
+                  var hasResults = false;
+          
+                  courseItems.forEach(function(course) {
+                      var courseTitle = course.textContent.toLowerCase();
+                      if (courseTitle.includes(searchTerm) || searchTerm === '') {
+                          course.style.display = '';
+                          hasResults = true;
+                      } else {
+                          course.style.display = 'none';
+                      }
+                  });
+          
+                  // Update the results count display
+                  var resultsCountContainer = document.querySelector('.search-results-count');
+                  var resultsCount = document.getElementById('results-count');
+                  var searchTermDisplay = document.getElementById('search-term');
+          
+                  if (hasResults) {
+                      var visibleCourses = coursesList.querySelectorAll('.courses-listing-item:not([style*="display: none"])');
+                      var numberOfResults = visibleCourses.length;
+                      var resultTerm = (numberOfResults === 1) ? 'result' : 'results';
+                      
+                      resultsCountContainer.style.display = 'block';
+                      resultsCount.textContent = numberOfResults + ' ' + resultTerm;
+                      searchTermDisplay.textContent = searchTerm;
+                  } else {
+                      resultsCountContainer.style.display = 'block';
+                      resultsCount.textContent = '0 results';
+                      searchTermDisplay.textContent = searchTerm;
+                  }
+              });
+          });
+          </script>
+          
 
 
       </section>
