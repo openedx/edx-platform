@@ -16,7 +16,6 @@ class StudioEditableBlock(XBlockMixin):
 
     This class is only intended to be used with an XBlock!
     """
-    has_author_view = True
 
     def render_children(self, context, fragment, can_reorder=False, can_add=False):
         """
@@ -53,14 +52,14 @@ class StudioEditableBlock(XBlockMixin):
         """
         return AUTHOR_VIEW if has_author_view(block) else STUDENT_VIEW
 
-    def editor_saved(self, old_metadata, old_content) -> None:  # pylint: disable=unused-argument
+    def editor_saved(self, user, old_metadata, old_content) -> None:  # pylint: disable=unused-argument
         """
         Called right *before* the block is written to the DB. Can be used, e.g., to modify fields before saving.
 
         By default, is a no-op. Can be overriden in subclasses.
         """
 
-    def post_editor_saved(self, old_metadata, old_content) -> None:  # pylint: disable=unused-argument
+    def post_editor_saved(self, user, old_metadata, old_content) -> None:  # pylint: disable=unused-argument
         """
         Called right *after* the block is written to the DB. Can be used, e.g., to spin up followup tasks.
 

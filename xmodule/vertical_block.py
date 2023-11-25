@@ -76,6 +76,8 @@ class VerticalBlock(
     Layout XBlock for rendering subblocks vertically.
     """
 
+    has_author_view = True
+
     resources_dir = 'assets/vertical'
 
     mako_template = 'widgets/sequence-edit.html'

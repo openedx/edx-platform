@@ -83,6 +83,7 @@ class ConditionalBlock(
         And my_property/my_method will be called for required blocks.
 
     """
+    has_author_view = True
 
     display_name = String(
         display_name=_("Display Name"),
