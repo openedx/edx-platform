@@ -716,6 +716,8 @@
     "Email": "E-posta",
     "Email Address (Sign In)": "E-posta Adresi (Giri\u015f Yap)",
     "Email address": "E-posta adresi",
+    "Email cannot be sent to the following users via batch enrollment. They will be allowed to enroll once they register:": "A\u015fa\u011f\u0131daki kullan\u0131c\u0131lara toplu kay\u0131t yoluyla e-posta g\u00f6nderilemez. Sisteme kay\u0131t olduklar\u0131nda derslere kaydolmalar\u0131na izin verilecektir:",
+    "Email cannot be sent to the following users via batch enrollment. They will be enrolled once they register:": "A\u015fa\u011f\u0131daki kullan\u0131c\u0131lara toplu kay\u0131t yoluyla e-posta g\u00f6nderilemez. Sisteme kay\u0131t olduklar\u0131nda derslere kaydedileceklerdir:",
     "Emails successfully sent. The following users are no longer enrolled in the course:": "E-postalar ba\u015far\u0131yla g\u00f6nderildi. A\u015fa\u011f\u0131daki kullan\u0131c\u0131lar bu derse art\u0131k kay\u0131tl\u0131 de\u011filler:",
     "Embed": "G\u00f6m\u00fcl\u00fc",
     "Emoticons": "\u0130fadeler",
@@ -733,6 +735,7 @@
     "Ends {end}": "Bitti {end}",
     "Engage with posts": "G\u00f6nderilerle etkile\u015fimde bulunun",
     "Enroll Now": "Hemen Kaydol",
+    "Enroll in a {programName}'s course": "{programName} dersine kaydol",
     "Enrolled": "Kay\u0131tland\u0131",
     "Enrolling you in the selected course": "Se\u00e7ilen derse sizi kay\u0131t ediyor",
     "Enrollment Date": "Kay\u0131t Tarihi",
@@ -1703,6 +1706,7 @@
     "Submit enrollment change": "Kay\u0131t de\u011fi\u015fimini g\u00f6nder",
     "Submitted": "Girildi",
     "Subscript": "Alt simge",
+    "Subscription trial expires in less than 24 hours": "Abonelik deneme s\u00fcresi 24 saat i\u00e7inde sona eriyor",
     "Subscription trial expires in {remainingDays} day": [
       "Abonelik deneme s\u00fcresi {remainingDays} g\u00fcn i\u00e7inde sona eriyor",
       "Abonelik deneme s\u00fcresi {remainingDays} g\u00fcn i\u00e7inde sona eriyor"
@@ -2248,6 +2252,7 @@
     "You did not submit the required files: {requiredFiles}.": "Gerekli dosyalar\u0131 g\u00f6ndermediniz: {requiredFiles}.",
     "You don't seem to have Flash installed. Get Flash to continue your verification.": "Flash'\u0131 y\u00fcklememi\u015f g\u00f6z\u00fck\u00fcyorsunuz. Do\u011frulamaya devam etmeniz i\u00e7in Flash'\u0131 y\u00fckleyin.",
     "You don't seem to have a webcam connected.": "Ba\u011fl\u0131 bir web kameran\u0131z olmad\u0131\u011f\u0131 g\u00f6r\u00fcnmekte.",
+    "You have access to the {enterpriseName} dashboard": "{enterpriseName} paneline eri\u015fiminiz var",
     "You have added a criterion. You will need to select an option for the criterion in the Learner Training step. To do this, click the Assessment Steps tab.": "Bir \u00f6l\u00e7\u00fct eklediniz. \u00d6\u011frenci E\u011fitimi ad\u0131m\u0131nda, \u00f6l\u00e7\u00fct i\u00e7in bir se\u00e7enek belirlemelisiniz. Bunu yapmak i\u00e7in, De\u011ferlendirme Ad\u0131mlar\u0131 sekmesine t\u0131klay\u0131n\u0131z.",
     "You have already verified your ID!": "Kimli\u011finizi \u00e7oktan do\u011frulad\u0131n\u0131z!",
     "You have an active subscription to the {programName} program but are not enrolled in any courses. Enroll in a remaining course and enjoy verified access.": "{programName} program\u0131na etkin bir aboneli\u011finiz var ancak herhangi bir derse kay\u0131tl\u0131 de\u011filsiniz. Mevcut bir derse kaydolun ve do\u011frulanm\u0131\u015f eri\u015fimin keyfini \u00e7\u0131kar\u0131n.",
@@ -2343,6 +2348,11 @@
     "Your upload of '{file}' succeeded.": "'{file}' y\u00fcklemeniz ba\u015far\u0131l\u0131.",
     "Your verification status is good until {verificationGoodUntil}.": "{verificationGoodUntil} a\u015famas\u0131na dek do\u011frulama durumunuz iyi.",
     "Your video uploads are not complete.": "Video y\u00fcklemeleriniz tamamlanmad\u0131.",
+    "Your {programName} trial will expire at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}.": "{programName} deneme s\u00fcr\u00fc\u015f\u00fcn\u00fcz {trialEndDate} tarihinde {trialEndTime} saati itibariyle sona erecek ve dosyadaki karttan {subscriptionPrice} tahsil edilecektir.",
+    "Your {programName} trial will expire in {remainingDays} day at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}.": [
+      "{programName} deneme s\u00fcr\u00fc\u015f\u00fcn\u00fcz {remainingDays} g\u00fcn sonra {trialEndDate} tarihinde {trialEndTime} saati itibariyle sona erecek ve dosyadaki karttan {subscriptionPrice} tahsil edilecektir.",
+      "{programName} deneme s\u00fcr\u00fc\u015f\u00fcn\u00fcz {remainingDays} g\u00fcn sonra {trialEndDate} tarihinde {trialEndTime} saati itibariyle sona erecek ve dosyadaki karttan {subscriptionPrice} tahsil edilecektir."
+    ],
     "Your {program} Certificate": "{program} Sertifikan\u0131z",
     "Yourself": "Kendiniz",
     "Zoom In": "B\u00fcy\u00fct",

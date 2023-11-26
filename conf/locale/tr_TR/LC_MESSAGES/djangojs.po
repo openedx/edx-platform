@@ -2531,6 +2531,8 @@ msgid ""
 "Email cannot be sent to the following users via batch enrollment. They will "
 "be allowed to enroll once they register:"
 msgstr ""
+"Aşağıdaki kullanıcılara toplu kayıt yoluyla e-posta gönderilemez. Sisteme "
+"kayıt olduklarında derslere kaydolmalarına izin verilecektir:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -2545,6 +2547,8 @@ msgid ""
 "Email cannot be sent to the following users via batch enrollment. They will "
 "be enrolled once they register:"
 msgstr ""
+"Aşağıdaki kullanıcılara toplu kayıt yoluyla e-posta gönderilemez. Sisteme "
+"kayıt olduklarında derslere kaydedileceklerdir:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -3018,7 +3022,7 @@ msgstr ""
 
 #: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 msgid "You have access to the {enterpriseName} dashboard"
-msgstr ""
+msgstr "{enterpriseName} paneline erişiminiz var"
 
 #: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 msgid ""
@@ -3157,7 +3161,7 @@ msgstr "Programı göster"
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid "Enroll in a {programName}'s course"
-msgstr ""
+msgstr "{programName} dersine kaydol"
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid ""
@@ -3181,7 +3185,7 @@ msgstr ""
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid "Subscription trial expires in less than 24 hours"
-msgstr ""
+msgstr "Abonelik deneme süresi 24 saat içinde sona eriyor"
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid "Subscription trial expires in {remainingDays} day"
@@ -3194,6 +3198,9 @@ msgid ""
 "Your {programName} trial will expire at {trialEndTime} on {trialEndDate} and"
 " the card on file will be charged {subscriptionPrice}."
 msgstr ""
+"{programName} deneme sürüşünüz {trialEndDate} tarihinde {trialEndTime} saati"
+" itibariyle sona erecek ve dosyadaki karttan {subscriptionPrice} tahsil "
+"edilecektir."
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid ""
@@ -3205,7 +3212,13 @@ msgid_plural ""
 "{trialEndTime} on {trialEndDate} and the card on file will be charged "
 "{subscriptionPrice}."
 msgstr[0] ""
+"{programName} deneme sürüşünüz {remainingDays} gün sonra {trialEndDate} "
+"tarihinde {trialEndTime} saati itibariyle sona erecek ve dosyadaki karttan "
+"{subscriptionPrice} tahsil edilecektir."
 msgstr[1] ""
+"{programName} deneme sürüşünüz {remainingDays} gün sonra {trialEndDate} "
+"tarihinde {trialEndTime} saati itibariyle sona erecek ve dosyadaki karttan "
+"{subscriptionPrice} tahsil edilecektir."
 
 #: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
 msgid "{type} Progress"
