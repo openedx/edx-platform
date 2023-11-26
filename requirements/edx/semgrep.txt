@@ -38,7 +38,7 @@ face==22.0.0
     # via glom
 glom==22.1.0
     # via semgrep
-idna==3.5
+idna==3.6
     # via requests
 importlib-resources==6.1.1
     # via

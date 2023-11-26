@@ -12,7 +12,7 @@ charset-normalizer==2.0.12
     #   requests
 edx-opaque-keys==2.5.1
     # via -r requirements/edx/paver.in
-idna==3.5
+idna==3.6
     # via requests
 lazy==1.6
     # via -r requirements/edx/paver.in
