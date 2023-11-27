@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-11-20 15:29+0000\n"
-"PO-Revision-Date: 2023-11-20 15:29:35.699299\n"
+"POT-Creation-Date: 2023-11-26 20:36+0000\n"
+"PO-Revision-Date: 2023-11-26 20:36:15.034816\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -13269,6 +13269,25 @@ msgstr ""
 "théïr änswérs änd réshüfflé séléçtéd ïtéms. Ⱡ'σяєм ιρѕυм ∂#"
 
 #: xmodule/library_content_block.py
+msgid "Source content library has not been specified."
+msgstr ""
+"Söürçé çöntént lïßrärý häs nöt ßéén spéçïfïéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α#"
+
+#: xmodule/library_content_block.py
+msgid "Content libraries are not available in the current runtime."
+msgstr ""
+"Çöntént lïßrärïés äré nöt äväïläßlé ïn thé çürrént rüntïmé. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: xmodule/library_content_block.py
+#, python-brace-format
+msgid "Source content library does not exist: {source_library_id}"
+msgstr ""
+"Söürçé çöntént lïßrärý döés nöt éxïst: {source_library_id} Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: xmodule/library_content_block.py
 msgid "This component is out of date. The library has new content."
 msgstr ""
 "Thïs çömpönént ïs öüt öf däté. Thé lïßrärý häs néw çöntént. Ⱡ'σяєм ιρѕυм "
@@ -13310,10 +13329,11 @@ msgid "Select a Library."
 msgstr "Séléçt ä Lïßrärý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: xmodule/library_content_block.py
-msgid "There are no matching problem types in the specified libraries."
+#, python-brace-format
+msgid "There are no problems in the specified library of type {capa_type}."
 msgstr ""
-"Théré äré nö mätçhïng prößlém týpés ïn thé spéçïfïéd lïßrärïés. Ⱡ'σяєм ιρѕυм"
-" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Théré äré nö prößléms ïn thé spéçïfïéd lïßrärý öf týpé {capa_type}. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: xmodule/library_content_block.py
 msgid "Select another problem type."
@@ -15927,14 +15947,6 @@ msgstr "Réqüïréménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #: lms/templates/module-error.html
 msgid "Details"
 msgstr "Détäïls Ⱡ'σяєм ιρѕυм #"
-
-#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
-#. Translators: this is a verb describing the action of viewing more details
-#: cms/templates/studio_xblock_wrapper.html
-#: lms/templates/wiki/includes/article_menu.html
-#: wiki/templates/wiki/includes/article_menu.html
-msgid "View"
-msgstr "Vïéw Ⱡ'σяєм ι#"
 
 #: cms/templates/maintenance/_announcement_edit.html
 #: lms/templates/problem.html lms/templates/word_cloud.html
@@ -23510,6 +23522,11 @@ msgid "Learn more"
 msgstr "Léärn möré Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/wiki/includes/article_menu.html
+#: wiki/templates/wiki/includes/article_menu.html
+msgid "View"
+msgstr "Vïéw Ⱡ'σяєм ι#"
+
+#: lms/templates/wiki/includes/article_menu.html
 msgid "{span_start}(active){span_end}"
 msgstr "{span_start}(äçtïvé){span_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
@@ -24334,6 +24351,10 @@ msgstr "Vïéw Lïvé Vérsïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм
 msgid "Preview the courseware in the LMS"
 msgstr ""
 "Prévïéw thé çöürséwäré ïn thé LMS Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: cms/templates/container.html
+msgid "Collapse All"
+msgstr "Çölläpsé Àll Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: cms/templates/container.html
 msgid "Adding components"
@@ -27906,12 +27927,24 @@ msgstr ""
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłł#"
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Importing components"
+msgstr "Ìmpörtïng çömpönénts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
 msgstr "Éxpänd ör Çölläpsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Select this problem"
+msgstr "Séléçt thïs prößlém Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"
 msgstr "Çöpý tö Çlïpßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage tags"
+msgstr "Mänägé tägs Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"
