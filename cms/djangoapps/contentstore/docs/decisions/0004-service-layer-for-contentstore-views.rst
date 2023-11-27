@@ -114,6 +114,7 @@ Examples
 
 Notes
 -----
-- Identifying suitable names for service layer files is challenging due to existing naming conventions within the ecosystem (as discussed in `this forum post <https://discuss.openedx.org/t/contentstore-views-refactoring/11801>`_).
-- The service layer is distinct from "Xblock Services" and should not be conflated with them.
+- Identifying a good way to structure file and folder naming and architecture around this is
+  discussed in `this forum post <https://discuss.openedx.org/t/contentstore-views-refactoring/11801>`_.
+- The terms "service" / "service layer" are distinct from "Xblock Services" and should not be conflated with them.
 - For a deeper understanding of service layer concepts, refer to `Cosmic Python, Chapter 4: Service Layer <https://www.cosmicpython.com/book/chapter_04_service_layer.html>`_.
