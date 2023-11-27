@@ -44,8 +44,6 @@
 
                 // Add default option to course array
                 this.addDefaultOption(fields, 0);
-                // Add default option to household income array
-                this.addDefaultOption(fields, 1);
 
                 // Set non-form data needed to render the View
                 this.context = {
@@ -146,11 +144,12 @@
             },
 
             addDefaultOption: function(array, index) {
-                if (array[index].options.length > 1) {
+                if (array[index].options.length >= 1) {
                     array[index].options.unshift({
-                        name: '- ' + gettext('Choose one') + ' -',
+                        name: gettext('Course'),
                         value: '',
-                        default: true
+                        default: true,
+                        disabled: true,
                     });
                 }
             }
