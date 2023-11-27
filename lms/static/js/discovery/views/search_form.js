@@ -42,7 +42,6 @@
                 this.$loadingIndicator.addClass('hidden');
             },
 
-           
             showFoundMessage: function(count) {
                 var msg = ngettext(
                     'Viewing %s course',
