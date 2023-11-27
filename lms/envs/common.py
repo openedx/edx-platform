@@ -1415,6 +1415,9 @@ ELASTIC_SEARCH_CONFIG = [
     }
 ]
 
+SEARCH_COURSEWARE_CONTENT_LOG_PARAMS = False
+
+
 # .. setting_name: ELASTIC_SEARCH_INDEX_PREFIX
 # .. setting_default: ''
 # .. setting_description: Specifies the prefix used when namixng elasticsearch indexes related to edx-search.
@@ -1593,6 +1596,9 @@ BRANCH_IO_KEY = ''
 ######################## OPTIMIZELY ###########################
 OPTIMIZELY_PROJECT_ID = None
 OPTIMIZELY_FULLSTACK_SDK_KEY = None
+
+######################## HOTJAR ###########################
+HOTJAR_SITE_ID = 00000
 
 ######################## ALGOLIA SEARCH ###########################
 ALGOLIA_APP_ID = None
@@ -2229,10 +2235,10 @@ MIDDLEWARE = [
     'common.djangoapps.track.middleware.TrackMiddleware',
 
     # CORS and CSRF
+    'django.middleware.csrf.CsrfViewMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'openedx.core.djangoapps.cors_csrf.middleware.CorsCSRFMiddleware',
     'openedx.core.djangoapps.cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
 
     'splash.middleware.SplashMiddleware',
 
@@ -4219,6 +4225,10 @@ ECOMMERCE_ORDERS_API_CACHE_TIMEOUT = 3600
 ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 
+# E-Commerce Commerce Coordinator Configuration
+COMMERCE_COORDINATOR_URL_ROOT = 'http://localhost:8000'
+COORDINATOR_CHECKOUT_REDIRECT_PATH = '/lms/redirect/'
+
 # Exam Service
 EXAMS_SERVICE_URL = 'http://localhost:18740/api/v1'
 
@@ -4437,6 +4447,9 @@ REGISTRATION_EXTENSION_FORM = None
 MOBILE_APP_USER_AGENT_REGEXES = [
     r'edX/org.edx.mobile',
 ]
+
+# set course limit for mobile search
+MOBILE_SEARCH_COURSE_LIMIT = 100
 
 # cache timeout in seconds for Mobile App Version Upgrade
 APP_UPGRADE_CACHE_TIMEOUT = 3600
@@ -5340,6 +5353,9 @@ NOTIFICATIONS_EXPIRY = 60
 EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
 NOTIFICATION_CREATION_BATCH_SIZE = 99
 
+############################ AI_TRANSLATIONS ##################################
+AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
+
 #### django-simple-history##
 # disable indexing on date field its coming from django-simple-history.
 SIMPLE_HISTORY_DATE_INDEX = False
@@ -5418,3 +5434,4 @@ derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.cert
                          'learning-certificate-lifecycle', 'enabled')
 derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.certificate.revoked.v1',
                          'learning-certificate-lifecycle', 'enabled')
+BEAMER_PRODUCT_ID = ""

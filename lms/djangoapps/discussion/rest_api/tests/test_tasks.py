@@ -25,7 +25,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_STUDENT,
     CourseDiscussionSettings
 )
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_COURSEWIDE_NOTIFICATIONS, ENABLE_NOTIFICATIONS
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -44,6 +44,7 @@ def _get_mfe_url(course_id, post_id):
 @httpretty.activate
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+@override_waffle_flag(ENABLE_COURSEWIDE_NOTIFICATIONS, active=True)
 class TestNewThreadCreatedNotification(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """
     Test cases related to new_discussion_post and new_question_post notification types

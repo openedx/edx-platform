@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-22 20:35+0000\n"
-"PO-Revision-Date: 2023-10-22 20:35:52.488124\n"
+"POT-Creation-Date: 2023-11-26 20:36+0000\n"
+"PO-Revision-Date: 2023-11-26 20:36:15.164044\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -1881,6 +1881,7 @@ msgstr ""
 msgid "[no tags]"
 msgstr ""
 
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: 'Tags' is the name of the view (noun) within the Student Notes
 #. page that shows all
 #. notes organized by the tags the student has associated with them (if any).
@@ -1889,6 +1890,7 @@ msgstr ""
 #. with the note
 #. in order to group similar notes together and help with search.
 #: lms/static/js/edxnotes/views/tabs/tags.js
+#: cms/templates/js/tag-list.underscore
 msgid "Tags"
 msgstr ""
 
@@ -9683,6 +9685,10 @@ msgid "Proctoring Settings"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore
+msgid "Manage Tags"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 msgid "Configure"
 msgstr ""
 
@@ -10525,6 +10531,10 @@ msgstr ""
 
 #: cms/templates/js/summary-configuration-editor.underscore
 msgid "Enable summaries"
+msgstr ""
+
+#: cms/templates/js/tag-list.underscore
+msgid "Manage tags"
 msgstr ""
 
 #: cms/templates/js/team-member.underscore

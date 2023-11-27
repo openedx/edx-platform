@@ -8,7 +8,6 @@ We extracted all the logic from the `xblock_handler` endpoint that lives in
 contentstore/views/block.py to this file, because the logic is reused in another view now.
 Along with it, we moved the business logic of the other views in that file, since that is related.
 """
-
 import logging
 from datetime import datetime
 from uuid import uuid4
@@ -16,7 +15,7 @@ from uuid import uuid4
 from attrs import asdict
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import (User)  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.utils.timezone import timezone
@@ -24,6 +23,7 @@ from django.utils.translation import gettext as _
 from edx_django_utils.plugins import pluggable_override
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
+from openedx_tagging.core.tagging import api as tagging_api
 from edx_proctoring.api import (
     does_backend_support_onboarding,
     get_exam_by_content_id,
@@ -38,7 +38,7 @@ from xblock.core import XBlock
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
-from cms.djangoapps.contentstore.toggles import ENABLE_COPY_PASTE_UNITS
+from cms.djangoapps.contentstore.toggles import ENABLE_COPY_PASTE_UNITS, use_tagging_taxonomy_list_page
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.ai_aside_summary_config import AiAsideSummaryConfig
 from common.djangoapps.edxmako.services import MakoService
@@ -54,38 +54,17 @@ from openedx.core.djangoapps.bookmarks import api as bookmarks_api
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.lib.gating import api as gating_api
+from openedx.core.lib.cache_utils import request_cached
 from openedx.core.toggles import ENTRANCE_EXAMS
-from xmodule.course_block import (
-    DEFAULT_START_DATE,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.library_tools import (
-    LibraryToolsService,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore import (
-    EdxJSONEncoder,
-    ModuleStoreEnum,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.django import (
-    modulestore,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.draft_and_published import (
-    DIRECT_ONLY_CATEGORIES,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.exceptions import (
-    InvalidLocationError,
-    ItemNotFoundError,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.inheritance import (
-    own_metadata,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.services import (
-    ConfigurationService,
-    SettingsService,
-    TeamsConfigurationService,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.tabs import (
-    CourseTabList,
-)  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_block import DEFAULT_START_DATE
+from xmodule.library_tools import LibraryToolsService
+from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
+from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
+from xmodule.modulestore.inheritance import own_metadata
+from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService
+from xmodule.tabs import CourseTabList
 
 from ..utils import (
     ancestor_has_staff_lock,
@@ -97,6 +76,7 @@ from ..utils import (
     has_children_visible_to_specific_partition_groups,
     is_currently_visible_to_students,
     is_self_paced,
+    get_taxonomy_tags_widget_url,
 )
 
 from .create_xblock import create_xblock
@@ -220,7 +200,6 @@ def handle_xblock(request, usage_key_string=None):
             return JsonResponse()
         else:  # Since we have a usage_key, we are updating an existing xblock.
             modified_xblock = modify_xblock(usage_key, request)
-            _post_editor_saved_callback(get_xblock(usage_key, request.user))
             return modified_xblock
 
     elif request.method in ("PUT", "POST"):
@@ -255,7 +234,6 @@ def handle_xblock(request, usage_key_string=None):
                 request.user,
                 request.json.get("display_name"),
             )
-            _post_editor_saved_callback(get_xblock(dest_usage_key, request.user))
 
             return JsonResponse(
                 {
@@ -361,27 +339,24 @@ def load_services_for_studio(runtime, user):
 def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
     """
     Updates the xblock in the modulestore.
-    But before doing so, it calls the xblock's editor_saved callback function.
+    But before doing so, it calls the xblock's editor_saved callback function,
+    and after doing so, it calls the xblock's post_editor_saved callback function.
+
+    TODO: Remove getattrs from this function.
+          See https://github.com/openedx/edx-platform/issues/33715
     """
-    if callable(getattr(xblock, "editor_saved", None)):
-        if old_metadata is None:
-            old_metadata = own_metadata(xblock)
-        if old_content is None:
-            old_content = xblock.get_explicitly_set_fields_by_scope(Scope.content)
+    if old_metadata is None:
+        old_metadata = own_metadata(xblock)
+    if old_content is None:
+        old_content = xblock.get_explicitly_set_fields_by_scope(Scope.content)
+    if hasattr(xblock, "editor_saved"):
         load_services_for_studio(xblock.runtime, user)
         xblock.editor_saved(user, old_metadata, old_content)
-
-    # Update after the callback so any changes made in the callback will get persisted.
-    return modulestore().update_item(xblock, user.id)
-
-
-def _post_editor_saved_callback(xblock):
-    """
-    Updates the xblock in the modulestore after saving xblock.
-    """
-    if callable(getattr(xblock, "post_editor_saved", None)):
-        xblock.post_editor_saved()
-
+    xblock_updated = modulestore().update_item(xblock, user.id)
+    if hasattr(xblock_updated, "post_editor_saved"):
+        load_services_for_studio(xblock_updated.runtime, user)
+        xblock_updated.post_editor_saved(user, old_metadata, old_content)
+    return xblock_updated
 
 def _save_xblock(
     user,
@@ -889,6 +864,8 @@ def _duplicate_block(
             # Allow an XBlock to do anything fancy it may need to when duplicated from another block.
             # These blocks may handle their own children or parenting if needed. Let them return booleans to
             # let us know if we need to handle these or not.
+            # TODO: Make this a proper method in the base class so we don't need getattr.
+            #       See https://github.com/openedx/edx-platform/issues/33715
             load_services_for_studio(dest_block.runtime, user)
             children_handled = dest_block.studio_post_duplicate(store, source_item)
 
@@ -1101,6 +1078,7 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
     course=None,
     is_concise=False,
     summary_configuration=None,
+    tags=None,
 ):
     """
     Creates the information needed for client-side XBlockInfo.
@@ -1393,6 +1371,10 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             )
         else:
             xblock_info["ancestor_has_staff_lock"] = False
+        if tags is not None:
+            xblock_info["tags"] = tags
+        if use_tagging_taxonomy_list_page():
+            xblock_info["taxonomy_tags_widget_url"] = get_taxonomy_tags_widget_url()
 
         if course_outline:
             if xblock_info["has_explicit_staff_lock"]:
@@ -1407,6 +1389,11 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             # If the ENABLE_COPY_PASTE_UNITS feature flag is enabled, we show the newer menu that allows copying/pasting
             xblock_info["enable_copy_paste_units"] = ENABLE_COPY_PASTE_UNITS.is_enabled()
 
+            # If the ENABLE_TAGGING_TAXONOMY_LIST_PAGE feature flag is enabled, we show the "Manage Tags" options
+            if use_tagging_taxonomy_list_page():
+                xblock_info["use_tagging_taxonomy_list_page"] = True
+                xblock_info["tag_counts_by_unit"] = _get_course_unit_tags(xblock.location.context_key)
+
             xblock_info[
                 "has_partition_group_components"
             ] = has_children_visible_to_specific_partition_groups(xblock)
@@ -1418,6 +1405,19 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             xblock_info["summary_configuration_enabled"] = summary_configuration.is_summary_enabled(xblock_info['id'])
 
     return xblock_info
+
+
+@request_cached()
+def _get_course_unit_tags(course_key) -> dict:
+    """
+    Get the count of tags that are applied to each unit (vertical) in this course, as a dict.
+    """
+    if not course_key.is_course:
+        return {}  # Unsupported key type, e.g. a library
+    # Create a pattern to match the IDs of the units, e.g. "block-v1:org+course+run+type@vertical+block@*"
+    vertical_key = course_key.make_usage_key('vertical', 'x')
+    unit_key_pattern = str(vertical_key).rsplit("@", 1)[0] + "@*"
+    return tagging_api.get_object_tag_counts(unit_key_pattern)
 
 
 def _was_xblock_ever_exam_linked_with_external(course, xblock):

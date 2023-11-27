@@ -177,6 +177,6 @@ class VideoUsageView(DeveloperErrorViewMixin, APIView):
         if not has_studio_read_access(request.user, course_key):
             self.permission_denied(request)
 
-        usage_locations = get_video_usage_path(request, course_key, edx_video_id)
+        usage_locations = get_video_usage_path(course_key, edx_video_id)
         serializer = VideoUsageSerializer(usage_locations)
         return Response(serializer.data)

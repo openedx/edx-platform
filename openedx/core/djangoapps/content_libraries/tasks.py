@@ -228,7 +228,7 @@ def _import_from_blockstore(user_id, store, dest_block, blockstore_block_ids):
         dest_block.children = store.get_item(dest_key).children
 
 
-class LibraryUpdateChildrenTask(UserTask):  # pylint: disable=abstract-method
+class LibrarySyncChildrenTask(UserTask):  # pylint: disable=abstract-method
     """
     Base class for tasks which operate upon library_content children.
     """
@@ -252,11 +252,12 @@ class LibraryUpdateChildrenTask(UserTask):  # pylint: disable=abstract-method
 # Note: The decorator @set_code_owner_attribute cannot be used here because the UserTaskMixin does stack
 # inspection and can't handle additional decorators. So, wet set the code_owner attribute in the tasks' bodies instead.
 
-@shared_task(base=LibraryUpdateChildrenTask, bind=True)
-def refresh_children(
-    self: LibraryUpdateChildrenTask,
+@shared_task(base=LibrarySyncChildrenTask, bind=True)
+def sync_from_library(
+    self: LibrarySyncChildrenTask,
     user_id: int,
     dest_block_id: str,
+    library_version: str | int | None,
 ) -> None:
     """
     Celery task to update the children of the library_content block at `dest_block_id`.
@@ -264,12 +265,18 @@ def refresh_children(
     set_code_owner_attribute_from_module(__name__)
     store = modulestore()
     dest_block = store.get_item(BlockUsageLocator.from_string(dest_block_id))
-    _update_children(task=self, store=store, user_id=user_id, dest_block=dest_block)
+    _sync_children(
+        task=self,
+        store=store,
+        user_id=user_id,
+        dest_block=dest_block,
+        library_version=library_version,
+    )
 
 
-@shared_task(base=LibraryUpdateChildrenTask, bind=True)
+@shared_task(base=LibrarySyncChildrenTask, bind=True)
 def duplicate_children(
-    self: LibraryUpdateChildrenTask,
+    self: LibrarySyncChildrenTask,
     user_id: int,
     source_block_id: str,
     dest_block_id: str,
@@ -280,29 +287,38 @@ def duplicate_children(
     set_code_owner_attribute_from_module(__name__)
     store = modulestore()
     # First, populate the destination block with children imported from the library.
-    # It's important that _update_children does this at the currently-set version of the dest library
-    # (someone may be duplicating an out of date block).
+    # It's important that _sync_children does this at the currently-set version of the dest library
+    # (someone may be duplicating an out-of-date block).
     dest_block = store.get_item(BlockUsageLocator.from_string(dest_block_id))
-    _update_children(task=self, store=store, user_id=user_id, dest_block=dest_block)
+    _sync_children(
+        task=self,
+        store=store,
+        user_id=user_id,
+        dest_block=dest_block,
+        library_version=dest_block.source_library_version,
+    )
     # Then, copy over any overridden settings the course author may have applied to the blocks.
     source_block = store.get_item(BlockUsageLocator.from_string(source_block_id))
     with store.bulk_operations(source_block.scope_ids.usage_id.context_key):
         _copy_overrides(store=store, user_id=user_id, source_block=source_block, dest_block=dest_block)
 
-
-def _update_children(
-    task: LibraryUpdateChildrenTask,
+def _sync_children(
+    task: LibrarySyncChildrenTask,
     store: MixedModuleStore,
     user_id: int,
     dest_block: LibraryContentBlock,
+    library_version: int | str | None,
 ) -> None:
     """
-    Implementation helper for `refresh_children` and `duplicate_children` Celery tasks.
+    Implementation helper for `sync_from_library` and `duplicate_children` Celery tasks.
+
+    Can update children with a specific library `library_version`, or latest (`library_version=None`).
     """
     source_blocks = []
     library_key = dest_block.source_library_key
     filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)
-    library = library_api.get_v1_or_v2_library(library_key)
+
+    library = library_api.get_v1_or_v2_library(library_key, version=library_version)
     if not library:
         task.status.fail(f"Requested library {library_key} not found.")
     elif isinstance(library, LibraryRootV1):
@@ -324,6 +340,7 @@ def _update_children(
                 TASK_LOGGER.exception('Error importing children for %s', dest_block.scope_ids.usage_id, exc_info=True)
                 if task.status.state != UserTaskStatus.FAILED:
                     task.status.fail({'raw_error_msg': str(exception)})
+                raise
     elif isinstance(library, library_api.ContentLibraryMetadata):
         # TODO: add filtering by capa_type when V2 library will support different problem types
         try:
@@ -336,6 +353,7 @@ def _update_children(
             TASK_LOGGER.exception('Error importing children for %s', dest_block.scope_ids.usage_id, exc_info=True)
             if task.status.state != UserTaskStatus.FAILED:
                 task.status.fail({'raw_error_msg': str(exception)})
+            raise
 
 
 def _copy_overrides(

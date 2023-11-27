@@ -203,6 +203,7 @@
 # abby li <yc.li@eliteu.cn>, 2019
 # alisan617, 2017
 # BertZou <turingcat@gmail.com>, 2015
+# Cecilia Liu, 2023
 # Changyue Wang <peterwang.dut@gmail.com>, 2015
 # Dustin Yu <dustintt123@hotmail.com>, 2015
 # focusheart <focusheart@gmail.com>, 2017
@@ -230,9 +231,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-08 20:42+0000\n"
+"POT-Creation-Date: 2023-11-19 20:43+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
-"Last-Translator: jsgang <jsgang9@gmail.com>, 2015-2017,2020\n"
+"Last-Translator: Cecilia Liu, 2023\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -314,7 +315,6 @@ msgstr "上传中"
 #: cms/templates/js/course-video-settings.underscore
 #: common/static/common/templates/discussion/templates.underscore
 #: common/static/common/templates/image-modal.underscore
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Close"
 msgstr "关闭"
 
@@ -3857,10 +3857,6 @@ msgid ""
 "interests are, why you're taking courses, or what you hope to learn."
 msgstr "向其他用户简单介绍下您自己：如居住地、兴趣爱好、为什么选择这些课程，及您希望学习哪方面的知识。"
 
-#: openedx/features/learner_profile/static/learner_profile/js/views/badge_list_container.js
-msgid "Accomplishments Pagination"
-msgstr "成绩分页"
-
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
 msgid "Account Settings page."
 msgstr "账号设置页面。"
@@ -3889,10 +3885,6 @@ msgstr "{username} 的头像"
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "About Me"
 msgstr "个人资料"
-
-#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
-msgid "Accomplishments"
-msgstr "成绩"
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "Profile"
@@ -4353,9 +4345,11 @@ msgstr "删除行"
 msgid "Delete table"
 msgstr "删除表格"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: xmodule/js/src/html/edit.js
+#: xmodule/js/src/html/edit.js cms/templates/js/certificate-editor.underscore
+#: cms/templates/js/group-configuration-editor.underscore
 msgid "Description"
 msgstr "描述"
 
@@ -5516,7 +5510,7 @@ msgstr "关闭字幕"
 msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
-msgstr ""
+msgstr "此情况可能由于服务器错误或者您的网络连接错误导致。尝试刷新页面或者确保网络畅通。"
 
 #: cms/static/cms/js/main.js
 msgid "Studio's having trouble saving your work"
@@ -6078,7 +6072,7 @@ msgstr ""
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
 msgid "Dismiss"
-msgstr ""
+msgstr "解散"
 
 #: cms/static/js/views/course_rerun.js
 msgid "Create Re-run"
@@ -9384,32 +9378,6 @@ msgstr[0] "继续加载 {num_items}个结果"
 msgid "Sorry, no results were found."
 msgstr "对不起，未找到搜索结果。"
 
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-#, python-format
-msgid "Share your \"%(display_name)s\" award"
-msgstr "分享您的 \"%(display_name)s\" 奖励"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-msgid "Share"
-msgstr "分享"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-#, python-format
-msgid "Earned %(created)s."
-msgstr "已获得 %(created)s。"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "What's Your Next Accomplishment?"
-msgstr "您的下一个目标是什么？"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "Start working toward your next learning goal."
-msgstr "开始向您的下一个学习目标迈进。"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "Find a course"
-msgstr "找到一个课程"
-
 #: openedx/features/learner_profile/static/learner_profile/templates/section_two.underscore
 msgid "You are currently sharing a limited profile."
 msgstr "您当前公开部分个人信息。"
@@ -9417,31 +9385,6 @@ msgstr "您当前公开部分个人信息。"
 #: openedx/features/learner_profile/static/learner_profile/templates/section_two.underscore
 msgid "This learner is currently sharing a limited profile."
 msgstr "该学生当前公开部分个人信息。"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid "Share on Mozilla Backpack"
-msgstr "分享到 Mozilla Backpack 上"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"To share your certificate on Mozilla Backpack, you must first have a "
-"Backpack account. Complete the following steps to add your certificate to "
-"Backpack."
-msgstr ""
-"要在 Mozilla Backpack 上分享您的证书，您必须首先拥有一个Backpack账号。通过完成以下步骤将您的证书添加至 Backpack。"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"Create a {link_start}Mozilla Backpack{link_end} account, or log in to your "
-"existing account"
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"{download_link_start}Download this image (right-click or option-click, save "
-"as){link_end} and then {upload_link_start}upload{link_end} it to your "
-"backpack."
-msgstr ""
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"
@@ -9779,7 +9722,7 @@ msgstr "如果您不选择“%(hide_label)s”，那么学员可看到本小节�
 
 #: cms/templates/js/copy-clipboard-button.underscore
 msgid "Copy Component Location"
-msgstr ""
+msgstr "复制组件地址"
 
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Course Highlight Emails"
@@ -9926,6 +9869,10 @@ msgid "Proctoring Settings"
 msgstr "监考设置"
 
 #: cms/templates/js/course-outline.underscore
+msgid "Manage Tags"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 msgid "Configure"
 msgstr "配置"
 
@@ -10051,7 +9998,7 @@ msgstr ""
 
 #: cms/templates/js/course-video-sharing-enable.underscore
 msgid "Learn more"
-msgstr ""
+msgstr "了解更多"
 
 #: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Transcript Turnaround"
@@ -10148,7 +10095,7 @@ msgstr "此类型将会被弃用的作业数。最低分的作业会最先被弃
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Warning: "
-msgstr ""
+msgstr "警告："
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid ""
@@ -10186,7 +10133,7 @@ msgstr "您的内容中有无效的代码。请仔细检查以确保其是合法
 
 #: cms/templates/js/course_info_update.underscore
 msgid "Date"
-msgstr ""
+msgstr "日期"
 
 #: cms/templates/js/course_info_update.underscore
 msgid "Post"
@@ -10276,7 +10223,7 @@ msgstr "添加一章"
 
 #: cms/templates/js/edit-title-button.underscore
 msgid "Edit Title"
-msgstr ""
+msgstr "编辑标题"
 
 #: cms/templates/js/grading-editor.underscore
 msgid "Grading"

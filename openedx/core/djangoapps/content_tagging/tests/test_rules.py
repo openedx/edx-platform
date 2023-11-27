@@ -599,7 +599,7 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
 
     def test_view_object_tag_diabled(self):
         """
-        Noboty can view a ObjectTag from a disable taxonomy
+        Nobody can view a ObjectTag from a disabled taxonomy
         """
         perm = "oel_tagging.view_objecttag"
         assert self.superuser.has_perm(perm, self.disabled_course_tag)

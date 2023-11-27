@@ -168,6 +168,7 @@ FEATURES['LICENSING'] = True
 FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
 FEATURES['ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF'] = True
 SEARCH_ENGINE = 'search.elastic.ElasticSearchEngine'
+SEARCH_COURSEWARE_CONTENT_LOG_PARAMS = True
 
 ELASTIC_SEARCH_CONFIG = [
     {
@@ -529,6 +530,9 @@ API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
 API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
 API_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/'
 AUTH_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/authentication/index.html'
+
+############################ AI_TRANSLATIONS ##################################
+AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
 
 ################# New settings must go ABOVE this line #################
 ########################################################################
