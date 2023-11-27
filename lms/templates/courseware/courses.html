@@ -303,11 +303,24 @@
             align-items: center; /* Vertically align the items in center */
         }
 
-        .courses{
+        .courses-list {
           display: flex;
           flex-wrap: wrap;
-          gap: 27px; 
-          width: 312px;
+          justify-content:flex-start;
+        }
+
+        .courses-listing-item {
+            flex: 0 1 25%; /* flex-grow: 0, flex-shrink: 1, flex-basis: 25% */
+            box-sizing: border-box; /* Includes padding and border in the element's total width */
+            /* Add margin or padding as needed, keeping in mind the total width */
+        }
+      
+
+        .find-courses .courses-container .courses:not(.no-course-discovery), .university-profile .courses-container .courses:not(.no-course-discovery) {
+            float: left;
+            display: block;
+            margin-right: 2.35765%;
+            width: 100%;
         }
 
     </style>
