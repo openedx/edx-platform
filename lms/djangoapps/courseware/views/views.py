@@ -2014,7 +2014,9 @@ def financial_assistance_request(request):
         legal_name = data['name']
         email = data['email']
         country = data['country']
-        marketing_permission = data['mktg-permission']
+        certify_economic_hardship = data['certify-economic-hardship']
+        certify_complete_certificate = data['certify-complete-certificate']
+        certify_honor_code = data['certify-honor-code']
         ip_address = get_client_ip(request)[0]
     except ValueError:
         # Thrown if JSON parsing fails
@@ -2044,7 +2046,9 @@ def financial_assistance_request(request):
             ('Full Name', legal_name),
             ('Course ID', course_id),
             ('Country', country),
-            ('Allowed for marketing purposes', 'Yes' if marketing_permission else 'No'),
+            ('Paying for the course would cause economic hardship', 'Yes' if certify_economic_hardship else 'No'),
+            ('Certify work diligently to receive a certificate', 'Yes' if certify_complete_certificate else 'No'),
+            ('Certify abide by the honor code', 'Yes' if certify_honor_code else 'No'),
             ('Client IP', ip_address),
         )),
         group='Financial Assistance',
@@ -2076,7 +2080,9 @@ def financial_assistance_request_v2(request):
         if course_id and course_id not in request.META.get('HTTP_REFERER'):
             return HttpResponseBadRequest('Invalid Course ID provided.')
         lms_user_id = request.user.id
-        allowed_for_marketing = data['mktg-permission']
+        certify_economic_hardship = data['certify-economic-hardship']
+        certify_complete_certificate = data['certify-complete-certificate']
+        certify_honor_code = data['certify-honor-code']
 
     except ValueError:
         # Thrown if JSON parsing fails
@@ -2088,7 +2094,9 @@ def financial_assistance_request_v2(request):
     form_data = {
         'lms_user_id': lms_user_id,
         'course_id': course_id,
-        'allowed_for_marketing': allowed_for_marketing
+        'certify_economic_hardship': certify_economic_hardship,
+        'certify_complete_certificate': certify_complete_certificate,
+        'certify-honor-code': certify_honor_code,
     }
     return create_financial_assistance_application(form_data)
 
