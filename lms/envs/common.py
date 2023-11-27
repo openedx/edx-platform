@@ -4224,6 +4224,10 @@ ECOMMERCE_ORDERS_API_CACHE_TIMEOUT = 3600
 ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 
+# E-Commerce Commerce Coordinator Configuration
+COMMERCE_COORDINATOR_URL_ROOT = 'http://localhost:8000'
+COORDINATOR_CHECKOUT_REDIRECT_PATH = '/lms/redirect/'
+
 # Exam Service
 EXAMS_SERVICE_URL = 'http://localhost:18740/api/v1'
 
