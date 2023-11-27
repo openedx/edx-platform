@@ -34,7 +34,7 @@ from lms.djangoapps.mobile_api.testutils import (
     MobileAuthUserTestMixin,
     MobileCourseAccessTestMixin
 )
-from lms.djangoapps.mobile_api.utils import API_V1, API_V05, API_V2
+from lms.djangoapps.mobile_api.utils import API_V1, API_V05, API_V2, API_V3
 from openedx.core.lib.courses import course_image_url
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
@@ -375,6 +375,29 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         response = self.api_response(api_version=API_V2)
         self.assertDictEqual(response.data['configs'], expected_result)
         assert 'enrollments' in response.data
+
+    def test_pagination_enrollment(self):
+        """
+        Test pagination for UserCourseEnrollmentsList view v3
+        for 3rd version of this view we use DefaultPagination
+
+        Test for /api/mobile/{api_version}/users/<user_name>/course_enrollments/
+        api_version = v3
+        """
+        self.login()
+        # Create and enroll to 15 courses
+        courses = [CourseFactory.create(org="my_org", mobile_available=True) for _ in range(15)]
+        for course in courses:
+            self.enroll(course.id)
+
+        response = self.api_response(api_version=API_V3)
+        assert response.status_code == 200
+        assert response.data["enrollments"]["count"] == 15
+        assert response.data["enrollments"]["num_pages"] == 2
+        assert response.data["enrollments"]["current_page"] == 1
+        assert len(response.data["enrollments"]["results"]) == 10
+        assert "next" in response.data["enrollments"]
+        assert "previous" in response.data["enrollments"]
 
 
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
