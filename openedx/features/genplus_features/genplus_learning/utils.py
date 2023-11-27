@@ -179,7 +179,7 @@ def get_user_next_program_lesson(user, program):
 
 def get_user_next_course_lesson(user, course_id):
     next_problem_block = get_next_problem_block(user, course_id)
-    if next_problem_block:
+    if next_problem_block and not user.is_staff:
         problem_block = next_problem_block.get('problem_block')
         url_to_block = reverse(
             'jump_to',
