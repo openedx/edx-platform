@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-11-20 15:29+0000\n"
-"PO-Revision-Date: 2023-11-20 15:29:35.699299\n"
+"POT-Creation-Date: 2023-11-26 20:36+0000\n"
+"PO-Revision-Date: 2023-11-26 20:36:15.034816\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -10319,6 +10319,19 @@ msgid ""
 msgstr ""
 
 #: xmodule/library_content_block.py
+msgid "Source content library has not been specified."
+msgstr ""
+
+#: xmodule/library_content_block.py
+msgid "Content libraries are not available in the current runtime."
+msgstr ""
+
+#: xmodule/library_content_block.py
+#, python-brace-format
+msgid "Source content library does not exist: {source_library_id}"
+msgstr ""
+
+#: xmodule/library_content_block.py
 msgid "This component is out of date. The library has new content."
 msgstr ""
 
@@ -10352,7 +10365,8 @@ msgid "Select a Library."
 msgstr ""
 
 #: xmodule/library_content_block.py
-msgid "There are no matching problem types in the specified libraries."
+#, python-brace-format
+msgid "There are no problems in the specified library of type {capa_type}."
 msgstr ""
 
 #: xmodule/library_content_block.py
@@ -12340,14 +12354,6 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/module-error.html
 msgid "Details"
-msgstr ""
-
-#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
-#. Translators: this is a verb describing the action of viewing more details
-#: cms/templates/studio_xblock_wrapper.html
-#: lms/templates/wiki/includes/article_menu.html
-#: wiki/templates/wiki/includes/article_menu.html
-msgid "View"
 msgstr ""
 
 #: cms/templates/maintenance/_announcement_edit.html
@@ -18247,6 +18253,11 @@ msgid "Learn more"
 msgstr ""
 
 #: lms/templates/wiki/includes/article_menu.html
+#: wiki/templates/wiki/includes/article_menu.html
+msgid "View"
+msgstr ""
+
+#: lms/templates/wiki/includes/article_menu.html
 msgid "{span_start}(active){span_end}"
 msgstr ""
 
@@ -18893,6 +18904,10 @@ msgstr ""
 
 #: cms/templates/container.html
 msgid "Preview the courseware in the LMS"
+msgstr ""
+
+#: cms/templates/container.html
+msgid "Collapse All"
 msgstr ""
 
 #: cms/templates/container.html
@@ -21439,11 +21454,23 @@ msgid ""
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Importing components"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Select this problem"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage tags"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
