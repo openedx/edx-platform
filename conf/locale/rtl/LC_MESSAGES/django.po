@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-11-20 15:29+0000\n"
-"PO-Revision-Date: 2023-11-20 15:29:35.699299\n"
+"POT-Creation-Date: 2023-11-26 20:36+0000\n"
+"PO-Revision-Date: 2023-11-26 20:36:15.034816\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -11457,6 +11457,19 @@ msgstr ""
 "ʇɥǝᴉɹ ɐnsʍǝɹs ɐnd ɹǝsɥnɟɟlǝ sǝlǝɔʇǝd ᴉʇǝɯs."
 
 #: xmodule/library_content_block.py
+msgid "Source content library has not been specified."
+msgstr "Sønɹɔǝ ɔønʇǝnʇ lᴉbɹɐɹʎ ɥɐs nøʇ bǝǝn sdǝɔᴉɟᴉǝd."
+
+#: xmodule/library_content_block.py
+msgid "Content libraries are not available in the current runtime."
+msgstr "Ȼønʇǝnʇ lᴉbɹɐɹᴉǝs ɐɹǝ nøʇ ɐʌɐᴉlɐblǝ ᴉn ʇɥǝ ɔnɹɹǝnʇ ɹnnʇᴉɯǝ."
+
+#: xmodule/library_content_block.py
+#, python-brace-format
+msgid "Source content library does not exist: {source_library_id}"
+msgstr "Sønɹɔǝ ɔønʇǝnʇ lᴉbɹɐɹʎ døǝs nøʇ ǝxᴉsʇ: {source_library_id}"
+
+#: xmodule/library_content_block.py
 msgid "This component is out of date. The library has new content."
 msgstr "Ŧɥᴉs ɔøɯdønǝnʇ ᴉs ønʇ øɟ dɐʇǝ. Ŧɥǝ lᴉbɹɐɹʎ ɥɐs nǝʍ ɔønʇǝnʇ."
 
@@ -11492,8 +11505,9 @@ msgid "Select a Library."
 msgstr "Sǝlǝɔʇ ɐ Łᴉbɹɐɹʎ."
 
 #: xmodule/library_content_block.py
-msgid "There are no matching problem types in the specified libraries."
-msgstr "Ŧɥǝɹǝ ɐɹǝ nø ɯɐʇɔɥᴉnƃ dɹøblǝɯ ʇʎdǝs ᴉn ʇɥǝ sdǝɔᴉɟᴉǝd lᴉbɹɐɹᴉǝs."
+#, python-brace-format
+msgid "There are no problems in the specified library of type {capa_type}."
+msgstr "Ŧɥǝɹǝ ɐɹǝ nø dɹøblǝɯs ᴉn ʇɥǝ sdǝɔᴉɟᴉǝd lᴉbɹɐɹʎ øɟ ʇʎdǝ {capa_type}."
 
 #: xmodule/library_content_block.py
 msgid "Select another problem type."
@@ -13722,14 +13736,6 @@ msgstr "Ɍǝbnᴉɹǝɯǝnʇs"
 #: lms/templates/module-error.html
 msgid "Details"
 msgstr "Đǝʇɐᴉls"
-
-#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
-#. Translators: this is a verb describing the action of viewing more details
-#: cms/templates/studio_xblock_wrapper.html
-#: lms/templates/wiki/includes/article_menu.html
-#: wiki/templates/wiki/includes/article_menu.html
-msgid "View"
-msgstr "Vᴉǝʍ"
 
 #: cms/templates/maintenance/_announcement_edit.html
 #: lms/templates/problem.html lms/templates/word_cloud.html
@@ -20473,6 +20479,11 @@ msgid "Learn more"
 msgstr "Łǝɐɹn ɯøɹǝ"
 
 #: lms/templates/wiki/includes/article_menu.html
+#: wiki/templates/wiki/includes/article_menu.html
+msgid "View"
+msgstr "Vᴉǝʍ"
+
+#: lms/templates/wiki/includes/article_menu.html
 msgid "{span_start}(active){span_end}"
 msgstr "{span_start}(ɐɔʇᴉʌǝ){span_end}"
 
@@ -21180,6 +21191,10 @@ msgstr "Vᴉǝʍ Łᴉʌǝ Vǝɹsᴉøn"
 #: cms/templates/container.html
 msgid "Preview the courseware in the LMS"
 msgstr "Ᵽɹǝʌᴉǝʍ ʇɥǝ ɔønɹsǝʍɐɹǝ ᴉn ʇɥǝ ŁMS"
+
+#: cms/templates/container.html
+msgid "Collapse All"
+msgstr "Ȼøllɐdsǝ Ⱥll"
 
 #: cms/templates/container.html
 msgid "Adding components"
@@ -24151,12 +24166,24 @@ msgstr ""
 "ʍøɹʇɥ."
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Importing components"
+msgstr "Ɨɯdøɹʇᴉnƃ ɔøɯdønǝnʇs"
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
 msgstr "Ɇxdɐnd øɹ Ȼøllɐdsǝ"
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Select this problem"
+msgstr "Sǝlǝɔʇ ʇɥᴉs dɹøblǝɯ"
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"
 msgstr "Ȼødʎ ʇø Ȼlᴉdbøɐɹd"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage tags"
+msgstr "Mɐnɐƃǝ ʇɐƃs"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"
