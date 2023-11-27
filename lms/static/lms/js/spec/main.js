@@ -785,7 +785,6 @@
         'js/spec/views/message_banner_spec.js',
         'js/spec/views/notification_spec.js',
         'learner_profile/js/spec/views/learner_profile_fields_spec.js',
-        'learner_profile/js/spec/views/learner_profile_view_spec.js',
         'learner_profile/js/spec/views/section_two_tab_spec.js',
         'support/js/spec/collections/enrollment_spec.js',
         'support/js/spec/models/enrollment_spec.js',
