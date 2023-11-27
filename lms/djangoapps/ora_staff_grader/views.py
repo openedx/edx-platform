@@ -397,6 +397,11 @@ class UpdateGradeView(StaffGraderBaseView):
 
             log.info(response_data)
             return Response(response_data)
+        # todo - here we can create a event for staff grade submission notification.
+        # https://github.com/openedx/frontend-app-ora-grading
+        # Flag openresponseassessment.enhanced_staff_grader
+        # https://2u-internal.atlassian.net/browse/INF-1168
+
 
         # Issues with the XBlock handlers
         except XBlockInternalError as ex:

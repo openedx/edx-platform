@@ -113,6 +113,19 @@ COURSE_NOTIFICATION_TYPES = {
         'email_template': '',
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
+    'grade_completed': {
+        'notification_app': 'ora',
+        'name': 'grade_completed',
+        'is_core': True,
+        'info': '',
+        'non_editable': [],
+        'content_template': _('<{p}>You have a grade ready in <{strong}>{title of ORA}</{strong}></{p}>'),
+        'content_context': {
+            'ora_title': 'ora title',
+        },
+        'email_template': '',
+        'filters': []
+    },
 }
 
 COURSE_NOTIFICATION_APPS = {
@@ -124,9 +137,19 @@ COURSE_NOTIFICATION_APPS = {
         'core_email': True,
         'core_push': True,
         'non_editable': ['web']
-    }
+    },
+    'ora': {
+        'enabled': True,
+        'core_info': _('Notifications for new grades and feedback on your ORA assignments.'),
+        'core_web': True,
+        'core_email': True,
+        'core_push': True,
+        'non_editable': ['web']
+    },
 }
 
+
+#
 
 class NotificationPreferenceSyncManager:
     """
