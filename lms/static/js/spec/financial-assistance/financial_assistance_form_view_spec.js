@@ -29,62 +29,29 @@ define([
                         type: 'select'
                     }, {
                         defaultValue: '',
-                        instructions: 'Specify your annual income in USD.',
-                        label: 'Annual Income',
-                        name: 'income',
-                        options: [
-                            {name: 'Less than $5,000', value: 'Less than $5,000'},
-                            {name: '$5,000 - $10,000', value: '$5,000 - $10,000'},
-                            {name: '$10,000 - $15,000', value: '$10,000 - $15,000'},
-                            {name: '$15,000 - $20,000', value: '$15,000 - $20,000'},
-                            {name: '$20,000 - $25,000', value: '$20,000 - $25,000'}
-                        ],
+                        instructions: '',
+                        label: 'Paying the verified certificate fee for the above course would cause me economic hardship',
+                        name: 'certify-economic-hardship',
                         placeholder: '',
                         required: true,
-                        type: 'select'
+                        restrictions: {},
+                        type: 'checkbox'
                     }, {
                         defaultValue: '',
-                        instructions: 'Your response should contain approximately 250 - 500 words.',
-                        label: 'Tell us about your current financial situation, including any unusual circumstances.',
-                        name: 'reason_for_applying',
+                        instructions: '',
+                        label: 'I will work diligently to complete the course work and receive a certificate',
+                        name: 'certify-complete-certificate',
                         placeholder: '',
                         required: true,
-                        restrictions: {
-                            min_length: 800,
-                            max_length: 2500
-                        },
-                        type: 'textarea'
+                        restrictions: {},
+                        type: 'checkbox'
                     }, {
                         defaultValue: '',
-                        instructions: 'Use between 250 and 500 words or so in your response.',
-                        label: 'Tell us about your learning or professional goals. How will a Verified Certificate in this course help you achieve these goals?',
-                        name: 'goals',
+                        instructions: '',
+                        label: 'I have read, understand, and will abide by the Honor Code for the edX Site',
+                        name: 'certify-honor-code',
                         placeholder: '',
                         required: true,
-                        restrictions: {
-                            min_length: 800,
-                            max_length: 2500
-                        },
-                        type: 'textarea'
-                    }, {
-                        defaultValue: '',
-                        instructions: 'Use between 250 and 500 words or so in your response.',
-                        label: 'Tell us about your plans for this course. What steps will you take to help you complete the course work a receive a certificate?',
-                        name: 'effort',
-                        placeholder: '',
-                        required: true,
-                        restrictions: {
-                            min_length: 800,
-                            max_length: 2500
-                        },
-                        type: 'textarea'
-                    }, {
-                        defaultValue: '',
-                        instructions: 'Annual income and personal information such as email address will not be shared.',
-                        label: 'I allow edX to use the information provided in this application for edX marketing purposes.',
-                        name: 'mktg-permission',
-                        placeholder: '',
-                        required: false,
                         restrictions: {},
                         type: 'checkbox'
                     }
@@ -96,7 +63,6 @@ define([
                     username: 'xsy4ever'
                 },
                 header_text: ['Line one.', 'Line two.'],
-                student_faq_url: '/faqs',
                 dashboard_url: '/dashboard',
                 platform_name: 'edx',
                 submit_url: '/api/financial/v1/assistance'
@@ -111,12 +77,11 @@ define([
         completeForm = function() {
             var courseOptions = context.fields[0].options,
                 courseSelectValue = courseOptions[courseOptions.length - 1].value;
-            var incomeOptions = context.fields[1].options,
-                incomeSelectValue = incomeOptions[incomeOptions.length - 1].value;
 
             view.$('#financial-assistance-course').val(courseSelectValue);
-            view.$('#financial-assistance-income').val(incomeSelectValue);
-            view.$('textarea').html(Array(802).join('w'));
+            view.$('#financial-assistance-certify-economic-hardship').prop('checked', true );
+            view.$('#financial-assistance-certify-complete-certificate').prop('checked', true );
+            view.$('#financial-assistance-certify-honor-code').prop('checked', true );
         };
 
         validSubmission = function() {
@@ -179,9 +144,9 @@ define([
             var $form = view.$('.financial-assistance-form');
 
             expect($form.find('select').first().attr('name')).toEqual(context.fields[0].name);
-            expect($form.find('select').last().attr('name')).toEqual(context.fields[1].name);
-            expect($form.find('textarea').first().attr('name')).toEqual(context.fields[2].name);
-            expect($form.find('input[type=checkbox]').attr('name')).toEqual(context.fields[5].name);
+            expect($form.find('input[type=checkbox]')[0].name).toEqual(context.fields[1].name);
+            expect($form.find('input[type=checkbox]')[1].name).toEqual(context.fields[2].name);
+            expect($form.find('input[type=checkbox]')[2].name).toEqual(context.fields[3].name);
         });
 
         it('should not submit the form if the front end validation fails', function() {
@@ -204,7 +169,7 @@ define([
         });
 
         it('should allow form resubmission after a front end validation failure', function() {
-            view.$('#financial-assistance-income').val(1312);
+            view.$('#financial-assistance-course').val('');
             expect(view.model.save).not.toHaveBeenCalled();
             validSubmission();
         });
