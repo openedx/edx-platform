@@ -46,6 +46,10 @@ and the business logic is extracted to a service file called `videos_provider.py
 the `views` folder. Now the videos provider is responsible for fetching and transforming
 the data, while the view is responsible for authorization and serialization.
 
+Note that the file name `videos_provider.py` is a made-up example and is not a recommendation, since
+we haven't determined any naming conventions at the time of writing this ADR
+`(Discuss forum thread) <https://discuss.openedx.org/t/contentstore-views-refactoring/11801>`_.
+
 
 **Before:**::
 
