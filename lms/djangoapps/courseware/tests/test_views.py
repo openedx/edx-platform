@@ -938,14 +938,12 @@ class ViewsTestCase(BaseViewsTestCase):
         course = str(self.course_key)
         legal_name = 'Jesse Pinkman'
         country = 'United States'
-        effort = "I'm done, okay? You just give me my money, and you and I, we're done."
         data = {
             'username': username,
             'course': course,
             'name': legal_name,
             'email': self.user.email,
             'country': country,
-            'effort': effort,
             'mktg-permission': False,
         }
         response = self._submit_financial_assistance_form(data)
@@ -958,7 +956,7 @@ class ViewsTestCase(BaseViewsTestCase):
         additional_info = mocked_kwargs['additional_info']
 
         private_comment = '\n'.join(list(additional_info.values()))
-        for info in (country, effort, username, legal_name, course):
+        for info in (country, username, legal_name, course):
             assert info in private_comment
 
         assert additional_info['Allowed for marketing purposes'] == 'No'
@@ -976,7 +974,6 @@ class ViewsTestCase(BaseViewsTestCase):
             'name': '',
             'email': '',
             'country': '',
-            'effort': '',
             'mktg-permission': False,
         })
         assert response.status_code == 500
@@ -993,7 +990,6 @@ class ViewsTestCase(BaseViewsTestCase):
         form_data = {
             'username': self.user.username,
             'course': 'course-v1:test+TestX+Test_Course',
-            'effort': "I'm done, okay? You just give me my money, and you and I, we're done.",
             'mktg-permission': False
         }
         response = self._submit_financial_assistance_form(

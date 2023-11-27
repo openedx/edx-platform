@@ -26,7 +26,6 @@ from django.utils.decorators import method_decorator
 from django.utils.text import slugify
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
-from django.utils.translation import gettext_noop
 from django.views.decorators.cache import cache_control
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -1981,10 +1980,6 @@ def _get_fa_header(header):
         format(percent_sign="%",
                platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)).split('\n')
 
-FA_EFFORT_LABEL = gettext_noop('Tell us about your plans for this course. What steps will you take to help you complete the course work and receive a certificate?')  # lint-amnesty, pylint: disable=line-too-long
-
-FA_SHORT_ANSWER_INSTRUCTIONS = _('Use between 1250 and 2500 characters or so in your response.')
-
 
 @login_required
 def financial_assistance(request, course_id=None):
@@ -2019,7 +2014,6 @@ def financial_assistance_request(request):
         legal_name = data['name']
         email = data['email']
         country = data['country']
-        effort = data['effort']
         marketing_permission = data['mktg-permission']
         ip_address = get_client_ip(request)[0]
     except ValueError:
@@ -2051,7 +2045,6 @@ def financial_assistance_request(request):
             ('Course ID', course_id),
             ('Country', country),
             ('Allowed for marketing purposes', 'Yes' if marketing_permission else 'No'),
-            (FA_EFFORT_LABEL, '\n' + effort + '\n\n'),
             ('Client IP', ip_address),
         )),
         group='Financial Assistance',
@@ -2083,7 +2076,6 @@ def financial_assistance_request_v2(request):
         if course_id and course_id not in request.META.get('HTTP_REFERER'):
             return HttpResponseBadRequest('Invalid Course ID provided.')
         lms_user_id = request.user.id
-        learner_plans = data['effort']
         allowed_for_marketing = data['mktg-permission']
 
     except ValueError:
@@ -2096,7 +2088,6 @@ def financial_assistance_request_v2(request):
     form_data = {
         'lms_user_id': lms_user_id,
         'course_id': course_id,
-        'learner_plans': learner_plans,
         'allowed_for_marketing': allowed_for_marketing
     }
     return create_financial_assistance_application(form_data)
@@ -2143,22 +2134,6 @@ def financial_assistance_form(request, course_id=None):
                     ' the course does not appear in the list, make sure that you have enrolled'
                     ' in the audit track for the course.'
                 )
-            },
-            {
-                'name': 'effort',
-                'type': 'textarea',
-                'label': _(FA_EFFORT_LABEL),  # lint-amnesty, pylint: disable=translation-of-non-string
-                'placeholder': '',
-                'defaultValue': '',
-                'required': True,
-                'restrictions': {
-                    'min_length': settings.FINANCIAL_ASSISTANCE_MIN_LENGTH,
-                    'max_length': settings.FINANCIAL_ASSISTANCE_MAX_LENGTH
-                },
-                'instructions': FA_SHORT_ANSWER_INSTRUCTIONS
-                'name': 'certify-heading',
-                'label': _('I certify that: '),
-                'type': 'plaintext',
             },
             {
                 'placeholder': '',
