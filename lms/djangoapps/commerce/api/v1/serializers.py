@@ -34,7 +34,7 @@ class CourseModeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CourseMode
-        fields = ('name', 'currency', 'price', 'sku', 'bulk_sku', 'expires')
+        fields = ('name', 'currency', 'price', 'sku', 'bulk_sku', 'expires', 'android_sku', 'ios_sku')
         # For disambiguating within the drf-yasg swagger schema
         ref_name = 'commerce.CourseMode'
 
