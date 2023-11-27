@@ -1982,7 +1982,6 @@ def _get_fa_header(header):
                platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)).split('\n')
 
 
-FA_REASON_FOR_APPLYING_LABEL = gettext_noop('Tell us about your current financial situation. Why do you need assistance?')  # lint-amnesty, pylint: disable=line-too-long
 FA_GOALS_LABEL = gettext_noop('Tell us about your learning or professional goals. How will a Verified Certificate in this course help you achieve these goals?')  # lint-amnesty, pylint: disable=line-too-long
 
 FA_EFFORT_LABEL = gettext_noop('Tell us about your plans for this course. What steps will you take to help you complete the course work and receive a certificate?')  # lint-amnesty, pylint: disable=line-too-long
@@ -2023,7 +2022,6 @@ def financial_assistance_request(request):
         legal_name = data['name']
         email = data['email']
         country = data['country']
-        reason_for_applying = data['reason_for_applying']
         goals = data['goals']
         effort = data['effort']
         marketing_permission = data['mktg-permission']
@@ -2057,7 +2055,6 @@ def financial_assistance_request(request):
             ('Course ID', course_id),
             ('Country', country),
             ('Allowed for marketing purposes', 'Yes' if marketing_permission else 'No'),
-            (FA_REASON_FOR_APPLYING_LABEL, '\n' + reason_for_applying + '\n\n'),
             (FA_GOALS_LABEL, '\n' + goals + '\n\n'),
             (FA_EFFORT_LABEL, '\n' + effort + '\n\n'),
             ('Client IP', ip_address),
@@ -2091,7 +2088,6 @@ def financial_assistance_request_v2(request):
         if course_id and course_id not in request.META.get('HTTP_REFERER'):
             return HttpResponseBadRequest('Invalid Course ID provided.')
         lms_user_id = request.user.id
-        learner_reasons = data['reason_for_applying']
         learner_goals = data['goals']
         learner_plans = data['effort']
         allowed_for_marketing = data['mktg-permission']
@@ -2106,7 +2102,6 @@ def financial_assistance_request_v2(request):
     form_data = {
         'lms_user_id': lms_user_id,
         'course_id': course_id,
-        'learner_reasons': learner_reasons,
         'learner_goals': learner_goals,
         'learner_plans': learner_plans,
         'allowed_for_marketing': allowed_for_marketing
@@ -2155,19 +2150,6 @@ def financial_assistance_form(request, course_id=None):
                     ' the course does not appear in the list, make sure that you have enrolled'
                     ' in the audit track for the course.'
                 )
-            },
-            {
-                'name': 'reason_for_applying',
-                'type': 'textarea',
-                'label': _(FA_REASON_FOR_APPLYING_LABEL),  # lint-amnesty, pylint: disable=translation-of-non-string
-                'placeholder': '',
-                'defaultValue': '',
-                'required': True,
-                'restrictions': {
-                    'min_length': settings.FINANCIAL_ASSISTANCE_MIN_LENGTH,
-                    'max_length': settings.FINANCIAL_ASSISTANCE_MAX_LENGTH
-                },
-                'instructions': FA_SHORT_ANSWER_INSTRUCTIONS
             },
             {
                 'name': 'goals',
