@@ -784,7 +784,6 @@
         'js/spec/views/file_uploader_spec.js',
         'js/spec/views/message_banner_spec.js',
         'js/spec/views/notification_spec.js',
-        'learner_profile/js/spec/learner_profile_factory_spec.js',
         'learner_profile/js/spec/views/learner_profile_fields_spec.js',
         'learner_profile/js/spec/views/learner_profile_view_spec.js',
         'learner_profile/js/spec/views/section_two_tab_spec.js',
