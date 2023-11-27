@@ -31,8 +31,21 @@ Consequences
 ------------
 - Future view methods should confine business logic to the service layer. This ADR mandates the extraction of business logic from view files into separate entities, without prescribing specific file structures or naming conventions.
 
-Examples
---------
+Example
+-------
+
+The following example shows a refactoring to this service layer pattern.
+
+Before refactoring, the view method implements some view-related logic like
+authorization via `if not has_studio_read_access: ...` and serialization,
+but also business logic: instantiating modulestore, fetching videos from it,
+and then transforming the data to generate a new data structure `usage_locations`.
+
+After refactoring, the view method only implements logic related to the view / API layer,
+and the business logic is extracted to a service file called `videos_provider.py` outside
+the `views` folder. Now the videos provider is responsible for fetching and transforming
+the data, while the view is responsible for authorization and serialization.
+
 
 **Before:**::
 
@@ -50,10 +63,10 @@ Examples
             store = modulestore()
             usage_locations = []
             videos = store.get_items(
-            course_key,
-            qualifiers={
-                    'category': 'video'
-            },
+                course_key,
+                qualifiers={
+                        'category': 'video'
+                },
             )
             for video in videos:
             video_id = getattr(video, 'edx_video_id', '')
