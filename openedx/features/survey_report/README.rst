@@ -3,7 +3,7 @@ Survey Report
 
 This Django app was created to gather aggregated, anonymized data about Open edX courses at scale so that we can begin to track the growth and trends in Open edX usage over time, namely in the annual Open edX Impact Report.
 
-With this app, you can recollect the following information on your platform:
+With this app, you can collect the following information on your platform:
 
 - ``courses_offered``: Total number of active unique courses.
 - ``learners``: Recently active users with login in the last four weeks.
@@ -13,12 +13,16 @@ With this app, you can recollect the following information on your platform:
 - ``extra_data``: Extra information that will be saved in the report, e.g., site_name, openedx-release.
 - ``state``: State of the async generating process.
 
-You can find in this directory some methods to manage survey reports, one command to generate the report, some queries to get the information from the database, and one method to send the report to Open edX API.
+You can find in this directory:
+- Some methods to manage survey reports.
+- One command to generate the report.
+- Some queries to get the information from the database.
+- One method to send the report to Open edX API.
 
-How to generate a report and send it
+How to Generate a Report and Send It
 -------------------------------------
 
-You can choose the endpoint to send the report to by setting ``SURVEY_REPORT_ENDPOINT``; by default, you will send the report to the Open edX organization to collaborate with the annual Open edX Impact Report. You can see `Settings for Survey Report`_ for more information.
+By setting ``SURVEY_REPORT_ENDPOINT``, you can choose to whom you would like to send the report; by default, you will send the report to the Open edX organization to collaborate with the annual Open edX Impact Report. You can see `Settings for Survey Report`_ for more information.
 
 .. TODO: Complete this part
     By the tutor plugin X
@@ -29,19 +33,19 @@ Django Admin
 ~~~~~~~~~~~~~
 You can create reports using the Django Admin; for that, you need to follow these steps:
 
-- Enter the Survey Report option in your Django admin (URL: ``<your LMs domain>/admin/survey_report/surveyreport/``)
-- Click the "Generate Report" button.
-- Then, you can select the reports you want to send and use the admin actions to send the report to an external API.
+1. Enter the **Survey Report** option in your Django admin (URL: ``<your LMs domain>/admin/survey_report/surveyreport/``)
+2. Click the **Generate Report** button.
+3. Then, you can select the reports you want to send and use the admin actions to send the report to an external API.
 
     .. image:: docs/_images/survey_report_admin.png
         :alt: Survey report by Django admin
 
 Screenshot of Survey Report option in a Django admin and use the admin actions to send the report to an external API
 
-Command line
+Command Line
 ~~~~~~~~~~~~~
-- Run a Bash shell in your LMS container. For example, using ``tutor dev run lms bash``.
-- Run the command: ``./manage.py lms generate_report``
+1. Run a Bash shell in your LMS container. For example, using ``tutor dev run lms bash``.
+2. Run the command: ``./manage.py lms generate_report``
 
 **Note:** by default that the command also sends the report; if you only want to generate it, you need to add the flag ``--no-send``. For more information, you can run the command ``./manage.py lms generate_report --help``
 
