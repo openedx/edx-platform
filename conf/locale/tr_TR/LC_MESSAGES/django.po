@@ -5026,6 +5026,10 @@ msgid ""
 " with the LTI consumer. See the Open edX LTI Provider documentation for more"
 " details."
 msgstr ""
+"İşaretlendiğinde, LTI içeriği yalnızca bu örnekte hesabı olan öğrenciler "
+"için yüklenecektir. Bu yalnızca öğrenci hesaplarını LTI tüketicisine "
+"bağlamak için gereklidir. Daha fazla ayrıntı için Open edX LTI Sağlayıcı "
+"belgelerine bakın."
 
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
@@ -7154,7 +7158,7 @@ msgstr "LTI sağlayıcısı kimliği"
 
 #: openedx/core/djangoapps/course_live/models.py
 msgid "True, if LTI credential are provided by Org globally"
-msgstr ""
+msgstr "LTI kimlik bilgileri Kurum tarafından global olarak sağlanmışsa, True"
 
 #: openedx/core/djangoapps/course_live/plugins.py
 #: openedx/core/djangoapps/course_live/tab.py
@@ -7185,14 +7189,18 @@ msgstr ""
 #: openedx/core/djangoapps/credentials/models.py
 msgid "Enable issuance of credentials via Credential Service."
 msgstr ""
+"Kimlik bilgilerinin Kimlik Doğrulama Servisi aracılığıyla gönderilmesini "
+"etkinleştirin."
 
 #: openedx/core/djangoapps/credentials/models.py
 msgid "Enable Authoring of Credential in Studio"
-msgstr ""
+msgstr "Studio'da Kimlik Doğrulama Bilgisinin Yazılmasını Etkinleştirin"
 
 #: openedx/core/djangoapps/credentials/models.py
 msgid "Enable authoring of Credential Service credentials in Studio."
 msgstr ""
+"Studio'da Kimlik Doğrulama Servisi kimlik bilgilerinin yazılmasını "
+"etkinleştirin."
 
 #: openedx/core/djangoapps/credit/email_utils.py
 msgid "Course Credit Eligibility"
@@ -7587,11 +7595,11 @@ msgstr "Öğrenci Patikaları"
 
 #: openedx/core/djangoapps/notifications/admin.py
 msgid "Notification App"
-msgstr ""
+msgstr "Bildirim Uygulaması"
 
 #: openedx/core/djangoapps/notifications/admin.py
 msgid "Notification Type"
-msgstr ""
+msgstr "Bildirim Türü"
 
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
