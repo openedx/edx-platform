@@ -457,7 +457,7 @@ edx-django-release-util==1.3.0
     #   openedx-blockstore
 edx-django-sites-extensions==4.0.2
     # via -r requirements/edx/kernel.in
-edx-django-utils==5.8.0
+edx-django-utils==5.9.0
     # via
     #   -r requirements/edx/kernel.in
     #   django-config-models
@@ -838,9 +838,8 @@ pgpy==0.6.0
     # via edx-enterprise
 piexif==1.1.3
     # via -r requirements/edx/kernel.in
-pillow==10.0.1
+pillow==10.1.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
     #   edx-organizations
