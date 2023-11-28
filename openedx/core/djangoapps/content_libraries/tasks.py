@@ -305,8 +305,8 @@ def duplicate_children(
             _copy_overrides(store=store, user_id=user_id, source_block=source_block, dest_block=dest_block)
         except Exception as exception:  # pylint: disable=broad-except
             TASK_LOGGER.exception('Error importing children for %s', dest_block.scope_ids.usage_id, exc_info=True)
-            if task.status.state != UserTaskStatus.FAILED:
-                task.status.fail({'raw_error_msg': str(exception)})
+            if self.status.state != UserTaskStatus.FAILED:
+                self.status.fail({'raw_error_msg': str(exception)})
 
 
 def _sync_children(
