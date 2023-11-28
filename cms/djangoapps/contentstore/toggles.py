@@ -537,3 +537,21 @@ def default_enable_flexible_peer_openassessments(course_key):
     level to opt in/out of rolling forward this feature.
     """
     return DEFAULT_ENABLE_FLEXIBLE_PEER_OPENASSESSMENTS.is_enabled(course_key)
+
+
+# .. toggle_name: new_studio_mfe.use_tagging_taxonomy_list_page
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the taxonomy list page.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-10-06
+# .. toggle_target_removal_date: TBA
+# .. toggle_warning:
+ENABLE_TAGGING_TAXONOMY_LIST_PAGE = WaffleFlag('new_studio_mfe.use_tagging_taxonomy_list_page', __name__)
+
+
+def use_tagging_taxonomy_list_page():
+    """
+    Returns a boolean if taxonomy list page is enabled
+    """
+    return ENABLE_TAGGING_TAXONOMY_LIST_PAGE.is_enabled()

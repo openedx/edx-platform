@@ -11,7 +11,6 @@ log = logging.getLogger(__name__)
 
 
 class Thread(models.Model):
-
     # accessible_fields can be set and retrieved on the model
     accessible_fields = [
         'id', 'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id',

@@ -29,6 +29,7 @@ from xblock.fields import ScopeIds
 from xblock.scorable import Score
 
 import xmodule
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.capa import responsetypes
 from xmodule.capa.correctmap import CorrectMap
 from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
@@ -182,6 +183,7 @@ if submission[0] == '':
 
 
 @ddt.ddt
+@skip_unless_lms
 class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
@@ -2898,6 +2900,7 @@ class ComplexEncoderTest(unittest.TestCase):  # lint-amnesty, pylint: disable=mi
         # ignore quotes
 
 
+@skip_unless_lms
 class ProblemCheckTrackingTest(unittest.TestCase):
     """
     Ensure correct tracking information is included in events emitted during problem checks.

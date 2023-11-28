@@ -2,7 +2,6 @@
   "lms-1": {
     "settings": "lms.envs.test",
     "paths": [
-      "lms/djangoapps/badges/",
       "lms/djangoapps/branding/",
       "lms/djangoapps/bulk_email/",
       "lms/djangoapps/bulk_enroll/",
@@ -54,7 +53,6 @@
       "lms/djangoapps/instructor_task/",
       "lms/djangoapps/learner_dashboard/",
       "lms/djangoapps/learner_home/",
-      "lms/djangoapps/learner_recommendations/",
       "lms/djangoapps/lms_initialization/",
       "lms/djangoapps/lms_xblock/",
       "lms/djangoapps/lti_provider/",
@@ -78,7 +76,7 @@
       "lms/tests.py"
     ]
   },
-  "openedx-1": {
+  "openedx-1-with-lms": {
     "settings": "lms.envs.test",
     "paths": [
       "openedx/core/djangoapps/ace_common/",
@@ -116,7 +114,7 @@
       "openedx/core/djangoapps/external_user_ids/"
     ]
   },
-  "openedx-2": {
+  "openedx-2-with-lms": {
     "settings": "lms.envs.test",
     "paths": [
       "openedx/core/djangoapps/geoinfo/",
@@ -159,7 +157,7 @@
       "openedx/tests/"
     ]
   },
-  "openedx-3": {
+  "openedx-1-with-cms": {
     "settings": "cms.envs.test",
     "paths": [
       "openedx/core/djangoapps/ace_common/",
@@ -197,7 +195,7 @@
       "openedx/core/djangoapps/external_user_ids/"
     ]
   },
-  "openedx-4": {
+  "openedx-2-with-cms": {
     "settings": "cms.envs.test",
     "paths": [
       "openedx/core/djangoapps/content_tagging/",
@@ -258,20 +256,26 @@
       "cms/djangoapps/contentstore/"
     ]
   },
-  "common-1": {
+  "common-with-lms": {
     "settings": "lms.envs.test",
     "paths": [
       "common/djangoapps/"
     ]
   },
-  "common-2": {
+  "common-with-cms": {
     "settings": "cms.envs.test",
     "paths": [
       "common/djangoapps/"
     ]
   },
-  "xmodule-1": {
+  "xmodule-with-lms": {
     "settings": "lms.envs.test",
+    "paths": [
+      "xmodule/"
+    ]
+  },
+  "xmodule-with-cms": {
+    "settings": "cms.envs.test",
     "paths": [
       "xmodule/"
     ]

@@ -48,6 +48,8 @@ class XForwardedForMiddleware(MiddlewareMixin):
         # Only used to support ip.legacy switch.
         request.META['ORIGINAL_REMOTE_ADDR'] = request.META['REMOTE_ADDR']
 
+        safest_client_ip = ip.get_safest_client_ip(request)
+
         try:
             # Give some observability into IP chain length and composition. Useful
             # for monitoring in case of unexpected network config changes, etc.
@@ -66,6 +68,8 @@ class XForwardedForMiddleware(MiddlewareMixin):
             external_chain = ip.get_all_client_ips(request)
             set_custom_attribute('ip_chain.external.count', len(external_chain))
             set_custom_attribute('ip_chain.external.types', '-'.join(_ip_type(s) for s in external_chain))
+
+            set_custom_attribute('ip_chain.safest_client_ip', safest_client_ip)
         except BaseException:
             warnings.warn('Error while computing IP chain metrics')
 
@@ -107,4 +111,4 @@ class XForwardedForMiddleware(MiddlewareMixin):
         if legacy_ip.USE_LEGACY_IP.is_enabled():
             request.META['REMOTE_ADDR'] = legacy_ip.get_legacy_ip(request)
         else:
-            request.META['REMOTE_ADDR'] = ip.get_safest_client_ip(request)
+            request.META['REMOTE_ADDR'] = safest_client_ip

@@ -1,7 +1,6 @@
 """
 Test audit user's access to various content based on content-gating features.
 """
-import os
 from datetime import datetime, timedelta
 from unittest.mock import patch, Mock
 
@@ -228,8 +227,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):  # pyli
                 graded=False,
             )
             cls.graded_score_weight_blocks[(graded, has_score, weight)] = block
-
-        host = os.environ.get('BOK_CHOY_HOSTNAME', '127.0.0.1')
+        host = '127.0.0.1'
         metadata_lti_xblock = {
             'lti_id': 'correct_lti_id',
             'launch_url': 'http://{}:{}/{}'.format(host, '8765', 'correct_lti_endpoint'),

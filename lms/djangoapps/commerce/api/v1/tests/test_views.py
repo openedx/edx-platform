@@ -23,7 +23,7 @@ from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, p
 from ....tests.mocks import mock_order_endpoint
 from ....tests.test_views import UserMixin
 
-PASSWORD = 'test'
+PASSWORD = 'Password1234'
 JSON_CONTENT_TYPE = 'application/json'
 
 
@@ -65,6 +65,8 @@ class CourseApiViewTestMixin:
             'sku': course_mode.sku,
             'bulk_sku': course_mode.bulk_sku,
             'expires': cls._serialize_datetime(course_mode.expiration_datetime),
+            'android_sku': course_mode.android_sku,
+            'ios_sku': course_mode.ios_sku
         }
 
     @classmethod

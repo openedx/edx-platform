@@ -14,8 +14,9 @@ class TestOrganizationListing(TestCase):
     """Verify Organization listing behavior."""
     def setUp(self):
         super().setUp()
-        self.staff = UserFactory(is_staff=True)
-        self.client.login(username=self.staff.username, password='test')
+        self.password = "password1234"
+        self.staff = UserFactory(is_staff=True, password=self.password)
+        self.client.login(username=self.staff.username, password=self.password)
         self.org_names_listing_url = reverse('organizations')
         self.org_short_names = ["alphaX", "betaX", "orgX"]
         for index, short_name in enumerate(self.org_short_names):
