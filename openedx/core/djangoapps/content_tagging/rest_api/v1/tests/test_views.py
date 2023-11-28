@@ -44,6 +44,7 @@ TAXONOMY_ORG_LIST_URL = "/api/content_tagging/v1/taxonomies/"
 TAXONOMY_ORG_DETAIL_URL = "/api/content_tagging/v1/taxonomies/{pk}/"
 TAXONOMY_ORG_UPDATE_ORG_URL = "/api/content_tagging/v1/taxonomies/{pk}/orgs/"
 OBJECT_TAG_UPDATE_URL = "/api/content_tagging/v1/object_tags/{object_id}/?taxonomy={taxonomy_id}"
+OBJECT_TAGS_URL = "/api/content_tagging/v1/object_tags/{object_id}/"
 TAXONOMY_TEMPLATE_URL = "/api/content_tagging/v1/taxonomies/import/{filename}"
 TAXONOMY_CREATE_IMPORT_URL = "/api/content_tagging/v1/taxonomies/import/"
 TAXONOMY_TAGS_IMPORT_URL = "/api/content_tagging/v1/taxonomies/{pk}/tags/import/"
@@ -1298,9 +1299,6 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
     Testing various cases for the ObjectTagView.
     """
 
-    def test_get_tags(self):
-        pass
-
     @ddt.data(
         # userA and userS are staff in courseA and can tag using enabled taxonomies
         ("user", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
@@ -1502,6 +1500,40 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_get_tags(self):
+        self.client.force_authenticate(user=self.staffA)
+        taxonomy = self.multiple_taxonomy
+        tag_values = ["Tag 1", "Tag 2"]
+        put_url = OBJECT_TAG_UPDATE_URL.format(object_id=self.courseA, taxonomy_id=taxonomy.pk)
+
+        # Tag an object
+        response1 = self.client.put(put_url, {"tags": tag_values}, format="json")
+        assert status.is_success(response1.status_code)
+
+        # Fetch this object's tags for a single taxonomy
+        expected_tags = [{
+            'editable': True,
+            'name': 'Multiple Taxonomy',
+            'taxonomy_id': taxonomy.pk,
+            'tags': [
+                {'value': 'Tag 1', 'lineage': ['Tag 1']},
+                {'value': 'Tag 2', 'lineage': ['Tag 2']},
+            ],
+        }]
+
+        # Fetch tags for a single taxonomy
+        get_url = OBJECT_TAGS_URL.format(object_id=self.courseA)
+        get_url += f"?taxonomy={taxonomy.pk}"
+        response2 = self.client.get(get_url, format="json")
+        assert status.is_success(response2.status_code)
+        assert response2.data[str(self.courseA)]["taxonomies"] == expected_tags
+
+        # Fetch all of this object's tags, for all taxonomies
+        get_all_url = OBJECT_TAGS_URL.format(object_id=self.courseA)
+        response3 = self.client.get(get_all_url, format="json")
+        assert status.is_success(response3.status_code)
+        assert response3.data[str(self.courseA)]["taxonomies"] == expected_tags
 
 
 @skip_unless_cms
