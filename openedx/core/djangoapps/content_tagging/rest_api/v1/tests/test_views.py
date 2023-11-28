@@ -1824,10 +1824,9 @@ class TestImportTagsView(ImportTaxonomyMixin, APITestCase):
         url = TAXONOMY_TAGS_URL.format(pk=self.taxonomy.id)
         response = self.client.get(url)
         tags = response.data["results"]
-        all_tags = [{"value": tag.value} for tag in self.old_tags] + new_tags
-        assert len(tags) == len(all_tags)
+        assert len(tags) == len(new_tags)
         for i, tag in enumerate(tags):
-            assert tag["value"] == all_tags[i]["value"]
+            assert tag["value"] == new_tags[i]["value"]
 
     def test_import_no_file(self) -> None:
         """
