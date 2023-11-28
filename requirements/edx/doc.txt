@@ -20,10 +20,8 @@ aiosignal==1.3.1
     #   aiohttp
 alabaster==0.7.13
     # via sphinx
-algoliasearch==2.6.3
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.txt
+algoliasearch==3.0.0
+    # via -r requirements/edx/base.txt
 amqp==5.2.0
     # via
     #   -r requirements/edx/base.txt
@@ -1007,9 +1005,8 @@ picobox==3.0.0
     # via sphinxcontrib-openapi
 piexif==1.1.3
     # via -r requirements/edx/base.txt
-pillow==10.0.1
+pillow==10.1.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   edx-organizations
