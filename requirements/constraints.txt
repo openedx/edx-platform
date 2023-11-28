@@ -75,7 +75,7 @@ boto==2.39.0
 
 # social-auth-app-django versions after 5.2.0 has a problematic migration that will cause issues deployments with large
 # `social_auth_usersocialauth` tables
-social-auth-app-django<5.3
+social-auth-app-django<5.2
 
 # adding these constraints to minimize boto3 and botocore changeset
 social-auth-core==4.3.0
