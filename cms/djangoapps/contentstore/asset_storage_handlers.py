@@ -438,11 +438,12 @@ def _get_assets_in_json_format(assets, course_key, assets_usage_locations_map):
         thumbnail_asset_key = _get_thumbnail_asset_key(asset, course_key)
         asset_is_locked = asset.get('locked', False)
         asset_file_size = asset.get('length', None)
+
         try:
             usage_locations = assets_usage_locations_map[asset_key_string]
         except KeyError:
             usage_locations = []
-        print(asset['displayname'], usage_locations)
+
         asset_in_json = get_asset_json(
             asset['displayname'],
             asset['contentType'],
