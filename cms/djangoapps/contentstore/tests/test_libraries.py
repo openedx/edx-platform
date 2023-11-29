@@ -445,7 +445,6 @@ class TestLibraries(LibraryTestCase):
         'openedx.core.djangoapps.content_libraries.tasks.SearchEngine.get_search_engine',
         Mock(return_value=None, autospec=True),
     )
-    
     def test_sync_if_capa_type_changed(self):
         """ Tests that children are automatically refreshed if capa type field changes """
         name1, name2 = "Option Problem", "Multiple Choice Problem"
@@ -1032,7 +1031,6 @@ class TestOverrides(LibraryTestCase):
         self.assertEqual(problem2_in_course.display_name, self.original_display_name)
 
         # Refresh our reference to the block
-        
         self.lc_block = self._upgrade_and_sync(self.lc_block)
         self.problem_in_course = store.get_item(self.problem_in_course.location)
 

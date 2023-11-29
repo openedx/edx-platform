@@ -10,9 +10,7 @@ from copy import copy
 from gettext import ngettext, gettext
 
 import bleach
-from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from django.utils.functional import classproperty
 from lxml import etree
 from lxml.etree import XMLSyntaxError
 from opaque_keys import InvalidKeyError
@@ -20,10 +18,8 @@ from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
 from rest_framework import status
 from web_fragments.fragment import Fragment
 from webob import Response
-from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.fields import Boolean, Integer, List, Scope, String
-from xblockutils.resources import ResourceLoader
 
 from xmodule.capa.responsetypes import registry
 from xmodule.mako_block import MakoTemplateBlockBase
@@ -214,10 +210,10 @@ class LibraryContentBlock(
         Dynamically selects block_ids which children are possible for selection
         """
         if candidates and manual:
-            valid_children =[]
+            valid_children = []
             for candidate in candidates:
                 for child in library_children:
-                    if child._to_string() == candidate[9:]:
+                    if str(child) == candidate[9:]:
                         valid_children.append((child.block_type, child.block_id))
             return valid_children
         return list((child.block_type, child.block_id) for child in library_children)
@@ -252,7 +248,6 @@ class LibraryContentBlock(
         When generating manully selected content, we want all users to see all the items selected.
         size, however, limits the amount of content shown.
         """
-
 
         old_selected = (tuple(k) for k in selected)
         valid_block_keys = LibraryContentBlock._get_valid_children(library_children, candidates, manual)
@@ -506,14 +501,6 @@ class LibraryContentBlock(
         """
         return list(self._get_selected_child_blocks())
 
-    @property
-    def non_editable_metadata_fields(self):
-        non_editable_fields = super().non_editable_metadata_fields
-        non_editable_fields.extend([
-            LibraryContentBlock.source_library_version,
-        ])
-        return non_editable_fields
-
     def get_tools(self, to_read_library_content: bool = False) -> 'LibraryToolsService':
         """
         Grab the library tools service and confirm that it'll work for us. Else, raise LibraryToolsUnavailable.
@@ -540,7 +527,6 @@ class LibraryContentBlock(
         Renders the children of the module with HTML appropriate for Studio. If can_reorder is True,
         then the children will be rendered to support drag and drop.
         """
-        print
         contents = []
         for child in self.get_children():  # pylint: disable=no-member
             if can_reorder:
@@ -560,7 +546,6 @@ class LibraryContentBlock(
             'can_add': can_add,
             'can_reorder': can_reorder,
         }))
-
 
     def _validate_sync_permissions(self):
         """
@@ -789,7 +774,8 @@ class LibraryContentBlock(
 
     def post_editor_saved(self, user, old_metadata, old_content):  # pylint: disable=unused-argument
         """
-        If source library, library version or capa_type have been edited, upgrade library, clear the candidates & sync automatically.
+        If source library, library version or capa_type have been edited, upgrade library,
+        clear the candidates & sync automatically.
 
         TODO: capa_type doesn't really need to trigger an upgrade once we've migrated to V2.
         """

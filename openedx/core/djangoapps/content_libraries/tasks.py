@@ -302,6 +302,7 @@ def duplicate_children(
     with store.bulk_operations(source_block.scope_ids.usage_id.context_key):
         _copy_overrides(store=store, user_id=user_id, source_block=source_block, dest_block=dest_block)
 
+
 def _sync_children(
     task: LibrarySyncChildrenTask,
     store: MixedModuleStore,

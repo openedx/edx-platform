@@ -358,6 +358,7 @@ def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
         xblock_updated.post_editor_saved(user, old_metadata, old_content)
     return xblock_updated
 
+
 def _save_xblock(
     user,
     xblock,

@@ -9,7 +9,6 @@ block type in mind.
 from unittest import mock
 
 import ddt
-from bson.objectid import ObjectId
 from django.conf import settings
 from django.test import override_settings
 from opaque_keys.edx.keys import UsageKey
@@ -67,7 +66,6 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         _ = self.tools.list_available_libraries()
         assert mock_get_library_summaries.called
 
-
     def test_get_latest_v1_library_version(self):
         """
         Test get_v1_library_version for V1 libraries.
@@ -94,7 +92,6 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         LibraryLocator.from_string('library-v1:Fake+Key'),
         LibraryLocatorV2.from_string('lib:Fake:V-2'),
     )
-
     def test_get_latest_library_version_no_library(self, lib_key):
         """
         Test get_latest_library_version result when the library does not exist.
