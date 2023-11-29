@@ -12,7 +12,8 @@ decorator `django.utils.decorators.decorator_from_middleware(middleware_class)`
 import logging
 
 from django.utils.deprecation import MiddlewareMixin
-from python_ipware import IpWare
+from ipware.ip import get_client_ip
+from ipware.utils import is_public_ip
 
 from .api import country_code_from_ip
 
@@ -29,18 +30,13 @@ class CountryMiddleware(MiddlewareMixin):
 
         Store country code in session.
         """
-        ipw = IpWare()
-        new_ip_address_obj, _ = ipw.get_client_ip(meta=request.META)
-
-        if new_ip_address_obj:
-            new_ip_address = format(new_ip_address_obj)
-
+        new_ip_address = get_client_ip(request)[0]
         old_ip_address = request.session.get('ip_address', None)
 
         if not new_ip_address and old_ip_address:
             del request.session['ip_address']
             del request.session['country_code']
-        elif new_ip_address != old_ip_address and new_ip_address_obj.is_global:
+        elif new_ip_address != old_ip_address and is_public_ip(new_ip_address):
             country_code = country_code_from_ip(new_ip_address)
             request.session['country_code'] = country_code
             request.session['ip_address'] = new_ip_address
