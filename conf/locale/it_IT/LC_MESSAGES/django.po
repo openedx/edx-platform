@@ -127,7 +127,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-01 20:43+0000\n"
+"POT-Creation-Date: 2023-11-12 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ilaria Botti <ilabotti@gmail.com>, 2021\n"
 "Language-Team: Italian (Italy) (https://app.transifex.com/open-edx/teams/6205/it_IT/)\n"
@@ -2195,75 +2195,6 @@ msgstr ""
 msgid "This value must be all lowercase."
 msgstr "Questo valore deve essere tutto in minuscolo."
 
-#: lms/djangoapps/badges/models.py
-msgid "The course mode for this badge image. For example, \"verified\" or \"honor\"."
-msgstr ""
-"La modalità corso per questa immagine del badge. Ad esempio, \"verificato\" "
-"o \"onorato\"."
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Badge images must be square PNG files. The file size should be under 250KB."
-msgstr ""
-"Le immagini dei badge devono essere dei file PNG di forma quadrata. La "
-"dimensione file deve essere inferiore a 250KB."
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Set this value to True if you want this image to be the default image for "
-"any course modes that do not have a specified badge image. You can have only"
-" one default image."
-msgstr ""
-"Impostare questo valore su True se si desidera che questa immagine sia "
-"quella predefinita per tutte le modalità corso che non presentano "
-"un'immagine badge specificata. È possibile avere una sola immagine "
-"predefinita."
-
-#: lms/djangoapps/badges/models.py
-msgid "There can be only one default image."
-msgstr "È possibile avere una sola immagine predefinita."
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"On each line, put the number of completed courses to award a badge for, a "
-"comma, and the slug of a badge class you have created that has the issuing "
-"component 'openedx__course'. For example: 3,enrolled_3_courses"
-msgstr ""
-"Immettere, su ciascuna riga, il numero di corsi completati a cui assegnare "
-"un badge, una virgola, e il campo dati dinamico di una classe badge creata "
-"che dispone del componente di emissione 'openedx__course'. Ad esempio: "
-"3,enrolled_3_courses"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"On each line, put the number of enrolled courses to award a badge for, a "
-"comma, and the slug of a badge class you have created that has the issuing "
-"component 'openedx__course'. For example: 3,enrolled_3_courses"
-msgstr ""
-"Immettere, su ciascuna riga, il numero di corsi iscritti a cui assegnare un "
-"badge, una virgola, e il campo dati dinamico di una classe badge creata che "
-"dispone del componente di emissione 'openedx__course'. Ad esempio: "
-"3,enrolled_3_courses"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Each line is a comma-separated list. The first item in each line is the slug"
-" of a badge class you have created that has an issuing component of "
-"'openedx__course'. The remaining items in each line are the course keys the "
-"learner needs to complete to be awarded the badge. For example: "
-"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
-msgstr ""
-"Ciascuna riga è un elenco separato da virgole. Il primo elemento in ciascuna"
-" riga è il campo dati dinamico di una classe badge creata che dispone di un "
-"componente di emissione 'openedx__course'. Gli elementi restanti in ciascuna"
-" riga sono le chiavi del corso che lo studente deve completare affinché "
-"venga assegnato il badge. Ad esempio: "
-"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
-
-#: lms/djangoapps/badges/models.py
-msgid "Please check the syntax of your entry."
-msgstr "Per favore, controlla la sintassi di quanto hai inserito."
-
 #. Translators: This string is used across Open edX installations
 #. as a callback to edX. Please do not translate `edX.org`
 #: lms/djangoapps/branding/api.py
@@ -3662,6 +3593,7 @@ msgstr "{sign_in_link} o {register_link}."
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
 #: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/lti_provider/user-auth-error.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Sign in"
 msgstr "Accedi"
@@ -5219,6 +5151,14 @@ msgid ""
 msgstr ""
 "L'elenco delle configurazioni di gruppo per la partizione degli studenti in "
 "esperimenti sui contenuti."
+
+#: lms/djangoapps/lti_provider/models.py
+msgid ""
+"When checked, the LTI content will load only for learners who have an "
+"account in this instance. This is required only for linking learner accounts"
+" with the LTI consumer. See the Open edX LTI Provider documentation for more"
+" details."
+msgstr ""
 
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
@@ -11185,18 +11125,6 @@ msgstr ""
 "Dettagli."
 
 #: xmodule/course_block.py
-msgid "Issue Open Badges"
-msgstr "Badge per problemi non risolti"
-
-#: xmodule/course_block.py
-msgid ""
-"Issue Open Badges badges for this course. Badges are generated when "
-"certificates are created."
-msgstr ""
-"Rilascia badge aperti per questo corso. I badge vengono generati alla "
-"creazione dei certificati."
-
-#: xmodule/course_block.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
 "marks, enter the short name of the type of certificate that students receive"
@@ -14754,10 +14682,10 @@ msgid "Welcome to {platform_name}"
 msgstr "Benvenuto su {platform_name}"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See https://open.edx.org for more information.
+#. untranslated. See https://openedx.org for more information.
 #: lms/templates/index_overlay.html
-msgid "It works! Powered by Open edX{registered_trademark}"
-msgstr "Funziona! Powered by Open edX{registered_trademark}"
+msgid "It works! Powered by the Open edX{registered_trademark} Platform"
+msgstr ""
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -15441,6 +15369,10 @@ msgstr "Dispense"
 #: lms/templates/video.html
 msgid "Download Handout"
 msgstr "Scarica il volantino"
+
+#: lms/templates/video.html
+msgid "How is the transcript quality ?"
+msgstr ""
 
 #: lms/templates/word_cloud.html
 msgid "{num} of {total}"
@@ -20571,6 +20503,25 @@ msgstr ""
 msgid "My Courses"
 msgstr "I miei corsi"
 
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "There was an error when loading this module!"
+msgstr ""
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"This module is available only for users who are signed into {platform}. "
+"Kindly sign in and refresh this page to load the content."
+msgstr ""
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "NOTE:"
+msgstr ""
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"The email used to sign into this platform and {platform} should be the same."
+msgstr ""
+
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
 msgstr "Modifica lingua preferita "
@@ -21710,8 +21661,8 @@ msgid "Studio Accessibility Policy"
 msgstr "Policy di Accessibilità Studio "
 
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
-msgid "Files & Uploads"
-msgstr "File e Caricamenti "
+msgid "Files"
+msgstr ""
 
 #: cms/templates/certificates.html
 msgid "Course Certificates"
@@ -23687,6 +23638,10 @@ msgstr "Corsi archiviati "
 #: cms/templates/index.html
 msgid "Libraries"
 msgstr "Librerie "
+
+#: cms/templates/index.html
+msgid "Taxonomies"
+msgstr ""
 
 #: cms/templates/index.html
 msgid "Are you staff on an existing {studio_name} course?"

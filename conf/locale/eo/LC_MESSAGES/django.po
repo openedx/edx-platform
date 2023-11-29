@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-22 20:35+0000\n"
-"PO-Revision-Date: 2023-10-22 20:35:52.246505\n"
+"POT-Creation-Date: 2023-11-26 20:36+0000\n"
+"PO-Revision-Date: 2023-11-26 20:36:15.034816\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -3872,6 +3872,7 @@ msgstr "{sign_in_link} ör {register_link}. Ⱡ'σяєм ιρѕυм ∂σłσя 
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
 #: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/lti_provider/user-auth-error.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Sign in"
 msgstr "Sïgn ïn Ⱡ'σяєм ιρѕυм #"
@@ -5629,6 +5630,22 @@ msgid ""
 msgstr ""
 "Thé lïst öf gröüp çönfïgürätïöns för pärtïtïönïng stüdénts ïn çöntént "
 "éxpérïménts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/djangoapps/lti_provider/models.py
+msgid ""
+"When checked, the LTI content will load only for learners who have an "
+"account in this instance. This is required only for linking learner accounts"
+" with the LTI consumer. See the Open edX LTI Provider documentation for more"
+" details."
+msgstr ""
+"Whén çhéçkéd, thé LTÌ çöntént wïll löäd önlý för léärnérs whö hävé än "
+"äççöünt ïn thïs ïnstänçé. Thïs ïs réqüïréd önlý för lïnkïng léärnér äççöünts"
+" wïth thé LTÌ çönsümér. Séé thé Öpén édX LTÌ Prövïdér döçüméntätïön för möré"
+" détäïls. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ "
+"єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм"
+" νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα "
+"¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт"
+" єѕѕє ¢ιłłυм ∂σłσя#"
 
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
@@ -13252,6 +13269,25 @@ msgstr ""
 "théïr änswérs änd réshüfflé séléçtéd ïtéms. Ⱡ'σяєм ιρѕυм ∂#"
 
 #: xmodule/library_content_block.py
+msgid "Source content library has not been specified."
+msgstr ""
+"Söürçé çöntént lïßrärý häs nöt ßéén spéçïfïéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α#"
+
+#: xmodule/library_content_block.py
+msgid "Content libraries are not available in the current runtime."
+msgstr ""
+"Çöntént lïßrärïés äré nöt äväïläßlé ïn thé çürrént rüntïmé. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: xmodule/library_content_block.py
+#, python-brace-format
+msgid "Source content library does not exist: {source_library_id}"
+msgstr ""
+"Söürçé çöntént lïßrärý döés nöt éxïst: {source_library_id} Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: xmodule/library_content_block.py
 msgid "This component is out of date. The library has new content."
 msgstr ""
 "Thïs çömpönént ïs öüt öf däté. Thé lïßrärý häs néw çöntént. Ⱡ'σяєм ιρѕυм "
@@ -13293,10 +13329,11 @@ msgid "Select a Library."
 msgstr "Séléçt ä Lïßrärý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: xmodule/library_content_block.py
-msgid "There are no matching problem types in the specified libraries."
+#, python-brace-format
+msgid "There are no problems in the specified library of type {capa_type}."
 msgstr ""
-"Théré äré nö mätçhïng prößlém týpés ïn thé spéçïfïéd lïßrärïés. Ⱡ'σяєм ιρѕυм"
-" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Théré äré nö prößléms ïn thé spéçïfïéd lïßrärý öf týpé {capa_type}. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: xmodule/library_content_block.py
 msgid "Select another problem type."
@@ -15911,14 +15948,6 @@ msgstr "Réqüïréménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 msgid "Details"
 msgstr "Détäïls Ⱡ'σяєм ιρѕυм #"
 
-#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
-#. Translators: this is a verb describing the action of viewing more details
-#: cms/templates/studio_xblock_wrapper.html
-#: lms/templates/wiki/includes/article_menu.html
-#: wiki/templates/wiki/includes/article_menu.html
-msgid "View"
-msgstr "Vïéw Ⱡ'σяєм ι#"
-
 #: cms/templates/maintenance/_announcement_edit.html
 #: lms/templates/problem.html lms/templates/word_cloud.html
 msgid "Save"
@@ -16413,12 +16442,12 @@ msgid "Welcome to {platform_name}"
 msgstr "Wélçömé tö {platform_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See https://open.edx.org for more information.
+#. untranslated. See https://openedx.org for more information.
 #: lms/templates/index_overlay.html
-msgid "It works! Powered by Open edX{registered_trademark}"
+msgid "It works! Powered by the Open edX{registered_trademark} Platform"
 msgstr ""
-"Ìt wörks! Pöwéréd ßý Öpén édX{registered_trademark} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тє#"
+"Ìt wörks! Pöwéréd ßý thé Öpén édX{registered_trademark} Plätförm Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -17161,6 +17190,10 @@ msgstr "Händöüts Ⱡ'σяєм ιρѕυм ∂#"
 #: lms/templates/video.html
 msgid "Download Handout"
 msgstr "Döwnlöäd Händöüt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/templates/video.html
+msgid "How is the transcript quality ?"
+msgstr "Höw ïs thé tränsçrïpt qüälïtý ? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/word_cloud.html
 msgid "{num} of {total}"
@@ -22813,6 +22846,31 @@ msgstr ""
 msgid "My Courses"
 msgstr "Mý Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "There was an error when loading this module!"
+msgstr ""
+"Théré wäs än érrör whén löädïng thïs mödülé! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"This module is available only for users who are signed into {platform}. "
+"Kindly sign in and refresh this page to load the content."
+msgstr ""
+"Thïs mödülé ïs äväïläßlé önlý för üsérs whö äré sïgnéd ïntö {platform}. "
+"Kïndlý sïgn ïn änd réfrésh thïs pägé tö löäd thé çöntént. Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "NOTE:"
+msgstr "NÖTÉ: Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"The email used to sign into this platform and {platform} should be the same."
+msgstr ""
+"Thé émäïl üséd tö sïgn ïntö thïs plätförm änd {platform} shöüld ßé thé sämé."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
 msgstr "Çhängé Préférréd Längüägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
@@ -23462,6 +23520,11 @@ msgstr "Göt ït! Ⱡ'σяєм ιρѕυм #"
 #: lms/templates/widgets/cookie-consent.html
 msgid "Learn more"
 msgstr "Léärn möré Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/templates/wiki/includes/article_menu.html
+#: wiki/templates/wiki/includes/article_menu.html
+msgid "View"
+msgstr "Vïéw Ⱡ'σяєм ι#"
 
 #: lms/templates/wiki/includes/article_menu.html
 msgid "{span_start}(active){span_end}"
@@ -24288,6 +24351,10 @@ msgstr "Vïéw Lïvé Vérsïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм
 msgid "Preview the courseware in the LMS"
 msgstr ""
 "Prévïéw thé çöürséwäré ïn thé LMS Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: cms/templates/container.html
+msgid "Collapse All"
+msgstr "Çölläpsé Àll Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: cms/templates/container.html
 msgid "Adding components"
@@ -27860,12 +27927,24 @@ msgstr ""
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłł#"
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Importing components"
+msgstr "Ìmpörtïng çömpönénts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
 msgstr "Éxpänd ör Çölläpsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Select this problem"
+msgstr "Séléçt thïs prößlém Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"
 msgstr "Çöpý tö Çlïpßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage tags"
+msgstr "Mänägé tägs Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"

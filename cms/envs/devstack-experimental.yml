@@ -31,6 +31,7 @@ AUTH_PASSWORD_VALIDATORS:
 -   NAME: common.djangoapps.util.password_policy_validators.MaximumLengthValidator
     OPTIONS:
         max_length: 75
+AUTHORING_API_URL: https://example.com
 AWS_ACCESS_KEY_ID: null
 AWS_QUERYSTRING_AUTH: false
 AWS_S3_CUSTOM_DOMAIN: SET-ME-PLEASE (ex. bucket-name.s3.amazonaws.com)

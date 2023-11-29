@@ -56,6 +56,9 @@ class VideoModelSerializer(serializers.Serializer):
     transcripts = serializers.ListField(
         child=serializers.CharField()
     )
+    usage_locations = serializers.ListField(
+        child=serializers.CharField()
+    )
 
 
 class VideoActiveTranscriptPreferencesSerializer(serializers.Serializer):
