@@ -293,8 +293,9 @@ django-filter==23.4
     #   edx-enterprise
     #   lti-consumer-xblock
     #   openedx-blockstore
-django-ipware==6.0.0
+django-ipware==5.0.2
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
     #   edx-proctoring
@@ -944,8 +945,6 @@ python-dateutil==2.8.2
     #   olxcleaner
     #   ora2
     #   xblock
-python-ipware==2.0.0
-    # via django-ipware
 python-memcached==1.59
     # via -r requirements/edx/paver.txt
 python-slugify==8.0.1
