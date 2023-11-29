@@ -2144,6 +2144,11 @@ def financial_assistance_form(request, course_id=None):
                 )
             },
             {
+                'name': 'certify-heading',
+                'label': _('I certify that: '),
+                'type': 'plaintext',
+            },
+            {
                 'placeholder': '',
                 'name': 'certify-economic-hardship',
                 'label': _(
