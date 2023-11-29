@@ -114,3 +114,6 @@ openedx-learning==0.3.5
 # existing custom parameter configurations unusable.
 # https://github.com/openedx/xblock-lti-consumer/issues/410 has been opened to track a fix
 lti-consumer-xblock==9.6.1
+
+# Open AI version 1.0.0 dropped support for openai.ChatCompletion which is currently in use in enterprise.
+openai<=0.28.1

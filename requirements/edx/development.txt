@@ -21,6 +21,7 @@ aiohttp==3.8.6
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   geoip2
+    #   openai
 aiosignal==1.3.1
     # via
     #   -r requirements/edx/doc.txt
@@ -50,16 +51,12 @@ aniso8601==9.0.1
     #   edx-tincan-py35
 annotated-types==0.6.0
     # via
-    #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   pydantic
 anyio==3.7.1
     # via
-    #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   fastapi
-    #   httpx
-    #   openai
     #   starlette
 appdirs==1.4.4
     # via
@@ -190,8 +187,6 @@ certifi==2023.7.22
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   elasticsearch
-    #   httpcore
-    #   httpx
     #   py2neo
     #   requests
     #   snowflake-connector-python
@@ -349,11 +344,6 @@ distlib==0.3.7
     # via
     #   -r requirements/edx/testing.txt
     #   virtualenv
-distro==1.8.0
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
-    #   openai
 django==3.2.23
     # via
     #   -c requirements/edx/../common_constraints.txt
@@ -900,7 +890,6 @@ event-tracking==2.2.0
     #   edx-search
 exceptiongroup==1.1.3
     # via
-    #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   anyio
     #   pytest
@@ -979,9 +968,7 @@ gunicorn==21.2.0
     #   -r requirements/edx/testing.txt
 h11==0.14.0
     # via
-    #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-    #   httpcore
     #   uvicorn
 help-tokens==2.3.0
     # via
@@ -992,18 +979,8 @@ html5lib==1.1
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   ora2
-httpcore==1.0.2
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
-    #   httpx
 httpretty==1.1.4
     # via -r requirements/edx/testing.txt
-httpx==0.25.1
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
-    #   openai
 icalendar==5.0.11
     # via
     #   -r requirements/edx/doc.txt
@@ -1013,7 +990,6 @@ idna==3.4
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   anyio
-    #   httpx
     #   optimizely-sdk
     #   requests
     #   snowflake-connector-python
@@ -1295,8 +1271,9 @@ olxcleaner==0.2.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openai==1.3.2
+openai==0.28.1
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
@@ -1491,13 +1468,10 @@ pycryptodomex==3.19.0
     #   pyjwkest
 pydantic==2.5.1
     # via
-    #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   fastapi
-    #   openai
 pydantic-core==2.14.3
     # via
-    #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   pydantic
 pydata-sphinx-theme==0.14.3
@@ -1767,6 +1741,7 @@ requests==2.31.0
     #   edx-rest-api-client
     #   geoip2
     #   mailsnake
+    #   openai
     #   optimizely-sdk
     #   pact-python
     #   pyjwkest
@@ -1889,10 +1864,8 @@ smmap==5.0.1
     #   gitdb
 sniffio==1.3.0
     # via
-    #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   anyio
-    #   httpx
 snowballstemmer==2.2.0
     # via
     #   -r requirements/edx/doc.txt
@@ -2092,7 +2065,6 @@ typing-extensions==4.8.0
     #   import-linter
     #   kombu
     #   mypy
-    #   openai
     #   pydantic
     #   pydantic-core
     #   pydata-sphinx-theme
