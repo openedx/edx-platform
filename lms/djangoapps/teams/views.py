@@ -922,6 +922,12 @@ class TeamsAssignmentsView(GenericAPIView):
         """ Get the URL for jumping to a designated XBlock in a course """
         return reverse('jump_to', kwargs={'course_id': str(course_id), 'location': str(location)})
 
+    def get_serializer_class(self, *args, **kwargs):
+        """
+        No-op passthrough function purely for fixing drf-yasg
+        """
+        return super().get_serializer_class(*args, **kwargs)
+
 
 class TopicListView(GenericAPIView):
     """
@@ -1063,6 +1069,12 @@ class TopicListView(GenericAPIView):
         response.data['sort_order'] = ordering
 
         return response
+
+    def get_serializer_class(self, *args, **kwargs):
+        """
+        No-op passthrough function purely for fixing drf-yasg
+        """
+        return super().get_serializer_class(*args, **kwargs)
 
 
 def _filter_hidden_private_teamsets(user, teamsets, course_block):
@@ -1713,3 +1725,9 @@ class MembershipBulkManagementView(GenericAPIView):
         if not course_block:
             raise Http404(f'Course not found: {course_id}')
         return course_block
+
+    def get_serializer_class(self, *args, **kwargs):
+        """
+        No-op passthrough function purely for fixing drf-yasg
+        """
+        return super().get_serializer_class(*args, **kwargs)
