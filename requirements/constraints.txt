@@ -87,9 +87,6 @@ urllib3<2.0.0
 # Issue to unpin Sphinx to resolve this constraint: https://github.com/openedx/edx-lint/issues/338
 docutils<0.20
 
-# greater version has dropped few dependencies. Fix this in other ticket.
-drf-yasg<1.21.6
-
 # Adding pin to avoid any major upgrade
 djangorestframework<3.15.0
 
