@@ -1,7 +1,7 @@
 <div class="form-field <%- type %>-<%- name %>">
     <% if ( type !== 'checkbox' && type !== 'plaintext') { %>
-        <label for="<%- form %>-<%- name %>">
-            <span class="label-text"><%- label %></span>
+        <label for="<%- form %>-<%- name %>" <%- name === 'course' ? 'hidden' : '' %>>
+            <span class="label-text" <%- name === 'course' ? 'hidden' : '' %>><%- label %></span>
             <% if ( required && type !== 'hidden' ) { %>
                 <span id="<%- form %>-<%- name %>-required-label"
                     class="label-required <% if ( !requiredStr ) { %>hidden<% } %>">
