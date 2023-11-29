@@ -10,7 +10,7 @@ from opaque_keys.edx.keys import CourseKey
 from common.djangoapps.student.tests.factories import AnonymousUserFactory, UserFactory
 from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.course_roles.helpers import (
+from openedx.core.djangoapps.course_roles.api import (
     user_has_permission_course_org,
     user_has_permission_list_course_org,
     user_has_permission_course,
