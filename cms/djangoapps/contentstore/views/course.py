@@ -622,13 +622,13 @@ def course_index(request, course_key):
     # A unit may not have a draft version, but one of its components could, and hence the unit itself has changes.
     with modulestore().bulk_operations(course_key):
         course_block = get_course_and_check_access(course_key, request.user, depth=None)
-        if not course_block:
-            raise Http404
-        if use_new_course_outline_page(course_key):
-            return redirect(get_course_outline_url(course_key))
+    if not course_block:
+        raise Http404
+    if use_new_course_outline_page(course_key):
+        return redirect(get_course_outline_url(course_key))
 
-        course_index_context = get_course_index_context(request, course_key, course_block)
-        return render_to_response('course_outline.html', course_index_context)
+    course_index_context = get_course_index_context(request, course_key, course_block)
+    return render_to_response('course_outline.html', course_index_context)
 
 
 @function_trace('get_courses_accessible_to_user')
