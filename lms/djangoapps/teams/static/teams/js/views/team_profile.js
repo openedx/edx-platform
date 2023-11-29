@@ -43,6 +43,7 @@
                     discussionTopicID = this.model.get('discussion_topic_id'),
                     isMember = TeamUtils.isUserMemberOfTeam(memberships, this.context.userInfo.username),
                     isAdminOrStaff = this.context.userInfo.privileged || this.context.userInfo.staff,
+                    isInstructorManagedTopic = TeamUtils.isInstructorManagedTopic(this.topic.attributes.type),
                     canJoinTeam = TeamUtils.canJoinTeam(this.context.userInfo, this.topic.attributes.type),
                     maxTeamSize = this.topic.getMaxTeamSize(this.context.courseMaxTeamSize);
 
@@ -50,7 +51,7 @@
                 // so we can treat it like a toggle
                 var showAssignments = !!this.context.teamsAssignmentsUrl;
 
-                var showLeaveLink = isMember && (isAdminOrStaff || canJoinTeam);
+                var showLeaveLink = isMember && (isAdminOrStaff || !isInstructorManagedTopic || canJoinTeam);
 
                 HtmlUtils.setHtml(
                     this.$el,
