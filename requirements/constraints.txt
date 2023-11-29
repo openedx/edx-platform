@@ -68,11 +68,9 @@ cryptography==38.0.4 # greater version has some issues with openssl.
 
 pylint<2.16.0 # greater version failing quality test. Fix them in seperate ticket.
 
-
 # Deprecated version of the AWS SDK;
 # we should stop using this
 boto==2.39.0
-
 
 # adding these constraints to minimize boto3 and botocore changeset
 social-auth-core==4.3.0
@@ -86,9 +84,6 @@ urllib3<2.0.0
 # Sphinx==5.3.0 requires docutils<0.20
 # Issue to unpin Sphinx to resolve this constraint: https://github.com/openedx/edx-lint/issues/338
 docutils<0.20
-
-# greater version has dropped few dependencies. Fix this in other ticket.
-drf-yasg<1.21.6
 
 # Adding pin to avoid any major upgrade
 djangorestframework<3.15.0
