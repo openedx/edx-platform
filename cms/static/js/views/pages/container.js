@@ -638,8 +638,8 @@ function($, _, Backbone, gettext, BasePage,
             $.getJSON(
                 ModuleUtils.getUpdateUrl(locator) + '/handler/get_block_ids',
                 function(data) {
-                    self.selectedLibraryComponents = Array.from(data.source_block_ids);
-                    self.storedSelectedLibraryComponents = Array.from(data.source_block_ids);
+                    self.selectedLibraryComponents = Array.from(data.candidates);
+                    self.storedSelectedLibraryComponents = Array.from(data.candidates);
                 }
             );
         },

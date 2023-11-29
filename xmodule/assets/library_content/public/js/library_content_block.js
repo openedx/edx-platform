@@ -15,7 +15,7 @@ window.LibraryContentBlockPickerView = function(runtime, element) {
         var url = $(e.target).data('submit-url');
         var data = {
             values: {
-                source_block_ids: self.sourceBlockIds
+                candidates: self.sourceBlockIds
             },
             defaults: ['display_name']
         };
