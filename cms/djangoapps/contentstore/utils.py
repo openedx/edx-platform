@@ -1693,7 +1693,7 @@ def get_course_videos_context(course_block, pagination_conf, course_key=None):
     return course_video_context
 
 
-def get_course_index_context(request, course_key, course_block):
+def get_course_index_context(request, course_key, course_block=None):
     """
     Utils is used to get context of course index outline.
     It is used for both DRF and django views.
@@ -1705,6 +1705,10 @@ def get_course_index_context(request, course_key, course_block):
         _deprecated_blocks_info,
     )
     from openedx.core.djangoapps.content_staging import api as content_staging_api
+
+    if not course_block:
+        with modulestore().bulk_operations(course_key):
+            course_block = modulestore().get_course(course_key)
 
     lms_link = get_lms_link_for_item(course_block.location)
     reindex_link = None

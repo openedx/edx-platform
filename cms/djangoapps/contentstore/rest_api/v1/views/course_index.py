@@ -11,7 +11,6 @@ from cms.djangoapps.contentstore.rest_api.v1.serializers import CourseIndexSeria
 from cms.djangoapps.contentstore.utils import get_course_index_context
 from common.djangoapps.student.auth import has_studio_read_access
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, verify_course_exists, view_auth_classes
-from xmodule.modulestore.django import modulestore
 
 
 @view_auth_classes(is_authenticated=True)
@@ -89,15 +88,11 @@ class CourseIndexView(DeveloperErrorViewMixin, APIView):
         course_key = CourseKey.from_string(course_id)
         if not has_studio_read_access(request.user, course_key):
             self.permission_denied(request)
+        course_index_context = get_course_index_context(request, course_key)
+        course_index_context.update({
+            "discussions_incontext_learnmore_url": settings.DISCUSSIONS_INCONTEXT_LEARNMORE_URL,
+            "discussions_incontext_feedback_url": settings.DISCUSSIONS_INCONTEXT_FEEDBACK_URL,
+        })
 
-        with modulestore().bulk_operations(course_key):
-            course_block = modulestore().get_course(course_key)
-
-            course_index_context = get_course_index_context(request, course_key, course_block)
-            course_index_context.update({
-                "discussions_incontext_learnmore_url": settings.DISCUSSIONS_INCONTEXT_LEARNMORE_URL,
-                "discussions_incontext_feedback_url": settings.DISCUSSIONS_INCONTEXT_FEEDBACK_URL,
-            })
-
-            serializer = CourseIndexSerializer(course_index_context)
-            return Response(serializer.data)
+        serializer = CourseIndexSerializer(course_index_context)
+        return Response(serializer.data)
