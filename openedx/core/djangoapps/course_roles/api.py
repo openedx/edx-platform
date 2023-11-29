@@ -1,7 +1,7 @@
 """
 Helpers for the course roles app.
 """
-from typing import Union, List
+from __future__ import annotations
 
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db.models import Q
@@ -10,7 +10,7 @@ from opaque_keys.edx.keys import CourseKey
 from edx_toggles.toggles import WaffleFlag
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_roles.models import UserRole
-from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.core.lib.cache_utils import request_cached
 
 
@@ -35,10 +35,10 @@ def use_permission_checks():
 
 @request_cached()
 def user_has_permission_course(
-        user: Union[User, AnonymousUser],
-        permission: Union[CourseRolesPermission, str],
+        user: User | AnonymousUser,
+        permission: CourseRolesPermission,
         course_key: CourseKey
-):
+) -> bool:
     """
     Check if a user has a permission in a course.
     """
@@ -46,21 +46,19 @@ def user_has_permission_course(
         return False
     elif isinstance(user, AnonymousUser):
         return False
-    if isinstance(permission, CourseRolesPermission):
-        permission = permission.value.name
     return UserRole.objects.filter(
         user=user,
-        role__permissions__name=permission,
+        role__permissions__name=permission.value.name,
         course=course_key,
     ).exists()
 
 
 @request_cached()
 def user_has_permission_list_course(
-        user: Union[User, AnonymousUser],
-        permissions: List[Union[CourseRolesPermission, str]],
+        user: User | AnonymousUser,
+        permissions: list[CourseRolesPermission],
         course_key: CourseKey
-):
+) -> bool:
     """
     Check if a user has all of the given permissions in a course.
     """
@@ -71,10 +69,10 @@ def user_has_permission_list_course(
 
 @request_cached()
 def user_has_permission_list_any_course(
-        user: Union[User, AnonymousUser],
-        permissions: List[Union[CourseRolesPermission, str]],
+        user: User | AnonymousUser,
+        permissions: list[CourseRolesPermission],
         course_key: CourseKey
-):
+) -> bool:
     """
     Check if a user has ANY of the given permissions in a course.
     """
@@ -83,10 +81,10 @@ def user_has_permission_list_any_course(
 
 @request_cached()
 def user_has_permission_org(
-        user: Union[User, AnonymousUser],
-        permission: Union[CourseRolesPermission, str],
+        user: User | AnonymousUser,
+        permission: CourseRolesPermission,
         organization_name: str
-):
+) -> bool:
     """
     Check if a user has a permission for all courses in an organization.
     """
@@ -94,11 +92,9 @@ def user_has_permission_org(
         return False
     elif isinstance(user, AnonymousUser):
         return False
-    if isinstance(permission, CourseRolesPermission):
-        permission = permission.value.name
     return UserRole.objects.filter(
         user=user,
-        role__permissions__name=permission,
+        role__permissions__name=permission.value.name,
         course__isnull=True,
         org__name=organization_name,
     ).exists()
@@ -106,10 +102,10 @@ def user_has_permission_org(
 
 @request_cached()
 def user_has_permission_list_org(
-        user: Union[User, AnonymousUser],
-        permissions: List[Union[CourseRolesPermission, str]],
+        user: User | AnonymousUser,
+        permissions: list[CourseRolesPermission],
         organization_name: str
-):
+) -> bool:
     """
     Check if a user has ALL of the given permissions for all courses in an organization.
     """
@@ -122,10 +118,10 @@ def user_has_permission_list_org(
 
 @request_cached()
 def user_has_permission_course_org(
-        user: Union[User, AnonymousUser],
-        permission: Union[CourseRolesPermission, str],
+        user: User | AnonymousUser,
+        permission: CourseRolesPermission,
         course_key: CourseKey
-):
+) -> bool:
     """
     Check if a user has a permission for all courses in an organization or for a specific course.
     """
@@ -133,8 +129,6 @@ def user_has_permission_course_org(
         return False
     elif isinstance(user, AnonymousUser):
         return False
-    if isinstance(permission, CourseRolesPermission):
-        permission = permission.value.name
     return (user_has_permission_course(user, permission, course_key) or
             user_has_permission_org(user, permission, course_key.org)
             )
@@ -142,10 +136,10 @@ def user_has_permission_course_org(
 
 @request_cached()
 def user_has_permission_list_course_org(
-        user: Union[User, AnonymousUser],
-        permissions: List[Union[CourseRolesPermission, str]],
+        user: User | AnonymousUser,
+        permissions: list[CourseRolesPermission],
         course_key: CourseKey
-):
+) -> bool:
     """
     Check if a user has all of the given permissions for all courses in an organization or for a specific course.
     """
@@ -158,7 +152,7 @@ def user_has_permission_list_course_org(
 
 
 @request_cached()
-def get_all_user_permissions_for_a_course(user_id: int, course_key: CourseKey):
+def get_all_user_permissions_for_a_course(user_id: int, course_key: CourseKey) -> set[str]:
     """
     Get all of a user's permissions for a course,
     including, if applicable, organization-wide permissions

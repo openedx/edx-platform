@@ -1,20 +1,20 @@
 """
 Permissions for course roles app.
 """
+from attrs import frozen, field, validators
 from enum import Enum, unique
 
 from django.utils.translation import gettext as _
 
 
+@frozen
 class PermissionData:
     """
     Data class for a permission.
     """
-
-    def __init__(self, name, readable_name, description):
-        self.name = name
-        self.readable_name = readable_name
-        self.description = description
+    name: str = field(validator=validators.instance_of(str))
+    readable_name: str = field(validator=validators.instance_of(str))
+    description: str = field(validator=validators.instance_of(str))
 
 
 @unique
