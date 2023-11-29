@@ -605,6 +605,7 @@ LEARNING_MICROFRONTEND_URL = "http://learning-mfe"
 DISCUSSIONS_MICROFRONTEND_URL = "http://discussions-mfe"
 LEARNER_HOME_MICROFRONTEND_URL = "http://learner-home-mfe"
 ORA_GRADING_MICROFRONTEND_URL = "http://ora-grading-mfe"
+ORA_MICROFRONTEND_URL = "http://ora-mfe"
 
 ########################## limiting dashboard courses ######################
 

@@ -5,6 +5,7 @@ Common utility methods for Mobile APIs.
 API_V05 = 'v0.5'
 API_V1 = 'v1'
 API_V2 = 'v2'
+API_V3 = 'v3'
 
 
 def parsed_version(version):
