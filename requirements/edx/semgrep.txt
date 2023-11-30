@@ -60,7 +60,7 @@ pkgutil-resolve-name==1.3.10
     # via jsonschema
 pygments==2.17.2
     # via rich
-referencing==0.31.0
+referencing==0.31.1
     # via
     #   jsonschema
     #   jsonschema-specifications
@@ -68,7 +68,7 @@ requests==2.31.0
     # via semgrep
 rich==13.7.0
     # via semgrep
-rpds-py==0.13.1
+rpds-py==0.13.2
     # via
     #   jsonschema
     #   referencing
