@@ -142,7 +142,7 @@ class AuthoringMixin(XBlockMixin):
 
     def studio_post_duplicate(
         self,
-        source_item,
+        source_block,
         store,
         user,
         shallow: bool,
@@ -154,11 +154,11 @@ class AuthoringMixin(XBlockMixin):
 
         By default, implements standard duplication logic.
         """
-        if not source_item.has_children or shallow:
+        if not source_block.has_children or shallow:
             return
 
         self.children = self.children or []
-        for child in source_item.children:
+        for child in source_block.children:
             child_block = store.get_item(child)
             dupe = child_block.studio_duplicate(self.location, child, user=user, store=store, is_child=True)
             if dupe not in self.children:  # studio_duplicate may add the child for us.

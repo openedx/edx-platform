@@ -589,7 +589,7 @@ class LibraryContentBlock(
 
     def studio_post_duplicate(
         self,
-        source_item,
+        source_block,
         *_args,
         **__kwargs,
     ) -> None:
@@ -600,7 +600,7 @@ class LibraryContentBlock(
         Otherwise we'll end up losing data on the next refresh.
         """
         self._validate_sync_permissions()
-        self.get_tools(to_read_library_content=True).trigger_duplication(source_block=source_item, dest_block=self)
+        self.get_tools(to_read_library_content=True).trigger_duplication(source_block=source_block, dest_block=self)
 
     def _validate_library_version(self, validation, lib_tools, version, library_key):
         """
