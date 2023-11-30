@@ -7,6 +7,9 @@
 // }
 
 // better text rendering/kerning through SVG
+.none{
+  display: none !important;
+}
 * {
   text-rendering: optimizeLegibility;
 }

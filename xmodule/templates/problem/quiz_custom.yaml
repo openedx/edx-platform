@@ -1,0 +1,128 @@
+---
+metadata:
+    display_name: Quiz 
+    markdown: |
+      
+     
+      >> quest 1 <<
+
+      [x] a correct answer {{ selected: You can specify optional feedback that appears after the learner selects and submits this answer. }, { unselected: You can specify optional feedback that appears after the learner clears and submits this answer.}}
+      [ ] an incorrect answer
+      [ ] an incorrect answer {{ selected: You can specify optional feedback for none, all, or a subset of the answers. }, { unselected: You can specify optional feedback for selected answers, cleared answers, or both.}}
+      [x] a correct answer
+
+
+      {{ ((A B D)) You can specify optional feedback for a combination of answers which appears after the specified set of answers is submitted. }}
+      {{ ((A B C D)) You can specify optional feedback for one, several, or all answer combinations. }}
+
+      || hint 1.1 ||
+      || hint 1.2 ||
+
+      
+      >> quest 2 <<
+
+      [x] a correct answer {{ selected: You can specify optional feedback that appears after the learner selects and submits this answer. }, { unselected: You can specify optional feedback that appears after the learner clears and submits this answer.}}
+      [ ] an incorrect answer
+      [ ] an incorrect answer {{ selected: You can specify optional feedback for none, all, or a subset of the answers. }, { unselected: You can specify optional feedback for selected answers, cleared answers, or both.}}
+      [x] a correct answer
+
+
+      {{ ((A B D)) You can specify optional feedback for a combination of answers which appears after the specified set of answers is submitted. }}
+      {{ ((A B C D)) You can specify optional feedback for one, several, or all answer combinations. }}
+
+      || hint 2.1 ||
+      || hint 2.2 ||
+
+      
+      >> quest 3 <<
+
+      [x] a correct answer {{ selected: You can specify optional feedback that appears after the learner selects and submits this answer. }, { unselected: You can specify optional feedback that appears after the learner clears and submits this answer.}}
+      [ ] an incorrect answer
+      [ ] an incorrect answer {{ selected: You can specify optional feedback for none, all, or a subset of the answers. }, { unselected: You can specify optional feedback for selected answers, cleared answers, or both.}}
+      [x] a correct answer
+
+
+      {{ ((A B D)) You can specify optional feedback for a combination of answers which appears after the specified set of answers is submitted. }}
+      {{ ((A B C D)) You can specify optional feedback for one, several, or all answer combinations. }}
+
+      || hint 3.1 ||
+      || hint 3.2 ||
+
+      >> quest 3 <<
+
+      (x) Yes
+      ( ) No
+      ( ) No
+      ( ) No
+
+
+      || hint 3.1 ||
+      || hint 3.2 ||
+
+hinted: true
+data:   |
+        <div>
+            <div id='qz-1'>
+                <problem>
+               
+                    <choiceresponse>
+                        <p>quiz 1</p>
+                        <label>content</label>
+                        <checkboxgroup>
+                            <choice correct="true">a correct answer
+                                <choicehint selected="true">You can specify optional feedback that appears after the learner selects and submits this answer.</choicehint>
+                                <choicehint selected="false">You can specify optional feedback that appears after the learner clears and submits this answer.</choicehint>
+                            </choice>
+                            <choice correct="false">an incorrect answer
+                            </choice>
+                            <choice correct="false">an incorrect answer
+                                <choicehint selected="true">You can specify optional feedback for none, all, or a subset of the answers.</choicehint>
+                                <choicehint selected="false">You can specify optional feedback for selected answers, cleared answers, or both.</choicehint>
+                            </choice>
+                            <choice correct="true">a correct answer
+                            </choice>
+                            <compoundhint value="A B D">You can specify optional feedback for a combination of answers which appears after the specified set of answers is submitted.</compoundhint>
+                            <compoundhint value="A B C D">You can specify optional feedback for one, several, or all answer combinations.</compoundhint>
+                        </checkboxgroup>
+                    </choiceresponse>
+                    <demandhint>
+                        <hint>Hint 1.1</hint>
+                        <hint>hint 1.2 </hint>
+                    </demandhint>
+                        
+                </problem>
+    
+             </div>
+
+             <div id='qz-2'>
+                <problem>
+               
+                    <choiceresponse>
+                        <p>quiz 2</p>
+                        <label>content</label>
+                        <checkboxgroup>
+                            <choice correct="true">a correct answer
+                                <choicehint selected="true">You can specify optional feedback that appears after the learner selects and submits this answer.</choicehint>
+                                <choicehint selected="false">You can specify optional feedback that appears after the learner clears and submits this answer.</choicehint>
+                            </choice>
+                            <choice correct="false">an incorrect answer
+                            </choice>
+                            <choice correct="false">an incorrect answer
+                                <choicehint selected="true">You can specify optional feedback for none, all, or a subset of the answers.</choicehint>
+                                <choicehint selected="false">You can specify optional feedback for selected answers, cleared answers, or both.</choicehint>
+                            </choice>
+                            <choice correct="true">a correct answer
+                            </choice>
+                            <compoundhint value="A B D">You can specify optional feedback for a combination of answers which appears after the specified set of answers is submitted.</compoundhint>
+                            <compoundhint value="A B C D">You can specify optional feedback for one, several, or all answer combinations.</compoundhint>
+                        </checkboxgroup>
+                    </choiceresponse>
+                    <demandhint>
+                        <hint>Hint 2.1</hint>
+                        <hint>hint 2.2 </hint>
+                    </demandhint>
+                        
+                </problem>
+    
+             </div>
+        </div>

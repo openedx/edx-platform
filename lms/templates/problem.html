@@ -27,9 +27,15 @@ from openedx.core.djangolib.markup import HTML
     % endif
 
     <div class="problem-action-buttons-wrapper">
+      
       % if demand_hint_possible:
       <span class="problem-action-button-wrapper">
           <button type="button" class="hint-button problem-action-btn btn-link btn-small" data-value="${_('Hint')}" ${'' if should_enable_next_hint else 'disabled'}>${_('Hint')}</button>
+      </span>
+      <span>
+        <button class='btn-prev'> prev </button>
+
+        <button class='btn-submit-qz'> Submit </button>
       </span>
       % endif
       % if save_button:
@@ -162,3 +168,7 @@ from openedx.core.djangolib.markup import HTML
         parent.postMessage(message, '*');
     }
 </script>
+
+
+<div>
+
