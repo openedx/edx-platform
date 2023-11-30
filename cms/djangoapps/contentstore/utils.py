@@ -6,8 +6,7 @@ import configparser
 import logging
 from collections import defaultdict
 from contextlib import contextmanager
-from datetime import datetime, timezone
-from uuid import uuid4
+from datetime import datetime
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -18,8 +17,6 @@ from help_tokens.core import HelpUrlExpert
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocator
-from openedx_events.content_authoring.data import DuplicatedXBlockData
-from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from milestones import api as milestones_api
 from pytz import UTC
 from xblock.fields import Scope
@@ -1026,63 +1023,21 @@ def duplicate_block(
     Duplicate an existing xblock as a child of the supplied parent_usage_key. You can
     optionally specify what usage key the new duplicate block will use via dest_usage_key.
 
-    If shallow is True, does not copy children. Otherwise, this function calls itself
-    recursively, and will set the is_child flag to True when dealing with recursed child
-    blocks.
+    If shallow is True, does not copy children.
     """
     store = modulestore()
     with store.bulk_operations(duplicate_source_usage_key.course_key):
         source_item = store.get_item(duplicate_source_usage_key)
-        if not dest_usage_key:
-            # Change the blockID to be unique.
-            dest_usage_key = source_item.location.replace(name=uuid4().hex)
-
-        category = dest_usage_key.block_type
-
-        duplicate_metadata, asides_to_create = gather_block_attributes(
-            source_item, display_name=display_name, is_child=is_child,
+        return source_item.studio_duplicate(
+            parent_usage_key=parent_usage_key,
+            duplicate_source_usage_key=duplicate_source_usage_key,
+            user=user,
+            store=store,
+            dest_usage_key=dest_usage_key,
+            display_name=display_name,
+            shallow=shallow,
+            is_child=is_child,
         )
-
-        dest_block = store.create_item(
-            user.id,
-            dest_usage_key.course_key,
-            dest_usage_key.block_type,
-            block_id=dest_usage_key.block_id,
-            definition_data=source_item.get_explicitly_set_fields_by_scope(Scope.content),
-            metadata=duplicate_metadata,
-            runtime=source_item.runtime,
-            asides=asides_to_create
-        )
-
-        # Allow an XBlock to do anything fancy it may need to when duplicated from another block.
-        load_services_for_studio(source_item.runtime, user)
-        dest_block.studio_post_duplicate(
-            source_item, store, user, duplication_function=duplicate_block, shallow=shallow
-        )
-
-        # pylint: disable=protected-access
-        if 'detached' not in source_item.runtime.load_block_type(category)._class_tags:
-            parent = store.get_item(parent_usage_key)
-            # If source was already a child of the parent, add duplicate immediately afterward.
-            # Otherwise, add child to end.
-            if source_item.location in parent.children:
-                source_index = parent.children.index(source_item.location)
-                parent.children.insert(source_index + 1, dest_block.location)
-            else:
-                parent.children.append(dest_block.location)
-            store.update_item(parent, user.id)
-
-        # .. event_implemented_name: XBLOCK_DUPLICATED
-        XBLOCK_DUPLICATED.send_event(
-            time=datetime.now(timezone.utc),
-            xblock_info=DuplicatedXBlockData(
-                usage_key=dest_block.location,
-                block_type=dest_block.location.block_type,
-                source_usage_key=duplicate_source_usage_key,
-            )
-        )
-
-        return dest_block.location
 
 
 def update_from_source(*, source_block, destination_block, user_id):

@@ -10,7 +10,6 @@ Along with it, we moved the business logic of the other views in that file, sinc
 """
 import logging
 from datetime import datetime
-from uuid import uuid4
 
 from attrs import asdict
 from django.conf import settings
@@ -18,11 +17,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseBadRequest
-from django.utils.timezone import timezone
 from django.utils.translation import gettext as _
 from edx_django_utils.plugins import pluggable_override
-from openedx_events.content_authoring.data import DuplicatedXBlockData
-from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from openedx_tagging.core.tagging import api as tagging_api
 from edx_proctoring.api import (
     does_backend_support_onboarding,
@@ -755,93 +751,14 @@ def _duplicate_block(
     store = modulestore()
     with store.bulk_operations(duplicate_source_usage_key.course_key):
         source_item = store.get_item(duplicate_source_usage_key)
-        # Change the blockID to be unique.
-        dest_usage_key = source_item.location.replace(name=uuid4().hex)
-        category = dest_usage_key.block_type
-
-        # Update the display name to indicate this is a duplicate (unless display name provided).
-        # Can't use own_metadata(), b/c it converts data for JSON serialization -
-        # not suitable for setting metadata of the new block
-        duplicate_metadata = {}
-        for field in source_item.fields.values():
-            if field.scope == Scope.settings and field.is_set_on(source_item):
-                duplicate_metadata[field.name] = field.read_from(source_item)
-
-        if is_child:
-            display_name = (
-                display_name or source_item.display_name or source_item.category
-            )
-
-        if display_name is not None:
-            duplicate_metadata["display_name"] = display_name
-        else:
-            if source_item.display_name is None:
-                duplicate_metadata["display_name"] = _("Duplicate of {0}").format(
-                    source_item.category
-                )
-            else:
-                duplicate_metadata["display_name"] = _("Duplicate of '{0}'").format(
-                    source_item.display_name
-                )
-
-        asides_to_create = []
-        for aside in source_item.runtime.get_asides(source_item):
-            for field in aside.fields.values():
-                if field.scope in (
-                    Scope.settings,
-                    Scope.content,
-                ) and field.is_set_on(aside):
-                    asides_to_create.append(aside)
-                    break
-
-        for aside in asides_to_create:
-            for field in aside.fields.values():
-                if field.scope not in (
-                    Scope.settings,
-                    Scope.content,
-                ):
-                    field.delete_from(aside)
-
-        dest_block = store.create_item(
-            user.id,
-            dest_usage_key.course_key,
-            dest_usage_key.block_type,
-            block_id=dest_usage_key.block_id,
-            definition_data=source_item.get_explicitly_set_fields_by_scope(
-                Scope.content
-            ),
-            metadata=duplicate_metadata,
-            runtime=source_item.runtime,
-            asides=asides_to_create,
+        return source_item.studio_duplicate(
+            parent_usage_key=parent_usage_key,
+            duplicate_source_usage_key=duplicate_source_usage_key,
+            user=user,
+            store=store,
+            display_name=display_name,
+            is_child=is_child,
         )
-
-        # Allow an XBlock to do anything fancy it may need to when duplicated from another block.
-        load_services_for_studio(source_item.runtime, user)
-        dest_block.studio_post_duplicate(source_item, store, user, duplication_function=_duplicate_block, shallow=False)
-
-        # pylint: disable=protected-access
-        if "detached" not in source_item.runtime.load_block_type(category)._class_tags:
-            parent = store.get_item(parent_usage_key)
-            # If source was already a child of the parent, add duplicate immediately afterward.
-            # Otherwise, add child to end.
-            if source_item.location in parent.children:
-                source_index = parent.children.index(source_item.location)
-                parent.children.insert(source_index + 1, dest_block.location)
-            else:
-                parent.children.append(dest_block.location)
-            store.update_item(parent, user.id)
-
-        # .. event_implemented_name: XBLOCK_DUPLICATED
-        XBLOCK_DUPLICATED.send_event(
-            time=datetime.now(timezone.utc),
-            xblock_info=DuplicatedXBlockData(
-                usage_key=dest_block.location,
-                block_type=dest_block.location.block_type,
-                source_usage_key=duplicate_source_usage_key,
-            ),
-        )
-
-        return dest_block.location
 
 
 @login_required
