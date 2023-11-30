@@ -237,12 +237,17 @@ def get_video_usage_path(course_key, edx_video_id):
     for video in videos:
         video_id = getattr(video, 'edx_video_id', '')
         if video_id == edx_video_id:
+            usage_dict = {'display_location': '', 'url': ''}
+            video_location = str(video.location)
             unit = video.get_parent()
+            unit_location = str(video.parent)
+            unit_display_name = getattr(unit, 'display_name', '')
             subsection = unit.get_parent()
             subsection_display_name = getattr(subsection, 'display_name', '')
-            unit_display_name = getattr(unit, 'display_name', '')
             xblock_display_name = getattr(video, 'display_name', '')
-            usage_locations.append(f'{subsection_display_name} - {unit_display_name} / {xblock_display_name}')
+            usage_dict['display_location'] = f'{subsection_display_name} - {unit_display_name} / {xblock_display_name}'
+            usage_dict['url'] = f'/container/{unit_location}#{video_location}'
+            usage_locations.append(usage_dict)
     return {'usage_locations': usage_locations}
 
 
