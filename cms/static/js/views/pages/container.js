@@ -175,6 +175,17 @@ function($, _, Backbone, gettext, BasePage,
                     if (!self.isLibraryPage && !self.isLibraryContentPage) {
                         self.initializePasteButton();
                     }
+
+                    var targetId = window.location.hash.slice(1);
+                    if (targetId) {
+                        var target = document.getElementById(targetId);
+                        var targetOffset = target.offsetTop;
+                        window.scrollTo({
+                            top: targetOffset,
+                            left: 0,
+                            behavior: 'smooth',
+                        });
+                    }
                 },
                 block_added: options && options.block_added
             });
