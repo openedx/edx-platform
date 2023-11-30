@@ -9,6 +9,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
+from cms.djangoapps.contentstore.utils import load_services_for_studio
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
@@ -28,7 +29,6 @@ from openedx.core.lib.xblock_utils import (
 from xmodule.modulestore.django import (
     modulestore,
 )
-from xmodule.services import load_services_for_studio  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 from xmodule.x_module import (

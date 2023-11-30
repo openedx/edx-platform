@@ -77,17 +77,10 @@ class StudioEditableBlock(XBlockMixin):
         """
         Called when a the block is duplicated. Can be used, e.g., for special handling of child duplication.
 
-        Returns 'True' if children have been handled and thus shouldn't be handled by the standard
-        duplication logic.
+        Children must always be handled. In case of inheritance it can be done by running this method with super().
 
         By default, implements standard duplication logic.
         """
-        self.handle_children_duplication(source_item, store, user, duplication_function, shallow)
-        return True
-
-    def handle_children_duplication(
-        self, source_item, store, user, duplication_function: Callable[..., None], shallow: bool
-    ):
         handle_children_duplication(self, source_item, store, user, duplication_function, shallow)
 
 

@@ -59,7 +59,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
-from xmodule.services import load_services_for_studio
 from xmodule.tabs import CourseTabList
 from xmodule.util.duplicate import handle_children_duplication
 
@@ -74,6 +73,7 @@ from ..utils import (
     is_currently_visible_to_students,
     is_self_paced,
     get_taxonomy_tags_widget_url,
+    load_services_for_studio,
 )
 
 from .create_xblock import create_xblock
