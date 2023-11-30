@@ -213,7 +213,7 @@ class LibraryContentBlock(
             valid_children = []
             for candidate in candidates:
                 for child in library_children:
-                    if child._to_string() == candidate[9:]: # pylint: disable=protected-access
+                    if child._to_string() == candidate[9:]:  # pylint: disable=protected-access
                         valid_children.append((child.block_type, child.block_id))
             return set(valid_children)
         return {(child.block_type, child.block_id) for child in library_children}
