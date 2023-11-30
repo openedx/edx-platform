@@ -1,6 +1,7 @@
 """
 Views for the course roles API.
 """
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from rest_framework.exceptions import ParseError, NotFound
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -34,10 +35,10 @@ class UserPermissionsView(APIView):
         - 400: If the user_id or course_id parameters are missing or are invalid.
         - 404: If the user or course does not exist.
         """
-        user_id = self.request.query_params.get('user_id', None)
+        user_id = self.request.query_params.get('user_id')
         if user_id is None:
             raise ParseError('Required user_id parameter is missing')
-        course_id = self.request.query_params.get('course_id', None)
+        course_id = self.request.query_params.get('course_id')
         if course_id is None:
             raise ParseError('Required course_id parameter is missing')
         try:
@@ -45,8 +46,13 @@ class UserPermissionsView(APIView):
         except InvalidKeyError as exc:
             raise ParseError('Invalid course_id parameter') from exc
         try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist as exc:
+            raise NotFound(str(exc)) from exc
+        try:
+            permissions_set = get_all_user_permissions_for_a_course(user, course_key)
             permissions = {
-                'permissions': get_all_user_permissions_for_a_course(user_id, course_key),
+                'permissions': {permission.value.name for permission in permissions_set},
             }
         except ValueError as exc:
             raise NotFound(str(exc)) from exc
