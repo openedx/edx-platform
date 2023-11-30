@@ -66,60 +66,27 @@ from openedx.core.djangolib.markup import HTML, Text
             });
 
             xblockView.xblockReady = function() {
-                var currentAction = "new_unit";
-                var actionIcons = {
-                    'new_unit': 'fa fa-plus',
-                    'paste_unit': 'fa fa-clipboard'
-                };
-                var actionLabels = {
-                    'new_unit': gettext('New Unit'),
-                    'paste_unit': gettext('Paste Unit')
-                };
 
-                var updateButtonAndCheckmarks = function(selectedAction) {
-                    var iconName = actionIcons[selectedAction];
-                    var buttonIconSpan = $('.dropdown-main-button .icon');
-
-                    // Update the button icon
-                    buttonIconSpan.removeClass('fa-plus fa-clipboard').addClass(iconName);
-
-                    $('.dropdown-options a').each(function() {
-                        $(this).find('.checkmark').remove();
-                        if ($(this).data('action') === selectedAction) {
-                            $(this).append('<span class="checkmark fa fa-check"></span>');
-                        }
-                    });
-                };
-
-                var resetToDefaultAction = function() {
-                    // Set the current action to "new unit"
-                    currentAction = 'new_unit';
-
-                    // Update the button label and icon to "new unit"
-                    var defaultLabel = actionLabels[currentAction];
-                    var defaultIconName = actionIcons[currentAction];
-                    $('.dropdown-main-button .button-label').text(defaultLabel);
-                    $('.dropdown-main-button .icon').removeClass('fa-plus fa-clipboard').addClass(defaultIconName);
-
-                    // Ensure that the checkmarks are updated to reflect the default state
-                    updateButtonAndCheckmarks(currentAction);
-
-                    // Hide the "Paste as new unit" option
-                    $('.seq_paste_unit').closest('li').hide();
-                };
-
-                this.clipboardBroadcastChannel = new BroadcastChannel("studio_clipboard_channel");
-                this.clipboardBroadcastChannel.onmessage = (event) => {
-                    if (!event.data.source_usage_key?.includes("vertical")) {
-                        resetToDefaultAction();
+                var toggleCaretButton = function(clipboardData) {
+                    if (clipboardData && clipboardData.content && clipboardData.source_usage_key.includes("vertical")) {
+                        $('.dropdown-toggle-button').show();
                     } else {
-                        $('.seq_paste_unit').closest('li').show();
+                        $('.dropdown-toggle-button').hide();
+                        $('.dropdown-options').hide();
                     }
                 };
+                this.clipboardBroadcastChannel = new BroadcastChannel("studio_clipboard_channel");
+                this.clipboardBroadcastChannel.onmessage = (event) => {
+                    toggleCaretButton(event.data);
+                };
+                toggleCaretButton(this.options.clipboardData);
 
-                if (!this.options.clipboardData.content || !this.options.clipboardData.source_usage_key?.includes("vertical")) {
-                    resetToDefaultAction();
-                }
+                $('#new-unit-button').on('click', function(event) {
+                    event.preventDefault();
+                    XBlockUtils.addXBlock($(this)).done(function(locator) {
+                        ViewUtils.redirect('/container/' + locator + '?action=new');
+                    });
+                });
 
                 $('.custom-dropdown .dropdown-toggle-button').on('click', function(event) {
                     event.stopPropagation(); // Prevent the event from closing immediately when we open it
@@ -128,44 +95,13 @@ from openedx.core.djangolib.markup import HTML, Text
                     $(this).attr('aria-expanded', !isExpanded);
                 });
 
-                $('.dropdown-options a').click(function(event) {
+                $('.seq_paste_unit').on('click', function(event) {
                     event.preventDefault();
-                    var $option = $(this);
-                    var newAction = $option.data('action')
-
-                    var newLabel = actionLabels[newAction];
-                    $('.custom-dropdown .dropdown-main-button .button-label').text(newLabel);
-                    currentAction = newAction;
-
-                    updateButtonAndCheckmarks(currentAction);
-                    $('.custom-dropdown .dropdown-options').slideUp('fast');
+                    $('.dropdown-options').hide();
+                    XBlockUtils.pasteXBlock($(this)).done(function(data) {
+                        ViewUtils.redirect('/container/' + data.locator + '?action=new');
+                    });
                 });
-
-                $('#execute-action-button').on('click', function(event) {
-                    event.preventDefault();
-                    var $button = $(this);
-                    switch (currentAction) {
-                        case 'new_unit':
-                            XBlockUtils.addXBlock($button).done(function(locator) {
-                                ViewUtils.redirect('/container/' + locator + '?action=new');
-                            });
-                            break;
-                        case 'paste_unit':
-                            XBlockUtils.pasteXBlock($button).done(function(data) {
-                                ViewUtils.redirect('/container/' + data.locator + '?action=new');
-                            });
-                            break;
-                        default:
-                            console.error('Unknown action');
-                            break;
-                    }
-                });
-
-                if ($('.seq_paste_unit').is(':visible')) {
-                    updateButtonAndCheckmarks(currentAction);
-                } else {
-                    updateButtonAndCheckmarks('new_unit');
-                }
             };
 
             xblockView.render();
