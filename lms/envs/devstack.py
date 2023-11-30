@@ -281,6 +281,9 @@ WRITABLE_GRADEBOOK_URL = 'http://localhost:1994'
 ########################## ORA STAFF GRADING APP ##############################
 ORA_GRADING_MICROFRONTEND_URL = 'http://localhost:1993'
 
+########################## ORA MFE APP ##############################
+ORA_MICROFRONTEND_URL = 'http://localhost:1992'
+
 ########################## LEARNER HOME APP ##############################
 LEARNER_HOME_MICROFRONTEND_URL = 'http://localhost:1996'
 
