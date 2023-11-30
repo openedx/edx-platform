@@ -267,22 +267,14 @@ class LibraryContentBlock(
 
             if vaccancies_in_selected < 0:
                 num_to_remove = -1 * vaccancies_in_selected
-                overlimit_block_keys = set(rand.sample(selected_keys, num_to_remove))
-                new_selected = new_selected - overlimit_block_keys
+                overlimit_block_keys = set(random.sample(valid_old_block_keys, num_to_remove))
+                new_selected = valid_old_block_keys - overlimit_block_keys
             else:
                 new_selected = valid_old_block_keys | set(random.sample(valid_additions, vaccancies_in_selected))
                 if new_selected != old_selected:
                     random.shuffle(new_selected)
         else:
             new_selected = set(list(valid_block_keys)[:size])
-        print(LibraryContentBlock._get_valid_children(library_children, candidates, manual))
-        print(size)
-        print({
-            'selected': list(new_selected),
-            'invalid': list(old_selected - new_selected),
-            'overlimit': list(overlimit_block_keys),
-            'added': list(new_selected - old_selected),
-        })
 
         # return lists because things get json serialized down the line.
         return {
