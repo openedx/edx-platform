@@ -10,8 +10,10 @@ from django.urls import reverse
 from django.utils.deprecation import MiddlewareMixin
 
 from common.djangoapps.edxmako.shortcuts import marketing_link
+from lms.envs.common import PANEL_ADMIN_LOGOUT_REDIRECT_URL
+from openedx.core.djangoapps.site_configuration.helpers import get_current_site_configuration
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-from openedx.features.edly.constants import TRIAL_EXPIRED
+from openedx.features.edly.constants import DEACTIVATED, TRIAL_EXPIRED
 from openedx.features.edly.utils import (
     is_edly_sub_org_active,
     get_current_plan_from_site_configurations,
@@ -32,6 +34,21 @@ class EdlyOrganizationAccessMiddleware(MiddlewareMixin):
         """
         if request.user.is_superuser or request.user.is_staff:
             return
+
+        restricted_group_name = settings.EDLY_USER_ROLES.get('panel_restricted', None)
+
+        account_deactivation_url = reverse('edly_app_urls:account_deactivated_view')
+        if get_current_plan_from_site_configurations() == DEACTIVATED and \
+                not _is_internal_path(request.path) and request.user.is_authenticated:
+            if request.user.groups.filter(name=restricted_group_name).exists():
+                return HttpResponseRedirect(account_deactivation_url)
+            else:
+                site_config = get_current_site_configuration()
+                redirect_url = site_config.get_value('PANEL_NOTIFICATIONS_BASE_URL', PANEL_ADMIN_LOGOUT_REDIRECT_URL)
+                if not redirect_url.endswith('/'):
+                    redirect_url += '/'
+
+                return HttpResponseRedirect(redirect_url)
 
         if get_current_plan_from_site_configurations() == TRIAL_EXPIRED and not _is_internal_path(request.path):
             redirect_url = getattr(settings, 'EXPIRE_REDIRECT_URL', None)
@@ -107,7 +124,7 @@ def _is_internal_path(path):
     """
     Check if the given path is for internal use.
     """
-    login_paths = ['login', 'oauth2', 'logout', 'api', 'media', ]
+    login_paths = ['login', 'oauth2', 'logout', 'api', 'media', 'account_deactivated', ]
     for login_path in login_paths:
         if login_path in path:
             return True

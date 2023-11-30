@@ -199,6 +199,7 @@ urlpatterns = [
     url(r'^api/discounts/', include(('openedx.features.discounts.urls', 'openedx.features.discounts'),
                                     namespace='api_discounts')),
 
+    url(r'', include(('openedx.features.edly.urls', 'openedx.features.edly'), namespace='edly_app_urls')),
     url(r'^api/v1/courses/', include('openedx.features.edly.api.urls')),
 ]
 
