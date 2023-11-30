@@ -758,7 +758,7 @@ edx-drf-extensions==9.0.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.7.6
+edx-enterprise==4.8.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -1314,7 +1314,7 @@ openedx-filters==1.6.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
-openedx-learning==0.3.5
+openedx-learning==0.3.6
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -1327,7 +1327,7 @@ optimizely-sdk==4.1.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-ora2==6.0.8
+ora2==6.0.9
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
