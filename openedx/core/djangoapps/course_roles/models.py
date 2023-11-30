@@ -16,7 +16,7 @@ class Role(models.Model):
     The services field defines in which service UI the role is intended to be assigned, such as CMS and/or LMS.
 
     """
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     services = models.ManyToManyField('Service', through='RoleService')
     permissions = models.ManyToManyField('Permission', through='RolePermission')
     users = models.ManyToManyField(settings.AUTH_USER_MODEL, through='UserRole')
@@ -48,7 +48,7 @@ class RolePermission(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['role', 'permission'], name='unique_role_permission')
+            models.UniqueConstraint(fields=['role', 'permission'], name='course_roles__rolepermission_uniq_idx')
         ]
 
     def __str__(self):
@@ -75,11 +75,11 @@ class UserRole(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['user', 'role', 'course'], name='unique_user_role_course')
+            models.UniqueConstraint(fields=['user', 'role', 'course'], name='course_roles__urserrole_uniq_idx')
         ]
 
     def __str__(self):
-        return f"{self.user} - {self.course} - {self.role} - {self.org}"
+        return f"{self.user} - {self.role} - {self.course} - {self.org}"
 
 
 class Service(models.Model):
@@ -106,7 +106,7 @@ class RoleService(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['role', 'service'], name='unique_role_service')
+            models.UniqueConstraint(fields=['role', 'service'], name='course_roles__roleservice_uniq_idx')
         ]
 
     def __str__(self):
