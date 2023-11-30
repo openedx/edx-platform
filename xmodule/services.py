@@ -6,23 +6,15 @@ Module contains various XModule/XBlock services
 import inspect
 import logging
 from functools import partial
-from common.djangoapps.edxmako.services import MakoService
-from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from eventtracking import tracker
 from edx_when.field_data import DateLookupFieldData
-from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from xblock.reference.plugins import Service
 from xblock.runtime import KvsFieldData
 
-import xmodule
 from common.djangoapps.track import contexts
-from common.djangoapps.student.auth import (
-    has_studio_read_access,
-    has_studio_write_access,
-)
 from lms.djangoapps.courseware.masquerade import is_masquerading_as_specific_student
 from xmodule.modulestore.django import modulestore
 

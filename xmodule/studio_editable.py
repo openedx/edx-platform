@@ -1,8 +1,6 @@
 """
 Mixin to support editing in Studio.
 """
-from typing import Callable
-
 from xblock.core import XBlock, XBlockMixin
 
 from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
@@ -52,7 +50,6 @@ class StudioEditableBlock(XBlockMixin):
         Helper method for getting preview view name (student_view or author_view) for a given block.
         """
         return AUTHOR_VIEW if has_author_view(block) else STUDENT_VIEW
-
 
 
 def has_author_view(block):
