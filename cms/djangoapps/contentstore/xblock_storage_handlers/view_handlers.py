@@ -60,7 +60,6 @@ from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.tabs import CourseTabList
-from xmodule.util.duplicate import handle_children_duplication
 
 from ..utils import (
     ancestor_has_staff_lock,
@@ -816,17 +815,9 @@ def _duplicate_block(
             asides=asides_to_create,
         )
 
-        children_handled = False
         # Allow an XBlock to do anything fancy it may need to when duplicated from another block.
         load_services_for_studio(source_item.runtime, user)
-        children_handled = dest_block.studio_post_duplicate(
-            source_item, store, user, duplication_function=_duplicate_block, shallow=False
-        )
-
-        if not children_handled:
-            handle_children_duplication(
-                dest_block, source_item, store, user, duplication_function=_duplicate_block, shallow=False
-            )
+        dest_block.studio_post_duplicate(source_item, store, user, duplication_function=_duplicate_block, shallow=False)
 
         # pylint: disable=protected-access
         if "detached" not in source_item.runtime.load_block_type(category)._class_tags:

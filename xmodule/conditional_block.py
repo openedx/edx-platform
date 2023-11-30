@@ -84,8 +84,6 @@ class ConditionalBlock(
 
     """
 
-    has_author_view = True
-
     display_name = String(
         display_name=_("Display Name"),
         help=_("The display name for this component."),
