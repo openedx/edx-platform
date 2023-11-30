@@ -7,11 +7,11 @@ from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pyli
 from django.db.models import Q
 from opaque_keys.edx.keys import CourseKey
 
+from edx_django_utils.cache import RequestCache
 from edx_toggles.toggles import WaffleFlag
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_roles.models import UserRole
 from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
-from openedx.core.lib.cache_utils import request_cached
 
 
 # .. toggle_name: FLAG_USE_PERMISSION_CHECKS
@@ -33,143 +33,29 @@ def use_permission_checks():
     return USE_PERMISSION_CHECKS_FLAG.is_enabled()
 
 
-@request_cached()
-def user_has_permission_course(
-        user: User | AnonymousUser,
-        permission: CourseRolesPermission,
-        course_key: CourseKey
-) -> bool:
-    """
-    Check if a user has a permission in a course.
-    """
-    if not use_permission_checks():
-        return False
-    elif isinstance(user, AnonymousUser):
-        return False
-    return UserRole.objects.filter(
-        user=user,
-        role__permissions__name=permission.value.name,
-        course=course_key,
-    ).exists()
-
-
-@request_cached()
-def user_has_permission_list_course(
-        user: User | AnonymousUser,
-        permissions: list[CourseRolesPermission],
-        course_key: CourseKey
-) -> bool:
-    """
-    Check if a user has all of the given permissions in a course.
-    """
-    if not use_permission_checks():
-        return False
-    return all(user_has_permission_course(user, permission, course_key) for permission in permissions)
-
-
-@request_cached()
-def user_has_permission_list_any_course(
-        user: User | AnonymousUser,
-        permissions: list[CourseRolesPermission],
-        course_key: CourseKey
-) -> bool:
-    """
-    Check if a user has ANY of the given permissions in a course.
-    """
-    return any(user_has_permission_course(user, permission, course_key) for permission in permissions)
-
-
-@request_cached()
-def user_has_permission_org(
-        user: User | AnonymousUser,
-        permission: CourseRolesPermission,
-        organization_name: str
-) -> bool:
-    """
-    Check if a user has a permission for all courses in an organization.
-    """
-    if not use_permission_checks():
-        return False
-    elif isinstance(user, AnonymousUser):
-        return False
-    return UserRole.objects.filter(
-        user=user,
-        role__permissions__name=permission.value.name,
-        course__isnull=True,
-        org__name=organization_name,
-    ).exists()
-
-
-@request_cached()
-def user_has_permission_list_org(
-        user: User | AnonymousUser,
-        permissions: list[CourseRolesPermission],
-        organization_name: str
-) -> bool:
-    """
-    Check if a user has ALL of the given permissions for all courses in an organization.
-    """
-    if not use_permission_checks():
-        return False
-    return all(
-        user_has_permission_org(user, permission, organization_name) for permission in permissions
-    )
-
-
-@request_cached()
-def user_has_permission_course_org(
-        user: User | AnonymousUser,
-        permission: CourseRolesPermission,
-        course_key: CourseKey
-) -> bool:
-    """
-    Check if a user has a permission for all courses in an organization or for a specific course.
-    """
-    if not use_permission_checks():
-        return False
-    elif isinstance(user, AnonymousUser):
-        return False
-    return (user_has_permission_course(user, permission, course_key) or
-            user_has_permission_org(user, permission, course_key.org)
-            )
-
-
-@request_cached()
-def user_has_permission_list_course_org(
-        user: User | AnonymousUser,
-        permissions: list[CourseRolesPermission],
-        course_key: CourseKey
-) -> bool:
-    """
-    Check if a user has all of the given permissions for all courses in an organization or for a specific course.
-    """
-    if not use_permission_checks():
-        return False
-    return all(
-        user_has_permission_course_org(user, permission, course_key)
-        for permission in permissions
-    )
-
-
-@request_cached()
-def get_all_user_permissions_for_a_course(user_id: int, course_key: CourseKey) -> set[str]:
+def get_all_user_permissions_for_a_course(
+    user: User | AnonymousUser, course_key: CourseKey
+) -> set[CourseRolesPermission]:
     """
     Get all of a user's permissions for a course,
     including, if applicable, organization-wide permissions
     and instance-wide permissions.
     """
-    if user_id is None:
-        raise ValueError('user_id must not be None')
-    if course_key is None:
-        raise ValueError('course_key must not be None')
-    try:
-        user = User.objects.get(pk=user_id)
-    except User.DoesNotExist as exc:
-        raise ValueError('user does not exist') from exc
+    if isinstance(user, AnonymousUser):
+        return set()
+    if not isinstance(course_key, CourseKey):
+        raise TypeError('course_key must be a CourseKey')
+    if not isinstance(user, User):
+        raise TypeError('user must be a User')
+    cache = RequestCache("course_roles")
+    cache_key = f"all_user_permissions_for_course:{user.id}:{course_key}"
+    cached_response = cache.get_cached_response(cache_key)
+    if cached_response.is_found:
+        return cached_response.value
     if not CourseOverview.course_exists(course_key):
         raise ValueError('course does not exist')
     permissions_qset = UserRole.objects.filter(
-        Q(user__id=user_id),
+        Q(user=user),
         (
             # Course-specific roles
             Q(course=course_key) |
@@ -179,5 +65,11 @@ def get_all_user_permissions_for_a_course(user_id: int, course_key: CourseKey) -
             Q(org__isnull=True)
         )
     )
-    permissions = set(permissions_qset.values_list('role__permissions__name', flat=True))
+    permissions = set(
+        CourseRolesPermission[permission_name.upper()]
+        for permission_name
+        in permissions_qset.values_list('role__permissions__name', flat=True)
+    )
+    cache.set(cache_key, permissions)
+
     return permissions
