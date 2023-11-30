@@ -42,8 +42,8 @@ class HasForumsRolesRule(Rule):  # lint-amnesty, pylint: disable=abstract-method
     """
     Rule to check if a user has a forum role for a course.
     """
-    def __init__(self, role):
-        self.role = role
+    def __init__(self, *roles):
+        self.role = roles
 
     def check(self, user, instance=None):
         if not user.is_authenticated:
@@ -57,4 +57,4 @@ class HasForumsRolesRule(Rule):  # lint-amnesty, pylint: disable=abstract-method
         else:
             course_key = CourseKey.from_string(str(instance))
 
-        return Role.user_has_role_for_course(user, course_key, self.role)
+        return Role.user_has_role_for_course(user, course_key, self.roles)
