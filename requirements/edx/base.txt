@@ -669,10 +669,8 @@ libsass==0.10.0
     #   -r requirements/edx/paver.txt
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==9.6.1
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/kernel.in
+lti-consumer-xblock==9.8.1
+    # via -r requirements/edx/kernel.in
 lxml==4.9.3
     # via
     #   -r requirements/edx/kernel.in
@@ -1227,7 +1225,6 @@ xblock-poll==1.13.0
 xblock-utils==4.0.0
     # via
     #   edx-sga
-    #   lti-consumer-xblock
     #   xblock-google-drive
 xmlsec==1.3.13
     # via python3-saml
