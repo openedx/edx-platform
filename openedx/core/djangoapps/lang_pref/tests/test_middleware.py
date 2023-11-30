@@ -11,6 +11,7 @@ from django.conf import settings
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.http import HttpResponse
 from django.test.client import Client, RequestFactory
+from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation.trans_real import parse_accept_lang_header
 
@@ -30,6 +31,7 @@ from common.djangoapps.student.tests.factories import AnonymousUserFactory, User
 
 
 @ddt.ddt
+@override_settings(ENFORCE_SESSION_EMAIL_MATCH=False)
 class TestUserPreferenceMiddleware(CacheIsolationTestCase):
     """
     Tests to make sure user preferences are getting properly set in the middleware.

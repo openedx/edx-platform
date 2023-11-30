@@ -768,6 +768,59 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         return encrypt_for_log(str(request.headers), getattr(settings, 'SAFE_SESSIONS_DEBUG_PUBLIC_KEY', None))
 
 
+class EmailChangeSessionInvalidationMiddleware(MiddlewareMixin):
+    """
+    Middleware responsible for invalidating user sessions
+    by detecting a mismatch between the user's email in
+    the session and request.user.email.
+
+    This middleware ensures that the sessions in other browsers
+    are invalidated when a user changes their email in one browser.
+    The active session in which the email change is made will remain valid.
+
+    The user's email is stored in their session during login
+    and gets updated when the user changes their email.
+    This middleware checks for any mismatch between the stored email
+    and the current user's email in each request, and if found,
+    it invalidates/flushes the session and mark cookies for deletion in request
+    which are then deleted in the process_response of SafeSessionMiddleware.
+    """
+
+    def process_request(self, request):
+        """
+        Invalidate the user session if there's a mismatch
+        between the email in the user's session and request.user.email.
+        """
+        if settings.ENFORCE_SESSION_EMAIL_MATCH and request.user.is_authenticated:
+            user_session_email = request.session.get('email', None)
+
+            if user_session_email is not None and request.user.email != user_session_email:
+                # Flush the session and mark cookies for deletion.
+                request.session.flush()
+                request.user = AnonymousUser()
+                _mark_cookie_for_deletion(request)
+                EmailChangeSessionInvalidationMiddleware._set_session_email_match_custom_attribute(False)
+            else:
+                EmailChangeSessionInvalidationMiddleware._set_session_email_match_custom_attribute(True)
+
+    @staticmethod
+    def register_email_change(request, email):
+        """
+        Sets email in session for comparison
+        """
+        request.session['email'] = email
+
+    @staticmethod
+    def _set_session_email_match_custom_attribute(value):
+        """
+        Sets custom attribute of session_email_match
+        """
+        # .. custom_attribute_name: session_email_match
+        # .. custom_attribute_description: Indicates whether there is a match between the
+        #      email in the user's session and the current user's email in the request.
+        set_custom_attribute('session_email_match', value)
+
+
 def obscure_token(value: Union[str, None]) -> Union[str, None]:
     """
     Return a short string that can be used to detect other occurrences

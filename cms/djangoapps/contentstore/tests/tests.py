@@ -85,6 +85,7 @@ class ContentStoreTestCase(ModuleStoreTestCase):
 
 
 @ddt
+@override_settings(ENFORCE_SESSION_EMAIL_MATCH=False)
 class AuthTestCase(ContentStoreTestCase):
     """Check that various permissions-related things work"""
 

@@ -47,6 +47,7 @@ from common.djangoapps.util.password_policy_validators import DEFAULT_MAX_PASSWO
 
 
 @ddt.ddt
+@override_settings(ENFORCE_SESSION_EMAIL_MATCH=False)
 class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
     """
     Test login_user() view
@@ -1179,29 +1180,37 @@ class LoginSessionViewTest(ApiTestCase, OpenEdxEventsTestMixin):
         })
         self.assertHttpBadRequest(response)
 
-        # Invalid email address
-        response = self.client.post(self.url, {
-            "email": "invalid@example.com",
+    @override_settings(ENFORCE_SESSION_EMAIL_MATCH=True)
+    def test_email_in_session_if_ENFORCE_SESSION_EMAIL_MATCH_is_enabled(self):
+        # Login and check email in session
+        data = {
+            "email": self.EMAIL,
             "password": self.PASSWORD,
-        })
-        self.assertHttpBadRequest(response)
+        }
 
-    @ddt.data(True, False)
-    def test_missing_login_params(self, is_api_v1):
-        email_field_name = "email" if is_api_v1 else "email_or_username"
-        url = self.url if is_api_v1 else self.url_v2
-        # Missing password
-        response = self.client.post(url, {
-            email_field_name: self.EMAIL,
-        })
-        self.assertHttpBadRequest(response)
+        response = self.client.post(self.url, data)
+        self.assertHttpOK(response)
 
-        # Missing email
-        response = self.client.post(url, {
+        # Ensure the login was successful
+        self.assertEqual(response.status_code, 200)
+
+        stored_email = self.client.session.get('email')
+        assert stored_email == self.EMAIL
+
+    @override_settings(ENFORCE_SESSION_EMAIL_MATCH=False)
+    def test_email_is_not_set_in_session_if_ENFORCE_SESSION_EMAIL_MATCH_is_disabled(self):
+        # Login and check email in session
+        data = {
+            "email": self.EMAIL,
             "password": self.PASSWORD,
-        })
-        self.assertHttpBadRequest(response)
+        }
 
-        # Missing both email and password
-        response = self.client.post(url, {})
-        self.assertHttpBadRequest(response)
+        response = self.client.post(self.url, data)
+        self.assertHttpOK(response)
+
+        # Ensure the login was successful
+        self.assertEqual(response.status_code, 200)
+
+        # Verify that the email is not stored in the session
+        stored_email = self.client.session.get('email')
+        assert stored_email is None

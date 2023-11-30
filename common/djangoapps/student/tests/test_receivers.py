@@ -2,6 +2,7 @@
 
 from unittest import skipUnless
 from unittest.mock import patch
+from django.test.utils import override_settings
 
 from edx_toggles.toggles.testutils import override_waffle_flag
 
@@ -9,7 +10,7 @@ from common.djangoapps.student.models import CourseEnrollmentCelebration, Pendin
 from common.djangoapps.student.signals.signals import USER_EMAIL_CHANGED
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory, UserProfileFactory
 from lms.djangoapps.courseware.toggles import COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES
-from openedx.core.djangolib.testing.utils import skip_unless_lms
+from openedx.core.djangolib.testing.utils import skip_unless_lms, get_mock_request
 from openedx.features.name_affirmation_api.utils import is_name_affirmation_installed
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -75,10 +76,26 @@ class ReceiversTest(SharedModuleStoreTestCase):
     @patch('common.djangoapps.student.signals.receivers.get_braze_client')
     def test_listen_for_user_email_changed(self, mock_get_braze_client):
         """
-        Ensure that USER_EMAIL_CHANGED signal triggers correct calls to get_braze_client.
+        Ensure that USER_EMAIL_CHANGED signal triggers correct calls to
+        get_braze_client and update email in session if ENFORCE_SESSION_EMAIL_MATCH
+        is enabled.
         """
         user = UserFactory(email='email@test.com', username='jdoe')
+        request = get_mock_request(user=user)
+        request.session = self.client.session
 
-        USER_EMAIL_CHANGED.send(sender=None, user=user)
+        # simulating email change
+        user.email = 'new_email@test.com'
+        user.save()
 
-        assert mock_get_braze_client.called
+        with override_settings(ENFORCE_SESSION_EMAIL_MATCH=False):
+            USER_EMAIL_CHANGED.send(sender=None, user=user, request=request)
+
+            assert mock_get_braze_client.called
+            assert request.session.get('email', None) is None
+
+        with override_settings(ENFORCE_SESSION_EMAIL_MATCH=True):
+            USER_EMAIL_CHANGED.send(sender=None, user=user, request=request)
+
+            assert mock_get_braze_client.called
+            assert request.session.get('email', None) == user.email

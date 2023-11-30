@@ -17,6 +17,7 @@ from openedx.core.djangolib.testing.utils import get_mock_request, CacheIsolatio
 from common.djangoapps.student.tests.factories import UserFactory
 
 from ..middleware import (
+    EmailChangeSessionInvalidationMiddleware,
     SafeCookieData,
     SafeSessionMiddleware,
     mark_user_change_as_expected,
@@ -615,3 +616,126 @@ class TestTrackRequestUserChanges(TestCase):
         request.user = object()
         assert len(request.debug_user_changes) == 2
         assert "Changing request user but user has no id." in request.debug_user_changes[1]
+
+
+class TestEmailChangeSessionInvalidationMiddleware(TestSafeSessionsLogMixin, TestCase):
+    """
+    Test class for EmailChangeSessionInvalidationMiddleware
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.TEST_PASSWORD = 'Password1234'
+        self.user = UserFactory.create(email='test@example.com', password=self.TEST_PASSWORD)
+        self.addCleanup(set_current_request, None)
+        self.request = get_mock_request(self.user)
+        self.client.response = HttpResponse()
+        self.client.response.cookies = SimpleCookie()
+
+    @override_settings(ENFORCE_SESSION_EMAIL_MATCH=False)
+    @patch('openedx.core.djangoapps.safe_sessions.middleware._mark_cookie_for_deletion')
+    def test_process_request_settings_disabled(self, mock_mark_cookie_for_deletion):
+        """
+        Calls EmailChangeSessionInvalidationMiddleware.process_request when no user is authenticated.
+        Verifies that session and cookies are not affected.
+        """
+        # Log in the user
+        self.client.login(email=self.user.email, password=self.TEST_PASSWORD)
+        self.request.session = self.client.session
+
+        # Ensure no email is stored in the session
+        self.assertIsNone(self.request.session.get('email'))
+
+        # Call process_request without authenticating a user
+        EmailChangeSessionInvalidationMiddleware(get_response=lambda request: None).process_request(self.request)
+
+        # Assert that session and cookies are not affected
+        # Assert that _mark_cookie_for_deletion not called
+        mock_mark_cookie_for_deletion.assert_not_called()
+
+    @override_settings(ENFORCE_SESSION_EMAIL_MATCH=True)
+    @patch('openedx.core.djangoapps.safe_sessions.middleware._mark_cookie_for_deletion')
+    def test_process_request_not_authenticated(self, mock_mark_cookie_for_deletion):
+        """
+        Calls EmailChangeSessionInvalidationMiddleware.process_request when no user is authenticated.
+        Verifies that session and cookies are not affected.
+        """
+        # Unauthenticated User
+        self.request.user = AnonymousUser()
+
+        # Call process_request without authenticating a user
+        EmailChangeSessionInvalidationMiddleware(get_response=lambda request: None).process_request(self.request)
+
+        # Assert that session and cookies are not affected
+        # Assert that _mark_cookie_for_deletion not called
+        mock_mark_cookie_for_deletion.assert_not_called()
+
+    @override_settings(ENFORCE_SESSION_EMAIL_MATCH=True)
+    def test_process_request_authenticated_no_session_email(self):
+        """
+        Calls EmailChangeSessionInvalidationMiddleware.process_request when a user is authenticated
+        but there is no email in the session. Verifies that session and cookies are not affected.
+        """
+        # Log in the user
+        self.client.login(email=self.user.email, password=self.TEST_PASSWORD)
+        self.request.session = self.client.session
+
+        # Ensure no email is stored in the session
+        self.assertIsNone(self.request.session.get('email'))
+
+        # Call process_request
+        EmailChangeSessionInvalidationMiddleware(get_response=lambda request: None).process_request(self.request)
+
+        # Assert that the session and cookies are not affected
+        self.assertIsNone(self.request.session.get('email'))
+        self.assertEqual(len(self.client.response.cookies), 0)
+
+    @override_settings(ENFORCE_SESSION_EMAIL_MATCH=True)
+    def test_process_request_authenticated_matching_session_email(self):
+        """
+        Calls EmailChangeSessionInvalidationMiddleware.process_request when a user is authenticated
+        and the session email matches request.user.email. Verifies that session and cookies are not affected.
+        """
+        # Log in the user
+        self.client.login(email=self.user.email, password=self.TEST_PASSWORD)
+        self.request.session = self.client.session
+        self.request.session['email'] = self.user.email  # Set the session email to match request.user.email
+        self.client.response.set_cookie(settings.SESSION_COOKIE_NAME, 'authenticated')  # Add some logged-in cookie
+
+        # Ensure email matches in the session
+        self.assertEqual(self.request.session.get('email'), self.user.email)
+        # Ensure session cookie exist
+        self.assertEqual(len(self.client.response.cookies), 1)
+
+        # Call process_request
+        EmailChangeSessionInvalidationMiddleware(get_response=lambda request: None).process_request(self.request)
+
+        # Assert that the session and cookies are not affected
+        self.assertEqual(self.request.session.get('email'), self.user.email)
+        self.assertEqual(len(self.client.response.cookies), 1)
+        self.assertEqual(self.client.response.cookies[settings.SESSION_COOKIE_NAME].value, 'authenticated')
+
+    @override_settings(ENFORCE_SESSION_EMAIL_MATCH=True)
+    @patch('openedx.core.djangoapps.safe_sessions.middleware._mark_cookie_for_deletion')
+    def test_process_request_email_mismatch(self, mock_mark_cookie_for_deletion):
+        """
+        Calls EmailChangeSessionInvalidationMiddleware.process_request with
+        a mismatch between session email and user email. Verifies that session
+        is flushed and cookies are marked for deletion.
+        """
+        # Log in the user
+        self.client.login(email=self.user.email, password=self.TEST_PASSWORD)
+        self.request.session = self.client.session
+        self.request.session['email'] = self.user.email  # Set the session email to match request.user.email
+        self.client.response.set_cookie(settings.SESSION_COOKIE_NAME, 'authenticated')  # Add some logged-in cookie
+
+        # Modify session email to create a mismatch (Email changed)
+        self.request.session['email'] = 'mismatched_email@example.com'
+
+        # Call process_request
+        EmailChangeSessionInvalidationMiddleware(get_response=lambda request: None).process_request(self.request)
+
+        # Assert that the session is flushed and cookies marked for deletion
+        mock_mark_cookie_for_deletion.assert_called()
+        assert self.request.session.get(SESSION_KEY) is None
+        assert self.request.user == AnonymousUser()

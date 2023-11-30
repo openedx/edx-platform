@@ -54,6 +54,7 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig  # lint-am
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
+from openedx.core.djangoapps.user_authn.cookies import update_jwt_cookies_in_response
 from openedx.core.djangoapps.user_authn.tasks import send_activation_email
 from openedx.core.djangoapps.user_authn.toggles import should_redirect_to_authn_microfrontend
 from openedx.core.djangolib.markup import HTML, Text
@@ -910,7 +911,11 @@ def confirm_email_change(request, key):
 
         response = render_to_response("email_change_successful.html", address_context)
 
-        USER_EMAIL_CHANGED.send(sender=None, user=user)
+        if settings.ENFORCE_SESSION_EMAIL_MATCH:
+            # Update the JWT cookies with new user email
+            response = update_jwt_cookies_in_response(request, response, user)
+
+        USER_EMAIL_CHANGED.send(sender=None, user=user, request=request)
         return response
 
 

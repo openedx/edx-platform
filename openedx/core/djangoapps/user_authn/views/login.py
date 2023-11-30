@@ -39,7 +39,10 @@ from common.djangoapps.track import segment
 from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.util.password_policy_validators import normalize_password
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
-from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
+from openedx.core.djangoapps.safe_sessions.middleware import (
+    mark_user_change_as_expected,
+    EmailChangeSessionInvalidationMiddleware
+)
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
@@ -314,6 +317,10 @@ def _handle_successful_authentication_and_login(user, request):
         django_login(request, user)
         request.session.set_expiry(604800 * 4)
         log.debug("Setting user session expiry to 4 weeks")
+
+        if settings.ENFORCE_SESSION_EMAIL_MATCH:
+            # Store the user's email for session consistency (used by EmailChangeSessionInvalidationMiddleware)
+            EmailChangeSessionInvalidationMiddleware.register_email_change(request, user.email)
 
         # .. event_implemented_name: SESSION_LOGIN_COMPLETED
         SESSION_LOGIN_COMPLETED.send_event(
