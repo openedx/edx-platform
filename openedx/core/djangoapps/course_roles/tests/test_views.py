@@ -12,6 +12,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_roles.api import USE_PERMISSION_CHECKS_FLAG
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.core.djangoapps.course_roles.models import (
     Permission,
     Role,
@@ -39,8 +40,8 @@ class UserPermissionsViewTestCase(SharedModuleStoreTestCase):
         self.role_1 = Role.objects.create(name="test_role_1")
         self.service = Service.objects.create(name="test_service")
         self.role_1.services.add(self.service)
-        self.permission_1 = Permission.objects.create(name="test_permission_1")
-        self.permission_2 = Permission.objects.create(name="test_permission_2")
+        self.permission_1 = Permission.objects.create(name=CourseRolesPermission.MANAGE_CONTENT.value.name)
+        self.permission_2 = Permission.objects.create(name=CourseRolesPermission.MANAGE_COURSE_SETTINGS.value.name)
         self.role_1.permissions.add(self.permission_1)
         self.role_1.permissions.add(self.permission_2)
         UserRole.objects.create(
@@ -48,14 +49,18 @@ class UserPermissionsViewTestCase(SharedModuleStoreTestCase):
         )
 
     def test_get_user_permissions_without_login(self):
-        # Test get user permissions without login.
+        """
+        Test get user permissions without login.
+        """
         querykwargs = {'course_id': self.course_1.id, 'user_id': self.user_1.id}
         url = f'{reverse("course_roles_api:user_permissions")}?{urlencode(querykwargs)}'
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_user_permissions_view(self):
-        # Test get user permissions view with valid queryargs.
+        """
+        Test get user permissions view with valid queryargs.
+        """
         querykwargs = {'course_id': self.course_1.id, 'user_id': self.user_1.id}
         url = f'{reverse("course_roles_api:user_permissions")}?{urlencode(querykwargs)}'
         expected_api_response = {'permissions': {self.permission_1.name, self.permission_2.name}}
@@ -73,7 +78,9 @@ class UserPermissionsViewTestCase(SharedModuleStoreTestCase):
     )
     @ddt.unpack
     def test_get_user_permission_view_without_queryargs(self, user_id, course_id):
-        # Test get user permissions without queryargs.
+        """
+        Test get user permissions without queryargs.
+        """
         querykwargs = {'course_id': course_id, 'user_id': user_id}
         querykwargs = {k: v for k, v in querykwargs.items() if v is not None}
         url = f'{reverse("course_roles_api:user_permissions")}?{urlencode(querykwargs)}'
@@ -82,7 +89,9 @@ class UserPermissionsViewTestCase(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_get_user_permission_view_with_invalid_queryargs(self):
-        # Test get user permissions with invalid queryargs.
+        """
+        Test get user permissions with invalid queryargs.
+        """
         self.client.login(username=self.user_1, password='test')
         org = 'org1'
         number = 'course1'
