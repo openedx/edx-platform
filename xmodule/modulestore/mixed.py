@@ -13,6 +13,10 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 
+from openedx_events.content_authoring.data import CourseData
+from openedx_events.content_authoring.signals import COURSE_CREATED
+
+from django.utils.timezone import datetime, timezone
 from xmodule.assetstore import AssetMetadata
 
 from . import XMODULE_FIELDS_WITH_USAGE_KEYS, ModuleStoreWriteBase
@@ -666,6 +670,14 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         # add new course to the mapping
         self.mappings[course_key] = store
+
+        # .. event_implemented_name: COURSE_CREATED
+        COURSE_CREATED.send_event(
+            time=datetime.now(timezone.utc),
+            course=CourseData(
+                course_key=course_key,
+            )
+        )
 
         return course
 

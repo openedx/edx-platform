@@ -15,6 +15,7 @@ from uuid import uuid4
 from unittest.mock import Mock, call, patch
 
 import ddt
+from openedx_events.content_authoring.signals import COURSE_CREATED
 import pymongo
 import pytest
 # Mixed modulestore depends on django, so we'll manually configure some django settings
@@ -109,6 +110,9 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         ],
         'xblock_mixins': modulestore_options['xblock_mixins'],
     }
+    ENABLED_OPENEDX_EVENTS = [
+        "org.openedx.content_authoring.course.created.v1",
+    ]
 
     def setUp(self):
         """
@@ -723,6 +727,29 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         # delete vertical and check sequential has no changes
         self.store.delete_item(vertical.location, self.user_id)
         assert not self._has_changes(sequential.location)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_course_create_event(self, default_ms):
+        """
+        Check that COURSE_CREATED event is sent when a course is created.
+        """
+        self.initdb(default_ms)
+        event_receiver = Mock()
+        COURSE_CREATED.connect(event_receiver)
+
+        test_course = self.store.create_course('test_org', 'test_course', 'test_run', self.user_id)
+
+        event_receiver.assert_called_once()
+        self.assertDictContainsSubset(
+            {
+                "signal": COURSE_CREATED,
+                "sender": None,
+                "course": CourseData(
+                    course_key=test_course.id,
+                ),
+            },
+            event_receiver.call_args.kwargs,
+        )
 
     def setup_has_changes(self, default_ms):
         """
