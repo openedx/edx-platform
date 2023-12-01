@@ -104,17 +104,15 @@ bleach[css]==6.1.0
     #   ora2
     #   xblock-drag-and-drop-v2
     #   xblock-poll
-boto==2.39.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.txt
-boto3==1.33.4
+boto==2.49.0
+    # via -r requirements/edx/base.txt
+boto3==1.33.5
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.33.4
+botocore==1.33.5
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -753,7 +751,7 @@ idna==3.6
     #   yarl
 import-linter==1.12.1
     # via -r requirements/edx/testing.in
-importlib-metadata==6.8.0
+importlib-metadata==6.9.0
     # via
     #   -r requirements/edx/base.txt
     #   markdown
@@ -822,7 +820,7 @@ jsonschema==4.20.0
     #   -r requirements/edx/base.txt
     #   drf-spectacular
     #   optimizely-sdk
-jsonschema-specifications==2023.11.1
+jsonschema-specifications==2023.11.2
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
@@ -992,7 +990,7 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/base.txt
 optimizely-sdk==4.1.1
     # via -r requirements/edx/base.txt
-ora2==6.0.9
+ora2==6.0.10
     # via -r requirements/edx/base.txt
 packaging==23.2
     # via
@@ -1082,10 +1080,8 @@ pyasn1==0.5.1
     # via
     #   -r requirements/edx/base.txt
     #   pgpy
-pycodestyle==2.8.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/testing.in
+pycodestyle==2.11.1
+    # via -r requirements/edx/testing.in
 pycountry==22.3.5
     # via -r requirements/edx/base.txt
 pycparser==2.21
@@ -1555,7 +1551,7 @@ vine==5.1.0
     #   amqp
     #   celery
     #   kombu
-virtualenv==20.24.7
+virtualenv==20.25.0
     # via tox
 voluptuous==0.14.1
     # via
