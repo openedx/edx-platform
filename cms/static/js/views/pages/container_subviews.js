@@ -150,6 +150,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
                         releaseDateFrom: this.model.get('release_date_from'),
                         hasExplicitStaffLock: this.model.get('has_explicit_staff_lock'),
                         staffLockFrom: this.model.get('staff_lock_from'),
+                        enableCopyUnit: this.model.get('enable_copy_paste_units'),
                         course: window.course,
                         HtmlUtils: HtmlUtils
                     })
