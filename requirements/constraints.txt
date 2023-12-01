@@ -54,10 +54,6 @@ charset-normalizer<2.1.0
 # pinning the version untill the issue gets resolved in the package itself
 markdown<3.4.0
 
-# pycodestyle==2.9.0 generates false positive error E275.
-# Constraint can be removed once the issue https://github.com/PyCQA/pycodestyle/issues/1090 is fixed.
-pycodestyle<2.9.0
-
 # pyopenssl>22.0.0 requires cryptography>=38.0 && conflicts with snowflak-connector-python requires cryptography<37
 # which causes the requirements upgrade job to fail due to constraint conflict
 # This constraint can be removed once https://github.com/snowflakedb/snowflake-connector-python/issues/1259 is resolved
@@ -100,6 +96,9 @@ djangorestframework-stubs==3.14.0  # Pinned to match django-stubs. Remove this w
 # away from legacy LMS/CMS frontends:
 # https://github.com/openedx/edx-platform/issues/31616
 libsass==0.10.0
+
+# greater version breaking upgrade builds
+click==8.1.6
 
 # pinning this version to avoid updates while the library is being developed
 openedx-learning==0.3.6
