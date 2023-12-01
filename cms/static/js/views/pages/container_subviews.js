@@ -2,8 +2,9 @@
  * Subviews (usually small side panels) for XBlockContainerPage.
  */
 define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/components/utils/view_utils',
-    'js/views/utils/xblock_utils', 'js/views/utils/move_xblock_utils', 'edx-ui-toolkit/js/utils/html-utils'],
-function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, HtmlUtils) {
+    'js/views/utils/xblock_utils', 'js/views/utils/move_xblock_utils', 'edx-ui-toolkit/js/utils/html-utils',
+    'js/views/utils/tagging_drawer_utils'],
+function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, HtmlUtils, TaggingDrawerUtils) {
     'use strict';
 
     var disabledCss = 'is-disabled';
@@ -295,11 +296,175 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
         }
     });
 
+    /**
+     * TagList displays the tags of a unit.
+     */
+    var TagList = BaseView.extend({
+        // takes XBlockInfo as a model
+
+        events: {
+            'click .wrapper-tag-header': 'expandTagContainer',
+            'click .tagging-label': 'expandContentTag',
+            'click .manage-tag-button': 'openManageTagDrawer',
+            'keydown .wrapper-tag-header': 'handleKeyDownOnHeader',
+            'keydown .tagging-label': 'handleKeyDownOnContentTag',
+            'keydown .manage-tag-button': 'handleKeyDownOnTagDrawer',
+        },
+
+        initialize: function() {
+            BaseView.prototype.initialize.call(this);
+            this.template = this.loadTemplate('tag-list');
+            this.model.on('sync', this.onSync, this);
+        },
+
+        onSync: function(model) {
+            if (ViewUtils.hasChangedAttributes(model, ['tags'])) {
+                this.render();
+            }
+        },
+
+        handleKeyDownOnHeader: function(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                this.expandTagContainer();
+            }
+        },
+
+        handleKeyDownOnContentTag: function(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                this.expandContentTag(event);
+            }
+        },
+
+        handleKeyDownOnTagDrawer: function(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                this.openManageTagDrawer();
+            }
+        },
+
+        expandTagContainer: function() {
+            var $content = this.$('.wrapper-tags .wrapper-tag-content'),
+                $header = this.$('.wrapper-tags .wrapper-tag-header'),
+                $icon = this.$('.wrapper-tags .wrapper-tag-header .icon');
+
+            if ($content.hasClass('is-hidden')) {
+                $content.removeClass('is-hidden');
+                $icon.addClass('fa-caret-up');
+                $icon.removeClass('fa-caret-down');
+                $header.attr('aria-expanded', 'true');
+            } else {
+                $content.addClass('is-hidden');
+                $icon.removeClass('fa-caret-up');
+                $icon.addClass('fa-caret-down');
+                $header.attr('aria-expanded', 'false');
+            }
+        },
+
+        expandContentTag: function(event) {
+            var contentId = event.target.id,
+                $content = this.$(`.wrapper-tags .content-tags-${contentId}`),
+                $header = this.$(`.wrapper-tags .tagging-label-${contentId}`),
+                $icon = this.$(`.wrapper-tags .tagging-label-${contentId} .icon`);
+
+            if ($content.hasClass('is-hidden')) {
+                $content.removeClass('is-hidden');
+                $icon.addClass('fa-caret-up');
+                $icon.removeClass('fa-caret-down');
+                $header.attr('aria-expanded', 'true');
+            } else {
+                $content.addClass('is-hidden');
+                $icon.removeClass('fa-caret-up');
+                $icon.addClass('fa-caret-down');
+                $header.attr('aria-expanded', 'false');
+            }
+        },
+
+        renderTagElements: function(tags, depth, parentId) {
+            const tagListElement = this;
+            tags.forEach(function(tag) {
+                const parentElement = document.querySelector(`.content-tags-${parentId}`);
+                var tagContentElement = document.createElement('div'),
+                    tagValueElement = document.createElement('span');
+
+                // Element that contains the tag value and the arrow icon
+                tagContentElement.style.marginLeft = `${depth}em`;
+                tagContentElement.className = `tagging-label tagging-label-tag-${tag.id}`;
+                tagContentElement.id = `tag-${tag.id}`;
+
+                // Element that contains the tag value
+                tagValueElement.textContent = tag.value;
+                tagValueElement.id = `tag-${tag.id}`;
+                tagValueElement.className = 'tagging-label-value';
+
+                tagContentElement.appendChild(tagValueElement);
+                parentElement.appendChild(tagContentElement);
+
+                if (tag.children.length > 0) {
+                    var tagIconElement = document.createElement('span'),
+                        tagChildrenElement = document.createElement('div');
+
+                    // Arrow icon
+                    tagIconElement.className = 'icon fa fa-caret-down';
+                    tagIconElement.ariaHidden = 'true';
+                    tagIconElement.id = `tag-${tag.id}`;
+
+                    // Element that contains the children of this tag
+                    tagChildrenElement.className = `content-tags-tag-${tag.id} is-hidden`;
+
+                    tagContentElement.tabIndex = 0;
+                    tagContentElement.role = "button";
+                    tagContentElement.ariaExpanded = "false";
+                    tagContentElement.setAttribute('aria-controls', `content-tags-tag-${tag.id}`);
+                    tagContentElement.appendChild(tagIconElement);
+                    parentElement.appendChild(tagChildrenElement);
+
+                    // Render children
+                    tagListElement.renderTagElements(tag.children, depth + 1, `tag-${tag.id}`);
+                }
+            });
+        },
+
+        renderTags: function() {
+            if (this.model.get('tags') !== null) {
+                const taxonomies = this.model.get('tags').taxonomies;
+                const tagListElement = this;
+                taxonomies.forEach(function(taxonomy) {
+                    tagListElement.renderTagElements(taxonomy.tags, 1, `tax-${taxonomy.id}`);
+                });
+            }
+        },
+
+        openManageTagDrawer: function() {
+            const taxonomyTagsWidgetUrl = this.model.get('taxonomy_tags_widget_url');
+            const contentId = this.model.get('id');
+
+            TaggingDrawerUtils.openDrawer(taxonomyTagsWidgetUrl, contentId);
+        },
+
+        render: function() {
+            HtmlUtils.setHtml(
+                this.$el,
+                HtmlUtils.HTML(
+                    this.template({
+                        tags: this.model.get('tags'),
+                    })
+                )
+            );
+
+            this.renderTags();
+
+            return this;
+        }
+    });
+
     return {
         MessageView: MessageView,
         ViewLiveButtonController: ViewLiveButtonController,
         Publisher: Publisher,
         PublishHistory: PublishHistory,
-        ContainerAccess: ContainerAccess
+        ContainerAccess: ContainerAccess,
+        TagList: TagList
     };
 }); // end define();

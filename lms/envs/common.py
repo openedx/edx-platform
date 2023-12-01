@@ -1597,6 +1597,9 @@ BRANCH_IO_KEY = ''
 OPTIMIZELY_PROJECT_ID = None
 OPTIMIZELY_FULLSTACK_SDK_KEY = None
 
+######################## HOTJAR ###########################
+HOTJAR_SITE_ID = 00000
+
 ######################## ALGOLIA SEARCH ###########################
 ALGOLIA_APP_ID = None
 ALGOLIA_SEARCH_API_KEY = None
@@ -2232,10 +2235,10 @@ MIDDLEWARE = [
     'common.djangoapps.track.middleware.TrackMiddleware',
 
     # CORS and CSRF
+    'django.middleware.csrf.CsrfViewMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'openedx.core.djangoapps.cors_csrf.middleware.CorsCSRFMiddleware',
     'openedx.core.djangoapps.cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
 
     'splash.middleware.SplashMiddleware',
 
@@ -3223,6 +3226,9 @@ INSTALLED_APPS = [
     # rule-based authorization
     'rules.apps.AutodiscoverRulesConfig',
     'bridgekeeper',
+
+    # management of user-triggered async tasks (course import/export, etc.)
+    'user_tasks',
 
     # Customized celery tasks, including persisting failed tasks so they can
     # be retried
@@ -4219,6 +4225,10 @@ ECOMMERCE_ORDERS_API_CACHE_TIMEOUT = 3600
 ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 
+# E-Commerce Commerce Coordinator Configuration
+COMMERCE_COORDINATOR_URL_ROOT = 'http://localhost:8000'
+COORDINATOR_CHECKOUT_REDIRECT_PATH = '/lms/redirect/'
+
 # Exam Service
 EXAMS_SERVICE_URL = 'http://localhost:18740/api/v1'
 
@@ -4401,6 +4411,8 @@ EDX_DRF_EXTENSIONS = {
     # Set this value to an empty dict in order to prevent automatically updating
     # user data from values in (possibly stale) JWTs.
     'JWT_PAYLOAD_USER_ATTRIBUTE_MAPPING': {},
+    # Allows JWT authentication to find the LMS user id for verification
+    'VERIFY_LMS_USER_ID_PROPERTY_NAME': 'id',
 }
 
 ################################ Settings for rss_proxy ################################
@@ -4937,6 +4949,13 @@ LEARNING_MICROFRONTEND_URL = None
 # .. setting_warning: Also set site's openresponseassessment.enhanced_staff_grader
 #     waffle flag.
 ORA_GRADING_MICROFRONTEND_URL = None
+# .. setting_name: ORA_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL for modern openassessment app.
+#     This is will be show in the open response tab list data.
+# .. setting_warning: Also set site's openresponseassessment.mfe_views
+#     waffle flag.
+ORA_MICROFRONTEND_URL = None
 # .. setting_name: DISCUSSIONS_MICROFRONTEND_URL
 # .. setting_default: None
 # .. setting_description: Base URL of the micro-frontend-based discussions page.

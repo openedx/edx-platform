@@ -56,7 +56,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-08 20:42+0000\n"
+"POT-Creation-Date: 2023-11-19 20:43+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Lasha Kokilashvili, 2018\n"
 "Language-Team: Georgian (http://app.transifex.com/open-edx/edx-platform/language/ka/)\n"
@@ -140,7 +140,6 @@ msgstr "ატვირთვა"
 #: cms/templates/js/course-video-settings.underscore
 #: common/static/common/templates/discussion/templates.underscore
 #: common/static/common/templates/image-modal.underscore
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Close"
 msgstr "დახურვა"
 
@@ -3807,10 +3806,6 @@ msgid ""
 "interests are, why you're taking courses, or what you hope to learn."
 msgstr ""
 
-#: openedx/features/learner_profile/static/learner_profile/js/views/badge_list_container.js
-msgid "Accomplishments Pagination"
-msgstr ""
-
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
 msgid "Account Settings page."
 msgstr ""
@@ -3837,10 +3832,6 @@ msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "About Me"
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
-msgid "Accomplishments"
 msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
@@ -9448,32 +9439,6 @@ msgstr[1] ""
 msgid "Sorry, no results were found."
 msgstr "სამწუხაროდ ძიება უშედეგოდ დასრულდა."
 
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-#, python-format
-msgid "Share your \"%(display_name)s\" award"
-msgstr "გააზიარეთ თქვენი „%(display_name)s“ ჯილდო."
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-msgid "Share"
-msgstr "გაზიარება"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-#, python-format
-msgid "Earned %(created)s."
-msgstr "მიღებული %(created)s."
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "What's Your Next Accomplishment?"
-msgstr "რა არის თქვენი შემდეგი მიღწევა?"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "Start working toward your next learning goal."
-msgstr "დაიწყე მუშაობა შემდეგი მიზნის მისაღწევად."
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "Find a course"
-msgstr "იპოვეთ კურსი"
-
 #: openedx/features/learner_profile/static/learner_profile/templates/section_two.underscore
 msgid "You are currently sharing a limited profile."
 msgstr "ამჟამად თქვენს პროფაილზე წვდომა შეზღუდულია."
@@ -9481,33 +9446,6 @@ msgstr "ამჟამად თქვენს პროფაილზე წ
 #: openedx/features/learner_profile/static/learner_profile/templates/section_two.underscore
 msgid "This learner is currently sharing a limited profile."
 msgstr "მსმენელის პროფილზე წვდომა ამჟამად შეზღუდულია."
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid "Share on Mozilla Backpack"
-msgstr "გააზიარეთ Mozilla Backpack-ზე "
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"To share your certificate on Mozilla Backpack, you must first have a "
-"Backpack account. Complete the following steps to add your certificate to "
-"Backpack."
-msgstr ""
-"Mozilla Backpack-ზე სერტიფიკატის გაზიარებისთვის პირველ რიგში უნდა ფლობდეთ "
-"Backpack-ის ანგარიშს. Backpack-ზე სერტიფიკატის დასამატებლად, შეასრულეთ "
-"შემდეგი საფეხურები."
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"Create a {link_start}Mozilla Backpack{link_end} account, or log in to your "
-"existing account"
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"{download_link_start}Download this image (right-click or option-click, save "
-"as){link_end} and then {upload_link_start}upload{link_end} it to your "
-"backpack."
-msgstr ""
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"
@@ -10007,6 +9945,10 @@ msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Proctoring Settings"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+msgid "Manage Tags"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore

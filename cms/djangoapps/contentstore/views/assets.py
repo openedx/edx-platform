@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import ensure_csrf_cookie
 from cms.djangoapps.contentstore.asset_storage_handlers import (
     handle_assets,
-    get_asset_usage_path,
+    get_asset_usage_path_json,
     update_course_run_asset as update_course_run_asset_source_function,
     get_file_size as get_file_size_source_function,
     delete_asset as delete_asset_source_function,
@@ -57,7 +57,7 @@ def assets_handler(request, course_key_string=None, asset_key_string=None):
 @login_required
 @ensure_csrf_cookie
 def asset_usage_path_handler(request, course_key_string, asset_key_string):
-    return get_asset_usage_path(request, course_key_string, asset_key_string)
+    return get_asset_usage_path_json(request, course_key_string, asset_key_string)
 
 
 def update_course_run_asset(course_key, upload_file):

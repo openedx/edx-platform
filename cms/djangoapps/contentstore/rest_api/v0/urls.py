@@ -39,7 +39,7 @@ urlpatterns = [
 
     # Authoring API
     re_path(
-        fr'^file_assets/{settings.COURSE_ID_PATTERN}/$',
+        fr'^file_assets/{settings.COURSE_ID_PATTERN}$',
         assets.AssetsCreateRetrieveView.as_view(), name='cms_api_create_retrieve_assets'
     ),
     re_path(
@@ -51,7 +51,7 @@ urlpatterns = [
         authoring_videos.VideoEncodingsDownloadView.as_view(), name='cms_api_videos_encodings'
     ),
     path(
-        'videos/features/',
+        'videos/features',
         authoring_videos.VideoFeaturesView.as_view(), name='cms_api_videos_features'
     ),
     re_path(
@@ -59,7 +59,7 @@ urlpatterns = [
         authoring_videos.VideoImagesView.as_view(), name='cms_api_videos_images'
     ),
     re_path(
-        fr'^videos/uploads/{settings.COURSE_ID_PATTERN}/$',
+        fr'^videos/uploads/{settings.COURSE_ID_PATTERN}$',
         authoring_videos.VideosCreateUploadView.as_view(), name='cms_api_create_videos_upload'
     ),
     re_path(
@@ -71,7 +71,7 @@ urlpatterns = [
         transcripts.TranscriptView.as_view(), name='cms_api_video_transcripts'
     ),
     re_path(
-        fr'^xblock/{settings.COURSE_ID_PATTERN}/$',
+        fr'^xblock/{settings.COURSE_ID_PATTERN}$',
         xblock.XblockCreateView.as_view(), name='cms_api_create_xblock'
     ),
     re_path(
