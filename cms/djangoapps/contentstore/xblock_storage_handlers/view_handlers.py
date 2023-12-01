@@ -10,7 +10,6 @@ Along with it, we moved the business logic of the other views in that file, sinc
 """
 import logging
 from datetime import datetime
-from uuid import uuid4
 
 from attrs import asdict
 from django.conf import settings
@@ -18,11 +17,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseBadRequest
-from django.utils.timezone import timezone
 from django.utils.translation import gettext as _
 from edx_django_utils.plugins import pluggable_override
-from openedx_events.content_authoring.data import DuplicatedXBlockData
-from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from openedx_tagging.core.tagging import api as tagging_api
 from edx_proctoring.api import (
     does_backend_support_onboarding,
