@@ -106,7 +106,8 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
         events: {
             'click .action-publish': 'publish',
             'click .action-discard': 'discardChanges',
-            'click .action-staff-lock': 'toggleStaffLock'
+            'click .action-staff-lock': 'toggleStaffLock',
+            'click .action-copy': 'copyToClipboard'
         },
 
         // takes XBlockInfo as a model
@@ -116,6 +117,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
             this.template = this.loadTemplate('publish-xblock');
             this.model.on('sync', this.onSync, this);
             this.renderPage = this.options.renderPage;
+            this.clipboardBroadcastChannel = this.options.clipboardBroadcastChannel;
         },
 
         onSync: function(model) {
@@ -170,6 +172,50 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
                 MoveXBlockUtils.hideMovedNotification();
             }).done(function() {
                 xblockInfo.fetch();
+            });
+        },
+
+        copyToClipboard: function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const clipboardEndpoint = "/api/content-staging/v1/clipboard/";
+            const usageKeyToCopy = this.model.get('id');
+            // Start showing a "Copying" notification:
+            ViewUtils.runOperationShowingMessage(gettext('Copying'), () => {
+                return $.postJSON(
+                    clipboardEndpoint,
+                    { usage_key: usageKeyToCopy },
+                ).then((data) => {
+                    const status = data.content?.status;
+                    if (status === "ready") {
+                        // something that enables the paste button in the actions dropdown
+                        this.clipboardBroadcastChannel.postMessage(data);
+                        return data;
+                    } else if (status === "loading") {
+                        // The clipboard is being loaded asynchonously.
+                        // Poll the endpoint until the copying process is complete:
+                        const deferred = $.Deferred();
+                        const checkStatus = () => {
+                            $.getJSON(clipboardEndpoint, (pollData) => {
+                                const newStatus = pollData.content?.status;
+                                if (newStatus === "ready") {
+                                    // something that enables the paste button in actions dropdown
+                                    this.clipboardBroadcastChannel.postMessage(pollData);
+                                    deferred.resolve(pollData);
+                                } else if (newStatus === "loading") {
+                                    setTimeout(checkStatus, 1_000);
+                                } else {
+                                    deferred.reject();
+                                    throw new Error(`Unexpected clipboard status "${newStatus}" in successful API response.`);
+                                }
+                            })
+                        }
+                        setTimeout(checkStatus, 1_000);
+                        return deferred;
+                    } else {
+                        throw new Error(`Unexpected clipboard status "${status}" in successful API response.`);
+                    }
+                });
             });
         },
 
