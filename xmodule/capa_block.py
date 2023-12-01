@@ -77,6 +77,7 @@ except ImproperlyConfigured:
 # Left for backwards compatibility
 SHOWANSWER = ShowAnswer
 
+
 class RANDOMIZATION:
     """
     Constants for problem randomization
@@ -1341,25 +1342,19 @@ class ProblemBlock(
 
     def used_all_attempts(self):
         """ All attempts have been used """
-        return self.max_attempts is not None and self.attempts >= self.max_attempts
+        return self.runtime.service(self, 'problem_feedback').used_all_attempts()
 
     def is_past_due(self):
         """
         Is it now past this problem's due date, including grace period?
         """
-        return (self.close_date is not None and
-                datetime.datetime.now(utc) > self.close_date)
+        return self.runtime.service(self, 'problem_feedback').is_past_due()
 
     def closed(self):
         """
         Is the student still allowed to submit answers?
         """
-        if self.used_all_attempts():
-            return True
-        if self.is_past_due():
-            return True
-
-        return False
+        return self.runtime.service(self, 'problem_feedback').closed()
 
     def is_submitted(self):
         """
@@ -1378,15 +1373,13 @@ class ProblemBlock(
 
         used by conditional block
         """
-        return self.attempts > 0
+        return self.runtime.service(self, 'problem_feedback').is_attempted()
 
     def is_correct(self):
         """
         True iff full points
         """
-        # self.score is initialized in self.lcp but in this method is accessed before self.lcp so just call it first.
-        self.lcp  # pylint: disable=pointless-statement
-        return self.score.raw_earned == self.score.raw_possible
+        return self.runtime.service(self, 'problem_feedback').is_correct()
 
     def answer_available(self):
         """

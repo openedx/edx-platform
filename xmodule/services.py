@@ -330,6 +330,50 @@ class ProblemFeedbackService(Service):
         #  argument, but the `service` method from the `DescriptorSystem` passes a `block`.
         self._xblock = self.xblock() or block
 
+    def is_past_due(self):
+        """
+        Returns if the problem is past its due date.
+        """
+        if self._xblock:
+            return (self._xblock.close_date is not None and
+                datetime.datetime.now(UTC) > self._xblock.close_date)
+        return False
+
+    def is_attempted(self):
+        """
+        Has the problem been attempted?
+        """
+        if self._xblock:
+            return self._xblock.attempts > 0
+        return False
+
+    def is_correct(self):
+        """
+        True if full points
+        """
+        if self._xblock:
+            # self._xblock.score is initialized in self._xblock.lcp but in this method is accessed before self._xblock.lcp so just call it first.
+            self._xblock.lcp  # pylint: disable=pointless-statement
+            return self._xblock.score.raw_earned == self._xblock.score.raw_possible
+        return False
+
+    def used_all_attempts(self):
+        """ All attempts have been used """
+        if self._xblock:
+            return (self._xblock.max_attempts is not None and
+                    self._xblock.attempts >= self._xblock.max_attempts)
+        return False
+
+    def closed(self):
+        """
+        Is the student still allowed to submit answers?
+        """
+        if self.used_all_attempts():
+            return True
+        if self.is_past_due():
+            return True
+        return False
+
     def answer_available(self):
         """
         Returns whether correctness is available now, for the given attributes.
@@ -337,25 +381,20 @@ class ProblemFeedbackService(Service):
         if self._xblock:
             show_correctness = self._xblock.show_correctness
             show_answer = self._xblock.showanswer
-            past_due = self._xblock.is_past_due()
             max_attempts = self._xblock.max_attempts
             attempts = self._xblock.attempts
-            is_attempted = self._xblock.is_attempted()
-            is_correct = self._xblock.is_correct()
             required_attempts = self._xblock.attempts_before_showanswer_button
-            used_all_attempts = self._xblock.used_all_attempts()
-            closed = self._xblock.closed()
         else:
             show_correctness = ''
             show_answer = ''
-            past_due = False
             max_attempts = 0
             attempts = 0
-            is_attempted = False
-            is_correct = False
             required_attempts = 0
-            used_all_attempts = False
-            closed = False
+        past_due = self.is_past_due()
+        is_attempted = self.is_attempted()
+        is_correct = self.is_correct()
+        used_all_attempts = self.used_all_attempts()
+        closed = self.closed()
 
         if not show_correctness:
             # If correctness is being withheld, then don't show answers either.
