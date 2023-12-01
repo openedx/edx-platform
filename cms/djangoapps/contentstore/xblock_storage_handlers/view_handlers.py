@@ -225,7 +225,7 @@ def handle_xblock(request, usage_key_string=None):
                 parent_usage_key,
                 duplicate_source_usage_key,
                 request.user,
-                request.json.get("display_name"),
+                display_name=request.json.get('display_name'),
             )
 
             return JsonResponse(
