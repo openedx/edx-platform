@@ -3860,6 +3860,7 @@ class StudentLab (models.Model):
     course_id = models.CharField(max_length=255)
     block_id = models.CharField(max_length=255)
     result_student = models.TextField()
+    date =  models.DateTimeField(auto_now_add=True)
     
     @classmethod
     def create_student_result_lab (self, course_id, student , block_id, result):

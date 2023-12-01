@@ -41,7 +41,8 @@ def getFileUser (block_id , email):
     
     if len(file) > 0:
         data = {
-            "url" : url_lms + '/media/' + file[0].file.name
+            "url" : url_lms + '/media/' + file[0].file.name,
+            "date" : file[0].date
         }
     
 
