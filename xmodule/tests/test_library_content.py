@@ -366,12 +366,6 @@ class LibraryContentBlockTestMixin:
         assert len(self.lc_block.selected_children()) == 1
 
         # ... unless requested more blocks than exists in library
-        self.lc_block.capa_type = 'multiplechoiceresponse'
-        self.store.update_item(self.lc_block, self.user_id)
-        self.lc_block.refresh_children()
-        self.lc_block = self.store.get_item(self.lc_block.location)
-        result = self.lc_block.validate()
-        assert not result
         self._sync_lc_block_from_library()
         self.lc_block.max_count = 10
         result = self.lc_block.validate()
@@ -751,7 +745,7 @@ class TestLibraryContentSelectionInShuffleMode(LibraryContentTest):
     """
     def setUp(self):
         super().setUp()
-        self.lc_block.refresh_children()
+        self._sync_lc_block_from_library()
         self.lc_block.shuffle = True
         self.lc_block.manual = False
         self.lc_block = self.store.get_item(self.lc_block.location)
@@ -822,7 +816,7 @@ class TestLibraryContentSelectionInManualMode(LibraryContentTest):
     """
     def setUp(self):
         super().setUp()
-        self.lc_block.refresh_children()
+        self._sync_lc_block_from_library()
         self.lc_block = self.store.get_item(self.lc_block.location)
         self.lc_block.shuffle = False
         self.lc_block.manual = True

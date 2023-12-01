@@ -249,13 +249,13 @@ class LibraryContentBlock(
         size, however, limits the amount of content shown.
         """
 
-        old_selected: set = {tuple(k) for k in selected}
+        old_selected: set = {tuple(k) for k in selected} if selected is not None else set()
         valid_block_keys: set = LibraryContentBlock._get_valid_children(library_children, candidates, manual)
         valid_old_block_keys: set = valid_block_keys & old_selected
         valid_additions: set = valid_block_keys - valid_old_block_keys
-        new_selected = set()
+        new_selected = []
         overlimit_block_keys = set()
-        size: int = min(max_count, len(valid_block_keys)) if max_count > 0 else len(valid_block_keys)
+        size: int = min(max_count, len(valid_block_keys)) if max_count >= 0 else len(valid_block_keys)
 
         if shuffle:
             #determine how many blocks need to be added or removed.
@@ -268,20 +268,21 @@ class LibraryContentBlock(
             if vaccancies_in_selected < 0:
                 num_to_remove = -1 * vaccancies_in_selected
                 overlimit_block_keys = set(random.sample(valid_old_block_keys, num_to_remove))
-                new_selected = valid_old_block_keys - overlimit_block_keys
+                new_selected = list(valid_old_block_keys - overlimit_block_keys)
             else:
-                new_selected = valid_old_block_keys | set(random.sample(valid_additions, vaccancies_in_selected))
-                if new_selected != old_selected:
+                new_selected = list(valid_old_block_keys | set(random.sample(valid_additions, vaccancies_in_selected)))
+                if new_selected != old_selected and new_selected:
                     random.shuffle(new_selected)
+
         else:
-            new_selected = set(list(valid_block_keys)[:size])
+            new_selected = list(valid_block_keys)[:size]
 
         # return lists because things get json serialized down the line.
         return {
-            'selected': list(new_selected),
-            'invalid': list(old_selected - new_selected),
+            'selected': new_selected,
+            'invalid': list(old_selected - set(new_selected)),
             'overlimit': list(overlimit_block_keys),
-            'added': list(new_selected - old_selected),
+            'added': list(set(new_selected) - old_selected),
         }
 
     @classmethod
