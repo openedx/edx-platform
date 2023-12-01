@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from django.conf import settings
 from common.djangoapps.util.json_request import JsonResponse
+import json
 
 def index(request):
     # if this is a POST request we need to process the form data
@@ -68,7 +69,9 @@ def index(request):
 def create_feedback (request) :
     form = FeedbackForm(request.POST, request.FILES)
     url_lms = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
+  
     if form.is_valid():
+        
         feedback = Feedback() 
        
         feedback.email = form.cleaned_data['email']
@@ -79,11 +82,7 @@ def create_feedback (request) :
         feedback.lesson_url = form.cleaned_data['lesson_url']
         feedback.save()
 
-        if feedback.attachment == '':
-            attachmentURL = ''
-        else:
-            attachmentURL = url_lms + '/media/' + feedback.attachment.name
-
+    
         category = [
             {"id" : 'outdated' , "content": 'Content contains outdated information' } ,
             {'id' : "bad_explain" , "content" : "Content is not explained well"} ,
@@ -98,11 +97,28 @@ def create_feedback (request) :
         data = {
                 'ticket_category': category_id,
                 'student_email': feedback.email,
-                "course_code" : feedback.course_code,
+                "course_id" : 'course-v1:FUNiX+PYB101x_1.1-A_VN+2021_T12',
                 "lesson_url" : feedback.lesson_url,
                 'ticket_description': feedback.content ,
-                "image" : attachmentURL
             }
+        if request.FILES.get('attachment', '') :
+            data['image'] = url_lms + '/media/' + feedback.attachment.name
+            
+            
+        print('========data=======', data) 
+        url_portal  = 'https://staging-portal.funix.edu.vn/api/feedback-ticket-management/create'
+        headers = {
+            "Content-Type": "application/json"
+            }
+        resp = requests.post(url_portal, data=json.dumps(data), headers=headers)
+        if resp.status_code != 200:
+            print(f"Lỗi yêu cầu: {resp.status_code}")
+            print(resp.text)
+        else:
+            print("Yêu cầu POST thành công")
+        
         return JsonResponse(data)
+    else :
+        print('==============', form.errors)
 
     return HttpResponse('success')
