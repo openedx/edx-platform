@@ -352,7 +352,8 @@ class ProblemFeedbackService(Service):
         True if full points
         """
         if self._xblock:
-            # self._xblock.score is initialized in self._xblock.lcp but in this method is accessed before self._xblock.lcp so just call it first.
+            # self._xblock.score is initialized in self._xblock.lcp but in this
+            # method is accessed before self._xblock.lcp so just call it first.
             self._xblock.lcp  # pylint: disable=pointless-statement
             return self._xblock.score.raw_earned == self._xblock.score.raw_possible
         return False
