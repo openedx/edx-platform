@@ -75,13 +75,13 @@ boto==2.39.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
-boto3==1.33.4
+boto3==1.33.5
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.33.4
+botocore==1.33.5
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -603,7 +603,7 @@ idna==3.6
     #   requests
     #   snowflake-connector-python
     #   yarl
-importlib-metadata==6.8.0
+importlib-metadata==6.9.0
     # via markdown
 importlib-resources==6.1.1
     # via
@@ -646,7 +646,7 @@ jsonschema==4.20.0
     # via
     #   drf-spectacular
     #   optimizely-sdk
-jsonschema-specifications==2023.11.1
+jsonschema-specifications==2023.11.2
     # via jsonschema
 jwcrypto==1.5.0
     # via
@@ -790,7 +790,7 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/kernel.in
 optimizely-sdk==4.1.1
     # via -r requirements/edx/bundled.in
-ora2==6.0.9
+ora2==6.0.10
     # via -r requirements/edx/bundled.in
 packaging==23.2
     # via
@@ -1087,9 +1087,8 @@ social-auth-app-django==5.0.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   edx-auth-backends
-social-auth-core==4.3.0
+social-auth-core==4.5.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   edx-auth-backends
     #   social-auth-app-django

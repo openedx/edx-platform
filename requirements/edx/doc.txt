@@ -104,13 +104,13 @@ boto==2.39.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-boto3==1.33.4
+boto3==1.33.5
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.33.4
+botocore==1.33.5
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -703,7 +703,7 @@ idna==3.6
     #   yarl
 imagesize==1.4.1
     # via sphinx
-importlib-metadata==6.8.0
+importlib-metadata==6.9.0
     # via
     #   -r requirements/edx/base.txt
     #   markdown
@@ -766,7 +766,7 @@ jsonschema==4.20.0
     #   drf-spectacular
     #   optimizely-sdk
     #   sphinxcontrib-openapi
-jsonschema-specifications==2023.11.1
+jsonschema-specifications==2023.11.2
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
@@ -932,7 +932,7 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/base.txt
 optimizely-sdk==4.1.1
     # via -r requirements/edx/base.txt
-ora2==6.0.9
+ora2==6.0.10
     # via -r requirements/edx/base.txt
 packaging==23.2
     # via
@@ -1293,9 +1293,8 @@ social-auth-app-django==5.0.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-auth-backends
-social-auth-core==4.3.0
+social-auth-core==4.5.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-auth-backends
     #   social-auth-app-django
