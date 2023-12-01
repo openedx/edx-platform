@@ -2,7 +2,7 @@ from .forms import UploadFileForm
 from .models import UploadFile
 from django.conf import settings
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-
+import datetime
 def index (request , course_id, usage_id) :
 
     post_data = request.POST.copy()  
@@ -21,8 +21,10 @@ def index (request , course_id, usage_id) :
         uploadFile.file = request.FILES.get('file','')
 
         uploadFile.save()
+        current_date = datetime.datetime.now()
         data = {
-            "url" : url_lms + '/media/' + uploadFile.file.name
+            "url" : url_lms + '/media/' + uploadFile.file.name,
+            "date": current_date.strftime("%Y-%m-%d %H:%M:%S")
         }
         return data
     else:

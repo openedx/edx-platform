@@ -941,6 +941,7 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
             data['url'] = file.get('url', '') 
             data['result'] = result_lab.result
             data['date'] = file.get('date','' )
+            print('==========', file.get('date','' ))
             return JsonResponse(data)
         if request.method == 'GET' :
             data = {}
