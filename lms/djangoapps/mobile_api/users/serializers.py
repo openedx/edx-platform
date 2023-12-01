@@ -74,7 +74,7 @@ class CourseOverviewField(serializers.RelatedField):  # lint-amnesty, pylint: di
                 'discussion_course',
                 kwargs={'course_id': course_id},
                 request=request,
-            ) if course_overview.is_discussion_tab_enabled() else None,
+            ) if course_overview.is_discussion_tab_enabled(request.user) else None,
 
             # This is an old API that was removed as part of DEPR-4. We keep the
             # field present in case API parsers expect it, but this API is now
