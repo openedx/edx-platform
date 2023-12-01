@@ -69,10 +69,6 @@ cryptography==38.0.4 # greater version has some issues with openssl.
 pylint<2.16.0 # greater version failing quality test. Fix them in seperate ticket.
 
 
-# Deprecated version of the AWS SDK;
-# we should stop using this
-boto==2.39.0
-
 # social-auth-app-django versions after 5.2.0 has a problematic migration that will cause issues deployments with large
 # `social_auth_usersocialauth` tables. 5.1.0 has missing migration and 5.2.0 has that problematic migration.
 social-auth-app-django==5.0.0
@@ -106,11 +102,6 @@ click==8.1.6
 
 # pinning this version to avoid updates while the library is being developed
 openedx-learning==0.3.6
-
-# lti-consumer-xblock 9.6.2 contains a breaking change that makes
-# existing custom parameter configurations unusable.
-# https://github.com/openedx/xblock-lti-consumer/issues/410 has been opened to track a fix
-lti-consumer-xblock==9.6.1
 
 # Open AI version 1.0.0 dropped support for openai.ChatCompletion which is currently in use in enterprise.
 openai<=0.28.1

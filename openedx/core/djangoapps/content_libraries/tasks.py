@@ -379,7 +379,7 @@ def _copy_overrides(
             _copy_overrides(
                 store=store,
                 user_id=user_id,
-                source_block=source_block.runtime.get_block(source_child_key),
-                dest_block=dest_block.runtime.get_block(dest_child_key),
+                source_block=store.get_item(source_child_key),
+                dest_block=store.get_item(dest_child_key),
             )
     store.update_item(dest_block, user_id)
