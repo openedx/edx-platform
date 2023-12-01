@@ -97,7 +97,7 @@ def create_feedback (request) :
         data = {
                 'ticket_category': category_id,
                 'student_email': feedback.email,
-                "course_id" : 'course-v1:FUNiX+PYB101x_1.1-A_VN+2021_T12',
+                "course_id" :  feedback.course_code,
                 "lesson_url" : feedback.lesson_url,
                 'ticket_description': feedback.content ,
             }
