@@ -9,10 +9,10 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
-from cms.djangoapps.contentstore.utils import load_services_for_studio
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
+from cms.djangoapps.contentstore.utils import load_services_for_studio
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from common.djangoapps.student.auth import (
