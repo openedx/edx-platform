@@ -336,7 +336,7 @@ class ProblemFeedbackService(Service):
         """
         if self._xblock:
             return (self._xblock.close_date is not None and
-                datetime.datetime.now(UTC) > self._xblock.close_date)
+                    datetime.now(UTC) > self._xblock.close_date)
         return False
 
     def is_attempted(self):

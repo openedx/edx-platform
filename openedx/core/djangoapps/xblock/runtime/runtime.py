@@ -300,7 +300,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
         elif service_name == 'publish':
             return EventPublishingService(self.user, context_key, make_track_function())
         elif service_name == 'problem_feedback':
-            return ProblemFeedbackService(block=block, user_is_staff=self.user.is_staff) # type: ignore
+            return ProblemFeedbackService(block=block, user_is_staff=self.user.is_staff)  # type: ignore
 
         # Check if the XBlockRuntimeSystem wants to handle this:
         service = self.system.get_service(block, service_name)
