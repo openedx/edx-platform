@@ -53,7 +53,6 @@ from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.toggles import ENTRANCE_EXAMS
-<<<<<<< HEAD
 from xmodule.course_block import DEFAULT_START_DATE
 from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -61,31 +60,6 @@ from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.tabs import CourseTabList
-=======
-from xmodule.course_block import (
-    DEFAULT_START_DATE,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore import (
-    EdxJSONEncoder,
-    ModuleStoreEnum,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.django import (
-    modulestore,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.draft_and_published import (
-    DIRECT_ONLY_CATEGORIES,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.exceptions import (
-    InvalidLocationError,
-    ItemNotFoundError,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.inheritance import (
-    own_metadata,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.tabs import (
-    CourseTabList,
-)  # lint-amnesty, pylint: disable=wrong-import-order
->>>>>>> c67608e558 (fix: lint)
 
 from ..utils import (
     ancestor_has_staff_lock,
