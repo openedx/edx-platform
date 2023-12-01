@@ -179,12 +179,7 @@ function($, _, Backbone, gettext, BasePage,
                     var targetId = window.location.hash.slice(1);
                     if (targetId) {
                         var target = document.getElementById(targetId);
-                        var targetOffset = target.offsetTop;
-                        window.scrollTo({
-                            top: targetOffset,
-                            left: 0,
-                            behavior: 'smooth',
-                        });
+                        target.scrollIntoView({ behavior: 'smooth', inline: 'center' });
                     }
                 },
                 block_added: options && options.block_added
