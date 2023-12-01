@@ -73,6 +73,7 @@ from ..utils import (
     is_self_paced,
     get_taxonomy_tags_widget_url,
     load_services_for_studio,
+    duplicate_block,
 )
 
 from .create_xblock import create_xblock
@@ -224,7 +225,7 @@ def handle_xblock(request, usage_key_string=None):
                     status=400,
                 )
 
-            dest_usage_key = _duplicate_block(
+            dest_usage_key = duplicate_block(
                 parent_usage_key,
                 duplicate_source_usage_key,
                 request.user,
@@ -740,129 +741,6 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
             "source_index": target_index if target_index is not None else source_index,
         }
         return JsonResponse(context)
-
-
-def _duplicate_block(
-    parent_usage_key,
-    duplicate_source_usage_key,
-    user,
-    display_name=None,
-    is_child=False,
-):
-    """
-    Duplicate an existing xblock as a child of the supplied parent_usage_key.
-    """
-    store = modulestore()
-    with store.bulk_operations(duplicate_source_usage_key.course_key):
-        source_item = store.get_item(duplicate_source_usage_key)
-        # Change the blockID to be unique.
-        dest_usage_key = source_item.location.replace(name=uuid4().hex)
-        category = dest_usage_key.block_type
-
-        # Update the display name to indicate this is a duplicate (unless display name provided).
-        # Can't use own_metadata(), b/c it converts data for JSON serialization -
-        # not suitable for setting metadata of the new block
-        duplicate_metadata = {}
-        for field in source_item.fields.values():
-            if field.scope == Scope.settings and field.is_set_on(source_item):
-                duplicate_metadata[field.name] = field.read_from(source_item)
-
-        if is_child:
-            display_name = (
-                display_name or source_item.display_name or source_item.category
-            )
-
-        if display_name is not None:
-            duplicate_metadata["display_name"] = display_name
-        else:
-            if source_item.display_name is None:
-                duplicate_metadata["display_name"] = _("Duplicate of {0}").format(
-                    source_item.category
-                )
-            else:
-                duplicate_metadata["display_name"] = _("Duplicate of '{0}'").format(
-                    source_item.display_name
-                )
-
-        asides_to_create = []
-        for aside in source_item.runtime.get_asides(source_item):
-            for field in aside.fields.values():
-                if field.scope in (
-                    Scope.settings,
-                    Scope.content,
-                ) and field.is_set_on(aside):
-                    asides_to_create.append(aside)
-                    break
-
-        for aside in asides_to_create:
-            for field in aside.fields.values():
-                if field.scope not in (
-                    Scope.settings,
-                    Scope.content,
-                ):
-                    field.delete_from(aside)
-
-        dest_block = store.create_item(
-            user.id,
-            dest_usage_key.course_key,
-            dest_usage_key.block_type,
-            block_id=dest_usage_key.block_id,
-            definition_data=source_item.get_explicitly_set_fields_by_scope(
-                Scope.content
-            ),
-            metadata=duplicate_metadata,
-            runtime=source_item.runtime,
-            asides=asides_to_create,
-        )
-
-        children_handled = False
-
-        if hasattr(dest_block, "studio_post_duplicate"):
-            # Allow an XBlock to do anything fancy it may need to when duplicated from another block.
-            # These blocks may handle their own children or parenting if needed. Let them return booleans to
-            # let us know if we need to handle these or not.
-            # TODO: Make this a proper method in the base class so we don't need getattr.
-            #       See https://github.com/openedx/edx-platform/issues/33715
-            load_services_for_studio(dest_block.runtime, user)
-            children_handled = dest_block.studio_post_duplicate(store, source_item)
-
-        # Children are not automatically copied over (and not all xblocks have a 'children' attribute).
-        # Because DAGs are not fully supported, we need to actually duplicate each child as well.
-        if source_item.has_children and not children_handled:
-            dest_block.children = dest_block.children or []
-            for child in source_item.children:
-                dupe = _duplicate_block(
-                    dest_block.location, child, user=user, is_child=True
-                )
-                if (
-                    dupe not in dest_block.children
-                ):  # _duplicate_block may add the child for us.
-                    dest_block.children.append(dupe)
-            store.update_item(dest_block, user.id)
-
-        # pylint: disable=protected-access
-        if "detached" not in source_item.runtime.load_block_type(category)._class_tags:
-            parent = store.get_item(parent_usage_key)
-            # If source was already a child of the parent, add duplicate immediately afterward.
-            # Otherwise, add child to end.
-            if source_item.location in parent.children:
-                source_index = parent.children.index(source_item.location)
-                parent.children.insert(source_index + 1, dest_block.location)
-            else:
-                parent.children.append(dest_block.location)
-            store.update_item(parent, user.id)
-
-        # .. event_implemented_name: XBLOCK_DUPLICATED
-        XBLOCK_DUPLICATED.send_event(
-            time=datetime.now(timezone.utc),
-            xblock_info=DuplicatedXBlockData(
-                usage_key=dest_block.location,
-                block_type=dest_block.location.block_type,
-                source_usage_key=duplicate_source_usage_key,
-            ),
-        )
-
-        return dest_block.location
 
 
 @login_required
