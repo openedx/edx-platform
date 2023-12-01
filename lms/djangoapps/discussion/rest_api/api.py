@@ -364,7 +364,6 @@ def get_course(request, course_key):
         "enable_in_context": course_config.enable_in_context,
         "group_at_subsection": course_config.plugin_configuration.get("group_at_subsection", False),
         'learners_tab_enabled': ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE.is_enabled(course_key),
-        "reason_codes_enabled": True,
         "edit_reasons": [
             {"code": reason_code, "label": label}
             for (reason_code, label) in EDIT_REASON_CODES.items()
