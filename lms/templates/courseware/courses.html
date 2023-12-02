@@ -34,353 +34,327 @@
 
 <%block name="pagetitle">${_("Courses")}</%block>
 
-
 <main id="main" aria-label="Content" tabindex="-1">
-    <section class="find-courses">
-      <section class="courses-container">
-        % if course_discovery_enabled:
-        <div class="container" style="padding-bottom: 0px;">
+  <section class="find-courses">
+    <section class="courses-container">
+      % if course_discovery_enabled:
+      <div class="container">
         <div id="discovery-form" role="search" aria-label="course" class="wrapper-search-context">
           <div class="search-bar-contents">
+            <div class="filter-search-container">
 
-
-    <div class="filter-search-container">
-
-      % if filter_enabled:
-             <!-- Filter Section -->
-      <div class="filter-container">
-        <!-- Filter Box with Icon and Count -->
-        <span class="mdi mdi-tune-vertical"></span>
-        <span class="filter-text">Filter</span>
-        <div style="background: #FEEBEE; padding: 4px 6px;">
-            <span style="font-weight: 600; font-size: 12px; color: #ED4338;">3</span>
-        </div>
-      </div>
-      % endif
-
-        <!-- Search Bar -->
-      <div class="search-container">
-        <div class="search-info" >
-          <form class="wrapper-search-input">
-            <div class="magnifier-input">
-              <span class="mdi mdi-magnify"></span>
-              <label for="discovery-input" class="sr">${_('Search for a course')}</label>
-            <input id="discovery-input" class="search-input" placeholder="${_('Search for a course')}" />
-            
-          
-              <div aria-live="polite" aria-relevant="all">
-                  <span class="sr">${_('Loading')}</span>
-                 </div> 
-                 
+              % if filter_enabled:
+              <!-- Filter Section -->
+              <div class="filter-container">
+                <!-- Filter Box with Icon and Count -->
+                <span class="mdi mdi-tune-vertical"></span>
+                <span class="filter-text">Filter</span>
+                <div style="background: #FEEBEE; padding: 4px 6px;">
+                  <span style="font-weight: 600; font-size: 12px; color: #ED4338;">3</span>
+                </div>
               </div>
-          </form>
+              % endif
+
+              <!-- Search Bar -->
+              <div class="search-container">
+                <div class="search-info">
+                  <form class="wrapper-search-input">
+                    <div class="magnifier-input">
+                      <span class="mdi mdi-magnify"></span>
+                      <label for="discovery-input" class="sr">${_('Search for a course')}</label>
+                      <input id="discovery-input" class="search-input" placeholder="${_('Search for a course')}" />
+
+                      <div aria-live="polite" aria-relevant="all">
+                        <span class="sr">${_('Loading')}</span>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+            </div>
+
+            % if sortby_enabled:
+            <!-- Sort By Dropdown -->
+            <div class="sort-section">
+              <span class="sort-by-label">Sort by:</span>
+              <select class="sort-dropdown">
+                <!-- add options here -->
+              </select>
+            </div>
+            % endif
+
+          </div>
+          <div id="discovery-message" class="search-status-label" style="display: none;"></div>
+          <div id="filter-bar" class="filters hide-phone is-collapsed" style="display: none;"></div>
+
+
+          <div class="search-results-count" style="display: none;">
+            <span id="results-count"></span> find for "<span id="search-term"></span>"
+          </div>
+
         </div>
       </div>
 
-    </div>
-    
-    % if sortby_enabled:
-      <!-- Sort By Dropdown -->
-      <div class="sort-section">
-        <span class="sort-by-label">Sort by:</span>
-        <select class="sort-dropdown">
-          <!-- add options here -->
-        </select>
-      </div>
       % endif
 
-        </div>
-        <div id="discovery-message" class="search-status-label" style="display: none;"></div>
+      <!-- Including the 'Inter' font -->
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+      <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.3.67/css/materialdesignicons.min.css" rel="stylesheet">
 
-        <div class="search-results-count" style="display: none;">
-          <span id="results-count"></span> find for "<span id="search-term"></span>"
-      </div>
-
-      </div>
-      </div>
-          
-        % endif
-
-         <!-- Including the 'Inter' font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.3.67/css/materialdesignicons.min.css" rel="stylesheet">
-
-
-    <style>
+      <style>
         body {
-            font-family: 'Inter', sans-serif;
+          font-family: 'Inter', sans-serif;
         }
+
         .mdi {
-          font-size: 1.5em; /* Set the size of the icon */
-          color: black;    /* Set the color of the icon */
+          font-size: 1.5em;
+          /* Set the size of the icon */
+          color: black;
+          /* Set the color of the icon */
           display: flex;
           align-items: center;
 
         }
 
         .find-courses .wrapper-search-context {
-            width: 100%;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .courses-container {
-          max-width: 70%;
-          height:auto;
-          padding: 0px, 0px, 0px, 0px;
-
+          max-width: 100%;
+          margin-left: 10%;
         }
 
         .search-results-count {
-            height: 22px;
-            font-family: 'Inter', sans-serif; /* Fallback to sans-serif */
-            font-style: normal;
-            font-weight: 400;
-            font-size: 14px;
-            line-height: 22px;
-            letter-spacing: -0.01em;
-            color: #4E5566;
-            flex: none;
-            order: 1;
-            flex-grow: 0;
-            padding: 24px 0px 16px 0px;
+          height: 22px;
+          font-family: 'Inter', sans-serif;
+          /* Fallback to sans-serif */
+          font-style: normal;
+          font-weight: 400;
+          font-size: 14px;
+          line-height: 22px;
+          letter-spacing: -0.01em;
+          color: #4E5566;
+          flex: none;
+          order: 1;
+          flex-grow: 0;
+          padding: 24px 0px 16px 0px;
         }
 
         #results-count {
-            font-weight: bold; /* Make the number of results bold */
-            color: #1D2026;
+          font-weight: bold;
+          /* Make the number of results bold */
+          color: #1D2026;
         }
 
-
-        .magnifier-input{
+        .magnifier-input {
           display: flex;
           flex-direction: row;
-          align-items: stretch; 
+          align-items: stretch;
 
         }
-        
 
         .wrapper-search-context {
           display: flex;
           flex-direction: column;
-          align-items: left; /* To ensure children elements take full width */
+          align-items: left;
+          /* To ensure children elements take full width */
 
         }
 
         .search-bar-contents {
           display: flex;
           flex-direction: row;
-          align-items: stretch; /* To ensure children elements take full width */
+          align-items: stretch;
+          /* To ensure children elements take full width */
           width: 100%;
           height: 48px;
           justify-content: space-between;
         }
 
         .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: left;
-            width:100%;
+          display: flex;
+          justify-content: space-between;
+          align-items: left;
+          width: 100%;
+          padding-bottom:0px;
         }
 
         .filter-search-container {
-            display: flex;
-            gap: 24px; /* Gap between filter and search bar */
+          display: flex;
+          gap: 24px;
+          /* Gap between filter and search bar */
         }
-
 
         /* Filter Box CSS */
         .filter-container {
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: center;
-            padding: 0px 24px;
-            gap: 24px;
-            width: 167px;
-            height: 48px;
-            background: #FFFFFF;
-            border: 1px solid #FEEBEE;
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: center;
+          padding: 0px 24px;
+          gap: 24px;
+          width: 167px;
+          height: 48px;
+          background: #FFFFFF;
+          border: 1px solid #FEEBEE;
         }
 
         .contents {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: center;
-            padding: 0px;
-            gap: 12px;
-            width: 75px;
-            height: 48px;
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: center;
+          padding: 0px;
+          gap: 12px;
+          width: 75px;
+          height: 48px;
         }
 
         .filter-text {
-            width: 39px;
-            height: 48px;
-            font-weight: 600;
-            font-size: 16px;
-            line-height: 48px;
-            color: #1D2026;
+          width: 39px;
+          height: 48px;
+          font-weight: 600;
+          font-size: 16px;
+          line-height: 48px;
+          color: #1D2026;
         }
 
         /* Search Bar CSS */
         .search-container {
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: row;
-            align-items: flex-start;
-            padding: 12px 18px;
-            gap: 10px;
-            width: 389px;
-            height: 48px;
-            background: #FFFFFF;
-            border: 1px solid #E9EAF0;
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: row;
+          align-items: flex-start;
+          padding: 12px 18px;
+          gap: 10px;
+          width: 389px;
+          height: 48px;
+          background: #FFFFFF;
+          border: 1px solid #E9EAF0;
         }
 
         .search-info {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            padding: 0px;
-            gap: 12px;
-            width: 105px;
-            height: 24px;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          padding: 0px;
+          gap: 12px;
+          width: 105px;
+          height: 24px;
         }
 
         .search-input {
-            width: auto;
-            height: 30px;
-            font-weight: 400;
-            font-size: 16px;
-            line-height: 24px;
-            color: #1D2026;
-            border: none;
-            padding-left: 10px;
-            background: #FFFFFF;
+          width: auto;
+          height: 30px;
+          font-weight: 400;
+          font-size: 16px;
+          line-height: 24px;
+          color: #1D2026;
+          border: none;
+          padding-left: 10px;
+          background: #FFFFFF;
         }
 
         .search-input:focus {
-            outline: none;
+          outline: none;
         }
 
-    
-
         .sort-by-label {
-            margin-right: 8px;
-            font-weight: 400;
-            font-size: 16px;
-            line-height: 24px;
-            color: #1D2026;
+          margin-right: 8px;
+          font-weight: 400;
+          font-size: 16px;
+          line-height: 24px;
+          color: #1D2026;
         }
 
         .sort-dropdown {
-            
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: center;
-            padding: 12px 16px;
-            gap: 83px;
 
-            width: 198px;
-            height: 48px;
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: center;
+          padding: 12px 16px;
+          gap: 83px;
 
-            /* Gray/White */
-            background: #FFFFFF;
-            /* Gray/100 */
-            border: 1px solid #E9EAF0;
+          width: 198px;
+          height: 48px;
 
-            /* Inside auto layout */
-            flex: none;
-            order: 1;
-            flex-grow: 0;
+          /* Gray/White */
+          background: #FFFFFF;
+          /* Gray/100 */
+          border: 1px solid #E9EAF0;
+
+          /* Inside auto layout */
+          flex: none;
+          order: 1;
+          flex-grow: 0;
         }
 
         .sort-section {
-            display: flex; /* Add flex display to horizontally align Sort By text and dropdown */
-            align-items: center; /* Vertically align the items in center */
-        }
-
-        .courses-list {
           display: flex;
-          flex-wrap: wrap;
-          justify-content:flex-start;
+          /* Add flex display to horizontally align Sort By text and dropdown */
+          align-items: center;
+          /* Vertically align the items in center */
         }
 
-        .courses-listing-item {
-            flex: 0 1 25%; /* flex-grow: 0, flex-shrink: 1, flex-basis: 25% */
-            box-sizing: border-box; /* Includes padding and border in the element's total width */
-            /* Add margin or padding as needed, keeping in mind the total width */
-        }
-      
 
-        .find-courses .courses-container .courses:not(.no-course-discovery), .university-profile .courses-container .courses:not(.no-course-discovery) {
-            float: left;
-            display: block;
-            margin-right: 2.35765%;
-            width: 100%;
-        }
+      </style>
 
-    </style>
+      <div class="courses${'' if course_discovery_enabled else ' no-course-discovery'}" role="region" aria-label="${_('List of Courses')}">
+        <ul class="courses-listing courses-list">
+          %for course in courses:
+          <li class="courses-listing-item">
+            <%include file="../course.html" args="course=course" />
+          </li>
+          %endfor
+        </ul>
+      </div>
 
-        <div class="courses${'' if course_discovery_enabled else ' no-course-discovery'}" role="region" aria-label="${_('List of Courses')}" style="margin-right: 0px;">
-          <ul class="courses-listing courses-list">
-            %for course in courses:
-            <li class="courses-listing-item">
-              <%include file="../course.html" args="course=course" />
-            </li>
-            %endfor
-          </ul>
-        </div>
+      % if course_discovery_enabled:
+        <aside aria-label="${_('Refine Your Search')}" class="search-facets phone-menu" style="
+        margin-right: 0px;">
+          <h2 class="header-search-facets">${_('Refine Your Search')}</h2>
+          <section class="search-facets-lists">
+          </section>
+        </aside>
+        % endif
 
-        <script>
-          document.addEventListener('DOMContentLoaded', function() {
-              var searchForm = document.getElementById('discovery-form');
-              var coursesList = document.querySelector('.courses-list');
-              var courseItems = coursesList.querySelectorAll('.courses-listing-item');
-          
-              searchForm.addEventListener('submit', function(event) {
-                  event.preventDefault(); // Prevents the form from submitting traditionally
-          
-                  var searchTerm = document.getElementById('discovery-input').value.trim().toLowerCase();
-                  var hasResults = false;
-          
-                  courseItems.forEach(function(course) {
-                      var courseTitle = course.textContent.toLowerCase();
-                      if (courseTitle.includes(searchTerm) || searchTerm === '') {
-                          course.style.display = '';
-                          hasResults = true;
-                      } else {
-                          course.style.display = 'none';
-                      }
-                  });
-          
-                  // Update the results count display
-                  var resultsCountContainer = document.querySelector('.search-results-count');
-                  var resultsCount = document.getElementById('results-count');
-                  var searchTermDisplay = document.getElementById('search-term');
-          
-                  if (hasResults) {
-                      var visibleCourses = coursesList.querySelectorAll('.courses-listing-item:not([style*="display: none"])');
-                      var numberOfResults = visibleCourses.length;
-                      var resultTerm = (numberOfResults === 1) ? 'result' : 'results';
-                      
-                      resultsCountContainer.style.display = 'block';
-                      resultsCount.textContent = numberOfResults + ' ' + resultTerm;
-                      searchTermDisplay.textContent = searchTerm;
-                  } else {
-                      resultsCountContainer.style.display = 'block';
-                      resultsCount.textContent = '0 results';
-                      searchTermDisplay.textContent = searchTerm;
-                  }
-              });
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          var searchForm = document.getElementById('discovery-form');
+          var coursesList = document.querySelector('.courses-list');
+          var courseItems = coursesList.querySelectorAll('.courses-listing-item');
+
+          searchForm.addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevents the form from submitting traditionally
+
+            var searchTerm = document.getElementById('discovery-input').value.trim().toLowerCase();
+            var hasResults = false;
+
+           
+
+            // Update the results count display
+            var resultsCountContainer = document.querySelector('.search-results-count');
+            var resultsCount = document.getElementById('results-count');
+            var searchTermDisplay = document.getElementById('search-term');
+
+            if (hasResults) {
+              var visibleCourses = coursesList.querySelectorAll('.courses-listing-item:not([style*="display: none"])');
+              var numberOfResults = visibleCourses.length;
+              var resultTerm = (numberOfResults === 1) ? 'result' : 'results';
+
+              resultsCountContainer.style.display = 'block';
+              resultsCount.textContent = numberOfResults + ' ' + resultTerm;
+              searchTermDisplay.textContent = searchTerm;
+            } else {
+              resultsCountContainer.style.display = 'block';
+              resultsCount.textContent = '0 results';
+              searchTermDisplay.textContent = searchTerm;
+            }
           });
-          </script>
-          
+        });
+      </script>
 
-
-      </section>
     </section>
+  </section>
 </main>
