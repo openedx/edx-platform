@@ -1073,3 +1073,10 @@ urlpatterns +=[
     path ('api/funix_portal/user/create_user', CreateUserAPIView.as_view() , name='funix_portal_create_user'),
     path ('api/funix_portal/project/grade_project', GradeLearningProjectXblockAPIView.as_view() , name='funix_portal_grade_learning_project'),
 ]
+
+# assignmentxblock-xblock js translation
+from django.views.i18n import JavaScriptCatalog
+
+urlpatterns += [
+    path('jsi18n/', JavaScriptCatalog.as_view(), name='assignmentxblock-xblock'),
+]
