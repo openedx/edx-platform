@@ -3865,7 +3865,13 @@ class StudentLab (models.Model):
     @classmethod
     def create_student_result_lab (self, course_id, student , block_id, result):
 
-        return StudentLab.objects.create(course_id=course_id, student=student, block_id=block_id, result_student=result)
+        student_lab, created = StudentLab.objects.get_or_create(course_id=course_id, student=student, block_id=block_id, defaults={'result_student': result})
+
+        if not created:
+            student_lab.result_student = result
+            student_lab.save()
+
+        return student_lab
     
     
     
