@@ -33,7 +33,7 @@ from .signals import GRADING_POLICY_CHANGED
 log = logging.getLogger(__name__)
 
 GRADING_POLICY_COUNTDOWN_SECONDS = 3600
-UTC = datetime.timezone.utc
+UTC = timezone.utc
 
 
 def locked(expiry_seconds, key):  # lint-amnesty, pylint: disable=missing-function-docstring
