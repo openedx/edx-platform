@@ -138,6 +138,11 @@ case "$TEST_SUITE" in
                 run_paver_quality check_keywords || { EXIT=1; }
                 ;;
 
+            5)
+                echo "Running ruff linter..."
+                make ruff || { EXIT=1; }
+                ;;
+
         esac
 
         # Need to create an empty test result so the post-build

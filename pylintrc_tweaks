@@ -34,6 +34,7 @@ disable+ =
     no-name-in-module,
     unnecessary-lambda-assignment,
 
+    # Checked via ruff instead
     anomalous-backslash-in-string,
     assert-on-tuple,
     bad-str-strip-call,
