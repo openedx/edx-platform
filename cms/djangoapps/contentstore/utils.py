@@ -1595,6 +1595,7 @@ def get_course_videos_context(course_block, pagination_conf, course_key=None):
         get_transcript_preferences,
     )
     from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
+    from openedx.core.djangoapps.video_config.toggles import XPERT_TRANSLATIONS_UI
     from xmodule.video_block.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
 
     from .video_storage_handlers import (
@@ -1619,6 +1620,7 @@ def get_course_videos_context(course_block, pagination_conf, course_key=None):
             course = modulestore().get_course(course_key)
 
     is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course.id)
+    is_ai_translations_enabled = XPERT_TRANSLATIONS_UI.is_enabled(course.id)
     previous_uploads, pagination_context = _get_index_videos(course, pagination_conf)
     course_video_context = {
         'context_course': course,
@@ -1639,6 +1641,7 @@ def get_course_videos_context(course_block, pagination_conf, course_key=None):
             'supported_file_formats': settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS
         },
         'is_video_transcript_enabled': is_video_transcript_enabled,
+        'is_ai_translations_enabled': is_ai_translations_enabled,
         'active_transcript_preferences': None,
         'transcript_credentials': None,
         'transcript_available_languages': get_all_transcript_languages(),
