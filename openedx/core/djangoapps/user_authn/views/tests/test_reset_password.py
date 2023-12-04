@@ -5,7 +5,7 @@ Test the various password reset flows
 import json
 import re
 import unicodedata
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from unittest.mock import Mock, patch
 
 import ddt
@@ -24,7 +24,6 @@ from django.urls import reverse
 from django.utils.http import int_to_base36
 from freezegun import freeze_time
 from oauth2_provider import models as dot_models
-from pytz import UTC
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -268,7 +267,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         self.request_password_reset(200)
         # now reset the time to 1 min from now in future and change the email and
         # verify that it will allow another request from same IP
-        reset_time = datetime.now(UTC) + timedelta(seconds=61)
+        reset_time = datetime.now(timezone.utc) + timedelta(seconds=61)
         with freeze_time(reset_time):
             for status in [200, 403]:
                 self.request_password_reset(status)

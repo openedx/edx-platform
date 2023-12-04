@@ -26,7 +26,6 @@ from edx_django_utils.monitoring import set_custom_attribute
 from openedx_events.learning.data import UserData, UserPersonalData
 from openedx_events.learning.signals import STUDENT_REGISTRATION_COMPLETED
 from openedx_filters.learning.filters import StudentRegistrationRequested
-from pytz import UTC
 from django_ratelimit.decorators import ratelimit
 from requests import HTTPError
 from rest_framework.response import Response
@@ -355,7 +354,7 @@ def _track_user_registration(user, profile, params, third_party_provider, regist
             'name': profile.name,
             # Mailchimp requires the age & yearOfBirth to be integers, we send a sane integer default if falsey.
             'age': profile.age or -1,
-            'yearOfBirth': profile.year_of_birth or datetime.datetime.now(UTC).year,
+            'yearOfBirth': profile.year_of_birth or datetime.datetime.now(datetime.timezone.utc).year,
             'education': profile.level_of_education_display,
             'address': profile.mailing_address,
             'gender': profile.gender_display,
