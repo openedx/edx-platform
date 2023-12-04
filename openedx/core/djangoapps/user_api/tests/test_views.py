@@ -150,12 +150,12 @@ class RoleTestCase(UserApiTestCase):
         self.assertHttpMethodNotAllowed(self.request_with_auth("delete", self.LIST_URI))
 
     def test_list_unauthorized(self):
-        self.assertHttpForbidden(self.client.get(self.LIST_URI))
+        self.assertHttpNotAuthorized(self.client.get(self.LIST_URI))
 
     @override_settings(DEBUG=True)
     @override_settings(EDX_API_KEY=None)
     def test_debug_auth(self):
-        self.assertHttpForbidden(self.client.get(self.LIST_URI))
+        self.assertHttpNotAuthorized(self.client.get(self.LIST_URI))
 
     @override_settings(DEBUG=False)
     @override_settings(EDX_API_KEY=TEST_API_KEY)
@@ -164,7 +164,7 @@ class RoleTestCase(UserApiTestCase):
         self.assertHttpOK(
             self.request_with_auth("get", self.LIST_URI,
                                    **self.basic_auth("someuser", "somepass")))
-        self.assertHttpForbidden(
+        self.assertHttpNotAuthorized(
             self.client.get(self.LIST_URI, **self.basic_auth("someuser", "somepass")))
 
     def test_get_list_nonempty(self):
@@ -236,12 +236,12 @@ class UserViewSetTest(UserApiTestCase):
         self.assertHttpMethodNotAllowed(self.request_with_auth("delete", self.LIST_URI))
 
     def test_list_unauthorized(self):
-        self.assertHttpForbidden(self.client.get(self.LIST_URI))
+        self.assertHttpNotAuthorized(self.client.get(self.LIST_URI))
 
     @override_settings(DEBUG=True)
     @override_settings(EDX_API_KEY=None)
     def test_debug_auth(self):
-        self.assertHttpForbidden(self.client.get(self.LIST_URI))
+        self.assertHttpNotAuthorized(self.client.get(self.LIST_URI))
 
     @override_settings(DEBUG=False)
     @override_settings(EDX_API_KEY=TEST_API_KEY)
@@ -250,7 +250,7 @@ class UserViewSetTest(UserApiTestCase):
         self.assertHttpOK(
             self.request_with_auth("get", self.LIST_URI,
                                    **self.basic_auth('someuser', 'somepass')))
-        self.assertHttpForbidden(
+        self.assertHttpNotAuthorized(
             self.client.get(self.LIST_URI, **self.basic_auth('someuser', 'somepass')))
 
     def test_get_list_nonempty(self):
@@ -303,7 +303,7 @@ class UserViewSetTest(UserApiTestCase):
         self.assertHttpMethodNotAllowed(self.request_with_auth("delete", self.detail_uri))
 
     def test_get_detail_unauthorized(self):
-        self.assertHttpForbidden(self.client.get(self.detail_uri))
+        self.assertHttpNotAuthorized(self.client.get(self.detail_uri))
 
     def test_get_detail(self):
         user = self.users[1]
@@ -342,12 +342,12 @@ class UserPreferenceViewSetTest(CacheIsolationTestCase, UserApiTestCase):
         self.assertHttpMethodNotAllowed(self.request_with_auth("delete", self.LIST_URI))
 
     def test_list_unauthorized(self):
-        self.assertHttpForbidden(self.client.get(self.LIST_URI))
+        self.assertHttpNotAuthorized(self.client.get(self.LIST_URI))
 
     @override_settings(DEBUG=True)
     @override_settings(EDX_API_KEY=None)
     def test_debug_auth(self):
-        self.assertHttpForbidden(self.client.get(self.LIST_URI))
+        self.assertHttpNotAuthorized(self.client.get(self.LIST_URI))
 
     def test_get_list_nonempty(self):
         result = self.get_json(self.LIST_URI)
@@ -433,7 +433,7 @@ class UserPreferenceViewSetTest(CacheIsolationTestCase, UserApiTestCase):
         self.assertHttpMethodNotAllowed(self.request_with_auth("delete", self.detail_uri))
 
     def test_detail_unauthorized(self):
-        self.assertHttpForbidden(self.client.get(self.detail_uri))
+        self.assertHttpNotAuthorized(self.client.get(self.detail_uri))
 
     def test_get_detail(self):
         pref = self.prefs[1]
@@ -466,12 +466,12 @@ class PreferenceUsersListViewTest(UserApiTestCase):
         self.assertHttpMethodNotAllowed(self.request_with_auth("delete", self.LIST_URI))
 
     def test_unauthorized(self):
-        self.assertHttpForbidden(self.client.get(self.LIST_URI))
+        self.assertHttpNotAuthorized(self.client.get(self.LIST_URI))
 
     @override_settings(DEBUG=True)
     @override_settings(EDX_API_KEY=None)
     def test_debug_auth(self):
-        self.assertHttpForbidden(self.client.get(self.LIST_URI))
+        self.assertHttpNotAuthorized(self.client.get(self.LIST_URI))
 
     def test_get_basic(self):
         result = self.get_json(self.LIST_URI)
@@ -583,8 +583,8 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
 
     def test_update_email_opt_in_anonymous_user(self):
         """
-        Test that an anonymous user gets 403 response when
-        updating email optin preference.
+        Test that an anonymous user gets 401 response when
+        updating email opt-in preference.
         """
         self.client.logout()
         response = self.client.post(self.url, {
@@ -635,8 +635,8 @@ class CountryTimeZoneListViewTest(UserApiTestCase):
         assert time_zone_info['description'] == get_display_time_zone(time_zone_name)
 
     # The time zones count may need to change each time we upgrade pytz
-    @ddt.data((ALL_TIME_ZONES_URI, 434),
-              (COUNTRY_TIME_ZONES_URI, 24))
+    @ddt.data((ALL_TIME_ZONES_URI, 433),
+              (COUNTRY_TIME_ZONES_URI, 23))
     @ddt.unpack
     def test_get_basic(self, country_uri, expected_count):
         """ Verify that correct time zone info is returned """
