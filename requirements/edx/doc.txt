@@ -102,13 +102,13 @@ bleach[css]==6.1.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.33.4
+boto3==1.33.6
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.33.4
+botocore==1.33.6
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -399,7 +399,7 @@ django-sekizai==4.1.0
     # via
     #   -r requirements/edx/base.txt
     #   openedx-django-wiki
-django-ses==3.5.1
+django-ses==3.5.2
     # via -r requirements/edx/base.txt
 django-simple-history==3.4.0
     # via
@@ -701,7 +701,7 @@ idna==3.6
     #   yarl
 imagesize==1.4.1
     # via sphinx
-importlib-metadata==6.8.0
+importlib-metadata==7.0.0
     # via
     #   -r requirements/edx/base.txt
     #   markdown
@@ -764,7 +764,7 @@ jsonschema==4.20.0
     #   drf-spectacular
     #   optimizely-sdk
     #   sphinxcontrib-openapi
-jsonschema-specifications==2023.11.1
+jsonschema-specifications==2023.11.2
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
