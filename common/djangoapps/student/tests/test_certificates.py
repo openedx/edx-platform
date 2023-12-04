@@ -7,7 +7,6 @@ import ddt
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
-from pytz import UTC
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -24,8 +23,11 @@ from lms.djangoapps.certificates.tests.factories import (
 
 # pylint: disable=no-member
 
+UTC = datetime.timezone.utc
+
 PAST_DATE = datetime.datetime.now(UTC) - datetime.timedelta(days=2)
 FUTURE_DATE = datetime.datetime.now(UTC) + datetime.timedelta(days=2)
+
 
 
 class CertificateDisplayTestBase(SharedModuleStoreTestCase):

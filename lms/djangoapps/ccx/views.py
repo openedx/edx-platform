@@ -8,7 +8,6 @@ import json
 import logging
 from copy import deepcopy
 
-import pytz
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib import messages
@@ -190,7 +189,7 @@ def create_ccx(request, course, ccx=None):
     ccx.save()
 
     # Make sure start/due are overridden for entire course
-    start = TODAY().replace(tzinfo=pytz.UTC)
+    start = TODAY().replace(tzinfo=datetime.timezone.utc)
     override_field_for_ccx(ccx, course, 'start', start)
     override_field_for_ccx(ccx, course, 'due', None)
 

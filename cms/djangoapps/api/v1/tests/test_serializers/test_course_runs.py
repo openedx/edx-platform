@@ -4,7 +4,6 @@
 import datetime
 
 import ddt
-import pytz
 from django.test import RequestFactory
 
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
@@ -16,6 +15,7 @@ from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, p
 from ...serializers.course_runs import CourseRunSerializer
 from ..utils import serialize_datetime
 
+UTC = datetime.timezone.utc
 
 @ddt.ddt
 class CourseRunSerializerTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -23,7 +23,7 @@ class CourseRunSerializerTests(ModuleStoreTestCase):  # lint-amnesty, pylint: di
     def setUp(self):
         super().setUp()
 
-        self.course_start = datetime.datetime.now(pytz.UTC)
+        self.course_start = datetime.datetime.now(UTC)
         self.course_end = self.course_start + datetime.timedelta(days=30)
 
         self.request = RequestFactory().get('')

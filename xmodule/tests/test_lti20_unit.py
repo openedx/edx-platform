@@ -6,7 +6,6 @@ import textwrap
 import unittest
 from unittest.mock import Mock
 
-from pytz import UTC
 from xblock.field_data import DictFieldData
 
 from xmodule.lti_2_util import LTIError
@@ -14,6 +13,8 @@ from xmodule.lti_block import LTIBlock
 from xmodule.tests.helpers import StubUserService
 
 from . import get_test_system
+
+UTC = datetime.timezone.utc
 
 
 class LTI20RESTResultServiceTest(unittest.TestCase):

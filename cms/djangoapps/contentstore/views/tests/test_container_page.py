@@ -10,7 +10,6 @@ from unittest.mock import Mock, patch
 from django.http import Http404
 from django.test.client import RequestFactory
 from django.urls import reverse
-from pytz import UTC
 from urllib.parse import quote
 
 import cms.djangoapps.contentstore.views.component as views
@@ -21,6 +20,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # l
 
 from .utils import StudioPageTestCase
 
+UTC = datetime.timezone.utc
 
 class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
     """

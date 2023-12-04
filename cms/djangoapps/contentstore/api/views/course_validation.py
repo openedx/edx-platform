@@ -1,8 +1,8 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 import logging
+import datetime
 
 import dateutil
-from pytz import UTC
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
@@ -16,6 +16,7 @@ from .utils import course_author_access_required, get_bool_param
 
 log = logging.getLogger(__name__)
 
+UTC = datetime.timezone.utc
 
 @view_auth_classes()
 class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):

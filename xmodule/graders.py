@@ -9,13 +9,14 @@ import logging
 import random
 import sys
 from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, timezone
 
-from pytz import UTC
 from django.utils.translation import gettext_lazy as _
 
 from xmodule.util.misc import get_short_labeler
 
+
+UTC = timezone.utc
 
 log = logging.getLogger("edx.courseware")
 

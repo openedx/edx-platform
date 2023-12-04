@@ -5,7 +5,7 @@ Tests for Discussion API views
 
 import json
 import random
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest import mock
 from urllib.parse import parse_qs, urlencode, urlparse
 
@@ -16,7 +16,6 @@ from django.test import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient, APITestCase
@@ -64,6 +63,7 @@ from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFactory, ApplicationFactory
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
+UTC = timezone.utc
 
 
 class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMixin):

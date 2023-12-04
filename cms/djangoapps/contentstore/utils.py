@@ -21,7 +21,6 @@ from opaque_keys.edx.locator import LibraryLocator
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from milestones import api as milestones_api
-from pytz import UTC
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.toggles import exam_setting_view_enabled
@@ -88,6 +87,9 @@ from xmodule.services import SettingsService, ConfigurationService, TeamsConfigu
 
 
 log = logging.getLogger(__name__)
+
+
+UTC = timezone.utc
 
 
 def add_instructor(course_key, requesting_user, new_instructor):
@@ -1087,7 +1089,7 @@ def duplicate_block(
 
         # .. event_implemented_name: XBLOCK_DUPLICATED
         XBLOCK_DUPLICATED.send_event(
-            time=datetime.now(timezone.utc),
+            time=datetime.now(UTC),
             xblock_info=DuplicatedXBlockData(
                 usage_key=dest_block.location,
                 block_type=dest_block.location.block_type,

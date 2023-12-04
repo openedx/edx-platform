@@ -13,12 +13,13 @@ from django.conf import settings
 from django.core.cache import cache
 from django.test.utils import override_settings
 from django.urls import reverse
-from pytz import UTC
 
 from cms.djangoapps.contentstore.tests.test_course_settings import CourseTestCase
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, parse_json, registration, user
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+
+UTC = datetime.timezone.utc
 
 
 class ContentStoreTestCase(ModuleStoreTestCase):

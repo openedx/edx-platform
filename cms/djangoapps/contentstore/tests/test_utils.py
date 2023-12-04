@@ -1,6 +1,6 @@
 """ Tests for utils. """
 import collections
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from unittest import mock
 from unittest.mock import Mock, patch
 from uuid import uuid4
@@ -12,7 +12,6 @@ from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 from path import Path as path
-from pytz import UTC
 from rest_framework import status
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
@@ -30,6 +29,8 @@ from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: di
 )
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
+
+UTC = timezone.utc
 
 
 class LMSLinksTestCase(TestCase):
