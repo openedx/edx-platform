@@ -7,7 +7,7 @@ import json
 import os
 import shutil
 import tarfile
-from datetime import datetime
+from datetime import datetime, timezone
 from tempfile import NamedTemporaryFile, mkdtemp
 
 import olxcleaner
@@ -89,7 +89,7 @@ ALL_ALLOWED_XBLOCKS = frozenset(
     [entry_point.name for entry_point in pkg_resources.iter_entry_points("xblock.v1")]
 )
 
-UTC = datetime.timezone.utc
+UTC = timezone.utc
 
 def clone_instance(instance, field_values):
     """ Clones a Django model instance.
