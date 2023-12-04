@@ -19,6 +19,7 @@
         };
 
     this.Problem = (function() {
+        let currentIndex = 0;  
         function Problem(element) {
             var that = this;
             // button custom problem quizz
@@ -646,7 +647,7 @@
             }
         };
         // problem quizz
-        let currentIndex = 0;   
+ 
         Problem.prototype.submit_qz = function () {
             console.log('submit_qz');
             console.log('========', currentIndex)
