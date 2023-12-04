@@ -77,20 +77,41 @@ case "$TEST_SUITE" in
 
         mkdir -p reports
 
-        echo "Finding fixme's and storing report..."
-        run_paver_quality find_fixme || { EXIT=1; }
-        echo "Finding pycodestyle violations and storing report..."
-        run_paver_quality run_pep8 || { EXIT=1; }
-        echo "Finding ESLint violations and storing report..."
-        run_paver_quality run_eslint -l "$ESLINT_THRESHOLD" || { EXIT=1; }
-        echo "Finding Stylelint violations and storing report..."
-        run_paver_quality run_stylelint || { EXIT=1; }
-        echo "Running xss linter report."
-        run_paver_quality run_xsslint -t "$XSSLINT_THRESHOLDS" || { EXIT=1; }
-        echo "Running PII checker on all Django models..."
-        run_paver_quality run_pii_check || { EXIT=1; }
-        echo "Running reserved keyword checker on all Django models..."
-        run_paver_quality check_keywords || { EXIT=1; }
+        case "$SHARD" in
+            1)
+                echo "Finding pylint violations and storing in report..."
+                run_paver_quality run_pylint --system=common  || { EXIT=1; }
+                ;;
+
+            2)
+                echo "Finding pylint violations and storing in report..."
+                run_paver_quality run_pylint --system=lms || { EXIT=1; }
+                ;;
+
+            3)
+                echo "Finding pylint violations and storing in report..."
+                run_paver_quality run_pylint --system="cms,openedx,pavelib" || { EXIT=1; }
+                ;;
+
+            4)
+                echo "Finding fixme's and storing report..."
+                run_paver_quality find_fixme || { EXIT=1; }
+                echo "Finding pycodestyle violations and storing report..."
+                run_paver_quality run_pep8 || { EXIT=1; }
+                echo "Finding ESLint violations and storing report..."
+                run_paver_quality run_eslint -l "$ESLINT_THRESHOLD" || { EXIT=1; }
+                echo "Finding Stylelint violations and storing report..."
+                run_paver_quality run_stylelint || { EXIT=1; }
+                echo "Running xss linter report."
+                run_paver_quality run_xsslint -t "$XSSLINT_THRESHOLDS" || { EXIT=1; }
+                echo "Running PII checker on all Django models..."
+                run_paver_quality run_pii_check || { EXIT=1; }
+                echo "Running reserved keyword checker on all Django models..."
+                run_paver_quality check_keywords || { EXIT=1; }
+                echo "Running ruff linter..."
+                make ruff || { EXIT=1; }
+
+        esac
 
         # Need to create an empty test result so the post-build
         # action doesn't fail the build.
