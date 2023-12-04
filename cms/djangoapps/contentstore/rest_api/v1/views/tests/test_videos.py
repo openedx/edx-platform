@@ -127,8 +127,9 @@ class CourseVideosViewTest(CourseTestCase, PermissionAccessMixin):
             )
             self.assertIn("transcript_credentials_handler_url", transcript_settings)
             self.assertEqual(expected_credentials_handler, transcript_settings["transcript_credentials_handler_url"])
-            from openedx.core.djangoapps.video_config.toggles import XPERT_TRANSLATIONS_UI
-        with patch('openedx.core.djangoapps.video_config.toggles.XPERT_TRANSLATIONS_UI.is_enabled') as xpertTranslationfeature:
+        with patch(
+            'openedx.core.djangoapps.video_config.toggles.XPERT_TRANSLATIONS_UI.is_enabled'
+        ) as xpertTranslationfeature:
             xpertTranslationfeature.return_value = True
             response = self.client.get(self.url)
             self.assertIn("is_ai_translations_enabled", response.data)
