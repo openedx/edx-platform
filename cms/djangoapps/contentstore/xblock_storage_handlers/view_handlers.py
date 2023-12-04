@@ -1387,9 +1387,6 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             else:
                 xblock_info["staff_only_message"] = False
 
-            # If the ENABLE_COPY_PASTE_UNITS feature flag is enabled, we show the newer menu that allows copying/pasting
-            xblock_info["enable_copy_paste_units"] = ENABLE_COPY_PASTE_UNITS.is_enabled()
-
             # If the ENABLE_TAGGING_TAXONOMY_LIST_PAGE feature flag is enabled, we show the "Manage Tags" options
             if use_tagging_taxonomy_list_page():
                 xblock_info["use_tagging_taxonomy_list_page"] = True
@@ -1401,6 +1398,10 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
         xblock_info["user_partition_info"] = get_visibility_partition_info(
             xblock, course=course
         )
+
+        if course_outline or is_xblock_unit:
+            # If the ENABLE_COPY_PASTE_UNITS feature flag is enabled, we show the newer menu that allows copying/pasting
+            xblock_info["enable_copy_paste_units"] = ENABLE_COPY_PASTE_UNITS.is_enabled()
 
         if is_xblock_unit and summary_configuration.is_enabled():
             xblock_info["summary_configuration_enabled"] = summary_configuration.is_summary_enabled(xblock_info['id'])
