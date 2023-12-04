@@ -23,10 +23,11 @@ from lms.djangoapps.certificates.tests.factories import (
 
 # pylint: disable=no-member
 
+UTC = datetime.timezone.utc
+
 PAST_DATE = datetime.datetime.now(UTC) - datetime.timedelta(days=2)
 FUTURE_DATE = datetime.datetime.now(UTC) + datetime.timedelta(days=2)
 
-UTC = datetime.timezone.utc
 
 
 class CertificateDisplayTestBase(SharedModuleStoreTestCase):
