@@ -3,7 +3,7 @@ Tests for the edx_proctoring integration into Studio
 """
 
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from unittest.mock import patch, Mock
 
 import ddt
@@ -16,7 +16,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from cms.djangoapps.contentstore.signals.handlers import listen_for_course_publish
 from common.djangoapps.student.tests.factories import UserFactory
 
-UTC = datetime.timezone.utc
+UTC = timezone.utc
 
 
 @ddt.ddt
