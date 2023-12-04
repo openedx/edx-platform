@@ -4,14 +4,13 @@ Tests for the Studio Tagging XBlockAside
 
 
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from io import StringIO
 
 import ddt
 from django.test.client import RequestFactory
 from lxml import etree
 from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
-from pytz import UTC
 from xblock.fields import ScopeIds
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
@@ -27,6 +26,7 @@ from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
+UTC = timezone.utc
 
 
 @ddt.ddt

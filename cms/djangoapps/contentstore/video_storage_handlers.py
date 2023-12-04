@@ -9,7 +9,7 @@ import io
 import json
 import logging
 from contextlib import closing
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 from boto.s3.connection import S3Connection
 from boto import s3
@@ -36,7 +36,6 @@ from edxval.api import (
     update_video_status
 )
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
 from rest_framework import status as rest_status
 from rest_framework.response import Response
 
@@ -56,6 +55,8 @@ from .toggles import use_new_video_uploads_page, use_mock_video_uploads
 from .utils import get_video_uploads_url, get_course_videos_context
 from .video_utils import validate_video_image
 from .views.course import get_course_and_check_access
+
+UTC = timezone.utc
 
 LOGGER = logging.getLogger(__name__)
 
