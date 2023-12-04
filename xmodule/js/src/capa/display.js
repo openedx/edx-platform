@@ -655,62 +655,63 @@
             }
         };
         // problem quizz
-        let currentIndex = 0;   
+        // let currentIndex = 0;   
         Problem.prototype.submit_qz = function () {
-          var that = this;
-          const listQz = that.$('.wrapper-problem-response');
-  
-          return $.postWithPrefix('' + this.url + '/problem_check', that.answers, function (response) {
+            console.log('submit_qz');
+        //   var that = this;
+        //   const listQz = that.$('.wrapper-problem-response');
+        //   return $.postWithPrefix('' + this.url + '/problem_check', that.answers, function (response) {
 
-            if (response.success === 'submitted' || response.success === 'incorrect' || response.success === 'correct') {
+        //     if (response.success === 'submitted' || response.success === 'incorrect' || response.success === 'correct') {
 
-              if (response.success === 'correct' ){
-                listQz[currentIndex].style.display = 'none'; 
-                currentIndex += 1; 
-                if (currentIndex >= listQz.length) {
-                  currentIndex = 0; 
-                }
-                listQz[currentIndex].style.display = 'block'; 
-              }
+        //       if (response.success === 'correct' ){
+        //         listQz[currentIndex].style.display = 'none'; 
+        //         currentIndex += 1; 
+        //         if (currentIndex >= listQz.length) {
+        //           currentIndex = 0; 
+        //         }
+        //         listQz[currentIndex].style.display = 'block'; 
+        //       }
               
-              if (response.success === 'incorrect' && response.current_score == (currentIndex + 1)){
-                console.log(currentIndex)
-                listQz[currentIndex].style.display = 'none'; 
-                currentIndex += 1; 
-                if (currentIndex >= listQz.length) {
-                  currentIndex = 0; 
-                }
-                listQz[currentIndex].style.display = 'block'; 
-              }
-              window.SR.readTexts(that.get_sr_status(response.contents));
-              that.el.trigger('contentChanged', [that.id, response.contents, response]);
-              // that.render(response.contents, that.focus_on_submit_notification);
-              that.updateProgress(response);
+        //       if (response.success === 'incorrect' && response.current_score == (currentIndex + 1)){
+        //         console.log(currentIndex)
+        //         listQz[currentIndex].style.display = 'none'; 
+        //         currentIndex += 1; 
+        //         if (currentIndex >= listQz.length) {
+        //           currentIndex = 0; 
+        //         }
+        //         listQz[currentIndex].style.display = 'block'; 
+        //       }
+        //       window.SR.readTexts(that.get_sr_status(response.contents));
+        //       that.el.trigger('contentChanged', [that.id, response.contents, response]);
+        //       // that.render(response.contents, that.focus_on_submit_notification);
+        //       that.updateProgress(response);
             
-              if (response.entrance_exam_passed) {
-                window.parent.postMessage({
-                  type: 'entranceExam.passed'
-                }, '*');
-              }
-            } else {
-              that.saveNotification.hide();
-              that.gentle_alert(response.success);
-            }
+        //       if (response.entrance_exam_passed) {
+        //         window.parent.postMessage({
+        //           type: 'entranceExam.passed'
+        //         }, '*');
+        //       }
+        //     } else {
+        //       that.saveNotification.hide();
+        //       that.gentle_alert(response.success);
+        //     }
         
-            return Logger.log('problem_graded', [that.answers, response.contents], that.id);
-          }); 
+        //     return Logger.log('problem_graded', [that.answers, response.contents], that.id);
+        //   }); 
         }
 
         Problem.prototype.prev_btn = function () {
-            var that = this;
-            console.log('currentIndex' , currentIndex)
-            const listQz = that.$('.wrapper-problem-response');
-              listQz[currentIndex].style.display = 'none'; 
-              currentIndex -= 1; 
-              if (currentIndex < 0) {
-                currentIndex = listQz.length - 1; 
-              }
-              listQz[currentIndex].style.display = 'block'; 
+            console.log('prev_btn')
+            // var that = this;
+            // console.log('currentIndex' , currentIndex)
+            // const listQz = that.$('.wrapper-problem-response');
+            //   listQz[currentIndex].style.display = 'none'; 
+            //   currentIndex -= 1; 
+            //   if (currentIndex < 0) {
+            //     currentIndex = listQz.length - 1; 
+            //   }
+            //   listQz[currentIndex].style.display = 'block'; 
           }
         
 
