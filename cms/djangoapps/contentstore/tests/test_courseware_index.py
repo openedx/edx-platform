@@ -11,7 +11,6 @@ import ddt
 import pytest
 from django.conf import settings
 from lazy.lazy import lazy
-from pytz import UTC
 from search.search_engine_base import SearchEngine
 
 from cms.djangoapps.contentstore.courseware_index import (
@@ -44,6 +43,9 @@ COURSE_CHILD_STRUCTURE = {
     "sequential": "vertical",
     "vertical": "html",
 }
+
+
+UTC = datetime.timezone.utc
 
 
 def create_children(store, parent, category, load_factor):

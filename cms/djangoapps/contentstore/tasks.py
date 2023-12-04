@@ -36,7 +36,6 @@ from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from organizations.models import Organization, OrganizationCourse
 from path import Path as path
-from pytz import UTC
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.tasks import UserTask
 
@@ -90,6 +89,7 @@ ALL_ALLOWED_XBLOCKS = frozenset(
     [entry_point.name for entry_point in pkg_resources.iter_entry_points("xblock.v1")]
 )
 
+UTC = datetime.timezone.utc
 
 def clone_instance(instance, field_values):
     """ Clones a Django model instance.

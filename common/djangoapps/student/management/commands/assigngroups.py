@@ -8,13 +8,14 @@ from textwrap import dedent
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management.base import BaseCommand
-from pytz import UTC
 
 from common.djangoapps.student.models import UserTestGroup
 
 # Examples:
 # python manage.py assigngroups summary_test:0.3,skip_summary_test:0.7 log.txt "Do previews of future materials help?"
 # python manage.py assigngroups skip_capacitor:0.3,capacitor:0.7 log.txt "Do we show capacitor in linearity tutorial?"
+
+UTC = datetime.timezone.utc
 
 
 def group_from_value(groups, v):

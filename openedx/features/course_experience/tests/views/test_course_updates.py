@@ -5,7 +5,6 @@ Tests for the course updates page.
 from datetime import datetime
 
 from django.urls import reverse
-from pytz import UTC
 
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig

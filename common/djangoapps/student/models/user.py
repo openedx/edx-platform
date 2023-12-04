@@ -16,7 +16,7 @@ import hashlib  # lint-amnesty, pylint: disable=wrong-import-order
 import json  # lint-amnesty, pylint: disable=wrong-import-order
 import logging  # lint-amnesty, pylint: disable=wrong-import-order
 import uuid  # lint-amnesty, pylint: disable=wrong-import-order
-from datetime import datetime, timedelta  # lint-amnesty, pylint: disable=wrong-import-order
+from datetime import datetime, timedelta, timezone  # lint-amnesty, pylint: disable=wrong-import-order
 from functools import total_ordering  # lint-amnesty, pylint: disable=wrong-import-order
 from importlib import import_module  # lint-amnesty, pylint: disable=wrong-import-order
 from urllib.parse import urlencode
@@ -52,7 +52,6 @@ from edx_django_utils.cache import RequestCache
 from eventtracking import tracker
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, LearningContextKeyField
-from pytz import UTC, timezone
 from user_util import user_util
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
@@ -73,6 +72,7 @@ IS_MARKETABLE = 'is_marketable'
 USER_LOGGED_IN_EVENT_NAME = 'edx.user.login'
 USER_LOGGED_OUT_EVENT_NAME = 'edx.user.logout'
 
+UTC = timezone.utc
 
 class AnonymousUserId(models.Model):
     """

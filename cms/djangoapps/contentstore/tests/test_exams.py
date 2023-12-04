@@ -7,12 +7,13 @@ from unittest.mock import patch, Mock
 import ddt
 from django.conf import settings
 from edx_toggles.toggles.testutils import override_waffle_flag
-from pytz import UTC
 
 from cms.djangoapps.contentstore.signals.handlers import listen_for_course_publish
 from openedx.core.djangoapps.course_apps.toggles import EXAMS_IDA
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
+
+UTC = datetime.timezone.utc
 
 
 @ddt.ddt

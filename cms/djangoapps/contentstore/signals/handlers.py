@@ -14,7 +14,6 @@ from edx_toggles.toggles import SettingToggle
 from opaque_keys.edx.keys import CourseKey
 from openedx_events.content_authoring.data import CourseCatalogData, CourseScheduleData
 from openedx_events.content_authoring.signals import COURSE_CATALOG_INFO_CHANGED
-from pytz import UTC
 
 from cms.djangoapps.contentstore.courseware_index import (
     CourseAboutSearchIndexer,
@@ -34,6 +33,7 @@ from .signals import GRADING_POLICY_CHANGED
 log = logging.getLogger(__name__)
 
 GRADING_POLICY_COUNTDOWN_SECONDS = 3600
+UTC = datetime.timezone.utc
 
 
 def locked(expiry_seconds, key):  # lint-amnesty, pylint: disable=missing-function-docstring

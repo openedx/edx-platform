@@ -6,11 +6,12 @@ import re
 import time
 
 import dateutil.parser
-from pytz import UTC
 from xblock.fields import JSONField
 from xblock.scorable import Score
 
 log = logging.getLogger(__name__)
+
+UTC = datetime.timezone.utc
 
 
 class Date(JSONField):

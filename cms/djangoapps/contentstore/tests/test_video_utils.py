@@ -3,12 +3,11 @@ Unit tests for video utils.
 """
 
 
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest import TestCase
 from unittest import mock
 
 import ddt
-import pytz
 import requests
 from django.conf import settings
 from django.core.files.base import ContentFile
@@ -26,6 +25,9 @@ from cms.djangoapps.contentstore.video_utils import (
     validate_video_image
 )
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
+
+
+UTC = timezone.utc
 
 
 class ValidateVideoImageTestCase(TestCase):
@@ -63,7 +65,7 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
         super().setUp()
         course_ids = [str(self.course.id)]
         profiles = ['youtube']
-        created = datetime.now(pytz.utc)
+        created = datetime.now(UTC)
         previous_uploads = [
             {
                 'edx_video_id': 'test1',

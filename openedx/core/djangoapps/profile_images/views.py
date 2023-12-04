@@ -11,7 +11,7 @@ from contextlib import closing
 from django.utils.translation import gettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
-from pytz import UTC
+
 from rest_framework import permissions, status
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
@@ -31,6 +31,8 @@ log = logging.getLogger(__name__)
 
 LOG_MESSAGE_CREATE = 'Generated and uploaded images %(image_names)s for user %(user_id)s'
 LOG_MESSAGE_DELETE = 'Deleted images %(image_names)s for user %(user_id)s'
+
+UTC = datetime.timezone.utc
 
 
 def _make_upload_dt():
