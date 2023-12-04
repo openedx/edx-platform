@@ -8,8 +8,6 @@ from django.utils.deprecation import MiddlewareMixin
 from edx_django_utils import ip
 from edx_django_utils.monitoring import set_custom_attribute
 
-from openedx.core.djangoapps.util import legacy_ip
-
 
 def _ip_type(ip_str):
     """
@@ -45,8 +43,7 @@ class XForwardedForMiddleware(MiddlewareMixin):
         # This function will cache its results in the request.
         ip.init_client_ips(request)
 
-        # Only used to support ip.legacy switch.
-        request.META['ORIGINAL_REMOTE_ADDR'] = request.META['REMOTE_ADDR']
+        safest_client_ip = ip.get_safest_client_ip(request)
 
         try:
             # Give some observability into IP chain length and composition. Useful
@@ -61,11 +58,11 @@ class XForwardedForMiddleware(MiddlewareMixin):
             set_custom_attribute('ip_chain.count', len(ip_chain))
             set_custom_attribute('ip_chain.types', '-'.join(_ip_type(s) for s in ip_chain))
 
-            set_custom_attribute('ip_chain.use_legacy', legacy_ip.USE_LEGACY_IP.is_enabled())
-
             external_chain = ip.get_all_client_ips(request)
             set_custom_attribute('ip_chain.external.count', len(external_chain))
             set_custom_attribute('ip_chain.external.types', '-'.join(_ip_type(s) for s in external_chain))
+
+            set_custom_attribute('ip_chain.safest_client_ip', safest_client_ip)
         except BaseException:
             warnings.warn('Error while computing IP chain metrics')
 
@@ -98,13 +95,8 @@ class XForwardedForMiddleware(MiddlewareMixin):
         # makes it possible to handle multi-valued headers correctly.
         # After that, this override can probably be safely removed.
         #
-        # It is very important that init_client_ips is called before this
+        # It is important that init_client_ips is called before this
         # point, allowing it to cache its results in request.META, since
-        # after this point it will be more difficult for it to operate
-        # without knowing about ORIGINAL_REMOTE_ADDR. (The less code that
-        # is aware of that, the better, and the ip code should be lifted
-        # out into a library anyhow.)
-        if legacy_ip.USE_LEGACY_IP.is_enabled():
-            request.META['REMOTE_ADDR'] = legacy_ip.get_legacy_ip(request)
-        else:
-            request.META['REMOTE_ADDR'] = ip.get_safest_client_ip(request)
+        # after this point it will be unable to reconstruct the original
+        # IP chain.
+        request.META['REMOTE_ADDR'] = safest_client_ip

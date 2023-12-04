@@ -71,7 +71,7 @@ module.exports = {
             './xmodule/js/src/raw/edit/metadata-only.js'
         ],
         LibraryContentBlockDisplay: './xmodule/js/src/xmodule.js',
-        LibraryContentBlockStudio: [
+        LibraryContentBlockEditor: [
             './xmodule/js/src/xmodule.js',
             './xmodule/js/src/vertical/edit.js'
         ],
