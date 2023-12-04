@@ -21,7 +21,12 @@
     this.Problem = (function() {
         function Problem(element) {
             var that = this;
+            // button custom problem quizz
+            this.submit_button = function (){
+                console.log('===================')
+            }
             this.hint_button = function() {
+                console.log('===============')
                 return Problem.prototype.hint_button.apply(that, arguments);
             };
             this.enableSubmitButtonAfterTimeout = function() {
@@ -170,6 +175,10 @@
             this.submitButton.click(this.submit_fd);
             this.hintButton = this.$('.action .hint-button');
             this.hintButton.click(this.hint_button);
+          //problem quiz custom
+            this.submitButton = this.$('.btn-submit-qz')
+            this.submitButton.click(this.submit_button)
+
             this.resetButton = this.$('.action .reset');
             this.resetButton.click(this.reset);
             this.showButton = this.$('.action .show');
@@ -180,6 +189,8 @@
             this.saveButton.click(this.save);
             this.gentleAlertNotification = this.$('.notification-gentle-alert');
             this.submitNotification = this.$('.notification-submit');
+
+
 
             // Accessibility helper for sighted keyboard users to show <clarification> tooltips on focus:
             this.$('.clarification').focus(function(ev) {
