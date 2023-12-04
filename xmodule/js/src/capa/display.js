@@ -23,16 +23,19 @@
         function Problem(element) {
             var that = this;
             // button custom problem quizz
-            // let a = 0
-            this.prev_btn = function (){
-                return Problem.prototype.prev_btn(that, arguments)
-              };
+            this.next_btn = function (){
 
+                return Problem.prototype.next_btn.apply(that, arguments)
+              };
+            this.prev_btn = function (){
+    
+                return Problem.prototype.prev_btn.apply(that, arguments)
+              };
             this.submit_btn_qz = function(){
-  
+      
                 return Problem.prototype.submit_qz.apply(that, arguments);
                 
-            };
+              };
 
             this.enableSubmitButtonAfterTimeout = function() {
                 return Problem.prototype.enableSubmitButtonAfterTimeout.apply(that, arguments);
@@ -182,6 +185,8 @@
             this.hintButton = this.$('.action .hint-button');
             this.hintButton.click(this.hint_button);
           //problem quiz custom
+            this.nextButton = this.$('.action #btn-next')
+            this.nextButton.click(this.next_btn)
             this.prevBtn = this.$('.action .btn-prev');
             this.prevBtn.click(this.prev_btn)
             this.submitBtnQz = this.$('.action .btn-submit-qz')
@@ -649,67 +654,88 @@
             }
         };
         // problem quizz
-        var currentIndex = 0
+        var currentIndex = 0;   
         Problem.prototype.submit_qz = function () {
-            console.log('submit_qz');
+          console.log('submit_qz');
             
-            var that = this;
-            const listQz = that.$('.wrapper-problem-response');
+          var that = this;
+          const listQz = that.$('.wrapper-problem-response');
 
-          return $.postWithPrefix('' + this.url + '/problem_check', that.answers, function (response) {
+        return $.postWithPrefix('' + this.url + '/problem_check', that.answers, function (response) {
 
-            if (response.success === 'submitted' || response.success === 'incorrect' || response.success === 'correct') {
-
-              if (response.success === 'correct' ){
-                listQz[currentIndex].style.display = 'none'; 
-                currentIndex += 1; 
-                if (currentIndex >= listQz.length) {
-                  currentIndex = 0; 
-                }
-                listQz[currentIndex].style.display = 'block'; 
+          if (response.success === 'submitted' || response.success === 'incorrect' || response.success === 'correct') {
+            console.log('====', response)
+            if (response.success === 'correct' ){
+               that.$('.btn-submit-qz').css('display', 'none');
+               that.$('#btn-next').css('display', 'block');
+               if (currentIndex > 0) {
+                that.$('.btn-prev').css('display', 'block')
               }
-              
-              if (response.success === 'incorrect' && response.current_score == (currentIndex + 1)){
-                console.log(currentIndex)
-                listQz[currentIndex].style.display = 'none'; 
-                currentIndex += 1; 
-                if (currentIndex >= listQz.length) {
-                  currentIndex = 0; 
-                }
-                listQz[currentIndex].style.display = 'block'; 
-              }
-              window.SR.readTexts(that.get_sr_status(response.contents));
-              that.el.trigger('contentChanged', [that.id, response.contents, response]);
-              // that.render(response.contents, that.focus_on_submit_notification);
-              that.updateProgress(response);
-            
-              if (response.entrance_exam_passed) {
-                window.parent.postMessage({
-                  type: 'entranceExam.passed'
-                }, '*');
-              }
-            } else {
-              that.saveNotification.hide();
-              that.gentle_alert(response.success);
             }
-        
-            return Logger.log('problem_graded', [that.answers, response.contents], that.id);
-          }); 
+            
+            if (response.success === 'incorrect' && response.current_score == (currentIndex + 1)){
+              that.$('.btn-submit-qz').css('display', 'none');
+              that.$('#btn-next').css('display', 'block');
+              if (currentIndex > 0) {
+                that.$('.btn-prev').css('display', 'block')
+              }
+  
+            }
+ 
+            if (response.success === 'incorrect' && (currentIndex + 1) <= response.current_score){
+              that.$('.btn-submit-qz').css('display', 'none');
+              that.$('#btn-next').css('display', 'block');
+              if (currentIndex > 0) {
+                that.$('.btn-prev').css('display', 'block')
+              }
+            }
+            window.SR.readTexts(that.get_sr_status(response.contents));
+            that.el.trigger('contentChanged', [that.id, response.contents, response]);
+            // that.render(response.contents, that.focus_on_submit_notification);
+            that.updateProgress(response);
+          
+            if (response.entrance_exam_passed) {
+              window.parent.postMessage({
+                type: 'entranceExam.passed'
+              }, '*');
+            }
+          } else {
+            that.saveNotification.hide();
+            that.gentle_alert(response.success);
+          }
+      
+          return Logger.log('problem_graded', [that.answers, response.contents], that.id);
+        }); 
         }
 
         Problem.prototype.prev_btn = function () {
-            console.log('prev_btn')
-    
-            var that = this;
-            console.log('currentIndex' , currentIndex)
-            const listQz = that.$('.wrapper-problem-response');
-              listQz[currentIndex].style.display = 'none'; 
-              currentIndex -= 1; 
-              if (currentIndex < 0) {
-                currentIndex = listQz.length - 1; 
-              }
-              listQz[currentIndex].style.display = 'block'; 
-          }
+          var that = this;
+          const listQz = that.$('.wrapper-problem-response');
+            listQz[currentIndex].style.display = 'none'; 
+            currentIndex -= 1; 
+            if (currentIndex < 0) {
+              currentIndex = listQz.length - 1; 
+            }
+            listQz[currentIndex].style.display = 'block'; 
+        }
+        Problem.prototype.next_btn = function(){
+          var that = this;  
+ 
+           const listQz = that.$('.wrapper-problem-response');
+            listQz[currentIndex].style.display = 'none'; 
+            currentIndex += 1; 
+            if (currentIndex >= listQz.length) {
+              currentIndex = 0; 
+            }
+            listQz[currentIndex].style.display = 'block'; 
+            that.$('.btn-submit-qz').css('display', 'block');
+            that.$('#btn-next').css('display', 'none');
+            if (currentIndex > 0) {
+              that.$('.btn-prev').css('display', 'block')
+            }
+            
+            
+        };
         
 
 

@@ -32,10 +32,11 @@ from openedx.core.djangolib.markup import HTML
       <span class="problem-action-button-wrapper">
           <button type="button" class="hint-button problem-action-btn btn-link btn-small" data-value="${_('Hint')}" ${'' if should_enable_next_hint else 'disabled'}>${_('Hint')}</button>
       </span>
-      <span>
+      <span style='display:flex; gap: 10px'>
+    
         % if problem['name'] == 'Quiz Problem Custom' :
-          <button class='btn-prev'> prev </button>
-          <button class'btn-next'> Next </button>
+          <button class='btn-prev' style='display:none'> prev </button>
+          <button id='btn-next' style='display:none'> Next </button>
           <button class='btn-submit-qz'> Submit </button>
         %endif
 
