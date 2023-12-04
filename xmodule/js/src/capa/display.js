@@ -23,15 +23,6 @@
             var that = this;
             // button custom problem quizz
             this.prev_btn = function (){
-                // const listQz = that.$('.wrapper-problem-response');
-                // listQz[currentIndex].style.display = 'none'; 
-      
-                // currentIndex -= 1; 
-                // if (currentIndex < 0) {
-                //   currentIndex = listQz.length - 1; 
-                // }
-      
-                // listQz[currentIndex].style.display = 'block'; 
                 return Problem.prototype.prev_btn(that, arguments)
               };
 
@@ -188,10 +179,10 @@
             this.hintButton = this.$('.action .hint-button');
             this.hintButton.click(this.hint_button);
           //problem quiz custom
-            this.prevBtn = this.$('.action .btn-prev');
-            this.prevBtn.click(this.prev_btn)
-            this.submitBtnQz = this.$('.action .btn-submit-qz')
-            this.submitBtnQz.click(this.submit_btn_qz)
+            // this.prevBtn = this.$('.action .btn-prev');
+            // this.prevBtn.click(this.prev_btn)
+            // this.submitBtnQz = this.$('.action .btn-submit-qz')
+            // this.submitBtnQz.click(this.submit_btn_qz)
 
             this.resetButton = this.$('.action .reset');
             this.resetButton.click(this.reset);
@@ -655,9 +646,10 @@
             }
         };
         // problem quizz
-        // let currentIndex = 0;   
+        let currentIndex = 0;   
         Problem.prototype.submit_qz = function () {
             console.log('submit_qz');
+            console.log('========', currentIndex)
         //   var that = this;
         //   const listQz = that.$('.wrapper-problem-response');
         //   return $.postWithPrefix('' + this.url + '/problem_check', that.answers, function (response) {
@@ -703,6 +695,7 @@
 
         Problem.prototype.prev_btn = function () {
             console.log('prev_btn')
+            console.log('========', currentIndex)
             // var that = this;
             // console.log('currentIndex' , currentIndex)
             // const listQz = that.$('.wrapper-problem-response');
