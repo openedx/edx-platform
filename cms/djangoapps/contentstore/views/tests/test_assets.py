@@ -4,7 +4,7 @@ Unit tests for the asset upload endpoint.
 
 
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from io import BytesIO
 from unittest import mock
 from unittest.mock import patch
@@ -15,7 +15,6 @@ from django.test.utils import override_settings
 from opaque_keys.edx.keys import AssetKey
 from opaque_keys.edx.locator import CourseLocator
 from PIL import Image
-from pytz import UTC
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
@@ -37,6 +36,7 @@ MAX_FILE_SIZE = settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB * 1000 ** 2
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 
+UTC = timezone.utc
 
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
 class AssetsTestCase(CourseTestCase):

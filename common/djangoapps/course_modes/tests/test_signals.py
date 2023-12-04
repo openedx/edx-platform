@@ -3,7 +3,7 @@ Unit tests for the course_mode signals
 """
 
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
 
 import ddt

@@ -9,7 +9,7 @@ contentstore/views/block.py to this file, because the logic is reused in another
 Along with it, we moved the business logic of the other views in that file, since that is related.
 """
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import uuid4
 
 from attrs import asdict
@@ -33,7 +33,6 @@ from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from help_tokens.core import HelpUrlExpert
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from opaque_keys.edx.locator import LibraryUsageLocator
-from pytz import UTC
 from xblock.core import XBlock
 from xblock.fields import Scope
 
@@ -97,7 +96,7 @@ CREATE_IF_NOT_FOUND = ["course_info"]
 # Useful constants for defining predicates
 NEVER = lambda x: False
 ALWAYS = lambda x: True
-
+UTC = timezone.utc
 
 def _filter_entrance_exam_grader(graders):
     """

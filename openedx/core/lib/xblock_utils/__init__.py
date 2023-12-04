@@ -19,7 +19,6 @@ from django.utils.html import escape
 from edx_django_utils.plugins import pluggable_override
 from lxml import etree, html
 from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
-from pytz import UTC
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
@@ -37,6 +36,7 @@ from xmodule.x_module import (  # lint-amnesty, pylint: disable=wrong-import-ord
 )
 
 log = logging.getLogger(__name__)
+UTC = datetime.timezone.utc
 
 
 def wrap_fragment(fragment, new_content):

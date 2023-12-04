@@ -73,7 +73,6 @@ from opaque_keys.edx.locator import (
     LocalId,
 )
 from path import Path as path
-from pytz import UTC
 from xblock.core import XBlock
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope
 
@@ -130,6 +129,7 @@ log = logging.getLogger(__name__)
 
 # When blacklists are this, all children should be excluded
 EXCLUDE_ALL = '*'
+UTC = datetime.timezone.utc
 
 
 class SplitBulkWriteRecord(BulkOpsRecord):  # lint-amnesty, pylint: disable=missing-class-docstring

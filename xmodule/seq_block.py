@@ -8,13 +8,12 @@ XBlock implementation of a learning sequence
 import collections
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from functools import reduce
 from django.conf import settings
 
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
-from pytz import UTC
 from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
@@ -68,6 +67,7 @@ TIMED_EXAM_GATING_WAFFLE_FLAG = WaffleFlag(  # lint-amnesty, pylint: disable=tog
 # .. toggle_creation_date: 2022-02-09
 # .. toggle_target_removal_date: None
 SHOW_PROGRESS_BAR = SettingDictToggle("FEATURES", "SHOW_PROGRESS_BAR", default=False, module_name=__name__)
+UTC = timezone.utc
 
 
 class SequenceFields:  # lint-amnesty, pylint: disable=missing-class-docstring
