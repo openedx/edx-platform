@@ -19,8 +19,9 @@
         };
 
     this.Problem = (function() {
-        let currentIndex = 0;  
+       
         function Problem(element) {
+            let currentIndex = 0;  
             var that = this;
             // button custom problem quizz
             this.prev_btn = function (){
@@ -650,7 +651,7 @@
  
         Problem.prototype.submit_qz = function () {
             console.log('submit_qz');
-            console.log('========', currentIndex)
+
         //   var that = this;
         //   const listQz = that.$('.wrapper-problem-response');
         //   return $.postWithPrefix('' + this.url + '/problem_check', that.answers, function (response) {
@@ -696,7 +697,7 @@
 
         Problem.prototype.prev_btn = function () {
             console.log('prev_btn')
-            console.log('========', currentIndex)
+    
             // var that = this;
             // console.log('currentIndex' , currentIndex)
             // const listQz = that.$('.wrapper-problem-response');
