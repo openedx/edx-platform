@@ -13,7 +13,7 @@ from openedx.core.djangoapps.course_apps.toggles import EXAMS_IDA
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
-UTC = datetime.timezone.utc
+UTC = timezone.utc
 
 
 @ddt.ddt
