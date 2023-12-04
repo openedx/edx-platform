@@ -1283,7 +1283,7 @@ class ProblemBlock(
             'save_message': save_message,
             'submit_disabled_cta': submit_disabled_ctas[0] if submit_disabled_ctas else None,
         }
-
+        # print('==============', context['problem']['name'])
         html = self.runtime.service(self, 'mako').render_template('problem.html', context)
 
         if encapsulate:
