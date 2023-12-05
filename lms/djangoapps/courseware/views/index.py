@@ -445,7 +445,7 @@ class CoursewareIndex(View):
             'disable_optimizely': not WaffleSwitchNamespace('RET').is_enabled('enable_optimizely_in_courseware'),
             'section_title': None,
             'sequence_title': None,
-            'disable_accordion': not DISABLE_COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id),
+            'disable_accordion':  DISABLE_COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id),
             'show_search': show_search,
         }
         courseware_context.update(
@@ -463,7 +463,7 @@ class CoursewareIndex(View):
             self.field_data_cache,
         )
 
-        if DISABLE_COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id):
+        if not DISABLE_COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id):
             course_block_tree = get_course_outline_block_tree(
                 request, six.text_type(self.course.id), request.user
             )
