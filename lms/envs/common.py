@@ -4411,6 +4411,8 @@ EDX_DRF_EXTENSIONS = {
     # Set this value to an empty dict in order to prevent automatically updating
     # user data from values in (possibly stale) JWTs.
     'JWT_PAYLOAD_USER_ATTRIBUTE_MAPPING': {},
+    # Allows JWT authentication to find the LMS user id for verification
+    'VERIFY_LMS_USER_ID_PROPERTY_NAME': 'id',
 }
 
 ################################ Settings for rss_proxy ################################
@@ -4947,6 +4949,13 @@ LEARNING_MICROFRONTEND_URL = None
 # .. setting_warning: Also set site's openresponseassessment.enhanced_staff_grader
 #     waffle flag.
 ORA_GRADING_MICROFRONTEND_URL = None
+# .. setting_name: ORA_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL for modern openassessment app.
+#     This is will be show in the open response tab list data.
+# .. setting_warning: Also set site's openresponseassessment.mfe_views
+#     waffle flag.
+ORA_MICROFRONTEND_URL = None
 # .. setting_name: DISCUSSIONS_MICROFRONTEND_URL
 # .. setting_default: None
 # .. setting_description: Base URL of the micro-frontend-based discussions page.

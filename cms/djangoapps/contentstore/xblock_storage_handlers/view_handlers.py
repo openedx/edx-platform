@@ -69,6 +69,7 @@ from ..utils import (
     is_self_paced,
     get_taxonomy_tags_widget_url,
     load_services_for_studio,
+    duplicate_block,
 )
 
 from .create_xblock import create_xblock
@@ -220,11 +221,11 @@ def handle_xblock(request, usage_key_string=None):
                     status=400,
                 )
 
-            dest_usage_key = _duplicate_block(
+            dest_usage_key = duplicate_block(
                 parent_usage_key,
                 duplicate_source_usage_key,
                 request.user,
-                request.json.get("display_name"),
+                display_name=request.json.get('display_name'),
             )
 
             return JsonResponse(
@@ -735,29 +736,6 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
         return JsonResponse(context)
 
 
-def _duplicate_block(
-    parent_usage_key,
-    duplicate_source_usage_key,
-    user,
-    display_name=None,
-    is_child=False,
-):
-    """
-    Duplicate an existing xblock as a child of the supplied parent_usage_key.
-    """
-    store = modulestore()
-    with store.bulk_operations(duplicate_source_usage_key.course_key):
-        source_item = store.get_item(duplicate_source_usage_key)
-        return source_item.studio_duplicate(
-            parent_usage_key=parent_usage_key,
-            duplicate_source_usage_key=duplicate_source_usage_key,
-            user=user,
-            store=store,
-            display_name=display_name,
-            is_child=is_child,
-        )
-
-
 @login_required
 def delete_item(request, usage_key):
     """
@@ -1236,9 +1214,6 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             else:
                 xblock_info["staff_only_message"] = False
 
-            # If the ENABLE_COPY_PASTE_UNITS feature flag is enabled, we show the newer menu that allows copying/pasting
-            xblock_info["enable_copy_paste_units"] = ENABLE_COPY_PASTE_UNITS.is_enabled()
-
             # If the ENABLE_TAGGING_TAXONOMY_LIST_PAGE feature flag is enabled, we show the "Manage Tags" options
             if use_tagging_taxonomy_list_page():
                 xblock_info["use_tagging_taxonomy_list_page"] = True
@@ -1250,6 +1225,10 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
         xblock_info["user_partition_info"] = get_visibility_partition_info(
             xblock, course=course
         )
+
+        if course_outline or is_xblock_unit:
+            # If the ENABLE_COPY_PASTE_UNITS feature flag is enabled, we show the newer menu that allows copying/pasting
+            xblock_info["enable_copy_paste_units"] = ENABLE_COPY_PASTE_UNITS.is_enabled()
 
         if is_xblock_unit and summary_configuration.is_enabled():
             xblock_info["summary_configuration_enabled"] = summary_configuration.is_summary_enabled(xblock_info['id'])
