@@ -3,9 +3,7 @@ Public rest API endpoints for contentstore API video assets (outside authoring A
 """
 import edx_api_doc_tools as apidocs
 import logging
-import os
 from opaque_keys.edx.keys import CourseKey
-from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -218,4 +216,3 @@ class VideoDownloadView(DeveloperErrorViewMixin, APIView):
             self.permission_denied(request)
         files = request.data['files']
         return create_video_zip(course_id, files)
-    

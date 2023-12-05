@@ -231,13 +231,13 @@ def handle_videos(request, course_key_string, edx_video_id=None):
         return JsonResponse(data, status=status)
 
 
-def send_zip(zip, size=None):
+def send_zip(zip_file, size=None):
     """
     Generates a streaming http response for the zip file
     """
-    wrapper = FileWrapper(zip, settings.COURSE_EXPORT_DOWNLOAD_CHUNK_SIZE)
+    wrapper = FileWrapper(zip_file, settings.COURSE_EXPORT_DOWNLOAD_CHUNK_SIZE)
     response = StreamingHttpResponse(wrapper, content_type='application/zip')
-    response['Content-Dispositon'] = 'attachment; filename=%s' % os.path.basename(zip.name)
+    response['Content-Dispositon'] = 'attachment; filename=%s' % os.path.basename(zip_file.name)
     response['Content-Length'] = size
     return response
 
@@ -250,7 +250,7 @@ def create_video_zip(course_key_string, files):
     """
     name = course_key_string + '_videos'
     video_folder_zip = NamedTemporaryFile(prefix=name + '_',
-                                     suffix=".zip")  # lint-amnesty, pylint: disable=consider-using-with
+                                          suffix=".zip")  # lint-amnesty, pylint: disable=consider-using-with
     root_dir = path(mkdtemp())
     video_dir = root_dir + '/' + name
     zip_folder = None
@@ -258,9 +258,9 @@ def create_video_zip(course_key_string, files):
         for file in files:
             url = file['url']
             file_name = file['name']
-            response = requests.get(url, allow_redirects=True)   
+            response = requests.get(url, allow_redirects=True)
             file_type = '.' + response.headers['Content-Type'][6:]
-            if not file_type in file_name:
+            if file_type not in file_name:
                 file_name = file['name'] + file_type
             if not os.path.isdir(video_dir):
                 os.makedirs(video_dir)
@@ -271,7 +271,7 @@ def create_video_zip(course_key_string, files):
             for file_path in directory.iterdir():
                 archive.write(file_path, arcname=file_path.name)
         zip_folder = open(video_folder_zip.name, '+rb')
-        
+
         return send_zip(zip_folder, video_folder_zip.tell())
     finally:
         if os.path.exists(root_dir / name):
