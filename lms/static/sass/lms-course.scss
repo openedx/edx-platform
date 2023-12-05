@@ -33,5 +33,16 @@
 }
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus+label,.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+label,.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover+label,.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label {
   border: none;
-  cursor : pointer
+  cursor : pointer ;
+  background-color: rgba(0, 134, 255, 0.08);
+}
+
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input[type="radio"],.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input[type="checkbox"] {
+    left: 0.5625em;
+    position: absolute;
+    top: 0.6em;
+    width: 18px;
+    height: 14px;
+    z-index: 1;
+    accent-color: #0086ff;
 }
