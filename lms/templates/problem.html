@@ -38,6 +38,55 @@ from openedx.core.djangolib.markup import HTML
     color : #d82c0d
   }
 
+
+.btn-custom{
+  border : none !important;
+  background-color :  #007ae6;
+  color: #fff;
+  background-image: none !important;
+  text-shadow : none !important;
+  box-shadow: none !important;
+
+}
+.btn-custom:hover {
+  background : #025dae !important ;
+}
+
+.btn-custom[disabled]{
+  background-color :  #c5c5c5;
+}
+
+.btn-prev {
+  border : 1px solid  #007ae6!important;
+  background : none ;
+  color: #007ae6;
+  background-image: none !important;
+  text-shadow : none !important;
+  box-shadow: none !important;
+}
+.btn-prev:hover {
+  background : #eef7ff !important;
+}
+
+.btn-span{
+  display: flex;
+  align-items : center;
+
+  gap: 5px;
+}
+
+.btn-span > i {
+  font-size:18px
+}
+
+.problem .field  > label {
+  border : none !important ;
+}
+
+
+
+
+
 </style>
 
 <%namespace name='static' file='static_content.html'/>
@@ -71,9 +120,12 @@ from openedx.core.djangolib.markup import HTML
       <span style='display:flex; gap: 10px'>
     
         % if problem['name'] == 'Quiz Problem Custom' :
-          <button class='btn-prev' style='display:none'> prev </button>
-          <button id='btn-next' style='display:none'> Next </button>
-          <button class='btn-submit-qz'> Submit </button>
+          <button class='btn-prev' style='display:none'> <span class='btn-span'><i class="bi bi-arrow-left"></i> </span></button>
+          <button id='btn-next' class='btn-custom' style='display:none'> <span class='btn-span'>
+
+            Câu hỏi tiếp theo  <i class="bi bi-arrow-right"></i>
+          </span></button>
+          <button class='btn-submit-qz btn-custom' disabled > Trả lời  </button>
         %endif
 
       </span>
@@ -218,6 +270,8 @@ from openedx.core.djangolib.markup import HTML
 const problemElement = document.querySelector('.problem');
 const btnSubmit = document.querySelector('.btn-submit-qz')
 const btnNext = document.querySelector('#btn-next')
+
+
 if (problemList.length > 1) {
   const divContainer = document.createElement('div');
   divContainer.classList.add('container-problem');
@@ -230,6 +284,8 @@ if (problemList.length > 1) {
     const submittedInput = problemList[i].querySelector('input.submitted');
     const incorrectLabel = problemList[i].querySelector('label.choicegroup_correct');
     const wrongLabel = problemList[i].querySelector('label.choicegroup_incorrect')
+
+ 
     if (i == 0){
       spanElement.classList.add('active-number')
       if (submittedInput && incorrectLabel) {
@@ -247,17 +303,18 @@ if (problemList.length > 1) {
         spanElement.classList.add('err-number-qusetion');
       }
     }
-
-    //if (submittedInput && incorrectLabel) {
-
-      //spanElement.classList.add('active-number');
-    //}
-    //else {
-     // if (i === 0){
-     //   spanElement.classList.add('active-number');
-    //  }
-   // }
-
+    const checkInput = problemList[i].querySelectorAll('input[type="checkbox"], input[type="radio"]' )
+    checkInput.forEach(input => {
+      input.addEventListener('change', ()=>{
+        const atLeastOneChecked = Array.from(checkInput).some(inp => inp.checked);
+        if (atLeastOneChecked) {
+          btnSubmit.removeAttribute('disabled');
+        } else {
+          btnSubmit.setAttribute('disabled', true);
+        }
+      });
+    });
+    
     divContainer.appendChild(spanElement);
   }
 

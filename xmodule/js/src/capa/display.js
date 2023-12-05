@@ -774,7 +774,9 @@
 
         Problem.prototype.next_btn = function(){
           var that = this;  
- 
+
+          that.$('.btn-submit-qz').prop('disabled' , true);
+
            const listQz = that.$('.wrapper-problem-response');
            const problemQuestionNumbers = that.$('.problem-question-number');
 
@@ -796,6 +798,23 @@
               that.$('.btn-prev').css('display', 'block')
             }
     
+            const checkInput = listQz[currentIndex].querySelectorAll('input[type="checkbox"], input[type="radio"]' )
+      
+            checkInput.forEach(input => {
+              input.addEventListener('change', ()=>{
+                
+                const atLeastOneChecked = Array.from(checkInput).some(inp => inp.checked);
+             
+                if (atLeastOneChecked) {
+                  that.$('.btn-submit-qz').prop('disabled' , false);
+                } else {
+                  that.$('.btn-submit-qz').prop('disabled' , true);
+
+
+                }
+              });
+            });
+
 
             problemQuestionNumbers.each(function(index, element) {
               if (element.textContent === (currentIndex +1 ).toString()) {
