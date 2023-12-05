@@ -86,17 +86,15 @@
             % endif
 
           </div>
-          <div id="discovery-message" class="search-status-label" ></div>
+          <div id="discovery-message" class="search-status-label" style="display: none;" ></div>
 
 
-          <div class="search-results-count" style="display: none;">
-            <span id="results-count"></span> find for "<span id="search-term"></span>"
-          </div>
+          <div id="search-results-container"></div>
 
         </div>
 
       </div>
-      <div id="filter-bar" class="filters hide-phone is-collapsed" ></div>
+      <div id="filter-bar" class="filters hide-phone is-collapsed" style="display: none;"></div>
 
 
       % endif
@@ -125,7 +123,7 @@
           margin-left: 10%;
         }
 
-        .search-results-count {
+        .search-results-container {
           height: 22px;
           font-family: 'Inter', sans-serif;
           /* Fallback to sans-serif */
@@ -138,7 +136,7 @@
           flex: none;
           order: 1;
           flex-grow: 0;
-          padding: 24px 0px 16px 0px;
+          padding: 24px 20px 16px 0px;
         }
 
         #results-count {
@@ -235,6 +233,10 @@
           border: 1px solid #E9EAF0;
         }
 
+        .search-results-count {     
+          padding-top: 5%;
+        }
+
         .search-info {
           display: flex;
           flex-direction: row;
@@ -325,37 +327,48 @@
       <script>
         document.addEventListener('DOMContentLoaded', function () {
           var searchForm = document.getElementById('discovery-form');
-          var coursesList = document.querySelector('.courses-list');
-          var courseItems = coursesList.querySelectorAll('.courses-listing-item');
-
+      
+          function updateSearchResultsCount(currentMessage, searchTerm) {
+              var message;
+      
+              if (searchTerm === '') {
+                  // If no search term is entered, use the current discovery message
+                  message = currentMessage;
+              } else {
+                  // If a search term is entered, format the message
+                  var numberOfCourses = currentMessage.includes("any") ? 0 : parseInt(currentMessage.match(/\d+/)[0]);
+                  var courseWord = numberOfCourses === 1 ? "course" : "courses"; // Singular or plural
+                  message = "<b>" + numberOfCourses + "</b> " + courseWord + " find for \"" + searchTerm + "\"";
+              }
+      
+              var resultsContainer = document.getElementById('search-results-container');
+              var existingElement = resultsContainer.querySelector('.search-results-count');
+      
+              if (existingElement) {
+                  existingElement.innerHTML = message; // Use innerHTML to interpret HTML tags
+              } else {
+                  var newElement = document.createElement('div');
+                  newElement.className = 'search-results-count';
+                  newElement.innerHTML = message; // Use innerHTML to interpret HTML tags
+                  resultsContainer.appendChild(newElement);
+              }
+          }
+      
           searchForm.addEventListener('submit', function (event) {
-            event.preventDefault(); // Prevents the form from submitting traditionally
-
-            var searchTerm = document.getElementById('discovery-input').value.trim().toLowerCase();
-            var hasResults = false;
-
-           
-
-            // Update the results count display
-            var resultsCountContainer = document.querySelector('.search-results-count');
-            var resultsCount = document.getElementById('results-count');
-            var searchTermDisplay = document.getElementById('search-term');
-
-            if (hasResults) {
-              var visibleCourses = coursesList.querySelectorAll('.courses-listing-item:not([style*="display: none"])');
-              var numberOfResults = visibleCourses.length;
-              var resultTerm = (numberOfResults === 1) ? 'result' : 'results';
-
-              resultsCountContainer.style.display = 'block';
-              resultsCount.textContent = numberOfResults + ' ' + resultTerm;
-              searchTermDisplay.textContent = searchTerm;
-            } else {
-              resultsCountContainer.style.display = 'block';
-              resultsCount.textContent = '0 results';
-              searchTermDisplay.textContent = searchTerm;
-            }
+              event.preventDefault();
+      
+              var searchTerm = document.getElementById('discovery-input').value.trim();
+      
+              setTimeout(function() {
+                  var currentMessage = document.getElementById('discovery-message').textContent;
+                  updateSearchResultsCount(currentMessage, searchTerm);
+              }, 500);
           });
-        });
+      });
+      
+      
+      
+      
       </script>
 
     </section>
