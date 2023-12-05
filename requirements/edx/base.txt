@@ -73,13 +73,13 @@ bleach[css]==6.1.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.33.4
+boto3==1.33.7
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.33.4
+botocore==1.33.7
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -333,7 +333,7 @@ django-sekizai==4.1.0
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-django-wiki
-django-ses==3.5.1
+django-ses==3.5.2
     # via -r requirements/edx/bundled.in
 django-simple-history==3.4.0
     # via
@@ -601,7 +601,7 @@ idna==3.6
     #   requests
     #   snowflake-connector-python
     #   yarl
-importlib-metadata==6.8.0
+importlib-metadata==7.0.0
     # via markdown
 importlib-resources==6.1.1
     # via
@@ -644,7 +644,7 @@ jsonschema==4.20.0
     # via
     #   drf-spectacular
     #   optimizely-sdk
-jsonschema-specifications==2023.11.1
+jsonschema-specifications==2023.11.2
     # via jsonschema
 jwcrypto==1.5.0
     # via
@@ -796,7 +796,7 @@ packaging==23.2
     #   snowflake-connector-python
 pansi==2020.7.3
     # via py2neo
-path==16.7.1
+path==16.9.0
     # via
     #   -r requirements/edx/kernel.in
     #   -r requirements/edx/paver.txt
