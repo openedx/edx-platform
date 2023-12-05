@@ -749,9 +749,9 @@ blockquote cite {
   clear: both;
 }
 .completion-badges .image-frame {
-  height: 5rem;
-  width: 5rem;
-  margin: 0 auto 0.8rem;
+  height: 3rem;
+  width: 3rem;
+  margin: 0 auto 0.2rem;
   background: #fff;
   position: relative;
   z-index: 1;

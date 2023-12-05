@@ -4,6 +4,7 @@ import logging
 import copy
 from django.db.models import Q
 from opaque_keys.edx.keys import UsageKey, CourseKey
+from openedx.features.genplus_features.genplus_learning.constants import ProgramStatuses
 from rest_framework import views, viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -12,7 +13,7 @@ from xmodule.modulestore.django import modulestore
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.features.genplus_features.genplus.api.v1.permissions import IsTeacher, IsStudentOrTeacher, IsAdmin, \
     IsUserFromSameSchool
-from openedx.features.genplus_features.genplus.models import Class, Skill
+from openedx.features.genplus_features.genplus.models import Class, Skill, GenUser
 from openedx.features.genplus_features.genplus_assessments.constants import (
     TOTAL_PROBLEM_SCORE,
     INTRO_RATING_ASSESSMENT_RESPONSE,
@@ -34,7 +35,7 @@ from openedx.features.genplus_features.genplus_assessments.utils import (
     skill_reflection_response,
     skill_reflection_individual_response,
 )
-from openedx.features.genplus_features.genplus_learning.models import Unit, Program
+from openedx.features.genplus_features.genplus_learning.models import Unit, Program, ProgramEnrollment
 from openedx.features.genplus_features.utils import get_full_name
 from .serializers import (
     ClassSerializer,
@@ -577,7 +578,9 @@ class SkillReflectionIndividualApiView(ProgramFilterMixin):
 
     def get(self, request, **kwargs):
         user_id = kwargs['user_id']
-        skills = list(self.get_program_queryset().values_list('units__skill__name', flat=True).distinct().all())
+        skills = list(set(self.get_program_queryset().values_list('units__skill__name',
+                                                                  flat=True).distinct().order_by(
+            'units__program_id')))
         courses = self.get_program_queryset().values_list('units__course', flat=True).all()
         likert_questions = SkillAssessmentQuestion.objects.filter(
             start_unit__in=courses,
