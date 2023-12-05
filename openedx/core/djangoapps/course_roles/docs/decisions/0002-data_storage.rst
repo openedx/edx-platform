@@ -29,7 +29,7 @@ We will only add data in the database if a role is being added to a single Open 
 Consequences
 ************
 
-This decision will mean that any futurue default role additions or permissions changes will require changes in the code and the database. It also means that there is a chance of a default role name being listed in the UI using the name value in the database. This would occur if a role was added to the database, but the role was not added to the data structure in the code.
+This decision will mean that any future default role additions or permissions changes will require changes in the code and the database. It also means that there is a chance of a default role name being listed in the UI using the name value in the database. This would occur if a role was added to the database, but the role was not added to the data structure in the code.
 
 This decision will allow for roles to be added to one instance of Open edX and not others. This can be achieved by adding the role in the database for the instance, but intentionally not adding it in the data object in the code. It is important that the role name added in the database is in the language that it should be displayed in, in the UI, because it will not be translated.
 
@@ -41,10 +41,15 @@ Rejected Alternatives
 *********************
 
 * Code Based Data Objects Only - Utilize dictionaries, constants, etc to create roles and permissions
+  
   * Pros: Allows for use of all Open edX defined i18n best practices
+  
   * Cons: Does not allow for different roles on different systems, Slower data querying, 
+
 * Database Only - Utilize database tables to store data and store translation data for the strings
+  
   * Pros: Allows for different roles on different instances, Allows for easy addition of new roles
+  
   * Cons: Requires custom built translation option 
 
 
