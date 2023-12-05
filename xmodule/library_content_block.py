@@ -17,6 +17,7 @@ from lxml import etree
 from lxml.etree import XMLSyntaxError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
+from opaque_keys.edx.keys import UsageKey
 from rest_framework import status
 from web_fragments.fragment import Fragment
 from webob import Response
@@ -223,7 +224,7 @@ class LibraryContentBlock(
     def _get_valid_children(
         cls,
         library_children: list[UsageKey],
-        candidates: list[Usagekey]
+        candidates: list[UsageKey],
         manual: bool,
     ) -> list[tuple[str, str]]:
         """
@@ -239,7 +240,7 @@ class LibraryContentBlock(
     @classmethod
     def make_selection(
         cls,
-        selected: list[tuple[str, str]],
+        old_selected: list[tuple[str, str]],
         library_children: list[UsageKey],
         candidates: list[UsageKey],
         max_count: int,
@@ -274,48 +275,41 @@ class LibraryContentBlock(
         When generating manully selected content, we want all users to see all the items selected.
         size, however, limits the amount of content shown.
         """
+        selected: list[tuple[str, str]] = old_selected.copy()
+        valid_children: list[tuple[str, str]] = cls._get_valid_children(library_children, candidates, manual)
 
-        old_selected: list[tuple[str, str]] = selected or []  #set(selected) if selected is not None else set()
-        new_selected: list[tuple[str, str]] = []
+        # Remove blocks from selection if they're no longer candidates.
+        selected = [block for block in selected if block in valid_children]
+        invalid: set[tuple[str, str]] = set(selected) - set(valid_children)
 
-        valid_block_keys: list[tuple[str, str]] = cls._get_valid_children(library_children, candidates, manual)
-        valid_old_block_keys: set[tuple[str, str]] = set(valid_block_keys) & set(old_selected)
-        valid_additions: set[tuple[str, str]] = set(valid_block_keys) - valid_old_block_keys
+        # Remove or add blocks if we don't have the correct number in the selection.
+        additions: set[tuple[str, str]] = set()
+        overlimit: set[tuple[str, str]] = set()
+        desired_size: int = min(max_count, len(valid_children)) if max_count >= 0 else len(valid_children)
+        if len(selected) > desired_size:
+            num_to_remove = len(selected) - desired_size
+            overlimit = set(random.sample(selected, num_to_remove))
+            selected = [block for block in selected if selected not in overlimit]
+        elif len(selected) < desired_size:
+            num_to_add = desired_size - len(selected)
+            valid_additions: set[tuple[str, str]] = set(valid_children) - set(selected)
+            additions = set(random.sample(valid_additions, num_to_add))
+            selected = [block for block in valid_children if block in (additions | set(selected))]
 
-        overlimit_block_keys: set[tuple[str, str]] = set()
-        size: int = min(max_count, len(valid_block_keys)) if max_count >= 0 else len(valid_block_keys)
-
-        # determine how many blocks need to be added or removed.
-        vaccancies_in_selected: int = size - len(valid_old_block_keys)
-
-        if vaccancies_in_selected < 0:
-            # negative means we need to remove blocks.
-            num_to_remove = -1 * vaccancies_in_selected
-            overlimit_block_keys = set(random.sample(valid_old_block_keys, num_to_remove))
-            new_selected_unordered = valid_old_block_keys - overlimit_block_keys
-        else:
-            # Positive means we need to add blocks (there is space).
-            # Special case: If vaccancies_in_selected equals len(valid_additions), then a random sample
-            # just means all the valid_additions.
-            additions = set(random.sample(valid_additions, vaccancies_in_selected))
-            new_selected_unordered = additions | valid_old_block_keys
-
-        if shuffle:
-            if vaccancies_in_selected:
-                new_selected = list(new_selected_unordered)
-                random.shuffle(new_selected)
-            else:
-                new_selected = old_selected
-        else:
-            new_selected = [key for key in valid_block_keys if key in new_selected_unordered]
-
+        # If we've made any change AND if shuffling is enabled, then re-shuffle.
+        # In other words, always shuffle UNLESS:
+        #  * no changes have been made (because we don't want to re-order a learner's blocks for no reason); OR
+        #  * shuffling is disabled (the code above ensures that we're using the order from the library).
+        # Otherwise, use the pre-existing order.
+        if shuffle and (invalid or overlimit or additions):
+            random.shuffle(sele):
 
         # return lists because things get json serialized down the line.
         return {
-            'selected': new_selected,
-            'invalid': list(old_selected - set(new_selected)),
-            'overlimit': list(overlimit_block_keys),
-            'added': list(set(new_selected) - old_selected),
+            'selected': selected,
+            'invalid': list(invalid),
+            'overlimit': list(overlimit),
+            'added': list(additions),
         }
 
     @classmethod
@@ -389,7 +383,7 @@ class LibraryContentBlock(
             max_count = len(self.children)
 
         block_keys = self.make_selection(
-            selected=self.selected,
+            old_selected=self.selected,
             library_children=self.children,
             candidates=[UsageKey.from_string(candidate) for candidate in self.candidates],
             max_count=self.max_count,
