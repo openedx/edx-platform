@@ -8,6 +8,7 @@ from xblock.core import XBlock
 
 from openedx.core.djangoapps.course_roles.api import get_all_user_permissions_for_a_course
 from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
+from openedx.core.djangoapps.course_roles.toggles import use_permission_checks
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.course_block import CourseBlock
 from openedx.core.djangoapps.django_comment_common.models import Role
@@ -24,6 +25,8 @@ class HasPermissionRule(Rule):  # lint-amnesty, pylint: disable=abstract-method,
         self.permission = permission
 
     def check(self, user, instance=None):
+        if not use_permission_checks():
+            return False
         if not user.is_authenticated:
             return False
         if isinstance(instance, CourseKey):
@@ -46,6 +49,8 @@ class HasForumsRolesRule(Rule):  # lint-amnesty, pylint: disable=abstract-method
         self.role = roles
 
     def check(self, user, instance=None):
+        if not use_permission_checks():
+            return False
         if not user.is_authenticated:
             return False
         if isinstance(instance, CourseKey):
