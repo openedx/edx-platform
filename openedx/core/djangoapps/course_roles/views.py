@@ -11,8 +11,8 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.djangoapps.course_roles.api import (
     get_all_user_permissions_for_a_course,
-    use_permission_checks
 )
+from openedx.core.djangoapps.course_roles.toggles import use_permission_checks
 
 
 @view_auth_classes()

@@ -11,7 +11,7 @@ from organizations.tests.factories import OrganizationFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.course_roles.api import USE_PERMISSION_CHECKS_FLAG
+from openedx.core.djangoapps.course_roles.toggles import USE_PERMISSION_CHECKS_FLAG
 from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.core.djangoapps.course_roles.models import (
     Permission,
