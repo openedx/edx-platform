@@ -444,6 +444,7 @@
     "Copy": "\u023b\u00f8d\u028e",
     "Copy Component Location": "\u023b\u00f8d\u028e \u023b\u00f8\u026fd\u00f8n\u01ddn\u0287 \u0141\u00f8\u0254\u0250\u0287\u1d09\u00f8n",
     "Copy Email To Editor": "\u023b\u00f8d\u028e \u0246\u026f\u0250\u1d09l \u0166\u00f8 \u0246d\u1d09\u0287\u00f8\u0279",
+    "Copy Unit": "\u023b\u00f8d\u028e \u0244n\u1d09\u0287",
     "Copy of '{componentDisplayName}'": "\u023b\u00f8d\u028e \u00f8\u025f '{componentDisplayName}'",
     "Copy row": "\u023b\u00f8d\u028e \u0279\u00f8\u028d",
     "Copy to Clipboard": "\u023b\u00f8d\u028e \u0287\u00f8 \u023bl\u1d09db\u00f8\u0250\u0279d",
