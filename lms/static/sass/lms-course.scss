@@ -24,3 +24,14 @@
         }
     }
 }
+
+
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup label,.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup label {
+
+    border: none ;
+
+}
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus+label,.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+label,.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover+label,.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label {
+  border: none;
+  cursor : pointer
+}
