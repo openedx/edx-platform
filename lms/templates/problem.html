@@ -177,6 +177,22 @@ from openedx.core.djangolib.markup import HTML
     }
 </script>
 
+<script > 
+  const problemList = document.querySelectorAll('.wrapper-problem-response')
+  const problemElement = document.querySelector('.problem')
+  if (problemList.length > 1) {
+    const divContainer = document.createElement('div');
+
+    for (let i = 0; i < problemList.length; i++) {
+      const spanElement = document.createElement('span');
+      spanElement.textContent = (i + 1).toString();
+      spanElement.classList.add('a')
+      divContainer.appendChild(spanElement);
+    }
+  
+    problemElement.insertBefore(divContainer, problemElement.firstChild);
+  }
+</script>
 
 <div>
 

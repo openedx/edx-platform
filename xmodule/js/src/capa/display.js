@@ -717,6 +717,12 @@
               currentIndex = listQz.length - 1; 
             }
             listQz[currentIndex].style.display = 'block'; 
+
+            that.$('.btn-submit-qz').css('display', 'none');
+            that.$('#btn-next').css('display', 'block');
+            if (currentIndex == 0){
+              that.$('.btn-prev').css('display', 'none')
+            }
         }
         Problem.prototype.next_btn = function(){
           var that = this;  
