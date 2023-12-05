@@ -277,7 +277,7 @@
           }
         }
 
-        .wrapper-tag-header:focus {
+        .wrapper-tag-header:focus-visible {
           border: 1px dotted gray;
         }
 
@@ -313,8 +313,8 @@
               }
             }
 
-            .tagging-label:hover,
-            .tagging-label:focus {
+            .tagging-label-link:hover,
+            .tagging-label-link:focus {
               color: $blue;
             }
 
