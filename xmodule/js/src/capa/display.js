@@ -655,6 +655,8 @@
         };
         // problem quizz
         var currentIndex = 0;   
+
+ 
         Problem.prototype.submit_qz = function () {
           console.log('submit_qz');
             
@@ -664,23 +666,26 @@
         return $.postWithPrefix('' + this.url + '/problem_check', that.answers, function (response) {
 
           if (response.success === 'submitted' || response.success === 'incorrect' || response.success === 'correct') {
-            console.log('====', response)
+           
+            const problemQuestionNumbers = that.$('.problem-question-number');
+            console.log(response)
             if (response.success === 'correct' ){
                that.$('.btn-submit-qz').css('display', 'none');
                that.$('#btn-next').css('display', 'block');
                if (currentIndex > 0) {
                 that.$('.btn-prev').css('display', 'block')
               }
+
+              problemQuestionNumbers.each(function(index, element) {
+                if (element.textContent === (currentIndex +1 ).toString()) {
+                  element.classList.add('submitted-question');
+                  element.classList.remove('active-number');
+                  element.classList.remove('err-number-qusetion');
+
+                } 
+              });
             }
             
-            if (response.success === 'incorrect' && response.current_score == (currentIndex + 1)){
-              that.$('.btn-submit-qz').css('display', 'none');
-              that.$('#btn-next').css('display', 'block');
-              if (currentIndex > 0) {
-                that.$('.btn-prev').css('display', 'block')
-              }
-  
-            }
  
             if (response.success === 'incorrect' && (currentIndex + 1) <= response.current_score){
               that.$('.btn-submit-qz').css('display', 'none');
@@ -688,7 +693,27 @@
               if (currentIndex > 0) {
                 that.$('.btn-prev').css('display', 'block')
               }
+
+
+              problemQuestionNumbers.each(function(index, element) {
+                if (element.textContent === (currentIndex +1 ).toString()) {
+                  element.classList.add('submitted-question');
+                  element.classList.remove('err-number-qusetion');
+                  element.classList.remove('active-number');
+                } 
+              });
+            }else {
+              problemQuestionNumbers.each(function(index, element) {
+                if (element.textContent === (currentIndex +1 ).toString()) {
+   
+                  element.classList.add('err-number-qusetion');
+                  element.classList.remove('active-number');
+
+                } 
+              });
             }
+
+
             window.SR.readTexts(that.get_sr_status(response.contents));
             that.el.trigger('contentChanged', [that.id, response.contents, response]);
             // that.render(response.contents, that.focus_on_submit_notification);
@@ -723,11 +748,31 @@
             if (currentIndex == 0){
               that.$('.btn-prev').css('display', 'none')
             }
+
+            const problemQuestionNumbers = that.$('.problem-question-number');
+
+            problemQuestionNumbers.each(function(index, element) {
+              if (element.textContent === (currentIndex +1 ).toString()) {
+                element.classList.add('active-number');
+  
+              } else {
+                element.classList.remove('active-number');
+              }
+            });
         }
+
         Problem.prototype.next_btn = function(){
           var that = this;  
  
            const listQz = that.$('.wrapper-problem-response');
+           const problemQuestionNumbers = that.$('.problem-question-number');
+
+           problemQuestionNumbers.each(function(index, element) {
+            if (element.textContent === (currentIndex +1 ).toString()) {
+              element.classList.remove('err-number-qusetion');
+              element.classList.add('submitted-question');
+            } })
+    
             listQz[currentIndex].style.display = 'none'; 
             currentIndex += 1; 
             if (currentIndex >= listQz.length) {
@@ -739,6 +784,21 @@
             if (currentIndex > 0) {
               that.$('.btn-prev').css('display', 'block')
             }
+    
+
+            problemQuestionNumbers.each(function(index, element) {
+              if (element.textContent === (currentIndex +1 ).toString()) {
+                element.classList.add('active-number');
+                const submittedInput =  listQz[currentIndex].querySelector('input.submitted');
+                const incorrectLabel = listQz[currentIndex].querySelector('label.choicegroup_correct');
+                if (submittedInput && incorrectLabel){
+                  that.$('.btn-submit-qz').css('display', 'none');
+                  that.$('#btn-next').css('display', 'block');
+                }
+              } else {
+                element.classList.remove('active-number');
+              }
+            });
             
             
         };
