@@ -713,7 +713,18 @@
               });
             }
 
-
+            if (response.success === 'correct') {
+                problemQuestionNumbers.each(function(index, element) {
+                  if (element.textContent === (currentIndex +1 ).toString()) {
+    
+                    element.classList.add('submitted-question');
+                    element.classList.remove('err-number-qusetion');
+                    element.classList.remove('active-number');
+  
+                  } 
+                });
+              }
+              
             window.SR.readTexts(that.get_sr_status(response.contents));
             that.el.trigger('contentChanged', [that.id, response.contents, response]);
             // that.render(response.contents, that.focus_on_submit_notification);
