@@ -154,7 +154,7 @@ class LibraryContentBlock(
         scope=Scope.settings,
     )
     candidates = List(
-        # This is a list of (block_type, block_id) tuples used to record the set of blocks
+        # This is a list of (TODO) used to record the set of blocks
         # which are candidates for the selected list.
         display_name=_("Manually Selected Blocks"),
         default=[],
@@ -220,21 +220,32 @@ class LibraryContentBlock(
         self._last_event_result_count = len(result)  # pylint: disable=attribute-defined-outside-init
 
     @classmethod
-    def _get_valid_children(cls, library_children, candidates, manual) -> set:
+    def _get_valid_children(
+        cls,
+        library_children: list[UsageKey],
+        candidates: list[Usagekey]
+        manual: bool,
+    ) -> list[tuple[str, str]]:
         """
-        Dynamically selects block_ids which children are possible for selection
+        Dynamically selects (block_type, block_id) tupless which children are possible for selection,
+        in the original order from the candidates list or the library.
         """
-        if candidates and manual:
-            valid_children = []
-            for candidate in candidates:
-                for child in library_children:
-                    if child._to_string() == candidate[9:]:  # pylint: disable=protected-access
-                        valid_children.append((child.block_type, child.block_id))
-            return set(valid_children)
-        return {(child.block_type, child.block_id) for child in library_children}
+        return list(
+            (child.block_type, child.block_id)
+            for child
+            in (candidates if (candidates and manual) else library_children)
+        )
 
     @classmethod
-    def make_selection(cls, selected, library_children, candidates, max_count, manual, shuffle):
+    def make_selection(
+        cls,
+        selected: list[tuple[str, str]],
+        library_children: list[UsageKey],
+        candidates: list[UsageKey],
+        max_count: int,
+        manual: bool,
+        shuffle: bool,
+    ) -> dict[str, list]:
         """
         Dynamically selects block_ids indicating which of the possible children are displayed to the current user.
         The blocks returned are kept consistent for a user,
@@ -264,33 +275,40 @@ class LibraryContentBlock(
         size, however, limits the amount of content shown.
         """
 
-        old_selected: set = {tuple(k) for k in selected} if selected is not None else set()
-        valid_block_keys: set = LibraryContentBlock._get_valid_children(library_children, candidates, manual)
-        valid_old_block_keys: set = valid_block_keys & old_selected
-        valid_additions: set = valid_block_keys - valid_old_block_keys
-        new_selected = []
-        overlimit_block_keys = set()
+        old_selected: list[tuple[str, str]] = selected or []  #set(selected) if selected is not None else set()
+        new_selected: list[tuple[str, str]] = []
+
+        valid_block_keys: list[tuple[str, str]] = cls._get_valid_children(library_children, candidates, manual)
+        valid_old_block_keys: set[tuple[str, str]] = set(valid_block_keys) & set(old_selected)
+        valid_additions: set[tuple[str, str]] = set(valid_block_keys) - valid_old_block_keys
+
+        overlimit_block_keys: set[tuple[str, str]] = set()
         size: int = min(max_count, len(valid_block_keys)) if max_count >= 0 else len(valid_block_keys)
 
-        if shuffle:
-            #determine how many blocks need to be added or removed.
-            vaccancies_in_selected = (
-                size - len(valid_old_block_keys)
-                if size >= 0
-                else len(valid_block_keys) - len(valid_old_block_keys)
-            )
+        # determine how many blocks need to be added or removed.
+        vaccancies_in_selected: int = size - len(valid_old_block_keys)
 
-            if vaccancies_in_selected < 0:
-                num_to_remove = -1 * vaccancies_in_selected
-                overlimit_block_keys = set(random.sample(valid_old_block_keys, num_to_remove))
-                new_selected = list(valid_old_block_keys - overlimit_block_keys)
-            else:
-                new_selected = list(valid_old_block_keys | set(random.sample(valid_additions, vaccancies_in_selected)))
-                if new_selected != old_selected and new_selected:
-                    random.shuffle(new_selected)
-
+        if vaccancies_in_selected < 0:
+            # negative means we need to remove blocks.
+            num_to_remove = -1 * vaccancies_in_selected
+            overlimit_block_keys = set(random.sample(valid_old_block_keys, num_to_remove))
+            new_selected_unordered = valid_old_block_keys - overlimit_block_keys
         else:
-            new_selected = list(valid_block_keys)[:size]
+            # Positive means we need to add blocks (there is space).
+            # Special case: If vaccancies_in_selected equals len(valid_additions), then a random sample
+            # just means all the valid_additions.
+            additions = set(random.sample(valid_additions, vaccancies_in_selected))
+            new_selected_unordered = additions | valid_old_block_keys
+
+        if shuffle:
+            if vaccancies_in_selected:
+                new_selected = list(new_selected_unordered)
+                random.shuffle(new_selected)
+            else:
+                new_selected = old_selected
+        else:
+            new_selected = [key for key in valid_block_keys if key in new_selected_unordered]
+
 
         # return lists because things get json serialized down the line.
         return {
@@ -371,12 +389,12 @@ class LibraryContentBlock(
             max_count = len(self.children)
 
         block_keys = self.make_selection(
-            self.selected,
-            self.children,
-            self.candidates,
-            self.max_count,
-            self.manual,
-            self.shuffle
+            selected=self.selected,
+            library_children=self.children,
+            candidates=[UsageKey.from_string(candidate) for candidate in self.candidates],
+            max_count=self.max_count,
+            manual=self.manual,
+            shuffle=self.shuffle,
         )
 
         # Publish events for analytics purposes:
