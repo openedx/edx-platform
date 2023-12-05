@@ -17,6 +17,7 @@ from lxml import etree
 from lxml.etree import XMLSyntaxError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
+from opaque_keys.edx.keys import UsageKey
 from rest_framework import status
 from web_fragments.fragment import Fragment
 from webob import Response
@@ -154,7 +155,7 @@ class LibraryContentBlock(
         scope=Scope.settings,
     )
     candidates = List(
-        # This is a list of (block_type, block_id) tuples used to record the set of blocks
+        # This is a list of (TODO) used to record the set of blocks
         # which are candidates for the selected list.
         display_name=_("Manually Selected Blocks"),
         default=[],
@@ -220,21 +221,32 @@ class LibraryContentBlock(
         self._last_event_result_count = len(result)  # pylint: disable=attribute-defined-outside-init
 
     @classmethod
-    def _get_valid_children(cls, library_children, candidates, manual) -> set:
+    def _get_valid_children(
+        cls,
+        library_children: list[UsageKey],
+        candidates: list[UsageKey],
+        manual: bool,
+    ) -> list[tuple[str, str]]:
         """
-        Dynamically selects block_ids which children are possible for selection
+        Dynamically selects (block_type, block_id) tupless which children are possible for selection,
+        in the original order from the candidates list or the library.
         """
-        if candidates and manual:
-            valid_children = []
-            for candidate in candidates:
-                for child in library_children:
-                    if child._to_string() == candidate[9:]:  # pylint: disable=protected-access
-                        valid_children.append((child.block_type, child.block_id))
-            return set(valid_children)
-        return {(child.block_type, child.block_id) for child in library_children}
+        return list(
+            (child.block_type, child.block_id)
+            for child
+            in (candidates if (candidates and manual) else library_children)
+        )
 
     @classmethod
-    def make_selection(cls, selected, library_children, candidates, max_count, manual, shuffle):
+    def make_selection(
+        cls,
+        old_selected: list[tuple[str, str]],
+        library_children: list[UsageKey],
+        candidates: list[UsageKey],
+        max_count: int,
+        manual: bool,
+        shuffle: bool,
+    ) -> dict[str, list]:
         """
         Dynamically selects block_ids indicating which of the possible children are displayed to the current user.
         The blocks returned are kept consistent for a user,
@@ -263,41 +275,41 @@ class LibraryContentBlock(
         When generating manully selected content, we want all users to see all the items selected.
         size, however, limits the amount of content shown.
         """
+        selected: list[tuple[str, str]] = old_selected.copy()
+        valid_children: list[tuple[str, str]] = cls._get_valid_children(library_children, candidates, manual)
 
-        old_selected: set = {tuple(k) for k in selected} if selected is not None else set()
-        valid_block_keys: set = LibraryContentBlock._get_valid_children(library_children, candidates, manual)
-        valid_old_block_keys: set = valid_block_keys & old_selected
-        valid_additions: set = valid_block_keys - valid_old_block_keys
-        new_selected = []
-        overlimit_block_keys = set()
-        size: int = min(max_count, len(valid_block_keys)) if max_count >= 0 else len(valid_block_keys)
+        # Remove blocks from selection if they're no longer candidates.
+        selected = [block for block in selected if block in valid_children]
+        invalid: set[tuple[str, str]] = set(selected) - set(valid_children)
 
-        if shuffle:
-            #determine how many blocks need to be added or removed.
-            vaccancies_in_selected = (
-                size - len(valid_old_block_keys)
-                if size >= 0
-                else len(valid_block_keys) - len(valid_old_block_keys)
-            )
+        # Remove or add blocks if we don't have the correct number in the selection.
+        additions: set[tuple[str, str]] = set()
+        overlimit: set[tuple[str, str]] = set()
+        desired_size: int = min(max_count, len(valid_children)) if max_count >= 0 else len(valid_children)
+        if len(selected) > desired_size:
+            num_to_remove = len(selected) - desired_size
+            overlimit = set(random.sample(selected, num_to_remove))
+            selected = [block for block in selected if selected not in overlimit]
+        elif len(selected) < desired_size:
+            num_to_add = desired_size - len(selected)
+            valid_additions: set[tuple[str, str]] = set(valid_children) - set(selected)
+            additions = set(random.sample(valid_additions, num_to_add))
+            selected = [block for block in valid_children if block in (additions | set(selected))]
 
-            if vaccancies_in_selected < 0:
-                num_to_remove = -1 * vaccancies_in_selected
-                overlimit_block_keys = set(random.sample(valid_old_block_keys, num_to_remove))
-                new_selected = list(valid_old_block_keys - overlimit_block_keys)
-            else:
-                new_selected = list(valid_old_block_keys | set(random.sample(valid_additions, vaccancies_in_selected)))
-                if new_selected != old_selected and new_selected:
-                    random.shuffle(new_selected)
-
-        else:
-            new_selected = list(valid_block_keys)[:size]
+        # If we've made any change AND if shuffling is enabled, then re-shuffle.
+        # In other words, always shuffle UNLESS:
+        #  * no changes have been made (because we don't want to re-order a learner's blocks for no reason); OR
+        #  * shuffling is disabled (the code above ensures that we're using the order from the library).
+        # Otherwise, use the pre-existing order.
+        if shuffle and (invalid or overlimit or additions):
+            random.shuffle(selected)
 
         # return lists because things get json serialized down the line.
         return {
-            'selected': new_selected,
-            'invalid': list(old_selected - set(new_selected)),
-            'overlimit': list(overlimit_block_keys),
-            'added': list(set(new_selected) - old_selected),
+            'selected': selected,
+            'invalid': list(invalid),
+            'overlimit': list(overlimit),
+            'added': list(additions),
         }
 
     @classmethod
@@ -371,12 +383,12 @@ class LibraryContentBlock(
             max_count = len(self.children)
 
         block_keys = self.make_selection(
-            self.selected,
-            self.children,
-            self.candidates,
-            self.max_count,
-            self.manual,
-            self.shuffle
+            old_selected=self.selected,
+            library_children=self.children,
+            candidates=[UsageKey.from_string(candidate) for candidate in self.candidates],
+            max_count=self.max_count,
+            manual=self.manual,
+            shuffle=self.shuffle,
         )
 
         # Publish events for analytics purposes:
