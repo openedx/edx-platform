@@ -1,5 +1,24 @@
 """
 Permissions for course roles app.
+
+These are the permissions that can be assigned to a CourseRole which grants access for a course,
+but can also be assigned for org wide course access or instance wide course access.
+They are defined in the database in the course_roles_permission table.
+
+To add a new permission, add a new entry to the CourseRolesPermission enum,
+then and add a new row to the course_roles_permission table in database,
+with a migration.
+
+To remove a permission, remove the entry from the CourseRolesPermission enum,
+and remove the row from the course_roles_permission table in database,
+with a migration.
+
+To change the readable_name or description of a permission, change the
+corresponding entry in CourseRolesPermission enum.
+
+To change the name of a permission, change the corresponding entry on the
+CourseRolesPermission enum, and change the name field of the corresponding
+row in the course_roles_permission table in database, with a migration.
 """
 from attrs import frozen, field, validators
 from enum import Enum, unique
@@ -22,6 +41,8 @@ class CourseRolesPermission(Enum):
     """
     Enum of all user permissions, the values are the permissions names
     in the course_roles_permission table in database.
+
+    The readable_name and description are used in the UI.
     """
 
     MANAGE_CONTENT = PermissionData(
