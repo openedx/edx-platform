@@ -302,7 +302,7 @@ class LibraryContentBlock(
         #  * shuffling is disabled (the code above ensures that we're using the order from the library).
         # Otherwise, use the pre-existing order.
         if shuffle and (invalid or overlimit or additions):
-            random.shuffle(selected):
+            random.shuffle(selected)
 
         # return lists because things get json serialized down the line.
         return {
