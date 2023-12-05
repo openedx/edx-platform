@@ -43,12 +43,13 @@
                     fields = context.fields;
 
                 // Add default option to course array
-                this.addDefaultOption(fields, 0);
+                this.addDefaultOption(fields, 0, context.course_id);
 
                 // Set non-form data needed to render the View
                 this.context = {
                     dashboard_url: context.dashboard_url,
                     header_text: context.header_text,
+                    course_id: context.course_id,
                     platform_name: context.platform_name,
                     account_settings_url: context.account_settings_url
                 };
@@ -143,14 +144,16 @@
                 }
             },
 
-            addDefaultOption: function(array, index) {
+            addDefaultOption: function(array, index, course_id) {
                 if (array[index].options.length >= 1) {
-                    array[index].options.unshift({
-                        name: gettext('Course'),
-                        value: '',
-                        default: true,
-                        disabled: true,
-                    });
+                    if (!course_id) {
+                        array[index].options.unshift({
+                            name: gettext('Choose one'),
+                            value: '',
+                            default: true,
+                            disabled: true,
+                        });
+                    }
                 }
             }
         });

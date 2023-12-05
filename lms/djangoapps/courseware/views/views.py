@@ -2110,6 +2110,11 @@ def financial_assistance_form(request, course_id=None):
         disabled = True
     enrolled_courses = get_financial_aid_courses(user, course_id)
 
+    default_course = None
+    for enrolled_course in enrolled_courses:
+        if enrolled_course['value'] == course_id:
+            default_course = enrolled_course['name']
+
     if course_id and _use_new_financial_assistance_flow(course_id):
         submit_url = 'submit_financial_assistance_request_v2'
     else:
@@ -2117,6 +2122,7 @@ def financial_assistance_form(request, course_id=None):
 
     return render_to_response('financial-assistance/apply.html', {
         'header_text': _get_fa_header(FINANCIAL_ASSISTANCE_HEADER),
+        'course_id': course_id,
         'dashboard_url': reverse('dashboard'),
         'account_settings_url': reverse('account_settings'),
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
@@ -2133,7 +2139,7 @@ def financial_assistance_form(request, course_id=None):
                 'type': 'select',
                 'label': _('Course'),
                 'placeholder': '',
-                'defaultValue': '',
+                'defaultValue': default_course,
                 'required': True,
                 'disabled': disabled,
                 'options': enrolled_courses,
@@ -2220,7 +2226,6 @@ def get_financial_aid_courses(user, course_id=None):
                     'value': str(enrollment.course_id)
                 }
             )
-
     if course_id is not None and use_new_flow is False:
         # We don't want to show financial_aid_courses if the course_id is not found in the enrolled courses.
         return []

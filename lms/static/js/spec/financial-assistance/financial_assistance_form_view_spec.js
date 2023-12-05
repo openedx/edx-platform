@@ -63,6 +63,7 @@ define([
                     username: 'xsy4ever'
                 },
                 header_text: ['Line one.', 'Line two.'],
+                course_id: 'course-v1:edX+Test+1',
                 dashboard_url: '/dashboard',
                 platform_name: 'edx',
                 submit_url: '/api/financial/v1/assistance'
