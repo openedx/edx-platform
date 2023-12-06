@@ -13,14 +13,18 @@ metadata:
 
       {{ ((A B D)) Feedback 1 }}
       {{ ((A B C D)) Feedback 2 }}
-      
+
+      ||hint1.1||
+      ||hint1.2||
+
       >>Question 2 <<
 
       ( ) an incorrect answer 
       (x) the correct answer  {{ Answer .}}
       ( ) an incorrect answer 
 
-
+      ||hint2.1||
+      ||hint2.2||
       
       >> Question 3 <<
 
@@ -29,7 +33,11 @@ metadata:
       [ ] an incorrect answer 
       [x] a correct answer  {{ selected: Answer  2. }}
 
+      {{ ((A B D)) Feedback 1 }}
+      {{ ((A B C D)) Feedback 2 }}
 
+      ||hint3.1||
+      ||hint3.2||
 
 
       >>Question 4 <<
@@ -38,7 +46,8 @@ metadata:
       (x) the correct answer  {{ Answer. }}
       ( ) an incorrect answer 
 
-
+      ||hint4.1||
+      ||hint4.2||
 
 
 hinted: true
