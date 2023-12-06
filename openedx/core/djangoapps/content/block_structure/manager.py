@@ -32,9 +32,10 @@ class BlockStructureManager:
                 cache to use for storing/retrieving the block structure's
                 collected data.
         """
-        self.root_block_usage_key = root_block_usage_key
+        self.root_block_usage_key = root_block_usage_key        
         self.modulestore = modulestore
         self.store = BlockStructureStore(cache)
+        self.staff_visibility = False
 
     def get_transformed(self, transformers, starting_block_usage_key=None, collected_block_structure=None):
         """
@@ -62,6 +63,7 @@ class BlockStructureManager:
             BlockStructureBlockData - A transformed block structure,
                 starting at starting_block_usage_key.
         """
+        self.staff_visibility = bool(transformers.usage_info.has_staff_access)
         block_structure = collected_block_structure.copy() if collected_block_structure else self.get_collected()
 
         if starting_block_usage_key:
@@ -96,6 +98,7 @@ class BlockStructureManager:
             block_structure = BlockStructureFactory.create_from_store(
                 self.root_block_usage_key,
                 self.store,
+                self.staff_visibility,
             )
             BlockStructureTransformers.verify_versions(block_structure)
 

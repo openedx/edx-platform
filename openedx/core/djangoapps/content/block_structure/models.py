@@ -161,16 +161,16 @@ class BlockStructureModel(TimeStampedModel):
         'transformers_schema_version',
         'block_structure_schema_version',
     ]
-    UNIQUENESS_FIELDS = ['data_usage_key'] + VERSION_FIELDS
+    UNIQUENESS_FIELDS = ['data_usage_key', 'staff_visibility'] + VERSION_FIELDS
 
     class Meta:
         db_table = 'block_structure'
+        unique_together = ('data_usage_key', 'staff_visibility')
 
     data_usage_key = UsageKeyWithRunField(
         'Identifier of the data being collected.',
         blank=False,
         max_length=255,
-        unique=True,
     )
     data_version = models.CharField(
         'Version of the data at the time of collection.',
@@ -193,6 +193,10 @@ class BlockStructureModel(TimeStampedModel):
         blank=False,
         max_length=255,
     )
+    staff_visibility = models.BooleanField(
+        'Indicates block structure data is stored with blocks only visible to staff',
+        default=False,
+    )
     data = CustomizableFileField()
 
     def get_serialized_data(self):
@@ -207,20 +211,20 @@ class BlockStructureModel(TimeStampedModel):
         return serialized_data
 
     @classmethod
-    def get(cls, data_usage_key):
+    def get(cls, data_usage_key, staff_visibility):
         """
         Returns the entry associated with the given data_usage_key.
         Raises:
              BlockStructureNotFound if an entry for data_usage_key is not found.
         """
         try:
-            return cls.objects.get(data_usage_key=data_usage_key)
+            return cls.objects.get(data_usage_key=data_usage_key, staff_visibility=staff_visibility)
         except cls.DoesNotExist:
             log.info('BlockStructure: Not found in table; %s.', data_usage_key)
             raise BlockStructureNotFound(data_usage_key)  # lint-amnesty, pylint: disable=raise-missing-from
 
     @classmethod
-    def update_or_create(cls, serialized_data, data_usage_key, **kwargs):
+    def update_or_create(cls, serialized_data, data_usage_key, staff_visibility, **kwargs):
         """
         Updates or creates the BlockStructureModel entry
         for the given data_usage_key in the kwargs,
@@ -229,7 +233,11 @@ class BlockStructureModel(TimeStampedModel):
         # Use an atomic transaction so the model isn't updated
         # unless the file is successfully persisted.
         with transaction.atomic():
-            bs_model, created = cls.objects.update_or_create(defaults=kwargs, data_usage_key=data_usage_key)
+            bs_model, created = cls.objects.update_or_create(
+                defaults=kwargs, 
+                data_usage_key=data_usage_key,
+                staff_visibility=staff_visibility
+            )
             operation = 'Created' if created else 'Updated'
 
             with _storage_error_handling(bs_model, operation):

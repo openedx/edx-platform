@@ -58,7 +58,7 @@ class BlockStructureFactory:
         return block_structure
 
     @classmethod
-    def create_from_store(cls, root_block_usage_key, block_structure_store):
+    def create_from_store(cls, root_block_usage_key, block_structure_store, staff_visibility):
         """
         Deserializes and returns the block structure starting at
         root_block_usage_key from the given store, if it's found in the store.
@@ -74,6 +74,8 @@ class BlockStructureFactory:
             block_structure_store (BlockStructureStore) - The
                 store from which the block structure is to be
                 deserialized.
+            
+            staff_visibility (Bool) - get data with staff_visibility
 
         Returns:
             BlockStructure - The deserialized block structure starting
@@ -83,7 +85,7 @@ class BlockStructureFactory:
             BlockStructureNotFound - If the root_block_usage_key is not found
                 in the store.
         """
-        return block_structure_store.get(root_block_usage_key)
+        return block_structure_store.get(root_block_usage_key, staff_visibility)
 
     @classmethod
     def create_new(cls, root_block_usage_key, block_relations, transformer_data, block_data_map):

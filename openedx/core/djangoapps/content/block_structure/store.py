@@ -28,11 +28,12 @@ class StubModel:
     conditional statements in the code.
     """
 
-    def __init__(self, root_block_usage_key):
+    def __init__(self, root_block_usage_key, staff_visibility):
         self.data_usage_key = root_block_usage_key
+        self.staff_visibility = staff_visibility
 
     def __str__(self):
-        return str(self.data_usage_key)
+        return ''.joing([str(self.data_usage_key), str(self.staff_visibility)])
 
     def delete(self):
         """
@@ -54,6 +55,7 @@ class BlockStructureStore:
                 is to be serialized.
         """
         self._cache = cache
+        self.staff_visibility = False
 
     def add(self, block_structure):
         """
@@ -72,7 +74,7 @@ class BlockStructureStore:
         bs_model = self._update_or_create_model(block_structure, serialized_data)
         self._add_to_cache(serialized_data, bs_model)
 
-    def get(self, root_block_usage_key):
+    def get(self, root_block_usage_key, staff_visibility):
         """
         Deserializes and returns the block structure starting at
         root_block_usage_key, if found in the cache or storage.
@@ -85,6 +87,8 @@ class BlockStructureStore:
                 root of the block structure that is to be retrieved
                 from the store.
 
+            staff_visibility (Bool) - get data with staff_visibility
+
         Returns:
             BlockStructure - The deserialized block structure starting
             at root_block_usage_key, if found.
@@ -93,6 +97,7 @@ class BlockStructureStore:
             BlockStructureNotFound if the root_block_usage_key is not
             found.
         """
+        self.staff_visibility = staff_visibility
         bs_model = self._get_model(root_block_usage_key)
 
         try:
@@ -137,9 +142,9 @@ class BlockStructureStore:
         Returns the model associated with the given key.
         """
         if config.STORAGE_BACKING_FOR_CACHE.is_enabled():
-            return BlockStructureModel.get(root_block_usage_key)
+            return BlockStructureModel.get(root_block_usage_key, self.staff_visibility)
         else:
-            return StubModel(root_block_usage_key)
+            return StubModel(root_block_usage_key, self.staff_visibility)
 
     def _update_or_create_model(self, block_structure, serialized_data):
         """
@@ -151,11 +156,12 @@ class BlockStructureStore:
             bs_model, _ = BlockStructureModel.update_or_create(
                 serialized_data,
                 data_usage_key=block_structure.root_block_usage_key,
+                staff_visibility=self.staff_visibility,
                 **self._version_data_of_block(root_block)
             )
             return bs_model
         else:
-            return StubModel(block_structure.root_block_usage_key)
+            return StubModel(block_structure.root_block_usage_key, self.staff_visibility)
 
     def _add_to_cache(self, serialized_data, bs_model):
         """
