@@ -4,60 +4,42 @@ metadata:
     markdown: |
       
      
-      >> quest 1 <<
+      >> Question 1 <<
 
-      [x] a correct answer {{ selected: You can specify optional feedback that appears after the learner selects and submits this answer. }, { unselected: You can specify optional feedback that appears after the learner clears and submits this answer.}}
+      [x] a correct answer  {{ selected: Answer 1 . }}
       [ ] an incorrect answer
-      [ ] an incorrect answer {{ selected: You can specify optional feedback for none, all, or a subset of the answers. }, { unselected: You can specify optional feedback for selected answers, cleared answers, or both.}}
-      [x] a correct answer
+      [ ] an incorrect answer 
+      [x] a correct answer  {{ selected: Answer  2. }}
 
+      {{ ((A B D)) Feedback 1 }}
+      {{ ((A B C D)) Feedback 2 }}
+      
+      >>Question 2 <<
 
-      {{ ((A B D)) You can specify optional feedback for a combination of answers which appears after the specified set of answers is submitted. }}
-      {{ ((A B C D)) You can specify optional feedback for one, several, or all answer combinations. }}
+      ( ) an incorrect answer 
+      (x) the correct answer  {{ Answer .}}
+      ( ) an incorrect answer 
 
-      || hint 1.1 ||
-      || hint 1.2 ||
 
       
-      >> quest 2 <<
+      >> Question 3 <<
 
-      [x] a correct answer {{ selected: You can specify optional feedback that appears after the learner selects and submits this answer. }, { unselected: You can specify optional feedback that appears after the learner clears and submits this answer.}}
+      [x] a correct answer  {{ selected: Answer 1 . }}
       [ ] an incorrect answer
-      [ ] an incorrect answer {{ selected: You can specify optional feedback for none, all, or a subset of the answers. }, { unselected: You can specify optional feedback for selected answers, cleared answers, or both.}}
-      [x] a correct answer
+      [ ] an incorrect answer 
+      [x] a correct answer  {{ selected: Answer  2. }}
 
 
-      {{ ((A B D)) You can specify optional feedback for a combination of answers which appears after the specified set of answers is submitted. }}
-      {{ ((A B C D)) You can specify optional feedback for one, several, or all answer combinations. }}
-
-      || hint 2.1 ||
-      || hint 2.2 ||
-
-      
-      >> quest 3 <<
-
-      [x] a correct answer {{ selected: You can specify optional feedback that appears after the learner selects and submits this answer. }, { unselected: You can specify optional feedback that appears after the learner clears and submits this answer.}}
-      [ ] an incorrect answer
-      [ ] an incorrect answer {{ selected: You can specify optional feedback for none, all, or a subset of the answers. }, { unselected: You can specify optional feedback for selected answers, cleared answers, or both.}}
-      [x] a correct answer
 
 
-      {{ ((A B D)) You can specify optional feedback for a combination of answers which appears after the specified set of answers is submitted. }}
-      {{ ((A B C D)) You can specify optional feedback for one, several, or all answer combinations. }}
+      >>Question 4 <<
 
-      || hint 3.1 ||
-      || hint 3.2 ||
-
-      >> quest 3 <<
-
-      (x) Yes
-      ( ) No
-      ( ) No
-      ( ) No
+      ( ) an incorrect answer 
+      (x) the correct answer  {{ Answer. }}
+      ( ) an incorrect answer 
 
 
-      || hint 3.1 ||
-      || hint 3.2 ||
+
 
 hinted: true
 data:   |
