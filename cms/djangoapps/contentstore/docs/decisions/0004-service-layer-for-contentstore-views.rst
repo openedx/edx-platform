@@ -18,18 +18,18 @@ Decision
     - Authorization processes
     - Data validation
     - Serialization tasks
-- Business logic will be extracted and relocated to a distinct service layer, accountable for:
+- Business logic will be extracted and relocated as a distinct service layer to a folder called `edx-platform/cms/djangoapps/contentstore/core`, accountable for:
     - Interactions with the modulestore
     - All Create, Read, Update, Delete (CRUD) operations
     - Data mapping and transformation
     - Query-related logic
     - Business domain-specific logic
     - Functions not directly associated with API-layer tasks
-- Given potential naming conflicts (e.g., with "Xblock Services"), meticulous consideration is required when naming service layer entities to avoid confusion.
+- Given naming conflicts (e.g., with "Xblock Services"), we should generally avoid the term "service" where it could lead to confusion.
 
 Consequences
 ------------
-- Future view methods should confine business logic to the service layer. This ADR mandates the extraction of business logic from view files into separate entities, without prescribing specific file structures or naming conventions.
+- Future view methods should confine business logic to the service layer (the `/core` folder). This ADR mandates the extraction of business logic from view files into the `/core` folder. There are no specific rules to how things in this folder should be named for now.
 
 Example
 -------
@@ -103,7 +103,7 @@ we haven't determined any naming conventions at the time of writing this ADR
             serializer = VideoUsageSerializer(usage_locations)
             return Response(serializer.data)
 
-    # cms/djangoapps/contentstore/videos_provider.py
+    # cms/djangoapps/contentstore/core/videos_provider.py
 
     def get_video_usage_path(course_key, edx_video_id):
         """
