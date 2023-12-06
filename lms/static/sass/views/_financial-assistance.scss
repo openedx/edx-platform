@@ -87,13 +87,8 @@
     margin-bottom: 1rem;
 
     .action-link {
-      @include float(right);
-
-      padding: $baseline/2;
-      background-color: $m-blue-d2;
-      color: $gray-l7;
-      font-weight: 600;
-      letter-spacing: normal;
+      float: right;
+      font-weight: 500;
     }
   }
 

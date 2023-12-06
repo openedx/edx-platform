@@ -2036,7 +2036,12 @@ def financial_assistance_request(request):
             course_name=course.display_name
         ),
         'Financial Assistance Request',
-        tags={'course_id': course_id},
+        custom_fields=[
+            {
+                'id': settings.ZENDESK_CUSTOM_FIELDS.get('course_id'),
+                'value': course_id,
+            },
+        ],
         # Send the application as additional info on the ticket so
         # that it is not shown when support replies. This uses
         # OrderedDict so that information is presented in the right
@@ -2110,10 +2115,11 @@ def financial_assistance_form(request, course_id=None):
         disabled = True
     enrolled_courses = get_financial_aid_courses(user, course_id)
 
-    default_course = None
+    default_course = ''
     for enrolled_course in enrolled_courses:
         if enrolled_course['value'] == course_id:
             default_course = enrolled_course['name']
+            break
 
     if course_id and _use_new_financial_assistance_flow(course_id):
         submit_url = 'submit_financial_assistance_request_v2'
