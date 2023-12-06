@@ -803,59 +803,62 @@
         }
 
         Problem.prototype.next_btn = function(){
-          var that = this;  
-
-          that.$('.btn-submit-qz').prop('disabled' , true);
-
-           const listQz = that.$('.wrapper-problem-response');
-           const problemQuestionNumbers = that.$('.problem-question-number');
-
-           problemQuestionNumbers.each(function(index, element) {
-            if (element.textContent === (currentIndex +1 ).toString()) {
-              element.classList.remove('err-number-qusetion');
-              element.classList.add('submitted-question');
-            } })
-    
-            listQz[currentIndex].style.display = 'none'; 
-            currentIndex += 1; 
-            if (currentIndex >= listQz.length) {
-              currentIndex = 0; 
-            }
-            listQz[currentIndex].style.display = 'block'; 
-            that.$('.btn-submit-qz').css('display', 'block');
-            that.$('#btn-next').css('display', 'none');
-            if (currentIndex > 0) {
-              that.$('.btn-prev').css('display', 'block')
-            }
-    
-            const checkInput = listQz[currentIndex].querySelectorAll('input[type="checkbox"], input[type="radio"]' )
-            checkInput.on('change', function() {
-                const atLeastOneChecked = $('.field input:checked').length > 0;
+            var that = this;  
+  
+  
+  
+            that.$('.btn-submit-qz').prop('disabled' , true);
+             const listQz = that.$('.wrapper-problem-response');
+             const problemQuestionNumbers = that.$('.problem-question-number');
+  
+             problemQuestionNumbers.each(function(index, element) {
+              if (element.textContent === (currentIndex +1 ).toString()) {
+                element.classList.remove('err-number-qusetion');
+                element.classList.add('submitted-question');
+              } })
+      
+              listQz[currentIndex].style.display = 'none'; 
+              currentIndex += 1; 
+              if (currentIndex >= listQz.length) {
+                currentIndex = 0; 
+              }
+              listQz[currentIndex].style.display = 'block'; 
+              that.$('.btn-submit-qz').css('display', 'block');
+              that.$('#btn-next').css('display', 'none');
+              if (currentIndex > 0) {
+                that.$('.btn-prev').css('display', 'block')
+              }
               
+  
+              const checkInput = listQz[currentIndex].querySelectorAll('input[type="checkbox"], input[type="radio"]' )
+        
+              checkInput.on('change', function() {
+                const atLeastOneChecked = $('.field input:checked').length > 0;
+            
                 if (atLeastOneChecked) {
                   $('.btn-submit-qz').prop('disabled', false);
                 } else {
                   $('.btn-submit-qz').prop('disabled', true);
                 }
               });
-
-
-            problemQuestionNumbers.each(function(index, element) {
-              if (element.textContent === (currentIndex +1 ).toString()) {
-                element.classList.add('active-number');
-                const submittedInput =  listQz[currentIndex].querySelector('input.submitted');
-                const incorrectLabel = listQz[currentIndex].querySelector('label.choicegroup_correct');
-                if (submittedInput && incorrectLabel){
-                  that.$('.btn-submit-qz').css('display', 'none');
-                  that.$('#btn-next').css('display', 'block');
+  
+  
+              problemQuestionNumbers.each(function(index, element) {
+                if (element.textContent === (currentIndex +1 ).toString()) {
+                  element.classList.add('active-number');
+                  const submittedInput =  listQz[currentIndex].querySelector('input.submitted');
+                  const incorrectLabel = listQz[currentIndex].querySelector('label.choicegroup_correct');
+                  if (submittedInput && incorrectLabel){
+                    that.$('.btn-submit-qz').css('display', 'none');
+                    that.$('#btn-next').css('display', 'block');
+                  }
+                } else {
+                  element.classList.remove('active-number');
                 }
-              } else {
-                element.classList.remove('active-number');
-              }
-            });
-            
-            
-        };
+              });
+  
+              
+          };
         
 
 
