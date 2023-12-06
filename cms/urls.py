@@ -183,6 +183,7 @@ urlpatterns = [
 
     # Include edly panel app URL's
     url(r'^api/edly_panel/', include('edly_panel_app.api.urls', namespace='edly_panel_api')),
+    url(r'', include(('openedx.features.edly.urls', 'openedx.features.edly'), namespace='edly_app_urls')),
 ]
 
 if not settings.DISABLE_DEPRECATED_SIGNIN_URL:
