@@ -717,7 +717,7 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin)
 
 
 @ddt.ddt
-class TestDiscussionCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin):
+class TestDiscussionCourseEnrollmentSerializer(UrlResetMixin, MobileAPITestCase, MilestonesTestCaseMixin):
     """
     Tests discussion data in course enrollment serializer
     """
