@@ -5104,12 +5104,6 @@ RATE_LIMIT_FOR_VIDEO_METADATA_API = '10/minute'
 MAILCHIMP_NEW_USER_LIST_ID = ""
 
 ########################## BLOCKSTORE #####################################
-BLOCKSTORE_PUBLIC_URL_ROOT = 'http://localhost:18250'
-BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
-
-# Disable the Blockstore app API by default.
-# See openedx.core.lib.blockstore_api.config for details.
-BLOCKSTORE_USE_BLOCKSTORE_APP_API = False
 
 # .. setting_name: XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE
 # .. setting_default: default
