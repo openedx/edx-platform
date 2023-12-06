@@ -829,21 +829,15 @@
             }
     
             const checkInput = listQz[currentIndex].querySelectorAll('input[type="checkbox"], input[type="radio"]' )
-      
-            checkInput.forEach(input => {
-              input.addEventListener('change', ()=>{
-                
-                const atLeastOneChecked = Array.from(checkInput).some(inp => inp.checked);
-             
+            checkInput.on('change', function() {
+                const atLeastOneChecked = $('.field input:checked').length > 0;
+              
                 if (atLeastOneChecked) {
-                  that.$('.btn-submit-qz').prop('disabled' , false);
+                  $('.btn-submit-qz').prop('disabled', false);
                 } else {
-                  that.$('.btn-submit-qz').prop('disabled' , true);
-
-
+                  $('.btn-submit-qz').prop('disabled', true);
                 }
               });
-            });
 
 
             problemQuestionNumbers.each(function(index, element) {
