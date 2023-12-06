@@ -417,7 +417,7 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
             style = QUESTION_HINT_INCORRECT_STYLE
 
         # Ready to go
-        return HTML('<div class="{st}"><div class="explanation-title">{text}</div>{lwrp}{hintswrap}</div>').format(
+        return HTML('<div class="{st} messages-box"><div class="explanation-title">Giải thích</div>{hintswrap}</div>').format(
             st=style,
             text=Text(_("Answer")),
             lwrp=label_wrap,

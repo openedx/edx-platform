@@ -184,6 +184,7 @@
             this.submitButton.click(this.submit_fd);
             this.hintButton = this.$('.action .hint-button');
             this.hintButton.click(this.hint_button);
+            
           //problem quiz custom
             this.nextButton = this.$('.action #btn-next')
             this.nextButton.click(this.next_btn)

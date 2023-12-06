@@ -87,7 +87,41 @@ from openedx.core.djangolib.markup import HTML
   display: none !important;
 }
 
+.message{
+  border-top : 1px solid #d7d7d7 ;
+  padding-top : 20px;
+}
 
+.messages-box {
+  align-self: stretch;
+  flex-grow: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border-left: solid 2px #5aa447;
+  background-color: rgba(90, 164, 71, 0.05);
+}
+
+.explanation-title{
+  align-self: stretch;  
+  flex-grow: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.5;
+  letter-spacing: normal;
+  text-align: left;
+  color: #5aa447;
+  padding-bottom: 10px;
+}
+
+.wrapper-problem-response  fieldset{
+  padding:20px 0px;
+}
 
 </style>
 
@@ -115,22 +149,26 @@ from openedx.core.djangolib.markup import HTML
 
     <div class="problem-action-buttons-wrapper">
       
-      % if demand_hint_possible:
-      <span class="problem-action-button-wrapper">
-          <button type="button" class="hint-button problem-action-btn btn-link btn-small" data-value="${_('Hint')}" ${'' if should_enable_next_hint else 'disabled'}>${_('Hint')}</button>
-      </span>
+
+      % if problem['name'] == 'Quiz Problem Custom' :
       <span style='display:flex; gap: 10px'>
-    
-        % if problem['name'] == 'Quiz Problem Custom' :
-          <button class='btn-prev' style='display:none'> <span class='btn-span'><i class="bi bi-arrow-left"></i> </span></button>
-          <button id='btn-next' class='btn-custom' style='display:none'> <span class='btn-span'>
+        <button class='btn-prev' style='display:none'> <span class='btn-span'><i class="bi bi-arrow-left"></i> </span></button>
+        <button id='btn-next' class='btn-custom' style='display:none'> <span class='btn-span'>
 
-            Câu hỏi tiếp theo  <i class="bi bi-arrow-right"></i>
-          </span></button>
-          <button class='btn-submit-qz btn-custom' disabled > Trả lời  </button>
-        %endif
-
+          Câu hỏi tiếp theo  <i class="bi bi-arrow-right"></i>
+        </span></button>
+        <button class='btn-submit-qz btn-custom' disabled > Trả lời  </button>
       </span>
+        
+      %endif
+
+      % if demand_hint_possible:
+        % if problem['name'] != 'Quiz Problem Custom':
+            <span class="problem-action-button-wrapper">
+              <button type="button" class="hint-button problem-action-btn btn-link btn-small" data-value="${_('Hint')}" ${'' if should_enable_next_hint else 'disabled'}>${_('Hint')}</button>
+          </span>
+        %endif
+   
       % endif
       % if save_button:
       <span class="problem-action-button-wrapper">
