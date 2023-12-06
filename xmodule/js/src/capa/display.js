@@ -656,123 +656,135 @@
         // problem quizz
         var currentIndex = 0;   
         Problem.prototype.submit_qz = function () {
-            var that = this;
-            const listQz = that.$('.wrapper-problem-response');
-            const checkedInput = that.$('.field input:checked');
-          
-  
-          return $.postWithPrefix('' + this.url + '/problem_check', that.answers, function (response) {
-  
-            if (response.success === 'submitted' || response.success === 'incorrect' || response.success === 'correct') {
-             
-              const problemQuestionNumbers = that.$('.problem-question-number');
-              console.log(response)
-              if (response.success === 'correct' ){
-                 that.$('.btn-submit-qz').css('display', 'none');
-                 that.$('#btn-next').css('display', 'block');
-                 if (currentIndex > 0) {
-                  that.$('.btn-prev').css('display', 'block')
-                }
-  
-                problemQuestionNumbers.each(function(index, element) {
-                  if (element.textContent === (currentIndex +1 ).toString()) {
-                    element.classList.add('submitted-question');
-                    element.classList.remove('active-number');
-                    element.classList.remove('err-number-qusetion');
-  
-                  } 
-                });
-  
-                checkedInput.each(function () {
-                  const input = $(this);
-                  const label = $('label[for="' + $(this).attr('id') + '"]'); 
-                  input.addClass('submitted')
-                  label.addClass('response-label field-label label-inline choicegroup_correct')
-      
-                })
-              }
-              
-   
-              if (response.success === 'incorrect' && (currentIndex + 1) <= response.current_score){
-                that.$('.btn-submit-qz').css('display', 'none');
-                that.$('#btn-next').css('display', 'block');
-                if (currentIndex > 0) {
-                  that.$('.btn-prev').css('display', 'block')
-                }
-  
-  
-                problemQuestionNumbers.each(function(index, element) {
-                  if (element.textContent === (currentIndex +1 ).toString()) {
-                    element.classList.add('submitted-question');
-                    element.classList.remove('err-number-qusetion');
-                    element.classList.remove('active-number');
-                  } 
-                });
-  
-                checkedInput.each(function () {
-                  const input = $(this);
-                  const label = $('label[for="' + $(this).attr('id') + '"]'); 
-                  input.addClass('submitted')
-                  label.addClass('response-label field-label label-inline choicegroup_correct')
-      
-                })
-  
-              }else {
-                problemQuestionNumbers.each(function(index, element) {
-                  if (element.textContent === (currentIndex +1 ).toString()) {
-     
-                    element.classList.add('err-number-qusetion');
-                    element.classList.remove('active-number');
-  
-                    checkedInput.each(function () {
-                      const input = $(this);
-                      const label = $('label[for="' + $(this).attr('id') + '"]'); 
-                      input.addClass('submitted')
-                      label.addClass('response-label field-label label-inline choicegroup_incorrect')
-          
-                    })
-  
-                  } 
-                });
-              }
-              if (response.success === 'correct') {
-                problemQuestionNumbers.each(function(index, element) {
-                  if (element.textContent === (currentIndex +1 ).toString()) {
-    
-                    element.classList.add('submitted-question');
-                    element.classList.remove('err-number-qusetion');
-                    element.classList.remove('active-number');
-  
-                  } 
-                });
-  
-                checkedInput.each(function () {
-                  const input = $(this);
-                  const label = $('label[for="' + $(this).attr('id') + '"]'); 
-                  input.addClass('submitted')
-                  label.addClass('response-label field-label label-inline choicegroup_correct')
-      
-                })
-              }
-  
-  
-              window.SR.readTexts(that.get_sr_status(response.contents));
-              that.el.trigger('contentChanged', [that.id, response.contents, response]);
-              // that.render(response.contents, that.focus_on_submit_notification);
-              that.updateProgress(response);
-            
-              if (response.entrance_exam_passed) {
-                window.parent.postMessage({
-                  type: 'entranceExam.passed'
-                }, '*');
-              }
-            } else {
-              that.saveNotification.hide();
-              that.gentle_alert(response.success);
-            }
+          var that = this;
+          const listQz = that.$('.wrapper-problem-response');
+          const checkedInput = that.$('.field input:checked');
         
-            return Logger.log('problem_graded', [that.answers, response.contents], that.id);
-          }); 
+
+        return $.postWithPrefix('' + this.url + '/problem_check', that.answers, function (response) {
+
+          if (response.success === 'submitted' || response.success === 'incorrect' || response.success === 'correct') {
+           
+            const problemQuestionNumbers = that.$('.problem-question-number');
+            const parsedHTML = $(response.contents);
+            const listProblemParsed = parsedHTML.find('.wrapper-problem-response')
+            const messagesProblem = listProblemParsed[currentIndex].querySelector('.message')
+
+            const choicegroup = listQz[currentIndex].querySelector('.choicegroup , .capa_inputtype')
+            // choicegroup.appendChild(messagesProblem)
+
+            if (response.success === 'correct' ){
+               that.$('.btn-submit-qz').css('display', 'none');
+               that.$('#btn-next').css('display', 'block');
+               if (currentIndex > 0) {
+                that.$('.btn-prev').css('display', 'block')
+              }
+
+              problemQuestionNumbers.each(function(index, element) {
+                if (element.textContent === (currentIndex +1 ).toString()) {
+                  element.classList.add('submitted-question');
+                  element.classList.remove('active-number');
+                  element.classList.remove('err-number-qusetion');
+                
+                  choicegroup.appendChild(messagesProblem)
+                } 
+              });
+
+              checkedInput.each(function () {
+                const input = $(this);
+                const label = $('label[for="' + $(this).attr('id') + '"]'); 
+                input.addClass('submitted')
+                label.addClass('response-label field-label label-inline choicegroup_correct')
+                
+                choicegroup.appendChild(messagesProblem)
+              })
+            }
+            
+ 
+            if (response.success === 'incorrect' && (currentIndex + 1) <= response.current_score){
+              that.$('.btn-submit-qz').css('display', 'none');
+              that.$('#btn-next').css('display', 'block');
+              if (currentIndex > 0) {
+                that.$('.btn-prev').css('display', 'block')
+              }
+
+
+              problemQuestionNumbers.each(function(index, element) {
+                if (element.textContent === (currentIndex +1 ).toString()) {
+                  element.classList.add('submitted-question');
+                  element.classList.remove('err-number-qusetion');
+                  element.classList.remove('active-number');
+
+                  choicegroup.appendChild(messagesProblem)
+                } 
+              });
+
+              checkedInput.each(function () {
+                const input = $(this);
+                const label = $('label[for="' + $(this).attr('id') + '"]'); 
+                input.addClass('submitted')
+                label.addClass('response-label field-label label-inline choicegroup_correct')
+                
+                choicegroup.appendChild(messagesProblem)
+    
+              })
+
+            }else {
+              problemQuestionNumbers.each(function(index, element) {
+                if (element.textContent === (currentIndex +1 ).toString()) {
+   
+                  element.classList.add('err-number-qusetion');
+                  element.classList.remove('active-number');
+
+                  checkedInput.each(function () {
+                    const input = $(this);
+                    const label = $('label[for="' + $(this).attr('id') + '"]'); 
+                    input.addClass('submitted')
+                    label.addClass('response-label field-label label-inline choicegroup_incorrect')
+        
+                  })
+
+                } 
+              });
+            }
+            if (response.success === 'correct') {
+              problemQuestionNumbers.each(function(index, element) {
+                if (element.textContent === (currentIndex +1 ).toString()) {
+  
+                  element.classList.add('submitted-question');
+                  element.classList.remove('err-number-qusetion');
+                  element.classList.remove('active-number');
+
+                } 
+              });
+
+              checkedInput.each(function () {
+                const input = $(this);
+                const label = $('label[for="' + $(this).attr('id') + '"]'); 
+                input.addClass('submitted')
+                label.addClass('response-label field-label label-inline choicegroup_correct')
+    
+              })
+            }
+
+
+            window.SR.readTexts(that.get_sr_status(response.contents));
+            that.el.trigger('contentChanged', [that.id, response.contents, response]);
+            // that.render(response.contents, that.focus_on_submit_notification);
+            that.updateProgress(response);
+          
+            if (response.entrance_exam_passed) {
+              window.parent.postMessage({
+                type: 'entranceExam.passed'
+              }, '*');
+            }
+          } else {
+            that.saveNotification.hide();
+            that.gentle_alert(response.success);
+          }
+      
+          return Logger.log('problem_graded', [that.answers, response.contents], that.id);
+        }); 
         }
 
         Problem.prototype.prev_btn = function () {
@@ -808,6 +820,7 @@
 
           that.$('.btn-submit-qz').prop('disabled' , true);
 
+
            const listQz = that.$('.wrapper-problem-response');
            const problemQuestionNumbers = that.$('.problem-question-number');
 
@@ -831,7 +844,6 @@
     
 
 
-
             problemQuestionNumbers.each(function(index, element) {
               if (element.textContent === (currentIndex +1 ).toString()) {
                 element.classList.add('active-number');
@@ -840,6 +852,9 @@
                 if (submittedInput && incorrectLabel){
                   that.$('.btn-submit-qz').css('display', 'none');
                   that.$('#btn-next').css('display', 'block');
+                 
+                }else {
+                  const message = $(listQz[currentIndex]).find('.message').remove()
                 }
               } else {
                 element.classList.remove('active-number');
@@ -847,7 +862,6 @@
             });
             
             const checkInput = $(listQz[currentIndex]).find('input[type="checkbox"], input[type="radio"]');
-            console.log('checkInput' , checkInput);
             checkInput.on('change', function() {
                 const atLeastOneChecked = $('.field input:checked').length > 0;
               
@@ -859,7 +873,6 @@
               });
             
         };
-        
 
 
 
