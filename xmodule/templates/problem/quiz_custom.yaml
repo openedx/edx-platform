@@ -6,48 +6,40 @@ metadata:
      
       >> Question 1 <<
 
-      [x] a correct answer  {{ selected: Answer 1 . }}
+      [x] a correct answer {{ selected:  giai thich 1 }}
       [ ] an incorrect answer
       [ ] an incorrect answer 
-      [x] a correct answer  {{ selected: Answer  2. }}
+      [x] a correct answer {{ selected:  giai thich  2 }}
 
-      {{ ((A B D)) Feedback 1 }}
-      {{ ((A B C D)) Feedback 2 }}
 
-      ||hint1.1||
-      ||hint1.2||
+      
+      >> Question 2 <<
 
-      >>Question 2 <<
+      [x] a correct answer {{ selected:  giai thich 1 }}
+      [ ] an incorrect answer
+      [ ] an incorrect answer 
+      [x] a correct answer {{ selected:  giai thich  2  }}
 
-      ( ) an incorrect answer 
-      (x) the correct answer  {{ Answer .}}
-      ( ) an incorrect answer 
 
-      ||hint2.1||
-      ||hint2.2||
+
       
       >> Question 3 <<
 
-      [x] a correct answer  {{ selected: Answer 1 . }}
-      [ ] an incorrect answer
-      [ ] an incorrect answer 
-      [x] a correct answer  {{ selected: Answer  2. }}
-
-      {{ ((A B D)) Feedback 1 }}
-      {{ ((A B C D)) Feedback 2 }}
-
-      ||hint3.1||
-      ||hint3.2||
+      (x) Yes {{ giai thich  }}
+      ( ) No 
+      ( ) No
+      ( ) No
 
 
-      >>Question 4 <<
 
-      ( ) an incorrect answer 
-      (x) the correct answer  {{ Answer. }}
-      ( ) an incorrect answer 
+      >> Question 4 <<
 
-      ||hint4.1||
-      ||hint4.2||
+      (x) Yes  {{ giai thich   }}
+      ( ) No
+      ( ) No
+      ( ) No
+
+
 
 
 hinted: true

@@ -660,16 +660,20 @@
           var that = this;
           const listQz = that.$('.wrapper-problem-response');
           const checkedInput = that.$('.field input:checked');
-        
+          const indicatorError = $(listQz[currentIndex]).find('.indicator-container')
+
+
+
 
         return $.postWithPrefix('' + this.url + '/problem_check', that.answers, function (response) {
-
+            console.log(response)
           if (response.success === 'submitted' || response.success === 'incorrect' || response.success === 'correct') {
            
             const problemQuestionNumbers = that.$('.problem-question-number');
             const parsedHTML = $(response.contents);
             const listProblemParsed = parsedHTML.find('.wrapper-problem-response')
             const messagesProblem = listProblemParsed[currentIndex].querySelector('.message')
+            const indicatorErrorParsed = listProblemParsed[currentIndex].querySelector('.indicator-container')
 
             const choicegroup = listQz[currentIndex].querySelector('.choicegroup , .capa_inputtype')
             // choicegroup.appendChild(messagesProblem)
@@ -688,6 +692,9 @@
                   element.classList.remove('err-number-qusetion');
                 
                   choicegroup.appendChild(messagesProblem)
+
+                  indicatorError.css('display', 'none')
+
                 } 
               });
 
@@ -717,6 +724,9 @@
                   element.classList.remove('active-number');
 
                   choicegroup.appendChild(messagesProblem)
+
+                  indicatorError.css('display', 'none')
+
                 } 
               });
 
@@ -731,11 +741,21 @@
               })
 
             }else {
+
+              indicatorError.css('display', 'block')
+              const indocatorName = $(indicatorError).find('.sr')
+              if (indocatorName.text() == 'unanswered'){
+                indicatorError.remove()
+                choicegroup.appendChild(indicatorErrorParsed)
+              }
+
               problemQuestionNumbers.each(function(index, element) {
                 if (element.textContent === (currentIndex +1 ).toString()) {
    
                   element.classList.add('err-number-qusetion');
                   element.classList.remove('active-number');
+
+
 
                   checkedInput.each(function () {
                     const input = $(this);
@@ -747,6 +767,7 @@
 
                 } 
               });
+
             }
             if (response.success === 'correct') {
               problemQuestionNumbers.each(function(index, element) {
@@ -755,6 +776,8 @@
                   element.classList.add('submitted-question');
                   element.classList.remove('err-number-qusetion');
                   element.classList.remove('active-number');
+
+                  indicatorError.css('display', 'none')
 
                 } 
               });
@@ -767,7 +790,6 @@
     
               })
             }
-
 
             window.SR.readTexts(that.get_sr_status(response.contents));
             that.el.trigger('contentChanged', [that.id, response.contents, response]);
@@ -843,7 +865,8 @@
               that.$('.btn-prev').css('display', 'block')
             }
     
-
+            const indicatorError = $(listQz[currentIndex]).find('.indicator-container')
+            // indicatorError.css('display', 'none');
 
             problemQuestionNumbers.each(function(index, element) {
               if (element.textContent === (currentIndex +1 ).toString()) {
@@ -853,9 +876,11 @@
                 if (submittedInput && incorrectLabel){
                   that.$('.btn-submit-qz').css('display', 'none');
                   that.$('#btn-next').css('display', 'block');
+    
                  
                 }else {
                   const message = $(listQz[currentIndex]).find('.message').remove()
+                 
                 }
               } else {
                 element.classList.remove('active-number');
@@ -872,6 +897,9 @@
                   $('.btn-submit-qz').prop('disabled', true);
                 }
               });
+
+            
+
             
         };
 

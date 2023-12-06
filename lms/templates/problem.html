@@ -83,9 +83,7 @@ from openedx.core.djangolib.markup import HTML
   border : none !important ;
 }
 
-.indicator-container{
-  display: none !important;
-}
+
 
 .message{
   border-top : 1px solid #d7d7d7 ;
@@ -121,6 +119,26 @@ from openedx.core.djangolib.markup import HTML
 
 .wrapper-problem-response  fieldset{
   padding:20px 0px;
+}
+
+.problem-error{
+  display: flex;
+  gap:6px;
+  width: 100% ;
+  min-width: 13.438rem;
+  flex-grow: 0;
+  font-family: Roboto;
+  font-size: 0.95rem;
+  font-weight: 500;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.5;
+  letter-spacing: normal;
+  text-align: left;
+  color: #d82c0d;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background-color: rgba(216, 44, 13, 0.05);
 }
 
 </style>
@@ -311,12 +329,12 @@ const problemElement = document.querySelector('.problem');
 const btnSubmit = document.querySelector('.btn-submit-qz')
 const btnNext = document.querySelector('#btn-next')
 
-
 if (problemList.length > 1) {
   const divContainer = document.createElement('div');
   divContainer.classList.add('container-problem');
+  
 
-  for (let i = 0; i < problemList.length; i++) {
+  for (var i = 0; i < problemList.length; i++) {
     const spanElement = document.createElement('span');
     spanElement.textContent = (i + 1).toString();
     spanElement.classList.add('problem-question-number');
@@ -324,18 +342,22 @@ if (problemList.length > 1) {
     const submittedInput = problemList[i].querySelector('input.submitted');
     const incorrectLabel = problemList[i].querySelector('label.choicegroup_correct');
     const wrongLabel = problemList[i].querySelector('label.choicegroup_incorrect')
-    const message = problemList[i].querySelector('.message')
+    const indicatorError = problemList[i].querySelector('.indicator-container')
     
+    indicatorError.style.display = 'none'
+    
+
  
     if (i == 0){
       spanElement.classList.add('active-number')
       if (submittedInput && incorrectLabel) {
         btnSubmit.style.display = 'none';
         btnNext.style.display = 'block';
-        }else if (submittedInput && wrongLabel) {
-          const message = problemList[i].querySelector('.message')
-          message.remove()
+      }else {
+          spanElement.classList.add('err-number-qusetion')
+
         }
+        
         
     }else {
       
@@ -349,6 +371,9 @@ if (problemList.length > 1) {
 
       }
     }
+
+    divContainer.appendChild(spanElement);
+
     const checkInput = problemList[i].querySelectorAll('input[type="checkbox"], input[type="radio"]' )
     checkInput.forEach(input => {
       input.addEventListener('change', ()=>{
@@ -360,11 +385,18 @@ if (problemList.length > 1) {
         }
       });
     });
+
     
-    divContainer.appendChild(spanElement);
   }
 
   problemElement.insertBefore(divContainer, problemElement.firstChild);
+
+  const elementError = document.querySelector('.err-number-qusetion')
+  if(elementError){
+    const numberError = elementError.textContent
+    const indicatorError = problemList[numberError - 1].querySelector('.indicator-container')
+    indicatorError.style.display = 'block';
+  }
 }
 
 
