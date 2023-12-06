@@ -16,8 +16,8 @@
 % if course_discovery_enabled:
 <%block name="header_extras">
   % for template_name in ["course_card", "filter_bar", "filter", "facet", "facet_option"]:
-  <script type="text/template" id="${template_name}-tpl">
-      <%static:include path="discovery/${template_name}.underscore" />
+  <script type="text/template" id="${template_name | h}-tpl">
+      <%static:include path="discovery/${template_name | h}.underscore" />
   </script>
   % endfor
   <%static:require_module module_name="js/discovery/discovery_factory" class_name="DiscoveryFactory">
@@ -324,53 +324,57 @@
         </aside>
         % endif
 
-      <script>
-        document.addEventListener('DOMContentLoaded', function () {
-          var searchForm = document.getElementById('discovery-form');
-      
-          function updateSearchResultsCount(currentMessage, searchTerm) {
-              var message;
-      
-              if (searchTerm === '') {
-                  // If no search term is entered, use the current discovery message
-                  message = currentMessage;
-              } else {
-                  // If a search term is entered, format the message
-                  var numberOfCourses = currentMessage.includes("any") ? 0 : parseInt(currentMessage.match(/\d+/)[0]);
-                  var courseWord = numberOfCourses === 1 ? "course" : "courses"; // Singular or plural
-                  message = "<b>" + numberOfCourses + "</b> " + courseWord + " find for \"" + searchTerm + "\"";
+        <script>
+          document.addEventListener('DOMContentLoaded', function () {
+              var searchForm = document.getElementById('discovery-form');
+        
+              function updateSearchResultsCount(currentMessage, searchTerm) {
+                // ...
+            
+                var resultsContainer = document.getElementById('search-results-container');
+                var existingElement = resultsContainer.querySelector('.search-results-count');
+            
+                if (!existingElement) {
+                    existingElement = document.createElement('div');
+                    existingElement.className = 'search-results-count';
+                    resultsContainer.appendChild(existingElement);
+                }
+            
+                // Clear existing content
+                existingElement.innerHTML = '';
+            
+                // Create and append the bold element for the number of courses
+                var boldElement = document.createElement('b');
+                boldElement.textContent = numberOfCourses;
+                existingElement.appendChild(boldElement);
+            
+                // Append the rest of the text
+                existingElement.appendChild(document.createTextNode(" " + courseWord + " found for \"" + escapeHtml(searchTerm) + "\""));
+            }
+            
+        
+              searchForm.addEventListener('submit', function (event) {
+                  event.preventDefault();
+        
+                  var searchTerm = document.getElementById('discovery-input').value.trim();
+        
+                  setTimeout(function() {
+                      var currentMessage = document.getElementById('discovery-message').textContent;
+                      updateSearchResultsCount(currentMessage, searchTerm);
+                  }, 500);
+              });
+        
+              function escapeHtml(text) {
+                  return text
+                      .replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "&gt;")
+                      .replace(/"/g, "&quot;")
+                      .replace(/'/g, "&#039;");
               }
-      
-              var resultsContainer = document.getElementById('search-results-container');
-              var existingElement = resultsContainer.querySelector('.search-results-count');
-      
-              if (existingElement) {
-                  existingElement.innerHTML = message; // Use innerHTML to interpret HTML tags
-              } else {
-                  var newElement = document.createElement('div');
-                  newElement.className = 'search-results-count';
-                  newElement.innerHTML = message; // Use innerHTML to interpret HTML tags
-                  resultsContainer.appendChild(newElement);
-              }
-          }
-      
-          searchForm.addEventListener('submit', function (event) {
-              event.preventDefault();
-      
-              var searchTerm = document.getElementById('discovery-input').value.trim();
-      
-              setTimeout(function() {
-                  var currentMessage = document.getElementById('discovery-message').textContent;
-                  updateSearchResultsCount(currentMessage, searchTerm);
-              }, 500);
           });
-      });
+        </script>
       
-      
-      
-      
-      </script>
-
     </section>
   </section>
 </main>
