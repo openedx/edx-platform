@@ -23,7 +23,6 @@ class CourseOverviewField(serializers.RelatedField):  # lint-amnesty, pylint: di
         request = self.context.get('request')
         api_version = self.context.get('api_version')
         enrollment = CourseEnrollment.get_enrollment(user=self.context.get('request').user, course_key=course_id)
-
         return {
             # identifiers
             'id': course_id,

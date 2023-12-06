@@ -717,7 +717,6 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin)
 
 
 @ddt.ddt
-@patch.dict(settings.FEATURES, {'ENABLE_DISCUSSION_SERVICE': True})
 class TestDiscussionCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin):
     """
     Tests discussion data in course enrollment serializer
@@ -727,7 +726,8 @@ class TestDiscussionCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTest
         """
         Setup data for test
         """
-        super().setUp()
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_DISCUSSION_SERVICE': True}):
+            super().setUp()
         self.login_and_enroll()
         self.request = RequestFactory().get('/')
         self.request.user = self.user
@@ -754,7 +754,8 @@ class TestDiscussionCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTest
         config, _ = DiscussionsConfiguration.objects.get_or_create(context_key=self.course.id)
         config.enabled = discussion_tab_enabled
         config.save()
-        serialized = self.get_serialized_data(API_V2)
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_DISCUSSION_SERVICE': True}):
+            serialized = self.get_serialized_data(API_V2)
         discussion_url = serialized["course"]["discussion_url"]
         if discussion_tab_enabled:
             assert discussion_url is not None
