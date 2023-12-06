@@ -33,7 +33,7 @@ def get_all_user_permissions_for_a_course(
     if cached_response.is_found:
         return cached_response.value
     if not CourseOverview.course_exists(course_key):
-        raise ValueError('course does not exist')
+        raise ValueError(f'course does not exist: {course_key}')
     permissions_qset = UserRole.objects.filter(
         Q(user=user),
         (
@@ -42,7 +42,7 @@ def get_all_user_permissions_for_a_course(
             # Org-wide roles that apply to this course
             (Q(course__isnull=True) & Q(org__name=course_key.org)) |
             # Instance-wide roles
-            Q(org__isnull=True)
+            (Q(course__isnull=True) & Q(org__isnull=True))
         )
     )
     permissions = set(
