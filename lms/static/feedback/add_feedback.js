@@ -102,17 +102,17 @@ const handlerSubmit  = async (event)=>{
 
 	const regex = /course-v1:([^/]+)/;
 	const course_id = lesson_url.match(regex)[0]
-	const course_code = course_id.split('+')[1]
+	// const course_code = course_id.split('+')[1]
 	formData.append('attachment', fileInput.files[0]);
 	formData.append('category_id', feedbackcategory)
 	formData.append('content' , comment)
 	formData.append('email' , email)
 	formData.append('lesson_url' , lesson_url)
-	formData.append('course_code', course_code)
+	formData.append('course_code', course_id)
 
 	try {
 		const data = await fetchFeedbackLMS(url , formData)
-		await fetchFeedbackPortal(data)
+		// await fetchFeedbackPortal(data)
 		document.getElementById('fileInput').value = null;
 		document.getElementById('comments').value = '';
 		alert('Cám ơn bạn đã gửi phản hồi lỗi!')

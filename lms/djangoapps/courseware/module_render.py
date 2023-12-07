@@ -940,6 +940,8 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
             result_lab = CourseResultLab.getResultLab( block_id=usage_id)
             data['url'] = file.get('url', '') 
             data['result'] = result_lab.result
+            data['date'] = file.get('date','' )
+            print('==========', file.get('date','' ))
             return JsonResponse(data)
         if request.method == 'GET' :
             data = {}
@@ -947,6 +949,8 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
             result_lab = CourseResultLab.getResultLab( block_id=usage_id)
             data['url'] = file.get('url', '') 
             data['result'] = result_lab.result
+            data['date'] = file.get('date' , '')
+    
             return JsonResponse(data)
     if handler == 'lab':
         if request.method == 'GET' :
@@ -954,6 +958,7 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
             student = StudentLab.get_result_lab_student(block_id=usage_id, course_id=course_id, student=request.user)
             if student :
                 data['result_student'] = student[0].result_student
+                data['date'] = student[0].date
             return  JsonResponse(data)
     if handler == 'lab_text' : 
         if request.method == 'POST' :
@@ -962,7 +967,8 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
             result = CourseResultLab.getResultLab( block_id=usage_id).result
             data ={
                 "result" : result,
-                "result_student" : student.result_student
+                "result_student" : student.result_student,
+                "date" : student.date
             }
             return JsonResponse(data)
     if request.user.is_authenticated:
