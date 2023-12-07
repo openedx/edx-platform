@@ -119,10 +119,11 @@ class BlockStructureStore:
             root_block_usage_key (UsageKey) - The usage_key for the root
                 of the block structure that is to be removed.
         """
-        bs_model = self._get_model(root_block_usage_key)
-        self._cache.delete(self._encode_root_cache_key(bs_model))
-        bs_model.delete()
-        logger.info("BlockStructure: Deleted from cache and store; %s.", bs_model)
+        for staff_visibility in [True, False]:
+            bs_model = self._get_model_by_staff_visibility(root_block_usage_key, staff_visibility)
+            self._cache.delete(self._encode_root_cache_key(bs_model))
+            bs_model.delete()
+            logger.info("BlockStructure: Deleted from cache and store; %s.", bs_model)
 
     def is_up_to_date(self, root_block_usage_key, modulestore):
         """
@@ -147,6 +148,15 @@ class BlockStructureStore:
             return BlockStructureModel.get(root_block_usage_key, self.staff_visibility)
         else:
             return StubModel(root_block_usage_key, self.staff_visibility)
+
+    def _get_model_by_staff_visibility(self, root_block_usage_key, staff_visibility):
+        """
+        Returns the model associated with the given key.
+        """
+        if config.STORAGE_BACKING_FOR_CACHE.is_enabled():
+            return BlockStructureModel.get(root_block_usage_key, staff_visibility)
+        else:
+            return StubModel(root_block_usage_key, staff_visibility)
 
     def _update_or_create_model(self, block_structure, serialized_data):
         """
