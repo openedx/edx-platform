@@ -6,7 +6,6 @@ import logging
 from unittest import mock
 from unittest.mock import patch
 from uuid import uuid4
-from Lib import copy
 
 import botocore
 import ddt
@@ -216,7 +215,7 @@ class TestUserTaskStopped(APITestCase):
         UserTaskArtifact.objects.create(
             status=self.status, name='BASE_URL', url='https://test.edx.org/'
         )
-        end_of_task_status = copy.copy(self.status) # shallow copy suffices to protect downstream tests
+        end_of_task_status = self.status # TODO: provide at least a shallow copy here to protect downstream tests
         end_of_task_status.name = "updating block-v1:course+type@library_content+block@uuid from library"
         user_task_stopped.send(sender=UserTaskStatus, status=end_of_task_status)
 
