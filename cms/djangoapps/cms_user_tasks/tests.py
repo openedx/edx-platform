@@ -6,6 +6,7 @@ import logging
 from unittest import mock
 from unittest.mock import patch
 from uuid import uuid4
+from Lib import copy
 
 import botocore
 import ddt
@@ -207,6 +208,19 @@ class TestUserTaskStopped(APITestCase):
 
         self.assert_msg_subject(msg)
         self.assert_msg_body_fragments(msg, body_fragments)
+
+    def test_email_not_sent_with_libary_content_update(self):
+        """
+        Check the signal receiver and email sending.
+        """
+        UserTaskArtifact.objects.create(
+            status=self.status, name='BASE_URL', url='https://test.edx.org/'
+        )
+        end_of_task_status = copy.copy(self.status) # shallow copy suffices to protect downstream tests
+        end_of_task_status.name = "updating block-v1:course+type@library_content+block@uuid from library"
+        user_task_stopped.send(sender=UserTaskStatus, status=end_of_task_status)
+
+        self.assertEqual(len(mail.outbox), 0)
 
     def test_email_sent_with_olx_validations_with_config_enabled(self):
         """
