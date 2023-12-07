@@ -29,7 +29,7 @@ class GetAllUserPermissionsTestcase(SharedModuleStoreTestCase):
     Tests of get_all_user_permissions_for_a_course function in course_roles.helpers module
     """
     @classmethod
-    def setUpClass(cls): # pylint: disable=super-method-not-called
+    def setUpClass(cls):  # pylint: disable=super-method-not-called
         with super().setUpClassAndTestData():
             cls.organization_1_name = "test_organization_1"
             cls.course_1 = CourseFactory.create(
