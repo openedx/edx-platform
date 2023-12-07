@@ -104,6 +104,7 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
     @ddt.data(
         # A problem with absolutely no fields set. A previous version of copy-paste had an error when pasting this.
         {"category": "problem", "display_name": None, "data": ""},
+        {"category": "problem", "display_name": "Emoji Land 😎", "data": "<problem>emoji in the body 😎</problem>"},
     )
     def test_copy_and_paste_component(self, block_args):
         """
