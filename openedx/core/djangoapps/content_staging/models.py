@@ -59,7 +59,7 @@ class StagedContent(models.Model):
     )
     olx = MultiCollationTextField(null=False, blank=False, db_collations=CASE_SENSITIVE_COLLATIONS)
     # The display name of whatever item is staged here, i.e. the root XBlock.
-    display_name = case_insensitive_char_field(max_length=767)
+    display_name = case_insensitive_char_field(max_length=768)
     # A _suggested_ URL name to use for this content. Since this suggestion may already be in use, it's fine to generate
     # a new url_name instead.
     suggested_url_name = models.CharField(max_length=1024)

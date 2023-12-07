@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='stagedcontent',
             name='display_name',
-            field=openedx_learning.lib.fields.MultiCollationCharField(db_collations={'mysql': 'utf8mb4_unicode_ci', 'sqlite': 'NOCASE'}, max_length=767),
+            field=openedx_learning.lib.fields.MultiCollationCharField(db_collations={'mysql': 'utf8mb4_unicode_ci', 'sqlite': 'NOCASE'}, max_length=768),
         ),
         migrations.AlterField(
             model_name='stagedcontent',
