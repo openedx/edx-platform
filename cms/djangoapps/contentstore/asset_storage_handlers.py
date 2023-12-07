@@ -140,7 +140,7 @@ def _get_asset_usage_path(course_key, assets):
                         subsection_display_name = getattr(subsection, 'display_name', '')
                         current_locations = usage_locations[asset_key_string]
                         usage_dict['display_location'] = (f'{subsection_display_name} - '
-                                                        f'{unit_display_name} / {xblock_display_name}')
+                                                          f'{unit_display_name} / {xblock_display_name}')
                         usage_dict['url'] = f'/container/{unit_location}#{xblock_location}'
                         usage_locations[asset_key_string] = [*current_locations, usage_dict]
                 else:
@@ -156,7 +156,7 @@ def _get_asset_usage_path(course_key, assets):
                         subsection_display_name = getattr(subsection, 'display_name', '')
                         current_locations = usage_locations[asset_key_string]
                         usage_dict['display_location'] = (f'{subsection_display_name} - '
-                                                        f'{unit_display_name} / {xblock_display_name}')
+                                                          f'{unit_display_name} / {xblock_display_name}')
                         usage_dict['url'] = f'/container/{unit_location}#{xblock_location}'
                         usage_locations[asset_key_string] = [*current_locations, usage_dict]
             except AttributeError:

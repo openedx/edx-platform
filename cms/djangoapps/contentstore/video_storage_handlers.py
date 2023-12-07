@@ -247,7 +247,8 @@ def get_video_usage_path(course_key, edx_video_id):
                 unit_display_name = getattr(unit, 'display_name', '')
                 subsection = unit.get_parent()
                 subsection_display_name = getattr(subsection, 'display_name', '')
-                usage_dict['display_location'] = f'{subsection_display_name} - {unit_display_name} / {xblock_display_name}'
+                usage_dict['display_location'] = (f'{subsection_display_name} - '
+                                                  f'{unit_display_name} / {xblock_display_name}')
                 usage_dict['url'] = f'/container/{unit_location}#{video_location}'
                 usage_locations.append(usage_dict)
         except AttributeError:
