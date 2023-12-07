@@ -23,6 +23,7 @@ from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
+from xblock.exceptions import JsonHandlerError
 from xblock.fields import Boolean, Integer, List, Scope, String
 
 from xmodule.capa.responsetypes import registry
@@ -155,7 +156,7 @@ class LibraryContentBlock(
         scope=Scope.settings,
     )
     candidates = List(
-        # This is a list of (TODO) used to record the set of blocks
+        # This is a list of (block_type, block_id) used to record the set of blocks
         # which are candidates for the selected list.
         display_name=_("Manually Selected Blocks"),
         default=[],
@@ -280,7 +281,7 @@ class LibraryContentBlock(
 
         # Remove blocks from selection if they're no longer candidates.
         selected = [block for block in selected if block in valid_children]
-        invalid: set[tuple[str, str]] = set(selected) - set(valid_children)
+        invalid: set[tuple[str, str]] = set(old_selected) - set(selected)
 
         # Remove or add blocks if we don't have the correct number in the selection.
         additions: set[tuple[str, str]] = set()
@@ -289,7 +290,7 @@ class LibraryContentBlock(
         if len(selected) > desired_size:
             num_to_remove = len(selected) - desired_size
             overlimit = set(random.sample(selected, num_to_remove))
-            selected = [block for block in selected if selected not in overlimit]
+            selected = [block for block in selected if block not in overlimit]
         elif len(selected) < desired_size:
             num_to_add = desired_size - len(selected)
             valid_additions: set[tuple[str, str]] = set(valid_children) - set(selected)
@@ -381,11 +382,10 @@ class LibraryContentBlock(
         max_count = self.max_count
         if max_count < 0:
             max_count = len(self.children)
-
         block_keys = self.make_selection(
-            old_selected=self.selected,
+            old_selected=list(map(tuple, self.selected)),
             library_children=self.children,
-            candidates=[UsageKey.from_string(candidate) for candidate in self.candidates],
+            candidates=[child for child in self.children if [child.block_type, child.block_id] in self.candidates],
             max_count=self.max_count,
             manual=self.manual,
             shuffle=self.shuffle,
@@ -560,7 +560,8 @@ class LibraryContentBlock(
             if can_reorder:
                 context['reorderable_items'].add(child.location)
             context['can_add'] = can_add
-            context['is_selected'] = str(child.location) in self.candidates
+
+            context['is_selected'] = [child.location.block_type, child.location.block_id] in self.candidates
             rendered_child = child.render(StudioEditableBlock.get_preview_view_name(child), context)
             fragment.add_fragment_resources(rendered_child)
             contents.append({
@@ -589,12 +590,30 @@ class LibraryContentBlock(
             if not user_perms.can_read(self.source_library_key):
                 raise PermissionDenied(f"Cannot read library at {self.source_library_key}")
 
+    # suffix argument is specified for xblocks, but we are not using herein
+    @XBlock.json_handler
+    def submit_studio_edits(self, data, suffix=''):  # pylint: disable=unused-argument
+        """
+        Ajax handler for submiting changes to the candidates list.
+        Cleans them to be of type List[tuple[str,str]]
+        where the tuple is (block_type, block_id)
+        """
+        if list(data['values'].keys()) != list(self.editable_fields):
+            raise JsonHandlerError(
+                400,
+                f"Library Content Block only supports the editing of the candidates field  with this handler."
+            )
+        usage_key_list = [UsageKey.from_string(usage_key_string) for usage_key_string in data['values']['candidates']]
+        self.candidates = [(usage_key.block_type, usage_key.block_id) for usage_key in usage_key_list]
+
     @XBlock.handler
     def get_block_ids(self, request, suffix=''):  # lint-amnesty, pylint: disable=unused-argument
         """
         Return candidates for selection.
         """
-        return Response(json.dumps({'candidates': self.candidates}))
+        # construct usage_key list from library children so it is fully formed.
+        usage_key_list = [child for child in self.children if [child.block_type, child.block_id] in self.candidates]
+        return Response(json.dumps({'candidates': [str(usage_key) for usage_key in usage_key_list]}))
 
     @XBlock.handler
     def upgrade_and_sync(self, request=None, suffix=None):  # pylint: disable=unused-argument
@@ -821,7 +840,7 @@ class LibraryContentBlock(
     def has_dynamic_children(self):
         """
         Inform the runtime that our children vary per-user.
-        See get_child_blocks() above
+        See get_child_blocks()
         """
         return True
 
