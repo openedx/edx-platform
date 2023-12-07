@@ -44,68 +44,50 @@ metadata:
 
 hinted: true
 data:   |
-        <div>
-            <div id='qz-1'>
-                <problem>
-               
-                    <choiceresponse>
-                        <p>quiz 1</p>
-                        <label>content</label>
-                        <checkboxgroup>
-                            <choice correct="true">a correct answer
-                                <choicehint selected="true">You can specify optional feedback that appears after the learner selects and submits this answer.</choicehint>
-                                <choicehint selected="false">You can specify optional feedback that appears after the learner clears and submits this answer.</choicehint>
-                            </choice>
-                            <choice correct="false">an incorrect answer
-                            </choice>
-                            <choice correct="false">an incorrect answer
-                                <choicehint selected="true">You can specify optional feedback for none, all, or a subset of the answers.</choicehint>
-                                <choicehint selected="false">You can specify optional feedback for selected answers, cleared answers, or both.</choicehint>
-                            </choice>
-                            <choice correct="true">a correct answer
-                            </choice>
-                            <compoundhint value="A B D">You can specify optional feedback for a combination of answers which appears after the specified set of answers is submitted.</compoundhint>
-                            <compoundhint value="A B C D">You can specify optional feedback for one, several, or all answer combinations.</compoundhint>
-                        </checkboxgroup>
-                    </choiceresponse>
-                    <demandhint>
-                        <hint>Hint 1.1</hint>
-                        <hint>hint 1.2 </hint>
-                    </demandhint>
-                        
-                </problem>
-    
-             </div>
-
-             <div id='qz-2'>
-                <problem>
-               
-                    <choiceresponse>
-                        <p>quiz 2</p>
-                        <label>content</label>
-                        <checkboxgroup>
-                            <choice correct="true">a correct answer
-                                <choicehint selected="true">You can specify optional feedback that appears after the learner selects and submits this answer.</choicehint>
-                                <choicehint selected="false">You can specify optional feedback that appears after the learner clears and submits this answer.</choicehint>
-                            </choice>
-                            <choice correct="false">an incorrect answer
-                            </choice>
-                            <choice correct="false">an incorrect answer
-                                <choicehint selected="true">You can specify optional feedback for none, all, or a subset of the answers.</choicehint>
-                                <choicehint selected="false">You can specify optional feedback for selected answers, cleared answers, or both.</choicehint>
-                            </choice>
-                            <choice correct="true">a correct answer
-                            </choice>
-                            <compoundhint value="A B D">You can specify optional feedback for a combination of answers which appears after the specified set of answers is submitted.</compoundhint>
-                            <compoundhint value="A B C D">You can specify optional feedback for one, several, or all answer combinations.</compoundhint>
-                        </checkboxgroup>
-                    </choiceresponse>
-                    <demandhint>
-                        <hint>Hint 2.1</hint>
-                        <hint>hint 2.2 </hint>
-                    </demandhint>
-                        
-                </problem>
-    
-             </div>
-        </div>
+            <problem>
+                <label> <b>Question 1</b> 123</label>
+            <choiceresponse>
+                <checkboxgroup>
+                <choice correct="true">a correct answer
+                    <choicehint selected="true">giai thich 1</choicehint></choice>
+                <choice correct="false">an incorrect answer</choice>
+                <choice correct="false">an incorrect answer </choice>
+                <choice correct="true">a correct answer
+                    <choicehint selected="true">giai thich  2</choicehint></choice>
+                </checkboxgroup>
+            </choiceresponse>
+            
+                <label> <b>Question 2</b> 123</label>
+            <choiceresponse>
+                <checkboxgroup>
+                <choice correct="true">a correct answer
+                    <choicehint selected="true">giai thich 1</choicehint></choice>
+                <choice correct="false">an incorrect answer</choice>
+                <choice correct="false">an incorrect answer </choice>
+                <choice correct="true">a correct answer
+                    <choicehint selected="true">giai thich  2</choicehint></choice>
+                </checkboxgroup>
+            </choiceresponse>
+            
+            <label> Question 3 </label>
+            <multiplechoiceresponse>
+                <choicegroup type="MultipleChoice">
+                <choice correct="true">Yes <choicehint>giai thich</choicehint></choice>
+                <choice correct="false">No</choice>
+                <choice correct="false">No</choice>
+                <choice correct="false">No</choice>
+                </choicegroup>
+            </multiplechoiceresponse>
+            
+            <label> Question 4 </label>
+            <multiplechoiceresponse>
+                <choicegroup type="MultipleChoice">
+                <choice correct="true">Yes <choicehint>giai thich</choicehint></choice>
+                <choice correct="false">No</choice>
+                <choice correct="false">No</choice>
+                <choice correct="false">No</choice>
+                </choicegroup>
+            </multiplechoiceresponse>
+            
+            
+            </problem>

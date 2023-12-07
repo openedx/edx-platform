@@ -10,7 +10,7 @@ from openedx.core.djangolib.markup import HTML
     padding-bottom : 10px;
   }
   .problem-question-number {
-      padding : 0px 6px;
+      padding : 4px 10px;
       background-color: #f6f6f7;
       text-align: center;
       color: #8097b1;
@@ -141,6 +141,13 @@ from openedx.core.djangolib.markup import HTML
   background-color: rgba(216, 44, 13, 0.05);
 }
 
+.success-problem   {
+  accent-color: #5aa447 !important;
+}
+
+
+
+
 </style>
 
 <%namespace name='static' file='static_content.html'/>
@@ -176,6 +183,7 @@ from openedx.core.djangolib.markup import HTML
           Câu hỏi tiếp theo  <i class="bi bi-arrow-right"></i>
         </span></button>
         <button class='btn-submit-qz btn-custom' disabled > Trả lời  </button>
+        <button class='btn-submitted btn-custom' style='display:none' > Hoàn thành  </button>
       </span>
         
       %endif
@@ -201,7 +209,7 @@ from openedx.core.djangolib.markup import HTML
           <button type="button" class="reset problem-action-btn btn-link btn-small" data-value="${_('Reset')}"><span aria-hidden="true">${_('Reset')}</span><span class="sr">${_("Reset your answer")}</span></button>
       </span>
       % endif
-      % if answer_available:
+      % if answer_available and problem['name'] != 'Quiz Problem Custom' :
       <span class="problem-action-button-wrapper">
           <button type="button" class="show problem-action-btn btn-link btn-small" aria-describedby="${ short_id }-problem-title"><span class="show-label">${_('Show answer')}</span></button>
       </span>
@@ -347,12 +355,13 @@ if (problemList.length > 1) {
     indicatorError.style.display = 'none'
     
 
- 
     if (i == 0){
       spanElement.classList.add('active-number')
       if (submittedInput && incorrectLabel) {
         btnSubmit.style.display = 'none';
         btnNext.style.display = 'block';
+        const inputs = problemList[i].querySelectorAll('input:checked');
+        inputs.forEach(input => input.classList.add('success-problem'))
       }else {
           spanElement.classList.add('err-number-qusetion')
 
@@ -365,6 +374,8 @@ if (problemList.length > 1) {
       spanElement.classList.add('submitted-question');
       btnSubmit.style.display = 'none';
       btnNext.style.display = 'block';
+      const inputs = problemList[i].querySelectorAll('input:checked');
+      inputs.forEach(input => input.classList.add('success-problem'))
       }
       else if (submittedInput && wrongLabel){
         spanElement.classList.add('err-number-qusetion');
