@@ -33,7 +33,9 @@ class StubModel:
         self.staff_visibility = staff_visibility
 
     def __str__(self):
-        return ''.joing([str(self.data_usage_key), str(self.staff_visibility)])
+        key = ''.join([str(self.data_usage_key), str(self.staff_visibility)])
+        logger.info(f'Couse Block Stub Key: {key}')
+        return key
 
     def delete(self):
         """
