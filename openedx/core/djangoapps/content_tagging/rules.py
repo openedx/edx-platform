@@ -239,7 +239,9 @@ def can_view_object_tag_taxonomy(user: UserType, taxonomy: oel_tagging.Taxonomy)
 
     This rule is different from can_view_taxonomy because it checks if the taxonomy is enabled.
     """
-    return taxonomy.cast().enabled and can_view_taxonomy(user, taxonomy)
+    # Note: in the REST API, where we're dealing with multiple taxonomies at once, permissions
+    # are also enforced by ObjectTagTaxonomyOrgFilterBackend.
+    return not taxonomy or (taxonomy.cast().enabled and can_view_taxonomy(user, taxonomy))
 
 
 @rules.predicate

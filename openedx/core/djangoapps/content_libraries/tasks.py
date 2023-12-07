@@ -300,7 +300,13 @@ def duplicate_children(
     # Then, copy over any overridden settings the course author may have applied to the blocks.
     source_block = store.get_item(BlockUsageLocator.from_string(source_block_id))
     with store.bulk_operations(source_block.scope_ids.usage_id.context_key):
-        _copy_overrides(store=store, user_id=user_id, source_block=source_block, dest_block=dest_block)
+        try:
+            TASK_LOGGER.info('Copying Overrides from %s to %s', source_block_id, dest_block_id)
+            _copy_overrides(store=store, user_id=user_id, source_block=source_block, dest_block=dest_block)
+        except Exception as exception:  # pylint: disable=broad-except
+            TASK_LOGGER.exception('Error Copying Overrides from %s to %s', source_block_id, dest_block_id)
+            if self.status.state != UserTaskStatus.FAILED:
+                self.status.fail({'raw_error_msg': str(exception)})
 
 
 def _sync_children(
@@ -373,7 +379,7 @@ def _copy_overrides(
             _copy_overrides(
                 store=store,
                 user_id=user_id,
-                source_block=source_block.runtime.get_block(source_child_key),
-                dest_block=dest_block.runtime.get_block(dest_child_key),
+                source_block=store.get_item(source_child_key),
+                dest_block=store.get_item(dest_child_key),
             )
     store.update_item(dest_block, user_id)

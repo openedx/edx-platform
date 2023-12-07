@@ -11504,6 +11504,19 @@ msgid ""
 msgstr ""
 
 #: xmodule/library_content_block.py
+msgid "Source content library has not been specified."
+msgstr ""
+
+#: xmodule/library_content_block.py
+msgid "Content libraries are not available in the current runtime."
+msgstr ""
+
+#: xmodule/library_content_block.py
+#, python-brace-format
+msgid "Source content library does not exist: {source_library_id}"
+msgstr ""
+
+#: xmodule/library_content_block.py
 msgid "This component is out of date. The library has new content."
 msgstr "انقضت مدّة هذا المكوِّن. حُدّثت المكتبة بمحتوى جديد الآن. "
 
@@ -11539,8 +11552,9 @@ msgid "Select a Library."
 msgstr "يُرجى اختيار مكتبة."
 
 #: xmodule/library_content_block.py
-msgid "There are no matching problem types in the specified libraries."
-msgstr "لا توجد أنواع مسائل مطابقة في المكتبات المحدَّدة."
+#, python-brace-format
+msgid "There are no problems in the specified library of type {capa_type}."
+msgstr ""
 
 #: xmodule/library_content_block.py
 msgid "Select another problem type."
@@ -13747,14 +13761,6 @@ msgstr "المتطلّبات"
 msgid "Details"
 msgstr "التفاصيل"
 
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-#. Translators: this is a verb describing the action of viewing more details
-#: cms/templates/studio_xblock_wrapper.html
-#: lms/templates/wiki/includes/article_menu.html
-#: wiki/templates/wiki/includes/article_menu.html
-msgid "View"
-msgstr "عرض"
-
 #: cms/templates/maintenance/_announcement_edit.html
 #: lms/templates/problem.html lms/templates/word_cloud.html
 msgid "Save"
@@ -14538,6 +14544,14 @@ msgstr "تسلسل"
 #: lms/templates/seq_block.html lms/templates/vert_module.html
 msgid "Completed"
 msgstr "تمّت"
+
+#: lms/templates/seq_block.html
+msgid "New Unit"
+msgstr ""
+
+#: lms/templates/seq_block.html
+msgid "Paste as new unit"
+msgstr ""
 
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"
@@ -20372,6 +20386,11 @@ msgid "Learn more"
 msgstr "تعلّم المزيد"
 
 #: lms/templates/wiki/includes/article_menu.html
+#: wiki/templates/wiki/includes/article_menu.html
+msgid "View"
+msgstr "عرض"
+
+#: lms/templates/wiki/includes/article_menu.html
 msgid "{span_start}(active){span_end}"
 msgstr "{span_start}(مفعّل){span_end}"
 
@@ -21071,6 +21090,10 @@ msgstr "شاهد النسخة الحالية"
 #: cms/templates/container.html
 msgid "Preview the courseware in the LMS"
 msgstr "معاينة محتويات المساق في نظام إدارة التعلّم LMS"
+
+#: cms/templates/container.html
+msgid "Collapse All"
+msgstr ""
 
 #: cms/templates/container.html
 msgid "Adding components"
@@ -23974,11 +23997,23 @@ msgstr ""
 "موجزة، وامتحانات، كما يمكنك تحديد حصّة كلّ نوع من مجموع درجة الطالب."
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Importing components"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
 msgstr "تكبير أو تصغير"
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Select this problem"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage tags"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
