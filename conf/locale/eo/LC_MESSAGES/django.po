@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-11-26 20:36+0000\n"
-"PO-Revision-Date: 2023-11-26 20:36:15.034816\n"
+"POT-Creation-Date: 2023-12-05 14:25+0000\n"
+"PO-Revision-Date: 2023-12-05 14:25:08.102305\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -9447,6 +9447,12 @@ msgstr ""
 "¢σηѕє¢тє#"
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
+msgid "Full name can't be longer than 255 symbols"
+msgstr ""
+"Füll nämé çän't ßé löngér thän 255 sýmßöls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: openedx/core/djangoapps/user_api/accounts/api.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Enter a valid name"
 msgstr "Éntér ä välïd nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
@@ -15113,13 +15119,11 @@ msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}, {current_group} Ⱡ'σяєм ιρѕυм ∂#"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "Düplïçäté öf {0} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "Düplïçäté öf '{0}' Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
@@ -16796,6 +16800,14 @@ msgstr "Séqüénçé Ⱡ'σяєм ιρѕυм ∂#"
 #: lms/templates/seq_block.html lms/templates/vert_module.html
 msgid "Completed"
 msgstr "Çömplétéd Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/templates/seq_block.html
+msgid "New Unit"
+msgstr "Néw Ûnït Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/templates/seq_block.html
+msgid "Paste as new unit"
+msgstr "Pästé äs néw ünït Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"

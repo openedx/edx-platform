@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-11-26 20:36+0000\n"
-"PO-Revision-Date: 2023-11-26 20:36:15.034816\n"
+"POT-Creation-Date: 2023-12-05 14:25+0000\n"
+"PO-Revision-Date: 2023-12-05 14:25:08.102305\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -7410,6 +7410,10 @@ msgid "The '{field_name}' field cannot be edited."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
+msgid "Full name can't be longer than 255 symbols"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/api.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Enter a valid name"
 msgstr ""
@@ -11678,13 +11682,11 @@ msgid "{previous_groups}, {current_group}"
 msgstr ""
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr ""
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr ""
@@ -13095,6 +13097,14 @@ msgstr ""
 
 #: lms/templates/seq_block.html lms/templates/vert_module.html
 msgid "Completed"
+msgstr ""
+
+#: lms/templates/seq_block.html
+msgid "New Unit"
+msgstr ""
+
+#: lms/templates/seq_block.html
+msgid "Paste as new unit"
 msgstr ""
 
 #: lms/templates/signup_modal.html
