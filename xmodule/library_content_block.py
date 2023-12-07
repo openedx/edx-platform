@@ -601,7 +601,7 @@ class LibraryContentBlock(
         if list(data['values'].keys()) != list(self.editable_fields):
             raise JsonHandlerError(
                 400,
-                f"Library Content Block only supports the editing of the candidates field  with this handler."
+                "Library Content Block only supports the editing of the candidates field  with this handler."
             )
         usage_key_list = [UsageKey.from_string(usage_key_string) for usage_key_string in data['values']['candidates']]
         self.candidates = [(usage_key.block_type, usage_key.block_id) for usage_key in usage_key_list]
