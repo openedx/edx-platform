@@ -234,20 +234,25 @@ def get_video_usage_path(course_key, edx_video_id):
             'category': 'video'
         },
     )
+
     for video in videos:
         video_id = getattr(video, 'edx_video_id', '')
-        if video_id == edx_video_id:
-            usage_dict = {'display_location': '', 'url': ''}
-            video_location = str(video.location)
-            unit = video.get_parent()
-            unit_location = str(video.parent)
-            unit_display_name = getattr(unit, 'display_name', '')
-            subsection = unit.get_parent()
-            subsection_display_name = getattr(subsection, 'display_name', '')
-            xblock_display_name = getattr(video, 'display_name', '')
-            usage_dict['display_location'] = f'{subsection_display_name} - {unit_display_name} / {xblock_display_name}'
-            usage_dict['url'] = f'/container/{unit_location}#{video_location}'
-            usage_locations.append(usage_dict)
+        try:
+            if video_id == edx_video_id:
+                usage_dict = {'display_location': '', 'url': ''}
+                video_location = str(video.location)
+                xblock_display_name = getattr(video, 'display_name', '')
+                unit = video.get_parent()
+                unit_location = str(video.parent)
+                unit_display_name = getattr(unit, 'display_name', '')
+                subsection = unit.get_parent()
+                subsection_display_name = getattr(subsection, 'display_name', '')
+                usage_dict['display_location'] = f'{subsection_display_name} - {unit_display_name} / {xblock_display_name}'
+                usage_dict['url'] = f'/container/{unit_location}#{video_location}'
+                usage_locations.append(usage_dict)
+        except AttributeError:
+            continue
+
     return {'usage_locations': usage_locations}
 
 
@@ -671,12 +676,12 @@ def videos_index_html(course, pagination_conf=None):
     """
     Returns an HTML page to display previous video uploads and allow new ones
     """
+    if use_new_video_uploads_page(course.id):
+        return redirect(get_video_uploads_url(course.id))
     context = get_course_videos_context(
         course,
         pagination_conf,
     )
-    if use_new_video_uploads_page(course.id):
-        return redirect(get_video_uploads_url(course.id))
     return render_to_response('videos_index.html', context)
 
 

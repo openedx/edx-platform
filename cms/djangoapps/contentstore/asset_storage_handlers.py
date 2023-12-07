@@ -126,38 +126,41 @@ def _get_asset_usage_path(course_key, assets):
             asset_key_string = str(asset_key)
             static_path = StaticContent.get_static_path_from_location(asset_key)
             is_video_block = getattr(block, 'category', '') == 'video'
-            if is_video_block:
-                handout = getattr(block, 'handout', '')
-                if handout and asset_key_string in handout:
-                    usage_dict = {'display_location': '', 'url': ''}
-                    xblock_display_name = getattr(block, 'display_name', '')
-                    xblock_location = str(block.location)
-                    unit = block.get_parent()
-                    unit_location = str(block.parent)
-                    unit_display_name = getattr(unit, 'display_name', '')
-                    subsection = unit.get_parent()
-                    subsection_display_name = getattr(subsection, 'display_name', '')
-                    current_locations = usage_locations[asset_key_string]
-                    usage_dict['display_location'] = (f'{subsection_display_name} - '
-                                                      f'{unit_display_name} / {xblock_display_name}')
-                    usage_dict['url'] = f'/container/{unit_location}#{xblock_location}'
-                    usage_locations[asset_key_string] = [*current_locations, usage_dict]
-            else:
-                data = getattr(block, 'data', '')
-                if static_path in data or asset_key_string in data:
-                    usage_dict = {'display_location': '', 'url': ''}
-                    xblock_display_name = getattr(block, 'display_name', '')
-                    xblock_location = str(block.location)
-                    unit = block.get_parent()
-                    unit_location = str(block.parent)
-                    unit_display_name = getattr(unit, 'display_name', '')
-                    subsection = unit.get_parent()
-                    subsection_display_name = getattr(subsection, 'display_name', '')
-                    current_locations = usage_locations[asset_key_string]
-                    usage_dict['display_location'] = (f'{subsection_display_name} - '
-                                                      f'{unit_display_name} / {xblock_display_name}')
-                    usage_dict['url'] = f'/container/{unit_location}#{xblock_location}'
-                    usage_locations[asset_key_string] = [*current_locations, usage_dict]
+            try:
+                if is_video_block:
+                    handout = getattr(block, 'handout', '')
+                    if handout and asset_key_string in handout:
+                        usage_dict = {'display_location': '', 'url': ''}
+                        xblock_display_name = getattr(block, 'display_name', '')
+                        xblock_location = str(block.location)
+                        unit = block.get_parent()
+                        unit_location = str(block.parent)
+                        unit_display_name = getattr(unit, 'display_name', '')
+                        subsection = unit.get_parent()
+                        subsection_display_name = getattr(subsection, 'display_name', '')
+                        current_locations = usage_locations[asset_key_string]
+                        usage_dict['display_location'] = (f'{subsection_display_name} - '
+                                                        f'{unit_display_name} / {xblock_display_name}')
+                        usage_dict['url'] = f'/container/{unit_location}#{xblock_location}'
+                        usage_locations[asset_key_string] = [*current_locations, usage_dict]
+                else:
+                    data = getattr(block, 'data', '')
+                    if static_path in data or asset_key_string in data:
+                        usage_dict = {'display_location': '', 'url': ''}
+                        xblock_display_name = getattr(block, 'display_name', '')
+                        xblock_location = str(block.location)
+                        unit = block.get_parent()
+                        unit_location = str(block.parent)
+                        unit_display_name = getattr(unit, 'display_name', '')
+                        subsection = unit.get_parent()
+                        subsection_display_name = getattr(subsection, 'display_name', '')
+                        current_locations = usage_locations[asset_key_string]
+                        usage_dict['display_location'] = (f'{subsection_display_name} - '
+                                                        f'{unit_display_name} / {xblock_display_name}')
+                        usage_dict['url'] = f'/container/{unit_location}#{xblock_location}'
+                        usage_locations[asset_key_string] = [*current_locations, usage_dict]
+            except AttributeError:
+                continue
     return usage_locations
 
 
