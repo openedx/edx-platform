@@ -536,7 +536,6 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 'is_user_admin': False,
                 "user_roles": ["Student"],
                 'learners_tab_enabled': False,
-                "reason_codes_enabled": False,
                 "edit_reasons": [{"code": "test-edit-reason", "label": "Test Edit Reason"}],
                 "post_close_reasons": [{"code": "test-close-reason", "label": "Test Close Reason"}],
             }

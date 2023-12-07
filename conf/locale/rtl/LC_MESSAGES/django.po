@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-11-26 20:36+0000\n"
-"PO-Revision-Date: 2023-11-26 20:36:15.034816\n"
+"POT-Creation-Date: 2023-12-05 14:25+0000\n"
+"PO-Revision-Date: 2023-12-05 14:25:08.102305\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -8182,6 +8182,10 @@ msgid "The '{field_name}' field cannot be edited."
 msgstr "Ŧɥǝ '{field_name}' ɟᴉǝld ɔɐnnøʇ bǝ ǝdᴉʇǝd."
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
+msgid "Full name can't be longer than 255 symbols"
+msgstr "Fnll nɐɯǝ ɔɐn'ʇ bǝ lønƃǝɹ ʇɥɐn 255 sʎɯbøls"
+
+#: openedx/core/djangoapps/user_api/accounts/api.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Enter a valid name"
 msgstr "Ɇnʇǝɹ ɐ ʌɐlᴉd nɐɯǝ"
@@ -13016,13 +13020,11 @@ msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}, {current_group}"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "Đndlᴉɔɐʇǝ øɟ {0}"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "Đndlᴉɔɐʇǝ øɟ '{0}'"
@@ -14515,6 +14517,14 @@ msgstr "Sǝbnǝnɔǝ"
 #: lms/templates/seq_block.html lms/templates/vert_module.html
 msgid "Completed"
 msgstr "Ȼøɯdlǝʇǝd"
+
+#: lms/templates/seq_block.html
+msgid "New Unit"
+msgstr "Nǝʍ Ʉnᴉʇ"
+
+#: lms/templates/seq_block.html
+msgid "Paste as new unit"
+msgstr "Ᵽɐsʇǝ ɐs nǝʍ nnᴉʇ"
 
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"

@@ -1,16 +1,10 @@
 """
 Common code for tests that work with Blockstore
 """
-from unittest import mock, skipUnless
+from unittest import mock
 from urllib.parse import urlparse
 
-from django.conf import settings
 from django.test.client import RequestFactory
-
-# Decorators for tests that require the blockstore service/app
-requires_blockstore = skipUnless(settings.RUN_BLOCKSTORE_TESTS, "Requires a running Blockstore server")
-
-requires_blockstore_app = skipUnless(settings.BLOCKSTORE_USE_BLOCKSTORE_APP_API, "Requires blockstore app")
 
 
 class BlockstoreAppTestMixin:

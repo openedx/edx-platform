@@ -20,8 +20,6 @@ from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.core.lib import blockstore_api
 from openedx.core.lib.blockstore_api.tests.base import (
     BlockstoreAppTestMixin,
-    requires_blockstore,
-    requires_blockstore_app,
 )
 
 # Define the URLs here - don't use reverse() because we want to detect
@@ -355,15 +353,6 @@ class _ContentLibrariesRestApiTestMixin:
         return self._api('get', url, None, expect_response=200)["handler_url"]
 
 
-@requires_blockstore
-class ContentLibrariesRestApiBlockstoreServiceTest(_ContentLibrariesRestApiTestMixin, APITestCase):
-    """
-    Base class for Blockstore-based Content Libraries test that use the REST API
-    and the standalone Blockstore service.
-    """
-
-
-@requires_blockstore_app
 class ContentLibrariesRestApiTest(
     _ContentLibrariesRestApiTestMixin,
     BlockstoreAppTestMixin,
