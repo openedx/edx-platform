@@ -646,8 +646,11 @@ def build_course_report_for_students(user_id, course_key, student_list):
                 # which isn't useful for this report.
                 if block_key.block_type in ('course', 'sequential', 'chapter', 'vertical'):
                     continue
-
-                block = store.get_item(block_key)
+                try:
+                    block = store.get_item(block_key)
+                except ItemNotFoundError as ex:
+                    loggger.error(ex)
+                    continue
                 if not hasattr(block, 'is_exportable'):
                     continue
                 if not block.is_exportable:
