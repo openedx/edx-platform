@@ -192,7 +192,6 @@ def handle_xblock(request, usage_key_string=None):
             _delete_item(usage_key, request.user)
             return JsonResponse()
         else:  # Since we have a usage_key, we are updating an existing xblock.
-            xblock_to_be_modified = get_xblock(usage_key, request.user)
             modified_xblock = modify_xblock(usage_key, request)
             return modified_xblock
 
@@ -221,12 +220,14 @@ def handle_xblock(request, usage_key_string=None):
                     },
                     status=400,
                 )
+
             dest_usage_key = duplicate_block(
                 parent_usage_key,
                 duplicate_source_usage_key,
                 request.user,
                 display_name=request.json.get('display_name'),
             )
+
             return JsonResponse(
                 {
                     "locator": str(dest_usage_key),

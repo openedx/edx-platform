@@ -26,7 +26,6 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.core.exceptions import PermissionDenied
 from edx_django_utils.monitoring import set_code_owner_attribute, set_code_owner_attribute_from_module
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import (
     BlockUsageLocator,
     LibraryUsageLocator,
@@ -328,7 +327,10 @@ def _sync_children(
     library = library_api.get_v1_or_v2_library(library_key, version=library_version)
     #update the key to match the library on account of the runtime mapping.
     if library:
-        library_key = library.key if hasattr(library, 'key') else library.location.library_key
+        if isinstance(library, LibraryRootV1):
+            library_key = library.location.library_key
+        elif isinstance(library, library_api.ContentLibraryMetadata):
+            library_key = library.key
     if not library:
         task.status.fail(f"Requested library {library_key} not found.")
     elif isinstance(library, LibraryRootV1):
@@ -359,8 +361,6 @@ def _sync_children(
             _import_from_blockstore(user_id, store, dest_block, source_block_ids)
             dest_block.source_library_version = str(library.version)
             store.update_item(dest_block, user_id)
-            print("RALIEGH")
-            print(store.get_item(dest_block, user_id).__dict__)
         except Exception as exception:  # pylint: disable=broad-except
             TASK_LOGGER.exception('Error importing children for %s', dest_block.scope_ids.usage_id, exc_info=True)
             if task.status.state != UserTaskStatus.FAILED:

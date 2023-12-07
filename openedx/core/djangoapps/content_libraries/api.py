@@ -132,6 +132,7 @@ from xmodule.library_root_xblock import LibraryRoot as LibraryRootV1
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.mixed import MixedModuleStore
 
 from . import tasks
 
@@ -1179,8 +1180,8 @@ def revert_changes(library_key):
 
 def get_v1_or_v2_library(
     library_id: str | LibraryLocatorV1 | LibraryLocatorV2,
-    store=None
     version: str | int | None,
+    store: MixedModuleStore | None = None,
 ) -> LibraryRootV1 | ContentLibraryMetadata | None:
     """
     Fetch either a V1 or V2 content library from a V1/V2 key (or key string) and version.
@@ -1241,9 +1242,10 @@ def get_v1_or_v2_library(
             v1_version = str(version)
         else:
             v1_version = None
-        store = modulestore()
         library_key = library_key.for_branch(ModuleStoreEnum.BranchName.library).for_version(v1_version)
         try:
+            if store is None:
+                store = modulestore()
             return store.get_library(library_key, remove_version=False, remove_branch=False, head_validation=False)
         except ItemNotFoundError:
             return None
