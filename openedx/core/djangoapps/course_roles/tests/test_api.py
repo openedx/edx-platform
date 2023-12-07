@@ -30,8 +30,7 @@ class GetAllUserPermissionsTestcase(SharedModuleStoreTestCase):
     """
     @classmethod
     def setUpClass(cls):
-        with super().setUpClassAndTestData():
-            # pylint: disable=super-method-not-called
+        with super().setUpClassAndTestData(): # pylint: disable=super-method-not-called
             cls.organization_1_name = "test_organization_1"
             cls.course_1 = CourseFactory.create(
                 display_name="test course 1", run="Testing_course_1", org=cls.organization_1_name
