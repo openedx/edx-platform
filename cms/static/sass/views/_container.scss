@@ -264,6 +264,7 @@
         .wrapper-tag-header {
           display: flex;
           justify-content: space-between;
+          border: 1px dotted transparent;
 
           .tag-title {
             font-weight: bold;
@@ -278,7 +279,7 @@
         }
 
         .wrapper-tag-header:focus-visible {
-          border: 1px dotted gray;
+          border-color: gray;
         }
 
         .action-primary {
