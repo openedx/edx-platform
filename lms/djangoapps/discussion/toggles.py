@@ -24,17 +24,6 @@ ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE = CourseWaffleFlag(
     f'{WAFFLE_FLAG_NAMESPACE}.enable_learners_tab_in_discussions_mfe', __name__
 )
 
-# .. toggle_name: discussions.enable_moderation_reason_codes
-# .. toggle_implementation: CourseWaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Waffle flag to toggle support for the new edit and post close reason codes
-# .. toggle_use_cases: temporary, open_edx
-# .. toggle_creation_date: 2022-02-22
-# .. toggle_target_removal_date: 2022-09-22
-ENABLE_DISCUSSION_MODERATION_REASON_CODES = CourseWaffleFlag(
-    f'{WAFFLE_FLAG_NAMESPACE}.enable_moderation_reason_codes', __name__
-)
-
 # .. toggle_name: discussions.enable_reported_content_email_notifications
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False

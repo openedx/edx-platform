@@ -185,7 +185,7 @@ class LibraryToolsService:
             for lib in self.store.get_library_summaries()
         ]
         v2_query = library_api.get_libraries_for_user(user)
-        v2_libs_with_meta = library_api.get_metadata_from_index(v2_query)
+        v2_libs_with_meta = library_api.get_metadata(v2_query)
         v2_libs = [(lib.key, lib.title) for lib in v2_libs_with_meta]
 
         if settings.FEATURES.get('ENABLE_LIBRARY_AUTHORING_MICROFRONTEND'):

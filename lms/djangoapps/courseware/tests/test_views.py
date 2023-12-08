@@ -932,27 +932,22 @@ class ViewsTestCase(BaseViewsTestCase):
         url = reverse(submit_url)
         return self.client.post(url, json.dumps(data), content_type='application/json', HTTP_REFERER=referrer_url)
 
+    @override_settings(ZENDESK_CUSTOM_FIELDS={'course_id': 'custom_123'})
     @patch.object(views, 'create_zendesk_ticket', return_value=200)
     def test_submit_financial_assistance_request(self, mock_create_zendesk_ticket):
         username = self.user.username
         course = str(self.course_key)
         legal_name = 'Jesse Pinkman'
         country = 'United States'
-        income = '1234567890'
-        reason_for_applying = "It's just basic chemistry, yo."
-        goals = "I don't know if it even matters, but... work with my hands, I guess."
-        effort = "I'm done, okay? You just give me my money, and you and I, we're done."
         data = {
             'username': username,
             'course': course,
             'name': legal_name,
             'email': self.user.email,
             'country': country,
-            'income': income,
-            'reason_for_applying': reason_for_applying,
-            'goals': goals,
-            'effort': effort,
-            'mktg-permission': False,
+            'certify-economic-hardship': False,
+            'certify-complete-certificate': False,
+            'certify-honor-code': False,
         }
         response = self._submit_financial_assistance_form(data)
         assert response.status_code == 204
@@ -960,17 +955,19 @@ class ViewsTestCase(BaseViewsTestCase):
         __, __, ticket_subject, __ = mock_create_zendesk_ticket.call_args[0]
         mocked_kwargs = mock_create_zendesk_ticket.call_args[1]
         group_name = mocked_kwargs['group']
-        tags = mocked_kwargs['tags']
+        custom_fields = mocked_kwargs['custom_fields']
         additional_info = mocked_kwargs['additional_info']
 
         private_comment = '\n'.join(list(additional_info.values()))
-        for info in (country, income, reason_for_applying, goals, effort, username, legal_name, course):
+        for info in (country, username, legal_name, course):
             assert info in private_comment
 
-        assert additional_info['Allowed for marketing purposes'] == 'No'
+        assert additional_info['Paying for the course would cause economic hardship'] == 'No'
+        assert additional_info['Certify work diligently to receive a certificate'] == 'No'
+        assert additional_info['Certify abide by the honor code'] == 'No'
 
         assert ticket_subject == f'Financial assistance request for learner {username} in course {self.course.display_name}'  # pylint: disable=line-too-long
-        self.assertDictContainsSubset({'course_id': course}, tags)
+        self.assertEqual([{'id': 'custom_123', 'value': course}], custom_fields)
         assert 'Client IP' in additional_info
         assert group_name == 'Financial Assistance'
 
@@ -982,11 +979,9 @@ class ViewsTestCase(BaseViewsTestCase):
             'name': '',
             'email': '',
             'country': '',
-            'income': '',
-            'reason_for_applying': '',
-            'goals': '',
-            'effort': '',
-            'mktg-permission': False,
+            'certify-economic-hardship': False,
+            'certify-complete-certificate': False,
+            'certify-honor-code': False,
         })
         assert response.status_code == 500
 
@@ -1002,11 +997,9 @@ class ViewsTestCase(BaseViewsTestCase):
         form_data = {
             'username': self.user.username,
             'course': 'course-v1:test+TestX+Test_Course',
-            'income': '$25,000 - $40,000',
-            'reason_for_applying': "It's just basic chemistry, yo.",
-            'goals': "I don't know if it even matters, but... work with my hands, I guess.",
-            'effort': "I'm done, okay? You just give me my money, and you and I, we're done.",
-            'mktg-permission': False
+            'certify-economic-hardship': False,
+            'certify-complete-certificate': False,
+            'certify-honor-code': False,
         }
         response = self._submit_financial_assistance_form(
             form_data,
