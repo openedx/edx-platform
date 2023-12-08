@@ -18,6 +18,8 @@ jobs:
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            ls -la
-            sudo -s
-            whoami
+            cd tutor
+            export TUTOR_ROOT=$(pwd)/tutor
+            export TUTOR_PLUGINS_ROOT=$(pwd)/tutor-plugins
+            . tutor-venv/bin/activate
+            tutor --version
