@@ -27,24 +27,28 @@ class Xporter:
         try:
             if xporter_detail.token and xporter_detail.token_expiry >= timezone.now():
                 return xporter_detail.token
+            return self.fetch_token()
         except TypeError:
-            post_obj = {
-                "estab": self.school.pk,
-                "relyingParty": settings.XPORTER_RELYING_PARTY_ID,
-                "password": xporter_detail.secret,
-                "thirdpartyid": settings.XPORTER_THIRD_PARTY_ID,
-            }
+          return self.fetch_token()
 
-            res = requests.post(self.AUTH_TOKEN_URL, json=post_obj)
+    def fetch_token(self):
+        xporter_detail = self.school.xporter_detail
+        post_obj = {
+            "estab": self.school.pk,
+            "relyingParty": settings.XPORTER_RELYING_PARTY_ID,
+            "password": xporter_detail.secret,
+            "thirdpartyid": settings.XPORTER_THIRD_PARTY_ID,
+        }
 
-            if res.status_code == HTTPStatus.OK:
-                res_obj = res.json()
-                xporter_detail.token = res_obj['token']
-                xporter_detail.token_expiry = res_obj['expires']
-                xporter_detail.save()
-                return xporter_detail.token
+        res = requests.post(self.AUTH_TOKEN_URL, json=post_obj)
 
-        return None
+        if res.status_code == HTTPStatus.OK:
+            res_obj = res.json()
+            xporter_detail.token = res_obj['token']
+            xporter_detail.token_expiry = res_obj['expires']
+            xporter_detail.save()
+            return xporter_detail.token
+
 
     def fetch(self, url):
         headers = self.get_header()
@@ -143,7 +147,6 @@ class Xporter:
 
     @staticmethod
     def update_gen_class_students(gen_class, gen_students, gen_user_ids):
-        gen_class.students.clear()
         gen_class.students.add(*gen_students)
         logger.info(f'{gen_students.count()} students added to {gen_class.name}')
         to_be_removed_students = gen_class.students.exclude(gen_user__id__in=gen_user_ids)
