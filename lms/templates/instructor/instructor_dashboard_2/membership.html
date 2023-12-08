@@ -4,6 +4,7 @@
 from django.utils.translation import ugettext as _
 from django.utils.translation import pgettext
 from openedx.core.djangolib.markup import HTML, Text
+from six.moves.urllib.parse import quote
 %>
 <fieldset class="batch-enrollment membership-section">
     <legend id="heading-batch-enrollment" class="hd hd-3">${_("Batch Enrollment")}</legend>
@@ -92,10 +93,11 @@ from openedx.core.djangolib.markup import HTML, Text
     <div class="bulk-enroll-management" style="margin-top: 20px; padding: 10px 20px; background: #f8f8f8; border-radius: 2px;">
         <p class="">
             <span class="icon fa fa-info-circle" aria-hidden="true"></span>
+            <% bulk_enrollment_url_encode = quote("Edly+Learners+Bulk+Enrollment+(CSV).csv") %>
             ${Text(
                 _("Here is a sample bulk enrollments CSV file: {link_start}Edly Learners Bulk Enrollment (CSV).csv{link_end}.")
             ).format(
-                link_start=HTML('<a href="https://edly-cloud-static-assets.s3.amazonaws.com/Edly+Learners+Bulk+Enrollment+(CSV).csv" class="btn-link link-cross-reference" target="_blank">'),
+                link_start=HTML('<a href="https://edly-cloud-static-assets.s3.amazonaws.com/' + bulk_enrollment_url_encode + '" class="btn-link link-cross-reference" target="_blank">'),
                 link_end=HTML('</a>')
             )}
         </p>
