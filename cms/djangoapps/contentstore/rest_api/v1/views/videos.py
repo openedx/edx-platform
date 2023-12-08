@@ -20,6 +20,7 @@ from cms.djangoapps.contentstore.video_storage_handlers import (
 from cms.djangoapps.contentstore.rest_api.v1.serializers import (
     CourseVideosSerializer,
     VideoUsageSerializer,
+    VideoDownloadSerializer
 )
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
 
@@ -189,6 +190,7 @@ class VideoDownloadView(DeveloperErrorViewMixin, APIView):
     View for course video downloads.
     """
     @apidocs.schema(
+        body=VideoDownloadSerializer,
         parameters=[
             apidocs.string_parameter("course_id", apidocs.ParameterLocation.PATH, description="Course ID"),
         ],
@@ -204,7 +206,11 @@ class VideoDownloadView(DeveloperErrorViewMixin, APIView):
         """
         Get an object containing course videos.
         **Example Request**
-            PUT /api/contentstore/v1/videos/download
+            PUT /api/contentstore/v1/videos/download, {
+                "files": [
+                    {"url": 'someUrl.com', "name": 'test.mp4'}
+                ]
+            }
         **Response Values**
         If the request is successful, an HTTP 200 "OK" response is returned.
         The HTTP 200 response contains a zip file attachment containing all the

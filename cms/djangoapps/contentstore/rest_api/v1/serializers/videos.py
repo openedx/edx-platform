@@ -114,6 +114,15 @@ class VideoUsageSerializer(serializers.Serializer):
     )
 
 
+class VideoDownloadSerializer(serializers.Serializer):
+    """Serializer for video downloads"""
+    files = serializers.listField(
+        child=serializers.DictField(
+            child=serializers.CharField()
+        )
+    )
+
+
 class VideoUploadSerializer(StrictSerializer):
     """
     Strict Serializer for video upload urls.
