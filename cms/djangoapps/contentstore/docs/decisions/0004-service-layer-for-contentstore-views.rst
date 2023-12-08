@@ -3,7 +3,7 @@ ADR 0004: Service Layer for Contentstore Views
 
 Status
 ------
-Proposed
+Accepted
 
 Context
 -------
@@ -130,21 +130,20 @@ we haven't determined any naming conventions at the time of writing this ADR
         return {'usage_locations': usage_locations}
 
 Rejected Alternatives
-_____________________
-
+---------------------
 Contentstore may be becoming too big and may warrant being split up into multiple djangoapps. However, that would be a much larger and different refactoring effort and is not considered necessary at this point. By implementing this ADR we are not preventing this to happen later, so we decided to follow the patterns described in this ADR for now.
 
 Community Feedback
 ------------------
-
-The following feedback about this ADR is considered out of scope here, but consists of relevant recommendations from the community. (Source: https://discuss.openedx.org/t/contentstore-views-refactoring/11801/5)
+The following feedback about this ADR is considered out of scope here, but consists of relevant recommendations from the community. (`Source <https://discuss.openedx.org/t/contentstore-views-refactoring/11801/5>`_)
 
 1. Code in `contentstore/api` should be for Python API that can be consumed by other edx-platform apps, as per `OEP-49 <https://open-edx-proposals.readthedocs.io/en/latest/best-practices/oep-0049-django-app-patterns.html>`_.
 2. "One recommendation I’d add is the use of a `data.py module <https://docs.openedx.org/projects/openedx-proposals/en/latest/best-practices/oep-0049-django-app-patterns.html#data-py>`_ for immutable domain-layer attrs classes (dataclasses are good too, they just weren’t available when that OEP was written) which can be passed around in place of models or entire xblocks. (`Example <https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/content/learning_sequences/data.py>`_) If there are data classes that you’d rather not expose in the public API, maybe you could have two data modules:
-cms/djangoapps/contentstore/data.py – domain objects exposed by the public python API
-cms/djangoapps/contentstore/core/data.py – domain objects for internal business logic"
+    - cms/djangoapps/contentstore/data.py – domain objects exposed by the public python API
+    - cms/djangoapps/contentstore/core/data.py – domain objects for internal business logic"
 3. "Another recommendation is to be wary of deep nesting and long names. There’s a non-trivial cognitive load that is added when we have modules paths like openedx/core/djangoapps/content/foo/bar/bar_providers.py instead of, e.g., common/core/foo/bar.py. I know you’re working within the existing framework of edx-platform’s folder structure, so there’s only so much you can do here"
 4. "once the refactoring is done, if we like how the end result looks and think it’d generalize well to other apps, I suggest that we update OEP-49 with the structure."
+
 
 Notes
 -----
