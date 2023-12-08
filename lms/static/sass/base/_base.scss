@@ -26,6 +26,9 @@ body {
 [tabindex="-1"] {
   outline: none;
 }
+.none {
+  display: none !important;
+}
 
 h1,
 h2,

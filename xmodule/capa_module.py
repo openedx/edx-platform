@@ -1284,6 +1284,7 @@ class ProblemBlock(
             'submit_disabled_cta': submit_disabled_ctas[0] if submit_disabled_ctas else None,
         }
 
+        next_lesson(context['id'])
         html = self.runtime.service(self, 'mako').render_template('problem.html', context)
 
         if encapsulate:
@@ -2280,3 +2281,8 @@ def randomization_bin(seed, problem_id):
     r_hash.update(str(problem_id).encode())
     # get the first few digits of the hash, convert to an int, then mod.
     return int(r_hash.hexdigest()[:7], 16) % NUM_RANDOMIZATION_BINS
+
+
+
+def next_lesson (unit_id) :
+    print('=============', unit_id)

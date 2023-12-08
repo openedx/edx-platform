@@ -19,11 +19,24 @@
         };
 
     this.Problem = (function() {
+ 
         function Problem(element) {
             var that = this;
-            this.hint_button = function() {
-                return Problem.prototype.hint_button.apply(that, arguments);
-            };
+            // button custom problem quizz
+            this.next_btn = function (){
+
+                return Problem.prototype.next_btn.apply(that, arguments)
+              };
+            this.prev_btn = function (){
+    
+                return Problem.prototype.prev_btn.apply(that, arguments)
+              };
+            this.submit_btn_qz = function(){
+      
+                return Problem.prototype.submit_qz.apply(that, arguments);
+                
+              };
+
             this.enableSubmitButtonAfterTimeout = function() {
                 return Problem.prototype.enableSubmitButtonAfterTimeout.apply(that, arguments);
             };
@@ -155,6 +168,7 @@
                     return MathJax.Hub.Queue(['Typeset', MathJax.Hub, element]);
                 });
             }
+            
             if (window.hasOwnProperty('update_schematics')) {
                 window.update_schematics();
             }
@@ -170,6 +184,15 @@
             this.submitButton.click(this.submit_fd);
             this.hintButton = this.$('.action .hint-button');
             this.hintButton.click(this.hint_button);
+            
+          //problem quiz custom
+            this.nextButton = this.$('.action #btn-next')
+            this.nextButton.click(this.next_btn)
+            this.prevBtn = this.$('.action .btn-prev');
+            this.prevBtn.click(this.prev_btn)
+            this.submitBtnQz = this.$('.action .btn-submit-qz')
+            this.submitBtnQz.click(this.submit_btn_qz)
+
             this.resetButton = this.$('.action .reset');
             this.resetButton.click(this.reset);
             this.showButton = this.$('.action .show');
@@ -180,6 +203,8 @@
             this.saveButton.click(this.save);
             this.gentleAlertNotification = this.$('.notification-gentle-alert');
             this.submitNotification = this.$('.notification-submit');
+
+
 
             // Accessibility helper for sighted keyboard users to show <clarification> tooltips on focus:
             this.$('.clarification').focus(function(ev) {
@@ -629,6 +654,253 @@
                 this.disableAllButtonsWhileRunning(this.submit_internal, true);
             }
         };
+        // problem quizz
+        var currentIndex = 0;   
+        Problem.prototype.submit_qz = function () {
+          var that = this;
+          const listQz = that.$('.wrapper-problem-response');
+          const checkedInput = that.$('.field input:checked');
+          const indicatorError = $(listQz[currentIndex]).find('.indicator-container')
+
+
+
+
+        return $.postWithPrefix('' + this.url + '/problem_check', that.answers, function (response) {
+            console.log(response)
+          if (response.success === 'submitted' || response.success === 'incorrect' || response.success === 'correct') {
+           
+            const problemQuestionNumbers = that.$('.problem-question-number');
+            const parsedHTML = $(response.contents);
+            const listProblemParsed = parsedHTML.find('.wrapper-problem-response')
+            const messagesProblem = listProblemParsed[currentIndex].querySelector('.message')
+            const indicatorErrorParsed = listProblemParsed[currentIndex].querySelector('.indicator-container')
+
+            const choicegroup = listQz[currentIndex].querySelector('.choicegroup , .capa_inputtype')
+            // choicegroup.appendChild(messagesProblem)
+
+ 
+            if (response.success === 'incorrect' && (currentIndex + 1) <= response.current_score){
+              that.$('.btn-submit-qz').css('display', 'none');
+              that.$('#btn-next').css('display', 'block');
+              
+        
+
+              if (currentIndex > 0) {
+                that.$('.btn-prev').css('display', 'block')
+              }
+
+
+              problemQuestionNumbers.each(function(index, element) {
+                if (element.textContent === (currentIndex +1 ).toString()) {
+                  element.classList.add('submitted-question');
+                  element.classList.remove('err-number-qusetion');
+                  element.classList.remove('active-number');
+
+                  choicegroup.appendChild(messagesProblem)
+
+                  indicatorError.css('display', 'none')
+
+                } 
+              });
+
+              checkedInput.each(function () {
+                const input = $(this);
+                const label = $('label[for="' + $(this).attr('id') + '"]'); 
+                input.addClass('submitted')
+                input.addClass('success-problem')
+                label.addClass('response-label field-label label-inline choicegroup_correct')
+                
+                choicegroup.appendChild(messagesProblem)
+    
+              })
+
+            }else {
+
+              indicatorError.css('display', 'block')
+              const indocatorName = $(indicatorError).find('.sr')
+              if (indocatorName.text() == 'unanswered'){
+                indicatorError.remove()
+                choicegroup.appendChild(indicatorErrorParsed)
+              }
+
+              problemQuestionNumbers.each(function(index, element) {
+                if (element.textContent === (currentIndex +1 ).toString()) {
+   
+                  element.classList.add('err-number-qusetion');
+                  element.classList.remove('active-number');
+
+
+
+                  checkedInput.each(function () {
+                    const input = $(this);
+                    const label = $('label[for="' + $(this).attr('id') + '"]'); 
+                    input.addClass('submitted')
+                    label.addClass('response-label field-label label-inline choicegroup_incorrect')
+           
+        
+                  })
+
+                } 
+              });
+
+            }
+
+
+            if (response.success === 'correct' ){
+              that.$('.btn-submit-qz').css('display', 'none');
+              that.$('#btn-next').css('display', 'block');
+              if (currentIndex > 0) {
+               that.$('.btn-prev').css('display', 'block')
+             }
+
+             problemQuestionNumbers.each(function(index, element) {
+               if (element.textContent === (currentIndex +1 ).toString()) {
+                 element.classList.add('submitted-question');
+                 element.classList.remove('active-number');
+                 element.classList.remove('err-number-qusetion');
+                 
+                
+                 choicegroup.appendChild(messagesProblem)
+
+                 indicatorError.css('display', 'none')
+
+               } 
+             });
+
+             checkedInput.each(function () {
+               const input = $(this);
+               const label = $('label[for="' + $(this).attr('id') + '"]'); 
+               input.addClass('submitted')
+               input.addClass('success-problem')
+               label.addClass('response-label field-label label-inline choicegroup_correct')
+               
+               choicegroup.appendChild(messagesProblem)
+             })
+
+             if(response.current_score == (currentIndex + 1)){
+              that.$('.btn-submit-qz').css('display', 'none');
+              that.$('#btn-next').css('display', 'none');
+              that.$('.btn-submitted').css('display', 'block')
+             }
+           }
+           
+
+            window.SR.readTexts(that.get_sr_status(response.contents));
+            that.el.trigger('contentChanged', [that.id, response.contents, response]);
+            // that.render(response.contents, that.focus_on_submit_notification);
+            that.updateProgress(response);
+          
+            if (response.entrance_exam_passed) {
+              window.parent.postMessage({
+                type: 'entranceExam.passed'
+              }, '*');
+            }
+          } else {
+            that.saveNotification.hide();
+            that.gentle_alert(response.success);
+          }
+      
+          return Logger.log('problem_graded', [that.answers, response.contents], that.id);
+        }); 
+        }
+
+        Problem.prototype.prev_btn = function () {
+          var that = this;
+          const listQz = that.$('.wrapper-problem-response');
+            listQz[currentIndex].style.display = 'none'; 
+            currentIndex -= 1; 
+            if (currentIndex < 0) {
+              currentIndex = listQz.length - 1; 
+            }
+            listQz[currentIndex].style.display = 'block'; 
+
+            that.$('.btn-submit-qz').css('display', 'none');
+            that.$('#btn-next').css('display', 'block');
+            if (currentIndex == 0){
+              that.$('.btn-prev').css('display', 'none')
+            }
+
+            const problemQuestionNumbers = that.$('.problem-question-number');
+
+            problemQuestionNumbers.each(function(index, element) {
+              if (element.textContent === (currentIndex +1 ).toString()) {
+                element.classList.add('active-number');
+  
+              } else {
+                element.classList.remove('active-number');
+              }
+            });
+
+  
+        }
+
+        Problem.prototype.next_btn = function(){
+          var that = this;  
+       
+           const listQz = that.$('.wrapper-problem-response');
+           const problemQuestionNumbers = that.$('.problem-question-number');
+
+           problemQuestionNumbers.each(function(index, element) {
+            if (element.textContent === (currentIndex +1 ).toString()) {
+              element.classList.remove('err-number-qusetion');
+              element.classList.add('submitted-question');
+            } })
+    
+            listQz[currentIndex].style.display = 'none'; 
+            currentIndex += 1; 
+            if (currentIndex >= listQz.length) {
+              currentIndex = 0; 
+            }
+            listQz[currentIndex].style.display = 'block'; 
+            that.$('.btn-submit-qz').css('display', 'block');
+            that.$('#btn-next').css('display', 'none');
+            if (currentIndex > 0) {
+              that.$('.btn-prev').css('display', 'block')
+            }
+    
+            const indicatorError = $(listQz[currentIndex]).find('.indicator-container')
+            // indicatorError.css('display', 'none');
+
+            problemQuestionNumbers.each(function(index, element) {
+              if (element.textContent === (currentIndex +1 ).toString()) {
+                element.classList.add('active-number');
+                const submittedInput =  listQz[currentIndex].querySelector('input.submitted');
+                const incorrectLabel = listQz[currentIndex].querySelector('label.choicegroup_correct');
+                if (submittedInput && incorrectLabel){
+                  that.$('.btn-submit-qz').css('display', 'none');
+                  that.$('#btn-next').css('display', 'block');
+    
+                 
+                }else {
+                  const message = $(listQz[currentIndex]).find('.message').remove()
+                 
+                }
+              } else {
+                element.classList.remove('active-number');
+              }
+            });
+            
+            const checkInput = $(listQz[currentIndex]).find('input[type="checkbox"], input[type="radio"]');
+            checkInput.on('change', function() {
+                const atLeastOneChecked = $('.field input:checked').length > 0;
+              
+                if (atLeastOneChecked) {
+                  $('.btn-submit-qz').prop('disabled', false);
+                } else {
+                  $('.btn-submit-qz').prop('disabled', true);
+                }
+              });
+
+            
+
+              if (that.$('.submitted-question').length === listQz.length && listQz.length == (currentIndex +1)){
+                  that.$('.btn-submit-qz').css('display', 'none');
+                  that.$('#btn-next').css('display', 'none');
+                  that.$('.btn-submitted').css('display', 'block')
+              }
+            
+        };
+
 
         Problem.prototype.submit_internal = function() {
             var that = this;

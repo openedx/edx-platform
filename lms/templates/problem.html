@@ -3,6 +3,157 @@
 from django.utils.translation import ngettext, gettext as _
 from openedx.core.djangolib.markup import HTML
 %>
+<style>
+  .container-problem{
+    display : flex ;
+    gap: 10px;
+    padding-bottom : 10px;
+  }
+  .problem-question-number {
+      padding : 4px 10px;
+      background-color: #f6f6f7;
+      text-align: center;
+      color: #8097b1;
+      font-size : 14px;
+      border-radius: 4px;
+
+  }
+
+  .active-number {
+    border-bottom: solid 2px #0086ff !important;
+    background-color: rgba(0, 134, 255, 0.16) !important;
+
+    color: #0086ff !important;
+  }
+
+  .submitted-question{
+    color :#5aa447 ;
+    border-bottom: solid 2px #5aa447;
+    background-color: rgba(90, 164, 71, 0.16);
+    
+  }
+  .err-number-qusetion {
+    border-bottom: solid 2px #d82c0d;
+    background-color: rgba(216, 44, 13, 0.16);
+    color : #d82c0d
+  }
+
+
+.btn-custom{
+  border : none !important;
+  background-color :  #007ae6;
+  color: #fff;
+  background-image: none !important;
+  text-shadow : none !important;
+  box-shadow: none !important;
+
+}
+.btn-custom:hover {
+  background : #025dae !important ;
+}
+
+.btn-custom[disabled]{
+  background-color :  #c5c5c5;
+}
+
+.btn-prev {
+  border : 1px solid  #007ae6!important;
+  background : none ;
+  color: #007ae6;
+  background-image: none !important;
+  text-shadow : none !important;
+  box-shadow: none !important;
+}
+.btn-prev:hover {
+  background : #eef7ff !important;
+}
+
+.btn-span{
+  display: flex;
+  align-items : center;
+
+  gap: 5px;
+}
+
+.btn-span > i {
+  font-size:18px
+}
+
+.problem .field  > label {
+  border : none !important ;
+}
+
+
+
+.message{
+  border-top : 1px solid #d7d7d7 ;
+  padding-top : 20px;
+}
+
+.messages-box {
+  align-self: stretch;
+  flex-grow: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border-left: solid 2px #5aa447;
+  background-color: rgba(90, 164, 71, 0.05);
+}
+
+.explanation-title{
+  align-self: stretch;  
+  flex-grow: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.5;
+  letter-spacing: normal;
+  text-align: left;
+  color: #5aa447;
+  padding-bottom: 10px;
+}
+
+.wrapper-problem-response  fieldset{
+  padding:20px 0px;
+}
+
+.problem-error{
+  display: flex;
+  gap:6px;
+  width: 100% ;
+  min-width: 13.438rem;
+  flex-grow: 0;
+  font-family: Roboto;
+  font-size: 0.95rem;
+  font-weight: 500;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.5;
+  letter-spacing: normal;
+  text-align: left;
+  color: #d82c0d;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background-color: rgba(216, 44, 13, 0.05);
+}
+
+.success-problem   {
+  accent-color: #5aa447 !important;
+}
+
+.wrapper-problem-response fieldset {
+  font-weight: 600;
+}
+
+
+
+
+
+</style>
 
 <%namespace name='static' file='static_content.html'/>
 <h3 class="hd hd-3 problem-header" id="${ short_id }-problem-title" aria-describedby="${ id }-problem-progress" tabindex="-1">
@@ -27,10 +178,28 @@ from openedx.core.djangolib.markup import HTML
     % endif
 
     <div class="problem-action-buttons-wrapper">
-      % if demand_hint_possible:
-      <span class="problem-action-button-wrapper">
-          <button type="button" class="hint-button problem-action-btn btn-link btn-small" data-value="${_('Hint')}" ${'' if should_enable_next_hint else 'disabled'}>${_('Hint')}</button>
+      
+
+      % if problem['name'] == 'Quiz Problem Custom' :
+      <span style='display:flex; gap: 10px'>
+        <button class='btn-prev' style='display:none'> <span class='btn-span'><i class="bi bi-arrow-left"></i> </span></button>
+        <button id='btn-next' class='btn-custom' style='display:none'> <span class='btn-span'>
+
+          Câu hỏi tiếp theo  <i class="bi bi-arrow-right"></i>
+        </span></button>
+        <button class='btn-submit-qz btn-custom' disabled > Trả lời  </button>
+        <button class='btn-submitted btn-custom' style='display:none' > Hoàn thành  </button>
       </span>
+        
+      %endif
+
+      % if demand_hint_possible:
+        % if problem['name'] != 'Quiz Problem Custom':
+            <span class="problem-action-button-wrapper">
+              <button type="button" class="hint-button problem-action-btn btn-link btn-small" data-value="${_('Hint')}" ${'' if should_enable_next_hint else 'disabled'}>${_('Hint')}</button>
+          </span>
+        %endif
+   
       % endif
       % if save_button:
       <span class="problem-action-button-wrapper">
@@ -45,16 +214,20 @@ from openedx.core.djangolib.markup import HTML
           <button type="button" class="reset problem-action-btn btn-link btn-small" data-value="${_('Reset')}"><span aria-hidden="true">${_('Reset')}</span><span class="sr">${_("Reset your answer")}</span></button>
       </span>
       % endif
-      % if answer_available:
+      % if answer_available and problem['name'] != 'Quiz Problem Custom' :
       <span class="problem-action-button-wrapper">
           <button type="button" class="show problem-action-btn btn-link btn-small" aria-describedby="${ short_id }-problem-title"><span class="show-label">${_('Show answer')}</span></button>
       </span>
       % endif
     </div>
     <div class="submit-attempt-container">
-      <button type="button" class="submit btn-brand" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" data-should-enable-submit-button="${ should_enable_submit_button }" aria-describedby="submission_feedback_${short_id}" ${'' if should_enable_submit_button else 'disabled'}>
+
+      % if problem['name'] != 'Quiz Problem Custom' :
+        <button type="button" class="submit btn-brand" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" data-should-enable-submit-button="${ should_enable_submit_button }" aria-describedby="submission_feedback_${short_id}" ${'' if should_enable_submit_button else 'disabled'}>
           <span class="submit-label">${ submit_button }</span>
       </button>
+      % endif
+
 
       % if submit_disabled_cta:
         % if submit_disabled_cta.get('event_data'):
@@ -162,3 +335,88 @@ from openedx.core.djangolib.markup import HTML
         parent.postMessage(message, '*');
     }
 </script>
+
+<script > 
+  const problemList = document.querySelectorAll('.wrapper-problem-response');
+const problemElement = document.querySelector('.problem');
+const btnSubmit = document.querySelector('.btn-submit-qz')
+const btnNext = document.querySelector('#btn-next')
+
+if (problemList.length > 1 && btnSubmit && btnNext) {
+  const divContainer = document.createElement('div');
+  divContainer.classList.add('container-problem');
+  
+
+  for (var i = 0; i < problemList.length; i++) {
+    const spanElement = document.createElement('span');
+    spanElement.textContent = (i + 1).toString();
+    spanElement.classList.add('problem-question-number');
+
+    const submittedInput = problemList[i].querySelector('input.submitted');
+    const incorrectLabel = problemList[i].querySelector('label.choicegroup_correct');
+    const wrongLabel = problemList[i].querySelector('label.choicegroup_incorrect')
+    const indicatorError = problemList[i].querySelector('.indicator-container')
+    
+    indicatorError.style.display = 'none'
+    
+
+    if (i == 0){
+      spanElement.classList.add('active-number')
+      if (submittedInput && incorrectLabel) {
+        btnSubmit.style.display = 'none';
+        btnNext.style.display = 'block';
+        const inputs = problemList[i].querySelectorAll('input:checked');
+        inputs.forEach(input => input.classList.add('success-problem'))
+      }else {
+          spanElement.classList.add('err-number-qusetion')
+
+        }
+        
+        
+    }else {
+      
+        if (submittedInput && incorrectLabel) {
+      spanElement.classList.add('submitted-question');
+      btnSubmit.style.display = 'none';
+      btnNext.style.display = 'block';
+      const inputs = problemList[i].querySelectorAll('input:checked');
+      inputs.forEach(input => input.classList.add('success-problem'))
+      }
+      else if (submittedInput && wrongLabel){
+        spanElement.classList.add('err-number-qusetion');
+
+      }
+    }
+
+    divContainer.appendChild(spanElement);
+
+    const checkInput = problemList[i].querySelectorAll('input[type="checkbox"], input[type="radio"]' )
+    checkInput.forEach(input => {
+      input.addEventListener('change', ()=>{
+        const atLeastOneChecked = Array.from(checkInput).some(inp => inp.checked);
+        if (atLeastOneChecked) {
+          btnSubmit.removeAttribute('disabled');
+        } else {
+          btnSubmit.setAttribute('disabled', true);
+        }
+      });
+    });
+
+    
+  }
+
+  problemElement.insertBefore(divContainer, problemElement.firstChild);
+
+  const elementError = document.querySelector('.err-number-qusetion')
+  if(elementError){
+    const numberError = elementError.textContent
+    const indicatorError = problemList[numberError - 1].querySelector('.indicator-container')
+    indicatorError.style.display = 'block';
+  }
+}
+
+
+</script>
+
+<div>
+

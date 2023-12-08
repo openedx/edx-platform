@@ -43,6 +43,8 @@ from openedx.core.release import RELEASE_LINE
       jsi18n_path = "js/i18n/{language}/djangojs.js".format(language=LANGUAGE_CODE)
     %>
 
+    <script src="https://cdn.ckeditor.com/ckeditor5/35.2.0/classic/ckeditor.js"></script>
+
     % if getattr(settings, 'CAPTURE_CONSOLE_LOG', False):
         <script type="text/javascript">
             var oldOnError = window.onerror;
@@ -78,8 +80,13 @@ from openedx.core.release import RELEASE_LINE
     <%include file="widgets/segment-io.html" />
 
     <%block name="header_extras"></%block>
-  </head>
 
+  </head>
+  <style>
+    .none {
+      display: none;
+    }
+  </style>
   <body class="${static.dir_rtl()} <%block name='bodyclass'></%block> lang_${LANGUAGE_CODE}">
     <%block name="view_notes"></%block>
 

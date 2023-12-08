@@ -44,6 +44,10 @@ button {
   outline: none;
 }
 
+.none {
+  display: none !important;
+}
+
 a {
   @include transition(color $tmg-f2 ease-in-out 0s);
 
