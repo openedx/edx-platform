@@ -110,3 +110,51 @@ def register_xporter_gen_user(user, gen_user_data):
         except GenUser.DoesNotExist:
             gen_user = create_gen_user(user, role, '', '', '', school)
     process_gen_user_enrollments(gen_user)
+
+
+def register_microsoft_gen_user(user, gen_user_data):
+    #TODO: Remove the duplication of the code
+    role = gen_user_data.get('role', None)
+    scn = gen_user_data.get('scn', None)
+    gen_user = None
+
+    if role and role.lower() in GenUserRoles.TEACHING_ROLES:
+        role = GenUserRoles.XPORTER_TEACHING_STAFF
+    else:
+        role = GenUserRoles.STUDENT
+    if scn is None:
+        extracted_scn = user.email.split('@')[0]
+        scn = extracted_scn
+    if role == GenUserRoles.STUDENT and scn is None:
+        raise ValidationError('SCN is missing in the claims')
+    organisation_cost_center = gen_user_data.get('organisation')
+    try:
+        school = School.objects.get(cost_center=organisation_cost_center)
+    except School.DoesNotExist:
+        raise ValidationError('School not found')
+
+    if role not in GenUserRoles.TEACHING_ROLES:
+        try:
+            student = Student.objects.get(scn=scn)
+            # update the email with the sso claimed email. (in case of xporter it can be differentiated)
+            gen_user = student.gen_user
+            gen_user.email = user.email
+            gen_user.user = user
+            gen_user.school = school
+            gen_user.save()
+        except Student.DoesNotExist:
+            gen_user = create_gen_user(user, role, '', '', '', school)
+            gen_user.refresh_from_db()
+            gen_user.student.scn = scn
+            gen_user.student.save()
+        except Student.MultipleObjectsReturned:
+            raise ValidationError('Multiple student exists with this SCN')
+    elif role in GenUserRoles.TEACHING_ROLES:
+        try:
+            gen_user = GenUser.objects.get(email=user.email)
+            gen_user.user = user
+            gen_user.school = school
+            gen_user.save()
+        except GenUser.DoesNotExist:
+            gen_user = create_gen_user(user, role, '', '', '', school)
+    process_gen_user_enrollments(gen_user)

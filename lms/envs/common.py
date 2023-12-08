@@ -3192,6 +3192,7 @@ RM_UNIFY_SECRET = 'rmunify-secret'
 GLOW_COMMON_DOMAINS =['glow.sch.uk', ]
 RM_UNIFY_PROVIDER_SLUGS = ['rmunify-dev', 'rmunify-stage']
 ABERDEEN_PROVIDER_SLUGS = ['aberdeen', 'google-stage']
+MICROSOFT_PROVIDER_SLUGS = ['microsoft',]
 
 XPORTER_RELYING_PARTY_ID = 'Learn.genplus.co.uk'
 XPORTER_THIRD_PARTY_ID = 'XporterOnDemand'

@@ -58,7 +58,7 @@ from openedx.core.djangoapps.user_authn.views.registration_form import (
     get_registration_extension_form
 )
 from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_auth_enabled
-from openedx.features.genplus_features.genplus.utils import register_rm_unify_gen_user, register_xporter_gen_user
+from openedx.features.genplus_features.genplus.utils import register_rm_unify_gen_user, register_microsoft_gen_user, register_xporter_gen_user
 from openedx.features.genplus_features.genplus.exceptions import GenUserRegistrationException
 from openedx.features.genplus_features.genplus.models import GenLog
 from common.djangoapps.student.helpers import (
@@ -229,6 +229,8 @@ def create_account_with_params(request, params):
             registration_function = register_rm_unify_gen_user
         elif provider_slug in settings.ABERDEEN_PROVIDER_SLUGS:
             registration_function = register_xporter_gen_user
+        elif provider_slug in settings.MICROSOFT_PROVIDER_SLUGS:
+            registration_function = register_microsoft_gen_user
         else:
             log.error("Unknown provider slug: %s", provider_slug)
             return
