@@ -11,7 +11,7 @@
         "django-trans-missing-escape": 0,
         "javascript-concat-html": 2,
         "javascript-escape": 1,
-        "javascript-jquery-append": 1,
+        "javascript-jquery-append": 2,
         "javascript-jquery-html": 5,
         "javascript-jquery-insert-into-target": 2,
         "javascript-jquery-insertion": 0,
@@ -36,5 +36,5 @@
         "python-wrap-html": 0,
         "underscore-not-escaped": 2
     },
-    "total": 63
+    "total": 64
 }
