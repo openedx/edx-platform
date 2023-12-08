@@ -116,7 +116,7 @@ class VideoUsageSerializer(serializers.Serializer):
 
 class VideoDownloadSerializer(serializers.Serializer):
     """Serializer for video downloads"""
-    files = serializers.listField(
+    files = serializers.ListField(
         child=serializers.DictField(
             child=serializers.CharField()
         )
