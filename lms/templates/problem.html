@@ -145,6 +145,11 @@ from openedx.core.djangolib.markup import HTML
   accent-color: #5aa447 !important;
 }
 
+.wrapper-problem-response fieldset {
+  font-weight: 600;
+}
+
+
 
 
 
@@ -337,7 +342,7 @@ const problemElement = document.querySelector('.problem');
 const btnSubmit = document.querySelector('.btn-submit-qz')
 const btnNext = document.querySelector('#btn-next')
 
-if (problemList.length > 1) {
+if (problemList.length > 1 && btnSubmit && btnNext) {
   const divContainer = document.createElement('div');
   divContainer.classList.add('container-problem');
   
@@ -409,7 +414,6 @@ if (problemList.length > 1) {
     indicatorError.style.display = 'block';
   }
 }
-
 
 
 </script>
