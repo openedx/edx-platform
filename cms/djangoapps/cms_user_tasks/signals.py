@@ -42,9 +42,9 @@ def user_task_stopped_handler(sender, **kwargs):  # pylint: disable=unused-argum
         XBlock update operation, and that emails following such operations amount to spam
         Arguments:
             task_name: The name of the just-ended task. By convention, if this was a library content XBlock update
-            task, then the task name follows the pattern prescribed in LibrarySyncChildrenTask (content_libraries under openedx)
-            'Updating {key} from library'. Moreover, the block type in the task name is always of type
-            'library_content' for such operations
+            task, then the task name follows the pattern prescribed in LibrarySyncChildrenTask
+            (content_libraries under openedx) 'Updating {key} from library'. Moreover, the block type
+            in the task name is always of type 'library_content' for such operations
         Returns:
             True if the end-of-task email should be suppressed
         """
