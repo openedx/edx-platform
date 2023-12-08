@@ -92,9 +92,9 @@ class BlockStructureManager:
                 from each registered transformer.
         """
         try:
-            block_structure = BlockStructureFactory.create_from_store(
+            block_structure = BlockStructureFactory.create_from_modulestore(
                 self.root_block_usage_key,
-                self.store,
+                self.modulestore
             )
             BlockStructureTransformers.verify_versions(block_structure)
 

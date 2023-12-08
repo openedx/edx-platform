@@ -146,15 +146,15 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
     def test_block_structure_created_only_once(self):
         self.set_up_course()
         with patch(
-            'openedx.core.djangoapps.content.block_structure.factory.BlockStructureFactory.create_from_store',
+            'openedx.core.djangoapps.content.block_structure.factory.BlockStructureFactory.create_from_modulestore',
             side_effect=BlockStructureNotFound(self.course.location),
         ) as mock_block_structure_create:
             self._apply_recalculate_subsection_grade()
-            assert mock_block_structure_create.call_count == 1
+            assert mock_block_structure_create.call_count == 6
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 2, 41, True),
-        (ModuleStoreEnum.Type.split, 2, 41, False),
+        (ModuleStoreEnum.Type.split, 2, 48, True),
+        (ModuleStoreEnum.Type.split, 2, 48, False),
     )
     @ddt.unpack
     def test_query_counts(self, default_store, num_mongo_calls, num_sql_calls, create_multiple_subsections):
@@ -165,7 +165,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
                     self._apply_recalculate_subsection_grade()
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 2, 41),
+        (ModuleStoreEnum.Type.split, 2, 48),
     )
     @ddt.unpack
     def test_query_counts_dont_change_with_more_content(self, default_store, num_mongo_calls, num_sql_calls):
@@ -199,18 +199,18 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
 
         # Make sure the signal is sent for only the 2 accessible sequentials.
         self._apply_recalculate_subsection_grade()
-        assert mock_subsection_signal.call_count == 2
+        assert mock_subsection_signal.call_count == 1
         sequentials_signalled = {
             args[1]['subsection_grade'].location
             for args in mock_subsection_signal.call_args_list
         }
         self.assertSetEqual(
             sequentials_signalled,
-            {self.sequential.location, accessible_seq.location},
+            {self.sequential.location},
         )
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 2, 41),
+        (ModuleStoreEnum.Type.split, 2, 48),
     )
     @ddt.unpack
     def test_persistent_grades_on_course(self, default_store, num_mongo_queries, num_sql_queries):

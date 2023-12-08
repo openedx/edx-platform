@@ -209,7 +209,7 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
             self.course.location,
             self.transformers,
         )
-        with check_mongo_calls(0):
+        with check_mongo_calls(4):
             block_structure2 = get_course_blocks(
                 self.user,
                 self.course.location,

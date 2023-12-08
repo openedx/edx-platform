@@ -1491,8 +1491,8 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, "earned a certificate for this course.")
 
     @ddt.data(
-        (True, 53),
-        (False, 53),
+        (True, 60),
+        (False, 60),
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
@@ -1500,21 +1500,21 @@ class ProgressPageTests(ProgressPageBaseTests):
         # TODO: decrease query count as part of REVO-28
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.setup_course(self_paced=self_paced)
-        with self.assertNumQueries(query_count, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST), check_mongo_calls(2):
+        with self.assertNumQueries(query_count, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST), check_mongo_calls(3):
             self._get_progress_page()
 
     def test_progress_queries(self):
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.setup_course()
         with self.assertNumQueries(
-            53, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
-        ), check_mongo_calls(2):
+            60, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
+        ), check_mongo_calls(3):
             self._get_progress_page()
 
         for _ in range(2):
             with self.assertNumQueries(
-                37, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
-            ), check_mongo_calls(2):
+                44, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
+            ), check_mongo_calls(3):
                 self._get_progress_page()
 
     @patch.dict(settings.FEATURES, {'ENABLE_CERTIFICATES_IDV_REQUIREMENT': True})

@@ -16,7 +16,6 @@ from xmodule.modulestore.tests.factories import check_mongo_calls_range
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
-from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
 
 from ..transformer import GradesTransformer
 
@@ -423,7 +422,7 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
         self.client.login(username=self.student.username, password=password)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 2, 2),
+        (ModuleStoreEnum.Type.split, 4, 4),
     )
     @ddt.unpack
     def test_modulestore_performance(self, store_type, max_mongo_calls, min_mongo_calls):
@@ -462,6 +461,5 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
             )
         with self.store.default_store(store_type):
             blocks = self.build_course(course)
-        clear_course_from_cache(blocks['course'].id)
         with check_mongo_calls_range(max_mongo_calls, min_mongo_calls):
             get_course_blocks(self.student, blocks['course'].location, self.transformers)

@@ -7,10 +7,8 @@ from django.test import TestCase
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from ..exceptions import BlockStructureNotFound
 from ..factory import BlockStructureFactory
-from ..store import BlockStructureStore
-from .helpers import ChildrenMapTestMixin, MockCache, MockModulestoreFactory
+from .helpers import ChildrenMapTestMixin, MockModulestoreFactory
 
 
 class TestBlockStructureFactory(TestCase, ChildrenMapTestMixin):
@@ -34,24 +32,6 @@ class TestBlockStructureFactory(TestCase, ChildrenMapTestMixin):
             BlockStructureFactory.create_from_modulestore(
                 root_block_usage_key=len(self.children_map) + 1,
                 modulestore=self.modulestore,
-            )
-
-    def test_from_cache(self):
-        store = BlockStructureStore(MockCache())
-        block_structure = self.create_block_structure(self.children_map)
-        store.add(block_structure)
-        from_cache_block_structure = BlockStructureFactory.create_from_store(
-            block_structure.root_block_usage_key,
-            store,
-        )
-        self.assert_block_structure(from_cache_block_structure, self.children_map)
-
-    def test_from_cache_none(self):
-        store = BlockStructureStore(MockCache())
-        with pytest.raises(BlockStructureNotFound):
-            BlockStructureFactory.create_from_store(
-                root_block_usage_key=0,
-                block_structure_store=store,
             )
 
     def test_new(self):
