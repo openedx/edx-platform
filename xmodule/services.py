@@ -347,17 +347,6 @@ class ProblemFeedbackService(Service):
             return self._xblock.attempts > 0
         return False
 
-    def is_correct(self):
-        """
-        True if full points
-        """
-        if self._xblock:
-            # self._xblock.score is initialized in self._xblock.lcp but in this
-            # method is accessed before self._xblock.lcp so just call it first.
-            self._xblock.lcp  # pylint: disable=pointless-statement
-            return self._xblock.score.raw_earned == self._xblock.score.raw_possible
-        return False
-
     def used_all_attempts(self):
         """ All attempts have been used """
         if self._xblock:
@@ -384,6 +373,7 @@ class ProblemFeedbackService(Service):
             show_answer = self._xblock.showanswer
             max_attempts = self._xblock.max_attempts
             attempts = self._xblock.attempts
+            is_correct = self._xblock.is_correct()
             required_attempts = self._xblock.attempts_before_showanswer_button
         else:
             show_correctness = ''
@@ -391,9 +381,9 @@ class ProblemFeedbackService(Service):
             max_attempts = 0
             attempts = 0
             required_attempts = 0
+            is_correct = False
         past_due = self.is_past_due()
         is_attempted = self.is_attempted()
-        is_correct = self.is_correct()
         used_all_attempts = self.used_all_attempts()
         closed = self.closed()
 
@@ -458,6 +448,4 @@ class ProblemFeedbackService(Service):
             # Is it now past the due date?
             return (due_date is None or
                     due_date < datetime.now(UTC))
-
-        # else: show_correctness == ShowCorrectness.ALWAYS
         return True

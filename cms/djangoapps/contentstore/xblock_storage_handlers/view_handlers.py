@@ -58,10 +58,10 @@ from openedx.core.lib.cache_utils import request_cached
 from openedx.core.toggles import ENTRANCE_EXAMS
 from xmodule.services import (
     ConfigurationService,
+    ProblemFeedbackService,
     SettingsService,
     TeamsConfigurationService,
-    ProblemFeedbackService
-)  # lint-amnesty, pylint: disable=wrong-import-order
+)
 from xmodule.course_block import DEFAULT_START_DATE
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum

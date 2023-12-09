@@ -1379,7 +1379,9 @@ class ProblemBlock(
         """
         True iff full points
         """
-        return self.runtime.service(self, 'problem_feedback').is_correct()
+        # self.score is initialized in self.lcp but in this method is accessed before self.lcp so just call it first.
+        self.lcp  # pylint: disable=pointless-statement
+        return self.score.raw_earned == self.score.raw_possible
 
     def answer_available(self):
         """
