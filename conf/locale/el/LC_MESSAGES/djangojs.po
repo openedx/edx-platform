@@ -575,7 +575,7 @@ msgstr ""
 
 #: common/static/common/js/discussion/views/thread_response_view.js
 msgid "Are you sure you want to delete this response?"
-msgstr "Είστε σίγουρος ότι θέλετε να διαγράψετε την απόκριση;"
+msgstr "Είστε σίγουρος ότι θέλετε να διαγράψετε την απάντηση;"
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "The email address you've provided isn't formatted correctly."
@@ -3003,7 +3003,7 @@ msgstr ""
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Enter and confirm your new password."
-msgstr "Εισάγετε και επιβεβαιώστε το νέο σας κωδικό."
+msgstr "Εισαγάγετε και επιβεβαιώστε τον νέο σας κωδικό."
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "New Password"
@@ -3015,7 +3015,7 @@ msgstr "Επιβεβαιώστε τον κωδικό σας"
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Passwords do not match."
-msgstr "Οι κωδικοί δεν συμπίπτουν"
+msgstr "Οι κωδικοί δεν ταιριάζουν."
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Reset My Password"
@@ -10233,7 +10233,7 @@ msgstr ""
 
 #: cms/templates/js/grading-editor.underscore
 msgid "Grading"
-msgstr "ΒΑΘΜΟΛΟΓΙΑ"
+msgstr "Βαθμολογία"
 
 #: cms/templates/js/grading-editor.underscore
 msgid "Grade as:"
