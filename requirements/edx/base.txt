@@ -181,7 +181,7 @@ defusedxml==0.7.1
     #   social-auth-core
 deprecated==1.2.14
     # via jwcrypto
-django==4.2.6
+django==4.2.8
     # via
     #   -r requirements/edx/kernel.in
     #   django-appconf
