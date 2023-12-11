@@ -9,13 +9,13 @@ to decide whether to check course creator role, and other such functions.
 from ccx_keys.locator import CCXBlockUsageLocator, CCXLocator
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from common.djangoapps.student.permissions import CourseLimitedStaffRolePermission
 from opaque_keys.edx.locator import LibraryLocator
 
 from common.djangoapps.student.roles import (
     CourseBetaTesterRole,
     CourseCreatorRole,
     CourseInstructorRole,
-    CourseLimitedStaffRole,
     CourseRole,
     CourseStaffRole,
     GlobalStaff,
@@ -101,7 +101,7 @@ def get_user_permissions(user, course_key, org=None):
     #  The permissions matrix from the RBAC project (https://github.com/openedx/platform-roadmap/issues/246) shows that
     #  the LMS and Studio permissions will be separated as a part of this project. Once this is done (and this code is
     #  not removed during its implementation), we can replace the Limited Staff permissions with more granular ones.
-    if course_key and user_has_role(user, CourseLimitedStaffRole(course_key)):
+    if course_key and CourseLimitedStaffRolePermission.check(user, course_key):
         return STUDIO_EDIT_CONTENT
     # Staff have all permissions except EDIT_ROLES:
     if OrgStaffRole(org=org).has_user(user) or (course_key and user_has_role(user, CourseStaffRole(course_key))):
