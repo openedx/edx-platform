@@ -194,7 +194,6 @@ class DiscussionsProvidersView(APIView):
         else:
             hidden_providers.append(Provider.OPEN_EDX)
 
-
         serializer = DiscussionsProvidersSerializer(
             {
                 'features': [
@@ -210,6 +209,7 @@ class DiscussionsProvidersView(APIView):
             }
         )
         return serializer.data
+
 
 class CombinedDiscussionsConfigurationView(DiscussionsConfigurationSettingsView):
     """
