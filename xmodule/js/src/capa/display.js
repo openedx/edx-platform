@@ -777,11 +777,7 @@
                choicegroup.appendChild(messagesProblem)
              })
 
-             if(response.current_score == (currentIndex + 1)){
-              that.$('.btn-submit-qz').css('display', 'none');
-              that.$('#btn-next').css('display', 'none');
-              that.$('.btn-submitted').css('display', 'block')
-             }
+             
            }
            
 
@@ -893,11 +889,7 @@
 
             
 
-              if (that.$('.submitted-question').length === listQz.length && listQz.length == (currentIndex +1)){
-                  that.$('.btn-submit-qz').css('display', 'none');
-                  that.$('#btn-next').css('display', 'none');
-                  that.$('.btn-submitted').css('display', 'block')
-              }
+         
             
         };
 
