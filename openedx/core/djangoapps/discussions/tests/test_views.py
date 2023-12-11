@@ -314,14 +314,14 @@ class ProviderDataTest(CourseInstructorAuthorizedTest, DataTestMixin):
         # If the legacy provider is selected always show the legacy provider,
         # and only show the new one if the toggle is enabled
         (Provider.LEGACY, [Provider.LEGACY], Provider.OPEN_EDX, False),
-        (Provider.LEGACY, [Provider.LEGACY, Provider.OPEN_EDX], 'dummy', True),
+        (Provider.LEGACY, [Provider.LEGACY], 'dummy', True),
         # If the new provider is selected show the legacy provider only
         # if the new discussions toggle is disabled
-        (Provider.OPEN_EDX, [Provider.OPEN_EDX, Provider.LEGACY], 'dummy', False),
+        (Provider.OPEN_EDX, [Provider.OPEN_EDX], 'dummy', False),
         (Provider.OPEN_EDX, [Provider.OPEN_EDX], Provider.LEGACY, True),
         # If some other provider is selected show only legacy provider if the toggle is false
         # and only the new provider if the toggle is enabled
-        (Provider.PIAZZA, [Provider.LEGACY], Provider.OPEN_EDX, False),
+        (Provider.PIAZZA, [], Provider.OPEN_EDX, False),
         (Provider.PIAZZA, [Provider.OPEN_EDX], Provider.LEGACY, True),
     )
     @ddt.unpack
@@ -424,9 +424,11 @@ class DataTest(AuthorizedApiTest, DataTestMixin):
         with override_waffle_flag(ENABLE_NEW_STRUCTURE_DISCUSSIONS, new_structure_enabled):
             response = self._get()
             data = response.json()
-            visible_providers = [Provider.OPEN_EDX, Provider.LEGACY]
-            if not new_structure_enabled:
+            visible_providers = []
+            if current_provider == Provider.LEGACY:
                 visible_providers = [Provider.LEGACY]
+            if current_provider != Provider.LEGACY and new_structure_enabled:
+                visible_providers = [Provider.OPEN_EDX]
             for visible_provider in visible_providers:
                 assert visible_provider in data['providers']['available'].keys()
 
