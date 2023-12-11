@@ -22,4 +22,4 @@ jobs:
             export TUTOR_ROOT=$(pwd)/tutor
             export TUTOR_PLUGINS_ROOT=$(pwd)/tutor-plugins
             . tutor-venv/bin/activate
-            tutor local launch
+            echo -e "n\n\n\n"  | tutor local launch
