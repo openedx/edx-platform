@@ -6,17 +6,4 @@
         <% } %>
         <h2 class="hd-1 program-title"><%- programData.title %></h2>
     </div>
-    <div class='authoring-organizations'>
-        <h2 class="heading">Institutions</h2>
-        <% if (programData.authoring_organizations.length) { %>
-            <div class="orgs">
-              <% _.each(programData.authoring_organizations, function(org) { %>
-                <img src="<%- org.certificate_logo_image_url || org.logo_image_url %>" class="org-logo" alt="<%- StringUtils.interpolate(
-                    gettext('{organization}\'s logo'),
-                    {organization: org.name}
-                ) %>">
-              <% }) %>
-            </div>
-        <% } %>
-    </div>
 </div>
