@@ -157,7 +157,7 @@ class HomePageCoursesView(APIView):
         active_courses, archived_courses, in_process_course_actions = get_course_context(request)
         courses_context = {
             "courses": active_courses,
-            "archived_course": archived_courses,
+            "archived_courses": archived_courses,
             "in_process_course_actions": in_process_course_actions,
         }
         serializer = CourseTabSerializer(courses_context)

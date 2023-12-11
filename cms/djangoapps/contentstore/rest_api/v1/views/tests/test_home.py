@@ -11,6 +11,7 @@ from edx_toggles.toggles.testutils import (
 from rest_framework import status
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from cms.djangoapps.contentstore.views.course import ENABLE_GLOBAL_STAFF_OPTIMIZATION
 from cms.djangoapps.contentstore.toggles import ENABLE_TAGGING_TAXONOMY_LIST_PAGE
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
@@ -20,17 +21,16 @@ from xmodule.modulestore.tests.factories import CourseFactory
 @ddt.ddt
 class HomePageViewTest(CourseTestCase):
     """
-    Tests for HomePageView.
+    Tests for HomePageCoursesView.
     """
 
     def setUp(self):
         super().setUp()
         self.url = reverse("cms.djangoapps.contentstore:v1:home")
 
-    def test_home_page_response(self):
+    def test_home_page_courses_response(self):
         """Check successful response content"""
         response = self.client.get(self.url)
-        course_id = str(self.course.id)
 
         expected_response = {
             "allow_course_reruns": True,
@@ -40,16 +40,7 @@ class HomePageViewTest(CourseTestCase):
             "archived_courses": [],
             "can_create_organizations": True,
             "course_creator_status": "granted",
-            "courses": [{
-                "course_key": course_id,
-                "display_name": self.course.display_name,
-                "lms_link": f'//{settings.LMS_BASE}/courses/{course_id}/jump_to/{self.course.location}',
-                "number": self.course.number,
-                "org": self.course.org,
-                "rerun_link": f'/course_rerun/{course_id}',
-                "run": self.course.id.run,
-                "url": f'/course/{course_id}',
-            }],
+            "courses": [],
             "in_process_course_actions": [],
             "libraries": [],
             "libraries_enabled": True,
@@ -73,6 +64,51 @@ class HomePageViewTest(CourseTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(expected_response, response.data)
 
+    @override_waffle_flag(ENABLE_TAGGING_TAXONOMY_LIST_PAGE, True)
+    def test_taxonomy_list_link(self):
+        response = self.client.get(self.url)
+        self.assertTrue(response.data['taxonomies_enabled'])
+        self.assertEqual(
+            response.data['taxonomy_list_mfe_url'],
+            f'{settings.COURSE_AUTHORING_MICROFRONTEND_URL}/taxonomy-list'
+        )
+
+
+@ddt.ddt
+class HomePageCoursesViewTest(CourseTestCase):
+    """
+    Tests for HomePageView.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.url = reverse("cms.djangoapps.contentstore:v1:courses")
+
+    def test_home_page_response(self):
+        """Check successful response content"""
+        response = self.client.get(self.url)
+        course_id = str(self.course.id)
+
+        expected_response = {
+            "archived_courses": [],
+            "courses": [{
+                "course_key": course_id,
+                "display_name": self.course.display_name,
+                "lms_link": f'//{settings.LMS_BASE}/courses/{course_id}/jump_to/{self.course.location}',
+                "number": self.course.number,
+                "org": self.course.org,
+                "rerun_link": f'/course_rerun/{course_id}',
+                "run": self.course.id.run,
+                "url": f'/course/{course_id}',
+            }],
+            "in_process_course_actions": [],
+            # "libraries": [],
+        }
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        print(response.data)
+        self.assertDictEqual(expected_response, response.data)
+
     @override_waffle_switch(ENABLE_GLOBAL_STAFF_OPTIMIZATION, True)
     def test_org_query_if_passed(self):
         """Test home page when org filter passed as a query param"""
@@ -94,11 +130,32 @@ class HomePageViewTest(CourseTestCase):
         self.assertEqual(len(response.data['courses']), 0)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    @override_waffle_flag(ENABLE_TAGGING_TAXONOMY_LIST_PAGE, True)
-    def test_taxonomy_list_link(self):
+
+@ddt.ddt
+class HomePageLibrariesViewTest(LibraryTestCase):
+    """
+    Tests for HomePageLibrariesView.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.url = reverse("cms.djangoapps.contentstore:v1:libraries")
+
+    def test_home_page_libraries_response(self):
+        """Check successful response content"""
         response = self.client.get(self.url)
-        self.assertTrue(response.data['taxonomies_enabled'])
-        self.assertEqual(
-            response.data['taxonomy_list_mfe_url'],
-            f'{settings.COURSE_AUTHORING_MICROFRONTEND_URL}/taxonomy-list'
-        )
+
+        expected_response = {
+            "libraries": [{
+                'display_name': 'Test Library',
+                'library_key': 'library-v1:org+lib',
+                'url': '/library/library-v1:org+lib',
+                'org': 'org',
+                'number': 'lib',
+                'can_edit': True
+            }],
+        }
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        print(response.data)
+        self.assertDictEqual(expected_response, response.data)

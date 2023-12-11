@@ -1473,6 +1473,11 @@ def get_library_context(request, request_is_json=False):
 
 
 def get_course_context(request):
+    """
+    Utils is used to get context of course home library tab.
+    It is used for both DRF and django views.
+    """
+
     from cms.djangoapps.contentstore.views.course import (
         get_courses_accessible_to_user,
         _process_courses_list,
@@ -1499,7 +1504,7 @@ def get_course_context(request):
                 },
             ) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
         }
-    
+
     optimization_enabled = GlobalStaff().has_user(request.user) and ENABLE_GLOBAL_STAFF_OPTIMIZATION.is_enabled()
 
     org = request.GET.get('org', '') if optimization_enabled else None
@@ -1535,7 +1540,6 @@ def get_home_context(request, no_course=False):
     active_courses = []
     archived_courses = []
     in_process_course_actions = []
-
 
     optimization_enabled = GlobalStaff().has_user(request.user) and ENABLE_GLOBAL_STAFF_OPTIMIZATION.is_enabled()
 

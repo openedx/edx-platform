@@ -30,10 +30,12 @@ urlpatterns = [
         HomePageView.as_view(),
         name="home"
     ),
-    path('home/courses',
+    path(
+        'home/courses',
         HomePageCoursesView.as_view(),
         name="courses"),
-    path('home/libraries',
+    path(
+        'home/libraries',
         HomePageLibrariesView.as_view(),
         name="libraries"),
     re_path(
