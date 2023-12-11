@@ -696,6 +696,9 @@
                   element.classList.remove('err-number-qusetion');
                   element.classList.remove('active-number');
 
+
+                  $(listQz[currentIndex]).find('.message').remove()
+
                   choicegroup.appendChild(messagesProblem)
 
                   indicatorError.css('display', 'none')
@@ -729,7 +732,9 @@
                   element.classList.add('err-number-qusetion');
                   element.classList.remove('active-number');
 
-
+                  //remove messgae
+                  $(listQz[currentIndex]).find('.message').remove()
+                  choicegroup.appendChild(messagesProblem)
 
                   checkedInput.each(function () {
                     const input = $(this);
@@ -759,10 +764,13 @@
                  element.classList.remove('active-number');
                  element.classList.remove('err-number-qusetion');
                  
-                
+               
+
                  choicegroup.appendChild(messagesProblem)
 
                  indicatorError.css('display', 'none')
+
+                
 
                } 
              });
@@ -867,10 +875,11 @@
                   that.$('#btn-next').css('display', 'block');
     
                  
-                }else {
-                  const message = $(listQz[currentIndex]).find('.message').remove()
-                 
                 }
+                // else {
+                //   const message = $(listQz[currentIndex]).find('.message').remove()
+                 
+                // }
               } else {
                 element.classList.remove('active-number');
               }
@@ -892,7 +901,6 @@
          
             
         };
-
 
         Problem.prototype.submit_internal = function() {
             var that = this;
