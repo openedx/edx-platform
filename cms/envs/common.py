@@ -297,9 +297,6 @@ FEATURES = {
     # Enable content libraries (modulestore) search functionality
     'ENABLE_LIBRARY_INDEX': False,
 
-    # Enable content libraries (blockstore) indexing
-    'ENABLE_CONTENT_LIBRARY_INDEX': False,
-
     # .. toggle_name: FEATURES['ALLOW_COURSE_RERUNS']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: True
