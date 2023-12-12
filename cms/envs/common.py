@@ -297,9 +297,6 @@ FEATURES = {
     # Enable content libraries (modulestore) search functionality
     'ENABLE_LIBRARY_INDEX': False,
 
-    # Enable content libraries (blockstore) indexing
-    'ENABLE_CONTENT_LIBRARY_INDEX': False,
-
     # .. toggle_name: FEATURES['ALLOW_COURSE_RERUNS']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: True
@@ -495,6 +492,16 @@ FEATURES = {
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MST-1348'
     'ENABLE_INTEGRITY_SIGNATURE': False,
+
+    # .. toggle_name: FEATURES['ENABLE_LTI_PII_ACKNOWLEDGEMENT']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Enables the lti pii acknowledgement feature for a course
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2023-10
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: 'https://2u-internal.atlassian.net/browse/MST-2055'
+    'ENABLE_LTI_PII_ACKNOWLEDGEMENT': False,
 
     # .. toggle_name: MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW
     # .. toggle_implementation: DjangoSetting
@@ -2496,6 +2503,8 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
     CORS_ALLOW_INSECURE = False
     CORS_ALLOW_HEADERS = corsheaders_default_headers + (
         'use-jwt-cookie',
+        'content-range',
+        'content-disposition',
     )
 
 LOGIN_REDIRECT_WHITELIST = []

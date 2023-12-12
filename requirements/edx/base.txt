@@ -73,13 +73,13 @@ bleach[css]==6.1.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.33.4
+boto3==1.33.12
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.33.4
+botocore==1.33.12
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -277,13 +277,13 @@ django-environ==0.11.2
     # via openedx-blockstore
 django-fernet-fields-v2==0.9
     # via edx-enterprise
-django-filter==23.4
+django-filter==23.5
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
     #   lti-consumer-xblock
     #   openedx-blockstore
-django-ipware==6.0.1
+django-ipware==6.0.2
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
@@ -333,7 +333,7 @@ django-sekizai==4.1.0
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-django-wiki
-django-ses==3.5.1
+django-ses==3.5.2
     # via -r requirements/edx/bundled.in
 django-simple-history==3.4.0
     # via
@@ -356,7 +356,7 @@ django-storages==1.14.2
     #   edxval
 django-user-tasks==3.1.0
     # via -r requirements/edx/kernel.in
-django-waffle==4.0.0
+django-waffle==4.1.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-django-utils
@@ -400,7 +400,7 @@ drf-jwt==1.19.2
     # via edx-drf-extensions
 drf-nested-routers==0.93.4
     # via openedx-blockstore
-drf-spectacular==0.26.5
+drf-spectacular==0.27.0
     # via -r requirements/edx/kernel.in
 drf-yasg==1.21.5
     # via
@@ -462,7 +462,7 @@ edx-django-utils==5.9.0
     #   openedx-blockstore
     #   ora2
     #   super-csv
-edx-drf-extensions==9.0.0
+edx-drf-extensions==9.0.1
     # via
     #   -r requirements/edx/kernel.in
     #   edx-completion
@@ -474,7 +474,7 @@ edx-drf-extensions==9.0.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.8.8
+edx-enterprise==4.8.11
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -560,7 +560,7 @@ event-tracking==2.2.0
     #   edx-completion
     #   edx-proctoring
     #   edx-search
-fastavro==1.9.0
+fastavro==1.9.1
     # via openedx-events
 filelock==3.13.1
     # via snowflake-connector-python
@@ -580,7 +580,7 @@ fs-s3fs==0.1.8
     #   openedx-django-pyfs
 future==0.18.3
     # via pyjwkest
-geoip2==4.7.0
+geoip2==4.8.0
     # via -r requirements/edx/kernel.in
 glob2==0.7
     # via -r requirements/edx/kernel.in
@@ -601,12 +601,13 @@ idna==3.6
     #   requests
     #   snowflake-connector-python
     #   yarl
-importlib-metadata==6.8.0
+importlib-metadata==7.0.0
     # via markdown
-importlib-resources==6.1.1
+importlib-resources==5.13.0
     # via
     #   jsonschema
     #   jsonschema-specifications
+    #   pycountry
 inflection==0.5.1
     # via
     #   drf-spectacular
@@ -644,7 +645,7 @@ jsonschema==4.20.0
     # via
     #   drf-spectacular
     #   optimizely-sdk
-jsonschema-specifications==2023.11.1
+jsonschema-specifications==2023.11.2
     # via jsonschema
 jwcrypto==1.5.0
     # via
@@ -728,7 +729,7 @@ mysqlclient==2.2.0
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-blockstore
-newrelic==9.2.0
+newrelic==9.3.0
     # via
     #   -r requirements/edx/bundled.in
     #   edx-django-utils
@@ -786,7 +787,7 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/kernel.in
 optimizely-sdk==4.1.1
     # via -r requirements/edx/bundled.in
-ora2==6.0.11
+ora2==6.0.13
     # via -r requirements/edx/bundled.in
 packaging==23.2
     # via
@@ -796,7 +797,7 @@ packaging==23.2
     #   snowflake-connector-python
 pansi==2020.7.3
     # via py2neo
-path==16.7.1
+path==16.9.0
     # via
     #   -r requirements/edx/kernel.in
     #   -r requirements/edx/paver.txt
@@ -841,7 +842,7 @@ py2neo @ https://github.com/overhangio/py2neo/releases/download/2021.2.3/py2neo-
     #   -r requirements/edx/bundled.in
 pyasn1==0.5.1
     # via pgpy
-pycountry==22.3.5
+pycountry==23.12.11
     # via -r requirements/edx/kernel.in
 pycparser==2.21
     # via cffi
@@ -972,7 +973,7 @@ redis==5.0.1
     # via
     #   -r requirements/edx/kernel.in
     #   walrus
-referencing==0.31.1
+referencing==0.32.0
     # via
     #   jsonschema
     #   jsonschema-specifications
@@ -1074,7 +1075,7 @@ slumber==0.7.1
     #   edx-bulk-grades
     #   edx-enterprise
     #   edx-rest-api-client
-snowflake-connector-python==3.5.0
+snowflake-connector-python==3.6.0
     # via edx-enterprise
 social-auth-app-django==5.0.0
     # via
@@ -1129,11 +1130,12 @@ tqdm==4.66.1
     # via
     #   nltk
     #   openai
-typing-extensions==4.8.0
+typing-extensions==4.9.0
     # via
     #   -r requirements/edx/paver.txt
     #   asgiref
     #   django-countries
+    #   drf-spectacular
     #   edx-opaque-keys
     #   kombu
     #   pylti1p3
@@ -1226,7 +1228,7 @@ xmlsec==1.3.13
     # via python3-saml
 xss-utils==0.5.0
     # via -r requirements/edx/kernel.in
-yarl==1.9.3
+yarl==1.9.4
     # via aiohttp
 zipp==3.17.0
     # via

@@ -57,7 +57,7 @@ class VideoModelSerializer(serializers.Serializer):
         child=serializers.CharField()
     )
     usage_locations = serializers.ListField(
-        child=serializers.CharField()
+        child=serializers.DictField()
     )
 
 
@@ -111,7 +111,16 @@ class CourseVideosSerializer(serializers.Serializer):
 class VideoUsageSerializer(serializers.Serializer):
     """Serializer for video usage"""
     usage_locations = serializers.ListField(
-        child=serializers.CharField()
+        child=serializers.DictField()
+    )
+
+
+class VideoDownloadSerializer(serializers.Serializer):
+    """Serializer for video downloads"""
+    files = serializers.ListField(
+        child=serializers.DictField(
+            child=serializers.CharField()
+        )
     )
 
 

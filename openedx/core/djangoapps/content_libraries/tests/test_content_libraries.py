@@ -5,10 +5,8 @@ from uuid import UUID
 from unittest.mock import Mock, patch
 
 import ddt
-from django.conf import settings
 from django.contrib.auth.models import Group
 from django.test.client import Client
-from django.test.utils import override_settings
 from organizations.models import Organization
 from rest_framework.test import APITestCase
 
@@ -22,10 +20,8 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED,
 )
-from openedx.core.djangoapps.content_libraries.libraries_index import LibraryBlockIndexer, ContentLibraryIndexer
 from openedx.core.djangoapps.content_libraries.tests.base import (
     ContentLibrariesRestApiTest,
-    elasticsearch_test,
     URL_BLOCK_METADATA_URL,
     URL_BLOCK_RENDER_VIEW,
     URL_BLOCK_GET_HANDLER_URL,
@@ -61,13 +57,6 @@ class ContentLibrariesTestMixin:
     library slug and bundle UUID does not because it's assumed to be immutable
     and cached forever.
     """
-
-    def setUp(self):
-        super().setUp()
-        if settings.ENABLE_ELASTICSEARCH_FOR_TESTS:
-            ContentLibraryIndexer.remove_all_items()
-            LibraryBlockIndexer.remove_all_items()
-
     def test_library_crud(self):
         """
         Test Create, Read, Update, and Delete of a Content Library
@@ -210,89 +199,83 @@ class ContentLibrariesTestMixin:
             'slug': ['Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or hyphens.'],
         }
 
-    @ddt.data(True, False)
     @patch("openedx.core.djangoapps.content_libraries.views.LibraryApiPagination.page_size", new=2)
-    def test_list_library(self, is_indexing_enabled):
+    def test_list_library(self):
         """
         Test the /libraries API and its pagination
         """
-        with override_settings(FEATURES={**settings.FEATURES, 'ENABLE_CONTENT_LIBRARY_INDEX': is_indexing_enabled}):
-            lib1 = self._create_library(slug="some-slug-1", title="Existing Library")
-            lib2 = self._create_library(slug="some-slug-2", title="Existing Library")
-            if not is_indexing_enabled:
-                lib1['num_blocks'] = lib2['num_blocks'] = None
-                lib1['last_published'] = lib2['last_published'] = None
-                lib1['has_unpublished_changes'] = lib2['has_unpublished_changes'] = None
-                lib1['has_unpublished_deletes'] = lib2['has_unpublished_deletes'] = None
+        lib1 = self._create_library(slug="some-slug-1", title="Existing Library")
+        lib2 = self._create_library(slug="some-slug-2", title="Existing Library")
+        lib1['num_blocks'] = lib2['num_blocks'] = None
+        lib1['last_published'] = lib2['last_published'] = None
+        lib1['has_unpublished_changes'] = lib2['has_unpublished_changes'] = None
+        lib1['has_unpublished_deletes'] = lib2['has_unpublished_deletes'] = None
 
-            result = self._list_libraries()
-            assert len(result) == 2
-            assert lib1 in result
-            assert lib2 in result
-            result = self._list_libraries({'pagination': 'true'})
-            assert len(result['results']) == 2
-            assert result['next'] is None
+        result = self._list_libraries()
+        assert len(result) == 2
+        assert lib1 in result
+        assert lib2 in result
+        result = self._list_libraries({'pagination': 'true'})
+        assert len(result['results']) == 2
+        assert result['next'] is None
 
-            # Create another library which causes number of libraries to exceed the page size
-            self._create_library(slug="some-slug-3", title="Existing Library")
-            # Verify that if `pagination` param isn't sent, API still honors the max page size.
-            # This is for maintaining compatibility with older non pagination-aware clients.
-            result = self._list_libraries()
-            assert len(result) == 2
+        # Create another library which causes number of libraries to exceed the page size
+        self._create_library(slug="some-slug-3", title="Existing Library")
+        # Verify that if `pagination` param isn't sent, API still honors the max page size.
+        # This is for maintaining compatibility with older non pagination-aware clients.
+        result = self._list_libraries()
+        assert len(result) == 2
 
-            # Pagination enabled:
-            # Verify total elements and valid 'next' in page 1
-            result = self._list_libraries({'pagination': 'true'})
-            assert len(result['results']) == 2
-            assert 'page=2' in result['next']
-            assert 'pagination=true' in result['next']
-            # Verify total elements and null 'next' in page 2
-            result = self._list_libraries({'pagination': 'true', 'page': '2'})
-            assert len(result['results']) == 1
-            assert result['next'] is None
+        # Pagination enabled:
+        # Verify total elements and valid 'next' in page 1
+        result = self._list_libraries({'pagination': 'true'})
+        assert len(result['results']) == 2
+        assert 'page=2' in result['next']
+        assert 'pagination=true' in result['next']
+        # Verify total elements and null 'next' in page 2
+        result = self._list_libraries({'pagination': 'true', 'page': '2'})
+        assert len(result['results']) == 1
+        assert result['next'] is None
 
-    @ddt.data(True, False)
-    def test_library_filters(self, is_indexing_enabled):
+    def test_library_filters(self):
         """
         Test the filters in the list libraries API
         """
-        suffix = str(is_indexing_enabled)
-        with override_settings(FEATURES={**settings.FEATURES, 'ENABLE_CONTENT_LIBRARY_INDEX': is_indexing_enabled}):
-            self._create_library(
-                slug=f"test-lib-filter-{suffix}-1", title="Fob", description=f"Bar-{suffix}", library_type=VIDEO,
-            )
-            self._create_library(
-                slug=f"test-lib-filter-{suffix}-2", title=f"Library-Title-{suffix}-2", description=f"Bar-{suffix}-2",
-            )
-            self._create_library(
-                slug=f"l3{suffix}", title=f"Library-Title-{suffix}-3", description="Description", library_type=VIDEO,
-            )
+        self._create_library(
+            slug="test-lib-filter-1", title="Fob", description="Bar", library_type=VIDEO,
+        )
+        self._create_library(
+            slug="test-lib-filter-2", title="Library-Title-2", description="Bar-2",
+        )
+        self._create_library(
+            slug="l3", title="Library-Title-3", description="Description", library_type=VIDEO,
+        )
 
-            Organization.objects.get_or_create(
-                short_name=f"org-test-{suffix}",
-                defaults={"name": "Content Libraries Tachyon Exploration & Survey Team"},
-            )
-            self._create_library(
-                slug=f"l4-{suffix}", title=f"Library-Title-{suffix}-4",
-                description="Library-Description", org=f'org-test-{suffix}',
-                library_type=VIDEO,
-            )
-            self._create_library(
-                slug="l5", title=f"Library-Title-{suffix}-5", description="Library-Description",
-                org=f'org-test-{suffix}',
-            )
+        Organization.objects.get_or_create(
+            short_name="org-test",
+            defaults={"name": "Content Libraries Tachyon Exploration & Survey Team"},
+        )
+        self._create_library(
+            slug="l4", title="Library-Title-4",
+            description="Library-Description", org='org-test',
+            library_type=VIDEO,
+        )
+        self._create_library(
+            slug="l5", title="Library-Title-5", description="Library-Description",
+            org='org-test',
+        )
 
-            assert len(self._list_libraries()) == 5
-            assert len(self._list_libraries({'org': f'org-test-{suffix}'})) == 2
-            assert len(self._list_libraries({'text_search': f'test-lib-filter-{suffix}'})) == 2
-            assert len(self._list_libraries({'text_search': f'test-lib-filter-{suffix}', 'type': VIDEO})) == 1
-            assert len(self._list_libraries({'text_search': f'library-title-{suffix}'})) == 4
-            assert len(self._list_libraries({'text_search': f'library-title-{suffix}', 'type': VIDEO})) == 2
-            assert len(self._list_libraries({'text_search': f'bar-{suffix}'})) == 2
-            assert len(self._list_libraries({'text_search': f'org-test-{suffix}'})) == 2
-            assert len(self._list_libraries({'org': f'org-test-{suffix}',
-                                             'text_search': f'library-title-{suffix}-4'})) == 1
-            assert len(self._list_libraries({'type': VIDEO})) == 3
+        assert len(self._list_libraries()) == 5
+        assert len(self._list_libraries({'org': 'org-test'})) == 2
+        assert len(self._list_libraries({'text_search': 'test-lib-filter'})) == 2
+        assert len(self._list_libraries({'text_search': 'test-lib-filter', 'type': VIDEO})) == 1
+        assert len(self._list_libraries({'text_search': 'library-title'})) == 4
+        assert len(self._list_libraries({'text_search': 'library-title', 'type': VIDEO})) == 2
+        assert len(self._list_libraries({'text_search': 'bar'})) == 2
+        assert len(self._list_libraries({'text_search': 'org-test'})) == 2
+        assert len(self._list_libraries({'org': 'org-test',
+                                         'text_search': 'library-title-4'})) == 1
+        assert len(self._list_libraries({'type': VIDEO})) == 3
 
     # General Content Library XBlock tests:
 
@@ -439,65 +422,61 @@ class ContentLibrariesTestMixin:
         assert 'resources' in fragment
         assert 'Hello world!' in fragment['content']
 
-    @ddt.data(True, False)
     @patch("openedx.core.djangoapps.content_libraries.views.LibraryApiPagination.page_size", new=2)
-    def test_list_library_blocks(self, is_indexing_enabled):
+    def test_list_library_blocks(self):
         """
         Test the /libraries/{lib_key_str}/blocks API and its pagination
         """
-        with override_settings(FEATURES={**settings.FEATURES, 'ENABLE_CONTENT_LIBRARY_INDEX': is_indexing_enabled}):
-            lib = self._create_library(slug="list_blocks-slug" + str(is_indexing_enabled), title="Library 1")
-            block1 = self._add_block_to_library(lib["id"], "problem", "problem1")
-            block2 = self._add_block_to_library(lib["id"], "unit", "unit1")
+        lib = self._create_library(slug="list_blocks-slug", title="Library 1")
+        block1 = self._add_block_to_library(lib["id"], "problem", "problem1")
+        block2 = self._add_block_to_library(lib["id"], "unit", "unit1")
 
-            self._add_block_to_library(lib["id"], "problem", "problem2", parent_block=block2["id"])
+        self._add_block_to_library(lib["id"], "problem", "problem2", parent_block=block2["id"])
 
-            result = self._get_library_blocks(lib["id"])
-            assert len(result) == 2
-            assert block1 in result
+        result = self._get_library_blocks(lib["id"])
+        assert len(result) == 2
+        assert block1 in result
 
-            result = self._get_library_blocks(lib["id"], {'pagination': 'true'})
-            assert len(result['results']) == 2
-            assert result['next'] is None
+        result = self._get_library_blocks(lib["id"], {'pagination': 'true'})
+        assert len(result['results']) == 2
+        assert result['next'] is None
 
-            self._add_block_to_library(lib["id"], "problem", "problem3")
-            # Test pagination
-            result = self._get_library_blocks(lib["id"])
-            assert len(result) == 3
-            result = self._get_library_blocks(lib["id"], {'pagination': 'true'})
-            assert len(result['results']) == 2
-            assert 'page=2' in result['next']
-            assert 'pagination=true' in result['next']
-            result = self._get_library_blocks(lib["id"], {'pagination': 'true', 'page': '2'})
-            assert len(result['results']) == 1
-            assert result['next'] is None
+        self._add_block_to_library(lib["id"], "problem", "problem3")
+        # Test pagination
+        result = self._get_library_blocks(lib["id"])
+        assert len(result) == 3
+        result = self._get_library_blocks(lib["id"], {'pagination': 'true'})
+        assert len(result['results']) == 2
+        assert 'page=2' in result['next']
+        assert 'pagination=true' in result['next']
+        result = self._get_library_blocks(lib["id"], {'pagination': 'true', 'page': '2'})
+        assert len(result['results']) == 1
+        assert result['next'] is None
 
-    @ddt.data(True, False)
-    def test_library_blocks_filters(self, is_indexing_enabled):
+    def test_library_blocks_filters(self):
         """
         Test the filters in the list libraries API
         """
-        with override_settings(FEATURES={**settings.FEATURES, 'ENABLE_CONTENT_LIBRARY_INDEX': is_indexing_enabled}):
-            lib = self._create_library(slug="test-lib-blocks" + str(is_indexing_enabled), title="Title")
-            block1 = self._add_block_to_library(lib["id"], "problem", "foo-bar")
-            self._add_block_to_library(lib["id"], "video", "vid-baz")
-            self._add_block_to_library(lib["id"], "html", "html-baz")
-            self._add_block_to_library(lib["id"], "problem", "foo-baz")
-            self._add_block_to_library(lib["id"], "problem", "bar-baz")
+        lib = self._create_library(slug="test-lib-blocks", title="Title")
+        block1 = self._add_block_to_library(lib["id"], "problem", "foo-bar")
+        self._add_block_to_library(lib["id"], "video", "vid-baz")
+        self._add_block_to_library(lib["id"], "html", "html-baz")
+        self._add_block_to_library(lib["id"], "problem", "foo-baz")
+        self._add_block_to_library(lib["id"], "problem", "bar-baz")
 
-            self._set_library_block_olx(block1["id"], "<problem display_name=\"DisplayName\"></problem>")
+        self._set_library_block_olx(block1["id"], "<problem display_name=\"DisplayName\"></problem>")
 
-            assert len(self._get_library_blocks(lib['id'])) == 5
-            assert len(self._get_library_blocks(lib['id'], {'text_search': 'Foo'})) == 2
-            assert len(self._get_library_blocks(lib['id'], {'text_search': 'Display'})) == 1
-            assert len(self._get_library_blocks(lib['id'], {'text_search': 'Video'})) == 1
-            assert len(self._get_library_blocks(lib['id'], {'text_search': 'Foo', 'block_type': 'video'})) == 0
-            assert len(self._get_library_blocks(lib['id'], {'text_search': 'Baz', 'block_type': 'video'})) == 1
-            assert len(self._get_library_blocks(lib['id'], {'text_search': 'Baz', 'block_type': ['video', 'html']})) ==\
-                2
-            assert len(self._get_library_blocks(lib['id'], {'block_type': 'video'})) == 1
-            assert len(self._get_library_blocks(lib['id'], {'block_type': 'problem'})) == 3
-            assert len(self._get_library_blocks(lib['id'], {'block_type': 'squirrel'})) == 0
+        assert len(self._get_library_blocks(lib['id'])) == 5
+        assert len(self._get_library_blocks(lib['id'], {'text_search': 'Foo'})) == 2
+        assert len(self._get_library_blocks(lib['id'], {'text_search': 'Display'})) == 1
+        assert len(self._get_library_blocks(lib['id'], {'text_search': 'Video'})) == 1
+        assert len(self._get_library_blocks(lib['id'], {'text_search': 'Foo', 'block_type': 'video'})) == 0
+        assert len(self._get_library_blocks(lib['id'], {'text_search': 'Baz', 'block_type': 'video'})) == 1
+        assert len(self._get_library_blocks(lib['id'], {'text_search': 'Baz', 'block_type': ['video', 'html']})) ==\
+            2
+        assert len(self._get_library_blocks(lib['id'], {'block_type': 'video'})) == 1
+        assert len(self._get_library_blocks(lib['id'], {'block_type': 'problem'})) == 3
+        assert len(self._get_library_blocks(lib['id'], {'block_type': 'squirrel'})) == 0
 
     @ddt.data(
         ('video-problem', VIDEO, 'problem', 400),
@@ -1231,7 +1210,6 @@ class ContentLibrariesTestMixin:
         )
 
 
-@elasticsearch_test
 class ContentLibrariesTest(
     ContentLibrariesTestMixin,
     ContentLibrariesRestApiTest,

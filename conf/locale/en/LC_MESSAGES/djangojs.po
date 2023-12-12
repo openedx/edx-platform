@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-12-05 14:24+0000\n"
-"PO-Revision-Date: 2023-12-05 14:25:07.995704\n"
+"POT-Creation-Date: 2023-12-10 20:36+0000\n"
+"PO-Revision-Date: 2023-12-10 20:36:19.589403\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -750,6 +750,7 @@ msgid "Select a category"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr ""
@@ -7723,13 +7724,13 @@ msgid "Financial Assistance Application"
 msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid "About You"
+msgid "Profile Information"
 msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
-"The following information is already a part of your {platform} profile. "
-"We've included it here for your application."
+"The following information is already a part of your {platform} profile and "
+"is required for your application. To edit this information go to "
 msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
@@ -7745,7 +7746,7 @@ msgid "Country of residence"
 msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid "Back to {platform} FAQs"
+msgid "Application Details"
 msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore

@@ -970,6 +970,16 @@ FEATURES = {
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MST-1348'
     'ENABLE_INTEGRITY_SIGNATURE': False,
 
+    # .. toggle_name: FEATURES['ENABLE_LTI_PII_ACKNOWLEDGEMENT']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Enables the lti pii acknowledgement feature for a course
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2023-10
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: 'https://2u-internal.atlassian.net/browse/MST-2055'
+    'ENABLE_LTI_PII_ACKNOWLEDGEMENT': False,
+
     # .. toggle_name: FEATURES['ENABLE_NEW_BULK_EMAIL_EXPERIENCE']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
