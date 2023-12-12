@@ -9,6 +9,8 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from completion.models import BlockCompletion
 from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
+
+from common.config.waffle import TEACHER_PROGRESS_TACKING_DISABLED_SWITCH
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.features.genplus_features.genplus.models import Class, Student
@@ -167,7 +169,8 @@ def revoke_program_access_for_class_teachers(self, class_id, program_id, class_t
 )
 @set_code_owner_attribute
 def update_unit_and_lesson_completions(self, user_id, course_key_str, usage_key_str):
-    if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():
+    user = User.objects.get(id=user_id)
+    if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled() or is_staff_progress_tracking_disabled(user):
         return
 
     usage_key = UsageKey.from_string(usage_key_str)
@@ -177,7 +180,6 @@ def update_unit_and_lesson_completions(self, user_id, course_key_str, usage_key_
     if block_type not in aggregator_types:
         course_key = CourseKey.from_string(course_key_str)
         block_id = usage_key.block_id
-        user = User.objects.get(id=user_id)
         course_completion = get_course_completion(course_key_str, user, ['course'], block_id)
 
         if not (course_completion and course_completion.get('attempted')):
@@ -227,4 +229,6 @@ def update_unit_and_lesson_completions(self, user_id, course_key_str, usage_key_
                 return
 
 
-
+def is_staff_progress_tracking_disabled(user):
+    user_is_staff = user.is_staff
+    return user_is_staff and TEACHER_PROGRESS_TACKING_DISABLED_SWITCH.is_enabled()

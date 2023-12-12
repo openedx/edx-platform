@@ -13,6 +13,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from social_django.models import UserSocialAuth
 
+from common.config.waffle import TEACHER_PROGRESS_TACKING_DISABLED_SWITCH
 from common.djangoapps.third_party_auth.config.waffle import ENABLE_MULTIPLE_SSO_ACCOUNTS_ASSOCIATION_TO_SAML_USER
 from common.djangoapps.student.models import AccountRecovery, Registration, get_retired_email_by_email
 from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models
@@ -119,7 +120,7 @@ def retrieve_last_sitewide_block_completed(user):
     :return: block_lms_url
 
     """
-    if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():
+    if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled() or is_staff_progress_tracking_disabled(user):
         return
 
     latest_completions_by_course = BlockCompletion.latest_blocks_completed_all_courses(user)
@@ -236,3 +237,8 @@ def create_retirement_request_and_deactivate_account(user):
     # Delete OAuth tokens associated with the user.
     retire_dot_oauth2_models(user)
     AccountRecovery.retire_recovery_email(user.id)
+
+
+def is_staff_progress_tracking_disabled(user):
+    user_is_staff = user.is_staff
+    return user_is_staff and TEACHER_PROGRESS_TACKING_DISABLED_SWITCH.is_enabled()

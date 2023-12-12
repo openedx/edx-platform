@@ -19,6 +19,7 @@ from xblock.field_data import SplitFieldData
 from xblock.fields import Scope
 from xblock.runtime import KvsFieldData, MemoryIdManager, Runtime
 
+from common.config.waffle import TEACHER_PROGRESS_TACKING_DISABLED_SWITCH
 from common.djangoapps.track import contexts as track_contexts
 from common.djangoapps.track import views as track_views
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
@@ -48,7 +49,14 @@ def make_track_function():
 
     def function(event_type, event):
         return track_views.server_track(current_request, event_type, event, page='x_module')
+
     return function
+
+
+def is_staff_progress_tracking_disabled(user):
+    user_is_staff = user.is_staff
+    return user_is_staff and TEACHER_PROGRESS_TACKING_DISABLED_SWITCH.is_enabled()
+
 
 
 class XBlockRuntime(RuntimeShim, Runtime):
@@ -180,7 +188,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
         """
         Submit a completion object for the block.
         """
-        if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():
+        if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled() or is_staff_progress_tracking_disabled(self.user):
             return
         BlockCompletion.objects.submit_completion(
             user=self.user,
