@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 <%page expression_filter="h" args="status, status_id='', hide_correctness=False"/>
 
 % if status_id == '':
@@ -12,7 +13,7 @@
   <span class="sr">${status.display_name}</span>
   <span class='problem-error'>
       <i class="bi bi-x-circle-fill"></i>
-      <span>Đáp án của bản chưa chính xác</span>
+      <span>${_("The answer of the document is not correct")}</span>
   </span>
   % elif status.display_name == 'correct' :
       <span></span>

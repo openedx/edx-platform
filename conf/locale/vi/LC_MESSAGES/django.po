@@ -23974,3 +23974,6 @@ msgstr "Loại bỏ"
 #: 
 msgid "You are about to submit your answers to this assignment. Once submitted, you will not be able to edit or submit new submission."
 msgstr "Bạn sắp nộp câu trả lời cho bài tập này. Sau khi gửi bài bạn sẽ không thể chỉnh sửa hoặc nộp bài mới."
+
+msgid "The answer of the document is not correct"
+msgstr "Đáp án của bản chưa chính xác"
