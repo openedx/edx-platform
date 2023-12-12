@@ -148,6 +148,7 @@ social-auth-core
 simplejson
 Shapely                             # Geometry library, used for image click regions in capa
 six                                 # Utilities for supporting Python 2 & 3 in the same codebase
+slumber                             # The following dependency is unsupported and used by the DeprecatedRestApiClient
 social-auth-app-django
 sorl-thumbnail
 sortedcontainers                    # Provides SortedKeyList, used for lists of XBlock assets
@@ -159,4 +160,3 @@ webob
 web-fragments                       # Provides the ability to render fragments of web pages
 XBlock[django]                      # Courseware component architecture
 xss-utils                           # https://github.com/edx/edx-platform/pull/20633 Fix XSS via Translations
-slumber                             # The following dependency is unsupported and used by the DeprecatedRestApiClient
