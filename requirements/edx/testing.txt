@@ -69,7 +69,7 @@ attrs==23.1.0
     #   openedx-events
     #   openedx-learning
     #   referencing
-babel==2.13.1
+babel==2.14.0
     # via
     #   -r requirements/edx/base.txt
     #   enmerkar
@@ -254,7 +254,7 @@ diff-cover==8.0.1
     # via -r requirements/edx/coverage.txt
 dill==0.3.7
     # via pylint
-distlib==0.3.7
+distlib==0.3.8
     # via virtualenv
 django==3.2.23
     # via
@@ -1058,7 +1058,7 @@ polib==1.2.0
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
     #   edx-i18n-tools
-prompt-toolkit==3.0.41
+prompt-toolkit==3.0.42
     # via
     #   -r requirements/edx/base.txt
     #   click-repl
