@@ -416,14 +416,11 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
         else:
             style = QUESTION_HINT_INCORRECT_STYLE
             
-        from django.utils.translation import gettext as __
-        explanation = __("Explanation")
-        
+
     
         # Ready to go
-        return HTML('<div class="{st} messages-box"><div class="explanation-title">{dashboard}</div>{hintswrap}</div>').format(
+        return HTML('<div class="{st} messages-box"><div class="explanation-title"></div>{hintswrap}</div>').format(
             st=style,
-            dashboard=explanation,
             lwrp=label_wrap,
             hintswrap=hints_wrap
         )

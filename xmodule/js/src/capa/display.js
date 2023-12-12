@@ -721,6 +721,8 @@
                         indicatorError.remove()
                         choicegroup.appendChild(indicatorErrorParsed)
                       }
+                      
+     
   
                       problemQuestionNumbers.each(function(index, element) {
                         if (element.textContent === (currentIndex +1 ).toString()) {
@@ -730,6 +732,9 @@
                           //remove messgae
                           $(listQz[currentIndex]).find('.message').remove()
                           choicegroup.appendChild(messagesProblem)
+  
+                          const messgasBox = listQz[currentIndex].querySelector('.feedback-hint-incorrect');
+                          messgasBox.classList.add('error-problem-answer'); 
   
                           checkedInput.each(function () {
                             const input = $(this);
@@ -811,12 +816,14 @@
              const problemQuestionNumbers = that.$('.problem-question-number');
   
              $('.btn-submit-qz').prop('disabled', true);
-             
+  
             //  problemQuestionNumbers.each(function(index, element) {
             //   if (element.textContent === (currentIndex +1 ).toString()) {
             //     element.classList.remove('err-number-qusetion');
             //     element.classList.add('submitted-question');
             //   } })
+  
+  
       
               listQz[currentIndex].style.display = 'none'; 
               currentIndex += 1; 
@@ -828,8 +835,9 @@
               const incorrectLabel = listQz[currentIndex].querySelector('label.choicegroup_correct');
               const wrongLabel = listQz[currentIndex].querySelector('label.choicegroup_incorrect')
   
-  
-  
+              const elementNumber = problemQuestionNumbers[currentIndex]
+              
+              
               listQz[currentIndex].style.display = 'block'; 
               // that.$('.btn-submit-qz').css('display', 'block');
               // that.$('#btn-next').css('display', 'none');
@@ -844,11 +852,34 @@
               else if (wrongLabel && submittedInput){
                 that.$('.btn-submit-qz').css('display', 'block');
                 that.$('#btn-next').css('display', 'none');
-              }else {
+                const messgasBox = listQz[currentIndex].querySelector('.feedback-hint-incorrect');
+                messgasBox.classList.add('error-problem-answer'); 
+                
+              } 
+              
+              else {
                 that.$('.btn-submit-qz').css('display', 'block');
                 that.$('#btn-next').css('display', 'none');
               }
   
+  
+              if (elementNumber.classList.contains('err-number-qusetion')){
+                // choicegroup_correct success-problem
+                const checkedInput = $(listQz[currentIndex]).find('.field input:checked') ;
+                checkedInput.each(function () {
+                  const input = $(this);
+                  const label = $('label[for="' + $(this).attr('id') + '"]'); 
+                  label.removeClass('choicegroup_correct')
+                  input.removeClass('success-problem')
+                  
+                })
+  
+                that.$('.btn-submit-qz').css('display', 'block');
+                that.$('#btn-next').css('display', 'none');
+  
+                const messgasBox = listQz[currentIndex].querySelector('.feedback-hint-incorrect');
+                messgasBox.classList.add('error-problem-answer'); 
+              }
      
               problemQuestionNumbers.each(function(index,element){
            
@@ -895,6 +926,7 @@
   
               
           };
+          
 
         Problem.prototype.submit_internal = function() {
             var that = this;
