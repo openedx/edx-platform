@@ -206,7 +206,7 @@ class VideoDownloadView(DeveloperErrorViewMixin, APIView):
         """
         Get an object containing course videos.
         **Example Request**
-            PUT /api/contentstore/v1/videos/download, {
+            PUT /api/contentstore/v1/videos/{course_id}/download, {
                 "files": [
                     {"url": 'someUrl.com', "name": 'test.mp4'}
                 ]
@@ -214,7 +214,7 @@ class VideoDownloadView(DeveloperErrorViewMixin, APIView):
         **Response Values**
         If the request is successful, an HTTP 200 "OK" response is returned.
         The HTTP 200 response contains a zip file attachment containing all the
-        requested videos.
+        requested videos. The returned file's name will be {course_id}_videos_{random_id}.zip.
         """
         course_key = CourseKey.from_string(course_id)
 
