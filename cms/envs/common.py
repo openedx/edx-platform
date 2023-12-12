@@ -2503,6 +2503,8 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
     CORS_ALLOW_INSECURE = False
     CORS_ALLOW_HEADERS = corsheaders_default_headers + (
         'use-jwt-cookie',
+        'content-range',
+        'content-disposition',
     )
 
 LOGIN_REDIRECT_WHITELIST = []
