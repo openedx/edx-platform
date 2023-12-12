@@ -46,7 +46,7 @@ attrs==23.1.0
     #   openedx-events
     #   openedx-learning
     #   referencing
-babel==2.13.1
+babel==2.14.0
     # via
     #   -r requirements/edx/kernel.in
     #   enmerkar
@@ -830,7 +830,7 @@ platformdirs==3.11.0
     # via snowflake-connector-python
 polib==1.2.0
     # via edx-i18n-tools
-prompt-toolkit==3.0.41
+prompt-toolkit==3.0.42
     # via click-repl
 psutil==5.9.6
     # via
@@ -1072,6 +1072,7 @@ six==1.16.0
     #   python-memcached
 slumber==0.7.1
     # via
+    #   -r requirements/edx/kernel.in
     #   edx-bulk-grades
     #   edx-enterprise
     #   edx-rest-api-client

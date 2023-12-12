@@ -98,7 +98,7 @@ attrs==23.1.0
     #   openedx-events
     #   openedx-learning
     #   referencing
-babel==2.13.1
+babel==2.14.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -338,7 +338,7 @@ dill==0.3.7
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
-distlib==0.3.7
+distlib==0.3.8
     # via
     #   -r requirements/edx/testing.txt
     #   virtualenv
@@ -1418,7 +1418,7 @@ polib==1.2.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-i18n-tools
-prompt-toolkit==3.0.41
+prompt-toolkit==3.0.42
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
