@@ -36,6 +36,11 @@ from xblock.fields import Scope
 
 from common.djangoapps.student.auth import has_studio_write_access
 from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import (
+    LibraryLocatorV2,
+    LibraryUsageLocatorV2,
+    LibraryLocator as LibraryLocatorV1
+)
 from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.xblock.api import load_block
 from openedx.core.lib import ensure_cms, blockstore_api
@@ -45,6 +50,8 @@ from xmodule.library_root_xblock import LibraryRoot as LibraryRootV1
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.mixed import MixedModuleStore
+from xmodule.modulestore.split_mongo import BlockKey
+from xmodule.modulestore.store_utilities import derived_key
 
 from . import api
 from .models import ContentLibraryBlockImportTask
@@ -55,7 +62,7 @@ TASK_LOGGER = get_task_logger(__name__)
 
 @shared_task(base=LoggedTask)
 @set_code_owner_attribute
-def import_blocks_from_course(import_task_id, course_key_str):
+def import_blocks_from_course(import_task_id, course_key_str, use_course_key_as_block_id_suffix=True):
     """
     A Celery task to import blocks from a course through modulestore.
     """
@@ -72,7 +79,10 @@ def import_blocks_from_course(import_task_id, course_key_str):
                 logger.info('Import block succesful: %s', block_key)
             import_task.save_progress(block_num / block_count)
 
-        edx_client = api.EdxModulestoreImportClient(library=import_task.library)
+        edx_client = api.EdxModulestoreImportClient(
+            library=import_task.library,
+            use_course_key_as_block_id_suffix=use_course_key_as_block_id_suffix
+        )
         edx_client.import_blocks_from_course(
             course_key, on_progress
         )
@@ -84,14 +94,23 @@ def _import_block(store, user_id, source_block, dest_parent_key):
     """
     def generate_block_key(source_key, dest_parent_key):
         """
-        Deterministically generate an ID for the new block and return the key
+        Deterministically generate an ID for the new block and return the key.
+        Keys are generated such that they appear identical to a v1 library with
+        the same input block_id, library name, library organization, and parent block using derived_key
         """
-        block_id = (
-            dest_parent_key.block_id[:10] +
-            '-' +
-            hashlib.sha1(str(source_key).encode('utf-8')).hexdigest()[:10]
+        if not isinstance(source_key.lib_key, LibraryLocatorV2):
+            raise ValueError("Input must be an instance of LibraryLocatorV2")
+        source_key_as_v1_course_key = LibraryLocatorV1(org=source_key.lib_key.org, library=source_key.lib_key.slug)
+        source_key_usage_id_as_block_key = BlockKey(
+            type= source_key.block_type,
+            id=source_key.usage_id,
         )
-        return dest_parent_key.context_key.make_usage_key(source_key.block_type, block_id)
+        block_id = derived_key(
+            source_key_as_v1_course_key,
+            source_key_usage_id_as_block_key,
+            BlockKey(dest_parent_key.block_type, dest_parent_key.block_id)
+        )
+        return dest_parent_key.context_key.make_usage_key(source_key.block_type, block_id.id)
 
     source_key = source_block.scope_ids.usage_id
     new_block_key = generate_block_key(source_key, dest_parent_key)
