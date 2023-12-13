@@ -24,9 +24,9 @@ def get_all_user_permissions_for_a_course(
     if isinstance(user, AnonymousUser):
         return set()
     if not isinstance(course_key, CourseKey):
-        raise TypeError('course_key must be a CourseKey')
+        raise TypeError(f'course_key must be a CourseKey, not {type(course_key)}')
     if not isinstance(user, User):
-        raise TypeError('user must be a User')
+        raise TypeError(f'user must be a User, not {type(user)}')
     cache = RequestCache("course_roles")
     cache_key = f"all_user_permissions_for_course:{user.id}:{course_key}"
     cached_response = cache.get_cached_response(cache_key)
