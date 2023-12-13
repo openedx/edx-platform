@@ -97,16 +97,17 @@ def create_feedback (request) :
         data = {
                 'ticket_category': category_id,
                 'student_email': feedback.email,
-                "course_id" :  feedback.course_code,
+                "course_id" :  'course-v1:FUNiX+DMP101x.1.0.VN+1023.XS',
                 "lesson_url" : feedback.lesson_url,
                 'ticket_description': feedback.content ,
             }
         if request.FILES.get('attachment', '') :
             data['image'] = url_lms + '/media/' + feedback.attachment.name
             
-            
-        print('========data=======', data) 
-        url_portal  = 'https://staging-portal.funix.edu.vn/api/feedback-ticket-management/create'
+        from django.contrib.sites.models import Site
+        portal_domain = Site.objects.get(name='portal_domain')   
+        print('=============', portal_domain)
+        url_portal  = f'https://{portal_domain}/api/feedback-ticket-management/create'
         headers = {
             "Content-Type": "application/json"
             }
