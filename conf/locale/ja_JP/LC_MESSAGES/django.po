@@ -114,7 +114,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-11-05 20:43+0000\n"
+"POT-Creation-Date: 2023-11-19 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Japanese (Japan) (https://app.transifex.com/open-edx/teams/6205/ja_JP/)\n"
@@ -10386,6 +10386,19 @@ msgid ""
 msgstr ""
 
 #: xmodule/library_content_block.py
+msgid "Source content library has not been specified."
+msgstr ""
+
+#: xmodule/library_content_block.py
+msgid "Content libraries are not available in the current runtime."
+msgstr ""
+
+#: xmodule/library_content_block.py
+#, python-brace-format
+msgid "Source content library does not exist: {source_library_id}"
+msgstr ""
+
+#: xmodule/library_content_block.py
 msgid "This component is out of date. The library has new content."
 msgstr "このコンポーネントは期限切れです。ライブラリに新しいコンテンツがあります。"
 
@@ -10419,8 +10432,9 @@ msgid "Select a Library."
 msgstr "ライブラリを選択してください。"
 
 #: xmodule/library_content_block.py
-msgid "There are no matching problem types in the specified libraries."
-msgstr "ご指定のライブラリに合致する問題タイプがありません。"
+#, python-brace-format
+msgid "There are no problems in the specified library of type {capa_type}."
+msgstr ""
 
 #: xmodule/library_content_block.py
 msgid "Select another problem type."
@@ -12448,12 +12462,6 @@ msgstr "必須事項"
 msgid "Details"
 msgstr "詳細"
 
-#. Translators: this is a verb describing the action of viewing more details
-#: cms/templates/studio_xblock_wrapper.html
-#: lms/templates/wiki/includes/article_menu.html
-msgid "View"
-msgstr "見る"
-
 #: cms/templates/maintenance/_announcement_edit.html
 #: lms/templates/problem.html lms/templates/word_cloud.html
 msgid "Save"
@@ -13197,6 +13205,14 @@ msgstr "順番"
 
 #: lms/templates/seq_block.html lms/templates/vert_module.html
 msgid "Completed"
+msgstr ""
+
+#: lms/templates/seq_block.html
+msgid "New Unit"
+msgstr ""
+
+#: lms/templates/seq_block.html
+msgid "Paste as new unit"
 msgstr ""
 
 #: lms/templates/signup_modal.html
@@ -18430,6 +18446,10 @@ msgid "Learn more"
 msgstr "詳しく知る"
 
 #: lms/templates/wiki/includes/article_menu.html
+msgid "View"
+msgstr "見る"
+
+#: lms/templates/wiki/includes/article_menu.html
 msgid "{span_start}(active){span_end}"
 msgstr "{span_start}(アクティブ){span_end}"
 
@@ -19091,6 +19111,10 @@ msgstr "現行バージョンを見る"
 #: cms/templates/container.html
 msgid "Preview the courseware in the LMS"
 msgstr "LMSのコースウェアをプレビュー"
+
+#: cms/templates/container.html
+msgid "Collapse All"
+msgstr ""
 
 #: cms/templates/container.html
 msgid "Adding components"
@@ -21739,11 +21763,23 @@ msgid ""
 msgstr "宿題、実習、小テスト、試験などの課題タイプを作成することができ、それぞれの課題タイプの配点を設定できます。"
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Importing components"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
 msgstr "開くまたは閉じる"
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Select this problem"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage tags"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html

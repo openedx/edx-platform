@@ -28,10 +28,8 @@ from edx_django_utils.monitoring import set_code_owner_attribute, set_code_owner
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import (
     BlockUsageLocator,
-    LibraryUsageLocator,
     LibraryUsageLocatorV2
 )
-from search.search_engine_base import SearchEngine
 
 from user_tasks.tasks import UserTask, UserTaskStatus
 from xblock.fields import Scope
@@ -78,11 +76,6 @@ def import_blocks_from_course(import_task_id, course_key_str):
         edx_client.import_blocks_from_course(
             course_key, on_progress
         )
-
-
-def _normalize_key_for_search(library_key):
-    """ Normalizes library key for use with search indexing """
-    return library_key.replace(version_guid=None, branch=None)
 
 
 def _import_block(store, user_id, source_block, dest_parent_key):
@@ -168,21 +161,7 @@ def _filter_child(store, usage_key, capa_type):
 
 def _problem_type_filter(store, library, capa_type):
     """ Filters library children by capa type."""
-    try:
-        search_engine = SearchEngine.get_search_engine(index="library_index")
-    except:  # pylint: disable=bare-except
-        search_engine = None
-    if search_engine:
-        filter_clause = {
-            "library": str(_normalize_key_for_search(library.location.library_key)),
-            "content_type": ProblemBlock.INDEX_CONTENT_TYPE,
-            "problem_types": capa_type
-        }
-        search_result = search_engine.search(field_dictionary=filter_clause)
-        results = search_result.get('results', [])
-        return [LibraryUsageLocator.from_string(item['data']['id']) for item in results]
-    else:
-        return [key for key in library.children if _filter_child(store, key, capa_type)]
+    return [key for key in library.children if _filter_child(store, key, capa_type)]
 
 
 def _import_from_blockstore(user_id, store, dest_block, blockstore_block_ids):
@@ -300,7 +279,13 @@ def duplicate_children(
     # Then, copy over any overridden settings the course author may have applied to the blocks.
     source_block = store.get_item(BlockUsageLocator.from_string(source_block_id))
     with store.bulk_operations(source_block.scope_ids.usage_id.context_key):
-        _copy_overrides(store=store, user_id=user_id, source_block=source_block, dest_block=dest_block)
+        try:
+            TASK_LOGGER.info('Copying Overrides from %s to %s', source_block_id, dest_block_id)
+            _copy_overrides(store=store, user_id=user_id, source_block=source_block, dest_block=dest_block)
+        except Exception as exception:  # pylint: disable=broad-except
+            TASK_LOGGER.exception('Error Copying Overrides from %s to %s', source_block_id, dest_block_id)
+            if self.status.state != UserTaskStatus.FAILED:
+                self.status.fail({'raw_error_msg': str(exception)})
 
 
 def _sync_children(
@@ -373,7 +358,7 @@ def _copy_overrides(
             _copy_overrides(
                 store=store,
                 user_id=user_id,
-                source_block=source_block.runtime.get_block(source_child_key),
-                dest_block=dest_block.runtime.get_block(dest_child_key),
+                source_block=store.get_item(source_child_key),
+                dest_block=store.get_item(dest_child_key),
             )
     store.update_item(dest_block, user_id)

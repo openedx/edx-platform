@@ -970,6 +970,16 @@ FEATURES = {
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MST-1348'
     'ENABLE_INTEGRITY_SIGNATURE': False,
 
+    # .. toggle_name: FEATURES['ENABLE_LTI_PII_ACKNOWLEDGEMENT']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Enables the lti pii acknowledgement feature for a course
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2023-10
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: 'https://2u-internal.atlassian.net/browse/MST-2055'
+    'ENABLE_LTI_PII_ACKNOWLEDGEMENT': False,
+
     # .. toggle_name: FEATURES['ENABLE_NEW_BULK_EMAIL_EXPERIENCE']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -2235,10 +2245,10 @@ MIDDLEWARE = [
     'common.djangoapps.track.middleware.TrackMiddleware',
 
     # CORS and CSRF
+    'django.middleware.csrf.CsrfViewMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'openedx.core.djangoapps.cors_csrf.middleware.CorsCSRFMiddleware',
     'openedx.core.djangoapps.cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
 
     'splash.middleware.SplashMiddleware',
 
@@ -4225,6 +4235,10 @@ ECOMMERCE_ORDERS_API_CACHE_TIMEOUT = 3600
 ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 
+# E-Commerce Commerce Coordinator Configuration
+COMMERCE_COORDINATOR_URL_ROOT = 'http://localhost:8000'
+COORDINATOR_CHECKOUT_REDIRECT_PATH = '/lms/redirect/'
+
 # Exam Service
 EXAMS_SERVICE_URL = 'http://localhost:18740/api/v1'
 
@@ -4407,6 +4421,8 @@ EDX_DRF_EXTENSIONS = {
     # Set this value to an empty dict in order to prevent automatically updating
     # user data from values in (possibly stale) JWTs.
     'JWT_PAYLOAD_USER_ATTRIBUTE_MAPPING': {},
+    # Allows JWT authentication to find the LMS user id for verification
+    'VERIFY_LMS_USER_ID_PROPERTY_NAME': 'id',
 }
 
 ################################ Settings for rss_proxy ################################
@@ -4943,6 +4959,13 @@ LEARNING_MICROFRONTEND_URL = None
 # .. setting_warning: Also set site's openresponseassessment.enhanced_staff_grader
 #     waffle flag.
 ORA_GRADING_MICROFRONTEND_URL = None
+# .. setting_name: ORA_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL for modern openassessment app.
+#     This is will be show in the open response tab list data.
+# .. setting_warning: Also set site's openresponseassessment.mfe_views
+#     waffle flag.
+ORA_MICROFRONTEND_URL = None
 # .. setting_name: DISCUSSIONS_MICROFRONTEND_URL
 # .. setting_default: None
 # .. setting_description: Base URL of the micro-frontend-based discussions page.
@@ -5091,12 +5114,6 @@ RATE_LIMIT_FOR_VIDEO_METADATA_API = '10/minute'
 MAILCHIMP_NEW_USER_LIST_ID = ""
 
 ########################## BLOCKSTORE #####################################
-BLOCKSTORE_PUBLIC_URL_ROOT = 'http://localhost:18250'
-BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
-
-# Disable the Blockstore app API by default.
-# See openedx.core.lib.blockstore_api.config for details.
-BLOCKSTORE_USE_BLOCKSTORE_APP_API = False
 
 # .. setting_name: XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE
 # .. setting_default: default

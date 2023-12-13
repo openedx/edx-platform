@@ -129,7 +129,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-11-05 20:43+0000\n"
+"POT-Creation-Date: 2023-11-19 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Danylo Shcherbak <danylo.shcherbak@raccoongang.com>, 2020\n"
 "Language-Team: Ukrainian (https://app.transifex.com/open-edx/teams/6205/uk/)\n"
@@ -11181,6 +11181,19 @@ msgid ""
 msgstr ""
 
 #: xmodule/library_content_block.py
+msgid "Source content library has not been specified."
+msgstr ""
+
+#: xmodule/library_content_block.py
+msgid "Content libraries are not available in the current runtime."
+msgstr ""
+
+#: xmodule/library_content_block.py
+#, python-brace-format
+msgid "Source content library does not exist: {source_library_id}"
+msgstr ""
+
+#: xmodule/library_content_block.py
 msgid "This component is out of date. The library has new content."
 msgstr "Цей компонент застарів. Оновлено вміст бібліотеки."
 
@@ -11216,8 +11229,9 @@ msgid "Select a Library."
 msgstr "Вибрати бібліотеку."
 
 #: xmodule/library_content_block.py
-msgid "There are no matching problem types in the specified libraries."
-msgstr "У заданих бібліотеках немає відповідного виду завдань."
+#, python-brace-format
+msgid "There are no problems in the specified library of type {capa_type}."
+msgstr ""
 
 #: xmodule/library_content_block.py
 msgid "Select another problem type."
@@ -13442,14 +13456,6 @@ msgstr "Вимоги"
 msgid "Details"
 msgstr "Деталі"
 
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-#. Translators: this is a verb describing the action of viewing more details
-#: cms/templates/studio_xblock_wrapper.html
-#: lms/templates/wiki/includes/article_menu.html
-#: wiki/templates/wiki/includes/article_menu.html
-msgid "View"
-msgstr "Дивитися"
-
 #: cms/templates/maintenance/_announcement_edit.html
 #: lms/templates/problem.html lms/templates/word_cloud.html
 msgid "Save"
@@ -14211,6 +14217,14 @@ msgstr ""
 
 #: lms/templates/seq_block.html lms/templates/vert_module.html
 msgid "Completed"
+msgstr ""
+
+#: lms/templates/seq_block.html
+msgid "New Unit"
+msgstr ""
+
+#: lms/templates/seq_block.html
+msgid "Paste as new unit"
 msgstr ""
 
 #: lms/templates/signup_modal.html
@@ -19434,6 +19448,11 @@ msgid "Learn more"
 msgstr "Дізнатися більше"
 
 #: lms/templates/wiki/includes/article_menu.html
+#: wiki/templates/wiki/includes/article_menu.html
+msgid "View"
+msgstr "Дивитися"
+
+#: lms/templates/wiki/includes/article_menu.html
 msgid "{span_start}(active){span_end}"
 msgstr ""
 
@@ -20086,6 +20105,10 @@ msgstr ""
 
 #: cms/templates/container.html
 msgid "Preview the courseware in the LMS"
+msgstr ""
+
+#: cms/templates/container.html
+msgid "Collapse All"
 msgstr ""
 
 #: cms/templates/container.html
@@ -22786,11 +22809,23 @@ msgstr ""
 "кожний тип завдання, виконаний студентом."
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Importing components"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Select this problem"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage tags"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
