@@ -365,3 +365,10 @@ urlpatterns +=[
     path ('api/course_unit_time/<str:block_id>', get_time_course_unit , name='get_time_course_unit'),
     path('api/set_course_unit_time',set_course_time_unit, name='set_course_time_unit' )
 ]
+
+# assignmentxblock-xblock js translation
+from django.views.i18n import JavaScriptCatalog
+
+urlpatterns += [
+    path('jsi18n/', JavaScriptCatalog.as_view(), name='assignmentxblock-xblock'),
+]

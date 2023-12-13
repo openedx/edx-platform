@@ -23842,10 +23842,6 @@ msgstr "File ảnh: jpg,jpeg,png. Kích thước tối đa 5MB"
 msgid "<p>In case you have problems with the mentor Q&A function, please see the instructions below to handle it:</p> <p><strong>A. In case you sent a question but couldn't find a mentor</strong></p> <ol> <li> Please try again in a few minutes, or try during direct hours from <strong>8h-23h</strong>. If not, go to step 2. </li> <li>Text to hannah in charge for support</li> </ol> <p><strong>B. In case you do not see the Ask Mentors section or do not see the full content of the question input</strong></p> <ol> <li>Please press <strong>F5</strong> after a few minutes. If not, go to step 2</li> <li>Text to hannah in charge for support</li> </ol>"
 msgstr "<p>Trường hợp bạn gặp vấn đề với chức năng hỏi đáp mentor, vui lòng xem hướng dẫn dưới để xử lý:</p> <p><strong>A. Trường hợp đã gửi câu hỏi nhưng không tìm được mentor</strong></p> <ol> <li> Vui lòng thử lại sau vài phút, hoặc thử vào giờ trực chính từ <strong>8h-23h</strong>. Nếu không được, hãy sang bước 2. </li> <li>Nhắn hannah phụ trách để được hỗ trợ</li> </ol> <p><strong>B. Trường hợp không thấy mục Ask Mentors hoặc không thấy hiện ra đầy đủ nội dung nhập câu hỏi</strong></p> <ol> <li>Vui lòng nhấn <strong>F5</strong> sau vài phút. Nếu không được, hãy sang bước 2</li> <li>Nhắn hannah phụ trách để được hỗ trợ</li> </ol>"
 
-######################################################
-# Learning Project XBlock Translation
-######################################################
-#: 
 msgid "Submission Results"
 msgstr "Kết quả bài nộp"
 
@@ -23977,3 +23973,4 @@ msgstr "Bạn sắp nộp câu trả lời cho bài tập này. Sau khi gửi b�
 
 msgid "The answer of the document is not correct"
 msgstr "Đáp án của bản chưa chính xác"
+

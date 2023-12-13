@@ -1238,6 +1238,7 @@ class CourseResultLab(models.Model):
     course_id = models.CharField(max_length=255)
     result = models.TextField(default='')
     type_lab = models.CharField(max_length=20)
+    
     def __str__ (self) :
         return self.block_id
     
@@ -1271,12 +1272,14 @@ def render_type_lab_xblock (block_id , email):
         data = {
             "result" : lab.result,
             "type"  : lab.type_lab,
-            "block_id" : block_id
+            "block_id" : block_id,
+          
         }
         
         if file :
+    
             data['url'] = file.get('url', '') 
-
+            data['date'] = file.get('date', '')
         return data
    except:
        return ''

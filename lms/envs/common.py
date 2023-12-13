@@ -67,6 +67,13 @@ from openedx.core.lib.derived import derived, derived_collection_entry
 from openedx.core.release import doc_version
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
+############# Learning Project XBlock ##########
+from openedx.core.djangoapps.learningprojectxblock.utils import (
+    LEARNINGPROJECTXBLOCK_TEMPLATES_DIR,
+    add_learningprojectxblock_templates_dir,
+    add_learningprojectxblock_locale_path
+)
+
 ################################### FEATURES ###################################
 # .. setting_name: PLATFORM_NAME
 # .. setting_default: Your Platform Name Here
@@ -1220,7 +1227,7 @@ MAKO_TEMPLATE_DIRS_BASE = [
     OPENEDX_ROOT / 'features' / 'course_experience' / 'templates',
 ]
 
-
+@add_learningprojectxblock_templates_dir
 def _make_mako_template_dirs(settings):
     """
     Derives the final Mako template directories list from other settings.
@@ -1274,6 +1281,7 @@ TEMPLATES = [
             XMODULE_ROOT / 'capa' / 'templates',
             COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
             COMMON_ROOT / 'static',  # required to statically include common Underscore templates
+            LEARNINGPROJECTXBLOCK_TEMPLATES_DIR
         ],
         # Options specific to this backend.
         'OPTIONS': {
@@ -1522,6 +1530,8 @@ from xmodule.modulestore.edit_info import EditInfoMixin  # lint-amnesty, pylint:
 from xmodule.modulestore.inheritance import InheritanceMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
 from xmodule.modulestore import prefer_xmodules  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
 from xmodule.x_module import XModuleMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
+
+
 
 # These are the Mixins that should be added to every XBlock.
 # This should be moved into an XBlock Runtime/Application object
@@ -1912,6 +1922,7 @@ STATICI18N_OUTPUT_DIR = "js/i18n"
 
 
 # Localization strings (e.g. django.po) are under these directories
+@add_learningprojectxblock_locale_path
 def _make_locale_paths(settings):  # pylint: disable=missing-function-docstring
     locale_paths = list(settings.PREPEND_LOCALE_PATHS)
     locale_paths += [settings.REPO_ROOT + '/conf/locale']  # edx-platform/conf/locale/

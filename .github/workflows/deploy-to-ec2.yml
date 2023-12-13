@@ -1,0 +1,25 @@
+name: Deploy to AWS
+on:
+  push:
+    branches:
+      - "dev"
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Deploy docker image to EC2
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd tutor
+            export TUTOR_ROOT=$(pwd)/tutor
+            export TUTOR_PLUGINS_ROOT=$(pwd)/tutor-plugins
+            . tutor-venv/bin/activate
+            echo -e "n\n\n\n"  | tutor local launch
