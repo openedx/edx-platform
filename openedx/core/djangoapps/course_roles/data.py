@@ -5,20 +5,24 @@ These are the permissions that can be assigned to a CourseRole which grants acce
 but can also be assigned for org wide course access or instance wide course access.
 They are defined in the database in the course_roles_permission table.
 
+Remember that edX has blue/green deployments, so they're going to be running in a state
+where some of the code has the new permissions and some won't.
+So old code needs to be resilient to seeing new permissions it doesn't recognize.
+
 To add a new permission, add a new entry to the CourseRolesPermission enum,
 then and add a new row to the course_roles_permission table in database,
-with a migration.
+with a migration in this app.
 
 To remove a permission, remove the entry from the CourseRolesPermission enum,
 and remove the row from the course_roles_permission table in database,
-with a migration.
+with a migration in this app.
 
 To change the readable_name or description of a permission, change the
 corresponding entry in CourseRolesPermission enum.
 
 To change the name of a permission, change the corresponding entry on the
 CourseRolesPermission enum, and change the name field of the corresponding
-row in the course_roles_permission table in database, with a migration.
+row in the course_roles_permission table in database, with a migration in this app.
 """
 from attrs import frozen, field, validators
 from enum import Enum, unique
@@ -156,5 +160,5 @@ class CourseRolesPermission(Enum):
     SPECIFIC_MASQUERADING = PermissionData(
         "specific_masquerading",
         _("Specific Masquerading"),
-        _("Can view the course as an Audit, Verified, Beta Tester, Masters track, username/email."),
+        _("Can view the course as an Audit, Verified, Beta Tester, Master's track, username/email."),
     )
