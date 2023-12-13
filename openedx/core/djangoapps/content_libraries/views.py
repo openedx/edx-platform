@@ -172,12 +172,12 @@ class LibraryRootView(APIView):
         paginator = LibraryApiPagination()
         queryset = api.get_libraries_for_user(request.user, org=org, library_type=library_type)
         if text_search:
-            result = api.get_metadata_from_index(queryset, text_search=text_search)
+            result = api.get_metadata(queryset, text_search=text_search)
             result = paginator.paginate_queryset(result, request)
         else:
             # We can paginate queryset early and prevent fetching unneeded metadata
             paginated_qs = paginator.paginate_queryset(queryset, request)
-            result = api.get_metadata_from_index(paginated_qs)
+            result = api.get_metadata(paginated_qs)
 
         serializer = ContentLibraryMetadataSerializer(result, many=True)
         # Verify `pagination` param to maintain compatibility with older
