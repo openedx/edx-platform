@@ -336,8 +336,14 @@ def _import_xml_node_to_parent(
     new_xblock = store.update_item(temp_xblock, user_id, allow_not_found=True)
     parent_xblock.children.append(new_xblock.location)
     store.update_item(parent_xblock, user_id)
-    for child_node in child_nodes:
-        _import_xml_node_to_parent(child_node, new_xblock, store, user_id=user_id)
+    if new_xblock.scope_ids.block_type == "library_content":
+        # Special case handling for library content. If we need this for other blocks in the future, it can be made into
+        # an API, and we'd call new_block.studio_post_paste() instead of this code.
+        # In this case, we want to pull the children from the library and let library_tools assign their IDs.
+        new_xblock.sync_from_library(upgrade_to_latest=False)
+    else:
+        for child_node in child_nodes:
+            _import_xml_node_to_parent(child_node, new_xblock, store, user_id=user_id)
     return new_xblock
 
 

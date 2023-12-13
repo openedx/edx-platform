@@ -91,7 +91,15 @@ from xblock.exceptions import XBlockNotFoundError
 from edx_rest_api_client.client import OAuthAPIClient
 
 from openedx.core.djangoapps.content_libraries import permissions
-from openedx.core.djangoapps.content_libraries.constants import DRAFT_NAME, COMPLEX
+# pylint: disable=unused-import
+from openedx.core.djangoapps.content_libraries.constants import (
+    ALL_RIGHTS_RESERVED,
+    CC_4_BY,
+    COMPLEX,
+    DRAFT_NAME,
+    PROBLEM,
+    VIDEO,
+)
 from openedx.core.djangoapps.content_libraries.library_bundle import LibraryBundle
 from openedx.core.djangoapps.content_libraries.models import (
     ContentLibrary,
@@ -387,8 +395,15 @@ def get_library(library_key):
 
 
 def create_library(
-        collection_uuid, library_type, org, slug, title, description, allow_public_learning, allow_public_read,
-        library_license,
+        collection_uuid,
+        org,
+        slug,
+        title,
+        description="",
+        allow_public_learning=False,
+        allow_public_read=False,
+        library_license=ALL_RIGHTS_RESERVED,
+        library_type=COMPLEX,
 ):
     """
     Create a new content library.
@@ -404,6 +419,8 @@ def create_library(
     allow_public_learning: Allow anyone to read/learn from blocks in the LMS
 
     allow_public_read: Allow anyone to view blocks (including source) in Studio?
+
+    library_type: Deprecated parameter, not really used. Set to COMPLEX.
 
     Returns a ContentLibraryMetadata instance.
     """
