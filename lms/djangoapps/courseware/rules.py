@@ -163,6 +163,8 @@ class HasRolesRule(Rule):  # lint-amnesty, pylint: disable=abstract-method, miss
     def check(self, user, instance=None):
         if not user.is_authenticated:
             return False
+        if instance is None:
+            return False
         if isinstance(instance, CourseKey):
             course_key = instance
         elif isinstance(instance, (CourseBlock, CourseOverview)):
