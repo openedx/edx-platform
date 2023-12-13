@@ -131,7 +131,7 @@ we haven't determined any naming conventions at the time of writing this ADR
 
 Rejected Alternatives
 ---------------------
-Contentstore may be becoming too big and may warrant being split up into multiple djangoapps. However, that would be a much larger and different refactoring effort and is not considered necessary at this point. By implementing this ADR we are not preventing this to happen later, so we decided to follow the patterns described in this ADR for now.
+Contentstore may be becoming too big and may warrant being split up into multiple djangoapps. However, that would be a much larger and different refactoring effort and is not considered necessary at this point. By implementing this ADR we are not preventing this from happening later, so we decided to follow the patterns described in this ADR for now.
 
 Community Feedback
 ------------------
