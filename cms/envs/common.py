@@ -115,7 +115,6 @@ from lms.envs.common import (
     ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL,
 
     # Blockstore
-    BLOCKSTORE_USE_BLOCKSTORE_APP_API,
     BUNDLE_ASSET_STORAGE_SETTINGS,
 
     # Methods to derive settings
@@ -297,9 +296,6 @@ FEATURES = {
 
     # Enable content libraries (modulestore) search functionality
     'ENABLE_LIBRARY_INDEX': False,
-
-    # Enable content libraries (blockstore) indexing
-    'ENABLE_CONTENT_LIBRARY_INDEX': False,
 
     # .. toggle_name: FEATURES['ALLOW_COURSE_RERUNS']
     # .. toggle_implementation: DjangoSetting
@@ -496,6 +492,16 @@ FEATURES = {
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MST-1348'
     'ENABLE_INTEGRITY_SIGNATURE': False,
+
+    # .. toggle_name: FEATURES['ENABLE_LTI_PII_ACKNOWLEDGEMENT']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Enables the lti pii acknowledgement feature for a course
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2023-10
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: 'https://2u-internal.atlassian.net/browse/MST-2055'
+    'ENABLE_LTI_PII_ACKNOWLEDGEMENT': False,
 
     # .. toggle_name: MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW
     # .. toggle_implementation: DjangoSetting
@@ -1994,8 +2000,6 @@ ADVANCED_PROBLEM_TYPES = [
 ]
 
 LIBRARY_BLOCK_TYPES = [
-    # Per https://github.com/openedx/build-test-release-wg/issues/231
-    # we removed the library source content block from defaults until complete.
     {
         'component': 'library_content',
         'boilerplate_name': None
@@ -2499,6 +2503,8 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
     CORS_ALLOW_INSECURE = False
     CORS_ALLOW_HEADERS = corsheaders_default_headers + (
         'use-jwt-cookie',
+        'content-range',
+        'content-disposition',
     )
 
 LOGIN_REDIRECT_WHITELIST = []
@@ -2608,8 +2614,7 @@ PROCTORING_BACKENDS = {
 PROCTORING_SETTINGS = {}
 
 ################## BLOCKSTORE RELATED SETTINGS  #########################
-BLOCKSTORE_PUBLIC_URL_ROOT = 'http://localhost:18250'
-BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
+
 # Which of django's caches to use for storing anonymous user state for XBlocks
 # in the blockstore-based XBlock runtime
 XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
@@ -2654,6 +2659,9 @@ REGISTRATION_EXTRA_FIELDS = {
     'marketing_emails_opt_in': 'hidden',
 }
 EDXAPP_PARSE_KEYS = {}
+
+############################ AI_TRANSLATIONS ##################################
+AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
 
 ###################### DEPRECATED URLS ##########################
 
@@ -2780,23 +2788,12 @@ DISCUSSIONS_INCONTEXT_LEARNMORE_URL = ''
 # disable indexing on date field its coming django-simple-history.
 SIMPLE_HISTORY_DATE_INDEX = False
 
-# This affects the CMS API swagger docs but not the legacy swagger docs under /api-docs/.
-REST_FRAMEWORK['DEFAULT_SCHEMA_CLASS'] = 'drf_spectacular.openapi.AutoSchema'
-
-# These fields override the spectacular settings default values.
-# Any fields not included here will use the default values.
-SPECTACULAR_SETTINGS = {
-    'TITLE': 'CMS API',
-    'DESCRIPTION': 'Experimental API to edit xblocks and course content. Danger: Do not use on running courses!',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
-    'PREPROCESSING_HOOKS': ['cms.lib.spectacular.cms_api_filter'],  # restrict spectacular to CMS API endpoints
-}
-
-
 #### Event bus producing ####
+
+
 def _should_send_xblock_events(settings):
     return settings.FEATURES['ENABLE_SEND_XBLOCK_LIFECYCLE_EVENTS_OVER_BUS']
+
 
 # .. setting_name: EVENT_BUS_PRODUCER_CONFIG
 # .. setting_default: all events disabled
@@ -2856,3 +2853,11 @@ derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.content_autho
                          'course-authoring-xblock-lifecycle', 'enabled')
 derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.content_authoring.xblock.deleted.v1',
                          'course-authoring-xblock-lifecycle', 'enabled')
+
+
+################### Authoring API ######################
+
+# This affects the Authoring API swagger docs but not the legacy swagger docs under /api-docs/.
+REST_FRAMEWORK['DEFAULT_SCHEMA_CLASS'] = 'drf_spectacular.openapi.AutoSchema'
+
+BEAMER_PRODUCT_ID = ""

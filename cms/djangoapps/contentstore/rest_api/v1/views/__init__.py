@@ -8,15 +8,9 @@ from .grading import CourseGradingView
 from .proctoring import ProctoredExamSettingsView, ProctoringErrorsView
 from .home import HomePageView
 from .settings import CourseSettingsView
-from .xblock import XblockView, XblockCreateView
-from .assets import AssetsCreateRetrieveView, AssetsUpdateDestroyView
 from .videos import (
     CourseVideosView,
-    VideosUploadsView,
-    VideosCreateUploadView,
-    VideoImagesView,
-    VideoEncodingsDownloadView,
-    VideoFeaturesView,
     VideoUsageView,
+    VideoDownloadView
 )
 from .help_urls import HelpUrlsView

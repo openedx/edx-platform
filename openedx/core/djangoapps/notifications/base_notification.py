@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .utils import find_app_in_normalized_apps, find_pref_in_normalized_prefs
 
-FILTER_AUDIT_EXPIRED = 'filter_audit_expired'
+FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE = 'filter_audit_expired_users_with_no_role'
 
 COURSE_NOTIFICATION_TYPES = {
     'new_comment_on_response': {
@@ -19,7 +19,7 @@ COURSE_NOTIFICATION_TYPES = {
             'replier_name': 'replier name',
         },
         'email_template': '',
-        'filters': [FILTER_AUDIT_EXPIRED]
+        'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
     'new_comment': {
         'notification_app': 'discussion',
@@ -33,7 +33,7 @@ COURSE_NOTIFICATION_TYPES = {
             'replier_name': 'replier name',
         },
         'email_template': '',
-        'filters': [FILTER_AUDIT_EXPIRED]
+        'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
     'new_response': {
         'notification_app': 'discussion',
@@ -46,7 +46,7 @@ COURSE_NOTIFICATION_TYPES = {
             'replier_name': 'replier name',
         },
         'email_template': '',
-        'filters': [FILTER_AUDIT_EXPIRED]
+        'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
     'new_discussion_post': {
         'notification_app': 'discussion',
@@ -63,7 +63,7 @@ COURSE_NOTIFICATION_TYPES = {
             'username': 'Post author name',
         },
         'email_template': '',
-        'filters': [FILTER_AUDIT_EXPIRED]
+        'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
     'new_question_post': {
         'notification_app': 'discussion',
@@ -80,7 +80,7 @@ COURSE_NOTIFICATION_TYPES = {
             'username': 'Post author name',
         },
         'email_template': '',
-        'filters': [FILTER_AUDIT_EXPIRED]
+        'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
     'response_on_followed_post': {
         'notification_app': 'discussion',
@@ -95,7 +95,7 @@ COURSE_NOTIFICATION_TYPES = {
             'replier_name': 'replier name',
         },
         'email_template': '',
-        'filters': [FILTER_AUDIT_EXPIRED]
+        'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
     'comment_on_followed_post': {
         'notification_app': 'discussion',
@@ -111,7 +111,7 @@ COURSE_NOTIFICATION_TYPES = {
             'replier_name': 'replier name',
         },
         'email_template': '',
-        'filters': [FILTER_AUDIT_EXPIRED]
+        'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
 }
 

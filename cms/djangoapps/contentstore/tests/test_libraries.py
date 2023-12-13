@@ -96,9 +96,9 @@ class LibraryTestCase(ModuleStoreTestCase):
             user_id=self.user.id, publish_item=False
         )
 
-    def _refresh_children(self, lib_content_block, status_code_expected=200):
+    def _upgrade_and_sync(self, lib_content_block, status_code_expected=200):
         """
-        Helper method: Uses the REST API to call the 'refresh_children' handler
+        Helper method: Uses the REST API to call the 'upgrade_and_sync' handler
         of a LibraryContent block
         """
         if 'user' not in lib_content_block.runtime._services:  # pylint: disable=protected-access
@@ -106,9 +106,9 @@ class LibraryTestCase(ModuleStoreTestCase):
             lib_content_block.runtime._services['user'] = user_service  # pylint: disable=protected-access
 
         handler_url = reverse_usage_url(
-            'component_handler',
+            'preview_handler',
             lib_content_block.location,
-            kwargs={'handler': 'refresh_children'}
+            kwargs={'handler': 'upgrade_and_sync'}
         )
         response = self.client.ajax_post(handler_url)
         self.assertEqual(response.status_code, status_code_expected)
@@ -171,7 +171,7 @@ class TestLibraries(LibraryTestCase):
 
         lc_block = self._add_library_content_block(course, self.lib_key, other_settings={'max_count': num_to_select})
         self.assertEqual(len(lc_block.children), 0)
-        lc_block = self._refresh_children(lc_block)
+        lc_block = self._upgrade_and_sync(lc_block)
 
         # Now, we want to make sure that .children has the total # of potential
         # children, and that get_child_blocks() returns the actual children
@@ -198,7 +198,7 @@ class TestLibraries(LibraryTestCase):
 
         lc_block = self._add_library_content_block(course, self.lib_key, {'max_count': 1})
         lc_block_key = lc_block.location
-        lc_block = self._refresh_children(lc_block)
+        lc_block = self._upgrade_and_sync(lc_block)
 
         def get_child_of_lc_block(block):
             """
@@ -231,7 +231,7 @@ class TestLibraries(LibraryTestCase):
 
         check()
         # Refresh the children:
-        lc_block = self._refresh_children(lc_block)
+        lc_block = self._upgrade_and_sync(lc_block)
         # Now re-load the block and try yet again, in case refreshing the children changed anything:
         check()
 
@@ -251,7 +251,7 @@ class TestLibraries(LibraryTestCase):
 
         # Add a LibraryContent block to the course:
         lc_block = self._add_library_content_block(course, self.lib_key)
-        lc_block = self._refresh_children(lc_block)
+        lc_block = self._upgrade_and_sync(lc_block)
         for child_key in lc_block.children:
             child = modulestore().get_item(child_key)
             def_id = child.definition_locator.definition_id
@@ -281,7 +281,7 @@ class TestLibraries(LibraryTestCase):
 
         # Add a LibraryContent block to the course:
         lc_block = self._add_library_content_block(course, self.lib_key)
-        lc_block = self._refresh_children(lc_block)
+        lc_block = self._upgrade_and_sync(lc_block)
         course_block = modulestore().get_item(lc_block.children[0])
 
         self.assertEqual(course_block.data, data_value)
@@ -317,7 +317,7 @@ class TestLibraries(LibraryTestCase):
 
         # Add a LibraryContent block to the course:
         lc_block = self._add_library_content_block(course, self.lib_key)
-        lc_block = self._refresh_children(lc_block)
+        lc_block = self._upgrade_and_sync(lc_block)
         self.assertEqual(len(lc_block.children), 1)
         course_vert_block = modulestore().get_item(lc_block.children[0])
         self.assertEqual(len(course_vert_block.children), 1)
@@ -326,10 +326,11 @@ class TestLibraries(LibraryTestCase):
         self.assertEqual(course_child_block.data, data_value)
         self.assertEqual(course_child_block.display_name, name_value)
 
-    def test_change_after_first_sync(self):
+    def test_switch_to_unknown_source_library_preserves_settings(self):
         """
-        Check that nothing goes wrong if we (A) Set up a LibraryContent block
-        and use it successfully, then (B) Give it an invalid configuration.
+        Check that nothing goes wrong if we (A) set up a LibraryContent block
+        and use it successfully, then (B) give it an invalid source lib, and then
+        (C) try to upgrade the source library version.
         No children should be deleted until the configuration is fixed.
         """
         # Add a block to the library:
@@ -348,31 +349,58 @@ class TestLibraries(LibraryTestCase):
 
         # Add a LibraryContent block to the course:
         lc_block = self._add_library_content_block(course, self.lib_key)
-        lc_block = self._refresh_children(lc_block)
+        lc_block = self._upgrade_and_sync(lc_block)
+        good_library_id = lc_block.source_library_id
+        good_library_version = lc_block.source_library_version
+        assert good_library_id
+        assert good_library_version
         self.assertEqual(len(lc_block.children), 1)
+        self.assertEqual(modulestore().get_item(lc_block.children[0]).data, data_value)
 
         # Now, change the block settings to have an invalid library key:
+        bad_library_id = "library-v1:NOT+FOUND"
         resp = self._update_block(
             lc_block.location,
-            {"source_library_id": "library-v1:NOT+FOUND"},
+            {"source_library_id": bad_library_id},
         )
         self.assertEqual(resp.status_code, 200)
-        lc_block = modulestore().get_item(lc_block.location)
-        self.assertEqual(len(lc_block.children), 1)  # Children should not be deleted due to a bad setting.
-        html_block = modulestore().get_item(lc_block.children[0])
-        self.assertEqual(html_block.data, data_value)
 
-    def test_refreshes_children_if_libraries_change(self):
-        """ Tests that children are automatically refreshed if libraries list changes """
+        lc_block = modulestore().get_item(lc_block.location)
+        # Source library id should be set to the new bad one...
+        assert lc_block.source_library_id == bad_library_id
+        # ...but old source library version should be preserved...
+        assert lc_block.source_library_version == good_library_version
+        # ...and children should not be deleted due to a bad setting.
+        self.assertEqual(len(lc_block.children), 1)
+        self.assertEqual(modulestore().get_item(lc_block.children[0]).data, data_value)
+
+        # Attempting to force an upgrade (the user would have to do this through the API, as
+        # the UI wouldn't give them the option) returns a 400 and preserves the LC block's state.
+        self._upgrade_and_sync(lc_block, status_code_expected=400)
+
+        # (Repeat the exact same checks)
+        lc_block = modulestore().get_item(lc_block.location)
+        # Source library id should be set to the new bad one...
+        assert lc_block.source_library_id == bad_library_id
+        # ...but old source library version should be preserved...
+        assert lc_block.source_library_version == good_library_version
+        # ...and children should not be deleted due to a bad setting.
+        self.assertEqual(len(lc_block.children), 1)
+        self.assertEqual(modulestore().get_item(lc_block.children[0]).data, data_value)
+
+    def test_sync_if_source_library_changed(self):
+        """
+        Tests that children are automatically synced with new lib if source library id is changed.
+        """
         library2key = self._create_library("org2", "lib2", "Library2")
         library2 = modulestore().get_library(library2key)
-        data1, data2 = "Hello world!", "Hello other world!"
+        data1, data2 = "Hello world from lib 1!", "Hello other world from lib 2"
         BlockFactory.create(
             category="html",
             parent_location=self.library.location,
             user_id=self.user.id,
             publish_item=False,
-            display_name="Lib1: HTML BLock",
+            display_name="Lib 1: HTML BLock",
             data=data1,
         )
 
@@ -389,25 +417,30 @@ class TestLibraries(LibraryTestCase):
         with modulestore().default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
 
-        # Add a LibraryContent block to the course:
+        # Add a LibraryContent block to the course.
         lc_block = self._add_library_content_block(course, self.lib_key)
-        lc_block = self._refresh_children(lc_block)
-        self.assertEqual(len(lc_block.children), 1)
+        lc_block = self._upgrade_and_sync(lc_block)
 
-        # Now, change the block settings to have an invalid library key:
+        # Sanity check the initial condition.
+        self.assertEqual(len(lc_block.children), 1)
+        html_block_1 = modulestore().get_item(lc_block.children[0])
+        self.assertEqual(html_block_1.data, data1)
+
+        # Now, switch over to new library. Don't call upgrade_and_sync, because we are
+        # testing that it happens automatically.
         resp = self._update_block(
             lc_block.location,
             {"source_library_id": str(library2key)},
         )
         self.assertEqual(resp.status_code, 200)
+
+        # Check that the course now has the new lib's new block.
         lc_block = modulestore().get_item(lc_block.location)
-
         self.assertEqual(len(lc_block.children), 1)
-        html_block = modulestore().get_item(lc_block.children[0])
-        self.assertEqual(html_block.data, data2)
+        html_block_2 = modulestore().get_item(lc_block.children[0])
+        self.assertEqual(html_block_2.data, data2)
 
-    @patch("xmodule.library_tools.SearchEngine.get_search_engine", Mock(return_value=None, autospec=True))
-    def test_refreshes_children_if_capa_type_change(self):
+    def test_sync_if_capa_type_changed(self):
         """ Tests that children are automatically refreshed if capa type field changes """
         name1, name2 = "Option Problem", "Multiple Choice Problem"
         BlockFactory.create(
@@ -433,7 +466,7 @@ class TestLibraries(LibraryTestCase):
 
         # Add a LibraryContent block to the course:
         lc_block = self._add_library_content_block(course, self.lib_key)
-        lc_block = self._refresh_children(lc_block)
+        lc_block = self._upgrade_and_sync(lc_block)
         self.assertEqual(len(lc_block.children), 2)
 
         resp = self._update_block(
@@ -457,26 +490,6 @@ class TestLibraries(LibraryTestCase):
         self.assertEqual(len(lc_block.children), 1)
         html_block = modulestore().get_item(lc_block.children[0])
         self.assertEqual(html_block.display_name, name2)
-
-    def test_refresh_fails_for_unknown_library(self):
-        """ Tests that refresh children fails if unknown library is configured """
-        # Create a course:
-        with modulestore().default_store(ModuleStoreEnum.Type.split):
-            course = CourseFactory.create()
-
-        # Add a LibraryContent block to the course:
-        lc_block = self._add_library_content_block(course, self.lib_key)
-        lc_block = self._refresh_children(lc_block)
-        self.assertEqual(len(lc_block.children), 0)
-
-        # Now, change the block settings to have an invalid library key:
-        resp = self._update_block(
-            lc_block.location,
-            {"source_library_id": "library-v1:NOT+FOUND"},
-        )
-        self.assertEqual(resp.status_code, 200)
-        with self.assertRaises(ValueError):
-            self._refresh_children(lc_block, status_code_expected=400)
 
     def test_library_filters(self):
         """
@@ -742,9 +755,9 @@ class TestLibraryAccess(LibraryTestCase):
         (LibraryUserRole, None, False),
     )
     @ddt.unpack
-    def test_refresh_library_content_permissions(self, library_role, course_role, expected_result):
+    def test_upgrade_and_sync_handler_content_permissions(self, library_role, course_role, expected_result):
         """
-        Test that the LibraryContent block's 'refresh_children' handler will correctly
+        Test that the LibraryContent block's 'upgrade_library' handler will correctly
         handle permissions and allow/refuse when updating its content with the latest
         version of a library. We try updating from a library with (write, read, or no)
         access to a course with (write or no) access.
@@ -767,7 +780,7 @@ class TestLibraryAccess(LibraryTestCase):
         lc_block = self._add_library_content_block(course, self.lib_key)
         # We must use the CMS's module system in order to get permissions checks.
         self._bind_block(lc_block, user=self.non_staff_user)
-        lc_block = self._refresh_children(lc_block, status_code_expected=200 if expected_result else 403)
+        lc_block = self._upgrade_and_sync(lc_block, status_code_expected=200 if expected_result else 403)
         self.assertEqual(len(lc_block.children), 1 if expected_result else 0)
 
     def test_studio_user_permissions(self):
@@ -860,7 +873,7 @@ class TestOverrides(LibraryTestCase):
 
         # Add a LibraryContent block to the course:
         self.lc_block = self._add_library_content_block(self.course, self.lib_key)
-        self.lc_block = self._refresh_children(self.lc_block)
+        self.lc_block = self._upgrade_and_sync(self.lc_block)
         self.problem_in_course = modulestore().get_item(self.lc_block.children[0])
 
     def test_overrides(self):
@@ -875,7 +888,7 @@ class TestOverrides(LibraryTestCase):
 
         # Add a second LibraryContent block to the course, with no override:
         lc_block2 = self._add_library_content_block(self.course, self.lib_key)
-        lc_block2 = self._refresh_children(lc_block2)
+        lc_block2 = self._upgrade_and_sync(lc_block2)
         # Re-load the two problem blocks - one with and one without an override:
         self.problem_in_course = modulestore().get_item(self.lc_block.children[0])
         problem2_in_course = modulestore().get_item(lc_block2.children[0])
@@ -925,7 +938,7 @@ class TestOverrides(LibraryTestCase):
         self.problem.weight = 20
         self.problem.display_name = "NEW"
         modulestore().update_item(self.problem, self.user.id)
-        self.lc_block = self._refresh_children(self.lc_block)
+        self.lc_block = self._upgrade_and_sync(self.lc_block)
         self.problem_in_course = modulestore().get_item(self.problem_in_course.location)
 
         self.assertEqual(self.problem.definition_locator.definition_id, definition_id)
@@ -962,7 +975,7 @@ class TestOverrides(LibraryTestCase):
         self.problem.data = new_data_value
         modulestore().update_item(self.problem, self.user.id)
 
-        self.lc_block = self._refresh_children(self.lc_block)
+        self.lc_block = self._upgrade_and_sync(self.lc_block)
         self.problem_in_course = modulestore().get_item(self.problem_in_course.location)
 
         self.assertEqual(self.problem_in_course.display_name, new_display_name)
@@ -992,14 +1005,11 @@ class TestOverrides(LibraryTestCase):
         # Refresh our reference to the library
         self.library = store.get_library(self.lib_key)
 
-        # Refresh our reference to the block
-        self.lc_block = store.get_item(self.lc_block.location)
-        self.problem_in_course = store.get_item(self.problem_in_course.location)
-
         # The library has changed...
         self.assertEqual(len(self.library.children), 2)
 
         # But the block hasn't.
+        self.lc_block = store.get_item(self.lc_block.location)
         self.assertEqual(len(self.lc_block.children), 1)
         self.assertEqual(self.problem_in_course.location, self.lc_block.children[0])
         self.assertEqual(self.problem_in_course.display_name, self.original_display_name)
@@ -1009,8 +1019,15 @@ class TestOverrides(LibraryTestCase):
             duplicate_block(self.course.location, self.lc_block.location, self.user)
         )
         # The duplicate should have identical children to the original:
-        self.assertEqual(len(duplicate.children), 1)
         self.assertTrue(self.lc_block.source_library_version)
         self.assertEqual(self.lc_block.source_library_version, duplicate.source_library_version)
+        self.assertEqual(len(duplicate.children), 1)
         problem2_in_course = store.get_item(duplicate.children[0])
         self.assertEqual(problem2_in_course.display_name, self.original_display_name)
+
+        # Refresh our reference to the block
+        self.lc_block = self._upgrade_and_sync(self.lc_block)
+        self.problem_in_course = store.get_item(self.problem_in_course.location)
+
+        # and the block has changed too.
+        self.assertEqual(len(self.lc_block.children), 2)

@@ -1,6 +1,5 @@
 """ Contenstore API v1 URLs. """
 
-from django.conf import settings
 from django.urls import re_path, path
 
 from openedx.core.constants import COURSE_ID_PATTERN
@@ -15,12 +14,9 @@ from .views import (
     HomePageView,
     ProctoredExamSettingsView,
     ProctoringErrorsView,
-    xblock,
-    assets,
-    videos,
-    transcripts,
     HelpUrlsView,
-    VideoUsageView
+    VideoUsageView,
+    VideoDownloadView
 )
 
 app_name = 'v1'
@@ -41,6 +37,11 @@ urlpatterns = [
     re_path(
         fr'^videos/{COURSE_ID_PATTERN}/{VIDEO_ID_PATTERN}/usage$',
         VideoUsageView.as_view(),
+        name="video_usage"
+    ),
+    re_path(
+        fr'^videos/{COURSE_ID_PATTERN}/download$',
+        VideoDownloadView.as_view(),
         name="video_usage"
     ),
     re_path(
@@ -84,45 +85,6 @@ urlpatterns = [
         name="course_rerun"
     ),
 
-    # CMS API
-    re_path(
-        fr'^file_assets/{settings.COURSE_ID_PATTERN}/$',
-        assets.AssetsCreateRetrieveView.as_view(), name='cms_api_create_retrieve_assets'
-    ),
-    re_path(
-        fr'^file_assets/{settings.COURSE_ID_PATTERN}/{settings.ASSET_KEY_PATTERN}$',
-        assets.AssetsUpdateDestroyView.as_view(), name='cms_api_update_destroy_assets'
-    ),
-    re_path(
-        fr'^videos/encodings/{settings.COURSE_ID_PATTERN}$',
-        videos.VideoEncodingsDownloadView.as_view(), name='cms_api_videos_encodings'
-    ),
-    path(
-        'videos/features/',
-        videos.VideoFeaturesView.as_view(), name='cms_api_videos_features'
-    ),
-    re_path(
-        fr'^videos/images/{settings.COURSE_ID_PATTERN}/{VIDEO_ID_PATTERN}$',
-        videos.VideoImagesView.as_view(), name='cms_api_videos_images'
-    ),
-    re_path(
-        fr'^videos/uploads/{settings.COURSE_ID_PATTERN}/$',
-        videos.VideosCreateUploadView.as_view(), name='cms_api_create_videos_upload'
-    ),
-    re_path(
-        fr'^videos/uploads/{settings.COURSE_ID_PATTERN}/{VIDEO_ID_PATTERN}$',
-        videos.VideosUploadsView.as_view(), name='cms_api_videos_uploads'
-    ),
-    re_path(
-        fr'^video_transcripts/{settings.COURSE_ID_PATTERN}$',
-        transcripts.TranscriptView.as_view(), name='cms_api_video_transcripts'
-    ),
-    re_path(
-        fr'^xblock/{settings.COURSE_ID_PATTERN}/$',
-        xblock.XblockCreateView.as_view(), name='cms_api_create_xblock'
-    ),
-    re_path(
-        fr'^xblock/{settings.COURSE_ID_PATTERN}/{settings.USAGE_KEY_PATTERN}$',
-        xblock.XblockView.as_view(), name='cms_api_xblock'
-    ),
+    # Authoring API
+    # Do not use under v1 yet (Nov. 23). The Authoring API is still experimental and the v0 versions should be used
 ]
