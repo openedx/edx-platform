@@ -70,3 +70,8 @@ About the Survey Report Admin Banner
 -------------------------------------
 
 This app implements a banner to make it easy for the Open edX operators to generate and send reports automatically.
+
+    .. image:: docs/_images/survey_report_banner.png
+        :alt: Survey Report Banner
+
+**Note:** The banner will appear if a survey report is not sent in the months defined in the ``context_processor`` file, by default, is set to appear monthly.
