@@ -100,7 +100,7 @@ def _import_block(store, user_id, source_block, dest_parent_key):
         """
         if not isinstance(source_key.lib_key, LibraryLocatorV2):
             raise ValueError("Input must be an instance of LibraryLocatorV2")
-        source_key_as_v1_course_key = LibraryLocatorV1(org=source_key.lib_key.org, library=source_key.lib_key.slug)
+        source_key_as_v1_course_key = LibraryLocatorV1(org=source_key.lib_key.org, library=source_key.lib_key.slug, branch='library')
         source_key_usage_id_as_block_key = BlockKey(
             type= source_key.block_type,
             id=source_key.usage_id,
