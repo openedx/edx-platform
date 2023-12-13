@@ -279,7 +279,7 @@
         }
 
         .wrapper-tag-header:focus-visible {
-          border-color: gray;
+          border-color: $gray;
         }
 
         .action-primary {
@@ -314,9 +314,16 @@
               }
             }
 
-            .tagging-label-link:hover,
-            .tagging-label-link:focus {
+            .tagging-label-link {
+              border: 1px dotted transparent;
+            }
+
+            .tagging-label-link:hover {
               color: $blue;
+            }
+
+            .tagging-label-link:focus-visible {
+              border-color: $gray;
             }
 
             .icon {
