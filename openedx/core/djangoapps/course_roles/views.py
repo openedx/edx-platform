@@ -44,7 +44,7 @@ class UserPermissionsView(APIView):
         try:
             course_key = CourseKey.from_string(course_id)
         except InvalidKeyError as exc:
-            raise ParseError('Invalid course_id parameter') from exc
+            raise ParseError(f'Invalid course_id: {course_id}') from exc
         try:
             user = User.objects.get(pk=user_id)
         except User.DoesNotExist as exc:
