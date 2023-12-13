@@ -211,9 +211,9 @@ class LibraryContentBlock(
         non_editable_fields = super().non_editable_metadata_fields
         non_editable_fields.extend([
             LibraryContentBlock.source_library_version,
-            candidates,
-            manual,
-            shuffle,
+            LibraryContentBlock.candidates,
+            LibraryContentBlock.manual,
+            LibraryContentBlock.shuffle,
         ])
         return non_editable_fields
 
