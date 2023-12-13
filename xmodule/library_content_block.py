@@ -128,7 +128,7 @@ class LibraryContentBlock(
     display_name = String(
         display_name=_("Display Name"),
         help=_("The display name for this component."),
-        default="Library Reference Block",
+        default="Library Content",
         scope=Scope.settings,
     )
     source_library_id = String(
@@ -169,12 +169,16 @@ class LibraryContentBlock(
         scope=Scope.user_state,
     )
     shuffle = Boolean(
-        # Are the blocks seen and their order randomized for each learner?
+        # Do we shuffle (randomize order) of selected blocks for each learner?
+        # True -> Order is randomized for each learner. \n False -> Original order from candidates/children is used.
+        # False -> is the block content only drawn from content which is in the candidates list?
         default=True,
         scope=Scope.settings,
     )
     manual = Boolean(
-        #is the block content only drawn from content which is in the candidates list?
+        # Should selected blocks be limited to the manually-picked candidates?
+        # True -> Draw selections from `candidates`.
+        # False -> Draw selections from `children`.
         default=False,
         cope=Scope.settings,
     )
@@ -201,9 +205,15 @@ class LibraryContentBlock(
 
     @property
     def non_editable_metadata_fields(self):
+        """
+        This variable contains a list of the XBlock fields that should not be displayed in the Studio editor.
+        """
         non_editable_fields = super().non_editable_metadata_fields
         non_editable_fields.extend([
             LibraryContentBlock.source_library_version,
+            candidates,
+            manual,
+            shuffle,
         ])
         return non_editable_fields
 
@@ -443,8 +453,6 @@ class LibraryContentBlock(
         fragment = Fragment()
         contents = []
         child_context = {} if not context else copy(context)
-
-        logger.error(f'hello world foralbe{self.get_children}')
 
         for child in self._get_selected_child_blocks():
             if child is None:
@@ -828,7 +836,6 @@ class LibraryContentBlock(
         """
         source_lib_changed = (self.source_library_id != old_metadata.get("source_library_id", ""))
         capa_filter_changed = (self.capa_type != old_metadata.get("capa_type", ANY_CAPA_TYPE_VALUE))
-        version_changed = (self.source_library_version != old_metadata.get("source_library_id", ""))
         if source_lib_changed or capa_filter_changed:
             try:
                 self.sync_from_library(upgrade_to_latest=True)
