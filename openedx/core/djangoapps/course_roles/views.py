@@ -2,7 +2,7 @@
 Views for the course roles API.
 """
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from rest_framework.exceptions import ParseError, NotFound
+from rest_framework.exceptions import ParseError, PermissionDenied, NotFound
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from opaque_keys import InvalidKeyError
@@ -46,6 +46,10 @@ class UserPermissionsView(APIView):
             course_key = CourseKey.from_string(course_id)
         except InvalidKeyError as exc:
             raise ParseError(f'Invalid course_id: {course_id}') from exc
+        # TODO: At the moment we only allow users to get their own permissions.
+        # This will change in the future, and will be implemented with proper permission validation.
+        if int(user_id) != int(self.request.user.id):
+            raise PermissionDenied('You do not have access to this resource')
         try:
             user = User.objects.get(pk=user_id)
         except User.DoesNotExist as exc:

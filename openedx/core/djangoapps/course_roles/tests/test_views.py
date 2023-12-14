@@ -106,7 +106,7 @@ class UserPermissionsViewTestCase(SharedModuleStoreTestCase):
         querykwargs = {'course_id': self.course_1.id, 'user_id': 999}
         url = f'{reverse("course_roles_api:user_permissions")}?{urlencode(querykwargs)}'
         response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
 class UserPermissionsFlagViewTestCase(SharedModuleStoreTestCase):
