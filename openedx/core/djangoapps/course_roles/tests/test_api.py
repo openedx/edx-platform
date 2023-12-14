@@ -19,6 +19,7 @@ from openedx.core.djangoapps.course_roles.models import (
     Service,
     UserRole
 )
+from openedx.core.lib.exceptions import CourseNotFoundError
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -136,7 +137,7 @@ class GetAllUserPermissionsTestcase(SharedModuleStoreTestCase):
         """
         Test that get_all_user_permissions_for_a_course raises value error when the course not exist
         """
-        with pytest.raises(ValueError):
+        with pytest.raises(CourseNotFoundError):
             get_all_user_permissions_for_a_course(self.user_1, CourseKey.from_string("course-v1:org+course+run"))
 
     def test_number_of_queries(self):

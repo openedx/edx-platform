@@ -13,6 +13,7 @@ from openedx.core.djangoapps.course_roles.api import (
     get_all_user_permissions_for_a_course,
 )
 from openedx.core.djangoapps.course_roles.toggles import use_permission_checks
+from openedx.core.lib.exceptions import CourseNotFoundError
 
 
 @view_auth_classes()
@@ -48,14 +49,14 @@ class UserPermissionsView(APIView):
         try:
             user = User.objects.get(pk=user_id)
         except User.DoesNotExist as exc:
-            raise NotFound(str(exc)) from exc
+            raise NotFound(f'user_id: {user_id} not found') from exc
         try:
             permissions_set = get_all_user_permissions_for_a_course(user, course_key)
-            permissions = {
+        except CourseNotFoundError as exc:
+            raise NotFound(f'course_key: {course_key} not found') from exc
+        permissions = {
                 'permissions': {permission.value.name for permission in permissions_set},
             }
-        except ValueError as exc:
-            raise NotFound(str(exc)) from exc
         return Response(permissions)
 
 

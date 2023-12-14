@@ -11,6 +11,7 @@ from edx_django_utils.cache import RequestCache
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_roles.models import UserRole
 from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
+from openedx.core.lib.exceptions import CourseNotFoundError
 
 
 def get_all_user_permissions_for_a_course(
@@ -33,7 +34,7 @@ def get_all_user_permissions_for_a_course(
     if cached_response.is_found:
         return cached_response.value
     if not CourseOverview.course_exists(course_key):
-        raise ValueError(f'course does not exist: {course_key}')
+        raise CourseNotFoundError(f'course does not exist: {course_key}')
     permissions_qset = UserRole.objects.filter(
         Q(user=user),
         (
