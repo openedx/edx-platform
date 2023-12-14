@@ -525,14 +525,6 @@ BLOCKSTORE_API_URL = ENV_TOKENS.get('BLOCKSTORE_API_URL', None)  # e.g. "https:/
 # Configure an API auth token at (blockstore URL)/admin/authtoken/token/
 BLOCKSTORE_API_AUTH_TOKEN = AUTH_TOKENS.get('BLOCKSTORE_API_AUTH_TOKEN', None)
 
-# Datadog for events!
-DATADOG = AUTH_TOKENS.get("DATADOG", {})
-DATADOG.update(ENV_TOKENS.get("DATADOG", {}))
-
-# TODO: deprecated (compatibility with previous settings)
-if 'DATADOG_API' in AUTH_TOKENS:
-    DATADOG['api_key'] = AUTH_TOKENS['DATADOG_API']
-
 # Analytics API
 ANALYTICS_API_KEY = AUTH_TOKENS.get("ANALYTICS_API_KEY", ANALYTICS_API_KEY)
 ANALYTICS_API_URL = ENV_TOKENS.get("ANALYTICS_API_URL", ANALYTICS_API_URL)
