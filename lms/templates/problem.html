@@ -125,7 +125,7 @@ from openedx.core.djangolib.markup import HTML
   display: flex;
   gap:6px;
   width: 100% ;
-  min-width: 13.438rem;
+  min-width: 17.438rem;
   flex-grow: 0;
   font-family: Roboto;
   font-size: 0.95rem;
@@ -149,9 +149,14 @@ from openedx.core.djangolib.markup import HTML
   font-weight: 600;
 }
 
+.error-problem-answer {
+  background-color: #FFE4E4  !important;
+  border-left: solid 2px #D82C0D !important;
+}
 
-
-
+.problem-question-number:hover{
+  cursor: pointer;
+}
 
 </style>
 
@@ -181,15 +186,18 @@ from openedx.core.djangolib.markup import HTML
       
 
       % if problem['name'] == 'Quiz Problem Custom' :
-      <span style='display:flex; gap: 10px'>
-        <button class='btn-prev' style='display:none'> <span class='btn-span'><i class="bi bi-arrow-left"></i> </span></button>
-        <button id='btn-next' class='btn-custom' style='display:none'> <span class='btn-span'>
+      <div id='problem-buttom' data-problem-name="${problem['name']}" style="padding-top:10px">
+        <span style='display:flex; gap: 10px'>
+      
+          <button id='btn-next' class='btn-custom' style='display:none'> <span class='btn-span'>
+  
+            Câu hỏi tiếp theo  <i class="bi bi-arrow-right"></i>
+          </span></button>
+          <button class='btn-submit-qz btn-custom' disabled > Trả lời  </button>
+  
+        </span>
 
-          Câu hỏi tiếp theo  <i class="bi bi-arrow-right"></i>
-        </span></button>
-        <button class='btn-submit-qz btn-custom' disabled > Trả lời  </button>
-        <button class='btn-submitted btn-custom' style='display:none' > Hoàn thành  </button>
-      </span>
+      </div>
         
       %endif
 
@@ -341,6 +349,11 @@ from openedx.core.djangolib.markup import HTML
 const problemElement = document.querySelector('.problem');
 const btnSubmit = document.querySelector('.btn-submit-qz')
 const btnNext = document.querySelector('#btn-next')
+const problemBtn = document.querySelector('#problem-buttom')
+
+
+var currentIndex = 0;  
+
 
 if (problemList.length > 1 && btnSubmit && btnNext) {
   const divContainer = document.createElement('div');
@@ -351,7 +364,8 @@ if (problemList.length > 1 && btnSubmit && btnNext) {
     const spanElement = document.createElement('span');
     spanElement.textContent = (i + 1).toString();
     spanElement.classList.add('problem-question-number');
-
+    spanElement.setAttribute('data-problem-number-id', i.toString());
+    
     const submittedInput = problemList[i].querySelector('input.submitted');
     const incorrectLabel = problemList[i].querySelector('label.choicegroup_correct');
     const wrongLabel = problemList[i].querySelector('label.choicegroup_incorrect')
@@ -362,15 +376,18 @@ if (problemList.length > 1 && btnSubmit && btnNext) {
 
     if (i == 0){
       spanElement.classList.add('active-number')
+
       if (submittedInput && incorrectLabel) {
         btnSubmit.style.display = 'none';
         btnNext.style.display = 'block';
+        spanElement.classList.add('submitted-question');
         const inputs = problemList[i].querySelectorAll('input:checked');
         inputs.forEach(input => input.classList.add('success-problem'))
-      }else {
-          spanElement.classList.add('err-number-qusetion')
+      }
+      else if (submittedInput && wrongLabel){
+        spanElement.classList.add('err-number-qusetion');
 
-        }
+      }
         
         
     }else {
@@ -409,10 +426,102 @@ if (problemList.length > 1 && btnSubmit && btnNext) {
 
   const elementError = document.querySelector('.err-number-qusetion')
   if(elementError){
-    const numberError = elementError.textContent
-    const indicatorError = problemList[numberError - 1].querySelector('.indicator-container')
+    const numberError = elementError.textContent;
+    const indicatorError = problemList[numberError - 1].querySelector('.indicator-container');
     indicatorError.style.display = 'block';
+    const messgasBox = problemList[numberError - 1].querySelector('.feedback-hint-incorrect');
+    messgasBox.classList.add('error-problem-answer'); 
   }
+ 
+
+
+  const btnNumber = document.querySelectorAll('.problem-question-number');
+
+  btnNumber.forEach(function(element) {
+    element.addEventListener('click', function() {
+      const numnberId = element.getAttribute('data-problem-number-id');
+
+      btnSubmit.setAttribute('disabled', true);
+
+      currentIndex = parseInt(numnberId, 10);
+      btnNumber.forEach(function(btn) {
+        btn.classList.remove('active-number');
+      });
+     
+      problemList.forEach(function(problem) {
+        problem.style.display = 'none';
+      });
+  
+      const submittedInput = problemList[currentIndex].querySelector('input.submitted');
+      const incorrectLabel = problemList[currentIndex].querySelector('label.choicegroup_correct');
+      const wrongLabel = problemList[currentIndex].querySelector('label.choicegroup_incorrect')
+
+
+      if (problemList[currentIndex]) {
+        problemList[currentIndex].style.display = 'block';
+      element.classList.add('active-number')
+
+      if (element.classList.contains('err-number-qusetion')) {
+        const indicator = problemList[currentIndex].querySelector('.indicator-container')
+        indicator.style.display = 'block';
+
+        btnNext.style.display = 'none';
+        btnSubmit.style.display = 'block';
+
+        const messgasBox = problemList[currentIndex].querySelector('.feedback-hint-incorrect');
+        messgasBox.classList.add('error-problem-answer'); 
+
+        
+          const checkedInput = problemList[currentIndex].querySelectorAll('.field input:checked')
+       
+          checkedInput.forEach(function (element,index) {
+            
+            const input = element;
+            const label = document.querySelector('label[for="' + element.id + '"]');
+            input.classList.add('submitted');
+            input.classList.remove('success-problem');
+            label.classList.remove('choicegroup_correct')
+            label.classList.add( 'choicegroup_incorrect');
+        });
+
+
+      }
+      if (incorrectLabel){
+        btnNext.style.display = 'block';
+        btnSubmit.style.display = 'none';
+      }
+      else if (!incorrectLabel && !wrongLabel){
+        btnNext.style.display = 'none';
+        btnSubmit.style.display = 'block';
+
+      }
+      else if (wrongLabel){
+        btnNext.style.display = 'none';
+        btnSubmit.style.display = 'block';
+
+       
+      }
+      
+      const checkInput = problemList[currentIndex].querySelectorAll('input[type="checkbox"], input[type="radio"]' )
+
+      checkInput.forEach(input => {
+        input.addEventListener('change', ()=>{
+          const atLeastOneChecked = Array.from(checkInput).some(inp => inp.checked);
+          if (atLeastOneChecked) {
+            btnSubmit.removeAttribute('disabled');
+          } else {
+            btnSubmit.setAttribute('disabled', true);
+          }
+        });
+      });
+
+      }
+
+     
+    });
+
+  });
+
 }
 
 

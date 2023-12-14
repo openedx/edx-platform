@@ -23841,3 +23841,136 @@ msgstr "File ảnh: jpg,jpeg,png. Kích thước tối đa 5MB"
 #: lms/templates/feedback_form.html
 msgid "<p>In case you have problems with the mentor Q&A function, please see the instructions below to handle it:</p> <p><strong>A. In case you sent a question but couldn't find a mentor</strong></p> <ol> <li> Please try again in a few minutes, or try during direct hours from <strong>8h-23h</strong>. If not, go to step 2. </li> <li>Text to hannah in charge for support</li> </ol> <p><strong>B. In case you do not see the Ask Mentors section or do not see the full content of the question input</strong></p> <ol> <li>Please press <strong>F5</strong> after a few minutes. If not, go to step 2</li> <li>Text to hannah in charge for support</li> </ol>"
 msgstr "<p>Trường hợp bạn gặp vấn đề với chức năng hỏi đáp mentor, vui lòng xem hướng dẫn dưới để xử lý:</p> <p><strong>A. Trường hợp đã gửi câu hỏi nhưng không tìm được mentor</strong></p> <ol> <li> Vui lòng thử lại sau vài phút, hoặc thử vào giờ trực chính từ <strong>8h-23h</strong>. Nếu không được, hãy sang bước 2. </li> <li>Nhắn hannah phụ trách để được hỗ trợ</li> </ol> <p><strong>B. Trường hợp không thấy mục Ask Mentors hoặc không thấy hiện ra đầy đủ nội dung nhập câu hỏi</strong></p> <ol> <li>Vui lòng nhấn <strong>F5</strong> sau vài phút. Nếu không được, hãy sang bước 2</li> <li>Nhắn hannah phụ trách để được hỗ trợ</li> </ol>"
+
+msgid "Submission Results"
+msgstr "Kết quả bài nộp"
+
+#: 
+msgid "Feedback Details"
+msgstr "Nhận xét chi tiết"
+
+#: 
+msgid "Reviewer Note"
+msgstr "Nhận xét của mentor"
+
+#: 
+#: templates/openassessmentblock/response/submit.html
+msgid "Resubmit"
+msgstr "Nộp lại bài"
+
+#: 
+msgid "Submission History"
+msgstr "Lịch sử nộp bài"
+
+#: 
+msgid "Choose a different project submission"
+msgstr "Chọn bài nộp"
+
+#: 
+msgid "Upload Zip File"
+msgstr "Tải lên file zip"
+
+#: 
+msgid "Compress your project file(s) into a single zip file on your computer. 500 MB limit."
+msgstr "Nén các file của bạn thành một file zip duy nhất, tối đa 500 MB."
+
+#: 
+msgid "Choose File"
+msgstr "Chọn file"
+
+#: 
+msgid "Submission Details (optional)"
+msgstr "Ghi chú bài nộp (tùy chọn)"
+
+#: 
+msgid "Are there any areas you would like your reviewer to pay particular attention to?"
+msgstr "Có phần nào trong bài nộp bạn muốn mentor đặc biệt chú ý đến không?"
+
+#: 
+msgid "You must agree to the following before submitting your project."
+msgstr "Bạn cần đồng ý các điều sau trước khi nộp bài"
+
+#: 
+msgid "I affirm that I have read Funix's definitoin of plagiarism, and that this submission is my own work."
+msgstr "Tôi đã đọc định nghĩa của Funix về đạo văn, và tôi khẳng định đây là bài làm của chính tôi."
+
+#: 
+msgid "I have correctly attributed all content obtained from other sources, such as websites, books, forums, blogs, GitHub repos, etc."
+msgstr "Tôi đã ghi rõ nguồn của tất cả nội dung được lấy từ các nguồn khác nhau, như các trang web, sách, diễn đàn, blog, kho lưu trữ GitHub, v.v."
+
+#: 
+msgid "I unserstand that Funix actively checks submissions for plagiarism and that failure to adhere to the Funix Honor Code may result in the cancellation of my enrollment."
+msgstr "Tôi hiểu rằng Funix thường xuyên kiểm tra bài nộp để phát hiện vi phạm bản quyền và vi phạm Đạo đức học sinh của Funix, và việc không tuân thủ có thể dẫn đến hủy bỏ việc nộp bài của tôi."
+
+#: 
+msgid "Resubmit Assignment"
+msgstr "Nộp lại bài"
+
+#: 
+msgid "Complete both slide deck templates and check your work against the Rubric."
+msgstr "Hoàn thành cả hai mẫu bản trình chiếu và kiểm tra bài nộp của bạn dựa trên Rubric."
+
+#: 
+msgid "Include both template files in a ZIP file called PYUR_Final_Project.zip"
+msgstr "Cho cả hai file mẫu vào một file ZIP có tên là PYUR_Final_Project.zip."
+
+#: 
+msgid "Upload this ZIP file in your submission."
+msgstr "Tải lên tệp ZIP này trong bài gửi của bạn."
+
+#: 
+msgid "Learn the best practices for revising and resubmitting your project. "
+msgstr "Tìm hiểu các phương pháp tốt nhất để sửa đổi và gửi lại bài nộp của bạn. "
+
+#: 
+msgid "View Video"
+msgstr "Xem Video"
+
+#: 
+msgid "Submission In Review"
+msgstr "Bài nộp đang được chấm"
+
+#: 
+msgid "Submission Did Not Pass"
+msgstr "Bài nộp không đạt"
+
+#: 
+msgid "Submission Passed"
+msgstr "Bài nộp đạt"
+
+#: 
+msgid "Submission Passed"
+msgstr "Bài nộp đạt"
+
+#: 
+msgid "Unable To Review"
+msgstr "Bài nộp không thể chấm"
+
+#:
+msgid "Download Submission"
+msgstr "Tải bài nộp"
+
+#: 
+msgid "Must be .zip file."
+msgstr "Phải là file .zip"
+
+#: 
+msgid "File is too large."
+msgstr "File quá lớn."
+
+#:
+msgid "Confirmation of submission"
+msgstr "Xác nhận nộp bài"
+
+
+#:
+msgid "remove"
+msgstr "Loại bỏ"
+
+#: 
+msgid "You are about to submit your answers to this assignment. Once submitted, you will not be able to edit or submit new submission."
+msgstr "Bạn sắp nộp câu trả lời cho bài tập này. Sau khi gửi bài bạn sẽ không thể chỉnh sửa hoặc nộp bài mới."
+
+msgid "The answer of the document is not correct"
+msgstr "Đáp án của bản chưa chính xác"
+
