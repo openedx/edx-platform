@@ -19,4 +19,4 @@ jobs:
           port: 22
           script: |
             tutor images build openedx --no-cache
-            tutor local restart
+            tutor local launch
