@@ -349,9 +349,10 @@ class GradeLearningProjectXblockAPIView(APIView):
                             components = unit.get_children()
                             for component in components:
                                 if type(component).__name__ == 'AssignmentXBlockWithMixins':
-                                    found_learningprojectxblock = True
-                                    usage_id = str(component.scope_ids.usage_id)
-                                    break
+                                    if (component.has_score):
+                                        found_learningprojectxblock = True
+                                        usage_id = str(component.scope_ids.usage_id)
+                                        break
 
         except Exception as e:
             logging.error(str(e))
