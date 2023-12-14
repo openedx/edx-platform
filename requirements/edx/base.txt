@@ -181,9 +181,7 @@ pillow==7.1.2             # via -r requirements/edx/base.in, edx-enterprise, edx
 pkgconfig==1.5.1          # via xmlsec
 polib==1.1.0              # via edx-i18n-tools
 psutil==1.2.1             # via -r requirements/edx/paver.txt, edx-django-utils
-# modified from https://github.com/openedx/edx-platform/pull/33453
-# for earlier pip version in use on Juniper release
-py2neo --find-links https://github.com/overhangio/py2neo/releases/download/2021.2.3/py2neo-2021.2.3.tar.gz
+py2neo-history==3.1.2
 pycontracts==1.8.12       # via -r requirements/edx/base.in, edx-user-state-client
 pycountry==19.8.18        # via -r requirements/edx/base.in
 pycparser==2.20           # via -r requirements/edx/../edx-sandbox/shared.txt, cffi

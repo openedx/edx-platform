@@ -211,7 +211,7 @@ polib==1.1.0              # via -r requirements/edx/base.txt, -r requirements/ed
 psutil==1.2.1             # via -r requirements/edx/base.txt, edx-django-utils
 # modified from https://github.com/openedx/edx-platform/pull/33453
 # for earlier pip version in use on Juniper release
-py2neo --find-links https://github.com/overhangio/py2neo/releases/download/2021.2.3/py2neo-2021.2.3.tar.gz
+py2neo-history==3.1.2
 py==1.8.1                 # via pytest, tox
 pycodestyle==2.6.0        # via -r requirements/edx/testing.in, flake8
 pycontracts==1.8.12       # via -r requirements/edx/base.txt, edx-user-state-client
