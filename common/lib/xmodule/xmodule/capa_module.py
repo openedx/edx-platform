@@ -29,6 +29,7 @@ from xmodule.x_module import (
 )
 from xmodule.xml_module import XmlMixin
 
+from common.config.waffle import TEACHER_PROGRESS_TACKING_DISABLED_SWITCH
 from .capa_base import CapaMixin, ComplexEncoder, _  # lint-amnesty, pylint: disable=unused-import
 
 log = logging.getLogger("edx.courseware")
@@ -161,6 +162,11 @@ class ProblemBlock(
           'progress' : 'none'/'in_progress'/'done',
           <other request-specific values here > }
         """
+        # Check if the current user is a staff user
+        if self.runtime.user_is_staff and TEACHER_PROGRESS_TACKING_DISABLED_SWITCH.is_enabled():
+            # Prevent staff users from submitting the problem
+            return json.dumps({'success': 'Staff users cannot submit this problem.'})
+
         # self.score is initialized in self.lcp but in this method is accessed before self.lcp so just call it first.
         self.lcp  # lint-amnesty, pylint: disable=pointless-statement
         handlers = {
