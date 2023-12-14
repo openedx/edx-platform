@@ -71,11 +71,11 @@ class CourseRolesPermission(Enum):
             "Published and live, Draft, Staff-only, Published-not-yet-released."
         ),
     )
-    VIEW_ONLY_LIVE_PUBLISHED_CONTENT = PermissionData(
-        "view_only_live_published_content",
-        _("View Only Live Published Content"),
+    VIEW_LIVE_PUBLISHED_CONTENT = PermissionData(
+        "view_live_published_content",
+        _("View Live Published Content"),
         _(
-            "Can only view published-and-live content in a course. "
+            "Can view published-and-live content in a course. "
             "Cannot view published-not-yet-released content. Cannot view Staff-only content."
         ),
     )

@@ -60,7 +60,7 @@ class GetAllUserPermissionsTestcase(SharedModuleStoreTestCase):
         cls.permission_2 = CourseRolesPermission.MANAGE_COURSE_SETTINGS
         cls.permission_3 = CourseRolesPermission.MANAGE_ADVANCED_SETTINGS
         cls.permission_4 = CourseRolesPermission.VIEW_ALL_CONTENT
-        cls.permission_5 = CourseRolesPermission.VIEW_ONLY_LIVE_PUBLISHED_CONTENT
+        cls.permission_5 = CourseRolesPermission.VIEW_LIVE_PUBLISHED_CONTENT
         permission_1 = Permission.objects.create(name=cls.permission_1.value.name)
         permission_2 = Permission.objects.create(name=cls.permission_2.value.name)
         permission_3 = Permission.objects.create(name=cls.permission_3.value.name)

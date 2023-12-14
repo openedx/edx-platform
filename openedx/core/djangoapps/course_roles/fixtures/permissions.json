@@ -38,7 +38,7 @@
         "pk": 6,
         "model": "course_roles.permission",
         "fields": {
-            "name": "view_only_live_published_content"
+            "name": "view_live_published_content"
         }
     },
     {
