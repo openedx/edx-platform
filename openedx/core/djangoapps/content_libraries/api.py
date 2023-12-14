@@ -1250,9 +1250,7 @@ class BaseEdxImportClient(abc.ABC):
         """
         Import a single modulestore block.
         """
-        print(f'modulestore_key {modulestore_key}')
         block_data = self.get_block_data(modulestore_key)
-        print(f'block_data {block_data}')
 
         # Get or create the block in the library.
         #
@@ -1264,19 +1262,18 @@ class BaseEdxImportClient(abc.ABC):
                 str(modulestore_key.course_key).encode()
             ).digest()
         )[:16].decode().lower()
-        print(f'course_key_id {course_key_id}')
-        # Prepend 'c' to allow changing hash without conflicts.
 
         # add the course_key_id if use_course_key_as_suffix is enabled to increase the namespace.
-        # in some cases, for the preservation of child-parent relationships
-        # of the same content across modulestore and blockstore, only the block_id is used.
-        block_id = block_id = (
+        # The option exists to not use the course key as a suffix because
+        # in order to preserve learner state in the v1 to v2 libraries migration,
+        # the v2 and v1 libraries' child block ids must be the same.
+        block_id = (
+            # Prepend 'c' to allow changing hash without conflicts.
             f"{modulestore_key.block_id}_c{course_key_id}"
             if self.use_course_key_as_block_id_suffix
             else f"{modulestore_key.block_id}"
         )
 
-        print(f'block_id {block_id}')
         log.info('Importing to library block: id=%s', block_id)
         try:
             library_block = create_library_block(
@@ -1355,7 +1352,6 @@ class EdxModulestoreImportClient(BaseEdxImportClient):
         """
         Initialize the client with a modulestore instance.
         """
-        print(kwargs.items())
         super().__init__(**kwargs)
         self.modulestore = modulestore_instance or modulestore()
 
