@@ -19,7 +19,3 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             cd tutor
-            export TUTOR_ROOT=$(pwd)/tutor
-            export TUTOR_PLUGINS_ROOT=$(pwd)/tutor-plugins
-            . tutor-venv/bin/activate
-            echo -e "n\n\n\n"  | tutor local launch
