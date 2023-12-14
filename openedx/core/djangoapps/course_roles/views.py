@@ -55,6 +55,8 @@ class UserPermissionsView(APIView):
         except CourseNotFoundError as exc:
             raise NotFound(f'course_key: {course_key} not found') from exc
         permissions = {
+                'user_id': user_id,
+                'course_key': str(course_key),
                 'permissions': {permission.value.name for permission in permissions_set},
             }
         return Response(permissions)

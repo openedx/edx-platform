@@ -70,6 +70,8 @@ class UserPermissionsViewTestCase(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Ensure the view returns the correct permissions for the user
         self.assertEqual(response.data['permissions'], expected_api_response['permissions'])
+        self.assertEqual(response.data['user_id'], str(self.user_1.id))
+        self.assertEqual(response.data['course_key'], str(self.course_1.id))
 
     @ddt.data(
         (None, None),
