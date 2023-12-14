@@ -25,10 +25,10 @@ perms[f'course_roles.{CourseRolesPermission.VIEW_ALL_CONTENT.value.name}'] = (
     HasRolesRule('staff', 'instructor', 'limited_staff')
     | HasPermissionRule(CourseRolesPermission.VIEW_ALL_CONTENT)
 )
-perms[f'course_roles.{CourseRolesPermission.VIEW_ONLY_LIVE_PUBLISHED_CONTENT.value.name}'] = (
+perms[f'course_roles.{CourseRolesPermission.VIEW_LIVE_PUBLISHED_CONTENT.value.name}'] = (
     HasRolesRule('beta_testers', 'ccx_coach')
     | HasForumsRolesRule('administrator')
-    | HasPermissionRule(CourseRolesPermission.VIEW_ONLY_LIVE_PUBLISHED_CONTENT)
+    | HasPermissionRule(CourseRolesPermission.VIEW_LIVE_PUBLISHED_CONTENT)
 )
 perms[f'course_roles.{CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.value.name}'] = (
     HasPermissionRule(CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT)
