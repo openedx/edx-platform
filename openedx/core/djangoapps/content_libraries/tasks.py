@@ -17,7 +17,6 @@ Architecture note:
 from __future__ import annotations
 
 import logging
-import hashlib
 
 from celery import shared_task
 from celery_utils.logged_task import LoggedTask
@@ -28,7 +27,9 @@ from edx_django_utils.monitoring import set_code_owner_attribute, set_code_owner
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import (
     BlockUsageLocator,
-    LibraryUsageLocatorV2
+    LibraryLocatorV2,
+    LibraryUsageLocatorV2,
+    LibraryLocator as LibraryLocatorV1
 )
 
 from user_tasks.tasks import UserTask, UserTaskStatus
@@ -36,11 +37,6 @@ from xblock.fields import Scope
 
 from common.djangoapps.student.auth import has_studio_write_access
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locator import (
-    LibraryLocatorV2,
-    LibraryUsageLocatorV2,
-    LibraryLocator as LibraryLocatorV1
-)
 from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.xblock.api import load_block
 from openedx.core.lib import ensure_cms, blockstore_api
@@ -100,9 +96,13 @@ def _import_block(store, user_id, source_block, dest_parent_key):
         """
         if not isinstance(source_key.lib_key, LibraryLocatorV2):
             raise ValueError("Input must be an instance of LibraryLocatorV2")
-        source_key_as_v1_course_key = LibraryLocatorV1(org=source_key.lib_key.org, library=source_key.lib_key.slug, branch='library')
+        source_key_as_v1_course_key = LibraryLocatorV1(
+            org=source_key.lib_key.org,
+            library=source_key.lib_key.slug,
+            branch='library'
+        )
         source_key_usage_id_as_block_key = BlockKey(
-            type= source_key.block_type,
+            type=source_key.block_type,
             id=source_key.usage_id,
         )
         block_id = derived_key(
