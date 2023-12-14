@@ -25,7 +25,6 @@ from openedx.core.lib.xblock_utils import (
     wrap_xblock,
     wrap_xblock_aside,
 )
-from openedx.core.djangoapps.content_tagging.api import get_object_tag_counts
 from xmodule.modulestore.django import (
     modulestore,
 )  # lint-amnesty, pylint: disable=wrong-import-order
@@ -52,7 +51,10 @@ from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
     get_xblock,
     delete_orphans,
 )
-from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import usage_key_with_run
+from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import (
+    usage_key_with_run,
+    get_children_tags_count,
+)
 
 
 __all__ = [
@@ -234,10 +236,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
             # Fetch tags of children components
             tags_count_map = {}
             if use_tagging_taxonomy_list_page():
-                children = xblock.get_children()
-                child_usage_keys = [str(child.location) for child in children]
-                tags_count_query = ','.join(child_usage_keys)
-                tags_count_map = get_object_tag_counts(tags_count_query)
+                tags_count_map = get_children_tags_count(xblock)
 
             # Set up the context to be passed to each XBlock's render method.
             context = request.GET.dict()
