@@ -13,9 +13,9 @@ jobs:
       - name: Deploy docker image to EC2
         uses: appleboy/ssh-action@v0.1.4
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY }}
-          port: ${{ secrets.PORT }}
+          host: ${{ secrets.DEV_IP }}
+          username: ${{ secrets.DEV_USERNAME }}
+          key: ${{ secrets.DEV_KEY }}
+          port: 22
           script: |
             cd tutor
