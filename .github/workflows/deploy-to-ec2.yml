@@ -18,4 +18,5 @@ jobs:
           key: ${{ secrets.DEV_KEY }}
           port: 22
           script: |
-            cd tutor
+            tutor images build openedx --no-cache
+            tutor local restart
