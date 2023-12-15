@@ -825,7 +825,7 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2017-08-28
     # .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1880
-    'ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA': False,
+    'ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA': True,
 
     # .. toggle_name: FEATURES['ENABLE_PASSWORD_RESET_FAILURE_EMAIL']
     # .. toggle_implementation: DjangoSetting
