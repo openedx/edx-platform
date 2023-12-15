@@ -10,7 +10,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta  # for months test
 from .models import SurveyReport
 from django.urls import reverse
-
+from django.conf import settings
 
 def admin_extra_context(request):
     """
@@ -19,7 +19,7 @@ def admin_extra_context(request):
     The current treshhold to show the banner is one month but this can be redefined in the future
 
     """
-    months = 6
+    months = settings.SURVEY_REPORT_CHECK_THRESHOLD
     if not request.path.startswith(reverse('admin:index')):
         return {'show_survey_report_banner': False, }
 
