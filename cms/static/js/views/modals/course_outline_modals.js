@@ -314,6 +314,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             var isProctoredExam = xblockInfo.get('is_proctored_exam');
             var isPracticeExam = xblockInfo.get('is_practice_exam');
             var isOnboardingExam = xblockInfo.get('is_onboarding_exam');
+            var enableHideFromTOCUI = xblockInfo.get('enable_hide_from_toc_ui');
             var html = this.template($.extend({}, {
                 xblockInfo: xblockInfo,
                 xblockType: this.options.xblockType,
@@ -323,6 +324,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 isProctoredExam: isProctoredExam,
                 isPracticeExam: isPracticeExam,
                 isOnboardingExam: isOnboardingExam,
+                enableHideFromTOCUI: enableHideFromTOCUI,
                 isTimedExam: isTimeLimited && !(
                     isProctoredExam || isPracticeExam || isOnboardingExam
                 ),
@@ -798,6 +800,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             return this.model.get('ancestor_has_staff_lock');
         },
 
+        isModelHiddenFromTOC: function() {
+            return this.model.get('hide_from_toc');
+        },
+
         getContext: function() {
             return {
                 hasExplicitStaffLock: this.isModelLocked(),
@@ -812,6 +818,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         afterRender: function() {
             AbstractVisibilityEditor.prototype.afterRender.call(this);
             this.setLock(this.isModelLocked());
+            this.setHideFromTOC(this.isModelHiddenFromTOC());
+            this.setVisibleToLearners(this.isVisibleToLearners());
         },
 
         setLock: function(value) {
@@ -822,8 +830,24 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             return this.$('#staff_lock').is(':checked');
         },
 
+        setHideFromTOC: function(value) {
+            this.$('#hide_from_toc').prop('checked', value);
+        },
+
+        setVisibleToLearners: function(value) {
+            this.$('#visible_to_learners').prop('checked', value);
+        },
+
+        isVisibleToLearners: function() {
+            return this.$('#staff_lock').is(':not(:checked)') && this.$('#hide_from_toc').is(':not(:checked)');
+        },
+
+        isHiddenFromTOC: function() {
+            return this.$('#hide_from_toc').is(':checked');
+        },
+
         hasChanges: function() {
-            return this.isModelLocked() !== this.isLocked();
+            return this.isModelLocked() !== this.isLocked() || this.isModelHiddenFromTOC() !== this.isHiddenFromTOC();
         },
 
         getRequestData: function() {
@@ -831,7 +855,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 return {
                     publish: 'republish',
                     metadata: {
-                        visible_to_staff_only: this.isLocked() ? true : null
+                        visible_to_staff_only: this.isLocked() ? true : null,
+                        hide_from_toc: this.isHiddenFromTOC() ? true : null
                     }
                 };
             } else {
@@ -1055,12 +1080,20 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 if (this.currentVisibility() === 'staff_only') {
                     metadata.visible_to_staff_only = true;
                     metadata.hide_after_due = null;
+                    metadata.hide_from_toc = null;
                 } else if (this.currentVisibility() === 'hide_after_due') {
                     metadata.visible_to_staff_only = null;
                     metadata.hide_after_due = true;
-                } else {
+                    metadata.hide_from_toc = null;
+                } else if (this.currentVisibility() === 'hide_from_toc'){
                     metadata.visible_to_staff_only = null;
                     metadata.hide_after_due = null;
+                    metadata.hide_from_toc = true;
+                }
+                else {
+                    metadata.visible_to_staff_only = null;
+                    metadata.hide_after_due = null;
+                    metadata.hide_from_toc = null;
                 }
 
                 return {
