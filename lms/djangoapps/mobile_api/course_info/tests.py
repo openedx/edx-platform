@@ -294,7 +294,7 @@ class TestBlocksInfoInCourseView(TestBlocksInCourseView):  # lint-amnesty, pylin
         assert response.data['name'] == self.course.display_name
         assert response.data['number'] == self.course.display_number_with_default
         assert response.data['org'] == self.course.display_org_with_default
-        assert response.data['start'] == self.course.start
+        assert response.data['start'] == self.course.start.strftime('%Y-%m-%dT%H:%M:%SZ')
         assert response.data['start_display'] == 'July 17, 2015'
         assert response.data['start_type'] == 'timestamp'
         assert response.data['end'] == self.course.end

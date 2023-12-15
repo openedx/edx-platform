@@ -16,6 +16,7 @@ from lms.djangoapps.certificates.api import certificate_downloadable_status
 from lms.djangoapps.courseware.courses import get_course_info_section_block
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.course_api.blocks.views import BlocksInCourseView
+from lms.djangoapps.mobile_api.course_info.serializers import CourseInfoOverviewSerializer
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.lib.xblock_utils import get_course_update_items
@@ -212,7 +213,8 @@ class BlocksInfoInCourseView(BlocksInCourseView):
 
     **Response example**
 
-        Body consists of the following fields:
+        Body consists of the following fields, you received this response if you use
+        'return_type=dict' in query params:
 
         root: (str) The ID of the root node of the requested course block structure.\
         blocks: (dict) A dictionary or list, based on the value of the
@@ -240,6 +242,22 @@ class BlocksInfoInCourseView(BlocksInCourseView):
                 * uri: The location of the user's certificate
         is_self_paced: (bool) Indicates if the course is self paced
 
+        Body consists of the following fields, you received this response if you use
+        'return_type=list' in query params:
+
+        id: (str) The Course's id (Course Run key)
+        block_id: (str) The unique identifier for the block_id
+        lms_web_url: (str) The URL to the navigational container of the xBlock on the web.
+        legacy_web_url: (str) Like `lms_web_url`, but always directs to
+            the "Legacy" frontend experience.
+        student_view_url: (str) The URL to retrieve the HTML rendering
+            of this block's student view
+        type: (str): The type of block. Possible values the names of any
+            XBlock type in the system, including custom blocks. Examples are
+            course, chapter, sequential, vertical, html, problem, video, and
+            discussion.
+        display_name: (str) The display name of the block.
+
     **Returns**
 
         * 200 on success with above fields.
@@ -252,7 +270,16 @@ class BlocksInfoInCourseView(BlocksInCourseView):
     """
 
     def get_certificate(self, request, course_id):
-        """Returns the information about the user's certificate in the course."""
+        """
+        Returns the information about the user's certificate in the course.
+
+        Arguments:
+            request (Request): The request object.
+            course_id (str): The identifier of the course.
+        Returns:
+            (dict): A dict containing information about location of the user's certificate
+            or an empty dictionary, if there is no certificate.
+        """
         if request.user.is_authenticated:
             certificate_info = certificate_downloadable_status(request.user, course_id)
             if certificate_info['is_downloadable']:
@@ -262,35 +289,6 @@ class BlocksInfoInCourseView(BlocksInCourseView):
                     ),
                 }
         return {}
-
-    @staticmethod
-    def compose_course_info(course_overview):
-        """
-        Method for obtaining additional information about the course.
-
-        Arguments:
-            request - Django request object
-        """
-
-        course_data = {
-            # identifiers
-            'name': course_overview.display_name,
-            'number': course_overview.display_number_with_default,
-            'org': course_overview.display_org_with_default,
-
-            # dates
-            'start': course_overview.start,
-            'start_display': course_overview.start_display,
-            'start_type': course_overview.start_type,
-            'end': course_overview.end,
-
-            # various URLs
-            'media': {
-                'image': course_overview.image_urls,
-            },
-            'is_self_paced': course_overview.self_paced
-        }
-        return course_data
 
     def list(self, request, **kwargs):  # pylint: disable=W0221
         """
@@ -311,7 +309,6 @@ class BlocksInfoInCourseView(BlocksInCourseView):
                 'id': course_id,
                 'certificate': self.get_certificate(request, course_key),
             }
-
-            course_data.update(BlocksInfoInCourseView.compose_course_info(course_overview))
+            course_data.update(CourseInfoOverviewSerializer(course_overview).data)
             response.data.update(course_data)
         return response
