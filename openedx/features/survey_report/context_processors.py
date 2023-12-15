@@ -9,6 +9,7 @@ across all admin pages in case a survey report has not been generated
 from datetime import datetime
 from dateutil.relativedelta import relativedelta  # for months test
 from .models import SurveyReport
+from django.urls import reverse
 
 
 def admin_extra_context(request):
@@ -18,14 +19,15 @@ def admin_extra_context(request):
     The current treshhold to show the banner is one month but this can be redefined in the future
 
     """
-    months = 1
+    months = 6
+    if not request.path.startswith(reverse('admin:index')):
+        return {'show_survey_report_banner': False, }
+
     try:
         latest_report = SurveyReport.objects.latest('created_at')
         months_treshhold = datetime.today().date() - relativedelta(months=months)  # Calculate date one month ago
         show_survey_report_banner = latest_report.created_at.date() <= months_treshhold
     except SurveyReport.DoesNotExist:
-        show_survey_report_banner = False
+        show_survey_report_banner = True
 
-    return {
-        'show_survey_report_banner': show_survey_report_banner,
-    }
+    return {'show_survey_report_banner': show_survey_report_banner, }
