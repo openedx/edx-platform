@@ -11,10 +11,12 @@
 define(['jquery', 'underscore', 'js/views/xblock_outline', 'edx-ui-toolkit/js/utils/string-utils',
     'common/js/components/utils/view_utils', 'js/views/utils/xblock_utils',
     'js/models/xblock_outline_info', 'js/views/modals/course_outline_modals', 'js/utils/drag_and_drop',
-    'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',],
+    'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
+    'js/views/utils/tagging_drawer_utils',],
 function(
     $, _, XBlockOutlineView, StringUtils, ViewUtils, XBlockViewUtils,
-    XBlockOutlineInfo, CourseOutlineModalsFactory, ContentDragger, NotificationView, PromptView
+    XBlockOutlineInfo, CourseOutlineModalsFactory, ContentDragger, NotificationView, PromptView,
+    TaggingDrawerUtils
 ) {
     var CourseOutlineView = XBlockOutlineView.extend({
         // takes XBlockOutlineInfo as a model
@@ -458,6 +460,14 @@ function(
             event.stopPropagation();
         },
 
+        openManageTagsDrawer() {
+            const article = document.querySelector('[data-taxonomy-tags-widget-url]');
+            const taxonomyTagsWidgetUrl = $(article).attr('data-taxonomy-tags-widget-url');
+            const contentId = this.model.get('id');
+
+            TaggingDrawerUtils.openDrawer(taxonomyTagsWidgetUrl, contentId);
+        },
+
         addButtonActions: function(element) {
             XBlockOutlineView.prototype.addButtonActions.apply(this, arguments);
             element.find('.configure-button').click(function(event) {
@@ -477,6 +487,10 @@ function(
             element.find('.copy-button').click((event) => {
                 event.preventDefault();
                 this.copyXBlock();
+            });
+            element.find('.manage-tags-button').click((event) => {
+                event.preventDefault();
+                this.openManageTagsDrawer();
             });
             element.find('.paste-component-button').click((event) => {
                 event.preventDefault();

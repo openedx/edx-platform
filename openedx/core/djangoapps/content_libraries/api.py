@@ -48,7 +48,7 @@ remote platform instances as well as local modulestore APIs.  Additionally,
 there are Celery-based interfaces suitable for background processing controlled
 through RESTful APIs (see :mod:`.views`).
 """
-
+from __future__ import annotations
 
 import abc
 import collections
@@ -67,7 +67,6 @@ from django.core.exceptions import PermissionDenied
 from django.core.validators import validate_unicode_slug
 from django.db import IntegrityError, transaction
 from django.utils.translation import gettext as _
-from elasticsearch.exceptions import ConnectionError as ElasticConnectionError
 from lxml import etree
 from opaque_keys.edx.keys import LearningContextKey, UsageKey
 from opaque_keys.edx.locator import (
@@ -76,6 +75,7 @@ from opaque_keys.edx.locator import (
     LibraryUsageLocatorV2,
     LibraryLocator as LibraryLocatorV1
 )
+from opaque_keys import InvalidKeyError
 from openedx_events.content_authoring.data import ContentLibraryData, LibraryBlockData
 from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_CREATED,
@@ -85,21 +85,19 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED,
 )
-
 from organizations.models import Organization
 from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
 from edx_rest_api_client.client import OAuthAPIClient
+
 from openedx.core.djangoapps.content_libraries import permissions
 from openedx.core.djangoapps.content_libraries.constants import DRAFT_NAME, COMPLEX
 from openedx.core.djangoapps.content_libraries.library_bundle import LibraryBundle
-from openedx.core.djangoapps.content_libraries.libraries_index import ContentLibraryIndexer, LibraryBlockIndexer
 from openedx.core.djangoapps.content_libraries.models import (
     ContentLibrary,
     ContentLibraryPermission,
     ContentLibraryBlockImportTask,
 )
-
 from openedx.core.djangoapps.xblock.api import (
     get_block_display_name,
     get_learning_context_impl,
@@ -124,7 +122,10 @@ from openedx.core.lib.blockstore_api import (
 )
 from openedx.core.djangolib import blockstore_cache
 from openedx.core.djangolib.blockstore_cache import BundleCache
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.library_root_xblock import LibraryRoot as LibraryRootV1
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from . import tasks
 
@@ -287,56 +288,35 @@ def get_libraries_for_user(user, org=None, library_type=None):
     return permissions.perms[permissions.CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, qs)
 
 
-def get_metadata_from_index(queryset, text_search=None):
+def get_metadata(queryset, text_search=None):
     """
-    Take a list of ContentLibrary objects and return metadata stored in
-    ContentLibraryIndex.
+    Take a list of ContentLibrary objects and return metadata from blockstore.
     """
-    metadata = None
-    if ContentLibraryIndexer.indexing_is_enabled():
-        try:
-            library_keys = [str(lib.library_key) for lib in queryset]
-            metadata = ContentLibraryIndexer.get_items(library_keys, text_search=text_search)
-            metadata_dict = {
-                item["id"]: item
-                for item in metadata
-            }
-            metadata = [
-                metadata_dict[key]
-                if key in metadata_dict
-                else None
-                for key in library_keys
-            ]
-        except ElasticConnectionError as e:
-            log.exception(e)
+    uuids = [lib.bundle_uuid for lib in queryset]
+    bundles = get_bundles(uuids=uuids, text_search=text_search)
 
-    # If ContentLibraryIndex is not available, we query blockstore for a limited set of metadata
-    if metadata is None:
-        uuids = [lib.bundle_uuid for lib in queryset]
-        bundles = get_bundles(uuids=uuids, text_search=text_search)
+    if text_search:
+        # Bundle APIs can't apply text_search on a bundle's org, so including those results here
+        queryset_org_search = queryset.filter(org__short_name__icontains=text_search)
+        if queryset_org_search.exists():
+            uuids_org_search = [lib.bundle_uuid for lib in queryset_org_search]
+            bundles += get_bundles(uuids=uuids_org_search)
 
-        if text_search:
-            # Bundle APIs can't apply text_search on a bundle's org, so including those results here
-            queryset_org_search = queryset.filter(org__short_name__icontains=text_search)
-            if queryset_org_search.exists():
-                uuids_org_search = [lib.bundle_uuid for lib in queryset_org_search]
-                bundles += get_bundles(uuids=uuids_org_search)
-
-        bundle_dict = {
-            bundle.uuid: {
-                'uuid': bundle.uuid,
-                'title': bundle.title,
-                'description': bundle.description,
-                'version': bundle.latest_version,
-            }
-            for bundle in bundles
+    bundle_dict = {
+        bundle.uuid: {
+            'uuid': bundle.uuid,
+            'title': bundle.title,
+            'description': bundle.description,
+            'version': bundle.latest_version,
         }
-        metadata = [
-            bundle_dict[uuid]
-            if uuid in bundle_dict
-            else None
-            for uuid in uuids
-        ]
+        for bundle in bundles
+    }
+    metadata = [
+        bundle_dict[uuid]
+        if uuid in bundle_dict
+        else None
+        for uuid in uuids
+    ]
 
     libraries = [
         ContentLibraryMetadata(
@@ -639,56 +619,34 @@ def delete_library(library_key):
         raise
 
 
-def get_library_blocks(library_key, text_search=None, block_types=None):
+def get_library_blocks(library_key, text_search=None, block_types=None) -> list[LibraryXBlockMetadata]:
     """
     Get the list of top-level XBlocks in the specified library.
 
     Returns a list of LibraryXBlockMetadata objects
     """
-    metadata = None
-    if LibraryBlockIndexer.indexing_is_enabled():
-        try:
-            filter_terms = {
-                'library_key': [str(library_key)],
-                'is_child': [False],
-            }
-            if block_types:
-                filter_terms['block_type'] = block_types
-            metadata = [
-                {
-                    **item,
-                    "id": LibraryUsageLocatorV2.from_string(item['id']),
-                }
-                for item in LibraryBlockIndexer.get_items(filter_terms=filter_terms, text_search=text_search)
-                if item is not None
-            ]
-        except ElasticConnectionError as e:
-            log.exception(e)
+    metadata = []
+    ref = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    lib_bundle = LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME)
+    usages = lib_bundle.get_top_level_usages()
 
-    # If indexing is disabled, or connection to elastic failed
-    if metadata is None:
-        metadata = []
-        ref = ContentLibrary.objects.get_by_key(library_key)
-        lib_bundle = LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME)
-        usages = lib_bundle.get_top_level_usages()
-
-        for usage_key in usages:
-            # For top-level definitions, we can go from definition key to usage key using the following, but this would
-            # not work for non-top-level blocks as they may have multiple usages. Top level blocks are guaranteed to
-            # have only a single usage in the library, which is part of the definition of top level block.
-            def_key = lib_bundle.definition_for_usage(usage_key)
-            display_name = get_block_display_name(def_key)
-            text_match = (text_search is None or
-                          text_search.lower() in display_name.lower() or
-                          text_search.lower() in str(usage_key).lower())
-            type_match = (block_types is None or usage_key.block_type in block_types)
-            if text_match and type_match:
-                metadata.append({
-                    "id": usage_key,
-                    "def_key": def_key,
-                    "display_name": display_name,
-                    "has_unpublished_changes": lib_bundle.does_definition_have_unpublished_changes(def_key),
-                })
+    for usage_key in usages:
+        # For top-level definitions, we can go from definition key to usage key using the following, but this would
+        # not work for non-top-level blocks as they may have multiple usages. Top level blocks are guaranteed to
+        # have only a single usage in the library, which is part of the definition of top level block.
+        def_key = lib_bundle.definition_for_usage(usage_key)
+        display_name = get_block_display_name(def_key)
+        text_match = (text_search is None or
+                      text_search.lower() in display_name.lower() or
+                      text_search.lower() in str(usage_key).lower())
+        type_match = (block_types is None or usage_key.block_type in block_types)
+        if text_match and type_match:
+            metadata.append({
+                "id": usage_key,
+                "def_key": def_key,
+                "display_name": display_name,
+                "has_unpublished_changes": lib_bundle.does_definition_have_unpublished_changes(def_key),
+            })
 
     return [
         LibraryXBlockMetadata(
@@ -701,7 +659,7 @@ def get_library_blocks(library_key, text_search=None, block_types=None):
     ]
 
 
-def _lookup_usage_key(usage_key):
+def _lookup_usage_key(usage_key) -> tuple[BundleDefinitionLocator, LibraryBundle]:
     """
     Given a LibraryUsageLocatorV2 (usage key for an XBlock in a content library)
     return the definition key and LibraryBundle
@@ -716,7 +674,7 @@ def _lookup_usage_key(usage_key):
     return def_key, lib_bundle
 
 
-def get_library_block(usage_key):
+def get_library_block(usage_key) -> LibraryXBlockMetadata:
     """
     Get metadata (LibraryXBlockMetadata) about one specific XBlock in a library
 
@@ -888,7 +846,7 @@ def delete_library_block(usage_key, remove_from_parent=True):
     )
 
 
-def create_library_block_child(parent_usage_key, block_type, definition_id):
+def create_library_block_child(parent_usage_key, block_type, definition_id) -> LibraryXBlockMetadata:
     """
     Create a new XBlock definition in this library of the specified type (e.g.
     "html"), and add it as a child of the specified existing block.
@@ -908,7 +866,7 @@ def create_library_block_child(parent_usage_key, block_type, definition_id):
     include_data = XBlockInclude(link_id=None, block_type=block_type, definition_id=definition_id, usage_hint=None)
     parent_block.runtime.add_child_include(parent_block, include_data)
     parent_block.save()
-    ref = ContentLibrary.objects.get_by_key(parent_usage_key.context_key)
+    ref = ContentLibrary.objects.get_by_key(parent_usage_key.context_key)  # type: ignore[attr-defined]
     LIBRARY_BLOCK_UPDATED.send_event(
         library_block=LibraryBlockData(
             library_key=ref.library_key,
@@ -1163,6 +1121,77 @@ def revert_changes(library_key):
             update_blocks=True
         )
     )
+
+
+# V1/V2 Compatibility Helpers
+# (Should be removed as part of
+#  https://github.com/openedx/edx-platform/issues/32457)
+# ======================================================
+
+def get_v1_or_v2_library(
+    library_id: str | LibraryLocatorV1 | LibraryLocatorV2,
+    version: str | int | None,
+) -> LibraryRootV1 | ContentLibraryMetadata | None:
+    """
+    Fetch either a V1 or V2 content library from a V1/V2 key (or key string) and version.
+
+    V1 library versions are Mongo ObjectID strings.
+    V2 library versions can be positive ints, or strings of positive ints.
+    Passing version=None will return the latest version the library.
+
+    Returns None if not found.
+    If key is invalid, raises InvalidKeyError.
+    For V1, if key has a version, it is ignored in favor of `version`.
+    For V2, if version is provided but it isn't an int or parseable to one, we raise a ValueError.
+
+    Examples:
+    * get_v1_or_v2_library("library-v1:ProblemX+PR0B", None)       -> <LibraryRootV1>
+    * get_v1_or_v2_library("library-v1:ProblemX+PR0B", "65ff...")  -> <LibraryRootV1>
+    * get_v1_or_v2_library("lib:RG:rg-1", None)                    -> <ContentLibraryMetadata>
+    * get_v1_or_v2_library("lib:RG:rg-1", "36")                    -> <ContentLibraryMetadata>
+    * get_v1_or_v2_library("lib:RG:rg-1", "xyz")                   -> <ValueError>
+    * get_v1_or_v2_library("notakey", "xyz")                       -> <InvalidKeyError>
+
+    If you just want to get a V2 library, use `get_library` instead.
+    """
+    library_key: LibraryLocatorV1 | LibraryLocatorV2
+    if isinstance(library_id, str):
+        try:
+            library_key = LibraryLocatorV1.from_string(library_id)
+        except InvalidKeyError:
+            library_key = LibraryLocatorV2.from_string(library_id)
+    else:
+        library_key = library_id
+    if isinstance(library_key, LibraryLocatorV2):
+        v2_version: int | None
+        if version:
+            v2_version = int(version)
+        else:
+            v2_version = None
+        try:
+            library = get_library(library_key)
+            if v2_version is not None and library.version != v2_version:
+                raise NotImplementedError(
+                    f"Tried to load version {v2_version} of blockstore-based library {library_key}. "
+                    f"Currently, only the latest version ({library.version}) may be loaded. "
+                    "This is a known issue. "
+                    "It will be fixed before the production release of blockstore-based (V2) content libraries. "
+                )
+            return library
+        except ContentLibrary.DoesNotExist:
+            return None
+    elif isinstance(library_key, LibraryLocatorV1):
+        v1_version: str | None
+        if version:
+            v1_version = str(version)
+        else:
+            v1_version = None
+        store = modulestore()
+        library_key = library_key.for_branch(ModuleStoreEnum.BranchName.library).for_version(v1_version)
+        try:
+            return store.get_library(library_key, remove_version=False, remove_branch=False, head_validation=False)
+        except ItemNotFoundError:
+            return None
 
 
 # Import from Courseware

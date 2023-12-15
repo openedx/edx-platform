@@ -1,11 +1,12 @@
 """
 Serializers for v1 contentstore API.
 """
-from .home import CourseHomeSerializer
 from .course_details import CourseDetailsSerializer
-from .course_team import CourseTeamSerializer
 from .course_rerun import CourseRerunSerializer
+from .course_team import CourseTeamSerializer
+from .course_index import CourseIndexSerializer
 from .grading import CourseGradingModelSerializer, CourseGradingSerializer
+from .home import CourseHomeSerializer
 from .proctoring import (
     LimitedProctoredExamSettingsSerializer,
     ProctoredExamConfigurationSerializer,
@@ -13,12 +14,10 @@ from .proctoring import (
     ProctoringErrorsSerializer
 )
 from .settings import CourseSettingsSerializer
-from .xblock import XblockSerializer
 from .videos import (
     CourseVideosSerializer,
     VideoUploadSerializer,
     VideoImageSerializer,
-    VideoUsageSerializer
+    VideoUsageSerializer,
+    VideoDownloadSerializer
 )
-from .transcripts import TranscriptSerializer
-from .assets import AssetSerializer

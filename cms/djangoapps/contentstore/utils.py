@@ -1,6 +1,7 @@
 """
 Common utility functions useful throughout the contentstore
 """
+from __future__ import annotations
 import configparser
 import logging
 from collections import defaultdict
@@ -24,7 +25,8 @@ from pytz import UTC
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.toggles import exam_setting_view_enabled
-from common.djangoapps.course_action_state.models import CourseRerunUIStateManager
+from common.djangoapps.course_action_state.models import CourseRerunUIStateManager, CourseRerunState
+from common.djangoapps.course_action_state.managers import CourseActionStateItemNotFoundError
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.student import auth
@@ -44,9 +46,10 @@ from common.djangoapps.util.milestones_helpers import (
     get_namespace_choices,
     generate_milestone_namespace
 )
+from common.djangoapps.util.date_utils import get_default_time_display
+from common.djangoapps.xblock_django.api import deprecated_xblocks
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from openedx.core import toggles as core_toggles
-from openedx.core.djangoapps.course_apps.toggles import proctoring_settings_modal_view_enabled
 from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
@@ -77,9 +80,12 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_video_uploads_page,
     use_new_custom_pages,
     use_tagging_taxonomy_list_page,
+    # use_xpert_translations_component,
 )
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
+from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from xmodule.library_tools import LibraryToolsService
+from xmodule.course_block import DEFAULT_START_DATE  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
@@ -246,10 +252,7 @@ def get_proctored_exam_settings_url(course_locator) -> str:
         mfe_base_url = get_course_authoring_url(course_locator)
         course_mfe_url = f'{mfe_base_url}/course/{course_locator}'
         if mfe_base_url:
-            if proctoring_settings_modal_view_enabled(course_locator):
-                proctored_exam_settings_url = f'{course_mfe_url}/pages-and-resources/proctoring/settings'
-            else:
-                proctored_exam_settings_url = f'{course_mfe_url}/proctored-exam-settings'
+            proctored_exam_settings_url = f'{course_mfe_url}/pages-and-resources/proctoring/settings'
     return proctored_exam_settings_url
 
 
@@ -442,8 +445,25 @@ def get_taxonomy_list_url():
     if use_tagging_taxonomy_list_page():
         mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
         if mfe_base_url:
-            taxonomy_list_url = f'{mfe_base_url}/taxonomy-list'
+            taxonomy_list_url = f'{mfe_base_url}/taxonomies'
     return taxonomy_list_url
+
+
+def get_taxonomy_tags_widget_url(course_locator=None) -> str | None:
+    """
+    Gets course authoring microfrontend URL for taxonomy tags drawer widget view.
+
+    The `content_id` needs to be appended to the end of the URL when using it.
+    """
+    taxonomy_tags_widget_url = None
+    # Uses the same waffle flag as taxonomy list page
+    if use_tagging_taxonomy_list_page():
+        mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
+        if course_locator:
+            mfe_base_url = get_course_authoring_url(course_locator)
+        if mfe_base_url:
+            taxonomy_tags_widget_url = f'{mfe_base_url}/tagging/components/widget/'
+    return taxonomy_tags_widget_url
 
 
 def course_import_olx_validation_is_enabled():
@@ -1581,6 +1601,7 @@ def get_course_videos_context(course_block, pagination_conf, course_key=None):
         get_transcript_preferences,
     )
     from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
+    from openedx.core.djangoapps.video_config.toggles import use_xpert_translations_component
     from xmodule.video_block.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
 
     from .video_storage_handlers import (
@@ -1605,6 +1626,7 @@ def get_course_videos_context(course_block, pagination_conf, course_key=None):
             course = modulestore().get_course(course_key)
 
     is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course.id)
+    is_ai_translations_enabled = use_xpert_translations_component(course.id)
     previous_uploads, pagination_context = _get_index_videos(course, pagination_conf)
     course_video_context = {
         'context_course': course,
@@ -1625,6 +1647,7 @@ def get_course_videos_context(course_block, pagination_conf, course_key=None):
             'supported_file_formats': settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS
         },
         'is_video_transcript_enabled': is_video_transcript_enabled,
+        'is_ai_translations_enabled': is_ai_translations_enabled,
         'active_transcript_preferences': None,
         'transcript_credentials': None,
         'transcript_available_languages': get_all_transcript_languages(),
@@ -1652,6 +1675,89 @@ def get_course_videos_context(course_block, pagination_conf, course_key=None):
         # Cached state for transcript providers' credentials (org-specific)
         course_video_context['transcript_credentials'] = get_transcript_credentials_state_for_org(course.id.org)
     return course_video_context
+
+
+def get_course_index_context(request, course_key, course_block=None):
+    """
+    Utils is used to get context of course index outline.
+    It is used for both DRF and django views.
+    """
+
+    from cms.djangoapps.contentstore.views.course import (
+        course_outline_initial_state,
+        _course_outline_json,
+        _deprecated_blocks_info,
+    )
+    from openedx.core.djangoapps.content_staging import api as content_staging_api
+
+    if not course_block:
+        with modulestore().bulk_operations(course_key):
+            course_block = modulestore().get_course(course_key)
+
+    lms_link = get_lms_link_for_item(course_block.location)
+    reindex_link = None
+    if settings.FEATURES.get('ENABLE_COURSEWARE_INDEX', False):
+        if GlobalStaff().has_user(request.user):
+            reindex_link = f"/course/{str(course_key)}/search_reindex"
+    sections = course_block.get_children()
+    course_structure = _course_outline_json(request, course_block)
+    locator_to_show = request.GET.get('show', None)
+
+    course_release_date = (
+        get_default_time_display(course_block.start)
+        if course_block.start != DEFAULT_START_DATE
+        else _("Set Date")
+    )
+
+    settings_url = reverse_course_url('settings_handler', course_key)
+
+    try:
+        current_action = CourseRerunState.objects.find_first(course_key=course_key, should_display=True)
+    except (ItemNotFoundError, CourseActionStateItemNotFoundError):
+        current_action = None
+
+    deprecated_block_names = [block.name for block in deprecated_xblocks()]
+    deprecated_blocks_info = _deprecated_blocks_info(course_block, deprecated_block_names)
+
+    frontend_app_publisher_url = configuration_helpers.get_value_for_org(
+        course_block.location.org,
+        'FRONTEND_APP_PUBLISHER_URL',
+        settings.FEATURES.get('FRONTEND_APP_PUBLISHER_URL', False)
+    )
+    # gather any errors in the currently stored proctoring settings.
+    advanced_dict = CourseMetadata.fetch(course_block)
+    proctoring_errors = CourseMetadata.validate_proctoring_settings(course_block, advanced_dict, request.user)
+
+    user_clipboard = content_staging_api.get_user_clipboard_json(request.user.id, request)
+
+    course_index_context = {
+        'language_code': request.LANGUAGE_CODE,
+        'context_course': course_block,
+        'lms_link': lms_link,
+        'sections': sections,
+        'course_structure': course_structure,
+        'initial_state': course_outline_initial_state(locator_to_show, course_structure) if locator_to_show else None,  # lint-amnesty, pylint: disable=line-too-long
+        'initial_user_clipboard': user_clipboard,
+        'rerun_notification_id': current_action.id if current_action else None,
+        'course_release_date': course_release_date,
+        'settings_url': settings_url,
+        'reindex_link': reindex_link,
+        'deprecated_blocks_info': deprecated_blocks_info,
+        'notification_dismiss_url': reverse_course_url(
+            'course_notifications_handler',
+            current_action.course_key,
+            kwargs={
+                'action_state_id': current_action.id,
+            },
+        ) if current_action else None,
+        'frontend_app_publisher_url': frontend_app_publisher_url,
+        'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_block.id),
+        'advance_settings_url': reverse_course_url('advanced_settings_handler', course_block.id),
+        'proctoring_errors': proctoring_errors,
+        'taxonomy_tags_widget_url': get_taxonomy_tags_widget_url(course_block.id),
+    }
+
+    return course_index_context
 
 
 class StudioPermissionsService:

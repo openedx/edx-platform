@@ -970,6 +970,16 @@ FEATURES = {
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MST-1348'
     'ENABLE_INTEGRITY_SIGNATURE': False,
 
+    # .. toggle_name: FEATURES['ENABLE_LTI_PII_ACKNOWLEDGEMENT']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Enables the lti pii acknowledgement feature for a course
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2023-10
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: 'https://2u-internal.atlassian.net/browse/MST-2055'
+    'ENABLE_LTI_PII_ACKNOWLEDGEMENT': False,
+
     # .. toggle_name: FEATURES['ENABLE_NEW_BULK_EMAIL_EXPERIENCE']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -1415,6 +1425,9 @@ ELASTIC_SEARCH_CONFIG = [
     }
 ]
 
+SEARCH_COURSEWARE_CONTENT_LOG_PARAMS = False
+
+
 # .. setting_name: ELASTIC_SEARCH_INDEX_PREFIX
 # .. setting_default: ''
 # .. setting_description: Specifies the prefix used when namixng elasticsearch indexes related to edx-search.
@@ -1593,6 +1606,9 @@ BRANCH_IO_KEY = ''
 ######################## OPTIMIZELY ###########################
 OPTIMIZELY_PROJECT_ID = None
 OPTIMIZELY_FULLSTACK_SDK_KEY = None
+
+######################## HOTJAR ###########################
+HOTJAR_SITE_ID = 00000
 
 ######################## ALGOLIA SEARCH ###########################
 ALGOLIA_APP_ID = None
@@ -2229,10 +2245,10 @@ MIDDLEWARE = [
     'common.djangoapps.track.middleware.TrackMiddleware',
 
     # CORS and CSRF
+    'django.middleware.csrf.CsrfViewMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'openedx.core.djangoapps.cors_csrf.middleware.CorsCSRFMiddleware',
     'openedx.core.djangoapps.cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
 
     'splash.middleware.SplashMiddleware',
 
@@ -3221,6 +3237,9 @@ INSTALLED_APPS = [
     'rules.apps.AutodiscoverRulesConfig',
     'bridgekeeper',
 
+    # management of user-triggered async tasks (course import/export, etc.)
+    'user_tasks',
+
     # Customized celery tasks, including persisting failed tasks so they can
     # be retried
     'celery_utils',
@@ -3332,7 +3351,14 @@ CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
 REST_FRAMEWORK = {
     # These default classes add observability around endpoints using defaults, and should
     # not be used anywhere else.
+    # Notes on Order:
+    # 1. `JwtAuthentication` does not check `is_active`, so email validation does not affect it. However,
+    #    `SessionAuthentication` does. These work differently, and order changes in what way, which really stinks. See
+    #    https://github.com/openedx/public-engineering/issues/165 for details.
+    # 2. `JwtAuthentication` may also update the database based on contents. Since the LMS creates these JWTs, this
+    #    shouldn't have any affect at this time. But it could, when and if another service started creating the JWTs.
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'openedx.core.djangolib.default_auth_classes.DefaultJwtAuthentication',
         'openedx.core.djangolib.default_auth_classes.DefaultSessionAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'edx_rest_framework_extensions.paginators.DefaultPagination',
@@ -4209,6 +4235,10 @@ ECOMMERCE_ORDERS_API_CACHE_TIMEOUT = 3600
 ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 
+# E-Commerce Commerce Coordinator Configuration
+COMMERCE_COORDINATOR_URL_ROOT = 'http://localhost:8000'
+COORDINATOR_CHECKOUT_REDIRECT_PATH = '/lms/redirect/'
+
 # Exam Service
 EXAMS_SERVICE_URL = 'http://localhost:18740/api/v1'
 
@@ -4391,6 +4421,8 @@ EDX_DRF_EXTENSIONS = {
     # Set this value to an empty dict in order to prevent automatically updating
     # user data from values in (possibly stale) JWTs.
     'JWT_PAYLOAD_USER_ATTRIBUTE_MAPPING': {},
+    # Allows JWT authentication to find the LMS user id for verification
+    'VERIFY_LMS_USER_ID_PROPERTY_NAME': 'id',
 }
 
 ################################ Settings for rss_proxy ################################
@@ -4427,6 +4459,9 @@ REGISTRATION_EXTENSION_FORM = None
 MOBILE_APP_USER_AGENT_REGEXES = [
     r'edX/org.edx.mobile',
 ]
+
+# set course limit for mobile search
+MOBILE_SEARCH_COURSE_LIMIT = 100
 
 # cache timeout in seconds for Mobile App Version Upgrade
 APP_UPGRADE_CACHE_TIMEOUT = 3600
@@ -4924,6 +4959,13 @@ LEARNING_MICROFRONTEND_URL = None
 # .. setting_warning: Also set site's openresponseassessment.enhanced_staff_grader
 #     waffle flag.
 ORA_GRADING_MICROFRONTEND_URL = None
+# .. setting_name: ORA_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL for modern openassessment app.
+#     This is will be show in the open response tab list data.
+# .. setting_warning: Also set site's openresponseassessment.mfe_views
+#     waffle flag.
+ORA_MICROFRONTEND_URL = None
 # .. setting_name: DISCUSSIONS_MICROFRONTEND_URL
 # .. setting_default: None
 # .. setting_description: Base URL of the micro-frontend-based discussions page.
@@ -5072,12 +5114,6 @@ RATE_LIMIT_FOR_VIDEO_METADATA_API = '10/minute'
 MAILCHIMP_NEW_USER_LIST_ID = ""
 
 ########################## BLOCKSTORE #####################################
-BLOCKSTORE_PUBLIC_URL_ROOT = 'http://localhost:18250'
-BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
-
-# Disable the Blockstore app API by default.
-# See openedx.core.lib.blockstore_api.config for details.
-BLOCKSTORE_USE_BLOCKSTORE_APP_API = False
 
 # .. setting_name: XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE
 # .. setting_default: default
@@ -5306,6 +5342,10 @@ ENTERPRISE_PLOTLY_SECRET = "I am a secret"
 
 ############## PLOTLY ##############
 
+############ Internal Enterprise Settings ############
+ENTERPRISE_VSF_UUID = "e815503343644ac7845bc82325c34460"
+############ Internal Enterprise Settings ############
+
 ENTERPRISE_MANUAL_REPORTING_CUSTOMER_UUIDS = []
 
 AVAILABLE_DISCUSSION_TOURS = []
@@ -5325,6 +5365,9 @@ SUBSCRIPTIONS_SERVICE_WORKER_USERNAME = 'subscriptions_worker'
 NOTIFICATIONS_EXPIRY = 60
 EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
 NOTIFICATION_CREATION_BATCH_SIZE = 99
+
+############################ AI_TRANSLATIONS ##################################
+AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
 
 #### django-simple-history##
 # disable indexing on date field its coming from django-simple-history.
@@ -5404,3 +5447,4 @@ derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.cert
                          'learning-certificate-lifecycle', 'enabled')
 derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.certificate.revoked.v1',
                          'learning-certificate-lifecycle', 'enabled')
+BEAMER_PRODUCT_ID = ""
