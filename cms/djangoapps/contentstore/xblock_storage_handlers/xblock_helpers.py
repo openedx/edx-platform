@@ -23,4 +23,4 @@ def get_children_tags_count(xblock):
     children = xblock.get_children()
     child_usage_keys = [str(child.location) for child in children]
     tags_count_query = ','.join(child_usage_keys)
-    return get_object_tag_counts(tags_count_query)
+    return get_object_tag_counts(tags_count_query, count_implicit=True)

@@ -19,7 +19,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.utils.translation import gettext as _
 from edx_django_utils.plugins import pluggable_override
-from openedx_tagging.core.tagging import api as tagging_api
+from openedx.core.djangoapps.content_tagging.api import get_object_tag_counts
 from edx_proctoring.api import (
     does_backend_support_onboarding,
     get_exam_by_content_id,
@@ -1249,7 +1249,7 @@ def _get_course_unit_tags(course_key) -> dict:
     # Create a pattern to match the IDs of the units, e.g. "block-v1:org+course+run+type@vertical+block@*"
     vertical_key = course_key.make_usage_key('vertical', 'x')
     unit_key_pattern = str(vertical_key).rsplit("@", 1)[0] + "@*"
-    return tagging_api.get_object_tag_counts(unit_key_pattern)
+    return get_object_tag_counts(unit_key_pattern, count_implicit=True)
 
 
 def _was_xblock_ever_exam_linked_with_external(course, xblock):
