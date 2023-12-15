@@ -68,7 +68,7 @@ requests==2.31.0
     # via semgrep
 rich==13.7.0
     # via semgrep
-rpds-py==0.10.6
+rpds-py==0.13.2
     # via
     #   jsonschema
     #   referencing
@@ -76,7 +76,7 @@ ruamel-yaml==0.17.40
     # via semgrep
 ruamel-yaml-clib==0.2.8
     # via ruamel-yaml
-semgrep==1.44.0
+semgrep==1.52.0
     # via -r requirements/edx/semgrep.in
 tomli==2.0.1
     # via semgrep
