@@ -12,6 +12,7 @@ from .models import SurveyReport
 from django.urls import reverse
 from django.conf import settings
 
+
 def admin_extra_context(request):
     """
     This function sends extra context to every admin site
