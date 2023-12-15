@@ -311,6 +311,52 @@ class CourseSequenceExam(TimeStampedModel):
     is_time_limited = models.BooleanField(default=False)
 
 
+class CourseSequenceAccessControl(TimeStampedModel):
+    """
+    This model stores XBlock information that affects outline level information
+    pertaining to access control
+    """
+    course_section_sequence = models.OneToOneField(CourseSectionSequence, on_delete=models.CASCADE, related_name='access_control')
+
+    is_access_controlled = models.BooleanField(default=False)
+    access_control_type = models.CharField(max_length=255, null=True)
+    access_control_allowed_values = models.CharField(max_length=255, null=True)
+
+    def has_access(self, **kwargs):
+        """
+        Returns True if the user has access to the section sequence
+        """
+        if not self.is_access_controlled:
+            return True
+
+        if self.access_control_type == 'password':
+            return kwargs.get('password') in self.access_control_allowed_values.split(',')
+
+        if self.access_control_type == 'ip_range':
+            return kwargs.get('ip_address') in self.access_control_allowed_values.split(',')
+
+        return False
+
+
+class AccessControlService:
+    """
+    An XBlock service to talk to the AccessControl api.
+    """
+
+    def is_access_granted(self, sequence_id, **kwargs):
+        """
+        Returns the access control dict for a given course and user
+
+        Arguments:
+            course_key (str|CourseKey): The course key
+            user_id (str): The user id
+
+        Returns:
+            dict: The access control dict
+        """
+        return CourseSequenceAccessControl.objects.filter(course_section_sequence__id=sequence_id).first().has_access(**kwargs)
+
+
 class PublishReport(models.Model):
     """
     A report about the content that generated this LearningContext publish.

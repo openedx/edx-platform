@@ -78,6 +78,9 @@ class CourseMetadata:
         'highlights_enabled_for_messaging',
         'is_onboarding_exam',
         'discussions_settings',
+        'access_control_type',
+        'is_access_controlled',
+        'access_control_allowed_values',
     ]
 
     @classmethod

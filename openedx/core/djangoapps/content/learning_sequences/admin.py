@@ -58,6 +58,9 @@ class CourseSectionSequenceInline(admin.TabularInline):
         'accessible_after_due',
         'visible_to_staff_only',
         'hide_from_toc',
+        'is_access_controlled',
+        'access_control_type',
+        'access_control_allowed_values',
     )
     readonly_fields = (
         'title',
@@ -67,6 +70,9 @@ class CourseSectionSequenceInline(admin.TabularInline):
         'accessible_after_due',
         'visible_to_staff_only',
         'hide_from_toc',
+        'is_access_controlled',
+        'access_control_type',
+        'access_control_allowed_values',
     )
     ordering = ['ordering']
 
@@ -82,6 +88,18 @@ class CourseSectionSequenceInline(admin.TabularInline):
         qs = super().get_queryset(request)
         qs = qs.select_related('section', 'sequence')
         return qs
+
+    @types.admin_display(boolean=True, description="Access controlled")
+    def is_access_controlled(self, cs_seq):
+        return cs_seq.access_control.is_access_controlled
+
+    @types.admin_display(description="Access control type")
+    def access_control_type(self, cs_seq):
+        return cs_seq.access_control.access_control_type
+
+    @types.admin_display(description="Access control allowed values")
+    def access_control_allowed_values(self, cs_seq):
+        return cs_seq.access_control.access_control_allowed_values
 
     @types.admin_display(description="Title")
     def title(self, cs_seq):

@@ -92,6 +92,16 @@ class ExamData:
         return self.is_practice_exam or self.is_proctored_enabled or self.is_time_limited
 
 
+@attr.s(frozen=True, auto_attribs=True)
+class AccessControlData:
+    """
+    XBlock attributes that help determine item access.
+    """
+    is_access_controlled: bool = False
+    access_control_type: str = ""
+    access_control_allowed_values: str = ""
+
+
 def user_partition_groups_not_empty(instance, attribute, value):  # pylint: disable=unused-argument
     """
     It's not valid to have a user_partition_groups key with no groups.
@@ -129,6 +139,7 @@ class CourseLearningSequenceData:
     title = attr.ib(type=str)
     visibility = attr.ib(type=VisibilityData, default=VisibilityData())
     exam = attr.ib(type=ExamData, default=ExamData())
+    access_control = attr.ib(type=AccessControlData, default=AccessControlData())
     inaccessible_after_due = attr.ib(type=bool, default=False)
 
     # Mapping of UserPartition IDs to list of UserPartition Groups that are

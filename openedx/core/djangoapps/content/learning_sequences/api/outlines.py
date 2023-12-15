@@ -18,6 +18,7 @@ from opaque_keys.edx.locator import LibraryLocator
 from openedx.core import types
 
 from ..data import (
+    AccessControlData,
     ContentErrorData,
     CourseLearningSequenceData,
     CourseOutlineData,
@@ -33,6 +34,7 @@ from ..models import (
     CourseContext,
     CourseSection,
     CourseSectionSequence,
+    CourseSequenceAccessControl,
     CourseSequenceExam,
     LearningContext,
     LearningSequence,
@@ -159,6 +161,11 @@ def get_course_outline(course_key: CourseKey) -> CourseOutlineData:
             exam=exam_data,
             user_partition_groups=_get_user_partition_groups_from_qset(
                 sec_seq_model.new_user_partition_groups.all()
+            ),
+            access_control=AccessControlData(
+                is_access_controlled=sec_seq_model.access_control.is_access_controlled,
+                access_control_type=sec_seq_model.access_control.access_control_type,
+                access_control_allowed_values=sec_seq_model.access_control.access_control_allowed_values,
             ),
         )
         sec_ids_to_sequence_list[sec_seq_model.section_id].append(sequence_data)
@@ -514,6 +521,19 @@ def _update_course_section_sequences(course_outline: CourseOutlineData, course_c
                 },
             )
             ordering += 1
+            # If a sequence is access controlled, update or create an access control record
+            if bool(sequence_data.access_control):
+                CourseSequenceAccessControl.objects.update_or_create(
+                    course_section_sequence=course_section_sequence,
+                    defaults={
+                        'is_access_controlled': sequence_data.access_control.is_access_controlled,
+                        'access_control_type': sequence_data.access_control.access_control_type,
+                        'access_control_allowed_values': sequence_data.access_control.access_control_allowed_values,
+                    },
+                )
+            else:
+                # Otherwise, delete any access control associated with it
+                CourseSequenceAccessControl.objects.filter(course_section_sequence=course_section_sequence).delete()
 
             # If a sequence is an exam, update or create an exam record
             if bool(sequence_data.exam):

@@ -10,6 +10,7 @@ from edx_django_utils.monitoring import function_trace, set_custom_attribute
 
 from openedx.core.djangoapps.content.learning_sequences.api import replace_course_outline
 from openedx.core.djangoapps.content.learning_sequences.data import (
+    AccessControlData,
     ContentErrorData,
     CourseLearningSequenceData,
     CourseOutlineData,
@@ -298,6 +299,11 @@ def _make_section_data(section, unique_sequences):
                     is_practice_exam=sequence.is_practice_exam,
                     is_proctored_enabled=sequence.is_proctored_enabled,
                     is_time_limited=sequence.is_time_limited,
+                ),
+                access_control=AccessControlData(
+                    is_access_controlled=sequence.is_access_controlled,
+                    access_control_type=sequence.access_control_type,
+                    access_control_allowed_values=sequence.access_control_allowed_values,
                 ),
                 visibility=VisibilityData(
                     hide_from_toc=sequence.hide_from_toc,

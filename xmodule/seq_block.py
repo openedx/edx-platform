@@ -148,6 +148,69 @@ class SequenceMixin(SequenceFields):
         return xblock_body
 
 
+class AccessControlFields:
+    """
+    A mixin of shared code between the SequenceBlock and other XBlocks.
+    """
+
+    is_access_controlled = Boolean(
+        display_name=_("Is this sequence access controlled?"),
+        help=_(
+            "This setting indicates whether this block is access controlled."
+        ),
+        default=False,
+        scope=Scope.settings,
+    )
+    access_control_type = String(
+        display_name=_("Access Control Type"),
+        help=_(
+            "This setting indicates the type of access control."
+        ),
+        default="",
+        scope=Scope.settings,
+    )
+    access_control_allowed_values = String(
+        display_name=_("Access Control Allowed Values"),
+        help=_(
+            "This setting indicates the allowed values within an access control option."
+        ),
+        default="",
+        scope=Scope.settings,
+    )
+    access_granted = Boolean(
+        display_name=_("Access Granted"),
+        help=_(
+            "This setting indicates whether the user has access to this sequence."
+        ),
+        default=False,
+        scope=Scope.user_state,
+    )
+
+
+class AccessControlMixin(AccessControlFields):
+
+    @XBlock.json_handler
+    def has_subsection_access(self, **kwargs):
+        """
+        Returns whether the user has access to this sequence.
+        """
+        user = self.runtime.service(self, 'user').get_current_user()
+        if not self.is_access_controlled:
+            return True
+        if user.opt_attrs.get(ATTR_KEY_USER_IS_STAFF):
+            return True
+        return self.access_granted
+
+    @XBlock.json_handler
+    def grant_subsection_access(self, data, **kwargs):
+        """
+        Grants access to this sequence.
+        """
+        access_control_service = self.runtime.service(self, 'access_control')
+        if access_control_service:
+            self.access_granted = access_control_service.has_access(self, data)
+        return self.access_granted
+
 class ProctoringFields:
     """
     Fields that are specific to Proctored or Timed Exams
@@ -242,6 +305,7 @@ class ProctoringFields:
 
 @XBlock.wants('proctoring')
 @XBlock.wants('gating')
+@XBlock.wants('access_control')
 @XBlock.wants('credit')
 @XBlock.wants('completion')
 @XBlock.needs('user')
@@ -258,6 +322,7 @@ class SequenceBlock(
     XModuleToXBlockMixin,
     ResourceTemplates,
     XModuleMixin,
+    AccessControlMixin,
 ):
     """
     Layout module which lays out content in a temporal sequence
@@ -568,7 +633,10 @@ class SequenceBlock(
             'gated_content': self._get_gated_content_info(prereq_met, prereq_meta_info),
             'sequence_name': self.display_name,
             'exclude_units': context.get('exclude_units', False),
-            'gated_sequence_paywall': self.gated_sequence_paywall
+            'gated_sequence_paywall': self.gated_sequence_paywall,
+            'is_access_controlled': self.is_access_controlled,
+            'access_control_type': self.access_control_type,
+            'access_control_allowed_values': self.access_control_allowed_values,
         }
 
         return params
@@ -693,6 +761,10 @@ class SequenceBlock(
         if self.is_time_limited:
             if self._time_limited_student_view() or self._hidden_content_student_view({}):
                 return True
+
+        # We're not allowed to see when the access control hasn't been granted.
+        if self.is_access_controlled:
+            return not self.has_access
 
         # Otherwise, nothing is blocking us.
         return False

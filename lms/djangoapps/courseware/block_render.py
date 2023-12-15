@@ -31,6 +31,7 @@ from edx_when.field_data import DateLookupFieldData
 from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from openedx.core.djangoapps.content.learning_sequences.models import AccessControlService
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import APIException
 from typing import Callable, TYPE_CHECKING
@@ -603,6 +604,7 @@ def prepare_runtime_for_user(
         'credit': CreditService(),
         'bookmarks': BookmarksService(user=user),
         'gating': GatingService(),
+        'access_control': AccessControlService(),
         'grade_utils': GradesUtilService(course_id=course_id),
         'user_state': UserStateService(),
         'content_type_gating': ContentTypeGatingService(),
