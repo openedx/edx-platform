@@ -22,6 +22,8 @@ from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Boolean, Integer, List, Scope, String
 
 from edx_toggles.toggles import LegacyWaffleFlag
+
+from common.config.waffle import TEACHER_PROGRESS_TACKING_DISABLED_SWITCH
 from lms.djangoapps.courseware.toggles import COURSEWARE_PROCTORING_IMPROVEMENTS
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import (
@@ -314,7 +316,9 @@ class SequenceBlock(
             # set position to default value if either 'position' argument not
             # found in request or it is a non-positive integer
             position = data.get('position', '1')
-            if position.isdigit() and int(position) > 0:
+            if position.isdigit() and int(position) > 0 and not (
+                self.runtime.user_is_staff and TEACHER_PROGRESS_TACKING_DISABLED_SWITCH.is_enabled()
+            ):
                 self.position = int(position)
             else:
                 self.position = 1
