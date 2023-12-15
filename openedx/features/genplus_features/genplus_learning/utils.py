@@ -10,6 +10,8 @@ from django.urls import reverse
 from opaque_keys.edx.keys import UsageKey
 
 import capa.inputtypes as inputtypes
+
+from common.config.waffle import TEACHER_PROGRESS_TACKING_DISABLED_SWITCH
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.course_blocks.api import get_course_blocks
@@ -86,7 +88,9 @@ def get_lesson_lms_url(user, course_key, usage_key):
             )
             break
 
-    if not url_to_block:
+    if not url_to_block or (
+        user.is_staff and TEACHER_PROGRESS_TACKING_DISABLED_SWITCH.is_enabled()
+    ):
         url_to_block = reverse(
             'jump_to',
             kwargs={'course_id': course_key, 'location': usage_key}
