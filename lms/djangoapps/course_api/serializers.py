@@ -167,18 +167,22 @@ class CourseDetailSerializer(CourseSerializer):  # pylint: disable=abstract-meth
         Get the `certificate_available_date` in response
         if the `certificates.auto_certificate_generation` waffle switch is enabled
 
-        Get the 'is_enrolled' in response
-        if user is authenticated and 'username' is in query params.
+        Get the 'is_enrolled' in response if 'username' is in query params,
+        user is staff, superuser, or user is authenticated and
+        the has the same 'username' as the 'username' in the query params.
         """
         response = super().to_representation(instance)
         if can_show_certificate_available_date_field(instance):
             response['certificate_available_date'] = instance.certificate_available_date
 
-        requested_user = self.context['request'].query_params.get('username', None)
-        if self.context['request'].user.is_authenticated and requested_user:
-            User = get_user_model()
-            requested_user = User.objects.get(username=requested_user)
-            response['is_enrolled'] = CourseEnrollment.is_enrolled(requested_user, instance.id)
+        requested_username = self.context['request'].query_params.get('username', None)
+        if requested_username:
+            user = self.context['request'].user
+            if ((user.is_authenticated and user.username == requested_username)
+                    or user.is_staff or user.is_superuser):
+                User = get_user_model()
+                requested_user = User.objects.get(username=requested_username)
+                response['is_enrolled'] = CourseEnrollment.is_enrolled(requested_user, instance.id)
         return response
 
 
