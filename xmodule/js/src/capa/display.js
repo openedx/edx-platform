@@ -19,11 +19,16 @@
         };
 
     this.Problem = (function() {
+ 
         function Problem(element) {
             var that = this;
-            this.hint_button = function() {
-                return Problem.prototype.hint_button.apply(that, arguments);
-            };
+            // button custom problem quizz
+            this.next_btn = function (){
+                return Problem.prototype.next_btn.apply(that, arguments)
+              };
+            this.submit_btn_qz = function(){
+                return Problem.prototype.submit_qz.apply(that, arguments);
+              };
             this.enableSubmitButtonAfterTimeout = function() {
                 return Problem.prototype.enableSubmitButtonAfterTimeout.apply(that, arguments);
             };
@@ -155,6 +160,7 @@
                     return MathJax.Hub.Queue(['Typeset', MathJax.Hub, element]);
                 });
             }
+            
             if (window.hasOwnProperty('update_schematics')) {
                 window.update_schematics();
             }
@@ -170,6 +176,13 @@
             this.submitButton.click(this.submit_fd);
             this.hintButton = this.$('.action .hint-button');
             this.hintButton.click(this.hint_button);
+            
+          //problem quiz custom
+            this.nextButton = this.$('.action #btn-next')
+            this.nextButton.click(this.next_btn)
+            this.submitBtnQz = this.$('.action .btn-submit-qz')
+            this.submitBtnQz.click(this.submit_btn_qz)
+
             this.resetButton = this.$('.action .reset');
             this.resetButton.click(this.reset);
             this.showButton = this.$('.action .show');
@@ -180,6 +193,8 @@
             this.saveButton.click(this.save);
             this.gentleAlertNotification = this.$('.notification-gentle-alert');
             this.submitNotification = this.$('.notification-submit');
+
+
 
             // Accessibility helper for sighted keyboard users to show <clarification> tooltips on focus:
             this.$('.clarification').focus(function(ev) {
@@ -629,6 +644,289 @@
                 this.disableAllButtonsWhileRunning(this.submit_internal, true);
             }
         };
+        // problem quizz
+        Problem.prototype.submit_qz = function () {
+            var that = this;
+            const listQz = that.$('.wrapper-problem-response');
+            const checkedInput = that.$('.field input:checked');
+            const indicatorError = $(listQz[currentIndex]).find('.indicator-container')
+    
+  
+  
+  
+          return $.postWithPrefix('' + this.url + '/problem_check', that.answers, function (response) {
+              console.log(response)
+            if (response.success === 'submitted' || response.success === 'incorrect' || response.success === 'correct') {
+             
+              const problemQuestionNumbers = that.$('.problem-question-number');
+              const parsedHTML = $(response.contents);
+              const listProblemParsed = parsedHTML.find('.wrapper-problem-response')
+              const messagesProblem = listProblemParsed[currentIndex].querySelector('.message')
+              const indicatorErrorParsed = listProblemParsed[currentIndex].querySelector('.indicator-container')
+  
+              const choicegroup = listQz[currentIndex].querySelector('.choicegroup , .capa_inputtype')
+              // choicegroup.appendChild(messagesProblem)
+  
+                if (response.success === 'incorrect'){
+                  const problemParsed = listProblemParsed[currentIndex]
+                  const submittedInput = problemParsed.querySelector('input.submitted');
+                  const incorrectLabel = problemParsed.querySelector('label.choicegroup_correct');
+                  const wrongLabel = problemParsed.querySelector('label.choicegroup_incorrect')
+  
+  
+                  if (incorrectLabel && submittedInput ){
+                    
+                    that.$('.btn-submit-qz').css('display', 'none');
+                    that.$('#btn-next').css('display', 'block');
+      
+      
+                   problemQuestionNumbers.each(function(index, element) {
+                     if (element.textContent === (currentIndex +1 ).toString()) {
+                       element.classList.add('submitted-question');
+                       element.classList.remove('active-number');
+     
+                     
+                       $(listQz[currentIndex]).find('.message').remove()
+                       choicegroup.appendChild(messagesProblem)
+      
+                       indicatorError.css('display', 'none')
+      
+                       element.classList.remove('err-number-qusetion');
+  
+                       checkedInput.each(function () {
+                        const input = $(this);
+                        const label = $('label[for="' + $(this).attr('id') + '"]'); 
+                        input.addClass('submitted')
+                        input.addClass('success-problem')
+                        label.addClass('response-label field-label label-inline choicegroup_correct')
+                        
+                        choicegroup.appendChild(messagesProblem)
+                      })
+                       
+      
+                     } 
+                   });
+      
+                  
+      
+                  } else {
+                    
+                  }
+          
+                  if (wrongLabel && submittedInput){
+  
+                      indicatorError.css('display', 'block')
+                      const indocatorName = $(indicatorError).find('.sr')
+                      if (indocatorName.text() == 'unanswered'){
+                        indicatorError.remove()
+                        choicegroup.appendChild(indicatorErrorParsed)
+                      }
+                      
+     
+  
+                      problemQuestionNumbers.each(function(index, element) {
+                        if (element.textContent === (currentIndex +1 ).toString()) {
+                          element.classList.add('err-number-qusetion');
+                          element.classList.remove('active-number');
+  
+                          //remove messgae
+                          $(listQz[currentIndex]).find('.message').remove()
+                          choicegroup.appendChild(messagesProblem)
+  
+                          const messgasBox = listQz[currentIndex].querySelector('.feedback-hint-incorrect');
+                          messgasBox.classList.add('error-problem-answer'); 
+  
+                          checkedInput.each(function () {
+                            const input = $(this);
+                            const label = $('label[for="' + $(this).attr('id') + '"]'); 
+                            input.addClass('submitted')
+                            label.addClass('response-label field-label label-inline choicegroup_incorrect')
+                  
+                
+                          })
+  
+                        } 
+                      });
+  
+                        }
+  
+                       
+                }
+             
+  
+              if (response.success === 'correct' ){
+                that.$('.btn-submit-qz').css('display', 'none');
+                that.$('#btn-next').css('display', 'block');
+  
+  
+               problemQuestionNumbers.each(function(index, element) {
+                 if (element.textContent === (currentIndex +1 ).toString()) {
+                   element.classList.add('submitted-question');
+                   element.classList.remove('active-number');
+                   element.classList.remove('err-number-qusetion');
+      
+                 
+                   $(listQz[currentIndex]).find('.message').remove()
+                   choicegroup.appendChild(messagesProblem)
+  
+                   indicatorError.css('display', 'none')
+                  
+                 } 
+               });
+  
+               checkedInput.each(function () {
+                 const input = $(this);
+                 const label = $('label[for="' + $(this).attr('id') + '"]'); 
+                 input.addClass('submitted')
+                 input.addClass('success-problem')
+                 label.addClass('response-label field-label label-inline choicegroup_correct')
+                 
+                 choicegroup.appendChild(messagesProblem)
+               })
+  
+               
+             }
+             
+  
+              window.SR.readTexts(that.get_sr_status(response.contents));
+              that.el.trigger('contentChanged', [that.id, response.contents, response]);
+              // that.render(response.contents, that.focus_on_submit_notification);
+              that.updateProgress(response);
+            
+              if (response.entrance_exam_passed) {
+                window.parent.postMessage({
+                  type: 'entranceExam.passed'
+                }, '*');
+              }
+            } else {
+              that.saveNotification.hide();
+              that.gentle_alert(response.success);
+            }
+        
+            return Logger.log('problem_graded', [that.answers, response.contents], that.id);
+          }); 
+          }
+  
+          
+  
+          Problem.prototype.next_btn = function(){
+            var that = this;  
+         
+             const listQz = that.$('.wrapper-problem-response');
+             const problemQuestionNumbers = that.$('.problem-question-number');
+  
+             $('.btn-submit-qz').prop('disabled', true);
+  
+            //  problemQuestionNumbers.each(function(index, element) {
+            //   if (element.textContent === (currentIndex +1 ).toString()) {
+            //     element.classList.remove('err-number-qusetion');
+            //     element.classList.add('submitted-question');
+            //   } })
+  
+  
+      
+              listQz[currentIndex].style.display = 'none'; 
+              currentIndex += 1; 
+              if (currentIndex >= listQz.length) {
+                currentIndex = 0; 
+              }
+  
+              const submittedInput = listQz[currentIndex].querySelector('input.submitted');
+              const incorrectLabel = listQz[currentIndex].querySelector('label.choicegroup_correct');
+              const wrongLabel = listQz[currentIndex].querySelector('label.choicegroup_incorrect')
+  
+              const elementNumber = problemQuestionNumbers[currentIndex]
+              
+              
+              listQz[currentIndex].style.display = 'block'; 
+              // that.$('.btn-submit-qz').css('display', 'block');
+              // that.$('#btn-next').css('display', 'none');
+  
+              // console.log('=======incorrectLabel=======', incorrectLabel)
+              // console.log('======wrongLabel========', wrongLabel)
+              
+              if (incorrectLabel && submittedInput){
+                  that.$('.btn-submit-qz').css('display', 'none');
+                  that.$('#btn-next').css('display', 'block');
+              }
+              else if (wrongLabel && submittedInput){
+                that.$('.btn-submit-qz').css('display', 'block');
+                that.$('#btn-next').css('display', 'none');
+                const messgasBox = listQz[currentIndex].querySelector('.feedback-hint-incorrect');
+                messgasBox.classList.add('error-problem-answer'); 
+                
+              } 
+              
+              else {
+                that.$('.btn-submit-qz').css('display', 'block');
+                that.$('#btn-next').css('display', 'none');
+              }
+  
+  
+              if (elementNumber.classList.contains('err-number-qusetion')){
+                // choicegroup_correct success-problem
+                const checkedInput = $(listQz[currentIndex]).find('.field input:checked') ;
+                checkedInput.each(function () {
+                  const input = $(this);
+                  const label = $('label[for="' + $(this).attr('id') + '"]'); 
+                  label.removeClass('choicegroup_correct')
+                  input.removeClass('success-problem')
+                  
+                })
+  
+                that.$('.btn-submit-qz').css('display', 'block');
+                that.$('#btn-next').css('display', 'none');
+  
+                const messgasBox = listQz[currentIndex].querySelector('.feedback-hint-incorrect');
+                messgasBox.classList.add('error-problem-answer'); 
+              }
+     
+              problemQuestionNumbers.each(function(index,element){
+           
+                if (element.textContent === (currentIndex +1 ).toString()) {
+                  element.classList.add('active-number');
+                }else {
+                  element.classList.remove('active-number');
+                }
+              })
+  
+              // const indicatorError = $(listQz[currentIndex]).find('.indicator-container')
+              // indicatorError.css('display', 'none');
+  
+              // problemQuestionNumbers.each(function(index, element) {
+              //   if (element.textContent === (currentIndex +1 ).toString()) {
+              //     element.classList.add('active-number');
+              //     const submittedInput =  listQz[currentIndex].querySelector('input.submitted');
+              //     const incorrectLabel = listQz[currentIndex].querySelector('label.choicegroup_correct');
+              //     if (submittedInput && incorrectLabel){
+              //       that.$('.btn-submit-qz').css('display', 'none');
+              //       that.$('#btn-next').css('display', 'block');
+      
+                   
+              //     }
+                  // else {
+                  //   const message = $(listQz[currentIndex]).find('.message').remove()
+                   
+                  // }
+              //   } else {
+              //     element.classList.remove('active-number');
+              //   }
+              // });
+              
+              const checkInput = $(listQz[currentIndex]).find('input[type="checkbox"], input[type="radio"]');
+              checkInput.on('change', function() {
+                  const atLeastOneChecked = $('.field input:checked').length > 0;
+                
+                  if (atLeastOneChecked) {
+                    $('.btn-submit-qz').prop('disabled', false);
+                  } else {
+                    $('.btn-submit-qz').prop('disabled', true);
+                  }
+                });
+  
+              
+          };
+          
 
         Problem.prototype.submit_internal = function() {
             var that = this;

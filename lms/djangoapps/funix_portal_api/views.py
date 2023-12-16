@@ -252,17 +252,17 @@ class CreateUserAPIView(APIView):
 
 
 
-class PortalGradeAssignmentXblockAPIView(APIView): 
+class GradeLearningProjectXblockAPIView(APIView): 
     """
     **Use Case**
-        Grade a student's assignment. Just grade if 'result' is 'passed' or 'did_not_pass'.
+        Grade a student's learning project. Just grade if 'result' is 'passed' or 'did_not_pass'.
 
     **Example Request**
-        POST http://localhost:18000/api/funix_portal/assignment/grade_assignment
+        POST http://localhost:18000/api/funix_portal/project/grade_project
         Content-Type: application/json
 
         {
-            "assignment_name":  "assignment1",
+            "project_name":  "project",
             "course_code":"course-v1:o1+c1+r1",
             "email": "edx@example.com",
             "result": "did_not_pass"
@@ -288,7 +288,7 @@ class PortalGradeAssignmentXblockAPIView(APIView):
 
         data = request.data
         course_code = data.get('course_code')
-        assignment_name = data.get('assignment_name')
+        project_name = data.get('project_name')
         email = data.get('email')
         result = data.get('result')
 
@@ -302,9 +302,9 @@ class PortalGradeAssignmentXblockAPIView(APIView):
                  "message": "Missing email",
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        if not assignment_name:
+        if not project_name:
             return Response(data={
-                 "message": "Missing assignment_name",
+                 "message": "Missing project_name",
             }, status=status.HTTP_400_BAD_REQUEST)
         
         if not result:
@@ -314,7 +314,7 @@ class PortalGradeAssignmentXblockAPIView(APIView):
         
         if result not in ['passed', 'did_not_pass']:
             return Response(data={
-                 "message": "Result value must be 'passed' or 'did_not_pass'",
+                 "message": "This result will not be took into account. The result value must be 'passed' or 'did_not_pass'",
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -326,8 +326,8 @@ class PortalGradeAssignmentXblockAPIView(APIView):
 
 
         usage_id = ''
-        found_assignmentxblock = False
-        found_assignment = False
+        found_learningprojectxblock = False
+        found_learningproject = False
         try:
             course_overview = CourseOverview.get_from_id(course_code)
             print(course_overview)
@@ -342,16 +342,17 @@ class PortalGradeAssignmentXblockAPIView(APIView):
             for section in sections:
                 subsections = section.get_children()
                 for sub in subsections:
-                    if sub.display_name == assignment_name:
-                        found_assignment = True
+                    if sub.display_name == project_name:
+                        found_learningproject = True
                         units = sub.get_children()
                         for unit in units:
                             components = unit.get_children()
                             for component in components:
                                 if type(component).__name__ == 'AssignmentXBlockWithMixins':
-                                    found_assignmentxblock = True
-                                    usage_id = str(component.scope_ids.usage_id)
-                                    break
+                                    if (component.has_score):
+                                        found_learningprojectxblock = True
+                                        usage_id = str(component.scope_ids.usage_id)
+                                        break
 
         except Exception as e:
             logging.error(str(e))
@@ -359,14 +360,14 @@ class PortalGradeAssignmentXblockAPIView(APIView):
                 "message": f"Could not load course with course_code '{course_code}'",
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        if not found_assignment:
+        if not found_learningproject:
             return Response(data={
-                 "message": f"Not found assignment '{assignment_name}'",
+                 "message": f"Not found learning project '{project_name}'",
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        if not found_assignmentxblock:
+        if not found_learningprojectxblock:
             return Response(data={
-                 "message": f"Not found assignmentxblock in assignment '{assignment_name}'",
+                 "message": f"Not found learningprojectxblock in learning project '{project_name}'",
             }, status=status.HTTP_400_BAD_REQUEST)
 
         if usage_id == '':

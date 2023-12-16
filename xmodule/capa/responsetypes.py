@@ -268,7 +268,12 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
 
         # wrap the content inside a section
         tree = etree.Element('div')
+        
+        # print('==========', response_index)
         tree.set('class', 'wrapper-problem-response')
+        if int(response_index) > 1 :
+            tree.set('style', 'display: none ; margin-top: 0px')
+        
         tree.set('tabindex', '-1')
         tree.set('aria-label', response_label)
         tree.set('role', 'group')
@@ -410,11 +415,12 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
             style = QUESTION_HINT_CORRECT_STYLE
         else:
             style = QUESTION_HINT_INCORRECT_STYLE
+            
 
+    
         # Ready to go
-        return HTML('<div class="{st}"><div class="explanation-title">{text}</div>{lwrp}{hintswrap}</div>').format(
+        return HTML('<div class="{st} messages-box"><div class="explanation-title"></div>{hintswrap}</div>').format(
             st=style,
-            text=Text(_("Answer")),
             lwrp=label_wrap,
             hintswrap=hints_wrap
         )

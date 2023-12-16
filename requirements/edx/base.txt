@@ -1217,3 +1217,6 @@ openpyxl==3.1.2
 # xblock lab
 labxblock-xblock
 
+
+# learningprojectxblock
+assignmentxblock-xblock

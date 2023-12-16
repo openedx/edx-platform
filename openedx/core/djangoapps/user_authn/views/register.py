@@ -549,6 +549,8 @@ class RegistrationView(APIView):
     @method_decorator(csrf_exempt)
     @method_decorator(ratelimit(key=REAL_IP_KEY, rate=settings.REGISTRATION_RATELIMIT, method='POST'))
     def post(self, request):
+   
+        
         """Create the user's account.
 
         You must send all required form fields with the request.
@@ -609,9 +611,14 @@ class RegistrationView(APIView):
             student_code =UserProfile.create_student_code(user=user)
         except:
             None 
-            
+
+
+        from django.contrib.sites.models import Site
+        portal_domain = Site.objects.get(name='portal_domain')
+      
+        
         # create student portal 
-        url_create_student = 'https://staging-portal.funix.edu.vn/api/student/register'
+        url_create_student =  f'https://{portal_domain}/api/student/register'
         headers = {
                 "Content-Type": "application/json"
             }
@@ -621,7 +628,7 @@ class RegistrationView(APIView):
                 "student_code" : student_code,
                 "username" : user.username
             }))
-        print('===============', data.get('organization'))
+
      # add student org protal
         add_student_to_organization(user.email, data.get('organization'))
     
@@ -947,13 +954,16 @@ class RegistrationValidationView(APIView):
         return Response(response_dict)
 
 def add_student_to_organization(user_email, organization_name):
-    url_add_org_student = 'https://staging-portal.funix.edu.vn/api/student_organization/add_student'
+    from django.contrib.sites.models import Site
+    portal_domain = Site.objects.get(name='portal_domain')
+    
+    url_add_org_student = f'https://{portal_domain}/api/student_organization/add_student'
     headers = {
         'Content-Type': 'application/json',
     }
     payload = {
         "student": [user_email],
-        "organization": organization_name
+        "organization": 'Staging'
     }
 
     try:

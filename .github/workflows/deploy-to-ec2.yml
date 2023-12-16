@@ -1,0 +1,20 @@
+name: Deploy to AWS
+on:
+  push:
+    branches:
+      - "dev"
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy docker image to EC2
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.DEV_IP }}
+          username: ${{ secrets.DEV_USERNAME }}
+          key: ${{ secrets.DEV_KEY }}
+          port: 22
+          command_timeout: 100m
+          script: |
+            tutor images build openedx --no-cache
+            echo -e "y\n\n\n\n\n\ny" | tutor local launch

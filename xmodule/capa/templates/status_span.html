@@ -1,3 +1,7 @@
+<%!
+
+from django.utils.translation import gettext as _
+%>
 <%page expression_filter="h" args="status, status_id='', hide_correctness=False"/>
 
 % if status_id == '':
@@ -8,6 +12,15 @@
       data-tooltip="${'' if hide_correctness == True else status.display_tooltip}">
 % endif
   % if hide_correctness == False:
+  %if status.display_name == 'incorrect' : 
+  <span class="sr">${status.display_name}</span>
+  <span class='problem-error'>
+      <span></span>
+  </span>
+  % elif status.display_name == 'correct' :
+      <span></span>
+  %else :
   <span class="sr">${status.display_name}</span><span class="status-icon" aria-hidden="true"></span>
+  %endif
   % endif
 </span>

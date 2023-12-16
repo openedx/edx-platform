@@ -699,7 +699,7 @@ def do_create_account(form, custom_form=None):
     user = User(
         username=proposed_username,
         email=form.cleaned_data["email"],
-        is_active=False
+        is_active=True
     )
     password = normalize_password(form.cleaned_data["password"])
     user.set_password(password)
