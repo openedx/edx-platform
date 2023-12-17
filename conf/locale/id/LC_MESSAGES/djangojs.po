@@ -802,6 +802,7 @@ msgid "Select a category"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "Seting Account"
@@ -8031,13 +8032,13 @@ msgid "Financial Assistance Application"
 msgstr "Permohonan Bantuan Keuangan"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid "About You"
-msgstr "Tentang Anda"
+msgid "Profile Information"
+msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
-"The following information is already a part of your {platform} profile. "
-"We've included it here for your application."
+"The following information is already a part of your {platform} profile and "
+"is required for your application. To edit this information go to "
 msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
@@ -8053,8 +8054,8 @@ msgid "Country of residence"
 msgstr "Negara tempat tinggal"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid "Back to {platform} FAQs"
-msgstr "Kembali ke FAQ {platform}"
+msgid "Application Details"
+msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Submit Application"

@@ -487,6 +487,7 @@ msgid "You're enrolled as an honor code student"
 msgstr "Usted está inscrito como estudiante con código de honor"
 
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
+#: lms/djangoapps/courseware/views/views.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
@@ -3809,46 +3810,22 @@ msgid "Certificate is being created."
 msgstr "Ha comenzado a crearse el certificado"
 
 #: lms/djangoapps/courseware/views/views.py
-#, python-brace-format
 msgid ""
-"{platform_name} now offers financial assistance for learners who want to earn Verified Certificates but who may not be able to pay the Verified Certificate fee. Eligible learners may receive up to 90{percent_sign} off the Verified Certificate fee for a course.\n"
-"To apply for financial assistance, enroll in the audit track for a course that offers Verified Certificates, and then complete this application. Note that you must complete a separate application for each course you take.\n"
-" We plan to use this information to evaluate your application for financial assistance and to further develop our financial assistance program."
+"We plan to use this information to evaluate your application for financial assistance and to further develop our financial assistance program. Please note that while \n"
+"assistance is available in most courses that offer verified certificates, a few courses and programs are not eligible. You must complete a separate application \n"
+"for each course you take. You may be approved for financial assistance five (5) times each year (based on 12-month period from you first approval). \n"
+"To apply for financial assistance: \n"
+"1. Enroll in the audit track for an eligible course that offers Verified Certificates \n"
+"2. Complete this  application \n"
+"3. Check your email, your application will be reviewed in 3-4 business days"
 msgstr ""
-"{platform_name} ahora ofrece asistencia financiera para los estudiantes que quieran obtener un certificado verificado pero no tengan la capacidad de pagar la tarifa correspondiente. Los estudiantes elegibles podrán recibir hasta 90{percent_sign} de descuento en la tarifa de certificados verificados para un curso.\n"
-"Para aplicar a la asistencia financiera, inscríbase al curso como asistente y luego complete esta aplicación. Tenga en cuenta que usted debe completar una aplicación diferente por cada curso tomado.\n"
-"Planeamos usar esta información para evaluar su solicitud de asistencia financiera y desarrollar en mayor medida nuestro programa de asistencia."
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Annual Household Income"
-msgstr "Ingresos anuales en tu hogar"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your current financial situation. Why do you need assistance?"
-msgstr ""
-"Cuéntenos sobre su situación financiera actual. ¿Por qué requiere "
-"asistencia?"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your learning or professional goals. How will a Verified "
-"Certificate in this course help you achieve these goals?"
-msgstr ""
-"Cuéntenos sobre sus metas de aprendizaje y profesionales. ¿Cómo le puede "
-"ayudar a lograr estas metas un Certificado Verificado?"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your plans for this course. What steps will you take to help "
-"you complete the course work and receive a certificate?"
-msgstr ""
-"Cuéntenos sobre sus planes respecto a este curso. ¿Cuáles son los pasos que "
-"tomará para completar las asignaciones del curso y recibir un certificado?"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Use between 1250 and 2500 characters or so in your response."
-msgstr "Use entre 1250 y 2500 caracteres más o menos en su respuesta"
+"Planeamos utilizar esta información para evaluar su solicitud de asistencia financiera y desarrollar aún más nuestro programa de asistencia financiera. Tenga en cuenta que mientras\n"
+" La asistencia está disponible en la mayoría de los cursos que ofrecen certificados verificados; algunos cursos y programas no son elegibles. Debe completar una solicitud por separado\n"
+" por cada curso que tomes. Es posible que se le apruebe asistencia financiera cinco (5) veces al año (basado en Período de 12 meses desde su primera aprobación).\n"
+" Para solicitar asistencia financiera:\n"
+" 1. inscribirse en Tomar el curso de forma gratuita, sin certificado Certificado Verificado para un curso elegible que ofrezca Certificados Verificados\n"
+" 2. Complete esta solicitud\n"
+" 3. Revise su correo electrónico, su solicitud será revisada en 3-4 días hábiles"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
@@ -3861,19 +3838,30 @@ msgstr ""
 " de asistente para el curso."
 
 #: lms/djangoapps/courseware/views/views.py
-msgid "Specify your annual household income in US Dollars."
+msgid "I certify that: "
+msgstr "Certifico que:"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"Paying the verified certificate fee for the above course would cause me "
+"economic hardship"
 msgstr ""
-"Especifica los ingresos anuales en tu hogar en dólares estadounidenses."
+"Pagar la tarifa Certificado Verificado por el curso anterior me causaría "
+"dificultades económicas"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"I will work diligently to complete the course work and receive a certificate"
+msgstr ""
+"Trabajaré en para completar el trabajo del curso y recibir un Certificado"
 
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid ""
-"I allow {platform_name} to use the information provided in this application "
-"(except for financial information) for {platform_name} marketing purposes."
+"I have read, understand, and will abide by the {honor_code_link} for the edX"
+" Site"
 msgstr ""
-"Autorizo a {platform_name} de usar la información entregada en esta "
-"aplicación (excepto por la información financiera) para propósitos de "
-"marketing de {platform_name}."
+"He leído, entiendo y cumpliré por {honor_code_link} para el sitio edX."
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Title can't be empty"
@@ -8672,6 +8660,10 @@ msgstr ""
 #, python-brace-format
 msgid "The '{field_name}' field cannot be edited."
 msgstr "El campo '{field_name}' no puede ser editado."
+
+#: openedx/core/djangoapps/user_api/accounts/api.py
+msgid "Full name can't be longer than 255 symbols"
+msgstr "Nombrar completo no puede tener más de 255 símbolos."
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
@@ -13699,13 +13691,11 @@ msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}, {current_group}"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "Duplicado de {0}"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "Duplicado de '{0}'"
@@ -18974,20 +18964,6 @@ msgstr ""
 #. Translators: This string will not be used in Open edX installations.
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
-"In order to be eligible for edX Financial Assistance, you must demonstrate "
-"that paying the Verified Certificate fee would cause you economic hardship. "
-"To apply, you will be asked to answer a few questions about why you are "
-"applying and how the Verified Certificate will benefit you."
-msgstr ""
-"Para ser elegible para la asistencia financiera de edX, debe demostrar que "
-"el pago de la tarifa correspondiente al certificado verificado le causará "
-"problemas económicos. Para aplicar, se le pedirá responder algunas preguntas"
-" acerca de sus motivos para aplicar y sobre cómo se beneficiará con el "
-"certificado verificado."
-
-#. Translators: This string will not be used in Open edX installations.
-#: lms/templates/financial-assistance/financial-assistance.html
-msgid ""
 "If your application is approved, we'll give you instructions for verifying "
 "your identity on edx.org so you can start working toward completing your edX"
 " course."
@@ -19012,10 +18988,6 @@ msgstr ""
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Sincerely, Anant"
 msgstr "Sinceramente,  Anant"
-
-#: lms/templates/financial-assistance/financial-assistance.html
-msgid "Back to Student FAQs"
-msgstr "Regresar a FAQs para estudiantes"
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Apply for Financial Assistance"

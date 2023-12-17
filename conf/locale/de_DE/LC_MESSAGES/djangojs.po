@@ -901,6 +901,7 @@ msgid "Select a category"
 msgstr "Wählen Sie eine Kategorie"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "Benutzerkonto-Einstellungen"
@@ -8510,16 +8511,14 @@ msgid "Financial Assistance Application"
 msgstr "Antrag auf finanzielle Unterstützung"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid "About You"
-msgstr "Über Sie"
+msgid "Profile Information"
+msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
-"The following information is already a part of your {platform} profile. "
-"We've included it here for your application."
+"The following information is already a part of your {platform} profile and "
+"is required for your application. To edit this information go to "
 msgstr ""
-"Die folgende Information ist Teil Ihres {platform} Profils. Wir haben es "
-"hier für Sie eingefügt."
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Email address"
@@ -8534,8 +8533,8 @@ msgid "Country of residence"
 msgstr "Wohnsitz"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid "Back to {platform} FAQs"
-msgstr "Zurück zu den {platform} FAQs"
+msgid "Application Details"
+msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Submit Application"
