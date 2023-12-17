@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-12-10 20:36+0000\n"
-"PO-Revision-Date: 2023-12-10 20:36:19.422580\n"
+"POT-Creation-Date: 2023-12-17 20:36+0000\n"
+"PO-Revision-Date: 2023-12-17 20:36:18.369413\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -21453,7 +21453,7 @@ msgid "Select this problem"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy to Clipboard"
+msgid "Manage Access"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
@@ -21461,7 +21461,7 @@ msgid "Manage tags"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Manage Access"
+msgid "Copy to Clipboard"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
