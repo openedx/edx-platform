@@ -47,7 +47,7 @@ class GetLibraryV1ToV2Test(TestCase):
         mock_store = mock.MagicMock()
         mock_store.get_library.return_value = mock_library
 
-        library = api.get_v1_or_v2_library(self.v1_library_key, store=mock_store)
+        library = api.get_v1_or_v2_library(self.v1_library_key, version=None, store=mock_store)
         assert library == mock_library
 
     @override_waffle_flag(MAP_V1_LIBRARIES_TO_V2_LIBRARIES, active=True)
@@ -56,7 +56,7 @@ class GetLibraryV1ToV2Test(TestCase):
         """
         If the flag is enabled, V1 Keys return V2 Libs.
         """
-        library = api.get_v1_or_v2_library(self.v1_library_key)
+        library = api.get_v1_or_v2_library(self.v1_library_key, version=None, store=None)
         mock_get_v2_library.assert_called_once()
 
 

@@ -53,26 +53,57 @@ from openedx.core.djangolib.markup import HTML, Text
                 clipboardData: ${user_clipboard | n, dump_js_escaped_json},
             }
         );
-        require(["js/models/xblock_info", "js/views/xblock", "js/views/utils/xblock_utils", "common/js/components/utils/view_utils"], function (XBlockInfo, XBlockView, XBlockUtils, ViewUtils) {
+
+        require(["js/models/xblock_info", "js/views/xblock", "js/views/utils/xblock_utils", "common/js/components/utils/view_utils", "gettext"], function (XBlockInfo, XBlockView, XBlockUtils, ViewUtils, gettext) {
             var model = new XBlockInfo({
                 id: '${subsection.location|n, decode.utf8}'
             });
             var xblockView = new XBlockView({
                 model: model,
                 el: $('#sequence-nav'),
-                view: 'author_view?position=${position|n, decode.utf8}&next_url=${next_url|n, decode.utf8}&prev_url=${prev_url|n, decode.utf8}'
+                view: 'author_view?position=${position|n, decode.utf8}&next_url=${next_url|n, decode.utf8}&prev_url=${prev_url|n, decode.utf8}',
+                clipboardData: ${user_clipboard | n, dump_js_escaped_json},
             });
+
             xblockView.xblockReady = function() {
-                $('.seq_new_button').click(function(evt) {
-                    evt.preventDefault();
-                    XBlockUtils.addXBlock($(evt.target)).done(function(locator) {
+
+                var toggleCaretButton = function(clipboardData) {
+                    if (clipboardData && clipboardData.content && clipboardData.source_usage_key.includes("vertical")) {
+                        $('.dropdown-toggle-button').show();
+                    } else {
+                        $('.dropdown-toggle-button').hide();
+                        $('.dropdown-options').hide();
+                    }
+                };
+                this.clipboardBroadcastChannel = new BroadcastChannel("studio_clipboard_channel");
+                this.clipboardBroadcastChannel.onmessage = (event) => {
+                    toggleCaretButton(event.data);
+                };
+                toggleCaretButton(this.options.clipboardData);
+
+                $('#new-unit-button').on('click', function(event) {
+                    event.preventDefault();
+                    XBlockUtils.addXBlock($(this)).done(function(locator) {
                         ViewUtils.redirect('/container/' + locator + '?action=new');
-                        return false;
                     });
-                    return false;
                 });
 
+                $('.custom-dropdown .dropdown-toggle-button').on('click', function(event) {
+                    event.stopPropagation(); // Prevent the event from closing immediately when we open it
+                    $(this).next('.dropdown-options').slideToggle('fast'); // This toggles the dropdown visibility
+                    var isExpanded = $(this).attr('aria-expanded') === 'true';
+                    $(this).attr('aria-expanded', !isExpanded);
+                });
+
+                $('.seq_paste_unit').on('click', function(event) {
+                    event.preventDefault();
+                    $('.dropdown-options').hide();
+                    XBlockUtils.pasteXBlock($(this)).done(function(data) {
+                        ViewUtils.redirect('/container/' + data.locator + '?action=new');
+                    });
+                });
             };
+
             xblockView.render();
         });
     </%static:webpack>
@@ -228,7 +259,10 @@ from openedx.core.djangolib.markup import HTML, Text
                                 )}</span>
                             </p>
                         </div>
-                     </div>
+                    </div>
+                    % if show_unit_tags:
+                        <div class="unit-tags is-hidden"></div>
+                    % endif
                 % endif
             </aside>
         </section>
@@ -253,4 +287,7 @@ from openedx.core.djangolib.markup import HTML, Text
         </div>
     </div>
 </div>
+
+<div id="manage-tags-drawer" class="drawer"></div>
+<div class="drawer-cover"></div>
 </%block>

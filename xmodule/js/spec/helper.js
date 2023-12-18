@@ -180,6 +180,38 @@
                 return {};
             } else if (settings.url === '/save_user_state') {
                 return {success: true};
+            } else if (settings.url.match(/.+video-transcript.+$/)) {
+                if (settings.url.match(/.+&video_id=notAIGenerated/)) {
+                    return settings.success(null);
+                }
+                if (settings.url.match(/.+&video_id=inProgress/)) {
+                    return settings.success({
+                        status: 'In Progress'
+                    });
+                }
+                if (settings.url.match(/.+&video_id=error/)) {
+                    return settings.error();
+                }
+                return settings.success({
+                    status: 'Completed'
+                });
+            } else if (settings.url.match(/.+transcript-feedback.+$/) && settings.type === 'GET') {
+                if (settings.url.match(/.+&video_id=error.+$/)) {
+                    return settings.error();
+                }
+                if (settings.url.match(/.+&video_id=negative.+$/)) {
+                    return settings.success({
+                        value: false
+                    });
+                }
+                if (settings.url.match(/.+&video_id=none.+$/)) {
+                    return settings.success(null);
+                }
+                return settings.success({
+                    value: true
+                });
+            } else if (settings.url.match(/.+transcript-feedback.+$/) && settings.type === 'POST') {
+                return settings.success(settings.data.value !== null ? { value: settings.data.value } : null);
             } else if (settings.url.match(new RegExp(jasmine.getFixtures().fixturesPath + '.+', 'g'))) {
                 return origAjax(settings);
             } else {

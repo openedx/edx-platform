@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-22 20:35+0000\n"
-"PO-Revision-Date: 2023-10-22 20:35:52.246505\n"
+"POT-Creation-Date: 2023-12-05 14:25+0000\n"
+"PO-Revision-Date: 2023-12-05 14:25:08.102305\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -3390,6 +3390,7 @@ msgstr "{sign_in_link} øɹ {register_link}."
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
 #: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/lti_provider/user-auth-error.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Sign in"
 msgstr "Sᴉƃn ᴉn"
@@ -4887,6 +4888,18 @@ msgid ""
 msgstr ""
 "Ŧɥǝ lᴉsʇ øɟ ƃɹønd ɔønɟᴉƃnɹɐʇᴉøns ɟøɹ dɐɹʇᴉʇᴉønᴉnƃ sʇndǝnʇs ᴉn ɔønʇǝnʇ "
 "ǝxdǝɹᴉɯǝnʇs."
+
+#: lms/djangoapps/lti_provider/models.py
+msgid ""
+"When checked, the LTI content will load only for learners who have an "
+"account in this instance. This is required only for linking learner accounts"
+" with the LTI consumer. See the Open edX LTI Provider documentation for more"
+" details."
+msgstr ""
+"Wɥǝn ɔɥǝɔʞǝd, ʇɥǝ ŁŦƗ ɔønʇǝnʇ ʍᴉll løɐd ønlʎ ɟøɹ lǝɐɹnǝɹs ʍɥø ɥɐʌǝ ɐn "
+"ɐɔɔønnʇ ᴉn ʇɥᴉs ᴉnsʇɐnɔǝ. Ŧɥᴉs ᴉs ɹǝbnᴉɹǝd ønlʎ ɟøɹ lᴉnʞᴉnƃ lǝɐɹnǝɹ ɐɔɔønnʇs"
+" ʍᴉʇɥ ʇɥǝ ŁŦƗ ɔønsnɯǝɹ. Sǝǝ ʇɥǝ Ødǝn ǝdX ŁŦƗ Ᵽɹøʌᴉdǝɹ døɔnɯǝnʇɐʇᴉøn ɟøɹ ɯøɹǝ"
+" dǝʇɐᴉls."
 
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
@@ -8169,6 +8182,10 @@ msgid "The '{field_name}' field cannot be edited."
 msgstr "Ŧɥǝ '{field_name}' ɟᴉǝld ɔɐnnøʇ bǝ ǝdᴉʇǝd."
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
+msgid "Full name can't be longer than 255 symbols"
+msgstr "Fnll nɐɯǝ ɔɐn'ʇ bǝ lønƃǝɹ ʇɥɐn 255 sʎɯbøls"
+
+#: openedx/core/djangoapps/user_api/accounts/api.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Enter a valid name"
 msgstr "Ɇnʇǝɹ ɐ ʌɐlᴉd nɐɯǝ"
@@ -11444,6 +11461,19 @@ msgstr ""
 "ʇɥǝᴉɹ ɐnsʍǝɹs ɐnd ɹǝsɥnɟɟlǝ sǝlǝɔʇǝd ᴉʇǝɯs."
 
 #: xmodule/library_content_block.py
+msgid "Source content library has not been specified."
+msgstr "Sønɹɔǝ ɔønʇǝnʇ lᴉbɹɐɹʎ ɥɐs nøʇ bǝǝn sdǝɔᴉɟᴉǝd."
+
+#: xmodule/library_content_block.py
+msgid "Content libraries are not available in the current runtime."
+msgstr "Ȼønʇǝnʇ lᴉbɹɐɹᴉǝs ɐɹǝ nøʇ ɐʌɐᴉlɐblǝ ᴉn ʇɥǝ ɔnɹɹǝnʇ ɹnnʇᴉɯǝ."
+
+#: xmodule/library_content_block.py
+#, python-brace-format
+msgid "Source content library does not exist: {source_library_id}"
+msgstr "Sønɹɔǝ ɔønʇǝnʇ lᴉbɹɐɹʎ døǝs nøʇ ǝxᴉsʇ: {source_library_id}"
+
+#: xmodule/library_content_block.py
 msgid "This component is out of date. The library has new content."
 msgstr "Ŧɥᴉs ɔøɯdønǝnʇ ᴉs ønʇ øɟ dɐʇǝ. Ŧɥǝ lᴉbɹɐɹʎ ɥɐs nǝʍ ɔønʇǝnʇ."
 
@@ -11479,8 +11509,9 @@ msgid "Select a Library."
 msgstr "Sǝlǝɔʇ ɐ Łᴉbɹɐɹʎ."
 
 #: xmodule/library_content_block.py
-msgid "There are no matching problem types in the specified libraries."
-msgstr "Ŧɥǝɹǝ ɐɹǝ nø ɯɐʇɔɥᴉnƃ dɹøblǝɯ ʇʎdǝs ᴉn ʇɥǝ sdǝɔᴉɟᴉǝd lᴉbɹɐɹᴉǝs."
+#, python-brace-format
+msgid "There are no problems in the specified library of type {capa_type}."
+msgstr "Ŧɥǝɹǝ ɐɹǝ nø dɹøblǝɯs ᴉn ʇɥǝ sdǝɔᴉɟᴉǝd lᴉbɹɐɹʎ øɟ ʇʎdǝ {capa_type}."
 
 #: xmodule/library_content_block.py
 msgid "Select another problem type."
@@ -12989,13 +13020,11 @@ msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}, {current_group}"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "Đndlᴉɔɐʇǝ øɟ {0}"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "Đndlᴉɔɐʇǝ øɟ '{0}'"
@@ -13710,14 +13739,6 @@ msgstr "Ɍǝbnᴉɹǝɯǝnʇs"
 msgid "Details"
 msgstr "Đǝʇɐᴉls"
 
-#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
-#. Translators: this is a verb describing the action of viewing more details
-#: cms/templates/studio_xblock_wrapper.html
-#: lms/templates/wiki/includes/article_menu.html
-#: wiki/templates/wiki/includes/article_menu.html
-msgid "View"
-msgstr "Vᴉǝʍ"
-
 #: cms/templates/maintenance/_announcement_edit.html
 #: lms/templates/problem.html lms/templates/word_cloud.html
 msgid "Save"
@@ -14176,10 +14197,10 @@ msgid "Welcome to {platform_name}"
 msgstr "Wǝlɔøɯǝ ʇø {platform_name}"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See https://open.edx.org for more information.
+#. untranslated. See https://openedx.org for more information.
 #: lms/templates/index_overlay.html
-msgid "It works! Powered by Open edX{registered_trademark}"
-msgstr "Ɨʇ ʍøɹʞs! Ᵽøʍǝɹǝd bʎ Ødǝn ǝdX{registered_trademark}"
+msgid "It works! Powered by the Open edX{registered_trademark} Platform"
+msgstr "Ɨʇ ʍøɹʞs! Ᵽøʍǝɹǝd bʎ ʇɥǝ Ødǝn ǝdX{registered_trademark} Ᵽlɐʇɟøɹɯ"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -14496,6 +14517,14 @@ msgstr "Sǝbnǝnɔǝ"
 #: lms/templates/seq_block.html lms/templates/vert_module.html
 msgid "Completed"
 msgstr "Ȼøɯdlǝʇǝd"
+
+#: lms/templates/seq_block.html
+msgid "New Unit"
+msgstr "Nǝʍ Ʉnᴉʇ"
+
+#: lms/templates/seq_block.html
+msgid "Paste as new unit"
+msgstr "Ᵽɐsʇǝ ɐs nǝʍ nnᴉʇ"
 
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"
@@ -14858,6 +14887,10 @@ msgstr "Ħɐndønʇs"
 #: lms/templates/video.html
 msgid "Download Handout"
 msgstr "Đøʍnløɐd Ħɐndønʇ"
+
+#: lms/templates/video.html
+msgid "How is the transcript quality ?"
+msgstr "Ħøʍ ᴉs ʇɥǝ ʇɹɐnsɔɹᴉdʇ bnɐlᴉʇʎ ?"
 
 #: lms/templates/word_cloud.html
 msgid "{num} of {total}"
@@ -19856,6 +19889,28 @@ msgstr ""
 msgid "My Courses"
 msgstr "Mʎ Ȼønɹsǝs"
 
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "There was an error when loading this module!"
+msgstr "Ŧɥǝɹǝ ʍɐs ɐn ǝɹɹøɹ ʍɥǝn løɐdᴉnƃ ʇɥᴉs ɯødnlǝ!"
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"This module is available only for users who are signed into {platform}. "
+"Kindly sign in and refresh this page to load the content."
+msgstr ""
+"Ŧɥᴉs ɯødnlǝ ᴉs ɐʌɐᴉlɐblǝ ønlʎ ɟøɹ nsǝɹs ʍɥø ɐɹǝ sᴉƃnǝd ᴉnʇø {platform}. "
+"Ꝁᴉndlʎ sᴉƃn ᴉn ɐnd ɹǝɟɹǝsɥ ʇɥᴉs dɐƃǝ ʇø løɐd ʇɥǝ ɔønʇǝnʇ."
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "NOTE:"
+msgstr "NØŦɆ:"
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"The email used to sign into this platform and {platform} should be the same."
+msgstr ""
+"Ŧɥǝ ǝɯɐᴉl nsǝd ʇø sᴉƃn ᴉnʇø ʇɥᴉs dlɐʇɟøɹɯ ɐnd {platform} sɥønld bǝ ʇɥǝ sɐɯǝ."
+
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
 msgstr "Ȼɥɐnƃǝ Ᵽɹǝɟǝɹɹǝd Łɐnƃnɐƃǝ"
@@ -20432,6 +20487,11 @@ msgstr "Ǥøʇ ᴉʇ!"
 #: lms/templates/widgets/cookie-consent.html
 msgid "Learn more"
 msgstr "Łǝɐɹn ɯøɹǝ"
+
+#: lms/templates/wiki/includes/article_menu.html
+#: wiki/templates/wiki/includes/article_menu.html
+msgid "View"
+msgstr "Vᴉǝʍ"
 
 #: lms/templates/wiki/includes/article_menu.html
 msgid "{span_start}(active){span_end}"
@@ -21141,6 +21201,10 @@ msgstr "Vᴉǝʍ Łᴉʌǝ Vǝɹsᴉøn"
 #: cms/templates/container.html
 msgid "Preview the courseware in the LMS"
 msgstr "Ᵽɹǝʌᴉǝʍ ʇɥǝ ɔønɹsǝʍɐɹǝ ᴉn ʇɥǝ ŁMS"
+
+#: cms/templates/container.html
+msgid "Collapse All"
+msgstr "Ȼøllɐdsǝ Ⱥll"
 
 #: cms/templates/container.html
 msgid "Adding components"
@@ -24112,12 +24176,24 @@ msgstr ""
 "ʍøɹʇɥ."
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Importing components"
+msgstr "Ɨɯdøɹʇᴉnƃ ɔøɯdønǝnʇs"
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
 msgstr "Ɇxdɐnd øɹ Ȼøllɐdsǝ"
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Select this problem"
+msgstr "Sǝlǝɔʇ ʇɥᴉs dɹøblǝɯ"
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"
 msgstr "Ȼødʎ ʇø Ȼlᴉdbøɐɹd"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage tags"
+msgstr "Mɐnɐƃǝ ʇɐƃs"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"
