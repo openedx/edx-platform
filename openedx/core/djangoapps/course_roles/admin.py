@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
 
 from openedx.core.djangoapps.course_roles.models import UserRole
+from organizations.models import Organization
 
 
 User = get_user_model()  # pylint:disable=invalid-name
@@ -21,9 +22,13 @@ class UserRoleForm(forms.ModelForm):
         confirm org matches coures's org name
         """
         if self.cleaned_data.get("course") is not None and self.cleaned_data["org"] is None:
-            raise forms.ValidationError(
-                _("Org cannot be blank if the role is being assigned for a course.")
-            )
+            course = self.cleaned_data.get("course")
+            try:
+                org = Organization.objects.get(name=course.org)
+            except Exception as exc:
+                err = _("An organization could not be found for {course}").format(course=course)
+                raise forms.ValidationError(err) from exc
+            return org
         if self.cleaned_data.get("course") and self.cleaned_data["org"]:
             org = self.cleaned_data["org"]
             org_name = self.cleaned_data.get("course").org
@@ -39,12 +44,12 @@ class UserRoleForm(forms.ModelForm):
         email = self.cleaned_data["email"]
         try:
             user = User.objects.get(email=email)
-        except Exception:
+        except User.DoesNotExist as exc:
             err = _("Email does not exist. Could not find {email}. Please re-enter email address").format(email=email)
-            raise forms.ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
-                err
-            )
-
+            raise forms.ValidationError(err) from exc
+        except Exception as exc:
+            err = _("There was an error submitting the email. Please re-enter email address")
+            raise forms.ValidationError(err) from exc
         return user
 
     def clean(self):
@@ -76,7 +81,12 @@ class UserRoleForm(forms.ModelForm):
                     role=cleaned_data.get("role")
                 )
             if user_role.exists():
-                raise forms.ValidationError(_("Duplicate Record."))
+                raise forms.ValidationError(_(
+                    "The {role} is already assigned to the user ({email}) for this context."
+                    ).format(
+                        role=cleaned_data.get("role"),
+                        email=cleaned_data.get("email")
+                ))
         return cleaned_data
 
     def __init__(self, *args, **kwargs):
@@ -100,11 +110,11 @@ class UserRoleAdmin(admin.ModelAdmin):
             # Translators: The <br> does not need to be translated.
             "description": _(
                 "<br/>A role assigned to a course will only be"
-                " valid for that course.<br/>"
+                " valid for that course. Leave the org field blank.<br/>"
                 "A role assigned to an org, without a course,"
-                "will apply to all courses that are assigned to that org."
+                " will apply to all courses that are assigned to that org. Leave the course field blank."
                 "<br/>A role assigned to neither a course nor an org will apply to"
-                " all courses for the instance.<br/><br/>"
+                " all courses for the instance. Leave the course and org fields blank.<br/><br/>"
             )
         }),
     )

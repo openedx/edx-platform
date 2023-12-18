@@ -56,7 +56,7 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
 
         #try adding with same information raise error.
         response = self.client.post(reverse('admin:course_roles_userrole_add'), data=data)
-        self.assertContains(response, 'Duplicate')
+        self.assertContains(response, 'already assigned to the user')
 
     def test_instance_level_role_creation(self):
         data = {
@@ -106,15 +106,13 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
         # adding new role from django admin page
         response = self.client.post(reverse('admin:course_roles_userrole_add'), data=data)
 
-        # checking new role not added, and errors are shown
-        self.assertContains(
-            response,
-            "Org cannot be blank if the role is being assigned for a course.",
-            1,
-            200,
-            "",
-            True
-        )
+        # checking the new role created matches expectations
+        response = self.client.get(reverse('admin:course_roles_userrole_changelist'))
+        self.assertContains(response, 'Select user role to change')
+        self.assertContains(response, 'Add user role')
+        self.assertContains(response, 'test_role')
+        self.assertContains(response, str(self.course.id))
+        self.assertContains(response, '1 user role')
 
     def test_course_level_role_creation_with_invalid_data(self):
         email = 'invalid@email.com'
@@ -166,6 +164,31 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
             response,
             'Org name {} ({}) is not valid. Valid name is {}.'.format(
                 self.fake_org.name, self.fake_org.short_name, self.org.name
+            ),
+            1,
+            200,
+            '',
+            True
+        )
+
+    def test_course_level_role_creation_with_valid_course_blank_org_that_is_invalid_in_db(self):
+        course = CourseOverviewFactory(org='nonexistant_org_for_invalid_tests', run='1')
+        data = {
+            'course': str(course),
+            'role': str(self.role.id),
+            'email': self.user.email
+        }
+
+        self.client.login(username=self.user, password='test')
+
+        # adding new role from django admin page
+        response = self.client.post(reverse('admin:course_roles_userrole_add'), data=data)
+
+        # checking new role not added, and errors are shown
+        self.assertContains(
+            response,
+            'An organization could not be found for {course}'.format(
+                course = course
             ),
             1,
             200,
