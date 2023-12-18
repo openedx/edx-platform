@@ -605,7 +605,7 @@ class RegistrationView(APIView):
         redirect_url = get_redirect_url_with_host(root_url, redirect_to)
         response = self._create_response(request, {}, status_code=200, redirect_url=redirect_url)
         set_logged_in_cookies(request, response, user)
-        
+        UserProfile.add_student_organization(user , organization=data.get('organization'))
         # create student_code
         try :
             student_code =UserProfile.create_student_code(user=user)
@@ -613,21 +613,21 @@ class RegistrationView(APIView):
             None 
 
 
-        from django.contrib.sites.models import Site
-        portal_domain = Site.objects.get(name='portal_domain')
+        # from django.contrib.sites.models import Site
+        # portal_domain = Site.objects.get(name='portal_domain')
       
         
-        # create student portal 
-        url_create_student =  f'https://{portal_domain}/api/student/register'
-        headers = {
-                "Content-Type": "application/json"
-            }
-        response_portal=requests.post(url=url_create_student,headers=headers, data=json.dumps({
-                "name" : data.get('name'),
-                "email" : user.email,
-                "student_code" : student_code,
-                "username" : user.username
-            }))
+        # # create student portal 
+        # url_create_student =  f'https://{portal_domain}/api/student/register'
+        # headers = {
+        #         "Content-Type": "application/json"
+        #     }
+        # response_portal=requests.post(url=url_create_student,headers=headers, data=json.dumps({
+        #         "name" : data.get('name'),
+        #         "email" : user.email,
+        #         "student_code" : student_code,
+        #         "username" : user.username
+        #     }))
 
      # add student org protal
         add_student_to_organization(user.email, data.get('organization'))
