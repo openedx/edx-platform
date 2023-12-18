@@ -2,11 +2,13 @@
 Tests for the course_roles views.
 """
 import ddt
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.urls import reverse
 from django.utils.http import urlencode
 from rest_framework import status
 from rest_framework.test import APIClient
 from organizations.tests.factories import OrganizationFactory
+from unittest.mock import patch
 
 from common.djangoapps.student.tests.factories import UserFactory
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -19,12 +21,12 @@ from openedx.core.djangoapps.course_roles.models import (
     Service,
     UserRole
 )
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
-class UserPermissionsViewTestCase(SharedModuleStoreTestCase):
+class UserPermissionsViewTestCase(ModuleStoreTestCase):
     """
     Tests for the UserPermissionsView.
     """
@@ -63,7 +65,7 @@ class UserPermissionsViewTestCase(SharedModuleStoreTestCase):
         """
         querykwargs = {'course_id': self.course_1.id, 'user_id': self.user_1.id}
         url = f'{reverse("course_roles_api:user_permissions")}?{urlencode(querykwargs)}'
-        expected_api_response = {'permissions': {self.permission_1.name, self.permission_2.name}}
+        expected_api_response = {'permissions': sorted([self.permission_1.name, self.permission_2.name])}
         # Ensure the view returns a 200 OK status code
         self.client.login(username=self.user_1, password='test')
         response = self.client.get(url)
@@ -108,8 +110,20 @@ class UserPermissionsViewTestCase(SharedModuleStoreTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_get_user_permission_view_with_deleted_user(self):
+        """
+        Test get user permissions with deleted user.
+        """
+        self.client.login(username=self.user_1, password='test')
+        querykwargs = {'course_id': self.course_1.id, 'user_id': self.user_1.id}
+        url = f'{reverse("course_roles_api:user_permissions")}?{urlencode(querykwargs)}'
+        with patch('openedx.core.djangoapps.course_roles.api.User.objects.get') as mock_user:
+            mock_user.side_effect = User.DoesNotExist
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-class UserPermissionsFlagViewTestCase(SharedModuleStoreTestCase):
+
+class UserPermissionsFlagViewTestCase(ModuleStoreTestCase):
     """
     Tests for the UserPermissionsFlagView.
     """
