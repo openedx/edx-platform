@@ -188,6 +188,49 @@ class TestCourseDetailSerializer(TestCourseSerializer):  # lint-amnesty, pylint:
             )
         self.assertDictEqual(result, self.expected_data)
 
+    @mock.patch('lms.djangoapps.course_api.serializers.CourseEnrollment.is_enrolled', return_value=True)
+    def test_is_enrolled_field_true(self, mock_is_enrolled):
+        course = self.create_course()
+        result = self._get_result_with_query_param(course)
+        assert result['is_enrolled'] is True
+        mock_is_enrolled.assert_called_once()
+
+    @mock.patch('lms.djangoapps.course_api.serializers.CourseEnrollment.is_enrolled', return_value=False)
+    def test_is_enrolled_field_false(self, mock_is_enrolled):
+        course = self.create_course()
+        result = self._get_result_with_query_param(course)
+        assert result['is_enrolled'] is False
+        mock_is_enrolled.assert_called_once()
+
+    def test_is_enrolled_field_anonymous_user(self):
+        course = self.create_course()
+        result = self._get_anonymous_result(course)
+        self.assertNotIn('is_enrolled', result)
+
+    def _get_anonymous_request(self):
+        return Request(self.request_factory.get('/'))
+
+    def _get_anonymous_result(self, course):
+        course_overview = CourseOverview.get_from_id(course.id)
+        return self.serializer_class(course_overview, context={'request': self._get_anonymous_request()}).data
+
+    def _get_result_with_query_param(self, course):
+        """
+        Return the CourseSerializer for the specified course with 'username' in query params.
+        """
+        course_overview = CourseOverview.get_from_id(course.id)
+        return self.serializer_class(course_overview, context={'request': self._get_request_with_query_param()}).data
+
+    def _get_request_with_query_param(self, user=None):
+        """
+        Build a Request object for the specified user with 'username' in query params.
+        """
+        if user is None:
+            user = self.honor_user
+        request = Request(self.request_factory.get('/', {'username': user.username}))
+        request.user = user
+        return request
+
 
 class TestCourseKeySerializer(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 

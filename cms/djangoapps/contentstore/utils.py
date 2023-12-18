@@ -440,7 +440,7 @@ def get_taxonomy_list_url():
     if use_tagging_taxonomy_list_page():
         mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
         if mfe_base_url:
-            taxonomy_list_url = f'{mfe_base_url}/taxonomy-list'
+            taxonomy_list_url = f'{mfe_base_url}/taxonomies'
     return taxonomy_list_url
 
 

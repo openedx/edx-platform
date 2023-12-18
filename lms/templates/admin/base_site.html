@@ -20,3 +20,7 @@
 
 
 {% endblock %}
+
+{% block header %}{{ block.super }}
+    {% include "survey_report/admin_banner.html" %}
+{% endblock %}

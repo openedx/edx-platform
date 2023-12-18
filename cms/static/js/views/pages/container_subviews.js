@@ -465,6 +465,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
                     tagContentElement.ariaExpanded = "false";
                     tagContentElement.setAttribute('aria-controls', `content-tags-tag-${tag.id}`);
                     tagContentElement.appendChild(tagIconElement);
+                    tagContentElement.className += ' tagging-label-link';
                     parentElement.appendChild(tagChildrenElement);
 
                     // Render children
