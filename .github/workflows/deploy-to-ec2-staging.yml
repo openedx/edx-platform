@@ -1,4 +1,4 @@
-name: Deploy to AWS
+name: Deploy OpenEdx to Staging
 on:
   push:
     branches:
