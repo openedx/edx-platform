@@ -411,14 +411,6 @@ BLOCKSTORE_API_URL = ENV_TOKENS.get('BLOCKSTORE_API_URL', None)  # e.g. "https:/
 # Configure an API auth token at (blockstore URL)/admin/authtoken/token/
 BLOCKSTORE_API_AUTH_TOKEN = AUTH_TOKENS.get('BLOCKSTORE_API_AUTH_TOKEN', None)
 
-# Datadog for events!
-DATADOG = AUTH_TOKENS.get("DATADOG", {})
-DATADOG.update(ENV_TOKENS.get("DATADOG", {}))
-
-# TODO: deprecated (compatibility with previous settings)
-if 'DATADOG_API' in AUTH_TOKENS:
-    DATADOG['api_key'] = AUTH_TOKENS['DATADOG_API']
-
 # Celery Broker
 CELERY_ALWAYS_EAGER = ENV_TOKENS.get("CELERY_ALWAYS_EAGER", False)
 CELERY_BROKER_TRANSPORT = ENV_TOKENS.get("CELERY_BROKER_TRANSPORT", "")
@@ -608,6 +600,8 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
     CORS_ALLOW_INSECURE = ENV_TOKENS.get('CORS_ALLOW_INSECURE', False)
     CORS_ALLOW_HEADERS = corsheaders_default_headers + (
         'use-jwt-cookie',
+        'content-range',
+        'content-disposition',
     )
 
 ################# Settings for brand logos. #################

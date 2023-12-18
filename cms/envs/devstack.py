@@ -258,6 +258,8 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_HEADERS = corsheaders_default_headers + (
     'use-jwt-cookie',
+    'content-range',
+    'content-disposition',
 )
 
 ################### Special Exams (Proctoring) and Prereqs ###################

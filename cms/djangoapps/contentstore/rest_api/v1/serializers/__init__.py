@@ -17,5 +17,6 @@ from .videos import (
     CourseVideosSerializer,
     VideoUploadSerializer,
     VideoImageSerializer,
-    VideoUsageSerializer
+    VideoUsageSerializer,
+    VideoDownloadSerializer
 )

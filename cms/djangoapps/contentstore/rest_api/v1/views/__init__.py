@@ -11,5 +11,6 @@ from .settings import CourseSettingsView
 from .videos import (
     CourseVideosView,
     VideoUsageView,
+    VideoDownloadView
 )
 from .help_urls import HelpUrlsView

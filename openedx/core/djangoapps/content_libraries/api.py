@@ -91,7 +91,15 @@ from xblock.exceptions import XBlockNotFoundError
 from edx_rest_api_client.client import OAuthAPIClient
 
 from openedx.core.djangoapps.content_libraries import permissions
-from openedx.core.djangoapps.content_libraries.constants import DRAFT_NAME, COMPLEX
+# pylint: disable=unused-import
+from openedx.core.djangoapps.content_libraries.constants import (
+    ALL_RIGHTS_RESERVED,
+    CC_4_BY,
+    COMPLEX,
+    DRAFT_NAME,
+    PROBLEM,
+    VIDEO,
+)
 from openedx.core.djangoapps.content_libraries.library_bundle import LibraryBundle
 from openedx.core.djangoapps.content_libraries.models import (
     ContentLibrary,
@@ -387,8 +395,15 @@ def get_library(library_key):
 
 
 def create_library(
-        collection_uuid, library_type, org, slug, title, description, allow_public_learning, allow_public_read,
-        library_license,
+        collection_uuid,
+        org,
+        slug,
+        title,
+        description="",
+        allow_public_learning=False,
+        allow_public_read=False,
+        library_license=ALL_RIGHTS_RESERVED,
+        library_type=COMPLEX,
 ):
     """
     Create a new content library.
@@ -404,6 +419,8 @@ def create_library(
     allow_public_learning: Allow anyone to read/learn from blocks in the LMS
 
     allow_public_read: Allow anyone to view blocks (including source) in Studio?
+
+    library_type: Deprecated parameter, not really used. Set to COMPLEX.
 
     Returns a ContentLibraryMetadata instance.
     """
@@ -1214,12 +1231,13 @@ class BaseEdxImportClient(abc.ABC):
         "video",
     }
 
-    def __init__(self, library_key=None, library=None):
+    def __init__(self, library_key=None, library=None, use_course_key_as_block_id_suffix=True):
         """
         Initialize an import client for a library.
 
         The method accepts either a library object or a key to a library object.
         """
+        self.use_course_key_as_block_id_suffix = use_course_key_as_block_id_suffix
         if bool(library_key) == bool(library):
             raise ValueError('Provide at least one of `library_key` or '
                              '`library`, but not both.')
@@ -1261,8 +1279,18 @@ class BaseEdxImportClient(abc.ABC):
                 str(modulestore_key.course_key).encode()
             ).digest()
         )[:16].decode().lower()
-        # Prepend 'c' to allow changing hash without conflicts.
-        block_id = f"{modulestore_key.block_id}_c{course_key_id}"
+
+        # add the course_key_id if use_course_key_as_suffix is enabled to increase the namespace.
+        # The option exists to not use the course key as a suffix because
+        # in order to preserve learner state in the v1 to v2 libraries migration,
+        # the v2 and v1 libraries' child block ids must be the same.
+        block_id = (
+            # Prepend 'c' to allow changing hash without conflicts.
+            f"{modulestore_key.block_id}_c{course_key_id}"
+            if self.use_course_key_as_block_id_suffix
+            else f"{modulestore_key.block_id}"
+        )
+
         log.info('Importing to library block: id=%s', block_id)
         try:
             library_block = create_library_block(
@@ -1473,7 +1501,7 @@ class EdxApiImportClient(BaseEdxImportClient):
         return response
 
 
-def import_blocks_create_task(library_key, course_key):
+def import_blocks_create_task(library_key, course_key, use_course_key_as_block_id_suffix=True):
     """
     Create a new import block task.
 
@@ -1486,7 +1514,7 @@ def import_blocks_create_task(library_key, course_key):
         course_id=course_key,
     )
     result = tasks.import_blocks_from_course.apply_async(
-        args=(import_task.pk, str(course_key))
+        args=(import_task.pk, str(course_key), use_course_key_as_block_id_suffix)
     )
     log.info(f"Import block task created: import_task={import_task} "
              f"celery_task={result.id}")

@@ -56,9 +56,6 @@ XMODULE_METRIC_NAME = 'edxapp.xmodule'
 XMODULE_DURATION_METRIC_NAME = XMODULE_METRIC_NAME + '.duration'
 XMODULE_METRIC_SAMPLE_RATE = 0.1
 
-# Stats event sent to DataDog in order to determine if old XML parsing can be deprecated.
-DEPRECATION_VSCOMPAT_EVENT = 'deprecation.vscompat'
-
 # xblock view names
 
 # This is the view that will be rendered to display the XBlock in the LMS.

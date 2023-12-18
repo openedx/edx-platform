@@ -17,7 +17,8 @@ from .views import (
     ProctoredExamSettingsView,
     ProctoringErrorsView,
     HelpUrlsView,
-    VideoUsageView
+    VideoUsageView,
+    VideoDownloadView
 )
 
 app_name = 'v1'
@@ -46,6 +47,11 @@ urlpatterns = [
     re_path(
         fr'^videos/{COURSE_ID_PATTERN}/{VIDEO_ID_PATTERN}/usage$',
         VideoUsageView.as_view(),
+        name="video_usage"
+    ),
+    re_path(
+        fr'^videos/{COURSE_ID_PATTERN}/download$',
+        VideoDownloadView.as_view(),
         name="video_usage"
     ),
     re_path(
