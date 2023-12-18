@@ -1176,6 +1176,10 @@ def revert_changes(library_key):
 #  https://github.com/openedx/edx-platform/issues/32457)
 # ======================================================
 
+
+def should_map_v1_to_v2_library() -> bool:
+    return MAP_V1_LIBRARIES_TO_V2_LIBRARIES.is_enabled()
+
 def get_v1_or_v2_library(
     library_id: str | LibraryLocatorV1 | LibraryLocatorV2,
     store=None

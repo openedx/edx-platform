@@ -18,8 +18,10 @@ from django.views.decorators.http import require_http_methods
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator
-from openedx.core.djangoapps.content_libraries.toggles import MAP_V1_LIBRARIES_TO_V2_LIBRARIES
-from openedx.core.djangoapps.content_libraries.api import map_v1_to_v2_library
+from openedx.core.djangoapps.content_libraries.api import (
+    map_v1_to_v2_library,
+    should_map_v1_to_v2_library,
+)
 
 from organizations.api import ensure_organization
 from organizations.exceptions import InvalidOrganizationException
@@ -142,7 +144,7 @@ def _display_library(library_key_string, request):
         raise PermissionDenied()
     if (
         should_redirect_to_library_authoring_mfe()
-        and MAP_V1_LIBRARIES_TO_V2_LIBRARIES.is_enabled()
+        and should_map_v1_to_v2_library()
         and settings.LIBRARY_AUTHORING_MICROFRONTEND_URL
     ):
         v2_key_string = str(map_v1_to_v2_library(library_key))

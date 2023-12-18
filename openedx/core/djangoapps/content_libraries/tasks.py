@@ -30,7 +30,9 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import (
     BlockUsageLocator,
     LibraryUsageLocator,
-    LibraryUsageLocatorV2
+    LibraryUsageLocatorV2,
+    LibraryLocator as LibraryLocatorV1,
+    LibraryLocatorV2
 )
 from search.search_engine_base import SearchEngine
 
@@ -305,8 +307,10 @@ def _update_children(
     filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)
     library = library_api.get_v1_or_v2_library(library_key)
     #update the key to match the library on account of the runtime mapping.
-    if library:
-        library_key = library.key if hasattr(library, 'key') else library.location.library_key
+    if isinstance(library, LibraryLocatorV1):
+        library.location.library_key
+    if isinstance(library, LibraryLocatorV2):
+        library_key = library.key
     if not library:
         task.status.fail(f"Requested library {library_key} not found.")
     elif isinstance(library, LibraryRootV1):
