@@ -18,7 +18,6 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
     def setUp(self):
         super().setUp()
         self.user = UserFactory(username="test_user_1", password="test", is_staff=True, is_superuser=True)
-        # self.user = UserFactory.create(is_staff=True, is_superuser=True)
         self.user.save()
         self.org = Organization.objects.create(
             name='test_org_for_course_roles',
