@@ -70,7 +70,7 @@ class HomePageViewTest(CourseTestCase):
         self.assertTrue(response.data['taxonomies_enabled'])
         self.assertEqual(
             response.data['taxonomy_list_mfe_url'],
-            f'{settings.COURSE_AUTHORING_MICROFRONTEND_URL}/taxonomy'
+            f'{settings.COURSE_AUTHORING_MICROFRONTEND_URL}/taxonomies'
         )
 
 
