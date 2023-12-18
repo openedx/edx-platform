@@ -61,7 +61,7 @@ class UserPermissionsView(APIView):
         permissions = {
             'user_id': user_id,
             'course_key': str(course_key),
-            'permissions': {permission.value.name for permission in permissions_set},
+            'permissions': sorted(permission.value.name for permission in permissions_set),
         }
         return Response(permissions)
 
