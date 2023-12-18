@@ -95,7 +95,7 @@ def _import_block(store, user_id, source_block, dest_parent_key):
         the same input block_id, library name, library organization, and parent block using derived_key
         """
         if not isinstance(source_key.lib_key, LibraryLocatorV2):
-            raise ValueError("Input must be an instance of LibraryLocatorV2")
+            raise TypeError(f"Expected source library key of type LibraryLocatorV2, got {source_key.lib_key} instead.")
         source_key_as_v1_course_key = LibraryLocatorV1(
             org=source_key.lib_key.org,
             library=source_key.lib_key.slug,
