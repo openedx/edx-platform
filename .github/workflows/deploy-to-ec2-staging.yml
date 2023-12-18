@@ -16,7 +16,7 @@ jobs:
           host: ${{ secrets.DEV_IP }}
           username: ubuntu
           key: ${{ secrets.DEV_KEY }}
-          port: ${{ secrets.DEV_USERNAME }}
+          port: 22
           script: |
             docker tag overhangio/openedx:15.3.6 848839979695.dkr.ecr.ap-southeast-1.amazonaws.com/lms:15.3.6
             docker push 848839979695.dkr.ecr.ap-southeast-1.amazonaws.com/lms:15.3.6
@@ -26,7 +26,7 @@ jobs:
           host: ${{ secrets.STAG_IP }}
           username: openedx
           key: ${{ secrets.STAG_KEY }}
-          port: ${{ secrets.PORT }}
+          port: 22
           script: |
             export PATH='/home/openedx/.local/bin:/home/openedx/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'
             echo $PATH
