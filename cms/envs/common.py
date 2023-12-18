@@ -1815,6 +1815,9 @@ INSTALLED_APPS = [
     # alternative swagger generator for CMS API
     'drf_spectacular',
     'openedx_events',
+
+    # Course Roles
+    'openedx.core.djangoapps.course_roles',
 ]
 
 
