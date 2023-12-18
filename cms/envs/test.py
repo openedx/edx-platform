@@ -27,8 +27,6 @@ from .common import *
 
 # import settings from LMS for consistent behavior with CMS
 from lms.envs.test import (  # pylint: disable=wrong-import-order
-    BLOCKSTORE_USE_BLOCKSTORE_APP_API,
-    BLOCKSTORE_API_URL,
     COMPREHENSIVE_THEME_DIRS,  # unimport:skip
     DEFAULT_FILE_STORAGE,
     ECOMMERCE_API_URL,
@@ -184,10 +182,6 @@ CACHES = {
 }
 
 ############################### BLOCKSTORE #####################################
-# Blockstore tests
-RUN_BLOCKSTORE_TESTS = os.environ.get('EDXAPP_RUN_BLOCKSTORE_TESTS', 'no').lower() in ('true', 'yes', '1')
-BLOCKSTORE_API_URL = os.environ.get('EDXAPP_BLOCKSTORE_API_URL', "http://edx.devstack.blockstore-test:18251/api/v1/")
-BLOCKSTORE_API_AUTH_TOKEN = os.environ.get('EDXAPP_BLOCKSTORE_API_AUTH_TOKEN', 'edxapp-test-key')
 BUNDLE_ASSET_STORAGE_SETTINGS = dict(
     STORAGE_CLASS='django.core.files.storage.FileSystemStorage',
     STORAGE_KWARGS=dict(

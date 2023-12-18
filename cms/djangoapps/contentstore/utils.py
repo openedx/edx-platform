@@ -1,6 +1,7 @@
 """
 Common utility functions useful throughout the contentstore
 """
+from __future__ import annotations
 import configparser
 import logging
 from collections import defaultdict
@@ -46,7 +47,6 @@ from common.djangoapps.util.milestones_helpers import (
 )
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from openedx.core import toggles as core_toggles
-from openedx.core.djangoapps.course_apps.toggles import proctoring_settings_modal_view_enabled
 from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
@@ -77,6 +77,7 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_video_uploads_page,
     use_new_custom_pages,
     use_tagging_taxonomy_list_page,
+    # use_xpert_translations_component,
 )
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from xmodule.library_tools import LibraryToolsService
@@ -246,10 +247,7 @@ def get_proctored_exam_settings_url(course_locator) -> str:
         mfe_base_url = get_course_authoring_url(course_locator)
         course_mfe_url = f'{mfe_base_url}/course/{course_locator}'
         if mfe_base_url:
-            if proctoring_settings_modal_view_enabled(course_locator):
-                proctored_exam_settings_url = f'{course_mfe_url}/pages-and-resources/proctoring/settings'
-            else:
-                proctored_exam_settings_url = f'{course_mfe_url}/proctored-exam-settings'
+            proctored_exam_settings_url = f'{course_mfe_url}/pages-and-resources/proctoring/settings'
     return proctored_exam_settings_url
 
 
@@ -444,6 +442,23 @@ def get_taxonomy_list_url():
         if mfe_base_url:
             taxonomy_list_url = f'{mfe_base_url}/taxonomy-list'
     return taxonomy_list_url
+
+
+def get_taxonomy_tags_widget_url(course_locator=None) -> str | None:
+    """
+    Gets course authoring microfrontend URL for taxonomy tags drawer widget view.
+
+    The `content_id` needs to be appended to the end of the URL when using it.
+    """
+    taxonomy_tags_widget_url = None
+    # Uses the same waffle flag as taxonomy list page
+    if use_tagging_taxonomy_list_page():
+        mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
+        if course_locator:
+            mfe_base_url = get_course_authoring_url(course_locator)
+        if mfe_base_url:
+            taxonomy_tags_widget_url = f'{mfe_base_url}/tagging/components/widget/'
+    return taxonomy_tags_widget_url
 
 
 def course_import_olx_validation_is_enabled():
@@ -1581,6 +1596,7 @@ def get_course_videos_context(course_block, pagination_conf, course_key=None):
         get_transcript_preferences,
     )
     from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
+    from openedx.core.djangoapps.video_config.toggles import use_xpert_translations_component
     from xmodule.video_block.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
 
     from .video_storage_handlers import (
@@ -1605,6 +1621,7 @@ def get_course_videos_context(course_block, pagination_conf, course_key=None):
             course = modulestore().get_course(course_key)
 
     is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course.id)
+    is_ai_translations_enabled = use_xpert_translations_component(course.id)
     previous_uploads, pagination_context = _get_index_videos(course, pagination_conf)
     course_video_context = {
         'context_course': course,
@@ -1625,6 +1642,7 @@ def get_course_videos_context(course_block, pagination_conf, course_key=None):
             'supported_file_formats': settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS
         },
         'is_video_transcript_enabled': is_video_transcript_enabled,
+        'is_ai_translations_enabled': is_ai_translations_enabled,
         'active_transcript_preferences': None,
         'transcript_credentials': None,
         'transcript_available_languages': get_all_transcript_languages(),

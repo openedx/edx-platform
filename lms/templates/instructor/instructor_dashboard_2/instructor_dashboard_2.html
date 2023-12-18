@@ -6,6 +6,10 @@
 from django.utils.translation import gettext as _
 from django.urls import reverse
 from openedx.core.djangolib.markup import HTML
+from django.conf import settings
+from openedx.core.djangolib.js_utils import (
+    js_escaped_string
+)
 %>
 <%block name="bodyclass">view-in-course view-instructordash</%block>
 
@@ -77,6 +81,13 @@ from openedx.core.djangolib.markup import HTML
       ${HTML(section_data['fragment'].foot_html())}
     % endif
   % endfor
+
+   <script>
+	var beamer_config = {
+		product_id : "${settings.BEAMER_PRODUCT_ID | n, js_escaped_string}",
+	};
+</script>
+<script type="text/javascript" src="https://app.getbeamer.com/js/beamer-embed.js" defer="defer"></script>
 </%block>
 
 ## Include Underscore templates
@@ -137,6 +148,7 @@ from openedx.core.djangolib.markup import HTML
         </section>
         </main>
   </div>
+
 </div>
 
 <%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
