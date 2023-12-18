@@ -147,7 +147,6 @@ XBLOCK_SETTINGS.update({'VideoBlock': {'licensing_enabled': True}})
 ################################ SEARCH INDEX ################################
 FEATURES['ENABLE_COURSEWARE_INDEX'] = True
 FEATURES['ENABLE_LIBRARY_INDEX'] = False
-FEATURES['ENABLE_CONTENT_LIBRARY_INDEX'] = False
 SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
 
 ELASTIC_SEARCH_CONFIG = [
@@ -259,6 +258,8 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_HEADERS = corsheaders_default_headers + (
     'use-jwt-cookie',
+    'content-range',
+    'content-disposition',
 )
 
 ################### Special Exams (Proctoring) and Prereqs ###################
@@ -300,6 +301,9 @@ CLOSEST_CLIENT_IP_FROM_HEADERS = []
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:18150'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 
+############################ AI_TRANSLATIONS ##################################
+AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
+
 #################### Event bus backend ########################
 
 EVENT_BUS_PRODUCER = 'edx_event_bus_redis.create_producer'
@@ -323,3 +327,32 @@ xblock_duplicated_event_setting['course-authoring-xblock-lifecycle']['enabled'] 
 # See if the developer has any local overrides.
 if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):
     from .private import *  # pylint: disable=import-error,wildcard-import
+
+############## Authoring API drf-spectacular openapi settings ##############
+# These fields override the spectacular settings default values.
+# Any fields not included here will use the default values.
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Authoring API',
+    'DESCRIPTION': f'''Experimental API to edit xblocks and course content.
+    \n\nDanger: Do not use on running courses!
+    \n\n - How to gain access: Please email the owners of this openedx service.
+    \n - How to use: This API uses oauth2 authentication with the
+    access token endpoint: `{LMS_ROOT_URL}/oauth2/access_token`.
+    Please see separately provided documentation.
+    \n - How to test: You must be logged in as course author for whatever course you want to test with.
+    You can use the [Swagger UI](https://{CMS_BASE}/authoring-api/ui/) to "Try out" the API with your test course. To do this, you must select the "Local" server.
+    \n - Public vs. Local servers: The "Public" server is where you can reach the API externally. The "Local" server is
+    for development with a local edx-platform version,  and for use via the [Swagger UI](https://{CMS_BASE}/authoring-api/ui/).
+    \n - Swaggerfile: [Download link](https://{CMS_BASE}/authoring-api/schema/)''',
+    'VERSION': '0.1.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # restrict spectacular to CMS API endpoints (cms/lib/spectacular.py):
+    'PREPROCESSING_HOOKS': ['cms.lib.spectacular.cms_api_filter'],
+    # remove the default schema path prefix to replace it with server-specific base paths:
+    'SCHEMA_PATH_PREFIX': '/api/contentstore',
+    'SCHEMA_PATH_PREFIX_TRIM': '/api/contentstore',
+    'SERVERS': [
+        {'url': AUTHORING_API_URL, 'description': 'Public'},
+        {'url': f'http://{CMS_BASE}/api/contentstore', 'description': 'Local'}
+    ],
+}

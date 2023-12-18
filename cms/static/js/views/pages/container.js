@@ -7,14 +7,15 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
     'js/views/components/add_xblock', 'js/views/modals/edit_xblock', 'js/views/modals/move_xblock_modal',
     'js/models/xblock_info', 'js/views/xblock_string_field_editor', 'js/views/xblock_access_editor',
     'js/views/pages/container_subviews', 'js/views/unit_outline', 'js/views/utils/xblock_utils',
-    'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt', 'js/utils/module',
+    'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
+    'js/views/utils/tagging_drawer_utils', 'js/utils/module',
 ],
 function($, _, Backbone, gettext, BasePage,
     ViewUtils, ContainerView, XBlockView,
     AddXBlockComponent, EditXBlockModal, MoveXBlockModal,
     XBlockInfo, XBlockStringFieldEditor, XBlockAccessEditor,
     ContainerSubviews, UnitOutlineView, XBlockUtils,
-    NotificationView, PromptView,  ModuleUtils) {
+    NotificationView, PromptView, TaggingDrawerUtils, ModuleUtils) {
     'use strict';
 
     var XBlockContainerPage = BasePage.extend({
@@ -31,6 +32,7 @@ function($, _, Backbone, gettext, BasePage,
             'click .new-component-button': 'scrollToNewComponentButtons',
             'click .save-button': 'saveSelectedLibraryComponents',
             'click .paste-component-button': 'pasteComponent',
+            'click .tags-button': 'openManageTags',
             'change .header-library-checkbox': 'toggleLibraryComponent',
             'click .collapse-button': 'collapseXBlock',
         },
@@ -75,6 +77,7 @@ function($, _, Backbone, gettext, BasePage,
                 model: this.model
             });
             this.messageView.render();
+            this.clipboardBroadcastChannel = new BroadcastChannel("studio_clipboard_channel");
             // Display access message on units and split test components
             if (!this.isLibraryPage) {
                 this.containerAccessView = new ContainerSubviews.ContainerAccess({
@@ -87,7 +90,8 @@ function($, _, Backbone, gettext, BasePage,
                     el: this.$('#publish-unit'),
                     model: this.model,
                     // When "Discard Changes" is clicked, the whole page must be re-rendered.
-                    renderPage: this.render
+                    renderPage: this.render,
+                    clipboardBroadcastChannel: this.clipboardBroadcastChannel,
                 });
                 this.xblockPublisher.render();
 
@@ -103,11 +107,18 @@ function($, _, Backbone, gettext, BasePage,
                 });
                 this.viewLiveActions.render();
 
+                this.tagListView = new ContainerSubviews.TagList({
+                    el: this.$('.unit-tags'),
+                    model: this.model
+                });
+                this.tagListView.render();
+
                 this.unitOutlineView = new UnitOutlineView({
                     el: this.$('.wrapper-unit-overview'),
                     model: this.model
                 });
                 this.unitOutlineView.render();
+
             }
             if (this.isLibraryContentPage) {
                 this.selectedLibraryComponents = [];
@@ -116,7 +127,6 @@ function($, _, Backbone, gettext, BasePage,
             }
 
             this.listenTo(Backbone, 'move:onXBlockMoved', this.onXBlockMoved);
-            this.clipboardBroadcastChannel = new BroadcastChannel("studio_clipboard_channel");
         },
 
         getViewParameters: function() {
@@ -136,6 +146,7 @@ function($, _, Backbone, gettext, BasePage,
                 xblockView = this.xblockView,
                 loadingElement = this.$('.ui-loading'),
                 unitLocationTree = this.$('.unit-location'),
+                unitTags = this.$('.unit-tags'),
                 hiddenCss = 'is-hidden';
 
             loadingElement.removeClass(hiddenCss);
@@ -161,6 +172,7 @@ function($, _, Backbone, gettext, BasePage,
                     // Refresh the views now that the xblock is visible
                     self.onXBlockRefresh(xblockView);
                     unitLocationTree.removeClass(hiddenCss);
+                    unitTags.removeClass(hiddenCss);
 
                     // Re-enable Backbone events for any updated DOM elements
                     self.delegateEvents();
@@ -169,6 +181,13 @@ function($, _, Backbone, gettext, BasePage,
                     if (!self.isLibraryPage && !self.isLibraryContentPage) {
                         self.initializePasteButton();
                     }
+
+                    var targetId = window.location.hash.slice(1);
+                    if (targetId) {
+                        var target = document.getElementById(targetId);
+                        target.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+                    }
+
                 },
                 block_added: options && options.block_added
             });
@@ -425,6 +444,13 @@ function($, _, Backbone, gettext, BasePage,
             this.duplicateComponent(this.findXBlockElement(event.target));
         },
 
+        openManageTags: function(event) {
+            const taxonomyTagsWidgetUrl = this.model.get('taxonomy_tags_widget_url');
+            const contentId = this.findXBlockElement(event.target).data('locator');
+
+            TaggingDrawerUtils.openDrawer(taxonomyTagsWidgetUrl, contentId);
+        },
+
         showMoveXBlockModal: function(event) {
             var xblockElement = this.findXBlockElement(event.target),
                 parentXBlockElement = xblockElement.parents('.studio-xblock-wrapper'),
@@ -625,8 +651,8 @@ function($, _, Backbone, gettext, BasePage,
             $.getJSON(
                 ModuleUtils.getUpdateUrl(locator) + '/handler/get_block_ids',
                 function(data) {
-                    self.selectedLibraryComponents = Array.from(data.source_block_ids);
-                    self.storedSelectedLibraryComponents = Array.from(data.source_block_ids);
+                    self.selectedLibraryComponents = Array.from(data.candidates);
+                    self.storedSelectedLibraryComponents = Array.from(data.candidates);
                 }
             );
         },

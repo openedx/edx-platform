@@ -20,6 +20,7 @@ from lms.djangoapps.courseware.access_response import (
     DataSharingConsentRequiredAccessError,
     EnrollmentRequiredAccessError,
     IncorrectActiveEnterpriseAccessError,
+    StartDateEnterpriseLearnerError,
     StartDateError
 )
 from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_student
@@ -75,6 +76,7 @@ def check_start_date(user, days_early_for_beta, start, course_key, display_error
     Returns:
         AccessResponse: Either ACCESS_GRANTED or StartDateError.
     """
+    from openedx.features.enterprise_support.api import enterprise_customer_from_session_or_learner_data
     start_dates_disabled = settings.FEATURES['DISABLE_START_DATES']
     masquerading_as_student = is_masquerading_as_student(user, course_key)
 
@@ -91,6 +93,30 @@ def check_start_date(user, days_early_for_beta, start, course_key, display_error
         should_grant_access = now > effective_start
         if should_grant_access:
             return ACCESS_GRANTED
+
+        # Before returning a StartDateError, determine if the learner should be redirected to the enterprise learner
+        # portal by returning StartDateEnterpriseLearnerError instead.
+        if user.is_authenticated:
+            # enterprise_customer_data is either None (if learner is not linked to any customer) or a serialized
+            # EnterpriseCustomer representing the learner's active linked customer.
+            enterprise_customer_data = enterprise_customer_from_session_or_learner_data(get_current_request())
+            learner_portal_enabled = enterprise_customer_data and enterprise_customer_data['enable_learner_portal']
+            if learner_portal_enabled:
+                # Additionally make sure the enterprise learner is actually enrolled in the requested course, subsidized
+                # via the discovered customer.
+                enterprise_enrollments = EnterpriseCourseEnrollment.objects.filter(
+                    course_id=course_key,
+                    enterprise_customer_user__user_id=user.id,
+                    enterprise_customer_user__enterprise_customer__uuid=enterprise_customer_data['uuid'],
+                )
+                if enterprise_enrollments.exists():
+                    # Finally, we have established:
+                    # * The learner is linked to an enterprise customer,
+                    # * The enterprise customer has subsidized the learner's enrollment in the requested course,
+                    # * The enterprise customer has the learner portal enabled.
+                    #
+                    # We are now safe to kick the learner over to the enterprise learner dashboard.
+                    return StartDateEnterpriseLearnerError(start, display_error_to_user=display_error_to_user)
 
         return StartDateError(start, display_error_to_user=display_error_to_user)
 

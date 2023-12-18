@@ -1,7 +1,7 @@
 """
 LibraryContent: The XBlock used to include blocks from a library in a course.
 """
-
+from __future__ import annotations
 
 import json
 import logging
@@ -11,25 +11,25 @@ from gettext import ngettext, gettext
 
 import bleach
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.utils.functional import classproperty
-from lazy import lazy
 from lxml import etree
 from lxml.etree import XMLSyntaxError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
-from pkg_resources import resource_string
+from opaque_keys.edx.keys import UsageKey
 from rest_framework import status
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
+from xblock.exceptions import JsonHandlerError
 from xblock.fields import Boolean, Integer, List, Scope, String
-from xblockutils.resources import ResourceLoader
-from xblockutils.studio_editable import StudioEditableXBlockMixin
 
 from xmodule.capa.responsetypes import registry
 from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.studio_editable import StudioEditableBlock
+from xblockutils.studio_editable import StudioEditableXBlockMixin
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.xml_block import XmlMixin
@@ -46,7 +46,6 @@ from xmodule.x_module import (
 _ = lambda text: text
 
 logger = logging.getLogger(__name__)
-loader = ResourceLoader(__name__)
 
 ANY_CAPA_TYPE_VALUE = 'any'
 
@@ -70,14 +69,22 @@ def _get_capa_types():
     ], key=lambda item: item.get('display_name'))
 
 
-@XBlock.wants('library_tools')  # Only needed in studio
-@XBlock.wants('studio_user_permissions')  # Only available in studio
+class LibraryToolsUnavailable(ValueError):
+    """
+    Raised when the library_tools service is requested in a runtime that doesn't provide it.
+    """
+    def __init__(self):
+        super().__init__("Needed 'library_tools' features which were not available in the current runtime")
+
+
+@XBlock.wants('library_tools')  # TODO: Split this service into its LMS and CMS parts.
+@XBlock.wants('studio_user_permissions')  # Only available in CMS.
 @XBlock.wants('user')
 @XBlock.needs('mako')
 class LibraryContentBlock(
     XmlMixin,
-    StudioEditableXBlockMixin,
     MakoTemplateBlockBase,
+    StudioEditableXBlockMixin,
     XModuleToXBlockMixin,
     ResourceTemplates,
     XModuleMixin,
@@ -104,31 +111,24 @@ class LibraryContentBlock(
 
     show_in_read_only_mode = True
 
-    resources_dir = 'assets/library_content'
+    # noinspection PyMethodParameters
+    @classproperty
+    def completion_mode(cls):  # pylint: disable=no-self-argument
+        """
+        Allow overriding the completion mode with a feature flag.
+        This is a property, so it can be dynamically overridden in tests, as it is not evaluated at runtime.
+        """
+        if settings.FEATURES.get('MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW', False):
+            return XBlockCompletionMode.COMPLETABLE
 
-    preview_view_js = {
-        'js': [],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    preview_view_css = {
-        'scss': [],
-    }
-    mako_template = 'widgets/metadata-edit.html'
-    studio_js_module_name = "VerticalDescriptor"
-    studio_view_js = {
-        'js': [
-            resource_string(__name__, 'js/src/vertical/edit.js'),
-        ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    studio_view_css = {
-        'scss': [],
-    }
+        return XBlockCompletionMode.AGGREGATOR
+
+    resources_dir = 'assets/library_content'
 
     display_name = String(
         display_name=_("Display Name"),
         help=_("The display name for this component."),
-        default="Library Reference Block",
+        default="Library Content",
         scope=Scope.settings,
     )
     source_library_id = String(
@@ -156,7 +156,7 @@ class LibraryContentBlock(
         scope=Scope.settings,
     )
     candidates = List(
-        # This is a list of (block_type, block_id) tuples used to record the set of blocks
+        # This is a list of (block_type, block_id) used to record the set of blocks
         # which are candidates for the selected list.
         display_name=_("Manually Selected Blocks"),
         default=[],
@@ -169,12 +169,16 @@ class LibraryContentBlock(
         scope=Scope.user_state,
     )
     shuffle = Boolean(
-        #is the block content randomized for every user.
+        # Do we shuffle (randomize order) of selected blocks for each learner?
+        # True -> Order is randomized for each learner. \n False -> Original order from candidates/children is used.
+        # False -> is the block content only drawn from content which is in the candidates list?
         default=True,
         scope=Scope.settings,
     )
     manual = Boolean(
-        #is the block content only drawn from content which is in the candidates list?
+        # Should selected blocks be limited to the manually-picked candidates?
+        # True -> Draw selections from `candidates`.
+        # False -> Draw selections from `children`.
         default=False,
         cope=Scope.settings,
     )
@@ -186,19 +190,6 @@ class LibraryContentBlock(
         scope=Scope.settings,
         default=False
     )
-
-    # noinspection PyMethodParameters
-    @classproperty
-    def completion_mode(cls):  # pylint: disable=no-self-argument
-        """
-        Allow overriding the completion mode with a feature flag.
-
-        This is a property, so it can be dynamically overridden in tests, as it is not evaluated at runtime.
-        """
-        if settings.FEATURES.get('MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW', False):
-            return XBlockCompletionMode.COMPLETABLE
-
-        return XBlockCompletionMode.AGGREGATOR
 
     @property
     def source_library_key(self):
@@ -214,9 +205,15 @@ class LibraryContentBlock(
 
     @property
     def non_editable_metadata_fields(self):
+        """
+        This variable contains a list of the XBlock fields that should not be displayed in the Studio editor.
+        """
         non_editable_fields = super().non_editable_metadata_fields
         non_editable_fields.extend([
             LibraryContentBlock.source_library_version,
+            LibraryContentBlock.candidates,
+            LibraryContentBlock.manual,
+            LibraryContentBlock.shuffle,
         ])
         return non_editable_fields
 
@@ -235,61 +232,95 @@ class LibraryContentBlock(
         self._last_event_result_count = len(result)  # pylint: disable=attribute-defined-outside-init
 
     @classmethod
-    def _get_valid_children(cls, library_children, candidates, manual):
+    def _get_valid_children(
+        cls,
+        library_children: list[UsageKey],
+        candidates: list[UsageKey],
+        manual: bool,
+    ) -> list[tuple[str, str]]:
         """
-        Dynamically selects block_ids which children are possible for selection
+        Dynamically selects (block_type, block_id) tupless which children are possible for selection,
+        in the original order from the candidates list or the library.
         """
-        if candidates and manual:
-            return candidates
-        return {(child.block_type, child.block_id) for child in library_children}
+        return list(
+            (child.block_type, child.block_id)
+            for child
+            in (candidates if (candidates and manual) else library_children)
+        )
 
     @classmethod
-    def make_selection(cls, selected, library_children, candidates, max_count, manual, shuffle):
+    def make_selection(
+        cls,
+        old_selected: list[tuple[str, str]],
+        library_children: list[UsageKey],
+        candidates: list[UsageKey],
+        max_count: int,
+        manual: bool,
+        shuffle: bool,
+    ) -> dict[str, list]:
         """
         Dynamically selects block_ids indicating which of the possible children are displayed to the current user.
         The blocks returned are kept consistent for a user,
         unless changes have been made to the library's contents or the settings of the block.
         Returns:
             A dict containing the following keys:
-            'selected' (set) of (block_type, block_id) tuples assigned to this student
-            'invalid' (set) of dropped (block_type, block_id) tuples that are no longer valid
-            'overlimit' (set) of dropped (block_type, block_id) tuples that were previously selected
-            'added' (set) of newly added (block_type, block_id) tuples
+            'selected' (list) of (block_type, block_id) tuples assigned to this student
+            'invalid' (list) of dropped (block_type, block_id) tuples that are no longer valid
+            'overlimit' (list) of dropped (block_type, block_id) tuples that were previously selected
+            'added' (list) of newly added (block_type, block_id) tuples
+
+        When generating randomized content to show to a user, we want the following user experince:
+        1. When a learner first interacts with the block, they are shown N items from the children at random.
+        2. Every subsequent time they view that content, they are given the same content,
+        unless one of the below conditions is met:
+            a. The max_count is increased, requiring the learner to see more.
+            b. The max_count is decreased, requiring the learner to see less content.
+            c. When blocks previously assigned to a learner are deleted.
+        3. In case a, we take the selected blocks that were valid before the edit,
+            and supplament those with new blocks chosen at random until the number of blocks is max_count
+        4. In case b, we take the selected blocks that were valid before the edit,
+            and remove blocks randomly until he number of blocks is max_count.
+        5. In case c, we remove the blocks that are now invalid,
+           and supplament those remaining with new blocks chosen at random until the number of blocks is max_count.
+
+        When generating manully selected content, we want all users to see all the items selected.
+        size, however, limits the amount of content shown.
         """
-        old_selected = set(tuple(k) for k in selected)
-        valid_block_keys = LibraryContentBlock._get_valid_children(library_children, candidates, manual)
-        valid_old_block_keys = valid_block_keys.intersection(old_selected)
-        valid_additions = valid_block_keys.difference(valid_old_block_keys)
-        new_selected = set()
-        overlimit_block_keys = []
-        size = max_count if len(valid_block_keys) >= max_count else len(valid_block_keys)
+        selected: list[tuple[str, str]] = old_selected.copy()
+        valid_children: list[tuple[str, str]] = cls._get_valid_children(library_children, candidates, manual)
 
-        if shuffle:
-            #determine how many blocks need to be added or removed.
-            vaccancies_in_selected = (
-                size - len(valid_old_block_keys)
-                if size >= 0
-                else len(valid_block_keys) - len(valid_old_block_keys)
-            )
+        # Remove blocks from selection if they're no longer candidates.
+        selected = [block for block in selected if block in valid_children]
+        invalid: set[tuple[str, str]] = set(old_selected) - set(selected)
 
-            if vaccancies_in_selected < 0:
-                new_selected = list(valid_old_block_keys)[0:size]
-                overlimit_block_keys = list(valid_old_block_keys)[size:]
-            else:
-                if not manual:
-                    new_selected = list(valid_old_block_keys) + random.sample(valid_additions, vaccancies_in_selected)
-                else:
-                    new_selected = list(valid_old_block_keys) + list(valid_additions)[0:vaccancies_in_selected]
-                if new_selected != old_selected:
-                    random.shuffle(new_selected)
-        else:
-            new_selected = list(valid_block_keys)[:size]
+        # Remove or add blocks if we don't have the correct number in the selection.
+        additions: set[tuple[str, str]] = set()
+        overlimit: set[tuple[str, str]] = set()
+        desired_size: int = min(max_count, len(valid_children)) if max_count >= 0 else len(valid_children)
+        if len(selected) > desired_size:
+            num_to_remove = len(selected) - desired_size
+            overlimit = set(random.sample(selected, num_to_remove))
+            selected = [block for block in selected if block not in overlimit]
+        elif len(selected) < desired_size:
+            num_to_add = desired_size - len(selected)
+            valid_additions: set[tuple[str, str]] = set(valid_children) - set(selected)
+            additions = set(random.sample(valid_additions, num_to_add))
+            selected = [block for block in valid_children if block in (additions | set(selected))]
 
+        # If we've made any change AND if shuffling is enabled, then re-shuffle.
+        # In other words, always shuffle UNLESS:
+        #  * no changes have been made (because we don't want to re-order a learner's blocks for no reason); OR
+        #  * shuffling is disabled (the code above ensures that we're using the order from the library).
+        # Otherwise, use the pre-existing order.
+        if shuffle and (invalid or overlimit or additions):
+            random.shuffle(selected)
+
+        # return lists because things get json serialized down the line.
         return {
-            'selected': new_selected,
-            'invalid': list(old_selected.difference(set(new_selected))),
-            'overlimit': overlimit_block_keys,
-            'added': list(set(new_selected) - old_selected),
+            'selected': selected,
+            'invalid': list(invalid),
+            'overlimit': list(overlimit),
+            'added': list(additions),
         }
 
     @classmethod
@@ -361,18 +392,17 @@ class LibraryContentBlock(
         max_count = self.max_count
         if max_count < 0:
             max_count = len(self.children)
-
         block_keys = self.make_selection(
-            self.selected,
-            self.children,
-            self.candidates,
-            self.max_count,
-            self.manual,
-            self.shuffle
+            old_selected=list(map(tuple, self.selected)),
+            library_children=self.children,
+            candidates=[child for child in self.children if [child.block_type, child.block_id] in self.candidates],
+            max_count=self.max_count,
+            manual=self.manual,
+            shuffle=self.shuffle,
         )
 
         # Publish events for analytics purposes:
-        lib_tools = self.runtime.service(self, 'library_tools')
+        lib_tools = self.get_tools()
         format_block_keys = lambda keys: lib_tools.create_block_analytics_summary(self.location.course_key, keys)
         self.publish_selected_children_events(
             block_keys,
@@ -424,8 +454,6 @@ class LibraryContentBlock(
         contents = []
         child_context = {} if not context else copy(context)
 
-        logger.error(f'hello world foralbe{self.get_children}')
-
         for child in self._get_selected_child_blocks():
             if child is None:
                 # TODO: Fix the underlying issue in TNL-7424
@@ -466,7 +494,10 @@ class LibraryContentBlock(
         fragment = Fragment()
         root_xblock = context.get('root_xblock')
         is_root = root_xblock and root_xblock.location == self.location
-        is_updating = self.tools and self.tools.are_children_updating(self)
+        try:
+            is_updating = self.get_tools().are_children_syncing(self)
+        except LibraryToolsUnavailable:
+            is_updating = False
         if is_root and not is_updating:
             # User has clicked the "View" link. Show a preview of all possible children:
             if self.children:  # pylint: disable=no-member
@@ -496,16 +527,24 @@ class LibraryContentBlock(
             self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
         )
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit_helpers.js'))
-        add_webpack_js_to_fragment(fragment, 'LibraryContentBlockStudio')
+        add_webpack_js_to_fragment(fragment, 'LibraryContentBlockEditor')
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
 
-    @lazy
-    def tools(self):
+    def get_child_blocks(self):
         """
-        Grab the library tools service or raise an error.
+        Return only the subset of our children relevant to the current student.
         """
-        return self.runtime.service(self, 'library_tools')
+        return list(self._get_selected_child_blocks())
+
+    def get_tools(self, to_read_library_content: bool = False) -> 'LibraryToolsService':
+        """
+        Grab the library tools service and confirm that it'll work for us. Else, raise LibraryToolsUnavailable.
+        """
+        if tools := self.runtime.service(self, 'library_tools'):
+            if (not to_read_library_content) or tools.can_use_library_content(self):
+                return tools
+        raise LibraryToolsUnavailable()
 
     def get_user_id(self):
         """
@@ -529,10 +568,10 @@ class LibraryContentBlock(
             if can_reorder:
                 context['reorderable_items'].add(child.location)
             context['can_add'] = can_add
-            context['is_selected'] = str(child.location) in self.candidates
+
+            context['is_selected'] = [child.location.block_type, child.location.block_id] in self.candidates
             rendered_child = child.render(StudioEditableBlock.get_preview_view_name(child), context)
             fragment.add_fragment_resources(rendered_child)
-
             contents.append({
                 'id': str(child.location),
                 'content': rendered_child.content
@@ -545,41 +584,87 @@ class LibraryContentBlock(
             'can_reorder': can_reorder,
         }))
 
-    def get_child_blocks(self):
+    def _validate_sync_permissions(self):
         """
-        Return only the subset of our children relevant to the current student.
+        Raises PermissionDenied() if we can't confirm that user has write on this block and read on source library.
+
+        If source library isn't set, then that's OK.
         """
-        return list(self._get_selected_child_blocks())
+        if not (user_perms := self.runtime.service(self, 'studio_user_permissions')):
+            raise PermissionDenied("Access cannot be validated in the current runtime.")
+        if not user_perms.can_write(self.scope_ids.usage_id.context_key):
+            raise PermissionDenied(f"Cannot write to block at {self.scope_ids.usage_id}")
+        if self.source_library_key:
+            if not user_perms.can_read(self.source_library_key):
+                raise PermissionDenied(f"Cannot read library at {self.source_library_key}")
+
+    # suffix argument is specified for xblocks, but we are not using herein
+    @XBlock.json_handler
+    def submit_studio_edits(self, data, suffix=''):  # pylint: disable=unused-argument
+        """
+        Ajax handler for submiting changes to the candidates list.
+        Cleans them to be of type List[tuple[str,str]]
+        where the tuple is (block_type, block_id)
+        """
+        if list(data['values'].keys()) != list(self.editable_fields):
+            raise JsonHandlerError(
+                400,
+                "Library Content Block only supports the editing of the candidates field  with this handler."
+            )
+        usage_key_list = [UsageKey.from_string(usage_key_string) for usage_key_string in data['values']['candidates']]
+        self.candidates = [(usage_key.block_type, usage_key.block_id) for usage_key in usage_key_list]
 
     @XBlock.handler
     def get_block_ids(self, request, suffix=''):  # lint-amnesty, pylint: disable=unused-argument
         """
-        Return source_block_ids for selection.
+        Return candidates for selection.
         """
-        return Response(json.dumps({'source_block_ids': self.candidates}))
+        # construct usage_key list from library children so it is fully formed.
+        usage_key_list = [child for child in self.children if [child.block_type, child.block_id] in self.candidates]
+        return Response(json.dumps({'candidates': [str(usage_key) for usage_key in usage_key_list]}))
 
     @XBlock.handler
-    def refresh_children(self, request=None, suffix=None):  # lint-amnesty, pylint: disable=unused-argument
+    def upgrade_and_sync(self, request=None, suffix=None):  # pylint: disable=unused-argument
         """
-        Refresh children:
-        This method is to be used when any of the libraries that this block
-        references have been updated. It will re-fetch all matching blocks from
-        the libraries, and copy them as children of this block. The children
-        will be given new block_ids, but the definition ID used should be the
-        exact same definition ID used in the library.
+        HTTP handler allowing Studio users to update to latest version of source library and synchronize children.
 
-        This method will update this block's 'source_library_id' field to store
-        the version number of the libraries used, so we easily determine if
-        this block is up to date or not.
+        This is a thin wrapper around `sync_from_library(upgrade_to_latest=True)`, plus permission checks.
+
+        Returns 400 if libraray tools or user permission services are not available.
+        Returns 403/404 if user lacks read access on source library or write access on this block.
         """
-        user_perms = self.runtime.service(self, 'studio_user_permissions')
-        if not self.tools:
-            return Response("Library Tools unavailable in current runtime.", status=400)
-        self.tools.trigger_refresh_children(self, user_perms)
+        self._validate_sync_permissions()
+        if not self.source_library_id:
+            return Response(_("Source content library has not been specified."), status=400)
+        try:
+            self.sync_from_library(upgrade_to_latest=True)
+        except LibraryToolsUnavailable:
+            return Response(_("Content libraries are not available in the current runtime."), status=400)
+        except ObjectDoesNotExist:
+            return Response(
+                _("Source content library does not exist: {source_library_id}").format(
+                    source_library_id=self.source_library_id
+                ),
+                status=400,
+            )
         return Response()
 
+    def sync_from_library(self, upgrade_to_latest: bool = False) -> None:
+        """
+        Synchronize children with source library.
+
+        If `upgrade_to_latest==True` or if source library version is unset, update library version to latest.
+        Otherwise, use current source library version.
+
+        Raises ObjectDoesNotExist if library or version is missing.
+        """
+        self.get_tools(to_read_library_content=True).trigger_library_sync(
+            dest_block=self,
+            library_version=(None if upgrade_to_latest else self.source_library_version),
+        )
+
     @XBlock.json_handler
-    def is_v2_library(self, data, suffix=''):  # lint-amnesty, pylint: disable=unused-argument
+    def is_v2_library(self, data, suffix=''):  # pylint: disable=unused-argument
         """
         Check the library version by library_id.
 
@@ -595,15 +680,15 @@ class LibraryContentBlock(
         return {'is_v2': is_v2}
 
     @XBlock.handler
-    def children_are_updating(self, request, suffix=''):  # pylint: disable=unused-argument
+    def children_are_syncing(self, request, suffix=''):  # pylint: disable=unused-argument
         """
         Returns whether this block is currently having its children updated from the source library.
         """
-        return Response(
-            json.dumps(
-                self.tools and self.tools.are_children_updating(self)
-            )
-        )
+        try:
+            is_updating = self.get_tools().are_children_syncing(self)
+        except LibraryToolsUnavailable:
+            is_updating = False
+        return Response(json.dumps(is_updating))
 
     def studio_post_duplicate(self, store, source_block):
         """
@@ -612,24 +697,17 @@ class LibraryContentBlock(
 
         Otherwise we'll end up losing data on the next refresh.
         """
-        user_id = self.get_user_id()
-        user_perms = self.runtime.service(self, 'studio_user_permissions')
-        if not self.tools:
-            raise RuntimeError("Library tools unavailable, duplication will not be sane!")
-        self.tools.trigger_duplicate_children(
-            user_perms=user_perms, source_block=source_block, dest_block=self
-        )
-
-        # Children have been handled.
-        return True
+        self._validate_sync_permissions()
+        self.get_tools(to_read_library_content=True).trigger_duplication(source_block=source_block, dest_block=self)
+        return True  # Children have been handled.
 
     def _validate_library_version(self, validation, lib_tools, version, library_key):
         """
         Validates library version
         """
-        latest_version = lib_tools.get_library_version(library_key)
+        latest_version = lib_tools.get_latest_library_version(library_key)
         if latest_version is not None:
-            if version is None or version != str(latest_version):
+            if version is None or version != latest_version:
                 validation.set_summary(
                     StudioValidationMessage(
                         StudioValidationMessage.WARNING,
@@ -668,8 +746,9 @@ class LibraryContentBlock(
         validation = super().validate()
         if not isinstance(validation, StudioValidation):
             validation = StudioValidation.copy(validation)
-        library_tools = self.runtime.service(self, "library_tools")
-        if not (library_tools and library_tools.can_use_library_content(self)):
+        try:
+            lib_tools = self.get_tools(to_read_library_content=True)
+        except LibraryToolsUnavailable:
             validation.set_summary(
                 StudioValidationMessage(
                     StudioValidationMessage.ERROR,
@@ -690,10 +769,9 @@ class LibraryContentBlock(
                 )
             )
             return validation
-        lib_tools = self.runtime.service(self, 'library_tools')
         self._validate_library_version(validation, lib_tools, self.source_library_version, self.source_library_key)
 
-        # Note: we assume refresh_children() has been called
+        # Note: we assume children have been synced
         # since the last time fields like source_library_id or capa_types were changed.
         matching_children_count = len(self.children)  # pylint: disable=no-member
         if matching_children_count == 0:
@@ -736,7 +814,7 @@ class LibraryContentBlock(
         """
         Return a list of possible values for self.source_library_id
         """
-        lib_tools = self.runtime.service(self, 'library_tools')
+        lib_tools = self.get_tools()
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         all_libraries = [
             (key, bleach.clean(name)) for key, name in lib_tools.list_available_libraries()
@@ -749,34 +827,27 @@ class LibraryContentBlock(
         values = [{"display_name": name, "value": str(key)} for key, name in all_libraries]
         return values
 
-    def editor_saved(self, user, old_metadata, old_content):  # lint-amnesty, pylint: disable=unused-argument
+    def post_editor_saved(self, user, old_metadata, old_content):  # pylint: disable=unused-argument
         """
-        If source_library_id is empty, clear source_library_version and children.
-        If source_library_id has chnaged, clear the candidate pool,
-        as selections should not be preserved across libraries unwittingly
-        """
-        if not self.source_library_id:
-            self.children = []  # lint-amnesty, pylint: disable=attribute-defined-outside-init
-            self.source_library_version = ""
-        else:
-            self.source_library_version = str(self.tools.get_library_version(self.source_library_id))
-            if old_metadata and 'source_library_id' in old_metadata and self.source_library_id != old_metadata['source_library_id']:
-                self.candidates = []
+        If source library, library version or capa_type have been edited, upgrade library,
+        clear the candidates & sync automatically.
 
-    def post_editor_saved(self):
+        TODO: capa_type doesn't really need to trigger an upgrade once we've migrated to V2.
         """
-        If xblock has been edited, refresh_children automatically.
-        """
-        try:
-            if self.source_library_id:
-                self.refresh_children()
-        except ValueError:
-            pass  # The validation area will display an error message, no need to do anything now.
+        source_lib_changed = (self.source_library_id != old_metadata.get("source_library_id", ""))
+        capa_filter_changed = (self.capa_type != old_metadata.get("capa_type", ANY_CAPA_TYPE_VALUE))
+        if source_lib_changed or capa_filter_changed:
+            try:
+                self.sync_from_library(upgrade_to_latest=True)
+                self.candidates = []
+            except (ObjectDoesNotExist, LibraryToolsUnavailable):
+                # The validation area will display an error message, no need to do anything now.
+                pass
 
     def has_dynamic_children(self):
         """
         Inform the runtime that our children vary per-user.
-        See get_child_blocks() above
+        See get_child_blocks()
         """
         return True
 

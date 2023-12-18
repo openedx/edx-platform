@@ -5,10 +5,8 @@ Tests for rate-limiting.
 import ddt
 from django.test import TestCase
 from django.test.client import RequestFactory
-from edx_toggles.toggles.testutils import override_waffle_switch
 
 import openedx.core.djangoapps.util.ratelimit as ratelimit
-from openedx.core.djangoapps.util.legacy_ip import USE_LEGACY_IP
 from openedx.core.lib.x_forwarded_for.middleware import XForwardedForMiddleware
 
 
@@ -35,18 +33,6 @@ class TestRateLimiting(TestCase):
         """
         XForwardedForMiddleware(get_response=lambda request: None).process_request(self.request)
         assert ratelimit.real_ip(None, self.request) == '1.2.3.4'
-
-    @override_waffle_switch(USE_LEGACY_IP, True)
-    def test_legacy_switch(self):
-        assert ratelimit.real_ip(None, self.request) == '7.8.9.0'
-
-    @override_waffle_switch(USE_LEGACY_IP, True)
-    def test_legacy_switch_after_xff_middleware(self):
-        """
-        Again, but with XFF Middleware running first.
-        """
-        XForwardedForMiddleware(get_response=lambda request: None).process_request(self.request)
-        assert ratelimit.real_ip(None, self.request) == '7.8.9.0'
 
     def test_request_post_email(self):
         """

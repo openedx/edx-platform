@@ -173,6 +173,10 @@ define(
              * True if summary configuration is enabled.
              */
                 summary_configuration_enabled: null,
+               /**
+                * List of tags of the unit. This list is managed by the content_tagging module.
+                */
+               tags: null,
             },
 
             initialize: function() {
