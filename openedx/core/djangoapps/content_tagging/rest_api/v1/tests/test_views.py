@@ -31,7 +31,6 @@ from common.djangoapps.student.roles import (
 from openedx.core.djangoapps.content_libraries.api import (
     AccessLevel,
     create_library,
-    COMPLEX,
     set_library_user_permissions,
 )
 from openedx.core.djangoapps.content_tagging.models import TaxonomyOrg
@@ -104,12 +103,8 @@ class TestTaxonomyObjectsMixin:
             collection_uuid=self.collection.uuid,
             org=self.orgA,
             slug="lib_a",
-            library_type=COMPLEX,
             title="Library Org A",
             description="This is a library from Org A",
-            allow_public_learning=False,
-            allow_public_read=False,
-            library_license="",
         )
 
     def _setUp_users(self):
