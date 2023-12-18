@@ -7,6 +7,7 @@ from openedx.core.constants import COURSE_ID_PATTERN
 from .views import (
     CourseDetailsView,
     CourseTeamView,
+    CourseIndexView,
     CourseGradingView,
     CourseRerunView,
     CourseSettingsView,
@@ -15,7 +16,8 @@ from .views import (
     ProctoredExamSettingsView,
     ProctoringErrorsView,
     HelpUrlsView,
-    VideoUsageView
+    VideoUsageView,
+    VideoDownloadView
 )
 
 app_name = 'v1'
@@ -39,6 +41,11 @@ urlpatterns = [
         name="video_usage"
     ),
     re_path(
+        fr'^videos/{COURSE_ID_PATTERN}/download$',
+        VideoDownloadView.as_view(),
+        name="video_usage"
+    ),
+    re_path(
         fr'^proctored_exam_settings/{COURSE_ID_PATTERN}$',
         ProctoredExamSettingsView.as_view(),
         name="proctored_exam_settings"
@@ -52,6 +59,11 @@ urlpatterns = [
         fr'^course_settings/{COURSE_ID_PATTERN}$',
         CourseSettingsView.as_view(),
         name="course_settings"
+    ),
+    re_path(
+        fr'^course_index/{COURSE_ID_PATTERN}$',
+        CourseIndexView.as_view(),
+        name="course_index"
     ),
     re_path(
         fr'^course_details/{COURSE_ID_PATTERN}$',

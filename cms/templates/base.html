@@ -188,4 +188,10 @@ from openedx.core.release import RELEASE_LINE
     <%include file="widgets/segment-io-footer.html" />
     <div class="modal-cover"></div>
   </body>
+  <script>
+	var beamer_config = {
+		product_id : "${settings.BEAMER_PRODUCT_ID | n, js_escaped_string}"
+	};
+    </script>
+<script type="text/javascript" src="https://app.getbeamer.com/js/beamer-embed.js" defer="defer"></script>
 </html>

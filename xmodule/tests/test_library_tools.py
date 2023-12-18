@@ -9,7 +9,6 @@ block type in mind.
 from unittest import mock
 
 import ddt
-from bson.objectid import ObjectId
 from django.conf import settings
 from django.test import override_settings
 from opaque_keys.edx.keys import UsageKey
@@ -67,9 +66,9 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         _ = self.tools.list_available_libraries()
         assert mock_get_library_summaries.called
 
-    def test_get_v1_library_version(self):
+    def test_get_latest_v1_library_version(self):
         """
-        Test get_library_version for V1 libraries.
+        Test get_v1_library_version for V1 libraries.
 
         Covers getting results for either string library key or LibraryLocator.
         """
@@ -78,16 +77,14 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         lib = self.store.get_library(lib_key, remove_version=False, remove_branch=False)
         # check the result using the LibraryLocator
         assert isinstance(lib_key, LibraryLocator)
-        result = self.tools.get_library_version(lib_key)
+        result = self.tools.get_latest_library_version(lib_key)
         assert result
-        assert isinstance(result, ObjectId)
-        assert result == lib.location.library_key.version_guid
+        assert result == str(lib.location.library_key.version_guid)
         # the same check for string representation of the LibraryLocator
         str_key = str(lib_key)
-        result = self.tools.get_library_version(str_key)
+        result = self.tools.get_latest_library_version(str_key)
         assert result
-        assert isinstance(result, ObjectId)
-        assert result == lib.location.library_key.version_guid
+        assert result == str(lib.location.library_key.version_guid)
 
     @ddt.data(
         'library-v1:Fake+Key',  # V1 library key
@@ -95,13 +92,13 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         LibraryLocator.from_string('library-v1:Fake+Key'),
         LibraryLocatorV2.from_string('lib:Fake:V-2'),
     )
-    def test_get_library_version_no_library(self, lib_key):
+    def test_get_latest_library_version_no_library(self, lib_key):
         """
-        Test get_library_version result when the library does not exist.
+        Test get_latest_library_version result when the library does not exist.
 
         Provided lib_key's are valid V1 or V2 keys.
         """
-        assert self.tools.get_library_version(lib_key) is None
+        assert self.tools.get_latest_library_version(lib_key) is None
 
     def test_update_children_for_v2_lib(self):
         """
@@ -124,7 +121,7 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         assert len(content_block.children) == 0
 
         # Populate children from library
-        self.tools.trigger_refresh_children(content_block)
+        self.tools.trigger_library_sync(content_block, library_version=None)
 
         # The updates happen in a Celery task, so this particular content_block instance is no updated.
         # We must re-instantiate it from modulstore in order to see the updated children list.
@@ -161,7 +158,7 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         )
 
         # Import the unit block from the library to the course
-        self.tools.trigger_refresh_children(lc_block)
+        self.tools.trigger_library_sync(lc_block, library_version=None)
         lc_block = self.store.get_item(lc_block.location)
 
         # Verify imported block with its children
@@ -182,7 +179,7 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
 
         # Check that reimporting updates the target block
         self._set_library_block_olx(html_block_id, '<html><a href="/static/test.txt">Foo bar</a></html>')
-        self.tools.trigger_refresh_children(lc_block)
+        self.tools.trigger_library_sync(lc_block, library_version=None)
         lc_block = self.store.get_item(lc_block.location)
 
         assert len(lc_block.children) == 1
@@ -209,6 +206,6 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         )
 
         assert len(content_block.children) == 0
-        self.tools.trigger_refresh_children(content_block)
+        self.tools.trigger_library_sync(content_block, library_version=None)
         content_block = self.store.get_item(content_block.location)
         assert len(content_block.children) == 1

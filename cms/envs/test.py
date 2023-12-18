@@ -27,8 +27,6 @@ from .common import *
 
 # import settings from LMS for consistent behavior with CMS
 from lms.envs.test import (  # pylint: disable=wrong-import-order
-    BLOCKSTORE_USE_BLOCKSTORE_APP_API,
-    BLOCKSTORE_API_URL,
     COMPREHENSIVE_THEME_DIRS,  # unimport:skip
     DEFAULT_FILE_STORAGE,
     ECOMMERCE_API_URL,
@@ -184,10 +182,6 @@ CACHES = {
 }
 
 ############################### BLOCKSTORE #####################################
-# Blockstore tests
-RUN_BLOCKSTORE_TESTS = os.environ.get('EDXAPP_RUN_BLOCKSTORE_TESTS', 'no').lower() in ('true', 'yes', '1')
-BLOCKSTORE_API_URL = os.environ.get('EDXAPP_BLOCKSTORE_API_URL', "http://edx.devstack.blockstore-test:18251/api/v1/")
-BLOCKSTORE_API_AUTH_TOKEN = os.environ.get('EDXAPP_BLOCKSTORE_API_AUTH_TOKEN', 'edxapp-test-key')
 BUNDLE_ASSET_STORAGE_SETTINGS = dict(
     STORAGE_CLASS='django.core.files.storage.FileSystemStorage',
     STORAGE_KWARGS=dict(
@@ -265,20 +259,9 @@ VIDEO_CDN_URL = {
 # Courseware Search Index
 FEATURES['ENABLE_COURSEWARE_INDEX'] = True
 FEATURES['ENABLE_LIBRARY_INDEX'] = True
-FEATURES['ENABLE_CONTENT_LIBRARY_INDEX'] = False
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 
 FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
-
-####################### ELASTICSEARCH TESTS #######################
-# Enable this when testing elasticsearch-based code which couldn't be tested using the mock engine
-ENABLE_ELASTICSEARCH_FOR_TESTS = os.environ.get(
-    'EDXAPP_ENABLE_ELASTICSEARCH_FOR_TESTS', 'no').lower() in ('true', 'yes', '1')
-
-TEST_ELASTICSEARCH_USE_SSL = os.environ.get(
-    'EDXAPP_TEST_ELASTICSEARCH_USE_SSL', 'no').lower() in ('true', 'yes', '1')
-TEST_ELASTICSEARCH_HOST = os.environ.get('EDXAPP_TEST_ELASTICSEARCH_HOST', 'edx.devstack.elasticsearch710')
-TEST_ELASTICSEARCH_PORT = int(os.environ.get('EDXAPP_TEST_ELASTICSEARCH_PORT', '9200'))
 
 ########################## AUTHOR PERMISSION #######################
 FEATURES['ENABLE_CREATOR_GROUP'] = False

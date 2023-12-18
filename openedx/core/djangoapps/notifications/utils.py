@@ -3,7 +3,7 @@ Utils function for notifications app
 """
 from common.djangoapps.student.models import CourseEnrollment
 
-from .config.waffle import SHOW_NOTIFICATIONS_TRAY
+from .config.waffle import ENABLE_COURSEWIDE_NOTIFICATIONS, SHOW_NOTIFICATIONS_TRAY
 
 
 def find_app_in_normalized_apps(app_name, apps_list):
@@ -51,3 +51,20 @@ def get_list_in_batches(input_list, batch_size):
     list_length = len(input_list)
     for index in range(0, list_length, batch_size):
         yield input_list[index: index + batch_size]
+
+
+def filter_course_wide_preferences(course_key, preferences):
+    """
+    If course wide notifications is disabled for course, it filters course_wide
+    preferences from response
+    """
+    if ENABLE_COURSEWIDE_NOTIFICATIONS.is_enabled(course_key):
+        return preferences
+    course_wide_notification_types = ['new_discussion_post', 'new_question_post']
+    config = preferences['notification_preference_config']
+    for app_prefs in config.values():
+        notification_types = app_prefs['notification_types']
+        for course_wide_type in course_wide_notification_types:
+            if course_wide_type in notification_types.keys():
+                notification_types.pop(course_wide_type)
+    return preferences

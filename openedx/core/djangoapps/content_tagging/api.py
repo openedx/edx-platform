@@ -18,7 +18,7 @@ def create_taxonomy(
     name: str,
     description: str | None = None,
     enabled=True,
-    allow_multiple=False,
+    allow_multiple=True,
     allow_free_text=False,
     orgs: list[Organization] | None = None,
 ) -> Taxonomy:
@@ -58,6 +58,9 @@ def set_taxonomy_orgs(
     If not `all_orgs`, the taxonomy is associated with each org in the `orgs` list. If that list is empty, the
     taxonomy is not associated with any orgs.
     """
+    if taxonomy.system_defined:
+        raise ValueError("Cannot set orgs for a system-defined taxonomy")
+
     TaxonomyOrg.objects.filter(
         taxonomy=taxonomy,
         rel_type=relationship,

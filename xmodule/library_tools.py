@@ -4,8 +4,8 @@ XBlock runtime services for LibraryContentBlock
 from __future__ import annotations
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from django.core.exceptions import PermissionDenied
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from user_tasks.models import UserTaskStatus
 
 from openedx.core.lib import ensure_cms
@@ -33,24 +33,24 @@ class LibraryToolsService:
         self.store = modulestore
         self.user_id = user_id
 
-    def get_library_version(self, lib_key) -> str | int | None:
+    def get_latest_library_version(self, lib_key) -> str | None:
         """
-        Get the version of the given library.
+        Get the version of the given library as string.
 
         The return value (library version) could be:
-            ObjectID - for V1 library;
-            int      - for V2 library.
-            None     - if the library does not exist.
+            str(<ObjectID>) - for V1 library;
+            str(<int>)      - for V2 library.
+            None            - if the library does not exist.
         """
-        library = library_api.get_v1_or_v2_library(lib_key)
+        library = library_api.get_v1_or_v2_library(lib_key, version=None)
         if not library:
             return None
         elif isinstance(library, LibraryRootV1):
             # We need to know the library's version so ensure it's set in library.location.library_key.version_guid
             assert library.location.library_key.version_guid is not None
-            return library.location.library_key.version_guid
+            return str(library.location.library_key.version_guid)
         elif isinstance(library, library_api.ContentLibraryMetadata):
-            return library.version
+            return str(library.version)
 
     def create_block_analytics_summary(self, course_key, block_keys):
         """
@@ -96,14 +96,18 @@ class LibraryToolsService:
         """
         return self.store.check_supports(block.location.course_key, 'copy_from_template')
 
-    def trigger_refresh_children(self, dest_block: LibraryContentBlock, user_perms=None) -> None:
+    def trigger_library_sync(self, dest_block: LibraryContentBlock, library_version: str | int | None) -> None:
         """
-        Queue a task to update the children of `dest_block`.
+        Queue task to synchronize the children of `dest_block` with it source library (at `library_version` or latest).
+
+        Raises ObjectDoesNotExist if library/version cannot be found.
 
         The task will:
+        * Load that library at `dest_block.source_library_id` and `library_version`.
+          * If `library_version` is None, load the latest.
+          * Update `dest_block.source_library_version` based on what is loaded.
         * Ensure that `dest_block` has children corresponding to all matching source library blocks.
           * Considered fields of `dest_block` include: `source_library_id`, `source_library_version`, `capa_type`.
-          * If `dest_block.source_library_version` is set, use that. Otherwise, use latest available
             library version, and upate `dest_block.source_library_version` to match.
         * Derive each child block id as a function of `dest_block`'s id and the library block's definition id.
         * Follow these important create/update/delete semantics for children:
@@ -113,36 +117,30 @@ class LibraryToolsService:
           * When a block in `dest_block.children` DOES NOT MATCH any library children: delete it from
             `dest_block.children`.
         """
-        ensure_cms("library_content block children may only be updated in a CMS context")
+        ensure_cms("library_content block children may only be synced in a CMS context")
         if not isinstance(dest_block, LibraryContentBlock):
-            raise ValueError(f"Can only refresh children for library_content blocks, not {dest_block.tag} blocks.")
-        if user_perms and not user_perms.can_write(dest_block.location.course_key):
-            raise PermissionDenied()
+            raise ValueError(f"Can only sync children for library_content blocks, not {dest_block.tag} blocks.")
         if not dest_block.source_library_id:
             dest_block.source_library_version = ""
             return
         library_key = dest_block.source_library_key
-        if not library_api.get_v1_or_v2_library(library_key):
-            raise ValueError(f"Requested library {library_key} not found.")
-        if user_perms and not user_perms.can_read(library_key):
-            raise PermissionDenied()
-        library_tasks.refresh_children.delay(
+        if not library_api.get_v1_or_v2_library(library_key, version=library_version):
+            if library_version:
+                raise ObjectDoesNotExist(f"Version {library_version} of library {library_key} not found.")
+            raise ObjectDoesNotExist(f"Library {library_key} not found.")
+        library_tasks.sync_from_library.delay(
             user_id=self.user_id,
             dest_block_id=str(dest_block.scope_ids.usage_id),
+            library_version=library_version,
         )
 
-    def trigger_duplicate_children(
-        self,
-        source_block: LibraryContentBlock,
-        dest_block: LibraryContentBlock,
-        user_perms=None,
-    ) -> None:
+    def trigger_duplication(self, source_block: LibraryContentBlock, dest_block: LibraryContentBlock) -> None:
         """
         Queue a task to duplicate the children of `source_block` to `dest_block`.
         """
         ensure_cms("library_content block children may only be duplicated in a CMS context")
         if not isinstance(dest_block, LibraryContentBlock):
-            raise ValueError(f"Can only refresh children for library_content blocks, not {dest_block.tag} blocks.")
+            raise ValueError(f"Can only duplicate children for library_content blocks, not {dest_block.tag} blocks.")
         if source_block.scope_ids.usage_id.context_key != source_block.scope_ids.usage_id.context_key:
             raise ValueError(
                 "Cannot duplicate_children across different learning contexts "
@@ -159,15 +157,15 @@ class LibraryToolsService:
             dest_block_id=str(dest_block.scope_ids.usage_id),
         )
 
-    def are_children_updating(self, library_content_block: LibraryContentBlock) -> bool:
+    def are_children_syncing(self, library_content_block: LibraryContentBlock) -> bool:
         """
-        Is a task currently running to update the children of `library_content_block`?
+        Is a task currently running to sync the children of `library_content_block`?
 
         Only checks the latest task (so that this block's state can't get permanently messed up by
         some older task that's stuck in PENDING).
         """
         args = {'dest_block_id': library_content_block.scope_ids.usage_id}
-        name = library_tasks.LibraryUpdateChildrenTask.generate_name(args)
+        name = library_tasks.LibrarySyncChildrenTask.generate_name(args)
         status = UserTaskStatus.objects.filter(name=name).order_by('-created').first()
         return status and status.state in [
             UserTaskStatus.IN_PROGRESS, UserTaskStatus.PENDING, UserTaskStatus.RETRYING
@@ -187,7 +185,7 @@ class LibraryToolsService:
             for lib in self.store.get_library_summaries()
         ]
         v2_query = library_api.get_libraries_for_user(user)
-        v2_libs_with_meta = library_api.get_metadata_from_index(v2_query)
+        v2_libs_with_meta = library_api.get_metadata(v2_query)
         v2_libs = [(lib.key, lib.title) for lib in v2_libs_with_meta]
 
         if settings.FEATURES.get('ENABLE_LIBRARY_AUTHORING_MICROFRONTEND'):
