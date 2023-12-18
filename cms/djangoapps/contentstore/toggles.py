@@ -178,7 +178,7 @@ def use_add_game_block():
     return ENABLE_ADD_GAME_BLOCK_FLAG.is_enabled()
 
 
-# .. toggle_name: new_core_editors.use_new_library_editor
+# .. toggle_name: new_core_editors.use_new_library_content_editor
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: This flag enables the use of the new library xblock editor
@@ -187,14 +187,14 @@ def use_add_game_block():
 # .. toggle_target_removal_date: 2025-1-30
 # .. toggle_tickets: TNL-11040
 # .. toggle_warning:
-ENABLE_NEW_LIBRARY_EDITOR_FLAG = WaffleFlag('new_core_editors.use_new_library_editor', __name__)
+ENABLE_NEW_LIBRARY_CONTENT_EDITOR_FLAG = WaffleFlag('new_core_editors.use_new_library_content_editor', __name__)
 
 
-def use_new_library_editor():
+def use_new_library_content_editor():
     """
     Returns a boolean if new library content block editor is enabled
     """
-    return ENABLE_NEW_LIBRARY_EDITOR_FLAG.is_enabled()
+    return ENABLE_NEW_LIBRARY_CONTENT_EDITOR_FLAG.is_enabled()
 
 
 # .. toggle_name: contentstore.individualize_anonymous_user_id
