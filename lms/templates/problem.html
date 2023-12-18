@@ -405,15 +405,33 @@ if (problemList.length > 1 && btnSubmit && btnNext) {
 
   problemElement.insertBefore(divContainer, problemElement.firstChild);
 
-  const elementError = document.querySelector('.err-number-qusetion')
-  if(elementError){
-    const numberError = elementError.textContent;
-    const indicatorError = problemList[numberError - 1].querySelector('.indicator-container');
-    indicatorError.style.display = 'block';
-    const messgasBox = problemList[numberError - 1].querySelector('.feedback-hint-incorrect');
-    messgasBox.classList.add('error-problem-answer'); 
-  }
+  const elementsError = document.querySelectorAll('.err-number-qusetion');
+elementsError.forEach((elementError) => {
+  const numberError = elementError.textContent;
+  const indicatorError = problemList[numberError - 1].querySelector('.indicator-container');
+  indicatorError.style.display = 'block';
+  const messgasBox = problemList[numberError - 1].querySelector('.feedback-hint-incorrect');
+  messgasBox.classList.add('error-problem-answer'); 
+
+  const childElements = messgasBox.children;
+  const childElementsArray = Array.from(childElements);
+  childElementsArray.forEach((child) => {
+    messgasBox.removeChild(child);
+  }); 
+
+  const newSpan = document.createElement('span');
+  newSpan.textContent = 'Câu trả lời của bạn chưa chính xác';
+  messgasBox.appendChild(newSpan);
+});
  
+const elementsSubmitted = document.querySelectorAll('.submitted-question')
+elementsSubmitted.forEach((element)=>{
+  const numberSubmitted = element.textContent;
+  const title = problemList[numberSubmitted - 1].querySelector('.explanation-title');
+
+  title.textContent = 'Bạn đã trả lời đúng';
+
+})
 
 
   const btnNumber = document.querySelectorAll('.problem-question-number');
