@@ -185,7 +185,7 @@ def use_add_game_block():
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2023-10-30
 # .. toggle_target_removal_date: 2025-1-30
-# .. toggle_tickets: TNL-11040
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/33640
 # .. toggle_warning:
 ENABLE_NEW_LIBRARY_EDITOR_FLAG = WaffleFlag('new_core_editors.use_new_library_editor', __name__)
 
