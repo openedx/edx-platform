@@ -102,7 +102,6 @@ class HomePageCoursesViewTest(CourseTestCase):
                 "url": f'/course/{course_id}',
             }],
             "in_process_course_actions": [],
-            # "libraries": [],
         }
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
