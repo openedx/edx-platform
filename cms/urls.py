@@ -351,3 +351,8 @@ urlpatterns += [
     re_path('^authoring-api/ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     re_path('^authoring-api/schema/', SpectacularAPIView.as_view(), name='schema'),
 ]
+
+# Course Roles API
+urlpatterns += [
+    path('api/course_roles/', include('openedx.core.djangoapps.course_roles.urls', namespace='course_roles_api')),
+]
