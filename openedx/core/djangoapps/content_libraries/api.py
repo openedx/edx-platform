@@ -1178,6 +1178,11 @@ def revert_changes(library_key):
 
 
 def should_map_v1_to_v2_library() -> bool:
+    """
+    get MAP_V1_LIBRARIES_TO_V2_LIBRARIES.
+    This value, when true, means that v1 library keys pull content from corresponding v2 libs.
+    Returns True if the mapping is enabled, False if not.
+    """
     return MAP_V1_LIBRARIES_TO_V2_LIBRARIES.is_enabled()
 
 def get_v1_or_v2_library(
