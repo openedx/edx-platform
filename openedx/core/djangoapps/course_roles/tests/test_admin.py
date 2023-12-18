@@ -6,7 +6,7 @@ from django.urls import reverse
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from openedx.core.djangoapps.course_roles.models import CourseRolesRole
+from openedx.core.djangoapps.course_roles.models import Role
 from organizations.models import Organization
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
@@ -17,7 +17,8 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
     """
     def setUp(self):
         super().setUp()
-        self.user = UserFactory.create(is_staff=True, is_superuser=True)
+        self.user = UserFactory(username="test_user_1", password="test", is_staff=True, is_superuser=True)
+        # self.user = UserFactory.create(is_staff=True, is_superuser=True)
         self.user.save()
         self.org = Organization.objects.create(
             name='test_org_for_course_roles',
@@ -25,7 +26,7 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
             short_name='test_org_for_course_roles'
         )
         self.course = CourseOverviewFactory(org='test_org_for_course_roles', run='1')
-        self.role = CourseRolesRole.objects.create(name='test_role')
+        self.role = Role.objects.create(name='test_role')
         self.fake_org = Organization.objects.create(
             name='fake_test_org_for_course_roles',
             active=True,
@@ -40,22 +41,22 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
             'email': self.user.email
         }
 
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user, password='test')
 
         # adding new role from django admin page
-        response = self.client.post(reverse('admin:course_roles_courserolesuserrole_add'), data=data)
-        self.assertRedirects(response, reverse('admin:course_roles_courserolesuserrole_changelist'))
+        response = self.client.post(reverse('admin:course_roles_userrole_add'), data=data)
+        self.assertRedirects(response, reverse('admin:course_roles_userrole_changelist'))
 
         # checking the new role created matches expectations
-        response = self.client.get(reverse('admin:course_roles_courserolesuserrole_changelist'))
-        self.assertContains(response, 'Select course roles user role to change')
-        self.assertContains(response, 'Add course roles user role')
+        response = self.client.get(reverse('admin:course_roles_userrole_changelist'))
+        self.assertContains(response, 'Select user role to change')
+        self.assertContains(response, 'Add user role')
         self.assertContains(response, 'test_role')
         self.assertContains(response, str(self.course.id))
-        self.assertContains(response, '1 course roles user role')
+        self.assertContains(response, '1 user role')
 
         #try adding with same information raise error.
-        response = self.client.post(reverse('admin:course_roles_courserolesuserrole_add'), data=data)
+        response = self.client.post(reverse('admin:course_roles_userrole_add'), data=data)
         self.assertContains(response, 'Duplicate')
 
     def test_instance_level_role_creation(self):
@@ -64,16 +65,16 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
             'email': self.user.email,
         }
 
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user, password='test')
 
         # adding new role from django admin page
-        response = self.client.post(reverse('admin:course_roles_courserolesuserrole_add'), data=data)
-        self.assertRedirects(response, reverse('admin:course_roles_courserolesuserrole_changelist'))
+        response = self.client.post(reverse('admin:course_roles_userrole_add'), data=data)
+        self.assertRedirects(response, reverse('admin:course_roles_userrole_changelist'))
 
         # checking the new role created matches expectations
-        response = self.client.get(reverse('admin:course_roles_courserolesuserrole_changelist'))
+        response = self.client.get(reverse('admin:course_roles_userrole_changelist'))
         self.assertContains(response, 'test_role')
-        self.assertContains(response, '1 course roles user role')
+        self.assertContains(response, '1 user role')
 
     def test_org_level_role_creation(self):
         data = {
@@ -83,16 +84,16 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
 
         }
 
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user, password='test')
 
         # adding new role from django admin page
-        response = self.client.post(reverse('admin:course_roles_courserolesuserrole_add'), data=data)
-        self.assertRedirects(response, reverse('admin:course_roles_courserolesuserrole_changelist'))
+        response = self.client.post(reverse('admin:course_roles_userrole_add'), data=data)
+        self.assertRedirects(response, reverse('admin:course_roles_userrole_changelist'))
 
         # checking the new role created matches expectations
-        response = self.client.get(reverse('admin:course_roles_courserolesuserrole_changelist'))
+        response = self.client.get(reverse('admin:course_roles_userrole_changelist'))
         self.assertContains(response, 'test_role')
-        self.assertContains(response, '1 course roles user role')
+        self.assertContains(response, '1 user role')
 
     def test_course_level_role_creation_without_org_data(self):
         data = {
@@ -101,10 +102,10 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
             'course': str(self.course.id)
         }
 
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user, password='test')
 
         # adding new role from django admin page
-        response = self.client.post(reverse('admin:course_roles_courserolesuserrole_add'), data=data)
+        response = self.client.post(reverse('admin:course_roles_userrole_add'), data=data)
 
         # checking new role not added, and errors are shown
         self.assertContains(
@@ -125,10 +126,10 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
             'email': email
         }
 
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user, password='test')
 
         # Adding new role with invalid data
-        response = self.client.post(reverse('admin:course_roles_courserolesuserrole_add'), data=data)
+        response = self.client.post(reverse('admin:course_roles_userrole_add'), data=data)
 
         # checking new role not added, and errors are shown
         self.assertContains(
@@ -156,10 +157,10 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
             'email': self.user.email
         }
 
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user, password='test')
 
         # adding new role from django admin page
-        response = self.client.post(reverse('admin:course_roles_courserolesuserrole_add'), data=data)
+        response = self.client.post(reverse('admin:course_roles_userrole_add'), data=data)
 
         # checking new role not added, and errors are shown
         self.assertContains(
