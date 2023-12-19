@@ -178,6 +178,25 @@ def use_add_game_block():
     return ENABLE_ADD_GAME_BLOCK_FLAG.is_enabled()
 
 
+# .. toggle_name: new_core_editors.use_new_library_content_editor
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new library xblock editor
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-10-30
+# .. toggle_target_removal_date: 2025-1-30
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/33640
+# .. toggle_warning:
+ENABLE_NEW_LIBRARY_CONTENT_EDITOR_FLAG = WaffleFlag('new_core_editors.use_new_library_content_editor', __name__)
+
+
+def use_new_library_content_editor():
+    """
+    Returns a boolean if new library content block editor is enabled
+    """
+    return ENABLE_NEW_LIBRARY_CONTENT_EDITOR_FLAG.is_enabled()
+
+
 # .. toggle_name: contentstore.individualize_anonymous_user_id
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
