@@ -9,6 +9,7 @@ from logging import getLogger
 
 from crum import get_current_request
 from django.conf import settings
+from edx_toggles.toggles import SettingToggle
 from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomerUser
 from pytz import UTC
 
@@ -137,9 +138,10 @@ def check_start_date(user, days_early_for_beta, start, course_key, display_error
 
         # Before returning a StartDateError, determine if the learner should be redirected to the enterprise learner
         # portal by returning StartDateEnterpriseLearnerError instead.
-        request = get_current_request()
-        if request and enterprise_learner_enrolled(request, user, course_key):
-            return StartDateEnterpriseLearnerError(start, display_error_to_user=display_error_to_user)
+        if SettingToggle('COURSEWARE_COURSE_NOT_STARTED_ENTERPRISE_LEARNER_ERROR', default=False).is_enabled():
+            request = get_current_request()
+            if request and enterprise_learner_enrolled(request, user, course_key):
+                return StartDateEnterpriseLearnerError(start, display_error_to_user=display_error_to_user)
 
         return StartDateError(start, display_error_to_user=display_error_to_user)
 
