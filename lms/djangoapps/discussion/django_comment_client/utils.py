@@ -29,6 +29,7 @@ from lms.djangoapps.discussion.django_comment_client.permissions import (
 )
 from lms.djangoapps.discussion.django_comment_client.settings import MAX_COMMENT_DEPTH
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.core.djangoapps.discussions.utils import (
     get_accessible_discussion_xblocks,
     get_accessible_discussion_xblocks_by_course_id,
@@ -126,11 +127,18 @@ def has_discussion_privileges(user, course_id):
     Returns:
       bool
     """
+    # TODO: remove user_ids check once course_roles is fully impelented and data is migrated
     roles = get_role_ids(course_id)
 
     for user_ids in roles.values():
         if user.id in user_ids:
             return True
+    if user.has_perm(
+        "f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value.name}'"
+    ) and user.has_perm(
+        "f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.value.name}'"
+    ):
+        return True
     return False
 
 

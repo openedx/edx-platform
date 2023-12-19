@@ -50,6 +50,7 @@ from lms.djangoapps.discussion.exceptions import TeamDiscussionHiddenFromUserExc
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.teams import api as team_api
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.core.djangoapps.discussions.utils import (
     available_division_schemes,
     get_discussion_categories_ids,
@@ -756,7 +757,9 @@ def is_course_staff(course_key: CourseKey, user: User):
     """
     Check if user has course instructor or course staff role.
     """
-    return CourseInstructorRole(course_key).has_user(user) or CourseStaffRole(course_key).has_user(user)
+    # TODO: remove role checks once course_roles is fully impelented and data is migrated
+    return (CourseInstructorRole(course_key).has_user(user) or CourseStaffRole(course_key).has_user(user) or
+        user.has_perm("f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value.name}'"))
 
 
 def is_privileged_user(course_key: CourseKey, user: User):
@@ -772,7 +775,13 @@ def is_privileged_user(course_key: CourseKey, user: User):
         FORUM_ROLE_ADMINISTRATOR,
     ]
     has_course_role = Role.user_has_role_for_course(user, course_key, forum_roles)
-    return GlobalStaff().has_user(user) or has_course_role
+    # TODO: remove role checks once course_roles is fully impelented and data is migrated
+    has_moderate_discussion_permissions = user.has_perm(
+        "f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value.name}'"
+    ) or user.has_perm(
+        "f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.value.name}'"
+    )
+    return GlobalStaff().has_user(user) or has_course_role or has_moderate_discussion_permissions
 
 
 class DiscussionBoardFragmentView(EdxFragmentView):
@@ -804,7 +813,11 @@ class DiscussionBoardFragmentView(EdxFragmentView):
         course_key = CourseKey.from_string(course_id)
         # Force using the legacy view if a user profile is requested or the URL contains a specific topic or thread
         force_legacy_view = (profile_page_context or thread_id or discussion_id)
-        is_educator_or_staff = is_course_staff(course_key, request.user) or GlobalStaff().has_user(request.user)
+        # TODO: remove role checks once course_roles is fully impelented and data is migrated
+        is_educator_or_staff = (
+            is_course_staff(course_key, request.user) or GlobalStaff().has_user(request.user) or
+            request.user.has_perm("f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_MODERATORS.value.name}'")
+        )
         try:
             base_context = _create_base_discussion_view_context(request, course_key)
             # Note:

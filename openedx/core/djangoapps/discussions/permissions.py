@@ -6,6 +6,7 @@ from rest_framework.permissions import BasePermission
 
 from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff, CourseInstructorRole
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.core.lib.api.view_utils import validate_course_key
 
 DEFAULT_MESSAGE = "You're not authorized to perform this operation."
@@ -29,10 +30,13 @@ class IsStaffOrCourseTeam(BasePermission):
 
         if GlobalStaff().has_user(request.user):
             return True
-
+        # TODO: remove role checks once course_roles is fully impelented and data is migrated
         return (
             CourseInstructorRole(course_key).has_user(request.user) or
             CourseStaffRole(course_key).has_user(request.user) or
+            request.user.has_perm(
+                "f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value.name}'"
+            ) or
             has_discussion_privileges(request.user, course_key)
         )
 
