@@ -146,7 +146,7 @@ laboratory==1.0.2         # via -r requirements/edx/base.in
 lazy==1.4                 # via -r requirements/edx/paver.txt, acid-xblock, lti-consumer-xblock, ora2
 libsass==0.10.0           # via -r requirements/edx/paver.txt, ora2
 loremipsum==1.0.5         # via ora2
-lti-consumer-xblock==2.4  # via -r requirements/edx/base.in
+lti-consumer-xblock==4.3  # via -r requirements/edx/base.in
 lxml==4.9.3               # via -c requirements/edx/../constraints.txt, -r requirements/edx/../edx-sandbox/shared.txt, capa, edxval, lti-consumer-xblock, ora2, safe-lxml, xblock, xmlsec
 mailsnake==1.6.4          # via -r requirements/edx/base.in
 mako==1.1.3               # via -r requirements/edx/base.in, acid-xblock, lti-consumer-xblock, xblock-google-drive, xblock-utils

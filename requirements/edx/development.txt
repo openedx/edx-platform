@@ -173,7 +173,7 @@ lazy-object-proxy==1.4.3  # via -r requirements/edx/testing.txt, astroid
 lazy==1.4                 # via -r requirements/edx/testing.txt, acid-xblock, bok-choy, lti-consumer-xblock, ora2
 libsass==0.10.0           # via -r requirements/edx/testing.txt, ora2
 loremipsum==1.0.5         # via -r requirements/edx/testing.txt, ora2
-lti-consumer-xblock==2.4  # via -r requirements/edx/testing.txt
+lti-consumer-xblock==4.3  # via -r requirements/edx/testing.txt
 lxml==4.9.3               # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, capa, edxval, lti-consumer-xblock, ora2, pyquery, safe-lxml, xblock, xmlsec
 m2r==0.2.1                # via sphinxcontrib-openapi
 mailsnake==1.6.4          # via -r requirements/edx/testing.txt
