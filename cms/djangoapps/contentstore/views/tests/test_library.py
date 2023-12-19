@@ -352,18 +352,18 @@ class UnitTestLibraries(CourseTestCase):
     ENABLE_LIBRARY_AUTHORING_MICROFRONTEND, and MAP_V1_LIBRARIES_TO_V2_LIBRARIES
     are enabled, the user is NOT redirected to view the V2 library in the MFE
     """
-    with mock.patch(
-        'django.conf.settings.LIBRARY_AUTHORING_MICROFRONTEND_URL', data[0]
-    ), mock.patch(
-        'cms.djangoapps.contentstore.views.library.should_redirect_to_library_authoring_mfe',
-        return_value=data[1]
-    ), mock.patch(
-        'cms.djangoapps.contentstore.views.library.should_map_v1_to_v2_library',
-        return_value=data[2]
-    ):
-        lib = LibraryFactory.create()
-        response = self.client.get(make_url_for_lib(lib.location.library_key))
-        self.assertNotEqual(response.status_code, 302)
+        with mock.patch(
+            'django.conf.settings.LIBRARY_AUTHORING_MICROFRONTEND_URL', data[0]
+        ), mock.patch(
+            'cms.djangoapps.contentstore.views.library.should_redirect_to_library_authoring_mfe',
+            return_value=data[1]
+        ), mock.patch(
+            'cms.djangoapps.contentstore.views.library.should_map_v1_to_v2_library',
+            return_value=data[2]
+        ):
+            lib = LibraryFactory.create()
+            response = self.client.get(make_url_for_lib(lib.location.library_key))
+            self.assertNotEqual(response.status_code, 302)
 
     def test_get_lib_info(self):
         """
