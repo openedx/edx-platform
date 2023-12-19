@@ -5,7 +5,7 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
 
-from openedx.core.djangoapps.course_roles.models import UserRole
+from .models import UserRole
 from organizations.models import Organization
 
 
@@ -86,7 +86,7 @@ class UserRoleForm(forms.ModelForm):
                     ).format(
                         role=cleaned_data.get("role"),
                         email=cleaned_data.get("email")
-                ))
+                    ))
         return cleaned_data
 
     def __init__(self, *args, **kwargs):
@@ -98,7 +98,6 @@ class UserRoleForm(forms.ModelForm):
         self.fields["email"].widget.attrs.update(style="width: 25%")
 
 
-@admin.register(UserRole)
 class UserRoleAdmin(admin.ModelAdmin):
     """Admin panel for course_roles role assignment"""
     form = UserRoleForm
@@ -130,3 +129,6 @@ class UserRoleAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         obj.user = form.cleaned_data["email"]
         super().save_model(request, obj, form, change)
+
+
+admin.site.register(UserRole, UserRoleAdmin)

@@ -188,7 +188,7 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
         self.assertContains(
             response,
             'An organization could not be found for {course}'.format(
-                course = course
+                course=course
             ),
             1,
             200,
