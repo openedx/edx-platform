@@ -1,4 +1,5 @@
 import json
+import math
 import logging
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from .models import ChatbotSession, ChatbotQuery
@@ -7,26 +8,31 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.utils.translation import gettext_lazy as _
 import requests
-from .api import CHATBOT_QUERY_API, CHATBOT_BEARER_TOKEN
+from .api import get_chatbot_bearer_token, get_chatbot_api_url
 
 @require_http_methods('GET')
 @login_required
-def chatbot_fetch_query_list_view(request, session_id, skip, limit):
+def chatbot_fetch_query_list_view(request, session_id, page, limit):
     user = request.user
-
+    
+    skip = (page - 1) * limit
     if session_id == '0':
         last_session = ChatbotSession.objects.filter(student=request.user).last()
 
-        query_list = [] if last_session is None else last_session.chatbot_queries.all()
-        print(query_list)
+        query_list = [] if last_session is None else last_session.chatbot_queries.order_by('-id').all()[skip:skip + limit]
+        total_page = 0 if last_session is None else math.ceil(last_session.chatbot_queries.count() / limit)
     else:
-        query_list = ChatbotQuery.objects.filter(session__student=user, session__id=session_id)
+        query_list = ChatbotQuery.objects.filter(session__student=user, session__id=session_id).order_by('-id')[skip:skip + limit]
+        total_page = math.ceil(ChatbotQuery.objects.filter(session__student=user, session__id=session_id).count() / limit)
+
 
     return JsonResponse(
         {
             'message': _('success'),
             'data': {
-                'query_list': chatbot_query_list_serializer(query_list)
+                'query_list': chatbot_query_list_serializer(query_list),
+                'total_page': total_page,
+                'remain_page': total_page - page,
             }
         }, 
         status=200
@@ -56,11 +62,7 @@ def chatbot_query_view(request):
     """
     Gửi query đến chatbot
     """
-    user = request.user
-
     request_data = json.loads(request.body.decode('utf8'))
-
-    print('REQUEST DATA::::', request_data)
 
     query_msg = request_data.get('query_msg')
     session_id = request_data.get('session_id')
@@ -77,6 +79,7 @@ def chatbot_query_view(request):
         return JsonResponse(
             {
                 'message': _('Internal Server Error'),
+                'hash': request_data.get('hash')
             }, 
             status=500
         )
@@ -88,9 +91,10 @@ def chatbot_query_view(request):
         return JsonResponse(
             {
                 'message': _('Failed'),
-                'data': chatbot_query_serializer(created_query)
+                'data': chatbot_query_serializer(created_query),
+                'hash': request_data.get('hash')
             }, 
-            status=500
+            status=200
         )
 
     created_query.status = 'succeeded'
@@ -100,7 +104,8 @@ def chatbot_query_view(request):
     return JsonResponse(
         {
             'message': _('success'),
-            'data': chatbot_query_serializer(created_query)
+            'data': chatbot_query_serializer(created_query),
+            'hash': request_data.get('hash')
         }, 
         status=200
     )
@@ -110,30 +115,35 @@ def chatbot_query_view(request):
 def chatbot_vote_response_view(request):
     data = json.loads(request.body.decode('utf8'))
 
-    if data.get('vote') not in ['up', 'down']:
+    if data.get('vote') not in ['up', 'down', 'remove']:
         return JsonResponse(
             {
-                'message': _('Vote must be "up" or "down"')
+                'message': _('Vote must be "up" or "down" or "remove"')
             },
             status=200
         )
         
     response = ChatbotQuery.objects.filter(id=data.get('query_id')).first()
-    if resopnse is None: 
+    if response is None: 
         return JsonResponse(
             {
                 'message': _('Not found query response')
             },
             status=400
         )
-    response.vote = data.get('vote')
+    if data.get('vote') == 'remove': 
+        response.vote = None
+    else:
+        response.vote = data.get('vote')
+
+    response.save()
 
     return JsonResponse(
         {
             'message': _('success'),  
             'data': {
                 'vote': data.get('vote'),
-                'query_id': data.get('query_id')
+                'id': data.get('query_id')
             }
         }
     )
@@ -169,7 +179,7 @@ def chatbot_retry_query_view(request):
     query = ChatbotQuery.objects.filter(id=data.get('query_id')).first()
 
     if query is None:
-        return JsonRespone(
+        return JsonResponse(
             {
                 'message': _('Not found query')
             },
@@ -177,7 +187,7 @@ def chatbot_retry_query_view(request):
         )
     
     if query.status != 'failed':
-        return JsonRespone(
+        return JsonResponse(
             {
                 'message': _('You can only retry on failed query')
             },
@@ -187,22 +197,21 @@ def chatbot_retry_query_view(request):
     response_msg = _chatbot_get_response(query.query_msg, query.session.id)
 
     if response_msg is None: 
-        query.status = 'failed'
-        return JsonRespone(
+        return JsonResponse(
             {
-                'message': _('Internal Server Error')
+                'message': _('Internal Server Error'),
+                'data': chatbot_query_serializer(query)
             },
-            status=500
+            status=200
         )
 
-    query.status == 'succeeded'
+    query.status = 'succeeded'
     query.response_msg = response_msg
-    return JsonRespone(
+    query.save()
+    return JsonResponse(
         {
             'message': _('success'),
-            'data': {
-                'id': query
-            }
+            'data': chatbot_query_serializer(query)
         },
         status=200
     )
@@ -216,7 +225,7 @@ def chatbot_cancel_query_view(request):
     query = ChatbotQuery.objects.filter(id=data.get('query_id')).first()
 
     if query is None:
-        return JsonRespone(
+        return JsonResponse(
             {
                 'message': _('Not found query')
             },
@@ -224,7 +233,7 @@ def chatbot_cancel_query_view(request):
         )
     
     if query.status != 'pending':
-        return JsonRespone(
+        return JsonResponse(
             {
                 'message': _('This query has already finished')
             },
@@ -232,7 +241,7 @@ def chatbot_cancel_query_view(request):
         )
 
     query.status = 'canceled'
-    return JsonRespone(
+    return JsonResponse(
         {
             'message': _('success')
         },
@@ -242,12 +251,10 @@ def chatbot_cancel_query_view(request):
 
 # helper function
 def _chatbot_get_response(query_msg, session_id):
-    url = CHATBOT_QUERY_API
-    print(url)
-    print(CHATBOT_BEARER_TOKEN)
+    url = get_chatbot_api_url()
     headers = {
         'Content-Type': 'application/json', 
-        'Authorization': f'Bearer {CHATBOT_BEARER_TOKEN}'
+        'Authorization': f'Bearer {get_chatbot_bearer_token()}'
     }
     data = {
         'query': query_msg,
