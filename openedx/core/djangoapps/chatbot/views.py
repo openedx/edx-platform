@@ -15,71 +15,13 @@ def chatbot_fetch_query_list_view(request, session_id, skip, limit):
     user = request.user
 
     if session_id == '0':
-        sessions = ChatbotSession.objects.filter(student=request.user).all()
-        print('STILL OK HERE')
-        print('STILL OK HERE')
-        print('STILL OK HERE')
-        print('STILL OK HERE')
-        print('STILL OK HERE')
-        print('STILL OK HERE')
-        print('STILL OK HERE')
-        print('STILL OK HERE')
-        print('STILL OK HERE')
-        print('STILL OK HERE')
-        print('STILL OK HERE')
-        print('STILL OK HERE')
-        print('STILL OK HERE')
-        print('STILL OK HERE')
-        print('STILL OK HERE')
-        print('STILL OK HERE')
-        print('STILL OK HERE')
-        print('STILL OK HERE')
-        print('STILL OK HERE')
-        print('STILL OK HERE')
-        print('STILL OK HERE')
-        print('STILL OK HERE')
-        print('STILL OK HERE')
-        print('STILL OK HERE')
-        # query_list = [] if len(last_session) == 0 else last_session[-1].chatbot_queries.all()
-        print(sessions)
-        query_list = []
-        print('STILL OK HERE -------------------------------------------------------')
-        print('STILL OK HERE -------------------------------------------------------')
-        print('STILL OK HERE -------------------------------------------------------')
-        print('STILL OK HERE -------------------------------------------------------')
-        print('STILL OK HERE -------------------------------------------------------')
-        print('STILL OK HERE -------------------------------------------------------')
-        print('STILL OK HERE -------------------------------------------------------')
-        print('STILL OK HERE -------------------------------------------------------')
-        print('STILL OK HERE -------------------------------------------------------')
-        print('STILL OK HERE -------------------------------------------------------')
-        print('STILL OK HERE -------------------------------------------------------')
-        print('STILL OK HERE -------------------------------------------------------')
-        print('STILL OK HERE -------------------------------------------------------')
-        print('STILL OK HERE -------------------------------------------------------')
-        print('STILL OK HERE -------------------------------------------------------')
-        print('STILL OK HERE -------------------------------------------------------')
-        print('STILL OK HERE -------------------------------------------------------')
-        print('STILL OK HERE -------------------------------------------------------')
-        print('STILL OK HERE -------------------------------------------------------')
-        print('STILL OK HERE -------------------------------------------------------')
-        print('STILL OK HERE -------------------------------------------------------')
-        print('STILL OK HERE -------------------------------------------------------')
-        print('STILL OK HERE -------------------------------------------------------')
-    else:
-        print('SESSION ID IS NOT 0')
-        print('SESSION ID IS NOT 0')
-        print('SESSION ID IS NOT 0')
-        print('SESSION ID IS NOT 0')
-        print('SESSION ID IS NOT 0')
+        last_session = ChatbotSession.objects.filter(student=request.user).last()
 
+        query_list = [] if last_session is None else last_session.chatbot_queries.all()
+        print(query_list)
+    else:
         query_list = ChatbotQuery.objects.filter(session__student=user, session__id=session_id)
 
-    print('SEEM OK')
-    print('SEEM OK')
-    print('SEEM OK')
-    print('SEEM OK')
-    print('SEEM OK')
     return JsonResponse(
         {
             'message': _('success'),
@@ -118,22 +60,18 @@ def chatbot_query_view(request):
 
     request_data = json.loads(request.body.decode('utf8'))
 
+    print('REQUEST DATA::::', request_data)
+
     query_msg = request_data.get('query_msg')
     session_id = request_data.get('session_id')
 
-    session = ChatbotSession.objects.filter(session_id=session_id).first()
+    session = ChatbotSession.objects.filter(id=session_id).last()
 
     if session is None: 
-        return JsonResponse(
-            {
-                'message': _('Not found session'),
-            }, 
-            status=400
-        )
-
+        session = ChatbotSession.objects.create(student=request.user)
 
     try:
-        created_query = ChatbotQuery.objects.create(session=session, student=user, query_msg=query_msg)
+        created_query = ChatbotQuery.objects.create(session=session, query_msg=query_msg)
     except Exception as e:
         logging.error(str(e))
         return JsonResponse(
@@ -143,18 +81,22 @@ def chatbot_query_view(request):
             status=500
         )
 
-    response_msg = _chatbot_get_response(query_msg, session_id)
+    response_msg = _chatbot_get_response(query_msg, session.id)
     if response_msg is None: 
         created_query.status = 'failed'
+        created_query.save()
         return JsonResponse(
             {
                 'message': _('Failed'),
+                'data': chatbot_query_serializer(created_query)
             }, 
             status=500
         )
 
     created_query.status = 'succeeded'
     created_query.response_msg = response_msg
+    created_query.save()
+
     return JsonResponse(
         {
             'message': _('success'),
@@ -301,6 +243,8 @@ def chatbot_cancel_query_view(request):
 # helper function
 def _chatbot_get_response(query_msg, session_id):
     url = CHATBOT_QUERY_API
+    print(url)
+    print(CHATBOT_BEARER_TOKEN)
     headers = {
         'Content-Type': 'application/json', 
         'Authorization': f'Bearer {CHATBOT_BEARER_TOKEN}'
@@ -310,9 +254,16 @@ def _chatbot_get_response(query_msg, session_id):
         'chat_id': session_id
     }
 
-    r = requests.post(url, headers=headers, data=data)
+    r = requests.post(url, headers=headers, data=json.dumps(data))
 
     if r.status_code == 200:
-        return r.json()
+        return r.json().get('data').get('response')
+
+    else: 
+        print('chatbot failed: ', r.status_code)
+        try:
+            print(r.json())
+        except Exception as e: 
+            print(str(e))
     
     return None
