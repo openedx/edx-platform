@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-12-10 20:36+0000\n"
-"PO-Revision-Date: 2023-12-10 20:36:19.422580\n"
+"POT-Creation-Date: 2023-12-17 20:36+0000\n"
+"PO-Revision-Date: 2023-12-17 20:36:18.369413\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -24163,16 +24163,16 @@ msgid "Select this problem"
 msgstr "Sǝlǝɔʇ ʇɥᴉs dɹøblǝɯ"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy to Clipboard"
-msgstr "Ȼødʎ ʇø Ȼlᴉdbøɐɹd"
+msgid "Manage Access"
+msgstr "Mɐnɐƃǝ Ⱥɔɔǝss"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage tags"
 msgstr "Mɐnɐƃǝ ʇɐƃs"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Manage Access"
-msgstr "Mɐnɐƃǝ Ⱥɔɔǝss"
+msgid "Copy to Clipboard"
+msgstr "Ȼødʎ ʇø Ȼlᴉdbøɐɹd"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."

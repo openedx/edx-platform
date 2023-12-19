@@ -144,33 +144,6 @@ class StartDateError(AccessError):
         )
 
 
-class StartDateEnterpriseLearnerError(AccessError):
-    """
-    Access denied because the course has not started yet and the user is not staff.  Use this error when this user is
-    also an enterprise learner and enrolled in the requested course.
-    """
-    def __init__(self, start_date, display_error_to_user=True):
-        """
-        Arguments:
-            display_error_to_user: If True, display this error to users in the UI.
-        """
-        error_code = "course_not_started_enterprise_learner"
-        if start_date == DEFAULT_START_DATE:
-            developer_message = "Course has not started, and the learner is enrolled via an enterprise subsidy."
-            user_message = _("Course has not started")
-        else:
-            developer_message = (
-                f"Course does not start until {start_date}, and the learner is enrolled via an enterprise subsidy."
-            )
-            user_message = _("Course does not start until {}"  # lint-amnesty, pylint: disable=translation-of-non-string
-                             .format(f"{start_date:%B %d, %Y}"))
-        super().__init__(
-            error_code,
-            developer_message,
-            user_message if display_error_to_user else None
-        )
-
-
 class MilestoneAccessError(AccessError):
     """
     Access denied because the user has unfulfilled milestones

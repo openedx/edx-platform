@@ -1324,7 +1324,7 @@ optimizely-sdk==4.1.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-ora2==6.0.16
+ora2==6.0.17
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt

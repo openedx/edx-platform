@@ -53,6 +53,7 @@ def generate_report() -> None:
         data = get_report_data()
         data["state"] = SURVEY_REPORT_GENERATED
         update_report(survey_report.id, data)
+        send_report_to_external_api(survey_report.id)
     except (Exception, ) as update_report_error:
         update_report(survey_report.id, {"state": SURVEY_REPORT_ERROR})
         raise Exception(update_report_error) from update_report_error

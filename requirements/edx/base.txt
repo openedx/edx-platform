@@ -787,7 +787,7 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/kernel.in
 optimizely-sdk==4.1.1
     # via -r requirements/edx/bundled.in
-ora2==6.0.16
+ora2==6.0.17
     # via -r requirements/edx/bundled.in
 packaging==23.2
     # via
