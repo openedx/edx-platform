@@ -3276,6 +3276,9 @@ INSTALLED_APPS = [
     
     # FUNiX Feedback
     'lms.djangoapps.feedback',
+
+    # FUNiX chatbot AI
+    'openedx.core.djangoapps.chatbot'
     
 ]
 
