@@ -107,13 +107,13 @@ from openedx.core.djangolib.markup import HTML
   align-self: stretch;  
   flex-grow: 0;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 500 !important;
   font-stretch: normal;
   font-style: normal;
   line-height: 1.5;
   letter-spacing: normal;
   text-align: left;
-  color: #5aa447;
+
   padding-bottom: 10px;
 }
 
@@ -138,6 +138,7 @@ from openedx.core.djangolib.markup import HTML
 .problem-question-number:hover{
   cursor: pointer;
 }
+
 
 </style>
 
@@ -405,15 +406,25 @@ if (problemList.length > 1 && btnSubmit && btnNext) {
 
   problemElement.insertBefore(divContainer, problemElement.firstChild);
 
-  const elementError = document.querySelector('.err-number-qusetion')
-  if(elementError){
-    const numberError = elementError.textContent;
-    const indicatorError = problemList[numberError - 1].querySelector('.indicator-container');
-    indicatorError.style.display = 'block';
-    const messgasBox = problemList[numberError - 1].querySelector('.feedback-hint-incorrect');
-    messgasBox.classList.add('error-problem-answer'); 
-  }
+  const elementsError = document.querySelectorAll('.err-number-qusetion');
+elementsError.forEach((elementError) => {
+  const numberError = elementError.textContent;
+  const indicatorError = problemList[numberError - 1].querySelector('.indicator-container');
+  indicatorError.style.display = 'block';
+  const messgasBox = problemList[numberError - 1].querySelector('.feedback-hint-incorrect');
+  messgasBox.classList.add('error-problem-answer'); 
+  const title = problemList[numberError - 1].querySelector('.explanation-title')
+  title.textContent = 'Câu trả lời của bạn chưa chính xác';
+});
  
+const elementsSubmitted = document.querySelectorAll('.submitted-question')
+elementsSubmitted.forEach((element)=>{
+  const numberSubmitted = element.textContent;
+  const title = problemList[numberSubmitted - 1].querySelector('.explanation-title');
+
+  title.textContent = 'Bạn đã trả lời đúng';
+
+})
 
 
   const btnNumber = document.querySelectorAll('.problem-question-number');
