@@ -30,8 +30,6 @@ from opaque_keys.edx.locator import (
     BlockUsageLocator,
     LibraryUsageLocator,
     LibraryUsageLocatorV2,
-    LibraryLocator as LibraryLocatorV1,
-    LibraryLocatorV2
 )
 from search.search_engine_base import SearchEngine
 
