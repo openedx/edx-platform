@@ -688,7 +688,7 @@
                      
                        $(listQz[currentIndex]).find('.message').remove()
                        choicegroup.appendChild(messagesProblem)
-                      $('.explanation-title').append('<span>Bạn đã trả lời đúng</span>')
+                       $(listQz[currentIndex]).find('.explanation-title').append('<span>Bạn đã trả lời đúng</span>')
   
                        indicatorError.css('display', 'none')
       
@@ -734,8 +734,7 @@
                           $(listQz[currentIndex]).find('.message').remove()
   
                           choicegroup.appendChild(messagesProblem)
-                          $('.feedback-hint-incorrect').children().remove();
-                          $('.feedback-hint-incorrect').append('<span>Câu trả lời của bạn chưa chính xác</span>')
+                          $(listQz[currentIndex]).find('.explanation-title').append('<span>Câu trả lời của bạn chưa chính xác</span>')
   
                           const messgasBox = listQz[currentIndex].querySelector('.feedback-hint-incorrect');
                           messgasBox.classList.add('error-problem-answer'); 
@@ -774,7 +773,7 @@
                    choicegroup.appendChild(messagesProblem)
   
                    indicatorError.css('display', 'none')
-                  
+                   $(listQz[currentIndex]).find('.explanation-title').append('<span>Bạn đã trả lời đúng</span>')
                  } 
                });
   

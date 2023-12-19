@@ -107,13 +107,13 @@ from openedx.core.djangolib.markup import HTML
   align-self: stretch;  
   flex-grow: 0;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 500 !important;
   font-stretch: normal;
   font-style: normal;
   line-height: 1.5;
   letter-spacing: normal;
   text-align: left;
-  color: #5aa447;
+
   padding-bottom: 10px;
 }
 
@@ -138,6 +138,7 @@ from openedx.core.djangolib.markup import HTML
 .problem-question-number:hover{
   cursor: pointer;
 }
+
 
 </style>
 
@@ -412,16 +413,8 @@ elementsError.forEach((elementError) => {
   indicatorError.style.display = 'block';
   const messgasBox = problemList[numberError - 1].querySelector('.feedback-hint-incorrect');
   messgasBox.classList.add('error-problem-answer'); 
-
-  const childElements = messgasBox.children;
-  const childElementsArray = Array.from(childElements);
-  childElementsArray.forEach((child) => {
-    messgasBox.removeChild(child);
-  }); 
-
-  const newSpan = document.createElement('span');
-  newSpan.textContent = 'Câu trả lời của bạn chưa chính xác';
-  messgasBox.appendChild(newSpan);
+  const title = problemList[numberError - 1].querySelector('.explanation-title')
+  title.textContent = 'Câu trả lời của bạn chưa chính xác';
 });
  
 const elementsSubmitted = document.querySelectorAll('.submitted-question')
