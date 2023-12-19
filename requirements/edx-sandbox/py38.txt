@@ -22,7 +22,7 @@ cryptography==38.0.4
     #   -r requirements/edx-sandbox/py38.in
 cycler==0.12.1
     # via matplotlib
-fonttools==4.46.0
+fonttools==4.47.0
     # via matplotlib
 importlib-resources==6.1.1
     # via matplotlib
@@ -71,7 +71,7 @@ pyparsing==3.1.1
     #   openedx-calc
 python-dateutil==2.8.2
     # via matplotlib
-random2==1.0.1
+random2==1.0.2
     # via -r requirements/edx-sandbox/py38.in
 regex==2023.10.3
     # via nltk
