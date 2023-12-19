@@ -178,8 +178,10 @@ class BlocksInfoInCourseView(BlocksInCourseView):
     """
     **Use Case**
 
-        Returns the blocks in the course according to the requesting user's access level.
-        Add to response info fields with information about course
+        This API endpoint is specifically optimized for the course homepage on Mobile Apps.
+        The endpoint returns the blocks in the course according to the requesting user's access level.
+        Additionally, response encompasses info fields with information about the course,
+        including certificate URL, media dictionary with course image URLs, start and end dates for the course.
 
     **Example requests**:
 
