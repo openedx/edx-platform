@@ -407,15 +407,29 @@ if (problemList.length > 1 && btnSubmit && btnNext) {
   problemElement.insertBefore(divContainer, problemElement.firstChild);
 
   const elementsError = document.querySelectorAll('.err-number-qusetion');
-elementsError.forEach((elementError) => {
-  const numberError = elementError.textContent;
-  const indicatorError = problemList[numberError - 1].querySelector('.indicator-container');
-  indicatorError.style.display = 'block';
-  const messgasBox = problemList[numberError - 1].querySelector('.feedback-hint-incorrect');
-  messgasBox.classList.add('error-problem-answer'); 
-  const title = problemList[numberError - 1].querySelector('.explanation-title')
-  title.textContent = 'Câu trả lời của bạn chưa chính xác';
-});
+  elementsError.forEach((elementError) => {
+    const numberError = elementError.textContent;
+    const indicatorError = problemList[numberError - 1].querySelector('.indicator-container');
+    indicatorError.style.display = 'block';
+    
+    const existingMessgasBox = problemList[numberError - 1].querySelector('.feedback-hint-incorrect');
+    
+    if (existingMessgasBox) {
+      existingMessgasBox.classList.add('error-problem-answer'); 
+      const title = problemList[numberError - 1].querySelector('.explanation-title');
+      title.textContent = 'Câu trả lời của bạn chưa chính xác';
+    } else {
+      const newMessgasBox = document.createElement('div');
+      newMessgasBox.classList.add('feedback-hint-incorrect', 'error-problem-answer' , "messages-box");
+      const title = document.createElement('div');
+      title.classList.add('explanation-title');
+      title.style.paddingBottom = '0px'
+      title.textContent = 'Câu trả lời của bạn chưa chính xác';
+      newMessgasBox.appendChild(title);
+      problemList[numberError - 1].appendChild(newMessgasBox);
+  
+    }
+  });
  
 const elementsSubmitted = document.querySelectorAll('.submitted-question')
 elementsSubmitted.forEach((element)=>{
