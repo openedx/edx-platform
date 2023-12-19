@@ -9,6 +9,7 @@ from logging import getLogger
 
 from crum import get_current_request
 from django.conf import settings
+from edx_toggles.toggles import SettingToggle
 from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomerUser
 from pytz import UTC
 
@@ -65,6 +66,48 @@ def adjust_start_date(user, days_early_for_beta, start, course_key):
     return start
 
 
+def enterprise_learner_enrolled(request, user, course_key):
+    """
+    Determine if the learner should be redirected to the enterprise learner portal by checking their enterprise
+    memberships/enrollments.  If all of the following are true, then we are safe to redirect the learner:
+
+    * The learner is linked to an enterprise customer,
+    * The enterprise customer has subsidized the learner's enrollment in the requested course,
+    * The enterprise customer has the learner portal enabled.
+
+    NOTE: This function MUST be called from a view, or it will throw an exception.
+
+    Args:
+        request (django.http.HttpRequest): The current request being handled.  Must not be None.
+        user (User): The requesting enter, potentially an enterprise learner.
+        course_key (str): The requested course to check for enrollment.
+
+    Returns:
+        bool: True if the learner is enrolled via a linked enterprise customer and can safely be redirected to the
+        enterprise learner dashboard.
+    """
+    from openedx.features.enterprise_support.api import enterprise_customer_from_session_or_learner_data
+
+    if not user.is_authenticated:
+        return False
+
+    # enterprise_customer_data is either None (if learner is not linked to any customer) or a serialized
+    # EnterpriseCustomer representing the learner's active linked customer.
+    enterprise_customer_data = enterprise_customer_from_session_or_learner_data(request)
+    learner_portal_enabled = enterprise_customer_data and enterprise_customer_data['enable_learner_portal']
+    if not learner_portal_enabled:
+        return False
+
+    # Additionally make sure the enterprise learner is actually enrolled in the requested course, subsidized
+    # via the discovered customer.
+    enterprise_enrollments = EnterpriseCourseEnrollment.objects.filter(
+        course_id=course_key,
+        enterprise_customer_user__user_id=user.id,
+        enterprise_customer_user__enterprise_customer__uuid=enterprise_customer_data['uuid'],
+    )
+    return enterprise_enrollments.exists()
+
+
 def check_start_date(user, days_early_for_beta, start, course_key, display_error_to_user=True, now=None):
     """
     Verifies whether the given user is allowed access given the
@@ -76,7 +119,6 @@ def check_start_date(user, days_early_for_beta, start, course_key, display_error
     Returns:
         AccessResponse: Either ACCESS_GRANTED or StartDateError.
     """
-    from openedx.features.enterprise_support.api import enterprise_customer_from_session_or_learner_data
     start_dates_disabled = settings.FEATURES['DISABLE_START_DATES']
     masquerading_as_student = is_masquerading_as_student(user, course_key)
 
@@ -96,27 +138,10 @@ def check_start_date(user, days_early_for_beta, start, course_key, display_error
 
         # Before returning a StartDateError, determine if the learner should be redirected to the enterprise learner
         # portal by returning StartDateEnterpriseLearnerError instead.
-        if user.is_authenticated:
-            # enterprise_customer_data is either None (if learner is not linked to any customer) or a serialized
-            # EnterpriseCustomer representing the learner's active linked customer.
-            enterprise_customer_data = enterprise_customer_from_session_or_learner_data(get_current_request())
-            learner_portal_enabled = enterprise_customer_data and enterprise_customer_data['enable_learner_portal']
-            if learner_portal_enabled:
-                # Additionally make sure the enterprise learner is actually enrolled in the requested course, subsidized
-                # via the discovered customer.
-                enterprise_enrollments = EnterpriseCourseEnrollment.objects.filter(
-                    course_id=course_key,
-                    enterprise_customer_user__user_id=user.id,
-                    enterprise_customer_user__enterprise_customer__uuid=enterprise_customer_data['uuid'],
-                )
-                if enterprise_enrollments.exists():
-                    # Finally, we have established:
-                    # * The learner is linked to an enterprise customer,
-                    # * The enterprise customer has subsidized the learner's enrollment in the requested course,
-                    # * The enterprise customer has the learner portal enabled.
-                    #
-                    # We are now safe to kick the learner over to the enterprise learner dashboard.
-                    return StartDateEnterpriseLearnerError(start, display_error_to_user=display_error_to_user)
+        if SettingToggle('COURSEWARE_COURSE_NOT_STARTED_ENTERPRISE_LEARNER_ERROR', default=False).is_enabled():
+            request = get_current_request()
+            if request and enterprise_learner_enrolled(request, user, course_key):
+                return StartDateEnterpriseLearnerError(start, display_error_to_user=display_error_to_user)
 
         return StartDateError(start, display_error_to_user=display_error_to_user)
 
