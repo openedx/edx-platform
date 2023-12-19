@@ -29,7 +29,7 @@ from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import (
     BlockUsageLocator,
     LibraryUsageLocator,
-    LibraryUsageLocatorV2
+    LibraryUsageLocatorV2,
 )
 from search.search_engine_base import SearchEngine
 

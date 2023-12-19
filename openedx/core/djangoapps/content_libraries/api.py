@@ -1178,6 +1178,16 @@ def revert_changes(library_key):
 #  https://github.com/openedx/edx-platform/issues/32457)
 # ======================================================
 
+
+def should_map_v1_to_v2_library() -> bool:
+    """
+    get MAP_V1_LIBRARIES_TO_V2_LIBRARIES.
+    This value, when true, means that v1 library keys pull content from corresponding v2 libs.
+    Returns True if the mapping is enabled, False if not.
+    """
+    return MAP_V1_LIBRARIES_TO_V2_LIBRARIES.is_enabled()
+
+
 def get_v1_or_v2_library(
     library_id: str | LibraryLocatorV1 | LibraryLocatorV2,
     version: str | int | None,
@@ -1216,7 +1226,7 @@ def get_v1_or_v2_library(
 
     # If migration mapping is enabled, map the V1 key to a V2 key.
     if (not isinstance(library_key, LibraryLocatorV2)) and MAP_V1_LIBRARIES_TO_V2_LIBRARIES.is_enabled():
-        library_key = _map_v1_to_v2_library(library_key)
+        library_key = map_v1_to_v2_library(library_key)
 
     if isinstance(library_key, LibraryLocatorV2):
         v2_version: int | None
@@ -1251,7 +1261,7 @@ def get_v1_or_v2_library(
             return None
 
 
-def _map_v1_to_v2_library(v1_library_key) -> LibraryLocatorV2:
+def map_v1_to_v2_library(v1_library_key) -> LibraryLocatorV2:
     """
     Helper method to convert a v1 library key into a v2 library key using a strict string mapping.
     ex: library-v1:edx+Lib1 -> lib:edx:Lib1
