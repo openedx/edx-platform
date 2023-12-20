@@ -180,7 +180,7 @@ class LibraryContentBlock(
         # True -> Draw selections from `candidates`.
         # False -> Draw selections from `children`.
         default=False,
-        cope=Scope.settings,
+        scope=Scope.settings,
     )
     # This cannot be called `show_reset_button`, because children blocks inherit this as a default value.
     allow_resetting_children = Boolean(
