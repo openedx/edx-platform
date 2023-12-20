@@ -1599,7 +1599,7 @@ def get_course_rerun_context(course_key, course_block, user):
     return course_rerun_context
 
 
-def get_course_videos_context(course_block, pagination_conf, course_key=None):
+def get_course_videos_context(course_block, pagination_conf, fetch_usage_locations=None, course_key=None):
     """
     Utils is used to get contest of course videos.
     It is used for both DRF and django views.
@@ -1638,7 +1638,7 @@ def get_course_videos_context(course_block, pagination_conf, course_key=None):
 
     is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course.id)
     is_ai_translations_enabled = use_xpert_translations_component(course.id)
-    previous_uploads, pagination_context = _get_index_videos(course, pagination_conf)
+    previous_uploads, pagination_context = _get_index_videos(course, pagination_conf, fetch_usage_locations)
     course_video_context = {
         'context_course': course,
         'image_upload_url': reverse_course_url('video_images_handler', str(course.id)),
