@@ -669,7 +669,7 @@ def _get_default_video_image_url():
     return staticfiles_storage.url(settings.VIDEO_IMAGE_DEFAULT_FILENAME)
 
 
-def _get_index_videos(course, pagination_conf=None, fetch_usage_locations=None):
+def _get_index_videos(course, pagination_conf=None):
     """
     Returns the information about each video upload required for the video list
     """
@@ -685,8 +685,6 @@ def _get_index_videos(course, pagination_conf=None, fetch_usage_locations=None):
         Get data for predefined video attributes.
         """
         values = {}
-        if fetch_usage_locations:
-            values["usage_locations"] = get_video_usage_path(course.id, video["edx_video_id"])['usage_locations']
         for attr in attrs:
             if attr == 'courses':
                 current_course = [c for c in video['courses'] if course_id in c]

@@ -134,7 +134,6 @@ class CourseVideosView(DeveloperErrorViewMixin, APIView):
         course_videos_context = get_course_videos_context(
             None,
             None,
-            True,
             course_key,
         )
         serializer = CourseVideosSerializer(course_videos_context)
