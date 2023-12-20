@@ -10,7 +10,11 @@ from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.core.djangoapps.course_roles.rules import HasPermissionRule, HasForumsRolesRule
 
 
-perms['course_roles.full_access'] = (
+# DO NOT USE FOR AUTHORIZATION
+# This is added to ensure is_staff users can access the admin dashboard and is
+# NOT intended for code authorization checks
+# TODO: Consider removing this in favor of overriding the query method
+perms['course_roles.is_staff'] = (
     is_staff
 )
 perms[f'course_roles.{CourseRolesPermission.MANAGE_CONTENT.value.name}'] = (
