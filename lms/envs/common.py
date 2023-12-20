@@ -1618,7 +1618,6 @@ HOTJAR_SITE_ID = 00000
 ######################## ALGOLIA SEARCH ###########################
 ALGOLIA_APP_ID = None
 ALGOLIA_SEARCH_API_KEY = None
-ALGOLIA_COURSES_RECOMMENDATION_INDEX_NAME = ''
 
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
@@ -4833,18 +4832,8 @@ EDX_BRAZE_API_KEY = None
 EDX_BRAZE_API_SERVER = None
 BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
 
-### SETTINGS FOR AMPLITUDE ####
-AMPLITUDE_URL = ''
-AMPLITUDE_API_KEY = ''
-DASHBOARD_AMPLITUDE_RECOMMENDATION_ID = ''
-COURSE_ABOUT_PAGE_AMPLITUDE_RECOMMENDATION_ID = ''
 # Keeping this for back compatibility with learner dashboard api
 GENERAL_RECOMMENDATION = {}
-
-GENERAL_RECOMMENDATIONS = []
-
-### DEFAULT KEY DICTIONARY FOR CROSS_PRODUCT_RECOMMENDATIONS ###
-CROSS_PRODUCT_RECOMMENDATIONS_KEYS = {}
 
 ############### Settings for Retirement #####################
 # .. setting_name: RETIRED_USERNAME_PREFIX
