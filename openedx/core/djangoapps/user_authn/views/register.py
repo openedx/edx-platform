@@ -613,24 +613,24 @@ class RegistrationView(APIView):
             None 
 
 
-        # from django.contrib.sites.models import Site
-        # portal_domain = Site.objects.get(name='portal_domain')
+        from django.contrib.sites.models import Site
+        portal_domain = Site.objects.get(name='portal_domain')
       
         
         # # create student portal 
-        # url_create_student =  f'https://{portal_domain}/api/student/register'
-        # headers = {
-        #         "Content-Type": "application/json"
-        #     }
-        # response_portal=requests.post(url=url_create_student,headers=headers, data=json.dumps({
-        #         "name" : data.get('name'),
-        #         "email" : user.email,
-        #         "student_code" : student_code,
-        #         "username" : user.username
-        #     }))
+        url_create_student =  f'https://{portal_domain}/api/student/register'
+        headers = {
+                "Content-Type": "application/json"
+            }
+        response_portal=requests.post(url=url_create_student,headers=headers, data=json.dumps({
+                "name" : data.get('name'),
+                "email" : user.email,
+                "student_code" : student_code,
+                "username" : user.username
+            }))
 
      # add student org protal
-        # add_student_to_organization(user.email, data.get('organization'))
+        add_student_to_organization(user.email, data.get('organization'))
     
                 
         if not user.is_active and settings.SHOW_ACCOUNT_ACTIVATION_CTA and not settings.MARKETING_EMAILS_OPT_IN:
