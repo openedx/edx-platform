@@ -5,7 +5,7 @@ from .course_details import CourseDetailsSerializer
 from .course_rerun import CourseRerunSerializer
 from .course_team import CourseTeamSerializer
 from .grading import CourseGradingModelSerializer, CourseGradingSerializer
-from .home import CourseHomeSerializer
+from .home import CourseHomeSerializer, CourseTabSerializer, LibraryTabSerializer
 from .proctoring import (
     LimitedProctoredExamSettingsSerializer,
     ProctoredExamConfigurationSerializer,
@@ -17,5 +17,6 @@ from .videos import (
     CourseVideosSerializer,
     VideoUploadSerializer,
     VideoImageSerializer,
-    VideoUsageSerializer
+    VideoUsageSerializer,
+    VideoDownloadSerializer
 )

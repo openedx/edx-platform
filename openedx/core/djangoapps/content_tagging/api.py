@@ -109,6 +109,24 @@ def get_taxonomies_for_org(
     )
 
 
+def get_unassigned_taxonomies(enabled=True) -> QuerySet:
+    """
+    Generate a list of the enabled orphaned Taxomonies, i.e. that do not belong to any
+    organization. We don't use `TaxonomyOrg.get_relationships` as that returns
+    Taxonomies which are available for all Organizations when no `org` is provided
+    """
+    return oel_tagging.get_taxonomies(enabled=enabled).filter(
+        ~(
+            Exists(
+                TaxonomyOrg.objects.filter(
+                    taxonomy=OuterRef("pk"),
+                    rel_type=TaxonomyOrg.RelType.OWNER,
+                )
+            )
+        )
+    )
+
+
 def get_content_tags(
     object_key: ContentKey,
     taxonomy_id: int | None = None,

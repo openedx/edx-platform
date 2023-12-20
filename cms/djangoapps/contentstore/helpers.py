@@ -17,6 +17,7 @@ from xblock.runtime import IdGenerator
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
+from xmodule.library_content_block import LibraryContentBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.xml_block import XmlMixin
 
@@ -336,8 +337,14 @@ def _import_xml_node_to_parent(
     new_xblock = store.update_item(temp_xblock, user_id, allow_not_found=True)
     parent_xblock.children.append(new_xblock.location)
     store.update_item(parent_xblock, user_id)
-    for child_node in child_nodes:
-        _import_xml_node_to_parent(child_node, new_xblock, store, user_id=user_id)
+    if isinstance(new_xblock, LibraryContentBlock):
+        # Special case handling for library content. If we need this for other blocks in the future, it can be made into
+        # an API, and we'd call new_block.studio_post_paste() instead of this code.
+        # In this case, we want to pull the children from the library and let library_tools assign their IDs.
+        new_xblock.sync_from_library(upgrade_to_latest=False)
+    else:
+        for child_node in child_nodes:
+            _import_xml_node_to_parent(child_node, new_xblock, store, user_id=user_id)
     return new_xblock
 
 

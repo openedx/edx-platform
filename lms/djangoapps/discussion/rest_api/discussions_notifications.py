@@ -3,12 +3,10 @@ Discussion notifications sender util.
 """
 from django.conf import settings
 from lms.djangoapps.discussion.django_comment_client.permissions import get_team
-from openedx_events.learning.data import UserNotificationData
-from openedx_events.learning.signals import USER_NOTIFICATION_REQUESTED
+from openedx_events.learning.data import UserNotificationData, CourseNotificationData
+from openedx_events.learning.signals import USER_NOTIFICATION_REQUESTED, COURSE_NOTIFICATION_REQUESTED
 
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
-from openedx.core.djangoapps.course_groups.models import CourseCohortsSettings, CourseUserGroup
+from openedx.core.djangoapps.course_groups.models import CourseCohortsSettings
 from openedx.core.djangoapps.discussions.utils import get_divided_discussions
 from django.utils.translation import gettext_lazy as _
 
@@ -19,7 +17,6 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_MODERATOR,
     CourseDiscussionSettings,
-    Role
 )
 
 
@@ -61,6 +58,29 @@ class DiscussionNotificationSender:
             course_key=self.course.id,
         )
         USER_NOTIFICATION_REQUESTED.send_event(notification_data=notification_data)
+
+    def _send_course_wide_notification(self, notification_type, audience_filters=None, extra_context=None):
+        """
+        Send notification to all users in the course
+        """
+        if not extra_context:
+            extra_context = {}
+
+        notification_data = CourseNotificationData(
+            course_key=self.course.id,
+            content_context={
+                "replier_name": self.creator.username,
+                "post_title": self.thread.title,
+                "course_name": self.course.display_name,
+                "sender_id": self.creator.id,
+                **extra_context,
+            },
+            notification_type=notification_type,
+            content_url=f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/{str(self.course.id)}/posts/{self.thread.id}",
+            app_name="discussion",
+            audience_filters=audience_filters,
+        )
+        COURSE_NOTIFICATION_REQUESTED.send_event(course_notification_data=notification_data)
 
     def _get_parent_response(self):
         """
@@ -175,7 +195,7 @@ class DiscussionNotificationSender:
 
     def _create_cohort_course_audience(self):
         """
-        Creates audience based on user cohort and role
+        Creates audience filter based on user cohort and role
         """
         course_key_str = str(self.course.id)
         discussion_cohorted = is_discussion_cohorted(course_key_str)
@@ -193,43 +213,21 @@ class DiscussionNotificationSender:
             group_id = int(group_id)
 
         # Course wide topics
-        topic_id = self.thread.attributes['commentable_id']
         all_topics = divided_inline_discussions + divided_course_wide_discussions
+        topic_id = self.thread.attributes['commentable_id']
         topic_divided = topic_id in all_topics or discussion_settings.always_divide_inline_discussions
 
         # Team object from topic id
         team = get_team(topic_id)
-
-        user_ids = []
         if team:
-            user_ids = team.users.all().values_list('id', flat=True)
-        elif discussion_cohorted and topic_divided and group_id is not None:
-            users_in_cohort = CourseUserGroup.objects.filter(
-                course_id=course_key_str, id=group_id
-            ).values_list('users__id', flat=True)
-            user_ids.extend(users_in_cohort)
-
-            privileged_roles = [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
-            privileged_users = Role.objects.filter(
-                name__in=privileged_roles,
-                course_id=course_key_str
-            ).values_list('users__id', flat=True)
-            user_ids.extend(privileged_users)
-
-            staff_users = CourseStaffRole(self.course.id).users_with_role().values_list('id', flat=True)
-            user_ids.extend(staff_users)
-
-            admin_users = CourseInstructorRole(self.course.id).users_with_role().values_list('id', flat=True)
-            user_ids.extend(admin_users)
-        else:
-            user_ids = CourseEnrollment.objects.filter(
-                course__id=course_key_str, is_active=True
-            ).values_list('user__id', flat=True)
-
-        unique_user_ids = list(set(user_ids))
-        if self.creator.id in unique_user_ids:
-            unique_user_ids.remove(self.creator.id)
-        return unique_user_ids
+            return {
+                'teams': [team.team_id],
+            }
+        if discussion_cohorted and topic_divided and group_id is not None:
+            return {
+                'cohorts': [group_id],
+            }
+        return {}
 
     def send_new_thread_created_notification(self):
         """
@@ -244,12 +242,22 @@ class DiscussionNotificationSender:
         if notification_type not in ['new_discussion_post', 'new_question_post']:
             raise ValueError(f'Invalid notification type {notification_type}')
 
-        user_ids = self._create_cohort_course_audience()
+        audience_filters = self._create_cohort_course_audience()
+
+        if audience_filters:
+            # If the audience is cohorted/teamed, we add the course and forum roles to the audience.
+            # Include course staff and instructors for course wide discussion notifications.
+            audience_filters['course_roles'] = ['staff', 'instructor']
+
+            # Include privileged forum roles for course wide discussion notifications.
+            audience_filters['discussion_roles'] = [
+                FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
+            ]
         context = {
             'username': self.creator.username,
             'post_title': self.thread.title
         }
-        self._send_notification(user_ids, notification_type, context)
+        self._send_course_wide_notification(notification_type, audience_filters, context)
 
 
 def is_discussion_cohorted(course_key_str):

@@ -24,7 +24,6 @@ from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from simple_history.models import HistoricalRecords
 
 from lms.djangoapps.courseware.model_data import FieldDataCache
-from lms.djangoapps.discussion import django_comment_client
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.models.course_details import CourseDetails
@@ -708,15 +707,17 @@ class CourseOverview(TimeStampedModel):
         """
         return CourseOverview.objects.values_list('id', flat=True)
 
-    def is_discussion_tab_enabled(self):
+    def is_discussion_tab_enabled(self, user=None):
         """
         Returns True if course has discussion tab and is enabled
         """
+        # Importing here to avoid circular import
+        from lms.djangoapps.discussion.plugins import DiscussionTab
         tabs = self.tab_set.all()
         # creates circular import; hence explicitly referenced is_discussion_enabled
         for tab in tabs:
-            if tab.tab_id == "discussion" and django_comment_client.utils.is_discussion_enabled(self.id):
-                return True
+            if tab.tab_id == "discussion":
+                return DiscussionTab.is_enabled(self, user)
         return False
 
     @property

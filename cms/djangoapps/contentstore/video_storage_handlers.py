@@ -8,6 +8,12 @@ import csv
 import io
 import json
 import logging
+import os
+import requests
+import shutil
+import pathlib
+import zipfile
+
 from contextlib import closing
 from datetime import datetime, timedelta
 from uuid import uuid4
@@ -15,7 +21,7 @@ from boto.s3.connection import S3Connection
 from boto import s3
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.http import FileResponse, HttpResponseNotFound
+from django.http import FileResponse, HttpResponseNotFound, StreamingHttpResponse
 from django.shortcuts import redirect
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_noop
@@ -35,10 +41,14 @@ from edxval.api import (
     update_video_image,
     update_video_status
 )
+from fs.osfs import OSFS
 from opaque_keys.edx.keys import CourseKey
+from path import Path as path
 from pytz import UTC
 from rest_framework import status as rest_status
 from rest_framework.response import Response
+from tempfile import NamedTemporaryFile, mkdtemp
+from wsgiref.util import FileWrapper
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.util.json_request import JsonResponse
@@ -219,6 +229,53 @@ def handle_videos(request, course_key_string, edx_video_id=None):
 
         data, status = videos_post(course, request)
         return JsonResponse(data, status=status)
+
+
+def send_zip(zip_file, size=None):
+    """
+    Generates a streaming http response for the zip file
+    """
+    wrapper = FileWrapper(zip_file, settings.COURSE_EXPORT_DOWNLOAD_CHUNK_SIZE)
+    response = StreamingHttpResponse(wrapper, content_type='application/zip')
+    response['Content-Dispositon'] = 'attachment; filename=%s' % os.path.basename(zip_file.name)
+    response['Content-Length'] = size
+    return response
+
+
+def create_video_zip(course_key_string, files):
+    """
+    Generates the video zip, or returns None if there was an error.
+
+    Updates the context with any error information if applicable.
+    """
+    name = course_key_string + '_videos'
+    video_folder_zip = NamedTemporaryFile(prefix=name + '_',
+                                          suffix=".zip")  # lint-amnesty, pylint: disable=consider-using-with
+    root_dir = path(mkdtemp())
+    video_dir = root_dir + '/' + name
+    zip_folder = None
+    try:
+        for file in files:
+            url = file['url']
+            file_name = file['name']
+            response = requests.get(url, allow_redirects=True)
+            file_type = '.' + response.headers['Content-Type'][6:]
+            if file_type not in file_name:
+                file_name = file['name'] + file_type
+            if not os.path.isdir(video_dir):
+                os.makedirs(video_dir)
+            with OSFS(video_dir).open(file_name, mode="wb") as f:
+                f.write(response.content)
+        directory = pathlib.Path(video_dir)
+        with zipfile.ZipFile(video_folder_zip, mode="w") as archive:
+            for file_path in directory.iterdir():
+                archive.write(file_path, arcname=file_path.name)
+        zip_folder = open(video_folder_zip.name, '+rb')
+
+        return send_zip(zip_folder, video_folder_zip.tell())
+    finally:
+        if os.path.exists(root_dir / name):
+            shutil.rmtree(root_dir / name)
 
 
 def get_video_usage_path(course_key, edx_video_id):
