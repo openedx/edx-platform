@@ -3,12 +3,16 @@ Bridgekeeper permissions for course roles
 """
 
 from bridgekeeper import perms
+from bridgekeeper.rules import is_staff
 
 from lms.djangoapps.courseware.rules import HasRolesRule
 from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.core.djangoapps.course_roles.rules import HasPermissionRule, HasForumsRolesRule
 
 
+perms['course_roles.full_access'] = (
+    is_staff
+)
 perms[f'course_roles.{CourseRolesPermission.MANAGE_CONTENT.value.name}'] = (
     HasRolesRule('staff', 'instructor')
     | HasPermissionRule(CourseRolesPermission.MANAGE_CONTENT)
