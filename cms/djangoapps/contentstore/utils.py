@@ -77,6 +77,7 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_video_uploads_page,
     use_new_custom_pages,
     use_tagging_taxonomy_list_page,
+    # use_xpert_translations_component,
 )
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from xmodule.library_tools import LibraryToolsService
@@ -439,7 +440,7 @@ def get_taxonomy_list_url():
     if use_tagging_taxonomy_list_page():
         mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
         if mfe_base_url:
-            taxonomy_list_url = f'{mfe_base_url}/taxonomy-list'
+            taxonomy_list_url = f'{mfe_base_url}/taxonomies'
     return taxonomy_list_url
 
 
@@ -1471,44 +1472,17 @@ def get_library_context(request, request_is_json=False):
     return data
 
 
-def get_home_context(request):
+def get_course_context(request):
     """
-    Utils is used to get context of course home.
+    Utils is used to get context of course home library tab.
     It is used for both DRF and django views.
     """
 
     from cms.djangoapps.contentstore.views.course import (
-        get_allowed_organizations,
-        get_allowed_organizations_for_libraries,
         get_courses_accessible_to_user,
-        user_can_create_organizations,
-        _accessible_libraries_iter,
-        _get_course_creator_status,
-        _format_library_for_view,
         _process_courses_list,
         ENABLE_GLOBAL_STAFF_OPTIMIZATION,
     )
-    from cms.djangoapps.contentstore.views.library import (
-        LIBRARY_AUTHORING_MICROFRONTEND_URL,
-        LIBRARIES_ENABLED,
-        should_redirect_to_library_authoring_mfe,
-        user_can_create_library,
-    )
-
-    optimization_enabled = GlobalStaff().has_user(request.user) and ENABLE_GLOBAL_STAFF_OPTIMIZATION.is_enabled()
-
-    org = request.GET.get('org', '') if optimization_enabled else None
-    courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
-    user = request.user
-    libraries = []
-    response_format = get_response_format(request)
-
-    if not split_library_view_on_dashboard() and LIBRARIES_ENABLED:
-        accessible_libraries = _accessible_libraries_iter(user)
-        libraries = [_format_library_for_view(lib, request) for lib in accessible_libraries]
-
-    if split_library_view_on_dashboard() and request_response_format_is_json(request, response_format):
-        libraries = get_library_context(request, True)['libraries']
 
     def format_in_process_course_view(uca):
         """
@@ -1531,9 +1505,52 @@ def get_home_context(request):
             ) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
         }
 
+    optimization_enabled = GlobalStaff().has_user(request.user) and ENABLE_GLOBAL_STAFF_OPTIMIZATION.is_enabled()
+
+    org = request.GET.get('org', '') if optimization_enabled else None
+    courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
     split_archived = settings.FEATURES.get('ENABLE_SEPARATE_ARCHIVED_COURSES', False)
     active_courses, archived_courses = _process_courses_list(courses_iter, in_process_course_actions, split_archived)
     in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
+    return active_courses, archived_courses, in_process_course_actions
+
+
+def get_home_context(request, no_course=False):
+    """
+    Utils is used to get context of course home.
+    It is used for both DRF and django views.
+    """
+
+    from cms.djangoapps.contentstore.views.course import (
+        get_allowed_organizations,
+        get_allowed_organizations_for_libraries,
+        user_can_create_organizations,
+        _accessible_libraries_iter,
+        _get_course_creator_status,
+        _format_library_for_view,
+        ENABLE_GLOBAL_STAFF_OPTIMIZATION,
+    )
+    from cms.djangoapps.contentstore.views.library import (
+        LIBRARY_AUTHORING_MICROFRONTEND_URL,
+        LIBRARIES_ENABLED,
+        should_redirect_to_library_authoring_mfe,
+        user_can_create_library,
+    )
+
+    active_courses = []
+    archived_courses = []
+    in_process_course_actions = []
+
+    optimization_enabled = GlobalStaff().has_user(request.user) and ENABLE_GLOBAL_STAFF_OPTIMIZATION.is_enabled()
+
+    user = request.user
+    libraries = []
+
+    if not no_course:
+        active_courses, archived_courses, in_process_course_actions = get_course_context(request)
+
+    if not split_library_view_on_dashboard() and LIBRARIES_ENABLED and not no_course:
+        libraries = get_library_context(request, True)['libraries']
 
     home_context = {
         'courses': active_courses,
@@ -1595,6 +1612,7 @@ def get_course_videos_context(course_block, pagination_conf, course_key=None):
         get_transcript_preferences,
     )
     from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
+    from openedx.core.djangoapps.video_config.toggles import use_xpert_translations_component
     from xmodule.video_block.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
 
     from .video_storage_handlers import (
@@ -1619,6 +1637,7 @@ def get_course_videos_context(course_block, pagination_conf, course_key=None):
             course = modulestore().get_course(course_key)
 
     is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course.id)
+    is_ai_translations_enabled = use_xpert_translations_component(course.id)
     previous_uploads, pagination_context = _get_index_videos(course, pagination_conf)
     course_video_context = {
         'context_course': course,
@@ -1639,6 +1658,7 @@ def get_course_videos_context(course_block, pagination_conf, course_key=None):
             'supported_file_formats': settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS
         },
         'is_video_transcript_enabled': is_video_transcript_enabled,
+        'is_ai_translations_enabled': is_ai_translations_enabled,
         'active_transcript_preferences': None,
         'transcript_credentials': None,
         'transcript_available_languages': get_all_transcript_languages(),

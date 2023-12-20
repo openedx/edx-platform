@@ -177,6 +177,12 @@ function($, _, Backbone, gettext, BasePage,
                         self.initializePasteButton();
                     }
 
+                    var targetId = window.location.hash.slice(1);
+                    if (targetId) {
+                        var target = document.getElementById(targetId);
+                        target.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+                    }
+
                 },
                 block_added: options && options.block_added
             });

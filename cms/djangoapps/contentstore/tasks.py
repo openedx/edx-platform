@@ -715,6 +715,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
                 from .views.entrance_exam import add_entrance_exam_milestone
                 add_entrance_exam_milestone(course.id, entrance_exam_chapter)
                 LOGGER.info(f'Course import {course.id}: Entrance exam imported')
+    if is_course:
         sync_discussion_settings(courselike_key, user)
 
 
@@ -895,13 +896,14 @@ def _create_copy_content_task(v2_library_key, v1_library_key):
     spin up a celery task to import the V1 Library's content into the V2 library.
     This utalizes the fact that course and v1 library content is stored almost identically.
     """
-    return v2contentlib_api.import_blocks_create_task(v2_library_key, v1_library_key)
+    return v2contentlib_api.import_blocks_create_task(
+        v2_library_key, v1_library_key,
+        use_course_key_as_block_id_suffix=False
+    )
 
 
 def _create_metadata(v1_library_key, collection_uuid):
     """instansiate an index for the V2 lib in the collection"""
-
-    print(collection_uuid)
 
     store = modulestore()
     v1_library = store.get_library(v1_library_key)

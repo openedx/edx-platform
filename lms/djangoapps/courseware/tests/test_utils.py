@@ -135,7 +135,6 @@ class TestFinancialAssistanceViews(TestCase):
         test_form_data = {
             'lms_user_id': self.user.id,
             'course_id': self.test_course_id,
-            'income': '$85,000 - $100,000'
         }
         with patch.object(OAuthAPIClient, 'request') as oauth_mock:
             oauth_mock.return_value = self._mock_response(status.HTTP_200_OK, {'success': True})
@@ -150,7 +149,6 @@ class TestFinancialAssistanceViews(TestCase):
         test_form_data = {
             'lms_user_id': self.user.id,
             'course_id': 'invalid_course_id',
-            'income': '$85,000 - $100,000'
         }
         error_response = {'message': 'Invalid course id provided'}
         with patch.object(OAuthAPIClient, 'request') as oauth_mock:

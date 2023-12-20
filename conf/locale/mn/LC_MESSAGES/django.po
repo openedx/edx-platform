@@ -74,7 +74,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-11-19 20:43+0000\n"
+"POT-Creation-Date: 2023-12-10 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Mongolian (https://app.transifex.com/open-edx/teams/6205/mn/)\n"
@@ -260,6 +260,7 @@ msgid "You're enrolled as an honor code student"
 msgstr "Та ёс зүйн дүрэмтэй оюутнаар элссэн."
 
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
+#: lms/djangoapps/courseware/views/views.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
@@ -3170,36 +3171,14 @@ msgid "Certificate is being created."
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
-#, python-brace-format
 msgid ""
-"{platform_name} now offers financial assistance for learners who want to earn Verified Certificates but who may not be able to pay the Verified Certificate fee. Eligible learners may receive up to 90{percent_sign} off the Verified Certificate fee for a course.\n"
-"To apply for financial assistance, enroll in the audit track for a course that offers Verified Certificates, and then complete this application. Note that you must complete a separate application for each course you take.\n"
-" We plan to use this information to evaluate your application for financial assistance and to further develop our financial assistance program."
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Annual Household Income"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your current financial situation. Why do you need assistance?"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your learning or professional goals. How will a Verified "
-"Certificate in this course help you achieve these goals?"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your plans for this course. What steps will you take to help "
-"you complete the course work and receive a certificate?"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Use between 1250 and 2500 characters or so in your response."
+"We plan to use this information to evaluate your application for financial assistance and to further develop our financial assistance program. Please note that while \n"
+"assistance is available in most courses that offer verified certificates, a few courses and programs are not eligible. You must complete a separate application \n"
+"for each course you take. You may be approved for financial assistance five (5) times each year (based on 12-month period from you first approval). \n"
+"To apply for financial assistance: \n"
+"1. Enroll in the audit track for an eligible course that offers Verified Certificates \n"
+"2. Complete this  application \n"
+"3. Check your email, your application will be reviewed in 3-4 business days"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
@@ -3210,14 +3189,25 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
-msgid "Specify your annual household income in US Dollars."
+msgid "I certify that: "
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"Paying the verified certificate fee for the above course would cause me "
+"economic hardship"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"I will work diligently to complete the course work and receive a certificate"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid ""
-"I allow {platform_name} to use the information provided in this application "
-"(except for financial information) for {platform_name} marketing purposes."
+"I have read, understand, and will abide by the {honor_code_link} for the edX"
+" Site"
 msgstr ""
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
@@ -7428,6 +7418,10 @@ msgid "The '{field_name}' field cannot be edited."
 msgstr " '{field_name}' талбарыг засах боломжгүй."
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
+msgid "Full name can't be longer than 255 symbols"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/api.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Enter a valid name"
 msgstr ""
@@ -10352,6 +10346,19 @@ msgid ""
 msgstr ""
 
 #: xmodule/library_content_block.py
+msgid "Source content library has not been specified."
+msgstr ""
+
+#: xmodule/library_content_block.py
+msgid "Content libraries are not available in the current runtime."
+msgstr ""
+
+#: xmodule/library_content_block.py
+#, python-brace-format
+msgid "Source content library does not exist: {source_library_id}"
+msgstr ""
+
+#: xmodule/library_content_block.py
 msgid "This component is out of date. The library has new content."
 msgstr ""
 
@@ -10385,7 +10392,8 @@ msgid "Select a Library."
 msgstr ""
 
 #: xmodule/library_content_block.py
-msgid "There are no matching problem types in the specified libraries."
+#, python-brace-format
+msgid "There are no problems in the specified library of type {capa_type}."
 msgstr ""
 
 #: xmodule/library_content_block.py
@@ -11695,13 +11703,11 @@ msgid "{previous_groups}, {current_group}"
 msgstr ""
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr ""
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr ""
@@ -12372,14 +12378,6 @@ msgstr "Шаардлага"
 #: lms/templates/module-error.html
 msgid "Details"
 msgstr "Дэлгэрэнгүй"
-
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-#. Translators: this is a verb describing the action of viewing more details
-#: cms/templates/studio_xblock_wrapper.html
-#: lms/templates/wiki/includes/article_menu.html
-#: wiki/templates/wiki/includes/article_menu.html
-msgid "View"
-msgstr "Харах"
 
 #: cms/templates/maintenance/_announcement_edit.html
 #: lms/templates/problem.html lms/templates/word_cloud.html
@@ -13122,6 +13120,14 @@ msgstr "Дараалал"
 
 #: lms/templates/seq_block.html lms/templates/vert_module.html
 msgid "Completed"
+msgstr ""
+
+#: lms/templates/seq_block.html
+msgid "New Unit"
+msgstr ""
+
+#: lms/templates/seq_block.html
+msgid "Paste as new unit"
 msgstr ""
 
 #: lms/templates/signup_modal.html
@@ -16255,15 +16261,6 @@ msgstr ""
 #. Translators: This string will not be used in Open edX installations.
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
-"In order to be eligible for edX Financial Assistance, you must demonstrate "
-"that paying the Verified Certificate fee would cause you economic hardship. "
-"To apply, you will be asked to answer a few questions about why you are "
-"applying and how the Verified Certificate will benefit you."
-msgstr ""
-
-#. Translators: This string will not be used in Open edX installations.
-#: lms/templates/financial-assistance/financial-assistance.html
-msgid ""
 "If your application is approved, we'll give you instructions for verifying "
 "your identity on edx.org so you can start working toward completing your edX"
 " course."
@@ -16281,10 +16278,6 @@ msgstr ""
 #. translate the name "Anant".
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Sincerely, Anant"
-msgstr ""
-
-#: lms/templates/financial-assistance/financial-assistance.html
-msgid "Back to Student FAQs"
 msgstr ""
 
 #: lms/templates/financial-assistance/financial-assistance.html
@@ -18284,6 +18277,11 @@ msgid "Learn more"
 msgstr "Дэлгэрэнгүй"
 
 #: lms/templates/wiki/includes/article_menu.html
+#: wiki/templates/wiki/includes/article_menu.html
+msgid "View"
+msgstr "Харах"
+
+#: lms/templates/wiki/includes/article_menu.html
 msgid "{span_start}(active){span_end}"
 msgstr ""
 
@@ -18952,6 +18950,10 @@ msgstr "Одоогийн хувилбарыг нь үзэх"
 #: cms/templates/container.html
 msgid "Preview the courseware in the LMS"
 msgstr "Хичээлийн материалыг Сургалтын Менежментийн Системд урьдчилан харах"
+
+#: cms/templates/container.html
+msgid "Collapse All"
+msgstr ""
 
 #: cms/templates/container.html
 msgid "Adding components"
@@ -21555,11 +21557,23 @@ msgid ""
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Importing components"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Select this problem"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage tags"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html

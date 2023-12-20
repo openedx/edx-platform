@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-11-26 20:36+0000\n"
-"PO-Revision-Date: 2023-11-26 20:36:15.034816\n"
+"POT-Creation-Date: 2023-12-17 20:36+0000\n"
+"PO-Revision-Date: 2023-12-17 20:36:18.369413\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -229,6 +229,7 @@ msgid "You're enrolled as an honor code student"
 msgstr "Ɏøn'ɹǝ ǝnɹøllǝd ɐs ɐn ɥønøɹ ɔødǝ sʇndǝnʇ"
 
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
+#: lms/djangoapps/courseware/views/views.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
@@ -3444,45 +3445,22 @@ msgid "Certificate is being created."
 msgstr "Ȼǝɹʇᴉɟᴉɔɐʇǝ ᴉs bǝᴉnƃ ɔɹǝɐʇǝd."
 
 #: lms/djangoapps/courseware/views/views.py
-#, python-brace-format
 msgid ""
-"{platform_name} now offers financial assistance for learners who want to earn Verified Certificates but who may not be able to pay the Verified Certificate fee. Eligible learners may receive up to 90{percent_sign} off the Verified Certificate fee for a course.\n"
-"To apply for financial assistance, enroll in the audit track for a course that offers Verified Certificates, and then complete this application. Note that you must complete a separate application for each course you take.\n"
-" We plan to use this information to evaluate your application for financial assistance and to further develop our financial assistance program."
+"We plan to use this information to evaluate your application for financial assistance and to further develop our financial assistance program. Please note that while \n"
+"assistance is available in most courses that offer verified certificates, a few courses and programs are not eligible. You must complete a separate application \n"
+"for each course you take. You may be approved for financial assistance five (5) times each year (based on 12-month period from you first approval). \n"
+"To apply for financial assistance: \n"
+"1. Enroll in the audit track for an eligible course that offers Verified Certificates \n"
+"2. Complete this  application \n"
+"3. Check your email, your application will be reviewed in 3-4 business days"
 msgstr ""
-"{platform_name} nøʍ øɟɟǝɹs ɟᴉnɐnɔᴉɐl ɐssᴉsʇɐnɔǝ ɟøɹ lǝɐɹnǝɹs ʍɥø ʍɐnʇ ʇø ǝɐɹn Vǝɹᴉɟᴉǝd Ȼǝɹʇᴉɟᴉɔɐʇǝs bnʇ ʍɥø ɯɐʎ nøʇ bǝ ɐblǝ ʇø dɐʎ ʇɥǝ Vǝɹᴉɟᴉǝd Ȼǝɹʇᴉɟᴉɔɐʇǝ ɟǝǝ. Ɇlᴉƃᴉblǝ lǝɐɹnǝɹs ɯɐʎ ɹǝɔǝᴉʌǝ nd ʇø 90{percent_sign} øɟɟ ʇɥǝ Vǝɹᴉɟᴉǝd Ȼǝɹʇᴉɟᴉɔɐʇǝ ɟǝǝ ɟøɹ ɐ ɔønɹsǝ.\n"
-"Ŧø ɐddlʎ ɟøɹ ɟᴉnɐnɔᴉɐl ɐssᴉsʇɐnɔǝ, ǝnɹøll ᴉn ʇɥǝ ɐndᴉʇ ʇɹɐɔʞ ɟøɹ ɐ ɔønɹsǝ ʇɥɐʇ øɟɟǝɹs Vǝɹᴉɟᴉǝd Ȼǝɹʇᴉɟᴉɔɐʇǝs, ɐnd ʇɥǝn ɔøɯdlǝʇǝ ʇɥᴉs ɐddlᴉɔɐʇᴉøn. Nøʇǝ ʇɥɐʇ ʎøn ɯnsʇ ɔøɯdlǝʇǝ ɐ sǝdɐɹɐʇǝ ɐddlᴉɔɐʇᴉøn ɟøɹ ǝɐɔɥ ɔønɹsǝ ʎøn ʇɐʞǝ.\n"
-" Wǝ dlɐn ʇø nsǝ ʇɥᴉs ᴉnɟøɹɯɐʇᴉøn ʇø ǝʌɐlnɐʇǝ ʎønɹ ɐddlᴉɔɐʇᴉøn ɟøɹ ɟᴉnɐnɔᴉɐl ɐssᴉsʇɐnɔǝ ɐnd ʇø ɟnɹʇɥǝɹ dǝʌǝlød ønɹ ɟᴉnɐnɔᴉɐl ɐssᴉsʇɐnɔǝ dɹøƃɹɐɯ."
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Annual Household Income"
-msgstr "Ⱥnnnɐl Ħønsǝɥøld Ɨnɔøɯǝ"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your current financial situation. Why do you need assistance?"
-msgstr ""
-"Ŧǝll ns ɐbønʇ ʎønɹ ɔnɹɹǝnʇ ɟᴉnɐnɔᴉɐl sᴉʇnɐʇᴉøn. Wɥʎ dø ʎøn nǝǝd ɐssᴉsʇɐnɔǝ?"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your learning or professional goals. How will a Verified "
-"Certificate in this course help you achieve these goals?"
-msgstr ""
-"Ŧǝll ns ɐbønʇ ʎønɹ lǝɐɹnᴉnƃ øɹ dɹøɟǝssᴉønɐl ƃøɐls. Ħøʍ ʍᴉll ɐ Vǝɹᴉɟᴉǝd "
-"Ȼǝɹʇᴉɟᴉɔɐʇǝ ᴉn ʇɥᴉs ɔønɹsǝ ɥǝld ʎøn ɐɔɥᴉǝʌǝ ʇɥǝsǝ ƃøɐls?"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your plans for this course. What steps will you take to help "
-"you complete the course work and receive a certificate?"
-msgstr ""
-"Ŧǝll ns ɐbønʇ ʎønɹ dlɐns ɟøɹ ʇɥᴉs ɔønɹsǝ. Wɥɐʇ sʇǝds ʍᴉll ʎøn ʇɐʞǝ ʇø ɥǝld "
-"ʎøn ɔøɯdlǝʇǝ ʇɥǝ ɔønɹsǝ ʍøɹʞ ɐnd ɹǝɔǝᴉʌǝ ɐ ɔǝɹʇᴉɟᴉɔɐʇǝ?"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Use between 1250 and 2500 characters or so in your response."
-msgstr "Ʉsǝ bǝʇʍǝǝn 1250 ɐnd 2500 ɔɥɐɹɐɔʇǝɹs øɹ sø ᴉn ʎønɹ ɹǝsdønsǝ."
+"Wǝ dlɐn ʇø nsǝ ʇɥᴉs ᴉnɟøɹɯɐʇᴉøn ʇø ǝʌɐlnɐʇǝ ʎønɹ ɐddlᴉɔɐʇᴉøn ɟøɹ ɟᴉnɐnɔᴉɐl ɐssᴉsʇɐnɔǝ ɐnd ʇø ɟnɹʇɥǝɹ dǝʌǝlød ønɹ ɟᴉnɐnɔᴉɐl ɐssᴉsʇɐnɔǝ dɹøƃɹɐɯ. Ᵽlǝɐsǝ nøʇǝ ʇɥɐʇ ʍɥᴉlǝ \n"
+"ɐssᴉsʇɐnɔǝ ᴉs ɐʌɐᴉlɐblǝ ᴉn ɯøsʇ ɔønɹsǝs ʇɥɐʇ øɟɟǝɹ ʌǝɹᴉɟᴉǝd ɔǝɹʇᴉɟᴉɔɐʇǝs, ɐ ɟǝʍ ɔønɹsǝs ɐnd dɹøƃɹɐɯs ɐɹǝ nøʇ ǝlᴉƃᴉblǝ. Ɏøn ɯnsʇ ɔøɯdlǝʇǝ ɐ sǝdɐɹɐʇǝ ɐddlᴉɔɐʇᴉøn \n"
+"ɟøɹ ǝɐɔɥ ɔønɹsǝ ʎøn ʇɐʞǝ. Ɏøn ɯɐʎ bǝ ɐddɹøʌǝd ɟøɹ ɟᴉnɐnɔᴉɐl ɐssᴉsʇɐnɔǝ ɟᴉʌǝ (5) ʇᴉɯǝs ǝɐɔɥ ʎǝɐɹ (bɐsǝd øn 12-ɯønʇɥ dǝɹᴉød ɟɹøɯ ʎøn ɟᴉɹsʇ ɐddɹøʌɐl). \n"
+"Ŧø ɐddlʎ ɟøɹ ɟᴉnɐnɔᴉɐl ɐssᴉsʇɐnɔǝ: \n"
+"1. Ɇnɹøll ᴉn ʇɥǝ ɐndᴉʇ ʇɹɐɔʞ ɟøɹ ɐn ǝlᴉƃᴉblǝ ɔønɹsǝ ʇɥɐʇ øɟɟǝɹs Vǝɹᴉɟᴉǝd Ȼǝɹʇᴉɟᴉɔɐʇǝs \n"
+"2. Ȼøɯdlǝʇǝ ʇɥᴉs  ɐddlᴉɔɐʇᴉøn \n"
+"3. Ȼɥǝɔʞ ʎønɹ ǝɯɐᴉl, ʎønɹ ɐddlᴉɔɐʇᴉøn ʍᴉll bǝ ɹǝʌᴉǝʍǝd ᴉn 3-4 bnsᴉnǝss dɐʎs"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
@@ -3495,17 +3473,31 @@ msgstr ""
 "ɐndᴉʇ ʇɹɐɔʞ ɟøɹ ʇɥǝ ɔønɹsǝ."
 
 #: lms/djangoapps/courseware/views/views.py
-msgid "Specify your annual household income in US Dollars."
-msgstr "Sdǝɔᴉɟʎ ʎønɹ ɐnnnɐl ɥønsǝɥøld ᴉnɔøɯǝ ᴉn ɄS Đøllɐɹs."
+msgid "I certify that: "
+msgstr "Ɨ ɔǝɹʇᴉɟʎ ʇɥɐʇ: "
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"Paying the verified certificate fee for the above course would cause me "
+"economic hardship"
+msgstr ""
+"Ᵽɐʎᴉnƃ ʇɥǝ ʌǝɹᴉɟᴉǝd ɔǝɹʇᴉɟᴉɔɐʇǝ ɟǝǝ ɟøɹ ʇɥǝ ɐbøʌǝ ɔønɹsǝ ʍønld ɔɐnsǝ ɯǝ "
+"ǝɔønøɯᴉɔ ɥɐɹdsɥᴉd"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"I will work diligently to complete the course work and receive a certificate"
+msgstr ""
+"Ɨ ʍᴉll ʍøɹʞ dᴉlᴉƃǝnʇlʎ ʇø ɔøɯdlǝʇǝ ʇɥǝ ɔønɹsǝ ʍøɹʞ ɐnd ɹǝɔǝᴉʌǝ ɐ ɔǝɹʇᴉɟᴉɔɐʇǝ"
 
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid ""
-"I allow {platform_name} to use the information provided in this application "
-"(except for financial information) for {platform_name} marketing purposes."
+"I have read, understand, and will abide by the {honor_code_link} for the edX"
+" Site"
 msgstr ""
-"Ɨ ɐlløʍ {platform_name} ʇø nsǝ ʇɥǝ ᴉnɟøɹɯɐʇᴉøn dɹøʌᴉdǝd ᴉn ʇɥᴉs ɐddlᴉɔɐʇᴉøn "
-"(ǝxɔǝdʇ ɟøɹ ɟᴉnɐnɔᴉɐl ᴉnɟøɹɯɐʇᴉøn) ɟøɹ {platform_name} ɯɐɹʞǝʇᴉnƃ dnɹdøsǝs."
+"Ɨ ɥɐʌǝ ɹǝɐd, nndǝɹsʇɐnd, ɐnd ʍᴉll ɐbᴉdǝ bʎ ʇɥǝ {honor_code_link} ɟøɹ ʇɥǝ ǝdX"
+" Sᴉʇǝ"
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Title can't be empty"
@@ -8180,6 +8172,10 @@ msgstr ""
 #, python-brace-format
 msgid "The '{field_name}' field cannot be edited."
 msgstr "Ŧɥǝ '{field_name}' ɟᴉǝld ɔɐnnøʇ bǝ ǝdᴉʇǝd."
+
+#: openedx/core/djangoapps/user_api/accounts/api.py
+msgid "Full name can't be longer than 255 symbols"
+msgstr "Fnll nɐɯǝ ɔɐn'ʇ bǝ lønƃǝɹ ʇɥɐn 255 sʎɯbøls"
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
@@ -13016,13 +13012,11 @@ msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}, {current_group}"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "Đndlᴉɔɐʇǝ øɟ {0}"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "Đndlᴉɔɐʇǝ øɟ '{0}'"
@@ -14515,6 +14509,14 @@ msgstr "Sǝbnǝnɔǝ"
 #: lms/templates/seq_block.html lms/templates/vert_module.html
 msgid "Completed"
 msgstr "Ȼøɯdlǝʇǝd"
+
+#: lms/templates/seq_block.html
+msgid "New Unit"
+msgstr "Nǝʍ Ʉnᴉʇ"
+
+#: lms/templates/seq_block.html
+msgid "Paste as new unit"
+msgstr "Ᵽɐsʇǝ ɐs nǝʍ nnᴉʇ"
 
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"
@@ -18164,19 +18166,6 @@ msgstr ""
 #. Translators: This string will not be used in Open edX installations.
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
-"In order to be eligible for edX Financial Assistance, you must demonstrate "
-"that paying the Verified Certificate fee would cause you economic hardship. "
-"To apply, you will be asked to answer a few questions about why you are "
-"applying and how the Verified Certificate will benefit you."
-msgstr ""
-"Ɨn øɹdǝɹ ʇø bǝ ǝlᴉƃᴉblǝ ɟøɹ ǝdX Fᴉnɐnɔᴉɐl Ⱥssᴉsʇɐnɔǝ, ʎøn ɯnsʇ dǝɯønsʇɹɐʇǝ "
-"ʇɥɐʇ dɐʎᴉnƃ ʇɥǝ Vǝɹᴉɟᴉǝd Ȼǝɹʇᴉɟᴉɔɐʇǝ ɟǝǝ ʍønld ɔɐnsǝ ʎøn ǝɔønøɯᴉɔ ɥɐɹdsɥᴉd. "
-"Ŧø ɐddlʎ, ʎøn ʍᴉll bǝ ɐsʞǝd ʇø ɐnsʍǝɹ ɐ ɟǝʍ bnǝsʇᴉøns ɐbønʇ ʍɥʎ ʎøn ɐɹǝ "
-"ɐddlʎᴉnƃ ɐnd ɥøʍ ʇɥǝ Vǝɹᴉɟᴉǝd Ȼǝɹʇᴉɟᴉɔɐʇǝ ʍᴉll bǝnǝɟᴉʇ ʎøn."
-
-#. Translators: This string will not be used in Open edX installations.
-#: lms/templates/financial-assistance/financial-assistance.html
-msgid ""
 "If your application is approved, we'll give you instructions for verifying "
 "your identity on edx.org so you can start working toward completing your edX"
 " course."
@@ -18201,10 +18190,6 @@ msgstr ""
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Sincerely, Anant"
 msgstr "Sᴉnɔǝɹǝlʎ, Ⱥnɐnʇ"
-
-#: lms/templates/financial-assistance/financial-assistance.html
-msgid "Back to Student FAQs"
-msgstr "Ƀɐɔʞ ʇø Sʇndǝnʇ FȺQs"
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Apply for Financial Assistance"
@@ -24178,16 +24163,16 @@ msgid "Select this problem"
 msgstr "Sǝlǝɔʇ ʇɥᴉs dɹøblǝɯ"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy to Clipboard"
-msgstr "Ȼødʎ ʇø Ȼlᴉdbøɐɹd"
+msgid "Manage Access"
+msgstr "Mɐnɐƃǝ Ⱥɔɔǝss"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage tags"
 msgstr "Mɐnɐƃǝ ʇɐƃs"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Manage Access"
-msgstr "Mɐnɐƃǝ Ⱥɔɔǝss"
+msgid "Copy to Clipboard"
+msgstr "Ȼødʎ ʇø Ȼlᴉdbøɐɹd"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."

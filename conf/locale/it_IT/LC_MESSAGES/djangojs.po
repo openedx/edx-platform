@@ -113,7 +113,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-11-19 20:43+0000\n"
+"POT-Creation-Date: 2023-12-03 20:43+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Ilaria Botti <ilabotti@gmail.com>, 2022\n"
 "Language-Team: Italian (Italy) (http://app.transifex.com/open-edx/edx-platform/language/it_IT/)\n"
@@ -239,7 +239,8 @@ msgstr "Scegli File"
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js cms/static/js/views/tabs.js
-#: lms/static/js/Markdown.Editor.js xmodule/js/src/html/edit.js
+#: cms/static/js/views/utils/xblock_utils.js lms/static/js/Markdown.Editor.js
+#: xmodule/js/src/html/edit.js
 #: common/static/common/templates/discussion/templates.underscore
 #: lms/templates/learner_dashboard/verification_popover.underscore
 msgid "OK"
@@ -869,6 +870,7 @@ msgid "Select a category"
 msgstr "Seleziona una categoria"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "Impostazioni account"
@@ -6461,6 +6463,7 @@ msgstr "Sei sicuro di voler cancellare questo aggiornamento?"
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/pages/container_subviews.js
 msgid "Copying"
 msgstr ""
 
@@ -6470,26 +6473,31 @@ msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "Pasting"
 msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "Some errors occurred"
 msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "The following required files could not be added to the course:"
 msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "You may need to update a file(s) manually"
 msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid ""
 "The following files already exist in this course but don't match the version"
 " used by the component you pasted:"
@@ -6497,21 +6505,25 @@ msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "New file(s) added to Files & Uploads."
 msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "The following required files were imported to this course:"
 msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "View files"
 msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "Dismiss"
 msgstr ""
 
@@ -8447,16 +8459,14 @@ msgid "Financial Assistance Application"
 msgstr "Applicazione Assistenza finanziaria "
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid "About You"
-msgstr "Informazioni personali "
+msgid "Profile Information"
+msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
-"The following information is already a part of your {platform} profile. "
-"We've included it here for your application."
+"The following information is already a part of your {platform} profile and "
+"is required for your application. To edit this information go to "
 msgstr ""
-"Le seguenti informazioni fanno già parte del tuo profilo di {platform}. Sono"
-" state incluse qui per la tua applicazione."
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Email address"
@@ -8471,8 +8481,8 @@ msgid "Country of residence"
 msgstr "Paese di residenza "
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid "Back to {platform} FAQs"
-msgstr "Torna alle FAQ {platform} "
+msgid "Application Details"
+msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Submit Application"
@@ -11359,6 +11369,10 @@ msgid "Note: Do not hide graded assignments after they have been released."
 msgstr ""
 "Nota: Non nascondere i compiti valutati dopo che sono stati rilasciati."
 
+#: cms/templates/js/publish-xblock.underscore
+msgid "Copy Unit"
+msgstr ""
+
 #: cms/templates/js/release-date-editor.underscore
 msgid "Release Date and Time"
 msgstr "Data e ora rilascio"
@@ -11561,6 +11575,10 @@ msgstr ""
 
 #: cms/templates/js/summary-configuration-editor.underscore
 msgid "Enable summaries"
+msgstr ""
+
+#: cms/templates/js/tag-list.underscore
+msgid "Manage tags"
 msgstr ""
 
 #: cms/templates/js/team-member.underscore
