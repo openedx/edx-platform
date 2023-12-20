@@ -81,12 +81,12 @@ class UserRoleForm(forms.ModelForm):
                     role=cleaned_data.get("role")
                 )
             if user_role.exists():
-                raise forms.ValidationError(_(
-                    "The {role} is already assigned to the user ({email}) for this context."
-                    ).format(
+                raise forms.ValidationError(
+                    _("The {role} is already assigned to the user ({email}) for this context.").format(
                         role=cleaned_data.get("role"),
                         email=cleaned_data.get("email")
-                    ))
+                    )
+                )
         return cleaned_data
 
     def __init__(self, *args, **kwargs):
