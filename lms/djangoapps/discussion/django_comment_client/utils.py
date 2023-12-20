@@ -134,9 +134,9 @@ def has_discussion_privileges(user, course_id):
         if user.id in user_ids:
             return True
     if user.has_perm(
-        "f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value.name}'"
+        f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value.name}'
     ) and user.has_perm(
-        "f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.value.name}'"
+        f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.value.name}'
     ):
         return True
     return False

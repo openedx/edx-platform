@@ -364,13 +364,13 @@ def get_course(request, course_key):
         "is_user_admin": request.user.is_staff,
         # TODO: remove role checks once course_roles is fully impelented and data is migrated
         "is_course_staff": CourseStaffRole(course_key).has_user(request.user) or
-            request.user.has_perm(
-                "f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value.name}'"
-            ),
+        request.user.has_perm(
+            f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value.name}'
+        ),
         "is_course_admin": CourseInstructorRole(course_key).has_user(request.user) or
-            request.user.has_perm(
-                "f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value.name}'"
-            ),
+        request.user.has_perm(
+            f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value.name}'
+        ),
         "provider": course_config.provider_type,
         "enable_in_context": course_config.enable_in_context,
         "group_at_subsection": course_config.plugin_configuration.get("group_at_subsection", False),
@@ -988,13 +988,15 @@ def get_thread_list(
 
     if request.GET.get("group_id", None):
         # TODO: remove role check once course_roles is fully impelented and data is migrated
-        if (Role.user_has_role_for_course(request.user, course_key, allowed_roles) or
+        if (
+            Role.user_has_role_for_course(request.user, course_key, allowed_roles) or
             request.user.has_perm(
-                "f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value.name}'"
+                f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value.name}'
             ) or
             request.user.has_perm(
-                "f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.value.name}'"
-            )):
+                f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.value.name}'
+            )
+        ):
             try:
                 group_id = int(request.GET.get("group_id", None))
             except ValueError:

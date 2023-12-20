@@ -758,8 +758,11 @@ def is_course_staff(course_key: CourseKey, user: User):
     Check if user has course instructor or course staff role.
     """
     # TODO: remove role checks once course_roles is fully impelented and data is migrated
-    return (CourseInstructorRole(course_key).has_user(user) or CourseStaffRole(course_key).has_user(user) or
-        user.has_perm("f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value.name}'"))
+    return (
+        CourseInstructorRole(course_key).has_user(user) or
+        CourseStaffRole(course_key).has_user(user) or
+        user.has_perm(f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value.name}')
+    )
 
 
 def is_privileged_user(course_key: CourseKey, user: User):
@@ -777,9 +780,9 @@ def is_privileged_user(course_key: CourseKey, user: User):
     has_course_role = Role.user_has_role_for_course(user, course_key, forum_roles)
     # TODO: remove role checks once course_roles is fully impelented and data is migrated
     has_moderate_discussion_permissions = user.has_perm(
-        "f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value.name}'"
+        f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value.name}'
     ) or user.has_perm(
-        "f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.value.name}'"
+        f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.value.name}'
     )
     return GlobalStaff().has_user(user) or has_course_role or has_moderate_discussion_permissions
 
@@ -816,7 +819,7 @@ class DiscussionBoardFragmentView(EdxFragmentView):
         # TODO: remove role checks once course_roles is fully impelented and data is migrated
         is_educator_or_staff = (
             is_course_staff(course_key, request.user) or GlobalStaff().has_user(request.user) or
-            request.user.has_perm("f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_MODERATORS.value.name}'")
+            request.user.has_perm(f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_MODERATORS.value.name}')
         )
         try:
             base_context = _create_base_discussion_view_context(request, course_key)

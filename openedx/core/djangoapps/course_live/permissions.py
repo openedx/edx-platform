@@ -5,6 +5,7 @@ from rest_framework.permissions import BasePermission
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.core.lib.api.view_utils import validate_course_key
 
 
@@ -22,10 +23,11 @@ class IsStaffOrInstructor(BasePermission):
 
         if GlobalStaff().has_user(request.user):
             return True
-
+        # TODO: remove role checks once course_roles is fully impelented and data is migrated
         return (
             CourseInstructorRole(course_key).has_user(request.user) or
-            CourseStaffRole(course_key).has_user(request.user)
+            CourseStaffRole(course_key).has_user(request.user) or
+            request.user.has_perm(f'course_roles.{CourseRolesPermission.MANAGE_CONTENT.value.name}')
         )
 
 
@@ -41,8 +43,21 @@ class IsEnrolledOrStaff(BasePermission):
         if GlobalStaff().has_user(request.user):
             return True
 
+        user_has_permissions = (
+            request.user.has_perm(
+                f'course_roles.{CourseRolesPermission.VIEW_ALL_CONTENT.value.name}'
+            ) or
+            request.user.has_perm(
+                f'course_roles.{CourseRolesPermission.VIEW_LIVE_PUBLISHED_CONTENT.value.name}'
+            ) or
+            request.user.has_perm(
+                f'course_roles.{CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.value.name}'
+            )
+        )
+        # TODO: remove role checks once course_roles is fully impelented and data is migrated
         return (
             CourseInstructorRole(course_key).has_user(request.user) or
             CourseStaffRole(course_key).has_user(request.user) or
-            CourseEnrollment.is_enrolled(request.user, course_key)
+            CourseEnrollment.is_enrolled(request.user, course_key) or
+            user_has_permissions
         )

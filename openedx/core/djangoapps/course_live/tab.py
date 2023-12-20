@@ -11,6 +11,7 @@ from lms.djangoapps.courseware.tabs import EnrolledTab
 from openedx.core.djangoapps.course_live.config.waffle import ENABLE_COURSE_LIVE
 from openedx.core.djangoapps.course_live.models import CourseLiveConfiguration
 from openedx.core.djangoapps.course_live.providers import HasGlobalCredentials, ProviderManager
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.core.lib.cache_utils import request_cached
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from openedx.features.lti_course_tab.tab import LtiCourseLaunchMixin
@@ -34,7 +35,23 @@ def user_is_staff_or_instructor(user: AbstractBaseUser, course: CourseBlock) -> 
     """
     Check if the user is a staff or instructor for the course.
     """
-    return CourseStaffRole(course.id).has_user(user) or CourseInstructorRole(course.id).has_user(user)
+    user_has_permissions = (
+        user.has_perm(
+            f'course_roles.{CourseRolesPermission.VIEW_ALL_CONTENT.value.name}'
+        ) or
+        user.has_perm(
+            f'course_roles.{CourseRolesPermission.VIEW_LIVE_PUBLISHED_CONTENT.value.name}'
+        ) or
+        user.has_perm(
+            f'course_roles.{CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.value.name}'
+        )
+    )
+    # TODO: remove role checks once course_roles is fully impelented and data is migrated
+    return (
+        CourseStaffRole(course.id).has_user(user) or
+        CourseInstructorRole(course.id).has_user(user) or
+        user_has_permissions
+    )
 
 
 class CourseLiveTab(LtiCourseLaunchMixin, TabFragmentViewMixin, EnrolledTab):
