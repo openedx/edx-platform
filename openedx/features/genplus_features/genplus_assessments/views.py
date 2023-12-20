@@ -192,7 +192,7 @@ class AssessmentReportPDFView(TemplateView):
             'margin-left': '0in',
             'no-outline': None,
             'header-spacing': '5',
-            'javascript-delay': '500'
+            'javascript-delay': '2000'
         }
 
     def get_filename(self, user_id):
