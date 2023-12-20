@@ -630,7 +630,7 @@ class RegistrationView(APIView):
         #     }))
 
      # add student org protal
-        add_student_to_organization(user.email, data.get('organization'))
+        # add_student_to_organization(user.email, data.get('organization'))
     
                 
         if not user.is_active and settings.SHOW_ACCOUNT_ACTIVATION_CTA and not settings.MARKETING_EMAILS_OPT_IN:
