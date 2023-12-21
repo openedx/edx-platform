@@ -578,9 +578,11 @@ class SkillReflectionIndividualApiView(ProgramFilterMixin):
 
     def get(self, request, **kwargs):
         user_id = kwargs['user_id']
-        skills = list(set(self.get_program_queryset().values_list('units__skill__name',
-                                                                  flat=True).distinct().order_by(
-            'units__program_id')))
+        skills = list()
+        for sk in self.get_program_queryset().values_list('units__skill__name', flat=True).order_by(
+            'units__program_id'):
+            if sk not in skills:
+                skills.append(sk)
         courses = self.get_program_queryset().values_list('units__course', flat=True).all()
         likert_questions = SkillAssessmentQuestion.objects.filter(
             start_unit__in=courses,

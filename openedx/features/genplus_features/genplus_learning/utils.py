@@ -387,6 +387,18 @@ def generate_report_data(self, user_state_iterator, limit_responses=None):
                 return xml_element.xpath('@correct')[0]
             return '|| '.join(xml_element.xpath('*[@correct="true"]/text()'))
 
+        def find_question_label(self, answer_id):
+            question_text_queries = [
+                ".//span[@class='question-text']",
+                ".//label[@class='question-text']"
+            ]
+            for query in question_text_queries:
+                question_text_ele = self.tree.xpath(query)
+                if len(question_text_ele) > 0:
+                    return question_text_ele[0].text
+
+            return super().find_question_label(answer_id)
+
         def find_answer_text(self, answer_id, current_answer):
             """
             Process a raw answer text to make it more meaningful.
