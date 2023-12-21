@@ -605,7 +605,7 @@ class RegistrationView(APIView):
         redirect_url = get_redirect_url_with_host(root_url, redirect_to)
         response = self._create_response(request, {}, status_code=200, redirect_url=redirect_url)
         set_logged_in_cookies(request, response, user)
-        
+        UserProfile.add_student_organization(user , organization=data.get('organization'))
         # create student_code
         try :
             student_code =UserProfile.create_student_code(user=user)
@@ -617,7 +617,7 @@ class RegistrationView(APIView):
         portal_domain = Site.objects.get(name='portal_domain')
       
         
-        # create student portal 
+        # # create student portal 
         url_create_student =  f'https://{portal_domain}/api/student/register'
         headers = {
                 "Content-Type": "application/json"
