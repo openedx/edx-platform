@@ -12,7 +12,7 @@ on:
 
 jobs:
   variables:
-    uses: .github/workflows/variables.yml
+    uses: ./.github/workflows/variables.yml
 
   triggering-staging:
     needs: [ variables ]
