@@ -35,7 +35,7 @@ class IsStaffOrCourseTeam(BasePermission):
             CourseInstructorRole(course_key).has_user(request.user) or
             CourseStaffRole(course_key).has_user(request.user) or
             request.user.has_perm(
-                f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value.name}'
+                CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.perm_name
             ) or
             has_discussion_privileges(request.user, course_key)
         )

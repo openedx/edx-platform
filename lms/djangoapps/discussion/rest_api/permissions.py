@@ -162,9 +162,9 @@ class IsStaffOrCourseTeamOrEnrolled(permissions.BasePermission):
             CourseStaffRole(course_key).has_user(request.user) or
             CourseInstructorRole(course_key).has_user(request.user) or
             (request.user.has_perm(
-                f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value.name}'
+                CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.perm_name
             ) and request.user.has_perm(
-                f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.value.name}'
+                CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.perm_name
             )) or
             CourseEnrollment.is_enrolled(request.user, course_key) or
             has_discussion_privileges(request.user, course_key)

@@ -37,13 +37,13 @@ def user_is_staff_or_instructor(user: AbstractBaseUser, course: CourseBlock) -> 
     """
     user_has_permissions = (
         user.has_perm(
-            f'course_roles.{CourseRolesPermission.VIEW_ALL_CONTENT.value.name}'
+            CourseRolesPermission.VIEW_ALL_CONTENT.perm_name
         ) or
         user.has_perm(
-            f'course_roles.{CourseRolesPermission.VIEW_LIVE_PUBLISHED_CONTENT.value.name}'
+            CourseRolesPermission.VIEW_LIVE_PUBLISHED_CONTENT.perm_name
         ) or
         user.has_perm(
-            f'course_roles.{CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.value.name}'
+            CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.perm_name
         )
     )
     # TODO: remove role checks once course_roles is fully impelented and data is migrated

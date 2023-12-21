@@ -761,7 +761,7 @@ def is_course_staff(course_key: CourseKey, user: User):
     return (
         CourseInstructorRole(course_key).has_user(user) or
         CourseStaffRole(course_key).has_user(user) or
-        user.has_perm(f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value.name}')
+        user.has_perm(CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.perm_name)
     )
 
 
@@ -780,9 +780,9 @@ def is_privileged_user(course_key: CourseKey, user: User):
     has_course_role = Role.user_has_role_for_course(user, course_key, forum_roles)
     # TODO: remove role checks once course_roles is fully impelented and data is migrated
     has_moderate_discussion_permissions = user.has_perm(
-        f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value.name}'
+        CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.perm_name
     ) or user.has_perm(
-        f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.value.name}'
+        CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.perm_name
     )
     return GlobalStaff().has_user(user) or has_course_role or has_moderate_discussion_permissions
 
@@ -819,7 +819,7 @@ class DiscussionBoardFragmentView(EdxFragmentView):
         # TODO: remove role checks once course_roles is fully impelented and data is migrated
         is_educator_or_staff = (
             is_course_staff(course_key, request.user) or GlobalStaff().has_user(request.user) or
-            request.user.has_perm(f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_MODERATORS.value.name}')
+            request.user.has_perm(CourseRolesPermission.MODERATE_DISCUSSION_MODERATORS.perm_name)
         )
         try:
             base_context = _create_base_discussion_view_context(request, course_key)

@@ -27,7 +27,7 @@ class IsStaffOrInstructor(BasePermission):
         return (
             CourseInstructorRole(course_key).has_user(request.user) or
             CourseStaffRole(course_key).has_user(request.user) or
-            request.user.has_perm(f'course_roles.{CourseRolesPermission.MANAGE_CONTENT.value.name}')
+            request.user.has_perm(CourseRolesPermission.MANAGE_CONTENT.perm_name)
         )
 
 
@@ -45,13 +45,13 @@ class IsEnrolledOrStaff(BasePermission):
 
         user_has_permissions = (
             request.user.has_perm(
-                f'course_roles.{CourseRolesPermission.VIEW_ALL_CONTENT.value.name}'
+                CourseRolesPermission.VIEW_ALL_CONTENT.perm_name
             ) or
             request.user.has_perm(
-                f'course_roles.{CourseRolesPermission.VIEW_LIVE_PUBLISHED_CONTENT.value.name}'
+                CourseRolesPermission.VIEW_LIVE_PUBLISHED_CONTENT.perm_name
             ) or
             request.user.has_perm(
-                f'course_roles.{CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.value.name}'
+                CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.perm_name
             )
         )
         # TODO: remove role checks once course_roles is fully impelented and data is migrated

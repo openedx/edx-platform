@@ -365,11 +365,11 @@ def get_course(request, course_key):
         # TODO: remove role checks once course_roles is fully impelented and data is migrated
         "is_course_staff": CourseStaffRole(course_key).has_user(request.user) or
         request.user.has_perm(
-            f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value.name}'
+            CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.perm_name
         ),
         "is_course_admin": CourseInstructorRole(course_key).has_user(request.user) or
         request.user.has_perm(
-            f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value.name}'
+            CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.perm_name
         ),
         "provider": course_config.provider_type,
         "enable_in_context": course_config.enable_in_context,
@@ -991,10 +991,10 @@ def get_thread_list(
         if (
             Role.user_has_role_for_course(request.user, course_key, allowed_roles) or
             request.user.has_perm(
-                f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value.name}'
+                CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.perm_name
             ) or
             request.user.has_perm(
-                f'course_roles.{CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.value.name}'
+                CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.perm_name
             )
         ):
             try:
