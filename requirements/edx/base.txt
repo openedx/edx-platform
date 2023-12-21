@@ -56,6 +56,7 @@ backoff==1.10.0
 backports-zoneinfo[tzdata]==0.2.1
     # via
     #   celery
+    #   django
     #   icalendar
     #   kombu
 beautifulsoup4==4.12.2
@@ -73,13 +74,13 @@ bleach[css]==6.1.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.33.12
+boto3==1.34.5
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.33.12
+botocore==1.34.5
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -173,9 +174,9 @@ defusedxml==0.7.1
     #   social-auth-core
 deprecated==1.2.14
     # via jwcrypto
-django==3.2.23
+django==4.2.8
     # via
-    #   -c requirements/edx/../common_constraints.txt
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   django-appconf
     #   django-celery-results
@@ -283,12 +284,12 @@ django-filter==23.5
     #   edx-enterprise
     #   lti-consumer-xblock
     #   openedx-blockstore
-django-ipware==6.0.2
+django-ipware==6.0.3
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
     #   edx-proctoring
-django-js-asset==2.1.0
+django-js-asset==2.2.0
     # via django-mptt
 django-method-override==1.0.4
     # via -r requirements/edx/kernel.in
@@ -337,6 +338,7 @@ django-ses==3.5.2
     # via -r requirements/edx/bundled.in
 django-simple-history==3.4.0
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
     #   edx-name-affirmation
@@ -398,7 +400,7 @@ done-xblock==2.2.0
     # via -r requirements/edx/bundled.in
 drf-jwt==1.19.2
     # via edx-drf-extensions
-drf-nested-routers==0.93.4
+drf-nested-routers==0.93.5
     # via openedx-blockstore
 drf-spectacular==0.27.0
     # via -r requirements/edx/kernel.in
@@ -560,11 +562,11 @@ event-tracking==2.2.0
     #   edx-completion
     #   edx-proctoring
     #   edx-search
-fastavro==1.9.1
+fastavro==1.9.2
     # via openedx-events
 filelock==3.13.1
     # via snowflake-connector-python
-frozenlist==1.4.0
+frozenlist==1.4.1
     # via
     #   aiohttp
     #   aiosignal
@@ -670,7 +672,7 @@ loremipsum==1.0.5
     # via ora2
 lti-consumer-xblock==9.8.1
     # via -r requirements/edx/kernel.in
-lxml==4.9.3
+lxml==4.9.4
     # via
     #   -r requirements/edx/kernel.in
     #   edx-i18n-tools
@@ -725,7 +727,7 @@ multidict==6.0.4
     # via
     #   aiohttp
     #   yarl
-mysqlclient==2.2.0
+mysqlclient==2.2.1
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-blockstore
@@ -762,7 +764,7 @@ openedx-blockstore==1.4.0
     # via -r requirements/edx/kernel.in
 openedx-calc==3.0.1
     # via -r requirements/edx/kernel.in
-openedx-django-pyfs==3.4.0
+openedx-django-pyfs==3.4.1
     # via
     #   lti-consumer-xblock
     #   xblock
@@ -830,9 +832,9 @@ platformdirs==3.11.0
     # via snowflake-connector-python
 polib==1.2.0
     # via edx-i18n-tools
-prompt-toolkit==3.0.42
+prompt-toolkit==3.0.43
     # via click-repl
-psutil==5.9.6
+psutil==5.9.7
     # via
     #   -r requirements/edx/paver.txt
     #   edx-django-utils
@@ -919,7 +921,7 @@ python-dateutil==2.8.2
     #   olxcleaner
     #   ora2
     #   xblock
-python-ipware==2.0.0
+python-ipware==2.0.1
     # via django-ipware
 python-memcached==1.59
     # via -r requirements/edx/paver.txt
@@ -937,7 +939,6 @@ pytz==2023.3.post1
     # via
     #   -r requirements/edx/kernel.in
     #   babel
-    #   django
     #   django-ses
     #   djangorestframework
     #   drf-yasg
@@ -965,7 +966,7 @@ pyyaml==6.0.1
     #   edx-django-release-util
     #   edx-i18n-tools
     #   xblock
-random2==1.0.1
+random2==1.0.2
     # via -r requirements/edx/kernel.in
 recommender-xblock==2.0.1
     # via -r requirements/edx/bundled.in
@@ -1006,7 +1007,7 @@ requests-oauthlib==1.3.1
     # via
     #   -r requirements/edx/kernel.in
     #   social-auth-core
-rpds-py==0.13.2
+rpds-py==0.15.2
     # via
     #   jsonschema
     #   referencing
@@ -1020,7 +1021,7 @@ rules==3.3
     #   edx-enterprise
     #   edx-proctoring
     #   openedx-learning
-s3transfer==0.8.2
+s3transfer==0.9.0
     # via boto3
 sailthru-client==2.2.3
     # via edx-ace
@@ -1199,7 +1200,7 @@ wrapt==1.16.0
     # via
     #   -r requirements/edx/paver.txt
     #   deprecated
-xblock[django]==1.8.1
+xblock[django]==1.9.0
     # via
     #   -r requirements/edx/kernel.in
     #   acid-xblock
