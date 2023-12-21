@@ -679,7 +679,7 @@
                     that.$('.btn-submit-qz').css('display', 'none');
                     that.$('#btn-next').css('display', 'block');
       
-      
+                    $(listQz[currentIndex]).find('.error-problem-answer').remove()
                    problemQuestionNumbers.each(function(index, element) {
                      if (element.textContent === (currentIndex +1 ).toString()) {
                        element.classList.add('submitted-question');
@@ -724,19 +724,32 @@
                       }
                       
      
-  
+                     
                       problemQuestionNumbers.each(function(index, element) {
                         if (element.textContent === (currentIndex +1 ).toString()) {
                           element.classList.add('err-number-qusetion');
                           element.classList.remove('active-number');
-  
+                         
+                          const explanation = $(listQz[currentIndex]).find('.explanation-title')
                           //remove messgae
                           $(listQz[currentIndex]).find('.message').remove()
-  
-                          choicegroup.appendChild(messagesProblem)
-                          $(listQz[currentIndex]).find('.explanation-title').append('<span>Câu trả lời của bạn chưa chính xác</span>')
+                          if (messagesProblem ){
+                            choicegroup.appendChild(messagesProblem)
+                            $(listQz[currentIndex]).find('.explanation-title').append('<span>Câu trả lời của bạn chưa chính xác</span>')
+                          }else {
+                            if (explanation.length ===0){
+                                const newMessgasBox = $('<div></div>').addClass('feedback-hint-incorrect messages-box error-problem-answer ');
+                              const title = $('<div></div>').addClass('explanation-title').text('Câu trả lời của bạn chưa chính xác');
+                              title.css("padding-bottom" , '0px')
+                              newMessgasBox.append(title);
+                              $(listQz[currentIndex]).append(newMessgasBox);
+                            }
+                            
+                          }
+                          
   
                           const messgasBox = listQz[currentIndex].querySelector('.feedback-hint-incorrect');
+            
                           messgasBox.classList.add('error-problem-answer'); 
   
                           checkedInput.each(function () {
