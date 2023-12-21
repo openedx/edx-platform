@@ -101,17 +101,15 @@ bleach[css]==6.1.0
     #   ora2
     #   xblock-drag-and-drop-v2
     #   xblock-poll
-boto==2.39.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.txt
-boto3==1.28.64
+boto==2.49.0
+    # via -r requirements/edx/base.txt
+boto3==1.33.12
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.31.64
+botocore==1.33.12
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -226,7 +224,7 @@ deprecated==1.2.14
     # via
     #   -r requirements/edx/base.txt
     #   jwcrypto
-django==4.2.6
+django==3.2.23
     # via
     #   -r requirements/edx/base.txt
     #   django-appconf
@@ -345,12 +343,12 @@ django-filter==23.5
     #   edx-enterprise
     #   lti-consumer-xblock
     #   openedx-blockstore
-django-ipware==6.0.2
+django-ipware==6.0.3
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   edx-proctoring
-django-js-asset==2.1.0
+django-js-asset==2.2.0
     # via
     #   -r requirements/edx/base.txt
     #   django-mptt
@@ -658,7 +656,7 @@ filelock==3.13.1
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
-frozenlist==1.4.0
+frozenlist==1.4.1
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
@@ -865,7 +863,7 @@ multidict==6.0.4
     #   -r requirements/edx/base.txt
     #   aiohttp
     #   yarl
-mysqlclient==2.2.0
+mysqlclient==2.2.1
     # via
     #   -r requirements/edx/base.txt
     #   openedx-blockstore
@@ -906,7 +904,7 @@ openedx-blockstore==1.4.0
     # via -r requirements/edx/base.txt
 openedx-calc==3.0.1
     # via -r requirements/edx/base.txt
-openedx-django-pyfs==3.4.0
+openedx-django-pyfs==3.4.1
     # via
     #   -r requirements/edx/base.txt
     #   lti-consumer-xblock
@@ -990,7 +988,7 @@ polib==1.2.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-i18n-tools
-prompt-toolkit==3.0.42
+prompt-toolkit==3.0.43
     # via
     #   -r requirements/edx/base.txt
     #   click-repl
@@ -1099,7 +1097,7 @@ python-dateutil==2.8.2
     #   olxcleaner
     #   ora2
     #   xblock
-python-ipware==2.0.0
+python-ipware==2.0.1
     # via
     #   -r requirements/edx/base.txt
     #   django-ipware
@@ -1215,7 +1213,7 @@ rules==3.3
     #   edx-enterprise
     #   edx-proctoring
     #   openedx-learning
-s3transfer==0.8.2
+s3transfer==0.9.0
     # via
     #   -r requirements/edx/base.txt
     #   boto3
