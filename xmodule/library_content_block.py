@@ -172,13 +172,18 @@ class LibraryContentBlock(
         # Do we shuffle (randomize order) of selected blocks for each learner?
         # True -> Order is randomized for each learner. \n False -> Original order from candidates/children is used.
         # False -> is the block content only drawn from content which is in the candidates list?
+        display_name=_("Shuffle Components"),
+        help=_("When enabled, each learner will see the components in a randomized order."),
         default=True,
         scope=Scope.settings,
+
     )
     manual = Boolean(
         # Should selected blocks be limited to the manually-picked candidates?
         # True -> Draw selections from `candidates`.
         # False -> Draw selections from `children`.
+        display_name=_("Limit Components to Selection"),
+        help=_("When enabled, only the checked-off components on the 'View' page are available to learners."),
         default=False,
         scope=Scope.settings,
     )
@@ -212,8 +217,6 @@ class LibraryContentBlock(
         non_editable_fields.extend([
             LibraryContentBlock.source_library_version,
             LibraryContentBlock.candidates,
-            LibraryContentBlock.manual,
-            LibraryContentBlock.shuffle,
         ])
         return non_editable_fields
 
