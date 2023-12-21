@@ -1,0 +1,49 @@
+Name: Define Tag Variables
+on:
+  workflow_call:
+    outputs:
+      timestamp:
+        description: "The current timestamp"
+        value: ${{ jobs.variables.outputs.TIMESTAMP}}
+      release-name:
+        description: "Name of the edX release taken from the branch name"
+        value: ${{ jobs.variables.outputs.RELEASE-NAME}}
+      project:
+        description: "Code of the EOL project taken from the branch name"
+        value: ${{ jobs.variables.outputs.PROJECT}}
+
+jobs:
+  variables:
+    outputs:
+      - TIMESTAMP: ${{ steps.ts.outputs.TS}}
+      - RELEASE-NAME: ${{ steps.release.outputs.result}}
+      - PROJECT: ${{ steps.project.outputs.result}}
+    steps:
+      - name: Take current date
+        id: ts
+        run: echo "TS=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
+
+      - name: Obtain release version
+        id: release
+        uses: actions/script@v7
+        with:
+          result-encoding: string
+          script: |
+            if ( github.ref.match(/^refs\/heads\/(eol|openuchile|vlabx)\/([a-z]+).master$/) ) {
+              return github.ref.replace(/^refs\/heads\/(eol|openuchile|vlabx)\/([a-z]+).master$/,'$2')
+            } else if ( github.event.pull_request.base.ref.match(/^refs\/heads\/(eol|openuchile|vlabx)\/([a-z]+).master$/) ) {
+              return github.event.pull_request.base.ref.replace(/^refs\/heads\/(eol|openuchile|vlabx)\/([a-z]+).master$/,'$2')
+            } else throw 'No version'
+
+      - name: Obtain release project
+        id: project
+        uses: actions/script@v7
+        with:
+          result-encoding: string
+          script: |
+            if ( github.ref.match(/^refs\/heads\/(eol|openuchile|vlabx)\//) ) {
+              return github.ref.replace(/^refs\/heads\/(eol|openuchile|vlabx)\//,'$1')
+            } else if ( github.event.pull_request.base.ref.match(/^refs\/heads\/(eol|openuchile|vlabx)\//) ) {
+              return github.event.pull_request.base.ref.replace(/^refs\/heads\/(eol|openuchile|vlabx)\//,'$1')
+            } else throw 'No project';
+
