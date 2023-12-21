@@ -41,6 +41,7 @@ from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
 from xblock.reference.plugins import FSService
 from xblock.runtime import KvsFieldData
 
+from common.config.waffle import TEACHER_PROGRESS_TACKING_DISABLED_SWITCH
 from common.djangoapps import static_replace
 from capa.xqueue_interface import XQueueInterface
 from lms.djangoapps.courseware.access import get_user_role, has_access
@@ -543,7 +544,11 @@ def get_module_system_for_user(
         handlers = {
             'grade': handle_grade_event,
         }
-        if ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():
+        if ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled() and not is_staff_progress_tracking_disabled(
+            user,
+            descriptor,
+            course_id
+        ):
             handlers.update({
                 'completion': handle_completion_event,
                 'progress': handle_deprecated_progress_event,
@@ -574,7 +579,11 @@ def get_module_system_for_user(
         """
         Submit a completion object for the block.
         """
-        if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():  # lint-amnesty, pylint: disable=no-else-raise
+        if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled() or is_staff_progress_tracking_disabled(
+            user,
+            descriptor,
+            course_id
+        ):  # lint-amnesty, pylint: disable=no-else-raise
             raise Http404
         else:
             BlockCompletion.objects.submit_completion(
@@ -608,7 +617,11 @@ def get_module_system_for_user(
         edx-solutions.  New XBlocks should not emit these events, but instead
         emit completion events directly.
         """
-        if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():  # lint-amnesty, pylint: disable=no-else-raise
+        if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled() or is_staff_progress_tracking_disabled(
+            user,
+            descriptor,
+            course_id
+        ):  # lint-amnesty, pylint: disable=no-else-raise
             raise Http404
         else:
             requested_user_id = event.get('user_id', user.id)
@@ -1320,3 +1333,8 @@ def append_data_to_webob_response(response, data):
         response_data.update(data)
         response.body = json.dumps(response_data).encode('utf-8')
     return response
+
+
+def is_staff_progress_tracking_disabled(user, descriptor, course_id):
+    user_is_staff = bool(has_access(user, 'staff', descriptor.location, course_id))
+    return user_is_staff and TEACHER_PROGRESS_TACKING_DISABLED_SWITCH.is_enabled()
