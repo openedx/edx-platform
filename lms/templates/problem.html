@@ -324,7 +324,7 @@ from openedx.core.djangolib.markup import HTML
           parent.postMessage(message, '*');
       }
   </script>
-% if problem['name'] != 'Quiz Problem Custom':
+% if problem['name'] == 'Quiz Problem Custom':
 <script > 
   const problemElement = document.querySelector('#quiz-problem-custom');
   if (problemElement){
