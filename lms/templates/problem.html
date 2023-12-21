@@ -318,201 +318,80 @@ from openedx.core.djangolib.markup import HTML
       notification_message=notification_message,
       is_hidden=True"
     />
-</div>
-
-<script>
-    function emit_event(message) {
-        parent.postMessage(message, '*');
-    }
-</script>
-
-<script > 
-  const problemElement = document.querySelector('#quiz-problem-custom');
-  const problemList = problemElement.querySelectorAll('.wrapper-problem-response');
-const btnSubmit = document.querySelector('.btn-submit-qz')
-const btnNext = document.querySelector('#btn-next')
-const problemBtn = document.querySelector('#problem-buttom')
-
-
-var currentIndex = 0;  
+  </div>
+  <script>
+      function emit_event(message) {
+          parent.postMessage(message, '*');
+      }
+  </script>
+% if problem['name'] != 'Quiz Problem Custom':
+  <script > 
+    const problemElement = document.querySelector('#quiz-problem-custom');
+    const problemList = problemElement.querySelectorAll('.wrapper-problem-response');
+  const btnSubmit = document.querySelector('.btn-submit-qz')
+  const btnNext = document.querySelector('#btn-next')
+  const problemBtn = document.querySelector('#problem-buttom')
 
 
-if (problemList.length > 1 && btnSubmit && btnNext) {
-  const divContainer = document.createElement('div');
-  divContainer.classList.add('container-problem');
-  
+  var currentIndex = 0;  
 
-  for (var i = 0; i < problemList.length; i++) {
-    if(i > 0){
-      problemList[i].style.display = 'none'
-    }
-    const spanElement = document.createElement('span');
-    spanElement.textContent = (i + 1).toString();
-    spanElement.classList.add('problem-question-number');
-    spanElement.setAttribute('data-problem-number-id', i.toString());
-    
-    const submittedInput = problemList[i].querySelector('input.submitted');
-    const incorrectLabel = problemList[i].querySelector('label.choicegroup_correct');
-    const wrongLabel = problemList[i].querySelector('label.choicegroup_incorrect')
-    const indicatorError = problemList[i].querySelector('.indicator-container')
-    
-    indicatorError.style.display = 'none'
+
+  if (problemList.length > 1 && btnSubmit && btnNext) {
+    const divContainer = document.createElement('div');
+    divContainer.classList.add('container-problem');
     
 
-    if (i == 0){
-      spanElement.classList.add('active-number')
+    for (var i = 0; i < problemList.length; i++) {
+      if(i > 0){
+        problemList[i].style.display = 'none'
+      }
+      const spanElement = document.createElement('span');
+      spanElement.textContent = (i + 1).toString();
+      spanElement.classList.add('problem-question-number');
+      spanElement.setAttribute('data-problem-number-id', i.toString());
+      
+      const submittedInput = problemList[i].querySelector('input.submitted');
+      const incorrectLabel = problemList[i].querySelector('label.choicegroup_correct');
+      const wrongLabel = problemList[i].querySelector('label.choicegroup_incorrect')
+      const indicatorError = problemList[i].querySelector('.indicator-container')
+      
+      indicatorError.style.display = 'none'
+      
 
-      if (submittedInput && incorrectLabel) {
+      if (i == 0){
+        spanElement.classList.add('active-number')
+
+        if (submittedInput && incorrectLabel) {
+          btnSubmit.style.display = 'none';
+          btnNext.style.display = 'block';
+          spanElement.classList.add('submitted-question');
+          const inputs = problemList[i].querySelectorAll('input:checked');
+          inputs.forEach(input => input.classList.add('success-problem'))
+        }
+        else if (submittedInput && wrongLabel){
+          spanElement.classList.add('err-number-qusetion');
+
+        }
+          
+          
+      }else {
+        
+          if (submittedInput && incorrectLabel) {
+        spanElement.classList.add('submitted-question');
         btnSubmit.style.display = 'none';
         btnNext.style.display = 'block';
-        spanElement.classList.add('submitted-question');
         const inputs = problemList[i].querySelectorAll('input:checked');
         inputs.forEach(input => input.classList.add('success-problem'))
-      }
-      else if (submittedInput && wrongLabel){
-        spanElement.classList.add('err-number-qusetion');
-
-      }
-        
-        
-    }else {
-      
-        if (submittedInput && incorrectLabel) {
-      spanElement.classList.add('submitted-question');
-      btnSubmit.style.display = 'none';
-      btnNext.style.display = 'block';
-      const inputs = problemList[i].querySelectorAll('input:checked');
-      inputs.forEach(input => input.classList.add('success-problem'))
-      }
-      else if (submittedInput && wrongLabel){
-        spanElement.classList.add('err-number-qusetion');
-
-      }
-    }
-
-    divContainer.appendChild(spanElement);
-
-    const checkInput = problemList[i].querySelectorAll('input[type="checkbox"], input[type="radio"]' )
-    checkInput.forEach(input => {
-      input.addEventListener('change', ()=>{
-        const atLeastOneChecked = Array.from(checkInput).some(inp => inp.checked);
-        if (atLeastOneChecked) {
-          btnSubmit.removeAttribute('disabled');
-        } else {
-          btnSubmit.setAttribute('disabled', true);
         }
-      });
-    });
+        else if (submittedInput && wrongLabel){
+          spanElement.classList.add('err-number-qusetion');
 
-    
-  }
-
-  problemElement.insertBefore(divContainer, problemElement.firstChild);
-
-  const elementsError = document.querySelectorAll('.err-number-qusetion');
-  elementsError.forEach((elementError) => {
-    const numberError = elementError.textContent;
-    const indicatorError = problemList[numberError - 1].querySelector('.indicator-container');
-    indicatorError.style.display = 'block';
-    
-    const existingMessgasBox = problemList[numberError - 1].querySelector('.feedback-hint-incorrect');
-    
-    if (existingMessgasBox) {
-      existingMessgasBox.classList.add('error-problem-answer'); 
-      const title = problemList[numberError - 1].querySelector('.explanation-title');
-      title.textContent = 'Câu trả lời của bạn chưa chính xác';
-    } else {
-      const newMessgasBox = document.createElement('div');
-      newMessgasBox.classList.add('feedback-hint-incorrect', 'error-problem-answer' , "messages-box");
-      const title = document.createElement('div');
-      title.classList.add('explanation-title');
-      title.style.paddingBottom = '0px'
-      title.textContent = 'Câu trả lời của bạn chưa chính xác';
-      newMessgasBox.appendChild(title);
-      problemList[numberError - 1].appendChild(newMessgasBox);
-  
-    }
-  });
- 
-const elementsSubmitted = document.querySelectorAll('.submitted-question')
-elementsSubmitted.forEach((element)=>{
-  const numberSubmitted = element.textContent;
-  const title = problemList[numberSubmitted - 1].querySelector('.explanation-title');
-
-  title.textContent = 'Bạn đã trả lời đúng';
-
-})
-
-
-  const btnNumber = document.querySelectorAll('.problem-question-number');
-
-  btnNumber.forEach(function(element) {
-    element.addEventListener('click', function() {
-      const numnberId = element.getAttribute('data-problem-number-id');
-
-      btnSubmit.setAttribute('disabled', true);
-
-      currentIndex = parseInt(numnberId, 10);
-      btnNumber.forEach(function(btn) {
-        btn.classList.remove('active-number');
-      });
-     
-      problemList.forEach(function(problem) {
-        problem.style.display = 'none';
-      });
-  
-      const submittedInput = problemList[currentIndex].querySelector('input.submitted');
-      const incorrectLabel = problemList[currentIndex].querySelector('label.choicegroup_correct');
-      const wrongLabel = problemList[currentIndex].querySelector('label.choicegroup_incorrect')
-
-
-      if (problemList[currentIndex]) {
-        problemList[currentIndex].style.display = 'block';
-      element.classList.add('active-number')
-
-      if (element.classList.contains('err-number-qusetion')) {
-        const indicator = problemList[currentIndex].querySelector('.indicator-container')
-        indicator.style.display = 'block';
-
-        btnNext.style.display = 'none';
-        btnSubmit.style.display = 'block';
-
-        const messgasBox = problemList[currentIndex].querySelector('.feedback-hint-incorrect');
-        messgasBox.classList.add('error-problem-answer'); 
-
-        
-          const checkedInput = problemList[currentIndex].querySelectorAll('.field input:checked')
-       
-          checkedInput.forEach(function (element,index) {
-            
-            const input = element;
-            const label = document.querySelector('label[for="' + element.id + '"]');
-            input.classList.add('submitted');
-            input.classList.remove('success-problem');
-            label.classList.remove('choicegroup_correct')
-            label.classList.add( 'choicegroup_incorrect');
-        });
-
-
+        }
       }
-      if (incorrectLabel){
-        btnNext.style.display = 'block';
-        btnSubmit.style.display = 'none';
-      }
-      else if (!incorrectLabel && !wrongLabel){
-        btnNext.style.display = 'none';
-        btnSubmit.style.display = 'block';
 
-      }
-      else if (wrongLabel){
-        btnNext.style.display = 'none';
-        btnSubmit.style.display = 'block';
+      divContainer.appendChild(spanElement);
 
-       
-      }
-      
-      const checkInput = problemList[currentIndex].querySelectorAll('input[type="checkbox"], input[type="radio"]' )
-
+      const checkInput = problemList[i].querySelectorAll('input[type="checkbox"], input[type="radio"]' )
       checkInput.forEach(input => {
         input.addEventListener('change', ()=>{
           const atLeastOneChecked = Array.from(checkInput).some(inp => inp.checked);
@@ -524,25 +403,142 @@ elementsSubmitted.forEach((element)=>{
         });
       });
 
-      }
-
-     
-    });
-
-  });
-
-  const numberQuizs = document.querySelectorAll('.container-problem')
-  numberQuizs.forEach ((element, index) =>{
-    if (index != 0){
-      element.remove()
+      
     }
+
+    problemElement.insertBefore(divContainer, problemElement.firstChild);
+
+    const elementsError = document.querySelectorAll('.err-number-qusetion');
+    elementsError.forEach((elementError) => {
+      const numberError = elementError.textContent;
+      const indicatorError = problemList[numberError - 1].querySelector('.indicator-container');
+      indicatorError.style.display = 'block';
+      
+      const existingMessgasBox = problemList[numberError - 1].querySelector('.feedback-hint-incorrect');
+      
+      if (existingMessgasBox) {
+        existingMessgasBox.classList.add('error-problem-answer'); 
+        const title = problemList[numberError - 1].querySelector('.explanation-title');
+        title.textContent = 'Câu trả lời của bạn chưa chính xác';
+      } else {
+        const newMessgasBox = document.createElement('div');
+        newMessgasBox.classList.add('feedback-hint-incorrect', 'error-problem-answer' , "messages-box");
+        const title = document.createElement('div');
+        title.classList.add('explanation-title');
+        title.style.paddingBottom = '0px'
+        title.textContent = 'Câu trả lời của bạn chưa chính xác';
+        newMessgasBox.appendChild(title);
+        problemList[numberError - 1].appendChild(newMessgasBox);
+    
+      }
+    });
+  
+  const elementsSubmitted = document.querySelectorAll('.submitted-question')
+  elementsSubmitted.forEach((element)=>{
+    const numberSubmitted = element.textContent;
+    const title = problemList[numberSubmitted - 1].querySelector('.explanation-title');
+
+    title.textContent = 'Bạn đã trả lời đúng';
+
   })
 
 
-}
+    const btnNumber = document.querySelectorAll('.problem-question-number');
+
+    btnNumber.forEach(function(element) {
+      element.addEventListener('click', function() {
+        const numnberId = element.getAttribute('data-problem-number-id');
+
+        btnSubmit.setAttribute('disabled', true);
+
+        currentIndex = parseInt(numnberId, 10);
+        btnNumber.forEach(function(btn) {
+          btn.classList.remove('active-number');
+        });
+      
+        problemList.forEach(function(problem) {
+          problem.style.display = 'none';
+        });
+    
+        const submittedInput = problemList[currentIndex].querySelector('input.submitted');
+        const incorrectLabel = problemList[currentIndex].querySelector('label.choicegroup_correct');
+        const wrongLabel = problemList[currentIndex].querySelector('label.choicegroup_incorrect')
 
 
-</script>
+        if (problemList[currentIndex]) {
+          problemList[currentIndex].style.display = 'block';
+        element.classList.add('active-number')
+
+        if (element.classList.contains('err-number-qusetion')) {
+          const indicator = problemList[currentIndex].querySelector('.indicator-container')
+          indicator.style.display = 'block';
+
+          btnNext.style.display = 'none';
+          btnSubmit.style.display = 'block';
+
+          const messgasBox = problemList[currentIndex].querySelector('.feedback-hint-incorrect');
+          messgasBox.classList.add('error-problem-answer'); 
+
+          
+            const checkedInput = problemList[currentIndex].querySelectorAll('.field input:checked')
+        
+            checkedInput.forEach(function (element,index) {
+              
+              const input = element;
+              const label = document.querySelector('label[for="' + element.id + '"]');
+              input.classList.add('submitted');
+              input.classList.remove('success-problem');
+              label.classList.remove('choicegroup_correct')
+              label.classList.add( 'choicegroup_incorrect');
+          });
+
+
+        }
+        if (incorrectLabel){
+          btnNext.style.display = 'block';
+          btnSubmit.style.display = 'none';
+        }
+        else if (!incorrectLabel && !wrongLabel){
+          btnNext.style.display = 'none';
+          btnSubmit.style.display = 'block';
+
+        }
+        else if (wrongLabel){
+          btnNext.style.display = 'none';
+          btnSubmit.style.display = 'block';
+
+        
+        }
+        
+        const checkInput = problemList[currentIndex].querySelectorAll('input[type="checkbox"], input[type="radio"]' )
+
+        checkInput.forEach(input => {
+          input.addEventListener('change', ()=>{
+            const atLeastOneChecked = Array.from(checkInput).some(inp => inp.checked);
+            if (atLeastOneChecked) {
+              btnSubmit.removeAttribute('disabled');
+            } else {
+              btnSubmit.setAttribute('disabled', true);
+            }
+          });
+        });
+
+        }
+
+      
+      });
+
+    });
+
+    
+
+  }
+
+
+  </script>
+%endif
+
+
 
 <div>
 
