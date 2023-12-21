@@ -164,5 +164,9 @@ class CourseRolesPermission(Enum):
     )
 
     @property
-    def code(self):
+    def perm_name(self):
+        """
+        The permission name with the course_roles prefix.
+        Example: course_roles.manage_content
+        """
         return f'course_roles.{self.value.name}'
