@@ -1466,7 +1466,7 @@ wrapt==1.16.0
     # via
     #   -r requirements/edx/base.txt
     #   deprecated
-xblock[django]==1.8.1
+xblock[django]==1.9.0
     # via
     #   -r requirements/edx/base.txt
     #   acid-xblock
