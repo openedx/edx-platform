@@ -26,6 +26,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from web_fragments.fragment import Fragment
 
+from common.config.waffle import TEACHER_PROGRESS_TACKING_DISABLED_SWITCH
 from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
@@ -224,7 +225,8 @@ class CoursewareIndex(View):
 
             if self.chapter and self.section:
                 self._redirect_if_not_requested_section()
-                self._save_positions()
+                if (not request.user.is_staff) or (not TEACHER_PROGRESS_TACKING_DISABLED_SWITCH.is_enabled()):
+                    self._save_positions()
                 self._prefetch_and_bind_section()
                 self._redirect_to_learning_mfe()
 
