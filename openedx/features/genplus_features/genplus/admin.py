@@ -327,7 +327,8 @@ class ClassAdmin(admin.ModelAdmin):
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         db = kwargs.get('using')
-
+        obj = kwargs.get('obj')
+        object_id = request.resolver_match.kwargs.get('object_id')
         if db_field.name == 'students':
             kwargs['widget'] = FilteredSelectMultiple(
                 db_field.verbose_name, is_stacked=False
@@ -335,7 +336,13 @@ class ClassAdmin(admin.ModelAdmin):
         else:
             return super().formfield_for_manytomany(db_field, request, **kwargs)
         if 'queryset' not in kwargs:
-            queryset = Student.objects.all()
+            queryset = None
+            if object_id is not None:
+                obj = Class.objects.get(pk=object_id)
+            if obj.school is not None:
+                queryset = Student.objects.filter(gen_user__school=obj.school)
+            else:
+                queryset = Student.objects.all()
             if queryset is not None:
                 kwargs['queryset'] = queryset
         form_field = db_field.formfield(**kwargs)

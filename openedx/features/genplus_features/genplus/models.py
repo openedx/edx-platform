@@ -50,6 +50,8 @@ class School(TimeStampedModel):
             self.guid = f'private-{str(uuid.uuid4())[0:10]}'
             self.external_id = f'private-{str(uuid.uuid4())[0:10]}'
         super(School, self).save(*args, **kwargs)
+    class Meta:
+        ordering = ['name', ]
 
 
 class XporterDetail(TimeStampedModel):
