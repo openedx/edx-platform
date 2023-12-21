@@ -7,12 +7,18 @@ on:
       - completed
     branches:
       - 'eol/**'
+      - 'openuchile/**'
+      - 'vlabx/**'
 
 jobs:
+  variables:
+    uses: .github/workflows/variables.yml
+
   triggering-staging:
+    needs: [ variables ]
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Trigger edx-staging repository
         run: |
-          curl -XPOST -u "eolito:${{secrets.WEBHOOK_SECRET}}" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/eol-uchile/edx-staging/dispatches --data '{"event_type": "update-image", "client_payload": {"version": "koa"}}'
+          curl -XPOST -u "eolito:${{secrets.WEBHOOK_SECRET}}" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/eol-uchile/edx-staging/dispatches --data "{\"event_type\": \"update-image\", \"client_payload\": {\"version\": \"${{ needs.variables.outputs.release-name }}\"}}"
