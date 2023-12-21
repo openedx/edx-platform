@@ -271,8 +271,8 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
         
         # print('==========', response_index)
         tree.set('class', 'wrapper-problem-response')
-        if int(response_index) > 1 :
-            tree.set('style', 'display: none ; margin-top: 0px')
+        # if int(response_index) > 1 :
+        tree.set('style', ' margin-top: 0px')
         
         tree.set('tabindex', '-1')
         tree.set('aria-label', response_label)

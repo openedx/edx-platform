@@ -149,7 +149,7 @@ from openedx.core.djangolib.markup import HTML
 
 <div class="problem-progress" id="${ id }-problem-progress"></div>
 
-<div class="problem">
+<div class="problem" id="${ "-".join(problem['name'].lower().split())}">
   ${ HTML(problem['html']) }
   <div class="action">
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />
@@ -327,8 +327,8 @@ from openedx.core.djangolib.markup import HTML
 </script>
 
 <script > 
-  const problemList = document.querySelectorAll('.wrapper-problem-response');
-const problemElement = document.querySelector('.problem');
+  const problemElement = document.querySelector('#quiz-problem-custom');
+  const problemList = problemElement.querySelectorAll('.wrapper-problem-response');
 const btnSubmit = document.querySelector('.btn-submit-qz')
 const btnNext = document.querySelector('#btn-next')
 const problemBtn = document.querySelector('#problem-buttom')
@@ -343,6 +343,9 @@ if (problemList.length > 1 && btnSubmit && btnNext) {
   
 
   for (var i = 0; i < problemList.length; i++) {
+    if(i > 0){
+      problemList[i].style.display = 'none'
+    }
     const spanElement = document.createElement('span');
     spanElement.textContent = (i + 1).toString();
     spanElement.classList.add('problem-question-number');
@@ -527,6 +530,14 @@ elementsSubmitted.forEach((element)=>{
     });
 
   });
+
+  const numberQuizs = document.querySelectorAll('.container-problem')
+  numberQuizs.forEach ((element, index) =>{
+    if (index != 0){
+      element.remove()
+    }
+  })
+
 
 }
 
