@@ -162,3 +162,7 @@ class CourseRolesPermission(Enum):
         _("Specific Masquerading"),
         _("Can view the course as an Audit, Verified, Beta Tester, Master's track, username/email."),
     )
+
+    @property
+    def code(self):
+        return f'course_roles.{self.value.name}'
