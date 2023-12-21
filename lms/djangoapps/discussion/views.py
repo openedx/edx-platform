@@ -819,7 +819,7 @@ class DiscussionBoardFragmentView(EdxFragmentView):
         # TODO: remove role checks once course_roles is fully impelented and data is migrated
         is_educator_or_staff = (
             is_course_staff(course_key, request.user) or GlobalStaff().has_user(request.user) or
-            request.user.has_perm(CourseRolesPermission.MODERATE_DISCUSSION_MODERATORS.perm_name)
+            request.user.has_perm(CourseRolesPermission.MANAGE_DISCUSSION_MODERATORS.perm_name)
         )
         try:
             base_context = _create_base_discussion_view_context(request, course_key)
