@@ -852,14 +852,17 @@ class TestLibraryContentSelectionInManualMode(LibraryContentTest):
         self.lc_block.manual = True
         self._bind_course_block(self.lc_block)
 
-    def selects_children_from_candidates(self):
+    def test_selects_children_from_candidates(self):
         """
         Test that if "manual" mode is enabled, the user is shown all content from the manually selected content.
         """
 
         # set the candidate pool
         children = self.lc_block.children
-        pool = [(child.block_type, child.location) for child in children[:2]]
+        pool = [(child.block_type, child.block_id) for child in children[:2]]
         self.lc_block.candidates = pool
-        manualy_selected_blocks = self.lc_block.get_child_blocks()
-        assert manualy_selected_blocks == pool
+        manualy_selected_blocks = [
+            (child_block.location.block_type, child_block.location.block_id)
+            for child_block in self.lc_block.get_child_blocks()
+        ]
+        assert set(manualy_selected_blocks) == set(pool)
