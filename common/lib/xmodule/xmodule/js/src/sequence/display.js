@@ -480,8 +480,8 @@
                     $('#navigationModal').attr('data-event-type', 'direct');
                 }
 
-                $('#navigationModal').modal('show');
-                return true;
+              var $modal = $('#navigationModal:not([class*="staff-user"])').modal('show');
+              return $modal.length > 0;
             }
             return false;
         }
