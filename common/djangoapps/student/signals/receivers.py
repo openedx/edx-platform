@@ -25,6 +25,13 @@ from common.djangoapps.student.models_api import confirm_name_change
 from common.djangoapps.student.signals import USER_EMAIL_CHANGED
 from openedx.features.name_affirmation_api.utils import is_name_affirmation_installed
 
+from openedx_events.event_bus import get_producer
+from openedx_events.learning.signals import (
+    COURSE_ENROLLMENT_CREATED,
+    COURSE_ENROLLMENT_CHANGED,
+    COURSE_UNENROLLMENT_COMPLETED
+)
+
 logger = logging.getLogger(__name__)
 
 
@@ -117,3 +124,36 @@ def _listen_for_user_email_changed(sender, user, **kwargs):
             braze_client.track_user(attributes=attributes)
     except Exception as exc:   # pylint: disable=broad-except
         logger.exception(f'Unable to sync new email [{email}] with Braze for user [{user_id}]')
+
+# Put enrollment events on the event bus.
+@receiver(COURSE_ENROLLMENT_CREATED)
+def _listen_for_course_enrollment_created(sender, user, **kwargs):
+    get_producer().send(
+        signal=COURSE_ENROLLMENT_CREATED,
+        topic='enrollments',
+        event_key_field='enrollment.course.course_key',
+        event_data={'enrollment': kwargs['enrollment']},
+        event_metadata=kwargs['metadata'],
+    )
+
+
+@receiver(COURSE_ENROLLMENT_CHANGED)
+def _listen_for_course_enrollment_changed(sender, user, **kwargs):
+    get_producer().send(
+        signal=COURSE_ENROLLMENT_CHANGED,
+        topic='enrollments',
+        event_key_field='enrollment.course.course_key',
+        event_data={'enrollment': kwargs['enrollment']},
+        event_metadata=kwargs['metadata'],
+    )
+
+
+@receiver(COURSE_UNENROLLMENT_COMPLETED)
+def _listen_for_course_unenrollment_completed(sender, user, **kwargs):
+    get_producer().send(
+        signal=COURSE_UNENROLLMENT_COMPLETED,
+        topic='enrollments',
+        event_key_field='enrollment.course.course_key',
+        event_data={'enrollment': kwargs['enrollment']},
+        event_metadata=kwargs['metadata'],
+    )
