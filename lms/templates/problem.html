@@ -144,7 +144,12 @@ from openedx.core.djangolib.markup import HTML
 
 <%namespace name='static' file='static_content.html'/>
 <h3 class="hd hd-3 problem-header" id="${ short_id }-problem-title" aria-describedby="${ id }-problem-progress" tabindex="-1">
-  ${ problem['name'] }
+  
+  % if problem['name'] == 'Quiz Problem Custom' :
+    Quiz 
+  %else :
+    ${ problem['name'] }
+  %endif
 </h3>
 
 <div class="problem-progress" id="${ id }-problem-progress"></div>
@@ -337,12 +342,12 @@ from openedx.core.djangolib.markup import HTML
     var currentIndex = 0;  
   
   
-    if (problemList.length > 1 && btnSubmit && btnNext) {
+    if ( btnSubmit && btnNext) {
       const divContainer = document.createElement('div');
       divContainer.classList.add('container-problem');
       
   
-      for (var i = 0; i < problemList.length; i++) {
+      for (var i = 0; i < problemList.length; i++) {  
         if(i > 0){
           problemList[i].style.display = 'none'
         }
@@ -408,6 +413,10 @@ from openedx.core.djangolib.markup import HTML
       }
   
       problemElement.insertBefore(divContainer, problemElement.firstChild);
+      if ( problemList.length == 1){
+        document.querySelector('.container-problem').style.display= 'none'
+      }
+      
   
       const elementsError = document.querySelectorAll('.err-number-qusetion');
       elementsError.forEach((elementError) => {
