@@ -16,6 +16,7 @@ from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRol
 from lms.djangoapps.courseware.courses import has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.core.lib.teams_config import TeamsetType
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -144,6 +145,9 @@ def has_course_staff_privileges(user, course_key):
         return True
     if CourseInstructorRole(course_key).has_user(user):
         return True
+    # TODO: remove role checks once course_roles is fully impelented and data is migrated
+    if user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name):
+        return True
     return False
 
 
@@ -160,6 +164,7 @@ def has_team_api_access(user, course_key, access_username=None):
     Returns:
       bool: True if the user has access, False otherwise.
     """
+    # TODO: remove role checks once course_roles is fully impelented and data is migrated
     if has_course_staff_privileges(user, course_key):
         return True
     if has_discussion_privileges(user, course_key):
