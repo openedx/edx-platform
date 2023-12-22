@@ -29,6 +29,10 @@
             this.submit_btn_qz = function(){
                 return Problem.prototype.submit_qz.apply(that, arguments);
               };
+            this.hint_button = function () {
+  
+                return Problem.prototype.hint_button.apply(that, arguments);
+              };
             this.enableSubmitButtonAfterTimeout = function() {
                 return Problem.prototype.enableSubmitButtonAfterTimeout.apply(that, arguments);
             };
