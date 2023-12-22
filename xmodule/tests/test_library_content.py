@@ -3,6 +3,8 @@ Basic unit tests for LibraryContentBlock
 
 Higher-level tests are in `cms/djangoapps/contentstore/tests/test_libraries.py`.
 """
+from __future__ import annotations
+
 from unittest.mock import MagicMock, Mock, patch
 
 import ddt
@@ -739,75 +741,103 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         assert event_data['reason'] == 'invalid'
 
 
-class TestLibraryContentSelectionInShuffleMode(LibraryContentTest):
+class TestLibraryContentSelectionInRandomizedMode(LibraryContentTest):
     """
     Test the content filtering and selection features which allow randomized reference.
     """
     def setUp(self):
         super().setUp()
         self._sync_lc_block_from_library()
+        self.lc_block = self.store.get_item(self.lc_block.location)
         self.lc_block.shuffle = True
         self.lc_block.manual = False
-        self.lc_block = self.store.get_item(self.lc_block.location)
         self._bind_course_block(self.lc_block)
 
-    def test_block_added(self):
+    def _select_children(self) -> set[str]:
         """
-        Test that increasing the "max_count" value leads to more selected blocks.
+        Get the set of block ids that are this block's children (for the current learner).
+
+        If a selection has not yet been established, this establishes one.
+
+        We return block id strings rather than usage keys because they are easier to read
+        in the assertion outputs.
         """
-        # Start by assigning two blocks to the student:
-        self.lc_block.get_child_blocks()  # This line is needed in the test environment or the change has no effect
+        return {child.location.block_id for child in self.lc_block.get_child_blocks()}
+
+    def test_additional_blocks(self):
+        """
+        Test that increasing the "max_count" value leads to the original selected blocks, plus more.
+        """
+        # Start with 2
         self.lc_block.max_count = 2
-        initial_blocks_assigned = [block.location for block in self.lc_block.get_child_blocks()]
-        assert len(initial_blocks_assigned) == 2
+        initial_blocks = self._select_children()
+        assert len(initial_blocks) == 2
+
+        # Increase to 3... original 2 should remain.
         self.lc_block.max_count = 3
-        blocks_assigned_with_addition = [block.location for block in self.lc_block.get_child_blocks()]
-        assert len(blocks_assigned_with_addition) == 3
+        more_blocks = self._select_children()
+        assert len(more_blocks) == 3
+        assert initial_blocks < more_blocks
 
-        assert initial_blocks_assigned[0] in blocks_assigned_with_addition
-        assert initial_blocks_assigned[1] in blocks_assigned_with_addition
+        # Increase to entire library... 3 should remain
+        self.lc_block.max_count = -1
+        all_the_blocks = self._select_children()
+        assert len(all_the_blocks) == 4
+        assert more_blocks < all_the_blocks
+        assert all_the_blocks == {child.block_id for child in self.lc_block.children}
 
-    def test_block_removed_invalid(self):
+        # Toss a new block into the library and sync.
+        self.make_block("html", self.library, data="new guy in town")
+        self._sync_lc_block_from_library(upgrade_to_latest=True)
+        assert len(self.lc_block.children) == 5
+
+        # Since max_count=-1, it should be added to the selection.
+        all_the_blocks_plus_another = self._select_children()
+        assert len(all_the_blocks_plus_another) == 5
+        assert all_the_blocks < all_the_blocks_plus_another
+        assert all_the_blocks_plus_another == {child.block_id for child in self.lc_block.children}
+
+    def test_overlimit_blocks_removed(self):
+        """
+        Test that decreasing the "max_count" value leads a reduced version of the original subset.
+        """
+        # Start with max
+        self.lc_block.max_count = -1
+        all_the_blocks = self._select_children()
+        assert len(all_the_blocks) == 4
+        assert all_the_blocks == {child.block_id for child in self.lc_block.children}
+
+        # Then drop it down to 3... should be a subset
+        self.lc_block.max_count = 3
+        some_blocks = self._select_children()
+        assert len(some_blocks) == 3
+        assert some_blocks < all_the_blocks
+
+        # Then drop it down to 2... should be a smaller subset
+        self.lc_block.max_count = 2
+        few_blocks = self._select_children()
+        assert len(few_blocks) == 2
+        assert few_blocks < some_blocks
+
+    def test_invalid_blocks_replaced(self):
         """
         Test that if a block is deleted from the children (removed from the library),
-        the selected blocks are preserved,
-        except for that now invalid block, which is removed and replaced with a new block at random.
+        the selected blocks are preserved, except for that now invalid block, which is
+        removed and replaced with a new block at random.
         """
-
-        # Start by assigning all blocks to the student:
-        self.lc_block.get_child_blocks()  # This line is needed in the test environment or the change has no effect
-        self.lc_block.max_count = 4
-        all_blocks = self.lc_block.get_child_blocks()
-
-        # Then assigning 2 blocks to the student:
-        self.lc_block.get_child_blocks()  # This line is needed in the test environment or the change has no effect
         self.lc_block.max_count = 2
-        initial_blocks_assigned = self.lc_block.get_child_blocks()
+        old_selection = self._select_children()
+        assert len(old_selection) == 2
 
-        # Keep one block, delete one block
-        keep_block_key = initial_blocks_assigned[0].location
-        keep_block_lib_usage_key, keep_block_lib_version = self.store.get_block_original_usage(keep_block_key)
-        assert keep_block_lib_usage_key is not None
-        deleted_block_key = initial_blocks_assigned[1].location
+        keep_block_id, delete_block_id = list(old_selection)
+        self.lc_block.children = [
+            child for child in self.lc_block.children if child.block_id != delete_block_id
+        ]
 
-        self.lc_block.children = [block.location for block in all_blocks if block.location != deleted_block_key]
-        children = self.lc_block.get_child_blocks()
-
-        assert initial_blocks_assigned[0].location in [child.location for child in children]
-        assert initial_blocks_assigned[1].location not in [child.location for child in children]
-
-    def test_block_removed_overlimit(self):
-        """
-        Test that decrasing the "max_count" value leads to that many fewer selected blocks.
-        """
-        # Start by assigning six blocks to the student:
-        self.lc_block.get_child_blocks()  # This line is needed in the test environment or the change has no effect
-        self.lc_block.max_count = 4
-        initial_blocks_assigned = self.lc_block.get_child_blocks()
-        assert len(initial_blocks_assigned) == 4
-        self.lc_block.max_count = 2
-        blocks_assigned_with_addition = self.lc_block.get_child_blocks()
-        assert len(blocks_assigned_with_addition) == 2
+        new_selection = self._select_children()
+        assert len(old_selection) == 2
+        assert keep_block_id in new_selection
+        assert delete_block_id not in new_selection
 
 
 class TestLibraryContentSelectionInManualMode(LibraryContentTest):
