@@ -68,6 +68,7 @@ from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.runtime import UserTagsService, lms_wrappers_aside, lms_applicable_aside_types
 from lms.djangoapps.verify_student.services import XBlockVerificationService
 from openedx.core.djangoapps.bookmarks.api import BookmarksService
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
 from openedx.core.djangoapps.util.user_utils import SystemUser
@@ -572,7 +573,15 @@ def prepare_runtime_for_user(
     block_wrappers.append(partial(course_expiration_wrapper, user))
     block_wrappers.append(partial(offer_banner_wrapper, user))
 
-    user_is_staff = bool(has_access(user, 'staff', course_id))
+    has_permission = (
+        user.has_perm(CourseRolesPermission.VIEW_ALL_CONTENT.perm_name) and
+        user.has_perm(CourseRolesPermission.SPECIFIC_MASQUERADING.perm_name)
+    )
+    # TODO: remove role check once course_roles is fully impelented and data is migrated
+    user_is_staff = (
+        bool(has_access(user, 'staff', course_id)) or
+        has_permission
+    )
 
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
         if user_is_staff or is_masquerading_as_specific_student(user, course_id):
@@ -582,6 +591,9 @@ def prepare_runtime_for_user(
             block_wrappers.append(partial(add_staff_markup, user, disable_staff_debug_info))
 
     store = modulestore()
+    # The user_is_staff, user_is_beta_test, and user_role cannot be removed until
+    # all x-blocks have been updated to use permissions, once they have been updated
+    # remove role check in favor of permissions checks
 
     services = {
         'fs': FSService(),
@@ -596,6 +608,10 @@ def prepare_runtime_for_user(
             # See the docstring of `DjangoXBlockUserService`.
             deprecated_anonymous_user_id=anonymous_id_for_user(user, None),
             request_country_code=user_location,
+            user_has_manage_content=user.has_perm(CourseRolesPermission.MANAGE_CONTENT.perm_name),
+            user_has_manage_grades=user.has_perm(CourseRolesPermission.MANAGE_GRADES.perm_name),
+            user_has_access_data_downloads=user.has_perm(CourseRolesPermission.ACCESS_DATA_DOWNLOADS.perm_name),
+            user_has_view_all_content=user.has_perm(CourseRolesPermission.VIEW_ALL_CONTENT.perm_name)
         ),
         'verification': XBlockVerificationService(),
         'proctoring': ProctoringService(),
