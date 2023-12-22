@@ -25,17 +25,11 @@ jobs:
     needs: [ variables ]
     runs-on: ubuntu-latest
     env:
-      - TS: ${{ needs.variables.outputs.timestamp }}
-      - RELEASE-NAME: ${{ needs.variables.outputs.release-name }}
-      - PROJECT: ${{ needs.variables.outputs.project }}
+      TS: ${{ needs.variables.outputs.timestamp }}
+      RELEASE-NAME: ${{ needs.variables.outputs.release-name }}
+      PROJECT: ${{ needs.variables.outputs.project }}
 
     steps:
-      - name: Print variables
-        run: |
-          echo TS=${{ env.TS }}
-          echo RELEASE=${{ env.RELEASE }}
-          echo PROJECT=${{ env.PROJECT }}
-
       - uses: actions/checkout@v4
 
       - name: Set up Docker Buildx

@@ -1,23 +1,24 @@
-Name: Define Tag Variables
+name: Define Tag Variables
 on:
   workflow_call:
     outputs:
       timestamp:
         description: "The current timestamp"
-        value: ${{ jobs.variables.outputs.TIMESTAMP}}
+        value: ${{ jobs.variables.outputs.TIMESTAMP }}
       release-name:
         description: "Name of the edX release taken from the branch name"
-        value: ${{ jobs.variables.outputs.RELEASE-NAME}}
+        value: ${{ jobs.variables.outputs.RELEASE-NAME }}
       project:
         description: "Code of the EOL project taken from the branch name"
-        value: ${{ jobs.variables.outputs.PROJECT}}
+        value: ${{ jobs.variables.outputs.PROJECT }}
 
 jobs:
   variables:
+    runs-on: ubuntu-latest
     outputs:
-      - TIMESTAMP: ${{ steps.ts.outputs.TS}}
-      - RELEASE-NAME: ${{ steps.release.outputs.result}}
-      - PROJECT: ${{ steps.project.outputs.result}}
+      TIMESTAMP: ${{ steps.ts.outputs.TS }}
+      RELEASE-NAME: ${{ steps.release.outputs.result }}
+      PROJECT: ${{ steps.project.outputs.result }}
     steps:
       - name: Take current date
         id: ts
@@ -29,10 +30,11 @@ jobs:
         with:
           result-encoding: string
           script: |
-            if ( github.ref.match(/^refs\/heads\/(eol|openuchile|vlabx)\/([a-z]+).master$/) ) {
-              return github.ref.replace(/^refs\/heads\/(eol|openuchile|vlabx)\/([a-z]+).master$/,'$2')
-            } else if ( github.event.pull_request.base.ref.match(/^refs\/heads\/(eol|openuchile|vlabx)\/([a-z]+).master$/) ) {
-              return github.event.pull_request.base.ref.replace(/^refs\/heads\/(eol|openuchile|vlabx)\/([a-z]+).master$/,'$2')
+            console.log("github.ref='${{ github.ref }}'");
+            if ( "${{ github.ref }}".match(/^refs\/heads\/(eol|openuchile|vlabx)\/(\w+)\.master$/) ) {
+              return "${{ github.ref }}".replace(/^refs\/heads\/(eol|openuchile|vlabx)\/(\w+)\.master$/,'$2')
+            } else if ( "${{ github.event.pull_request.base.ref }}".match(/^refs\/heads\/(eol|openuchile|vlabx)\/(\w+)\.master$/) ) {
+              return "${{ github.event.pull_request.base.ref }}".replace(/^refs\/heads\/(eol|openuchile|vlabx)\/(\w+)\.master$/,'$2')
             } else throw 'No version'
 
       - name: Obtain release project
@@ -41,9 +43,19 @@ jobs:
         with:
           result-encoding: string
           script: |
-            if ( github.ref.match(/^refs\/heads\/(eol|openuchile|vlabx)\//) ) {
-              return github.ref.replace(/^refs\/heads\/(eol|openuchile|vlabx)\//,'$1')
-            } else if ( github.event.pull_request.base.ref.match(/^refs\/heads\/(eol|openuchile|vlabx)\//) ) {
-              return github.event.pull_request.base.ref.replace(/^refs\/heads\/(eol|openuchile|vlabx)\//,'$1')
-            } else throw 'No project';
+            console.log("github.ref='${{ github.ref }}'");
+            if ( "${{ github.ref }}".match(/^refs\/heads\/(eol|openuchile|vlabx)\//) ) {
+              return "${{ github.ref }}".replace(/^refs\/heads\/(eol|openuchile|vlabx)\/.+$/,'$1')
+            } else if ( "${{ github.event.pull_request.base.ref }}".match(/^refs\/heads\/(eol|openuchile|vlabx)\//) ) {
+              return "${{ github.event.pull_request.base.ref }}".replace(/^refs\/heads\/(eol|openuchile|vlabx)\/.+$/,'$1')
+            } else throw 'No project'
 
+      - name: Print variables
+        run: |
+          echo TS=${{ steps.ts.outputs.TS }}
+          echo RELEASE-NAME=${{ steps.release.outputs.result }}
+          echo PROJECT=${{ steps.project.outputs.result }}
+
+      - name: Fail on empty values
+        if: steps.ts.outputs.TS == '' || steps.release.outputs.result == '' || steps.project.outputs.result == ''
+        run: exit 1
