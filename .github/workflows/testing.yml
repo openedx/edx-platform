@@ -69,7 +69,7 @@ jobs:
             --tag ghcr.io/eol-uchile/edx-platform:testing-${{ env.RELEASE-NAME }}-${{ env.TS }} \
             --tag ghcr.io/eol-uchile/edx-platform:testing-${{ env.RELEASE-NAME }} \
             --cache-from "type=local,src=/tmp/.buildx-cache" \
-            --cache-to "type=local,src=/tmp/.buildx-cache-new" \
+            --cache-to "type=local,dest=/tmp/.buildx-cache-new" \
             --output "type=docker,push=false"
 
       - name: Test edX platform
