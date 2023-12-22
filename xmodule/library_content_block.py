@@ -706,7 +706,7 @@ class LibraryContentBlock(
 
     def _validate_library_version(self, validation, lib_tools, version, library_key):
         """
-        Validates library version
+        Verify the version stored in the block is the latest version of the Library
         """
         latest_version = lib_tools.get_latest_library_version(library_key)
         if latest_version is not None:
@@ -733,6 +733,21 @@ class LibraryContentBlock(
                 )
             )
             return False
+
+        if (version is None or version != str(latest_version)):
+            validation.set_summary(
+                StudioValidationMessage(
+                    StudioValidationMessage.WARNING,
+                    _('This component is out of date. The library has new content.'),
+                    # TODO: change this to action_runtime_event='...' once the unit page supports that feature.
+                    # See https://openedx.atlassian.net/browse/TNL-993
+                    action_class='library-update-btn',
+                    # Translators: {refresh_icon} placeholder is substituted to "↻" (without double quotes)
+                    action_label=_("{refresh_icon} Update now.").format(refresh_icon="↻")
+                )
+            )
+            return False
+
         return True
 
     def _set_validation_error_if_empty(self, validation, summary):

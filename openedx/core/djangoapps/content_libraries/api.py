@@ -106,6 +106,9 @@ from openedx.core.djangoapps.content_libraries.models import (
     ContentLibraryPermission,
     ContentLibraryBlockImportTask,
 )
+from openedx.core.djangoapps.content_libraries.toggles import (
+    MAP_V1_LIBRARIES_TO_V2_LIBRARIES,
+)
 from openedx.core.djangoapps.xblock.api import (
     get_block_display_name,
     get_learning_context_impl,
@@ -135,6 +138,7 @@ from xmodule.library_root_xblock import LibraryRoot as LibraryRootV1
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.mixed import MixedModuleStore
 
 from . import tasks
 
@@ -1149,6 +1153,7 @@ def revert_changes(library_key):
 def get_v1_or_v2_library(
     library_id: str | LibraryLocatorV1 | LibraryLocatorV2,
     version: str | int | None,
+    store: MixedModuleStore | None = None,
 ) -> LibraryRootV1 | ContentLibraryMetadata | None:
     """
     Fetch either a V1 or V2 content library from a V1/V2 key (or key string) and version.
@@ -1180,6 +1185,11 @@ def get_v1_or_v2_library(
             library_key = LibraryLocatorV2.from_string(library_id)
     else:
         library_key = library_id
+
+    # If migration mapping is enabled, map the V1 key to a V2 key.
+    if (not isinstance(library_key, LibraryLocatorV2)) and MAP_V1_LIBRARIES_TO_V2_LIBRARIES.is_enabled():
+        library_key = _map_v1_to_v2_library(library_key)
+
     if isinstance(library_key, LibraryLocatorV2):
         v2_version: int | None
         if version:
@@ -1204,16 +1214,31 @@ def get_v1_or_v2_library(
             v1_version = str(version)
         else:
             v1_version = None
-        store = modulestore()
         library_key = library_key.for_branch(ModuleStoreEnum.BranchName.library).for_version(v1_version)
         try:
+            if store is None:
+                store = modulestore()
             return store.get_library(library_key, remove_version=False, remove_branch=False, head_validation=False)
         except ItemNotFoundError:
             return None
 
 
+def _map_v1_to_v2_library(v1_library_key) -> LibraryLocatorV2:
+    """
+    Helper method to convert a v1 library key into a v2 library key using a strict string mapping.
+    ex: library-v1:edx+Lib1 -> lib:edx:Lib1
+    """
+    if not isinstance(v1_library_key, LibraryLocatorV1):
+        raise ValueError("Input must be an instance of LibraryLocator")
+
+    v2_library_key = LibraryLocatorV2(v1_library_key.org, v1_library_key.library)
+    log.info(f'Mapped V1 Key {v1_library_key} to v2 key {v2_library_key}')
+
+    return v2_library_key
+
+
 # Import from Courseware
-# ======================
+#===================
 
 
 class BaseEdxImportClient(abc.ABC):

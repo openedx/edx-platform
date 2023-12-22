@@ -322,8 +322,13 @@ def _sync_children(
     source_blocks = []
     library_key = dest_block.source_library_key
     filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)
-
     library = library_api.get_v1_or_v2_library(library_key, version=library_version)
+    #update the key to match the library on account of the runtime mapping.
+    if library:
+        if isinstance(library, LibraryRootV1):
+            library_key = library.location.library_key
+        elif isinstance(library, library_api.ContentLibraryMetadata):
+            library_key = library.key
     if not library:
         task.status.fail(f"Requested library {library_key} not found.")
     elif isinstance(library, LibraryRootV1):
