@@ -1080,3 +1080,8 @@ from django.views.i18n import JavaScriptCatalog
 urlpatterns += [
     path('jsi18n/', JavaScriptCatalog.as_view(), name='assignmentxblock-xblock'),
 ]
+
+# chatbot AI
+urlpatterns += [
+    path('api/chatbot/', include('openedx.core.djangoapps.chatbot.urls')),
+]

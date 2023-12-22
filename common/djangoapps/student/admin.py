@@ -321,6 +321,7 @@ class UserProfileInline(admin.StackedInline):
     verbose_name_plural = _('User profile')
 
 
+
 class AccountRecoveryInline(admin.StackedInline):
     """ Inline admin interface for AccountRecovery model. """
     model = AccountRecovery
@@ -353,7 +354,7 @@ class UserAdmin(BaseUserAdmin):
     """ Admin interface for the User model. """
     inlines = (UserProfileInline, AccountRecoveryInline)
     form = UserChangeForm
-
+   
     def get_readonly_fields(self, request, obj=None):
         """
         Allows editing the users while skipping the username check, so we can have Unicode username with no problems.
@@ -590,6 +591,15 @@ admin.site.register(SurveyQuestion)
 admin.site.register(SurveyCourse)
 admin.site.register(SurveyUser)
 
+
+class CustomUserProfileAdmin(admin.ModelAdmin):
+    model = UserProfile
+    list_display = [ 'user', 'name' , 'organization' ]
+    ordering = ['user__email']
+    
+
+
+admin.site.register(UserProfile,CustomUserProfileAdmin)
 
 
 

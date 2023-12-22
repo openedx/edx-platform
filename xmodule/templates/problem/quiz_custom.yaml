@@ -7,8 +7,8 @@ metadata:
       >> Question 1 <<
 
       [x] a correct answer {{ selected:  giai thich 1 }}
-      [ ] an incorrect answer
-      [ ] an incorrect answer 
+      [ ] an incorrect answer {{ selected: incorrect answer. }}
+      [ ] an incorrect answer {{ selected: incorrect answer. }}
       [x] a correct answer {{ selected:  giai thich  2 }}
 
 
@@ -16,8 +16,8 @@ metadata:
       >> Question 2 <<
 
       [x] a correct answer {{ selected:  giai thich 1 }}
-      [ ] an incorrect answer
-      [ ] an incorrect answer 
+      [ ] an incorrect answer {{ selected: incorrect answer. }}
+      [ ] an incorrect answer {{ selected: incorrect answer. }}
       [x] a correct answer {{ selected:  giai thich  2  }}
 
 
@@ -26,18 +26,18 @@ metadata:
       >> Question 3 <<
 
       (x) Yes {{ giai thich  }}
-      ( ) No 
-      ( ) No
-      ( ) No
+      ( ) No {{ incorrect answer }}
+      ( ) No {{  incorrect answer }}
+      ( ) No {{  incorrect answer }}
 
 
 
       >> Question 4 <<
 
       (x) Yes  {{ giai thich   }}
-      ( ) No
-      ( ) No
-      ( ) No
+      ( ) No {{  incorrect answer }}
+      ( ) No {{  incorrect answer }}
+      ( ) No {{  incorrect answer }}
 
 
 

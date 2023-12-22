@@ -5074,7 +5074,7 @@ msgstr ""
 
 #: xmodule/js/src/problem/edit.js
 msgid "Explanation"
-msgstr ""
+msgstr "Explanation"
 
 #: xmodule/js/src/sequence/display.js
 msgid ""

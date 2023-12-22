@@ -136,6 +136,7 @@ def _get_user_by_email_or_username(request, api_version):
 
     email_or_username = request.POST.get('email', None) or request.POST.get('email_or_username', None)
     user = _get_user_by_email(email_or_username)
+    
 
     if not user and is_api_v2:
         # If user not found with email and API_V2, try username lookup
@@ -534,7 +535,7 @@ def login_user(request, api_version='v1'):  # pylint: disable=too-many-statement
     third_party_auth_requested = third_party_auth.is_enabled() and pipeline.running(request)
     first_party_auth_requested = any(bool(request.POST.get(p)) for p in ['email', 'email_or_username', 'password'])
     is_user_third_party_authenticated = False
-
+    
     set_custom_attribute('login_user_course_id', request.POST.get('course_id'))
 
     if is_require_third_party_auth_enabled() and not third_party_auth_requested:
@@ -566,7 +567,8 @@ def login_user(request, api_version='v1'):  # pylint: disable=too-many-statement
                 return JsonResponse(response_content, status=403)
         else:
             user = _get_user_by_email_or_username(request, api_version)
-
+            
+        
         _check_excessive_login_attempts(user)
 
         possibly_authenticated_user = user
@@ -645,6 +647,10 @@ def login_user(request, api_version='v1'):  # pylint: disable=too-many-statement
         mark_user_change_as_expected(user.id)
         return response
     except AuthFailedError as error:
+        if user is None:
+            response_content = error.get_response()
+            response_content['email'] = False
+            return JsonResponse(response_content, status=400)
         response_content = error.get_response()
         log.exception(response_content)
 

@@ -536,6 +536,7 @@ class UserProfile(models.Model):
     VALID_YEARS = list(range(this_year, this_year - 120, -1))
     year_of_birth = models.IntegerField(blank=True, null=True, db_index=True)
     student_code = models.CharField( max_length=255, default='')
+    organization = models.CharField( max_length=255, default='')
     GENDER_CHOICES = (
         ('m', gettext_noop('Male')),
         ('f', gettext_noop('Female')),
@@ -633,6 +634,7 @@ class UserProfile(models.Model):
     profile_image_uploaded_at = models.DateTimeField(null=True, blank=True)
     phone_regex = RegexValidator(regex=r'^\+?1?\d*$', message="Phone number can only contain numbers.")
     phone_number = models.CharField(validators=[phone_regex], blank=True, null=True, max_length=50)
+
 
     @property
     def has_profile_image(self):
@@ -746,6 +748,13 @@ class UserProfile(models.Model):
         profile.student_code = student_code
         profile.save()
         return student_code
+    
+    # organization
+    def add_student_organization(user , organization):
+        profile = UserProfile.objects.filter(user=user).first()
+        profile.organization = organization
+        profile.save()
+        return organization
         
 
     @classmethod
@@ -3717,6 +3726,8 @@ class UserPasswordToggleHistory(TimeStampedModel):
 
     def __str__(self):
         return self.comment
+
+
 
 
 
