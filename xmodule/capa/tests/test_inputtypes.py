@@ -476,136 +476,6 @@ class CodeInputTest(unittest.TestCase):
         assert context == expected
 
 
-class MatlabTest(unittest.TestCase):
-    """
-    Test Matlab input types
-    """
-    def setUp(self):
-        super(MatlabTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
-        self.rows = '10'
-        self.cols = '80'
-        self.tabsize = '4'
-        self.mode = ""
-        self.payload = "payload"
-        self.linenumbers = 'true'
-        self.xml = """<matlabinput id="prob_1_2"
-            rows="{r}" cols="{c}"
-            tabsize="{tabsize}" mode="{m}"
-            linenumbers="{ln}">
-                <plot_payload>
-                    {payload}
-                </plot_payload>
-            </matlabinput>""".format(r=self.rows,
-                                     c=self.cols,
-                                     tabsize=self.tabsize,
-                                     m=self.mode,
-                                     payload=self.payload,
-                                     ln=self.linenumbers)
-        elt = etree.fromstring(self.xml)
-        state = {
-            'value': 'print "good evening"',
-            'status': 'incomplete',
-            'feedback': {'message': '3'},
-            'response_data': {}
-        }
-
-        self.input_class = lookup_tag('matlabinput')
-        self.the_input = self.input_class(test_capa_system(), elt, state)
-
-    def test_rendering(self):
-        context = self.the_input._get_render_context()  # pylint: disable=protected-access
-
-        expected = {
-            'STATIC_URL': '/dummy-static/',
-            'id': 'prob_1_2',
-            'value': 'print "good evening"',
-            'status': inputtypes.Status('queued'),
-            'msg': self.the_input.submitted_msg,
-            'mode': self.mode,
-            'rows': self.rows,
-            'cols': self.cols,
-            'queue_msg': '',
-            'linenumbers': 'true',
-            'hidden': '',
-            'tabsize': int(self.tabsize),
-            'button_enabled': True,
-            'queue_len': '3',
-            'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/octave.js',
-            'response_data': {},
-            'describedby_html': HTML('aria-describedby="status_prob_1_2"')
-        }
-
-        assert context == expected
-
-    def test_rendering_with_state(self):
-        state = {
-            'value': 'print "good evening"',
-            'status': 'incomplete',
-            'input_state': {'queue_msg': 'message'},
-            'feedback': {'message': '3'},
-            'response_data': RESPONSE_DATA
-        }
-        elt = etree.fromstring(self.xml)
-
-        the_input = self.input_class(test_capa_system(), elt, state)
-        context = the_input._get_render_context()  # pylint: disable=protected-access
-        prob_id = 'prob_1_2'
-        expected = {
-            'STATIC_URL': '/dummy-static/',
-            'id': prob_id,
-            'value': 'print "good evening"',
-            'status': inputtypes.Status('queued'),
-            'msg': the_input.submitted_msg,
-            'mode': self.mode,
-            'rows': self.rows,
-            'cols': self.cols,
-            'queue_msg': 'message',
-            'linenumbers': 'true',
-            'hidden': '',
-            'tabsize': int(self.tabsize),
-            'button_enabled': True,
-            'queue_len': '3',
-            'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/octave.js',
-            'response_data': RESPONSE_DATA,
-            'describedby_html': DESCRIBEDBY.format(status_id=prob_id)
-        }
-
-        assert context == expected
-
-    def test_rendering_when_completed(self):
-        for status in ['correct', 'incorrect']:
-            state = {
-                'value': 'print "good evening"',
-                'status': status,
-                'input_state': {},
-                'response_data': RESPONSE_DATA
-            }
-            elt = etree.fromstring(self.xml)
-            prob_id = 'prob_1_2'
-            the_input = self.input_class(test_capa_system(), elt, state)
-            context = the_input._get_render_context()  # pylint: disable=protected-access
-            expected = {
-                'STATIC_URL': '/dummy-static/',
-                'id': prob_id,
-                'value': 'print "good evening"',
-                'status': inputtypes.Status(status),
-                'msg': '',
-                'mode': self.mode,
-                'rows': self.rows,
-                'cols': self.cols,
-                'queue_msg': '',
-                'linenumbers': 'true',
-                'hidden': '',
-                'tabsize': int(self.tabsize),
-                'button_enabled': False,
-                'queue_len': '0',
-                'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/octave.js',
-                'response_data': RESPONSE_DATA,
-                'describedby_html': DESCRIBEDBY.format(status_id=prob_id)
-            }
-
-            assert context == expected
-
     @patch('xmodule.capa.inputtypes.time.time', return_value=10)
     def test_rendering_while_queued(self, time):  # lint-amnesty, pylint: disable=unused-argument
         state = {
@@ -633,7 +503,6 @@ class MatlabTest(unittest.TestCase):
             'tabsize': int(self.tabsize),
             'button_enabled': True,
             'queue_len': '1',
-            'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/octave.js',
             'response_data': RESPONSE_DATA,
             'describedby_html': DESCRIBEDBY.format(status_id=prob_id)
         }
@@ -695,53 +564,6 @@ class MatlabTest(unittest.TestCase):
         assert input_state['queuekey'] == queuekey
         assert input_state['queuestate'] == 'queued'
         assert 'queue_msg' not in input_state
-
-    @patch('xmodule.capa.inputtypes.time.time', return_value=20)
-    def test_matlab_response_timeout_not_exceeded(self, time):  # lint-amnesty, pylint: disable=unused-argument
-
-        state = {'input_state': {'queuestate': 'queued', 'queuetime': 5}}
-        elt = etree.fromstring(self.xml)
-
-        the_input = self.input_class(test_capa_system(), elt, state)
-        assert the_input.status == 'queued'
-
-    @patch('xmodule.capa.inputtypes.time.time', return_value=45)
-    def test_matlab_response_timeout_exceeded(self, time):  # lint-amnesty, pylint: disable=unused-argument
-
-        state = {'input_state': {'queuestate': 'queued', 'queuetime': 5}}
-        elt = etree.fromstring(self.xml)
-
-        the_input = self.input_class(test_capa_system(), elt, state)
-        assert the_input.status == 'unsubmitted'
-        assert the_input.msg == 'No response from Xqueue within {} seconds. Aborted.'.format(XQUEUE_TIMEOUT)
-
-    @patch('xmodule.capa.inputtypes.time.time', return_value=20)
-    def test_matlab_response_migration_of_queuetime(self, time):  # lint-amnesty, pylint: disable=unused-argument
-        """
-        Test if problem was saved before queuetime was introduced.
-        """
-        state = {'input_state': {'queuestate': 'queued'}}
-        elt = etree.fromstring(self.xml)
-
-        the_input = self.input_class(test_capa_system(), elt, state)
-        assert the_input.status == 'unsubmitted'
-
-    def test_matlab_api_key(self):
-        """
-        Test that api_key ends up in the xqueue payload
-        """
-        elt = etree.fromstring(self.xml)
-        system = test_capa_system()
-        system.matlab_api_key = 'test_api_key'
-        the_input = lookup_tag('matlabinput')(system, elt, {})
-
-        data = {'submission': 'x = 1234;'}
-        response = the_input.handle_ajax("plot", data)  # lint-amnesty, pylint: disable=unused-variable
-
-        body = system.xqueue.interface.send_to_queue.call_args[1]['body']
-        payload = json.loads(body)
-        assert 'test_api_key' == payload['token']
-        assert '2' == payload['endpoint_version']
 
     def test_get_html(self):
         # usual output
@@ -888,45 +710,6 @@ class MatlabTest(unittest.TestCase):
         assert context == expected
         self.the_input.capa_system.render_template = DemoSystem().render_template
         self.the_input.get_html()  # Should not raise an exception
-
-    def test_matlab_queue_message_allowed_tags(self):
-        """
-        Test allowed tags.
-        """
-        allowed_tags = ['div', 'p', 'audio', 'pre', 'span']
-        for tag in allowed_tags:
-            queue_msg = "<{0}>Test message</{0}>".format(tag)
-            state = {
-                'input_state': {'queue_msg': queue_msg},
-                'status': 'queued',
-            }
-            elt = etree.fromstring(self.xml)
-            the_input = self.input_class(test_capa_system(), elt, state)
-            assert the_input.queue_msg == queue_msg
-
-    def test_matlab_queue_message_not_allowed_tag(self):
-        """
-        Test not allowed tag.
-        """
-        not_allowed_tag = 'script'
-        queue_msg = "<{0}>Test message</{0}>".format(not_allowed_tag)
-        state = {
-            'input_state': {'queue_msg': queue_msg},
-            'status': 'queued',
-        }
-        elt = etree.fromstring(self.xml)
-        the_input = self.input_class(test_capa_system(), elt, state)
-        expected = "&lt;script&gt;Test message&lt;/script&gt;"
-        assert the_input.queue_msg == expected
-
-    def test_matlab_sanitize_msg(self):
-        """
-        Check that the_input.msg is sanitized.
-        """
-        not_allowed_tag = 'script'
-        self.the_input.msg = "<{0}>Test message</{0}>".format(not_allowed_tag)
-        expected = "&lt;script&gt;Test message&lt;/script&gt;"
-        assert self.the_input._get_render_context()['msg'] == expected  # pylint: disable=protected-access
 
 
 def html_tree_equal(received, expected):
