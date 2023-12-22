@@ -8,6 +8,7 @@ import logging
 import random
 from copy import copy
 from gettext import ngettext, gettext
+from typing import TYPE_CHECKING
 
 import bleach
 from django.conf import settings
@@ -40,6 +41,13 @@ from xmodule.x_module import (
     XModuleToXBlockMixin,
     shim_xmodule_js,
 )
+
+
+if TYPE_CHECKING:
+    # This class is only needed for a type annotation.
+    # To avoid circular import, only import it for type checking.
+    from xmodule.library_tools import LibraryToolsService
+
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
@@ -540,7 +548,7 @@ class LibraryContentBlock(
         """
         return list(self._get_selected_child_blocks())
 
-    def get_tools(self, to_read_library_content: bool = False) -> 'LibraryToolsService':
+    def get_tools(self, to_read_library_content: bool = False) -> LibraryToolsService:
         """
         Grab the library tools service and confirm that it'll work for us. Else, raise LibraryToolsUnavailable.
         """
