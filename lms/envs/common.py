@@ -1762,6 +1762,7 @@ DATABASES = {
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+DEFAULT_HASHING_ALGORITHM = 'sha256'
 
 #################### Python sandbox ############################################
 
