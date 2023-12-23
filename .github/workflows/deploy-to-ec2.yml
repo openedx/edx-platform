@@ -18,3 +18,4 @@ jobs:
           script: |
             tutor images build openedx --no-cache
             echo -e "y\n\n\n\n\n\ny" | tutor local launch
+            docker push 848839979695.dkr.ecr.ap-southeast-1.amazonaws.com/lms:15.3.6
