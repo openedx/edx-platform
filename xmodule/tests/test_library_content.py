@@ -12,6 +12,7 @@ from bson.objectid import ObjectId
 from fs.memoryfs import MemoryFS
 from lxml import etree
 from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
+from opaque_keys.edx.keys import UsageKey
 from rest_framework import status
 from search.search_engine_base import SearchEngine
 from web_fragments.fragment import Fragment
@@ -35,7 +36,7 @@ dummy_render = lambda block, _: Fragment(block.data)  # pylint: disable=invalid-
 
 
 @skip_unless_cms
-class LibraryContentTest(MixedSplitTestCase):
+class LibraryContentTestMixin:
     """
     Base class for tests of LibraryContentBlock (library_content_block.py)
     """
@@ -88,9 +89,17 @@ class LibraryContentTest(MixedSplitTestCase):
 
         block.runtime.get_block_for_descriptor = get_block
 
+    def _select_children(self) -> set[UsageKey]:
+        """
+        Get the set of usage keys representing this block's children (for the current learner).
+
+        If a selection has not yet been established, this establishes one.
+        """
+        return {child.location for child in self.lc_block.get_child_blocks()}
+
 
 @ddt.ddt
-class LibraryContentGeneralTest(LibraryContentTest):
+class LibraryContentGeneralTest(LibraryContentTestMixin, MixedSplitTestCase):
     """
     Test the base functionality of the LibraryContentBlock.
     """
@@ -135,7 +144,7 @@ class LibraryContentGeneralTest(LibraryContentTest):
         assert len(self.lc_block.children) == len(self.lib_blocks)
 
 
-class TestLibraryContentExportImport(LibraryContentTest):
+class TestLibraryContentExportImport(LibraryContentTestMixin, MixedSplitTestCase):
     """
     Export and import tests for LibraryContentBlock
     """
@@ -506,7 +515,7 @@ search_index_mock = Mock(spec=SearchEngine)  # pylint: disable=invalid-name
 
 
 @patch.object(SearchEngine, 'get_search_engine', Mock(return_value=None, autospec=True))
-class TestLibraryContentBlockWithSearchIndex(LibraryContentBlockTestMixin, LibraryContentTest):
+class TestLibraryContentBlockWithSearchIndex(LibraryContentBlockTestMixin, LibraryContentTestMixin, MixedSplitTestCase):
     """
     Tests for library container with mocked search engine response.
     """
@@ -535,7 +544,7 @@ class TestLibraryContentBlockWithSearchIndex(LibraryContentBlockTestMixin, Libra
 )
 @patch('xmodule.html_block.HtmlBlock.author_view', dummy_render, create=True)
 @patch('xmodule.x_module.DescriptorSystem.applicable_aside_types', lambda self, block: [])
-class TestLibraryContentRender(LibraryContentTest):
+class TestLibraryContentRender(LibraryContentTestMixin, MixedSplitTestCase):
     """
     Rendering unit tests for LibraryContentBlock
     """
@@ -562,7 +571,7 @@ class TestLibraryContentRender(LibraryContentTest):
         # but some js initialization should happen
 
 
-class TestLibraryContentAnalytics(LibraryContentTest):
+class TestLibraryContentAnalytics(LibraryContentTestMixin, MixedSplitTestCase):
     """
     Test analytics features of LibraryContentBlock
     """
@@ -741,33 +750,24 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         assert event_data['reason'] == 'invalid'
 
 
-class TestLibraryContentSelectionInRandomizedMode(LibraryContentTest):
+@ddt.ddt
+class TestLibraryContentSelectionInRandomizedMode(LibraryContentTestMixin, MixedSplitTestCase):
     """
-    Test the content filtering and selection features which allow randomized reference.
+    Test the content selection feature for a randomized library content reference.
     """
     def setUp(self):
         super().setUp()
         self._sync_lc_block_from_library()
-        self.lc_block = self.store.get_item(self.lc_block.location)
-        self.lc_block.shuffle = True
-        self.lc_block.manual = False
         self._bind_course_block(self.lc_block)
+        self.manual = False
 
-    def _select_children(self) -> set[str]:
-        """
-        Get the set of block ids that are this block's children (for the current learner).
-
-        If a selection has not yet been established, this establishes one.
-
-        We return block id strings rather than usage keys because they are easier to read
-        in the assertion outputs.
-        """
-        return {child.location.block_id for child in self.lc_block.get_child_blocks()}
-
-    def test_additional_blocks(self):
+    @ddt.data(True, False)
+    def test_additional_blocks(self, shuffle):
         """
         Test that increasing the "max_count" value leads to the original selected blocks, plus more.
         """
+        self.lc_block.shuffle = shuffle
+
         # Start with 2
         self.lc_block.max_count = 2
         initial_blocks = self._select_children()
@@ -784,7 +784,7 @@ class TestLibraryContentSelectionInRandomizedMode(LibraryContentTest):
         all_the_blocks = self._select_children()
         assert len(all_the_blocks) == 4
         assert more_blocks < all_the_blocks
-        assert all_the_blocks == {child.block_id for child in self.lc_block.children}
+        assert all_the_blocks == set(self.lc_block.children)
 
         # Toss a new block into the library and sync.
         self.make_block("html", self.library, data="new guy in town")
@@ -795,17 +795,20 @@ class TestLibraryContentSelectionInRandomizedMode(LibraryContentTest):
         all_the_blocks_plus_another = self._select_children()
         assert len(all_the_blocks_plus_another) == 5
         assert all_the_blocks < all_the_blocks_plus_another
-        assert all_the_blocks_plus_another == {child.block_id for child in self.lc_block.children}
+        assert all_the_blocks_plus_another == set(self.lc_block.children)
 
-    def test_overlimit_blocks_removed(self):
+    @ddt.data(True, False)
+    def test_overlimit_blocks_removed(self, shuffle):
         """
         Test that decreasing the "max_count" value leads a reduced version of the original subset.
         """
+        self.lc_block.shuffle = shuffle
+
         # Start with max
         self.lc_block.max_count = -1
         all_the_blocks = self._select_children()
         assert len(all_the_blocks) == 4
-        assert all_the_blocks == {child.block_id for child in self.lc_block.children}
+        assert all_the_blocks == set(self.lc_block.children)
 
         # Then drop it down to 3... should be a subset
         self.lc_block.max_count = 3
@@ -819,50 +822,47 @@ class TestLibraryContentSelectionInRandomizedMode(LibraryContentTest):
         assert len(few_blocks) == 2
         assert few_blocks < some_blocks
 
-    def test_invalid_blocks_replaced(self):
+    @ddt.data(True, False)
+    def test_invalid_blocks_replaced(self, shuffle):
         """
         Test that if a block is deleted from the children (removed from the library),
         the selected blocks are preserved, except for that now invalid block, which is
         removed and replaced with a new block at random.
         """
+        self.lc_block.shuffle = shuffle
+
         self.lc_block.max_count = 2
         old_selection = self._select_children()
         assert len(old_selection) == 2
 
-        keep_block_id, delete_block_id = list(old_selection)
-        self.lc_block.children = [
-            child for child in self.lc_block.children if child.block_id != delete_block_id
-        ]
+        kept, deleted = list(old_selection)
+        self.lc_block.children.remove(deleted)
 
         new_selection = self._select_children()
         assert len(old_selection) == 2
-        assert keep_block_id in new_selection
-        assert delete_block_id not in new_selection
+        assert kept in new_selection
+        assert deleted not in new_selection
 
 
-class TestLibraryContentSelectionInManualMode(LibraryContentTest):
+@ddt.ddt
+class TestLibraryContentSelectionInManualMode(LibraryContentTestMixin, MixedSplitTestCase):
     """
-    Test the content filtering and selection features which allow specific reference of content.
+    Test the content selection feature for a manual (aka static) and shuffled-manual library content reference.
     """
     def setUp(self):
         super().setUp()
         self._sync_lc_block_from_library()
-        self.lc_block = self.store.get_item(self.lc_block.location)
-        self.lc_block.shuffle = False
-        self.lc_block.manual = True
         self._bind_course_block(self.lc_block)
+        self.lc_block.manual = True
 
-    def test_selects_children_from_candidates(self):
+    @ddt.data(True, False)
+    def test_selects_children_from_candidates(self, shuffle):
         """
         Test that if "manual" mode is enabled, the user is shown all content from the manually selected content.
         """
+        self.lc_block.shuffle = shuffle
+        self.lc_block.max_count = -1
 
-        # set the candidate pool
-        children = self.lc_block.children
-        pool = [(child.block_type, child.block_id) for child in children[:2]]
-        self.lc_block.candidates = pool
-        manualy_selected_blocks = [
-            (child_block.location.block_type, child_block.location.block_id)
-            for child_block in self.lc_block.get_child_blocks()
-        ]
-        assert set(manualy_selected_blocks) == set(pool)
+        candidate_keys = self.lc_block.children[:2]
+        self.lc_block.candidates = [(candidate.block_type, candidate.block_id) for candidate in candidate_keys]
+        assert self._select_children() == set(candidate_keys)
