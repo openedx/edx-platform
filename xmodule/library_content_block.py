@@ -246,25 +246,24 @@ class LibraryContentBlock(
     def _get_valid_children(
         cls,
         library_children: list[UsageKey],
-        candidates: list[UsageKey],
+        candidates: list[tuple[str, str]],
         manual: bool,
     ) -> list[tuple[str, str]]:
         """
-        Dynamically selects (block_type, block_id) tupless which children are possible for selection,
+        Dynamically selects (block_type, block_id) tuples which children are possible for selection,
         in the original order from the candidates list or the library.
         """
-        return list(
-            (child.block_type, child.block_id)
-            for child
-            in (candidates if (candidates and manual) else library_children)
-        )
+        if manual:
+            return candidates
+        else:
+            return [(child.block_type, child.block_id) for child in library_children]
 
     @classmethod
     def make_selection(
         cls,
         old_selected: list[tuple[str, str]],
         library_children: list[UsageKey],
-        candidates: list[UsageKey],
+        candidates: list[tuple[str, str]],
         max_count: int,
         manual: bool,
         shuffle: bool,
@@ -404,9 +403,9 @@ class LibraryContentBlock(
         if max_count < 0:
             max_count = len(self.children)
         block_keys = self.make_selection(
-            old_selected=list(map(tuple, self.selected)),
+            old_selected=[(selected_type, selected_id) for selected_type, selected_id in self.selected],
             library_children=self.children,
-            candidates=[child for child in self.children if [child.block_type, child.block_id] in self.candidates],
+            candidates=[(candidate_type, candidate_id) for candidate_type, candidate_id in self.candidates],
             max_count=self.max_count,
             manual=self.manual,
             shuffle=self.shuffle,

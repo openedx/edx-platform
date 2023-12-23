@@ -105,11 +105,9 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                 # Update selected
                 previous_count = len(selected)
                 block_keys = LibraryContentBlock.make_selection(
-                    old_selected=list(map(tuple, selected)),
-                    library_children=library_children,
-                    candidates=[
-                        child for child in library_children if [child.block_type, child.block_id] in candidates
-                    ],
+                    old_selected=[(selected_type, selected_id) for selected_type, selected_id in selected],
+                    library_children=self.children,
+                    candidates=[(candidate_type, candidate_id) for candidate_type, candidate_id in candidates],
                     max_count=max_count,
                     manual=manual,
                     shuffle=shuffle,
