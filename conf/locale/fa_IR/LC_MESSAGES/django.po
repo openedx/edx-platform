@@ -134,7 +134,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-11-26 20:43+0000\n"
+"POT-Creation-Date: 2023-12-17 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Somaye Joolaee, 2022\n"
 "Language-Team: Persian (Iran) (https://app.transifex.com/open-edx/teams/6205/fa_IR/)\n"
@@ -24239,16 +24239,16 @@ msgid "Select this problem"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy to Clipboard"
-msgstr "کپی به کلیپ بورد"
+msgid "Manage Access"
+msgstr "مدیریت دسترسی"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage tags"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Manage Access"
-msgstr "مدیریت دسترسی"
+msgid "Copy to Clipboard"
+msgstr "کپی به کلیپ بورد"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
