@@ -655,7 +655,7 @@
         var checkedInput = that.$('.field input:checked');
         var indicatorError = $(listQz[currentIndex]).find('.indicator-container');
         return $.postWithPrefix('' + this.url + '/problem_check', that.answers, function (response) {
-          console.log( response);
+          console.log( '========',response);
 
           if (response.success === 'submitted' || response.success === 'incorrect' || response.success === 'correct') {
             var problemQuestionNumbers = that.$('.problem-question-number');
@@ -670,6 +670,8 @@
               var submittedInput = problemParsed.querySelector('input.submitted');
               var incorrectLabel = problemParsed.querySelector('label.choicegroup_correct');
               var wrongLabel = problemParsed.querySelector('label.choicegroup_incorrect');
+              console.log('========= ' ,indicatorError )
+              indicatorError.css('display', 'none')
               $(listQz[currentIndex]).find('.indicator-container').css('display' , 'none');
 
               if (incorrectLabel && submittedInput) {
