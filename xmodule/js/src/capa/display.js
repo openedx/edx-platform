@@ -670,9 +670,9 @@
               var submittedInput = problemParsed.querySelector('input.submitted');
               var incorrectLabel = problemParsed.querySelector('label.choicegroup_correct');
               var wrongLabel = problemParsed.querySelector('label.choicegroup_incorrect');
-              console.log('========= ' ,indicatorError )
+          
               indicatorError.css('display', 'none')
-              $(listQz[currentIndex]).find('.indicator-container').css('display' , 'none');
+    
 
               if (incorrectLabel && submittedInput) {
                 that.$('.btn-submit-qz').css('display', 'none');
@@ -707,6 +707,7 @@
                 if (indocatorName.text() == 'unanswered') {
                   indicatorError.remove();
                   choicegroup.appendChild(indicatorErrorParsed);
+                 
                 }
 
                 problemQuestionNumbers.each(function (index, element) {
@@ -740,6 +741,8 @@
                     });
                   }
                 });
+                
+                $(listQz[currentIndex]).find('.indicator-container').css('display' , 'none');
               }
             }
 
