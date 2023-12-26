@@ -7140,7 +7140,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "It looks like this username is already taken"
-msgstr ""
+msgstr "Tên người dùng này đã được sử dụng."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 #, python-brace-format
