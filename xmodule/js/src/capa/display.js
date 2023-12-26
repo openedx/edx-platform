@@ -659,7 +659,7 @@
   
   
           return $.postWithPrefix('' + this.url + '/problem_check', that.answers, function (response) {
-              console.log(response)
+              console.log('=======', response)
             if (response.success === 'submitted' || response.success === 'incorrect' || response.success === 'correct') {
              
               const problemQuestionNumbers = that.$('.problem-question-number');
@@ -720,11 +720,11 @@
           
                   if (wrongLabel && submittedInput){
   
-                      indicatorError.css('display', 'block')
+                      indicatorError.css('display', 'none')
                       const indocatorName = $(indicatorError).find('.sr')
                       if (indocatorName.text() == 'unanswered'){
                         indicatorError.remove()
-                        choicegroup.appendChild(indicatorErrorParsed)
+                        // choicegroup.appendChild(indicatorErrorParsed)
                       }
                       
      
