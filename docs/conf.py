@@ -299,13 +299,15 @@ def update_settings_module(service='lms'):
         settings_module = f'{service}.envs.devstack'
     os.environ['DJANGO_SETTINGS_MODULE'] = settings_module
 
+
 def find_rst_files(directory):
     rst_files = []
     for root, dirs, files in os.walk(directory):
-      for file in files:
-        if file.endswith('.rst'):
-          rst_files.append(os.path.join(root, file))
+        for file in files:
+            if file.endswith('.rst'):
+                rst_files.append(os.path.join(root, file))
     return rst_files
+
 
 def generate_toc_tree(destination, rst_files):
     toctree = "\n".join(["   " + file for file in rst_files])
@@ -313,8 +315,9 @@ def generate_toc_tree(destination, rst_files):
         custom_docs.write("..\n\tAutomatically Generated toctree\n\tDon't change anything in this file manually.\n\tRefer to the method `on_init` in docs/conf.py.")
         custom_docs.write("\n")
         custom_docs.write(".. toctree::\n")
-        custom_docs.write("   :glob:\n")  
+        custom_docs.write("   :glob:\n") 
         custom_docs.write(toctree)
+
 
 def on_init(app):  # lint-amnesty, pylint: disable=redefined-outer-name, unused-argument
     """
