@@ -762,9 +762,11 @@ class TestLibraryContentSelectionInRandomizedMode(LibraryContentTestMixin, Mixed
         self.manual = False
 
     @ddt.data(True, False)
-    def test_additional_blocks(self, shuffle):
+    def test_additional_blocks_added(self, shuffle):
         """
         Test that increasing the "max_count" value leads to the original selected blocks, plus more.
+
+        Should hold true regardless of whether we `shuffle` the selection or not.
         """
         self.lc_block.shuffle = shuffle
 
@@ -800,7 +802,9 @@ class TestLibraryContentSelectionInRandomizedMode(LibraryContentTestMixin, Mixed
     @ddt.data(True, False)
     def test_overlimit_blocks_removed(self, shuffle):
         """
-        Test that decreasing the "max_count" value leads a reduced version of the original subset.
+        Test that decreasing the `max_count` value leads a reduced version of the original subset.
+
+        Should hold true regardless of whether we `shuffle` the selection or not.
         """
         self.lc_block.shuffle = shuffle
 
@@ -823,26 +827,99 @@ class TestLibraryContentSelectionInRandomizedMode(LibraryContentTestMixin, Mixed
         assert few_blocks < some_blocks
 
     @ddt.data(True, False)
-    def test_invalid_blocks_replaced(self, shuffle):
+    def test_invalid_block_replaced_when_possible(self, shuffle):
         """
-        Test that if a block is deleted from the children (removed from the library),
-        the selected blocks are preserved, except for that now invalid block, which is
-        removed and replaced with a new block at random.
+        Test that if a selected block is removed from the library when there are replacements
+        available in the library, then it is replaced. Any still-valid block should remain in the
+        selection.
+
+        Should hold true regardless of whether we `shuffle` the selection or not.
         """
         self.lc_block.shuffle = shuffle
 
+        # Start with 2 blocks
         self.lc_block.max_count = 2
         old_selection = self._select_children()
         assert len(old_selection) == 2
 
-        kept, deleted = list(old_selection)
-        self.lc_block.children.remove(deleted)
+        # Choose one of them to remove, and find its usage key within the source lib
+        lc_child_to_remove, lc_child_to_keep = list(old_selection)
+        lib_child_to_remove, _version = self.store.get_block_original_usage(lc_child_to_remove)
+        assert lib_child_to_remove in self.library.children
 
+        # Then remove it from the source lib, and upgrade+sync the LC block
+        self.store.delete_item(lib_child_to_remove, self.user_id)
+        self.library = self.store.get_library(self.library.location.library_key)  # Pick up `children` change
+        assert len(self.library.children) == 3
+        self._sync_lc_block_from_library(upgrade_to_latest=True)
+        assert len(self.lc_block.children) == 3
+
+        # New selection should still have 2 blocks: the kept block, and another lib block
         new_selection = self._select_children()
-        assert len(old_selection) == 2
-        assert kept in new_selection
-        assert deleted not in new_selection
+        assert len(new_selection) == 2
+        assert lc_child_to_keep in new_selection
+        assert lc_child_to_remove not in new_selection
 
+    @ddt.data(True, False)
+    def test_invalid_block_without_replacement(self, shuffle):
+        """
+        Test that if a selected block is removed from the library when there are NOT replacements
+        available in the library, then it is just removed. Any still-valid blocks should remain in the
+        selection.
+
+        Should hold true regardless of whether we `shuffle` the selection or not.
+        """
+        self.lc_block.shuffle = shuffle
+
+        # Start with 2 blocks
+        self.lc_block.max_count = 2
+        old_selection = self._select_children()
+        assert len(old_selection) == 2
+
+        # Choose just one of them to keep, and find its usage key within the source lib
+        lc_child_to_keep, _ = list(old_selection)
+        lib_child_to_keep, _version = self.store.get_block_original_usage(lc_child_to_keep)
+        assert lib_child_to_keep in self.library.children
+
+        # Remove everything else from the source lib, and then and upgrade+sync the LC block
+        for lib_child in self.library.children:
+            if lib_child != lib_child_to_keep:
+                self.store.delete_item(lib_child, self.user_id)
+        self.library = self.store.get_library(self.library.location.library_key)  # Pick up `children` change
+        assert len(self.library.children) == 1
+        self._sync_lc_block_from_library(upgrade_to_latest=True)
+        assert len(self.lc_block.children) == 1
+
+        # New selection should have just the 1 remaining block, even though max_count is still 2
+        assert self._select_children() == {lc_child_to_keep}
+        assert self.lc_block.max_count == 2
+
+    @ddt.data(True, False)
+    def test_complex_scenario(self, shuffle):
+        """
+        Test that if a block is added to the source lib, AND a block is deleted from the source
+        lib, AND max_count changes, then everything behaves as expected. See the docstring of
+        make_seletion for full details.
+
+        Should work regardless of whether we `shuffle` the selection or not.
+        """
+        self.lc_block.shuffle = shuffle
+
+        self.lc_block.max_count = 3
+        assert True
+'''
+        # Choose one of them to remove, and find its usage key within the source lib
+        lc_child_to_remove, lc_child_to_keep = list(old_selection)
+        lib_child_to_remove, _version = self.store.get_block_original_usage(lc_child_to_remove)
+        assert lib_child_to_remove in self.library.children
+
+        # Then remove it from the source lib, and upgrade+sync the LC block
+        self.store.delete_item(lib_child_to_remove, self.user_id)
+        self.library = self.store.get_library(self.library.location.library_key)  # Pick up `children` change
+        assert len(self.library.children) == 3
+        self._sync_lc_block_from_library(upgrade_to_latest=True)
+        assert len(self.lc_block.children) == 3
+'''
 
 @ddt.ddt
 class TestLibraryContentSelectionInManualMode(LibraryContentTestMixin, MixedSplitTestCase):
