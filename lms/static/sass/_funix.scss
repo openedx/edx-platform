@@ -29,17 +29,22 @@ body {
     color: var(--color-text-default);
 }
 
-h1, 
-h2, 
-h3, 
-h4, 
-h5, 
-h6, 
-span, 
-strong, 
-i, 
-a, 
-p {
+.xmodule_display.xmodule_HtmlBlock * {
+    font-family: 'Roboto', sans-serif;
+    color: var(--color-text-default);
+}
+
+.xmodule_display.xmodule_HtmlBlock h1, 
+.xmodule_display.xmodule_HtmlBlock h2, 
+.xmodule_display.xmodule_HtmlBlock h3, 
+.xmodule_display.xmodule_HtmlBlock h4, 
+.xmodule_display.xmodule_HtmlBlock h5, 
+.xmodule_display.xmodule_HtmlBlock h6, 
+.xmodule_display.xmodule_HtmlBlock span, 
+.xmodule_display.xmodule_HtmlBlock strong, 
+.xmodule_display.xmodule_HtmlBlock i, 
+.xmodule_display.xmodule_HtmlBlock a, 
+.xmodule_display.xmodule_HtmlBlock p {
     line-height: 1.5;
 }
 
@@ -104,10 +109,11 @@ span,
     line-height: 1.5;
 }
 
-a, 
-p a:not(.btn), 
-p a:visited:not(.btn), 
-.xmodule_display.xmodule_HtmlBlock a {
+.xmodule_display.xmodule_HtmlBlock a:link, 
+.xmodule_display.xmodule_HtmlBlock a:visited, 
+.xmodule_display.xmodule_HtmlBlock a:active, 
+.xmodule_display.xmodule_HtmlBlock a:focus,
+.xmodule_display.xmodule_HtmlBlock a * {
     font-weight: 400;
     color: var(--color-active);
     text-decoration: underline;
@@ -117,10 +123,25 @@ p a:visited:not(.btn),
     cursor: pointer;
 }
 
+// a, 
+// p a:not(.btn), 
+// p a:visited:not(.btn), 
+// .xmodule_display.xmodule_HtmlBlock a {
+//     font-weight: 400;
+//     color: var(--color-active);
+//     text-decoration: underline;
+//     font-size: 1rem;
+//     font-family: 'Roboto', sans-serif;
+//     font: 400 1rem 'Roboto', sans-serif;
+//     cursor: pointer;
+// }
+
 a:hover, 
 a:hover:not(.btn), 
 a:focus:not(.btn),  
-.xmodule_display.xmodule_HtmlBlock a:hover {
+.xmodule_display.xmodule_HtmlBlock a:hover,
+.xmodule_display.xmodule_HtmlBlock a:hover *
+ {
     color: var(--color-hover);
 }
 
