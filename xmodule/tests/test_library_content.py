@@ -897,29 +897,63 @@ class TestLibraryContentSelectionInRandomizedMode(LibraryContentTestMixin, Mixed
     @ddt.data(True, False)
     def test_complex_scenario(self, shuffle):
         """
-        Test that if a block is added to the source lib, AND a block is deleted from the source
-        lib, AND max_count changes, then everything behaves as expected. See the docstring of
-        make_seletion for full details.
+        Test that if blocks are added to the source lib, AND blocks are deleted, AND max_count
+        changes, then everything works out accoring to the rules of make_selection.
 
         Should work regardless of whether we `shuffle` the selection or not.
         """
         self.lc_block.shuffle = shuffle
 
-        self.lc_block.max_count = 3
-        assert True
-'''
-        # Choose one of them to remove, and find its usage key within the source lib
-        lc_child_to_remove, lc_child_to_keep = list(old_selection)
-        lib_child_to_remove, _version = self.store.get_block_original_usage(lc_child_to_remove)
-        assert lib_child_to_remove in self.library.children
+        # Start with a library of 4 and selection of 2.
+        assert len(self.lc_block.children) == 4
+        self.lc_block.max_count = 2
+        old_selection = self._select_children()
+        assert len(old_selection) == 2
 
-        # Then remove it from the source lib, and upgrade+sync the LC block
-        self.store.delete_item(lib_child_to_remove, self.user_id)
-        self.library = self.store.get_library(self.library.location.library_key)  # Pick up `children` change
-        assert len(self.library.children) == 3
+        # Choose just one of them to keep, and one to remove. Find their keys in the source lib.
+        lc_child_to_keep, lc_child_to_remove = list(old_selection)
+        selected_lib_child_to_keep, _version = self.store.get_block_original_usage(lc_child_to_keep)
+        selected_lib_child_to_remove, _version = self.store.get_block_original_usage(lc_child_to_remove)
+        assert selected_lib_child_to_keep in self.library.children
+        assert selected_lib_child_to_remove in self.library.children
+
+        # Now from the *unselected* blocks in the source lib, also choose one to keep, and one to remove.
+        selected_lib_children = {selected_lib_child_to_keep, selected_lib_child_to_remove}
+        unselected_lib_children = set(self.library.children) - selected_lib_children
+        unselected_lib_child_to_keep, unselected_lib_child_to_remove = list(unselected_lib_children)
+
+        # So, of the 4 original library blocks, that's 2 to keep, and 2 to delete.
+        lib_children_to_keep = {selected_lib_child_to_keep, unselected_lib_child_to_keep}  # 2 keep
+        lib_children_to_remove = {selected_lib_child_to_remove, unselected_lib_child_to_remove}  # 2 remove
+
+        # Remove the 2 from the source lib, add 2 new ones, and sync+upgrade the LC block.
+        for lib_child in lib_children_to_remove:
+            self.store.delete_item(lib_child, self.user_id)
+        lib_children_new = {
+            self.make_block("html", self.library, data="new guy 1").location,
+            self.make_block("html", self.library, data="new guy 2").location,
+        }
+        self.library = self.store.get_library(self.library.location.library_key)  # Pick up `children` changes
         self._sync_lc_block_from_library(upgrade_to_latest=True)
-        assert len(self.lc_block.children) == 3
-'''
+
+        # The lib should now have (4 - 2 + 2) == 4 blocks, which we can break down as such:
+        # * 2 which WERE in the original library, including:
+        #     * 1 which was selected originally, and
+        #     * 1 which wasn't selected originally;
+        # * 2 which were NOT in the original library.
+        breakpoint()
+        assert set(self.library.children) > {*lib_children_to_keep, *lib_children_new}
+        assert len(self.lc_block.children) == 4
+
+        # Finally, up the max count to 3 and reselect.
+        self.lc_block.max_count = 3
+        new_selection = self._select_children()
+
+        # After all of that, we expect a selection containing 1 block from the old selection, and 2 new ones.
+        assert len(new_selection) == 3
+        assert len(new_selection & old_selection) == {lc_child_to_keep}
+        assert lc_child_to_remove not in old_selection
+
 
 @ddt.ddt
 class TestLibraryContentSelectionInManualMode(LibraryContentTestMixin, MixedSplitTestCase):
