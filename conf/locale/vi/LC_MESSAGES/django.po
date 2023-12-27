@@ -23939,10 +23939,6 @@ msgid "Submission Passed"
 msgstr "Bài nộp đạt"
 
 #: 
-msgid "Submission Passed"
-msgstr "Bài nộp đạt"
-
-#: 
 msgid "Unable To Review"
 msgstr "Bài nộp không thể chấm"
 

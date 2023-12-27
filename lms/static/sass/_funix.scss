@@ -16,19 +16,16 @@
     --background-selected: #f1f2f3;
 }
 
-
 html, 
 body {
     font-size: 16px;
+}
+
+html, button, input, select, textarea, form#wiki_revision .CodeMirror {
     font-family: 'Roboto', sans-serif;
 }
 
-
-* {
-    font-family: 'Roboto', sans-serif;
-    color: var(--color-text-default);
-}
-
+*,
 .xmodule_display.xmodule_HtmlBlock * {
     font-family: 'Roboto', sans-serif;
     color: var(--color-text-default);
@@ -40,7 +37,6 @@ body {
 .xmodule_display.xmodule_HtmlBlock h4, 
 .xmodule_display.xmodule_HtmlBlock h5, 
 .xmodule_display.xmodule_HtmlBlock h6, 
-.xmodule_display.xmodule_HtmlBlock span, 
 .xmodule_display.xmodule_HtmlBlock strong, 
 .xmodule_display.xmodule_HtmlBlock i, 
 .xmodule_display.xmodule_HtmlBlock a, 
@@ -109,26 +105,27 @@ p,
 
 span, 
 .xmodule_display.xmodule_HtmlBlock span {
-    font-size: 1rem;
-    font-weight: 400;
-    font-family: 'Roboto', sans-serif;
-    color: var(--color-text-default);
-    font: 400 1rem 'Roboto', sans-serif;
+    font-size: inherit;
+    font-weight: inherit;
+    font-family: inherit;
+    color: inherit;
+    font: inherit;
     margin-bottom: 0;
-    line-height: 1.5;
+    line-height: inherit;
 }
 
+a,
 .xmodule_display.xmodule_HtmlBlock a:link, 
 .xmodule_display.xmodule_HtmlBlock a:visited, 
 .xmodule_display.xmodule_HtmlBlock a:active, 
 .xmodule_display.xmodule_HtmlBlock a:focus,
 .xmodule_display.xmodule_HtmlBlock a * {
-    font-weight: 400;
+    font-weight: inherit;
     color: var(--color-active);
     text-decoration: underline;
-    font-size: 1rem;
-    font-family: 'Roboto', sans-serif;
-    font: 400 1rem 'Roboto', sans-serif;
+    font-size: inherit;
+    font-family: inherit;
+    font: inherit;
     cursor: pointer;
 }
 
