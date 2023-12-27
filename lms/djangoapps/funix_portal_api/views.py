@@ -213,11 +213,11 @@ class CreateUserAPIView(APIView):
                 new_user.is_active = True
                 new_user.save()
 
-                student_code = ""
-                try:
-                    student_code = profile.student_code
-                except Exception as e:
-                    logging.error(str(e))
+                student_code = profile.student_code
+                if not student_code:
+                    student_code = email.split('@')[0]
+                    profile.student_code = student_code
+                    profile.save()
 
                 _append_results(True, 
                     {

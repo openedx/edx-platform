@@ -647,10 +647,6 @@ def login_user(request, api_version='v1'):  # pylint: disable=too-many-statement
         mark_user_change_as_expected(user.id)
         return response
     except AuthFailedError as error:
-        if user is None:
-            response_content = error.get_response()
-            response_content['email'] = False
-            return JsonResponse(response_content, status=400)
         response_content = error.get_response()
         log.exception(response_content)
 

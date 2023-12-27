@@ -413,17 +413,24 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
         # Establish the outer style
         if correct:
             style = QUESTION_HINT_CORRECT_STYLE
+            return HTML('<div class="{st} messages-box"><div class="explanation-title"></div>{hintswrap}</div>').format(
+                st=style,
+                lwrp=label_wrap,
+                hintswrap=hints_wrap
+            )
+            
         else:
             style = QUESTION_HINT_INCORRECT_STYLE
+             # Ready to go
+            return HTML('<div class="{st} messages-box error-problem-answer "><div class="explanation-title"></div>{hintswrap}</div>').format(
+                st=style,
+                lwrp=label_wrap,
+                hintswrap=hints_wrap
+            )
             
 
     
-        # Ready to go
-        return HTML('<div class="{st} messages-box"><div class="explanation-title"></div>{hintswrap}</div>').format(
-            st=style,
-            lwrp=label_wrap,
-            hintswrap=hints_wrap
-        )
+       
 
     def get_extended_hints(self, student_answers, new_cmap):
         """
