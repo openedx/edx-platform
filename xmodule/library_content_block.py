@@ -403,9 +403,9 @@ class LibraryContentBlock(
         if max_count < 0:
             max_count = len(self.children)
         block_keys = self.make_selection(
-            old_selected=[(selected_type, selected_id) for selected_type, selected_id in self.selected],
+            old_selected=list(map(tuple, self.selected)),  # Convert from nested list to list-of-tuples.
             library_children=self.children,
-            candidates=[(candidate_type, candidate_id) for candidate_type, candidate_id in self.candidates],
+            candidates=list(map(tuple, self.candidates)),  # Convert from nested list to list-of-tuples.
             max_count=self.max_count,
             manual=self.manual,
             shuffle=self.shuffle,
