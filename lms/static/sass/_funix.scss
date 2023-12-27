@@ -59,7 +59,6 @@ h1,
     font: 500 2rem 'Roboto Serif', sans-serif;
     margin-bottom: 2rem;
     line-height: 1.5;
-
 }
 
 h2, 
@@ -97,7 +96,17 @@ h4,
 }
 
 p, 
-.xmodule_display.xmodule_HtmlBlock p, 
+.xmodule_display.xmodule_HtmlBlock p
+{
+    font-size: 1rem;
+    font-weight: 400;
+    font-family: 'Roboto', sans-serif;
+    color: var(--color-text-default);
+    font: 400 1rem 'Roboto', sans-serif;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
 span, 
 .xmodule_display.xmodule_HtmlBlock span {
     font-size: 1rem;
@@ -105,7 +114,7 @@ span,
     font-family: 'Roboto', sans-serif;
     color: var(--color-text-default);
     font: 400 1rem 'Roboto', sans-serif;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
     line-height: 1.5;
 }
 
