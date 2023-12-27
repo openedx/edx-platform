@@ -1,14 +1,14 @@
 // HTML component display:
 * {
-  line-height: 1.5;
+  line-height: 1.4em;
 }
 
 h1 {
   color: $body-color;
   font: normal 2em/1.4em $font-family-sans-serif;
   letter-spacing: 1px;
+
   @include margin(0, 0, 1.416em, 0);
-  background: red;
 }
 
 h2 {

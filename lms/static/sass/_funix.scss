@@ -1,0 +1,168 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Serif:opsz,wght@8..144,500&family=Roboto:wght@400;500&display=swap');
+
+:root {
+    --color-active: #007ae6;
+    --color-hover: #025dae;
+    --background-color-hover: #eef7ff;
+    --color-white: #ffffff;
+    --background-content: #fafbfb;
+    --color-stroke: #d7d7d7;
+    --color-disable: #c5c5c5;
+    --color-text-inactive: #7b7b7b;
+    --color-text-default: #2c3744;
+    --color-notification-critical: #d82c0d;
+    --color-warning: #ffb934;
+    --color-success: #5aa447;
+    --background-selected: #f1f2f3;
+}
+
+
+html, 
+body {
+    font-size: 16px;
+    font-family: 'Roboto', sans-serif;
+}
+
+
+* {
+    font-family: 'Roboto', sans-serif;
+    color: var(--color-text-default);
+}
+
+h1, 
+h2, 
+h3, 
+h4, 
+h5, 
+h6, 
+span, 
+strong, 
+i, 
+a, 
+p {
+    line-height: 1.5;
+}
+
+h1, 
+.course-wrapper .course-content h1, 
+.course-wrapper .courseware-results-wrapper h1, 
+.xmodule_display.xmodule_HtmlBlock h1  {
+    font-size: 2rem;
+    font-weight: 500;
+    font-family: 'Roboto Serif', sans-serif;
+    color: var(--color-text-default);
+    font: 500 2rem 'Roboto Serif', sans-serif;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+
+}
+
+h2, 
+.xmodule_display.xmodule_HtmlBlock h2, 
+.xblock .xblock h2, 
+.hd-2, 
+.xblock .xblock h2 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    font-family: 'Roboto', sans-serif;
+    color: var(--color-text-default);
+    font: 500 1.5rem 'Roboto', sans-serif;
+    margin: 0 0 .5rem 0;
+    line-height: 1.5;
+}
+
+h3, 
+.xmodule_display.xmodule_HtmlBlock h3 {
+    font-size: 1.25rem;
+    font-weight: 500;
+    font-family: 'Roboto', sans-serif;
+    color: var(--color-text-default);
+    font: 500 1.25rem 'Roboto', sans-serif;
+    line-height: 1.5;
+}
+
+h4, 
+.xmodule_display.xmodule_HtmlBlock h4 {
+    font-size: 1.125rem;
+    font-weight: 500;
+    font-family: 'Roboto', sans-serif;
+    color: var(--color-text-default);
+    font: 500 1.125rem 'Roboto', sans-serif;
+    line-height: 1.5;
+}
+
+p, 
+.xmodule_display.xmodule_HtmlBlock p, 
+span, 
+.xmodule_display.xmodule_HtmlBlock span {
+    font-size: 1rem;
+    font-weight: 400;
+    font-family: 'Roboto', sans-serif;
+    color: var(--color-text-default);
+    font: 400 1rem 'Roboto', sans-serif;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+a, 
+p a:not(.btn), 
+p a:visited:not(.btn), 
+.xmodule_display.xmodule_HtmlBlock a {
+    font-weight: 400;
+    color: var(--color-active);
+    text-decoration: underline;
+    font-size: 1rem;
+    font-family: 'Roboto', sans-serif;
+    font: 400 1rem 'Roboto', sans-serif;
+    cursor: pointer;
+}
+
+a:hover, 
+a:hover:not(.btn), 
+a:focus:not(.btn),  
+.xmodule_display.xmodule_HtmlBlock a:hover {
+    color: var(--color-hover);
+}
+
+
+ul, 
+.course-wrapper .course-content .vert-mod > div ul, 
+.course-wrapper .courseware-results-wrapper .vert-mod > div ul, 
+.xmodule_display.xmodule_HtmlBlock ul {
+    padding: 0 0 0 32px;
+    margin-bottom: 1rem;
+    margin-top: 0;
+    list-style-type: disc;
+}
+
+ul ul,
+ul, .course-wrapper .course-content .vert-mod > div ul ul, 
+.course-wrapper .courseware-results-wrapper .vert-mod > div ul ul,
+.xmodule_display.xmodule_HtmlBlock ul ul
+{
+    list-style-type: circle;
+    margin-bottom: 0;
+}
+
+.course-wrapper .course-content ul li, 
+.course-wrapper .courseware-results-wrapper ul li {
+    margin-bottom: 0.375rem;
+}
+
+.course-wrapper .course-content ul li:last-child, 
+.course-wrapper .courseware-results-wrapper ul li:last-child  {
+    margin-bottom: 0;
+}
+
+
+.xmodule_display.xmodule_HtmlBlock p + p, 
+.xmodule_display.xmodule_HtmlBlock ul + p, 
+.xmodule_display.xmodule_HtmlBlock ol + p {
+    margin-top: 0;
+}
+
+.xmodule_display.xmodule_HtmlBlock p + h2, 
+.xmodule_display.xmodule_HtmlBlock ul + h2, 
+.xmodule_display.xmodule_HtmlBlock ol + h2 {
+    margin-top: 1rem;
+}
