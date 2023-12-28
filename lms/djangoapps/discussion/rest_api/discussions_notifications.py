@@ -1,6 +1,8 @@
 """
 Discussion notifications sender util.
 """
+import logging
+
 from django.conf import settings
 from lms.djangoapps.discussion.django_comment_client.permissions import get_team
 from openedx_events.learning.data import UserNotificationData, CourseNotificationData
@@ -18,6 +20,9 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_MODERATOR,
     CourseDiscussionSettings,
 )
+
+
+log = logging.getLogger(__name__)
 
 
 class DiscussionNotificationSender:
@@ -257,6 +262,8 @@ class DiscussionNotificationSender:
             'username': self.creator.username,
             'post_title': self.thread.title
         }
+
+        log.info(f"Temp: Audience filter for course-wide notification is {audience_filters}")
         self._send_course_wide_notification(notification_type, audience_filters, context)
 
 
