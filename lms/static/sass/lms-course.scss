@@ -3,83 +3,85 @@
 @import 'build-course'; // shared app style assets/rendering
 @import 'funix';
 
-
 .dates-banner {
-    .upgrade-button {
-        button {
-            display: block;
-            border-radius: 2px;
-            border: solid 1px #0175b4;
-            background: white;
-            color: #2d323e;
-            font-size: 14px;
-            font-weight: bold;
-            line-height: 24px;
-            padding: 7px 18px;
+  .upgrade-button {
+    button {
+      display: block;
+      border-radius: 2px;
+      border: solid 1px #0175b4;
+      background: white;
+      color: #2d323e;
+      font-size: 14px;
+      font-weight: bold;
+      line-height: 24px;
+      padding: 7px 18px;
 
-            &:hover,
-            &:focus,
-            &:active {
-              cursor: pointer;
-              box-shadow: 0 2px 1px $shadow;
-            }
-        }
+      &:hover,
+      &:focus,
+      &:active {
+        cursor: pointer;
+        box-shadow: 0 2px 1px $shadow;
+      }
     }
+  }
 }
 
-  
-  .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup label,.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup label {
-  
-    border: none ;
-  
-  }
-  
-  .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover+label{
-  border : none ;
+
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup label,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup label {
+
+  border: none;
+
+}
+
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover+label {
+  border: none;
   background-color: rgba(0, 134, 255, 0.08);
-  }
-  
-  
-  .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input+label.choicegroup_correct{
+}
+
+
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input+label.choicegroup_correct {
   border: none;
   background-color: rgba(90, 164, 71, 0.08) !important;
-  color :  #5aa447
-  }
-  
-  .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input[type="radio"],.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input[type="checkbox"] {
-    left: 0.9em;
-    position: absolute;
-    top: 0.6em;
-    width: 18px;
-    height: 17px;
-    z-index: 1;
-    accent-color: #0086ff;
-  }
-  
-  .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input+label.choicegroup_correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover+label.choicegroup_correct{
+  color: #5aa447
+}
+
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input[type="radio"],
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input[type="checkbox"] {
+  left: 0.9em;
+  position: absolute;
+  top: 0.6em;
+  width: 18px;
+  height: 17px;
+  z-index: 1;
+  accent-color: #0086ff;
+}
+
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input+label.choicegroup_correct,
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover+label.choicegroup_correct {
   border: none
-  }
-  
-  .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:checked+label{
-  border : none ;
-  
-  }
-  
-  
-  .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input+label.choicegroup_incorrect{
+}
+
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:checked+label {
+  border: none;
+
+}
+
+
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input+label.choicegroup_incorrect {
   background-color: rgba(0, 134, 255, 0.08);
-  }
-  
-  .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:checked+label {
-    background-color: rgba(0, 134, 255, 0.08);
-  }
-  
-  .wrapper-problem-response legend {
-  
-    padding-top : 10px;
-  }
-  
-  .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup legend {
-    margin-bottom : 0 !important;
-    padding-top: 14px ;
-  }
+}
+
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:checked+label {
+  background-color: rgba(0, 134, 255, 0.08);
+}
+
+.wrapper-problem-response legend {
+
+  padding-top: 10px;
+}
+
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup legend {
+  margin-bottom: 0 !important;
+  padding-top: 14px;
+}

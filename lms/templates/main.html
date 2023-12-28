@@ -239,6 +239,57 @@ from common.djangoapps.pipeline_mako import render_require_js_path_overrides
   <script type="text/javascript" src="${js}"></script>
   % endfor
   % endif
+
+  <script>
+$(function() {
+  const summaries = Array.from(document.querySelectorAll('summary'));
+
+  summaries.forEach(summary => {
+
+    summary.onmouseenter = () => {
+      if (summary.parentElement.style.maxHeight === 'none' || !summary.parentElement.style.maxHeight ) {
+        summary.parentElement.style.maxHeight = summary.parentElement.scrollHeight + 'px'
+      }
+    }
+
+
+    summary.onclick = () => {
+      const details = summary.parentElement;
+      const closeHeight = summary.scrollHeight;
+      let willOpen = !details.open;
+
+      let openHeight;
+
+      if (willOpen) {
+        details.open = true;
+        openHeight = details.scrollHeight;
+        details.open = false;
+      } else {
+        openHeight = details.scrollHeight;
+      }
+
+      details.style.height = openHeight + 'px'
+      const offsetHeight = willOpen ? openHeight - closeHeight : closeHeight - openHeight;
+
+      if (willOpen) {
+        details.style.maxHeight = closeHeight + 'px'
+        details.style.maxHeight = openHeight + 'px'
+      } else {
+        details.style.maxHeight = closeHeight + 'px'
+      }
+
+      const msgData = {
+        resize: {
+          iframeHeight: $('#content').prop('scrollHeight') + offsetHeight,
+          transition: ".2s"
+        },
+        type: 'unit.resize' 
+      }
+      window.parent.postMessage(msgData, "*");
+    }
+  })
+})
+  </script>
 </body>
 </html>
 
