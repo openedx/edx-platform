@@ -26,11 +26,28 @@ export function CourseOrLibraryListing(props) {
     const items = props.items;
     const can_archive = props.can_archive;
 
+    const sendTracking = () => {
+        const url = props.tracking_api_url;
+        const requestData = { event_data: { has_viewed_course: "true" } };
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestData),
+        });
+    };
+
     return (
         <div>
             <ul className="list-courses">
                 {items.map((item, i) => (
-                    <li key={i} className="course-item" data-course-key={item.course_key}>
+                    <li
+                        key={i}
+                        className="course-item"
+                        data-course-key={item.course_key}
+                        onClick={props.default_course_id === item.course_key ? sendTracking : undefined}
+                    >
                         <a className={linkClass} href={item.url}>
                             <h3 className="course-title" id={`title-${idBase}-${i}`}>
                                 {item.display_name}

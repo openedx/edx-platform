@@ -82,6 +82,7 @@ from common.djangoapps.util.organizations_helpers import (
 )
 from common.djangoapps.util.string_utils import _has_non_ascii_characters
 from common.djangoapps.xblock_django.api import deprecated_xblocks
+from edly_panel_app.api.v1.constants import DESTINATION_COURSE_ID_PATTERN
 from xmodule.contentstore.content import StaticContent
 from xmodule.course_module import DEFAULT_START_DATE, CourseFields
 from xmodule.error_module import ErrorDescriptor
@@ -624,7 +625,12 @@ def course_listing(request):
     active_courses, archived_courses = _process_courses_list(courses_iter, in_process_course_actions, split_archived)
     in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
 
+    site_config = configuration_helpers.get_current_site_configuration()
+    tracking_api_url = f"{site_config.get_value('PANEL_NOTIFICATIONS_BASE_URL')}/api/v1/tracking_events/"
+
     return render_to_response(u'index.html', {
+        u'default_course_id': DESTINATION_COURSE_ID_PATTERN.format(org[0]),
+        u'tracking_api_url': tracking_api_url,
         u'courses': active_courses,
         u'archived_courses': archived_courses,
         u'in_process_course_actions': in_process_course_actions,

@@ -124,15 +124,15 @@ from openedx.core.djangolib.js_utils import (
             <input type="hidden" value="${allow_unicode_course_id}" class="allow-unicode-course-id" />
             <input
               type="submit"
-              value="${_('Create')}" 
+              value="${_('Create')}"
               class="action action-primary new-course-save"
               onclick="mixpanel.track('create_course',
-                    {
-                        'service': 'studio',
-                        'screen_name': 'studio_home',
-                        'organization': '${platform_name}',
-                    }
-                );"
+                  {
+                    'service': 'studio',
+                    'screen_name': 'studio_home',
+                    'organization': '${platform_name}',
+                  }
+              ); sendTracking({'has_created_course':'true'});"
             />
             <input type="button" value="${_('Cancel')}" class="action action-secondary action-cancel new-course-cancel" />
           </div>
@@ -354,6 +354,8 @@ from openedx.core.djangolib.js_utils import (
             'idBase': 'course',
             'allowReruns': allow_course_reruns and rerun_creator_status and course_creator_status=='granted',
             'can_archive': user.is_staff or course_creator_status=='granted',
+            'default_course_id': default_course_id,
+            'tracking_api_url': tracking_api_url,
           }
         )}
       </div>
@@ -607,4 +609,19 @@ from openedx.core.djangolib.js_utils import (
 
   %endif
 </div>
+
+<script>
+    function sendTracking(data) {
+        const url = "${tracking_api_url}";
+        requestData = { event_data: data }
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData)
+        })
+    }
+</script>
+
 </%block>
