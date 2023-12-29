@@ -302,6 +302,16 @@ def _import_xml_node_to_parent(
     # and VAL will thus make the transcript available.
 
     child_nodes = []
+
+    if issubclass(xblock_class, XmlMixin):
+        # Hack: XBlocks that use "XmlMixin" have their own XML parsing behavior, and in particular if they encounter
+        # an XML node that has no children and has only a "url_name" attribute, they'll try to load the XML data
+        # from an XML file in runtime.resources_fs. But that file doesn't exist here. So we set at least one
+        # additional attribute here to make sure that url_name is not the only attribute; otherwise in some cases,
+        # XmlMixin.parse_xml will try to load an XML file that doesn't exist, giving an error. The name and value
+        # of this attribute don't matter and should be ignored.
+        node.attrib["x-is-pointer-node"] = "no"
+
     if not xblock_class.has_children:
         # No children to worry about. The XML may contain child nodes, but they're not XBlocks.
         temp_xblock = xblock_class.parse_xml(node, runtime, keys, id_generator)
@@ -314,14 +324,6 @@ def _import_xml_node_to_parent(
         # serialization of a child block, in order. For blocks that don't support children, their XML content/nodes
         # could be anything (e.g. HTML, capa)
         node_without_children = etree.Element(node.tag, **node.attrib)
-        if issubclass(xblock_class, XmlMixin):
-            # Hack: XBlocks that use "XmlMixin" have their own XML parsing behavior, and in particular if they encounter
-            # an XML node that has no children and has only a "url_name" attribute, they'll try to load the XML data
-            # from an XML file in runtime.resources_fs. But that file doesn't exist here. So we set at least one
-            # additional attribute here to make sure that url_name is not the only attribute; otherwise in some cases,
-            # XmlMixin.parse_xml will try to load an XML file that doesn't exist, giving an error. The name and value
-            # of this attribute don't matter and should be ignored.
-            node_without_children.attrib["x-is-pointer-node"] = "no"
         temp_xblock = xblock_class.parse_xml(node_without_children, runtime, keys, id_generator)
         child_nodes = list(node)
     if xblock_class.has_children and temp_xblock.children:

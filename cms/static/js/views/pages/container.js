@@ -69,6 +69,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                 model: this.model
             });
             this.messageView.render();
+            this.clipboardBroadcastChannel = new BroadcastChannel("studio_clipboard_channel");
             // Display access message on units and split test components
             if (!this.isLibraryPage) {
                 this.containerAccessView = new ContainerSubviews.ContainerAccess({
@@ -81,7 +82,8 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     el: this.$('#publish-unit'),
                     model: this.model,
                     // When "Discard Changes" is clicked, the whole page must be re-rendered.
-                    renderPage: this.render
+                    renderPage: this.render,
+                    clipboardBroadcastChannel: this.clipboardBroadcastChannel,
                 });
                 this.xblockPublisher.render();
 
@@ -105,7 +107,6 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             }
 
             this.listenTo(Backbone, 'move:onXBlockMoved', this.onXBlockMoved);
-            this.clipboardBroadcastChannel = new BroadcastChannel("studio_clipboard_channel");
         },
 
         getViewParameters: function() {
@@ -158,6 +159,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     if (!self.isLibraryPage && !self.isLibraryContentPage) {
                         self.initializePasteButton();
                     }
+
                 },
                 block_added: options && options.block_added
             });

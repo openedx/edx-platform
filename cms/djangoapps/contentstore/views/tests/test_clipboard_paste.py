@@ -3,6 +3,7 @@ Test the import_staged_content_from_user_clipboard() method, which is used to
 allow users to paste XBlocks that were copied using the staged_content/clipboard
 APIs.
 """
+import ddt
 from opaque_keys.edx.keys import UsageKey
 from rest_framework.test import APIClient
 from xmodule.modulestore.django import contentstore
@@ -13,6 +14,7 @@ CLIPBOARD_ENDPOINT = "/api/content-staging/v1/clipboard/"
 XBLOCK_ENDPOINT = "/xblock/"
 
 
+@ddt.ddt
 class ClipboardPasteTestCase(ModuleStoreTestCase):
     """
     Test Clipboard Paste functionality
@@ -98,6 +100,41 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
         assert dest_poll.question == orig_poll.question
         # The new block should store a reference to where it was copied from
         assert dest_unit.copied_from_block == str(unit_key)
+
+    @ddt.data(
+        # A problem with absolutely no fields set. A previous version of copy-paste had an error when pasting this.
+        {"category": "problem", "display_name": None, "data": ""},
+    )
+    def test_copy_and_paste_component(self, block_args):
+        """
+        Test copying a component (XBlock) from one course into another
+        """
+        source_course = CourseFactory.create(display_name='Destination Course')
+        source_block = BlockFactory.create(parent_location=source_course.location, **block_args)
+
+        dest_course = CourseFactory.create(display_name='Destination Course')
+        with self.store.bulk_operations(dest_course.id):
+            dest_chapter = BlockFactory.create(parent=dest_course, category='chapter', display_name='Section')
+            dest_sequential = BlockFactory.create(parent=dest_chapter, category='sequential', display_name='Subsection')
+
+        # Copy the block
+        client = APIClient()
+        client.login(username=self.user.username, password=self.user_password)
+        copy_response = client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(source_block.location)}, format="json")
+        assert copy_response.status_code == 200
+
+        # Paste the unit
+        paste_response = client.post(XBLOCK_ENDPOINT, {
+            "parent_locator": str(dest_sequential.location),
+            "staged_content": "clipboard",
+        }, format="json")
+        assert paste_response.status_code == 200
+        dest_block_key = UsageKey.from_string(paste_response.json()["locator"])
+
+        dest_block = self.store.get_item(dest_block_key)
+        assert dest_block.display_name == source_block.display_name
+        # The new block should store a reference to where it was copied from
+        assert dest_block.copied_from_block == str(source_block.location)
 
     def test_paste_with_assets(self):
         """

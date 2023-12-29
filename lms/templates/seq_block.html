@@ -85,22 +85,17 @@
         % endfor
         % endif
         % if exclude_units:
-        <li role="presentation">
-          <button class="seq_new_button inactive xnav-item tab"
-            role="tab"
-            tabindex="-1"
-            aria-selected="false"
-            aria-expanded="false"
-            aria-controls="seq_content"
-            data-parent="${item_id}"
-            data-category="vertical"
-            data-default-name="${_('Unit')}"
-          >
-          <span
-                class="fa fa-plus"
-                aria-hidden="true"
-          ></span> New Unit
-        </button>
+        <li role="presentation" class="custom-dropdown">
+          <button id="new-unit-button" class="dropdown-main-button" data-parent="${item_id}" data-category="vertical" data-default-name="${_('Unit')}">
+            <span class="icon fa fa-plus" aria-hidden="true"></span>
+            ${_("New Unit")}
+          </button>
+          <button class="dropdown-toggle-button" aria-haspopup="true" aria-expanded="false" style="display: none;">
+            <span class="icon fa fa-caret-down" aria-hidden="true"></span>
+          </button>
+          <ul class="dropdown-options" style="display: none;">
+            <li><a href="#" class="seq_paste_unit" data-parent="${item_id}" data-category="vertical" data-default-name="${_('Unit')}">${_("Paste as new unit")}</a></li>
+          </ul>
         </li>
         % endif
       </ol>
