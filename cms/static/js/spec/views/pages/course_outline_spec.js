@@ -131,7 +131,7 @@ describe('CourseOutlinePage', function() {
             group_access: {},
             user_partition_info: {},
             hide_from_toc: false,
-            enable_hide_from_toc_ui: true
+            enable_hide_from_toc_ui: true,
         }, options, {child_info: {children: children}});
     };
 

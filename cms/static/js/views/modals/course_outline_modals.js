@@ -1192,7 +1192,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 AbstractVisibilityEditor.prototype.getContext.call(this),
                 {
                     hide_after_due: this.modelVisibility() === 'hide_after_due',
-                    self_paced: course.get('self_paced') === true
+                    self_paced: course.get('self_paced') === true,
+                    enable_hide_from_toc_ui: this.model.get('enable_hide_from_toc_ui'),
                 }
             );
         }

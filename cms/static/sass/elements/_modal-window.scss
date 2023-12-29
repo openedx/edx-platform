@@ -202,6 +202,33 @@
         min-height: 95px;
       }
 
+      .enable-hide-from-toc-container {
+        background: #E5F1F8;
+        padding: 20px 32px;
+        margin: 16px 0px;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+
+        .icon-message {
+          color: white;
+          background: #0075B4;
+          padding: 8px;
+          border-radius: 50%;
+          transform: rotate(90deg);
+          font-size: 16px;
+          height: 18px;
+          width: 20px;
+        }
+
+        .text-message {
+          padding: 0px 10px;
+          word-wrap: break-word;
+          font-weight: 500;
+        }
+      }
+
       .list-fields,
       .list-actions {
         display: inline-block;
