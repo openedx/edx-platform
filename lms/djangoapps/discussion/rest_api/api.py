@@ -68,6 +68,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
 from openedx.core.djangoapps.django_comment_common.signals import (
     comment_created,
     comment_deleted,
+    comment_endorsed,
     comment_edited,
     comment_flagged,
     comment_voted,
@@ -75,7 +76,9 @@ from openedx.core.djangoapps.django_comment_common.signals import (
     thread_deleted,
     thread_edited,
     thread_flagged,
-    thread_voted
+    thread_followed,
+    thread_voted,
+    thread_unfollowed
 )
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
@@ -1352,6 +1355,8 @@ def _handle_following_field(form_value, user, cc_content, request):
         user.follow(cc_content)
     else:
         user.unfollow(cc_content)
+    signal = thread_followed if form_value else thread_unfollowed
+    signal.send(sender=None, user=user, post=cc_content)
     track_thread_followed_event(request, course, cc_content, form_value)
 
 
@@ -1414,6 +1419,15 @@ def _handle_pinned_field(pin_thread: bool, cc_content: Thread, user: User):
         cc_content.pin(user, cc_content.id)
     else:
         cc_content.un_pin(user, cc_content.id)
+
+
+def _handle_comment_signals(update_data, comment, user, sender=None):
+    """
+    Send signals depending upon the the patch (update_data)
+    """
+    for key, value in update_data.items():
+        if key == "endorsed" and value is True:
+            comment_endorsed.send(sender=sender, user=user, post=comment)
 
 
 def create_thread(request, thread_data):
@@ -1597,6 +1611,7 @@ def update_comment(request, comment_id, update_data):
         comment_edited.send(sender=None, user=request.user, post=cc_comment)
     api_comment = serializer.data
     _do_extra_actions(api_comment, cc_comment, list(update_data.keys()), actions_form, context, request)
+    _handle_comment_signals(update_data, cc_comment, request.user)
     return api_comment
 
 
