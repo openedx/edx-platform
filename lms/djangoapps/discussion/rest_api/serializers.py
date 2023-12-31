@@ -406,7 +406,7 @@ class ThreadSerializer(_ContentSerializer):
         Returns a cleaned and truncated version of the thread's body to display in a
         preview capacity.
         """
-        return Truncator(strip_tags(self.get_rendered_body(obj))).chars(35, ).replace('\n', ' ')
+        return Truncator(strip_tags(self.get_rendered_body(obj))).chars(135, ).replace('\n', ' ')
 
     def get_close_reason(self, obj):
         """

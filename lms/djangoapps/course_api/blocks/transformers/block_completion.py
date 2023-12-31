@@ -63,9 +63,14 @@ class BlockCompletionTransformer(BlockStructureTransformer):
         arr = [block_structure.get_xblock_field(child_key, self.COMPLETE_TIME, None) for child_key in child_blocks]
 
         if len(arr) == 0:
-            return None;
+            return None
+        
+        filtered_arr = [el for el in arr if el is not None]
 
-        return max([el for el in arr if el is not None])
+        if len(filtered_arr) == 0:
+            return None
+
+        return max(filtered_arr)
 
     def _get_complete_time_leaf_block(self, block_key, usage_info):
         complete_block = BlockCompletion.objects.get(

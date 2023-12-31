@@ -404,7 +404,7 @@
                     that.bind();
                     that.queueing(focusCallback);
                     that.renderProgressState();
-                    return typeof focusCallback === 'function' ? focusCallback() : void 0;
+                    // return typeof focusCallback === 'function' ? focusCallback() : void 0;
                 });
             } else {
                 return $.postWithPrefix('' + this.url + '/problem_get', function(response) {
