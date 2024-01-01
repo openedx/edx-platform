@@ -3139,26 +3139,6 @@ msgstr ""
 msgid "Go to dashboard"
 msgstr "Gehe zur 'Meine Kurse' Übersicht"
 
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid "Recommendations for you"
-msgstr "Empfehlungen für Sie"
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid "loading"
-msgstr "Wird geladen"
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid ""
-"Browse recently launched courses and see what's new in your favorite "
-"subjects."
-msgstr ""
-"Stöbern Sie in den kürzlich hinzugefügten Kursen und erfahren Sie, was es in"
-" Ihren Lieblingsthemen Neues gibt."
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid "Explore courses"
-msgstr "Kursübersicht"
-
 #: lms/static/js/learner_dashboard/Static2UCallouts.jsx
 msgid "More opportunities for you"
 msgstr "Mehr Möglichkeiten für Sie"
