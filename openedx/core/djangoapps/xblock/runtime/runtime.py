@@ -54,7 +54,7 @@ def make_track_function():
 
 
 def is_staff_progress_tracking_disabled(user):
-    user_is_staff = user.is_staff
+    user_is_staff = user.gen_user.is_teacher
     return user_is_staff and TEACHER_PROGRESS_TACKING_DISABLED_SWITCH.is_enabled()
 
 

@@ -225,7 +225,8 @@ class CoursewareIndex(View):
 
             if self.chapter and self.section:
                 self._redirect_if_not_requested_section()
-                if (not request.user.is_staff) or (not TEACHER_PROGRESS_TACKING_DISABLED_SWITCH.is_enabled()):
+                if (not request.user.gen_user.is_teacher) or (
+                not TEACHER_PROGRESS_TACKING_DISABLED_SWITCH.is_enabled()):
                     self._save_positions()
                 self._prefetch_and_bind_section()
                 self._redirect_to_learning_mfe()

@@ -89,7 +89,7 @@ def get_lesson_lms_url(user, course_key, usage_key):
             break
 
     if not url_to_block or (
-        user.is_staff and TEACHER_PROGRESS_TACKING_DISABLED_SWITCH.is_enabled()
+        user.gen_user.is_teacher and TEACHER_PROGRESS_TACKING_DISABLED_SWITCH.is_enabled()
     ):
         url_to_block = reverse(
             'jump_to',
