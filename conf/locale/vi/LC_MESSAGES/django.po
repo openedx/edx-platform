@@ -23970,3 +23970,5 @@ msgstr "Bạn sắp nộp câu trả lời cho bài tập này. Sau khi gửi b�
 msgid "The answer of the document is not correct"
 msgstr "Đáp án của bản chưa chính xác"
 
+msgid "Post violates honour code or academic integrity"
+mmsgstr "Bài đăng vi phạm quy tắc "
