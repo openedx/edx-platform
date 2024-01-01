@@ -5192,12 +5192,12 @@ DISCUSSION_MODERATION_EDIT_REASON_CODES = {
 # Provide a list of reason codes for moderators to close posts, as a mapping
 # from the internal reason code representation, to  an internationalizable label
 #  to be shown to moderators in the form UI.
-DISCUSSION_MODERATION_CLOSE_REASON_CODES = {
-    "academic-integrity": _("Post violates honour code or academic integrity"),
-    "read-only": _("Post should be read-only"),
-    "duplicate": _("Post is a duplicate"),
-    "off-topic": _("Post is off-topic"),
-}
+# DISCUSSION_MODERATION_CLOSE_REASON_CODES = {
+#     "academic-integrity": _("Post violates honour code or academic integrity"),
+#     "read-only": _("Post should be read-only"),
+#     "duplicate": _("Post is a duplicate"),
+#     "off-topic": _("Post is off-topic"),
+# }
 
 ################# Settings for edx-financial-assistance #################
 IS_ELIGIBLE_FOR_FINANCIAL_ASSISTANCE_URL = '/core/api/course_eligibility/'
