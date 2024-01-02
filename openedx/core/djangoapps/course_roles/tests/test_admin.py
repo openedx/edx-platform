@@ -2,22 +2,40 @@
 Tests of the course_roles.admin module
 """
 
+import ddt
+
 from django.urls import reverse
 
 from common.djangoapps.student.tests.factories import UserFactory
+from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangoapps.course_roles.toggles import USE_PERMISSION_CHECKS_FLAG
 from openedx.core.djangoapps.course_roles.models import Role
 from organizations.models import Organization
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
+@ddt.ddt
+@override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=True)
 class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
     """
     Test the django admin course roles form saving data in db.
     """
+
+    ADMIN_URLS = (
+        ('get', reverse('admin:course_roles_userrole_add')),
+        ('get', reverse('admin:course_roles_userrole_changelist')),
+        ('get', reverse('admin:course_roles_userrole_change', args=(1,))),
+        ('get', reverse('admin:course_roles_userrole_delete', args=(1,))),
+        ('post', reverse('admin:course_roles_userrole_add')),
+        ('post', reverse('admin:course_roles_userrole_changelist')),
+        ('post', reverse('admin:course_roles_userrole_change', args=(1,))),
+        ('post', reverse('admin:course_roles_userrole_delete', args=(1,))),
+    )
+
     def setUp(self):
         super().setUp()
-        self.user = UserFactory(username="test_user_1", password="test", is_staff=True, is_superuser=True)
+        self.user = UserFactory(username="test_user_1", password="Password1234", is_staff=True, is_superuser=True)
         self.user.save()
         self.org = Organization.objects.create(
             name='test_org_for_course_roles',
@@ -31,6 +49,7 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
             active=True,
             short_name='fake_test_org_for_course_roles'
         )
+        self.client.login(username=self.user, password='Password1234')
 
     def test_course_level_role_creation(self):
         data = {
@@ -39,8 +58,6 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
             'org': str(self.org.id),
             'email': self.user.email
         }
-
-        self.client.login(username=self.user, password='test')
 
         # adding new role from django admin page
         response = self.client.post(reverse('admin:course_roles_userrole_add'), data=data)
@@ -64,8 +81,6 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
             'email': self.user.email,
         }
 
-        self.client.login(username=self.user, password='test')
-
         # adding new role from django admin page
         response = self.client.post(reverse('admin:course_roles_userrole_add'), data=data)
         self.assertRedirects(response, reverse('admin:course_roles_userrole_changelist'))
@@ -83,8 +98,6 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
 
         }
 
-        self.client.login(username=self.user, password='test')
-
         # adding new role from django admin page
         response = self.client.post(reverse('admin:course_roles_userrole_add'), data=data)
         self.assertRedirects(response, reverse('admin:course_roles_userrole_changelist'))
@@ -100,8 +113,6 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
             'email': self.user.email,
             'course': str(self.course.id)
         }
-
-        self.client.login(username=self.user, password='test')
 
         # adding new role from django admin page
         response = self.client.post(reverse('admin:course_roles_userrole_add'), data=data)
@@ -122,8 +133,6 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
             'org': 'edxx',
             'email': email
         }
-
-        self.client.login(username=self.user, password='test')
 
         # Adding new role with invalid data
         response = self.client.post(reverse('admin:course_roles_userrole_add'), data=data)
@@ -154,8 +163,6 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
             'email': self.user.email
         }
 
-        self.client.login(username=self.user, password='test')
-
         # adding new role from django admin page
         response = self.client.post(reverse('admin:course_roles_userrole_add'), data=data)
 
@@ -179,8 +186,6 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
             'email': self.user.email
         }
 
-        self.client.login(username=self.user, password='test')
-
         # adding new role from django admin page
         response = self.client.post(reverse('admin:course_roles_userrole_add'), data=data)
 
@@ -195,3 +200,22 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
             '',
             True
         )
+
+    @ddt.data(*ADMIN_URLS)
+    @ddt.unpack
+    @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=False)
+    def test_view_disabled_if_waffle_flag_false(self, method, url):
+        """
+        All CourseRoles views are disabled if waffle flag is set to false.
+        """
+        response = getattr(self.client, method)(url)
+        assert response.status_code == 403
+
+    @ddt.data(*ADMIN_URLS)
+    @ddt.unpack
+    def test_view_enabled_if_waffle_flag_true(self, method, url):
+        """
+        Ensure CourseRolesAdmin views can be enabled with the waffle switch.
+        """
+        response = getattr(self.client, method)(url)
+        assert response.status_code in [200, 302]
