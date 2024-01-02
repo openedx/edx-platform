@@ -1628,7 +1628,6 @@
     "group configuration": "konfiguracja grupy",
     "image omitted": "pomini\u0119ty obrazek",
     "last activity": "ostatnia aktywno\u015b\u0107",
-    "loading": "\u0142adowanie",
     "minute": "minuta",
     "minutes": "minut/y",
     "name": "nazwa",
