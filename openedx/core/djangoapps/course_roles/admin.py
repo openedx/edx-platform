@@ -9,7 +9,7 @@ from .models import UserRole
 from organizations.models import Organization
 
 
-User = get_user_model()  # pylint:disable=invalid-name
+User = get_user_model()
 
 
 class UserRoleForm(forms.ModelForm):
