@@ -318,7 +318,7 @@ EVENT_BUS_TOPIC_PREFIX = 'dev'
 EVENT_BUS_CONSUMER = 'edx_event_bus_redis.RedisEventConsumer'
 EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC = 'course-authoring-xblock-lifecycle'
 EVENT_BUS_ENROLLMENT_LIFECYCLE_TOPIC = 'course-authoring-enrollment-lifecycle'
-
+ENABLE_RAPID_RESPONSE_AUTHOR_VIEW= True or False
 ################# New settings must go ABOVE this line #################
 ########################################################################
 # See if the developer has any local overrides.
