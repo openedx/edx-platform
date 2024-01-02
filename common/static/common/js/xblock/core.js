@@ -60,7 +60,7 @@
         if (runtime) {
             block = (function() {
                 var initFn = window[$element.data('init')];
-
+                
                 // This create a new constructor that can then apply() the block_args
                 // to the initFn.
                 function Block() {
