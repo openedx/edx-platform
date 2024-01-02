@@ -106,23 +106,24 @@ class LibraryContentTestMixin:
         self.store.delete_item(to_remove, self.user_id)
         self.library = self.store.get_library(self.library.location.library_key)  # Updates the '.children' field.
 
-    def _lc_block_selection(self) -> set[tuple[str, str]]:
+    def _lc_block_selection(self) -> list[tuple[str, str]]:
         """
-        Get the set of (block type, block ID) pairs representing this block's selected children for the current learner.
+        Get the (type, ID) pairs representing the LC block's selected children for the current learner
+        (in the order the would be displayed to the learner).
 
         If a selection has not yet been established, this establishes one.
         """
-        return {(child.location.block_type, child.location.block_id) for child in self.lc_block.get_child_blocks()}
+        return [(child.location.block_type, child.location.block_id) for child in self.lc_block.get_child_blocks()]
 
-    def _lc_block_children(self) -> set[tuple[str, str]]:
+    def _lc_block_children(self) -> list[tuple[str, str]]:
         """
-        Get the set of (block type, block ID) pairs representing all of this block's children.
+        Get the (type, ID) pairs representing the LC block's children (in the order they were copied from lib).
         """
-        return {(child.block_type, child.block_id) for child in self.lc_block.children}
+        return [(child.block_type, child.block_id) for child in self.lc_block.children]
 
     def _get_key_in_library(self, lc_child: tuple[str, str]) -> UsageKey:
         """
-        Given a (block type, block ID) pair for a child of the LC block, find its upstream usage key in the source lib.
+        Given a (type, ID) pair for a child of the LC block, find its upstream usage key in the source lib.
         """
         block_type, block_id = lc_child
         lc_child_usage_key = self.course.id.make_usage_key(block_type, block_id)
@@ -806,21 +807,21 @@ class TestLibraryContentSelectionInRandomizedMode(LibraryContentTestMixin, Mixed
 
         # Start with 2
         self.lc_block.max_count = 2
-        initial_blocks = self._lc_block_selection()
+        initial_blocks = set(self._lc_block_selection())
         assert len(initial_blocks) == 2
 
         # Increase to 3... original 2 should remain.
         self.lc_block.max_count = 3
-        more_blocks = self._lc_block_selection()
+        more_blocks = set(self._lc_block_selection())
         assert len(more_blocks) == 3
         assert initial_blocks < more_blocks
 
         # Increase to entire library... 3 should remain
         self.lc_block.max_count = -1
-        all_the_blocks = self._lc_block_selection()
+        all_the_blocks = set(self._lc_block_selection())
         assert len(all_the_blocks) == 4
         assert more_blocks < all_the_blocks
-        assert all_the_blocks == self._lc_block_children()
+        assert all_the_blocks == set(self._lc_block_children())
 
         # Toss a new block into the library and sync.
         self._create_html_block_in_library()
@@ -828,10 +829,10 @@ class TestLibraryContentSelectionInRandomizedMode(LibraryContentTestMixin, Mixed
         assert len(self.lc_block.children) == 5
 
         # Since max_count=-1, it should be added to the selection.
-        all_the_blocks_plus_another = self._lc_block_selection()
+        all_the_blocks_plus_another = set(self._lc_block_selection())
         assert len(all_the_blocks_plus_another) == 5
         assert all_the_blocks < all_the_blocks_plus_another
-        assert all_the_blocks_plus_another == self._lc_block_children()
+        assert all_the_blocks_plus_another == set(self._lc_block_children())
 
     @ddt.data(True, False)
     def test_overlimit_blocks_removed(self, shuffle):
@@ -844,19 +845,19 @@ class TestLibraryContentSelectionInRandomizedMode(LibraryContentTestMixin, Mixed
 
         # Start with max
         self.lc_block.max_count = -1
-        all_the_blocks = self._lc_block_selection()
+        all_the_blocks = set(self._lc_block_selection())
         assert len(all_the_blocks) == 4
-        assert all_the_blocks == self._lc_block_children()
+        assert all_the_blocks == set(self._lc_block_children())
 
         # Then drop it down to 3... should be a subset
         self.lc_block.max_count = 3
-        some_blocks = self._lc_block_selection()
+        some_blocks = set(self._lc_block_selection())
         assert len(some_blocks) == 3
         assert some_blocks < all_the_blocks
 
         # Then drop it down to 2... should be a smaller subset
         self.lc_block.max_count = 2
-        few_blocks = self._lc_block_selection()
+        few_blocks = set(self._lc_block_selection())
         assert len(few_blocks) == 2
         assert few_blocks < some_blocks
 
@@ -877,13 +878,11 @@ class TestLibraryContentSelectionInRandomizedMode(LibraryContentTestMixin, Mixed
         assert len(old_selection) == 2
 
         # Choose one of them to remove, and find its usage key within the source lib
-        lc_child_to_remove, lc_child_to_keep = list(old_selection)
-        lib_child_to_remove = self._get_key_in_library(lc_child_to_remove)
-        assert lib_child_to_remove in self.library.children
+        lc_child_to_remove, lc_child_to_keep = old_selection
+        lib_block_to_remove: UsageKey = self._get_key_in_library(lc_child_to_remove)
 
         # Then remove it from the source lib, and upgrade+sync the LC block
-        self._remove_block_from_library(lib_child_to_remove)
-        self.library = self.store.get_library(self.library.location.library_key)  # Pick up `children` change
+        self._remove_block_from_library(lib_block_to_remove)
         assert len(self.library.children) == 3
         self._sync_lc_block_from_library(upgrade_to_latest=True)
         assert len(self.lc_block.children) == 3
@@ -911,20 +910,19 @@ class TestLibraryContentSelectionInRandomizedMode(LibraryContentTestMixin, Mixed
         assert len(old_selection) == 2
 
         # Choose just one of them to keep, and find its usage key within the source lib
-        lc_child_to_keep, _ = list(old_selection)
-        lib_child_to_keep = self._get_key_in_library(lc_child_to_keep)
+        lc_child_to_keep, _will_be_removed = old_selection
+        lib_block_to_keep: UsageKey = self._get_key_in_library(lc_child_to_keep)
 
         # Remove everything else from the source lib, and then and upgrade+sync the LC block
-        for lib_child in self.library.children:
-            if lib_child != lib_child_to_keep:
-                self._remove_block_from_library(lib_child)
-        self.library = self.store.get_library(self.library.location.library_key)  # Pick up `children` change
+        for lib_block in self.library.children:
+            if lib_block != lib_block_to_keep:
+                self._remove_block_from_library(lib_block)
         assert len(self.library.children) == 1
         self._sync_lc_block_from_library(upgrade_to_latest=True)
         assert len(self.lc_block.children) == 1
 
         # New selection should have just the 1 remaining block, even though max_count is still 2
-        assert self._lc_block_selection() == {lc_child_to_keep}
+        assert self._lc_block_selection() == [lc_child_to_keep]
         assert self.lc_block.max_count == 2
 
     @ddt.data(True, False)
@@ -944,17 +942,19 @@ class TestLibraryContentSelectionInRandomizedMode(LibraryContentTestMixin, Mixed
         assert len(old_selection) == 2
 
         # Choose just one of them to keep, and one to remove. Find their keys in the source lib.
-        lc_child_to_keep, lc_child_to_remove = list(old_selection)
-        selected_lib_child_to_keep = self._get_key_in_library(lc_child_to_keep)
-        selected_lib_child_to_remove = self._get_key_in_library(lc_child_to_remove)
+        lc_child_to_keep, lc_child_to_remove = old_selection
+        selected_lib_block_to_keep = self._get_key_in_library(lc_child_to_keep)
+        selected_lib_block_to_remove = self._get_key_in_library(lc_child_to_remove)
 
         # Now from the *unselected* blocks in the source lib, also choose one to keep, and one to remove.
-        unselected_lib_children = set(self.library.children) - {selected_lib_child_to_keep, selected_lib_child_to_remove}
-        unselected_lib_child_to_keep, unselected_lib_child_to_remove = list(unselected_lib_children)
+        unselected_lib_block_to_keep, unselected_lib_block_to_remove = [
+            lib_block for lib_block in self.library.children
+            if lib_block not in {selected_lib_block_to_keep, selected_lib_block_to_remove}
+        ]
 
         # So, of the 4 original library blocks, that's 2 to keep, and 2 to remove.
-        lib_children_to_keep = {selected_lib_child_to_keep, unselected_lib_child_to_keep}  # 2 to keep
-        lib_children_to_remove = {selected_lib_child_to_remove, unselected_lib_child_to_remove}  # 2 to remove
+        lib_blocks_to_keep = {selected_lib_block_to_keep, unselected_lib_block_to_keep}  # 2 to keep
+        lib_blocks_to_remove = {selected_lib_block_to_remove, unselected_lib_block_to_remove}  # 2 to remove
 
         # Remove the 2 from the source lib, add 2 new ones.
         # The resulting lib should have (4 - 2 + 2) == 4 blocks, which we can break down as such:
@@ -962,10 +962,10 @@ class TestLibraryContentSelectionInRandomizedMode(LibraryContentTestMixin, Mixed
         #     * 1 which was selected originally, and
         #     * 1 which wasn't selected originally;
         # * 2 which were NOT in the original library.
-        for lib_child in lib_children_to_remove:
-            self._remove_block_from_library(lib_child)
-        lib_children_new = {self._create_html_block_in_library(), self._create_html_block_in_library()}
-        assert set(self.library.children) == {*lib_children_to_keep, *lib_children_new}
+        for lib_block in lib_blocks_to_remove:
+            self._remove_block_from_library(lib_block)
+        lib_blocks_new = {self._create_html_block_in_library(), self._create_html_block_in_library()}
+        assert set(self.library.children) == {*lib_blocks_to_keep, *lib_blocks_new}
 
         # Sync & upgrade
         self._sync_lc_block_from_library(upgrade_to_latest=True)
@@ -979,7 +979,7 @@ class TestLibraryContentSelectionInRandomizedMode(LibraryContentTestMixin, Mixed
         assert len(new_selection) == 3
         assert lc_child_to_keep in new_selection
         assert lc_child_to_remove not in new_selection
-        assert new_selection & old_selection == {lc_child_to_keep}
+        assert set(new_selection) & set(old_selection) == {lc_child_to_keep}
 
 
 @ddt.ddt
@@ -1003,4 +1003,8 @@ class TestLibraryContentSelectionInManualMode(LibraryContentTestMixin, MixedSpli
 
         candidate_keys = self.lc_block.children[:2]
         self.lc_block.candidates = [(candidate.block_type, candidate.block_id) for candidate in candidate_keys]
-        assert self._lc_block_selection() == set(self.lc_block.candidates)
+        if shuffle:
+            # Use set comparison if shuffling is enabled, because order will not match.
+            assert set(self._lc_block_selection()) == set(self.lc_block.candidates)
+        else:
+            assert self._lc_block_selection() == self.lc_block.candidates
