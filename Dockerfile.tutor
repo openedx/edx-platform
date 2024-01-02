@@ -17,23 +17,25 @@ RUN pip install -r ./requirements/edx/base.txt  \
 
 # Sync with `edx-configs` `appsembler/tahoe/us/juniper/prod/files/server-vars.yml`
 RUN echo "Installing pip packages:" \
-    && pip install openedx-scorm-xblock==10.4.0 \
-    && pip install xblock-launchcontainer==2.3.1 \
+    && pip install xblock-launchcontainer==4.0.0 \
     && pip install xblock-prismjs==0.1.4 \
     && pip install xblock-problem-builder==4.1.9 \
     && echo \
+    && pip install https://github.com/appsembler/openedx-scorm-xblock/archive/refs/tags/v15.1.0-appsembler-tahoe-compat.tar.gz \
     && pip install https://github.com/appsembler/pdfXBlock/archive/v0.3.1.tar.gz \
     && pip install https://github.com/edx/xblock-free-text-response/archive/4149cc450.tar.gz \
     && pip install https://github.com/pmitros/FeedbackXBlock/archive/v1.1.tar.gz \
     && pip install https://github.com/ubc/ubcpi/archive/1.0.0.tar.gz \
     && echo \
-    && pip install course-access-groups==0.6.0 \
-    && pip install figures==0.4.1 \
+    && pip install course-access-groups==0.6.1 \
+    && pip install figures==0.4.4 \
     && pip install tahoe-figures-plugins==0.1.1  \
     && pip install tahoe-lti==0.3.0 \
-    && pip install tahoe-scorm==0.1.2 \
+    && pip install tahoe-scorm==0.1.4 \
+    && pip install xblock-grade-fetcher==0.5.0 \
+    && pip install django-manage-admins==0.1.0 \
     && echo \
-    && pip install https://github.com/appsembler/openedx-completion-aggregator/archive/3.0.3-2021-may-18-bug-fixes.tar.gz \
+    && pip install https://github.com/appsembler/openedx-completion-aggregator/archive/3.0.3-2023-mar-27-revert-use-of-task-track.tar.gz \
     && echo "Finished installing pip packages."
 
 EXPOSE 8000
