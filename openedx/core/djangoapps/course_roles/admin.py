@@ -1,4 +1,5 @@
 """ Django admin page for course_roles djangoapp """
+from functools import wraps
 
 from django import forms
 from django.contrib import admin
@@ -6,10 +7,76 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
 
 from .models import UserRole
+from .toggles import use_permission_checks
 from organizations.models import Organization
 
 
 User = get_user_model()
+
+
+class _Check:
+    """
+    A method decorator that pre-emptively returns false if a feature is disabled.
+    Otherwise, it returns the return value of the decorated method.
+
+    To use, add this decorator above a method and pass in a function that returns
+    a boolean indicating whether the feature is enabled.
+
+    Example:
+    @_Check.is_enabled(FEATURE_TOGGLE.is_enabled)
+    """
+    @classmethod
+    def is_enabled(cls, is_enabled_func):
+        """
+        See above docstring.
+        """
+        def inner(func):
+            @wraps(func)
+            def decorator(*args, **kwargs):
+                if not is_enabled_func():
+                    return False
+                return func(*args, **kwargs)
+            return decorator
+        return inner
+
+
+class DisableCourseRolesAdminMixin:
+    """ Disables admin access based on the waffle flag value """
+
+    @_Check.is_enabled(use_permission_checks)
+    def has_view_permission(self, request, obj=None):
+        """
+        Returns True if CourseRole objects can be viewed via the admin view.
+        """
+        return super().has_view_permission(request, obj)
+
+    @_Check.is_enabled(use_permission_checks)
+    def has_add_permission(self, request):
+        """
+        Returns True if CourseRole objects can be added via the admin view.
+        """
+        return super().has_add_permission(request)
+
+    @_Check.is_enabled(use_permission_checks)
+    def has_change_permission(self, request, obj=None):
+        """
+        Returns True if CourseRole objects can be modified via the admin view.
+        """
+        return super().has_change_permission(request, obj)
+
+    @_Check.is_enabled(use_permission_checks)
+    def has_delete_permission(self, request, obj=None):
+        """
+        Returns True if CourseRole objects can be deleted via the admin view.
+        """
+        return super().has_delete_permission(request, obj)
+
+    @_Check.is_enabled(use_permission_checks)
+    def has_module_permission(self, request):
+        """
+        Returns True if links to the CourseRole admin view can be displayed.
+        """
+        return super().has_module_permission(request)
 
 
 class UserRoleForm(forms.ModelForm):
@@ -98,7 +165,7 @@ class UserRoleForm(forms.ModelForm):
         self.fields["email"].widget.attrs.update(style="width: 25%")
 
 
-class UserRoleAdmin(admin.ModelAdmin):
+class UserRoleAdmin(DisableCourseRolesAdminMixin, admin.ModelAdmin):
     """Admin panel for course_roles role assignment"""
     form = UserRoleForm
     raw_id_fields = ("user", "org", "course")
