@@ -5,7 +5,7 @@ Higher-level tests are in `cms/djangoapps/contentstore/tests/test_libraries.py`.
 """
 from __future__ import annotations
 
-import random
+import itertools
 from unittest.mock import MagicMock, Mock, patch
 
 import ddt
@@ -20,6 +20,7 @@ from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
 
 from openedx.core.djangolib.testing.utils import skip_unless_cms
+from xmodule import library_content_block
 from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE, LibraryContentBlock
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore import ModuleStoreEnum
@@ -73,6 +74,7 @@ class LibraryContentTestMixin:
         self.store.update_item(self.lc_block, self.user_id)
         self.lc_block.sync_from_library(upgrade_to_latest=upgrade_to_latest)
         self.lc_block = self.store.get_item(self.lc_block.location)
+        self._bind_course_block(self.lc_block)  # Loads student state back up.
 
     def _bind_course_block(self, block):
         """
@@ -784,6 +786,51 @@ class TestLibraryContentAnalytics(LibraryContentTestMixin, MixedSplitTestCase):
         assert event_data['reason'] == 'invalid'
 
 
+def _mock_selection_shuffle(wrapped):
+    """
+    Replace "shuffling" with simply "reversing".
+
+    That is, make it so that when `shuffle==True`, the order of a learner's selection is just the
+    order of the learner's children, backwards.
+
+    Reversing simulates shuffling well enough for our purposes, and it gives us two nice guarantees:
+    * Selection order is stable. This makes it easier to debug test failures, and lowers the risk of test flakiness.
+    * When `len(selection) >= 2` and `shuffle=True`, the selection order will always be different than order of the
+      LCB's children. This avoids false-positive situations, wherein a test passes only because the shuffled selection
+      happened to be the same order as the original children.
+    """
+    def _mock_shuffle(selected: list):
+        selected.reverse()
+    return patch.object(library_content_block.random, "shuffle", _mock_shuffle)(wrapped)
+
+
+def _mock_selection_sample(wrapped):
+    """
+    Use a fake, deterministic "random sample" algorithm for when the selection must be build from a random subset of
+    the children/candidates. To maximize test stability, input order does not matter, but output order is stable.
+    """
+    def _mock_sample(pool, count: int) -> list:
+        """
+        Until count is reached, pick sample one-at-a-time from sorted pool using this pattern:
+          last, 1st, 2nd-to-last, 2nd, 3rd-to-last, 3rd, 4th-to-last, 4th, etc.
+        For example:
+             random.sample(['b','c','a','e','d'], 4)
+          == random.sample(['a','b','c','d','e'], 4)
+          == ['e', 'a', 'b', 'd']
+        """
+        assert count <= len(set(pool))
+        sample = []
+        remaining = sorted(set(pool))
+        while len(sample) < count:
+            remaining = list(reversed(remaining))
+            sample.append(remaining.pop(0))
+        assert len(set(sample)) == count  # Sanity check our algorithm
+        return sample
+    return patch.object(library_content_block.random, "sample", _mock_sample)(wrapped)
+
+
+@_mock_selection_shuffle
+@_mock_selection_sample
 @ddt.ddt
 class TestLibraryContentSelectionInRandomizedMode(LibraryContentTestMixin, MixedSplitTestCase):
     """
@@ -791,7 +838,6 @@ class TestLibraryContentSelectionInRandomizedMode(LibraryContentTestMixin, Mixed
     """
     def setUp(self):
         super().setUp()
-        random.seed(0)  # Make random selection & shuffling behave the same every test run.
         self._sync_lc_block_from_library()
         self._bind_course_block(self.lc_block)
         self.manual = False
@@ -861,8 +907,9 @@ class TestLibraryContentSelectionInRandomizedMode(LibraryContentTestMixin, Mixed
         assert len(few_blocks) == 2
         assert few_blocks < some_blocks
 
-    @ddt.data(True, False)
-    def test_invalid_block_replaced_when_possible(self, shuffle):
+    @ddt.data(*itertools.product((True, False), (0, 1)))
+    @ddt.unpack
+    def test_invalid_block_replaced_when_possible(self, shuffle, index_of_selected_to_keep):
         """
         Test that if a selected block is removed from the library when there are replacements
         available in the library, then it is replaced. Any still-valid block should remain in the
@@ -878,7 +925,8 @@ class TestLibraryContentSelectionInRandomizedMode(LibraryContentTestMixin, Mixed
         assert len(old_selection) == 2
 
         # Choose one of them to remove, and find its usage key within the source lib
-        lc_child_to_remove, lc_child_to_keep = old_selection
+        lc_child_to_keep = old_selection[index_of_selected_to_keep]
+        (lc_child_to_remove,) = set(old_selection) - {lc_child_to_keep}
         lib_block_to_remove: UsageKey = self._get_key_in_library(lc_child_to_remove)
 
         # Then remove it from the source lib, and upgrade+sync the LC block
@@ -893,8 +941,9 @@ class TestLibraryContentSelectionInRandomizedMode(LibraryContentTestMixin, Mixed
         assert lc_child_to_keep in new_selection
         assert lc_child_to_remove not in new_selection
 
-    @ddt.data(True, False)
-    def test_invalid_block_without_replacement(self, shuffle):
+    @ddt.data(*itertools.product((True, False), (0, 1)))
+    @ddt.unpack
+    def test_invalid_block_without_replacement(self, shuffle, index_of_selected_to_keep):
         """
         Test that if a selected block is removed from the library when there are NOT replacements
         available in the library, then it is just removed. Any still-valid blocks should remain in the
@@ -910,7 +959,7 @@ class TestLibraryContentSelectionInRandomizedMode(LibraryContentTestMixin, Mixed
         assert len(old_selection) == 2
 
         # Choose just one of them to keep, and find its usage key within the source lib
-        lc_child_to_keep, _will_be_removed = old_selection
+        lc_child_to_keep = old_selection[index_of_selected_to_keep]
         lib_block_to_keep: UsageKey = self._get_key_in_library(lc_child_to_keep)
 
         # Remove everything else from the source lib, and then and upgrade+sync the LC block
@@ -925,8 +974,9 @@ class TestLibraryContentSelectionInRandomizedMode(LibraryContentTestMixin, Mixed
         assert self._lc_block_selection() == [lc_child_to_keep]
         assert self.lc_block.max_count == 2
 
-    @ddt.data(True, False)
-    def test_complex_scenario(self, shuffle):
+    @ddt.data(*itertools.product((True, False), (0, 1), (0, 1)))
+    @ddt.unpack
+    def test_complex_scenario(self, shuffle, index_of_selected_to_keep, index_of_unselected_to_keep):
         """
         Test that if blocks are added to the source lib, AND blocks are deleted, AND max_count
         changes, then everything works out accoring to the rules of make_selection.
@@ -942,19 +992,22 @@ class TestLibraryContentSelectionInRandomizedMode(LibraryContentTestMixin, Mixed
         assert len(old_selection) == 2
 
         # Choose just one of them to keep, and one to remove. Find their keys in the source lib.
-        lc_child_to_keep, lc_child_to_remove = old_selection
+        lc_child_to_keep = old_selection[index_of_selected_to_keep]
+        (lc_child_to_remove,) = set(old_selection) - {lc_child_to_keep}
         selected_lib_block_to_keep = self._get_key_in_library(lc_child_to_keep)
         selected_lib_block_to_remove = self._get_key_in_library(lc_child_to_remove)
 
         # Now from the *unselected* blocks in the source lib, also choose one to keep, and one to remove.
-        unselected_lib_block_to_keep, unselected_lib_block_to_remove = [
+        unselected_lib_blocks = [
             lib_block for lib_block in self.library.children
             if lib_block not in {selected_lib_block_to_keep, selected_lib_block_to_remove}
         ]
+        unselected_lib_block_to_keep = unselected_lib_blocks[index_of_unselected_to_keep]
+        (unselected_lib_block_to_remove,) = set(unselected_lib_blocks) - {unselected_lib_block_to_keep}
 
         # So, of the 4 original library blocks, that's 2 to keep, and 2 to remove.
-        lib_blocks_to_keep = {selected_lib_block_to_keep, unselected_lib_block_to_keep}  # 2 to keep
-        lib_blocks_to_remove = {selected_lib_block_to_remove, unselected_lib_block_to_remove}  # 2 to remove
+        lib_blocks_to_keep = [selected_lib_block_to_keep, unselected_lib_block_to_keep]  # 2 to keep
+        lib_blocks_to_remove = [selected_lib_block_to_remove, unselected_lib_block_to_remove]  # 2 to remove
 
         # Remove the 2 from the source lib, add 2 new ones.
         # The resulting lib should have (4 - 2 + 2) == 4 blocks, which we can break down as such:
@@ -964,12 +1017,16 @@ class TestLibraryContentSelectionInRandomizedMode(LibraryContentTestMixin, Mixed
         # * 2 which were NOT in the original library.
         for lib_block in lib_blocks_to_remove:
             self._remove_block_from_library(lib_block)
-        lib_blocks_new = {self._create_html_block_in_library(), self._create_html_block_in_library()}
-        assert set(self.library.children) == {*lib_blocks_to_keep, *lib_blocks_new}
+        lib_block_new_0 = self._create_html_block_in_library()
+        lib_block_new_1 = self._create_html_block_in_library()
+        assert set(self.library.children) == {*lib_blocks_to_keep, lib_block_new_0, lib_block_new_1}
 
-        # Sync & upgrade
+        # Sync & upgrade, and sanity-check the LCB's updated children.
         self._sync_lc_block_from_library(upgrade_to_latest=True)
-        assert len(self.lc_block.children) == 4
+        new_children = self._lc_block_children()
+        assert len(new_children) == 4
+        assert lc_child_to_keep in new_children
+        assert lc_child_to_remove not in new_children
 
         # Finally, up the max count to 3 and reselect.
         self.lc_block.max_count = 3
@@ -977,8 +1034,8 @@ class TestLibraryContentSelectionInRandomizedMode(LibraryContentTestMixin, Mixed
 
         # After all of that, we expect a selection containing 1 block from the old selection, and 2 new ones.
         assert len(new_selection) == 3
-        assert lc_child_to_keep in new_selection
         assert lc_child_to_remove not in new_selection
+        assert lc_child_to_keep in new_selection
         assert set(new_selection) & set(old_selection) == {lc_child_to_keep}
 
 
