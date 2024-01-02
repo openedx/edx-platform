@@ -51,7 +51,6 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
         )
         self.client.login(username=self.user, password='Password1234')
 
-
     def test_course_level_role_creation(self):
         data = {
             'course': str(self.course.id),
@@ -59,7 +58,6 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
             'org': str(self.org.id),
             'email': self.user.email
         }
-
 
         # adding new role from django admin page
         response = self.client.post(reverse('admin:course_roles_userrole_add'), data=data)
@@ -83,7 +81,6 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
             'email': self.user.email,
         }
 
-
         # adding new role from django admin page
         response = self.client.post(reverse('admin:course_roles_userrole_add'), data=data)
         self.assertRedirects(response, reverse('admin:course_roles_userrole_changelist'))
@@ -101,7 +98,6 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
 
         }
 
-        
         # adding new role from django admin page
         response = self.client.post(reverse('admin:course_roles_userrole_add'), data=data)
         self.assertRedirects(response, reverse('admin:course_roles_userrole_changelist'))
@@ -117,7 +113,6 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
             'email': self.user.email,
             'course': str(self.course.id)
         }
-
 
         # adding new role from django admin page
         response = self.client.post(reverse('admin:course_roles_userrole_add'), data=data)
@@ -138,7 +133,6 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
             'org': 'edxx',
             'email': email
         }
-
 
         # Adding new role with invalid data
         response = self.client.post(reverse('admin:course_roles_userrole_add'), data=data)
@@ -169,7 +163,6 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
             'email': self.user.email
         }
 
-
         # adding new role from django admin page
         response = self.client.post(reverse('admin:course_roles_userrole_add'), data=data)
 
@@ -192,7 +185,6 @@ class AdminCourseRolesUserRoleTest(SharedModuleStoreTestCase):
             'role': str(self.role.id),
             'email': self.user.email
         }
-
 
         # adding new role from django admin page
         response = self.client.post(reverse('admin:course_roles_userrole_add'), data=data)
