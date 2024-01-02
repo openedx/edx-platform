@@ -9,7 +9,7 @@
 # Lasha Kokilashvili, 2016,2018
 # Natia Gogua <natiagogua79@gmail.com>, 2016
 # Nino Asatiani <niasatiani110@gmail.com>, 2016
-# Razmik Badalyan <badalyanrazmik@gmail.com>, 2016
+# რაზმიკ ბადალიანი <badalyanrazmik@gmail.com>, 2016
 # Razmik Badalyan <rbadalyan@educaregeorgia.com>, 2016
 # Simon Janashia <sjanashia@aat.ge>, 2019
 # Tamta Tchumburidze <tamtatioon@gmail.com>, 2016
@@ -2810,24 +2810,6 @@ msgstr ""
 
 #: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 msgid "Go to dashboard"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid "Recommendations for you"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid "loading"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid ""
-"Browse recently launched courses and see what's new in your favorite "
-"subjects."
-msgstr ""
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid "Explore courses"
 msgstr ""
 
 #: lms/static/js/learner_dashboard/Static2UCallouts.jsx
