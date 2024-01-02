@@ -102,8 +102,8 @@ class MasqueradeView(View):
         # TODO: remove role check once course_roles is fully impelented and data is migrated
         is_staff = has_staff_roles(request.user, course_key)
         has_permissions = (
-            request.user.has_perm(CourseRolesPermission.GENERAL_MASQUERADING.perm_name) or
-            request.user.has_perm(CourseRolesPermission.SPECIFIC_MASQUERADING.perm_name)
+            request.user.has_perm(CourseRolesPermission.GENERAL_MASQUERADING.perm_name, course_key) or
+            request.user.has_perm(CourseRolesPermission.SPECIFIC_MASQUERADING.perm_name, course_key)
         )
         if not is_staff and not has_permissions:
             return JsonResponse({
@@ -174,8 +174,8 @@ class MasqueradeView(View):
         # TODO: remove role check once course_roles is fully impelented and data is migrated
         is_staff = has_staff_roles(request.user, course_key)
         has_permissions = (
-            request.user.has_perm(CourseRolesPermission.GENERAL_MASQUERADING.perm_name) or
-            request.user.has_perm(CourseRolesPermission.SPECIFIC_MASQUERADING.perm_name)
+            request.user.has_perm(CourseRolesPermission.GENERAL_MASQUERADING.perm_name, course_key) or
+            request.user.has_perm(CourseRolesPermission.SPECIFIC_MASQUERADING.perm_name, course_key)
         )
         if not is_staff and not has_permissions:
             return JsonResponse({
@@ -409,12 +409,12 @@ def check_content_start_date_for_masquerade_user(course_key, user, request, cour
         # TODO: remove role check once course_roles is fully impelented and data is migrated
         is_staff = has_staff_roles(user, course_key)
         has_permissions = (
-            user.has_perm(CourseRolesPermission.SPECIFIC_MASQUERADING.perm_name) and
+            user.has_perm(CourseRolesPermission.SPECIFIC_MASQUERADING.perm_name, course_key) and
             (
-                user.has_perm(CourseRolesPermission.MANAGE_CONTENT.perm_name) or
-                user.has_perm(CourseRolesPermission.VIEW_ALL_CONTENT.perm_name) or
-                user.has_perm(CourseRolesPermission.VIEW_LIVE_AND_PUBLISHED_CONTENT.perm_name) or
-                user.has_perm(CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.perm_name)
+                user.has_perm(CourseRolesPermission.MANAGE_CONTENT.perm_name, course_key) or
+                user.has_perm(CourseRolesPermission.VIEW_ALL_CONTENT.perm_name, course_key) or
+                user.has_perm(CourseRolesPermission.VIEW_LIVE_AND_PUBLISHED_CONTENT.perm_name, course_key) or
+                user.has_perm(CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.perm_name, course_key)
             )
         )
         if group_masquerade or (

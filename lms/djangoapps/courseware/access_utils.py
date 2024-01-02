@@ -61,7 +61,7 @@ def adjust_start_date(user, days_early_for_beta, start, course_key):
     # TODO: remove role check once course_roles is fully impelented and data is migrated
     if (
         CourseBetaTesterRole(course_key).has_user(user) or
-        user.has_perm(CourseRolesPermission.VIEW_LIVE_PUBLISHED_CONTENT.perm_name)
+        user.has_perm(CourseRolesPermission.VIEW_LIVE_PUBLISHED_CONTENT.perm_name, course_key)
     ):
         debug("Adjust start time: user in beta role for %s", course_key)
         delta = timedelta(days_early_for_beta)

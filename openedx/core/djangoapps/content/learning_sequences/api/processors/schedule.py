@@ -65,10 +65,9 @@ class ScheduleOutlineProcessor(OutlineProcessor):
         # TODO: remove role checks once course_roles is fully impelented and data is migrated
         self._is_beta_tester = (
             user_has_role(self.user, CourseBetaTesterRole(self.course_key)) or
-            self.user.has_perm(CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.perm_name) or
-            self.user.has_perm(CourseRolesPermission.VIEW_LIVE_PUBLISHED_CONTENT.perm_name)
+            self.user.has_perm(CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.perm_name, self.course_key) or
+            self.user.has_perm(CourseRolesPermission.VIEW_LIVE_PUBLISHED_CONTENT.perm_name, self.course_key)
         )
-
 
     def inaccessible_sequences(self, full_course_outline):
         """

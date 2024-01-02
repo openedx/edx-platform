@@ -222,12 +222,12 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
             self._get_blocks(
                 course,
                 expected_mongo_queries=0,
-                expected_sql_queries=22 if with_storage_backing else 21,
+                expected_sql_queries=21 if with_storage_backing else 20,
             )
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 2, True, 31),
-        (ModuleStoreEnum.Type.split, 2, False, 21),
+        (ModuleStoreEnum.Type.split, 2, True, 30),
+        (ModuleStoreEnum.Type.split, 2, False, 20),
     )
     @ddt.unpack
     def test_query_counts_uncached(self, store_type, expected_mongo_queries, with_storage_backing, num_sql_queries):

@@ -85,7 +85,7 @@ def has_ccx_coach_role(user, course_key):
         role = CourseCcxCoachRole(course_key)
 
         # TODO: remove role check once course_roles is fully impelented and data is migrated
-        if role.has_user(user) or user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name):
+        if role.has_user(user) or user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name, course_key):
             list_ccx = CustomCourseForEdX.objects.filter(
                 course_id=course_key.to_course_locator(),
                 coach=user
@@ -180,7 +180,7 @@ def has_staff_access_to_preview_mode(user, course_key):
     return (
         has_admin_access_to_course or
         is_masquerading_as_student(user, course_key) or
-        user.has_perm(CourseRolesPermission.VIEW_ALL_CONTENT.perm_name)
+        user.has_perm(CourseRolesPermission.VIEW_ALL_CONTENT.perm_name, course_key)
     )
 
 
@@ -728,7 +728,7 @@ def _has_access_to_course(user, access_level, course_key):
         return ACCESS_DENIED
 
     global_staff, staff_access, instructor_access = administrative_accesses_to_course_for_user(user, course_key)
-    permissions_access = user.has_perm(CourseRolesPermission.VIEW_ALL_CONTENT.perm_name)
+    permissions_access = user.has_perm(CourseRolesPermission.VIEW_ALL_CONTENT.perm_name, course_key)
     if global_staff:
         debug("Allow: user.is_staff")
         return ACCESS_GRANTED
@@ -745,7 +745,7 @@ def _has_access_to_course(user, access_level, course_key):
     if instructor_access and access_level in ('staff', 'instructor'):
         debug("Allow: user has course instructor access")
         return ACCESS_GRANTED
-    
+
     if permissions_access:
         debug("Allow: user has view all content permission")
         return ACCESS_GRANTED
@@ -892,8 +892,10 @@ def is_mobile_available_for_user(user, block):
         block (CourseBlock|CourseOverview): course or overview of course in question
     """
     permissions_access = (
-        user.has_perm(CourseRolesPermission.VIEW_LIVE_PUBLISHED_CONTENT.perm_name) and
-        user.has_perm(CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.perm_name)
+        user.has_perms([
+            CourseRolesPermission.VIEW_LIVE_PUBLISHED_CONTENT.perm_name,
+            CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.perm_name
+        ], block.id)
     )
     # TODO: remove role check once course_roles is fully impelented and data is migrated
     return (

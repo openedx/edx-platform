@@ -446,7 +446,7 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
         # * django_comment_client_role
         # * DiscussionsConfiguration
 
-        num_queries = 6
+        num_queries = 9
 
         for discussion in discussions:
             discussion_xblock = get_block_for_descriptor(
@@ -466,7 +466,7 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
 
             # query to check for provider_type
             # query to check waffle flag discussions.enable_new_structure_discussions
-            num_queries = 2
+            num_queries = 5
 
             html = fragment.content
             assert 'data-user-create-comment="false"' in html

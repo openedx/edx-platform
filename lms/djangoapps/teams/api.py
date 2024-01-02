@@ -146,7 +146,7 @@ def has_course_staff_privileges(user, course_key):
     if CourseInstructorRole(course_key).has_user(user):
         return True
     # TODO: remove role checks once course_roles is fully impelented and data is migrated
-    if user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name):
+    if user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name, course_key):
         return True
     return False
 
@@ -167,7 +167,7 @@ def has_team_api_access(user, course_key, access_username=None):
     # TODO: remove role checks once course_roles is fully impelented and data is migrated
     if (
         has_course_staff_privileges(user, course_key) or
-        user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name)
+        user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name, course_key)
     ):
         return True
     if has_discussion_privileges(user, course_key):
@@ -187,7 +187,7 @@ def user_organization_protection_status(user, course_key):
     # TODO: remove role checks once course_roles is fully impelented and data is migrated
     if (
         has_course_staff_privileges(user, course_key) or
-        user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name)
+        user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name, course_key)
     ):
         return OrganizationProtectionStatus.protection_exempt
     enrollment = CourseEnrollment.get_enrollment(user, course_key)
@@ -213,7 +213,7 @@ def has_specific_team_access(user, team):
         - be in the team if it is private
     """
     # TODO: remove role checks once course_roles is fully impelented and data is migrated
-    user_has_manage_student_permission = user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name)
+    user_has_manage_student_permission = user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name, team.course_id)
     return (
         has_course_staff_privileges(user, team.course_id) or
         user_has_manage_student_permission or (
@@ -229,10 +229,10 @@ def has_specific_teamset_access(user, course_block, teamset_id):
     Non-staff users only have access to a private_managed teamset if they are in a team in that teamset
     """
     # TODO: remove role checks once course_roles is fully impelented and data is migrated
-    user_has_manage_student_permission = user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name)
+    user_has_manage_student_permission = user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name, course_block.id)
     return (
         has_course_staff_privileges(user, course_block.id) or
-        user_has_manage_student_permission or \
+        user_has_manage_student_permission or
         teamset_is_public_or_user_is_on_team_in_teamset(user, course_block, teamset_id)
     )
 
@@ -348,7 +348,7 @@ def can_user_modify_team(user, team):
     return (
         (not is_instructor_managed_team(team)) or
         has_course_staff_privileges(user, team.course_id) or
-        user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name)
+        user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name, team.course_id)
     )
 
 
@@ -362,7 +362,7 @@ def can_user_create_team_in_topic(user, course_id, topic_id):
     return (
         (not is_instructor_managed_topic(course_id, topic_id)) or
         has_course_staff_privileges(user, course_id) or
-        user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name)
+        user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name, course_id)
     )
 
 
@@ -430,7 +430,7 @@ def anonymous_user_ids_for_team(user, team):
     # TODO: remove role checks once course_roles is fully impelented and data is migrated
     if (
         not has_course_staff_privileges(user, team.course_id) and not
-        user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name)
+        user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name, team.course_id)
     ) and not user_is_a_team_member(user, team):
         raise Exception("User {user} is not permitted to access team info for {team}".format(
             user=user.username,

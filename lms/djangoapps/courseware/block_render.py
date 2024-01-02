@@ -574,8 +574,10 @@ def prepare_runtime_for_user(
     block_wrappers.append(partial(offer_banner_wrapper, user))
 
     has_permission = (
-        user.has_perm(CourseRolesPermission.VIEW_ALL_CONTENT.perm_name) and
-        user.has_perm(CourseRolesPermission.SPECIFIC_MASQUERADING.perm_name)
+        user.has_perms([
+            CourseRolesPermission.VIEW_ALL_CONTENT.perm_name,
+            CourseRolesPermission.SPECIFIC_MASQUERADING.perm_name
+        ], course_id)
     )
     # TODO: remove role check once course_roles is fully impelented and data is migrated
     user_is_staff = (
@@ -608,10 +610,16 @@ def prepare_runtime_for_user(
             # See the docstring of `DjangoXBlockUserService`.
             deprecated_anonymous_user_id=anonymous_id_for_user(user, None),
             request_country_code=user_location,
-            user_has_manage_content=user.has_perm(CourseRolesPermission.MANAGE_CONTENT.perm_name),
-            user_has_manage_grades=user.has_perm(CourseRolesPermission.MANAGE_GRADES.perm_name),
-            user_has_access_data_downloads=user.has_perm(CourseRolesPermission.ACCESS_DATA_DOWNLOADS.perm_name),
-            user_has_view_all_content=user.has_perm(CourseRolesPermission.VIEW_ALL_CONTENT.perm_name)
+            user_has_manage_content=user.has_perm(CourseRolesPermission.MANAGE_CONTENT.perm_name, course_id),
+            user_has_manage_grades=user.has_perm(CourseRolesPermission.MANAGE_GRADES.perm_name, course_id),
+            user_has_access_data_downloads=user.has_perm(
+                CourseRolesPermission.ACCESS_DATA_DOWNLOADS.perm_name,
+                course_id
+            ),
+            user_has_view_all_content=user.has_perm(
+                CourseRolesPermission.VIEW_ALL_CONTENT.perm_name,
+                course_id
+            )
         ),
         'verification': XBlockVerificationService(),
         'proctoring': ProctoringService(),

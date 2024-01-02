@@ -1190,9 +1190,10 @@ class TestContentTypeGatingService(ModuleStoreTestCase):
             self.user, blocks_dict['not_graded_1'], course['course'].id
         ) is None
 
-    @patch.object(ContentTypeGatingService, '_get_user', return_value=UserFactory.build())
+    @patch.object(ContentTypeGatingService, '_get_user')
     def test_check_children_for_content_type_gating_paywall(self, mocked_user):  # pylint: disable=unused-argument
         ''' Verify that the method returns a content type gate when appropriate '''
+        mocked_user.return_value = self.user
         course = self._create_course()
         blocks_dict = course['blocks']
         CourseEnrollmentFactory.create(

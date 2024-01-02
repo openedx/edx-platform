@@ -333,7 +333,7 @@ def check_course_access(user, course_enrollments):
                 administrative_accesses_to_course_for_user(
                     user, course_enrollment.course_id
                 ) or
-                user.has_perm(CourseRolesPermission.VIEW_ALL_CONTENT.perm_name)
+                user.has_perm(CourseRolesPermission.VIEW_ALL_CONTENT.perm_name, course_enrollment.course_id)
             ),
         }
 
