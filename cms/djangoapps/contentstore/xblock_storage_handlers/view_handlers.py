@@ -180,11 +180,7 @@ def handle_xblock(request, usage_key_string=None):
                     return JsonResponse(ancestor_info)
                 # TODO: pass fields to get_block_info and only return those
                 with modulestore().bulk_operations(usage_key.course_key):
-                    response = get_block_info(
-                        get_xblock(usage_key, request.user),
-                        include_child_info=True,
-                        include_children_predicate=ALWAYS
-                    )
+                    response = get_block_info(get_xblock(usage_key, request.user))
                     if "customReadToken" in fields:
                         parent_children = _get_block_parent_children(get_xblock(usage_key, request.user))
                         response.update(parent_children)
@@ -837,6 +833,7 @@ def get_block_info(
     :param usage_key: A UsageKey
     """
     with modulestore().bulk_operations(xblock.location.course_key):
+        category = getattr(xblock, "category", "")
         data = getattr(xblock, "data", "")
         if rewrite_static_links:
             data = replace_static_urls(data, None, course_id=xblock.location.course_key)
@@ -848,15 +845,25 @@ def get_block_info(
                 modulestore().get_course(xblock.location.course_key, depth=None)
             )
 
-        # Note that children aren't being returned until we have a use case.
-        xblock_info = create_xblock_info(
-            xblock,
-            data=data,
-            metadata=own_metadata(xblock),
-            include_ancestor_info=include_ancestor_info,
-            include_child_info=include_child_info,
-            include_children_predicate=include_children_predicate
-        )
+        # Note that children are returned for library_content blocks.
+        if category == "library_content":
+            xblock_info = create_xblock_info(
+                xblock,
+                data=data,
+                metadata=own_metadata(xblock),
+                include_ancestor_info=include_ancestor_info,
+                include_child_info=True,
+                include_children_predicate=ALWAYS
+            )
+        else:
+            xblock_info = create_xblock_info(
+                xblock,
+                data=data,
+                metadata=own_metadata(xblock),
+                include_ancestor_info=include_ancestor_info,
+                include_child_info=include_child_info,
+                include_children_predicate=include_children_predicate
+            )
         if include_publishing_info:
             add_container_page_publishing_info(xblock, xblock_info)
 
