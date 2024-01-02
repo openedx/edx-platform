@@ -70,8 +70,9 @@ class UserRole(models.Model):
         CourseOverview,
         on_delete=models.CASCADE,
         null=True,
+        blank=True,
     )
-    org = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True)
+    org = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         constraints = [
