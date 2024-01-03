@@ -834,7 +834,6 @@ def get_block_info(
     xblock,
     rewrite_static_links=True,
     include_ancestor_info=False,
-    include_child_info=False,
     include_publishing_info=False,
     include_children_predicate=NEVER,
 ):
@@ -843,7 +842,6 @@ def get_block_info(
     :param usage_key: A UsageKey
     """
     with modulestore().bulk_operations(xblock.location.course_key):
-        category = getattr(xblock, "category", "")
         data = getattr(xblock, "data", "")
         if rewrite_static_links:
             data = replace_static_urls(data, None, course_id=xblock.location.course_key)
