@@ -810,16 +810,16 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         sequential = self.make_block("sequential", chapter)
         vertical = self.make_block("vertical", sequential)
         self.lc_block = self.make_block("library_content", vertical)
+
+    def _set_up_lc_block(self, manual, shuffle):
+        self.lc_block.manual = manual
+        self.lc_block.shuffle = shuffle
         for name in ['a', 'b', 'c', 'd']:
-            self.create_lc_block_child(name)
+            self._create_lc_block_child(name, mark_as_candidate=True)
+        if manual:
+            self._create_lc_block_child('x', mark_as_candidate=False)
 
-    def lc_block_all_children(self) -> list[tuple[str, str]]:
-        """
-        Get the (type, ID) pairs representing the LC block's children (in the order they were copied from lib).
-        """
-        return [(child.block_type, child.block_id) for child in self.lc_block.children]
-
-    def create_lc_block_child(self, name) -> tuple[str, str]:
+    def _create_lc_block_child(self, name, mark_as_candidate=True) -> tuple[str, str]:
         """
         Add an HTML block as a child of the LCB, simluating an item being added to the source library.
 
@@ -830,73 +830,93 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         new_block = self.make_block(category="html", parent_block=self.lc_block, display_name=name)
         self.lc_block = self.store.get_item(self.lc_block.location)  # Reload to update '.children'.
         self.lc_block.selected = selected  # TODO/HACK
-        return new_block.location.block_type, new_block.location.block_id
+        new_block_key = (new_block.location.block_type, new_block.location.block_id)
+        if mark_as_candidate:
+            self.lc_block.candidates.append(new_block_key)
+        return new_block_key
 
-    def remove_lc_block_child(self, block_key: tuple[str, str]) -> None:
+    def _remove_lc_block_child(self, block_key: tuple[str, str]) -> None:
         """
         Remove a child of the LCB, simulating an item being removed from the source library.
         """
-        selected = self.lc_block.selected  # TODO/HACK: 'selected' is lost upon re-load, so we manuallay save+fix it.
-        self.store.update_item(self.lc_block, self.user_id)  # Persist any changes so we can reload later.
+        if self.lc_block.manual:
+            assert block_key in self.lc_block.candidates
         block_type, block_id = block_key
         block_usage_key = self.course.id.make_usage_key(block_type, block_id)
         assert block_usage_key in self.lc_block.children
-        self.store.delete_item(block_usage_key, self.user_id)
-        self.lc_block = self.store.get_item(self.lc_block.location)  # Reload to update '.children'.
-        self.lc_block.selected = selected  # TODO/HACK
+        if self.lc_block.manual:
+            self.lc_block.candidates.remove(block_key)
+        else:
+            selected = self.lc_block.selected  # TODO/HACK: 'selected' is lost upon re-load, so we manuallay save+fix it.
+            self.store.update_item(self.lc_block, self.user_id)  # Persist any changes so we can reload later.
+            self.store.delete_item(block_usage_key, self.user_id)
+            self.lc_block = self.store.get_item(self.lc_block.location)  # Reload to update '.children'.
+            self.lc_block.selected = selected  # TODO/HACK
 
-    @ddt.data(True, False)
-    def test_additional_blocks_added(self, shuffle):
+    @ddt.data(*itertools.product((True, False), (True, False)))
+    @ddt.unpack
+    def test_additional_blocks_added(self, manual, shuffle):
         """
         Test that increasing the "max_count" value leads to the original selected blocks, plus more.
 
         Should hold true regardless of whether we `shuffle` the selection or not.
         """
-        self.lc_block.manual = False
-        self.lc_block.shuffle = shuffle
+        self._set_up_lc_block(manual=manual, shuffle=shuffle)
 
-        # Start with 2.
+        # Start with 2 selected.
         self.lc_block.max_count = 2
-        selection_of_2 = set(self.lc_block.selected_children())
+        selection_of_2 = self.lc_block.selected_children()
         assert len(selection_of_2) == 2
 
-        # Increase to 3... original 2 should remain.
+        # Increase to 3 selected. Original 2 should remain selected.
         self.lc_block.max_count = 3
-        selection_of_3 = set(self.lc_block.selected_children())
+        selection_of_3 = self.lc_block.selected_children()
         assert len(selection_of_3) == 3
-        assert selection_of_2 < selection_of_3
+        assert set(selection_of_2) < set(selection_of_3)
 
-        # Increase to entire library... 3 should remain.
+        # Increase to -1 (all 4 blocks selected). The original 3 should remain selected.
         self.lc_block.max_count = -1
-        selection_of_all_4 = set(self.lc_block.selected_children())
+        selection_of_all_4 = self.lc_block.selected_children()
         assert len(selection_of_all_4) == 4
-        assert selection_of_3 < selection_of_all_4
-        assert selection_of_all_4 == set(self.lc_block_all_children())
+        assert set(selection_of_3) < set(selection_of_all_4)
+        if shuffle:
+            assert set(selection_of_all_4) == set(self.lc_block.available_children())
+        else:
+            assert selection_of_all_4 == self.lc_block.available_children()
 
-        # Toss a new block into the children list...
-        # since max_count=-1, it should be added to the selection immediately.
-        self.create_lc_block_child('e')
-        assert len(self.lc_block.children) == 5
-        selecion_of_all_5 = set(self.lc_block.selected_children())
+        # Toss a new block into the children list.
+        # Since -1 means "all blocks", 5 should be selected, including the 4 from last step.
+        self._create_lc_block_child('e')
+        assert len(self.lc_block.available_children()) == 5
+        selection_of_all_5 = self.lc_block.selected_children()
         assert len(selection_of_all_5) == 5
-        assert selection_of_all_4 < selection_of_all_5
-        assert selection_of_all_5 == set(self.lc_block_all_children())
+        assert set(selection_of_all_4) < set(selection_of_all_5)
+        if shuffle:
+            assert set(selection_of_all_5) == set(self.lc_block.available_children())
+        else:
+            assert selection_of_all_5 == self.lc_block.available_children()
 
-    @ddt.data(True, False)
-    def test_overlimit_blocks_removed(self, shuffle):
+        # Increase max_count past the number of available children.
+        # Since "too many" is treated the same as "all", the selection should be unchanged.
+        # Even when shuffle==True, the order should be unchanged, since the selection is equal.
+        self.lc_block.max_count = 10
+        assert self.lc_block.selected_children() == selection_of_all_5
+
+    @ddt.data(*itertools.product((True, False), (True, False)))
+    @ddt.unpack
+    def test_overlimit_blocks_removed(self, manual, shuffle):
         """
         Test that decreasing the `max_count` value leads a reduced version of the original subset.
 
         Should hold true regardless of whether we `shuffle` the selection or not.
         """
-        self.lc_block.manual = False
-        self.lc_block.shuffle = shuffle
+        self._set_up_lc_block(manual=manual, shuffle=shuffle)
 
         # Start with max
         self.lc_block.max_count = -1
         selection_of_all_4 = set(self.lc_block.selected_children())
         assert len(selection_of_all_4) == 4
-        assert selection_of_all_4 == set(self.lc_block_all_children())
+        assert selection_of_all_4 == set(self.lc_block.available_children())
 
         # Then drop it down to 3... should be a subset
         self.lc_block.max_count = 3
@@ -910,9 +930,9 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         assert len(selection_of_all_2) == 2
         assert selection_of_all_2 < selection_of_all_3
 
-    @ddt.data(*itertools.product((True, False), (0, 1)))
+    @ddt.data(*itertools.product((True, False), (True, False), (0, 1)))
     @ddt.unpack
-    def test_invalid_block_replaced_when_possible(self, shuffle, index_of_selected_to_keep):
+    def test_invalid_block_replaced_when_possible(self, manual, shuffle, index_of_selected_to_keep):
         """
         Test that if a selected block is removed from the library when there are replacements
         available in the library, then it is replaced. Any still-valid block should remain in the
@@ -920,8 +940,7 @@ class TestLibraryContentSelection(MixedSplitTestCase):
 
         Should hold true regardless of whether we `shuffle` the selection or not.
         """
-        self.lc_block.manual = False
-        self.lc_block.shuffle = shuffle
+        self._set_up_lc_block(manual=manual, shuffle=shuffle)
 
         # Start with 2 blocks
         self.lc_block.max_count = 2
@@ -931,8 +950,8 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         # Keep one, remove one.
         selected_child_to_keep = old_selection[index_of_selected_to_keep]
         (selected_child_to_remove,) = set(old_selection) - {selected_child_to_keep}
-        self.remove_lc_block_child(selected_child_to_remove)
-        assert len(self.lc_block.children) == 3  # Sanity check
+        self._remove_lc_block_child(selected_child_to_remove)
+        assert len(self.lc_block.available_children()) == 3
 
         # New selection should still have 2 blocks: the kept block, and another lib block
         new_selection = self.lc_block.selected_children()
@@ -940,9 +959,9 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         assert selected_child_to_keep in new_selection
         assert selected_child_to_remove not in new_selection
 
-    @ddt.data(*itertools.product((True, False), (0, 1)))
+    @ddt.data(*itertools.product((True, False), (True, False), (0, 1)))
     @ddt.unpack
-    def test_invalid_block_without_replacement(self, shuffle, index_of_selected_to_keep):
+    def test_invalid_block_without_replacement(self, manual, shuffle, index_of_selected_to_keep):
         """
         Test that if a selected block is removed from the library when there are NOT replacements
         available in the library, then it is just removed. Any still-valid blocks should remain in the
@@ -950,8 +969,7 @@ class TestLibraryContentSelection(MixedSplitTestCase):
 
         Should hold true regardless of whether we `shuffle` the selection or not.
         """
-        self.lc_block.manual = False
-        self.lc_block.shuffle = shuffle
+        self._set_up_lc_block(manual=manual, shuffle=shuffle)
 
         # Start with 2 blocks
         self.lc_block.max_count = 2
@@ -960,29 +978,34 @@ class TestLibraryContentSelection(MixedSplitTestCase):
 
         # Choose just one of them to keep; remove all other children.
         selected_child_to_keep = old_selection[index_of_selected_to_keep]
-        for child in self.lc_block_all_children():
+        for child in self.lc_block.available_children():
             if child != selected_child_to_keep:
-                self.remove_lc_block_child(child)
-        assert len(self.lc_block.children) == 1  # Sanity check
+                self._remove_lc_block_child(child)
+        assert len(self.lc_block.available_children()) == 1
 
         # New selection should have just the 1 remaining block, even though max_count is still 2
         assert self.lc_block.selected_children() == [selected_child_to_keep]
         assert self.lc_block.max_count == 2
 
-    @ddt.data(*itertools.product((True, False), (0, 1), (0, 1)))
+        # Finally, remove that last remaining block, and ensure that the selection is empty.
+        self._remove_lc_block_child(selected_child_to_keep)
+        assert self.lc_block.available_children() == []
+        assert self.lc_block.selected_children() == []
+        assert self.lc_block.max_count == 2
+
+    @ddt.data(*itertools.product((True, False), (True, False), (0, 1), (0, 1)))
     @ddt.unpack
-    def test_complex_scenario(self, shuffle, index_of_selected_to_keep, index_of_unselected_to_keep):
+    def test_complex_scenario(self, manual, shuffle, index_of_selected_to_keep, index_of_unselected_to_keep):
         """
         Test that if blocks are added to the source lib, AND blocks are deleted, AND max_count
         changes, then everything works out according to the rules of make_selection.
 
         Should work regardless of whether we `shuffle` the selection or not.
         """
-        self.lc_block.manual = False
-        self.lc_block.shuffle = shuffle
+        self._set_up_lc_block(manual=manual, shuffle=shuffle)
 
         # Start with a library of 4 and selection of 2.
-        old_children = self.lc_block_all_children()
+        old_children = self.lc_block.available_children()
         assert len(old_children) == 4
         self.lc_block.max_count = 2
         old_selection = self.lc_block.selected_children()
@@ -991,19 +1014,19 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         # From the selection: keep one, but remove the other from the children.
         selected_child_to_keep = old_selection[index_of_selected_to_keep]
         (selected_child_to_remove,) = set(old_selection) - {selected_child_to_keep}
-        self.remove_lc_block_child(selected_child_to_remove)
+        self._remove_lc_block_child(selected_child_to_remove)
 
         # Now from the *unselected* children: keep one, and remove the other.
         unselected_children = [child for child in old_children if child not in old_selection]
         unselected_child_to_keep = unselected_children[index_of_unselected_to_keep]
         (unselected_child_to_remove,) = set(unselected_children) - {unselected_child_to_keep}
-        self.remove_lc_block_child(unselected_child_to_remove)
+        self._remove_lc_block_child(unselected_child_to_remove)
 
         # Finally, add 2 new children.
-        additional_children = {self.create_lc_block_child('e'), self.create_lc_block_child('f')}
+        additional_children = {self._create_lc_block_child('e'), self._create_lc_block_child('f')}
 
         # Sanity check
-        new_children = self.lc_block_all_children()
+        new_children = self.lc_block.available_children()
         assert set(new_children) == {selected_child_to_keep, unselected_child_to_keep, *additional_children}
 
         # THE TEST: Up the max count to 3 and reselect.
@@ -1016,20 +1039,3 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         assert still_selected == {selected_child_to_keep}
         assert len(newly_selected) == 2
         assert newly_selected < {unselected_child_to_keep, *additional_children}
-
-    @ddt.data(True, False)
-    def test_manual_selection_from_candidates(self, shuffle):
-        """
-        Test that if "manual" mode is enabled, the user is shown all content from the manually selected content.
-        """
-        self.lc_block.manual = True
-        self.lc_block.shuffle = shuffle
-        self.lc_block.max_count = -1
-
-        candidate_keys = self.lc_block.children[:2]
-        self.lc_block.candidates = [(candidate.block_type, candidate.block_id) for candidate in candidate_keys]
-        if shuffle:
-            # Use set comparison if shuffling is enabled, because order will not match.
-            assert set(self.lc_block.selected_children()) == set(self.lc_block.candidates)
-        else:
-            assert self.lc_block.selected_children() == self.lc_block.candidates
