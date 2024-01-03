@@ -534,6 +534,7 @@ class TestLibraryContentBlockWithSearchIndex(LibraryContentBlockTestMixin, Libra
         search_index_mock.search = Mock(side_effect=self._get_search_response)
 
 
+@skip_unless_cms
 @patch(
     'xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render
 )
@@ -566,6 +567,7 @@ class TestLibraryContentRender(LibraryContentTestMixin, MixedSplitTestCase):
         # but some js initialization should happen
 
 
+@skip_unless_cms
 class TestLibraryContentAnalytics(LibraryContentTestMixin, MixedSplitTestCase):
     """
     Test analytics features of LibraryContentBlock
