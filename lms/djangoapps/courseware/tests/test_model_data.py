@@ -276,7 +276,7 @@ class TestMissingStudentModule(TestCase):  # lint-amnesty, pylint: disable=missi
         # on the StudentModule).
         # Django 1.8 also has a number of other BEGIN and SAVESTATE queries.
         with self.assertNumQueries(4, using='default'):
-            with self.assertNumQueries(2, using='student_module_history'):
+            with self.assertNumQueries(1, using='student_module_history'):
                 self.kvs.set(user_state_key('a_field'), 'a_value')
 
         assert 1 == sum(len(cache) for cache in self.field_data_cache.cache.values())

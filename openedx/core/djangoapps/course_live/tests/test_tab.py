@@ -6,7 +6,6 @@ from unittest.mock import Mock, patch
 
 import ddt
 from django.test import RequestFactory
-from edx_toggles.toggles.testutils import override_waffle_flag
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag, LtiConfiguration
 
 from lms.djangoapps.courseware.tests.test_tabs import TabTestCase
