@@ -464,7 +464,8 @@ def sync_discussion_settings(course_key, user):
             course.discussions_settings['provider_type'] = Provider.OPEN_EDX
             modulestore().update_item(course, user.id)
 
-        discussion_config.provider_type = Provider.OPEN_EDX
+            discussion_config.provider_type = Provider.OPEN_EDX
+
         discussion_config.enable_graded_units = discussion_settings['enable_graded_units']
         discussion_config.unit_level_visibility = discussion_settings['unit_level_visibility']
         discussion_config.save()
