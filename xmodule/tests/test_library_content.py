@@ -855,33 +855,32 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         self.lc_block.manual = False
         self.lc_block.shuffle = shuffle
 
-        # Start with 2
+        # Start with 2.
         self.lc_block.max_count = 2
-        initial_blocks = set(self.lc_block.selected_children())
-        assert len(initial_blocks) == 2
+        selection_of_2 = set(self.lc_block.selected_children())
+        assert len(selection_of_2) == 2
 
         # Increase to 3... original 2 should remain.
         self.lc_block.max_count = 3
-        more_blocks = set(self.lc_block.selected_children())
-        assert len(more_blocks) == 3
-        assert initial_blocks < more_blocks
+        selection_of_3 = set(self.lc_block.selected_children())
+        assert len(selection_of_3) == 3
+        assert selection_of_2 < selection_of_3
 
-        # Increase to entire library... 3 should remain
+        # Increase to entire library... 3 should remain.
         self.lc_block.max_count = -1
-        all_the_blocks = set(self.lc_block.selected_children())
-        assert len(all_the_blocks) == 4
-        assert more_blocks < all_the_blocks
-        assert all_the_blocks == set(self.lc_block_all_children())
+        selection_of_all_4 = set(self.lc_block.selected_children())
+        assert len(selection_of_all_4) == 4
+        assert selection_of_3 < selection_of_all_4
+        assert selection_of_all_4 == set(self.lc_block_all_children())
 
-        # Toss a new block into the children list
+        # Toss a new block into the children list...
+        # since max_count=-1, it should be added to the selection immediately.
         self.create_lc_block_child('e')
         assert len(self.lc_block.children) == 5
-
-        # Since max_count=-1, it should be added to the selection.
-        all_the_blocks_plus_another = set(self.lc_block.selected_children())
-        assert len(all_the_blocks_plus_another) == 5
-        assert all_the_blocks < all_the_blocks_plus_another
-        assert all_the_blocks_plus_another == set(self.lc_block_all_children())
+        selecion_of_all_5 = set(self.lc_block.selected_children())
+        assert len(selection_of_all_5) == 5
+        assert selection_of_all_4 < selection_of_all_5
+        assert selection_of_all_5 == set(self.lc_block_all_children())
 
     @ddt.data(True, False)
     def test_overlimit_blocks_removed(self, shuffle):
@@ -895,21 +894,21 @@ class TestLibraryContentSelection(MixedSplitTestCase):
 
         # Start with max
         self.lc_block.max_count = -1
-        all_the_blocks = set(self.lc_block.selected_children())
-        assert len(all_the_blocks) == 4
-        assert all_the_blocks == set(self.lc_block_all_children())
+        selection_of_all_4 = set(self.lc_block.selected_children())
+        assert len(selection_of_all_4) == 4
+        assert selection_of_all_4 == set(self.lc_block_all_children())
 
         # Then drop it down to 3... should be a subset
         self.lc_block.max_count = 3
-        some_blocks = set(self.lc_block.selected_children())
-        assert len(some_blocks) == 3
-        assert some_blocks < all_the_blocks
+        selection_of_all_3 = set(self.lc_block.selected_children())
+        assert len(selection_of_all_3) == 3
+        assert selection_of_all_3 < selection_of_all_4
 
         # Then drop it down to 2... should be a smaller subset
         self.lc_block.max_count = 2
-        few_blocks = set(self.lc_block.selected_children())
-        assert len(few_blocks) == 2
-        assert few_blocks < some_blocks
+        selection_of_all_2 = set(self.lc_block.selected_children())
+        assert len(selection_of_all_2) == 2
+        assert selection_of_all_2 < selection_of_all_3
 
     @ddt.data(*itertools.product((True, False), (0, 1)))
     @ddt.unpack
@@ -930,16 +929,16 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         assert len(old_selection) == 2
 
         # Keep one, remove one.
-        lc_child_to_keep = old_selection[index_of_selected_to_keep]
-        (lc_child_to_remove,) = set(old_selection) - {lc_child_to_keep}
-        self.remove_lc_block_child(lc_child_to_remove)
-        assert len(self.lc_block.children) == 3
+        selected_child_to_keep = old_selection[index_of_selected_to_keep]
+        (selected_child_to_remove,) = set(old_selection) - {selected_child_to_keep}
+        self.remove_lc_block_child(selected_child_to_remove)
+        assert len(self.lc_block.children) == 3  # Sanity check
 
         # New selection should still have 2 blocks: the kept block, and another lib block
         new_selection = self.lc_block.selected_children()
         assert len(new_selection) == 2
-        assert lc_child_to_keep in new_selection
-        assert lc_child_to_remove not in new_selection
+        assert selected_child_to_keep in new_selection
+        assert selected_child_to_remove not in new_selection
 
     @ddt.data(*itertools.product((True, False), (0, 1)))
     @ddt.unpack
@@ -960,14 +959,14 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         assert len(old_selection) == 2
 
         # Choose just one of them to keep; remove all other children.
-        lc_child_to_keep = old_selection[index_of_selected_to_keep]
+        selected_child_to_keep = old_selection[index_of_selected_to_keep]
         for child in self.lc_block_all_children():
-            if child != lc_child_to_keep:
+            if child != selected_child_to_keep:
                 self.remove_lc_block_child(child)
-        assert len(self.lc_block.children) == 1
+        assert len(self.lc_block.children) == 1  # Sanity check
 
         # New selection should have just the 1 remaining block, even though max_count is still 2
-        assert self.lc_block.selected_children() == [lc_child_to_keep]
+        assert self.lc_block.selected_children() == [selected_child_to_keep]
         assert self.lc_block.max_count == 2
 
     @ddt.data(*itertools.product((True, False), (0, 1), (0, 1)))
