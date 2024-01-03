@@ -433,3 +433,42 @@ def unsubscribe_from_course_goal_by_token(request, token):
     return Response({
         'course_title': course_overview.display_name,
     })
+    
+from opaque_keys.edx.keys import UsageKey
+from openedx.features.course_experience.utils import get_course_outline_block_tree
+from opaque_keys import InvalidKeyError
+from rest_framework import status
+
+@api_view(['GET'])
+def get_next_lesson (request, usage_key_string) :
+    try:
+        usage_key = UsageKey.from_string(usage_key_string)
+    except InvalidKeyError:
+        return Response({"error": "Invalid usage_key"}, status=status.HTTP_400_BAD_REQUEST)
+    course_key = usage_key.course_key
+    course_blocks = get_course_outline_block_tree(request, str(course_key), request.user).get('children', [])
+    vertical_id_next = ''
+    sequential_id_next = ''
+    for chapter_index, chapter in enumerate(course_blocks):
+        for sequential_index, sequential in enumerate(chapter.get('children', [])):
+            for vertical_index, vertical in enumerate(sequential.get('children', [])):
+                if vertical['id'] == usage_key_string:
+                    # vertical center sequential
+                    if  vertical_index + 1 < len(sequential['children']):
+                        vertical_id_next = sequential.get('children', [])[vertical_index +1]['id']
+                        sequential_id_next = sequential['id']
+                    # vertical end next sequential
+                    else :
+                        if  sequential_index + 1 < len(chapter['children']):
+                            sequential_id_next = chapter.get('children', [])[sequential_index+1]['id']
+                            vertical_id_next = 'first'
+                        else :
+                            # vertical end and sequential end next chapter
+                            if chapter_index + 1 < len(course_blocks):
+                                sequential_id_next= course_blocks[chapter_index+1].get('children', [])[0]['id']
+                                vertical_id_next = 'first'
+                            else :
+                                return Response({"error": "End of course reached"}, status=status.HTTP_400_BAD_REQUEST)
+                            
+  
+    return Response({"vertical_id" : vertical_id_next , "sequental_id" : sequential_id_next})
