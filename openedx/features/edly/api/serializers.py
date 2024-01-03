@@ -5,6 +5,7 @@ import json
 
 from rest_framework import serializers
 
+from openedx.features.edly.models import EdlyMultiSiteAccess
 from openedx.features.edly.utils import get_marketing_link
 
 
@@ -49,3 +50,19 @@ class UserSiteSerializer(serializers.Serializer):
         Returns mobile_enabled flag
         """
         return self.context['site_configuration'].get('MOBILE_ENABLED', False)
+
+
+class MutiSiteAccessSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Mutisite access endpoint
+    """
+    
+    name = serializers.CharField(source='sub_org.name', read_only=True)
+    slug = serializers.CharField(source='sub_org.slug', read_only=True)
+
+    class Meta:
+        """
+        Meta attribute for the MutiSiteAccess Model
+        """
+        model = EdlyMultiSiteAccess
+        fields = ['id', 'name', 'slug']

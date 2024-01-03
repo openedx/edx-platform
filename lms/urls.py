@@ -200,7 +200,7 @@ urlpatterns = [
                                     namespace='api_discounts')),
 
     url(r'', include(('openedx.features.edly.urls', 'openedx.features.edly'), namespace='edly_app_urls')),
-    url(r'^api/v1/courses/', include('openedx.features.edly.api.urls')),
+    url(r'^api/v1/', include('openedx.features.edly.api.urls')),
 ]
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
