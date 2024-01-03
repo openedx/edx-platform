@@ -221,6 +221,8 @@ class CoursewareIndex(View):
         if self.course.has_children_at_depth(CONTENT_DEPTH):
             self._reset_section_to_exam_if_required()
             self.chapter = self._find_chapter()
+            if (request.user.gen_user.is_teacher) and (TEACHER_PROGRESS_TACKING_DISABLED_SWITCH.is_enabled()):
+                self.chapter.position = 1
             self.section = self._find_section()
 
             if self.chapter and self.section:
