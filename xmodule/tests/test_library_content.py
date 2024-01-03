@@ -69,9 +69,9 @@ class LibraryContentTestMixin:
         We must re-load it because the syncing happens in a Celery task, so that original self.lc_block instance will
         not have changes manifested on it, but the re-loaded instance will.
         """
+        self.store.update_item(self.lc_block, self.user_id)
         self.lc_block.sync_from_library(upgrade_to_latest=upgrade_to_latest)
         self.lc_block = self.store.get_item(self.lc_block.location)
-        self._bind_course_block(self.lc_block)
 
     def _bind_course_block(self, block):
         """
@@ -350,7 +350,6 @@ class LibraryContentBlockTestMixin:
 
         # Set max_count to higher value than exists in library
         self.lc_block.max_count = 50
-
         result = self.lc_block.validate()
         assert not result
         self._assert_has_only_N_matching_problems(result, 4)
@@ -371,6 +370,7 @@ class LibraryContentBlockTestMixin:
         assert len(self.lc_block.selected_children()) == 1
 
         # ... unless requested more blocks than exists in library
+        self.lc_block.capa_type = 'multiplechoiceresponse'
         self._sync_lc_block_from_library()
         self.lc_block.max_count = 10
         result = self.lc_block.validate()
