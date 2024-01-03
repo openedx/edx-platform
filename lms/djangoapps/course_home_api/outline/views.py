@@ -438,6 +438,7 @@ from opaque_keys.edx.keys import UsageKey
 from openedx.features.course_experience.utils import get_course_outline_block_tree
 from opaque_keys import InvalidKeyError
 from rest_framework import status
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 @api_view(['GET'])
 def get_next_lesson (request, usage_key_string) :
@@ -470,5 +471,4 @@ def get_next_lesson (request, usage_key_string) :
                             else :
                                 return Response({"error": "End of course reached"}, status=status.HTTP_400_BAD_REQUEST)
                             
-  
     return Response({"vertical_id" : vertical_id_next , "sequental_id" : sequential_id_next})
