@@ -1,6 +1,6 @@
 import json
 import logging
-from django.http import HttpResponse
+from django.http import HttpResponse,JsonResponse
 from common.djangoapps.student.models import User
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -404,3 +404,32 @@ class GradeLearningProjectXblockAPIView(APIView):
         return Response(data={
             "message": "Graded",
         }, status=status.HTTP_200_OK)
+    
+def get_portal_host(request):
+    from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+    from django.contrib.sites.models import Site
+    from django.conf import settings
+
+    def get_site_config(domain, setting_name, default_value=None):
+        try:
+            site = Site.objects.filter(domain=domain).first()
+            if site is None: 
+                print('NOT FOUND SITE')
+                return default_value
+            site_config = SiteConfiguration.objects.filter(site=site).first()
+            if site_config is None:
+                print('NOT FOUND SITE CONFIG')
+                return default_value
+
+            return site_config.get_value(setting_name, default_value)
+        except Exception as e:
+            print(str(e))
+            return None
+
+    LMS_BASE = settings.LMS_BASE
+    PORTAL_HOST = get_site_config(LMS_BASE, 'PORTAL_HOST') 
+    return  JsonResponse( {
+            'HOST':PORTAL_HOST
+            }
+        ,
+        status=200)
