@@ -11,7 +11,7 @@ from openedx.core.djangolib.markup import HTML
 
 <div class="problem-progress" id="${ id }-problem-progress"></div>
 
-<div class="problem">
+<div class="problem" id="${ short_id }">
   ${ HTML(problem['html']) }
   <div class="action">
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />
@@ -161,4 +161,15 @@ from openedx.core.djangolib.markup import HTML
     function emit_event(message) {
         parent.postMessage(message, '*');
     }
+
+    $(document).ready(function () {
+        var $problem = $('#${short_id}');
+        var $submitBtn = $problem.find('button.submit.btn-brand');
+        var data = $submitBtn.data();
+        var disabled = $submitBtn.is(':disabled')
+        var shouldEnableSubmitButton = data.shouldEnableSubmitButton;
+        if ((!(shouldEnableSubmitButton == 'True')) && disabled) {
+            $problem.find('input').attr({disabled: 'disabled'});
+        }
+    })
 </script>
