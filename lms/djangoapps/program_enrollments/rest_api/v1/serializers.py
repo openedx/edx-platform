@@ -7,7 +7,7 @@ from rest_framework import serializers
 
 from lms.djangoapps.program_enrollments.api import is_course_staff_enrollment
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
-
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from .constants import CourseRunProgressStatuses
 
 # pylint: disable=abstract-method
@@ -104,7 +104,11 @@ class ProgramCourseEnrollmentSerializer(serializers.Serializer):
         return str(obj.program_enrollment.curriculum_uuid)
 
     def get_course_staff(self, obj):
-        return is_course_staff_enrollment(obj)
+        # TODO: remove is_course_staff_enrollment check once course_roles is fully impelented and data is migrated
+        return (
+            is_course_staff_enrollment(obj) or
+            obj.program_enrollment.user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name)
+        )
 
 
 class ProgramCourseEnrollmentRequestSerializer(serializers.Serializer, InvalidStatusMixin):
