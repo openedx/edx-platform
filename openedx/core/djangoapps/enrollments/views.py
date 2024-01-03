@@ -32,6 +32,7 @@ from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
 from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup, add_user_to_cohort, get_cohort_by_name
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.enrollments import api
@@ -667,7 +668,11 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         filtered_data = []
         for enrollment in enrollment_data:
             course_key = CourseKey.from_string(enrollment["course_details"]["course_id"])
-            if user_has_role(request.user, CourseStaffRole(course_key)):
+            # TODO: remove roles check once course_roles is fully impelented and data is migrated
+            if (
+                user_has_role(request.user, CourseStaffRole(course_key)) or
+                request.user.has_perm(CourseRolesPermission.MANAGE_USERS_EXCEPT_ADMIN_AND_STAFF.perm_name)
+            ):
                 filtered_data.append(enrollment)
         return Response(filtered_data)
 
