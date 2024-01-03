@@ -242,21 +242,32 @@ class LibraryContentBlock(
         self.runtime.publish(self, f"edx.librarycontentblock.content.{event_name}", event_data)
         self._last_event_result_count = len(result)  # pylint: disable=attribute-defined-outside-init
 
+    def available_children(self) -> list[tuple[str, str]]:
+        """
+        Returns (block_type, block_id) tuples which children are possible for selection,
+        in the original order from the candidates list (if manual) or lib-copied children list (if not).
+        """
+        return self._available_children(
+            library_children=self.children,
+            candidates=list(map(tuple, self.candidates)),  # Convert from nested list to list-of-tuples.
+            manual=self.manual,
+        )
+
     @classmethod
-    def _get_valid_children(
+    def _available_children(
         cls,
         library_children: list[UsageKey],
         candidates: list[tuple[str, str]],
         manual: bool,
     ) -> list[tuple[str, str]]:
         """
-        Dynamically selects (block_type, block_id) tuples which children are possible for selection,
-        in the original order from the candidates list or the library.
+        Static implementation of available_children.
         """
+        children = [(child.block_type, child.block_id) for child in library_children]
         if manual:
-            return candidates
+            return [candidate for candidate in candidates if candidate in children]
         else:
-            return [(child.block_type, child.block_id) for child in library_children]
+            return children
 
     @classmethod
     def make_selection(
@@ -297,25 +308,25 @@ class LibraryContentBlock(
         size, however, limits the amount of content shown.
         """
         selected: list[tuple[str, str]] = old_selected.copy()
-        valid_children: list[tuple[str, str]] = cls._get_valid_children(library_children, candidates, manual)
+        available: list[tuple[str, str]] = cls._available_children(library_children, candidates, manual)
 
-        # Remove blocks from selection if they're no longer candidates.
-        selected = [block for block in selected if block in valid_children]
+        # Remove blocks from selection if they're no longer candidates/children.
+        selected = [block for block in selected if block in available]
         invalid: set[tuple[str, str]] = set(old_selected) - set(selected)
 
         # Remove or add blocks if we don't have the correct number in the selection.
         additions: set[tuple[str, str]] = set()
         overlimit: set[tuple[str, str]] = set()
-        desired_size: int = min(max_count, len(valid_children)) if max_count >= 0 else len(valid_children)
+        desired_size: int = min(max_count, len(available)) if max_count >= 0 else len(available)
         if len(selected) > desired_size:
             num_to_remove = len(selected) - desired_size
             overlimit = set(random.sample(selected, num_to_remove))
             selected = [block for block in selected if block not in overlimit]
         elif len(selected) < desired_size:
             num_to_add = desired_size - len(selected)
-            valid_additions: set[tuple[str, str]] = set(valid_children) - set(selected)
-            additions = set(random.sample(valid_additions, num_to_add))
-            selected = [block for block in valid_children if block in (additions | set(selected))]
+            available_additions: set[tuple[str, str]] = set(available) - set(selected)
+            additions = set(random.sample(available_additions, num_to_add))
+            selected = [block for block in available if block in (additions | set(selected))]
 
         # If we've made any change AND if shuffling is enabled, then re-shuffle.
         # In other words, always shuffle UNLESS:
