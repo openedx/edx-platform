@@ -812,6 +812,13 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         self.lc_block = self.make_block("library_content", vertical)
 
     def _set_up_lc_block(self, manual, shuffle):
+        """
+        Set up the library content block with some combination of `manual` and `shuffle` flags.
+
+        Add four test "library items" (a-d) and mark them all as candidates.
+        If we're in manual mode, then add one extra "library item" (x) but don't mark it as a candidate. This tests
+        that non-candidate children are ignored when in manual mode.
+        """
         self.lc_block.manual = manual
         self.lc_block.shuffle = shuffle
         for name in ['a', 'b', 'c', 'd']:
@@ -822,6 +829,9 @@ class TestLibraryContentSelection(MixedSplitTestCase):
     def _create_lc_block_child(self, name, mark_as_candidate=True) -> tuple[str, str]:
         """
         Add an HTML block as a child of the LCB, simluating an item being added to the source library.
+
+        Optionally mark it as a candidate. Note that if `manual==False`, then the block's status as a candidate
+        will have no effect.
 
         Returns (type, ID) pair representing the new block.
         """
@@ -847,7 +857,7 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         if self.lc_block.manual:
             self.lc_block.candidates.remove(block_key)
         else:
-            selected = self.lc_block.selected  # TODO/HACK: 'selected' is lost upon re-load, so we manuallay save+fix it.
+            selected = self.lc_block.selected  # TODO/HACK: 'selected' is lost upon reload, so we manually save+fix it.
             self.store.update_item(self.lc_block, self.user_id)  # Persist any changes so we can reload later.
             self.store.delete_item(block_usage_key, self.user_id)
             self.lc_block = self.store.get_item(self.lc_block.location)  # Reload to update '.children'.
