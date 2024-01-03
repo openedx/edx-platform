@@ -10,7 +10,6 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag, LtiConfiguration
 
 from lms.djangoapps.courseware.tests.test_tabs import TabTestCase
-from openedx.core.djangoapps.course_live.config.waffle import ENABLE_COURSE_LIVE
 from openedx.core.djangoapps.course_live.models import CourseLiveConfiguration
 from openedx.core.djangoapps.course_live.tab import CourseLiveTab
 
@@ -56,13 +55,12 @@ class CourseLiveTabTestCase(TabTestCase):
         self.course_live_config.enabled = course_live_config_enabled
         self.course_live_config.save()
         tab = self.check_course_live_tab()
-        with override_waffle_flag(ENABLE_COURSE_LIVE, True):
-            self.check_can_display_results(
-                tab,
-                for_staff_only=True,
-                for_enrolled_users_only=True,
-                expected_value=course_live_config_enabled,
-            )
+        self.check_can_display_results(
+            tab,
+            for_staff_only=True,
+            for_enrolled_users_only=True,
+            expected_value=course_live_config_enabled,
+        )
 
     @ddt.data(*itertools.product((True, False), repeat=3))
     @ddt.unpack
