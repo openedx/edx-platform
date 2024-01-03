@@ -300,6 +300,26 @@ def update_settings_module(service='lms'):
     os.environ['DJANGO_SETTINGS_MODULE'] = settings_module
 
 
+def find_rst_files(directory):
+    rst_files = []
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if file.endswith('.rst'):
+                rst_files.append(os.path.join(root, file))
+    return rst_files
+
+
+def generate_toctree(custom_toctree_dir):
+    rst_files = find_rst_files(".")
+    toctree = "\n".join(["   " + file for file in rst_files])
+    with open(custom_toctree_dir, 'w') as custom_docs:
+        custom_docs.write("\n..\n\tAutomatically Generated Toctree. See `generate_toctree` \
+method in docs/conf.py.\nDo not change the contents of this file manually\n\n")
+        custom_docs.write(".. toctree::\n")
+        custom_docs.write("   :glob:\n")
+        custom_docs.write(toctree)
+
+
 def on_init(app):  # lint-amnesty, pylint: disable=redefined-outer-name, unused-argument
     """
     Run sphinx-apidoc after Sphinx initialization.
@@ -307,6 +327,9 @@ def on_init(app):  # lint-amnesty, pylint: disable=redefined-outer-name, unused-
     Read the Docs won't run tox or custom shell commands, so we need this to
     avoid checking in the generated reStructuredText files.
     """
+
+    generate_toctree('custom_toctree.rst')
+
     docs_path = root / 'docs'
     apidoc_path = 'sphinx-apidoc'
     if hasattr(sys, 'real_prefix'):  # Check to see if we are in a virtualenv
