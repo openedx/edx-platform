@@ -178,6 +178,16 @@ def handle_xblock(request, usage_key_string=None):
                         xblock, is_concise=True
                     )
                     return JsonResponse(ancestor_info)
+                elif "childrenInfo" in fields:
+                    xblock = get_xblock(usage_key, request.user)
+                    children_info = _create_xblock_child_info(
+                        xblock,
+                        course_outline=None,
+                        graders=None,
+                        include_children_predicate=ALWAYS,
+                        is_concise=True
+                    )
+                    return JsonResponse(children_info)
                 # TODO: pass fields to get_block_info and only return those
                 with modulestore().bulk_operations(usage_key.course_key):
                     response = get_block_info(get_xblock(usage_key, request.user))
@@ -825,7 +835,7 @@ def get_block_info(
     rewrite_static_links=True,
     include_ancestor_info=False,
     include_publishing_info=False,
-    include_children_predicate=False,
+    include_children_predicate=NEVER,
 ):
     """
     metadata, data, id representation of a leaf block fetcher.
