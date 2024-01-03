@@ -23,9 +23,8 @@ from xmodule import library_content_block
 from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE, LibraryContentBlock
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory, LibraryFactory
+from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.tests import prepare_block_runtime
 from xmodule.validation import StudioValidationMessage
 from xmodule.x_module import AUTHOR_VIEW
@@ -795,7 +794,7 @@ def _mock_selection_sample(wrapped):
 @ddt.ddt
 @_mock_selection_shuffle
 @_mock_selection_sample
-class TestLibraryContentSelection(SharedModuleStoreTestCase):
+class TestLibraryContentSelection(MixedSplitTestCase):
     """
     Test library content selection for the various modes of the LibraryContentBlock.
 
@@ -803,57 +802,38 @@ class TestLibraryContentSelection(SharedModuleStoreTestCase):
     Instead, we create a LibraryContentBlock (LCB) and add/remove children.
     This simulates how the CMS would add/remove children as part of the sync_from_library process.
     """
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.user_id = UserFactory().id
-        cls.course = CourseFactory.create(modulestore=cls.store)
-        chapter = BlockFactory(
-            modulestore=cls.store, category="chapter", parent_location=cls.course.location
-        )
-        sequential = BlockFactory(
-            modulestore=cls.store, category="sequential", parent_location=chapter.location
-        )
-        vertical = BlockFactory(
-            modulestore=cls.store, category="vertical", parent_location=sequential.location
-        )
-        cls.lc_block = BlockFactory(
-            modulestore=cls.store, category="library_content", parent_location=vertical.location
-        )
+    def setUp(self):
+        super().setUp()
+        self.user_id = UserFactory().id
+        self.course = CourseFactory.create(modulestore=self.store)
+        chapter = self.make_block("chapter", self.course)
+        sequential = self.make_block("sequential", chapter)
+        vertical = self.make_block("vertical", sequential)
+        self.lc_block = self.make_block("library_content", vertical)
 
     def _set_up_lc_block(self, manual, shuffle):
-        """
-        @@TODO
-        """
-        for old_child in self.lc_block.children:
-            self.store.delete_item(old_child)
-        self.lc_block = self.store.get_item(self.lc_block.location)
         self.lc_block.manual = manual
         self.lc_block.shuffle = shuffle
-        self._create_lc_block_children(['a', 'b', 'c', 'd'], mark_as_candidates=True)
+        for name in ['a', 'b', 'c', 'd']:
+            self._create_lc_block_child(name, mark_as_candidate=True)
         if manual:
-            self._create_lc_block_children(['x'], mark_as_candidates=False)
+            self._create_lc_block_child('x', mark_as_candidate=False)
 
-    def _create_lc_block_children(self, names, mark_as_candidates=True) -> list[tuple[str, str]]:
+    def _create_lc_block_child(self, name, mark_as_candidate=True) -> tuple[str, str]:
         """
-        Add an HTML blocks as a child of the LCB, simluating items being added to the source library.
+        Add an HTML block as a child of the LCB, simluating an item being added to the source library.
 
-        Returns (type, ID) pairs representing the new blocks.
+        Returns (type, ID) pair representing the new block.
         """
         selected = self.lc_block.selected  # TODO/HACK: 'selected' is lost upon re-load, so we manuallay save+fix it.
         self.store.update_item(self.lc_block, self.user_id)  # Persist any changes so we can reload later.
-        new_blocks = [
-            BlockFactory(
-                modulestore=self.store, category="html", parent_location=self.lc_block.location, display_name=name
-            )
-            for name in names
-        ]
+        new_block = self.make_block(category="html", parent_block=self.lc_block, display_name=name)
         self.lc_block = self.store.get_item(self.lc_block.location)  # Reload to update '.children'.
         self.lc_block.selected = selected  # TODO/HACK
-        new_block_keys = [(new_block.location.block_type, new_block.location.block_id) for new_block in new_blocks]
-        if mark_as_candidates:
-            self.lc_block.candidates += new_block_keys
-        return new_block_keys
+        new_block_key = (new_block.location.block_type, new_block.location.block_id)
+        if mark_as_candidate:
+            self.lc_block.candidates.append(new_block_key)
+        return new_block_key
 
     def _remove_lc_block_child(self, block_key: tuple[str, str]) -> None:
         """
@@ -867,7 +847,7 @@ class TestLibraryContentSelection(SharedModuleStoreTestCase):
         if self.lc_block.manual:
             self.lc_block.candidates.remove(block_key)
         else:
-            selected = self.lc_block.selected  # TODO/HACK: 'selected' is lost upon reload, so we manually save+fix it.
+            selected = self.lc_block.selected  # TODO/HACK: 'selected' is lost upon re-load, so we manuallay save+fix it.
             self.store.update_item(self.lc_block, self.user_id)  # Persist any changes so we can reload later.
             self.store.delete_item(block_usage_key, self.user_id)
             self.lc_block = self.store.get_item(self.lc_block.location)  # Reload to update '.children'.
@@ -906,7 +886,7 @@ class TestLibraryContentSelection(SharedModuleStoreTestCase):
 
         # Toss a new block into the children list.
         # Since -1 means "all blocks", 5 should be selected, including the 4 from last step.
-        self._create_lc_block_children(['e'])
+        self._create_lc_block_child('e')
         assert len(self.lc_block.available_children()) == 5
         selection_of_all_5 = self.lc_block.selected_children()
         assert len(selection_of_all_5) == 5
@@ -1043,7 +1023,7 @@ class TestLibraryContentSelection(SharedModuleStoreTestCase):
         self._remove_lc_block_child(unselected_child_to_remove)
 
         # Finally, add 2 new children.
-        additional_children = {*self._create_lc_block_children(['e', 'f'])}
+        additional_children = {self._create_lc_block_child('e'), self._create_lc_block_child('f')}
 
         # Sanity check
         new_children = self.lc_block.available_children()
