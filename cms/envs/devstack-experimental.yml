@@ -18,7 +18,6 @@
 # Paver, described here: https://github.com/openedx/devstack/pull/866
 # TODO: If the effort described above is abandoned, then this file should
 # probably be deleted.
-ALLOW_ALL_ADVANCED_COMPONENTS: true
 ACTIVATION_EMAIL_SUPPORT_LINK: ''
 AFFILIATE_COOKIE_NAME: dev_affiliate_id
 ALTERNATE_WORKER_QUEUES: lms

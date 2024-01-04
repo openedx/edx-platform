@@ -80,7 +80,6 @@ module.exports = Merge.smart({
             'js/factories/textbooks': './cms/static/js/factories/textbooks.js',
             'js/factories/container': './cms/static/js/factories/container.js',
             'js/factories/context_course': './cms/static/js/factories/context_course.js',
-            'js/factories/aside': './cms/static/js/factories/aside.js',
             'js/factories/library': './cms/static/js/factories/library.js',
             'js/factories/xblock_validation': './cms/static/js/factories/xblock_validation.js',
             'js/factories/edit_tabs': './cms/static/js/factories/edit_tabs.js',

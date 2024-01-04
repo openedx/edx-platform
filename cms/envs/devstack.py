@@ -338,8 +338,12 @@ xblock_duplicated_event_setting['course-authoring-xblock-lifecycle']['enabled'] 
 =======
 EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC = 'course-authoring-xblock-lifecycle'
 EVENT_BUS_ENROLLMENT_LIFECYCLE_TOPIC = 'course-authoring-enrollment-lifecycle'
+<<<<<<< HEAD
 ENABLE_RAPID_RESPONSE_AUTHOR_VIEW= True or False
 >>>>>>> feat: able to render aside only without xblock
+=======
+
+>>>>>>> feat: some cleaning
 ################# New settings must go ABOVE this line #################
 ########################################################################
 # See if the developer has any local overrides.
