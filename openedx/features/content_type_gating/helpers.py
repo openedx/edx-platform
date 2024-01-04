@@ -7,7 +7,7 @@ import logging
 from django.utils import timezone
 
 from common.djangoapps.course_modes.models import CourseMode
-from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.core.djangoapps.config_model_utils.utils import is_in_holdback
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.role_helpers import has_staff_roles
