@@ -101,7 +101,7 @@ class StudentResponse:
 
     def _create_and_update_text_journal_entry(self, **kwargs):
         problem_block = kwargs.get('problem_block')
-        parser = etree.XMLParser(remove_blank_text=True)
+        parser = etree.XMLParser(remove_blank_text=True, encoding='ISO-8859-1', ns_clean=True, recover=True)
         problem = etree.XML(problem_block.get_problem_html(encapsulate=True), parser=parser)
 
         student_module = kwargs.get('student_module')
