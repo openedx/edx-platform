@@ -11,6 +11,7 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions
 
 from edx_rest_framework_extensions.permissions import IsStaff, IsUserInUrl
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.core.lib.log_utils import audit_log
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 
@@ -63,14 +64,28 @@ class IsCourseStaffInstructor(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        return (hasattr(request, 'user') and
-                # either the user is a staff or instructor of the master course
-                (hasattr(obj, 'course_id') and
-                 (CourseInstructorRole(obj.course_id).has_user(request.user) or
-                  CourseStaffRole(obj.course_id).has_user(request.user))) or
-                # or it is a safe method and the user is a coach on the course object
-                (request.method in permissions.SAFE_METHODS
-                 and hasattr(obj, 'coach') and obj.coach == request.user))
+        return (
+            hasattr(request, 'user') and
+            # either the user is a staff or instructor of the master course
+            # TODO: remove roles checks once course_roles is fully impelented and data is migrated
+            (
+                hasattr(obj, 'course_id') and
+                (
+                    CourseInstructorRole(obj.course_id).has_user(request.user) or
+                    CourseStaffRole(obj.course_id).has_user(request.user) or
+                    (
+                        request.user.has_perm(CourseRolesPermission.MANAGE_COURSE_SETTINGS.perm_name) and
+                        request.user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name)
+                    )
+                )
+            ) or
+            # or it is a safe method and the user is a coach on the course object
+            (
+                request.method in permissions.SAFE_METHODS and
+                hasattr(obj, 'coach') and
+                obj.coach == request.user
+            )
+        )
 
 
 class IsMasterCourseStaffInstructor(permissions.BasePermission):
@@ -94,9 +109,12 @@ class IsMasterCourseStaffInstructor(permissions.BasePermission):
                 course_key = CourseKey.from_string(master_course_id)
             except InvalidKeyError:
                 raise Http404()  # lint-amnesty, pylint: disable=raise-missing-from
-            return (hasattr(request, 'user') and
-                    (CourseInstructorRole(course_key).has_user(request.user) or
-                     CourseStaffRole(course_key).has_user(request.user)))
+            # TODO: remove roles checks once course_roles is fully impelented and data is migrated
+            return (hasattr(request, 'user') and (
+                    CourseInstructorRole(course_key).has_user(request.user) or
+                    CourseStaffRole(course_key).has_user(request.user) or
+                    request.user.has_perm(CourseRolesPermission.MANAGE_COURSE_SETTINGS.perm_name)
+                    ))
         return False
 
 
@@ -111,8 +129,10 @@ class IsStaffOrReadOnly(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
+        # TODO: remove CourseStaffRole check once course_roles is fully impelented and data is migrated
         return (request.user.is_staff or
                 CourseStaffRole(obj.course_id).has_user(request.user) or
+                request.user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name) or
                 request.method in permissions.SAFE_METHODS)
 
 
