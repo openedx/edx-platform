@@ -114,13 +114,17 @@ def generate_course_notifications(signal, sender, course_notification_data, meta
 
     from openedx.core.djangoapps.notifications.tasks import send_notifications
     course_notification_data = course_notification_data.__dict__
+    user_ids = calculate_course_wide_notification_audience(
+        str(course_notification_data['course_key']),
+        course_notification_data['audience_filters']
+    )
+    sender_id = course_notification_data.get('content_context', {}).get('sender_id')
+    if sender_id in user_ids:
+        user_ids.remove(sender_id)
 
     notification_data = {
         'course_key': str(course_notification_data['course_key']),
-        'user_ids': calculate_course_wide_notification_audience(
-            str(course_notification_data['course_key']),
-            course_notification_data['audience_filters'],
-        ),
+        'user_ids': user_ids,
         'context': course_notification_data.get('content_context'),
         'app_name': course_notification_data.get('app_name'),
         'notification_type': course_notification_data.get('notification_type'),
