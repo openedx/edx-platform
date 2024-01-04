@@ -180,11 +180,7 @@ from openedx.core.djangoapps.util.user_messages import PageLevelMessages
             ${component_templates | n, dump_js_escaped_json},
             ${xblock_info | n, dump_js_escaped_json},
             "${action | n, js_escaped_string}",
-            {
-                isUnitPage: ${is_unit_page | n, dump_js_escaped_json},
-                canEdit: true,
-                outlineURL: "${outline_url | n, js_escaped_string}",
-                clipboardData: ${user_clipboard | n, dump_js_escaped_json},
+            {                
                 asidesOnly: true
             }
         );

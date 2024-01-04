@@ -71,48 +71,6 @@ class StructuredTagsAside(XBlockAside):
             return fragment
         else:
             return Fragment('')
-        
-    @XBlockAside.aside_for("studio_view")
-    def studio_view_aside(self, block, context=None):  # pylint: disable=unused-argument
-        """
-        Display the tag selector with specific categories and allowed values,
-        depending on the context.
-        """
-        if isinstance(block, ProblemBlock):
-            tags = []
-            for tag in self.get_available_tags():
-                tag_available_values = tag.get_values()
-                tag_current_values = self.saved_tags.get(tag.name, [])
-
-                if isinstance(tag_current_values, str):
-                    tag_current_values = [tag_current_values]
-
-                tag_values_not_exists = [cur_val for cur_val in tag_current_values
-                                         if cur_val not in tag_available_values]
-
-                tag_values_available_to_choose = tag_available_values + tag_values_not_exists
-                tag_values_available_to_choose.sort()
-
-                tags.append({
-                    'key': tag.name,
-                    'title': tag.title,
-                    'values': tag_values_available_to_choose,
-                    'current_values': tag_current_values,
-                })
-            tags.append({
-                    'key': "tag.name",
-                    'title': "tag.title",
-                    'values': ["tag_values_available_to_choose"],
-                    'current_values': ["tag_current_values"],
-                })
-            fragment = Fragment(render_to_string('structured_tags_block.html', {'tags': tags,
-                                                                                'tags_count': len(tags),
-                                                                                'block_location': block.location}))
-            fragment.add_javascript_url(self._get_studio_resource_url('/js/xblock_asides/structured_tags.js'))
-            fragment.initialize_js('StructuredTagsInit')
-            return fragment
-        else:
-            return Fragment('')
 
     @XBlock.handler
     def save_tags(self, request=None, suffix=None):  # lint-amnesty, pylint: disable=unused-argument

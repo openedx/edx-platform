@@ -29,7 +29,6 @@ function($, _, ViewUtils, BaseView, XBlock, HtmlUtils) {
                 xblockInfo = this.model,
                 xblockUrl = xblockInfo.url(),
                 querystring = window.location.search; // pass any querystring down to child views
-            console.log(decodeURIComponent(xblockUrl) + '/' + view + querystring)
                 return $.ajax({
                 url: decodeURIComponent(xblockUrl) + '/' + view + querystring,
                 type: 'GET',

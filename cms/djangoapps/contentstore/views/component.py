@@ -14,12 +14,11 @@ from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
-from xblock.core import XBlock, XBlockAside
+from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xblock.exceptions import NoSuchHandlerError
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
-from web_fragments.fragment import Fragment
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.auth import has_course_author_access
@@ -43,12 +42,11 @@ from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
 )
 from django.views.decorators.clickjacking import xframe_options_exempt
 from openedx.core.lib.xblock_utils import wrap_xblock_aside
-from openedx.core.djangolib.markup import HTML, Text
 
 __all__ = [
     'container_handler',
     'component_handler',
-    'plugin_handler'
+    'asides_handler'
 ]
 
 log = logging.getLogger(__name__)
@@ -115,7 +113,7 @@ def _load_mixed_class(category):
 @xframe_options_exempt
 @require_GET
 @login_required
-def plugin_handler(request, usage_key_string):
+def asides_handler(request, usage_key_string):
     """
     The restful handler for plugin xblock requests.
 
@@ -135,109 +133,44 @@ def plugin_handler(request, usage_key_string):
             except ItemNotFoundError:
                 return HttpResponseBadRequest()
             component_templates = get_component_templates(course)
-            ancestor_xblocks = []
-            parent = get_parent_xblock(xblock)
+
             action = request.GET.get('action', 'view')
 
             is_unit_page = is_unit(xblock)
-            unit = xblock if is_unit_page else None
-
-            if is_unit_page and use_new_unit_page(course.id):
-                return redirect(get_unit_url(course.id, unit.location))
-
-            is_first = True
-            block = xblock
-
-            # Build the breadcrumbs and find the ``Unit`` ancestor
-            # if it is not the immediate parent.
-            while parent:
-
-                if unit is None and is_unit(block):
-                    unit = block
-
-                # add all to nav except current xblock page
-                if xblock != block:
-                    current_block = {
-                        'title': block.display_name_with_default,
-                        'children': parent.get_children(),
-                        'is_last': is_first
-                    }
-                    is_first = False
-                    ancestor_xblocks.append(current_block)
-
-                block = parent
-                parent = get_parent_xblock(parent)
-
-            ancestor_xblocks.reverse()
-
-            assert unit is not None, "Could not determine unit page"
-            subsection = get_parent_xblock(unit)
-            assert subsection is not None, "Could not determine parent subsection from unit " + str(
-                unit.location)
-            section = get_parent_xblock(subsection)
-            assert section is not None, "Could not determine ancestor section from unit " + str(unit.location)
-
-            # for the sequence navigator
-            prev_url, next_url = get_sibling_urls(subsection, unit.location)
-            # these are quoted here because they'll end up in a query string on the page,
-            # and quoting with mako will trigger the xss linter...
-            prev_url = quote_plus(prev_url) if prev_url else None
-            next_url = quote_plus(next_url) if next_url else None
-
+ 
             # Fetch the XBlock info for use by the container page. Note that it includes information
             # about the block's ancestors and siblings for use by the Unit Outline.
             xblock_info = create_xblock_info(xblock, include_ancestor_info=is_unit_page)
-
-            if is_unit_page:
-                add_container_page_publishing_info(xblock, xblock_info)
-
-            # need to figure out where this item is in the list of children as the
-            # preview will need this
-            index = 1
-            for child in subsection.get_children():
-                if child.location == unit.location:
-                    break
-                index += 1
-
-            # Get the status of the user's clipboard so they can paste components if they have something to paste
-            user_clipboard = content_staging_api.get_user_clipboard_json(request.user.id, request)
             
             # Get the asides
             asides = xblock.runtime.get_asides(xblock)
             asides_fragments = [(aside,aside.studio_view_aside(xblock)) for aside in asides if getattr(type(aside),"studio_view_aside", None)]
             context = {}
-            asides_contents = [wrap_xblock_aside("StudioRuntime",aside,"studio_view",fragment,context,str,"1df72f76a3d911ee936b0242ac12000d").content for aside,fragment in asides_fragments]
+            asides_contents = [
+                wrap_xblock_aside(runtime_class="StudioRuntime",
+                                  aside=aside,
+                                  view="studio_view",
+                                  frag=fragment,context=context,
+                                  usage_id_serializer=str,
+                                  request_token="1df72f76a3d911ee936b0242ac12000d").content
+                for aside,fragment in asides_fragments
+                ]
 
-            return render_to_response('plugin.html', {
+            return render_to_response('asides.html', {
                 'html_contents':asides_contents,
                 'language_code': request.LANGUAGE_CODE,
                 'context_course': course,  # Needed only for display of menus at top of page.
                 'action': action,
                 'xblock': xblock,
                 'xblock_locator': xblock.location,
-                'unit': unit,
-                'is_unit_page': is_unit_page,
-                'subsection': subsection,
-                'section': section,
-                'position': index,
-                'prev_url': prev_url,
-                'next_url': next_url,
-                'new_unit_category': 'vertical',
-                'outline_url': '{url}?format=concise'.format(url=reverse_course_url('course_handler', course.id)),
-                'ancestor_xblocks': ancestor_xblocks,
                 'component_templates': component_templates,
                 'xblock_info': xblock_info,
-                'draft_preview_link': preview_lms_link,
-                'published_preview_link': lms_link,
                 'templates': CONTAINER_TEMPLATES,
-                # Status of the user's clipboard, exactly as would be returned from the "GET clipboard" REST API.
-                'user_clipboard': user_clipboard,
             })
     else:
         return HttpResponseBadRequest("Only supports HTML requests")
 
 
-@xframe_options_exempt
 @require_GET
 @login_required
 def container_handler(request, usage_key_string):  # pylint: disable=too-many-statements
@@ -259,7 +192,7 @@ def container_handler(request, usage_key_string):  # pylint: disable=too-many-st
             raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
         with modulestore().bulk_operations(usage_key.course_key):
             try:
-                course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)       
+                course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
             except ItemNotFoundError:
                 return HttpResponseBadRequest()
 
