@@ -19,6 +19,7 @@ from common.djangoapps.student.auth import STUDIO_EDIT_ROLES, STUDIO_VIEW_USERS,
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
 from common.djangoapps.util.json_request import JsonResponse, expect_json
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 
 from ..toggles import use_new_course_team_page
 from ..utils import get_course_team_url, get_course_team
@@ -127,7 +128,11 @@ def _course_team_user(request, course_key, email):
         }
         # what's the highest role that this user has? (How should this report global staff?)
         for role in role_hierarchy:
-            if role(course_key).has_user(user):
+            # TODO: remove role checks once course_roles is fully impelented and data is migrated
+            if (
+                role(course_key).has_user(user) or
+                user.has_perm(CourseRolesPermission.MANAGE_ALL_USERS.perm_name, course_key)
+            ):
                 msg["role"] = role.ROLE
                 break
         return JsonResponse(msg)

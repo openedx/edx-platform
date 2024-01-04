@@ -3,6 +3,7 @@
 
 from common.djangoapps.student import auth
 from common.djangoapps.student.roles import CourseInstructorRole
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 
 
 def get_user_role(user, course_id):
@@ -17,7 +18,11 @@ def get_user_role(user, course_id):
     :param course_id: the course_id of the course we're interested in
     """
     # afaik, this is only used in lti
-    if auth.user_has_role(user, CourseInstructorRole(course_id)):
+    # TODO: remove role checks once course_roles is fully impelented and data is migrated
+    if (
+        auth.user_has_role(user, CourseInstructorRole(course_id)) or
+        user.has_perm(CourseRolesPermission.MANAGE_ALL_USERS.perm_name, course_id)
+    ):
         return 'instructor'
     else:
         return 'staff'
