@@ -308,7 +308,7 @@ def create_ccx(request, course, ccx=None):
     COURSE_CREATED.send_event(
         time=datetime.datetime.now(tz=timezone.utc),
         course=CourseData(
-            course_key=ccx,
+            course_key=ccx_id,
         )
     )
 
