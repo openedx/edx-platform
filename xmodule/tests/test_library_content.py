@@ -811,52 +811,37 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         vertical = self.make_block("vertical", sequential)
         self.lc_block = self.make_block("library_content", vertical)
 
-    def _set_up_lc_block(self, manual, shuffle):
+    def _create_lc_block_children(self, block_keys: list[tuple[str, str]]) -> None:
         """
-        Set up the library content block with some combination of `manual` and `shuffle` flags.
+        Add blocks as children of the LCB, simluating an item being added to the source library.
 
-        Add four test "library items" (a-d) and mark them all as candidates.
-        If we're in manual mode, then add one extra "library item" (x) but don't mark it as a candidate. This tests
-        that non-candidate children are ignored when in manual mode.
-        """
-        self.lc_block.manual = manual
-        self.lc_block.shuffle = shuffle
-        for name in ['a', 'b', 'c', 'd']:
-            self._create_lc_block_child(name, mark_as_candidate=True)
-        if manual:
-            self._create_lc_block_child('x', mark_as_candidate=False)
-
-    def _create_lc_block_child(self, name, mark_as_candidate=True) -> tuple[str, str]:
-        """
-        Add an HTML block as a child of the LCB, simluating an item being added to the source library.
-
-        Optionally mark it as a candidate. Note that if `manual==False`, then the block's status as a candidate
-        will have no effect.
-
-        Returns (type, ID) pair representing the new block.
+        Each item should be a (type, ID) tuple.
         """
         selected = self.lc_block.selected  # TODO/HACK: 'selected' is lost upon re-load, so we manuallay save+fix it.
         self.store.update_item(self.lc_block, self.user_id)  # Persist any changes so we can reload later.
-        new_block = self.make_block(category="html", parent_block=self.lc_block, display_name=name)
+        for block_type, block_id in block_keys:
+            new_block = self.make_block(category=block_type, parent_block=self.lc_block, display_name=block_id)
         self.lc_block = self.store.get_item(self.lc_block.location)  # Reload to update '.children'.
         self.lc_block.selected = selected  # TODO/HACK
-        new_block_key = (new_block.location.block_type, new_block.location.block_id)
-        if mark_as_candidate:
-            self.lc_block.candidates.append(new_block_key)
-        return new_block_key
 
-    def _remove_lc_block_child(self, block_key: tuple[str, str]) -> None:
+    def _remove_lc_block_child(self, block_key: tuple[str, str], delete_child=True, remove_candidate=True) -> None:
         """
-        Remove a child of the LCB, simulating an item being removed from the source library.
+        Simulate the removal of a block from the source library and/or the candidates list.
+
+        If `delete_child`, remove it from the LCB's list of children and from modulestore entirely.
+        If `remove_candidate`, remove it fromthe LCB's list of candidates.
         """
-        if self.lc_block.manual:
-            assert block_key in self.lc_block.candidates
-        block_type, block_id = block_key
-        block_usage_key = self.course.id.make_usage_key(block_type, block_id)
-        assert block_usage_key in self.lc_block.children
-        if self.lc_block.manual:
-            self.lc_block.candidates.remove(block_key)
-        else:
+        assert delete_child or remove_candidate
+        if remove_candidate:
+            # candidates may contain tuples or lists, depending on whether it's been
+            # loaded from modulestore recently. Handle both cases.
+            try:
+                self.lc_block.candidates.remove(tuple(block_key))
+            except ValueError:
+                self.lc_block.candidates.remove(list(block_key))
+        if delete_child:
+            block_usage_key = self.course.id.make_usage_key(*block_key)
+            assert block_usage_key in self.lc_block.children
             selected = self.lc_block.selected  # TODO/HACK: 'selected' is lost upon reload, so we manually save+fix it.
             self.store.update_item(self.lc_block, self.user_id)  # Persist any changes so we can reload later.
             self.store.delete_item(block_usage_key, self.user_id)
@@ -871,7 +856,13 @@ class TestLibraryContentSelection(MixedSplitTestCase):
 
         Should hold true regardless of whether we `shuffle` the selection or not.
         """
-        self._set_up_lc_block(manual=manual, shuffle=shuffle)
+        self.lc_block.manual = manual
+        self.lc_block.shuffle = shuffle
+        initial_children = [('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')]
+        self._create_lc_block_children(initial_children)
+        self.lc_block.candidates = initial_children
+        if manual:
+            self._create_lc_block_children([('html', 'x')])  # Additional non-candidate child
 
         # Start with 2 selected.
         self.lc_block.max_count = 2
@@ -896,7 +887,10 @@ class TestLibraryContentSelection(MixedSplitTestCase):
 
         # Toss a new block into the children list.
         # Since -1 means "all blocks", 5 should be selected, including the 4 from last step.
-        self._create_lc_block_child('e')
+        additional_children = [('html', 'e')]
+        self._create_lc_block_children(additional_children)
+        self.lc_block.candidates += additional_children
+
         assert len(self.lc_block.available_children()) == 5
         selection_of_all_5 = self.lc_block.selected_children()
         assert len(selection_of_all_5) == 5
@@ -920,7 +914,13 @@ class TestLibraryContentSelection(MixedSplitTestCase):
 
         Should hold true regardless of whether we `shuffle` the selection or not.
         """
-        self._set_up_lc_block(manual=manual, shuffle=shuffle)
+        self.lc_block.manual = manual
+        self.lc_block.shuffle = shuffle
+        initial_children = [('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')]
+        self._create_lc_block_children(initial_children)
+        self.lc_block.candidates = initial_children
+        if manual:
+            self._create_lc_block_children([('html', 'x')])  # Additional non-candidate child
 
         # Start with max
         self.lc_block.max_count = -1
@@ -950,7 +950,13 @@ class TestLibraryContentSelection(MixedSplitTestCase):
 
         Should hold true regardless of whether we `shuffle` the selection or not.
         """
-        self._set_up_lc_block(manual=manual, shuffle=shuffle)
+        self.lc_block.manual = manual
+        self.lc_block.shuffle = shuffle
+        initial_children = [('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')]
+        self._create_lc_block_children(initial_children)
+        self.lc_block.candidates = initial_children
+        if manual:
+            self._create_lc_block_children([('html', 'x')])  # Additional non-candidate child
 
         # Start with 2 blocks
         self.lc_block.max_count = 2
@@ -979,7 +985,13 @@ class TestLibraryContentSelection(MixedSplitTestCase):
 
         Should hold true regardless of whether we `shuffle` the selection or not.
         """
-        self._set_up_lc_block(manual=manual, shuffle=shuffle)
+        self.lc_block.manual = manual
+        self.lc_block.shuffle = shuffle
+        initial_children = [('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')]
+        self._create_lc_block_children(initial_children)
+        self.lc_block.candidates = initial_children
+        if manual:
+            self._create_lc_block_children([('html', 'x')])  # Additional non-candidate child
 
         # Start with 2 blocks
         self.lc_block.max_count = 2
@@ -1012,7 +1024,13 @@ class TestLibraryContentSelection(MixedSplitTestCase):
 
         Should work regardless of whether we `shuffle` the selection or not.
         """
-        self._set_up_lc_block(manual=manual, shuffle=shuffle)
+        self.lc_block.manual = manual
+        self.lc_block.shuffle = shuffle
+        initial_children = [('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')]
+        self._create_lc_block_children(initial_children)
+        self.lc_block.candidates = initial_children
+        if manual:
+            self._create_lc_block_children([('html', 'x')])  # Additional non-candidate child
 
         # Start with a library of 4 and selection of 2.
         old_children = self.lc_block.available_children()
@@ -1033,7 +1051,9 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         self._remove_lc_block_child(unselected_child_to_remove)
 
         # Finally, add 2 new children.
-        additional_children = {self._create_lc_block_child('e'), self._create_lc_block_child('f')}
+        additional_children = [('html', 'e'), ('html', 'f')]
+        self._create_lc_block_children(additional_children)
+        self.lc_block.candidates += additional_children
 
         # Sanity check
         new_children = self.lc_block.available_children()
