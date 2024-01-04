@@ -851,6 +851,48 @@ class TestLibraryContentSelection(MixedSplitTestCase):
 
     @ddt.data(
         dict(
+            # "Randomized mode" with empty library.
+            manual=False,
+            shuffle=True,
+            children=[],
+            candidates=[],
+        ),
+        dict(
+            # "Randomized mode" with empty library. There are fake entries in candidates, which shouldn't matter.
+            manual=False,
+            shuffle=False,  # disabling shuffling -- shouldn't affect anything.
+            children=[],
+            candidates=[('html', 'i-do-not-exist'), ('html', 'i-am-not-real')],
+        ),
+        dict(
+            # "Static mode" with library items but no candidates.
+            manual=True,
+            shuffle=False,
+            children=[('html', 'a'), ('html', 'b'), ('html', 'c')],
+            candidates=[],
+        ),
+        dict(
+            # "Static mode with shuffling" with library items and candidates, but the candidates don't actually exist.
+            manual=True,
+            shuffle=True,
+            children=[('html', 'a'), ('html', 'b'), ('html', 'c')],
+            candidates=[('html', 'i-do-not-exist'), ('html', 'i-am-not-real')],
+        ),
+    )
+    @ddt.unpack
+    def test_none_available_for_selection(self, manual, shuffle, children, candidates):
+        """
+        Test various scennarios in which there are no blocks available to be selected.
+        """
+        self.lc_block.manual = manual
+        self.lc_block.shuffle = shuffle
+        self._create_lc_block_children(children)
+        self.lc_block.candidates = candidates
+        assert self.lc_block.available_children() == []
+        assert self.lc_block.selected_children() == []
+
+    @ddt.data(
+        dict(
             # "Randomized mode"
             manual=False,
             shuffle=True,
@@ -1212,3 +1254,87 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         assert still_selected == {selected_child_to_keep}
         assert len(newly_selected) == 2
         assert newly_selected < {unselected_child_to_keep, *additional_children}
+
+    @ddt.data(True, False)
+    def test_toggle_manual_when_selecting_all(self, shuffle):
+        """
+        Test the behavior of toggling `manual` on and off when `max_count==-1` (i,e., "select all").
+        """
+        # 4 children, 2 of which are candidates.
+        self.lc_block.shuffle = shuffle
+        children = [('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')]
+        self._create_lc_block_children(children)
+        candidates = [('html', 'a'), ('html', 'c')]
+        self.lc_block.candidates = candidates
+
+        # Select all available.
+        self.lc_block.max_count = -1
+
+        # Non-manual mode: All children are selected.
+        self.lc_block.manual = False
+        assert self.lc_block.available_children() == children
+        if shuffle:
+            assert set(self.lc_block.selected_children()) == set(children)
+        else:
+            assert self.lc_block.selected_children() == children
+
+        # Manual mode: All candidates are selected.
+        self.lc_block.manual = True
+        assert self.lc_block.available_children() == candidates
+        if shuffle:
+            assert set(self.lc_block.selected_children()) == set(candidates)
+        else:
+            assert self.lc_block.selected_children() == candidates
+
+        # Back to non-manual mode: All children are selected.
+        self.lc_block.manual = False
+        assert self.lc_block.available_children() == children
+        if shuffle:
+            assert set(self.lc_block.selected_children()) == set(children)
+        else:
+            assert self.lc_block.selected_children() == children
+
+    @ddt.data(True, False)
+    def test_toggle_manual_when_selecting_subset(self, shuffle):
+        """
+        Test the behavior of toggling `manual` on and off when `max_count` equals the number of candidates, but there
+        are additional non-candidates.
+        """
+        # 4 children.
+        self.lc_block.shuffle = shuffle
+        self.lc_block.max_count = 2
+        children = [('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')]
+        self._create_lc_block_children(children)
+
+        # Non-manual mode: Any 2 of 4 children are selected.
+        self.lc_block.manual = False
+        assert self.lc_block.available_children() == children
+        nonmanual_selected = self.lc_block.selected_children()
+        assert len(nonmanual_selected) == 2
+        assert set(nonmanual_selected) < set(children)
+
+        # Pick 2 candidates: 1 of which is currently selected, and 1 of which is not.
+        candidates = [nonmanual_selected[0]]
+        for child in children:
+            if child not in nonmanual_selected:
+                candidates.append(child)
+                break
+        assert len(candidates) == 2  # Sanity chek
+        self.lc_block.candidates = candidates
+
+        # Manual mode: Just the 2 candidates should now be selected.
+        self.lc_block.manual = True
+        assert self.lc_block.available_children() == candidates
+        manual_selected = self.lc_block.selected_children()
+        assert len(manual_selected) == 2
+        if shuffle:
+            assert set(manual_selected) == set(candidates)
+        else:
+            assert manual_selected == candidates
+
+        # Back to non-manual mode:
+        # Selection should be unchanged! Even though all children are now available for selection,
+        # the selection criteria (max_count==2) is still satisfied, so the selection should remain unchanged.
+        self.lc_block.manual = False
+        nonmanual_selected_new = self.lc_block.selected_children()
+        assert nonmanual_selected_new == manual_selected
