@@ -19,3 +19,20 @@ jobs:
             tutor images build openedx --no-cache
             echo -e "y\n\n\n\n\n\ny" | tutor local launch
             docker push 848839979695.dkr.ecr.ap-southeast-1.amazonaws.com/lms:15.3.6
+      - name: Send noti
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          fields: workflow,job,message,commit,repo,ref,author,took
+          custom_payload: |
+            {
+              username: 'github-action',
+              icon_emoji: ':octocat:',
+              attachments: [{
+                color: '${{ job.status }}' === 'success' ? 'good' : '${{ job.status }}' === 'failure' ? 'danger' : 'warning',
+                text: `${process.env.AS_AUTHOR.split(/[<@]/)[1]} Deploy Openedx "${process.env.AS_MESSAGE}" in ${process.env.AS_REF.replace('refs/heads/', '')} ${'${{ job.status }}' === 'success' ? 'succeeded' : '${{ job.status }}' === 'failure' ? 'failed' : '${{ job.status }}'} in ${process.env.AS_TOOK}`,
+              }]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always() # Pick up events even if the job fails or is canceled.            
