@@ -7,6 +7,7 @@ import logging
 from django.utils import timezone
 
 from common.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.course_roles.permissions import CourseRolesPermission
 from openedx.core.djangoapps.config_model_utils.utils import is_in_holdback
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.role_helpers import has_staff_roles
@@ -114,7 +115,16 @@ def enrollment_date_for_fbe(user, course_key=None, course=None):
     elif full_access_masquerade is False:
         user = None  # we are masquerading as a generic user, not a specific one -- avoid all user checks below
 
-    if user and user.id and has_staff_roles(user, course_key):
+    permissions = [
+        CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.perm_name,
+        CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.perm_name,
+        CourseRolesPermission.VIEW_ALL_CONTENT.perm_name,
+        CourseRolesPermission.VIEW_LIVE_PUBLISHED_CONTENT.perm_name,
+        CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.perm_name,
+    ]
+    # TODO: remove role checks once course_roles is fully impelented and data is migrated
+    if user and user.id and (has_staff_roles(user, course_key) or
+                             user.has_perms(permissions, course_key)):
         return None
 
     enrollment = user and CourseEnrollment.get_enrollment(user, course_key, ['fbeenrollmentexclusion'])
