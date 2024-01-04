@@ -850,19 +850,19 @@ class TestLibraryContentSelection(MixedSplitTestCase):
 
     @ddt.data(*itertools.product((True, False), (True, False)))
     @ddt.unpack
-    def test_additional_blocks_added(self, manual, shuffle):
+    def test_expanding_selection(self, manual, shuffle):
         """
-        Test that increasing the "max_count" value leads to the original selected blocks, plus more.
-
-        Should hold true regardless of whether we `shuffle` the selection or not.
+        Test that increasing max_count and/or available children results in an expanded selection.
         """
+        # Start with 4 available blocks.
         self.lc_block.manual = manual
         self.lc_block.shuffle = shuffle
         initial_children = [('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')]
         self._create_lc_block_children(initial_children)
         self.lc_block.candidates = initial_children
         if manual:
-            self._create_lc_block_children([('html', 'x')])  # Additional non-candidate child
+            self._create_lc_block_children([('html', 'x')])  # unavailable child
+        assert self.lc_block.available_children() == initial_children
 
         # Start with 2 selected.
         self.lc_block.max_count = 2
@@ -885,12 +885,16 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         else:
             assert selection_of_all_4 == self.lc_block.available_children()
 
-        # Toss a new block into the children list.
-        # Since -1 means "all blocks", 5 should be selected, including the 4 from last step.
-        additional_children = [('html', 'e')]
-        self._create_lc_block_children(additional_children)
-        self.lc_block.candidates += additional_children
+        # Toss a new block into the children list, and add it to candidates list too.
+        additional_child = ('html', 'e')
+        self._create_lc_block_children([additional_child])
+        self.lc_block.candidates += [additional_child]
 
+        # MANUAL ONLY: toss another non-candidate block into the children -- should be ignored.
+        if manual:
+            self._create_lc_block_children([('html', 'y')])  # Another additional non-candidate child
+
+        # Since -1 means "use all available children", 5 should be selected, including the 4 from last step.
         assert len(self.lc_block.available_children()) == 5
         selection_of_all_5 = self.lc_block.selected_children()
         assert len(selection_of_all_5) == 5
@@ -902,39 +906,39 @@ class TestLibraryContentSelection(MixedSplitTestCase):
 
         # Increase max_count past the number of available children.
         # Since "too many" is treated the same as "all", the selection should be unchanged.
-        # Even when shuffle==True, the order should be unchanged, since the selection is equal.
+        # Even when shuffle==True, the order should be unchanged, since the selected set is unchanged.
         self.lc_block.max_count = 10
         assert self.lc_block.selected_children() == selection_of_all_5
 
     @ddt.data(*itertools.product((True, False), (True, False)))
     @ddt.unpack
-    def test_overlimit_blocks_removed(self, manual, shuffle):
+    def test_overlimit_selection(self, manual, shuffle):
         """
-        Test that decreasing the `max_count` value leads a reduced version of the original subset.
-
-        Should hold true regardless of whether we `shuffle` the selection or not.
+        Test that decreasing the max_count value leads a reduced version of the original selection.
         """
+        # Start with 4 available blocks.
         self.lc_block.manual = manual
         self.lc_block.shuffle = shuffle
         initial_children = [('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')]
         self._create_lc_block_children(initial_children)
         self.lc_block.candidates = initial_children
         if manual:
-            self._create_lc_block_children([('html', 'x')])  # Additional non-candidate child
+            self._create_lc_block_children([('html', 'x')])  # unavailable child
+        assert self.lc_block.available_children() == initial_children
 
-        # Start with max
+        # Start with max selection.
         self.lc_block.max_count = -1
         selection_of_all_4 = set(self.lc_block.selected_children())
         assert len(selection_of_all_4) == 4
         assert selection_of_all_4 == set(self.lc_block.available_children())
 
-        # Then drop it down to 3... should be a subset
+        # Then drop it down to 3... should be a subset.
         self.lc_block.max_count = 3
         selection_of_all_3 = set(self.lc_block.selected_children())
         assert len(selection_of_all_3) == 3
         assert selection_of_all_3 < selection_of_all_4
 
-        # Then drop it down to 2... should be a smaller subset
+        # Then drop it down to 2... should be a smaller subset.
         self.lc_block.max_count = 2
         selection_of_all_2 = set(self.lc_block.selected_children())
         assert len(selection_of_all_2) == 2
@@ -942,30 +946,30 @@ class TestLibraryContentSelection(MixedSplitTestCase):
 
     @ddt.data(*itertools.product((True, False), (True, False), (0, 1)))
     @ddt.unpack
-    def test_invalid_block_replaced_when_possible(self, manual, shuffle, index_of_selected_to_keep):
+    def test_unavailable_block_with_replacement(self, manual, shuffle, index_of_selected_to_keep):
         """
-        Test that if a selected block is removed from the library when there are replacements
-        available in the library, then it is replaced. Any still-valid block should remain in the
-        selection.
-
-        Should hold true regardless of whether we `shuffle` the selection or not.
+        Test that if a selected block becomes unavailable (either by library removal or candidate removal)
+        when there are ARE other replacement blocks available, then it is just replaced with one of those.
+        Other selected blocks should remain selected.
         """
+        # Start with 4 available blocks.
         self.lc_block.manual = manual
         self.lc_block.shuffle = shuffle
         initial_children = [('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')]
         self._create_lc_block_children(initial_children)
         self.lc_block.candidates = initial_children
         if manual:
-            self._create_lc_block_children([('html', 'x')])  # Additional non-candidate child
+            self._create_lc_block_children([('html', 'x')])  # unavailable child
+        assert self.lc_block.available_children() == initial_children
 
-        # Start with 2 blocks
+        # Start with 2 selected blocks.
         self.lc_block.max_count = 2
-        old_selection = self.lc_block.selected_children()
-        assert len(old_selection) == 2
+        initial_selection = self.lc_block.selected_children()
+        assert len(initial_selection) == 2
 
         # Keep one, remove one.
-        selected_child_to_keep = old_selection[index_of_selected_to_keep]
-        (selected_child_to_remove,) = set(old_selection) - {selected_child_to_keep}
+        selected_child_to_keep = initial_selection[index_of_selected_to_keep]
+        (selected_child_to_remove,) = set(initial_selection) - {selected_child_to_keep}
         self._remove_lc_block_child(selected_child_to_remove)
         assert len(self.lc_block.available_children()) == 3
 
@@ -977,29 +981,29 @@ class TestLibraryContentSelection(MixedSplitTestCase):
 
     @ddt.data(*itertools.product((True, False), (True, False), (0, 1)))
     @ddt.unpack
-    def test_invalid_block_without_replacement(self, manual, shuffle, index_of_selected_to_keep):
+    def test_unavilable_block_without_replacement(self, manual, shuffle, index_of_selected_to_keep):
         """
-        Test that if a selected block is removed from the library when there are NOT replacements
-        available in the library, then it is just removed. Any still-valid blocks should remain in the
-        selection.
-
-        Should hold true regardless of whether we `shuffle` the selection or not.
+        Test that if a selected block becomes unavailable (either by library removal or candidate removal)
+        when there are NOT other replacement blocks available, then it is just removed.
+        Any still-available blocks should remain in the selection.
         """
+        # Start with 4 available blocks.
         self.lc_block.manual = manual
         self.lc_block.shuffle = shuffle
         initial_children = [('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')]
         self._create_lc_block_children(initial_children)
         self.lc_block.candidates = initial_children
         if manual:
-            self._create_lc_block_children([('html', 'x')])  # Additional non-candidate child
+            self._create_lc_block_children([('html', 'x')])  # unavailable child
+        assert self.lc_block.available_children() == initial_children
 
-        # Start with 2 blocks
+        # Start with 2 selected blocks.
         self.lc_block.max_count = 2
-        old_selection = self.lc_block.selected_children()
-        assert len(old_selection) == 2
+        initial_selection = self.lc_block.selected_children()
+        assert len(initial_selection) == 2
 
         # Choose just one of them to keep; remove all other children.
-        selected_child_to_keep = old_selection[index_of_selected_to_keep]
+        selected_child_to_keep = initial_selection[index_of_selected_to_keep]
         for child in self.lc_block.available_children():
             if child != selected_child_to_keep:
                 self._remove_lc_block_child(child)
@@ -1021,31 +1025,29 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         """
         Test that if blocks are added to the source lib, AND blocks are deleted, AND max_count
         changes, then everything works out according to the rules of make_selection.
-
-        Should work regardless of whether we `shuffle` the selection or not.
         """
+        # Start with 4 available blocks
         self.lc_block.manual = manual
         self.lc_block.shuffle = shuffle
         initial_children = [('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')]
         self._create_lc_block_children(initial_children)
         self.lc_block.candidates = initial_children
         if manual:
-            self._create_lc_block_children([('html', 'x')])  # Additional non-candidate child
+            self._create_lc_block_children([('html', 'x')])  # unavailable child
+        assert self.lc_block.available_children() == initial_children
 
-        # Start with a library of 4 and selection of 2.
-        old_children = self.lc_block.available_children()
-        assert len(old_children) == 4
+        # Start with a selection of 2
         self.lc_block.max_count = 2
-        old_selection = self.lc_block.selected_children()
-        assert len(old_selection) == 2
+        initial_selection = self.lc_block.selected_children()
+        assert len(initial_selection) == 2
 
         # From the selection: keep one, but remove the other from the children.
-        selected_child_to_keep = old_selection[index_of_selected_to_keep]
-        (selected_child_to_remove,) = set(old_selection) - {selected_child_to_keep}
+        selected_child_to_keep = initial_selection[index_of_selected_to_keep]
+        (selected_child_to_remove,) = set(initial_selection) - {selected_child_to_keep}
         self._remove_lc_block_child(selected_child_to_remove)
 
         # Now from the *unselected* children: keep one, and remove the other.
-        unselected_children = [child for child in old_children if child not in old_selection]
+        unselected_children = [child for child in initial_children if child not in initial_selection]
         unselected_child_to_keep = unselected_children[index_of_unselected_to_keep]
         (unselected_child_to_remove,) = set(unselected_children) - {unselected_child_to_keep}
         self._remove_lc_block_child(unselected_child_to_remove)
@@ -1064,8 +1066,8 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         self.lc_block.max_count = 3
         new_selection = self.lc_block.selected_children()
         assert len(new_selection) == 3
-        still_selected = set(new_selection) & set(old_selection)
-        newly_selected = set(new_selection) - set(old_selection)
+        still_selected = set(new_selection) & set(initial_selection)
+        newly_selected = set(new_selection) - set(initial_selection)
         assert still_selected == {selected_child_to_keep}
         assert len(newly_selected) == 2
         assert newly_selected < {unselected_child_to_keep, *additional_children}
