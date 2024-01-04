@@ -1253,6 +1253,9 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
         if is_xblock_unit and summary_configuration.is_enabled():
             xblock_info["summary_configuration_enabled"] = summary_configuration.is_summary_enabled(xblock_info['id'])
 
+        asides = xblock.runtime.get_asides(xblock)
+        xblock_info["has_cms_asides"] = bool([aside for aside in asides
+                                             if getattr(type(aside), "studio_view_aside", None)])
     return xblock_info
 
 

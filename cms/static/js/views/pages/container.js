@@ -160,7 +160,8 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             
             // Render the xblock
             xblockView.render({
-                done: function() {
+                done: function() {        
+                // If request needs to render asides only
                 if (self.options.asidesOnly){
                     self.$('.xblock_asides-v1').each(function() {
                         if (!$(this).hasClass('xblock-initialized')) {
@@ -168,14 +169,14 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                         self.initRuntimeData(aside, options);
                     }
                     self.$('.wrapper-comp-plugins').addClass('is-active');
+                    
                     // Removing Xblock as we only need Asides
-                    xblockView.remove(); 
-
+                    xblockView.remove();
                 });
-            }
-                    // Show the xblock and hide the loading indicator
-                    else{
-                        xblockView.$el.removeClass(hiddenCss);
+                }
+                    // Show the xblock
+                else{
+                    xblockView.$el.removeClass(hiddenCss);
                 
                     // Notify the runtime that the page has been successfully shown
                     xblockView.notifyRuntime('page-shown', self);
@@ -206,6 +207,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     }
 =======
                 }
+                // Hide the loading indicator
                 loadingElement.addClass(hiddenCss);
 >>>>>>> feat: asides only view working
 
@@ -394,7 +396,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
 
         editXBlock: function(event, options) {
             event.preventDefault();
-            console.log("in eventttttt")
+
             if (!options || options.view !== 'visibility_view') {
                 const primaryHeader = $(event.target).closest('.xblock-header-primary');
 

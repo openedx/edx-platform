@@ -110,15 +110,16 @@ def _load_mixed_class(category):
     mixologist = Mixologist(settings.XBLOCK_MIXINS)
     return mixologist.mix(component_class)
 
+
 @xframe_options_exempt
 @require_GET
 @login_required
 def asides_handler(request, usage_key_string):
     """
-    The restful handler for plugin xblock requests.
+    The restful handler for asides xblock requests.
 
     GET
-        html: returns the HTML page for editing a container
+        html: returns the HTML page for editing a xblock's aside
         json: not currently supported
     """
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
@@ -137,27 +138,30 @@ def asides_handler(request, usage_key_string):
             action = request.GET.get('action', 'view')
 
             is_unit_page = is_unit(xblock)
- 
+
             # Fetch the XBlock info for use by the container page. Note that it includes information
             # about the block's ancestors and siblings for use by the Unit Outline.
             xblock_info = create_xblock_info(xblock, include_ancestor_info=is_unit_page)
-            
+
             # Get the asides
             asides = xblock.runtime.get_asides(xblock)
-            asides_fragments = [(aside,aside.studio_view_aside(xblock)) for aside in asides if getattr(type(aside),"studio_view_aside", None)]
+            asides_fragments = [
+                (aside, aside.studio_view_aside(xblock))
+                for aside in asides if getattr(type(aside), "studio_view_aside", None)
+            ]
             context = {}
             asides_contents = [
                 wrap_xblock_aside(runtime_class="StudioRuntime",
                                   aside=aside,
                                   view="studio_view",
-                                  frag=fragment,context=context,
+                                  frag=fragment, context=context,
                                   usage_id_serializer=str,
                                   request_token="1df72f76a3d911ee936b0242ac12000d").content
-                for aside,fragment in asides_fragments
-                ]
+                for aside, fragment in asides_fragments
+            ]
 
             return render_to_response('asides.html', {
-                'html_contents':asides_contents,
+                'html_contents': asides_contents,
                 'language_code': request.LANGUAGE_CODE,
                 'context_course': course,  # Needed only for display of menus at top of page.
                 'action': action,
