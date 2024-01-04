@@ -10,7 +10,7 @@ from lms.djangoapps.course_home_api.course_metadata.views import CourseHomeMetad
 from openedx.features.funix_relative_date.views import FunixRelativeDatesTabView
 from lms.djangoapps.course_home_api.dates.views import DatesTabView
 from lms.djangoapps.course_home_api.outline.views import (
-    OutlineTabView, dismiss_welcome_message, save_course_goal, unsubscribe_from_course_goal_by_token,
+    OutlineTabView, dismiss_welcome_message, save_course_goal, unsubscribe_from_course_goal_by_token, get_next_lesson
 )
 from lms.djangoapps.course_home_api.progress.views import ProgressTabView
 from openedx.features.funix_goal.views import ( set_goal )
@@ -84,6 +84,11 @@ urlpatterns += [
         unsubscribe_from_course_goal_by_token,
         name='unsubscribe-from-course-goal'
     ),
+    re_path(
+        r'next_lesson/(?P<usage_key_string>[^/]*)$' ,
+        get_next_lesson,
+        name='next-lesson'       
+    )
 ]
 
 # Progress Tab URLs

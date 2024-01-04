@@ -649,238 +649,225 @@
             }
         };
         // problem quizz
-      Problem.prototype.submit_qz = function () {
-        var that = this;
-        var listQz = that.$('.wrapper-problem-response');
-        var checkedInput = that.$('.field input:checked');
-        var indicatorError = $(listQz[currentIndex]).find('.indicator-container');
-        return $.postWithPrefix('' + this.url + '/problem_check', that.answers, function (response) {
-          console.log( '========',response);
-
-          if (response.success === 'submitted' || response.success === 'incorrect' || response.success === 'correct') {
-            var problemQuestionNumbers = that.$('.problem-question-number');
-            var parsedHTML = $(response.contents);
-            var listProblemParsed = parsedHTML.find('.wrapper-problem-response');
-            var messagesProblem = listProblemParsed[currentIndex].querySelector('.message');
-            var indicatorErrorParsed = listProblemParsed[currentIndex].querySelector('.indicator-container');
-            var choicegroup = listQz[currentIndex].querySelector('.choicegroup , .capa_inputtype'); // choicegroup.appendChild(messagesProblem)
-           
-            if (response.success === 'incorrect') {
-              var problemParsed = listProblemParsed[currentIndex];
-              var submittedInput = problemParsed.querySelector('input.submitted');
-              var incorrectLabel = problemParsed.querySelector('label.choicegroup_correct');
-              var wrongLabel = problemParsed.querySelector('label.choicegroup_incorrect');
-          
-              indicatorError.css('display', 'none')
+        Problem.prototype.submit_qz = function () {
+            var that = this;
+            var listQz = that.$('.wrapper-problem-response');
+            var checkedInput = that.$('.field input:checked');
+            var indicatorError = $(listQz[currentIndex]).find('.indicator-container');
+            return $.postWithPrefix('' + this.url + '/problem_check', that.answers, function (response) {
+              console.log( response);
     
-
-              if (incorrectLabel && submittedInput) {
-                that.$('.btn-submit-qz').css('display', 'none');
-                that.$('#btn-next').css('display', 'block');
-                $(listQz[currentIndex]).find('.error-problem-answer').remove();
-                problemQuestionNumbers.each(function (index, element) {
-                  if (element.textContent === (currentIndex + 1).toString()) {
-                    element.classList.add('submitted-question');
-                    element.classList.remove('active-number');
-                    $(listQz[currentIndex]).find('.message').remove();
-                    choicegroup.appendChild(messagesProblem);
-                    $(listQz[currentIndex]).find('.explanation-title').append('<span>Bạn đã trả lời đúng</span>');
-                    indicatorError.css('display', 'none');
-                    element.classList.remove('err-number-qusetion');
-                    checkedInput.each(function () {
-                      var input = $(this);
-                      var label = $('label[for="' + $(this).attr('id') + '"]');
-                      input.addClass('submitted');
-                      input.addClass('success-problem');
-                      label.addClass('response-label field-label label-inline choicegroup_correct');
-                      choicegroup.appendChild(messagesProblem);
-                    });
-                  }
-                });
-              } else {}
-
-              if (wrongLabel && submittedInput) {
+              if (response.success === 'submitted' || response.success === 'incorrect' || response.success === 'correct') {
+                var problemQuestionNumbers = that.$('.problem-question-number');
+                var parsedHTML = $(response.contents);
+                var listProblemParsed = parsedHTML.find('.wrapper-problem-response');
+                var messagesProblem = listProblemParsed[currentIndex].querySelector('.message');
+                var indicatorErrorParsed = listProblemParsed[currentIndex].querySelector('.indicator-container');
+                var choicegroup = listQz[currentIndex].querySelector('.choicegroup , .capa_inputtype'); // choicegroup.appendChild(messagesProblem)
                
-                indicatorError.css('display', 'none');
-                var indocatorName = $(indicatorError).find('.sr');
-
-                if (indocatorName.text() == 'unanswered') {
-                  indicatorError.remove();
-                  choicegroup.appendChild(indicatorErrorParsed);
-                 
-                }
-
-                problemQuestionNumbers.each(function (index, element) {
-                  if (element.textContent === (currentIndex + 1).toString()) {
-                    element.classList.add('err-number-qusetion');
-                    element.classList.remove('active-number');
-                    var explanation = $(listQz[currentIndex]).find('.explanation-title'); //remove messgae
-
-                    $(listQz[currentIndex]).find('.message').remove();
-
-                    if (messagesProblem) {
-                      choicegroup.appendChild(messagesProblem);
-                      $(listQz[currentIndex]).find('.explanation-title').append('<span>Câu trả lời của bạn chưa chính xác</span>');
-                    } else {
-                      if (explanation.length === 0) {
-                        var newMessgasBox = $('<div></div>').addClass('feedback-hint-incorrect messages-box error-problem-answer ');
-                        var title = $('<div></div>').addClass('explanation-title').text('Câu trả lời của bạn chưa chính xác');
-                        title.css("padding-bottom", '0px');
-                        newMessgasBox.append(title);
-                        $(listQz[currentIndex]).append(newMessgasBox);
+                if (response.success === 'incorrect') {
+                  var problemParsed = listProblemParsed[currentIndex];
+                  var submittedInput = problemParsed.querySelector('input.submitted');
+                  var incorrectLabel = problemParsed.querySelector('label.choicegroup_correct');
+                  var wrongLabel = problemParsed.querySelector('label.choicegroup_incorrect');
+                  $(listQz[currentIndex]).find('.indicator-container').css('display' , 'none');
+    
+                  if (incorrectLabel && submittedInput) {
+                    that.$('.btn-submit-qz').css('display', 'none');
+                    that.$('#btn-next').css('display', 'block');
+                    $(listQz[currentIndex]).find('.error-problem-answer').remove();
+                    problemQuestionNumbers.each(function (index, element) {
+                      if (element.textContent === (currentIndex + 1).toString()) {
+                        element.classList.add('submitted-question');
+                        element.classList.remove('active-number');
+                        $(listQz[currentIndex]).find('.message').remove();
+                        choicegroup.appendChild(messagesProblem);
+                        $(listQz[currentIndex]).find('.explanation-title').append('<span>Bạn đã trả lời đúng</span>');
+                        indicatorError.css('display', 'none');
+                        element.classList.remove('err-number-qusetion');
+                        checkedInput.each(function () {
+                          var input = $(this);
+                          var label = $('label[for="' + $(this).attr('id') + '"]');
+                          input.addClass('submitted');
+                          input.addClass('success-problem');
+                          label.addClass('response-label field-label label-inline choicegroup_correct');
+                          choicegroup.appendChild(messagesProblem);
+                        });
                       }
+                    });
+                  } else {}
+    
+                  if (wrongLabel && submittedInput) {
+                   
+                    indicatorError.css('display', 'none');
+                    var indocatorName = $(indicatorError).find('.sr');
+    
+                    if (indocatorName.text() == 'unanswered') {
+                      indicatorError.remove();
+                      choicegroup.appendChild(indicatorErrorParsed);
                     }
-
-                    var messgasBox = listQz[currentIndex].querySelector('.feedback-hint-incorrect');
-                    messgasBox.classList.add('error-problem-answer');
-                    checkedInput.each(function () {
-                      var input = $(this);
-                      var label = $('label[for="' + $(this).attr('id') + '"]');
-                      input.addClass('submitted');
-                      label.addClass('response-label field-label label-inline choicegroup_incorrect');
+    
+                    problemQuestionNumbers.each(function (index, element) {
+                      if (element.textContent === (currentIndex + 1).toString()) {
+                        element.classList.add('err-number-qusetion');
+                        element.classList.remove('active-number');
+                        var explanation = $(listQz[currentIndex]).find('.explanation-title'); //remove messgae
+    
+                        $(listQz[currentIndex]).find('.message').remove();
+    
+                        if (messagesProblem) {
+                          choicegroup.appendChild(messagesProblem);
+                          $(listQz[currentIndex]).find('.explanation-title').append('<span>Câu trả lời của bạn chưa chính xác</span>');
+                        } else {
+                          if (explanation.length === 0) {
+                            var newMessgasBox = $('<div></div>').addClass('feedback-hint-incorrect messages-box error-problem-answer ');
+                            var title = $('<div></div>').addClass('explanation-title').text('Câu trả lời của bạn chưa chính xác');
+                            title.css("padding-bottom", '0px');
+                            newMessgasBox.append(title);
+                            $(listQz[currentIndex]).append(newMessgasBox);
+                          }
+                        }
+    
+                        var messgasBox = listQz[currentIndex].querySelector('.feedback-hint-incorrect');
+                        messgasBox.classList.add('error-problem-answer');
+                        checkedInput.each(function () {
+                          var input = $(this);
+                          var label = $('label[for="' + $(this).attr('id') + '"]');
+                          input.addClass('submitted');
+                          label.addClass('response-label field-label label-inline choicegroup_incorrect');
+                        });
+                      }
                     });
                   }
-                });
-                
-                $(listQz[currentIndex]).find('.indicator-container').css('display' , 'none');
+                }
+    
+                if (response.success === 'correct') {
+                  that.$('.btn-submit-qz').css('display', 'none');
+                  that.$('#btn-next').css('display', 'none');
+                  that.$('#btn-next-lesson').css('display', 'block');
+                  problemQuestionNumbers.each(function (index, element) {
+                    if (element.textContent === (currentIndex + 1).toString()) {
+                      element.classList.add('submitted-question');
+                      element.classList.remove('active-number');
+                      element.classList.remove('err-number-qusetion');
+                      $(listQz[currentIndex]).find('.message').remove();
+                      choicegroup.appendChild(messagesProblem);
+                      indicatorError.css('display', 'none');
+                      $(listQz[currentIndex]).find('.explanation-title').append('<span>Bạn đã trả lời đúng</span>');
+                    }
+                  });
+                  checkedInput.each(function () {
+                    var input = $(this);
+                    var label = $('label[for="' + $(this).attr('id') + '"]');
+                    input.addClass('submitted');
+                    input.addClass('success-problem');
+                    label.addClass('response-label field-label label-inline choicegroup_correct');
+                    choicegroup.appendChild(messagesProblem);
+                  });
+                }
+    
+                window.SR.readTexts(that.get_sr_status(response.contents));
+                that.el.trigger('contentChanged', [that.id, response.contents, response]); // that.render(response.contents, that.focus_on_submit_notification);
+    
+                that.updateProgress(response);
+    
+                if (response.entrance_exam_passed) {
+                  window.parent.postMessage({
+                    type: 'entranceExam.passed'
+                  }, '*');
+                }
+              } else {
+                that.saveNotification.hide();
+                that.gentle_alert(response.success);
               }
+    
+              return Logger.log('problem_graded', [that.answers, response.contents], that.id);
+            });
+          };
+    
+          Problem.prototype.next_btn = function () {
+            var that = this;
+            var listQz = that.$('.wrapper-problem-response');
+            var problemQuestionNumbers = that.$('.problem-question-number');
+            $('.btn-submit-qz').prop('disabled', true); //  problemQuestionNumbers.each(function(index, element) {
+            //   if (element.textContent === (currentIndex +1 ).toString()) {
+            //     element.classList.remove('err-number-qusetion');
+            //     element.classList.add('submitted-question');
+            //   } })
+    
+            listQz[currentIndex].style.display = 'none';
+            currentIndex += 1;
+    
+            if (currentIndex >= listQz.length) {
+              currentIndex = 0;
             }
-
-            if (response.success === 'correct') {
+    
+            var submittedInput = listQz[currentIndex].querySelector('input.submitted');
+            var incorrectLabel = listQz[currentIndex].querySelector('label.choicegroup_correct');
+            var wrongLabel = listQz[currentIndex].querySelector('label.choicegroup_incorrect');
+            var elementNumber = problemQuestionNumbers[currentIndex];
+            listQz[currentIndex].style.display = 'block'; // that.$('.btn-submit-qz').css('display', 'block');
+            // that.$('#btn-next').css('display', 'none');
+            // console.log('=======incorrectLabel=======', incorrectLabel)
+            // console.log('======wrongLabel========', wrongLabel)
+    
+            if (incorrectLabel && submittedInput) {
               that.$('.btn-submit-qz').css('display', 'none');
               that.$('#btn-next').css('display', 'block');
-              problemQuestionNumbers.each(function (index, element) {
-                if (element.textContent === (currentIndex + 1).toString()) {
-                  element.classList.add('submitted-question');
-                  element.classList.remove('active-number');
-                  element.classList.remove('err-number-qusetion');
-                  $(listQz[currentIndex]).find('.message').remove();
-                  choicegroup.appendChild(messagesProblem);
-                  indicatorError.css('display', 'none');
-                  $(listQz[currentIndex]).find('.explanation-title').append('<span>Bạn đã trả lời đúng</span>');
-                }
-              });
+            } else if (wrongLabel && submittedInput) {
+              that.$('.btn-submit-qz').css('display', 'block');
+              that.$('#btn-next').css('display', 'none');
+              var messgasBox = listQz[currentIndex].querySelector('.feedback-hint-incorrect');
+              messgasBox.classList.add('error-problem-answer');
+            } else {
+              that.$('.btn-submit-qz').css('display', 'block');
+              that.$('#btn-next').css('display', 'none');
+            }
+    
+            if (elementNumber.classList.contains('err-number-qusetion')) {
+              // choicegroup_correct success-problem
+              var checkedInput = $(listQz[currentIndex]).find('.field input:checked');
               checkedInput.each(function () {
                 var input = $(this);
                 var label = $('label[for="' + $(this).attr('id') + '"]');
-                input.addClass('submitted');
-                input.addClass('success-problem');
-                label.addClass('response-label field-label label-inline choicegroup_correct');
-                choicegroup.appendChild(messagesProblem);
+                label.removeClass('choicegroup_correct');
+                input.removeClass('success-problem');
               });
+              that.$('.btn-submit-qz').css('display', 'block');
+              that.$('#btn-next').css('display', 'none');
+    
+              var _messgasBox = listQz[currentIndex].querySelector('.feedback-hint-incorrect');
+    
+              _messgasBox.classList.add('error-problem-answer');
             }
-
-            window.SR.readTexts(that.get_sr_status(response.contents));
-            that.el.trigger('contentChanged', [that.id, response.contents, response]); // that.render(response.contents, that.focus_on_submit_notification);
-
-            that.updateProgress(response);
-
-            if (response.entrance_exam_passed) {
-              window.parent.postMessage({
-                type: 'entranceExam.passed'
-              }, '*');
+    
+            problemQuestionNumbers.each(function (index, element) {
+              if (element.textContent === (currentIndex + 1).toString()) {
+                element.classList.add('active-number');
+              } else {
+                element.classList.remove('active-number');
+              }
+            }); 
+    
+            var checkInput = $(listQz[currentIndex]).find('input[type="checkbox"], input[type="radio"]');
+            checkInput.on('change', function () {
+              var atLeastOneChecked = $('.field input:checked').length > 0;
+    
+              if (atLeastOneChecked) {
+                $('.btn-submit-qz').prop('disabled', false);
+              } else {
+                $('.btn-submit-qz').prop('disabled', true);
+              }
+            });
+    
+       
+    
+            if(that.$('.submitted-question').length === currentIndex + 1){
+              that.$('#btn-next').css('display', 'none');
+              that.$('#btn-next-lesson').css('display', 'block');
+    
             }
-          } else {
-            that.saveNotification.hide();
-            that.gentle_alert(response.success);
-          }
-
-          return Logger.log('problem_graded', [that.answers, response.contents], that.id);
-        });
-      };
-
-      Problem.prototype.next_btn = function () {
-        var that = this;
-        var listQz = that.$('.wrapper-problem-response');
-        var problemQuestionNumbers = that.$('.problem-question-number');
-        $('.btn-submit-qz').prop('disabled', true); //  problemQuestionNumbers.each(function(index, element) {
-        //   if (element.textContent === (currentIndex +1 ).toString()) {
-        //     element.classList.remove('err-number-qusetion');
-        //     element.classList.add('submitted-question');
-        //   } })
-
-        listQz[currentIndex].style.display = 'none';
-        currentIndex += 1;
-
-        if (currentIndex >= listQz.length) {
-          currentIndex = 0;
-        }
-
-        var submittedInput = listQz[currentIndex].querySelector('input.submitted');
-        var incorrectLabel = listQz[currentIndex].querySelector('label.choicegroup_correct');
-        var wrongLabel = listQz[currentIndex].querySelector('label.choicegroup_incorrect');
-        var elementNumber = problemQuestionNumbers[currentIndex];
-        listQz[currentIndex].style.display = 'block'; // that.$('.btn-submit-qz').css('display', 'block');
-        // that.$('#btn-next').css('display', 'none');
-        // console.log('=======incorrectLabel=======', incorrectLabel)
-        // console.log('======wrongLabel========', wrongLabel)
-
-        if (incorrectLabel && submittedInput) {
-          that.$('.btn-submit-qz').css('display', 'none');
-          that.$('#btn-next').css('display', 'block');
-        } else if (wrongLabel && submittedInput) {
-          that.$('.btn-submit-qz').css('display', 'block');
-          that.$('#btn-next').css('display', 'none');
-          var messgasBox = listQz[currentIndex].querySelector('.feedback-hint-incorrect');
-          messgasBox.classList.add('error-problem-answer');
-        } else {
-          that.$('.btn-submit-qz').css('display', 'block');
-          that.$('#btn-next').css('display', 'none');
-        }
-
-        if (elementNumber.classList.contains('err-number-qusetion')) {
-          // choicegroup_correct success-problem
-          var checkedInput = $(listQz[currentIndex]).find('.field input:checked');
-          checkedInput.each(function () {
-            var input = $(this);
-            var label = $('label[for="' + $(this).attr('id') + '"]');
-            label.removeClass('choicegroup_correct');
-            input.removeClass('success-problem');
-          });
-          that.$('.btn-submit-qz').css('display', 'block');
-          that.$('#btn-next').css('display', 'none');
-
-          var _messgasBox = listQz[currentIndex].querySelector('.feedback-hint-incorrect');
-
-          _messgasBox.classList.add('error-problem-answer');
-        }
-
-        problemQuestionNumbers.each(function (index, element) {
-          if (element.textContent === (currentIndex + 1).toString()) {
-            element.classList.add('active-number');
-          } else {
-            element.classList.remove('active-number');
-          }
-        }); // const indicatorError = $(listQz[currentIndex]).find('.indicator-container')
-        // indicatorError.css('display', 'none');
-        // problemQuestionNumbers.each(function(index, element) {
-        //   if (element.textContent === (currentIndex +1 ).toString()) {
-        //     element.classList.add('active-number');
-        //     const submittedInput =  listQz[currentIndex].querySelector('input.submitted');
-        //     const incorrectLabel = listQz[currentIndex].querySelector('label.choicegroup_correct');
-        //     if (submittedInput && incorrectLabel){
-        //       that.$('.btn-submit-qz').css('display', 'none');
-        //       that.$('#btn-next').css('display', 'block');
-        //     }
-        // else {
-        //   const message = $(listQz[currentIndex]).find('.message').remove()
-        // }
-        //   } else {
-        //     element.classList.remove('active-number');
-        //   }
-        // });
-
-        var checkInput = $(listQz[currentIndex]).find('input[type="checkbox"], input[type="radio"]');
-        checkInput.on('change', function () {
-          var atLeastOneChecked = $('.field input:checked').length > 0;
-
-          if (atLeastOneChecked) {
-            $('.btn-submit-qz').prop('disabled', false);
-          } else {
-            $('.btn-submit-qz').prop('disabled', true);
-          }
-        });
-      };
+          };
           
 
         Problem.prototype.submit_internal = function() {
