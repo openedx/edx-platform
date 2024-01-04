@@ -161,22 +161,22 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             // Render the xblock
             xblockView.render({
                 done: function() {
-                    console.log(self.el)
-                self.$('.xblock_asides-v1').each(function() {
-                    console.log("kkkkkkekekekkekekee")
-                    if (!$(this).hasClass('xblock-initialized')) {
-                        console.log("qqqwwwewqqwee")
-                        aside = XBlock.initializeBlock($(this));
+                if (self.options.asidesOnly){
+                    self.$('.xblock_asides-v1').each(function() {
+                        if (!$(this).hasClass('xblock-initialized')) {
+                        var aside = XBlock.initializeBlock($(this));
                         self.initRuntimeData(aside, options);
-                        // self.initRuntimeData(aside, options);
                     }
-                    self.$('.wrapper-comp-plugins').addClass('is-active')
-                    
-                });
-                    // Show the xblock and hide the loading indicator
-                    // xblockView.$el.removeClass(hiddenCss);
-                    loadingElement.addClass(hiddenCss);
+                    self.$('.wrapper-comp-plugins').addClass('is-active');
+                    // Removing Xblock as we only need Asides
+                    xblockView.remove(); 
 
+                });
+            }
+                    // Show the xblock and hide the loading indicator
+                    else{
+                        xblockView.$el.removeClass(hiddenCss);
+                
                     // Notify the runtime that the page has been successfully shown
                     xblockView.notifyRuntime('page-shown', self);
 
@@ -197,12 +197,17 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     if (!self.isLibraryPage && !self.isLibraryContentPage) {
                         self.initializePasteButton();
                     }
+<<<<<<< HEAD
 
                     var targetId = window.location.hash.slice(1);
                     if (targetId) {
                         var target = document.getElementById(targetId);
                         target.scrollIntoView({ behavior: 'smooth', inline: 'center' });
                     }
+=======
+                }
+                loadingElement.addClass(hiddenCss);
+>>>>>>> feat: asides only view working
 
                 },
                 block_added: options && options.block_added

@@ -42,10 +42,8 @@ from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
     load_services_for_studio,
 )
 from django.views.decorators.clickjacking import xframe_options_exempt
-from openedx.core.lib.xblock_utils import (
-
-    wrap_xblock_aside,
-)
+from openedx.core.lib.xblock_utils import wrap_xblock_aside
+from openedx.core.djangolib.markup import HTML, Text
 
 __all__ = [
     'container_handler',
@@ -200,28 +198,18 @@ def plugin_handler(request, usage_key_string):
                 if child.location == unit.location:
                     break
                 index += 1
-            print(f"\n\n\n{xblock}\n\n\n")
-            print(f"\n\n{list(XBlockAside.load_classes())}\n\n")
-            # print(f"\n\n\n{xblock.get_children()[0]}\n\n\n")
+
             # Get the status of the user's clipboard so they can paste components if they have something to paste
             user_clipboard = content_staging_api.get_user_clipboard_json(request.user.id, request)
-            aside = xblock.runtime.get_asides(xblock)
-            print(xblock.runtime.render_asides(xblock,"studio_view", Fragment(),{}))
-            # print(f"\n\n\n{aside}\n\n\n")
-            for a in aside:
-                if str(type(a))=="<class 'rapid_response_xblock.block.RapidResponseAside'>":
-                    print(a.studio_view_aside(xblock).content)
-                    asi = a
-
-                    frag = xblock.render("studio_view")
-                    frg = a.studio_view_aside(xblock)
-                    # xblock = a
-                    
-            c = wrap_xblock_aside("StudioRuntime",asi,"studio_view",frg,{},str,"1df72f76a3d911ee936b0242ac12000d")
-            print(c.content)
             
+            # Get the asides
+            asides = xblock.runtime.get_asides(xblock)
+            asides_fragments = [(aside,aside.studio_view_aside(xblock)) for aside in asides if getattr(type(aside),"studio_view_aside", None)]
+            context = {}
+            asides_contents = [wrap_xblock_aside("StudioRuntime",aside,"studio_view",fragment,context,str,"1df72f76a3d911ee936b0242ac12000d").content for aside,fragment in asides_fragments]
+
             return render_to_response('plugin.html', {
-                'fragment':frag,
+                'html_contents':asides_contents,
                 'language_code': request.LANGUAGE_CODE,
                 'context_course': course,  # Needed only for display of menus at top of page.
                 'action': action,
