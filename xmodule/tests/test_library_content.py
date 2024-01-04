@@ -838,6 +838,7 @@ class TestLibraryContentSelection(MixedSplitTestCase):
             try:
                 self.lc_block.candidates.remove(tuple(block_key))
             except ValueError:
+                assert list(block_key) in self.lc_block.candidates
                 self.lc_block.candidates.remove(list(block_key))
         if delete_child:
             block_usage_key = self.course.id.make_usage_key(*block_key)
@@ -848,21 +849,40 @@ class TestLibraryContentSelection(MixedSplitTestCase):
             self.lc_block = self.store.get_item(self.lc_block.location)  # Reload to update '.children'.
             self.lc_block.selected = selected  # TODO/HACK
 
-    @ddt.data(*itertools.product((True, False), (True, False)))
+    @ddt.data(
+        dict(
+            # "Randomized mode"
+            manual=False,
+            shuffle=True,
+            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            initial_candidates=[],
+        ),
+        dict(
+            # "Static mode" (with one non-candidate child)
+            manual=True,
+            shuffle=False,
+            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'x'), ('html', 'c'), ('html', 'd')],
+            initial_candidates=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+        ),
+        dict(
+            # "Static mode with shuffling" (with one non-candidate child)
+            manual=True,
+            shuffle=True,
+            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'x'), ('html', 'c'), ('html', 'd')],
+            initial_candidates=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+        ),
+    )
     @ddt.unpack
-    def test_expanding_selection(self, manual, shuffle):
+    def test_expanding_selection(self, manual, shuffle, initial_children, initial_candidates):
         """
         Test that increasing max_count and/or available children results in an expanded selection.
         """
         # Start with 4 available blocks.
         self.lc_block.manual = manual
         self.lc_block.shuffle = shuffle
-        initial_children = [('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')]
         self._create_lc_block_children(initial_children)
-        self.lc_block.candidates = initial_children
-        if manual:
-            self._create_lc_block_children([('html', 'x')])  # unavailable child
-        assert self.lc_block.available_children() == initial_children
+        self.lc_block.candidates = initial_candidates
+        assert len(self.lc_block.available_children()) == 4  # Sanity check ddt input
 
         # Start with 2 selected.
         self.lc_block.max_count = 2
@@ -910,21 +930,40 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         self.lc_block.max_count = 10
         assert self.lc_block.selected_children() == selection_of_all_5
 
-    @ddt.data(*itertools.product((True, False), (True, False)))
+    @ddt.data(
+        dict(
+            # "Randomized mode"
+            manual=False,
+            shuffle=True,
+            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            initial_candidates=[],
+        ),
+        dict(
+            # "Static mode" (with one non-candidate child)
+            manual=True,
+            shuffle=False,
+            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'x'), ('html', 'c'), ('html', 'd')],
+            initial_candidates=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+        ),
+        dict(
+            # "Static mode with shuffling" (with one non-candidate child)
+            manual=True,
+            shuffle=True,
+            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'x'), ('html', 'c'), ('html', 'd')],
+            initial_candidates=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+        ),
+    )
     @ddt.unpack
-    def test_overlimit_selection(self, manual, shuffle):
+    def test_overlimit_selection(self, manual, shuffle, initial_children, initial_candidates):
         """
         Test that decreasing the max_count value leads a reduced version of the original selection.
         """
         # Start with 4 available blocks.
         self.lc_block.manual = manual
         self.lc_block.shuffle = shuffle
-        initial_children = [('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')]
         self._create_lc_block_children(initial_children)
-        self.lc_block.candidates = initial_children
-        if manual:
-            self._create_lc_block_children([('html', 'x')])  # unavailable child
-        assert self.lc_block.available_children() == initial_children
+        self.lc_block.candidates = initial_candidates
+        assert len(self.lc_block.available_children()) == 4  # Sanity check ddt input
 
         # Start with max selection.
         self.lc_block.max_count = -1
@@ -944,9 +983,60 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         assert len(selection_of_all_2) == 2
         assert selection_of_all_2 < selection_of_all_3
 
-    @ddt.data(*itertools.product((True, False), (True, False), (0, 1)))
+    @ddt.data(
+        dict(
+            # "Randomized mode"
+            manual=False,
+            shuffle=True,
+            index_of_selected_to_keep=0,
+            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            initial_candidates=[],
+            delete_child=True,
+            remove_candidate=False,
+        ),
+        dict(
+            # "Randomized mode", but we also remove from the candidates list (which should have no extra effect)
+            manual=False,
+            shuffle=True,
+            index_of_selected_to_keep=1,
+            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            initial_candidates=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            delete_child=True,
+            remove_candidate=True,
+        ),
+        dict(
+            # "Static mode" (with one non-candidate child).
+            manual=True,
+            shuffle=False,
+            index_of_selected_to_keep=0,
+            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'x'), ('html', 'c'), ('html', 'd')],
+            initial_candidates=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            delete_child=False,
+            remove_candidate=True,
+        ),
+        dict(
+            # "Static mode with shuffling" (with one non-candidate child).
+            # TWIST: Remove from underling lib, not candidates. Should have the same effect of removing from candidates.
+            manual=True,
+            shuffle=True,
+            index_of_selected_to_keep=1,
+            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'x'), ('html', 'c'), ('html', 'd')],
+            initial_candidates=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            delete_child=True,
+            remove_candidate=False,
+        ),
+    )
     @ddt.unpack
-    def test_unavailable_block_with_replacement(self, manual, shuffle, index_of_selected_to_keep):
+    def test_unavailable_block_with_replacement(
+        self,
+        manual,
+        shuffle,
+        initial_children,
+        initial_candidates,
+        index_of_selected_to_keep,
+        delete_child,
+        remove_candidate,
+    ):
         """
         Test that if a selected block becomes unavailable (either by library removal or candidate removal)
         when there are ARE other replacement blocks available, then it is just replaced with one of those.
@@ -955,12 +1045,9 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         # Start with 4 available blocks.
         self.lc_block.manual = manual
         self.lc_block.shuffle = shuffle
-        initial_children = [('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')]
         self._create_lc_block_children(initial_children)
-        self.lc_block.candidates = initial_children
-        if manual:
-            self._create_lc_block_children([('html', 'x')])  # unavailable child
-        assert self.lc_block.available_children() == initial_children
+        self.lc_block.candidates = initial_candidates
+        assert len(self.lc_block.available_children()) == 4  # Sanity check ddt input
 
         # Start with 2 selected blocks.
         self.lc_block.max_count = 2
@@ -970,7 +1057,9 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         # Keep one, remove one.
         selected_child_to_keep = initial_selection[index_of_selected_to_keep]
         (selected_child_to_remove,) = set(initial_selection) - {selected_child_to_keep}
-        self._remove_lc_block_child(selected_child_to_remove)
+        self._remove_lc_block_child(
+            selected_child_to_remove, delete_child=delete_child, remove_candidate=remove_candidate
+        )
         assert len(self.lc_block.available_children()) == 3
 
         # New selection should still have 2 blocks: the kept block, and another lib block
@@ -979,23 +1068,71 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         assert selected_child_to_keep in new_selection
         assert selected_child_to_remove not in new_selection
 
-    @ddt.data(*itertools.product((True, False), (True, False), (0, 1)))
+    @ddt.data(
+        dict(
+            # "Randomized mode"
+            manual=False,
+            shuffle=True,
+            index_of_selected_to_keep=0,
+            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            initial_candidates=[],
+            delete_child=True,
+            remove_candidate=False,
+        ),
+        dict(
+            # "Randomized mode", but we also remove from the candidates list (which should have no extra effect)
+            manual=False,
+            shuffle=True,
+            index_of_selected_to_keep=1,
+            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            initial_candidates=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            delete_child=True,
+            remove_candidate=True,
+        ),
+        dict(
+            # "Static mode" (with one non-candidate child).
+            manual=True,
+            shuffle=False,
+            index_of_selected_to_keep=0,
+            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'x'), ('html', 'c'), ('html', 'd')],
+            initial_candidates=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            delete_child=False,
+            remove_candidate=True,
+        ),
+        dict(
+            # "Static mode with shuffling" (with one non-candidate child).
+            # TWIST: Remove from underling lib, not candidates. Should have the same effect of removing from candidates.
+            manual=True,
+            shuffle=True,
+            index_of_selected_to_keep=1,
+            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'x'), ('html', 'c'), ('html', 'd')],
+            initial_candidates=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            delete_child=True,
+            remove_candidate=False,
+        ),
+    )
     @ddt.unpack
-    def test_unavilable_block_without_replacement(self, manual, shuffle, index_of_selected_to_keep):
+    def test_unavilable_block_without_replacement(
+        self,
+        manual,
+        shuffle,
+        initial_children,
+        initial_candidates,
+        index_of_selected_to_keep,
+        delete_child,
+        remove_candidate,
+    ):
         """
         Test that if a selected block becomes unavailable (either by library removal or candidate removal)
-        when there are NOT other replacement blocks available, then it is just removed.
-        Any still-available blocks should remain in the selection.
+        when there are ARE other replacement blocks available, then it is just replaced with one of those.
+        Other selected blocks should remain selected.
         """
         # Start with 4 available blocks.
         self.lc_block.manual = manual
         self.lc_block.shuffle = shuffle
-        initial_children = [('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')]
         self._create_lc_block_children(initial_children)
-        self.lc_block.candidates = initial_children
-        if manual:
-            self._create_lc_block_children([('html', 'x')])  # unavailable child
-        assert self.lc_block.available_children() == initial_children
+        self.lc_block.candidates = initial_candidates
+        assert len(self.lc_block.available_children()) == 4  # Sanity check ddt input
 
         # Start with 2 selected blocks.
         self.lc_block.max_count = 2
@@ -1006,7 +1143,9 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         selected_child_to_keep = initial_selection[index_of_selected_to_keep]
         for child in self.lc_block.available_children():
             if child != selected_child_to_keep:
-                self._remove_lc_block_child(child)
+                self._remove_lc_block_child(
+                    child, delete_child=delete_child, remove_candidate=remove_candidate
+                )
         assert len(self.lc_block.available_children()) == 1
 
         # New selection should have just the 1 remaining block, even though max_count is still 2
@@ -1014,7 +1153,9 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         assert self.lc_block.max_count == 2
 
         # Finally, remove that last remaining block, and ensure that the selection is empty.
-        self._remove_lc_block_child(selected_child_to_keep)
+        self._remove_lc_block_child(
+            selected_child_to_keep, delete_child=delete_child, remove_candidate=remove_candidate
+        )
         assert self.lc_block.available_children() == []
         assert self.lc_block.selected_children() == []
         assert self.lc_block.max_count == 2
