@@ -44,6 +44,7 @@ perms[ENABLE_CERTIFICATE_GENERATION] = is_staff
 perms[GENERATE_CERTIFICATE_EXCEPTIONS] = is_staff
 perms[GENERATE_BULK_CERTIFICATE_EXCEPTIONS] = is_staff
 perms[GIVE_STUDENT_EXTENSION] = HasAccessRule('staff')
+# TODO: remove role checks once course_roles is fully impelented and data is migrated
 perms[VIEW_ISSUED_CERTIFICATES] = (
     HasAccessRule('staff') |
     HasRolesRule('data_researcher') |
@@ -51,6 +52,7 @@ perms[VIEW_ISSUED_CERTIFICATES] = (
 )
 # only global staff or those with the data_researcher role can access the data download tab
 # HasAccessRule('staff') also includes course staff
+# TODO: remove role checks once course_roles is fully impelented and data is migrated
 perms[CAN_RESEARCH] = (
     is_staff |
     HasRolesRule('data_researcher') |
@@ -58,11 +60,13 @@ perms[CAN_RESEARCH] = (
 )
 perms[CAN_ENROLL] = HasAccessRule('staff')
 perms[CAN_BETATEST] = HasAccessRule('instructor')
+# TODO: remove role checks once course_roles is fully impelented and data is migrated
 perms[ENROLLMENT_REPORT] = (
     HasAccessRule('staff') |
     HasRolesRule('data_researcher') |
     HasPermissionRule(CourseRolesPermission.ACCESS_DATA_DOWNLOADS.perm_name)
 )
+# TODO: remove role checks once course_roles is fully impelented and data is migrated
 perms[VIEW_COUPONS] = (
     HasAccessRule('staff') |
     HasRolesRule('data_researcher') |
@@ -70,6 +74,7 @@ perms[VIEW_COUPONS] = (
 )
 perms[EXAM_RESULTS] = HasAccessRule('staff')
 perms[OVERRIDE_GRADES] = HasAccessRule('staff')
+# TODO: remove role checks once course_roles is fully impelented and data is migrated
 perms[SHOW_TASKS] = (
     HasAccessRule('staff') |
     HasRolesRule('data_researcher') |
@@ -80,6 +85,7 @@ perms[SHOW_TASKS] = (
 perms[EMAIL] = HasAccessRule('staff')
 perms[RESCORE_EXAMS] = HasAccessRule('instructor')
 perms[VIEW_REGISTRATION] = HasAccessRule('staff')
+# TODO: remove role checks once course_roles is fully impelented and data is migrated
 perms[VIEW_DASHBOARD] = (
     HasRolesRule('staff', 'instructor', 'data_researcher') |
     HasAccessRule('staff') |
