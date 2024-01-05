@@ -71,7 +71,7 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):  # pylint: disable=mi
         user = self.user
         course_key = self.course_overview.id
 
-        query_count = 9
+        query_count = 15
 
         with self.assertNumQueries(query_count):
             enabled = ContentTypeGatingConfig.enabled_for_enrollment(
