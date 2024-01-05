@@ -338,7 +338,17 @@ from openedx.core.djangolib.markup import HTML
     
     btnNextLesson.addEventListener('click', async () => {
       try {
-          window.parent.postMessage({ type: 'quiz_submit'}, "*")
+        const headerProblem = document.querySelector('.xblock-student_view');
+        const usage_key_string = headerProblem.getAttribute('data-usage-id'); 
+        const response = await fetch('/api/course_home/next_lesson/' + usage_key_string);
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+      
+          window.parent.postMessage({ type: 'quiz_submit' , ...data}, "*")
       } catch (error) {
           console.error('There was a problem with the fetch operation:', error);
       }
