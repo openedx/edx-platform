@@ -18,7 +18,7 @@ def get_user_role(user, course_id):
     :param course_id: the course_id of the course we're interested in
     """
     # afaik, this is only used in lti
-    # TODO: remove role checks once course_roles is fully impelented and data is migrated
+    # TODO: remove role checks once course_roles is fully implemented and data is migrated
     if (
         auth.user_has_role(user, CourseInstructorRole(course_id)) or
         user.has_perm(CourseRolesPermission.MANAGE_ALL_USERS.perm_name, course_id)

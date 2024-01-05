@@ -128,7 +128,7 @@ def _course_team_user(request, course_key, email):
         }
         # what's the highest role that this user has? (How should this report global staff?)
         for role in role_hierarchy:
-            # TODO: remove role checks once course_roles is fully impelented and data is migrated
+            # TODO: remove role checks once course_roles is fully implemented and data is migrated
             if (
                 role(course_key).has_user(user) or
                 user.has_perm(CourseRolesPermission.MANAGE_ALL_USERS.perm_name, course_key)
