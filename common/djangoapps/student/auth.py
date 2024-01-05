@@ -261,6 +261,6 @@ def _check_caller_authority(caller, role):
         # TODO: remove role checks once course_roles is fully implemented and data is migrated
         if (
             not user_has_role(caller, CourseInstructorRole(role.course_key)) or
-            caller.has_perm(CourseRolesPermission.MANAGE_ALL_USERS.perm_name, role.course_key)
+            not caller.has_perm(CourseRolesPermission.MANAGE_ALL_USERS.perm_name, role.course_key)
         ):
             raise PermissionDenied
