@@ -122,9 +122,10 @@ def enrollment_date_for_fbe(user, course_key=None, course=None):
         CourseRolesPermission.VIEW_LIVE_PUBLISHED_CONTENT.perm_name,
         CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.perm_name,
     ]
+    has_permission = any(user.has_perm(permission, course_key) for permission in permissions)
     # TODO: remove role checks once course_roles is fully impelented and data is migrated
     if user and user.id and (has_staff_roles(user, course_key) or
-                             user.has_perms(permissions, course_key)):
+                             has_permission):
         return None
 
     enrollment = user and CourseEnrollment.get_enrollment(user, course_key, ['fbeenrollmentexclusion'])
