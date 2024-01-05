@@ -48,7 +48,11 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
         transformer's transform method.
         """
         block_structure.request_xblock_fields('mode')
+        block_structure.request_xblock_fields('shuffle')
         block_structure.request_xblock_fields('max_count')
+        block_structure.request_xblock_fields('manual')
+        block_structure.request_xblock_fields('candidates')
+        block_structure.request_xblock_fields('source_library_id')
         block_structure.request_xblock_fields('category')
         store = modulestore()
 
@@ -86,6 +90,9 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                 shuffle = block_structure.get_xblock_field(block_key, 'shuffle')
                 manual = block_structure.get_xblock_field(block_key, 'manual')
                 max_count = block_structure.get_xblock_field(block_key, 'max_count')
+                candidates = block_structure.get_xblock_field(block_key, 'candidates')
+                source_library_id = block_structure.get_xblock_field(block_key, 'source_library_id')
+
                 if max_count < 0:
                     max_count = len(library_children)
 
@@ -99,15 +106,19 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                     if usage_key in library_children:
                         selected.append(selected_block)
 
-                #Get "canidate" blocks which have been manually selected
-                candidates = state_dict.get('candidates', [])
-
                 # Update selected
                 previous_count = len(selected)
                 block_keys = LibraryContentBlock.make_selection(
                     old_selected=list(map(tuple, selected)),  # Convert from nested list to list-of-tuples.
                     library_children=library_children,
-                    candidates=list(map(tuple, candidates)),  # Convert from nested list to list-of-tuples.
+                    candidates= LibraryContentBlock.get_candidates_in_course(
+                        candidates=candidates,
+                        children=library_children,
+                        source_library_key=LibraryContentBlock.get_source_library_key(
+                            block_structure.get_xblock_field(block_key, 'source_library_id')
+                        ),
+                        location=block_key,
+                    ),
                     max_count=max_count,
                     manual=manual,
                     shuffle=shuffle,

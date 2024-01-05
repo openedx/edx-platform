@@ -17,7 +17,7 @@ from django.utils.functional import classproperty
 from lxml import etree
 from lxml.etree import XMLSyntaxError
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
+from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2, LibraryUsageLocator, LibraryUsageLocatorV2, BlockUsageLocator
 from opaque_keys.edx.keys import UsageKey
 from rest_framework import status
 from web_fragments.fragment import Fragment
@@ -29,6 +29,8 @@ from xblock.fields import Boolean, Integer, List, Scope, String
 
 from xmodule.capa.responsetypes import registry
 from xmodule.mako_block import MakoTemplateBlockBase
+from xmodule.modulestore.split_mongo import BlockKey
+from xmodule.modulestore.store_utilities import derived_key
 from xmodule.studio_editable import StudioEditableBlock
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment
@@ -211,10 +213,18 @@ class LibraryContentBlock(
 
         Supports either library v1 or library v2 locators.
         """
+        return self.get_source_library_key(self.source_library_id)
+
+    @classmethod
+    def get_source_library_key(cls, source_library_id):
+        """
+        A static method for the implementation of source_library_key
+        For use in block transformers, which don't have access to non-static methods.
+        """
         try:
-            return LibraryLocator.from_string(self.source_library_id)
+            return LibraryLocator.from_string(source_library_id)
         except InvalidKeyError:
-            return LibraryLocatorV2.from_string(self.source_library_id)
+            return LibraryLocatorV2.from_string(source_library_id)
 
     @property
     def non_editable_metadata_fields(self):
@@ -416,7 +426,7 @@ class LibraryContentBlock(
         block_keys = self.make_selection(
             old_selected=list(map(tuple, self.selected)),  # Convert from nested list to list-of-tuples.
             library_children=self.children,
-            candidates=list(map(tuple, self.candidates)),  # Convert from nested list to list-of-tuples.
+            candidates=self.candidates_keys,
             max_count=self.max_count,
             manual=self.manual,
             shuffle=self.shuffle,
@@ -619,7 +629,59 @@ class LibraryContentBlock(
             if not user_perms.can_read(self.source_library_key):
                 raise PermissionDenied(f"Cannot read library at {self.source_library_key}")
 
-    # suffix argument is specified for xblocks, but we are not using herein
+
+    @classmethod
+    def get_candidates_in_course(
+        cls,
+        candidates: list[list[str,str]],
+        children: list[BlockUsageLocator],
+        source_library_key: Union[LibraryLocator, LibraryLocatorV2, None],
+        location: BlockUsageLocator
+        ) -> list[tuple[str, str]]:
+        """
+        A static implementation of the getter for candidates_in_course.
+        """
+        # confirm that the set of block ids needs to be converted.
+        candidate_usage_id_strings = [usage_string for _block_type, usage_string in candidates]
+        children_usage_id_strings = [child.block_id for child in children]
+        if set(candidate_usage_id_strings) <= set (children_usage_id_strings):
+            return candidates
+        else:
+            if isinstance(source_library_key, LibraryLocatorV2):
+                source_library_key = LibraryLocator(
+                    org=source_library_key.org,
+                    library=source_library_key.slug,
+                    branch='library',
+                )
+            return [
+                tuple(
+                    derived_key(
+                        source_library_key,
+                        BlockKey(
+                            type=block_type,
+                            id=usage_id,
+                        ),
+                        BlockKey(
+                            type=location.block_type,
+                            id=location.block_id,
+                        ),
+                    )
+                ) for block_type, usage_id in candidates
+            ]
+
+    @property
+    def candidates_keys(self) -> list[tuple[str, str]]:
+        """
+        If the self.candidate value is a list of usage keys refering to this block's children, return it.
+        If the self.candidate value is a list of usage keys refering to the library's children
+        (which can occur through editing the candidates before the children are synced)
+        then convert  the self.candidates values to refer to the library's children.
+        We call a static method here so this can also be used in block transformers, which calls
+        xblock methods staticly.
+        """
+        return self.get_candidates_in_course(self.candidates, self.children, self.source_library_key, self.location)
+
+    # suffix argument is specified for xblocks, but we are not using it herein
     @XBlock.json_handler
     def submit_studio_edits(self, data, suffix=''):  # pylint: disable=unused-argument
         """
@@ -641,7 +703,7 @@ class LibraryContentBlock(
         Return candidates for selection.
         """
         # construct usage_key list from library children so it is fully formed.
-        usage_key_list = [child for child in self.children if [child.block_type, child.block_id] in self.candidates]
+        usage_key_list = [child for child in self.children if [child.block_type, child.block_id] in self.candidates_keys]
         return Response(json.dumps({'candidates': [str(usage_key) for usage_key in usage_key_list]}))
 
     @XBlock.handler
