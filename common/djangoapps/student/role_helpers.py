@@ -42,7 +42,7 @@ def has_staff_roles(user, course_key):
     is_org_instructor = OrgInstructorRole(course_key.org).has_user(user)
     is_global_staff = GlobalStaff().has_user(user)
     has_forum_role = Role.user_has_role_for_course(user, course_key, forum_roles)
-    has_discussion_perms = any([user.has_perm(permission, course_key) for permission in permissions]),
+    has_discussion_perms = any(user.has_perm(permission, course_key) for permission in permissions)
     if (
         any([is_staff, is_instructor, is_beta_tester, is_org_staff,
             is_org_instructor, is_global_staff, has_forum_role, has_discussion_perms])
