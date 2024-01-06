@@ -453,6 +453,19 @@ function(
             }
         },
 
+        subsectionShareLinkXBlock: function() {
+            var modal = CourseOutlineModalsFactory.getModal('subsection_share_link', this.model, {
+                onSave: this.refresh.bind(this),
+                xblockType: XBlockViewUtils.getXBlockType(
+                    this.model.get('category'), this.parentView.model, true
+                )
+            });
+
+            if (modal) {
+                modal.show();
+            }
+        },
+
         /**
          * If the new "Actions" menu is enabled, most actions like Configure,
          * Duplicate, Move, Delete, etc. are moved into this menu. For this
@@ -500,6 +513,10 @@ function(
                     event.preventDefault();
                     this.highlightsXBlock();
                 }
+            }.bind(this));
+            element.find('.subsection-share-link-button').click(function(event) {
+                event.preventDefault();
+                this.subsectionShareLinkXBlock();
             }.bind(this));
             element.find('.copy-button').click((event) => {
                 event.preventDefault();

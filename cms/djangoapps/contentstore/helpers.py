@@ -8,6 +8,7 @@ from lxml import etree
 from mimetypes import guess_type
 
 from attrs import frozen, Factory
+from django.conf import settings
 from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import AssetKey, CourseKey, UsageKey
 from opaque_keys.edx.locator import DefinitionLocator, LocalId
@@ -22,6 +23,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.xml_block import XmlMixin
 
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 import openedx.core.djangoapps.content_staging.api as content_staging_api
 
 from .utils import reverse_course_url, reverse_library_url, reverse_usage_url
@@ -123,6 +125,34 @@ def xblock_studio_url(xblock, parent_xblock=None, find_parent=False):
         return reverse_library_url('library_handler', library_key)
     else:
         return reverse_usage_url('container_handler', xblock.location)
+
+
+def xblock_lms_url(xblock) -> str:
+    """
+    Returns the LMS URL for the specified xblock.
+
+    Args:
+        xblock: The xblock to get the LMS URL for.
+
+    Returns:
+        str: The LMS URL for the specified xblock.
+    """
+    lms_root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
+    return f"{lms_root_url}/courses/{xblock.location.course_key}/jump_to/{xblock.location}"
+
+
+def xblock_embed_lms_url(xblock) -> str:
+    """
+    Returns the LMS URL for the specified xblock in embed mode.
+
+    Args:
+        xblock: The xblock to get the LMS URL for.
+
+    Returns:
+        str: The LMS URL for the specified xblock in embed mode.
+    """
+    lms_root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
+    return f"{lms_root_url}/xblock/{xblock.location}"
 
 
 def xblock_type_display_name(xblock, default_display_name=None):
