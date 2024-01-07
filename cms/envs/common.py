@@ -2379,7 +2379,8 @@ POLICY_CHANGE_TASK_RATE_LIMIT = '900/h'
 # .. setting_description: The default 'pass' grade cutoff designations to be used. The failure grade
 #     is always 'F' and should not be included in this list.
 # .. setting_warning: The DEFAULT_GRADE_DESIGNATIONS list must have more than one designation,
-#     or else ['A', 'B', 'C', 'D'] will be used as the default grade designations.
+#     or else ['A', 'B', 'C', 'D'] will be used as the default grade designations. Also, only the first
+#     11 grade designations are used by the UI, so it's advisable to restrict the list to 11 items.
 DEFAULT_GRADE_DESIGNATIONS = ['A', 'B', 'C', 'D']
 
 ############## Settings for CourseGraph ############################

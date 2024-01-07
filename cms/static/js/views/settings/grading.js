@@ -401,7 +401,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                 function(gradeEle) { return -gradeEle.cutoff; });
         },
         setupGradeDesignations: function(gradeDesignations) {
-            if (Array.isArray(gradeDesignations) && gradeDesignations.length > 1) { this.GRADES = gradeDesignations; }
+            if (Array.isArray(gradeDesignations) && gradeDesignations.length > 1) { this.GRADES = gradeDesignations.slice(0, 11); }
         },
         revertView: function() {
             var self = this;
