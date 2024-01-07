@@ -548,7 +548,6 @@ def component_handler(request, usage_key_string, handler, suffix=''):
         if request.method == "GET" :
             try:
                 lab = CourseResultLab.getResultLab(block_id=usage_key_string)
-                print('=======', lab)
                 data = {
                     "result": "",
                     "type": "",
