@@ -668,7 +668,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         filtered_data = []
         for enrollment in enrollment_data:
             course_key = CourseKey.from_string(enrollment["course_details"]["course_id"])
-            # TODO: remove roles check once course_roles is fully impelented and data is migrated
+            # TODO: remove roles check once course_roles is fully implemented and data is migrated
             if (
                 user_has_role(request.user, CourseStaffRole(course_key)) or
                 request.user.has_perm(CourseRolesPermission.MANAGE_USERS_EXCEPT_ADMIN_AND_STAFF.perm_name)
