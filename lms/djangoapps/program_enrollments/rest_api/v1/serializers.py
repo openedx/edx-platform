@@ -107,7 +107,7 @@ class ProgramCourseEnrollmentSerializer(serializers.Serializer):
         # TODO: remove is_course_staff_enrollment check once course_roles is fully impelented and data is migrated
         return (
             is_course_staff_enrollment(obj) or
-            obj.program_enrollment.user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name)
+            obj.program_enrollment.user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name, obj.course_key)
         )
 
 
