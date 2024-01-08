@@ -315,8 +315,9 @@ class VideoStudentViewHandlers:
         if dispatch.startswith('translation'):
             language = dispatch.replace('translation', '').strip('/')
 
-            # This check was added in response to user-less web scrapers which attempted to view video blocks.
-            if not request.user:
+            # Because scrapers hit video blocks, verify that a user exists.
+            # use the _request attr to get the django request object.
+            if not request._request.user:
                 log.info("Transcript: user must be logged or public view enabled to get transcript")
                 return Response(status=403)
 
