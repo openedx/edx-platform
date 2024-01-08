@@ -1818,3 +1818,103 @@ class ChoiceTextGroup(InputTypeBase):
             # Add the tuple for the current choice to the list of choices
             choices.append((choice.get("name"), components))
         return choices
+
+#---------------------------------------------------------------------
+    
+@registry.register
+class MatchingGroup(InputTypeBase):
+    """
+    Example:
+      <matchinggroup>
+        
+        <matchingitem matchingvalue='1' pos="left">Left 1</matchingitem>
+        <matchingitem matchingvalue='1' pos="right">Right 1</matchingitem>
+      
+        <matchingitem matchingvalue='2' pos="left">Left 2</matchingitem>
+        <matchingitem matchingvalue='2' pos="right">Right 2</matchingitem>
+      
+        <matchingitem pos="left">Left 3: will be hide, no matchingvalue</matchingitem>
+        <matchingitem pos="right">Right 3</matchingitem>
+        
+      </matchinggroup>
+    """
+
+    template = "matchinggroup.html"
+    tags = ['matchinggroup']
+    # tags = ['matchinggroup', 'matchingitem']
+
+    def setup(self):
+        i18n = self.capa_system.i18n
+        try: 
+            matching_items, left_items, right_items, matchingitems = self.extract_matching_items(self.xml, i18n, False, self.value)
+            self.matching_items = matching_items
+            self.left_items = left_items
+            self.right_items = right_items
+            self.matchingitems = matchingitems
+            self._matching_items_map = dict(self.matching_items,)
+
+        except Exception as e:
+            raise Exception(str(e))
+
+    @classmethod
+    def get_attributes(cls):
+        # Make '_' a no-op so we can scrape strings. Using lambda instead of
+        #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
+        _ = lambda text: text
+        return [Attribute("show_correctness", "always"),
+                Attribute("submitted_message", _("Answer received."))]
+
+    def _extra_context(self):
+        return {
+            'matching_items': self.matching_items,
+            'left_items': self.left_items,
+            'right_items': self.right_items,
+            'matchingitems': self.matchingitems,
+        }
+
+    @staticmethod
+    def extract_matching_items(element, i18n, text_only=False, value=None):
+        student_answer = {}
+        if value: 
+            for answer_item in list(map(lambda item: item.split('+'), value)):
+                student_answer[answer_item[0]] = answer_item[1]
+
+        matching_items = []
+        left_items = []
+        left_items_obj = {}
+        right_items_obj = {}
+        right_items = []
+        macthingitems = []
+        _ = edx_six.get_gettext(i18n)
+        for mitem in element:
+            if mitem.tag == 'matchingitem':
+                if not text_only:
+                    text = stringify_children(mitem)
+                else:
+                    text = mitem.text
+                if mitem.get('pos') == 'left':
+                    left_items.append((mitem.get("name"), text, mitem.get("matchingvalue")))
+                    left_items_obj[mitem.get('name')] =  (mitem.get('name'), text, mitem.get("matchingvalue"))
+                else:
+                    right_items.append((mitem.get("name"), text, mitem.get("matchingvalue")))
+                    right_items_obj[mitem.get('name')] = (mitem.get('name'), text, mitem.get("matchingvalue"))
+
+                matching_items.append((mitem.get("name"), mitem.get('pos')))
+        i = 0
+        for ritem in right_items: 
+            if student_answer:
+                left_name = left_items[i][0]
+                right_name = student_answer.get(left_name)
+                right_item = right_items_obj.get(right_name)
+                macthingitems.append((left_items[i], right_item))
+            else:
+                macthingitems.append((left_items[i], ritem))
+
+            i += 1
+        return [matching_items, left_items, right_items, macthingitems]
+
+    def get_user_visible_answer(self, internal_answer):
+        if isinstance(internal_answer, six.string_types):
+            return self._matching_items_map[internal_answer]
+
+        return [self._matching_items_map[i] for i in internal_answer]

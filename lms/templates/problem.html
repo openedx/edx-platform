@@ -551,6 +551,36 @@ from openedx.core.djangolib.markup import HTML
 %endif
 
 
+<script>
+  function allowDrop(ev) {
+      ev.preventDefault();
+  }
 
+  function drag(ev, parentId) {
+    console.log(parentId)
+    ev.dataTransfer.setData("eleId", ev.currentTarget.id);
+  }
+
+  function drop(ev, parentId) {
+      ev.preventDefault();
+      console.log(parentId)
+      var fromId = ev.dataTransfer.getData("eleId");
+
+      var targetHtml = ev.currentTarget.innerHTML;
+      var fromEle = document.getElementById(fromId);
+      var fromHtml = fromEle.innerHTML;
+
+
+      ev.currentTarget.innerHTML = '';
+      ev.currentTarget.innerHTML = fromHtml;
+      $('input', ev.currentTarget.parentElement).val($('input', ev.currentTarget.parentElement).data('left-value') + '+' + $(fromEle).data('right-value'))
+
+      fromEle.innerHTML = '';
+      fromEle.innerHTML = targetHtml;
+      if ($('input', fromEle.parentElement)[0]) {
+        $('input', fromEle.parentElement).val($('input', fromEle.parentElement).data('left-value') + '+' + $(ev.currentTarget).data('right-value'))
+      }
+  }
+</script>
 <div>
 

@@ -214,6 +214,12 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
         # map input_id -> maxpoints
         self.maxpoints = {}
         for inputfield in self.inputfields:
+            print('_____')
+            print('_____')
+            print(inputfield)
+            print('_____')
+            print('_____')
+
             # By default, each answerfield is worth 1 point
             maxpoints = inputfield.get('points', '1')
             self.maxpoints.update({inputfield.get('id'): int(maxpoints)})
@@ -279,6 +285,7 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
         tree.set('role', 'group')
 
         if self.xml.get('multiple_inputtypes'):
+  
             # add <div> to wrap all inputtypes
             content = etree.SubElement(tree, 'div')
             content.set('class', 'multi-inputs-group')
@@ -3918,6 +3925,123 @@ class ChoiceTextResponse(LoncapaResponse):
         return inputs_correct
 
 #-----------------------------------------------------------------------------
+    
+@registry.register
+class MatchingResponse(LoncapaResponse):
+    human_name = _('Matching Response')
+    tags = ['matchingresponse']
+    max_inputfields = 1
+    allowed_inputfields = ['matchinggroup','matchingitem']
+    correct_matchings = None
+    multi_device_support = True
+
+    def __init__(self, *args, **kwargs):
+        super(MatchingResponse, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+
+    def setup_response(self):
+        """
+        Collects information from the XML for later use.
+        """
+        # call secondary setup for MultipleChoice questions, to set name
+        # attributes
+        self.m_setup_response()
+
+        # define correct choices (after calling secondary setup)
+        xml = self.xml
+        cxml = xml.xpath('//*[@id=$id]//matchingitem', id=xml.get('id'))
+
+        # contextualize correct attribute and then select ones for which
+        # correct = "true"
+        self.left_items = [
+            contextualize_text(choice.get('name'), self.context)
+            for choice in cxml
+            if contextualize_text(choice.get('pos'), self.context).upper() == "LEFT"
+        ]
+
+        self.right_items = [
+            contextualize_text(choice.get('name'), self.context)
+            for choice in cxml
+            if contextualize_text(choice.get('pos'), self.context).upper() == "RIGHT"
+        ]
+
+        temp_matchings = {}
+        for item in self.get_matchingitems():
+            name = item.get('name')
+            value = item.get('matchingvalue')
+            
+            if value:
+                if temp_matchings.get(value) is not None:
+                    temp_matchings[value] += [name]
+                else:
+                    temp_matchings[value] = [name]
+
+        self.correct_matchings = list(temp_matchings.values())
+        # [['matchingitem_0', 'matchingitem_1'], ['matchingitem_2', 'matchingitem_3']]
+
+
+    def get_matchingitems(self):
+        return self.xml.xpath('//*[@id=$id]//matchingitem', id=self.xml.get('id'))
+
+    def m_setup_response(self):
+        """
+        Initialize name attributes in <choice> stanzas in the <matchinggroup> in this response.
+        Masks the choice names if applicable.
+        """
+        i = 0
+        for response in self.xml.xpath("matchinggroup"):
+            # Is Masking enabled? -- check for shuffle or answer-pool features
+            # Masking (self._has_mask) is off, to be re-enabled with a future PR.
+            for item in list(response):
+                # The regular, non-masked name:
+                if item.get("name") is not None:
+                    name = "matchingitem_" + item.get("name")
+                else:
+                    name = "matchingitem_" + str(i)
+                    i += 1
+                # If using the masked name, e.g. mask_0, save the regular name
+                # to support unmasking later (for the logs).
+                # Masking is currently disabled so this code is commented, as
+                # the variable `mask_ids` is not defined. (the feature appears to not be fully implemented)
+                # The original work for masking was done by Nick Parlante as part of the OLI Hinting feature.
+                # if self.has_mask():
+                #     mask_name = "mask_" + str(mask_ids.pop())
+                #     self._mask_dict[mask_name] = name
+                #     choice.set("name", mask_name)
+                # else:
+                item.set("name", name)
+
+    def get_score(self, student_answers):
+        """
+        grade student response.
+        Return a CorrectMap for the answers expected vs given.  This includes
+        (correctness, npoints, msg) for each answer_id.
+
+        Arguments:
+         - student_answers : dict of (answer_id, answer) where answer = student input (string)
+        """
+        # student_answers: {'matchingitem_2': 'value_matchingitem_4', 'matchingitem_0': 'matchingitem_1'}
+     
+        # answer = list(student_answers[self.answer_id].map(lambda item: item.split('+')))
+        answer = {}
+        for item in list(map(lambda item: item.split('+'), student_answers[self.answer_id])):
+            answer[item[0]] = item[1]
+
+        # answer: {'matchingitem_2': 'matchingitem_3', 'matchingitem_0': 'matchingitem_3'}
+            
+        i = 0
+        for item1, item2 in self.correct_matchings:
+            if answer.get(item1) == item2 or answer.get(item2) == item1:
+                i += 1
+
+        correctness = 'correct' if i == len(self.correct_matchings) else 'incorrect'
+        npoints = 1 if correctness == 'correct' else 0 
+     
+        return CorrectMap(self.answer_id, correctness=correctness, npoints=npoints)
+
+    def get_answers(self):
+        return {self.answer_id: self.correct_matchings}
+    
+
 
 # TEMPORARY: List of all response subclasses
 # FIXME: To be replaced by auto-registration
@@ -3939,5 +4063,8 @@ __all__ = [
     TrueFalseResponse,
     AnnotationResponse,
     ChoiceTextResponse,
+    MatchingResponse
 ]
 # pylint: enable=invalid-all-object
+
+

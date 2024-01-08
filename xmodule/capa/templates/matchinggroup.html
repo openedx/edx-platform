@@ -1,0 +1,33 @@
+<%!
+from xmodule.capa.util import remove_markup
+from openedx.core.djangolib.markup import HTML
+import six
+%>
+<div class="matchinggroup capa_inputtype" id="inputtype_${id}" >
+    % for left_item, right_item in matchingitems:
+        <div style="display: flex; width: 100%;flex-wrap: wrap;">
+            <div style="border: 1px solid #000; width: 40%; padding: 1rem;" > 
+                <div style="display: none">
+                    ${HTML(left_item[0])} 
+                </div>
+                % if not left_item[2]:
+                <div style="display: none">
+                % else:
+                <div>
+                % endif
+                    ${HTML(left_item[1])}
+                </div>
+                <input style="display: none" type="checkbox" checked data-left-value="${left_item[0]}" id="input_${id}_${left_item[0]}"  value="${left_item[0]}+${right_item[0]}" name="input_${id}[]"/>
+            </div>
+            <div data-right-value="${right_item[0]}" style="border: 1px solid #000; width: 40%; padding: 1rem;" id="right_${id}_${right_item[0]}" class="matching_right_item" ondrop="drop(event, inputtype_${id})" ondragover="allowDrop(event)" draggable="true" ondragstart="drag(event, inputtype_${id})">
+                <div style="display: none">
+                    ${HTML(right_item[0])}
+                </div>
+                <div>
+                    ${HTML(right_item[1])}
+                </div>
+            </div>
+        </div>
+    % endfor
+</div>
+

@@ -51,6 +51,7 @@ ACCESSIBLE_CAPA_INPUT_TYPES = [
     'textline',
     'formulaequationinput',
     'textbox',
+    'matchingitem'
 ]
 
 # these get captured as student responses
@@ -61,7 +62,11 @@ html_transforms = {
     'problem': {'tag': 'div'},
     'text': {'tag': 'span'},
     'math': {'tag': 'span'},
+    'matchingitem': {'tag': 'div'},
+    'matchingresponse': {'tag': 'div'},
 }
+
+
 
 # These should be removed from HTML output, including all subelements
 html_problem_semantics = [
