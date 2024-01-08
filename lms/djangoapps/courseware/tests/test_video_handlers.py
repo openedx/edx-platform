@@ -855,7 +855,10 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
         Verify that val transcript is not returned when its feature is disabled.
         """
         # Make request to XModule transcript handler
-        response = self.block.transcript(request=_create_djangowebobrequest_object_for_url('/translation/en'), dispatch='translation/en')
+        response = self.block.transcript(
+            request=_create_djangowebobrequest_object_for_url('/translation/en'),
+            dispatch='translation/en'
+        )
         # Assert the actual response
         assert response.status_code == 404
 
