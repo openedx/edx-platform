@@ -315,6 +315,11 @@ class VideoStudentViewHandlers:
         if dispatch.startswith('translation'):
             language = dispatch.replace('translation', '').strip('/')
 
+            # This check was added in response to user-less web scrapers which attempted to view video blocks.
+            if not request.user:
+                log.info("Transcript: user must be logged or public view enabled to get transcript")
+                return Response(status=403)
+
             if not language:
                 log.info("Invalid /translation request: no language.")
                 return Response(status=400)
@@ -324,6 +329,7 @@ class VideoStudentViewHandlers:
                 return Response(status=404)
 
             if language != self.transcript_language:
+
                 self.transcript_language = language
 
             try:
