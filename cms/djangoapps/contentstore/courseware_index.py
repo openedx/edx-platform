@@ -4,6 +4,7 @@ import logging
 import re
 from abc import ABCMeta, abstractmethod
 from datetime import timedelta
+from time import time
 
 from django.conf import settings
 from django.urls import resolve
@@ -133,6 +134,7 @@ class SearchIndexerBase(metaclass=ABCMeta):
         Returns:
         Number of items that have been added to the index
         """
+        start = time()
         error_list = []
         searcher = SearchEngine.get_search_engine(cls.INDEX_NAME)
         if not searcher:
@@ -207,10 +209,12 @@ class SearchIndexerBase(metaclass=ABCMeta):
 
             item_id = str(cls._id_modifier(item.scope_ids.usage_id))
             indexed_items.add(item_id)
+            log.info(f'INDEXTRACK {item_id} skip={skip_index}')
             if item.has_children:
                 # determine if it's okay to skip adding the children herein based upon how recently any may have changed
                 skip_child_index = skip_index or \
                     (triggered_at is not None and (triggered_at - item.subtree_edited_on) > reindex_age)
+                log.info(f'INDEXTRACK skip children={skip_child_index}')
                 children_groups_usage = []
                 for child_item in item.get_children():
                     if modulestore.has_published_version(child_item):
@@ -226,6 +230,8 @@ class SearchIndexerBase(metaclass=ABCMeta):
 
             if skip_index or not item_index_dictionary:
                 return
+
+            log.info(f'INDEXTRACK actually indexing {item_id}')
 
             item_index = {}
             # if it has something to add to the index, then add it
@@ -269,6 +275,11 @@ class SearchIndexerBase(metaclass=ABCMeta):
 
         if error_list:
             raise SearchIndexingError('Error(s) present during indexing', error_list)
+
+        end = time()
+        elapsed = end - start
+        count = indexed_count["count"]
+        log.info(f'INDEXTRACK count {count} time {elapsed:.1f} seconds')
 
         return indexed_count["count"]
 
