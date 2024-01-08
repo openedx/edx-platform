@@ -317,7 +317,7 @@ class VideoStudentViewHandlers:
 
             # Because scrapers hit video blocks, verify that a user exists.
             # use the _request attr to get the django request object.
-            if not request._request.user:
+            if not request._request.user: # pylint: disable=protected-access
                 log.info("Transcript: user must be logged or public view enabled to get transcript")
                 return Response(status=403)
 
