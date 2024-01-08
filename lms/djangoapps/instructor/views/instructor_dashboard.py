@@ -120,23 +120,13 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
 
     course = get_course_by_id(course_key, depth=None)
 
-    permissions_required = [
-        CourseRolesPermission.MANAGE_STUDENTS.perm_name,
-        CourseRolesPermission.ACCESS_INSTRUCTOR_DASHBOARD.perm_name,
-    ]
     # TODO: remove role checks once course_roles is fully implemented and data is migrated
     access = {
         'admin': request.user.is_staff,
-        'instructor': (
-            bool(has_access(request.user, 'instructor', course)) or
-            request.user.has_perms(permissions_required, course_key)
-        ),
+        'instructor': bool(has_access(request.user, 'instructor', course)),
         'finance_admin': CourseFinanceAdminRole(course_key).has_user(request.user),
         'sales_admin': CourseSalesAdminRole(course_key).has_user(request.user),
-        'staff': (
-            bool(has_access(request.user, 'staff', course)) or
-            request.user.has_perms(permissions_required, course_key)
-        ),
+        'staff': bool(has_access(request.user, 'staff', course)),
         'forum_admin': (
             has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR) or
             request.user.has_perm(CourseRolesPermission.MANAGE_DISCUSSION_MODERATORS.perm_name, course_key)
