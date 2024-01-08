@@ -180,15 +180,6 @@ def get_response_with_refreshed_jwt_cookies(request, user):
     return response
 
 
-def update_jwt_cookies_in_response(request, response, user):
-    """
-    Updates the JWT related cookies in the response for the given user.
-    """
-    cookie_settings = standard_cookie_settings(request)
-    _create_and_set_jwt_cookies(response, request, cookie_settings, user=user)
-    return response
-
-
 def _set_deprecated_user_info_cookie(response, request, user, cookie_settings):
     """
     Sets the user info cookie on the response.

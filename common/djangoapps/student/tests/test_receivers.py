@@ -2,7 +2,6 @@
 
 from unittest import skipUnless
 from unittest.mock import patch
-from django.test.utils import override_settings
 
 from edx_toggles.toggles.testutils import override_waffle_flag
 
@@ -77,8 +76,7 @@ class ReceiversTest(SharedModuleStoreTestCase):
     def test_listen_for_user_email_changed(self, mock_get_braze_client):
         """
         Ensure that USER_EMAIL_CHANGED signal triggers correct calls to
-        get_braze_client and update email in session if ENFORCE_SESSION_EMAIL_MATCH
-        is enabled.
+        get_braze_client and update email in session.
         """
         user = UserFactory(email='email@test.com', username='jdoe')
         request = get_mock_request(user=user)
@@ -88,14 +86,7 @@ class ReceiversTest(SharedModuleStoreTestCase):
         user.email = 'new_email@test.com'
         user.save()
 
-        with override_settings(ENFORCE_SESSION_EMAIL_MATCH=False):
-            USER_EMAIL_CHANGED.send(sender=None, user=user, request=request)
+        USER_EMAIL_CHANGED.send(sender=None, user=user, request=request)
 
-            assert mock_get_braze_client.called
-            assert request.session.get('email', None) is None
-
-        with override_settings(ENFORCE_SESSION_EMAIL_MATCH=True):
-            USER_EMAIL_CHANGED.send(sender=None, user=user, request=request)
-
-            assert mock_get_braze_client.called
-            assert request.session.get('email', None) == user.email
+        assert mock_get_braze_client.called
+        assert request.session.get('email', None) == user.email

@@ -95,7 +95,7 @@ from edx_django_utils.logging import encrypt_for_log
 from edx_django_utils.monitoring import set_custom_attribute
 from edx_toggles.toggles import SettingToggle
 
-from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
+from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies, set_logged_in_cookies
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
 # .. toggle_name: LOG_REQUEST_USER_CHANGES
@@ -768,17 +768,20 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         return encrypt_for_log(str(request.headers), getattr(settings, 'SAFE_SESSIONS_DEBUG_PUBLIC_KEY', None))
 
 
-class EmailChangeSessionInvalidationMiddleware(MiddlewareMixin):
+class EmailChangeMiddleware(MiddlewareMixin):
     """
-    Middleware responsible for invalidating user sessions
-    by detecting a mismatch between the user's email in
-    the session and request.user.email.
+    Middleware responsible for performing the following
+    jobs on detecting an email change
+    1) It will update the session's email and update the JWT cookie
+        to match the new email.
+    2) It will invalidate any future session on other browsers where
+        the user's email does not match its session email.
 
     This middleware ensures that the sessions in other browsers
     are invalidated when a user changes their email in one browser.
     The active session in which the email change is made will remain valid.
 
-    The user's email is stored in their session during login
+    The user's email is stored in their session and JWT cookies during login
     and gets updated when the user changes their email.
     This middleware checks for any mismatch between the stored email
     and the current user's email in each request, and if found,
@@ -791,34 +794,52 @@ class EmailChangeSessionInvalidationMiddleware(MiddlewareMixin):
         Invalidate the user session if there's a mismatch
         between the email in the user's session and request.user.email.
         """
-        if settings.ENFORCE_SESSION_EMAIL_MATCH and request.user.is_authenticated:
+        if request.user.is_authenticated:
             user_session_email = request.session.get('email', None)
-
-            if user_session_email is not None and request.user.email != user_session_email:
+            are_emails_mismatched = user_session_email is not None and request.user.email != user_session_email
+            EmailChangeMiddleware._set_session_email_match_custom_attributes(are_emails_mismatched)
+            if settings.ENFORCE_SESSION_EMAIL_MATCH and are_emails_mismatched:
                 # Flush the session and mark cookies for deletion.
                 request.session.flush()
                 request.user = AnonymousUser()
                 _mark_cookie_for_deletion(request)
-                EmailChangeSessionInvalidationMiddleware._set_session_email_match_custom_attribute(False)
-            else:
-                EmailChangeSessionInvalidationMiddleware._set_session_email_match_custom_attribute(True)
+
+    def process_response(self, request, response):
+        """
+        Update the logged-in cookies if the email change was requested
+        """
+        if request.user.is_authenticated and request_cache.get_cached_response('email_change_requested').is_found:
+            # Update the JWT cookies with new user email
+            response = set_logged_in_cookies(request, response, request.user)
+
+        return response
 
     @staticmethod
     def register_email_change(request, email):
         """
-        Sets email in session for comparison
+        Stores the fact that an email change happened.
+
+        1. Sets the email in session for later comparison.
+        2. Sets a request level variable to mark that the user email change was requested.
         """
         request.session['email'] = email
+        request_cache.set('email_change_requested', True)
 
     @staticmethod
-    def _set_session_email_match_custom_attribute(value):
+    def _set_session_email_match_custom_attributes(are_emails_mismatched):
         """
-        Sets custom attribute of session_email_match
+        Sets custom attributes of session_email_match
         """
         # .. custom_attribute_name: session_email_match
         # .. custom_attribute_description: Indicates whether there is a match between the
         #      email in the user's session and the current user's email in the request.
-        set_custom_attribute('session_email_match', value)
+        set_custom_attribute('session_email_match', not are_emails_mismatched)
+
+        # .. custom_attribute_name: is_enforce_session_email_match_enabled
+        # .. custom_attribute_description: Indicates whether session email match was enforced.
+        #       When enforced/enabled, it invalidates sessions in other browsers upon email change,
+        #       while preserving the session validity in the browser where the email change occurs.
+        set_custom_attribute('is_enforce_session_email_match_enabled', settings.ENFORCE_SESSION_EMAIL_MATCH)
 
 
 def obscure_token(value: Union[str, None]) -> Union[str, None]:

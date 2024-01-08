@@ -23,7 +23,7 @@ from common.djangoapps.student.models import (
 )
 from common.djangoapps.student.models_api import confirm_name_change
 from common.djangoapps.student.signals import USER_EMAIL_CHANGED
-from openedx.core.djangoapps.safe_sessions.middleware import EmailChangeSessionInvalidationMiddleware
+from openedx.core.djangoapps.safe_sessions.middleware import EmailChangeMiddleware
 from openedx.features.name_affirmation_api.utils import is_name_affirmation_installed
 
 logger = logging.getLogger(__name__)
@@ -109,9 +109,8 @@ if is_name_affirmation_installed():
 def _listen_for_user_email_changed(sender, user, request, **kwargs):
     """ If user has changed their email, update that in session and Braze profile. """
 
-    if settings.ENFORCE_SESSION_EMAIL_MATCH:
-        # Store the user's email for session consistency (used by EmailChangeSessionInvalidationMiddleware)
-        EmailChangeSessionInvalidationMiddleware.register_email_change(request, user.email)
+    # Store the user's email for session consistency (used by EmailChangeMiddleware)
+    EmailChangeMiddleware.register_email_change(request, user.email)
 
     email = user.email
     user_id = user.id

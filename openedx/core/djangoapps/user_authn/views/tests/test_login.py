@@ -47,7 +47,6 @@ from common.djangoapps.util.password_policy_validators import DEFAULT_MAX_PASSWO
 
 
 @ddt.ddt
-@override_settings(ENFORCE_SESSION_EMAIL_MATCH=False)
 class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
     """
     Test login_user() view
@@ -1180,8 +1179,7 @@ class LoginSessionViewTest(ApiTestCase, OpenEdxEventsTestMixin):
         })
         self.assertHttpBadRequest(response)
 
-    @override_settings(ENFORCE_SESSION_EMAIL_MATCH=True)
-    def test_email_in_session_if_ENFORCE_SESSION_EMAIL_MATCH_is_enabled(self):
+    def test_email_in_set_session(self):
         # Login and check email in session
         data = {
             "email": self.EMAIL,
@@ -1196,21 +1194,3 @@ class LoginSessionViewTest(ApiTestCase, OpenEdxEventsTestMixin):
 
         stored_email = self.client.session.get('email')
         assert stored_email == self.EMAIL
-
-    @override_settings(ENFORCE_SESSION_EMAIL_MATCH=False)
-    def test_email_is_not_set_in_session_if_ENFORCE_SESSION_EMAIL_MATCH_is_disabled(self):
-        # Login and check email in session
-        data = {
-            "email": self.EMAIL,
-            "password": self.PASSWORD,
-        }
-
-        response = self.client.post(self.url, data)
-        self.assertHttpOK(response)
-
-        # Ensure the login was successful
-        self.assertEqual(response.status_code, 200)
-
-        # Verify that the email is not stored in the session
-        stored_email = self.client.session.get('email')
-        assert stored_email is None
