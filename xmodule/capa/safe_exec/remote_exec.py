@@ -9,6 +9,7 @@ import requests
 
 from codejail.safe_exec import SafeExecException
 from django.conf import settings
+from edx_rest_api_client.client import OAuthAPIClient
 from edx_toggles.toggles import SettingToggle
 from requests.exceptions import RequestException, HTTPError
 from simplejson import JSONDecodeError
@@ -48,6 +49,46 @@ def get_remote_exec(*args, **kwargs):
     return remote_exec_function(*args, **kwargs)
 
 
+# .. setting_name: CODE_JAIL_REST_SERVICE_OAUTH_URL
+# .. setting_default: None
+# .. setting_description: The OAuth server to get access tokens from when making calls to
+#   the codejail service. Requires setting CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_ID and
+#   CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_SECRET. If not specified, no authorization header will
+#   be sent.
+CODE_JAIL_REST_SERVICE_OAUTH_URL = getattr(settings, 'CODE_JAIL_REST_SERVICE_OAUTH_URL', None)
+# .. setting_name: CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_ID
+# .. setting_default: None
+# .. setting_description: The OAuth client credential ID to use when making calls to
+#   the codejail service. If not specified, no authorization header will be sent.
+CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_ID = getattr(settings, 'CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_ID', None)
+# .. setting_name: CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_SECRET
+# .. setting_default: None
+# .. setting_description: The OAuth client credential secret to use when making calls to
+#   the codejail service. If not specified, no authorization header will be sent.
+CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_SECRET = getattr(settings, 'CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_SECRET', None)
+
+
+def _get_codejail_client():
+    """
+    Return a ``requests`` compatible HTTP client that has .get(...) and .post(...) methods.
+
+    The client will send an OAuth token if the appropriate CODE_JAIL_REST_SERVICE_* settings
+    are configured.
+    """
+    oauth_configured = (
+        CODE_JAIL_REST_SERVICE_OAUTH_URL and
+        CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_ID and CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_SECRET
+    )
+    if oauth_configured:
+        return OAuthAPIClient(
+            base_url=CODE_JAIL_REST_SERVICE_OAUTH_URL,
+            client_id=CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_ID,
+            client_secret=CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_SECRET,
+        )
+    else:
+        return requests
+
+
 def get_codejail_rest_service_endpoint():
     return f"{settings.CODE_JAIL_REST_SERVICE_HOST}/api/v0/code-exec"
 
@@ -68,8 +109,9 @@ def send_safe_exec_request_v0(data):
     codejail_service_endpoint = get_codejail_rest_service_endpoint()
     payload = json.dumps(data)
 
+    client = _get_codejail_client()
     try:
-        response = requests.post(
+        response = client.post(
             codejail_service_endpoint,
             files=extra_files,
             data={'payload': payload},
