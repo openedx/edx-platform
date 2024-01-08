@@ -74,8 +74,8 @@ class IsCourseStaffInstructor(permissions.BasePermission):
                     CourseInstructorRole(obj.course_id).has_user(request.user) or
                     CourseStaffRole(obj.course_id).has_user(request.user) or
                     (
-                        request.user.has_perm(CourseRolesPermission.MANAGE_COURSE_SETTINGS.perm_name) and
-                        request.user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name)
+                        request.user.has_perm(CourseRolesPermission.MANAGE_COURSE_SETTINGS.perm_name, obj.course_id) and
+                        request.user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name, obj.course_id)
                     )
                 )
             ) or
@@ -113,7 +113,7 @@ class IsMasterCourseStaffInstructor(permissions.BasePermission):
             return (hasattr(request, 'user') and (
                     CourseInstructorRole(course_key).has_user(request.user) or
                     CourseStaffRole(course_key).has_user(request.user) or
-                    request.user.has_perm(CourseRolesPermission.MANAGE_COURSE_SETTINGS.perm_name)
+                    request.user.has_perm(CourseRolesPermission.MANAGE_COURSE_SETTINGS.perm_name, course_key)
                     ))
         return False
 
@@ -132,7 +132,7 @@ class IsStaffOrReadOnly(permissions.BasePermission):
         # TODO: remove CourseStaffRole check once course_roles is fully impelented and data is migrated
         return (request.user.is_staff or
                 CourseStaffRole(obj.course_id).has_user(request.user) or
-                request.user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name) or
+                request.user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name, obj.course_id) or
                 request.method in permissions.SAFE_METHODS)
 
 
