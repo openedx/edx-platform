@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://app.transifex.com/open-edx/edx-platform/language/tr_TR/).
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -54,7 +54,7 @@
 #
 # Translators:
 # Adem Özgür <admozgur@gmail.com>, 2015
-# Ali Işıngör <ali@artistanbul.io>, 2017-2023
+# Ali Işıngör <ali@artistanbul.io>, 2017-2024
 # Ali Özcan <aliozcan@yandex.com>, 2014
 # ali selek <aliselek01@gmail.com>, 2015
 # baris <brscvs@gmail.com>, 2013
@@ -5038,6 +5038,7 @@ msgid "Disable User Account"
 msgstr "Kullanıcı Hesabını Askıya Al"
 
 #: lms/djangoapps/support/views/index.py
+#: lms/templates/support/entitlement.html
 msgid "Entitlements"
 msgstr "Yetkiler"
 
@@ -14399,7 +14400,7 @@ msgstr "{platform_name} platformuna hoş geldiniz"
 #. untranslated. See https://openedx.org for more information.
 #: lms/templates/index_overlay.html
 msgid "It works! Powered by the Open edX{registered_trademark} Platform"
-msgstr ""
+msgstr "Çalışıyor! İçinde Open edX{registered_trademark} Platformu Var"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -14721,11 +14722,11 @@ msgstr "Tamamlandı"
 
 #: lms/templates/seq_block.html
 msgid "New Unit"
-msgstr ""
+msgstr "Yeni Ünite"
 
 #: lms/templates/seq_block.html
 msgid "Paste as new unit"
-msgstr ""
+msgstr "Yeni ünite olarak yapıştır"
 
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"
@@ -17355,7 +17356,7 @@ msgstr "Bu bağlantı sertifika web görüntüsünü açacak"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "View my {cert_name_short}"
-msgstr "{cert_name_short} serfifikamı göster"
+msgstr "{cert_name_short} sertifikamı göster"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Complete our course feedback survey"
@@ -20037,22 +20038,27 @@ msgstr "Derslerim"
 
 #: lms/templates/lti_provider/user-auth-error.html
 msgid "There was an error when loading this module!"
-msgstr ""
+msgstr "Bu modül yüklenirken bir hata oluştu!"
 
 #: lms/templates/lti_provider/user-auth-error.html
 msgid ""
 "This module is available only for users who are signed into {platform}. "
 "Kindly sign in and refresh this page to load the content."
 msgstr ""
+"Bu modül yalnızca {platform} platformunda oturum açan kullanıcılar "
+"tarafından kullanılabilir. İçeriği yüklemek için lütfen oturum açın ve bu "
+"sayfayı yenileyin."
 
 #: lms/templates/lti_provider/user-auth-error.html
 msgid "NOTE:"
-msgstr ""
+msgstr "NOT:"
 
 #: lms/templates/lti_provider/user-auth-error.html
 msgid ""
 "The email used to sign into this platform and {platform} should be the same."
 msgstr ""
+"Bu platformda oturum açmak için kullanılan e-posta adresi ile {platform} "
+"aynı olmalıdır."
 
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"

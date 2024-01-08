@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2024-01-02 19:54+0000\n"
-"PO-Revision-Date: 2024-01-02 19:54:56.614547\n"
+"POT-Creation-Date: 2024-01-08 19:21+0000\n"
+"PO-Revision-Date: 2024-01-08 19:21:26.035640\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -11685,6 +11685,10 @@ msgstr ""
 msgid "Invalid prerequisite course key"
 msgstr ""
 
+#: cms/djangoapps/contentstore/utils.py
+msgid "Set Date"
+msgstr ""
+
 #. #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 #. Translators: This is the status of an active video upload
 #: cms/djangoapps/contentstore/video_storage_handlers.py
@@ -11890,10 +11894,6 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Course has been successfully reindexed."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "Set Date"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
