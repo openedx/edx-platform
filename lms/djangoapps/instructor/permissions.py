@@ -77,10 +77,11 @@ perms[OVERRIDE_GRADES] = HasAccessRule('staff')
 # TODO: remove role checks once course_roles is fully implemented and data is migrated
 perms[SHOW_TASKS] = (
     HasAccessRule('staff') |
-    HasRolesRule('data_researcher') |
-    HasPermissionRule(CourseRolesPermission.MANAGE_STUDENTS.perm_name) |
-    HasPermissionRule(CourseRolesPermission.ACCESS_DATA_DOWNLOADS.perm_name) |
-    HasPermissionRule(CourseRolesPermission.ACCESS_INSTRUCTOR_DASHBOARD.perm_name)
+    HasRolesRule('data_researcher') | (
+        HasPermissionRule(CourseRolesPermission.MANAGE_STUDENTS.perm_name) &
+        HasPermissionRule(CourseRolesPermission.ACCESS_DATA_DOWNLOADS.perm_name) &
+        HasPermissionRule(CourseRolesPermission.ACCESS_INSTRUCTOR_DASHBOARD.perm_name)
+    )
 )
 perms[EMAIL] = HasAccessRule('staff')
 perms[RESCORE_EXAMS] = HasAccessRule('instructor')
@@ -90,7 +91,7 @@ perms[VIEW_DASHBOARD] = (
     HasRolesRule('staff', 'instructor', 'data_researcher') |
     HasAccessRule('staff') |
     HasAccessRule('instructor') |
-    HasPermissionRule(CourseRolesPermission.ACCESS_DATA_DOWNLOADS.perm_name)
+    HasPermissionRule(CourseRolesPermission.ACCESS_INSTRUCTOR_DASHBOARD.perm_name)
 )
 perms[VIEW_ENROLLMENTS] = HasAccessRule('staff')
 perms[VIEW_FORUM_MEMBERS] = HasAccessRule('staff')
