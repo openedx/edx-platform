@@ -40,7 +40,10 @@ from common.djangoapps import third_party_auth
 from common.djangoapps.student.helpers import get_next_url_for_login_page, get_redirect_url_with_host
 from lms.djangoapps.discussion.notification_prefs.views import enable_notifications
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
-from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
+from openedx.core.djangoapps.safe_sessions.middleware import (
+    mark_user_change_as_expected,
+    EmailChangeMiddleware
+)
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from openedx.core.djangoapps.user_api.accounts.api import (
@@ -587,6 +590,9 @@ class RegistrationView(APIView):
         response, user = self._create_account(request, data)
         if response:
             return response
+
+        # Store the user's email for session consistency (used by EmailChangeMiddleware)
+        EmailChangeMiddleware.register_email_change(request, user.email)
 
         redirect_to, root_url = get_next_url_for_login_page(request, include_host=True)
         redirect_url = get_redirect_url_with_host(root_url, redirect_to)

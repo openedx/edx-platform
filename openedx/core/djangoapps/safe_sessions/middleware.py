@@ -799,6 +799,9 @@ class EmailChangeMiddleware(MiddlewareMixin):
             are_emails_mismatched = user_session_email is not None and request.user.email != user_session_email
             EmailChangeMiddleware._set_session_email_match_custom_attributes(are_emails_mismatched)
             if settings.ENFORCE_SESSION_EMAIL_MATCH and are_emails_mismatched:
+                log.info(
+                    f'EmailChangeMiddleware invalidating session for user: {request.user.id} due to email mismatch.'
+                )
                 # Flush the session and mark cookies for deletion.
                 request.session.flush()
                 request.user = AnonymousUser()
@@ -833,7 +836,7 @@ class EmailChangeMiddleware(MiddlewareMixin):
         # .. custom_attribute_name: session_email_match
         # .. custom_attribute_description: Indicates whether there is a match between the
         #      email in the user's session and the current user's email in the request.
-        set_custom_attribute('session_email_match', not are_emails_mismatched)
+        set_custom_attribute('session_email_mismatch', are_emails_mismatched)
 
         # .. custom_attribute_name: is_enforce_session_email_match_enabled
         # .. custom_attribute_description: Indicates whether session email match was enforced.

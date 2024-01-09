@@ -1179,7 +1179,34 @@ class LoginSessionViewTest(ApiTestCase, OpenEdxEventsTestMixin):
         })
         self.assertHttpBadRequest(response)
 
-    def test_email_in_set_session(self):
+        # Invalid email address
+        response = self.client.post(self.url, {
+            "email": "invalid@example.com",
+            "password": self.PASSWORD,
+        })
+        self.assertHttpBadRequest(response)
+
+    @ddt.data(True, False)
+    def test_missing_login_params(self, is_api_v1):
+        email_field_name = "email" if is_api_v1 else "email_or_username"
+        url = self.url if is_api_v1 else self.url_v2
+        # Missing password
+        response = self.client.post(url, {
+            email_field_name: self.EMAIL,
+        })
+        self.assertHttpBadRequest(response)
+
+        # Missing email
+        response = self.client.post(url, {
+            "password": self.PASSWORD,
+        })
+        self.assertHttpBadRequest(response)
+
+        # Missing both email and password
+        response = self.client.post(url, {})
+        self.assertHttpBadRequest(response)
+
+    def test_email_is_set_session(self):
         # Login and check email in session
         data = {
             "email": self.EMAIL,
