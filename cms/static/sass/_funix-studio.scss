@@ -202,9 +202,10 @@
         border-radius: var(--border-radius);
         overflow: hidden;
         margin-top: .5em;
-        margin-bottom: 1em;
-        width: 100%;
+        margin: .5rem auto 1rem;
+        max-width: 100%;
         box-sizing: border-box;
+        height: auto;
     }
 
     // table 
