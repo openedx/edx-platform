@@ -139,6 +139,7 @@ class LibraryToolsService:
                 library_version=library_version,
             ),
         )
+
     def trigger_duplication(self, source_block: LibraryContentBlock, dest_block: LibraryContentBlock) -> None:
         """
         Queue a task to duplicate the children of `source_block` to `dest_block`.
