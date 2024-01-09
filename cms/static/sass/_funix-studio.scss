@@ -55,6 +55,13 @@
         line-height: 1.5;
     }
 
+    strong span,
+    b span,
+    .xmodule_display.xmodule_HtmlBlock strong span,
+    .xmodule_display.xmodule_HtmlBlock b span {
+        font-weight: 500;
+    }
+
 
     h1,
     .course-wrapper .course-content h1,
