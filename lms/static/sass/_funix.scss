@@ -207,9 +207,8 @@ img,
     border: 1px solid var(--color-stroke);
     border-radius: var(--border-radius);
     overflow: hidden;
-    margin-top: .5rem;
-    margin-bottom: 1rem;
-    width: 100%;
+    // width: 100%;
+    margin: .5rem auto 1rem;
     box-sizing: border-box;
 }
 
@@ -289,7 +288,7 @@ details,
         list-style: none;
         line-height: 1.5;
         font: 500 1rem 'Roboto', sans-serif !important;
-        margin: 0  -1rem !important;
+        margin: 0 -1rem !important;
         cursor: pointer;
         padding: .75rem 1rem .75rem 1rem;
         position: relative;
