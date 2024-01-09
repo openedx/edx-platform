@@ -820,7 +820,7 @@ edx-rest-api-client==5.6.1
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
     #   edx-proctoring
-edx-search==3.7.1
+edx-search==3.8.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
