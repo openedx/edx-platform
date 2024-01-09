@@ -587,7 +587,12 @@ class LibraryContentBlock(
             is_updating = False
         return Response(json.dumps(is_updating))
 
-    def studio_post_duplicate(self, store, source_block):
+    def studio_post_duplicate(
+        self,
+        source_block,
+        *_args,
+        **__kwargs,
+    ) -> None:
         """
         Used by the studio after basic duplication of a source block. We handle the children
         ourselves, because we have to properly reference the library upstream and set the overrides.
@@ -596,7 +601,6 @@ class LibraryContentBlock(
         """
         self._validate_sync_permissions()
         self.get_tools(to_read_library_content=True).trigger_duplication(source_block=source_block, dest_block=self)
-        return True  # Children have been handled.
 
     def _validate_library_version(self, validation, lib_tools, version, library_key):
         """
