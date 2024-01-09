@@ -207,9 +207,10 @@ img,
     border: 1px solid var(--color-stroke);
     border-radius: var(--border-radius);
     overflow: hidden;
-    // width: 100%;
+    max-width: 100%;
     margin: .5rem auto 1rem;
     box-sizing: border-box;
+    height: auto;
 }
 
 // table 
