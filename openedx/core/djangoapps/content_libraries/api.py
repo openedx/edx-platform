@@ -67,7 +67,6 @@ from django.core.exceptions import PermissionDenied
 from django.core.validators import validate_unicode_slug
 from django.db import IntegrityError, transaction
 from django.utils.translation import gettext as _
-from elasticsearch.exceptions import ConnectionError as ElasticConnectionError
 from lxml import etree
 from opaque_keys.edx.keys import LearningContextKey, UsageKey
 from opaque_keys.edx.locator import (
@@ -92,9 +91,16 @@ from xblock.exceptions import XBlockNotFoundError
 from edx_rest_api_client.client import OAuthAPIClient
 
 from openedx.core.djangoapps.content_libraries import permissions
-from openedx.core.djangoapps.content_libraries.constants import DRAFT_NAME, COMPLEX
+# pylint: disable=unused-import
+from openedx.core.djangoapps.content_libraries.constants import (
+    ALL_RIGHTS_RESERVED,
+    CC_4_BY,
+    COMPLEX,
+    DRAFT_NAME,
+    PROBLEM,
+    VIDEO,
+)
 from openedx.core.djangoapps.content_libraries.library_bundle import LibraryBundle
-from openedx.core.djangoapps.content_libraries.libraries_index import ContentLibraryIndexer, LibraryBlockIndexer
 from openedx.core.djangoapps.content_libraries.models import (
     ContentLibrary,
     ContentLibraryPermission,
@@ -290,56 +296,35 @@ def get_libraries_for_user(user, org=None, library_type=None):
     return permissions.perms[permissions.CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, qs)
 
 
-def get_metadata_from_index(queryset, text_search=None):
+def get_metadata(queryset, text_search=None):
     """
-    Take a list of ContentLibrary objects and return metadata stored in
-    ContentLibraryIndex.
+    Take a list of ContentLibrary objects and return metadata from blockstore.
     """
-    metadata = None
-    if ContentLibraryIndexer.indexing_is_enabled():
-        try:
-            library_keys = [str(lib.library_key) for lib in queryset]
-            metadata = ContentLibraryIndexer.get_items(library_keys, text_search=text_search)
-            metadata_dict = {
-                item["id"]: item
-                for item in metadata
-            }
-            metadata = [
-                metadata_dict[key]
-                if key in metadata_dict
-                else None
-                for key in library_keys
-            ]
-        except ElasticConnectionError as e:
-            log.exception(e)
+    uuids = [lib.bundle_uuid for lib in queryset]
+    bundles = get_bundles(uuids=uuids, text_search=text_search)
 
-    # If ContentLibraryIndex is not available, we query blockstore for a limited set of metadata
-    if metadata is None:
-        uuids = [lib.bundle_uuid for lib in queryset]
-        bundles = get_bundles(uuids=uuids, text_search=text_search)
+    if text_search:
+        # Bundle APIs can't apply text_search on a bundle's org, so including those results here
+        queryset_org_search = queryset.filter(org__short_name__icontains=text_search)
+        if queryset_org_search.exists():
+            uuids_org_search = [lib.bundle_uuid for lib in queryset_org_search]
+            bundles += get_bundles(uuids=uuids_org_search)
 
-        if text_search:
-            # Bundle APIs can't apply text_search on a bundle's org, so including those results here
-            queryset_org_search = queryset.filter(org__short_name__icontains=text_search)
-            if queryset_org_search.exists():
-                uuids_org_search = [lib.bundle_uuid for lib in queryset_org_search]
-                bundles += get_bundles(uuids=uuids_org_search)
-
-        bundle_dict = {
-            bundle.uuid: {
-                'uuid': bundle.uuid,
-                'title': bundle.title,
-                'description': bundle.description,
-                'version': bundle.latest_version,
-            }
-            for bundle in bundles
+    bundle_dict = {
+        bundle.uuid: {
+            'uuid': bundle.uuid,
+            'title': bundle.title,
+            'description': bundle.description,
+            'version': bundle.latest_version,
         }
-        metadata = [
-            bundle_dict[uuid]
-            if uuid in bundle_dict
-            else None
-            for uuid in uuids
-        ]
+        for bundle in bundles
+    }
+    metadata = [
+        bundle_dict[uuid]
+        if uuid in bundle_dict
+        else None
+        for uuid in uuids
+    ]
 
     libraries = [
         ContentLibraryMetadata(
@@ -410,8 +395,15 @@ def get_library(library_key):
 
 
 def create_library(
-        collection_uuid, library_type, org, slug, title, description, allow_public_learning, allow_public_read,
-        library_license,
+        collection_uuid,
+        org,
+        slug,
+        title,
+        description="",
+        allow_public_learning=False,
+        allow_public_read=False,
+        library_license=ALL_RIGHTS_RESERVED,
+        library_type=COMPLEX,
 ):
     """
     Create a new content library.
@@ -427,6 +419,8 @@ def create_library(
     allow_public_learning: Allow anyone to read/learn from blocks in the LMS
 
     allow_public_read: Allow anyone to view blocks (including source) in Studio?
+
+    library_type: Deprecated parameter, not really used. Set to COMPLEX.
 
     Returns a ContentLibraryMetadata instance.
     """
@@ -648,50 +642,28 @@ def get_library_blocks(library_key, text_search=None, block_types=None) -> list[
 
     Returns a list of LibraryXBlockMetadata objects
     """
-    metadata = None
-    if LibraryBlockIndexer.indexing_is_enabled():
-        try:
-            filter_terms = {
-                'library_key': [str(library_key)],
-                'is_child': [False],
-            }
-            if block_types:
-                filter_terms['block_type'] = block_types
-            metadata = [
-                {
-                    **item,
-                    "id": LibraryUsageLocatorV2.from_string(item['id']),
-                }
-                for item in LibraryBlockIndexer.get_items(filter_terms=filter_terms, text_search=text_search)
-                if item is not None
-            ]
-        except ElasticConnectionError as e:
-            log.exception(e)
+    metadata = []
+    ref = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    lib_bundle = LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME)
+    usages = lib_bundle.get_top_level_usages()
 
-    # If indexing is disabled, or connection to elastic failed
-    if metadata is None:
-        metadata = []
-        ref = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
-        lib_bundle = LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME)
-        usages = lib_bundle.get_top_level_usages()
-
-        for usage_key in usages:
-            # For top-level definitions, we can go from definition key to usage key using the following, but this would
-            # not work for non-top-level blocks as they may have multiple usages. Top level blocks are guaranteed to
-            # have only a single usage in the library, which is part of the definition of top level block.
-            def_key = lib_bundle.definition_for_usage(usage_key)
-            display_name = get_block_display_name(def_key)
-            text_match = (text_search is None or
-                          text_search.lower() in display_name.lower() or
-                          text_search.lower() in str(usage_key).lower())
-            type_match = (block_types is None or usage_key.block_type in block_types)
-            if text_match and type_match:
-                metadata.append({
-                    "id": usage_key,
-                    "def_key": def_key,
-                    "display_name": display_name,
-                    "has_unpublished_changes": lib_bundle.does_definition_have_unpublished_changes(def_key),
-                })
+    for usage_key in usages:
+        # For top-level definitions, we can go from definition key to usage key using the following, but this would
+        # not work for non-top-level blocks as they may have multiple usages. Top level blocks are guaranteed to
+        # have only a single usage in the library, which is part of the definition of top level block.
+        def_key = lib_bundle.definition_for_usage(usage_key)
+        display_name = get_block_display_name(def_key)
+        text_match = (text_search is None or
+                      text_search.lower() in display_name.lower() or
+                      text_search.lower() in str(usage_key).lower())
+        type_match = (block_types is None or usage_key.block_type in block_types)
+        if text_match and type_match:
+            metadata.append({
+                "id": usage_key,
+                "def_key": def_key,
+                "display_name": display_name,
+                "has_unpublished_changes": lib_bundle.does_definition_have_unpublished_changes(def_key),
+            })
 
     return [
         LibraryXBlockMetadata(
@@ -1259,12 +1231,13 @@ class BaseEdxImportClient(abc.ABC):
         "video",
     }
 
-    def __init__(self, library_key=None, library=None):
+    def __init__(self, library_key=None, library=None, use_course_key_as_block_id_suffix=True):
         """
         Initialize an import client for a library.
 
         The method accepts either a library object or a key to a library object.
         """
+        self.use_course_key_as_block_id_suffix = use_course_key_as_block_id_suffix
         if bool(library_key) == bool(library):
             raise ValueError('Provide at least one of `library_key` or '
                              '`library`, but not both.')
@@ -1306,8 +1279,18 @@ class BaseEdxImportClient(abc.ABC):
                 str(modulestore_key.course_key).encode()
             ).digest()
         )[:16].decode().lower()
-        # Prepend 'c' to allow changing hash without conflicts.
-        block_id = f"{modulestore_key.block_id}_c{course_key_id}"
+
+        # add the course_key_id if use_course_key_as_suffix is enabled to increase the namespace.
+        # The option exists to not use the course key as a suffix because
+        # in order to preserve learner state in the v1 to v2 libraries migration,
+        # the v2 and v1 libraries' child block ids must be the same.
+        block_id = (
+            # Prepend 'c' to allow changing hash without conflicts.
+            f"{modulestore_key.block_id}_c{course_key_id}"
+            if self.use_course_key_as_block_id_suffix
+            else f"{modulestore_key.block_id}"
+        )
+
         log.info('Importing to library block: id=%s', block_id)
         try:
             library_block = create_library_block(
@@ -1518,7 +1501,7 @@ class EdxApiImportClient(BaseEdxImportClient):
         return response
 
 
-def import_blocks_create_task(library_key, course_key):
+def import_blocks_create_task(library_key, course_key, use_course_key_as_block_id_suffix=True):
     """
     Create a new import block task.
 
@@ -1531,7 +1514,7 @@ def import_blocks_create_task(library_key, course_key):
         course_id=course_key,
     )
     result = tasks.import_blocks_from_course.apply_async(
-        args=(import_task.pk, str(course_key))
+        args=(import_task.pk, str(course_key), use_course_key_as_block_id_suffix)
     )
     log.info(f"Import block task created: import_task={import_task} "
              f"celery_task={result.id}")

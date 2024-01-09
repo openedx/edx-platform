@@ -418,16 +418,6 @@ FACEBOOK_APP_SECRET = "Test"
 FACEBOOK_APP_ID = "Test"
 FACEBOOK_API_VERSION = "v2.8"
 
-####################### ELASTICSEARCH TESTS #######################
-# Enable this when testing elasticsearch-based code which couldn't be tested using the mock engine
-ENABLE_ELASTICSEARCH_FOR_TESTS = os.environ.get(
-    'EDXAPP_ENABLE_ELASTICSEARCH_FOR_TESTS', 'no').lower() in ('true', 'yes', '1')
-
-TEST_ELASTICSEARCH_USE_SSL = os.environ.get(
-    'EDXAPP_TEST_ELASTICSEARCH_USE_SSL', 'no').lower() in ('true', 'yes', '1')
-TEST_ELASTICSEARCH_HOST = os.environ.get('EDXAPP_TEST_ELASTICSEARCH_HOST', 'edx.devstack.elasticsearch710')
-TEST_ELASTICSEARCH_PORT = int(os.environ.get('EDXAPP_TEST_ELASTICSEARCH_PORT', '9200'))
-
 ######### custom courses #########
 INSTALLED_APPS += ['lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig']
 FEATURES['CUSTOM_COURSES_EDX'] = True
@@ -673,6 +663,7 @@ MFE_CONFIG_OVERRIDES = {
 ############## Settings for survey report ##############
 SURVEY_REPORT_EXTRA_DATA = {}
 SURVEY_REPORT_ENDPOINT = "https://example.com/survey_report"
+SURVEY_REPORT_CHECK_THRESHOLD = 6
 ANONYMOUS_SURVEY_REPORT = False
 
 ######################## Subscriptions API SETTINGS ########################

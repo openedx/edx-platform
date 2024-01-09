@@ -100,8 +100,7 @@ def send_ace_message_for_reported_content(context):  # lint-amnesty, pylint: dis
     context['course_name'] = modulestore().get_course(context['course_id']).display_name
 
     moderators = get_users_with_moderator_roles(context)
-    context['site'] = Site.objects.get(id=context['site_id']
-                                       )
+    context['site'] = Site.objects.get(id=context['site_id'])
     if not _is_content_still_reported(context):
         log.info('Reported content is no longer in reported state. Email to moderators will not be sent.')
         return
@@ -225,9 +224,10 @@ def _build_message_context(context):  # lint-amnesty, pylint: disable=missing-fu
 def _build_message_context_for_reported_content(context, moderator):  # lint-amnesty, pylint: disable=missing-function-docstring
     message_context = get_base_template_context(context['site'])
     message_context.update(context)
+    use_mfe_url = ENABLE_DISCUSSIONS_MFE.is_enabled(context['course_id'])
 
     message_context.update({
-        'post_link': _get_mfe_thread_url(context),
+        'post_link': _get_mfe_thread_url(context) if use_mfe_url else _get_thread_url(context, settings.LMS_BASE),
         'moderator_email': moderator.email,
     })
     return message_context
@@ -242,9 +242,11 @@ def _get_mfe_thread_url(context):
     return urljoin(forum_url, mfe_post_link)
 
 
-def _get_thread_url(context):  # lint-amnesty, pylint: disable=missing-function-docstring
+def _get_thread_url(context, domain_url=None):  # lint-amnesty, pylint: disable=missing-function-docstring
     scheme = 'https' if settings.HTTPS == 'on' else 'http'
-    base_url = '{}://{}'.format(scheme, context['site'].domain)
+    if domain_url is None:
+        domain_url = context['site'].domain
+    base_url = '{}://{}'.format(scheme, domain_url)
     thread_content = {
         'type': 'thread',
         'course_id': context['course_id'],
