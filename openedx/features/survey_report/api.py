@@ -11,7 +11,8 @@ from openedx.features.survey_report.models import (
     SurveyReportUpload,
     SurveyReportAnonymousSiteID,
     SURVEY_REPORT_ERROR,
-    SURVEY_REPORT_GENERATED
+    SURVEY_REPORT_GENERATED,
+    SURVEY_REPORT_SENT
 )
 from openedx.features.survey_report.queries import (
     get_course_enrollments,
@@ -108,6 +109,10 @@ def send_report_to_external_api(report_id: int) -> None:
         status_code=request.status_code,
         request_details=request.content
     )
+
+    # Update the state attribute to "sent"
+    report.state = SURVEY_REPORT_SENT
+    report.save()
 
 
 def update_report(survey_report_id: int, data: dict) -> None:
