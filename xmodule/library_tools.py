@@ -129,9 +129,9 @@ class LibraryToolsService:
                 raise ObjectDoesNotExist(f"Version {library_version} of library {library_key} not found.")
             raise ObjectDoesNotExist(f"Library {library_key} not found.")
 
-        # TODO: This task is synchronous until we can figure out race conditions with import
+        # TODO: This task is synchronous until we can figure out race conditions with import.
         # These race conditions lead to failed imports of library content from course import.
-        # See: TNL-TNL-11339, https://github.com/openedx/edx-platform/issues/34029 for more info.
+        # See: TNL-11339, https://github.com/openedx/edx-platform/issues/34029 for more info.
         library_tasks.sync_from_library.apply(
             user_id=self.user_id,
             dest_block_id=str(dest_block.scope_ids.usage_id),
