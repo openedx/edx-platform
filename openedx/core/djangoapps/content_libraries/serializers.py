@@ -117,6 +117,7 @@ class LibraryXBlockMetadataSerializer(serializers.Serializer):
     # When creating a new XBlock in a library, the slug becomes the ID part of
     # the definition key and usage key:
     slug = serializers.CharField(write_only=True)
+    tags_count = serializers.IntegerField(read_only=True)
 
 
 class LibraryXBlockTypeSerializer(serializers.Serializer):

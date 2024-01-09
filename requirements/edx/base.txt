@@ -779,7 +779,7 @@ openedx-filters==1.6.0
     # via
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
-openedx-learning==0.4.1
+openedx-learning==0.4.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
