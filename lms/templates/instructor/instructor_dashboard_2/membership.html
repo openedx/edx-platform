@@ -94,7 +94,7 @@ from openedx.core.djangolib.markup import HTML, Text
 
 <hr class="divider" />
 
-%if section_data['access']['manage_all_users']:
+%if section_data['access']['manage_membership_full']:
 <fieldset class="batch-beta-testers membership-section">
     <legend id="heading-batch-beta-testers" class="hd hd-3">${_("Batch Beta Tester Addition")}</legend>
     <label>
@@ -156,7 +156,7 @@ from openedx.core.djangolib.markup import HTML, Text
   </div>
 
 
-  %if not section_data['access']['manage_all_users']:
+  %if not section_data['access']['manage_membership_full']:
     <p>
       ${_("Staff cannot modify these lists. To manage course team membership, "
       "a course Admin must give you the Admin role to add Staff or Beta Testers, "
@@ -164,7 +164,7 @@ from openedx.core.djangolib.markup import HTML, Text
     </p>
   %endif
 
-  %if section_data['access']['manage_all_users']:
+  %if section_data['access']['manage_membership_full']:
     <div class="auth-list-container"
       data-rolename="staff"
       data-display-name="${_("Staff")}"
@@ -245,7 +245,7 @@ from openedx.core.djangolib.markup import HTML, Text
 
   %endif
 
-  %if section_data['access']['manage_all_users'] or section_data['access']['manage_disc_moderators']:
+  %if section_data['access']['manage_membership_full'] or section_data['access']['manage_discussions']:
     <div class="auth-list-container"
       data-rolename="Moderator"
       data-display-name="${_("Discussion Moderators")}"
@@ -288,7 +288,7 @@ from openedx.core.djangolib.markup import HTML, Text
     ></div>
   %endif
 
-  %if section_data['access']['manage_all_users'] and section_data['ccx_is_enabled']:
+  %if section_data['access']['manage_membership_full'] and section_data['ccx_is_enabled']:
     <div class="auth-list-container"
       data-rolename="ccx_coach"
       data-display-name="${_("CCX Coaches")}"

@@ -28,9 +28,7 @@ from common.djangoapps.course_modes.models import CourseMode, CourseModesArchive
 from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import (
-    CourseFinanceAdminRole,
     CourseInstructorRole,
-    CourseSalesAdminRole,
     CourseStaffRole
 )
 from common.djangoapps.util.json_request import JsonResponse
@@ -44,18 +42,16 @@ from lms.djangoapps.certificates.models import (
     CertificateInvalidation,
     GeneratedCertificate
 )
-from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_studio_url
 from lms.djangoapps.courseware.block_render import get_block_by_usage_id
 from lms.djangoapps.courseware.masquerade import get_masquerade_role
-from lms.djangoapps.discussion.django_comment_client.utils import has_forum_access
 from lms.djangoapps.grades.api import is_writable_gradebook_enabled
 from lms.djangoapps.instructor.constants import INSTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
 from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, get_course_cohorts, is_course_cohorted
 from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
 from openedx.core.djangoapps.discussions.utils import available_division_schemes
-from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
+from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.djangoapps.plugins.constants import ProjectType
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import HTML, Text
@@ -123,48 +119,34 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
     # TODO: remove role checks once course_roles is fully implemented and data is migrated
     access = {
         'data_research': request.user.has_perm(permissions.CAN_RESEARCH, course_key),
-
         'admin': request.user.is_staff,
-        'manage_grades': (
-            bool(has_access(request.user, 'instructor', course)) or
-            bool(has_access(request.user, 'staff', course)) or
-            request.user.has_perm(CourseRolesPermission.MANAGE_GRADES.perm_name)
+        'manage_oras': request.user.has_perm(permissions.MANAGE_ORAS, course_key),
+        'manage_discussions': request.user.has_perm(permissions.MANAGE_DISCUSSIONS, course_key),
+        'manage_students': request.user.has_perm(permissions.MANAGE_STUDENTS, course_key),
+        'manage_membership_limited': request.user.has_perm(
+            permissions.MANAGE_MEMBERSHIP_LIMITED, course_key
         ),
-        'manage_disc_moderators': (
-            request.user.has_perm(CourseRolesPermission.MANAGE_DISCUSSION_MODERATORS.perm_name) or
-            has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR)
-        ),
-        'manage_students': (
-            bool(has_access(request.user, 'instructor', course)) or
-            bool(has_access(request.user, 'staff', course)) or
-            request.user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name)
-        ),
-        'manage_users_except_admin_staff': (
-            bool(has_access(request.user, 'staff', course)) or
-            request.user.has_perm(CourseRolesPermission.MANAGE_USERS_EXCEPT_ADMIN_AND_STAFF.perm_name)
-        ),
-        'manage_all_users': (
-            bool(has_access(request.user, 'instructor', course)) or
-            request.user.has_perm(CourseRolesPermission.MANAGE_ALL_USERS.perm_name)
-        )
+        'manage_membership_full': request.user.has_perm(permissions.MANAGE_MEMBERSHIP_FULL, course_key),
+        'manage_cohorts': request.user.has_perm(permissions.MANAGE_COHORTS, course_key)
     }
 
     if not request.user.has_perm(permissions.VIEW_DASHBOARD, course_key):
         raise Http404()
 
     sections = []
-    if access['manage_users_except_admin_staff']:
-        sections_content = [
-            _section_course_info(course, access),
-            _section_membership(course, access),
-            _section_cohort_management(course, access),
-            _section_student_admin(course, access),
-        ]
+    if access['manage_membership_full'] or access['manage_membership_limited']:
+        sections.append(_section_course_info(course, access))
+        sections.append(_section_membership(course, access))
+    if access['manage_cohorts']:
+        sections.append(_section_cohort_management(course, access))
+    # consider this instead: if access['manage_students']:
+    if access['manage_membership_full'] or access['manage_membership_limited']:
+        sections.append(_section_student_admin(course, access))
 
         if legacy_discussion_experience_enabled(course_key):
-            sections_content.append(_section_discussions_management(course, access))
-        sections.extend(sections_content)
+            sections.append(_section_discussions_management(course, access))
 
+    log.info(f'data_research {access["data_research"]}')
     if access['data_research']:
         sections.append(_section_data_download(course, access))
 
@@ -195,7 +177,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
             str(course_key), len(paid_modes)
         )
 
-    if access['manage_all_users'] and is_enabled_for_course(course_key):
+    if access['manage_membership_full'] and is_enabled_for_course(course_key):
         sections.insert(3, _section_extensions(course))
 
     # Gate access to course email by feature flag & by course-specific authorization
@@ -237,7 +219,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
     openassessment_blocks = [
         block for block in openassessment_blocks if block.parent is not None
     ]
-    if len(openassessment_blocks) > 0 and access['manage_grades']:
+    if len(openassessment_blocks) > 0 and access['manage_oras']:
         sections.append(_section_open_response_assessment(request, course, openassessment_blocks, access))
 
     disable_buttons = not CourseEnrollment.objects.is_small_course(course_key)

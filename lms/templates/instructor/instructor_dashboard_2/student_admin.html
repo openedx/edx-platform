@@ -1,6 +1,6 @@
 <%page args="section_data" expression_filter="h"/>
 <%! from django.utils.translation import gettext as _ %>
-%if section_data['access']['manage_grades']:
+%if section_data['access']['manage_oras']:
 <div class="action-type-container">
     %if section_data.get('writable_gradebook_url') or section_data.get('is_small_course'):
         <br><br>
@@ -155,7 +155,7 @@
     <input type="button" name="skip-entrance-exam" value="${_('Let Learner Skip Entrance Exam')}" data-endpoint="${ section_data['student_can_skip_entrance_exam_url'] }">
     <br><br>
 
-    %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['manage_grades']:
+    %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['manage_oras']:
         <h5 class="hd hd-5">${_("Rescore")}</h5>
         <label for="rescore-actions-entrance-exam">
             ${_("Rescore any responses that have been submitted. The 'Rescore All Problems Only If Score Improves' option updates the learner's scores only if it improves in the learner's favor.")}
@@ -192,7 +192,7 @@
 
 %endif
 
-%if section_data['access']['manage_all_users']:
+%if section_data['access']['manage_membership_full']:
 %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
 <div class="course-specific-container action-type-container">
     <h4 class="hd hd-4">${_("Adjust all enrolled learners' grades for a specific problem")}</h4>
