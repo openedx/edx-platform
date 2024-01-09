@@ -146,7 +146,9 @@ all_html_tags = [
     'picture','pre','progress','q','rp','rt','ruby','s','samp','script','search','section','select',
     'small','source','span','strike','strong','style','sub','summary','sup','svg','table','tbody',
     'td','template','textarea','tfoot','th','thead','time','title','tr','track','tt','u','ul',
-    'var','video','wbr','hr','html','i','iframe','o:p'
+    'var','video','wbr','hr','html','i','iframe','o:p', 'v:shape', 'v:imagedata', 'v:shapetype', 
+    'v:stroke', 'v:f', 'v:path', 'v:formulas', 'o:lock', 'w:borderright', 'w:bordertop', 'w:borderleft', 
+    'w:borderbottom'
 ]
 
 tags_will_be_removed = []
