@@ -52,6 +52,7 @@ from lms.djangoapps.discussion.django_comment_client.utils import has_forum_acce
 from lms.djangoapps.grades.api import is_writable_gradebook_enabled
 from lms.djangoapps.instructor.constants import INSTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
 from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, get_course_cohorts, is_course_cohorted
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
 from openedx.core.djangoapps.discussions.utils import available_division_schemes
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
@@ -119,14 +120,21 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
 
     course = get_course_by_id(course_key, depth=None)
 
+    # TODO: remove role checks once course_roles is fully implemented and data is migrated
     access = {
         'admin': request.user.is_staff,
         'instructor': bool(has_access(request.user, 'instructor', course)),
         'finance_admin': CourseFinanceAdminRole(course_key).has_user(request.user),
         'sales_admin': CourseSalesAdminRole(course_key).has_user(request.user),
         'staff': bool(has_access(request.user, 'staff', course)),
-        'forum_admin': has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR),
-        'data_researcher': request.user.has_perm(permissions.CAN_RESEARCH, course_key),
+        'forum_admin': (
+            has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR) or
+            request.user.has_perm(CourseRolesPermission.MANAGE_DISCUSSION_MODERATORS.perm_name, course_key)
+        ),
+        'data_researcher': (
+            request.user.has_perm(permissions.CAN_RESEARCH, course_key) or
+            request.user.has_perm(CourseRolesPermission.ACCESS_DATA_DOWNLOADS.perm_name, course_key)
+        ),
     }
 
     if not request.user.has_perm(permissions.VIEW_DASHBOARD, course_key):
@@ -189,10 +197,12 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
     # Gate access to Special Exam tab depending if either timed exams or proctored exams
     # are enabled in the course
 
+    # TODO: remove role checks once course_roles is fully implemented and data is migrated
     user_has_access = any([
         request.user.is_staff,
         CourseStaffRole(course_key).has_user(request.user),
-        CourseInstructorRole(course_key).has_user(request.user)
+        CourseInstructorRole(course_key).has_user(request.user),
+        request.user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name, course_key)
     ])
     course_has_special_exams = course.enable_proctored_exams or course.enable_timed_exams
     can_see_special_exams = course_has_special_exams and user_has_access and settings.FEATURES.get(
