@@ -63,7 +63,7 @@ from xml.sax.saxutils import escape
 from unittest import mock
 from urllib import parse
 
-import bleach
+import nh3
 import oauthlib.oauth1
 from django.conf import settings
 from lxml import etree
@@ -468,7 +468,7 @@ class LTIBlock(
         #     'acronym': ['title'],
         #
         # This lets all plaintext through.
-        sanitized_comment = bleach.clean(self.score_comment)
+        sanitized_comment = nh3.clean(self.score_comment)
 
         return {
             'input_fields': self.get_input_fields(),

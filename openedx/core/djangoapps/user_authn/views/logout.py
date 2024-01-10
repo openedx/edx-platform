@@ -5,7 +5,7 @@ import re
 import urllib.parse as parse  # pylint: disable=import-error
 from urllib.parse import parse_qs, urlsplit, urlunsplit  # pylint: disable=import-error
 
-import bleach
+import nh3
 from django.conf import settings
 from django.contrib.auth import logout
 from django.shortcuts import redirect
@@ -60,7 +60,7 @@ class LogoutView(TemplateView):
         #  >> /courses/course-v1:ARTS+D1+2018_T/course/
         #  to handle this scenario we need to encode our URL using quote_plus and then unquote it again.
         if target_url:
-            target_url = bleach.clean(parse.unquote(parse.quote_plus(target_url)))
+            target_url = nh3.clean(parse.unquote(parse.quote_plus(target_url)))
 
         use_target_url = target_url and is_safe_login_or_logout_redirect(
             redirect_to=target_url,
