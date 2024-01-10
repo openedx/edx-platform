@@ -118,7 +118,7 @@ from .utils import (
     set_attribute
 )
 
-from openedx.core.djangoapps.discussions.models import DiscussionReport
+from openedx.core.djangoapps.discussions.models import DiscussionReport, DiscussionActions
 
 
 User = get_user_model()
@@ -765,7 +765,13 @@ def _serialize_discussion_entities(request, context, discussion_entities, reques
                 arr.append(r.report_type)
 
         e['reports'] = list(set(arr))
+        
+        # thread best
+        is_best = DiscussionActions.get_best_thread(thread_id=e['id'])
+        e['best'] = is_best
 
+    
+    
     return results
 
 
@@ -785,6 +791,7 @@ def get_thread_list(
     order_direction: Literal["desc"] = "desc",
     requested_fields: Optional[List[Literal["profile_image"]]] = None,
     count_flagged: bool = None,
+    best: bool = False,
 ):
     """
     Return the list of all discussion threads pertaining to the given course
@@ -1429,6 +1436,12 @@ def update_thread(request, thread_id, update_data):
             DiscussionReport.removeReport(id=thread_id, type='thread', user_id=request.user.id )
     except:
         None
+        
+    best_data = update_data.pop('best', None)
+    try:
+        DiscussionActions.set_best_thread(thread_id=thread_id, user_id=request.user.id, is_best=best_data)
+    except:
+        None
     
     cc_thread, context = _get_thread_and_context(request, thread_id, retrieve_kwargs={"with_responses": True})
     _check_editable_fields(cc_thread, update_data, context)
@@ -1451,7 +1464,7 @@ def update_thread(request, thread_id, update_data):
     # if update_data['']
 
 
-
+    
     return api_thread
 
 
