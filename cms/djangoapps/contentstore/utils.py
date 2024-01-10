@@ -14,6 +14,7 @@ from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils import translation
 from django.utils.translation import gettext as _
+from eventtracking import tracker
 from help_tokens.core import HelpUrlExpert
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -37,6 +38,7 @@ from common.djangoapps.student.roles import (
     CourseStaffRole,
     GlobalStaff,
 )
+from common.djangoapps.track import contexts
 from common.djangoapps.util.course import get_link_for_about_page
 from common.djangoapps.util.milestones_helpers import (
     is_prerequisite_courses_enabled,
@@ -1803,3 +1805,21 @@ class StudioPermissionsService:
     def can_write(self, course_key):
         """ Does the user have read access to the given course/library? """
         return has_studio_write_access(self._user, course_key)
+
+
+def track_course_update_event(course_key, user, event_data=None):
+    """
+    Track course update event
+    """
+    event_name = 'edx.contentstore.course_update'
+    event_data['course_id'] = str(course_key)
+    event_data['user_id'] = str(user.id)
+    event_data['user_forums_roles'] = [
+        role.name for role in user.roles.filter(course_id=str(course_key))
+    ]
+    event_data['user_course_roles'] = [
+        role.role for role in user.courseaccessrole_set.filter(course_id=str(course_key))
+    ]
+    context = contexts.course_context_from_course_id(course_key)
+    with tracker.get_tracker().context(event_name, context):
+        tracker.emit(event_name, event_data)
