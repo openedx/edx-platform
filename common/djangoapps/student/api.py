@@ -30,7 +30,7 @@ from common.djangoapps.student.roles import (
     GlobalStaff,
     REGISTERED_ACCESS_ROLES as _REGISTERED_ACCESS_ROLES,
 )
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 
 
 # This is done so that if these strings change within the app, we can keep exported constants the same
@@ -131,8 +131,10 @@ def is_user_staff_or_instructor_in_course(user, course_key):
     if not isinstance(course_key, CourseKey):
         course_key = CourseKey.from_string(course_key)
 
+    # TODO: remove role checks once course_roles is fully implemented and data is migrated
     return (
         GlobalStaff().has_user(user) or
         CourseStaffRole(course_key).has_user(user) or
-        CourseInstructorRole(course_key).has_user(user)
+        CourseInstructorRole(course_key).has_user(user) or
+        user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name, course_key)
     )
