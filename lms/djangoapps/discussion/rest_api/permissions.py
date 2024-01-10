@@ -12,6 +12,7 @@ from common.djangoapps.student.roles import (
     CourseStaffRole,
     GlobalStaff,
 )
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from lms.djangoapps.discussion.django_comment_client.utils import (
     get_user_role_names,
     has_discussion_privileges,
@@ -155,10 +156,16 @@ class IsStaffOrCourseTeamOrEnrolled(permissions.BasePermission):
     def has_permission(self, request, view):
         """Returns true if the user is enrolled or is staff."""
         course_key = CourseKey.from_string(view.kwargs.get('course_id'))
+        # TODO: remove role check once course_roles is fully impelented and data is migrated
         return (
             GlobalStaff().has_user(request.user) or
             CourseStaffRole(course_key).has_user(request.user) or
             CourseInstructorRole(course_key).has_user(request.user) or
+            (request.user.has_perms([
+                CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.perm_name,
+                CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.perm_name
+            ], course_key
+            )) or
             CourseEnrollment.is_enrolled(request.user, course_key) or
             has_discussion_privileges(request.user, course_key)
         )

@@ -39,6 +39,7 @@ from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.views import is_privileged_user
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.core.djangoapps.discussions.models import (
     DiscussionsConfiguration,
     DiscussionTopicLink,
@@ -359,8 +360,15 @@ def get_course(request, course_key):
         }),
         "is_group_ta": bool(user_roles & {FORUM_ROLE_GROUP_MODERATOR}),
         "is_user_admin": request.user.is_staff,
-        "is_course_staff": CourseStaffRole(course_key).has_user(request.user),
-        "is_course_admin": CourseInstructorRole(course_key).has_user(request.user),
+        # TODO: remove role checks once course_roles is fully impelented and data is migrated
+        "is_course_staff": CourseStaffRole(course_key).has_user(request.user) or
+        request.user.has_perm(
+            CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.perm_name, course_key
+        ),
+        "is_course_admin": CourseInstructorRole(course_key).has_user(request.user) or
+        request.user.has_perm(
+            CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.perm_name, course_key
+        ),
         "provider": course_config.provider_type,
         "enable_in_context": course_config.enable_in_context,
         "group_at_subsection": course_config.plugin_configuration.get("group_at_subsection", False),
@@ -976,7 +984,16 @@ def get_thread_list(
     ]
 
     if request.GET.get("group_id", None):
-        if Role.user_has_role_for_course(request.user, course_key, allowed_roles):
+        # TODO: remove role check once course_roles is fully impelented and data is migrated
+        if (
+            Role.user_has_role_for_course(request.user, course_key, allowed_roles) or
+            request.user.has_perm(
+                CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.perm_name, course_key
+            ) or
+            request.user.has_perm(
+                CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.perm_name, course_key
+            )
+        ):
             try:
                 group_id = int(request.GET.get("group_id", None))
             except ValueError:
