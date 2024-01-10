@@ -1437,11 +1437,12 @@ def update_thread(request, thread_id, update_data):
     except:
         None
         
-    best_data = update_data.pop('best', None)
-    try:
-        DiscussionActions.set_best_thread(thread_id=thread_id, user_id=request.user.id, is_best=best_data)
-    except:
-        None
+    if 'best' in update_data:    
+        best_data = update_data.pop('best', None)
+        try:
+            DiscussionActions.set_best_thread(thread_id=thread_id, user_id=request.user.id, is_best=best_data)
+        except:
+            None
     
     cc_thread, context = _get_thread_and_context(request, thread_id, retrieve_kwargs={"with_responses": True})
     _check_editable_fields(cc_thread, update_data, context)
@@ -1461,10 +1462,10 @@ def update_thread(request, thread_id, update_data):
     # accurate shortcut, rather than adding additional processing.
     api_thread['read'] = True
     api_thread['unread_comment_count'] = 0
-    # if update_data['']
 
 
-    
+
+    print('========', api_thread)
     return api_thread
 
 
