@@ -13,6 +13,7 @@ from .views import (
     CourseTextbooksView,
     CourseIndexView,
     CourseGradingView,
+    CourseGroupConfigurationsView,
     CourseRerunView,
     CourseSettingsView,
     CourseVideosView,
@@ -114,6 +115,11 @@ urlpatterns = [
         fr'^certificates/{COURSE_ID_PATTERN}$',
         CourseCertificatesView.as_view(),
         name="certificates"
+    ),
+    re_path(
+        fr'^group_configurations/{COURSE_ID_PATTERN}$',
+        CourseGroupConfigurationsView.as_view(),
+        name="group_configurations"
     ),
     re_path(
         fr'^container_handler/{settings.USAGE_KEY_PATTERN}$',
