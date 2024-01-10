@@ -11,12 +11,16 @@ import pytest
 import pytz
 from django.utils import timezone
 from edx_django_utils.cache import RequestCache
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.locator import CourseLocator
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.core.djangoapps.config_model_utils.models import Provenance
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
+from openedx.core.djangoapps.course_roles.models import Role, Permission, UserRole
+from openedx.core.djangoapps.course_roles.toggles import USE_PERMISSION_CHECKS_FLAG
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
@@ -93,6 +97,26 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
                 None,
                 Mock(name='course_key')
             )
+
+    @ddt.data(
+        CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.value.name,
+        CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.value.name,
+        CourseRolesPermission.VIEW_ALL_CONTENT.value.name,
+        CourseRolesPermission.VIEW_LIVE_PUBLISHED_CONTENT.value.name,
+        CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.value.name,
+    )
+    @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=True)
+    def test_enabled_for_enrollment_fails_if_user_has_content_or_discussion_permissions(self, permission_name):
+        role = Role.objects.create(name="test_role_1")
+        permission = Permission.objects.create(name=permission_name)
+        role.permissions.add(permission)
+        UserRole.objects.create(
+            user=self.user,
+            role=role,
+            course_id=self.course_overview.id,
+        )
+        enabled = CourseDurationLimitConfig.enabled_for_enrollment(self.user, self.course_overview)
+        assert not enabled
 
     @ddt.data(True, False)
     def test_enabled_for_course(
