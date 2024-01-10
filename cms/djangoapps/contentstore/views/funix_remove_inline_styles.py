@@ -21,9 +21,10 @@ from cms.djangoapps.contentstore.views.item import _save_xblock, _get_xblock
 from opaque_keys.edx.keys import  CourseKey
 from xmodule.modulestore.django import modulestore
 
+# component class, display text, should render on client side, title attribute on client side
 COMPONENT_TYPES = [
     ("HtmlBlockWithMixins", "Text Components", True, 'Remove Text Component Styles'),
-    ("ProblemBlockWithMixins", "Problem Components", True, 'Remove Problem Component Styles'),
+    ("ProblemBlockWithMixins", "Problem Components", False, 'Remove Problem Component Styles'),
     ("LabXBlockWithMixins", "Lab", False, ''),
     ("VideoBlockWithMixins", "Video", False, ''),
     ("LibraryContentBlockWithMixins", "Library", False, ''),
@@ -45,7 +46,7 @@ def remove_inline_styles(request, course_id):
 
     context = {
         'context_course': course,
-        'component_types': COMPONENT_TYPES
+        'component_types': list(filter(lambda item: item[2], COMPONENT_TYPES))
     }
 
     if request.method == 'GET':
@@ -64,6 +65,11 @@ def remove_inline_styles(request, course_id):
 
     course = course_overview._original_course
     sections = course.get_children()
+    
+    remove_errors = []
+    remove_success = []
+    publish_errors = []
+    publish_success = []
 
     for section in sections:
         subsections = section.get_children()
@@ -74,30 +80,55 @@ def remove_inline_styles(request, course_id):
                 for component in components:
                     if type(component).__name__ in component_types:
                         usage_key = component.scope_ids.usage_id
-                        print(component.category, type(component).__name__ )
-                        _save_xblock(
-                            request.user,
-                            _get_xblock(usage_key, request.user),
-                            data=_remove_style(component.data),
-                            children_strings=None,
-                            metadata={},
-                            nullout=None,
-                            grader_type=None,
-                            is_prereq=None,
-                            prereq_usage_key=None,
-                            prereq_min_score=None,
-                            prereq_min_completion=None,
-                            publish=None,
-                            fields=None,
-                        )
+                        try:
+                            _save_xblock(
+                                request.user,
+                                _get_xblock(usage_key, request.user),
+                                data=_remove_style(component.data),
+                                children_strings=None,
+                                metadata={},
+                                nullout=None,
+                                grader_type=None,
+                                is_prereq=None,
+                                prereq_usage_key=None,
+                                prereq_min_score=None,
+                                prereq_min_completion=None,
+                                publish=None,
+                                fields=None,
+                            )
+                            success_msg = f"{sub.display_name}, {unit.display_name}, {component.display_name}"
+                            remove_success.append(success_msg)
+                        except Exception as e:
+                            print(str(e))
+                            error_msg = f"{sub.display_name}, {unit.display_name}, {component.display_name}: {str(e)}"
+                            print(error_msg, type(component).__name__, component.data)
+                            remove_errors.append(error_msg)
+    
 
     if json.loads(request.body).get('publish'):
         for section in sections:
-            print(section.location)
-            modulestore().publish(section.location, request.user.id)
+            try:
+                modulestore().publish(section.location, request.user.id)
+                publish_success.append(section.display_name)
+            except Exception as e:
+                msg = f"Failed to publish section {section.display_name}: {str(e)}"
+                print(msg)
+                publish_errors.append(section.display_name)
+
+    response_msg = _componse_response_msg(
+        remove_success, \
+        remove_errors, \
+        publish_success, \
+        publish_errors, \
+        json.loads(request.body).get('publish')
+    )
 
     return JsonResponse(data={
-        "message": "OK",
+        "message": response_msg,
+        "errors": {
+            "publish_errors": publish_errors,
+            "remove_errors": remove_errors
+        }
     }, status=status.HTTP_200_OK)
 
 
@@ -115,10 +146,12 @@ all_html_tags = [
     'picture','pre','progress','q','rp','rt','ruby','s','samp','script','search','section','select',
     'small','source','span','strike','strong','style','sub','summary','sup','svg','table','tbody',
     'td','template','textarea','tfoot','th','thead','time','title','tr','track','tt','u','ul',
-    'var','video','wbr','hr','html','i','iframe',
+    'var','video','wbr','hr','html','i','iframe','o:p', 'v:shape', 'v:imagedata', 'v:shapetype', 
+    'v:stroke', 'v:f', 'v:path', 'v:formulas', 'o:lock', 'w:borderright', 'w:bordertop', 'w:borderleft', 
+    'w:borderbottom', 'google-sheets-html-origin'
 ]
 
-tags_will_be_removed = ['<o:p>', '</o:p>']
+tags_will_be_removed = []
 
 def _allow_all_attrs_except_style(tag, name, value):
     return name != 'style'
@@ -131,3 +164,31 @@ def _remove_style(data):
     cleaned_and_escaped_style_data = bleach.clean(unescaped_data, tags=all_html_tags, attributes=_allow_all_attrs_except_style)
 
     return cleaned_and_escaped_style_data
+
+def _componse_response_msg(remove_success, remove_errors, publish_success, publish_errors, publish):
+    response_msg = ""
+
+    if len(remove_success) == 0 and len(remove_errors) == 0: 
+        response_msg = "No remove styles actions happened. "
+    
+    elif len(remove_success) > 0 and len(remove_errors) == 0: 
+        response_msg = "Successfully to remove styles on all components. "
+
+    elif len(remove_success) == 0 and len(remove_errors) > 0: 
+        response_msg = "Failed to remove styles on all components. "
+    else: 
+        response_msg = f"Failed to remove styles on {len(remove_errors)} component(s). "
+
+    if publish:
+        if len(publish_success) == 0 and len(publish_errors) == 0:
+            response_msg += "No pulish actions happened."
+        elif len(publish_success) > 0 and len(publish_errors) == 0:
+            response_msg += "Published all sections successfully."
+        elif len(publish_success) == 0 and len(publish_errors) > 0:
+            response_msg += "Failed to publish all sections."
+        else:
+            response_msg += f"Failed to publish {len(publish_errors)} section(s)."
+    else: 
+        response_msg += "Did not publish."
+
+    return response_msg

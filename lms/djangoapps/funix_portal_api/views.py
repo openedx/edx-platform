@@ -18,6 +18,11 @@ from common.djangoapps.student.helpers import do_create_account, AccountValidati
 from .validators import funix_user_validator
 from lms.djangoapps.ora_staff_grader.utils import call_xblock_json_handler, is_json
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from opaque_keys.edx.keys import UsageKey, CourseKey
+from opaque_keys import InvalidKeyError
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
+from openedx.features.course_experience.url_helpers import get_courseware_url
+from common.djangoapps.util.course import course_location_from_key
 
 def check_missing_fields(fields, data):
     errors = {}
@@ -433,3 +438,41 @@ def get_portal_host(request):
             }
         ,
         status=200)
+
+def get_resume_path(request, course_id, location):
+
+    try:
+        course_key = CourseKey.from_string(course_id)
+        usage_key = UsageKey.from_string(location).replace(course_key=course_key)
+    except InvalidKeyError as exc:
+        return  JsonResponse({
+                'message': 'Invalid usage key or course key.'
+            }
+            ,
+            status=400
+        )
+
+    try:
+        redirect_url = get_courseware_url(
+            usage_key=usage_key,
+            request=request,
+        )
+    except (ItemNotFoundError, NoPathToItem):
+        # We used to 404 here, but that's ultimately a bad experience. There are real world use cases where a user
+        # hits a no-longer-valid URL (for example, "resume" buttons that link to no-longer-existing block IDs if the
+        # course changed out from under the user). So instead, let's just redirect to the beginning of the course,
+        # as it is at least a valid page the user can interact with...
+        redirect_url = get_courseware_url(
+            usage_key=course_location_from_key(course_key),
+            request=request,
+        )
+
+    return  JsonResponse({
+            'message': 'Success',
+            'data': {
+                'redirect_url': redirect_url
+            }
+        }
+        ,
+        status=200
+    )

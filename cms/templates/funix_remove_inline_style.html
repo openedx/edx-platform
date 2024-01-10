@@ -59,6 +59,23 @@ from six.moves.urllib.parse import quote
         background: #9696ff;
     }
 
+    #response_messages {
+        padding: 2rem 1rem 1rem 0;
+    }
+
+    .errors_list ol {
+        list-style-type: decimal;
+        list-style-position: inside;
+    }
+
+    .errors_list ol li {
+        color: red;
+    }
+
+    .errors_list_title {
+        font-weight: bold;
+    }
+
     #remove_inline_style_loading_modal {
         position: fixed;
         top: 0;
@@ -92,6 +109,8 @@ from six.moves.urllib.parse import quote
             transform: rotate(360deg);
         }
     } 
+
+
 </style>
 </%block>
 
@@ -108,11 +127,23 @@ from six.moves.urllib.parse import quote
             <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
             % for value, label, should_render, help in component_types: 
             % if should_render:
-            <label>
+            <label
+            % if len(component_types) == 1: 
+                style="pointer-events: none;"
+            % endif
+            >
                 <p title="${help}">
                     ${label}:
                 </p>
-                <input type="checkbox" name="component_types" value="${value}" id="${value}" />
+                <input 
+                    type="checkbox" 
+                    name="component_types" 
+                    value="${value}" 
+                    id="${value}" 
+                    % if len(component_types) == 1: 
+                        checked
+                    % endif
+                />
             </label>
             % endif
             % endfor
@@ -124,8 +155,19 @@ from six.moves.urllib.parse import quote
                 <input type="checkbox" name="publish" value="publish" id="publish" />
             </label>
     
-            <p id="remove_inline_style_response_msg"></p>
             <button type="submit">Submit </button>
+
+            <div id="response_messages">
+                <p id="remove_inline_style_response_msg"></p>
+                <div id="publish_errors" class="errors_list" style="display: none;">
+                    <h3 class="errors_list_title">Publish Errors</h3>
+                    <ol></ol>
+                </div>
+                <div id="remove_errors" class="errors_list" style="display: none;">
+                    <h3 class="errors_list_title">Remove Errors</h3>
+                    <ol></ol>
+                </div>
+            </div>
         </form>
     </div>
 </div>
@@ -155,6 +197,7 @@ from six.moves.urllib.parse import quote
         if (!confirm('Are you sure that you want to delete this image? This action cannot be undone.')) return;
 
         display_modal(true);
+        remove_messages();
 
         $.ajax({
             url: '/remove_inline_styles/' + course_id,
@@ -164,9 +207,17 @@ from six.moves.urllib.parse import quote
                 component_types,
                 publish
             }),
-            success: function() {
+            success: function(response) {
                 uncheck_all_component_type_checkboxes()
-                set_response_message('Success', 'success')
+                const {publish_errors, remove_errors} = response.errors;
+                const success = publish_errors.length === 0 && remove_errors.length === 0 ? 'success' : 'error'
+                set_response_message(response.message, 'success');
+                if (publish_errors.length > 0) {
+                    render_error_list(publish_errors, 'publish', true)
+                }
+                if (remove_errors.length > 0) {
+                    render_error_list(remove_errors, 'remove', true)
+                }
             },
             error: function(xhr, status, error) {
                 console.log(xhr)
@@ -185,8 +236,12 @@ from six.moves.urllib.parse import quote
 
     function uncheck_all_component_type_checkboxes() {
         Array.from(document.querySelectorAll('input[name=component_types]')).forEach(input => {
+            % if len(component_types) > 1:
             input.checked = false;
+            % endif
         })
+
+        document.querySelector('input[name=publish]').checked = false;
     }
 
     function get_ajax_error_message(xhr, status, error) {
@@ -223,6 +278,31 @@ from six.moves.urllib.parse import quote
         } else {
             document.getElementById('remove_inline_style_loading_modal').style.display = 'none'
         }
+    }
+
+    function render_error_list(items, type, should_render) {
+        const list_id = type === 'publish' ? '#publish_errors' : '#remove_errors';
+        const list_container = document.querySelector(list_id);
+        const list =  document.querySelector(list_id + ' ol');
+        if (!should_render) {
+            list_container.style.display = 'none';
+            list.innerHTML = '';
+            return;
+        } 
+
+        items.forEach(item => {
+            const li = document.createElement('li')
+            li.innerText = item;
+            list.appendChild(li);
+        })
+
+        list_container.style.display = 'block';
+    }
+
+    function remove_messages() {
+        set_response_message('')
+        render_error_list([], 'publish', false)
+        render_error_list([], 'remove', false)
     }
     
 </script>
