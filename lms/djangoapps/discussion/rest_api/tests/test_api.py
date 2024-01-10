@@ -2752,7 +2752,12 @@ class UpdateThreadTest(
         self.register_subscription_response(self.user)
         self.register_thread()
         data = {"following": new_following}
-        result = update_thread(self.request, "test_thread", data)
+        signal_name = "thread_followed" if new_following else "thread_unfollowed"
+        mock_path = f"openedx.core.djangoapps.django_comment_common.signals.{signal_name}.send"
+        with mock.patch(mock_path) as signal_patch:
+            result = update_thread(self.request, "test_thread", data)
+            if old_following != new_following:
+                self.assertEqual(signal_patch.call_count, 1)
         assert result['following'] == new_following
         last_request_path = urlparse(httpretty.last_request().path).path  # lint-amnesty, pylint: disable=no-member
         subscription_url = f"/api/v1/users/{self.user.id}/subscriptions"
@@ -3333,7 +3338,8 @@ class UpdateCommentTest(
         [True, False],
     ))
     @ddt.unpack
-    def test_endorsed_access(self, role_name, is_thread_author, thread_type, is_comment_author):
+    @mock.patch('openedx.core.djangoapps.django_comment_common.signals.comment_endorsed.send')
+    def test_endorsed_access(self, role_name, is_thread_author, thread_type, is_comment_author, endorsed_mock):
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=role_name)
         self.register_comment(
             {"user_id": str(self.user.id if is_comment_author else (self.user.id + 1))},
@@ -3348,6 +3354,7 @@ class UpdateCommentTest(
         )
         try:
             update_comment(self.request, "test_comment", {"endorsed": True})
+            self.assertEqual(endorsed_mock.call_count, 1)
             assert not expected_error
         except ValidationError as err:
             assert expected_error

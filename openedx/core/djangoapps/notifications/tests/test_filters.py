@@ -9,9 +9,11 @@ from django.utils.timezone import now
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.roles import CourseInstructorRole
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory, CourseEnrollmentFactory
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
@@ -22,7 +24,10 @@ from openedx.core.djangoapps.django_comment_common.models import (
 )
 from openedx.core.djangoapps.notifications.audience_filters import (
     EnrollmentAudienceFilter,
-    RoleAudienceFilter,
+    ForumRoleAudienceFilter,
+    CourseRoleAudienceFilter,
+    CohortAudienceFilter,
+    TeamAudienceFilter,
 )
 from openedx.core.djangoapps.notifications.filters import NotificationFilter
 from openedx.core.djangoapps.notifications.handlers import calculate_course_wide_notification_audience
@@ -224,9 +229,9 @@ class TestEnrollmentAudienceFilter(ModuleStoreTestCase):
 
 
 @ddt.ddt
-class TestRoleAudienceFilter(ModuleStoreTestCase):
+class TestForumRoleAudienceFilter(ModuleStoreTestCase):
     """
-    Tests for the RoleAudienceFilter.
+    Tests for the ForumRoleAudienceFilter.
     """
     def setUp(self):
         super().setUp()  # lint-amnesty, pylint: disable=super-with-arguments
@@ -263,15 +268,132 @@ class TestRoleAudienceFilter(ModuleStoreTestCase):
     )
     @ddt.unpack
     def test_valid_role_filter(self, role_names, expected_count):
-        role_filter = RoleAudienceFilter(self.course.id)
+        role_filter = ForumRoleAudienceFilter(self.course.id)
         filtered_users = role_filter.filter(role_names)
         self.assertEqual(len(filtered_users), expected_count)
 
     def test_invalid_role_filter(self):
-        role_filter = RoleAudienceFilter(self.course.id)
+        role_filter = ForumRoleAudienceFilter(self.course.id)
         role_names = ["INVALID_MODE"]
         with self.assertRaises(ValueError):
             role_filter.filter(role_names)
+
+
+# TODO: Cleanup this test class
+@ddt.ddt
+class TestCourseRoleAudienceFilter(ModuleStoreTestCase):
+    """
+    Tests for the CourseRoleAudienceFilter.
+    """
+    def setUp(self):
+        super().setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        self.course = CourseFactory()
+        self.students = [UserFactory() for _ in range(10)]
+
+        # Assign 5 users with course staff role
+        for student in self.students[:5]:
+            CourseStaffRole(self.course.id).add_users(student)
+
+        # Assign 5 users with course instructor role
+        for student in self.students[5:10]:
+            CourseInstructorRole(self.course.id).add_users(student)
+
+    @ddt.data(
+        (["instructor"], 5),
+        (["staff"], 5),
+        (["instructor", "staff"], 10),
+    )
+    @ddt.unpack
+    def test_valid_role_filter(self, role_names, expected_count):
+        course_role_filter = CourseRoleAudienceFilter(self.course.id)
+        filtered_users = course_role_filter.filter(role_names)
+        self.assertEqual(len(filtered_users), expected_count)
+
+    def test_invalid_role_filter(self):
+        course_role_filter = CourseRoleAudienceFilter(self.course.id)
+        role_names = ["INVALID_MODE"]
+        with self.assertRaises(ValueError):
+            course_role_filter.filter(role_names)
+
+
+@ddt.ddt
+class TestCohortAudienceFilter(ModuleStoreTestCase):
+    """
+    Tests for the CohortAudienceFilter.
+    """
+    def setUp(self):
+        super().setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        self.course = CourseFactory()
+
+        self.cohort1_users = [UserFactory() for _ in range(3)]
+        self.cohort2_users = [UserFactory() for _ in range(2)]
+
+        users = self.cohort1_users + self.cohort2_users
+
+        for user in users:
+            CourseEnrollment.enroll(user, self.course.id)
+
+        self.cohort1 = CohortFactory(course_id=self.course.id, users=self.cohort1_users)
+        self.cohort2 = CohortFactory(course_id=self.course.id, users=self.cohort2_users)
+
+    @ddt.data(
+        ([1], 3),
+        ([2], 2),
+        ([1, 2], 5),
+    )
+    @ddt.unpack
+    def test_valid_cohort_filter(self, cohort_ids, expected_count):
+        cohort_filter = CohortAudienceFilter(self.course.id)
+        filtered_users = cohort_filter.filter(cohort_ids)
+        self.assertEqual(len(filtered_users), expected_count)
+
+    def test_invalid_cohort_filter(self):
+        cohort_filter = CohortAudienceFilter(self.course.id)
+        cohort_ids = ["INVALID_MODE"]
+        with self.assertRaises(ValueError):
+            cohort_filter.filter(cohort_ids)
+
+
+@ddt.ddt
+class TestTeamAudienceFilter(ModuleStoreTestCase):
+    """
+    Tests for the TeamAudienceFilter.
+    """
+    def setUp(self):
+        super().setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        self.course = CourseFactory()
+        self.teams = [CourseTeamFactory(course_id=self.course.id, team_id=f"team-{i}") for i in range(2)]
+
+        self.team1_users = [UserFactory() for _ in range(3)]
+        self.team2_users = [UserFactory() for _ in range(2)]
+
+        users = self.team1_users + self.team2_users
+
+        for user in users:
+            CourseEnrollment.enroll(user, self.course.id)
+
+        for user in self.team1_users:
+            CourseTeamMembershipFactory.create(team=self.teams[0], user=user)
+
+        for user in self.team2_users:
+            CourseTeamMembershipFactory.create(team=self.teams[1], user=user)
+
+    @ddt.data(
+        (["team-0"], 3),
+        (["team-1"], 2),
+        (["team-0", "team-1"], 5),
+    )
+    @ddt.unpack
+    def test_valid_team_filter(self, team_ids, expected_count):
+        team_filter = TeamAudienceFilter(self.course.id)
+        filtered_users = team_filter.filter(team_ids)
+        self.assertEqual(len(filtered_users), expected_count)
+
+    def test_invalid_team_filter(self):
+        team_filter = TeamAudienceFilter(self.course.id)
+        team_ids = ["INVALID_MODE"]
+        with self.assertRaises(ValueError):
+            team_filter.filter(team_ids)
 
 
 @ddt.ddt
@@ -310,16 +432,16 @@ class TestAudienceFilter(ModuleStoreTestCase):
 
     @ddt.data(
         ({
-            "enrollment": ["verified"],
-            "role": ["Moderator"],
+            "enrollments": ["verified"],
+            "discussion_roles": ["Moderator"],
         }, 15),
         ({
-            "enrollment": ["audit", "verified"],
-            "role": ["Administrator", "Student"],
+            "enrollments": ["audit", "verified"],
+            "discussion_roles": ["Administrator", "Student"],
         }, 30),
         ({
-            "enrollment": ["audit", "honor", "verified"],
-            "role": ["Administrator", "Moderator", "Student", "Community TA"],
+            "enrollments": ["audit", "honor", "verified"],
+            "discussion_roles": ["Administrator", "Moderator", "Student", "Community TA"],
         }, 30),
     )
     @ddt.unpack

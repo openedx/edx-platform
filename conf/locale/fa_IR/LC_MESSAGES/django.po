@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Persian (Iran) (http://app.transifex.com/open-edx/edx-platform/language/fa_IR/).
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -134,7 +134,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-11-26 20:43+0000\n"
+"POT-Creation-Date: 2023-12-17 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Somaye Joolaee, 2022\n"
 "Language-Team: Persian (Iran) (https://app.transifex.com/open-edx/teams/6205/fa_IR/)\n"
@@ -322,6 +322,7 @@ msgid "You're enrolled as an honor code student"
 msgstr "شما به عنوان دانش آموز کد افتخار ثبت نام کرده اید"
 
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
+#: lms/djangoapps/courseware/views/views.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
@@ -3510,46 +3511,15 @@ msgid "Certificate is being created."
 msgstr "گواهی ساخته می‌شود."
 
 #: lms/djangoapps/courseware/views/views.py
-#, python-brace-format
 msgid ""
-"{platform_name} now offers financial assistance for learners who want to earn Verified Certificates but who may not be able to pay the Verified Certificate fee. Eligible learners may receive up to 90{percent_sign} off the Verified Certificate fee for a course.\n"
-"To apply for financial assistance, enroll in the audit track for a course that offers Verified Certificates, and then complete this application. Note that you must complete a separate application for each course you take.\n"
-" We plan to use this information to evaluate your application for financial assistance and to further develop our financial assistance program."
+"We plan to use this information to evaluate your application for financial assistance and to further develop our financial assistance program. Please note that while \n"
+"assistance is available in most courses that offer verified certificates, a few courses and programs are not eligible. You must complete a separate application \n"
+"for each course you take. You may be approved for financial assistance five (5) times each year (based on 12-month period from you first approval). \n"
+"To apply for financial assistance: \n"
+"1. Enroll in the audit track for an eligible course that offers Verified Certificates \n"
+"2. Complete this  application \n"
+"3. Check your email, your application will be reviewed in 3-4 business days"
 msgstr ""
-"{platform_name} اکنون کمک‌های مالی برای یادگیرندگان که می‌خواهند برای کسب گواهی تاییدشده اما قادر به پرداخت هزینه گواهی تایید شده نیستند. افراد واجد شرایط می‌توانند تا 90 {percent_sign} درصد از هزینه گواهی تایید شده دوره آموزشی را کاهش دهند.\n"
-"برای درخواست کمک مالی، از مسیر حسابرسی دوره آموزشی ثبت‌نام کرده و پس از تکمیل فرم مربوط به آن اقدام کنید. توجه کنید که شما باید یک فرم جداگانه برای هر دوره آموزشی پر کنید.\n"
-"ما قصد داریم از این اطلاعات برای ارزیابی فرم شما برای کمک مالی و توسعه بیشتر برنامه کمک مالی خود استفاده کنیم."
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Annual Household Income"
-msgstr "درآمد سالیانه خانوار"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your current financial situation. Why do you need assistance?"
-msgstr ""
-"در مورد وضعیت مالی فعلی خود به ما بگویید. به چه دلیل نیاز به کمک و راهنمایی "
-"دارید؟"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your learning or professional goals. How will a Verified "
-"Certificate in this course help you achieve these goals?"
-msgstr ""
-"در مورد آموزش یا اهداف حرفه‌‌ای خود به ما بگویید. چگونه یک گواهی تاییدشده در"
-" این دوره آموزشی به شما کمک خواهد کرد شما را در  تا به اهداف خود دست یابید؟"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your plans for this course. What steps will you take to help "
-"you complete the course work and receive a certificate?"
-msgstr ""
-"در مورد برنامه‌های خود برای این دوره آموزشی به ما بگویید. چه مراحلی را برای "
-"کمک به یادگیری بهتر و کامل تر و دریافت گواهی طی خواهید کرد؟"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Use between 1250 and 2500 characters or so in your response."
-msgstr "در پاسخ خود از 1250 تا 2500 نویسه استفاده کنید."
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
@@ -3562,18 +3532,26 @@ msgstr ""
 "ثبت‌نام کرده‌اید."
 
 #: lms/djangoapps/courseware/views/views.py
-msgid "Specify your annual household income in US Dollars."
-msgstr "درآمد سالانه خانوار خود را به دلار آمریکا مشخص کنید."
+msgid "I certify that: "
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"Paying the verified certificate fee for the above course would cause me "
+"economic hardship"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"I will work diligently to complete the course work and receive a certificate"
+msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid ""
-"I allow {platform_name} to use the information provided in this application "
-"(except for financial information) for {platform_name} marketing purposes."
+"I have read, understand, and will abide by the {honor_code_link} for the edX"
+" Site"
 msgstr ""
-"من به {platform_name} این اجازه را می‌دهم تا از اطلاعات ارائه‌شده در این "
-"برنامه (به جز اطلاعات مالی) برای اهداف بازاریابی {platform_name} استفاده "
-"کند."
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Title can't be empty"
@@ -4463,7 +4441,7 @@ msgstr "افزونه‌ها"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Data Download"
-msgstr "براگیری داده‌"
+msgstr "دانلود داده ها"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Analytics"
@@ -8223,6 +8201,10 @@ msgstr ""
 #, python-brace-format
 msgid "The '{field_name}' field cannot be edited."
 msgstr "قسمت '{field_name}' قابل ویرایش نیست."
+
+#: openedx/core/djangoapps/user_api/accounts/api.py
+msgid "Full name can't be longer than 255 symbols"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
@@ -13104,13 +13086,11 @@ msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}، {current_group}"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "کپی{0}"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "کپی '{0}' "
@@ -18255,19 +18235,6 @@ msgstr ""
 #. Translators: This string will not be used in Open edX installations.
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
-"In order to be eligible for edX Financial Assistance, you must demonstrate "
-"that paying the Verified Certificate fee would cause you economic hardship. "
-"To apply, you will be asked to answer a few questions about why you are "
-"applying and how the Verified Certificate will benefit you."
-msgstr ""
-"برای اینکه واجد شرایط دریافت کمک مالی edX باشید، باید اثبات کنید که پرداخت "
-"هزینۀ گواهی تأییدشده، شما را دچار مشکل اقتصادی می‌کند. برای اعلام درخواست، "
-"از شما خواسته می‌خواهیم به چند پرسش دربارۀ دلیل درخواست خود و مزیت  گواهی "
-"تأییدشده پاسخ دهید."
-
-#. Translators: This string will not be used in Open edX installations.
-#: lms/templates/financial-assistance/financial-assistance.html
-msgid ""
 "If your application is approved, we'll give you instructions for verifying "
 "your identity on edx.org so you can start working toward completing your edX"
 " course."
@@ -18291,10 +18258,6 @@ msgstr ""
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Sincerely, Anant"
 msgstr "با احترام"
-
-#: lms/templates/financial-assistance/financial-assistance.html
-msgid "Back to Student FAQs"
-msgstr "بازگشت به سؤالات متداول یادگیرندگان"
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Apply for Financial Assistance"
@@ -24276,16 +24239,16 @@ msgid "Select this problem"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy to Clipboard"
-msgstr "کپی به کلیپ بورد"
+msgid "Manage Access"
+msgstr "مدیریت دسترسی"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage tags"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Manage Access"
-msgstr "مدیریت دسترسی"
+msgid "Copy to Clipboard"
+msgstr "کپی به کلیپ بورد"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
