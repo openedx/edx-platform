@@ -6,6 +6,8 @@ from bridgekeeper import perms
 from bridgekeeper.rules import is_staff
 
 from lms.djangoapps.courseware.rules import HasAccessRule, HasRolesRule
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
+from openedx.core.djangoapps.course_roles.rules import HasPermissionRule
 
 ALLOW_STUDENT_TO_BYPASS_ENTRANCE_EXAM = 'instructor.allow_student_to_bypass_entrance_exam'
 ASSIGN_TO_COHORTS = 'instructor.assign_to_cohorts'
@@ -42,25 +44,54 @@ perms[ENABLE_CERTIFICATE_GENERATION] = is_staff
 perms[GENERATE_CERTIFICATE_EXCEPTIONS] = is_staff
 perms[GENERATE_BULK_CERTIFICATE_EXCEPTIONS] = is_staff
 perms[GIVE_STUDENT_EXTENSION] = HasAccessRule('staff')
-perms[VIEW_ISSUED_CERTIFICATES] = HasAccessRule('staff') | HasRolesRule('data_researcher')
+# TODO: remove role checks once course_roles is fully implemented and data is migrated
+perms[VIEW_ISSUED_CERTIFICATES] = (
+    HasAccessRule('staff') |
+    HasRolesRule('data_researcher') |
+    HasPermissionRule(CourseRolesPermission.ACCESS_DATA_DOWNLOADS.perm_name)
+)
 # only global staff or those with the data_researcher role can access the data download tab
 # HasAccessRule('staff') also includes course staff
-perms[CAN_RESEARCH] = is_staff | HasRolesRule('data_researcher')
+# TODO: remove role checks once course_roles is fully implemented and data is migrated
+perms[CAN_RESEARCH] = (
+    is_staff |
+    HasRolesRule('data_researcher') |
+    HasPermissionRule(CourseRolesPermission.ACCESS_DATA_DOWNLOADS.perm_name)
+)
 perms[CAN_ENROLL] = HasAccessRule('staff')
 perms[CAN_BETATEST] = HasAccessRule('instructor')
-perms[ENROLLMENT_REPORT] = HasAccessRule('staff') | HasRolesRule('data_researcher')
-perms[VIEW_COUPONS] = HasAccessRule('staff') | HasRolesRule('data_researcher')
+# TODO: remove role checks once course_roles is fully implemented and data is migrated
+perms[ENROLLMENT_REPORT] = (
+    HasAccessRule('staff') |
+    HasRolesRule('data_researcher') |
+    HasPermissionRule(CourseRolesPermission.ACCESS_DATA_DOWNLOADS.perm_name)
+)
+# TODO: remove role checks once course_roles is fully implemented and data is migrated
+perms[VIEW_COUPONS] = (
+    HasAccessRule('staff') |
+    HasRolesRule('data_researcher') |
+    HasPermissionRule(CourseRolesPermission.ACCESS_DATA_DOWNLOADS.perm_name)
+)
 perms[EXAM_RESULTS] = HasAccessRule('staff')
 perms[OVERRIDE_GRADES] = HasAccessRule('staff')
-perms[SHOW_TASKS] = HasAccessRule('staff') | HasRolesRule('data_researcher')
+# TODO: remove role checks once course_roles is fully implemented and data is migrated
+perms[SHOW_TASKS] = (
+    HasAccessRule('staff') |
+    HasRolesRule('data_researcher') | (
+        HasPermissionRule(CourseRolesPermission.MANAGE_STUDENTS.perm_name) &
+        HasPermissionRule(CourseRolesPermission.ACCESS_DATA_DOWNLOADS.perm_name) &
+        HasPermissionRule(CourseRolesPermission.ACCESS_INSTRUCTOR_DASHBOARD.perm_name)
+    )
+)
 perms[EMAIL] = HasAccessRule('staff')
 perms[RESCORE_EXAMS] = HasAccessRule('instructor')
 perms[VIEW_REGISTRATION] = HasAccessRule('staff')
-perms[VIEW_DASHBOARD] = \
-    HasRolesRule(
-        'staff',
-        'instructor',
-        'data_researcher'
-) | HasAccessRule('staff') | HasAccessRule('instructor')
+# TODO: remove role checks once course_roles is fully implemented and data is migrated
+perms[VIEW_DASHBOARD] = (
+    HasRolesRule('staff', 'instructor', 'data_researcher') |
+    HasAccessRule('staff') |
+    HasAccessRule('instructor') |
+    HasPermissionRule(CourseRolesPermission.ACCESS_INSTRUCTOR_DASHBOARD.perm_name)
+)
 perms[VIEW_ENROLLMENTS] = HasAccessRule('staff')
 perms[VIEW_FORUM_MEMBERS] = HasAccessRule('staff')

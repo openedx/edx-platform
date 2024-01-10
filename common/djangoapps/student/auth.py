@@ -25,6 +25,7 @@ from common.djangoapps.student.roles import (
     OrgLibraryUserRole,
     OrgStaffRole
 )
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 
 # Studio permissions:
 STUDIO_EDIT_ROLES = 8
@@ -79,6 +80,21 @@ def get_user_permissions(user, course_key, org=None):
     Can also set course_key=None and pass in an org to get the user's
     permissions for that organization as a whole.
     """
+    # TODO: remove role checks once course_roles is fully implemented and data is migrated
+    COURSE_INSTRUCTOR_ROLE_PERMISSIONS = [
+        CourseRolesPermission.MANAGE_CONTENT.perm_name,
+        CourseRolesPermission.MANAGE_COURSE_SETTINGS.perm_name,
+        CourseRolesPermission.MANAGE_ADVANCED_SETTINGS.perm_name,
+        CourseRolesPermission.VIEW_COURSE_SETTINGS.perm_name,
+        CourseRolesPermission.MANAGE_ALL_USERS.perm_name,
+    ]
+    STAFF_ROLE_PERMISSIONS = [
+        CourseRolesPermission.MANAGE_CONTENT.perm_name,
+        CourseRolesPermission.MANAGE_COURSE_SETTINGS.perm_name,
+        CourseRolesPermission.MANAGE_ADVANCED_SETTINGS.perm_name,
+        CourseRolesPermission.VIEW_COURSE_SETTINGS.perm_name,
+        CourseRolesPermission.MANAGE_USERS_EXCEPT_ADMIN_AND_STAFF.perm_name,
+    ]
     if org is None:
         org = course_key.org
         course_key = course_key.for_branch(None)
@@ -91,7 +107,11 @@ def get_user_permissions(user, course_key, org=None):
     # global staff, org instructors, and course instructors have all permissions:
     if GlobalStaff().has_user(user) or OrgInstructorRole(org=org).has_user(user):
         return all_perms
-    if course_key and user_has_role(user, CourseInstructorRole(course_key)):
+    if (
+        course_key and (
+            user_has_role(user, CourseInstructorRole(course_key)) or
+            user.has_perms(COURSE_INSTRUCTOR_ROLE_PERMISSIONS, course_key))
+    ):
         return all_perms
     # HACK: Limited Staff should not have studio read access. However, since many LMS views depend on the
     #  `has_course_author_access` check and `course_author_access_required` decorator, we have to allow write access
@@ -104,7 +124,11 @@ def get_user_permissions(user, course_key, org=None):
     if course_key and user_has_role(user, CourseLimitedStaffRole(course_key)):
         return STUDIO_EDIT_CONTENT
     # Staff have all permissions except EDIT_ROLES:
-    if OrgStaffRole(org=org).has_user(user) or (course_key and user_has_role(user, CourseStaffRole(course_key))):
+    if (
+        OrgStaffRole(org=org).has_user(user) or
+        (course_key and user_has_role(user, CourseStaffRole(course_key))) or
+        user.has_perms(STAFF_ROLE_PERMISSIONS, course_key)
+    ):
         return STUDIO_VIEW_USERS | STUDIO_EDIT_CONTENT | STUDIO_VIEW_CONTENT
     # Otherwise, for libraries, users can view only:
     if course_key and isinstance(course_key, LibraryLocator):
@@ -234,5 +258,9 @@ def _check_caller_authority(caller, role):
     if isinstance(role, (GlobalStaff, CourseCreatorRole, OrgContentCreatorRole)):  # lint-amnesty, pylint: disable=no-else-raise
         raise PermissionDenied
     elif isinstance(role, CourseRole):  # instructors can change the roles w/in their course
-        if not user_has_role(caller, CourseInstructorRole(role.course_key)):
+        # TODO: remove role checks once course_roles is fully implemented and data is migrated
+        if not (
+            user_has_role(caller, CourseInstructorRole(role.course_key)) or
+            caller.has_perm(CourseRolesPermission.MANAGE_ALL_USERS.perm_name, role.course_key)
+        ):
             raise PermissionDenied
