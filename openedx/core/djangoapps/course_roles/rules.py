@@ -70,7 +70,7 @@ class HasForumsRolesRule(CourseRolesRule):  # lint-amnesty, pylint: disable=abst
     Rule to check if a user has a forum role for a course.
     """
     def __init__(self, *roles):
-        self.role = roles
+        self.roles = roles
 
     def check(self, user, instance=None):
         if not use_permission_checks():
