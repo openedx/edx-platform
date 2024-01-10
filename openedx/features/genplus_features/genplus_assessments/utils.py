@@ -16,8 +16,8 @@ from openedx.features.course_experience.utils import get_course_outline_block_tr
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.courseware.models import StudentModule
-from openedx.features.genplus_features.genplus.constants import JournalTypes
-from openedx.features.genplus_features.genplus.models import Student, JournalPost, Class
+from genplus.lms.djangoapps.genplus.constants import JournalTypes
+from genplus.lms.djangoapps.genplus.models import Student, JournalPost, Class
 from openedx.features.genplus_features.genplus_learning.models import Unit
 from openedx.features.genplus_features.genplus_assessments.constants import ProblemTypes, ProblemSetting, JOURNAL_STYLE, \
     TOTAL_PROBLEM_SCORE, SkillAssessmentTypes, SkillAssessmentResponseTime

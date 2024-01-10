@@ -3130,14 +3130,14 @@ INSTALLED_APPS = [
 ######################### GENPLUS APPS #################################
 
 GENPLUS_INSTALLED_APPS = [
-    # genplus core app
-    'openedx.features.genplus_features.genplus',
+    # # genplus core app
+    # 'openedx.features.genplus_features.genplus',
 
     # genplus learning app
     'openedx.features.genplus_features.genplus_learning',
 
     # genplus teach app
-    'openedx.features.genplus_features.genplus_teach',
+    # 'openedx.features.genplus_features.genplus_teach',
 
     # genplus badges app
     'openedx.features.genplus_features.genplus_badges',

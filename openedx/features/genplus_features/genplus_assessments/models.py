@@ -11,7 +11,7 @@ from .constants import (
     SkillAssessmentResponseTime,
     SkillReflectionQuestionType,
 )
-from openedx.features.genplus_features.genplus.models import Skill, Class
+from genplus.lms.djangoapps.genplus.models import Skill, Class
 from openedx.features.genplus_features.genplus_learning.models import Program
 
 USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')

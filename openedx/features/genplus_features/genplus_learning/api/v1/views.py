@@ -5,9 +5,9 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.views import APIView
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
-from openedx.features.genplus_features.genplus.models import GenUser, Student, Class, Activity
+from genplus.lms.djangoapps.genplus.models import GenUser, Student, Class, Activity
 from openedx.features.genplus_features.common.display_messages import SuccessMessages, ErrorMessages
-from openedx.features.genplus_features.genplus.api.v1.permissions import IsStudentOrTeacher, IsTeacher, IsStudent, IsUserFromSameSchool
+from genplus.lms.djangoapps.genplus.api.v1.permissions import IsStudentOrTeacher, IsTeacher, IsStudent, IsUserFromSameSchool
 from openedx.features.genplus_features.genplus_learning.models import (Program, ProgramEnrollment, ProgramAccessRole,
                                                                        ClassUnit, ClassLesson, UnitCompletion,
                                                                        UnitBlockCompletion)
@@ -19,7 +19,7 @@ from .serializers import (
     ClassUnitSerializer,
     ProgramShortSerializer
 )
-from openedx.features.genplus_features.genplus.api.v1.serializers import ClassSummarySerializer
+from genplus.lms.djangoapps.genplus.api.v1.serializers import ClassSummarySerializer
 
 
 class ProgramViewSet(viewsets.ModelViewSet):

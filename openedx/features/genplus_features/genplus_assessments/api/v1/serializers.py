@@ -4,8 +4,8 @@ from django.contrib.auth import get_user_model
 from openedx.features.genplus_features.genplus_assessments.constants import SkillReflectionQuestionType
 from rest_framework import serializers
 
-from openedx.features.genplus_features.genplus.models import Student
-from openedx.features.genplus_features.genplus.models import Class
+from genplus.lms.djangoapps.genplus.models import Student
+from genplus.lms.djangoapps.genplus.models import Class
 from openedx.features.genplus_features.genplus_assessments.models import (
     UserResponse,
     UserRating,

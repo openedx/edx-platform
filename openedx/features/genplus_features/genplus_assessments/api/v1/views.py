@@ -11,9 +11,9 @@ from rest_framework.response import Response
 from xmodule.modulestore.django import modulestore
 
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
-from openedx.features.genplus_features.genplus.api.v1.permissions import IsTeacher, IsStudentOrTeacher, IsAdmin, \
+from genplus.lms.djangoapps.genplus.api.v1.permissions import IsTeacher, IsStudentOrTeacher, IsAdmin, \
     IsUserFromSameSchool
-from openedx.features.genplus_features.genplus.models import Class, Skill, GenUser
+from genplus.lms.djangoapps.genplus.models import Class, Skill, GenUser
 from openedx.features.genplus_features.genplus_assessments.constants import (
     TOTAL_PROBLEM_SCORE,
     INTRO_RATING_ASSESSMENT_RESPONSE,

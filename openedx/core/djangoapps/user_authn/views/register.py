@@ -58,9 +58,9 @@ from openedx.core.djangoapps.user_authn.views.registration_form import (
     get_registration_extension_form
 )
 from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_auth_enabled
-from openedx.features.genplus_features.genplus.utils import register_rm_unify_gen_user, register_microsoft_gen_user, register_xporter_gen_user
-from openedx.features.genplus_features.genplus.exceptions import GenUserRegistrationException
-from openedx.features.genplus_features.genplus.models import GenLog
+from genplus.lms.djangoapps.genplus.utils import register_rm_unify_gen_user, register_microsoft_gen_user, register_xporter_gen_user
+from genplus.lms.djangoapps.genplus.exceptions import GenUserRegistrationException
+from genplus.lms.djangoapps.genplus.models import GenLog
 from common.djangoapps.student.helpers import (
     AccountValidationError,
     authenticate_new_user,

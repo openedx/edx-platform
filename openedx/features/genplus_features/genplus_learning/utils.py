@@ -17,7 +17,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_experience.utils import get_course_outline_block_tree
-from openedx.features.genplus_features.genplus.models import Student
+from genplus.lms.djangoapps.genplus.models import Student
 from openedx.features.genplus_features.genplus_assessments.utils import (
     build_problem_list,
     get_student_unit_skills_assessment
@@ -275,7 +275,6 @@ def get_course_block_completion(course_block, include_block_children, block_id=N
 
     completion['attempted'] = attempted
     return completion
-
 
 def get_progress_and_completion_status(total_completed_blocks, total_blocks):
     progress = round((total_completed_blocks / total_blocks) * 100) if total_blocks else 0
