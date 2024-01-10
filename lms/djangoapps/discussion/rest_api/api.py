@@ -1462,10 +1462,10 @@ def update_thread(request, thread_id, update_data):
     # accurate shortcut, rather than adding additional processing.
     api_thread['read'] = True
     api_thread['unread_comment_count'] = 0
+    is_best = DiscussionActions.get_best_thread(thread_id=thread_id)
+    api_thread['best'] = is_best
 
-
-
-    print('========', api_thread)
+  
     return api_thread
 
 
