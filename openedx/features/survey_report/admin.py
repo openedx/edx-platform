@@ -81,6 +81,10 @@ class SurveyReportAdmin(admin.ModelAdmin):
         return actions
 
     def report_state(self, obj):
+        """
+        Method to define the custom State column with the new "send" state,
+        to avoid modifying the current models.
+        """
         if obj.surveyreportupload_set.last().is_uploaded():
             return "Sent"
         return obj.state.capitalize()
