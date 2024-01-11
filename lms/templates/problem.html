@@ -467,9 +467,15 @@ from openedx.core.djangolib.markup import HTML
     const elementsSubmitted = document.querySelectorAll('.submitted-question')
     elementsSubmitted.forEach((element)=>{
       const numberSubmitted = element.textContent;
-      const title = problemList[numberSubmitted - 1].querySelector('.explanation-title');
-  
-      title.textContent = 'Bạn đã trả lời đúng';
+      const problemElement = problemList[numberSubmitted - 1];
+
+
+      if (problemElement) {
+        const titleElement = problemElement.querySelector('.explanation-title');
+        if (titleElement) {
+          titleElement.textContent = 'Bạn đã trả lời đúng';
+        } 
+      } 
   
     })
   
