@@ -2,11 +2,11 @@
 Course certificates are created for a student and an offering of a course (a course run).
 """
 
-from datetime import timezone
 import json
 import logging
 import os
 import uuid
+from datetime import timezone
 
 from config_models.models import ConfigurationModel
 from django.apps import apps
@@ -16,11 +16,21 @@ from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models import Count
 from django.dispatch import receiver
-
 from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
+from openedx_events.learning.data import (  # lint-amnesty, pylint: disable=wrong-import-order
+    CertificateData,
+    CourseData,
+    UserData,
+    UserPersonalData,
+)
+from openedx_events.learning.signals import (  # lint-amnesty, pylint: disable=wrong-import-order
+    CERTIFICATE_CHANGED,
+    CERTIFICATE_CREATED,
+    CERTIFICATE_REVOKED,
+)
 from simple_history.models import HistoricalRecords
 
 from common.djangoapps.student import models_api as student_api
@@ -31,9 +41,6 @@ from lms.djangoapps.instructor_task.models import InstructorTask
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED, COURSE_CERT_CHANGED, COURSE_CERT_REVOKED
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.features.name_affirmation_api.utils import get_name_affirmation_service
-
-from openedx_events.learning.data import CourseData, UserData, UserPersonalData, CertificateData  # lint-amnesty, pylint: disable=wrong-import-order
-from openedx_events.learning.signals import CERTIFICATE_CHANGED, CERTIFICATE_CREATED, CERTIFICATE_REVOKED  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 User = get_user_model()
@@ -1241,6 +1248,28 @@ class CertificateTemplateAsset(TimeStampedModel):
     class Meta:
         get_latest_by = 'created'
         app_label = "certificates"
+
+class ModifiedCertificateTemplateCommandConfiguration(ConfigurationModel):
+    """
+    Manages configuration for a run of the modify_cert_template management command.
+
+    .. no_pii:
+    """
+
+    class Meta:
+        app_label = "certificates"
+        verbose_name = "modify_cert_template argument"
+
+    arguments = models.TextField(
+        blank=True,
+        help_text=(
+            "Arguments for the 'modify_cert_template' management command. Specify like '-template_ids <id1> <id2>'"
+        ),
+        default="",
+    )
+
+    def __str__(self):
+        return str(self.arguments)
 
 
 class CertificateGenerationCommandConfiguration(ConfigurationModel):
