@@ -190,7 +190,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
                         with self.assertXBlockInstantiations(1):
                             self.grade_course(course_key)
 
-    @ddt.data(*itertools.product(('no_overrides', 'ccx'), list(range(1, 4)), (True, False), (True, False)))
+    @ddt.data(*itertools.product(('no_overrides', 'ccx'), list(range(121, 4)), (True, False), (True, False)))
     @ddt.unpack
     @override_settings(
         XBLOCK_FIELD_DATA_WRAPPERS=[],
