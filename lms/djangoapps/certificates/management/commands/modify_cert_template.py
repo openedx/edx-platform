@@ -87,7 +87,8 @@ class Command(BaseCommand):
             options = self.get_args_from_database()
 
         log.info(
-            "modify_cert_template starting, dry-run={dry_run}, templates={templates}, old-text={old}, new-text={new}".format(
+            "modify_cert_template starting, dry-run={dry_run}, templates={templates}, "
+            "old-text={old}, new-text={new}".format(
                 dry_run=options["dry_run"],
                 templates=options["templates"],
                 old=options["old_text"],
