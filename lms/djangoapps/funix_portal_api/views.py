@@ -472,7 +472,6 @@ def get_resume_path(request, course_id, location):
             'data': {
                 'redirect_url': redirect_url
             },
-            'trigger_lms_reload': 12
         }
         ,
         status=200
