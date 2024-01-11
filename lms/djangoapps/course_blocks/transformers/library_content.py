@@ -109,16 +109,10 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                 # Update selected
                 previous_count = len(selected)
                 block_keys = LibraryContentBlock.make_selection(
+                    usage_key=block_key,
                     old_selected=list(map(tuple, selected)),  # Convert from nested list to list-of-tuples.
-                    library_children=library_children,
-                    candidates= LibraryContentBlock.get_candidates_in_course(
-                        candidates=candidates,
-                        children=library_children,
-                        source_library_key=LibraryContentBlock.get_source_library_key(
-                            block_structure.get_xblock_field(block_key, 'source_library_id')
-                        ),
-                        location=block_key,
-                    ),
+                    all_children=library_children,
+                    candidates=candidates,
                     max_count=max_count,
                     manual=manual,
                     shuffle=shuffle,

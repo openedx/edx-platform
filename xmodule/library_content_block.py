@@ -17,14 +17,13 @@ from django.utils.functional import classproperty
 from lxml import etree
 from lxml.etree import XMLSyntaxError
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2, LibraryUsageLocator, LibraryUsageLocatorV2, BlockUsageLocator
+from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
 from opaque_keys.edx.keys import UsageKey
 from rest_framework import status
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
-from xblock.exceptions import JsonHandlerError
 from xblock.fields import Boolean, Integer, List, Scope, String
 
 from xmodule.capa.responsetypes import registry
@@ -166,14 +165,15 @@ class LibraryContentBlock(
         scope=Scope.settings,
     )
     candidates = List(
-        # This is a list of (block_type, block_id) used to record the set of blocks
-        # which are candidates for the selected list.
+        # This is a list of library block usage keys representing the library subset that the author
+        # has manually picked as candidates for selection. Note: these are the keys of *blocks in the
+        # source library*, not of the keys of this block's children.
         display_name=_("Manually Selected Blocks"),
         default=[],
         scope=Scope.settings,
     )
     selected = List(
-        # This is a list of (block_type, block_id) tuples used to record
+        # This is a list of [block_type, block_id] pairs used to record
         # which set of matching blocks was selected per user
         default=[],
         scope=Scope.user_state,
@@ -245,88 +245,162 @@ class LibraryContentBlock(
         event_data = {
             "location": str(self.location),
             "result": result,
-            "previous_count": getattr(self, "_last_event_result_count", len(self.selected)),
+            "previous_count": getattr(self, "_last_event_result_count", len(self.selected_block_keys)),
             "max_count": self.max_count,
         }
         event_data.update(kwargs)
         self.runtime.publish(self, f"edx.librarycontentblock.content.{event_name}", event_data)
         self._last_event_result_count = len(result)  # pylint: disable=attribute-defined-outside-init
 
-    def available_children(self) -> list[tuple[str, str]]:
+    @classmethod
+    def _derive_child_block_key(cls, lcb_usage_key: UsageKey, library_block_usage_key: UsageKey) -> BlockKey:
         """
-        Returns (block_type, block_id) tuples which children are possible for selection,
-        in the original order from the candidates list (if manual) or lib-copied children list (if not).
+        Compute the appropriate block key for the child of a LibraryContentBlock (aka LCB)
+        that is sourced from a certain library block.
+
+        That is, given they keys of LibraryContentBlock and LibBlock2, we want to find the key of CHILD:
+
+                  Course                            Library
+                    |                                  |
+                    V                                  |
+                   ...                                 |
+                    |                                  |
+                    v                     LibBlock1 <--|
+            LibraryContentBlock                        |
+                    |                                  |
+                    |             + - - - LibBlock2 <--|
+                    v             .                    |
+                  CHILD < - - - - +                    |
+                                          LibBlock3 <--+
         """
-        return self._available_children(
-            library_children=self.children,
-            candidates=list(map(tuple, self.candidates)),  # Convert from nested list to list-of-tuples.
+        # Historically, BlockKeys for children have been generated using V1 Library keys (LibraryLocators).
+        # As we migrate V1 libraries to V2 libraries, we must keep the derived BlockKeys stable in order to maintain
+        # student state across the migration.
+        # So, for V2 libraries, we actually convert the V2 library key back into an "equivalent" V1 library key.
+        # We will have to maintain this historical artifact even after V1 libraries are deprecated and removed.
+        # TODO: Confirm that we still want to migrate V1->V2 libraries in-place like this
+        #       (https://github.com/openedx/edx-platform/issues/33640).
+        true_source_key = library_block_usage_key.context_key
+        derivable_source_key: LibraryLocator
+        if isinstance(true_source_key, LibraryLocator):
+            derivable_source_key = true_source_key
+        elif isinstance(true_source_key, LibraryLocatorV2):
+            derivable_source_key = LibraryLocator(
+                org=true_source_key.org,
+                library=true_source_key.slug,
+                branch='library',
+            )
+        else:
+            raise TypeError(
+                f"Source context for '{library_block_usage_key}' is '{true_source_key}'. "
+                f"Expected source context to be 'library-v1:' (a V1 library) or 'lib:' (a V2 library)."
+            )
+        return derived_key(
+            courselike_source_key=derivable_source_key,
+            block_key=BlockKey(library_block_usage_key.block_type, library_block_usage_key.block_id),
+            dest_parent=BlockKey(lcb_usage_key.block_type, lcb_usage_key.block_id),
+        )
+
+    def available_children(self) -> list[BlockKey]:
+        """
+        Returns an ordered list of LCB child BlockKeys which are possible for selection, based on either:
+         * this LCB's candidates (if manual), or
+         * this LCB's full children list (if not).
+
+        In the manual case, we filter out any candidates which do not actually map to a child of this LCB,
+        which could happen in the case of a poorly-formed OLX import.
+        """
+        return self.get_available_children(
+            usage_key=self.location,
+            all_children=self.children,
+            candidates=self.candidates,
             manual=self.manual,
         )
 
     @classmethod
-    def _available_children(
+    def _get_candidates_as_children(cls, lcb_usage_key: UsageKey, candidates: list[UsageKey]) -> list[BlockKey]:
+        return [
+            cls._derive_child_block_key(lcb_usage_key=lcb_usage_key, library_block_usage_key=candidate)
+            for candidate in candidates
+        ]
+
+    @classmethod
+    def get_available_children(
         cls,
-        library_children: list[UsageKey],
-        candidates: list[tuple[str, str]],
+        usage_key: UsageKey,
+        all_children: list[UsageKey],
+        candidates: list[UsageKey],
         manual: bool,
-    ) -> list[tuple[str, str]]:
+    ) -> list[BlockKey]:
         """
         Static implementation of available_children.
         """
-        children = [(child.block_type, child.block_id) for child in library_children]
+        all_children_block_keys = [BlockKey(child.block_type, child.block_id) for child in all_children]
         if manual:
-            return [candidate for candidate in candidates if candidate in children]
+            return [
+                child
+                for child in cls._get_candidates_as_children(lcb_usage_key=usage_key, candidates=candidates)
+                if child in all_children_block_keys
+            ]
         else:
-            return children
+            return all_children_block_keys
 
     @classmethod
     def make_selection(
         cls,
-        old_selected: list[tuple[str, str]],
-        library_children: list[UsageKey],
-        candidates: list[tuple[str, str]],
+        usage_key: UsageKey,
+        old_selected: list[BlockKey],
+        all_children: list[UsageKey],
+        candidates: list[UsageKey],
         max_count: int,
         manual: bool,
         shuffle: bool,
-    ) -> dict[str, list]:
+    ) -> dict[str, list[BlockKey]]:
         """
         Dynamically selects block_ids indicating which of the possible children are displayed to the current user.
         The blocks returned are kept consistent for a user,
         unless changes have been made to the library's contents or the settings of the block.
         Returns:
-            A dict containing the following keys:
-            'selected' (list) of (block_type, block_id) tuples assigned to this student
-            'invalid' (list) of dropped (block_type, block_id) tuples that are no longer valid
-            'overlimit' (list) of dropped (block_type, block_id) tuples that were previously selected
-            'added' (list) of newly added (block_type, block_id) tuples
+           A dict containing the following keys:
+            'selected': ordered list of BlockKeys assigned to this student
+            'invalid': unordered list of BlockKeys that were dropped because they're no longer available
+            'overlimit': unordered list of BlockKeys that were dropped because they no longer fit
+            'added': unordered list of newly-added BlockKeys
 
-        When generating randomized content to show to a user, we want the following user experince:
-        1. When a learner first interacts with the block, they are shown N items from the children at random.
-        2. Every subsequent time they view that content, they are given the same content,
-        unless one of the below conditions is met:
-            a. The max_count is increased, requiring the learner to see more.
-            b. The max_count is decreased, requiring the learner to see less content.
-            c. When blocks previously assigned to a learner are deleted.
-        3. In case a, we take the selected blocks that were valid before the edit,
-            and supplament those with new blocks chosen at random until the number of blocks is max_count
-        4. In case b, we take the selected blocks that were valid before the edit,
-            and remove blocks randomly until he number of blocks is max_count.
-        5. In case c, we remove the blocks that are now invalid,
-           and supplament those remaining with new blocks chosen at random until the number of blocks is max_count.
-
-        When generating manully selected content, we want all users to see all the items selected.
-        size, however, limits the amount of content shown.
+        When generating randomized content to show to a user, we want the following user experience:
+        1. When a learner first interacts with the block, they are shown $max_count items from the available children
+           at random, or all available children if $max_count is -1. If $shuffle is enabled, the order is random.
+           If $shuffle is disabled, then the order is author-determined.
+        2. Every subsequent time they view that content, they are given the same content in the same order,
+           unless one or more of the below conditions is met:
+              A. The max_count is increased, requiring the learner to see more.
+              B. The max_count is decreased, requiring the learner to see less.
+              C. Blocks previously assigned to a learner become unavailable (via deletion or removal from candidates).
+              D. max_count is -1 and more blocks become available, requiring the learner to see those new blocks.
+        3. In case A, we take the selected blocks that were valid before the edit,
+           and supplement those with new blocks chosen at random until the number of blocks is $max_count.
+        4. In case B, we take the selected blocks that were valid before the edit, and remove blocks randomly
+           until he number of blocks is <= $max_count.
+        5. In case C, we remove the blocks that are now unavailable, and supplement those remaining with new blocks
+           chosen at random until the number of blocks is $max_count.
+        6. In case D, we supplement the selected blocks with the newly-available blocks.
+        7. In all cases A-D, if $shuffle is enabled, then the order is re-randomized.
         """
-        selected: list[tuple[str, str]] = old_selected.copy()
-        available: list[tuple[str, str]] = cls._available_children(library_children, candidates, manual)
+        selected: list[BlockKey] = old_selected.copy()
+        available: list[BlockKey] = cls.get_available_children(
+            usage_key=usage_key,
+            all_children=all_children,
+            candidates=candidates,
+            manual=manual,
+        )
 
         # Remove blocks from selection if they're no longer candidates/children.
         selected = [block for block in selected if block in available]
-        invalid: set[tuple[str, str]] = set(old_selected) - set(selected)
+        invalid: set[BlockKey] = set(old_selected) - set(selected)
 
         # Remove or add blocks if we don't have the correct number in the selection.
-        additions: set[tuple[str, str]] = set()
-        overlimit: set[tuple[str, str]] = set()
+        additions: set[BlockKey] = set()
+        overlimit: set[BlockKey] = set()
         desired_size: int = min(max_count, len(available)) if max_count >= 0 else len(available)
         if len(selected) > desired_size:
             num_to_remove = len(selected) - desired_size
@@ -334,7 +408,7 @@ class LibraryContentBlock(
             selected = [block for block in selected if block not in overlimit]
         elif len(selected) < desired_size:
             num_to_add = desired_size - len(selected)
-            available_additions: set[tuple[str, str]] = set(available) - set(selected)
+            available_additions: set[BlockKey] = set(available) - set(selected)
             additions = set(random.sample(available_additions, num_to_add))
             selected = [block for block in available if block in (additions | set(selected))]
 
@@ -409,24 +483,35 @@ class LibraryContentBlock(
                 added=format_block_keys(block_keys['added'])
             )
 
-    def selected_children(self):
+    @property
+    def selected_block_keys(self) -> list[BlockKey]:
+        """
+        Same as self.selected, but converted from JSON-friendly 2-element-lists into typing-friendly BlockKeys.
+        """
+        return [BlockKey(block_type, block_id) for block_type, block_id in self.selected]
+
+    @selected_block_keys.setter
+    def selected_block_keys(self, value: list[BlockKey]) -> None:
+        """
+        Convert BlockKeys back into 2-element-lists.
+        """
+        self.selected = [[block_type, block_id] for block_type, block_id in value]
+
+    def selected_children(self) -> list[BlockKey]:
         """
         Returns a [] of block_ids indicating which of the possible children
         have been selected to display to the current user.
 
         This reads and updates the "selected" field, which has user_state scope.
-
-        Note: the return value (self.selected) contains block_ids. To get
-        actual BlockUsageLocators, it is necessary to use self.children,
-        because the block_ids alone do not specify the block type.
         """
         max_count = self.max_count
         if max_count < 0:
             max_count = len(self.children)
         block_keys = self.make_selection(
-            old_selected=list(map(tuple, self.selected)),  # Convert from nested list to list-of-tuples.
-            library_children=self.children,
-            candidates=self.candidates_keys,
+            usage_key=self.location,
+            old_selected=self.selected_block_keys,
+            all_children=self.children,
+            candidates=self.candidates,
             max_count=self.max_count,
             manual=self.manual,
             shuffle=self.shuffle,
@@ -444,9 +529,9 @@ class LibraryContentBlock(
         if any(block_keys[changed] for changed in ('invalid', 'overlimit', 'added')):
             # Save our selections to the user state, to ensure consistency:
             selected = block_keys['selected']
-            self.selected = selected  # TODO: this doesn't save from the LMS "Progress" page.
+            self.selected_block_keys = selected  # TODO: this doesn't save from the LMS "Progress" page.
 
-        return self.selected
+        return self.selected_block_keys
 
     @XBlock.handler
     def reset_selected_children(self, _, __):
@@ -466,7 +551,7 @@ class LibraryContentBlock(
                 block.reset_problem(None)
                 block.save()
 
-        self.selected = []
+        self.selected_block_keys = []
         return Response(json.dumps(self.student_view({}).content))
 
     def _get_selected_child_blocks(self):
@@ -629,82 +714,23 @@ class LibraryContentBlock(
             if not user_perms.can_read(self.source_library_key):
                 raise PermissionDenied(f"Cannot read library at {self.source_library_key}")
 
-
-    @classmethod
-    def get_candidates_in_course(
-        cls,
-        candidates: list[list[str,str]],
-        children: list[BlockUsageLocator],
-        source_library_key: Union[LibraryLocator, LibraryLocatorV2, None],
-        location: BlockUsageLocator
-        ) -> list[tuple[str, str]]:
-        """
-        A static implementation of the getter for candidates_in_course.
-        """
-        # confirm that the set of block ids needs to be converted.
-        candidate_usage_id_strings = [usage_string for _block_type, usage_string in candidates]
-        children_usage_id_strings = [child.block_id for child in children]
-        if set(candidate_usage_id_strings) <= set (children_usage_id_strings):
-            return candidates
-        else:
-            if isinstance(source_library_key, LibraryLocatorV2):
-                source_library_key = LibraryLocator(
-                    org=source_library_key.org,
-                    library=source_library_key.slug,
-                    branch='library',
-                )
-            return [
-                tuple(
-                    derived_key(
-                        source_library_key,
-                        BlockKey(
-                            type=block_type,
-                            id=usage_id,
-                        ),
-                        BlockKey(
-                            type=location.block_type,
-                            id=location.block_id,
-                        ),
-                    )
-                ) for block_type, usage_id in candidates
-            ]
-
-    @property
-    def candidates_keys(self) -> list[tuple[str, str]]:
-        """
-        If the self.candidate value is a list of usage keys refering to this block's children, return it.
-        If the self.candidate value is a list of usage keys refering to the library's children
-        (which can occur through editing the candidates before the children are synced)
-        then convert  the self.candidates values to refer to the library's children.
-        We call a static method here so this can also be used in block transformers, which calls
-        xblock methods staticly.
-        """
-        return self.get_candidates_in_course(self.candidates, self.children, self.source_library_key, self.location)
-
-    # suffix argument is specified for xblocks, but we are not using it herein
-    @XBlock.json_handler
-    def submit_studio_edits(self, data, suffix=''):  # pylint: disable=unused-argument
-        """
-        Ajax handler for submiting changes to the candidates list.
-        Cleans them to be of type List[tuple[str,str]]
-        where the tuple is (block_type, block_id)
-        """
-        if list(data['values'].keys()) != list(self.editable_fields):
-            raise JsonHandlerError(
-                400,
-                "Library Content Block only supports the editing of the candidates field  with this handler."
-            )
-        usage_key_list = [UsageKey.from_string(usage_key_string) for usage_key_string in data['values']['candidates']]
-        self.candidates = [(usage_key.block_type, usage_key.block_id) for usage_key in usage_key_list]
-
     @XBlock.handler
     def get_block_ids(self, request, suffix=''):  # lint-amnesty, pylint: disable=unused-argument
         """
-        Return candidates for selection.
+        Return candidates for selection, represented as usage keys of this LCB's children.
         """
-        # construct usage_key list from library children so it is fully formed.
-        usage_key_list = [child for child in self.children if [child.block_type, child.block_id] in self.candidates_keys]
-        return Response(json.dumps({'candidates': [str(usage_key) for usage_key in usage_key_list]}))
+        return Response(
+            json.dumps(
+                {
+                    'candidates': [
+                        str(self.location.context_key.make_usage_key(*block_key))
+                        for block_key in self._get_candidates_as_children(
+                            lcb_usage_key=self.location, candidates=self.candidates,
+                        )
+                    ],
+                }
+            )
+        )
 
     @XBlock.handler
     def upgrade_and_sync(self, request=None, suffix=None):  # pylint: disable=unused-argument
