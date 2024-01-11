@@ -463,19 +463,29 @@ from openedx.core.djangolib.markup import HTML
       
         }
       });
-    
+      
     const elementsSubmitted = document.querySelectorAll('.submitted-question')
     elementsSubmitted.forEach((element)=>{
       const numberSubmitted = element.textContent;
       const problemElement = problemList[numberSubmitted - 1];
-
-
       if (problemElement) {
         const titleElement = problemElement.querySelector('.explanation-title');
         if (titleElement) {
           titleElement.textContent = 'Bạn đã trả lời đúng';
-        } 
+        } else {
+          const htmlString =
+              '<span class="message">' +
+                '<div class="feedback-hint-correct messages-box">' +
+                  '<div class="explanation-title">Bạn đã trả lời đúng</div>' +
+                '</div>' +
+              '</span>';
+
+              const tempElement = document.createElement('div');
+              tempElement.innerHTML = htmlString;
+                  problemElement.appendChild(tempElement);
+        }
       } 
+ 
   
     })
   
