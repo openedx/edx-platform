@@ -132,7 +132,7 @@ from openedx.core.djangolib.js_utils import (
                     'screen_name': 'studio_home',
                     'organization': '${platform_name}',
                   }
-              ); sendTracking({'has_created_course':'true'});"
+              ); sendTracking({'has_created_course':'true'}); CourseLimitRedirect();"
             />
             <input type="button" value="${_('Cancel')}" class="action action-secondary action-cancel new-course-cancel" />
           </div>
@@ -621,6 +621,14 @@ from openedx.core.djangolib.js_utils import (
             },
             body: JSON.stringify(requestData)
         })
+    }
+
+    function CourseLimitRedirect(){
+      const is_limit_reached = "${is_course_limit_reached}";
+      const frontend_url = "${frontend_redirect_url}/?redirect=studio";
+      if(is_limit_reached == "True"){
+        window.location.replace(frontend_url);
+      }
     }
 </script>
 

@@ -627,6 +627,10 @@ def course_listing(request):
 
     site_config = configuration_helpers.get_current_site_configuration()
     tracking_api_url = f"{site_config.get_value('PANEL_NOTIFICATIONS_BASE_URL')}/api/v1/tracking_events/"
+    frontent_redirect_url = ''
+    frontend_url = [url for url in settings.CORS_ORIGIN_WHITELIST if 'apps' in url]   
+    if len(frontend_url):
+        frontent_redirect_url = '{}/panel/settings/billing'.format(frontend_url[0])
 
     return render_to_response(u'index.html', {
         u'default_course_id': DESTINATION_COURSE_ID_PATTERN.format(org[0]),
@@ -645,7 +649,9 @@ def course_listing(request):
         u'rerun_creator_status': _get_course_creator_status(user),
         u'allow_unicode_course_id': settings.FEATURES.get(u'ALLOW_UNICODE_COURSE_ID', False),
         u'allow_course_reruns': settings.FEATURES.get(u'ALLOW_COURSE_RERUNS', True),
-        u'optimization_enabled': optimization_enabled
+        u'optimization_enabled': optimization_enabled,
+        u'is_course_limit_reached':is_courses_limit_reached_for_plan(),
+        u'frontend_redirect_url':frontent_redirect_url
     })
 
 
