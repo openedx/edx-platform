@@ -779,7 +779,7 @@ openedx-filters==1.6.0
     # via
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
-openedx-learning==0.4.2
+openedx-learning @ git+https://github.com/openedx/openedx-learning.git@jill/serialize-permissions
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
