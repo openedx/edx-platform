@@ -10,6 +10,8 @@
 <% icp_license_info = getattr(settings, 'ICP_LICENSE_INFO', {})%>
 <%namespace name='static' file='static_content.html'/>
 
+
+
 % if uses_bootstrap:
   <div class="container-fluid wrapper-footer">
     <footer>
@@ -91,6 +93,8 @@
         dir=${bidi}
       % endif
     >
+    ## remove navbar
+    <%doc>
       <div class="colophon">
         <nav class="nav-colophon" aria-label="${_('About')}">
           <ol>
@@ -103,6 +107,7 @@
               % endfor
           </ol>
         </nav>
+      </%doc>
 
         % if context.get('include_language_selector', footer_language_selector_is_enabled()):
             <%include file="${static.get_template_path('widgets/footer-language-selector.html')}"/>
@@ -124,7 +129,7 @@
         </div>
 
         ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
-          <p class="copyright">${footer['copyright']}
+          <p id="footer_copyright">${footer['copyright']}
               % if icp_license_info.get('icp_license'):
                 ${u" | {text}".format(text=icp_license_info.get('text'))}
                 <a href="${icp_license_info.get('icp_license_link', '#')}">

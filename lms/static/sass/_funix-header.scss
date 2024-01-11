@@ -1,0 +1,21 @@
+.main-header .mobile-nav-item.hidden-mobile {
+    &:first-of-type {
+        margin: 0 10px 0 0 !important;
+    }
+
+    &:last-of-type {
+        margin: 0 !important;
+    }
+
+    padding: 0 !important;
+
+    .sign-in-btn {
+        @extend .funix-btn;
+        @extend .funix-btn-primary;
+    }
+
+    .register-btn {
+        @extend .funix-btn;
+        @extend .funix-btn-secondary;
+    }
+}
