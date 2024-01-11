@@ -1,0 +1,72 @@
+body .wrapper-problem-response fieldset {
+    padding: 0;
+}
+
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup .field {
+    margin-bottom: .5rem;
+}
+
+.xmodule_display.xmodule_ProblemBlock div.problem .choicegroup label {
+    margin: 0;
+}
+
+body .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input[type=radio],
+body .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input[type=checkbox] {
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;
+}
+
+.xmodule_display.xmodule_ProblemBlock div.problem .action .submit-attempt-container .submit {
+    // flex-grow: 0;
+    // padding: 0 1rem;
+    // border-radius: 6px;
+    // background-color: var(--color-active);
+    // color: white;
+    // border: none;
+    // outline: none;
+    // height: 2.375rem;
+    // line-height: 2.375rem;
+
+    // * {
+    //     font-weight: 500;
+    // }
+
+    // &:hover {
+    //     background-color: var(--color-hover);
+    // }
+
+    // &:disabled {
+    //     background-color: var(--color-disable);
+    // }
+
+    @extend .funix-btn-primary;
+    @extend .funix-btn;
+}
+
+.btn-primary:disabled,
+.btn-brand:disabled,
+.btn-primary.is-disabled,
+.is-disabled.btn-brand {
+    background-color: var(--color-disable);
+}
+
+input[type=submit]:disabled,
+input[type=submit].is-disabled,
+input[type=submit].disabled,
+input[type=button]:disabled,
+input[type=button].is-disabled,
+input[type=button].disabled,
+button:disabled,
+button.is-disabled,
+button.disabled,
+.button:disabled,
+.button.is-disabled,
+.button.disabled {
+    opacity: 1;
+    background-color: var(--color-disable);
+}
+
+.xmodule_display.xmodule_ProblemBlock div.problem {
+    padding-top: 0;
+}
