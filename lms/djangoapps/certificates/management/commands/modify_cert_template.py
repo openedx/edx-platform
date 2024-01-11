@@ -1,6 +1,5 @@
 """Management command to modify certificate templates.
 """
-
 import logging
 import shlex
 from argparse import RawDescriptionHelpFormatter
@@ -17,23 +16,19 @@ log = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     """Management command to modify certificate templates.
-
     Example usage:
     ./manage.py lms modify_cert_template --old-text
     """
 
     help = """Modify one or more certificate templates.
-
-    This is DANGEROUS. 
+    This is DANGEROUS.
     * This uses string replacement to modify HTML-like templates, because the presence of
-      Django Templating makes it impossible to do true parsing. 
+      Django Templating makes it impossible to do true parsing.
     * This isn't parameterizing the replacement text, for the same reason.  It has
       no way of knowing what is template language and what is HTML.
-
     Do not trust that this will get the conversion right without verification,
     and absolutely do not accepted untrusted user input for the replacement text. This is
     to be run by trusted users only.
-
     Always run this with dry-run or in a reliable test environment.
     """
 
@@ -75,17 +70,14 @@ class Command(BaseCommand):
             raise CommandError(
                 "ModifyCertificateTemplateCommandConfiguration is disabled, but --args-from-database was requested"
             )
-
         args = shlex.split(config.arguments)
         parser = self.create_parser("manage.py", "modify_cert_template")
-
         return vars(parser.parse_args(args))
 
     def handle(self, *args, **options):
         # database args will override cmd line args
         if options["args_from_database"]:
             options = self.get_args_from_database()
-
         log.info(
             "modify_cert_template starting, dry-run={dry_run}, templates={templates}, "
             "old-text={old}, new-text={new}".format(
@@ -95,5 +87,4 @@ class Command(BaseCommand):
                 new=options["new_text"],
             )
         )
-
         handle_modify_cert_template.delay(options)

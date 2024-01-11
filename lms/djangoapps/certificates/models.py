@@ -1241,6 +1241,7 @@ class CertificateTemplateAsset(TimeStampedModel):
         get_latest_by = 'created'
         app_label = "certificates"
 
+
 class ModifiedCertificateTemplateCommandConfiguration(ConfigurationModel):
     """
     Manages configuration for a run of the modify_cert_template management command.
