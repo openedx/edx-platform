@@ -127,7 +127,7 @@ def remove_inline_styles(request, course_id):
         "message": response_msg,
         "errors": {
             "publish_errors": publish_errors,
-            "remove_errors": remove_errors
+            "remove_errors": remove_errors,
         }
     }, status=status.HTTP_200_OK)
 

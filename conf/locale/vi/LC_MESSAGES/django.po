@@ -1939,6 +1939,8 @@ msgid ""
 "their respective logos are registered trademarks of edX Inc."
 msgstr ""
 
+
+
 #. Translators: 'Open edX' is a brand, please keep this untranslated. See
 #. http://openedx.org for more information.
 #: cms/templates/widgets/footer.html
@@ -23971,4 +23973,13 @@ msgid "The answer of the document is not correct"
 msgstr "Đáp án của bản chưa chính xác"
 
 msgid "Post violates honour code or academic integrity"
-mmsgstr "Bài đăng vi phạm quy tắc "
+msgstr "Bài đăng vi phạm quy tắc "
+
+#: lms/djangoapps/branding/api.py
+#, python-brace-format
+msgid "@{copyright_year}. Copyrighted. {platform_name} - Member of {org_name} {org_type}"
+msgstr "@{copyright_year}. Đã đăng ký bản quyền. {platform_name} - Thành viên của {org_type} {org_name}"
+
+#: company type
+msgid "JSC"
+msgstr "Công ty Cổ phần"

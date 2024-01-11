@@ -125,6 +125,22 @@ def _footer_copyright():
     Returns: unicode
 
     """
+
+    unique_language_copyright_footer = configuration_helpers.get_value('UNIQUE_LANGUAGE_COPYRIGHT_FOOTER', None)
+
+    if unique_language_copyright_footer: 
+        return unique_language_copyright_footer
+
+    return _compose_copyright_footer()
+        
+
+    return _(
+        # Translators: 'edX' and 'Open edX' are trademarks of 'edX Inc.'.
+        # Please do not translate any of these trademarks and company names.
+        "© {org_name}.  All rights reserved except where noted.  edX, Open edX "
+        "and their respective logos are registered trademarks of edX Inc."
+    ).format(org_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME))
+
     return _(
         # Translators: 'edX' and 'Open edX' are trademarks of 'edX Inc.'.
         # Please do not translate any of these trademarks and company names.
@@ -656,3 +672,13 @@ def get_logo_url_for_email():
     # The LOGO_URL_PNG might be reused in the future for other things, so including an email specific png logo
     return (getattr(settings, 'LOGO_URL_PNG_FOR_EMAIL', None) or
             getattr(settings, 'LOGO_URL_PNG', None) or default_logo_url)
+
+def _compose_copyright_footer():
+    platform_name = configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
+    copyright_year = configuration_helpers.get_value('COPYRIGHT_YEAR', "2023")
+    org_name = configuration_helpers.get_value('ORGANIZATION_NAME', "Galaxy Education")
+    org_type = _(configuration_helpers.get_value('ORGANIZATION_TYPE', "JSC"))
+
+    return _(
+        "@{copyright_year}. Copyrighted. {platform_name} - Member of {org_name} {org_type}"
+    ).format(copyright_year=copyright_year, platform_name=platform_name, org_name=org_name, org_type=org_type)

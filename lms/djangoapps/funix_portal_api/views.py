@@ -471,7 +471,7 @@ def get_resume_path(request, course_id, location):
             'message': 'Success',
             'data': {
                 'redirect_url': redirect_url
-            }
+            },
         }
         ,
         status=200
