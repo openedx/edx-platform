@@ -82,7 +82,7 @@ from openedx.core.djangolib.js_utils import (
                                 <div class="btn-link close-btn float-right">
                                     <span style="color: black" class="icon fa fa-close" />
                                 </div>
-    
+
                                 <br />
                                 % for sharing_site_info in sharing_sites_info:
                                 <a
@@ -153,7 +153,7 @@ from openedx.core.djangolib.js_utils import (
             % endif
         </div>
         % endif
-        % if transcript_feedback_enabled:
+        % if transcript_feedback_enabled and video_id:
         <div class="wrapper-transcript-feedback" data-video-id='${video_id}' data-user-id='${user_id}'>
             <h4 class="hd hd-5">${_('How is the transcript quality ?')}</h4>
             <div class="transcript-feedback-buttons">
