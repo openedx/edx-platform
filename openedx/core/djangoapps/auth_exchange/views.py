@@ -143,12 +143,15 @@ class LoginWithAccessTokenView(APIView):
         else:
             token_query = dot_models.AccessToken.objects.select_related('user')
             dot_token = token_query.filter(token=request.auth).first()
+            if dot_token.application.skip_authorization:
+                return
             if dot_token and dot_token.application.authorization_grant_type == dot_models.Application.GRANT_PASSWORD:
                 return
 
         raise AuthenticationFailed({
             'error_code': 'non_supported_token',
-            'developer_message': 'Only access tokens with grant type password are supported.'
+            'developer_message': 'Only access tokens with grant type password are supported, '
+                                 'or those with authorization explicitly skipped.'
         })
 
     @staticmethod
