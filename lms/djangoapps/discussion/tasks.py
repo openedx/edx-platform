@@ -20,6 +20,7 @@ from opaque_keys.edx.keys import CourseKey
 from six.moves.urllib.parse import urljoin
 
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
+from lms.djangoapps.discussion.toggles_utils import reported_content_email_notification_enabled
 from openedx.core.djangoapps.discussions.url_helpers import get_discussions_mfe_url
 from xmodule.modulestore.django import modulestore
 
@@ -98,6 +99,8 @@ def send_ace_message(context):  # lint-amnesty, pylint: disable=missing-function
 def send_ace_message_for_reported_content(context):  # lint-amnesty, pylint: disable=missing-function-docstring
     context['course_id'] = CourseKey.from_string(context['course_id'])
     context['course_name'] = modulestore().get_course(context['course_id']).display_name
+    if not reported_content_email_notification_enabled(context['course_id']):
+        return
 
     moderators = get_users_with_moderator_roles(context)
     context['site'] = Site.objects.get(id=context['site_id'])
