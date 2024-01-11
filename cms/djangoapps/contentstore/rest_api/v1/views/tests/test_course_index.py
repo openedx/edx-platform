@@ -10,7 +10,8 @@ from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import get_lms_link_for_item
 from cms.djangoapps.contentstore.views.course import _course_outline_json
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import BlockFactory
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
+from xmodule.modulestore.tests.factories import BlockFactory, check_mongo_calls
 
 
 class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
@@ -123,3 +124,11 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
             "developer_message": f"Unknown course {self.course.id}1",
             "error_code": "course_does_not_exist"
         })
+
+    def test_number_of_calls_to_db(self):
+        """
+        Test to check number of queries made to mysql and mongo
+        """
+        with self.assertNumQueries(29, table_ignorelist=WAFFLE_TABLES):
+            with check_mongo_calls(3):
+                self.client.get(self.url)

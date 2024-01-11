@@ -57,6 +57,7 @@ push_translations: ## push source strings to Transifex for translation
 
 pull_translations:  ## pull translations from Transifex
 	git clean -fdX conf/locale
+ifeq ($(OPENEDX_ATLAS_PULL),)
 	i18n_tool transifex pull
 	i18n_tool extract
 	i18n_tool dummy
@@ -65,6 +66,12 @@ pull_translations:  ## pull translations from Transifex
 	git clean -fdX conf/locale/eo
 	i18n_tool validate --verbose
 	paver i18n_compilejs
+else
+	find conf/locale -mindepth 1 -maxdepth 1 -type d -exec rm -r {} \;
+	atlas pull $(OPENEDX_ATLAS_ARGS) translations/edx-platform/conf/locale:conf/locale
+	i18n_tool generate
+	paver i18n_compilejs
+endif
 
 
 detect_changed_source_translations: ## check if translation files are up-to-date

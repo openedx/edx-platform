@@ -464,7 +464,8 @@ def sync_discussion_settings(course_key, user):
             course.discussions_settings['provider_type'] = Provider.OPEN_EDX
             modulestore().update_item(course, user.id)
 
-        discussion_config.provider_type = Provider.OPEN_EDX
+            discussion_config.provider_type = Provider.OPEN_EDX
+
         discussion_config.enable_graded_units = discussion_settings['enable_graded_units']
         discussion_config.unit_level_visibility = discussion_settings['unit_level_visibility']
         discussion_config.save()
@@ -896,13 +897,14 @@ def _create_copy_content_task(v2_library_key, v1_library_key):
     spin up a celery task to import the V1 Library's content into the V2 library.
     This utalizes the fact that course and v1 library content is stored almost identically.
     """
-    return v2contentlib_api.import_blocks_create_task(v2_library_key, v1_library_key)
+    return v2contentlib_api.import_blocks_create_task(
+        v2_library_key, v1_library_key,
+        use_course_key_as_block_id_suffix=False
+    )
 
 
 def _create_metadata(v1_library_key, collection_uuid):
     """instansiate an index for the V2 lib in the collection"""
-
-    print(collection_uuid)
 
     store = modulestore()
     v1_library = store.get_library(v1_library_key)
