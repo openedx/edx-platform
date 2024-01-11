@@ -181,6 +181,7 @@ from openedx.core.djangolib.markup import HTML
             Câu hỏi tiếp theo  <i class="bi bi-arrow-right"></i>
           </span></button>
           <button class='btn-submit-qz btn-custom' disabled > Trả lời  </button>
+          <button class=' btn-custom' id='btn-next-lesson'  style='display:none'> Hoàn thành   </button>
   
         </span>
 
@@ -333,6 +334,26 @@ from openedx.core.djangolib.markup import HTML
 <script > 
   const problemElement = document.querySelector('#quiz-problem-custom');
   if (problemElement){
+    const btnNextLesson = problemElement.querySelector('#btn-next-lesson');
+    
+    btnNextLesson.addEventListener('click', async () => {
+      try {
+        const headerProblem = document.querySelector('.xblock-student_view');
+        const usage_key_string = headerProblem.getAttribute('data-usage-id'); 
+        const response = await fetch('/api/course_home/next_lesson/' + usage_key_string);
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+      
+          window.parent.postMessage({ type: 'quiz_submit' , ...data}, "*")
+      } catch (error) {
+          console.error('There was a problem with the fetch operation:', error);
+      }
+  });
+
     const problemList = problemElement.querySelectorAll('.wrapper-problem-response');
     const btnSubmit = document.querySelector('.btn-submit-qz')
     const btnNext = document.querySelector('#btn-next')
@@ -458,7 +479,7 @@ from openedx.core.djangolib.markup import HTML
       btnNumber.forEach(function(element) {
         element.addEventListener('click', function() {
           const numnberId = element.getAttribute('data-problem-number-id');
-  
+       
           btnSubmit.setAttribute('disabled', true);
   
           currentIndex = parseInt(numnberId, 10);
@@ -534,7 +555,14 @@ from openedx.core.djangolib.markup import HTML
           });
   
           }
-  
+          
+          const submittedQuestions = document.querySelectorAll('.submitted-question');
+          if ( currentIndex+1 == submittedQuestions.length && submittedQuestions.length == btnNumber.length   ){
+            btnNext.style.display = 'none';
+            btnNextLesson.style.display = 'block'
+          }else {
+            btnNextLesson.style.display = 'none'
+          }
         
         });
   
