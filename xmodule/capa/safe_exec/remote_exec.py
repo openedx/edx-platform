@@ -49,25 +49,6 @@ def get_remote_exec(*args, **kwargs):
     return remote_exec_function(*args, **kwargs)
 
 
-# .. setting_name: CODE_JAIL_REST_SERVICE_OAUTH_URL
-# .. setting_default: None
-# .. setting_description: The OAuth server to get access tokens from when making calls to
-#   the codejail service. Requires setting CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_ID and
-#   CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_SECRET. If not specified, no authorization header will
-#   be sent.
-CODE_JAIL_REST_SERVICE_OAUTH_URL = getattr(settings, 'CODE_JAIL_REST_SERVICE_OAUTH_URL', None)
-# .. setting_name: CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_ID
-# .. setting_default: None
-# .. setting_description: The OAuth client credential ID to use when making calls to
-#   the codejail service. If not specified, no authorization header will be sent.
-CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_ID = getattr(settings, 'CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_ID', None)
-# .. setting_name: CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_SECRET
-# .. setting_default: None
-# .. setting_description: The OAuth client credential secret to use when making calls to
-#   the codejail service. If not specified, no authorization header will be sent.
-CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_SECRET = getattr(settings, 'CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_SECRET', None)
-
-
 def _get_codejail_client():
     """
     Return a ``requests`` compatible HTTP client that has .get(...) and .post(...) methods.
@@ -75,6 +56,24 @@ def _get_codejail_client():
     The client will send an OAuth token if the appropriate CODE_JAIL_REST_SERVICE_* settings
     are configured.
     """
+    # .. setting_name: CODE_JAIL_REST_SERVICE_OAUTH_URL
+    # .. setting_default: None
+    # .. setting_description: The OAuth server to get access tokens from when making calls to
+    #   the codejail service. Requires setting CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_ID and
+    #   CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_SECRET. If not specified, no authorization header will
+    #   be sent.
+    CODE_JAIL_REST_SERVICE_OAUTH_URL = getattr(settings, 'CODE_JAIL_REST_SERVICE_OAUTH_URL', None)
+    # .. setting_name: CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_ID
+    # .. setting_default: None
+    # .. setting_description: The OAuth client credential ID to use when making calls to
+    #   the codejail service. If not specified, no authorization header will be sent.
+    CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_ID = getattr(settings, 'CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_ID', None)
+    # .. setting_name: CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_SECRET
+    # .. setting_default: None
+    # .. setting_description: The OAuth client credential secret to use when making calls to
+    #   the codejail service. If not specified, no authorization header will be sent.
+    CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_SECRET = getattr(settings, 'CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_SECRET', None)
+
     oauth_configured = (
         CODE_JAIL_REST_SERVICE_OAUTH_URL and
         CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_ID and CODE_JAIL_REST_SERVICE_OAUTH_CLIENT_SECRET
