@@ -18,7 +18,7 @@ jobs:
               icon_emoji: ':octocat:',
               attachments: [{
                 color: 'good',
-                text: `${process.env.AS_AUTHOR.split(/[<@]/)[1]} start deploying Openedx "${process.env.AS_MESSAGE}" in ${process.env.AS_REF.replace('refs/heads/', '')}}`,
+                text: `${process.env.AS_AUTHOR.split(/[<@]/)[1]} start deploying Openedx "${process.env.AS_MESSAGE}" in ${process.env.AS_REF.replace('refs/heads/', '')}`,
               }]
             }
         env:
