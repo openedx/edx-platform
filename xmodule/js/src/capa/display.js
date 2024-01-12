@@ -692,7 +692,7 @@
                           var newElement = $(
                             '<div class="feedback-hint-correct messages-box">' +
                               '<div class="explanation-title">' +
-                                '<span></span>' +
+                                '<span>Bạn đã trả lời đúng</span>' +
                               '</div>' +
                             '</div>'
                           );
@@ -701,7 +701,7 @@
                           explanationTitle.append('<span>Bạn đã trả lời đúng</span>');
                         }
     
-                        $(listQz[currentIndex]).find('.explanation-title').append('<span>Bạn đã trả lời đúng</span>');
+                        // $(listQz[currentIndex]).find('.explanation-title').append('<span>Bạn đã trả lời đúng</span>');
                         indicatorError.css('display', 'none');
                         element.classList.remove('err-number-qusetion');
                         checkedInput.each(function () {
