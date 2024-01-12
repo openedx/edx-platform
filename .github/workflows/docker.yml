@@ -78,7 +78,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.CR_PAT }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push production image to the registry
         if: startsWith(github.ref, 'refs/heads/eol-release/') || startsWith(github.ref, 'refs/heads/openuchile-release/') || startsWith(github.ref, 'refs/heads/vlabx-release/')
