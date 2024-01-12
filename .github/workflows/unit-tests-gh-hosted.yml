@@ -38,7 +38,7 @@ jobs:
           - "xmodule-with-cms"
     name: gh-hosted-python-${{ matrix.python-version }},django-${{ matrix.django-version }},${{ matrix.shard_name }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Install Required System Packages
         run: sudo apt-get update && sudo apt-get install libxmlsec1-dev lynx
@@ -88,7 +88,7 @@ jobs:
         django-version:
           - "pinned"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Install Required System Packages
         run: sudo apt-get update && sudo apt-get install libxmlsec1-dev

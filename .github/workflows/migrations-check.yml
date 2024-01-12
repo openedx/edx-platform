@@ -73,7 +73,7 @@ jobs:
         mongosh --host 127.0.0.1 --username edxapp --password password --eval 'use edxapp; db.adminCommand("ping");' edxapp
 
     - name: Checkout repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
