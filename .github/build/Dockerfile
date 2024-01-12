@@ -41,7 +41,7 @@ RUN groupadd -r sandbox && useradd -m -r -g sandbox sandbox \
     && mkdir -p $SANDBOX_ENV && chown sandbox:sandbox $SANDBOX_ENV
 
 RUN python3 -m venv --copies $SANDBOX_ENV \
-    && $SANDBOX_ENV/bin/pip install --no-cache-dir pip==20.0.2 \
+    && $SANDBOX_ENV/bin/pip install --no-cache-dir pip==20.3.4 \
     && $SANDBOX_ENV/bin/pip install --no-cache-dir wheel==0.36.2 \
     # Install numpy before scipy
     && $SANDBOX_ENV/bin/pip install --no-cache-dir $(grep -o "^numpy==\w\+.\w\+.\w\+" requirements/edx-sandbox/py35.txt) \
@@ -55,7 +55,7 @@ ADD . /openedx/edx-platform
 # Also update boto from 2.39.0 to 2.40.0 as it has an exception on python3
 # Finally, install a compatibility layer for s3 (VIDEO_TRANSCRIPTS_SETTINGS save has an ASCII error on data)
 ENV NO_PYTHON_UNINSTALL 1
-RUN pip install pip==20.0.2 \
+RUN pip install pip==20.3.4 \
   && pip install --src ../venv/src -r requirements/edx/base.txt \
   && pip install boto==2.49.0 \
   && pip install -e git+https://github.com/eol-uchile/edx-s3-compatibility@c43347d36d5a20590a2e2f91e31d5270934ee993#egg=edx_s3_compatiblity
