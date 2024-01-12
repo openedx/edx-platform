@@ -10,7 +10,7 @@ jobs:
   verify_dunder_init:
 
     name: Verify __init__.py Files
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
 

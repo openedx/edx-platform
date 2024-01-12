@@ -13,7 +13,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-20.04 ]
+        os: [ ubuntu-latest ]
         python-version: [ '3.10' ]
         # 'pinned' is used to install the latest patch version of Django
         # within the global constraint i.e. Django==3.2.21 in current case
