@@ -21,4 +21,4 @@ jobs:
     steps:
       - name: Trigger edx-staging repository
         run: |
-          curl -XPOST -u "eolito:${{secrets.WEBHOOK_SECRET}}" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/eol-uchile/edx-staging/dispatches --data "{\"event_type\": \"update-image\", \"client_payload\": {\"version\": \"${{ needs.variables.outputs.release-name }}\"}}"
+          curl -XPOST -u "${{ github.actor }}:${{secrets.WEBHOOK_SECRET}}" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/eol-uchile/edx-staging/dispatches --data "{\"event_type\": \"update-image\", \"client_payload\": {\"version\": \"${{ needs.variables.outputs.release-name }}\"}}"

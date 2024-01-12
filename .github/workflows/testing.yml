@@ -76,7 +76,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: eolito
+          username: ${{ github.actor }}
           password: ${{ secrets.CR_PAT }}
 
       - name: Push testing image to the registry
