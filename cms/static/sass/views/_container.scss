@@ -24,10 +24,6 @@
 .view-container {
   @extend %two-col-1;
 
-  .drawer-cover {
-    background: rgba(112, 112, 112, 0.8);
-  }
-
   .wrapper-mast {
     .mast {
       border-bottom: none;
