@@ -381,9 +381,9 @@ from openedx.core.djangolib.markup import HTML
         const incorrectLabel = problemList[i].querySelector('label.choicegroup_correct');
         const wrongLabel = problemList[i].querySelector('label.choicegroup_incorrect')
         const indicatorError = problemList[i].querySelector('.indicator-container')
-        
-        indicatorError.style.display = 'none'
-        
+        if (indicatorError){
+            indicatorError.style.display = 'none'
+        }
   
         if (i == 0){
           spanElement.classList.add('active-number')
