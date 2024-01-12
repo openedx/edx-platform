@@ -59,7 +59,7 @@ ADD . /openedx/edx-platform
 ENV NO_PYTHON_UNINSTALL 1
 RUN pip install pip==20.0.2 \
   && pip install --src ../venv/src -r requirements/edx/base.txt \
-  && pip install boto==2.40.0 \
+  && pip install boto==2.49.0 \
   && pip install -e git+https://github.com/eol-uchile/edx-s3-compatibility@c43347d36d5a20590a2e2f91e31d5270934ee993#egg=edx_s3_compatiblity
 
 # Remove the original versions of ora2 and edx-sga
