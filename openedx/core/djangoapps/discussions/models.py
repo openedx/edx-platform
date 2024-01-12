@@ -649,3 +649,30 @@ class DiscussionActions (models.Model):
         except self.DoesNotExist:
             return False
         
+class DiscussionTagThread(models.Model):
+    thread_id= models.CharField(max_length=255)
+    user_id = models.IntegerField()
+    name_tag = models.CharField(max_length=50)
+    
+    def __str__(self) :
+        return self.thread_id
+    
+    @classmethod 
+    def set_tag (cls, thread_id, user_id, tags):
+        # print('===================', tag)
+        cls.objects.filter(thread_id=thread_id, user_id=user_id).delete()
+        for tag in tags:
+            new_tag_thread = cls(thread_id=thread_id, user_id=user_id, name_tag=tag)
+            new_tag_thread.save()
+
+    @classmethod
+    def get_tag (cls, thread_id, user_id):
+        try:
+            tags_thread = cls.objects.filter(thread_id=thread_id, user_id=user_id)
+            tags =[]
+            for tag in tags_thread:
+                tags.append(tag.name_tag)
+                
+            return tags
+        except DiscussionTagThread.DoesNotExist:
+            return None
