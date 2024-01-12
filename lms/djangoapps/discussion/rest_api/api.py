@@ -118,7 +118,7 @@ from .utils import (
     set_attribute
 )
 
-from openedx.core.djangoapps.discussions.models import DiscussionReport, DiscussionActions
+from openedx.core.djangoapps.discussions.models import DiscussionReport, DiscussionActions, DiscussionTagThread
 
 
 User = get_user_model()
@@ -769,8 +769,14 @@ def _serialize_discussion_entities(request, context, discussion_entities, reques
         # thread best
         is_best = DiscussionActions.get_best_thread(thread_id=e['id'])
         e['best'] = is_best
-
-    
+        
+        # thread tags
+        tags = DiscussionTagThread.get_tag(thread_id=e['id'], user_id=request.user.id)
+        if tags is not None :
+            e['tags'] = tags
+        else :
+            e['tags'] = []
+        
     
     return results
 
@@ -1326,6 +1332,10 @@ def create_thread(request, thread_data):
         The created thread; see discussion.rest_api.views.ThreadViewSet for more
         detail.
     """
+    selected_tags = thread_data.pop('selected_tags',None)
+    
+        
+    
     course_id = thread_data.get("course_id")
     user = request.user
     if not course_id:
@@ -1359,6 +1369,10 @@ def create_thread(request, thread_data):
     _do_extra_actions(api_thread, cc_thread, list(thread_data.keys()), actions_form, context, request)
 
     track_thread_created_event(request, course, cc_thread, actions_form.cleaned_data["following"])
+
+
+    DiscussionTagThread.set_tag(thread_id=api_thread['id'] , user_id = request.user.id, tags=selected_tags)
+        
 
     return api_thread
 
@@ -1443,6 +1457,10 @@ def update_thread(request, thread_id, update_data):
             DiscussionActions.set_best_thread(thread_id=thread_id, user_id=request.user.id, is_best=best_data)
         except:
             None
+    selected_tags = update_data.pop('selected_tags',None)
+    DiscussionTagThread.set_tag(thread_id=thread_id, user_id=request.user.id, tags=selected_tags)
+    
+    
     
     cc_thread, context = _get_thread_and_context(request, thread_id, retrieve_kwargs={"with_responses": True})
     _check_editable_fields(cc_thread, update_data, context)
