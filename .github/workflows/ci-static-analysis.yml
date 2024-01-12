@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.10']
-        os: ['ubuntu-latest']
+        os: ['ubuntu-20.04']
 
     steps:
       - uses: actions/checkout@v2
