@@ -74,17 +74,10 @@ jobs:
           cd .github/test
           docker-compose run lms /openedx/edx-platform/.github/test/tests.sh
 
-      - name: Login to GitHub Container Registry
-        if: startsWith(github.ref, 'refs/heads/eol-release/') || startsWith(github.ref, 'refs/heads/openuchile-release/') || startsWith(github.ref, 'refs/heads/vlabx-release/')
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Push production image to the registry
         if: startsWith(github.ref, 'refs/heads/eol-release/') || startsWith(github.ref, 'refs/heads/openuchile-release/') || startsWith(github.ref, 'refs/heads/vlabx-release/')
         run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io --username ${{ github.actor }} --password-stdin
           docker push ghcr.io/eol-uchile/edx-platform:${GITHUB_SHA}
           docker push ghcr.io/eol-uchile/edx-platform:${{ env.PROJECT }}-${{ env.RELEASE-NAME }}-${{ env.TS }}
           docker push ghcr.io/eol-uchile/edx-platform:${{ env.PROJECT }}-${{ env.RELEASE-NAME }}
