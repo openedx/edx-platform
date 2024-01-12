@@ -277,7 +277,7 @@ ECOMMERCE_PUBLIC_URL_ROOT: http://localhost:8002
 EDXMKTG_USER_INFO_COOKIE_NAME: edx-user-info
 EDX_PLATFORM_REVISION: master
 ELASTIC_SEARCH_CONFIG:
--   host: edx.devstack.elasticsearch
+-   host: edx.devstack.opensearch12
     port: 9200
     use_ssl: false
 EMAIL_BACKEND: django.core.mail.backends.smtp.EmailBackend
