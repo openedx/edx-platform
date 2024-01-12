@@ -118,7 +118,7 @@ from .utils import (
     set_attribute
 )
 
-from openedx.core.djangoapps.discussions.models import DiscussionReport, DiscussionActions, DiscussionTagThread
+from openedx.core.djangoapps.discussions.models import DiscussionReport, DiscussionTagThread
 
 
 User = get_user_model()
@@ -767,8 +767,6 @@ def _serialize_discussion_entities(request, context, discussion_entities, reques
         e['reports'] = list(set(arr))
         
         # thread best
-        is_best = DiscussionActions.get_best_thread(thread_id=e['id'])
-        e['best'] = is_best
         
         # thread tags
         tags = DiscussionTagThread.get_tag(thread_id=e['id'], user_id=request.user.id)
@@ -1370,8 +1368,8 @@ def create_thread(request, thread_data):
 
     track_thread_created_event(request, course, cc_thread, actions_form.cleaned_data["following"])
 
-
-    DiscussionTagThread.set_tag(thread_id=api_thread['id'] , user_id = request.user.id, tags=selected_tags)
+    if selected_tags is not None  :
+        DiscussionTagThread.set_tag(thread_id=api_thread['id'] , user_id = request.user.id, tags=selected_tags)
         
 
     return api_thread
@@ -1451,14 +1449,11 @@ def update_thread(request, thread_id, update_data):
     except:
         None
         
-    if 'best' in update_data:    
-        best_data = update_data.pop('best', None)
-        try:
-            DiscussionActions.set_best_thread(thread_id=thread_id, user_id=request.user.id, is_best=best_data)
-        except:
-            None
+   
     selected_tags = update_data.pop('selected_tags',None)
-    DiscussionTagThread.set_tag(thread_id=thread_id, user_id=request.user.id, tags=selected_tags)
+
+    if selected_tags is not None :
+        DiscussionTagThread.set_tag(thread_id=thread_id, user_id=request.user.id, tags=selected_tags)
     
     
     
@@ -1480,8 +1475,7 @@ def update_thread(request, thread_id, update_data):
     # accurate shortcut, rather than adding additional processing.
     api_thread['read'] = True
     api_thread['unread_comment_count'] = 0
-    is_best = DiscussionActions.get_best_thread(thread_id=thread_id)
-    api_thread['best'] = is_best
+   
 
   
     return api_thread
