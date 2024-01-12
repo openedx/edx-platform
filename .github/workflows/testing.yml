@@ -27,6 +27,8 @@ jobs:
       TS: ${{ needs.variables.outputs.timestamp }}
       RELEASE-NAME: ${{ needs.variables.outputs.release-name }}
       PROJECT: ${{ needs.variables.outputs.project }}
+    permissions:
+      packages: write
 
     steps:
       - uses: actions/checkout@v4
