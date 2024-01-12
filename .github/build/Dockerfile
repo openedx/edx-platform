@@ -42,7 +42,7 @@ RUN groupadd -r sandbox && useradd -m -r -g sandbox sandbox \
 
 RUN python3 -m venv --copies $SANDBOX_ENV \
     && $SANDBOX_ENV/bin/pip install --no-cache-dir pip==20.3.4 \
-    && $SANDBOX_ENV/bin/pip install --no-cache-dir wheel==0.36.2 \
+    && $SANDBOX_ENV/bin/pip install --no-cache-dir wheel==0.41.3 \
     # Install numpy before scipy
     && $SANDBOX_ENV/bin/pip install --no-cache-dir $(grep -o "^numpy==\w\+.\w\+.\w\+" requirements/edx-sandbox/py35.txt) \
     && $SANDBOX_ENV/bin/pip install --no-cache-dir -r requirements/edx-sandbox/py35.txt
