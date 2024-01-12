@@ -624,30 +624,7 @@ class DiscussionReport (models.Model):
         return DiscussionReport.objects.filter(id_type = id, user_id = user_id)
     
     
-class DiscussionActions (models.Model):
-    user_id = models.IntegerField()
-    thread_id= models.CharField(max_length=255)
-    is_best_thread = models.BooleanField(default=False)
-    
-    def __str__(self):
-        return f'{self.thread_id}'
-    
-    @classmethod
-    def set_best_thread(self, user_id, thread_id, is_best):
-        try:
-            discussion_action = DiscussionActions.objects.get(thread_id=thread_id)
-            discussion_action.is_best_thread = is_best
-            discussion_action.save()
-        except DiscussionActions.DoesNotExist:
-            DiscussionActions.objects.create(user_id=user_id, thread_id=thread_id, is_best_thread=is_best)
-    
-    @classmethod
-    def get_best_thread(self, thread_id):
-        try:
-            best_thread = self.objects.get(thread_id=thread_id, is_best_thread=True)
-            return best_thread.is_best_thread
-        except self.DoesNotExist:
-            return False
+
         
 class DiscussionTagThread(models.Model):
     thread_id= models.CharField(max_length=255)
