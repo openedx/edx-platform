@@ -1,0 +1,18 @@
+@mixin unit-table {
+    table {
+        tr {
+            &:first-child {
+                background: #e6e6e8 !important;
+                font-weight: 500;
+            }
+
+            &:nth-child(odd) {
+                background: #f6f6f7;
+            }
+
+            td {
+                padding: .75rem;
+            }
+        }
+    }
+}

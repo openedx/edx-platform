@@ -1,0 +1,47 @@
+@mixin btn {
+    height: 2.375rem;
+    padding: 0 1.25rem;
+    line-height: 2.375rem;
+    border-radius: 4px;
+    display: inline-block;
+    font-weight: 500;
+}
+
+@mixin btn-primary {
+    @include btn;
+
+    color: white;
+    background: $color-active;
+    border: 1px solid $color-active;
+
+    &:hover {
+        background: $color-hover;
+        border: 1px solid $color-hover;
+    }
+
+    &:disabled {
+        background: $color-disable;
+        border: 1px solid $color-disable;
+        pointer-events: none;
+        color: white;
+    }
+}
+
+@mixin btn-secondary {
+    @include btn;
+
+    color: $color-active;
+    background: white;
+    border: 1px solid $color-active;
+
+    &:hover {
+        color: $color-hover;
+        border: 1px solid $color-hover;
+    }
+
+    &:disabled {
+        color: white;
+        border: 1px solid $color-text-inactive;
+        pointer-events: none;
+    }
+}
