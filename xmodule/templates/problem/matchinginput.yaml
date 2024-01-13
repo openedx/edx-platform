@@ -1,21 +1,36 @@
 ---
 metadata:
   display_name: Matching Problem
-  markdown: ""
+  markdown: |
+            <matchingresponse>
+              <matchinggroup>
+
+                <matchingitem matchingvalue='1' pos="left">Left 1</matchingitem>
+                <matchingitem matchingvalue='1' pos="right">Right 1</matchingitem>
+
+                <matchingitem matchingvalue='2' pos="left">Left 2</matchingitem>
+                <matchingitem matchingvalue='2' pos="right">Right 2</matchingitem>
+
+                <matchingitem pos="left">Left 3: will be hide, no matchingvalue</matchingitem>
+                <matchingitem pos="right">Right 3</matchingitem>
+
+              </matchinggroup>
+            </matchingresponse>
+
 data: |
   <problem showanswer="attempted">
     <matchingresponse>
       <matchinggroup>
-        
+
         <matchingitem matchingvalue='1' pos="left">Left 1</matchingitem>
         <matchingitem matchingvalue='1' pos="right">Right 1</matchingitem>
-      
+
         <matchingitem matchingvalue='2' pos="left">Left 2</matchingitem>
         <matchingitem matchingvalue='2' pos="right">Right 2</matchingitem>
-      
+
         <matchingitem pos="left">Left 3: will be hide, no matchingvalue</matchingitem>
         <matchingitem pos="right">Right 3</matchingitem>
-        
+
       </matchinggroup>
     </matchingresponse>
     </problem>

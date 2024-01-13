@@ -1,0 +1,100 @@
+<%!
+from xmodule.capa.util import remove_markup
+from openedx.core.djangolib.markup import HTML
+import six
+%>
+
+## <!-- UFC - template hiển thị ra matching problem -->
+<div class="matchinggroup capa_inputtype" id="inputtype_${id}" >
+    % for left_item, right_item in matchingitems:
+        <div style="display: flex; width: 100%;flex-wrap: wrap;">
+            <div style="border: 1px solid #000; width: 40%; padding: 1rem;" >
+
+                ##<!-- Phần này cần hỏi lại tại sao có -->
+                <div style="display: none">
+                    ${HTML(left_item[0])}
+                </div>
+
+
+                % if not left_item[2]:
+                <div style="display: none">
+                % else:
+                <div>
+                % endif
+                    ${HTML(left_item[1])}
+                </div>
+                <input style="display: none" type="checkbox" checked data-left-value="${left_item[0]}" id="input_${id}_${left_item[0]}"  value="${left_item[0]}+${right_item[0]}" name="input_${id}[]"/>
+            </div>
+            <div data-right-value="${right_item[0]}" style="border: 1px solid #000; width: 40%; padding: 1rem;" id="right_${id}_${right_item[0]}" class="matching_right_item" ondrop="drop(event, inputtype_${id})" ondragover="allowDrop(event)" draggable="true" ondragstart="drag(event, inputtype_${id})">
+
+               ##<!-- Phần này cần hỏi lại tại sao có -->
+                <div style="display: none">
+                    ${HTML(right_item[0])}
+                </div>
+
+
+                <div>
+                    ${HTML(right_item[1])}
+                </div>
+            </div>
+        </div>
+    % endfor
+</div>
+
+
+##<div class="matchinggroup capa_inputtype" id="inputtype_${id}" >
+
+    ##<h1>% ${test_name_context} %</h1>
+    <h1>123_test</h1>
+
+    <div id="main_matching">
+        <!-- câu hỏi -->
+        <div class="question_matching_content">
+          Hãy ghép các thành phần của Marketing Framework tương ứng với các yếu tố
+          trong marketing phía dưới.
+        </div>
+
+        <!-- câu hỏi phụ -->
+        <div class="sub_question_matching_content">
+          (Hãy nối từ tương ứng tương ứng với đáp án bạn chọn.)
+        </div>
+
+        <!-- Phần câu hỏi container -->
+        <div class="main_content">
+            <!-- Phần title -->
+            <div class="content_title">
+                <div class="content_title_desc">Marketing Plan</div>
+                <div class="content_title_desc">Marketing Framework</div>
+            </div>
+
+            <!-- Nhóm câu hỏi thứ nhất  -->
+            <div class="content_container">
+                <div class="left left_content">Mục tiêu Marketing của bạn:</div>
+                <div class="right right_content">
+                    <div class="right_content_item">
+                        <div class="btn" draggable="true">
+                            <img src="https://svgshare.com/i/118B.svg" alt="Icon_Drag" data-result="right1">
+                            why
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nhóm câu hỏi thứ hai  -->
+            <div class="content_container">
+                <div class="left left_content">Các kênh mà khách hàng của bạn sử dụng:</div>
+
+                <div class="right right_content">
+                    <div class="right_content_item">
+                    <div class="btn" draggable="true">
+                        <img src="https://svgshare.com/i/118B.svg" title="Icon_Drag" />
+                        where
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>

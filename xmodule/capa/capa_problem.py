@@ -57,6 +57,7 @@ ACCESSIBLE_CAPA_INPUT_TYPES = [
 # these get captured as student responses
 response_properties = ["codeparam", "responseparam", "answer", "openendedparam"]
 
+# UFC - định nghĩa các tag được phép xuất hiện trong problem; vd: tag matchingitem sẽ được thay thế bằng tag div
 # special problem tags which should be turned into innocuous HTML
 html_transforms = {
     'problem': {'tag': 'div'},

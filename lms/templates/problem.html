@@ -30,7 +30,7 @@ from openedx.core.djangolib.markup import HTML
     color :#5aa447 ;
     border-bottom: solid 2px #5aa447;
     background-color: rgba(90, 164, 71, 0.16);
-    
+
   }
   .err-number-qusetion {
     border-bottom: solid 2px #d82c0d;
@@ -104,7 +104,7 @@ from openedx.core.djangolib.markup import HTML
 }
 
 .explanation-title{
-  align-self: stretch;  
+  align-self: stretch;
   flex-grow: 0;
   font-size: 1rem;
   font-weight: 500 !important;
@@ -142,11 +142,215 @@ from openedx.core.djangolib.markup import HTML
 
 </style>
 
+<style>
+    * {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    .question_matching_content {
+        margin-top: 1.5rem;
+        padding: 0 2rem;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #2c3744;
+        margin-bottom: 0.25rem;
+    }
+
+    .sub_question_matching_content {
+        padding: 0 2rem;
+        font-size: 0.875rem;
+        font-weight: normal;
+        color: #576f8a;
+        text-align: left;
+        margin-bottom: 1.5rem;
+    }
+
+    .content_title {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 1rem;
+        background-color: #e6e6e8;
+        text-align: center;
+    }
+
+    .content_title_desc {
+        padding: 0.5rem 1rem;
+        font-size: 1.25rem;
+        font-weight: 500;
+    }
+
+    .matchinggroup {
+        padding: 0;
+        margin: 0;
+        margin-bottom: 1.5rem;
+    }
+
+    .content_container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        justify-items: stretch;
+        grid-gap: 0 2rem;
+        grid-template-areas: "left right";
+    }
+
+    .left_content {
+        padding: 0.5rem 1rem;
+        /* font-size: 1rem;
+        font-weight: normal; */
+        /* color: #2c3744; */
+    }
+
+    .left_content .left_content_desc {
+        /* padding: 0.5rem 1rem; */
+        font-size: 1rem;
+        font-weight: normal;
+        color: #2c3744;
+    }
+
+    .right_content {
+        padding: 0.5rem 1rem 0.5rem 0;
+        position: relative;
+    }
+
+    .right_content::before {
+        --width_stick: 0.0625rem;
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -1rem;
+        width: var(--width_stick);
+        height: 100%;
+        background-color: #d9d9d9;
+        transform: translateX(-50%);
+    }
+
+    .right_content_item {
+        display: inline-block;
+    }
+
+    .right_content_item .btn {
+        outline: none;
+        border: none;
+        background: none;
+
+
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 8px;
+
+        padding: 0.5rem 1rem 0.5rem 0.25rem;
+        color: #fff !important;
+        background-color: #007ae6;
+        border-radius: 6px;
+        cursor: grab;
+        transition: all 0.3s ease-in-out;
+
+        /* New logic */
+        user-select: none;
+    }
+
+    .right_content_item .btn .image_container {
+        display: block;
+        /* min-width: 0; */
+        /* width: 100%;
+        height: 100%; */
+        flex-shrink: 0;
+    }
+
+
+    .right_content_item .btn .image_container .img_right {
+        margin: 0;
+        padding: 0;
+        outline: none;
+        border: none;
+        background: none;
+        width: 16px;
+        height: 16px;
+    }
+
+    .right_content_item .btn:hover {
+        outline: none;
+        border: none;
+        background: none;
+        background-color: #025dae;
+    }
+
+    .left {
+        grid-area: left;
+    }
+
+    .right {
+        grid-area: right;
+    }
+
+    .content_container:nth-child(odd) {
+        background-color: #f6f6f7;
+    }
+
+
+    /* phần result */
+    .matching_action {
+        display: flex;
+    }
+
+    .submit_matching_btn {
+        display: inline-block;
+        margin-top: 1.5rem;
+        margin-left: auto;
+        margin-right: 2rem;
+        margin-bottom: 2rem;
+        padding: 0.5rem 1rem;
+        background-color: #007ae6;
+        color: #fff  !important;
+        border-radius: 0.375rem;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .submit_matching_btn:hover {
+        background-color: #025dae;
+    }
+
+    .matching_result {
+        margin: 1.5rem 2rem 0;
+        border-top: 1px solid #d7d7d7;
+        padding-top: 1.5rem;
+    }
+
+    .matching_result_container {
+        padding: 0.75rem 1rem;
+        border-top-left-radius: 0.375rem;
+        border-bottom-left-radius: 0.375rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .matching_hidden {
+        display: none;
+    }
+
+    .success_result {
+        background-color: #F2FFEE;
+        border-left: 2px solid #5AA447;
+    }
+
+    .error_result {
+        background-color: #FFF1F1;
+        border-left: 2px solid #D82C0D;
+    }
+
+</style>
+
 <%namespace name='static' file='static_content.html'/>
 <h3 class="hd hd-3 problem-header" id="${ short_id }-problem-title" aria-describedby="${ id }-problem-progress" tabindex="-1">
-  
+
   % if problem['name'] == 'Quiz Problem Custom' :
-    Quiz 
+    Quiz
   %else :
     ${ problem['name'] }
   %endif
@@ -155,7 +359,11 @@ from openedx.core.djangolib.markup import HTML
 
 
 <div class="problem" id="${ "-".join(problem['name'].lower().split())}">
+
+
   ${ HTML(problem['html']) }
+
+
   <div class="action">
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />
     % if demand_hint_possible:
@@ -170,22 +378,30 @@ from openedx.core.djangolib.markup import HTML
     % endif
 
     <div class="problem-action-buttons-wrapper">
-      
+
 
       % if problem['name'] == 'Quiz Problem Custom' :
       <div id='problem-buttom' data-problem-name="${problem['name']}" style="padding-top:10px">
         <span style='display:flex; gap: 10px'>
-      
+
           <button id='btn-next' class='btn-custom' style='display:none'> <span class='btn-span'>
-  
+
             Câu hỏi tiếp theo  <i class="bi bi-arrow-right"></i>
           </span></button>
           <button class='btn-submit-qz btn-custom' disabled > Trả lời  </button>
-  
+
         </span>
 
       </div>
-        
+
+      % elif problem['name'] == 'Matching Problem':
+      ##<!-- <button type="button" class="submit btn-brand" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" data-should-enable-submit-button="${ should_enable_submit_button }" aria-describedby="submission_feedback_${short_id}" ${'' if should_enable_submit_button else 'disabled'}>
+      ##  <span class="submit-label ">Trả lời</span>
+      ##</button> -->##
+      <button type="button" class="submit btn-brand submit_matching_btn" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" data-should-enable-submit-button="${ should_enable_submit_button }" aria-describedby="submission_feedback_${short_id}" ${'' if should_enable_submit_button else 'disabled'}>
+        Trả lời
+      </button>
+
       %endif
 
       % if demand_hint_possible:
@@ -194,7 +410,7 @@ from openedx.core.djangolib.markup import HTML
               <button type="button" class="hint-button problem-action-btn btn-link btn-small" data-value="${_('Hint')}" ${'' if should_enable_next_hint else 'disabled'}>${_('Hint')}</button>
           </span>
         %endif
-   
+
       % endif
       % if save_button:
       <span class="problem-action-button-wrapper">
@@ -209,7 +425,7 @@ from openedx.core.djangolib.markup import HTML
           <button type="button" class="reset problem-action-btn btn-link btn-small" data-value="${_('Reset')}"><span aria-hidden="true">${_('Reset')}</span><span class="sr">${_("Reset your answer")}</span></button>
       </span>
       % endif
-      % if answer_available and problem['name'] != 'Quiz Problem Custom' :
+      % if answer_available and problem['name'] != 'Quiz Problem Custom':
       <span class="problem-action-button-wrapper">
           <button type="button" class="show problem-action-btn btn-link btn-small" aria-describedby="${ short_id }-problem-title"><span class="show-label">${_('Show answer')}</span></button>
       </span>
@@ -217,10 +433,12 @@ from openedx.core.djangolib.markup import HTML
     </div>
     <div class="submit-attempt-container">
 
-      % if problem['name'] != 'Quiz Problem Custom' :
+      % if problem['name'] != 'Quiz Problem Custom':
         <button type="button" class="submit btn-brand" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" data-should-enable-submit-button="${ should_enable_submit_button }" aria-describedby="submission_feedback_${short_id}" ${'' if should_enable_submit_button else 'disabled'}>
           <span class="submit-label">${ submit_button }</span>
-      </button>
+        </button>
+      % elif problem['name'] == 'Matching Problem':
+        <div>Test new condition</div>
       % endif
 
 
@@ -330,24 +548,24 @@ from openedx.core.djangolib.markup import HTML
       }
   </script>
 % if problem['name'] == 'Quiz Problem Custom':
-<script > 
+<script >
   const problemElement = document.querySelector('#quiz-problem-custom');
   if (problemElement){
     const problemList = problemElement.querySelectorAll('.wrapper-problem-response');
     const btnSubmit = document.querySelector('.btn-submit-qz')
     const btnNext = document.querySelector('#btn-next')
     const problemBtn = document.querySelector('#problem-buttom')
-  
-  
-    var currentIndex = 0;  
-  
-  
+
+
+    var currentIndex = 0;
+
+
     if ( btnSubmit && btnNext) {
       const divContainer = document.createElement('div');
       divContainer.classList.add('container-problem');
-      
-  
-      for (var i = 0; i < problemList.length; i++) {  
+
+
+      for (var i = 0; i < problemList.length; i++) {
         if(i > 0){
           problemList[i].style.display = 'none'
         }
@@ -355,18 +573,18 @@ from openedx.core.djangolib.markup import HTML
         spanElement.textContent = (i + 1).toString();
         spanElement.classList.add('problem-question-number');
         spanElement.setAttribute('data-problem-number-id', i.toString());
-        
+
         const submittedInput = problemList[i].querySelector('input.submitted');
         const incorrectLabel = problemList[i].querySelector('label.choicegroup_correct');
         const wrongLabel = problemList[i].querySelector('label.choicegroup_incorrect')
         const indicatorError = problemList[i].querySelector('.indicator-container')
-        
+
         indicatorError.style.display = 'none'
-        
-  
+
+
         if (i == 0){
           spanElement.classList.add('active-number')
-  
+
           if (submittedInput && incorrectLabel) {
             btnSubmit.style.display = 'none';
             btnNext.style.display = 'block';
@@ -376,12 +594,12 @@ from openedx.core.djangolib.markup import HTML
           }
           else if (submittedInput && wrongLabel){
             spanElement.classList.add('err-number-qusetion');
-  
+
           }
-            
-            
+
+
         }else {
-          
+
             if (submittedInput && incorrectLabel) {
           spanElement.classList.add('submitted-question');
           btnSubmit.style.display = 'none';
@@ -391,12 +609,12 @@ from openedx.core.djangolib.markup import HTML
           }
           else if (submittedInput && wrongLabel){
             spanElement.classList.add('err-number-qusetion');
-  
+
           }
         }
-  
+
         divContainer.appendChild(spanElement);
-  
+
         const checkInput = problemList[i].querySelectorAll('input[type="checkbox"], input[type="radio"]' )
         checkInput.forEach(input => {
           input.addEventListener('change', ()=>{
@@ -408,26 +626,26 @@ from openedx.core.djangolib.markup import HTML
             }
           });
         });
-  
-        
+
+
       }
-  
+
       problemElement.insertBefore(divContainer, problemElement.firstChild);
       if ( problemList.length == 1){
         document.querySelector('.container-problem').style.display= 'none'
       }
-      
-  
+
+
       const elementsError = document.querySelectorAll('.err-number-qusetion');
       elementsError.forEach((elementError) => {
         const numberError = elementError.textContent;
         const indicatorError = problemList[numberError - 1].querySelector('.indicator-container');
         indicatorError.style.display = 'block';
-        
+
         const existingMessgasBox = problemList[numberError - 1].querySelector('.feedback-hint-incorrect');
-        
+
         if (existingMessgasBox) {
-          existingMessgasBox.classList.add('error-problem-answer'); 
+          existingMessgasBox.classList.add('error-problem-answer');
           const title = problemList[numberError - 1].querySelector('.explanation-title');
           title.textContent = 'Câu trả lời của bạn chưa chính xác';
         } else {
@@ -439,61 +657,61 @@ from openedx.core.djangolib.markup import HTML
           title.textContent = 'Câu trả lời của bạn chưa chính xác';
           newMessgasBox.appendChild(title);
           problemList[numberError - 1].appendChild(newMessgasBox);
-      
+
         }
       });
-    
+
     const elementsSubmitted = document.querySelectorAll('.submitted-question')
     elementsSubmitted.forEach((element)=>{
       const numberSubmitted = element.textContent;
       const title = problemList[numberSubmitted - 1].querySelector('.explanation-title');
-  
+
       title.textContent = 'Bạn đã trả lời đúng';
-  
+
     })
-  
-  
+
+
       const btnNumber = document.querySelectorAll('.problem-question-number');
-  
+
       btnNumber.forEach(function(element) {
         element.addEventListener('click', function() {
           const numnberId = element.getAttribute('data-problem-number-id');
-  
+
           btnSubmit.setAttribute('disabled', true);
-  
+
           currentIndex = parseInt(numnberId, 10);
           btnNumber.forEach(function(btn) {
             btn.classList.remove('active-number');
           });
-        
+
           problemList.forEach(function(problem) {
             problem.style.display = 'none';
           });
-      
+
           const submittedInput = problemList[currentIndex].querySelector('input.submitted');
           const incorrectLabel = problemList[currentIndex].querySelector('label.choicegroup_correct');
           const wrongLabel = problemList[currentIndex].querySelector('label.choicegroup_incorrect')
-  
-  
+
+
           if (problemList[currentIndex]) {
             problemList[currentIndex].style.display = 'block';
           element.classList.add('active-number')
-  
+
           if (element.classList.contains('err-number-qusetion')) {
             const indicator = problemList[currentIndex].querySelector('.indicator-container')
             indicator.style.display = 'block';
-  
+
             btnNext.style.display = 'none';
             btnSubmit.style.display = 'block';
-  
+
             const messgasBox = problemList[currentIndex].querySelector('.feedback-hint-incorrect');
-            messgasBox.classList.add('error-problem-answer'); 
-  
-            
+            messgasBox.classList.add('error-problem-answer');
+
+
               const checkedInput = problemList[currentIndex].querySelectorAll('.field input:checked')
-          
+
               checkedInput.forEach(function (element,index) {
-                
+
                 const input = element;
                 const label = document.querySelector('label[for="' + element.id + '"]');
                 input.classList.add('submitted');
@@ -501,8 +719,8 @@ from openedx.core.djangolib.markup import HTML
                 label.classList.remove('choicegroup_correct')
                 label.classList.add( 'choicegroup_incorrect');
             });
-  
-  
+
+
           }
           if (incorrectLabel){
             btnNext.style.display = 'block';
@@ -511,17 +729,17 @@ from openedx.core.djangolib.markup import HTML
           else if (!incorrectLabel && !wrongLabel){
             btnNext.style.display = 'none';
             btnSubmit.style.display = 'block';
-  
+
           }
           else if (wrongLabel){
             btnNext.style.display = 'none';
             btnSubmit.style.display = 'block';
-  
-          
+
+
           }
-          
+
           const checkInput = problemList[currentIndex].querySelectorAll('input[type="checkbox"], input[type="radio"]' )
-  
+
           checkInput.forEach(input => {
             input.addEventListener('change', ()=>{
               const atLeastOneChecked = Array.from(checkInput).some(inp => inp.checked);
@@ -532,20 +750,20 @@ from openedx.core.djangolib.markup import HTML
               }
             });
           });
-  
+
           }
-  
-        
+
+
         });
-  
+
       });
-  
-      
-  
+
+
+
     }
-  
+
   }
- 
+
 
 </script>
 %endif
@@ -581,6 +799,7 @@ from openedx.core.djangolib.markup import HTML
         $('input', fromEle.parentElement).val($('input', fromEle.parentElement).data('left-value') + '+' + $(ev.currentTarget).data('right-value'))
       }
   }
+
 </script>
 <div>
 
