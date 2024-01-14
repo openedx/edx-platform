@@ -545,6 +545,7 @@ def component_handler(request, usage_key_string, handler, suffix=''):
             type_lab = request.POST.get('type_lab')
             CourseResultLab.createResultLab(block_id = usage_key_string , course_id=str(usage_key.course_key), result=resutl_lab,type=type_lab)
             return JsonResponse({"results":'success'})
+            
         if request.method == "GET" :
             try:
                 lab = CourseResultLab.getResultLab(block_id=usage_key_string)
