@@ -3,25 +3,6 @@
   navigation bar that can exist on any of the v1, v2 or bootstrap
   pages.
 */
-
-@mixin mobile-nav-item {
-  display: flex;
-  align-items: center;
-  padding: .75rem 1rem;
-  color: $color-active;
-  background-color: white;
-  font-weight: $fw-medium;
-  border: none;
-  border-bottom: 1px solid $color-stroke;
-  border-radius: 0;
-  font-family: $font-family-default;
-
-  &:hover {
-    color: $color-hover;
-    text-decoration: none;
-  }
-}
-
 .global-header {
   box-sizing: border-box;
   width: 100%;
@@ -108,7 +89,6 @@
       .nav-item {
         margin: 0 $baseline;
 
-
         a {
           text-decoration: none;
         }
@@ -153,11 +133,13 @@
 
       .secondary {
         @include float(right);
-        @include margin($baseline*0.75, 35px, 0, 0);
+        @include margin($baseline*0.75, $baseline*2, 0, 0);
 
         // All navigation items
         .nav-item {
+          font-size: $font-size-base;
           display: inline-block;
+          padding: $baseline/2 0 0;
           margin: 0 $baseline/2;
 
           &.nav-item-dropdown {
@@ -166,23 +148,45 @@
           }
 
           a {
-            @include btn;
+            color: theme-color("dark");
+            font-weight: $font-weight-normal;
           }
         }
 
 
         // Sign in, Register and Shopping Cart buttons
         .btn {
-          @include btn;
+          border: 1px solid theme-color("primary");
+          padding: $baseline/4 $baseline;
+          border-radius: $baseline/4;
+          cursor: pointer;
+          text-decoration: none;
         }
 
         a.sign-in-btn,
         .nav-item a.shopping-cart {
-          @include btn-primary;
+          background-color: theme-color("primary");
+          color: theme-color("inverse");
+          border: 1px solid theme-color("inverse");
+          font-weight: $font-weight-normal;
+          padding: $baseline/4 $baseline;
+
+          &:hover {
+            background-color: theme-color("inverse");
+            color: theme-color("primary");
+            border-color: theme-color("primary");
+          }
         }
 
         a.register-btn {
-          @include btn-secondary;
+          background: theme-color("inverse");
+          color: theme-color("primary");
+          font-weight: $font-weight-normal;
+
+          &:hover {
+            background-color: theme-color("primary");
+            color: theme-color("inverse");
+          }
         }
 
         // User information
@@ -344,7 +348,6 @@
   }
 
   @include media-breakpoint-down(md) {
-
     // Override standard styling for the mobile menu links
     .mobile-nav-link {
       position: static;
@@ -353,7 +356,29 @@
       padding: 0;
 
       a {
-        @include mobile-nav-item;
+        font-size: $font-size-base;
+        font-weight: 600;
+        text-decoration: none;
+        outline: none;
+        display: block;
+        background-color: theme-color('inverse');
+        border-radius: 0;
+        width: 100%;
+        padding: $baseline*0.6 $baseline;
+        border-bottom: 1px solid theme-color('light');
+        @include text-align(left);
+        cursor: pointer;
+
+        &:hover,
+        &:focus {
+          background-color: $gray-600;
+          color: theme-color('inverse');
+        }
+
+        &::after {
+          content: '\00BB';
+          padding-left: 4px;
+        }
       }
     }
   }
