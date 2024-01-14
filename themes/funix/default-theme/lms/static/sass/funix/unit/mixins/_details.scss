@@ -1,0 +1,233 @@
+@mixin unit-details {
+
+    // details - summary
+    details {
+        margin-bottom: 1rem;
+        padding: 0 1rem;
+        border-radius: $border-radius;
+        overflow: hidden;
+        transition: .2s;
+        max-height: none;
+
+        * {
+            line-height: 1.5 !important;
+        }
+
+        // -- auto subdued --
+        background: $color-subdued-light;
+        border-left: 2px solid $color-subdued;
+
+        >summary {
+            color: $color-subdued;
+        }
+
+        // ---
+
+        >summary {
+            list-style: none;
+            line-height: 1.5;
+            font: 500 1rem $font-family-default !important;
+            margin: 0 -1rem !important;
+            cursor: pointer;
+            padding: .75rem 1rem .75rem 1rem;
+            position: relative;
+
+            &::-webkit-details-marker {
+                display: none;
+            }
+
+            &::after {
+                position: absolute;
+                display: block;
+                content: '';
+                width: .5rem;
+                height: .5rem;
+                border-right: 2px solid $color-text-default;
+                border-bottom: 2px solid $color-text-default;
+                right: 1rem;
+                top: 50%;
+                transform: translateY(-50%) rotate(-45deg);
+                transition: .2s;
+            }
+        }
+
+        &[open] {
+            >summary {
+
+                &::after {
+                    transform: translateY(-50%) rotate(45deg);
+                }
+            }
+        }
+
+
+        &.details-primary {
+            background: $color-active-light;
+            border-left: 2px solid $color-active;
+
+            >summary {
+                color: $color-active;
+            }
+        }
+
+        &.details-subdued {
+            background: $color-subdued-light;
+            border-left: 2px solid $color-subdued;
+
+            >summary {
+                color: $color-subdued;
+            }
+        }
+
+        &.details-success {
+            background: $color-success-light;
+            border-left: 2px solid $color-success;
+
+            >summary {
+                color: $color-success;
+            }
+        }
+
+        &.details-warning {
+            background: $color-warning-light;
+            border-left: 2px solid $color-warning;
+
+            >summary {
+                color: $color-warning;
+            }
+        }
+
+        &.details-critical {
+            background: $color-critical-light;
+            border-left: 2px solid $color-critical;
+
+            >summary {
+                color: $color-critical;
+            }
+        }
+
+        &.details-leaf {
+            background: $color-leaf-light;
+            border-left: 2px solid $color-leaf;
+
+            >summary {
+                color: $color-leaf;
+            }
+        }
+    }
+
+    // =================== components ========================== 
+    // =================== info box ========================== 
+    .informa {
+        border-radius: $border-radius;
+        overflow: hidden;
+        padding: .75rem 1rem;
+        margin-bottom: 1rem;
+
+        >p {
+            font: 500 1rem $font-family-default !important;
+            margin-bottom: 0 !important;
+        }
+
+        >div {
+            margin: 0;
+            padding: 0;
+
+            p {
+                font: 400 1rem $font-family-default;
+                color: $color-text-default;
+                line-height: 1.5;
+            }
+
+            p,
+            ul {
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+
+            i,
+            span,
+            a {
+                font-size: inherit;
+                color: inherit;
+                font-weight: inherit;
+                font-family: inherit;
+            }
+
+            a {
+                color: $color-active;
+                font-weight: 500;
+                text-decoration: underline;
+
+                &:hover {
+                    color: $color-hover;
+                }
+            }
+        }
+
+        // -- auto subdued --
+        >p {
+            color: $color-subdued;
+        }
+
+        border-left: 2px solid $color-subdued;
+        background: $color-subdued-light;
+
+        // ----
+
+        &.informa-primary {
+            >p {
+                color: $color-active;
+            }
+
+            border-left: 2px solid $color-active;
+            background: $color-active-light;
+        }
+
+        &.informa-warning {
+            >p {
+                color: $color-warning;
+            }
+
+            border-left: 2px solid $color-warning;
+            background: $color-warning-light;
+        }
+
+        &.informa-success {
+            >p {
+                color: $color-success;
+            }
+
+            border-left: 2px solid $color-success;
+            background: $color-success-light;
+        }
+
+        &.informa-critical {
+            >p {
+                color: $color-critical;
+            }
+
+            border-left: 2px solid $color-critical;
+            background: $color-critical-light;
+        }
+
+        &.informa-subdued {
+            >p {
+                color: $color-subdued;
+            }
+
+            border-left: 2px solid $color-subdued;
+            background: $color-subdued-light;
+        }
+
+        &.informa-leaf {
+            >p {
+                color: $color-leaf;
+            }
+
+            border-left: 2px solid $color-leaf;
+            background: $color-leaf-light;
+        }
+    }
+}

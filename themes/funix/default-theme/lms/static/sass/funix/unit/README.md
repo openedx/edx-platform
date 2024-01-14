@@ -1,0 +1,1 @@
+This folder contains scss files used for only unit content.

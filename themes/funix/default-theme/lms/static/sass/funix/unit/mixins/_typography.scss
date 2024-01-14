@@ -1,0 +1,138 @@
+@mixin unit-typography {
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    .hd-1,
+    .hd-2,
+    .hd-3,
+    .hd-4,
+    .hd-5,
+    .hd-6 {
+        margin-bottom: 1.5rem;
+        font-weight: $fw-medium;
+        font-family: $font-family-default;
+        color: $color-text-default;
+    }
+
+    *:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) {
+
+        &+h1,
+        &+h2,
+        &+h3,
+        &+h4,
+        &+h5,
+        &+h6 {
+            padding-top: 1.5rem;
+        }
+    }
+
+    h1 {
+        font-size: $fz-h1;
+    }
+
+    h2 {
+        font-size: $fz-h2;
+    }
+
+    h3 {
+        font-size: $fz-h3;
+    }
+
+    h4 {
+        font-size: $fz-h4;
+    }
+
+    h5 {
+        font-size: $fz-h5;
+    }
+
+    h6 {
+        font-size: $fz-h6;
+    }
+
+    p {
+        font-size: $fz-p;
+        font-weight: $fw-normal;
+    }
+
+    p,
+    div,
+    article,
+    section,
+    aside,
+    fieldset,
+    ul,
+    ol {
+        margin: 0 0 1.5rem 0;
+    }
+
+    ul,
+    ol {
+        padding: 0 0 0 32px;
+
+        li {
+            margin-bottom: 0.375rem;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+
+        ul,
+        ol {
+            margin-bottom: 0;
+        }
+    }
+
+    ul {
+        list-style-type: disc;
+
+        ul {
+            list-style-type: circle;
+        }
+    }
+
+    span,
+    label,
+    i,
+    u,
+    strong,
+    b {
+        font-size: inherit;
+        color: inherit;
+        font-family: inherit;
+    }
+
+    strong,
+    b {
+        font-weight: $fw-medium;
+
+        * {
+            font-weight: inherit;
+        }
+    }
+
+    a {
+        color: $color-active;
+        font-weight: $fw-medium;
+        cursor: pointer;
+        text-decoration: none;
+
+        &:hover {
+            color: $color-hover;
+            text-decoration: none;
+
+        }
+    }
+
+    p+p,
+    ul+p,
+    ol+p {
+        margin-top: 0;
+    }
+
+}

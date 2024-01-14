@@ -1,0 +1,10 @@
+// used for many components
+
+@mixin unit-common {
+    @include unit-table;
+    @include unit-details;
+    @include unit-buttons;
+    @include unit-image;
+    @include unit-problem;
+    @include unit-typography;
+}

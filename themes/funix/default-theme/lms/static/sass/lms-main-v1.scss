@@ -2,5 +2,9 @@
 // Version 1 styling (pre-Pattern Library)
 // ====================
 
+@import 'funix/base/build';
+
 @import 'build-base-v1';
 @import 'build-lms-v1'; // shared app style assets/rendering
+
+@import 'funix/home/build';

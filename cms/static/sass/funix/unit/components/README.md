@@ -1,0 +1,1 @@
+Scss for specific component to avoid breaking other component such as video editor in Vdieo Component.
