@@ -127,7 +127,7 @@
 # Trung V. Nguyen <trung.ngvan@gmail.com>, 2015-2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Vietnamese (http://app.transifex.com/open-edx/edx-platform/language/vi/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:

@@ -114,7 +114,7 @@
 # 薛念林 <nlhsueh@mail.fcu.edu.tw>, 2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (Taiwan) (http://app.transifex.com/open-edx/edx-platform/language/zh_TW/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:

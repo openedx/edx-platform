@@ -62,7 +62,7 @@
 # Ειρήνη Απέργη, 2023
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Greek (http://app.transifex.com/open-edx/edx-platform/language/el/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
