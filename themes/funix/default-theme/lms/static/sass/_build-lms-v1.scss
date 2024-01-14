@@ -1,0 +1,96 @@
+// ------------------------------
+// LMS: Shared Build Compile
+
+// About: Sass compile for the LMS Elements that are shared between LTR and RTL UI. Configuration and vendor specific imports happen before this shared set of imports are compiled in the lms-main-*.scss files.
+
+// Base build
+@import 'base/build';
+
+// base - assets
+@import 'base/extends';
+@import 'base/animations';
+@import 'base/utilities';
+
+// base - starter
+@import 'base/base';
+
+// base - elements
+@import 'elements/banners';
+@import 'elements/controls';
+@import 'elements/creative-commons';
+@import 'elements/icons';
+@import 'elements/navigation';
+@import 'elements/pagination';
+@import 'elements/typography';
+
+// shared - course
+@import 'shared/fields';
+@import 'shared/forms';
+@import 'shared/footer';
+@import 'shared/footer-edx';
+@import 'shared/header';
+@import 'shared/course_object';
+@import 'shared/course_filter';
+@import 'shared/modal';
+@import 'shared/activation_messages';
+@import 'shared/unsubscribe';
+@import 'shared/help-tab';
+
+// shared - platform
+@import 'multicourse/home';
+@import 'multicourse/dashboard';
+@import 'multicourse/entitlement_dashboard';
+@import 'multicourse/account';
+@import 'multicourse/courses';
+@import 'multicourse/course_about';
+@import 'multicourse/jobs';
+@import 'multicourse/media-kit';
+@import 'multicourse/about_pages';
+@import 'multicourse/press_release';
+@import 'multicourse/error-pages';
+@import 'multicourse/help';
+@import 'multicourse/survey-page';
+
+// base - specific views
+@import 'views/account-settings';
+@import 'views/course-entitlements';
+@import 'views/login-register';
+@import 'views/verification';
+@import 'views/track_selection';
+@import 'views/decoupled-verification';
+@import 'views/shoppingcart';
+@import 'views/homepage';
+@import 'views/support';
+@import 'views/oauth2';
+@import 'views/financial-assistance';
+@import 'course/auto-cert';
+@import 'views/api-access';
+
+// features
+@import 'features/bookmarks-v1';
+@import "features/announcements";
+@import 'features/learner-profile';
+@import 'features/_unsupported-browser-alert';
+@import 'features/content-type-gating';
+@import 'features/course-duration-limits';
+
+// search
+@import 'search/search';
+@import 'search/instant-search';
+
+// news
+@import 'notifications';
+@import 'mixins';
+@import 'mixins-inherited';
+@import 'elements/system-feedback';
+
+// Responsive Design
+@import 'header';
+
+// overrides
+@import 'developer'; // used for any developer-created scss that needs further polish/refactoring
+@import 'shame';     // used for any bad-form/orphaned scss
+@import 'experiments';     // used for any ab tests and other experiments
+
+// Extra theme-specific rules
+@import 'lms/theme/extras';

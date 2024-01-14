@@ -71,3 +71,29 @@ select,
 textarea {
     font-family: inherit;
 }
+
+.btn,
+button.submit,
+.btn-default,
+.btn-primary,
+.btn-brand,
+.btn-upgrade,
+input[type=submit] {
+    @include btn-primary;
+}
+
+a:not(.btn):hover,
+a:not(.btn):focus,
+a:visited:not(.btn):hover,
+a:visited:not(.btn):focus {
+    color: $color-hover;
+    font-weight: $fw-medium;
+    text-decoration: none;
+}
+
+
+p+p,
+ul+p,
+ol+p {
+    margin-top: 0;
+}

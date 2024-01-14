@@ -4,11 +4,11 @@
     display: flex;
     justify-content: flex-end;
     padding-bottom: 0;
-    margin-bottom: -1rem;
+    margin-bottom: 1rem;
 
     form {
         padding: .2rem;
-        border: 1px solid var(--color-stroke);
+        border: 1px solid $color-stroke;
         border-radius: 4px;
         font-size: 1rem;
 
@@ -29,12 +29,12 @@
             border: none;
             outline: none;
             color: white;
-            background: var(--color-active);
+            background: $color-active;
 
             &:hover,
             &:active,
             &:focus {
-                background: var(--color-hover);
+                background: $color-hover;
                 box-shadow: none;
                 background-image: none;
             }

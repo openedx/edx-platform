@@ -25,8 +25,8 @@
 
   #welcome_title {
       font-weight: bold;
-      font-size: 3rem;
-      margin-bottom: 2rem;
+      font-size: 2.5rem;
+      margin-bottom: 0;
       color: #025dae;
       white-space: nowrap;
   }
@@ -47,7 +47,7 @@
 
       #welcome_title {
           font-size: calc(1.6rem + 1vw);
-          margin-bottom: 1.5rem;
+          margin-bottom: 0;
       }
 
       #welcome_description {

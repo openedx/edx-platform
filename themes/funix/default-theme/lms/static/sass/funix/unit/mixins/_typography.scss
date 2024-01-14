@@ -14,6 +14,8 @@
     .hd-6 {
         margin-bottom: 1.5rem;
         font-weight: $fw-medium;
+        font-family: $font-family-default;
+        color: $color-text-default;
     }
 
     *:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) {
@@ -28,6 +30,35 @@
         }
     }
 
+    h1 {
+        font-size: $fz-h1;
+    }
+
+    h2 {
+        font-size: $fz-h2;
+    }
+
+    h3 {
+        font-size: $fz-h3;
+    }
+
+    h4 {
+        font-size: $fz-h4;
+    }
+
+    h5 {
+        font-size: $fz-h5;
+    }
+
+    h6 {
+        font-size: $fz-h6;
+    }
+
+    p {
+        font-size: $fz-p;
+        font-weight: $fw-normal;
+    }
+
     p,
     div,
     article,
@@ -36,7 +67,7 @@
     fieldset,
     ul,
     ol {
-        margin-bottom: 1.5rem;
+        margin: 0 0 1.5rem 0;
     }
 
     ul,
@@ -79,6 +110,10 @@
     strong,
     b {
         font-weight: $fw-medium;
+
+        * {
+            font-weight: inherit;
+        }
     }
 
     a {

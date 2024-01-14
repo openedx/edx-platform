@@ -3,7 +3,10 @@
         tr {
             &:first-child {
                 background: #e6e6e8 !important;
-                font-weight: 500;
+
+                * {
+                    font-weight: 500;
+                }
             }
 
             &:nth-child(odd) {
@@ -12,6 +15,7 @@
 
             td {
                 padding: .75rem;
+                font-size: $fz-p;
             }
         }
     }

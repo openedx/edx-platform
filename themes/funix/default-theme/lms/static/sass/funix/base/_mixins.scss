@@ -5,6 +5,15 @@
     border-radius: 4px;
     display: inline-block;
     font-weight: 500;
+    font-family: $font-family-default;
+
+    &:hover {
+        text-decoration: none
+    }
+
+    &:disabled {
+        position: none;
+    }
 }
 
 @mixin btn-primary {
@@ -22,7 +31,6 @@
     &:disabled {
         background: $color-disable;
         border: 1px solid $color-disable;
-        pointer-events: none;
         color: white;
     }
 }
@@ -42,6 +50,24 @@
     &:disabled {
         color: white;
         border: 1px solid $color-text-inactive;
-        pointer-events: none;
+    }
+}
+
+@mixin btn-text {
+    @include btn;
+
+    border: none;
+    background: white;
+    color: $color-active;
+
+    &:hover {
+        color: $color-hover;
+        border: none;
+        background: white;
+    }
+
+    &:disabled {
+        color: $color-disable;
+        border: none;
     }
 }
