@@ -69,9 +69,9 @@ b {
   }
 }
 
-p + p,
-ul + p,
-ol + p {
+p+p,
+ul+p,
+ol+p {
   margin-top: $baseline;
 }
 
@@ -101,6 +101,7 @@ ul {
 }
 
 a {
+
   &:link,
   &:visited,
   &:hover,
