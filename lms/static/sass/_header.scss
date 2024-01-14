@@ -4,6 +4,9 @@
   pages.
 */
 
+@import 'funix/base/variables';
+@import 'funix/base/mixins';
+
 @mixin mobile-nav-item {
   display: flex;
   align-items: center;
