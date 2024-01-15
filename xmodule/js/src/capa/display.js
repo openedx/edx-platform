@@ -655,7 +655,9 @@
             var checkedInput = that.$('.field input:checked');
             var indicatorError = $(listQz[currentIndex]).find('.indicator-container');
             return $.postWithPrefix('' + this.url + '/problem_check', that.answers, function (response) {
+
               console.log(response);
+
     
               if (response.success === 'submitted' || response.success === 'incorrect' || response.success === 'correct') {
                 var problemQuestionNumbers = that.$('.problem-question-number');
@@ -664,19 +666,24 @@
                 var messagesProblem = listProblemParsed[currentIndex].querySelector('.message');
                 var indicatorErrorParsed = listProblemParsed[currentIndex].querySelector('.indicator-container');
                 var choicegroup = listQz[currentIndex].querySelector('.choicegroup , .capa_inputtype'); // choicegroup.appendChild(messagesProblem)
+
     
+
                 if (response.success === 'incorrect') {
                   var problemParsed = listProblemParsed[currentIndex];
                   var submittedInput = problemParsed.querySelector('input.submitted');
                   var incorrectLabel = problemParsed.querySelector('label.choicegroup_correct');
                   var wrongLabel = problemParsed.querySelector('label.choicegroup_incorrect');
+
                   $(listQz[currentIndex]).find('.indicator-container').css('display', 'none');
+
     
                   if (incorrectLabel && submittedInput) {
                     that.$('.btn-submit-qz').css('display', 'none');
                     that.$('#btn-next').css('display', 'block');
                     $(listQz[currentIndex]).find('.error-problem-answer').remove();
                     problemQuestionNumbers.each(function (index, element) {
+
      
                       if (element.textContent === (currentIndex + 1).toString()) {
             
@@ -702,6 +709,7 @@
                         }
     
                         // $(listQz[currentIndex]).find('.explanation-title').append('<span>Bạn đã trả lời đúng</span>');
+
                         indicatorError.css('display', 'none');
                         element.classList.remove('err-number-qusetion');
                         checkedInput.each(function () {
@@ -710,16 +718,20 @@
                           input.addClass('submitted');
                           input.addClass('success-problem');
                           label.addClass('response-label field-label label-inline choicegroup_correct');
+
                           if ( messagesProblem){
     
                             choicegroup.appendChild(messagesProblem);
                           }
+
                         });
                       }
                     });
                   } else {}
     
                   if (wrongLabel && submittedInput) {
+
+
                     indicatorError.css('display', 'none');
                     var indocatorName = $(indicatorError).find('.sr');
     
@@ -810,7 +822,9 @@
             var that = this;
             var listQz = that.$('.wrapper-problem-response');
             var problemQuestionNumbers = that.$('.problem-question-number');
+
             $('.btn-submit-qz').prop('disabled', true); 
+
     
             listQz[currentIndex].style.display = 'none';
             currentIndex += 1;
@@ -823,8 +837,10 @@
             var incorrectLabel = listQz[currentIndex].querySelector('label.choicegroup_correct');
             var wrongLabel = listQz[currentIndex].querySelector('label.choicegroup_incorrect');
             var elementNumber = problemQuestionNumbers[currentIndex];
+
             listQz[currentIndex].style.display = 'block'; 
     
+
     
             if (incorrectLabel && submittedInput) {
               that.$('.btn-submit-qz').css('display', 'none');
@@ -862,7 +878,9 @@
               } else {
                 element.classList.remove('active-number');
               }
+
             });
+
             var checkInput = $(listQz[currentIndex]).find('input[type="checkbox"], input[type="radio"]');
             checkInput.on('change', function () {
               var atLeastOneChecked = $('.field input:checked').length > 0;
@@ -874,9 +892,11 @@
               }
             });
     
+
             if (that.$('.submitted-question').length === currentIndex + 1) {
               that.$('#btn-next').css('display', 'none');
               that.$('#btn-next-lesson').css('display', 'block');
+
             }
           };
           
