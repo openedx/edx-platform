@@ -34,7 +34,7 @@ ENV SETTINGS production
 RUN mkdir -p /edx/etc/
 
 ENV VIRTUAL_ENV=/edx/app/edxapp/venvs/edxapp
-RUN python3.8 -m venv $VIRTUAL_ENV
+RUN python3.10 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 
