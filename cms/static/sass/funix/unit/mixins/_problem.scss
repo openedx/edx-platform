@@ -20,15 +20,15 @@
     }
 
     .messages-box {
-        padding: 0 1em .75em 1em;
+        padding: 0 1rem .75rem 1rem;
         border-radius: $border-radius;
         margin-bottom: 0;
         border-left: solid 2px $color-success;
         background-color: $color-success-light;
 
         .explanation-title {
-            padding-top: 0.75em;
-            margin-bottom: 0.5em;
+            padding-top: 0.75rem;
+            margin-bottom: 0.5rem;
             font-weight: 500;
             color: $color-success;
             padding-bottom: 0;
@@ -71,7 +71,7 @@
         overflow: hidden;
         border-radius: $border-radius;
         position: relative;
-        margin-bottom: 0.5em;
+        margin-bottom: 0.5rem;
 
         >input {
             position: absolute;
@@ -79,8 +79,8 @@
             height: 20px;
             max-width: 20px;
             position: absolute;
-            left: .75em;
-            top: calc(.75em + 1px);
+            left: .75rem;
+            top: calc(.75rem + 1px);
             margin: 0;
             accent-color: $color-active;
 
@@ -91,7 +91,7 @@
         }
 
         >label {
-            padding: .75em .75em .75em 3em;
+            padding: .75rem .75rem .75rem 3rem;
             display: block;
             width: 100%;
             border: none;
