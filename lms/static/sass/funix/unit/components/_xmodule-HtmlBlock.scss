@@ -2,5 +2,9 @@
 .course-wrapper .courseware-results-wrapper .vert-mod>div {
     .xmodule_display.xmodule_HtmlBlock {
         @include unit-common;
+
+        p {
+            line-height: 1.5 !important;
+        }
     }
 }
