@@ -14,9 +14,11 @@
             }
 
             td {
-                padding: .75em;
+                padding: .75rem;
                 font-size: $fz-p;
             }
         }
+
+        margin-bottom: $spacing-1;
     }
 }

@@ -1,0 +1,20 @@
+.wrapper-xblock.level-element article.xblock-render {
+    .xmodule_display.xmodule_VideoBlock {
+        
+        h3.hd.hd-2 {
+            margin-bottom: $spacing-1;
+            margin-top: $spacing-1;
+            font-weight: $fw-medium;
+            font-family: $font-family-default;
+            color: $color-text-default;
+            font-size: $fz-h3;
+        }
+
+        .video {
+            padding: 0;
+            margin: 0 0 $spacing-1 0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+    }
+}
