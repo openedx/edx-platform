@@ -55,7 +55,7 @@ from lms.djangoapps.ccx.utils import (
     parse_date,
 )
 from lms.djangoapps.courseware.field_overrides import disable_overrides
-from lms.djangoapps.grades.api import CourseGradeFactory
+from lms.djangoapps.grades.api import CourseGradeFactory, is_writable_gradebook_enabled
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
 from lms.djangoapps.instructor.views.gradebook_api import get_grade_book_page
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, assign_role
@@ -194,6 +194,12 @@ def dashboard(request, course, ccx=None):
         ) if is_course_licensing_enabled else []
         context['gradebook_url'] = reverse(
             'ccx_gradebook', kwargs={'course_id': ccx_locator})
+        writable_gradebook_url = configuration_helpers.get_value(
+            'WRITABLE_GRADEBOOK_URL',
+            getattr(settings, 'WRITABLE_GRADEBOOK_URL', None),
+        )
+        if is_writable_gradebook_enabled(ccx_locator) and writable_gradebook_url:
+            context['gradebook_url'] = f'{writable_gradebook_url}/{str(ccx_locator)}'
         context['grades_csv_url'] = reverse(
             'ccx_grades_csv', kwargs={'course_id': ccx_locator})
         context['grading_policy'] = json.dumps(grading_policy, indent=4)
