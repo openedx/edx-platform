@@ -12,18 +12,21 @@ from .api import get_chatbot_bearer_token, get_chatbot_api_url
 
 @require_http_methods('GET')
 @login_required
-def chatbot_fetch_query_list_view(request, session_id, page, limit):
+def chatbot_fetch_query_list_view(request, session_id, skip, limit):
     user = request.user
     
-    skip = (page - 1) * limit
     if session_id == '0':
         last_session = ChatbotSession.objects.filter(student=request.user).last()
 
         query_list = [] if last_session is None else last_session.chatbot_queries.order_by('-id').all()[skip:skip + limit]
-        total_page = 0 if last_session is None else math.ceil(last_session.chatbot_queries.count() / limit)
+        total = 0 if last_session is None else last_session.chatbot_queries.count()
+        total_page = math.ceil(total/limit)
     else:
         query_list = ChatbotQuery.objects.filter(session__student=user, session__id=session_id).order_by('-id')[skip:skip + limit]
-        total_page = math.ceil(ChatbotQuery.objects.filter(session__student=user, session__id=session_id).count() / limit)
+        total = ChatbotQuery.objects.filter(session__student=user, session__id=session_id).count()
+        total_page = math.ceil(total / limit)
+
+    remain_page = math.ceil((total - skip - limit)/limit)
 
 
     return JsonResponse(
@@ -32,7 +35,7 @@ def chatbot_fetch_query_list_view(request, session_id, page, limit):
             'data': {
                 'query_list': chatbot_query_list_serializer(query_list),
                 'total_page': total_page,
-                'remain_page': total_page - page,
+                'remain_page': remain_page,
             }
         }, 
         status=200
@@ -40,16 +43,21 @@ def chatbot_fetch_query_list_view(request, session_id, page, limit):
 
 @require_http_methods('GET')
 @login_required
-def chatbot_fetch_session_list_view(request, session_id, skip, limit):
+def chatbot_fetch_session_list_view(request, skip, limit):
     user = request.user
 
-    session_list = ChatbotQuery.objects.filter(student=user)
+    session_list = ChatbotSession.objects.filter(student=user).order_by('-id').all()[skip:skip + limit]
+    total = ChatbotSession.objects.filter(student=user).count()
+    total_page = math.ceil(total/limit)
+    remain_page = math.ceil((total - skip - limit)/limit)
 
     return JsonResponse(
         {
             'message': _('success'),
             'data': {
-                'session_list': chatbot_session_list_serializer(session_list)
+                'session_list': chatbot_session_list_serializer(session_list),
+                'total_page': total_page,
+                'remain_page': remain_page,
             }
         }, 
         status=200
