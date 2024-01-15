@@ -31,7 +31,8 @@
         &> .hd-3, 
         &> .hd-4, 
         &> .hd-5, 
-        &> .hd-6 {
+        &> .hd-6,
+        &> p {
             margin-top: $spacing-1;
         }
     }
@@ -47,7 +48,8 @@
     &> .hd-3, 
     &> .hd-4, 
     &> .hd-5, 
-    &> .hd-6 {
+    &> .hd-6,
+    &> p {
         margin-top: $spacing-1;
     }
 
