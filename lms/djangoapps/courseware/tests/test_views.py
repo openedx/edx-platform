@@ -365,7 +365,7 @@ class IndexQueryTestCase(ModuleStoreTestCase):
         self.client.login(username=self.user.username, password=self.user_password)
         CourseEnrollment.enroll(self.user, course.id)
 
-        with self.assertNumQueries(177, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
+        with self.assertNumQueries(178, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
             with check_mongo_calls(3):
                 url = reverse(
                     'courseware_section',
@@ -1491,8 +1491,8 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, "earned a certificate for this course.")
 
     @ddt.data(
-        (True, 53),
-        (False, 53),
+        (True, 54),
+        (False, 54),
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
@@ -1507,13 +1507,13 @@ class ProgressPageTests(ProgressPageBaseTests):
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.setup_course()
         with self.assertNumQueries(
-            53, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
+            54, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
         ), check_mongo_calls(2):
             self._get_progress_page()
 
         for _ in range(2):
             with self.assertNumQueries(
-                37, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
+                38, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
             ), check_mongo_calls(2):
                 self._get_progress_page()
 

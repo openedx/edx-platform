@@ -21,7 +21,7 @@ from rest_framework import status
 from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient, APITestCase
 
-from lms.djangoapps.discussion.config.waffle import ENABLE_LEARNERS_STATS
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.rest_api.utils import get_usernames_from_search_string
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -535,7 +535,6 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 "is_group_ta": False,
                 'is_user_admin': False,
                 "user_roles": ["Student"],
-                'learners_tab_enabled': False,
                 "edit_reasons": [{"code": "test-edit-reason", "label": "Test Edit Reason"}],
                 "post_close_reasons": [{"code": "test-close-reason", "label": "Test Close Reason"}],
             }
@@ -2842,7 +2841,6 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
             'division_scheme': 'cohort',
             'available_division_schemes': ['cohort'],
             'reported_content_email_notifications': False,
-            'reported_content_email_notifications_flag': False,
         }
 
     def patch_request(self, data, headers=None):
@@ -3259,7 +3257,7 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
 
 @ddt.ddt
 @httpretty.activate
-@override_waffle_flag(ENABLE_LEARNERS_STATS, True)
+@override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True)
 class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceMockMixin, APITestCase,
                               SharedModuleStoreTestCase):
     """

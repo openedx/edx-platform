@@ -49,7 +49,7 @@
 # YAHAYA MWAVURIZI <translations_1@camara.ie>, 2017
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Swahili (Kenya) (http://app.transifex.com/open-edx/edx-platform/language/sw_KE/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:

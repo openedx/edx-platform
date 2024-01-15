@@ -540,7 +540,7 @@ edx-django-utils==5.9.0
     #   openedx-blockstore
     #   ora2
     #   super-csv
-edx-drf-extensions==9.0.1
+edx-drf-extensions==9.1.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-completion
@@ -552,7 +552,7 @@ edx-drf-extensions==9.0.1
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.9.1
+edx-enterprise==4.9.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -931,7 +931,7 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/base.txt
 optimizely-sdk==4.1.1
     # via -r requirements/edx/base.txt
-ora2==6.0.24
+ora2==6.0.25
     # via -r requirements/edx/base.txt
 packaging==23.2
     # via
@@ -1468,7 +1468,7 @@ wrapt==1.16.0
     # via
     #   -r requirements/edx/base.txt
     #   deprecated
-xblock[django]==1.8.1
+xblock[django]==1.9.0
     # via
     #   -r requirements/edx/base.txt
     #   acid-xblock
