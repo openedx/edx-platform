@@ -19,6 +19,13 @@
         line-height: 1.5;
     }
 
+    p {
+        font-size: $fz-p;
+        font-weight: $fw-normal;
+        line-height: 1.5;
+        margin: 0 0 $spacing-1 0;
+    }
+
     div, section, article, aside {
         &> h1, 
         &> h2, 
@@ -96,13 +103,8 @@
         font-size: $fz-h6;
     }
 
-    p {
-        font-size: $fz-p;
-        font-weight: $fw-normal;
-        line-height: 1.5;
-    }
 
-    p,
+
     div,
     article,
     section,
