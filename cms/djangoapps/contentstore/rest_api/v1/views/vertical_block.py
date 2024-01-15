@@ -1,36 +1,30 @@
 """ API Views for unit page """
 
 import edx_api_doc_tools as apidocs
-from django.http import Http404, HttpResponseBadRequest
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import UsageKey
+from django.http import HttpResponseBadRequest
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from cms.djangoapps.contentstore.utils import get_container_handler_context
 from cms.djangoapps.contentstore.views.component import _get_item_in_course
-from cms.djangoapps.contentstore.rest_api.v1.serializers import ContainerHandlerSerializer
+from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import get_xblock
+from cms.djangoapps.contentstore.rest_api.v1.serializers import (
+    ContainerHandlerSerializer,
+    VerticalContainerSerializer,
+)
 from openedx.core.lib.api.view_utils import view_auth_classes
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
+from cms.djangoapps.contentstore.rest_api.v1.mixins import ContainerHandlerMixin
+
 
 @view_auth_classes(is_authenticated=True)
-class ContainerHandlerView(APIView):
+class ContainerHandlerView(APIView, ContainerHandlerMixin):
     """
     View for container xblock requests to get vertical data.
     """
-
-    def get_object(self, usage_key_string):
-        """
-        Get an object by usage-id of the block
-        """
-        try:
-            usage_key = UsageKey.from_string(usage_key_string)
-        except InvalidKeyError:
-            raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
-        return usage_key
 
     @apidocs.schema(
         parameters=[
@@ -140,4 +134,74 @@ class ContainerHandlerView(APIView):
                 'published_preview_link': lms_link,
             })
             serializer = ContainerHandlerSerializer(context)
+            return Response(serializer.data)
+
+
+@view_auth_classes(is_authenticated=True)
+class VerticalContainerView(APIView, ContainerHandlerMixin):
+    """
+    View for container xblock requests to get vertical state and children data.
+    """
+
+    @apidocs.schema(
+        parameters=[
+            apidocs.string_parameter(
+                "usage_key_string",
+                apidocs.ParameterLocation.PATH,
+                description="Vertical usage key",
+            ),
+        ],
+        responses={
+            200: VerticalContainerSerializer,
+            401: "The requester is not authenticated.",
+            404: "The requested locator does not exist.",
+        },
+    )
+    def get(self, request: Request, usage_key_string: str):
+        """
+        Get an object containing vertical state with children data.
+
+        **Example Request**
+
+            GET /api/contentstore/v1/container/vertical/{usage_key_string}/children
+
+        **Response Values**
+
+        If the request is successful, an HTTP 200 "OK" response is returned.
+
+        The HTTP 200 response contains a single dict that contains keys that
+        are the vertical's container children data.
+
+        **Example Response**
+
+        ```json
+        {
+            "children": [
+                {
+                    "name": "Drag and Drop",
+                    "block_id": "block-v1:org+101+101+type@drag-and-drop-v2+block@7599275ace6b46f5a482078a2954ca16"
+                },
+                {
+                    "name": "Video",
+                    "block_id": "block-v1:org+101+101+type@video+block@0e3d39b12d7c4345981bda6b3511a9bf"
+                },
+                {
+                    "name": "Text",
+                    "block_id": "block-v1:org+101+101+type@html+block@3e3fa1f88adb4a108cd14e9002143690"
+                }
+            ],
+            "is_published": false
+        }
+        ```
+        """
+        usage_key = self.get_object(usage_key_string)
+        current_xblock = get_xblock(usage_key, request.user)
+
+        with modulestore().bulk_operations(usage_key.course_key):
+            children = [
+                modulestore().get_item(child) for child in current_xblock.children
+            ]
+            is_published = not modulestore().has_changes(current_xblock)
+            container_data = {"children": children, "is_published": is_published}
+            serializer = VerticalContainerSerializer(container_data)
             return Response(serializer.data)
