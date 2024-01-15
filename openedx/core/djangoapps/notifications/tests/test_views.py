@@ -18,6 +18,7 @@ from rest_framework.test import APIClient, APITestCase
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
+from lms.djangoapps.discussion.toggles import ENABLE_REPORTED_CONTENT_NOTIFICATIONS
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
@@ -169,6 +170,7 @@ class CourseEnrollmentPostSaveTest(ModuleStoreTestCase):
 
 
 @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+@override_waffle_flag(ENABLE_REPORTED_CONTENT_NOTIFICATIONS, active=True)
 @ddt.ddt
 class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
     """
@@ -246,6 +248,7 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                         },
                         'new_discussion_post': {'web': False, 'email': False, 'push': False, 'info': ''},
                         'new_question_post': {'web': False, 'email': False, 'push': False, 'info': ''},
+                        'content_reported': {'web': True, 'email': True, 'push': True, 'info': ''},
                     },
                     'non_editable': {
                         'core': ['web']
