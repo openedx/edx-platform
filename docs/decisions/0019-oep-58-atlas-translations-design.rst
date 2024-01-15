@@ -110,26 +110,12 @@ we will use `openedx-atlas`_ to pull them from the
 `openedx-translations repo`_.
 
 
-New ``atlas_pull_plugin_translations`` command
+New ``pull_xblock_translations`` commands
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Introduce new Django commands to the ``edx-platform``:
+Introduce new Django command to the ``edx-platform``:
 
-- ``manage.py lms atlas_pull_plugin_translations --list``: List all XBlocks and
-  Plugins installed in the ``edx-platform`` virtual environment. This will
-  list the Python *module names* (as opposed to git repository names) of the
-  installed XBlocks and Plugins e.g.::
-
-    $ manage.py lms atlas_pull_plugin_translations --list
-    drag_and_drop_v2
-    done
-    eox_tenant
-
-  This list doesn't include plugins that are bundled within the
-  ``edx-platform`` repository itself. Translations for bundled plugins
-  are included in the ``edx-platform`` translation files.
-
-- ``manage.py lms atlas_pull_plugin_translations``: This command
+- ``manage.py lms pull_xblock_translations``: This command
   will pull translations for installed XBlocks and Plugins by module name::
 
     $ atlas pull --expand-glob \
@@ -181,6 +167,77 @@ Introduce new Django commands to the ``edx-platform``:
                 └── django.po
 
 
+
+Using XBlock python module names instead of repository names
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+There's more than one identifier for XBlocks and Plugins:
+
+#. **The XBlock/plugin tag:** Python plugins have an entry point name which
+   is referred to as ``tag`` in Open edX. For example, the
+   tag in the `Drag and Drop XBlock setup.py file`_ is ``drag-and-drop-v2``::
+
+     # xblock-drag-and-drop-v2/setup.py
+     entry_points={
+         'xblock.v1': 'drag-and-drop-v2 = drag_and_drop_v2:DragAndDropBlock',
+     }
+
+#. **The git repository name:** Each XBlock has a unique git repository name.
+   For example, the Drag and Drop XBlock has the ``xblock-drag-and-drop-v2``
+   repository name in GitHub: https://github.com/openedx/xblock-drag-and-drop-v2/
+
+#. **Python module name:** The python module name appears in the path of
+   XBlock translations in the `openedx-translations repo`_. For example,
+   the Drag and Drop XBlock will have ``drag_and_drop_v2`` python module name
+   in the translations directory structure::
+
+     translations/xblock-drag-and-drop-v2/drag_and_drop_v2/conf/locale/...
+
+
+The ``pull_xblock_translations`` command will use the Python module name
+instead of the repository name to pull translations from the
+`openedx-translations repo`_ via ``atlas``.
+
+Using the Python module name has the following pros and cons:
+
+**Pros:**
+
+- The python module name is available without needing to install the XBlock,
+  or parse the ``setup.py`` file.
+- It is available in Python runtime.
+- It is available in the `openedx-translations repo`_
+  file structure.
+- It is unique in the virtual environment which prevents
+  collisions.
+- The python module name of XBlocks doesn't change often if at all.
+
+**Cons:**
+
+- The python module name can be confused as the XBlock tag, which can
+  be different in some XBlocks.
+- The unique and stable identifier of XBlocks is the tag, not the
+  python module name. Therefore, this decision will implicitly make
+  the python module name another unique identifier for XBlocks.
+
+The trade-offs are acceptable and this decision is reversible in case
+the ``xblock.tag`` needs to be used. However, this will require parsing
+the ``setup.py`` file and/or installing the XBlock in order to get the tag
+in the `extract-translation-source-files.yml`_ workflow in the
+`openedx-translations repo`_.
+
+Using the ``django`` and ``djangojs`` gettext domains
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This proposal standardizes the gettext domain for XBlocks and Plugins to
+``django`` and ``djangojs``. This helps to unify the file names and avoid the
+need to add more complexity to the `openedx-translations repo`_ tooling.
+
+The `DjangoTranslation class`_ doesn't allow customizing the locale
+directory for ``django.mo`` files for caching reasons. Therefore,
+the `GNUTranslations class`_ will be used instead in the
+``create_js_namespaced_catalog`` helper function for generating
+JavaScript catalogs from ``django.mo`` files.
+
 BlockI18nService support for ``atlas`` Python translations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -201,22 +258,21 @@ Third-party XBlocks that are not included in the
 `xblocks Transifex project`_, such as the `Lime Survey XBlock`_,
 will benefit from this backwards compatibility.
 
-New ``compile_plugin_js_translations`` command
+New ``compile_xblock_translations`` command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 An ``XBlock.i18n_js_namespace`` property will be added for
-the ``compile_plugin_js_translations`` to generate JavaScript translations
+the ``compile_xblock_translations`` to generate JavaScript translations
 in a centrally managed manner for installed XBlocks.
 
-A ``compile_plugin_js_translations`` command will loop over XBlock
+A ``compile_xblock_translations`` command will loop over XBlock
 modules that has the ``i18n_js_namespace``
 property set and compile the JavaScript translations via the `compilejsi18n`_
 command.
 
 For example if the Drag and Drop XBlock has
 ``i18n_js_namespace = 'DragAndDropI18N'``, the
-``compile_plugin_js_translations`` command will execute the following
-commands::
+``compile_xblock_translations`` command will execute the equivalent of the following commands::
 
   i18n_tool generate -v  # Generate the .mo files
   python manage.py compilejsi18n --namespace DragAndDropI18N --output conf/plugins-locale/drag_and_drop_v2/js/
@@ -237,7 +293,7 @@ XBlocks as described in the :ref:`js-translations` section.
 
 For example, the `Drag and Drop XBlock get_static_i18n_js_url`_ will need to
 be updated to support the new ``XBlockI18nService``
-``get_javascript_locale_path`` method and the namespace.
+``get_javascript_i18n_catalog_url`` method and the namespace.
 
 .. code:: diff
 
@@ -256,10 +312,10 @@ be updated to support the new ``XBlockI18nService``
                return None
 
    +       # TODO: Make this the default once OEP-58 is implemented.
-   +       if hasattr(self.i18n_service, 'get_javascript_locale_path'):
-   +           atlas_locale_path = self.i18n_service.get_javascript_locale_path()
-   +           if atlas_locale_path:
-   +               return atlas_locale_path
+   +       if hasattr(self.i18n_service, 'get_javascript_i18n_catalog_url'):
+   +           i18n_catalog_url = self.i18n_service.get_javascript_i18n_catalog_url()
+   +           if i18n_catalog_url:
+   +               return i18n_catalog_url
 
            text_js = 'public/js/translations/{lang_code}/text.js'
            country_code = lang_code.split('-')[0]
@@ -360,3 +416,6 @@ be tackled in the future as part of the
 .. _xblocks Transifex project: https://www.transifex.com/open-edx/xblocks/
 
 .. _Lime Survey XBlock: https://github.com/eduNEXT/xblock-limesurvey
+.. _Drag and Drop XBlock setup.py file: https://github.com/openedx/xblock-drag-and-drop-v2/blame/192ecfc603a2314b2cb1105ebc7ba6991e459250/setup.py#L127-L129
+.. _DjangoTranslation class: https://github.com/django/django/blob/594873befbbec13a2d9a048a361757dd3cf178da/django/utils/translation/trans_real.py#L155-L161
+.. _GNUTranslations class: https://github.com/python/cpython/blob/b4144979934d7b8448f80c1fbee65dc3bfbce005/Lib/gettext.py#L528-L532
