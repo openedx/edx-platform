@@ -318,6 +318,7 @@ class ThreadSerializer(_ContentSerializer):
     close_reason = serializers.SerializerMethodField()
     closed_by = serializers.SerializerMethodField()
 
+
     non_updatable_fields = NON_UPDATABLE_THREAD_FIELDS
 
     def __init__(self, *args, **kwargs):
@@ -326,7 +327,7 @@ class ThreadSerializer(_ContentSerializer):
         # not have the pinned field set
         if self.instance and self.instance.get("pinned") is None:
             self.instance["pinned"] = False
-
+    
     def get_abuse_flagged_count(self, obj):
         """
         Returns the number of users that flagged content as abusive only if user has staff permissions

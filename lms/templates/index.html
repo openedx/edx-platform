@@ -8,39 +8,33 @@ from django.urls import reverse
 from openedx.core.djangolib.markup import HTML, Text
 %>
 
+## free banner url: https://www.vecteezy.com/vector-art/2294868-digital-learning-web-banner-design-students-study-with-mobile-phone-during-online-class-online-education-digital-classroom-e-learning-concept-header-or-footer-banner
+## banner img got from Vecteezy.com
+
 <main id="main" aria-label="Content" tabindex="-1">
     <section class="home">
       <header>
-        <div class="outer-wrapper">
-          <div class="title">
-            <div class="heading-group">
-              % if homepage_overlay_html:
-                ${homepage_overlay_html | n, decode.utf8}
-              % else:
-                <%include file="index_overlay.html" />
-              % endif
-            </div>
-            % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-              <div class="course-search">
-                <form method="get" action="/courses">
-                  <label><span class="sr">${_("Search for a course")}</span>
-                    <input class="search-input" name="search_query" type="text" placeholder="${_("Search for a course")}"></input>
-                  </label>
-                  <button class="search-button" type="submit">
-                    <span class="icon fa fa-search" aria-hidden="true"></span><span class="sr">${_("Search")}</span>
-                  </button>
-                </form>
-              </div>
-            % endif
-
+        <img id="learning_banner_img" src="${static.url('images/index_learning_banner.jpg')}" alt="Vecteezy.com" />
+        <div id="learning_banner_inner">
+          <div>
+              <p id="welcome_title">Welcome to Funix</p>
+              <p id="welcome_description">Cơ hội cho bất kỳ ai muốn học CNTT một cách bài bản, chủ động, hiệu quả.</p>
           </div>
-
-          <%include file="index_promo_video.html" />
         </div>
-
       </header>
-      <%include file="${courses_list}" />
 
+      % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
+      <div class="course_search">
+        <form method="get" action="/courses">
+            <input class="search-input" name="search_query" type="text" placeholder="${_("Search for a course")}"></input>
+          <button class="search-button" type="submit">
+            <span class="icon fa fa-search" aria-hidden="true"></span><span class="sr">${_("Search")}</span>
+          </button>
+        </form>
+      </div>
+      % endif
+
+      <%include file="${courses_list}" />
     </section>
 </main>
 

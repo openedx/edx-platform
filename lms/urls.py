@@ -1065,13 +1065,15 @@ urlpatterns += [
    
 ]
 
-from lms.djangoapps.funix_portal_api.views import UpdateUserPasswordAPIView, CreateUserAPIView, GradeLearningProjectXblockAPIView
+from lms.djangoapps.funix_portal_api.views import UpdateUserPasswordAPIView, CreateUserAPIView, GradeLearningProjectXblockAPIView,get_portal_host, get_resume_path
 
 # funix portal api
 urlpatterns +=[
     path ('api/funix_portal/user/update_password', UpdateUserPasswordAPIView.as_view() , name='funix_portal_update_password'),
     path ('api/funix_portal/user/create_user', CreateUserAPIView.as_view() , name='funix_portal_create_user'),
     path ('api/funix_portal/project/grade_project', GradeLearningProjectXblockAPIView.as_view() , name='funix_portal_grade_learning_project'),
+    path ('api/funix_portal/portal_host',get_portal_host , name='funix_portal_host'),
+    re_path(r'api/course_resume_path/{}/(?P<location>.*)$'.format(settings.COURSE_ID_PATTERN),get_resume_path , name='get_resume_path_for_mfe'),
 ]
 
 # assignmentxblock-xblock js translation

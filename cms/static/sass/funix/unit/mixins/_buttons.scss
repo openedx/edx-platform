@@ -1,0 +1,10 @@
+@mixin unit-buttons {
+
+    button.submit,
+    .btn-default,
+    .btn-primary,
+    .btn-brand,
+    .btn-upgrade {
+        @include btn-primary;
+    }
+}

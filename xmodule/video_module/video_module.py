@@ -126,8 +126,8 @@ class VideoBlock(
             <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.ogv"/>
         </video>
     """
-    has_custom_completion = True
-    completion_mode = XBlockCompletionMode.COMPLETABLE
+    has_custom_completion = False
+    # completion_mode = XBlockCompletionMode.COMPLETABLE
 
     video_time = 0
     icon_class = 'video'

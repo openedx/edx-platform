@@ -1,6 +1,6 @@
 import json
 import logging
-from django.http import HttpResponse
+from django.http import HttpResponse,JsonResponse
 from common.djangoapps.student.models import User
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -18,6 +18,11 @@ from common.djangoapps.student.helpers import do_create_account, AccountValidati
 from .validators import funix_user_validator
 from lms.djangoapps.ora_staff_grader.utils import call_xblock_json_handler, is_json
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from opaque_keys.edx.keys import UsageKey, CourseKey
+from opaque_keys import InvalidKeyError
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
+from openedx.features.course_experience.url_helpers import get_courseware_url
+from common.djangoapps.util.course import course_location_from_key
 
 def check_missing_fields(fields, data):
     errors = {}
@@ -404,3 +409,70 @@ class GradeLearningProjectXblockAPIView(APIView):
         return Response(data={
             "message": "Graded",
         }, status=status.HTTP_200_OK)
+    
+def get_portal_host(request):
+    from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+    from django.contrib.sites.models import Site
+    from django.conf import settings
+
+    def get_site_config(domain, setting_name, default_value=None):
+        try:
+            site = Site.objects.filter(domain=domain).first()
+            if site is None: 
+                print('NOT FOUND SITE')
+                return default_value
+            site_config = SiteConfiguration.objects.filter(site=site).first()
+            if site_config is None:
+                print('NOT FOUND SITE CONFIG')
+                return default_value
+
+            return site_config.get_value(setting_name, default_value)
+        except Exception as e:
+            print(str(e))
+            return None
+
+    LMS_BASE = settings.LMS_BASE
+    PORTAL_HOST = get_site_config(LMS_BASE, 'PORTAL_HOST') 
+    return  JsonResponse( {
+            'HOST':PORTAL_HOST
+            }
+        ,
+        status=200)
+
+def get_resume_path(request, course_id, location):
+
+    try:
+        course_key = CourseKey.from_string(course_id)
+        usage_key = UsageKey.from_string(location).replace(course_key=course_key)
+    except InvalidKeyError as exc:
+        return  JsonResponse({
+                'message': 'Invalid usage key or course key.'
+            }
+            ,
+            status=400
+        )
+
+    try:
+        redirect_url = get_courseware_url(
+            usage_key=usage_key,
+            request=request,
+        )
+    except (ItemNotFoundError, NoPathToItem):
+        # We used to 404 here, but that's ultimately a bad experience. There are real world use cases where a user
+        # hits a no-longer-valid URL (for example, "resume" buttons that link to no-longer-existing block IDs if the
+        # course changed out from under the user). So instead, let's just redirect to the beginning of the course,
+        # as it is at least a valid page the user can interact with...
+        redirect_url = get_courseware_url(
+            usage_key=course_location_from_key(course_key),
+            request=request,
+        )
+
+    return  JsonResponse({
+            'message': 'Success',
+            'data': {
+                'redirect_url': redirect_url
+            },
+        }
+        ,
+        status=200
+    )
