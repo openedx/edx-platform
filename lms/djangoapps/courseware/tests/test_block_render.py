@@ -81,7 +81,7 @@ from lms.djangoapps.courseware.tests.tests import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.credit.api import set_credit_requirement_status, set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse
-from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
+from openedx.core.djangoapps.oauth_dispatch.jwt import _create_jwt, create_jwt_for_user
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFactory, ApplicationFactory
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.gating import api as gating_api
@@ -374,6 +374,26 @@ class BlockRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         headers = {'HTTP_AUTHORIZATION': 'JWT ' + token}
         response = self.client.post(dispatch_url, {}, **headers)
         assert 200 == response.status_code
+
+    def test_jwt_authentication_with_restricted_application(self):
+        """Test that the XBlock endpoint disallows JWT authentication with restricted applications."""
+
+        def _mock_create_restricted_jwt(*args, **kwargs):
+            """Pass an additional argument to `_create_jwt` without modifying the signature of `create_jwt_for_user`."""
+            kwargs['is_restricted'] = True
+            return _create_jwt(*args, **kwargs)
+
+        with patch('openedx.core.djangoapps.oauth_dispatch.jwt._create_jwt', _mock_create_restricted_jwt):
+            token = create_jwt_for_user(self.mock_user)
+
+        dispatch_url = self._get_dispatch_url()
+        headers = {'HTTP_AUTHORIZATION': 'JWT ' + token}
+
+        response = self.client.get(dispatch_url, {}, **headers)
+        assert 403 == response.status_code
+
+        response = self.client.post(dispatch_url, {}, **headers)
+        assert 403 == response.status_code
 
     def test_missing_position_handler(self):
         """
