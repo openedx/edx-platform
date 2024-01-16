@@ -6,11 +6,11 @@
 #
 chardet==5.2.0
     # via diff-cover
-coverage==7.3.2
+coverage==7.4.0
     # via -r requirements/edx/coverage.in
-diff-cover==8.0.1
+diff-cover==8.0.2
     # via -r requirements/edx/coverage.in
-jinja2==3.1.2
+jinja2==3.1.3
     # via diff-cover
 markupsafe==2.1.3
     # via jinja2
