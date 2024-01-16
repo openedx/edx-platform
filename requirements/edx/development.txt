@@ -1324,7 +1324,7 @@ optimizely-sdk==4.1.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-ora2 @ git + https://github.com/openedx/edx-ora2@nsprenkle/reduce-duplicate-update-calls
+@ git+https://github.com/openedx/edx-ora2@nsprenkle/reduce-duplicate-update-calls
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt

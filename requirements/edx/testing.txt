@@ -989,7 +989,7 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/base.txt
 optimizely-sdk==4.1.1
     # via -r requirements/edx/base.txt
-ora2 @ git + https://github.com/openedx/edx-ora2@nsprenkle/reduce-duplicate-update-calls
+@ git+https://github.com/openedx/edx-ora2@nsprenkle/reduce-duplicate-update-calls
     # via -r requirements/edx/base.txt
 packaging==23.2
     # via
