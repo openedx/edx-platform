@@ -1,5 +1,11 @@
 @mixin unit-typography {
 
+    font-size: 16px;
+
+    * {
+        font-size: 16px;
+    }
+
     h1,
     h2,
     h3,
@@ -103,9 +109,6 @@
         font-size: $fz-h6;
     }
 
-
-
-  
     div,
     article,
     section,
@@ -113,15 +116,15 @@
     fieldset,
     ul,
     ol {
-        margin: 0 0 1.5rem 0;
+        margin: 0 0 1.5em 0;
     }
 
     ul,
     ol {
-        padding: 0 0 0 24px;
+        padding: 0 0 0 $spacing-1;
 
         li {
-            margin-bottom: 0.375rem;
+            margin-bottom: 0.375em;
 
             &:last-child {
                 margin-bottom: 0;
