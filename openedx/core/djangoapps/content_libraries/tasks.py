@@ -102,7 +102,7 @@ def _import_block(store, user_id, source_block, dest_parent_key):
             branch='library'
         )
         derived_block_key = derive_key(
-            source=source_key_as_v1_course_key.make_usage_key(source_key.block_type, source_key.usage_id),
+            source=source_key_as_v1_course_key.make_usage_key(source_key.block_type, source_key.block_id),
             dest_parent=BlockKey(dest_parent_key.block_type, dest_parent_key.block_id),
         )
         return dest_parent_key.context_key.make_usage_key(*derived_block_key)
