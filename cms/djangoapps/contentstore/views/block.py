@@ -28,7 +28,7 @@ from openedx.core.lib.xblock_utils import (
 from xmodule.modulestore.django import (
     modulestore,
 )  # lint-amnesty, pylint: disable=wrong-import-order
-
+from cms.djangoapps.contentstore.toggles import use_tagging_taxonomy_list_page
 
 from xmodule.x_module import (
     AUTHOR_VIEW,
@@ -51,7 +51,10 @@ from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
     get_xblock,
     delete_orphans,
 )
-from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import usage_key_with_run
+from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import (
+    usage_key_with_run,
+    get_children_tags_count,
+)
 
 
 __all__ = [
@@ -230,6 +233,11 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
             force_render = request.GET.get("force_render", None)
 
+            # Fetch tags of children components
+            tags_count_map = {}
+            if use_tagging_taxonomy_list_page():
+                tags_count_map = get_children_tags_count(xblock)
+
             # Set up the context to be passed to each XBlock's render method.
             context = request.GET.dict()
             context.update(
@@ -245,6 +253,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
                     "paging": paging,
                     "force_render": force_render,
                     "item_url": "/container/{usage_key}",
+                    "tags_count_map": tags_count_map,
                 }
             )
             fragment = get_preview_fragment(request, xblock, context)

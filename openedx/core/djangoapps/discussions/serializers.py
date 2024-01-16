@@ -7,7 +7,6 @@ from lti_consumer.models import LtiConfiguration
 from rest_framework import serializers
 from xmodule.modulestore.django import modulestore
 
-from lms.djangoapps.discussion.toggles import ENABLE_REPORTED_CONTENT_EMAIL_NOTIFICATIONS
 from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course_task
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.lib.courses import get_course_by_id
@@ -423,8 +422,6 @@ class DiscussionSettingsSerializer(serializers.Serializer):
             'division_scheme': instance.division_scheme,
             'available_division_schemes': available_division_schemes(course_key),
             'reported_content_email_notifications': instance.reported_content_email_notifications,
-            'reported_content_email_notifications_flag':
-                ENABLE_REPORTED_CONTENT_EMAIL_NOTIFICATIONS.is_enabled(course_key),
         }
         return payload
 

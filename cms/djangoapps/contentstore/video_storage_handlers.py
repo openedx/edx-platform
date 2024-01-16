@@ -685,7 +685,6 @@ def _get_index_videos(course, pagination_conf=None):
         Get data for predefined video attributes.
         """
         values = {}
-        values["usage_locations"] = get_video_usage_path(course.id, video["edx_video_id"])['usage_locations']
         for attr in attrs:
             if attr == 'courses':
                 current_course = [c for c in video['courses'] if course_id in c]

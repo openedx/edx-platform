@@ -264,6 +264,7 @@
         .wrapper-tag-header {
           display: flex;
           justify-content: space-between;
+          border: 1px dotted transparent;
 
           .tag-title {
             font-weight: bold;
@@ -277,8 +278,8 @@
           }
         }
 
-        .wrapper-tag-header:focus {
-          border: 1px dotted gray;
+        .wrapper-tag-header:focus-visible {
+          border-color: $gray;
         }
 
         .action-primary {
@@ -313,9 +314,16 @@
               }
             }
 
-            .tagging-label:hover,
-            .tagging-label:focus {
+            .tagging-label-link {
+              border: 1px dotted transparent;
+            }
+
+            .tagging-label-link:hover {
               color: $blue;
+            }
+
+            .tagging-label-link:focus-visible {
+              border-color: $gray;
             }
 
             .icon {

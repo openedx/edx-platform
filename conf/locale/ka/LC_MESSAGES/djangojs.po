@@ -9,7 +9,7 @@
 # Lasha Kokilashvili, 2016,2018
 # Natia Gogua <natiagogua79@gmail.com>, 2016
 # Nino Asatiani <niasatiani110@gmail.com>, 2016
-# Razmik Badalyan <badalyanrazmik@gmail.com>, 2016
+# რაზმიკ ბადალიანი <badalyanrazmik@gmail.com>, 2016
 # Razmik Badalyan <rbadalyan@educaregeorgia.com>, 2016
 # Simon Janashia <sjanashia@aat.ge>, 2019
 # Tamta Tchumburidze <tamtatioon@gmail.com>, 2016
@@ -45,7 +45,7 @@
 # Lasha Kokilashvili, 2018
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Georgian (http://app.transifex.com/open-edx/edx-platform/language/ka/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -56,7 +56,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-12-03 20:43+0000\n"
+"POT-Creation-Date: 2024-01-07 20:43+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Lasha Kokilashvili, 2018\n"
 "Language-Team: Georgian (http://app.transifex.com/open-edx/edx-platform/language/ka/)\n"
@@ -743,6 +743,7 @@ msgstr "თემა"
 msgid "Select a category"
 msgstr ""
 
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "ანგარიშის პარამეტრები"
@@ -2809,24 +2810,6 @@ msgstr ""
 
 #: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 msgid "Go to dashboard"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid "Recommendations for you"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid "loading"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid ""
-"Browse recently launched courses and see what's new in your favorite "
-"subjects."
-msgstr ""
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid "Explore courses"
 msgstr ""
 
 #: lms/static/js/learner_dashboard/Static2UCallouts.jsx
@@ -7873,13 +7856,13 @@ msgid "Financial Assistance Application"
 msgstr "განცხადება ფინანსური მხარდაჭერის შესახებ"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid "About You"
-msgstr "თქვენ შესახებ"
+msgid "Profile Information"
+msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
-"The following information is already a part of your {platform} profile. "
-"We've included it here for your application."
+"The following information is already a part of your {platform} profile and "
+"is required for your application. To edit this information go to "
 msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
@@ -7895,8 +7878,8 @@ msgid "Country of residence"
 msgstr "ქვეყანა რომელშიც ცხოვრობთ"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid "Back to {platform} FAQs"
-msgstr "უკან, {platform}-ის ხშირად დასმულ კითხვებთან"
+msgid "Application Details"
+msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Submit Application"

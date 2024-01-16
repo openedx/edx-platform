@@ -31,7 +31,6 @@ from common.djangoapps.student.roles import (
 from openedx.core.djangoapps.content_libraries.api import (
     AccessLevel,
     create_library,
-    COMPLEX,
     set_library_user_permissions,
 )
 from openedx.core.djangoapps.content_tagging.models import TaxonomyOrg
@@ -104,12 +103,8 @@ class TestTaxonomyObjectsMixin:
             collection_uuid=self.collection.uuid,
             org=self.orgA,
             slug="lib_a",
-            library_type=COMPLEX,
             title="Library Org A",
             description="This is a library from Org A",
-            allow_public_learning=False,
-            allow_public_read=False,
-            library_license="",
         )
 
     def _setUp_users(self):
@@ -282,7 +277,8 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
             user_attr: str,
             expected_taxonomies: list[str],
             enabled_parameter: bool | None = None,
-            org_parameter: str | None = None
+            org_parameter: str | None = None,
+            unassigned_parameter: bool | None = None
     ) -> None:
         """
         Helper function to call the list endpoint and check the response
@@ -293,7 +289,11 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
         self.client.force_authenticate(user=user)
 
         # Set parameters cleaning empty values
-        query_params = {k: v for k, v in {"enabled": enabled_parameter, "org": org_parameter}.items() if v is not None}
+        query_params = {k: v for k, v in {
+            "enabled": enabled_parameter,
+            "org": org_parameter,
+            "unassigned": unassigned_parameter,
+        }.items() if v is not None}
 
         response = self.client.get(url, query_params, format="json")
 
@@ -362,6 +362,31 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
             org_parameter=org_parameter,
             expected_taxonomies=expected_taxonomies,
         )
+
+    def test_list_unassigned_taxonomies(self):
+        """
+        Test that passing in "unassigned" query param returns Taxonomies that
+        are unassigned. i.e. does not belong to any org
+        """
+        self._test_list_taxonomy(
+            user_attr="staff",
+            expected_taxonomies=["ot1", "ot2"],
+            unassigned_parameter=True,
+        )
+
+    def test_list_unassigned_and_org_filter_invalid(self) -> None:
+        """
+        Test that passing "org" and "unassigned" query params should throw an error
+        """
+        url = TAXONOMY_ORG_LIST_URL
+
+        self.client.force_authenticate(user=self.user)
+
+        query_params = {"org": "orgA", "unassigned": "true"}
+
+        response = self.client.get(url, query_params, format="json")
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @ddt.data(
         ("user", (), None),

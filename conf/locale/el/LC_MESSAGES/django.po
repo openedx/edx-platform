@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Greek (http://app.transifex.com/open-edx/edx-platform/language/el/).
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -62,7 +62,7 @@
 # Ειρήνη Απέργη, 2023
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Greek (http://app.transifex.com/open-edx/edx-platform/language/el/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -100,7 +100,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-11-19 20:43+0000\n"
+"POT-Creation-Date: 2023-12-31 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Greek (https://app.transifex.com/open-edx/teams/6205/el/)\n"
@@ -286,6 +286,7 @@ msgid "You're enrolled as an honor code student"
 msgstr ""
 
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
+#: lms/djangoapps/courseware/views/views.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
@@ -1623,10 +1624,10 @@ msgid ""
 "able to log back into your account until you have activated it."
 msgstr ""
 "Έχετε σχεδόν ολοκληρώσει την εγγραφή σας! Κάντε κλικ στο κουμπί που θα "
-"βρείτε λίγο παρακάτω για να ενεργοποιήσετε το λογαριασμό σας και να "
-"αποκτήσετε πρόσβαση στα συναρπαστικά και υψηλής ποιότητας μαθήματα του  "
-"%(platform_name)s.  Υπενθυμίζουμε πως δεν θα μπορέσετε να ξανασυνδεθείτε  "
-"στο λογαριασμό σας εάν δεν τον ενεργοποιήσετε."
+"βρείτε λίγο παρακάτω, για να ενεργοποιήσετε τον λογαριασμό σας και να "
+"αποκτήσετε πρόσβαση στα μαθήματα του  %(platform_name)s.  Υπενθυμίζουμε πως "
+"δε θα μπορέσετε να συνδεθείτε στον λογαριασμό σας, εάν δεν τον "
+"ενεργοποιήσετε πρώτα."
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
 msgid "Activate your account"
@@ -1657,7 +1658,7 @@ msgid ""
 "attempted to create an account on %(platform_name)s using this email "
 "address."
 msgstr ""
-"Το μήνυμα αυτό στάλθηκε αυτόματα από το %(lms_url)s γιατί  κάποιος "
+"Το μήνυμα αυτό στάλθηκε αυτόματα από το %(lms_url)s, γιατί  κάποιος "
 "προσπάθησε να δημιουργήσει λογαριασμό στο %(platform_name)s χρησιμοποιώντας "
 "τη συγκεκριμένη διεύθυνση ηλεκτρονικού ταχυδρομείου."
 
@@ -1817,7 +1818,7 @@ msgid ""
 "                "
 msgstr ""
 "\n"
-"Αγαπητέ/αγαπητή %(full_name)s,"
+"Αγαπητέ/Αγαπητή %(full_name)s,"
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.html
 #, python-format
@@ -1874,7 +1875,7 @@ msgstr ""
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
 #, python-format
 msgid "Hello %(full_name)s"
-msgstr "Αγαπητέ/αγαπητή %(full_name)s"
+msgstr "Αγαπητέ/Αγαπητή %(full_name)s,"
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
 #, python-format
@@ -3260,36 +3261,14 @@ msgid "Certificate is being created."
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
-#, python-brace-format
 msgid ""
-"{platform_name} now offers financial assistance for learners who want to earn Verified Certificates but who may not be able to pay the Verified Certificate fee. Eligible learners may receive up to 90{percent_sign} off the Verified Certificate fee for a course.\n"
-"To apply for financial assistance, enroll in the audit track for a course that offers Verified Certificates, and then complete this application. Note that you must complete a separate application for each course you take.\n"
-" We plan to use this information to evaluate your application for financial assistance and to further develop our financial assistance program."
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Annual Household Income"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your current financial situation. Why do you need assistance?"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your learning or professional goals. How will a Verified "
-"Certificate in this course help you achieve these goals?"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your plans for this course. What steps will you take to help "
-"you complete the course work and receive a certificate?"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Use between 1250 and 2500 characters or so in your response."
+"We plan to use this information to evaluate your application for financial assistance and to further develop our financial assistance program. Please note that while \n"
+"assistance is available in most courses that offer verified certificates, a few courses and programs are not eligible. You must complete a separate application \n"
+"for each course you take. You may be approved for financial assistance five (5) times each year (based on 12-month period from you first approval). \n"
+"To apply for financial assistance: \n"
+"1. Enroll in the audit track for an eligible course that offers Verified Certificates \n"
+"2. Complete this  application \n"
+"3. Check your email, your application will be reviewed in 3-4 business days"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
@@ -3300,14 +3279,25 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
-msgid "Specify your annual household income in US Dollars."
+msgid "I certify that: "
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"Paying the verified certificate fee for the above course would cause me "
+"economic hardship"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"I will work diligently to complete the course work and receive a certificate"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid ""
-"I allow {platform_name} to use the information provided in this application "
-"(except for financial information) for {platform_name} marketing purposes."
+"I have read, understand, and will abide by the {honor_code_link} for the edX"
+" Site"
 msgstr ""
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
@@ -5396,7 +5386,7 @@ msgstr ""
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
 #, python-format
 msgid "Hello %(full_name)s,"
-msgstr "Αγαπητέ/αγαπητή %(full_name)s,"
+msgstr "Αγαπητέ/Αγαπητή %(full_name)s,"
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
@@ -5423,7 +5413,7 @@ msgstr ""
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
 #, python-format
 msgid "Hello %(full_name)s, "
-msgstr "Αγαπητέ/αγαπητή %(full_name)s,"
+msgstr "Αγαπητέ/Αγαπητή %(full_name)s,"
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/subject.txt
 #, python-format
@@ -6668,6 +6658,9 @@ msgid ""
 "eligibility email content which is sent when user has met all credit "
 "eligibility requirements."
 msgstr ""
+"Περιεχόμενο απλού κειμένου ή html για εμφάνιση προσαρμοσμένου μηνύματος "
+"εντός περιεχομένου email επιλεξιμότητας αναγνώρισης, το οποίο αποστέλλεται "
+"όταν ο χρήστης πληροί όλες τις απαιτήσεις καταλληλότητας αναγνώρισης."
 
 #: openedx/core/djangoapps/credit/models.py
 msgid ""
@@ -7576,6 +7569,10 @@ msgid "The '{field_name}' field cannot be edited."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
+msgid "Full name can't be longer than 255 symbols"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/api.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Enter a valid name"
 msgstr ""
@@ -7882,7 +7879,7 @@ msgstr "Επιτυχής αλλαγή του κωδικού σας"
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
 #, python-format
 msgid "Hello %(name)s,"
-msgstr "Αγαπητέ/αγαπητή %(name)s,"
+msgstr "Αγαπητέ/Αγαπητή %(name)s,"
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.txt
@@ -7897,7 +7894,7 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.txt
 #, python-format
 msgid "Hello %(name)s, "
-msgstr "Αγαπητέ/αγαπητή %(name)s,"
+msgstr "Αγαπητέ/Αγαπητή %(name)s,"
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/subject.txt
 #, python-format
@@ -11908,13 +11905,11 @@ msgid "{previous_groups}, {current_group}"
 msgstr ""
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr ""
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr ""
@@ -16370,7 +16365,7 @@ msgstr ""
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid "Hello {full_name},"
-msgstr "Αγαπητέ/αγαπητή {full_name},"
+msgstr "Αγαπητέ/Αγαπητή {full_name},"
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid "Your {platform_name} ID verification photos have been approved."
@@ -16537,15 +16532,6 @@ msgstr ""
 #. Translators: This string will not be used in Open edX installations.
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
-"In order to be eligible for edX Financial Assistance, you must demonstrate "
-"that paying the Verified Certificate fee would cause you economic hardship. "
-"To apply, you will be asked to answer a few questions about why you are "
-"applying and how the Verified Certificate will benefit you."
-msgstr ""
-
-#. Translators: This string will not be used in Open edX installations.
-#: lms/templates/financial-assistance/financial-assistance.html
-msgid ""
 "If your application is approved, we'll give you instructions for verifying "
 "your identity on edx.org so you can start working toward completing your edX"
 " course."
@@ -16563,10 +16549,6 @@ msgstr ""
 #. translate the name "Anant".
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Sincerely, Anant"
-msgstr ""
-
-#: lms/templates/financial-assistance/financial-assistance.html
-msgid "Back to Student FAQs"
 msgstr ""
 
 #: lms/templates/financial-assistance/financial-assistance.html
@@ -21887,7 +21869,7 @@ msgid "Select this problem"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy to Clipboard"
+msgid "Manage Access"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
@@ -21895,7 +21877,7 @@ msgid "Manage tags"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Manage Access"
+msgid "Copy to Clipboard"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
