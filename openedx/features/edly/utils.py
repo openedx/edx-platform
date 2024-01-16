@@ -658,3 +658,18 @@ def add_default_image_to_course_assets(course_key):
 
         contentstore().save(content)
         del_cached_content(content.location)
+
+from common.djangoapps.student.models import UserProfile
+def get_username_and_name_by_email(email):
+    """
+    helper function to return username if exists
+    """
+    user = get_user_model().objects.filter(email=email)
+    if not user.exists():
+        return {}
+    
+    user = user.first()
+    userProfile = UserProfile.objects.filter(user=user)
+    if userProfile.exists():
+        userProfile = userProfile.first()
+        return { "username": user.username, "name": userProfile.name }

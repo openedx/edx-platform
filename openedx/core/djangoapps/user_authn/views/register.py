@@ -65,6 +65,7 @@ from openedx.features.edly.utils import (
     create_learner_link_with_permission_groups,
     is_config_enabled,
     get_edly_sub_org_from_request,
+    get_username_and_name_by_email
 )
 from common.djangoapps.student.helpers import (
     AccountValidationError,
@@ -754,7 +755,8 @@ class RegistrationValidationView(APIView):
         "email": email_handler,
         "confirm_email": confirm_email_handler,
         "password": password_handler,
-        "country": country_handler
+        "country": country_handler,
+        "username_and_name": get_username_and_name_by_email
     }
 
     @method_decorator(
@@ -789,4 +791,10 @@ class RegistrationValidationView(APIView):
                 validation_decisions.update({
                     form_field_key: handler(self, request)
                 })
+
+        email = request.data.get('email')
+        validation_decisions.update({
+            'username_and_name': get_username_and_name_by_email(email)
+        })
+
         return Response({"validation_decisions": validation_decisions})
