@@ -755,8 +755,7 @@ class RegistrationValidationView(APIView):
         "email": email_handler,
         "confirm_email": confirm_email_handler,
         "password": password_handler,
-        "country": country_handler,
-        "username_and_name": get_username_and_name_by_email
+        "country": country_handler
     }
 
     @method_decorator(
@@ -793,8 +792,9 @@ class RegistrationValidationView(APIView):
                 })
 
         email = request.data.get('email')
-        validation_decisions.update({
-            'username_and_name': get_username_and_name_by_email(email)
-        })
+        if request.data.get('return_user_info'):
+            validation_decisions.update({
+                'username_and_name': get_username_and_name_by_email(email)
+            })
 
         return Response({"validation_decisions": validation_decisions})
