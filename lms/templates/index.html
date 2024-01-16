@@ -11,6 +11,12 @@ from openedx.core.djangolib.markup import HTML, Text
 ## free banner url: https://www.vecteezy.com/vector-art/2294868-digital-learning-web-banner-design-students-study-with-mobile-phone-during-online-class-online-education-digital-classroom-e-learning-concept-header-or-footer-banner
 ## banner img got from Vecteezy.com
 
+<%block name="js_extra">
+   <script type="text/javascript">
+      window.localtion.href = "/courses"
+   </script>
+</%block>
+
 <main id="main" aria-label="Content" tabindex="-1">
     <section class="home">
       <header>
