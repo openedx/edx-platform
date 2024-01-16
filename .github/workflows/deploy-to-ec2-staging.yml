@@ -1,4 +1,4 @@
-name: Deploy OpenEdx to Staging
+name: Deploy-OpenEdx-to-Staging
 on:
   workflow_dispatch
 jobs:
