@@ -3945,6 +3945,7 @@ class MatchingResponse(LoncapaResponse):
         """
         Collects information from the XML for later use.
         """
+        # print("setup_response")
         # call secondary setup for MultipleChoice questions, to set name
         # attributes
         self.m_setup_response()
@@ -4025,6 +4026,8 @@ class MatchingResponse(LoncapaResponse):
         Arguments:
          - student_answers : dict of (answer_id, answer) where answer = student input (string)
         """
+        print("get_score", student_answers)
+        print("get_score correct_matchings", self.correct_matchings)
         # student_answers: {'matchingitem_2': 'value_matchingitem_4', 'matchingitem_0': 'matchingitem_1'}
 
         # answer = list(student_answers[self.answer_id].map(lambda item: item.split('+')))
@@ -4047,6 +4050,7 @@ class MatchingResponse(LoncapaResponse):
         return CorrectMap(self.answer_id, correctness=correctness, npoints=npoints)
 
     def get_answers(self):
+        # print("get_answers")
         return {self.answer_id: self.correct_matchings}
 
 

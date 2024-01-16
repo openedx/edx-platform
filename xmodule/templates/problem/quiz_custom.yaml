@@ -2,8 +2,8 @@
 metadata:
     display_name: Quiz Problem Custom
     markdown: |
-      
-     
+
+
       >> Question 1 <<
 
       [x] a correct answer {{ selected:  giai thich 1 }}
@@ -12,7 +12,7 @@ metadata:
       [x] a correct answer {{ selected:  giai thich  2 }}
 
 
-      
+
       >> Question 2 <<
 
       [x] a correct answer {{ selected:  giai thich 1 }}
@@ -22,7 +22,7 @@ metadata:
 
 
 
-      
+
       >> Question 3 <<
 
       (x) Yes {{ giai thich  }}
@@ -56,7 +56,7 @@ data:   |
                     <choicehint selected="true">giai thich  2</choicehint></choice>
                 </checkboxgroup>
             </choiceresponse>
-            
+
                 <label> <b>Question 2</b> 123</label>
             <choiceresponse>
                 <checkboxgroup>
@@ -68,7 +68,7 @@ data:   |
                     <choicehint selected="true">giai thich  2</choicehint></choice>
                 </checkboxgroup>
             </choiceresponse>
-            
+
             <label> Question 3 </label>
             <multiplechoiceresponse>
                 <choicegroup type="MultipleChoice">
@@ -78,7 +78,7 @@ data:   |
                 <choice correct="false">No</choice>
                 </choicegroup>
             </multiplechoiceresponse>
-            
+
             <label> Question 4 </label>
             <multiplechoiceresponse>
                 <choicegroup type="MultipleChoice">
@@ -88,6 +88,30 @@ data:   |
                 <choice correct="false">No</choice>
                 </choicegroup>
             </multiplechoiceresponse>
-            
-            
+
+
+            <matchingresponse>
+                <div question_matching="True" class="question_matching_content">
+                  Hãy ghép các thành phần của Marketing Framework tương ứng với các yếu tố trong marketing phía dưới.
+                </div>
+                <div sub_question_matching="True" class="sub_question_matching_content">(Hãy nối từ tương ứng tương ứng với đáp án bạn chọn.)</div>
+
+                <div title="True" class="content_title">
+                  <div class="content_title_desc">Marketing Plan1</div>
+                  <div class="content_title_desc">Marketing Framework</div>
+                </div>
+
+                <matchinggroup>
+                  <matchingitem matchingvalue='1' pos="left">Mục tiêu Marketing của bạn:</matchingitem>
+                  <matchingitem matchingvalue='1' pos="right">Why 1</matchingitem>
+
+                  <matchingitem matchingvalue='2' pos="left">Các kênh mà khách hàng của bạn sử dụng:</matchingitem>
+                  <matchingitem matchingvalue='2' pos="right">Where 2</matchingitem>
+
+                  <matchingitem pos="left">Left 3: will be hide, no matchingvalue</matchingitem>
+                  <matchingitem pos="right">Yes/No</matchingitem>
+                </matchinggroup>
+            </matchingresponse>
+
+
             </problem>

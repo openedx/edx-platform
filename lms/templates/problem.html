@@ -388,16 +388,18 @@ from openedx.core.djangolib.markup import HTML
 
             Câu hỏi tiếp theo  <i class="bi bi-arrow-right"></i>
           </span></button>
-          <button class='btn-submit-qz btn-custom' disabled > Trả lời  </button>
+
+
+          <button class='btn-submit-qz btn-custom' > Trả lời  </button>
+          <button type="button" id="matching_quiz_custom" class="submit btn-brand submit_matching_btn" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" data-should-enable-submit-button="${ should_enable_submit_button }" aria-describedby="submission_feedback_${short_id}" ${'' if should_enable_submit_button else 'disabled'}>
+                Trả lời matching
+          </button>
 
         </span>
 
       </div>
 
       % elif problem['name'] == 'Matching Problem':
-      ##<!-- <button type="button" class="submit btn-brand" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" data-should-enable-submit-button="${ should_enable_submit_button }" aria-describedby="submission_feedback_${short_id}" ${'' if should_enable_submit_button else 'disabled'}>
-      ##  <span class="submit-label ">Trả lời</span>
-      ##</button> -->##
       <button type="button" class="submit btn-brand submit_matching_btn" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" data-should-enable-submit-button="${ should_enable_submit_button }" aria-describedby="submission_feedback_${short_id}" ${'' if should_enable_submit_button else 'disabled'}>
         Trả lời
       </button>
@@ -566,6 +568,7 @@ from openedx.core.djangolib.markup import HTML
 
 
       for (var i = 0; i < problemList.length; i++) {
+        console.log('problemList', problemList[i])
         if(i > 0){
           problemList[i].style.display = 'none'
         }
@@ -771,38 +774,89 @@ from openedx.core.djangolib.markup import HTML
 </script>
 %endif
 
-
+% if problem['name'] == 'Matching Problem' or problem['name'] == 'Quiz Problem Custom':
 <script>
-  function allowDrop(ev) {
-      ev.preventDefault();
-  }
+    const rightItem = document.querySelectorAll(".right_content_item");
+    const rightItemBtn = document.querySelectorAll(".right_content_item .btn");
+    let draggedItem = null;
 
-  function drag(ev, parentId) {
-    console.log(parentId)
-    ev.dataTransfer.setData("eleId", ev.currentTarget.id);
-  }
+    rightItemBtn.forEach(function(btn) {
+        btn.addEventListener("dragstart", function (e) {
+            draggedItem = btn.innerHTML;
+        });
 
-  function drop(ev, parentId) {
-      ev.preventDefault();
-      console.log(parentId)
-      var fromId = ev.dataTransfer.getData("eleId");
+        btn.addEventListener("dragend", function (e) {
+            console.log("dragend", btn);
+            btn.innerHTML = draggedItem;
+            draggedItem = null;
 
-      var targetHtml = ev.currentTarget.innerHTML;
-      var fromEle = document.getElementById(fromId);
-      var fromHtml = fromEle.innerHTML;
+            const inputName = btn.dataset.inputName
+            console.log("inputName", inputName);
+
+            const imgEle = document.querySelectorAll(`img[data-right-result]`);
+            console.log("imgEle", imgEle);
+            const imgValue = [];
+            imgEle.forEach(function(img) {
+
+                if (img.nodeName === 'IMG' && img.name === inputName) {
+                    console.log("img", img);
+                    imgValue.push(img.getAttribute('data-right-result'));
+                }
+
+            });
+            console.log("imgValue", imgValue);
+
+            const inputEle = document.querySelectorAll(`input[data-left-value]`);
+            console.log("inputEle", inputEle);
+
+            const inputValue = [];
+            let i = 0;
+            inputEle.forEach(function(input) {
+
+                if (input.nodeName === 'INPUT' && input.name === inputName && i < imgValue.length) {
+                    let currentValue = input.value;
+                    if (currentValue.length > 0) {
+                        const lastPartInput = currentValue.substring(currentValue.lastIndexOf("_") + 1);
+                        console.log("lastPartInput", lastPartInput);
+                        const lastPartImg = imgValue[i].substring(imgValue[i].lastIndexOf("_") + 1);
+                        console.log("lastPartImg", lastPartImg);
+
+                        const test_new_string = currentValue.replace(lastPartInput, lastPartImg);
+                        console.log("test_new_string", test_new_string);
+
+                        input.value = test_new_string;
+                    }
+                    i++;
+                    inputValue.push(input.value);
+                }
+
+            });
+            console.log("inputValue", inputValue);
 
 
-      ev.currentTarget.innerHTML = '';
-      ev.currentTarget.innerHTML = fromHtml;
-      $('input', ev.currentTarget.parentElement).val($('input', ev.currentTarget.parentElement).data('left-value') + '+' + $(fromEle).data('right-value'))
 
-      fromEle.innerHTML = '';
-      fromEle.innerHTML = targetHtml;
-      if ($('input', fromEle.parentElement)[0]) {
-        $('input', fromEle.parentElement).val($('input', fromEle.parentElement).data('left-value') + '+' + $(ev.currentTarget).data('right-value'))
-      }
-  }
+        });
+    });
+
+    rightItem.forEach( function(item) {
+        item.addEventListener("dragover", function (e) {
+            e.preventDefault();
+        });
+
+        item.addEventListener("drop", function (e) {
+            e.preventDefault();
+            const cloneItem = item.querySelector(".btn").innerHTML;
+
+            item.querySelector(".btn").innerHTML = draggedItem;
+
+            draggedItem = cloneItem;
+
+
+        });
+    });
 
 </script>
+%endif
+
 <div>
 

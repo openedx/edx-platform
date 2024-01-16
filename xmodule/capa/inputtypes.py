@@ -1868,6 +1868,7 @@ class MatchingGroup(InputTypeBase):
         try:
             # print("self MatchingGroup new", vars(self))
             # print("self MatchingGroup new", self.status)
+            print("setup_func")
 
             matching_items, left_items, right_items, matchingitems = self.extract_matching_items(self.xml, i18n, False, self.value)
             self.matching_items = matching_items
@@ -1894,14 +1895,12 @@ class MatchingGroup(InputTypeBase):
         # print("MatchingGroup_03")
         # print("MatchingGroup_03 new", vars(self))
         # print("MatchingGroup_03 new", self.status)
-        xml_str = ET.tostring(self.xml, encoding='utf8').decode('utf8')
-        root = ET.fromstring(xml_str)
-        # print("rootXML_new extract_matching_items", xml_str)
 
+        print("_extra_context")
         for left_item, right_item in self.matchingitems:
 
-            print("left_item", left_item)
-            print("right_item", right_item)
+            # print("left_item", left_item)
+            # print("right_item", right_item)
 
 
             pass
@@ -1919,9 +1918,14 @@ class MatchingGroup(InputTypeBase):
     @staticmethod
     def extract_matching_items(element, i18n, text_only=False, value=None):
         # print("MatchingGroup_04", value)
+        xml_str = ET.tostring(element, encoding='utf8').decode('utf8')
+        root = ET.fromstring(xml_str)
+        print("rootXML_new", xml_str)
 
         student_answer = {}
 
+        print("value_new", value)
+        # UFC - có thể chỗ này gây ra bug student_answer
         if value:
             for answer_item in list(map(lambda item: item.split('+'), value)):
                 student_answer[answer_item[0]] = answer_item[1]
@@ -1950,26 +1954,44 @@ class MatchingGroup(InputTypeBase):
 
         # print("matching_items", matching_items)
 
+        # UFC có thể chỗ này gây ra bug
+        # print("macthingitems rerun left_items", left_items)
+        print("left_items first", left_items)
+        print("left_items_obj first", left_items_obj)
+        print("right_items first", right_items)
+        print("right_items_obj first", right_items_obj)
+
+
+        print("student_answer first", student_answer)
         i = 0
         for ritem in right_items:
             # Nếu student đã submit thì sort lại
-            if student_answer:
+            if student_answer and i < len(right_items):
                 left_name = left_items[i][0]
-                right_name = student_answer.get(left_name)
-                right_item = right_items_obj.get(right_name)
+                right_name = student_answer[left_name]
+                # right_name = student_answer.get(left_name)
+                print("left_name-new", left_name)
+                print("right_name-new", right_name)
+
+                # right_item = right_items_obj.get(right_name)
+                right_item = right_items_obj[right_name]
                 macthingitems.append((left_items[i], right_item))
+                pass
             else:
                 macthingitems.append((left_items[i], ritem))
+
+            # macthingitems.append((left_items[i], ritem))
 
             i += 1
 
         # Nếu student chưa submit thì shuffle
+        print("macthingitems first", macthingitems)
         if not value:
             macthingitems = MatchingGroup.do_shuffle(macthingitems)
 
             pass
 
-        print("macthingitems rerun", macthingitems)
+        # print("macthingitems rerun after", macthingitems)
         return [matching_items, left_items, right_items, macthingitems]
 
     def get_user_visible_answer(self, internal_answer):
