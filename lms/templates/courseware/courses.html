@@ -35,7 +35,7 @@
     <section class="find-courses">
       <section class="courses-container">
         % if course_discovery_enabled:
-        <!--
+        
 
           <div id="discovery-form" role="search" aria-label="course" class="wrapper-search-context">
             <div id="discovery-message" class="search-status-label"></div>
@@ -56,7 +56,7 @@
           
           <div id="filter-bar" class="filters hide-phone is-collapsed">
           </div> 
-        -->
+        
         % endif
 
         <div class="courses${'' if course_discovery_enabled else ' no-course-discovery'}" role="region" aria-label="${_('List of Courses')}">
