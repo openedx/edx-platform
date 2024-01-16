@@ -263,7 +263,7 @@ dill==0.3.7
     # via pylint
 distlib==0.3.7
     # via virtualenv
-django==4.2.6
+django==4.2.8
     # via
     #   -r requirements/edx/base.txt
     #   django-appconf
@@ -1514,7 +1514,6 @@ tomlkit==0.12.1
     #   snowflake-connector-python
 tox==3.28.0
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/testing.in
     #   tox-battery
 tox-battery==0.6.2
