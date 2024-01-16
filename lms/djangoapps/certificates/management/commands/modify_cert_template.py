@@ -1,5 +1,4 @@
-"""Management command to modify certificate templates.
-"""
+"""Management command to modify certificate templates."""
 import logging
 import shlex
 from argparse import RawDescriptionHelpFormatter
@@ -41,18 +40,15 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             "--old-text",
-            required=True,
             help="Text to replace in the template.",
         )
         parser.add_argument(
             "--new-text",
-            required=True,
             help="Replacement text for the template.",
         )
         parser.add_argument(
             "--templates",
             nargs="+",
-            required=True,
             help="Certificate templates to modify.",
         )
         parser.add_argument(
@@ -63,7 +59,7 @@ class Command(BaseCommand):
 
     def get_args_from_database(self):
         """
-        Returns an options dictionary from the current CertificateGenerationCommandConfiguration model.
+        Returns an options dictionary from the current ModifiedCertificateTemplateCommandConfiguration instance.
         """
         config = ModifiedCertificateTemplateCommandConfiguration.current()
         if not config.enabled:
@@ -78,6 +74,11 @@ class Command(BaseCommand):
         # database args will override cmd line args
         if options["args_from_database"]:
             options = self.get_args_from_database()
+        # Check required arguments here. We can't rely on marking args "required" because they might come from django
+        if not (options["old_text"] and options["new_text"] and options["templates"]):
+            raise CommandError(
+                "The following arguments are required: --old-text, --new-text, --templates"
+            )
         log.info(
             "modify_cert_template starting, dry-run={dry_run}, templates={templates}, "
             "old-text={old}, new-text={new}".format(

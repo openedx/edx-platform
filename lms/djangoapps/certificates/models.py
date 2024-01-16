@@ -1256,7 +1256,8 @@ class ModifiedCertificateTemplateCommandConfiguration(ConfigurationModel):
     arguments = models.TextField(
         blank=True,
         help_text=(
-            "Arguments for the 'modify_cert_template' management command. Specify like '-template_ids <id1> <id2>'"
+            "Arguments for the 'modify_cert_template' management command. Specify like '--old-text \"foo\" "
+            "--new-text \"bar\" --template_ids <id1> <id2>'"
         ),
         default="",
     )

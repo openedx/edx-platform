@@ -66,15 +66,16 @@ def handle_modify_cert_template(options: Dict[str, Any]):
     Celery task to handle the modify_cert_template management command.
 
     Args:
-        FIXME
+        old_text (string): Text in the template of which the first instance should be changed
+        new_text (string): Replacement text for old_text
         template_ids (list[string]): List of template IDs for this run.
+        dry_run (boolean): Don't do the work, just report the changes that would happen
     """
 
     template_ids = options["templates"]
     if not template_ids:
         template_ids = []
 
-    # FIXME  Check to see if there was that particular logging configuration
     log.info(
         "[modify_cert_template] Attempting to modify {num} templates".format(
             num=len(template_ids)
@@ -130,7 +131,6 @@ def handle_modify_cert_template(options: Dict[str, Any]):
                         )
                     ),
                 )
-            # FIXME commit templates_to_change
     log.info(
         "[modify_cert_template] Modified {num} templates".format(num=templates_changed)
     )
