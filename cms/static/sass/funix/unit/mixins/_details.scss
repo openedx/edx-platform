@@ -2,8 +2,8 @@
 
     // details - summary
     details {
-        margin-bottom: 1rem;
-        padding: 0 1rem;
+        margin-bottom: 1em;
+        padding: 0 1em;
         border-radius: $border-radius;
         overflow: hidden;
         transition: .2s;
@@ -11,6 +11,7 @@
 
         * {
             line-height: 1.5 !important;
+            font-size: 16px;
         }
 
         // -- auto subdued --
@@ -26,10 +27,10 @@
         >summary {
             list-style: none;
             line-height: 1.5;
-            font: 500 1rem $font-family-default !important;
-            margin: 0 -1rem !important;
+            font: 500 1em $font-family-default !important;
+            margin: 0 -1em !important;
             cursor: pointer;
-            padding: .75rem 1rem .75rem 1rem;
+            padding: .75em 1em .75em 1em;
             position: relative;
 
             &::-webkit-details-marker {
@@ -40,11 +41,11 @@
                 position: absolute;
                 display: block;
                 content: '';
-                width: .5rem;
-                height: .5rem;
+                width: .5em;
+                height: .5em;
                 border-right: 2px solid $color-text-default;
                 border-bottom: 2px solid $color-text-default;
-                right: 1rem;
+                right: 1em;
                 top: 50%;
                 transform: translateY(-50%) rotate(-45deg);
                 transition: .2s;
@@ -121,11 +122,11 @@
     .informa {
         border-radius: $border-radius;
         overflow: hidden;
-        padding: .75rem 1rem;
-        margin-bottom: 1rem;
+        padding: .75em 1em;
+        margin-bottom: 1em;
 
         >p {
-            font: 500 1rem $font-family-default !important;
+            font: 500 1em $font-family-default !important;
             margin-bottom: 0 !important;
         }
 
@@ -134,7 +135,7 @@
             padding: 0;
 
             p {
-                font: 400 1rem $font-family-default;
+                font: 400 1em $font-family-default;
                 color: $color-text-default;
                 line-height: 1.5;
             }

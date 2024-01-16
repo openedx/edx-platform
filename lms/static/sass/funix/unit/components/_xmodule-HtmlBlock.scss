@@ -1,6 +1,8 @@
 div.course-wrapper .course-content .vert-mod > div .xmodule_display.xmodule_HtmlBlock {
     @include unit-common;
 
+    overflow-x: auto;
+
     p {
         line-height: 1.5 !important;
     }
