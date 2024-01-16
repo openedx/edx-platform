@@ -600,7 +600,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         if scope != Scope.user_state:
             raise ValueError("Only Scope.user_state is supported")
 
-        results = StudentModule.objects.order_by('id').filter(module_state_key=block_key)
+        results = StudentModule.objects.order_by('id').filter(module_state_key=block_key).select_related('student')
         p = Paginator(results, settings.USER_STATE_BATCH_SIZE)
 
         for page_number in p.page_range:
