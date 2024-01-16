@@ -10,3 +10,15 @@
 
 @import 'components/xmodule-HtmlBlock';
 @import 'components/xmodule-ProblemBlock';
+@import 'components/xmodule-VideoBlock';
+
+// Remove margin, padding, border of each component 
+.course-wrapper .course-content .vert-mod .vert {
+    margin: 0;
+    padding: 0;
+    border-bottom: 0;
+}
+
+.content-wrapper {
+    margin-top: 0;
+}

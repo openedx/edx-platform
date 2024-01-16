@@ -28,8 +28,8 @@ $color-critical-light: #fff1f1;
 $color-leaf: #06aaa5;
 $color-leaf-light: #faffff;
 
-$spacing-1: 1.5em;
-$spacing-2: 3em;
+$spacing-1: 24px;
+$spacing-2: 48px;
 
 $border-radius: 6px;
 
@@ -37,12 +37,11 @@ $fw-medium: 500;
 $fw-normal: 400;
 
 $font-family-default: 'Roboto', sans-serif;
-$font-family-title: 'Roboto', sans-serif;
 
-$fz-h1: 33pt;
-$fz-h2: 27pt;
-$fz-h3: 21pt;
-$fz-h4: 19pt;
-$fz-h5: 16pt;
-$fz-h6: 13pt;
+$fz-h1: 2.75em;
+$fz-h2: 2.38em;
+$fz-h3: 1.75em;
+$fz-h4: 1.56em;
+$fz-h5: 1.31em;
+$fz-h6: 1.06em;
 $fz-p: 1em;

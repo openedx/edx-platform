@@ -23,7 +23,7 @@
 
     h1 {
         font-size: $fz-h1;
-        font-family: $font-family-title;
+        font-family: $font-family-default;
     }
 
     h2 {
@@ -83,9 +83,9 @@
 }
 
 @mixin btn {
-    height: 2.375em;
-    padding: 0 1.25em;
-    line-height: 2.375em;
+    height: 2.375rem;
+    padding: 0 1.25rem;
+    line-height: 2.375rem;
     border-radius: 4px;
     display: inline-block;
     font-weight: 500;

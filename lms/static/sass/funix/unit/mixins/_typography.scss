@@ -12,54 +12,99 @@
     .hd-4,
     .hd-5,
     .hd-6 {
-        margin-bottom: 1.5rem;
+        margin-bottom: $spacing-1;
         font-weight: $fw-medium;
         font-family: $font-family-default;
         color: $color-text-default;
+        line-height: 1.5;
     }
 
-    *:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) {
+    p {
+        font-size: $fz-p;
+        font-weight: $fw-normal;
+        line-height: 1.5;
+        margin: 0 0 $spacing-1 0;
+    }
+
+    div, section, article, aside {
+        &> h1, 
+        &> h2, 
+        &> h3, 
+        &> h4, 
+        &> h5, 
+        &> h6, 
+        &> .hd-1, 
+        &> .hd-2, 
+        &> .hd-3, 
+        &> .hd-4, 
+        &> .hd-5, 
+        &> .hd-6,
+        &> p {
+            margin-top: $spacing-1;
+        }
+    }
+
+    &> h1, 
+    &> h2, 
+    &> h3, 
+    &> h4, 
+    &> h5, 
+    &> h6, 
+    &> .hd-1, 
+    &> .hd-2, 
+    &> .hd-3, 
+    &> .hd-4, 
+    &> .hd-5, 
+    &> .hd-6,
+    &> p {
+        margin-top: $spacing-1;
+    }
+
+    *:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6):not(.hd-1):not(.hd-2):not(.hd-3):not(.hd-4):not(.hd-5):not(.hd-6) {
 
         &+h1,
         &+h2,
         &+h3,
         &+h4,
         &+h5,
-        &+h6 {
-            padding-top: 1.5rem;
+        &+h6 ,
+        &+.hd-1,
+        &+.hd-2,
+        &+.hd-3,
+        &+.hd-4,
+        &+.hd-5,
+        &+.hd-6 
+        {
+            margin-top:  $spacing-2;
         }
     }
 
-    h1 {
+    h1,.hd-1 {
         font-size: $fz-h1;
     }
 
-    h2 {
+    h2,.hd-2 {
         font-size: $fz-h2;
     }
 
-    h3 {
+    h3,.hd-3 {
         font-size: $fz-h3;
     }
 
-    h4 {
+    h4,.hd-4 {
         font-size: $fz-h4;
     }
 
-    h5 {
+    h5,.hd-5 {
         font-size: $fz-h5;
     }
 
-    h6 {
+    h6,.hd-6 {
         font-size: $fz-h6;
     }
 
-    p {
-        font-size: $fz-p;
-        font-weight: $fw-normal;
-    }
 
-    p,
+
     div,
     article,
     section,
@@ -67,12 +112,12 @@
     fieldset,
     ul,
     ol {
-        margin: 0 0 1.5rem 0;
+        margin: 0 0 $spacing-1 0;
     }
 
     ul,
     ol {
-        padding: 0 0 0 32px;
+        padding: 0 0 0 $spacing-1;
 
         li {
             margin-bottom: 0.375rem;
@@ -135,4 +180,6 @@
         margin-top: 0;
     }
 
+
+ 
 }
