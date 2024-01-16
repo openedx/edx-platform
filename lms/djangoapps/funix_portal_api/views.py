@@ -1,6 +1,6 @@
 import json
 import logging
-from django.http import HttpResponse,JsonResponse
+from django.http import HttpResponse,JsonResponse, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseBadRequest
 from common.djangoapps.student.models import User
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -23,6 +23,13 @@ from opaque_keys import InvalidKeyError
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from openedx.features.course_experience.url_helpers import get_courseware_url
 from common.djangoapps.util.course import course_location_from_key
+from django.conf import settings
+import requests
+from django.contrib.staticfiles import finders
+import mimetypes
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+
+
 
 def check_missing_fields(fields, data):
     errors = {}
@@ -411,9 +418,7 @@ class GradeLearningProjectXblockAPIView(APIView):
         }, status=status.HTTP_200_OK)
     
 def get_portal_host(request):
-    from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
     from django.contrib.sites.models import Site
-    from django.conf import settings
 
     def get_site_config(domain, setting_name, default_value=None):
         try:
@@ -476,3 +481,53 @@ def get_resume_path(request, course_id, location):
         ,
         status=200
     )
+
+def funix_get_thumb(request):
+    FALLBACK_COURSE_IMAGE_PATH = 'images/default_course_thumb.png'
+    FALLBACK_DEFAULT_PATH = 'images/image_error.png'
+
+    if request.method != 'GET':
+        return HttpResponseNotAllowed('Not allowed method.')
+    
+    img_path = request.GET['path']
+
+    if not img_path: 
+        logging.error('From funix_get_thumb: Missing img_path.')
+        return HttpResponseBadRequest('Missing img_path')
+    
+    try:
+        ext = img_path.split('.')[-1]
+    except:
+        logging.error('From funix_get_thumb: Missing image extension.')
+        return HttpResponseBadRequest('Invalid image path: missing extension.')
+
+    schema = 'https://' if settings.HTTPS == 'on' else 'http://'
+    img_url = f"{schema}{settings.LMS_BASE}/{img_path}"
+
+    response = requests.get(img_url)
+
+    if response.status_code == 200:
+        mimetype = _get_mime_type(ext)
+        return HttpResponse(response.content, content_type=mimetype)
+    else: 
+        logging.error(f'From funix_get_thumb: image_path: {img_path}. img_url: {img_url}. status code: {response.status_code}')
+
+    fallback_path = FALLBACK_DEFAULT_PATH
+
+    if request.GET.get('type') == 'course_thumb':
+        fallback_path = FALLBACK_COURSE_IMAGE_PATH
+    
+    fallback_img_path = finders.find(fallback_path)
+
+    if fallback_img_path:
+        with open(fallback_img_path, 'rb') as f:
+            image_data = f.read()
+            mimetype = _get_mime_type(fallback_img_path.split('.')[-1])
+            return HttpResponse(image_data, content_type=mimetype)
+    else:
+        return HttpResponseNotFound("Image not found.")
+    
+def _get_mime_type(extension):
+    mime_type, _ = mimetypes.guess_type(f"dummy.{extension}")
+    return mime_type
+    
