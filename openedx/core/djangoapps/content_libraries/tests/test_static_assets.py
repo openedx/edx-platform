@@ -3,7 +3,6 @@ Tests for static asset files in Blockstore-based Content Libraries
 """
 
 from openedx.core.djangoapps.content_libraries.tests.base import (
-    ContentLibrariesRestApiBlockstoreServiceTest,
     ContentLibrariesRestApiTest,
 )
 
@@ -107,15 +106,6 @@ class ContentLibrariesStaticAssetsTestMixin:
         self._commit_library_changes(library["id"])
         check_sjson()
         check_download()
-
-
-class ContentLibrariesStaticAssetsBlockstoreServiceTest(
-    ContentLibrariesStaticAssetsTestMixin,
-    ContentLibrariesRestApiBlockstoreServiceTest,
-):
-    """
-    Tests for static asset files in Blockstore-based Content Libraries, using the standalone Blockstore service.
-    """
 
 
 class ContentLibrariesStaticAssetsTest(

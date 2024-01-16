@@ -7,15 +7,19 @@ from openedx.core.constants import COURSE_ID_PATTERN
 from .views import (
     CourseDetailsView,
     CourseTeamView,
+    CourseIndexView,
     CourseGradingView,
     CourseRerunView,
     CourseSettingsView,
     CourseVideosView,
     HomePageView,
+    HomePageCoursesView,
+    HomePageLibrariesView,
     ProctoredExamSettingsView,
     ProctoringErrorsView,
     HelpUrlsView,
-    VideoUsageView
+    VideoUsageView,
+    VideoDownloadView
 )
 
 app_name = 'v1'
@@ -28,6 +32,14 @@ urlpatterns = [
         HomePageView.as_view(),
         name="home"
     ),
+    path(
+        'home/courses',
+        HomePageCoursesView.as_view(),
+        name="courses"),
+    path(
+        'home/libraries',
+        HomePageLibrariesView.as_view(),
+        name="libraries"),
     re_path(
         fr'^videos/{COURSE_ID_PATTERN}$',
         CourseVideosView.as_view(),
@@ -36,6 +48,11 @@ urlpatterns = [
     re_path(
         fr'^videos/{COURSE_ID_PATTERN}/{VIDEO_ID_PATTERN}/usage$',
         VideoUsageView.as_view(),
+        name="video_usage"
+    ),
+    re_path(
+        fr'^videos/{COURSE_ID_PATTERN}/download$',
+        VideoDownloadView.as_view(),
         name="video_usage"
     ),
     re_path(
@@ -52,6 +69,11 @@ urlpatterns = [
         fr'^course_settings/{COURSE_ID_PATTERN}$',
         CourseSettingsView.as_view(),
         name="course_settings"
+    ),
+    re_path(
+        fr'^course_index/{COURSE_ID_PATTERN}$',
+        CourseIndexView.as_view(),
+        name="course_index"
     ),
     re_path(
         fr'^course_details/{COURSE_ID_PATTERN}$',

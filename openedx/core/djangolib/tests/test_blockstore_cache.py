@@ -5,11 +5,6 @@ from unittest.mock import patch
 
 from django.test import TestCase
 from openedx.core.djangolib.blockstore_cache import BundleCache
-from openedx.core.lib.blockstore_api.tests.base import (
-    BlockstoreAppTestMixin,
-    requires_blockstore,
-    requires_blockstore_app,
-)
 from openedx.core.lib import blockstore_api as api
 
 
@@ -27,7 +22,7 @@ class TestWithBundleMixin:
 
 
 @patch('openedx.core.djangolib.blockstore_cache.MAX_BLOCKSTORE_CACHE_DELAY', 0)
-class BundleCacheTestMixin(TestWithBundleMixin):
+class BundleCacheTestMixin(TestWithBundleMixin, TestCase):
     """
     Tests for BundleCache
     """
@@ -112,17 +107,3 @@ class BundleCacheClearTest(TestWithBundleMixin, TestCase):
         # Now "clear" the cache, forcing the check of the new version:
         cache.clear()
         assert cache.get(key1) is None
-
-
-@requires_blockstore
-class BundleCacheBlockstoreServiceTest(BundleCacheTestMixin, TestCase):
-    """
-    Tests BundleCache using the standalone Blockstore service.
-    """
-
-
-@requires_blockstore_app
-class BundleCacheTest(BundleCacheTestMixin, BlockstoreAppTestMixin, TestCase):
-    """
-    Tests BundleCache using the installed Blockstore app.
-    """

@@ -46,6 +46,7 @@ class TaxonomyOrgListQueryParamsSerializer(TaxonomyListQueryParamsSerializer):
         queryset=Organization.objects.all(),
         required=False,
     )
+    unassigned: fields.Field = serializers.BooleanField(required=False)
 
 
 class TaxonomyUpdateOrgBodySerializer(serializers.Serializer):

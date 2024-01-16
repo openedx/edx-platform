@@ -177,8 +177,10 @@ class ThreadActionGroupIdTestCase(
         self._assert_json_response_contains_group_info(response)
 
     def test_flag(self, mock_request):
-        response = self.call_view("flag_abuse_for_thread", mock_request)
-        self._assert_json_response_contains_group_info(response)
+        with mock.patch('openedx.core.djangoapps.django_comment_common.signals.thread_flagged.send') as signal_mock:
+            response = self.call_view("flag_abuse_for_thread", mock_request)
+            self._assert_json_response_contains_group_info(response)
+            self.assertEqual(signal_mock.call_count, 1)
         response = self.call_view("un_flag_abuse_for_thread", mock_request)
         self._assert_json_response_contains_group_info(response)
 
@@ -1347,6 +1349,48 @@ class UpdateCommentUnicodeTestCase(
         assert response.status_code == 200
         assert mock_request.called
         assert mock_request.call_args[1]['data']['body'] == text
+
+
+@patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
+class CommentActionTestCase(
+        MockRequestSetupMixin,
+        CohortedTestCase,
+        GroupIdAssertionMixin
+):
+    def call_view(
+            self,
+            view_name,
+            mock_request,
+            user=None,
+            post_params=None,
+            view_args=None
+    ):
+        self._set_mock_request_data(
+            mock_request,
+            {
+                "user_id": str(self.student.id),
+                "group_id": self.student_cohort.id,
+                "closed": False,
+                "type": "thread",
+                "commentable_id": "non_team_dummy_id",
+                "body": "test body",
+            }
+        )
+        request = RequestFactory().post("dummy_url", post_params or {})
+        request.user = user or self.student
+        request.view_name = view_name
+
+        return getattr(views, view_name)(
+            request,
+            course_id=str(self.course.id),
+            comment_id="dummy",
+            **(view_args or {})
+        )
+
+    def test_flag(self, mock_request):
+        with mock.patch('openedx.core.djangoapps.django_comment_common.signals.comment_flagged.send') as signal_mock:
+            self.call_view("flag_abuse_for_comment", mock_request)
+            self.assertEqual(signal_mock.call_count, 1)
 
 
 @disable_signal(views, 'comment_created')

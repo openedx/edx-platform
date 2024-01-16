@@ -7,8 +7,8 @@
         var videoId = "365b710a-6dd6-11ee-b962-0242ac120002";
         var userId = 1;
         var currentLanguage = "en";
-        var getAITranscriptUrl = '/video-transcript' + '?transcript_language=' + currentLanguage + '&video_uuid=' + videoId;
-        var getTranscriptFeedbackUrl = '/transcript-feedback' + '?transcript_language=' + currentLanguage + '&video_uuid=' + videoId + '&user_id=' + userId;
+        var getAITranscriptUrl = '/video-transcript' + '?transcript_language=' + currentLanguage + '&video_id=' + videoId;
+        var getTranscriptFeedbackUrl = '/transcript-feedback' + '?transcript_language=' + currentLanguage + '&video_id=' + videoId + '&user_id=' + userId;
         var sendTranscriptFeedbackUrl = '/transcript-feedback/';
 
         beforeEach(function() {
@@ -226,7 +226,7 @@
                 expect(sendTranscriptFeedbackCall.args[0].dataType).toEqual('json');
                 expect(sendTranscriptFeedbackCall.args[0].data).toEqual({
                     transcript_language: currentLanguage,
-                    video_uuid: videoId,
+                    video_id: videoId,
                     user_id: userId,
                     value: true,
                 });

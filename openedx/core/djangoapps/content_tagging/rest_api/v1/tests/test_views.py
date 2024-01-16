@@ -31,7 +31,6 @@ from common.djangoapps.student.roles import (
 from openedx.core.djangoapps.content_libraries.api import (
     AccessLevel,
     create_library,
-    COMPLEX,
     set_library_user_permissions,
 )
 from openedx.core.djangoapps.content_tagging.models import TaxonomyOrg
@@ -44,6 +43,7 @@ TAXONOMY_ORG_LIST_URL = "/api/content_tagging/v1/taxonomies/"
 TAXONOMY_ORG_DETAIL_URL = "/api/content_tagging/v1/taxonomies/{pk}/"
 TAXONOMY_ORG_UPDATE_ORG_URL = "/api/content_tagging/v1/taxonomies/{pk}/orgs/"
 OBJECT_TAG_UPDATE_URL = "/api/content_tagging/v1/object_tags/{object_id}/?taxonomy={taxonomy_id}"
+OBJECT_TAGS_URL = "/api/content_tagging/v1/object_tags/{object_id}/"
 TAXONOMY_TEMPLATE_URL = "/api/content_tagging/v1/taxonomies/import/{filename}"
 TAXONOMY_CREATE_IMPORT_URL = "/api/content_tagging/v1/taxonomies/import/"
 TAXONOMY_TAGS_IMPORT_URL = "/api/content_tagging/v1/taxonomies/{pk}/tags/import/"
@@ -103,12 +103,8 @@ class TestTaxonomyObjectsMixin:
             collection_uuid=self.collection.uuid,
             org=self.orgA,
             slug="lib_a",
-            library_type=COMPLEX,
             title="Library Org A",
             description="This is a library from Org A",
-            allow_public_learning=False,
-            allow_public_read=False,
-            library_license="",
         )
 
     def _setUp_users(self):
@@ -281,7 +277,8 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
             user_attr: str,
             expected_taxonomies: list[str],
             enabled_parameter: bool | None = None,
-            org_parameter: str | None = None
+            org_parameter: str | None = None,
+            unassigned_parameter: bool | None = None
     ) -> None:
         """
         Helper function to call the list endpoint and check the response
@@ -292,7 +289,11 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
         self.client.force_authenticate(user=user)
 
         # Set parameters cleaning empty values
-        query_params = {k: v for k, v in {"enabled": enabled_parameter, "org": org_parameter}.items() if v is not None}
+        query_params = {k: v for k, v in {
+            "enabled": enabled_parameter,
+            "org": org_parameter,
+            "unassigned": unassigned_parameter,
+        }.items() if v is not None}
 
         response = self.client.get(url, query_params, format="json")
 
@@ -361,6 +362,31 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
             org_parameter=org_parameter,
             expected_taxonomies=expected_taxonomies,
         )
+
+    def test_list_unassigned_taxonomies(self):
+        """
+        Test that passing in "unassigned" query param returns Taxonomies that
+        are unassigned. i.e. does not belong to any org
+        """
+        self._test_list_taxonomy(
+            user_attr="staff",
+            expected_taxonomies=["ot1", "ot2"],
+            unassigned_parameter=True,
+        )
+
+    def test_list_unassigned_and_org_filter_invalid(self) -> None:
+        """
+        Test that passing "org" and "unassigned" query params should throw an error
+        """
+        url = TAXONOMY_ORG_LIST_URL
+
+        self.client.force_authenticate(user=self.user)
+
+        query_params = {"org": "orgA", "unassigned": "true"}
+
+        response = self.client.get(url, query_params, format="json")
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @ddt.data(
         ("user", (), None),
@@ -1298,9 +1324,6 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
     Testing various cases for the ObjectTagView.
     """
 
-    def test_get_tags(self):
-        pass
-
     @ddt.data(
         # userA and userS are staff in courseA and can tag using enabled taxonomies
         ("user", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
@@ -1502,6 +1525,40 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_get_tags(self):
+        self.client.force_authenticate(user=self.staffA)
+        taxonomy = self.multiple_taxonomy
+        tag_values = ["Tag 1", "Tag 2"]
+        put_url = OBJECT_TAG_UPDATE_URL.format(object_id=self.courseA, taxonomy_id=taxonomy.pk)
+
+        # Tag an object
+        response1 = self.client.put(put_url, {"tags": tag_values}, format="json")
+        assert status.is_success(response1.status_code)
+
+        # Fetch this object's tags for a single taxonomy
+        expected_tags = [{
+            'editable': True,
+            'name': 'Multiple Taxonomy',
+            'taxonomy_id': taxonomy.pk,
+            'tags': [
+                {'value': 'Tag 1', 'lineage': ['Tag 1']},
+                {'value': 'Tag 2', 'lineage': ['Tag 2']},
+            ],
+        }]
+
+        # Fetch tags for a single taxonomy
+        get_url = OBJECT_TAGS_URL.format(object_id=self.courseA)
+        get_url += f"?taxonomy={taxonomy.pk}"
+        response2 = self.client.get(get_url, format="json")
+        assert status.is_success(response2.status_code)
+        assert response2.data[str(self.courseA)]["taxonomies"] == expected_tags
+
+        # Fetch all of this object's tags, for all taxonomies
+        get_all_url = OBJECT_TAGS_URL.format(object_id=self.courseA)
+        response3 = self.client.get(get_all_url, format="json")
+        assert status.is_success(response3.status_code)
+        assert response3.data[str(self.courseA)]["taxonomies"] == expected_tags
 
 
 @skip_unless_cms
@@ -1824,10 +1881,9 @@ class TestImportTagsView(ImportTaxonomyMixin, APITestCase):
         url = TAXONOMY_TAGS_URL.format(pk=self.taxonomy.id)
         response = self.client.get(url)
         tags = response.data["results"]
-        all_tags = [{"value": tag.value} for tag in self.old_tags] + new_tags
-        assert len(tags) == len(all_tags)
+        assert len(tags) == len(new_tags)
         for i, tag in enumerate(tags):
-            assert tag["value"] == all_tags[i]["value"]
+            assert tag["value"] == new_tags[i]["value"]
 
     def test_import_no_file(self) -> None:
         """

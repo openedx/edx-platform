@@ -14,11 +14,13 @@ from common.djangoapps.student.auth import has_studio_read_access
 from ....utils import get_course_videos_context
 
 from cms.djangoapps.contentstore.video_storage_handlers import (
-    get_video_usage_path
+    get_video_usage_path,
+    create_video_zip,
 )
 from cms.djangoapps.contentstore.rest_api.v1.serializers import (
     CourseVideosSerializer,
     VideoUsageSerializer,
+    VideoDownloadSerializer
 )
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
 
@@ -180,3 +182,43 @@ class VideoUsageView(DeveloperErrorViewMixin, APIView):
         usage_locations = get_video_usage_path(course_key, edx_video_id)
         serializer = VideoUsageSerializer(usage_locations)
         return Response(serializer.data)
+
+
+@view_auth_classes(is_authenticated=True)
+class VideoDownloadView(DeveloperErrorViewMixin, APIView):
+    """
+    View for course video downloads.
+    """
+    @apidocs.schema(
+        body=VideoDownloadSerializer,
+        parameters=[
+            apidocs.string_parameter("course_id", apidocs.ParameterLocation.PATH, description="Course ID"),
+        ],
+        responses={
+            200: "In case of success, a 200.",
+            401: "The requester is not authenticated",
+            403: "The requester cannot access the specified course",
+            404: "The requested course does not exist",
+        },
+    )
+    @verify_course_exists()
+    def put(self, request: Request, course_id: str) -> Response:
+        """
+        Get an object containing course videos.
+        **Example Request**
+            PUT /api/contentstore/v1/videos/{course_id}/download, {
+                "files": [
+                    {"url": 'someUrl.com', "name": 'test.mp4'}
+                ]
+            }
+        **Response Values**
+        If the request is successful, an HTTP 200 "OK" response is returned.
+        The HTTP 200 response contains a zip file attachment containing all the
+        requested videos. The returned file's name will be {course_id}_videos_{random_id}.zip.
+        """
+        course_key = CourseKey.from_string(course_id)
+
+        if not has_studio_read_access(request.user, course_key):
+            self.permission_denied(request)
+        files = request.data['files']
+        return create_video_zip(course_id, files)

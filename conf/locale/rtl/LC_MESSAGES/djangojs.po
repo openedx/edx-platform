@@ -1,39 +1,39 @@
 # #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2023.
+# EdX Team <info@edx.org>, 2024.
 #
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2023.
+# EdX Team <info@edx.org>, 2024.
 #
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2023.
+# EdX Team <info@edx.org>, 2024.
 #
 # #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2023.
+# EdX Team <info@edx.org>, 2024.
 #
 # #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2023.
+# EdX Team <info@edx.org>, 2024.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-11-20 15:29+0000\n"
-"PO-Revision-Date: 2023-11-20 15:29:35.863393\n"
+"POT-Creation-Date: 2024-01-14 20:35+0000\n"
+"PO-Revision-Date: 2024-01-14 20:36:07.075048\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -158,7 +158,8 @@ msgstr "Ȼɥøøsǝ Fᴉlǝ"
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js cms/static/js/views/tabs.js
-#: lms/static/js/Markdown.Editor.js xmodule/js/src/html/edit.js
+#: cms/static/js/views/utils/xblock_utils.js lms/static/js/Markdown.Editor.js
+#: xmodule/js/src/html/edit.js
 #: common/static/common/templates/discussion/templates.underscore
 #: lms/templates/learner_dashboard/verification_popover.underscore
 msgid "OK"
@@ -770,6 +771,7 @@ msgid "Select a category"
 msgstr "Sǝlǝɔʇ ɐ ɔɐʇǝƃøɹʎ"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "Ⱥɔɔønnʇ Sǝʇʇᴉnƃs"
@@ -2006,6 +2008,7 @@ msgstr "Sǝɐɹɔɥ Ɍǝsnlʇs"
 msgid "[no tags]"
 msgstr "[nø ʇɐƃs]"
 
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: 'Tags' is the name of the view (noun) within the Student Notes
 #. page that shows all
 #. notes organized by the tags the student has associated with them (if any).
@@ -2014,6 +2017,7 @@ msgstr "[nø ʇɐƃs]"
 #. with the note
 #. in order to group similar notes together and help with search.
 #: lms/static/js/edxnotes/views/tabs/tags.js
+#: cms/templates/js/tag-list.underscore
 msgid "Tags"
 msgstr "Ŧɐƃs"
 
@@ -2929,26 +2933,6 @@ msgstr ""
 #: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 msgid "Go to dashboard"
 msgstr "Ǥø ʇø dɐsɥbøɐɹd"
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid "Recommendations for you"
-msgstr "Ɍǝɔøɯɯǝndɐʇᴉøns ɟøɹ ʎøn"
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid "loading"
-msgstr "løɐdᴉnƃ"
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid ""
-"Browse recently launched courses and see what's new in your favorite "
-"subjects."
-msgstr ""
-"Ƀɹøʍsǝ ɹǝɔǝnʇlʎ lɐnnɔɥǝd ɔønɹsǝs ɐnd sǝǝ ʍɥɐʇ's nǝʍ ᴉn ʎønɹ ɟɐʌøɹᴉʇǝ "
-"snbɾǝɔʇs."
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid "Explore courses"
-msgstr "Ɇxdløɹǝ ɔønɹsǝs"
 
 #: lms/static/js/learner_dashboard/Static2UCallouts.jsx
 msgid "More opportunities for you"
@@ -6241,6 +6225,7 @@ msgstr "Ⱥɹǝ ʎøn snɹǝ ʎøn ʍɐnʇ ʇø dǝlǝʇǝ ʇɥᴉs nddɐʇǝ?"
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/pages/container_subviews.js
 msgid "Copying"
 msgstr "Ȼødʎᴉnƃ"
 
@@ -6250,26 +6235,31 @@ msgstr "Ȼødʎ øɟ '{componentDisplayName}'"
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "Pasting"
 msgstr "Ᵽɐsʇᴉnƃ"
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "Some errors occurred"
 msgstr "Søɯǝ ǝɹɹøɹs øɔɔnɹɹǝd"
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "The following required files could not be added to the course:"
 msgstr "Ŧɥǝ ɟølløʍᴉnƃ ɹǝbnᴉɹǝd ɟᴉlǝs ɔønld nøʇ bǝ ɐddǝd ʇø ʇɥǝ ɔønɹsǝ:"
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "You may need to update a file(s) manually"
 msgstr "Ɏøn ɯɐʎ nǝǝd ʇø nddɐʇǝ ɐ ɟᴉlǝ(s) ɯɐnnɐllʎ"
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid ""
 "The following files already exist in this course but don't match the version"
 " used by the component you pasted:"
@@ -6279,21 +6269,25 @@ msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "New file(s) added to Files & Uploads."
 msgstr "Nǝʍ ɟᴉlǝ(s) ɐddǝd ʇø Fᴉlǝs & Ʉdløɐds."
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "The following required files were imported to this course:"
 msgstr "Ŧɥǝ ɟølløʍᴉnƃ ɹǝbnᴉɹǝd ɟᴉlǝs ʍǝɹǝ ᴉɯdøɹʇǝd ʇø ʇɥᴉs ɔønɹsǝ:"
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "View files"
 msgstr "Vᴉǝʍ ɟᴉlǝs"
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "Dismiss"
 msgstr "Đᴉsɯᴉss"
 
@@ -8202,16 +8196,16 @@ msgid "Financial Assistance Application"
 msgstr "Fᴉnɐnɔᴉɐl Ⱥssᴉsʇɐnɔǝ Ⱥddlᴉɔɐʇᴉøn"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid "About You"
-msgstr "Ⱥbønʇ Ɏøn"
+msgid "Profile Information"
+msgstr "Ᵽɹøɟᴉlǝ Ɨnɟøɹɯɐʇᴉøn"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
-"The following information is already a part of your {platform} profile. "
-"We've included it here for your application."
+"The following information is already a part of your {platform} profile and "
+"is required for your application. To edit this information go to "
 msgstr ""
-"Ŧɥǝ ɟølløʍᴉnƃ ᴉnɟøɹɯɐʇᴉøn ᴉs ɐlɹǝɐdʎ ɐ dɐɹʇ øɟ ʎønɹ {platform} dɹøɟᴉlǝ. "
-"Wǝ'ʌǝ ᴉnɔlndǝd ᴉʇ ɥǝɹǝ ɟøɹ ʎønɹ ɐddlᴉɔɐʇᴉøn."
+"Ŧɥǝ ɟølløʍᴉnƃ ᴉnɟøɹɯɐʇᴉøn ᴉs ɐlɹǝɐdʎ ɐ dɐɹʇ øɟ ʎønɹ {platform} dɹøɟᴉlǝ ɐnd "
+"ᴉs ɹǝbnᴉɹǝd ɟøɹ ʎønɹ ɐddlᴉɔɐʇᴉøn. Ŧø ǝdᴉʇ ʇɥᴉs ᴉnɟøɹɯɐʇᴉøn ƃø ʇø "
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Email address"
@@ -8226,8 +8220,8 @@ msgid "Country of residence"
 msgstr "Ȼønnʇɹʎ øɟ ɹǝsᴉdǝnɔǝ"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid "Back to {platform} FAQs"
-msgstr "Ƀɐɔʞ ʇø {platform} FȺQs"
+msgid "Application Details"
+msgstr "Ⱥddlᴉɔɐʇᴉøn Đǝʇɐᴉls"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Submit Application"
@@ -11064,6 +11058,10 @@ msgstr "Ħᴉdǝ ɟɹøɯ lǝɐɹnǝɹs"
 msgid "Note: Do not hide graded assignments after they have been released."
 msgstr "Nøʇǝ: Đø nøʇ ɥᴉdǝ ƃɹɐdǝd ɐssᴉƃnɯǝnʇs ɐɟʇǝɹ ʇɥǝʎ ɥɐʌǝ bǝǝn ɹǝlǝɐsǝd."
 
+#: cms/templates/js/publish-xblock.underscore
+msgid "Copy Unit"
+msgstr "Ȼødʎ Ʉnᴉʇ"
+
 #: cms/templates/js/release-date-editor.underscore
 msgid "Release Date and Time"
 msgstr "Ɍǝlǝɐsǝ Đɐʇǝ ɐnd Ŧᴉɯǝ"
@@ -11264,6 +11262,10 @@ msgstr "Xdǝɹʇ nnᴉʇ snɯɯɐɹᴉǝs"
 #: cms/templates/js/summary-configuration-editor.underscore
 msgid "Enable summaries"
 msgstr "Ɇnɐblǝ snɯɯɐɹᴉǝs"
+
+#: cms/templates/js/tag-list.underscore
+msgid "Manage tags"
+msgstr "Mɐnɐƃǝ ʇɐƃs"
 
 #: cms/templates/js/team-member.underscore
 msgid "Current Role:"

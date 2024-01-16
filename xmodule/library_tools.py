@@ -128,10 +128,16 @@ class LibraryToolsService:
             if library_version:
                 raise ObjectDoesNotExist(f"Version {library_version} of library {library_key} not found.")
             raise ObjectDoesNotExist(f"Library {library_key} not found.")
-        library_tasks.sync_from_library.delay(
-            user_id=self.user_id,
-            dest_block_id=str(dest_block.scope_ids.usage_id),
-            library_version=library_version,
+
+        # TODO: This task is synchronous until we can figure out race conditions with import.
+        # These race conditions lead to failed imports of library content from course import.
+        # See: TNL-11339, https://github.com/openedx/edx-platform/issues/34029 for more info.
+        library_tasks.sync_from_library.apply(
+            kwargs=dict(
+                user_id=self.user_id,
+                dest_block_id=str(dest_block.scope_ids.usage_id),
+                library_version=library_version,
+            ),
         )
 
     def trigger_duplication(self, source_block: LibraryContentBlock, dest_block: LibraryContentBlock) -> None:
@@ -185,7 +191,7 @@ class LibraryToolsService:
             for lib in self.store.get_library_summaries()
         ]
         v2_query = library_api.get_libraries_for_user(user)
-        v2_libs_with_meta = library_api.get_metadata_from_index(v2_query)
+        v2_libs_with_meta = library_api.get_metadata(v2_query)
         v2_libs = [(lib.key, lib.title) for lib in v2_libs_with_meta]
 
         if settings.FEATURES.get('ENABLE_LIBRARY_AUTHORING_MICROFRONTEND'):

@@ -16,7 +16,7 @@
                 <% for (var i = 0; i < tags.taxonomies.length; i++) {
                     var taxonomy = tags.taxonomies[i];
                 %>
-                    <div class="tagging-label tagging-label-tax-<%- taxonomy.id %>" id="tax-<%- taxonomy.id %>" tabindex=0 role="button" aria-controls="content-tags-tax-<%- taxonomy.id %>" aria-expanded=false>
+                    <div class="tagging-label tagging-label-link tagging-label-tax-<%- taxonomy.id %>" id="tax-<%- taxonomy.id %>" tabindex=0 role="button" aria-controls="content-tags-tax-<%- taxonomy.id %>" aria-expanded=false>
                         <span class="tagging-label-value" id="tax-<%- taxonomy.id %>"><%- taxonomy.value %></span>
                         <span class="tagging-label-count" id="tax-<%- taxonomy.id %>">(<%- taxonomy.count %>)</span>
                         <span class="icon fa fa-caret-down" aria-hidden="true" id="tax-<%- taxonomy.id %>"></span>

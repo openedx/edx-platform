@@ -8,7 +8,6 @@ from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
 from lms.djangoapps.courseware.tabs import EnrolledTab
-from openedx.core.djangoapps.course_live.config.waffle import ENABLE_COURSE_LIVE
 from openedx.core.djangoapps.course_live.models import CourseLiveConfiguration
 from openedx.core.djangoapps.course_live.providers import HasGlobalCredentials, ProviderManager
 from openedx.core.lib.cache_utils import request_cached
@@ -87,7 +86,6 @@ class CourseLiveTab(LtiCourseLaunchMixin, TabFragmentViewMixin, EnrolledTab):
         Check if the tab is enabled.
         """
         return (
-            ENABLE_COURSE_LIVE.is_enabled(course.id) and
             super().is_enabled(course, user) and
             CourseLiveConfiguration.is_enabled(course.id)
         )

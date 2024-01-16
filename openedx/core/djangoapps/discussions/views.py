@@ -156,7 +156,7 @@ class DiscussionsProvidersView(APIView):
         Handle HTTP/GET requests
         """
         # Return all providers always, if the user is staff
-        data = self.get_provider_data(course_key_string, show_all=request.user.is_staff)
+        data = self.get_provider_data(course_key_string, show_all=False)
         return Response(data)
 
     @staticmethod
@@ -188,6 +188,11 @@ class DiscussionsProvidersView(APIView):
             if not ENABLE_NEW_STRUCTURE_DISCUSSIONS.is_enabled(course_key):
                 if configuration.provider_type != Provider.OPEN_EDX:
                     hidden_providers.append(Provider.OPEN_EDX)
+
+        if configuration.provider_type != Provider.LEGACY:
+            hidden_providers.append(Provider.LEGACY)
+        else:
+            hidden_providers.append(Provider.OPEN_EDX)
 
         serializer = DiscussionsProvidersSerializer(
             {

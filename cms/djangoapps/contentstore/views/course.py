@@ -54,12 +54,9 @@ from common.djangoapps.student.roles import (
     UserBasedRole,
     OrgStaffRole
 )
-from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
 from common.djangoapps.util.string_utils import _has_non_ascii_characters
-from common.djangoapps.xblock_django.api import deprecated_xblocks
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.content_staging import api as content_staging_api
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -69,11 +66,11 @@ from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
 from organizations.models import Organization
 from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.course_block import CourseBlock, DEFAULT_START_DATE, CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_block import CourseBlock, CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.error_block import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import EdxJSONEncoder  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import DuplicateCourseError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -102,10 +99,10 @@ from ..utils import (
     get_course_grading,
     get_home_context,
     get_library_context,
+    get_course_index_context,
     get_lms_link_for_item,
     get_proctored_exam_settings_url,
     get_course_outline_url,
-    get_taxonomy_tags_widget_url,
     get_studio_home_url,
     get_updates_url,
     get_advanced_settings_url,
@@ -621,76 +618,17 @@ def course_index(request, course_key):
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    # A depth of None implies the whole course. The course outline needs this in order to compute has_changes.
-    # A unit may not have a draft version, but one of its components could, and hence the unit itself has changes.
+    if use_new_course_outline_page(course_key):
+        return redirect(get_course_outline_url(course_key))
     with modulestore().bulk_operations(course_key):
+        # A depth of None implies the whole course. The course outline needs this in order to compute has_changes.
+        # A unit may not have a draft version, but one of its components could, and hence the unit itself has changes.
         course_block = get_course_and_check_access(course_key, request.user, depth=None)
         if not course_block:
             raise Http404
-        if use_new_course_outline_page(course_key):
-            return redirect(get_course_outline_url(course_key))
-        lms_link = get_lms_link_for_item(course_block.location)
-        reindex_link = None
-        if settings.FEATURES.get('ENABLE_COURSEWARE_INDEX', False):
-            if GlobalStaff().has_user(request.user):
-                reindex_link = f"/course/{str(course_key)}/search_reindex"
-        sections = course_block.get_children()
-        course_structure = _course_outline_json(request, course_block)
-        locator_to_show = request.GET.get('show', None)
-
-        course_release_date = (
-            get_default_time_display(course_block.start)
-            if course_block.start != DEFAULT_START_DATE
-            else _("Set Date")
-        )
-
-        settings_url = reverse_course_url('settings_handler', course_key)
-
-        try:
-            current_action = CourseRerunState.objects.find_first(course_key=course_key, should_display=True)
-        except (ItemNotFoundError, CourseActionStateItemNotFoundError):
-            current_action = None
-
-        deprecated_block_names = [block.name for block in deprecated_xblocks()]
-        deprecated_blocks_info = _deprecated_blocks_info(course_block, deprecated_block_names)
-
-        frontend_app_publisher_url = configuration_helpers.get_value_for_org(
-            course_block.location.org,
-            'FRONTEND_APP_PUBLISHER_URL',
-            settings.FEATURES.get('FRONTEND_APP_PUBLISHER_URL', False)
-        )
-        # gather any errors in the currently stored proctoring settings.
-        advanced_dict = CourseMetadata.fetch(course_block)
-        proctoring_errors = CourseMetadata.validate_proctoring_settings(course_block, advanced_dict, request.user)
-
-        user_clipboard = content_staging_api.get_user_clipboard_json(request.user.id, request)
-
-        return render_to_response('course_outline.html', {
-            'language_code': request.LANGUAGE_CODE,
-            'context_course': course_block,
-            'lms_link': lms_link,
-            'sections': sections,
-            'course_structure': course_structure,
-            'initial_state': course_outline_initial_state(locator_to_show, course_structure) if locator_to_show else None,  # lint-amnesty, pylint: disable=line-too-long
-            'initial_user_clipboard': user_clipboard,
-            'rerun_notification_id': current_action.id if current_action else None,
-            'course_release_date': course_release_date,
-            'settings_url': settings_url,
-            'reindex_link': reindex_link,
-            'deprecated_blocks_info': deprecated_blocks_info,
-            'notification_dismiss_url': reverse_course_url(
-                'course_notifications_handler',
-                current_action.course_key,
-                kwargs={
-                    'action_state_id': current_action.id,
-                },
-            ) if current_action else None,
-            'frontend_app_publisher_url': frontend_app_publisher_url,
-            'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_block.id),
-            'advance_settings_url': reverse_course_url('advanced_settings_handler', course_block.id),
-            'proctoring_errors': proctoring_errors,
-            'taxonomy_tags_widget_url': get_taxonomy_tags_widget_url(course_block.id),
-        })
+        # should be under bulk_operations if course_block is passed
+        course_index_context = get_course_index_context(request, course_key, course_block)
+        return render_to_response('course_outline.html', course_index_context)
 
 
 @function_trace('get_courses_accessible_to_user')

@@ -1,7 +1,11 @@
 """
 Utils function for notifications app
 """
+from typing import Dict, List
+
 from common.djangoapps.student.models import CourseEnrollment
+from openedx.core.djangoapps.django_comment_common.models import Role
+from openedx.core.lib.cache_utils import request_cached
 
 from .config.waffle import ENABLE_COURSEWIDE_NOTIFICATIONS, SHOW_NOTIFICATIONS_TRAY
 
@@ -67,4 +71,81 @@ def filter_course_wide_preferences(course_key, preferences):
         for course_wide_type in course_wide_notification_types:
             if course_wide_type in notification_types.keys():
                 notification_types.pop(course_wide_type)
+    return preferences
+
+
+def get_user_forum_roles(user_id: int, course_id: str) -> List[str]:
+    """
+    Get forum roles for the given user in the specified course.
+
+    :param user_id: User ID
+    :param course_id: Course ID
+    :return: List of forum roles
+    """
+    return list(Role.objects.filter(course_id=course_id, users__id=user_id).values_list('name', flat=True))
+
+
+@request_cached()
+def get_notification_types_with_visibility_settings() -> Dict[str, List[str]]:
+    """
+    Get notification types with their visibility settings.
+
+    :return: List of dictionaries with notification type names and corresponding visibility settings
+    """
+    from .base_notification import COURSE_NOTIFICATION_TYPES
+
+    notification_types_with_visibility_settings = {}
+    for notification_type in COURSE_NOTIFICATION_TYPES.values():
+        if notification_type.get('visible_to'):
+            notification_types_with_visibility_settings[notification_type['name']] = notification_type['visible_to']
+
+    return notification_types_with_visibility_settings
+
+
+def filter_out_visible_notifications(
+    user_preferences: dict,
+    notifications_with_visibility: Dict[str, List[str]],
+    user_forum_roles: List[str]
+) -> dict:
+    """
+    Filter out notifications visible to forum roles from user preferences.
+
+    :param user_preferences: User preferences dictionary
+    :param notifications_with_visibility: List of dictionaries with notification type names and
+    corresponding visibility settings
+    :param user_forum_roles: List of forum roles for the user
+    :return: Updated user preferences dictionary
+    """
+    for key in user_preferences:
+        if 'notification_types' in user_preferences[key]:
+            # Iterate over the types to remove and pop them from the dictionary
+            for notification_type, is_visible_to in notifications_with_visibility.items():
+                is_visible = False
+                for role in is_visible_to:
+                    if role in user_forum_roles:
+                        is_visible = True
+                        break
+                if is_visible:
+                    continue
+
+                user_preferences[key]['notification_types'].pop(notification_type)
+    return user_preferences
+
+
+def remove_preferences_with_no_access(preferences: dict, user) -> dict:
+    """
+    Filter out notifications visible to forum roles from user preferences.
+
+    :param preferences: User preferences dictionary
+    :param user: User object
+    :return: Updated user preferences dictionary
+    """
+    user_preferences = preferences['notification_preference_config']
+    user_forum_roles = get_user_forum_roles(user.id, preferences['course_id'])
+    notifications_with_visibility_settings = get_notification_types_with_visibility_settings()
+    preferences['notification_preference_config'] = filter_out_visible_notifications(
+        user_preferences,
+        notifications_with_visibility_settings,
+        user_forum_roles
+    )
     return preferences

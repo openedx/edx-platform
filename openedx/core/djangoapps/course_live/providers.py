@@ -5,8 +5,6 @@ from abc import ABC
 from typing import List, Dict
 from django.conf import settings
 
-from openedx.core.djangoapps.course_live.config.waffle import ENABLE_BIG_BLUE_BUTTON
-
 
 class LiveProvider(ABC):
     """
@@ -120,7 +118,7 @@ class BigBlueButton(LiveProvider, HasGlobalCredentials):
 
     @property
     def is_enabled(self) -> bool:
-        return ENABLE_BIG_BLUE_BUTTON.is_enabled()
+        return True
 
     @staticmethod
     def get_global_keys() -> Dict:

@@ -10,7 +10,6 @@ from lti_consumer.models import LtiConfiguration
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.course_apps.plugins import CourseApp
-from openedx.core.djangoapps.course_live.config.waffle import ENABLE_COURSE_LIVE
 
 from .models import CourseLiveConfiguration
 
@@ -32,9 +31,9 @@ class LiveCourseApp(CourseApp):
     @classmethod
     def is_available(cls, course_key: CourseKey) -> bool:
         """
-        Live is available based on ENABLE_COURSE_LIVE flag
+        Live is available
         """
-        return ENABLE_COURSE_LIVE.is_enabled(course_key)
+        return True
 
     @classmethod
     def is_enabled(cls, course_key: CourseKey) -> bool:

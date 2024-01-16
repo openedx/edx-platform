@@ -166,7 +166,7 @@ def _scale_image(image, side_length):
     Given a PIL.Image object, get a resized copy with each side being
     `side_length` pixels long.  The scaled image will always be square.
     """
-    return image.resize((side_length, side_length), Image.ANTIALIAS)
+    return image.resize((side_length, side_length), Image.LANCZOS)
 
 
 def _create_image_file(image, exif):

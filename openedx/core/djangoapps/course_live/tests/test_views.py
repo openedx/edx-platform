@@ -5,7 +5,6 @@ import json
 import ddt
 from django.test import RequestFactory
 from django.urls import reverse
-from edx_toggles.toggles.testutils import override_waffle_flag
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag, LtiConfiguration
 from markupsafe import Markup
 from rest_framework.test import APITestCase
@@ -13,13 +12,11 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..config.waffle import ENABLE_COURSE_LIVE, ENABLE_BIG_BLUE_BUTTON
 from ..models import CourseLiveConfiguration
 from ..providers import ProviderManager
 
 
 @ddt.ddt
-@override_waffle_flag(ENABLE_BIG_BLUE_BUTTON, True)
 class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
     """
     Unit tests for the CourseLiveConfigurationView.
@@ -310,13 +307,12 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
 
     def test_courseware_api_has_live_tab(self):
         """
-        Test if courseware api has live-tab after ENABLE_COURSE_LIVE flag is enabled
+        Test if courseware api has live-tab
         """
         self.create_course_live_config()
-        with override_waffle_flag(ENABLE_COURSE_LIVE, True):
-            url = reverse('course-home:course-metadata', args=[self.course.id])
-            response = self.client.get(url)
-            content = json.loads(response.content.decode('utf-8'))
+        url = reverse('course-home:course-metadata', args=[self.course.id])
+        response = self.client.get(url)
+        content = json.loads(response.content.decode('utf-8'))
         data = next((tab for tab in content['tabs'] if tab['tab_id'] == 'lti_live'), None)
         self.assertEqual(data, {
             'tab_id': 'lti_live',
@@ -356,7 +352,6 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         self.assertEqual(content, expected_data)
 
 
-@override_waffle_flag(ENABLE_BIG_BLUE_BUTTON, True)
 class TestCourseLiveProvidersView(ModuleStoreTestCase, APITestCase):
     """
     Tests for course live provider view
@@ -432,11 +427,10 @@ class TestCourseLiveIFrameView(ModuleStoreTestCase, APITestCase):
             lti_1p1_client_secret='test_client_secret',
         )
         live_config.save()
-        with override_waffle_flag(ENABLE_COURSE_LIVE, True):
-            response = self.client.get(self.url)
-            self.assertEqual(response.status_code, 200)
-            self.assertIsInstance(response.data['iframe'], Markup)
-            self.assertIn('iframe', str(response.data['iframe']))
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.data['iframe'], Markup)
+        self.assertIn('iframe', str(response.data['iframe']))
 
     def test_non_authenticated_user(self):
         """

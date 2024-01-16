@@ -37,3 +37,10 @@ TRANSCRIPT_FEEDBACK = CourseWaffleFlag(
 XPERT_TRANSLATIONS_UI = CourseWaffleFlag(
     f'{WAFFLE_FLAG_NAMESPACE}.xpert_translations_ui', __name__
 )
+
+
+def use_xpert_translations_component(course_key):
+    """
+    Returns a boolean if xpert translations ui component is enabled
+    """
+    return XPERT_TRANSLATIONS_UI.is_enabled(course_key)

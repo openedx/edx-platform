@@ -240,9 +240,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         even though the actual stored state in the database will be ``"{}"``).
     """
 
-    # Use this sample rate for DataDog events.
-    API_DATADOG_SAMPLE_RATE = 0.1
-
     class ServiceUnavailable(XBlockUserStateClient.ServiceUnavailable):
         """
         This error is raised if the service backing this client is currently unavailable.

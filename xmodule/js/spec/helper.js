@@ -181,30 +181,30 @@
             } else if (settings.url === '/save_user_state') {
                 return {success: true};
             } else if (settings.url.match(/.+video-transcript.+$/)) {
-                if (settings.url.match(/.+&video_uuid=notAIGenerated/)) {
+                if (settings.url.match(/.+&video_id=notAIGenerated/)) {
                     return settings.success(null);
                 }
-                if (settings.url.match(/.+&video_uuid=inProgress/)) {
+                if (settings.url.match(/.+&video_id=inProgress/)) {
                     return settings.success({
                         status: 'In Progress'
                     });
                 }
-                if (settings.url.match(/.+&video_uuid=error/)) {
+                if (settings.url.match(/.+&video_id=error/)) {
                     return settings.error();
                 }
                 return settings.success({
                     status: 'Completed'
                 });
             } else if (settings.url.match(/.+transcript-feedback.+$/) && settings.type === 'GET') {
-                if (settings.url.match(/.+&video_uuid=error.+$/)) {
+                if (settings.url.match(/.+&video_id=error.+$/)) {
                     return settings.error();
                 }
-                if (settings.url.match(/.+&video_uuid=negative.+$/)) {
+                if (settings.url.match(/.+&video_id=negative.+$/)) {
                     return settings.success({
                         value: false
                     });
                 }
-                if (settings.url.match(/.+&video_uuid=none.+$/)) {
+                if (settings.url.match(/.+&video_id=none.+$/)) {
                     return settings.success(null);
                 }
                 return settings.success({

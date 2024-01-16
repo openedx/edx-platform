@@ -21,7 +21,8 @@ from openedx.core.djangolib.js_utils import js_escaped_string
             $('button[name=verified_mode]').click(function(e){
                 e.preventDefault();
                 window.location.href = '${ecommerce_payment_page | n, js_escaped_string}?sku=' +
-                encodeURIComponent('${sku | n, js_escaped_string}');
+                    encodeURIComponent('${sku | n, js_escaped_string}') +
+                    '&course_run_key=' + encodeURIComponent('${course_run_key | n, js_escaped_string}');
             });
         });
         % endif

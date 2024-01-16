@@ -699,7 +699,7 @@ def _ora_assessment_to_assignment(
     date_config_type = block_data.get_xblock_field(ora_block, 'date_config_type', 'manual')
     assignment_type = block_data.get_xblock_field(ora_block, 'format', None)
     block_title = block_data.get_xblock_field(ora_block, 'title', _('Open Response Assessment'))
-    course_key = block_data.root_block_usage_key
+    block_key = block_data.root_block_usage_key
 
     # Steps with no "due" date, like staff or training, should not show up here
     assessment_step_due = assessment.get('start')
@@ -712,7 +712,7 @@ def _ora_assessment_to_assignment(
         extra_info = None
     elif date_config_type == 'course_end':
         assessment_start = None
-        assessment_due = block_data.get_xblock_field(course_key, 'end')
+        assessment_due = block_data.get_xblock_field(block_key, 'end')
         extra_info = None
     else:
         assessment_start, assessment_due = None, None
@@ -746,7 +746,7 @@ def _ora_assessment_to_assignment(
     now = datetime.now(pytz.UTC)
     assignment_released = not assessment_start or assessment_start < now
     if assignment_released:
-        url = reverse('jump_to', args=[course_key, ora_block])
+        url = reverse('jump_to', args=[block_key.course_key, ora_block])
 
     past_due = not complete and assessment_due and assessment_due < now
     first_component_block_id = str(ora_block)

@@ -65,6 +65,8 @@ class CourseApiViewTestMixin:
             'sku': course_mode.sku,
             'bulk_sku': course_mode.bulk_sku,
             'expires': cls._serialize_datetime(course_mode.expiration_datetime),
+            'android_sku': course_mode.android_sku,
+            'ios_sku': course_mode.ios_sku
         }
 
     @classmethod

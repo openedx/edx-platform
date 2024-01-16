@@ -128,4 +128,16 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
             </li>
         </ul>
     </div>
+    <% if (enableCopyUnit) { %>
+        <div class="wrapper-pub-actions bar-mod-actions">
+            <ul>
+                <li>
+                    <button class="btn btn-outline-primary btn-default action-copy">
+                        <span class="icon fa fa-copy" aria-hidden="true"></span>
+                        <span class="button-label"><%- gettext("Copy Unit") %></span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+    <% } %>
 </div>

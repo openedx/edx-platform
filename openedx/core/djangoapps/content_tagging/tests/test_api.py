@@ -156,6 +156,13 @@ class TestAPITaxonomy(TestTaxonomyMixin, TestCase):
             getattr(self, taxonomy_attr) for taxonomy_attr in expected
         ]
 
+    def test_get_unassigned_taxonomies(self):
+        expected = ["taxonomy_no_orgs"]
+        taxonomies = list(api.get_unassigned_taxonomies())
+        assert taxonomies == [
+            getattr(self, taxonomy_attr) for taxonomy_attr in expected
+        ]
+
     @ddt.data(
         ("taxonomy_all_orgs", "all_orgs_course_tag"),
         ("taxonomy_all_orgs", "all_orgs_block_tag"),

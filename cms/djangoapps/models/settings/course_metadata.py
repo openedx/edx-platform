@@ -146,7 +146,6 @@ class CourseMetadata:
             exclude_list.append('allow_anonymous')
             exclude_list.append('allow_anonymous_to_peers')
             exclude_list.append('discussion_topics')
-
         return exclude_list
 
     @classmethod

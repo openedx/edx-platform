@@ -16,7 +16,6 @@ from django.core.cache import cache
 from django.db import connection
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from edx_toggles.toggles.testutils import override_waffle_switch
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 
@@ -28,7 +27,6 @@ from common.djangoapps.student.roles import (
     OrgStaffRole, OrgInstructorRole
 )
 from common.djangoapps.util.testing import UrlResetMixin
-from openedx.core.djangoapps.util.legacy_ip import USE_LEGACY_IP
 
 from ..models import (
     RestrictedCourse, Country, CountryAccessRule,
@@ -234,15 +232,13 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
 
     @ddt.data(
         # (Note that any '0.x.x.x' IP _should_ be blocked in this test.)
-        # ips, legacy, allow access
-        (['0.0.0.0', '1.1.1.1'], True, False),  # legacy looks at first IP and blocks
-        (['1.1.1.1', '0.0.0.0'], True, True),  # legacy fails to look at later IPs and allows
-        (['1.1.1.1', '2.2.2.2'], False, True),  # normal chain of access
-        (['1.1.1.1', '0.0.0.0', '2.2.2.2'], False, False),  # tried to sneak a blocked IP in, but we caught it
+        # ips, allow access
+        (['1.1.1.1', '2.2.2.2'], True),  # normal chain of access
+        (['1.1.1.1', '0.0.0.0', '2.2.2.2'], False),  # tried to sneak a blocked IP in, but we caught it
     )
     @ddt.unpack
     @mock.patch('openedx.core.djangoapps.embargo.api.country_code_from_ip')
-    def test_redirect_if_blocked_ips(self, ips, use_legacy, allow_access, mock_country):
+    def test_redirect_if_blocked_ips(self, ips, allow_access, mock_country):
         # Block the US
         CountryAccessRule.objects.create(
             rule_type=CountryAccessRule.BLACKLIST_RULE,
@@ -256,8 +252,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
         request = RequestFactory().get('', HTTP_X_FORWARDED_FOR=','.join(ips))
         request.user = self.user
 
-        with override_waffle_switch(USE_LEGACY_IP, use_legacy):
-            assert (embargo_api.redirect_if_blocked(request, self.course.id) is None) == allow_access
+        assert (embargo_api.redirect_if_blocked(request, self.course.id) is None) == allow_access
 
     @ddt.data(
         # access point, check disabled, allow access

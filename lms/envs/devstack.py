@@ -281,6 +281,9 @@ WRITABLE_GRADEBOOK_URL = 'http://localhost:1994'
 ########################## ORA STAFF GRADING APP ##############################
 ORA_GRADING_MICROFRONTEND_URL = 'http://localhost:1993'
 
+########################## ORA MFE APP ##############################
+ORA_MICROFRONTEND_URL = 'http://localhost:1992'
+
 ########################## LEARNER HOME APP ##############################
 LEARNER_HOME_MICROFRONTEND_URL = 'http://localhost:1996'
 
@@ -389,7 +392,7 @@ ACCOUNT_MICROFRONTEND_URL = 'http://localhost:1997'
 COMMUNICATIONS_MICROFRONTEND_URL = 'http://localhost:1984'
 AUTHN_MICROFRONTEND_URL = 'http://localhost:1999'
 AUTHN_MICROFRONTEND_DOMAIN = 'localhost:1999'
-EXAMS_DATE_MICROFRONTEND_URL = 'http://localhost:2020'
+EXAMS_DASHBOARD_MICROFRONTEND_URL = 'http://localhost:2020'
 
 ################### FRONTEND APPLICATION DISCUSSIONS ###################
 DISCUSSIONS_MICROFRONTEND_URL = 'http://localhost:2002'

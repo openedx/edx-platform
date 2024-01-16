@@ -10,12 +10,14 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
 from freezegun import freeze_time
+import json
 
 from common.djangoapps.student.tests.factories import UserFactory, AdminFactory
 from common.djangoapps.student.roles import CourseStaffRole
 from openedx.core.djangoapps.agreements.api import (
     create_integrity_signature,
     get_integrity_signatures_for_course,
+    get_lti_pii_signature
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
@@ -218,3 +220,72 @@ class IntegritySignatureViewTests(APITestCase, ModuleStoreTestCase):
             )
         )
         self._assert_response(response, status.HTTP_404_NOT_FOUND)
+
+
+@skip_unless_lms
+@patch.dict(settings.FEATURES, {'ENABLE_LTI_PII_ACKNOWLEDGEMENT': True})
+class LTIPIISignatureSignatureViewTests(APITestCase, ModuleStoreTestCase):
+    """
+        Tests for the LTI PII Signature View
+    """
+    USERNAME = "Bob"
+    PASSWORD = "edx"
+
+    OTHER_USERNAME = "Jane"
+
+    STAFF_USERNAME = "Alice"
+
+    def setUp(self):
+        super().setUp()
+
+        self.course = CourseFactory.create()
+
+        self.user = UserFactory.create(
+            username=self.USERNAME,
+            password=self.PASSWORD,
+        )
+        self.other_user = UserFactory.create(
+            username=self.OTHER_USERNAME,
+            password=self.PASSWORD,
+        )
+        self.lti_tools = json.dumps({"first_lti_tool": "This is the first tool",
+                                     "second_lti_tool": "This is the second tool"})
+
+        self.client.login(username=self.USERNAME, password=self.PASSWORD)
+        self.course_id = str(self.course.id)
+        self.time_created = datetime.now()
+
+    def _assert_response(self, response, expected_response, user=None, course_id=None):
+        """
+        Assert response is correct for the given information
+        """
+        assert response.status_code == expected_response
+        if user and course_id:
+            data = response.data
+            assert data['username'] == user.username
+            assert data['course_id'] == course_id
+
+    @patch.dict(settings.FEATURES, {'ENABLE_LTI_PII_ACKNOWLEDGEMENT': False})
+    def test_enabled_lti_pii_signature(self):
+        response = self.client.post(
+            reverse(
+                'lti_pii_signature',
+                kwargs={'course_id': self.course_id},
+            )
+        )
+        self._assert_response(response, status.HTTP_404_NOT_FOUND)
+
+    def test_post_lti_pii_signature_invalid_serializer(self):
+        response = self.client.post(reverse('lti_pii_signature', kwargs={'course_id': self.course_id}),
+                                    {"username": self.user.username, "course_id": self.course_id,
+                                     "lti_tools": self.lti_tools, "created_at": "0000-00-00"})
+        self._assert_response(response, status.HTTP_500_INTERNAL_SERVER_ERROR, self.user, self.course_id)
+
+    def test_post_lti_pii_signature(self):
+        response = self.client.post(reverse('lti_pii_signature', kwargs={'course_id': self.course_id}),
+                                    {"username": self.user.username, "course_id": self.course_id,
+                                     "lti_tools": self.lti_tools, "created_at": self.time_created})
+        self._assert_response(response, status.HTTP_200_OK, self.user, self.course_id)
+        signature = get_lti_pii_signature(self.user.username, self.course_id)
+        self.assertEqual(signature.user.username, self.user.username)
+        self.assertEqual(signature.lti_tools, self.lti_tools)

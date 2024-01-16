@@ -3,6 +3,7 @@
 
 import logging
 from textwrap import dedent
+from time import time
 
 from django.core.management import BaseCommand, CommandError
 from elasticsearch import exceptions
@@ -24,7 +25,7 @@ class Command(BaseCommand):
     Examples:
 
         ./manage.py reindex_course <course_id_1> <course_id_2> ... - reindexes courses with provided keys
-        ./manage.py reindex_course --all - reindexes all available courses
+        ./manage.py reindex_course --all --warning - reindexes all available courses with quieter logging
         ./manage.py reindex_course --setup - reindexes all courses for devstack setup
     """
     help = dedent(__doc__)
@@ -40,6 +41,10 @@ class Command(BaseCommand):
         parser.add_argument('--setup',
                             action='store_true',
                             help='Reindex all courses on developers stack setup')
+        parser.add_argument('--warning',
+                            action='store_true',
+                            help='Reduce logging to a WARNING level of output for progress tracking'
+                            )
 
     def _parse_course_key(self, raw_value):
         """ Parses course key from string """
@@ -61,12 +66,17 @@ class Command(BaseCommand):
         course_ids = options['course_ids']
         all_option = options['all']
         setup_option = options['setup']
+        readable_option = options['warning']
         index_all_courses_option = all_option or setup_option
 
         if (not len(course_ids) and not index_all_courses_option) or (len(course_ids) and index_all_courses_option):  # lint-amnesty, pylint: disable=len-as-condition
             raise CommandError("reindex_course requires one or more <course_id>s OR the --all or --setup flags.")
 
         store = modulestore()
+
+        if readable_option:
+            logging.disable(level=logging.INFO)
+            logging.warning('Reducing logging to WARNING level for easier progress tracking')
 
         if index_all_courses_option:
             index_names = (CoursewareSearchIndexer.INDEX_NAME, CourseAboutSearchIndexer.INDEX_NAME)
@@ -98,8 +108,18 @@ class Command(BaseCommand):
             # in case course keys are provided as arguments
             course_keys = list(map(self._parse_course_key, course_ids))
 
+        total = len(course_keys)
+        logging.warning(f'Reindexing {total} courses')
+        reindexed = 0
+        start = time()
+
         for course_key in course_keys:
             try:
                 CoursewareSearchIndexer.do_course_reindex(store, course_key)
+                reindexed += 1
+                if reindexed % 10 == 0 or reindexed == total:
+                    now = time()
+                    t = now - start
+                    logging.warning(f'{reindexed}/{total} reindexed in {t:.1f} seconds')
             except Exception as exc:  # lint-amnesty, pylint: disable=broad-except
                 logging.exception('Error indexing course %s due to the error: %s', course_key, exc)
