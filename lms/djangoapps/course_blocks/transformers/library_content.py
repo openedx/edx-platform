@@ -1,21 +1,30 @@
 """
 Content Library Transformer.
 """
-
+from __future__ import annotations
 
 import json
 import logging
+from functools import partial
+from typing import Any, Callable
+
 
 from eventtracking import tracker
+from opaque_keys.edx.keys import UsageKey
 
 from common.djangoapps.track import contexts
 from lms.djangoapps.courseware.models import StudentModule
+from openedx.core.djangoapps.content.block_structure.block_structure import (
+    BlockStructureModulestoreData,
+    BlockStructureBlockData,
+)
 from openedx.core.djangoapps.content.block_structure.transformer import (
     BlockStructureTransformer,
     FilteringTransformerMixin
 )
 from xmodule.library_content_block import LibraryContentBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.util.keys import BlockKey
 
 from ..utils import get_student_module_as_dict
 
@@ -34,7 +43,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
     READ_VERSION = 1
 
     @classmethod
-    def name(cls):
+    def name(cls) -> str:
         """
         Unique identifier for the transformer's class;
         same identifier used in setup.py.
@@ -42,7 +51,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
         return "library_content"
 
     @classmethod
-    def collect(cls, block_structure):
+    def collect(cls, block_structure: BlockStructureModulestoreData) -> None:
         """
         Collects any information that's necessary to execute this
         transformer's transform method.
@@ -57,7 +66,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
         store = modulestore()
 
         # needed for analytics purposes
-        def summarize_block(usage_key):
+        def summarize_block(usage_key: UsageKey) -> dict[str, str | None]:
             """ Basic information about the given block """
             orig_key, orig_version = store.get_block_original_usage(usage_key)
             return {
@@ -77,21 +86,34 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                 summary = summarize_block(child_key)
                 block_structure.set_transformer_block_field(child_key, cls, 'block_analytics_summary', summary)
 
-    def transform_block_filters(self, usage_info, block_structure):
-        all_library_children = set()
-        all_selected_children = set()
+    def transform_block_filters(
+        self,
+        usage_info: Any,
+        block_structure: BlockStructureBlockData,
+    ) -> list[Callable[[UsageKey], bool]]:
+        """
+        Returns a list of functions which filter blocks out of this user's structure.
+
+        For this particular Transformer, we only need one filter:
+        "given a block, remove it IFF it's under a library_content block BUT it is not selected for this user"
+        """
+        all_library_children: set[UsageKey] = set()
+        all_selected_children: set[UsageKey] = set()
         for block_key in block_structure:
             if block_key.block_type != 'library_content':
                 continue
             library_children = block_structure.get_children(block_key)
             if library_children:
                 all_library_children.update(library_children)
-                selected = []
-                shuffle = block_structure.get_xblock_field(block_key, 'shuffle')
-                manual = block_structure.get_xblock_field(block_key, 'manual')
-                max_count = block_structure.get_xblock_field(block_key, 'max_count')
-                candidates = block_structure.get_xblock_field(block_key, 'candidates')
-                source_library_id = block_structure.get_xblock_field(block_key, 'source_library_id')
+                selected: list[BlockKey] = []
+                shuffle: bool = block_structure.get_xblock_field(block_key, 'shuffle')
+                manual: bool = block_structure.get_xblock_field(block_key, 'manual')
+                max_count: int = block_structure.get_xblock_field(block_key, 'max_count')
+                candidates: list[UsageKey] = [
+                    UsageKey.from_string(key_string)
+                    for key_string in block_structure.get_xblock_field(block_key, 'candidates')
+                ]
+                source_library_id: str = block_structure.get_xblock_field(block_key, 'source_library_id')
 
                 if max_count < 0:
                     max_count = len(library_children)
@@ -102,15 +124,15 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                     # Add all selected entries for this user for this
                     # library block to the selected list.
                     block_type, block_id = selected_block
-                    usage_key = usage_info.course_key.make_usage_key(block_type, block_id)
+                    usage_key = usage_info.course_key.make_usage_key(*selected_block)
                     if usage_key in library_children:
-                        selected.append(selected_block)
+                        selected.append(BlockKey(*selected_block))
 
                 # Update selected
                 previous_count = len(selected)
                 block_keys = LibraryContentBlock.make_selection(
                     usage_key=block_key,
-                    old_selected=list(map(tuple, selected)),  # Convert from nested list to list-of-tuples.
+                    old_selected=selected,
                     all_children=library_children,
                     candidates=candidates,
                     max_count=max_count,
@@ -140,9 +162,9 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                     block_keys,
                     usage_info.user.id,
                 )
-                all_selected_children.update(usage_info.course_key.make_usage_key(s[0], s[1]) for s in selected)
+                all_selected_children.update(usage_info.course_key.make_usage_key(*s) for s in selected)
 
-        def check_child_removal(block_key):
+        def check_child_removal(block_key: UsageKey):
             """
             Return True if selected block should be removed.
 
@@ -157,12 +179,20 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
 
         return [block_structure.create_removal_filter(check_child_removal)]
 
-    def _publish_events(self, block_structure, location, previous_count, max_count, block_keys, user_id):
+    def _publish_events(
+        self,
+        block_structure: BlockStructureBlockData,
+        location: UsageKey,
+        previous_count: int,
+        max_count: int,
+        block_keys: dict[str, list[BlockKey]],
+        user_id,
+    ) -> None:
         """
         Helper method to publish events for analytics purposes
         """
 
-        def format_block_keys(keys):
+        def format_block_keys(keys: list[BlockKey]) -> list:
             """
             Helper function to format block keys
             """
@@ -174,7 +204,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                 json_result.append(info)
             return json_result
 
-        def publish_event(event_name, result, **kwargs):
+        def publish_event(event_name: str, result: list, **kwargs) -> None:
             """
             Helper function to publish an event for analytics purposes
             """
@@ -213,7 +243,7 @@ class ContentLibraryOrderTransformer(BlockStructureTransformer):
     READ_VERSION = 1
 
     @classmethod
-    def name(cls):
+    def name(cls) -> str:
         """
         Unique identifier for the transformer's class;
         same identifier used in setup.py
@@ -221,15 +251,14 @@ class ContentLibraryOrderTransformer(BlockStructureTransformer):
         return "library_content_randomize"
 
     @classmethod
-    def collect(cls, block_structure):
+    def collect(cls, block_structure: BlockStructureModulestoreData) -> None:
         """
         Collects any information that's necessary to execute this
         transformer's transform method.
         """
         # There is nothing to collect
-        pass  # pylint:disable=unnecessary-pass
 
-    def transform(self, usage_info, block_structure):
+    def transform(self, usage_info: Any, block_structure: BlockStructureBlockData) -> None:
         """
         Transforms the order of the children of the randomized content block
         to match the order of the selections made and stored in the XBlock 'selected' field.
@@ -238,12 +267,16 @@ class ContentLibraryOrderTransformer(BlockStructureTransformer):
             if block_key.block_type != 'library_content':
                 continue
 
-            library_children = block_structure.get_children(block_key)
+            library_children: list[UsageKey] = block_structure.get_children(block_key)
 
             if library_children:
                 state_dict = get_student_module_as_dict(usage_info.user, usage_info.course_key, block_key)
-                current_children_blocks = {block.block_id for block in library_children}
-                current_selected_blocks = {item[1] for item in state_dict.get('selected', [])}
+                current_children_blocks: set[str] = {
+                    block.block_id for block in library_children
+                }
+                current_selected_blocks: set[str] = {
+                    block_id for _block_type, block_id in state_dict.get('selected', [])
+                }
 
                 # As the selections should have already been made by the ContentLibraryTransformer,
                 # the current children of the library_content block should be the same as the stored
@@ -258,5 +291,13 @@ class ContentLibraryOrderTransformer(BlockStructureTransformer):
                         usage_info.user.username
                     )
                 else:
-                    ordering_data = {block[1]: position for position, block in enumerate(state_dict['selected'])}
-                    library_children.sort(key=lambda block, data=ordering_data: data[block.block_id])
+                    ordering_data: dict[str, int] = {
+                        block_id: position
+                        for position, (_block_type, block_id)
+                        in enumerate(state_dict['selected'])
+                    }
+                    get_position_for_child: Callable[[UsageKey], int] = partial(
+                        lambda child_usage_key, ordering: ordering[child_usage_key.block_id],
+                        ordering_data,  # Avoid directly using ordering_data in lambda, since it's a loop variable.
+                    )
+                    library_children.sort(key=get_position_for_child)

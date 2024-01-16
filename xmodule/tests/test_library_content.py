@@ -12,6 +12,7 @@ import ddt
 from bson.objectid import ObjectId
 from fs.memoryfs import MemoryFS
 from lxml import etree
+from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
 from rest_framework import status
 from search.search_engine_base import SearchEngine
@@ -29,6 +30,7 @@ from xmodule.tests import prepare_block_runtime
 from xmodule.validation import StudioValidationMessage
 from xmodule.x_module import AUTHOR_VIEW
 from xmodule.capa_block import ProblemBlock
+from xmodule.util.keys import BlockKey
 from common.djangoapps.student.tests.factories import UserFactory
 
 from .test_course_block import DummySystem as TestImportSystem
@@ -790,10 +792,27 @@ def _mock_selection_sample(wrapped):
     return patch.object(library_content_block.random, "sample", _mock_sample)(wrapped)
 
 
+def _mock_child_key_derivation(wrapped):
+    """
+    Generate LCB child keys in a way that allows us to write readable unit tests.
+    """
+    def _mock_derive_key(source: UsageKey, dest_parent: BlockKey) -> BlockKey:
+        """
+        Instead of making a hash digest, just smash the source+dest key parts together with underscores.
+        """
+        source_library = source.context_key
+        return BlockKey(
+            source.block_type,
+            f"{source.context_key.org}_{source.context_key.library}_{source.block_id}_{dest_parent.id}",
+        )
+    return patch.object(library_content_block, "derive_key", _mock_derive_key)(wrapped)
+
+
 @skip_unless_lms
 @ddt.ddt
 @_mock_selection_shuffle
 @_mock_selection_sample
+@_mock_child_key_derivation
 class TestLibraryContentSelection(MixedSplitTestCase):
     """
     Test library content selection for the various modes of the LibraryContentBlock.
@@ -810,19 +829,28 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         sequential = self.make_block("sequential", chapter)
         vertical = self.make_block("vertical", sequential)
         self.lc_block = self.make_block("library_content", vertical)
+        self.source_library_key = LibraryLocator.from_string("library-v1:myorg+mylib")
 
-    def _create_lc_block_children(self, block_keys: list[tuple[str, str]]) -> None:
+    def _create_lc_block_children(self, block_ids: list[str]) -> None:
         """
-        Add blocks as children of the LCB, simluating an item being added to the source library.
+        Add HTML blocks as children of the LCB, simluating an item being added to the source library.
 
-        Each item should be a (type, ID) tuple.
+        Each item should be the .block_id part of a UsageKey.
         """
         selected = self.lc_block.selected  # TODO/HACK: 'selected' is lost upon re-load, so we manuallay save+fix it.
         self.store.update_item(self.lc_block, self.user_id)  # Persist any changes so we can reload later.
-        for block_type, block_id in block_keys:
-            new_block = self.make_block(category=block_type, parent_block=self.lc_block, display_name=block_id)
+        for block_id in block_ids:
+            new_block = self.make_block(category="html", parent_block=self.lc_block, display_name=block_id)
         self.lc_block = self.store.get_item(self.lc_block.location)  # Reload to update '.children'.
         self.lc_block.selected = selected  # TODO/HACK
+
+    def _set_lc_block_candidates(self, block_ids: list[str]) -> None:
+        """
+        Set HTML blocks as the candiates of the LCB.
+        """
+        self.lc_block.candidates = [
+            str(self.source_library_key.make_usage_key("html", block_id)) for block_id in block_ids
+        ]
 
     def _remove_lc_block_child(self, block_key: tuple[str, str], delete_child=True, remove_candidate=True) -> None:
         """
@@ -862,21 +890,21 @@ class TestLibraryContentSelection(MixedSplitTestCase):
             manual=False,
             shuffle=False,  # disabling shuffling -- shouldn't affect anything.
             children=[],
-            candidates=[('html', 'i-do-not-exist'), ('html', 'i-am-not-real')],
+            candidates=['i-do-not-exist', 'i-am-not-real'],
         ),
         dict(
             # "Static mode" with library items but no candidates.
             manual=True,
             shuffle=False,
-            children=[('html', 'a'), ('html', 'b'), ('html', 'c')],
+            children=['a', 'b', 'c'],
             candidates=[],
         ),
         dict(
             # "Static mode with shuffling" with library items and candidates, but the candidates don't actually exist.
             manual=True,
             shuffle=True,
-            children=[('html', 'a'), ('html', 'b'), ('html', 'c')],
-            candidates=[('html', 'i-do-not-exist'), ('html', 'i-am-not-real')],
+            children=['a', 'b', 'c'],
+            candidates=['i-do-not-exist', 'i-am-not-real'],
         ),
     )
     @ddt.unpack
@@ -887,7 +915,7 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         self.lc_block.manual = manual
         self.lc_block.shuffle = shuffle
         self._create_lc_block_children(children)
-        self.lc_block.candidates = candidates
+        self._set_lc_block_candidates(candidates)
         assert self.lc_block.available_children() == []
         assert self.lc_block.selected_children() == []
 
@@ -896,22 +924,22 @@ class TestLibraryContentSelection(MixedSplitTestCase):
             # "Randomized mode"
             manual=False,
             shuffle=True,
-            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            initial_children=['a', 'b', 'c', 'd'],
             initial_candidates=[],
         ),
         dict(
             # "Static mode" (with one non-candidate child)
             manual=True,
             shuffle=False,
-            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'x'), ('html', 'c'), ('html', 'd')],
-            initial_candidates=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            initial_children=['a', 'b', 'x', 'c', 'd'],
+            initial_candidates=['a', 'b', 'c', 'd'],
         ),
         dict(
             # "Static mode with shuffling" (with one non-candidate child)
             manual=True,
             shuffle=True,
-            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'x'), ('html', 'c'), ('html', 'd')],
-            initial_candidates=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            initial_children=['a', 'b', 'x', 'c', 'd'],
+            initial_candidates=['a', 'b', 'c', 'd'],
         ),
     )
     @ddt.unpack
@@ -923,7 +951,7 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         self.lc_block.manual = manual
         self.lc_block.shuffle = shuffle
         self._create_lc_block_children(initial_children)
-        self.lc_block.candidates = initial_candidates
+        self._set_lc_block_candidates(initial_candidates)
         assert len(self.lc_block.available_children()) == 4  # Sanity check ddt input
 
         # Start with 2 selected.
@@ -948,13 +976,13 @@ class TestLibraryContentSelection(MixedSplitTestCase):
             assert selection_of_all_4 == self.lc_block.available_children()
 
         # Toss a new block into the children list, and add it to candidates list too.
-        additional_child = ('html', 'e')
+        additional_child = 'e'
         self._create_lc_block_children([additional_child])
         self.lc_block.candidates += [additional_child]
 
         # MANUAL ONLY: toss another non-candidate block into the children -- should be ignored.
         if manual:
-            self._create_lc_block_children([('html', 'y')])  # Another additional non-candidate child
+            self._create_lc_block_children(['y'])  # Another additional non-candidate child
 
         # Since -1 means "use all available children", 5 should be selected, including the 4 from last step.
         assert len(self.lc_block.available_children()) == 5
@@ -977,22 +1005,22 @@ class TestLibraryContentSelection(MixedSplitTestCase):
             # "Randomized mode"
             manual=False,
             shuffle=True,
-            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            initial_children=['a', 'b', 'c', 'd'],
             initial_candidates=[],
         ),
         dict(
             # "Static mode" (with one non-candidate child)
             manual=True,
             shuffle=False,
-            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'x'), ('html', 'c'), ('html', 'd')],
-            initial_candidates=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            initial_children=['a', 'b', 'x', 'c', 'd'],
+            initial_candidates=['a', 'b', 'c', 'd'],
         ),
         dict(
             # "Static mode with shuffling" (with one non-candidate child)
             manual=True,
             shuffle=True,
-            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'x'), ('html', 'c'), ('html', 'd')],
-            initial_candidates=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            initial_children=['a', 'b', 'x', 'c', 'd'],
+            initial_candidates=['a', 'b', 'c', 'd'],
         ),
     )
     @ddt.unpack
@@ -1004,7 +1032,7 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         self.lc_block.manual = manual
         self.lc_block.shuffle = shuffle
         self._create_lc_block_children(initial_children)
-        self.lc_block.candidates = initial_candidates
+        self._set_lc_block_candidates(initial_candidates)
         assert len(self.lc_block.available_children()) == 4  # Sanity check ddt input
 
         # Start with max selection.
@@ -1031,7 +1059,7 @@ class TestLibraryContentSelection(MixedSplitTestCase):
             manual=False,
             shuffle=True,
             index_of_selected_to_keep=0,
-            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            initial_children=['a', 'b', 'c', 'd'],
             initial_candidates=[],
             delete_child=True,
             remove_candidate=False,
@@ -1041,8 +1069,8 @@ class TestLibraryContentSelection(MixedSplitTestCase):
             manual=False,
             shuffle=True,
             index_of_selected_to_keep=1,
-            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
-            initial_candidates=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            initial_children=['a', 'b', 'c', 'd'],
+            initial_candidates=['a', 'b', 'c', 'd'],
             delete_child=True,
             remove_candidate=True,
         ),
@@ -1051,8 +1079,8 @@ class TestLibraryContentSelection(MixedSplitTestCase):
             manual=True,
             shuffle=False,
             index_of_selected_to_keep=0,
-            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'x'), ('html', 'c'), ('html', 'd')],
-            initial_candidates=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            initial_children=['a', 'b', 'x', 'c', 'd'],
+            initial_candidates=['a', 'b', 'c', 'd'],
             delete_child=False,
             remove_candidate=True,
         ),
@@ -1062,8 +1090,8 @@ class TestLibraryContentSelection(MixedSplitTestCase):
             manual=True,
             shuffle=True,
             index_of_selected_to_keep=1,
-            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'x'), ('html', 'c'), ('html', 'd')],
-            initial_candidates=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            initial_children=['a', 'b', 'x', 'c', 'd'],
+            initial_candidates=['a', 'b', 'c', 'd'],
             delete_child=True,
             remove_candidate=False,
         ),
@@ -1088,7 +1116,7 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         self.lc_block.manual = manual
         self.lc_block.shuffle = shuffle
         self._create_lc_block_children(initial_children)
-        self.lc_block.candidates = initial_candidates
+        self._set_lc_block_candidates(initial_candidates)
         assert len(self.lc_block.available_children()) == 4  # Sanity check ddt input
 
         # Start with 2 selected blocks.
@@ -1116,7 +1144,7 @@ class TestLibraryContentSelection(MixedSplitTestCase):
             manual=False,
             shuffle=True,
             index_of_selected_to_keep=0,
-            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            initial_children=['a', 'b', 'c', 'd'],
             initial_candidates=[],
             delete_child=True,
             remove_candidate=False,
@@ -1126,8 +1154,8 @@ class TestLibraryContentSelection(MixedSplitTestCase):
             manual=False,
             shuffle=True,
             index_of_selected_to_keep=1,
-            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
-            initial_candidates=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            initial_children=['a', 'b', 'c', 'd'],
+            initial_candidates=['a', 'b', 'c', 'd'],
             delete_child=True,
             remove_candidate=True,
         ),
@@ -1136,8 +1164,8 @@ class TestLibraryContentSelection(MixedSplitTestCase):
             manual=True,
             shuffle=False,
             index_of_selected_to_keep=0,
-            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'x'), ('html', 'c'), ('html', 'd')],
-            initial_candidates=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            initial_children=['a', 'b', 'x', 'c', 'd'],
+            initial_candidates=['a', 'b', 'c', 'd'],
             delete_child=False,
             remove_candidate=True,
         ),
@@ -1147,8 +1175,8 @@ class TestLibraryContentSelection(MixedSplitTestCase):
             manual=True,
             shuffle=True,
             index_of_selected_to_keep=1,
-            initial_children=[('html', 'a'), ('html', 'b'), ('html', 'x'), ('html', 'c'), ('html', 'd')],
-            initial_candidates=[('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')],
+            initial_children=['a', 'b', 'x', 'c', 'd'],
+            initial_candidates=['a', 'b', 'c', 'd'],
             delete_child=True,
             remove_candidate=False,
         ),
@@ -1173,7 +1201,7 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         self.lc_block.manual = manual
         self.lc_block.shuffle = shuffle
         self._create_lc_block_children(initial_children)
-        self.lc_block.candidates = initial_candidates
+        self._set_lc_block_candidates(initial_candidates)
         assert len(self.lc_block.available_children()) == 4  # Sanity check ddt input
 
         # Start with 2 selected blocks.
@@ -1212,11 +1240,13 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         # Start with 4 available blocks
         self.lc_block.manual = manual
         self.lc_block.shuffle = shuffle
-        initial_children = [('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')]
+        initial_children = ['a', 'b', 'c', 'd']
         self._create_lc_block_children(initial_children)
+        initial_candidates = ['a', 'b', 'c', 'd']
+        self._set_lc_block_candidates(initial_candidates)
         self.lc_block.candidates = initial_children
         if manual:
-            self._create_lc_block_children([('html', 'x')])  # unavailable child
+            self._create_lc_block_children(['x'])  # unavailable child
         assert self.lc_block.available_children() == initial_children
 
         # Start with a selection of 2
@@ -1236,7 +1266,7 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         self._remove_lc_block_child(unselected_child_to_remove)
 
         # Finally, add 2 new children.
-        additional_children = [('html', 'e'), ('html', 'f')]
+        additional_children = ['e', 'f']
         self._create_lc_block_children(additional_children)
         self.lc_block.candidates += additional_children
 
@@ -1262,10 +1292,10 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         """
         # 4 children, 2 of which are candidates.
         self.lc_block.shuffle = shuffle
-        children = [('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')]
+        children = ['a', 'b', 'c', 'd']
         self._create_lc_block_children(children)
-        candidates = [('html', 'a'), ('html', 'c')]
-        self.lc_block.candidates = candidates
+        candidates = ['a', 'c']
+        self._set_lc_block_candidates(candidates)
 
         # Select all available.
         self.lc_block.max_count = -1
@@ -1303,7 +1333,7 @@ class TestLibraryContentSelection(MixedSplitTestCase):
         # 4 children.
         self.lc_block.shuffle = shuffle
         self.lc_block.max_count = 2
-        children = [('html', 'a'), ('html', 'b'), ('html', 'c'), ('html', 'd')]
+        children = ['a', 'b', 'c', 'd']
         self._create_lc_block_children(children)
 
         # Non-manual mode: Any 2 of 4 children are selected.
@@ -1320,7 +1350,7 @@ class TestLibraryContentSelection(MixedSplitTestCase):
                 candidates.append(child)
                 break
         assert len(candidates) == 2  # Sanity chek
-        self.lc_block.candidates = candidates
+        self._set_lc_block_candidates(candidates)
 
         # Manual mode: Just the 2 candidates should now be selected.
         self.lc_block.manual = True

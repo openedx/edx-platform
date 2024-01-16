@@ -8,7 +8,7 @@ import logging
 import random
 from copy import copy
 from gettext import ngettext, gettext
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Callable
 
 import bleach
 from django.conf import settings
@@ -58,23 +58,28 @@ logger = logging.getLogger(__name__)
 ANY_CAPA_TYPE_VALUE = 'any'
 
 
-def _get_human_name(problem_class):
+def _get_human_name(problem_class: type) -> str:
     """
     Get the human-friendly name for a problem type.
     """
     return getattr(problem_class, 'human_name', problem_class.__name__)
 
 
-def _get_capa_types():
+def _get_capa_types() -> list[dict[str, str]]:
     """
     Gets capa types tags and labels
     """
     capa_types = {tag: _get_human_name(registry.get_class_for_tag(tag)) for tag in registry.registered_tags()}
-
-    return [{'value': ANY_CAPA_TYPE_VALUE, 'display_name': _('Any Type')}] + sorted([
-        {'value': capa_type, 'display_name': caption}
-        for capa_type, caption in capa_types.items()
-    ], key=lambda item: item.get('display_name'))
+    return [
+        {'value': ANY_CAPA_TYPE_VALUE, 'display_name': _('Any Type')},
+        *sorted(
+            [
+                {'value': capa_type, 'display_name': caption}
+                for capa_type, caption in capa_types.items()
+            ],
+            key=lambda item: item['display_name']
+        ),
+    ]
 
 
 class LibraryToolsUnavailable(ValueError):
@@ -119,65 +124,67 @@ class LibraryContentBlock(
 
     show_in_read_only_mode = True
 
-    # noinspection PyMethodParameters
     @classproperty
-    def completion_mode(cls):  # pylint: disable=no-self-argument
+    def completion_mode(cls) -> str:  # pylint: disable=no-self-argument
         """
         Allow overriding the completion mode with a feature flag.
         This is a property, so it can be dynamically overridden in tests, as it is not evaluated at runtime.
         """
-        if settings.FEATURES.get('MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW', False):
+        if settings.FEATURES.get('MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW', False):  # type: ignore
             return XBlockCompletionMode.COMPLETABLE
 
         return XBlockCompletionMode.AGGREGATOR
 
     resources_dir = 'assets/library_content'
 
-    display_name = String(
+    # NOTE: These field type annotations are correct on an *instance* of LibraryContentBlock, but on the
+    #       LibraryContentBlock class itself, these would all actually be XBlock Field objects.
+    #       Until then, these annotations are the only way to thoroughly typecheck this module.
+    display_name: str = String(
         display_name=_("Display Name"),
         help=_("The display name for this component."),
         default="Library Content",
         scope=Scope.settings,
     )
-    source_library_id = String(
+    source_library_id: str | None = String(
         display_name=_("Library"),
         help=_("Select the library from which you want to draw content."),
         scope=Scope.settings,
         values_provider=lambda instance: instance.source_library_values(),
     )
-    source_library_version = String(
+    source_library_version: str | None = String(
         # This is a hidden field that stores the version of source_library when we last pulled content from it
         display_name=_("Library Version"),
         scope=Scope.settings,
     )
-    max_count = Integer(
+    max_count: int = Integer(
         display_name=_("Count"),
         help=_("Enter the number of components to display to each student. Set it to -1 to display all components."),
         default=1,
         scope=Scope.settings,
     )
-    capa_type = String(
+    capa_type: str = String(
         display_name=_("Problem Type"),
         help=_('Choose a problem type to fetch from the library. If "Any Type" is selected no filtering is applied.'),
         default=ANY_CAPA_TYPE_VALUE,
         values=_get_capa_types(),
         scope=Scope.settings,
     )
-    candidates = List(
-        # This is a list of library block usage keys representing the library subset that the author
+    candidates: list[str] = List(
+        # This is a list of stringified library block usage keys representing the library subset that the author
         # has manually picked as candidates for selection. Note: these are the keys of *blocks in the
         # source library*, not of the keys of this block's children.
         display_name=_("Manually Selected Blocks"),
         default=[],
         scope=Scope.settings,
     )
-    selected = List(
+    selected: list[list[str]] = List(
         # This is a list of [block_type, block_id] pairs used to record
         # which set of matching blocks was selected per user
         default=[],
         scope=Scope.user_state,
     )
-    shuffle = Boolean(
+    shuffle: bool = Boolean(
         # Do we shuffle (randomize order) of selected blocks for each learner?
         # True -> Order is randomized for each learner. \n False -> Original order from candidates/children is used.
         # False -> is the block content only drawn from content which is in the candidates list?
@@ -187,7 +194,7 @@ class LibraryContentBlock(
         scope=Scope.settings,
 
     )
-    manual = Boolean(
+    manual: bool = Boolean(
         # Should selected blocks be limited to the manually-picked candidates?
         # True -> Draw selections from `candidates`.
         # False -> Draw selections from `children`.
@@ -197,7 +204,7 @@ class LibraryContentBlock(
         scope=Scope.settings,
     )
     # This cannot be called `show_reset_button`, because children blocks inherit this as a default value.
-    allow_resetting_children = Boolean(
+    allow_resetting_children: bool = Boolean(
         display_name=_("Show Reset Button"),
         help=_("Determines whether a 'Reset Problems' button is shown, so users may reset their answers and reshuffle "
                "selected items."),
@@ -310,7 +317,7 @@ class LibraryContentBlock(
         return self.get_available_children(
             usage_key=self.location,
             all_children=self.children,
-            candidates=self.candidates,
+            candidates=[UsageKey.from_string(candidate) for candidate in self.candidates],
             manual=self.manual,
         )
 
@@ -426,7 +433,12 @@ class LibraryContentBlock(
         }
 
     @classmethod
-    def publish_selected_children_events(cls, block_keys, format_block_keys, publish_event):
+    def publish_selected_children_events(
+        cls,
+        block_keys: dict[str, list[BlockKey]],
+        format_block_keys: Callable[[list[BlockKey]], list],
+        publish_event: Callable[..., None],
+    ) -> None:
         """
         Helper method for publishing events when children blocks are
         selected/updated for a user.  This helper is also used by
@@ -508,7 +520,7 @@ class LibraryContentBlock(
             usage_key=self.location,
             old_selected=self.selected_block_keys,
             all_children=self.children,
-            candidates=self.candidates,
+            candidates=[UsageKey.from_string(candidate) for candidate in self.candidates],
             max_count=self.max_count,
             manual=self.manual,
             shuffle=self.shuffle,
@@ -671,7 +683,13 @@ class LibraryContentBlock(
             user_id = None
         return user_id
 
-    def render_children(self, context, fragment, can_reorder=False, can_add=False):
+    def render_children(
+        self,
+        context: dict[str, Any],
+        fragment: Fragment,
+        can_reorder: bool = False,
+        can_add: bool = False,
+    ) -> None:
         """
         Renders the children of the module with HTML appropriate for Studio. If can_reorder is True,
         then the children will be rendered to support drag and drop.
@@ -722,7 +740,8 @@ class LibraryContentBlock(
                     'candidates': [
                         str(self.location.context_key.make_usage_key(*block_key))
                         for block_key in self._get_candidates_as_children(
-                            lcb_usage_key=self.location, candidates=self.candidates,
+                            lcb_usage_key=self.location,
+                            candidates=[UsageKey.from_string(candidate) for candidate in self.candidates],
                         )
                     ],
                 }
