@@ -223,6 +223,16 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
         assert safe_cookie_data.session_id == 'some_session_id'
         assert safe_cookie_data.verify(self.user.id)
 
+    def test_update_cookie_data_at_step_3_with_sha256(self):
+        """ first encode cookie with default algo sha1 and then check with sha256"""
+        self.assert_response(set_request_user=True, set_session_cookie=True)
+        serialized_cookie_data = self.client.response.cookies[settings.SESSION_COOKIE_NAME].value
+        safe_cookie_data = SafeCookieData.parse(serialized_cookie_data)
+        assert safe_cookie_data.version == SafeCookieData.CURRENT_VERSION
+        assert safe_cookie_data.session_id == 'some_session_id'
+        with self.settings(DEFAULT_HASHING_ALGORITHM='sha256'):
+            assert safe_cookie_data.verify(self.user.id)
+
     def test_cant_update_cookie_at_step_3_error(self):
         self.client.response.cookies[settings.SESSION_COOKIE_NAME] = None
         with self.assert_invalid_session_id():
