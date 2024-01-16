@@ -25,14 +25,13 @@ from webob import Response
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.fields import Boolean, Integer, List, Scope, String
+from xblock.utils.studio_editable import StudioEditableXBlockMixin
 
 from xmodule.capa.responsetypes import registry
 from xmodule.mako_block import MakoTemplateBlockBase
-from xmodule.modulestore.split_mongo import BlockKey
-from xmodule.modulestore.store_utilities import derived_key
 from xmodule.studio_editable import StudioEditableBlock
-from xblockutils.studio_editable import StudioEditableXBlockMixin
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment
+from xmodule.util.keys import BlockKey, derive_key
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
@@ -280,26 +279,24 @@ class LibraryContentBlock(
         # We will have to maintain this historical artifact even after V1 libraries are deprecated and removed.
         # TODO: Confirm that we still want to migrate V1->V2 libraries in-place like this
         #       (https://github.com/openedx/edx-platform/issues/33640).
-        true_source_key = library_block_usage_key.context_key
-        derivable_source_key: LibraryLocator
-        if isinstance(true_source_key, LibraryLocator):
-            derivable_source_key = true_source_key
-        elif isinstance(true_source_key, LibraryLocatorV2):
-            derivable_source_key = LibraryLocator(
-                org=true_source_key.org,
-                library=true_source_key.slug,
-                branch='library',
+        true_source_context = library_block_usage_key.context_key
+        derivable_source_context: LibraryLocator
+        if isinstance(true_source_context, LibraryLocator):
+            derivable_source_context = true_source_context
+        elif isinstance(true_source_context, LibraryLocatorV2):
+            derivable_source_context = LibraryLocator(
+                true_source_context.org,  # type: ignore[abstract]
+                true_source_context.slug,
             )
         else:
             raise TypeError(
-                f"Source context for '{library_block_usage_key}' is '{true_source_key}'. "
+                f"Source context for '{library_block_usage_key}' is '{true_source_context}'. "
                 f"Expected source context to be 'library-v1:' (a V1 library) or 'lib:' (a V2 library)."
             )
-        return derived_key(
-            courselike_source_key=derivable_source_key,
-            block_key=BlockKey(library_block_usage_key.block_type, library_block_usage_key.block_id),
-            dest_parent=BlockKey(lcb_usage_key.block_type, lcb_usage_key.block_id),
-        )
+        source_block = BlockKey.from_usage_key(library_block_usage_key)
+        derivable_source_usage = derivable_source_context.make_usage_key(*source_block)
+        dest_parent_block = BlockKey.from_usage_key(lcb_usage_key)
+        return derive_key(source=derivable_source_usage, dest_parent=dest_parent_block)
 
     def available_children(self) -> list[BlockKey]:
         """
