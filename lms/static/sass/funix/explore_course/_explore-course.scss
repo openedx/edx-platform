@@ -12,6 +12,10 @@
     height: 100px;
 }
 
+.courses-container .courses .course .course-image .cover-image {
+    height: 12.5rem !important;
+}
+
 #main > section > section > div.courses > ul > li > article > a > section > h2 > span.course-title {
     margin-top: 15px;
 }
@@ -20,6 +24,13 @@
     display:none;
     
 }
+
+
+#main > section > section > div.courses > ul > li > article > a > section > h2 > span.course-code,
+#main > section > section > div.courses > ul > li > article > a > section > h2 > span.course-organization {
+    display: none;
+}
+
 
 @media only screen and (min-width : 1224px) {
 /* Styles */
@@ -49,12 +60,6 @@
     box-sizing: border-box;
     margin-left:20px !important;
 }
-}
-
-
-#main > section > section > div.courses > ul > li > article > a > section > h2 > span.course-code,
-#main > section > section > div.courses > ul > li > article > a > section > h2 > span.course-organization {
-    display: none;
 }
 
 
