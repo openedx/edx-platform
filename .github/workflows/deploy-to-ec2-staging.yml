@@ -1,8 +1,6 @@
-name: Deploy OpenEdx to Staging
+name: Deploy-OpenEdx-to-Staging
 on:
-  push:
-    branches:
-      - "staging"
+  workflow_dispatch
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -30,8 +28,11 @@ jobs:
           username: openedx
           key: ${{ secrets.STAG_KEY }}
           port: 22
+          command_timeout: 100m
           script: |
             export PATH='/home/openedx/.local/bin:/home/openedx/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'
+            docker ps
+            docker images
             tutor images build openedx --no-cache
             echo -e "y\n\n\n\n\n\ny" | tutor local launch
       - name: Send noti
