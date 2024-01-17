@@ -920,7 +920,8 @@
               that.$('#btn-next').css('display', 'block');
               that.$('.matching_quiz_custom').css('display', 'none');
               that.$('#btn-next-lesson').css('display', 'none');
-            }else if (matchingError){
+            }
+            else {
               that.$('.btn-submit-qz').css('display', 'none');
               that.$('#btn-next').css('display', 'none');
               that.$('.matching_quiz_custom').css('display', 'block');
