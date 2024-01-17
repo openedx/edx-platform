@@ -112,18 +112,18 @@ class ModifyCertTemplateTests(TestCase):
 
     def test_command_changes_called_templates(self):
         """Verify command changes for all and only those templates for which it is called."""
-        self.template1 = CertificateTemplateFactory.create(
+        template1 = CertificateTemplateFactory.create(
             template="fiddledee-doo fiddledee-dah"
         )
-        self.template2 = CertificateTemplateFactory.create(
+        template2 = CertificateTemplateFactory.create(
             template="violadee-doo violadee-dah"
         )
-        self.template3 = CertificateTemplateFactory.create(
+        template3 = CertificateTemplateFactory.create(
             template="fiddledee-doo fiddledee-dah"
         )
-        self.template1.save()
-        self.template2.save()
-        self.template3.save()
+        template1.save()
+        template2.save()
+        template3.save()
         expected1 = "fiddleeep-doo fiddledee-dah"
         expected2 = "violaeep-doo violadee-dah"
         options = {
@@ -138,14 +138,14 @@ class ModifyCertTemplateTests(TestCase):
 
     def test_dry_run(self):
         """Verify command doesn't change anything on dry-run."""
-        self.template1 = CertificateTemplateFactory.create(
+        template1 = CertificateTemplateFactory.create(
             template="fiddledee-doo fiddledee-dah"
         )
-        self.template2 = CertificateTemplateFactory.create(
+        template2 = CertificateTemplateFactory.create(
             template="violadee-doo violadee-dah"
         )
-        self.template1.save()
-        self.template2.save()
+        template1.save()
+        template2.save()
         options = {
             "old_text": "dee",
             "new_text": "eep",
@@ -153,14 +153,14 @@ class ModifyCertTemplateTests(TestCase):
             "dry_run": True,
         }
         new_templates = get_changed_cert_templates(options)
-        assert new_templates == []
+        assert not new_templates
 
     def test_multiline_change(self):
         """Verify template change works with a multiline change string."""
-        self.template1 = CertificateTemplateFactory.create(
+        template1 = CertificateTemplateFactory.create(
             template="fiddledee-doo fiddledee-dah"
         )
-        self.template1.save()
+        template1.save()
         new_text = """
         there's something happening here
         what it is ain't exactly clear

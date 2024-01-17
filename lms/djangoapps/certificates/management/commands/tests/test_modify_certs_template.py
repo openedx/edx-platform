@@ -33,7 +33,7 @@ class ModifyCertTemplateTests(TestCase):
                 "modify_cert_template", "--old-text", "blah", "--templates", "1 2 3"
             )
 
-    def test_command_with_missing_param_old_text(self):
+    def test_command_with_missing_param_templates(self):
         """Verify command with a missing param --templates."""
         with pytest.raises(
             CommandError,
