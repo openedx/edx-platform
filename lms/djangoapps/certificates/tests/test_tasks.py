@@ -16,7 +16,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.tasks import (
     generate_certificate,
-    handle_modify_cert_template,
+    get_changed_cert_templates,
 )
 from lms.djangoapps.certificates.tests.factories import CertificateTemplateFactory
 
@@ -108,52 +108,59 @@ class GenerateUserCertificateTest(TestCase):
 
 
 class ModifyCertTemplateTests(TestCase):
-    """Tests for handle_modify_cert_template"""
-
-    # FIXME: put in mocks for .get and .save
-    def setUp(self):
-        super().setUp()
-        self.cert1 = CertificateTemplateFactory
-        self.cert2 = CertificateTemplateFactory
-        self.cert3 = CertificateTemplateFactory
+    """Tests for get_changed_cert_templates"""
 
     def test_command_changes_called_templates(self):
         """Verify command changes for all and only those templates for which it is called."""
-        self.cert1.template = "fiddledee-doo fiddledee-dah"
-        self.cert2.template = "violadee-doo violadee-dah"
-        self.cert3.template = "fiddledee-doo fiddledee-dah"
+        self.template1 = CertificateTemplateFactory.create(
+            template="fiddledee-doo fiddledee-dah"
+        )
+        self.template2 = CertificateTemplateFactory.create(
+            template="violadee-doo violadee-dah"
+        )
+        self.template3 = CertificateTemplateFactory.create(
+            template="fiddledee-doo fiddledee-dah"
+        )
+        self.template1.save()
+        self.template2.save()
+        self.template3.save()
         expected1 = "fiddleeep-doo fiddledee-dah"
         expected2 = "violaeep-doo violadee-dah"
-        expected3 = "fiddledee-doo fiddledee-dah"
         options = {
             "old_text": "dee",
             "new_text": "eep",
             "templates": [1, 2],
         }
-        handle_modify_cert_template(options)
-        assert self.cert1.template == expected1
-        assert self.cert2.template == expected2
-        assert self.cert3.template == expected3
+        new_templates = get_changed_cert_templates(options)
+        assert len(new_templates) == 2
+        assert new_templates[0].template == expected1
+        assert new_templates[1].template == expected2
 
     def test_dry_run(self):
         """Verify command doesn't change anything on dry-run."""
-        self.cert1.template = "fiddledee-doo fiddledee-dah"
-        self.cert2.template = "violadee-doo violadee-dah"
-        expected1 = "fiddledee-doo fiddledee-dah"
-        expected2 = "violadee-doo violadee-dah"
+        self.template1 = CertificateTemplateFactory.create(
+            template="fiddledee-doo fiddledee-dah"
+        )
+        self.template2 = CertificateTemplateFactory.create(
+            template="violadee-doo violadee-dah"
+        )
+        self.template1.save()
+        self.template2.save()
         options = {
             "old_text": "dee",
             "new_text": "eep",
             "templates": [1, 2],
             "dry_run": True,
         }
-        handle_modify_cert_template(options)
-        assert self.cert1.template == expected1
-        assert self.cert2.template == expected2
+        new_templates = get_changed_cert_templates(options)
+        assert new_templates == []
 
     def test_multiline_change(self):
         """Verify template change works with a multiline change string."""
-        self.cert1.template = "fiddledee-doo fiddledee-dah"
+        self.template1 = CertificateTemplateFactory.create(
+            template="fiddledee-doo fiddledee-dah"
+        )
+        self.template1.save()
         new_text = """
         there's something happening here
         what it is ain't exactly clear
@@ -164,5 +171,6 @@ class ModifyCertTemplateTests(TestCase):
             "new_text": dedent(new_text),
             "templates": [1],
         }
-        handle_modify_cert_template(options)
-        assert self.cert1.template == expected
+        new_templates = get_changed_cert_templates(options)
+        assert len(new_templates) == 1
+        assert new_templates[0].template == expected

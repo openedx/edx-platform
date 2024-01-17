@@ -13,9 +13,6 @@ from django.test import (
 class ModifyCertTemplateTests(TestCase):
     """Tests for the modify_cert_template management command"""
 
-    def setUp(self):
-        super().setUp()
-
     def test_command_with_missing_param_old_text(self):
         """Verify command with a missing param --old-text."""
         with pytest.raises(

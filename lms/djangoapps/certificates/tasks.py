@@ -4,7 +4,7 @@ Tasks that operate on course certificates for a user
 
 from difflib import unified_diff
 from logging import getLogger
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from celery import shared_task
 from celery_utils.persist_on_failure import LoggedPersistOnFailureTask, LoggedTask
@@ -61,7 +61,7 @@ def generate_certificate(self, **kwargs):  # pylint: disable=unused-argument
 
 @shared_task(base=LoggedTask, ignore_result=True)
 @set_code_owner_attribute
-def handle_modify_cert_template(options: Dict[str, Any]):
+def handle_modify_cert_template(options: Dict[str, Any]) -> None:
     """
     Celery task to handle the modify_cert_template management command.
 
@@ -81,7 +81,34 @@ def handle_modify_cert_template(options: Dict[str, Any]):
             num=len(template_ids)
         )
     )
-    templates_changed = 0
+
+    templates_changed = get_changed_cert_templates(options)
+    for template in templates_changed:
+        template.save()
+
+
+def get_changed_cert_templates(options: Dict[str, Any]) -> List[CertificateTemplate]:
+    """
+    Loop through the templates and return instances with changed template text.
+
+    Args:
+        old_text (string): Text in the template of which the first instance should be changed
+        new_text (string): Replacement text for old_text
+        template_ids (list[string]): List of template IDs for this run.
+        dry_run (boolean): Don't do the work, just report the changes that would happen
+    """
+    template_ids = options["templates"]
+    if not template_ids:
+        template_ids = []
+
+    log.info(
+        "[modify_cert_template] Attempting to modify {num} templates".format(
+            num=len(template_ids)
+        )
+    )
+    dry_run = options.get("dry_run", None)
+    templates_changed = []
+
     for template_id in template_ids:
         template = None
         try:
@@ -94,8 +121,8 @@ def handle_modify_cert_template(options: Dict[str, Any]):
                     template_id=template_id, name=template.description
                 )
             )
-            new_template = get_modified_template_text(
-                template.template, options["old_text"], options["new_text"]
+            new_template = template.template.replace(
+                options["old_text"], options["new_text"], 1
             )
             if template.template == new_template:
                 log.info(
@@ -104,48 +131,36 @@ def handle_modify_cert_template(options: Dict[str, Any]):
                     )
                 )
             else:
-                log.info(
-                    "[modify_cert_template] Modifying template {template} ({description})".format(
-                        template=template_id,
-                        description=template.description,
-                    )
-                )
-            templates_changed += 1
-            if not options["dry_run"]:
-                template.template = new_template
-                template.save()
-            else:
-                log.info(
-                    "DRY-RUN: Not making the following template change to {id}.".format(
-                        id=template_id
-                    )
-                )
-                log.info(
-                    "\n".join(
-                        unified_diff(
-                            template.template.splitlines(),
-                            new_template.splitlines(),
-                            lineterm="",
-                            fromfile="old_template",
-                            tofile="new_template",
+                if not dry_run:
+                    log.info(
+                        "[modify_cert_template] Modifying template {template} ({description})".format(
+                            template=template_id,
+                            description=template.description,
                         )
-                    ),
-                )
+                    )
+                    template.template = new_template
+                    templates_changed.append(template)
+                else:
+                    log.info(
+                        "DRY-RUN: Not making the following template change to {id}.".format(
+                            id=template_id
+                        )
+                    )
+                    log.info(
+                        "\n".join(
+                            unified_diff(
+                                template.template.splitlines(),
+                                new_template.splitlines(),
+                                lineterm="",
+                                fromfile="old_template",
+                                tofile="new_template",
+                            )
+                        ),
+                    )
     log.info(
-        "[modify_cert_template] Modified {num} templates".format(num=templates_changed)
+        "[modify_cert_template] Modified {num} templates".format(
+            num=len(templates_changed)
+        )
     )
 
-
-def get_modified_template_text(
-    template_text: str,
-    old: str,
-    new: str,
-):
-    """
-    Returns the original template text with the first instance of `old` replaced with `new`.
-    Case-sensitive.
-
-    Although this is a trivial method, it's factored into its own method to allow us to
-    write unit tests that can be easily modified if the testing algorithm is made more complex.
-    """
-    return template_text.replace(old, new, 1)
+    return templates_changed
