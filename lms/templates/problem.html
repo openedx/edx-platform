@@ -142,6 +142,7 @@ from openedx.core.djangolib.markup import HTML
 
 </style>
 
+% if problem['name'] == 'Matching Problem' or problem['name'] == 'Quiz Problem Custom':
 <style>
     * {
         padding: 0;
@@ -344,7 +345,12 @@ from openedx.core.djangolib.markup import HTML
         border-left: 2px solid #D82C0D;
     }
 
+    .hidden_matching_btn {
+        display: none !important;
+    }
+
 </style>
+%endif
 
 <%namespace name='static' file='static_content.html'/>
 <h3 class="hd hd-3 problem-header" id="${ short_id }-problem-title" aria-describedby="${ id }-problem-progress" tabindex="-1">
@@ -389,9 +395,8 @@ from openedx.core.djangolib.markup import HTML
             Câu hỏi tiếp theo  <i class="bi bi-arrow-right"></i>
           </span></button>
 
-
           <button class='btn-submit-qz btn-custom' > Trả lời  </button>
-          <button type="button" id="matching_quiz_custom" class="submit btn-brand submit_matching_btn" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" data-should-enable-submit-button="${ should_enable_submit_button }" aria-describedby="submission_feedback_${short_id}" ${'' if should_enable_submit_button else 'disabled'}>
+          <button type="button" class="submit btn-brand submit_matching_btn matching_quiz_custom" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" data-should-enable-submit-button="${ should_enable_submit_button }" aria-describedby="submission_feedback_${short_id}">
                 Trả lời matching
           </button>
 
@@ -439,8 +444,6 @@ from openedx.core.djangolib.markup import HTML
         <button type="button" class="submit btn-brand" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" data-should-enable-submit-button="${ should_enable_submit_button }" aria-describedby="submission_feedback_${short_id}" ${'' if should_enable_submit_button else 'disabled'}>
           <span class="submit-label">${ submit_button }</span>
         </button>
-      % elif problem['name'] == 'Matching Problem':
-        <div>Test new condition</div>
       % endif
 
 
@@ -557,8 +560,9 @@ from openedx.core.djangolib.markup import HTML
     const btnSubmit = document.querySelector('.btn-submit-qz')
     const btnNext = document.querySelector('#btn-next')
     const problemBtn = document.querySelector('#problem-buttom')
+    const matchingBtn = document.querySelector('.matching_quiz_custom')
 
-
+    // console.log("matchingBtn", matchingBtn)
     var currentIndex = 0;
 
 
@@ -568,7 +572,7 @@ from openedx.core.djangolib.markup import HTML
 
 
       for (var i = 0; i < problemList.length; i++) {
-        console.log('problemList', problemList[i])
+        // console.log('problemList', problemList[i])
         if(i > 0){
           problemList[i].style.display = 'none'
         }
@@ -581,12 +585,22 @@ from openedx.core.djangolib.markup import HTML
         const incorrectLabel = problemList[i].querySelector('label.choicegroup_correct');
         const wrongLabel = problemList[i].querySelector('label.choicegroup_incorrect')
         const indicatorError = problemList[i].querySelector('.indicator-container')
+
         if (indicatorError){
           indicatorError.style.display = 'none'
         }
 
+        const matchingDiv = problemList[i].querySelector('div[question_matching="True"]')
 
         if (i == 0){
+            const matchingDiv = problemList[i].querySelector('div[question_matching="True"]')
+            if (matchingDiv) {
+                matchingBtn.style.display = 'block'
+                btnSubmit.style.display = 'none';
+            } else {
+                matchingBtn.style.display = 'none'
+            }
+
           spanElement.classList.add('active-number')
 
           if (submittedInput && incorrectLabel) {
@@ -598,7 +612,6 @@ from openedx.core.djangolib.markup import HTML
           }
           else if (submittedInput && wrongLabel){
             spanElement.classList.add('err-number-qusetion');
-
           }
 
 
@@ -678,7 +691,7 @@ from openedx.core.djangolib.markup import HTML
 
 
       const btnNumber = document.querySelectorAll('.problem-question-number');
-
+      // UFC - xử lý khi click vào nút next và ẩn hiển nút btn matching submit
       btnNumber.forEach(function(element) {
         element.addEventListener('click', function() {
           const numnberId = element.getAttribute('data-problem-number-id');
@@ -697,11 +710,15 @@ from openedx.core.djangolib.markup import HTML
           const submittedInput = problemList[currentIndex].querySelector('input.submitted');
           const incorrectLabel = problemList[currentIndex].querySelector('label.choicegroup_correct');
           const wrongLabel = problemList[currentIndex].querySelector('label.choicegroup_incorrect')
+          const matchingDiv = problemList[currentIndex].querySelector('div[question_matching="True"]')
 
 
           if (problemList[currentIndex]) {
             problemList[currentIndex].style.display = 'block';
-          element.classList.add('active-number')
+            element.classList.add('active-number')
+            // console.log('problemList[currentIndex]', problemList[currentIndex])
+            // console.log('matchingDiv', matchingDiv)
+            // console.log("btnSubmit", btnSubmit)
 
           if (element.classList.contains('err-number-qusetion')) {
             const indicator = problemList[currentIndex].querySelector('.indicator-container')
@@ -726,8 +743,9 @@ from openedx.core.djangolib.markup import HTML
                 label.classList.add( 'choicegroup_incorrect');
             });
 
-
           }
+
+
           if (incorrectLabel){
             btnNext.style.display = 'block';
             btnSubmit.style.display = 'none';
@@ -735,13 +753,18 @@ from openedx.core.djangolib.markup import HTML
           else if (!incorrectLabel && !wrongLabel){
             btnNext.style.display = 'none';
             btnSubmit.style.display = 'block';
-
           }
           else if (wrongLabel){
             btnNext.style.display = 'none';
             btnSubmit.style.display = 'block';
+          }
 
-
+          if (matchingDiv) {
+            matchingBtn.style.display = 'block'
+            matchingBtn.removeAttribute('disabled');
+            btnSubmit.style.display = 'none';
+          } else {
+            matchingBtn.style.display = 'none'
           }
 
           const checkInput = problemList[currentIndex].querySelectorAll('input[type="checkbox"], input[type="radio"]' )

@@ -7,8 +7,7 @@ import six
 ## <!-- UFC - template hiển thị ra matching problem -->
 
 <div class="matchinggroup capa_inputtype" id="inputtype_${id}" >
-    <h1>${test_name_context}</h1>
-    ##<p>${ HTML(problem['name']) }</p>
+    ##<h1>${test_name_context}</h1>
 
     % for left_item, right_item in matchingitems:
         <div class="content_container">
@@ -40,7 +39,7 @@ import six
     % endfor
 
     % if matching_result_status == 'unsubmitted':
-    <div>Chưa nộp ${matching_result_status}</div>
+    <div style="display: none;">${matching_result_status}</div>
     % elif matching_result_status == 'incorrect':
     <div class="matching_result">
         <div class="matching_result_container error_result">
