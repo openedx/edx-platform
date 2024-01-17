@@ -85,7 +85,10 @@
 # Critical fixes for packages that are not yet available in a PyPI release.
 ##############################################################################
 
-# ... add dependencies here
+# https://github.com/open-craft/XBlock/pull/6
+git+https://github.com/open-craft/XBlock.git@opencraft-release/1.6.2#egg=XBlock[django]==1.6.2
+# https://github.com/openedx/django-pyfs/pull/169
+git+https://github.com/open-craft/django-pyfs.git@opencraft-release/3.5.0-tox-3#egg=openedx-django-pyfs==3.5.0
 
 
 ##############################################################################

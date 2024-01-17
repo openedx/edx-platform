@@ -160,10 +160,15 @@ def _preview_module_system(request, descriptor, field_data):
     descriptor: An XModuleDescriptor
     """
 
+    # Import is placed here to avoid model import at project startup.
+    import xblock.reference.plugins
+
     course_id = descriptor.location.course_key
     display_name_only = (descriptor.category == 'static_tab')
 
     replace_url_service = ReplaceURLService(course_id=course_id)
+
+    fs_service = xblock.reference.plugins.FSService()
 
     wrappers = [
         # This wrapper wraps the block in the template specified above
@@ -229,7 +234,8 @@ def _preview_module_system(request, descriptor, field_data):
             "teams_configuration": TeamsConfigurationService(),
             "sandbox": SandboxService(contentstore=contentstore, course_id=course_id),
             "cache": CacheService(cache),
-            'replace_urls': replace_url_service
+            'replace_urls': replace_url_service,
+            "fs": fs_service
         },
     )
 
