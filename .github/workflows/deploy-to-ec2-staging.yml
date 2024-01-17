@@ -1,0 +1,54 @@
+name: Deploy-OpenEdx-to-Staging
+on:
+  workflow_dispatch
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send noti begining...
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          fields: workflow,job,message,commit,repo,ref,author,took
+          custom_payload: |
+            {
+              username: 'github-action',
+              icon_emoji: ':octocat:',
+              attachments: [{
+                color: 'good',
+                text: `${process.env.AS_AUTHOR.split(/[<@]/)[1]} start deploying Openedx "${process.env.AS_MESSAGE}" in ${process.env.AS_REF.replace('refs/heads/', '')}`,
+              }]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}    
+      - name: Deploy docker image to EC2
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.STAG_IP }}
+          username: openedx
+          key: ${{ secrets.STAG_KEY }}
+          port: 22
+          command_timeout: 100m
+          script: |
+            export PATH='/home/openedx/.local/bin:/home/openedx/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'
+            docker ps
+            docker images
+            tutor images build openedx --no-cache
+            echo -e "y\n\n\n\n\n\ny" | tutor local launch
+      - name: Send noti
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          fields: workflow,job,message,commit,repo,ref,author,took
+          custom_payload: |
+            {
+              username: 'github-action',
+              icon_emoji: ':octocat:',
+              attachments: [{
+                color: '${{ job.status }}' === 'success' ? 'good' : '${{ job.status }}' === 'failure' ? 'danger' : 'warning',
+                text: `${process.env.AS_AUTHOR.split(/[<@]/)[1]} Deploy Openedx "${process.env.AS_MESSAGE}" in ${process.env.AS_REF.replace('refs/heads/', '')} ${'${{ job.status }}' === 'success' ? 'succeeded' : '${{ job.status }}' === 'failure' ? 'failed' : '${{ job.status }}'} in ${process.env.AS_TOOK}`,
+              }]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always() # Pick up events even if the job fails or is canceled. 

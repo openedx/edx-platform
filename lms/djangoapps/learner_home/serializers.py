@@ -13,6 +13,7 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.helpers import user_has_passing_grade_in_course
 from openedx.features.course_experience import course_home_url
 from xmodule.data import CertificatesDisplayBehaviors
+from common.djangoapps.student.models import LastHistoryActivateDAO 
 
 
 class LiteralField(serializers.Field):
@@ -557,9 +558,10 @@ class LearnerDashboardSerializer(serializers.Serializer):
         a single list.
         """
         courses = []
-
+        user_id = ''
         for enrollment in instance.get("enrollments", []):
-            
+            user_id = enrollment.user_id
+
             courses.append(
                 LearnerEnrollmentSerializer(enrollment, context=self.context).data
             )
@@ -567,5 +569,15 @@ class LearnerDashboardSerializer(serializers.Serializer):
             courses.append(
                 UnfulfilledEntitlementSerializer(entitlement, context=self.context).data
             )
-       
+        
+        # last history course
+        for course in courses :
+            courseId = course['courseRun']['courseId']
+            date_last_history_course = LastHistoryActivateDAO.get_date_history(course_id=courseId, user_id=user_id)
+            course['lastHistoryCourse'] = date_last_history_course 
+        
+        courses.sort(key=lambda x: (x['lastHistoryCourse'] is not None, x['lastHistoryCourse']), reverse=True)
+
+        
+        
         return courses

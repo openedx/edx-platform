@@ -22,6 +22,7 @@ from lms.djangoapps.courseware.courses import check_course_access
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from openedx.features.toggle_feature.toggle_feature import featureCourse , featureUser , toggleFeature
+from common.djangoapps.student.models import LastHistoryActivateDAO 
 
 class CourseHomeMetadataView(RetrieveAPIView):
     """
@@ -114,6 +115,10 @@ class CourseHomeMetadataView(RetrieveAPIView):
         # Record course goals user activity for (web) learning mfe course tabs
         UserActivity.record_user_activity(request.user, course_key)
 
+        # last history activity
+        if request.user.id is not None :
+            LastHistoryActivateDAO.create_date_history(course_id=course_key, user_id=request.user.id)
+      
         data = {
             'course_id': course.id,
             'username': username,

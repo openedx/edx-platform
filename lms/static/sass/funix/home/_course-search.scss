@@ -1,0 +1,43 @@
+.course_search {
+    padding: 2rem 1rem;
+    padding-bottom: 2rem;
+    display: flex;
+    justify-content: flex-end;
+    padding-bottom: 0;
+    margin-bottom: 1rem;
+
+    form {
+        padding: .2rem;
+        border: 1px solid $color-stroke;
+        border-radius: 4px;
+        font-size: 1rem;
+
+        input {
+            border: none;
+            outline: none;
+            box-shadow: none;
+            font-family: 'Roboto', sans-serif;
+            font-style: normal;
+
+            &:focus {
+                border: none;
+                box-shadow: none;
+            }
+        }
+
+        button {
+            border: none;
+            outline: none;
+            color: white;
+            background: $color-active;
+
+            &:hover,
+            &:active,
+            &:focus {
+                background: $color-hover;
+                box-shadow: none;
+                background-image: none;
+            }
+        }
+    }
+}

@@ -1065,7 +1065,14 @@ urlpatterns += [
    
 ]
 
-from lms.djangoapps.funix_portal_api.views import UpdateUserPasswordAPIView, CreateUserAPIView, GradeLearningProjectXblockAPIView,get_portal_host
+from lms.djangoapps.funix_portal_api.views import (
+    UpdateUserPasswordAPIView, 
+    CreateUserAPIView, 
+    GradeLearningProjectXblockAPIView,
+    get_portal_host, 
+    get_resume_path,
+    funix_get_thumb
+)
 
 # funix portal api
 urlpatterns +=[
@@ -1073,7 +1080,14 @@ urlpatterns +=[
     path ('api/funix_portal/user/create_user', CreateUserAPIView.as_view() , name='funix_portal_create_user'),
     path ('api/funix_portal/project/grade_project', GradeLearningProjectXblockAPIView.as_view() , name='funix_portal_grade_learning_project'),
     path ('api/funix_portal/portal_host',get_portal_host , name='funix_portal_host'),
+    re_path(r'api/course_resume_path/{}/(?P<location>.*)$'.format(settings.COURSE_ID_PATTERN),get_resume_path , name='get_resume_path_for_mfe'),
 ]
+
+# image 
+urlpatterns += [
+    path('thumb/', funix_get_thumb, name='funix_get_thumb'),
+]
+
 
 # assignmentxblock-xblock js translation
 from django.views.i18n import JavaScriptCatalog
@@ -1086,3 +1100,4 @@ urlpatterns += [
 urlpatterns += [
     path('api/chatbot/', include('openedx.core.djangoapps.chatbot.urls')),
 ]
+

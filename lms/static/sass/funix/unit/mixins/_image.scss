@@ -1,0 +1,12 @@
+@mixin unit-image {
+    img {
+        display: block;
+        border: 1px solid $color-stroke;
+        border-radius: $border-radius;
+        overflow: hidden;
+        max-width: 100%;
+        margin: $spacing-1 auto $spacing-1;
+        box-sizing: border-box;
+        height: auto;
+    }
+}

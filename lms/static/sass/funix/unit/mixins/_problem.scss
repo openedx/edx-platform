@@ -1,0 +1,200 @@
+@mixin unit-problem {
+    .problem {
+        padding: 0;
+    }
+
+    .wrapper-problem-response {
+        fieldset {
+            margin-bottom: 0;
+            padding: 0;
+        }
+    }
+
+
+    .indicator-container {
+        margin: 0;
+
+        .status {
+            display: none;
+        }
+    }
+
+    .messages-box {
+        padding: 0 1rem .75rem 1rem;
+        border-radius: $border-radius;
+        margin-bottom: 0;
+        border-left: solid 2px $color-success;
+        background-color: $color-success-light;
+
+        .explanation-title {
+            padding-top: 0.75rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: $color-success;
+            padding-bottom: 0;
+        }
+
+        .hint-text {
+            margin: 0;
+        }
+    }
+
+    .problem-action-buttons-wrapper {
+        margin: 0;
+        padding: 0;
+    }
+
+    .submit-attempt-container {
+        margin: 0;
+        padding: 0;
+
+        .submission-feedback {
+            display: none;
+        }
+    }
+
+    .notification-btn-wrapper {
+        display: none;
+    }
+
+    .error-problem-answer {
+        background-color: $color-critical-light;
+        border-left: solid 2px $color-critical;
+
+        .explanation-title {
+            color: $color-critical;
+        }
+    }
+
+    .choicegroup .field {
+        width: 100%;
+        overflow: hidden;
+        border-radius: $border-radius;
+        position: relative;
+        margin-bottom: 0.5rem;
+
+        >input {
+            position: absolute;
+            width: 100%;
+            height: 20px;
+            max-width: 20px;
+            position: absolute;
+            left: .75rem;
+            top: calc(.75rem + 1px);
+            margin: 0;
+            accent-color: $color-active;
+
+            &:checked~label {
+                background: $background-color-hover;
+                border: none;
+            }
+        }
+
+        >label {
+            padding: .75rem .75rem .75rem 3rem;
+            display: block;
+            width: 100%;
+            border: none;
+            margin: 0;
+
+            >div {
+                margin-bottom: 0;
+            }
+
+            &:hover {
+                background: $background-color-hover;
+                border: none;
+
+            }
+        }
+    }
+
+    .success-problem {
+        accent-color: $color-success;
+    }
+
+    //
+    .container-problem {
+        display: flex;
+        gap: 10px;
+        padding-bottom: 10px;
+    }
+
+    .problem-question-number {
+        padding: 4px 10px;
+        background-color: #f6f6f7;
+        text-align: center;
+        color: #8097b1;
+        font-size: 14px;
+        border-radius: 4px;
+    }
+
+    .active-number {
+        border-bottom: solid 2px $color-active ;
+        background-color: $color-active-light;
+        color: $color-active ;
+    }
+
+    .submitted-question {
+        color: $color-success;
+        border-bottom: solid 2px $color-success;
+        background-color: $color-success-light;
+    }
+
+    .err-number-qusetion {
+        border-bottom: solid 2px $color-critical;
+        background-color: $color-critical-light;
+        color: $color-critical;
+    }
+
+    .btn-custom {
+        border: none !important;
+        background-color: $color-active;
+        color: #fff;
+        background-image: none !important;
+        text-shadow: none !important;
+        box-shadow: none !important;
+    }
+
+    .btn-custom:hover {
+        background: $color-hover;
+    }
+
+    .btn-custom[disabled] {
+        background-color: #c5c5c5;
+    }
+
+    .btn-prev {
+        border: 1px solid $color-active ;
+        background: none;
+        color: $color-active;
+        background-image: none;
+        text-shadow: none;
+        box-shadow: none;
+    }
+
+    .btn-prev:hover {
+        background: #eef7ff !important;
+    }
+
+    .btn-span {
+        display: flex;
+        align-items: center;
+
+        gap: 5px;
+    }
+
+    .btn-span>i {
+        font-size: 18px
+    }
+
+
+    .message {
+        border-top: 1px solid #d7d7d7;
+        padding-top: 20px;
+    }
+
+    .problem-question-number:hover {
+        cursor: pointer;
+    }
+}

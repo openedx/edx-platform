@@ -1,0 +1,407 @@
+/**
+  This file contains all the necessary styling for a uniform
+  navigation bar that can exist on any of the v1, v2 or bootstrap
+  pages.
+*/
+.global-header {
+  box-sizing: border-box;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  padding-bottom: $baseline/2;
+  border-bottom: 1px solid theme-color("primary");
+  box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.1);
+  background: theme-color("inverse");
+  line-height: 1.5;
+
+  @include media-breakpoint-up(lg) {
+    position: inherit;
+  }
+
+  /*
+    Logo and course identification block
+  */
+  .header-logo {
+    display: inline;
+
+    a {
+      @include float(left);
+      @include margin($baseline*0.75, 0, 0, $baseline*2);
+
+      display: block;
+
+      .logo {
+        @include float(left);
+
+        height: $header-logo-height;
+      }
+
+      @include media-breakpoint-down(md) {
+        @include margin-left(50%);
+
+        height: $header-logo-height;
+        width: auto;
+
+        .logo {
+          @include margin-left(-50%);
+        }
+      }
+    }
+
+    .course-header {
+      @include float(left);
+      @include margin($baseline*0.8, 0, 0, $baseline);
+
+      font-size: $font-size-sm;
+      color: theme-color("dark");
+      line-height: 1em;
+      display: none;
+
+      .course-name {
+        display: block;
+        font-size: $font-size-base;
+        margin-top: 7px;
+        font-weight: 600;
+      }
+
+      // Hide the course header for smaller screen sizes
+      @include media-breakpoint-up(lg) {
+        display: block;
+      }
+    }
+  }
+
+  .edx-cookie-banner-wrapper {
+    .edx-cookie-banner {
+      min-width: 0;
+    }
+  }
+
+  /*
+    Main navigation buttons for Courses, programs, profile and explore buttons.
+
+    There are two stylings for the two circumstances, first the mobile, followed
+    by the desktop styling
+  */
+  // Desktop styling
+  @include media-breakpoint-up(lg) {
+    .nav-links {
+      .nav-item {
+        margin: 0 $baseline;
+
+        a {
+          text-decoration: none;
+        }
+      }
+
+      .main {
+        @include float(left);
+        @include margin($baseline, 0, 0, $baseline);
+
+        .nav-item {
+          @include float(left);
+        }
+
+        .nav-tab {
+          text-transform: none;
+          padding: 0;
+          cursor: pointer;
+          margin: 0;
+
+          a {
+            color: theme-color("secondary");
+            padding: $baseline*0.35 $baseline*1.25 19px;
+            font-weight: $font-weight-normal;
+            display: inline-block;
+            margin-bottom: -1*$baseline/2;
+            border-bottom: 4px solid transparent;
+            cursor: pointer;
+
+            &.active,
+            &:hover {
+              border-bottom-style: solid;
+              border-bottom-color: theme-color("primary");
+            }
+
+            &:hover {
+              cursor: pointer;
+              border-bottom-color: theme-color("primary");
+            }
+          }
+        }
+      }
+
+      .secondary {
+        @include float(right);
+        @include margin($baseline*0.75, $baseline*2, 0, 0);
+
+        // All navigation items
+        .nav-item {
+          font-size: $font-size-base;
+          display: inline-block;
+          padding: $baseline/2 0 0;
+          margin: 0 $baseline/2;
+
+          &.nav-item-dropdown {
+            padding: 0;
+            margin: 0;
+          }
+
+          a {
+            color: theme-color("dark");
+            font-weight: $font-weight-normal;
+          }
+        }
+
+
+        // Sign in, Register and Shopping Cart buttons
+        .btn {
+          border: 1px solid theme-color("primary");
+          padding: $baseline/4 $baseline;
+          border-radius: $baseline/4;
+          cursor: pointer;
+          text-decoration: none;
+        }
+
+        a.sign-in-btn,
+        .nav-item a.shopping-cart {
+          background-color: theme-color("primary");
+          color: theme-color("inverse");
+          border: 1px solid theme-color("inverse");
+          font-weight: $font-weight-normal;
+          padding: $baseline/4 $baseline;
+
+          &:hover {
+            background-color: theme-color("inverse");
+            color: theme-color("primary");
+            border-color: theme-color("primary");
+          }
+        }
+
+        a.register-btn {
+          background: theme-color("inverse");
+          color: theme-color("primary");
+          font-weight: $font-weight-normal;
+
+          &:hover {
+            background-color: theme-color("primary");
+            color: theme-color("inverse");
+          }
+        }
+
+        // User information
+        .user-image-frame {
+          border: 1px solid theme-color("light");
+          margin: -1*$baseline/2 $baseline/4;
+          border-radius: $baseline/4;
+          width: $header-user-image-size;
+        }
+
+        // Dropdown behavior
+        .toggle-user-dropdown {
+          padding: $baseline/2;
+          text-decoration: none;
+          cursor: pointer;
+        }
+
+        .dropdown-user-menu {
+          border: 1px solid theme-color("secondary");
+          position: absolute;
+          background-color: theme-color("inverse");
+          color: theme-color("secondary");
+
+          @include right(30px);
+
+          top: 55px;
+          z-index: 10;
+
+          .dropdown-item {
+            cursor: pointer;
+            overflow: hidden;
+            padding: 0;
+
+            &:hover {
+              color: theme-color("dark");
+              background-color: theme-color("light");
+            }
+
+            &:not(:last-child) {
+              border-bottom: 1px solid theme-color("light");
+            }
+
+            a {
+              font-weight: $font-weight-base;
+              padding: $baseline/2 $baseline*0.75;
+              display: inline-block;
+              width: 100%;
+
+              &:focus {
+                outline: none;
+                color: theme-color("dark");
+                background-color: theme-color("light");
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .hamburger-menu {
+      display: none;
+    }
+  }
+
+  // Responsive styling for mobile
+  @include media-breakpoint-down(md) {
+    .main-header {
+      height: $header-logo-height;
+      position: inherit;
+    }
+
+    // Display the menu icon and allow for transition to an X on click
+    .hamburger-menu {
+      @include left($baseline);
+
+      position: absolute;
+      top: $baseline*0.9;
+      width: 30px;
+      height: 20px;
+      padding-bottom: $baseline/4;
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+      -webkit-transition: 0.5s ease-in-out;
+      transition: 0.5s ease-in-out;
+      cursor: pointer;
+
+      .line {
+        display: block;
+        position: absolute;
+        height: 5px;
+        width: 100%;
+        background: $gray-600;
+        opacity: 1;
+        left: 0;
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+        -webkit-transition: 0.25s ease-in-out;
+        transition: 0.25s ease-in-out;
+
+        &:nth-child(1) {
+          top: 0;
+        }
+
+        &:nth-child(2),
+        &:nth-child(3) {
+          top: $baseline/2;
+        }
+
+        &:nth-child(4) {
+          top: $baseline;
+        }
+      }
+
+      &.open .line {
+        &:nth-child(1) {
+          top: 18px;
+          width: 0%;
+          left: 50%;
+        }
+
+        &:nth-child(2) {
+          -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
+        }
+
+        &:nth-child(3) {
+          -webkit-transform: rotate(-45deg);
+          transform: rotate(-45deg);
+        }
+
+        &:nth-child(4) {
+          top: 18px;
+          width: 0%;
+          left: 50%;
+        }
+      }
+    }
+  }
+
+  // Hiding and displaying control classes
+  .hidden {
+    display: none !important;
+  }
+
+  @media print {
+    border-bottom: 1px solid $gray-500 !important;
+  }
+}
+
+/*
+  Mobile menu styling
+*/
+.mobile-menu {
+  border-top: 1px solid theme-color('primary');
+  margin: $baseline*1.25 0 -0.5*$baseline;
+
+  @include media-breakpoint-up(lg) {
+    display: none !important;
+  }
+
+  @include media-breakpoint-down(md) {
+    // Override standard styling for the mobile menu links
+    .mobile-nav-link {
+      position: static;
+      transform: none;
+      overflow: hidden;
+      padding: 0;
+
+      a {
+        font-size: $font-size-base;
+        font-weight: 600;
+        text-decoration: none;
+        outline: none;
+        display: block;
+        background-color: theme-color('inverse');
+        border-radius: 0;
+        width: 100%;
+        padding: $baseline*0.6 $baseline;
+        border-bottom: 1px solid theme-color('light');
+        @include text-align(left);
+        cursor: pointer;
+
+        &:hover,
+        &:focus {
+          background-color: $gray-600;
+          color: theme-color('inverse');
+        }
+
+        &::after {
+          content: '\00BB';
+          padding-left: 4px;
+        }
+      }
+    }
+  }
+
+  // Hiding and displaying control classes
+  &.hidden {
+    display: none !important;
+  }
+}
+
+// Hide elements in menu bar when they exist in mobile
+.hidden-mobile {
+  @include media-breakpoint-down(md) {
+    &:not(.mobile-nav-link) {
+      display: none;
+    }
+  }
+}
+
+// Language selection styling
+
+.settings-language-form {
+  @include float(right);
+
+  padding: $baseline/2;
+}

@@ -114,8 +114,8 @@ def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=
       these special cases could not only be handled inside has_access, but could
       be plugged in as additional callback checks for different actions.
     """
-    if user.id is not None :
-        LastHistoryActivateDAO.create_date_history(course_id=course_key, user_id=user.id)
+    # if user.id is not None :
+    #     LastHistoryActivateDAO.create_date_history(course_id=course_key, user_id=user.id)
     
     course = get_course_by_id(course_key, depth)
     check_course_access_with_redirect(course, user, action, check_if_enrolled, check_survey_complete, check_if_authenticated)  # lint-amnesty, pylint: disable=line-too-long

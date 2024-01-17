@@ -1,0 +1,310 @@
+<%page expression_filter="h"/>
+<%inherit file="survey-base.html" />
+<%def name="online_help_token()"><% return "certificates" %></%def>
+<%namespace name='static' file='static_content.html'/>
+
+
+
+<%!
+from cms.djangoapps.contentstore import utils
+from django.utils.translation import gettext as _
+from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
+import six
+from six.moves.urllib.parse import quote
+%>
+
+<%block name="title">Remove Inline Styles</%block>
+
+<%block name="header_extras">
+<style>
+    .remove_inline_style_container {
+        font-size: 16px;
+    }
+
+    .remove_inline_style_container form {
+        width: 100%%;
+        max-width: calc(100vw - 2em);
+        margin: 0;
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+        padding: 2em 2em 1em 2em;
+        background: white;
+    }
+
+    .remove_inline_style_container label {
+        display: flex; 
+        padding-bottom: 2em;
+        font-size: inherit;
+    }
+
+    .remove_inline_style_container label p {
+        width: 320px;
+        font-size: 1em;
+        position: relative;
+        margin: 0;
+    }
+
+    .remove_inline_style_container form button {
+        padding: .5em 1em;
+        border: none;
+        outline: none;
+        color: white;
+        background: #6d6de3;
+        font-weight: bold;
+    }
+
+    .remove_inline_style_container form button:hover {
+        background: #9696ff;
+    }
+
+    #response_messages {
+        padding: 2rem 1rem 1rem 0;
+    }
+
+    .errors_list ol {
+        list-style-type: decimal;
+        list-style-position: inside;
+    }
+
+    .errors_list ol li {
+        color: red;
+    }
+
+    .errors_list_title {
+        font-weight: bold;
+    }
+
+    #remove_inline_style_loading_modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #000000bf;
+        z-index: 9999;
+        display: flex; 
+        align-items: center;
+        justify-content: center;
+    }
+
+    #remove_inline_style_loading_modal .loader {
+        width: 48px;
+        height: 48px;
+        border: 5px solid #FFF;
+        border-bottom-color: transparent;
+        border-radius: 50%;
+        display: inline-block;
+        box-sizing: border-box;
+        animation: rotation 1s linear infinite;
+    }
+    
+    @keyframes rotation {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    } 
+
+
+</style>
+</%block>
+
+<%block name="content"> 
+<div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-subtitle">
+      <h1 class="page-header">
+        Remove Inline Style
+      </h1>
+    </header>
+
+    <div class="mast remove_inline_style_container">
+        <form id="remove_inline_style_form">
+            <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+            % for value, label, should_render, help in component_types: 
+            % if should_render:
+            <label
+            % if len(component_types) == 1: 
+                style="pointer-events: none;"
+            % endif
+            >
+                <p title="${help}">
+                    ${label}:
+                </p>
+                <input 
+                    type="checkbox" 
+                    name="component_types" 
+                    value="${value}" 
+                    id="${value}" 
+                    % if len(component_types) == 1: 
+                        checked
+                    % endif
+                />
+            </label>
+            % endif
+            % endfor
+
+            <label>
+                <p title="Publish">
+                    Publish right after removing the styles:
+                </p>
+                <input type="checkbox" name="publish" value="publish" id="publish" />
+            </label>
+    
+            <button type="submit">Submit </button>
+
+            <div id="response_messages">
+                <p id="remove_inline_style_response_msg"></p>
+                <div id="publish_errors" class="errors_list" style="display: none;">
+                    <h3 class="errors_list_title">Publish Errors</h3>
+                    <ol></ol>
+                </div>
+                <div id="remove_errors" class="errors_list" style="display: none;">
+                    <h3 class="errors_list_title">Remove Errors</h3>
+                    <ol></ol>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div id="remove_inline_style_loading_modal" style="display: none;">
+    <span class="loader"></span>
+</div>
+
+<script>
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const form = $('#remove_inline_style_form');
+    const course_id = "${context_course.course_id}";
+
+    form.submit(function(event) {
+        event.preventDefault();
+        const formData = $(this).serialize();
+        const component_types = [];
+        const publish = document.getElementById('publish').checked;
+
+        Array.from(document.querySelectorAll('input[name=component_types]')).forEach(input => {
+            if (input.checked) {
+                component_types.push(input.value)
+            }
+        })
+
+        if (!confirm('Are you sure that you want to delete this image? This action cannot be undone.')) return;
+
+        display_modal(true);
+        remove_messages();
+
+        $.ajax({
+            url: '/remove_inline_styles/' + course_id,
+            method: 'POST', 
+            headers: {'X-CSRFToken': csrftoken, 'Content-Type': 'application/json'},
+            data: JSON.stringify({
+                component_types,
+                publish
+            }),
+            success: function(response) {
+                uncheck_all_component_type_checkboxes()
+                const {publish_errors, remove_errors} = response.errors;
+                const success = publish_errors.length === 0 && remove_errors.length === 0 ? 'success' : 'error'
+                set_response_message(response.message, 'success');
+                if (publish_errors.length > 0) {
+                    render_error_list(publish_errors, 'publish', true)
+                }
+                if (remove_errors.length > 0) {
+                    render_error_list(remove_errors, 'remove', true)
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log(xhr)
+                console.log(status)
+                console.log(error)
+                uncheck_all_component_type_checkboxes()
+                const error_msg = get_ajax_error_message(xhr, status, error)
+                set_response_message(error_msg, 'error')
+            },
+            complete: () => {
+                display_modal(false);
+            }
+            
+        })
+    })
+
+    function uncheck_all_component_type_checkboxes() {
+        Array.from(document.querySelectorAll('input[name=component_types]')).forEach(input => {
+            % if len(component_types) > 1:
+            input.checked = false;
+            % endif
+        })
+
+        document.querySelector('input[name=publish]').checked = false;
+    }
+
+    function get_ajax_error_message(xhr, status, error) {
+        if (xhr.responseJSON?.message) return xhr.responseJSON.message;
+        if (typeof error === 'string') return error;
+        return 'Internal Server Error'
+    }
+
+    function set_response_message(msg, type) {
+        const ele = document.getElementById('remove_inline_style_response_msg')
+        if (msg === '') {
+            ele.innerText = '';
+            ele.style.display = 'd-none'
+            return 
+        }
+
+        const colors = {
+            success: 'green', 
+            error: 'red'
+        }
+
+        ele.style.color = 'black'
+        if (type) {
+            ele.style.color = colors[type];
+        }
+
+        ele.innerText = msg;
+        ele.style.display = 'block'
+    }
+
+    function display_modal(should_show) {
+        if (should_show) {
+            document.getElementById('remove_inline_style_loading_modal').style.display = 'flex'
+        } else {
+            document.getElementById('remove_inline_style_loading_modal').style.display = 'none'
+        }
+    }
+
+    function render_error_list(items, type, should_render) {
+        const list_id = type === 'publish' ? '#publish_errors' : '#remove_errors';
+        const list_container = document.querySelector(list_id);
+        const list =  document.querySelector(list_id + ' ol');
+        if (!should_render) {
+            list_container.style.display = 'none';
+            list.innerHTML = '';
+            return;
+        } 
+
+        items.forEach(item => {
+            const li = document.createElement('li')
+            li.innerText = item;
+            list.appendChild(li);
+        })
+
+        list_container.style.display = 'block';
+    }
+
+    function remove_messages() {
+        set_response_message('')
+        render_error_list([], 'publish', false)
+        render_error_list([], 'remove', false)
+    }
+    
+</script>
+</%block>
+

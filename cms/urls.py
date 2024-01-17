@@ -366,6 +366,13 @@ urlpatterns +=[
     path('api/set_course_unit_time',set_course_time_unit, name='set_course_time_unit' )
 ]
 
+# funix remove inline styles
+from cms.djangoapps.contentstore.views.funix_remove_inline_styles import remove_inline_styles
+urlpatterns +=[
+    path('remove_inline_styles/<str:course_id>', remove_inline_styles, name='remove_inline_styles')
+]
+
+
 # assignmentxblock-xblock js translation
 from django.views.i18n import JavaScriptCatalog
 

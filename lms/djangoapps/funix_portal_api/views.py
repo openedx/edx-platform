@@ -1,6 +1,6 @@
 import json
 import logging
-from django.http import HttpResponse,JsonResponse
+from django.http import HttpResponse,JsonResponse, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseBadRequest
 from common.djangoapps.student.models import User
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -18,6 +18,18 @@ from common.djangoapps.student.helpers import do_create_account, AccountValidati
 from .validators import funix_user_validator
 from lms.djangoapps.ora_staff_grader.utils import call_xblock_json_handler, is_json
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from opaque_keys.edx.keys import UsageKey, CourseKey
+from opaque_keys import InvalidKeyError
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
+from openedx.features.course_experience.url_helpers import get_courseware_url
+from common.djangoapps.util.course import course_location_from_key
+from django.conf import settings
+import requests
+from django.contrib.staticfiles import finders
+import mimetypes
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+
+
 
 def check_missing_fields(fields, data):
     errors = {}
@@ -406,9 +418,7 @@ class GradeLearningProjectXblockAPIView(APIView):
         }, status=status.HTTP_200_OK)
     
 def get_portal_host(request):
-    from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
     from django.contrib.sites.models import Site
-    from django.conf import settings
 
     def get_site_config(domain, setting_name, default_value=None):
         try:
@@ -433,3 +443,91 @@ def get_portal_host(request):
             }
         ,
         status=200)
+
+def get_resume_path(request, course_id, location):
+
+    try:
+        course_key = CourseKey.from_string(course_id)
+        usage_key = UsageKey.from_string(location).replace(course_key=course_key)
+    except InvalidKeyError as exc:
+        return  JsonResponse({
+                'message': 'Invalid usage key or course key.'
+            }
+            ,
+            status=400
+        )
+
+    try:
+        redirect_url = get_courseware_url(
+            usage_key=usage_key,
+            request=request,
+        )
+    except (ItemNotFoundError, NoPathToItem):
+        # We used to 404 here, but that's ultimately a bad experience. There are real world use cases where a user
+        # hits a no-longer-valid URL (for example, "resume" buttons that link to no-longer-existing block IDs if the
+        # course changed out from under the user). So instead, let's just redirect to the beginning of the course,
+        # as it is at least a valid page the user can interact with...
+        redirect_url = get_courseware_url(
+            usage_key=course_location_from_key(course_key),
+            request=request,
+        )
+
+    return  JsonResponse({
+            'message': 'Success',
+            'data': {
+                'redirect_url': redirect_url
+            },
+        }
+        ,
+        status=200
+    )
+
+def funix_get_thumb(request):
+    FALLBACK_COURSE_IMAGE_PATH = 'images/default_course_thumb.png'
+    FALLBACK_DEFAULT_PATH = 'images/image_error.png'
+
+    if request.method != 'GET':
+        return HttpResponseNotAllowed('Not allowed method.')
+    
+    img_path = request.GET['path']
+
+    if not img_path: 
+        logging.error('From funix_get_thumb: Missing img_path.')
+        return HttpResponseBadRequest('Missing img_path')
+    
+    try:
+        ext = img_path.split('.')[-1]
+    except:
+        logging.error('From funix_get_thumb: Missing image extension.')
+        return HttpResponseBadRequest('Invalid image path: missing extension.')
+
+    schema = 'https://' if settings.HTTPS == 'on' else 'http://'
+    img_url = f"{schema}{settings.LMS_BASE}/{img_path}"
+
+    response = requests.get(img_url)
+
+    if response.status_code == 200:
+        mimetype = _get_mime_type(ext)
+        return HttpResponse(response.content, content_type=mimetype)
+    else: 
+        logging.error(f'From funix_get_thumb: image_path: {img_path}. img_url: {img_url}. status code: {response.status_code}')
+
+    fallback_path = FALLBACK_DEFAULT_PATH
+
+    if request.GET.get('type') == 'course_thumb':
+        fallback_path = FALLBACK_COURSE_IMAGE_PATH
+    
+    fallback_img_path = finders.find(fallback_path)
+
+    if fallback_img_path:
+        with open(fallback_img_path, 'rb') as f:
+            image_data = f.read()
+            mimetype = _get_mime_type(fallback_img_path.split('.')[-1])
+            return HttpResponse(image_data, content_type=mimetype)
+    else:
+        return HttpResponseNotFound("Image not found.")
+    
+def _get_mime_type(extension):
+    mime_type, _ = mimetypes.guess_type(f"dummy.{extension}")
+    return mime_type
+    

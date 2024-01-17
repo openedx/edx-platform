@@ -1,0 +1,57 @@
+  .home>header {
+      position: relative;
+  }
+
+  #learning_banner_img {
+      width: 100%;
+      float: right;
+      min-width: 800px;
+  }
+
+  #learning_banner_inner {
+      position: absolute;
+      background: white;
+      top: 21%;
+      left: 2rem;
+      border-radius: 6px;
+      box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+      bottom: 21%;
+      display: flex;
+      align-items: center;
+      padding: 4rem 2rem;
+      max-width: 50%;
+      min-width: 35%;
+  }
+
+  #welcome_title {
+      font-weight: bold;
+      font-size: 2.5rem;
+      margin-bottom: 0;
+      color: #025dae;
+      white-space: nowrap;
+  }
+
+  #welcome_description {
+      color: rgb(242, 113, 35);
+      font-size: 1.1rem;
+      font-weight: bold;
+      line-height: 1.5;
+  }
+
+  @media screen and (max-width: 992px) {
+      #learning_banner_inner {
+          left: .5rem;
+          top: 10%;
+          bottom: 10%;
+      }
+
+      #welcome_title {
+          font-size: calc(1.6rem + 1vw);
+          margin-bottom: 0;
+      }
+
+      #welcome_description {
+          font-size: 1rem;
+      }
+
+  }

@@ -1,0 +1,6 @@
+.course-wrapper .course-content .vert-mod>div,
+.course-wrapper .courseware-results-wrapper .vert-mod>div {
+    .xmodule_display.xmodule_ProblemBlock {
+        @include unit-common;
+    }
+}
