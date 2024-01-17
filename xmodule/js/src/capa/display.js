@@ -675,8 +675,15 @@
                 matchingGroup.append(matchingResultParsed)
     
                 var matchingErrorParsed =  $(listProblemParsed[currentIndex]).find('.error_result');
+                var matchingSuccessParsed =  $(listProblemParsed[currentIndex]).find('.success_result');
                 if (matchingErrorParsed){
                    problemQuestionNumbers[currentIndex].classList.add('err-number-qusetion')
+                }else if (matchingSuccessParsed){
+                    problemQuestionNumbers[currentIndex].classList.add('submitted-question')
+                    that.$('.btn-submit-qz').css('display', 'none');
+                    that.$('#btn-next').css('display', 'block');
+                    that.$('.matching_quiz_custom').css('display', 'none');
+                    that.$('#btn-next-lesson').css('display', 'none');
                 }
     
               }
