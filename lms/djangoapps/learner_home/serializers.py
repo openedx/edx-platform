@@ -576,7 +576,7 @@ class LearnerDashboardSerializer(serializers.Serializer):
             date_last_history_course = LastHistoryActivateDAO.get_date_history(course_id=courseId, user_id=user_id)
             course['lastHistoryCourse'] = date_last_history_course 
         
-        courses.sort(key=lambda x: x['lastHistoryCourse'], reverse=True)
+        courses.sort(key=lambda x: (x['lastHistoryCourse'] is not None, x['lastHistoryCourse']), reverse=True)
         
         
         return courses
