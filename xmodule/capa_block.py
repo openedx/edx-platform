@@ -13,7 +13,7 @@ import struct
 import sys
 import traceback
 
-from bleach.sanitizer import Cleaner
+import nh3
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.encoding import smart_str
@@ -557,7 +557,7 @@ class ProblemBlock(
         capa_content = re.sub(
             r"(\s|&nbsp;|//)+",
             " ",
-            Cleaner(tags=[], strip=True).clean(capa_content)
+            nh3.clean(capa_content, tags=set())
         )
 
         capa_body = {
