@@ -1,0 +1,55 @@
+---
+metadata:
+  display_name: Matching Problem
+  markdown: |
+        <matchingresponse >
+
+              <div question_matching="True" class="question_matching_content">Hãy ghép các thành phần của Marketing Framework tương ứng với các yếu tố trong marketing phía dưới.</div>
+              <div sub_question_matching="True" class="sub_question_matching_content">(Hãy nối từ tương ứng tương ứng với đáp án bạn chọn.)</div>
+
+              <div title="True" class="content_title">
+                <div class="content_title_desc">Marketing Plan</div>
+                <div class="content_title_desc">Marketing Framework</div>
+              </div>
+
+              <matchinggroup>
+                <matchingitem matchingvalue='1' pos="left">Mục tiêu Marketing của bạn:</matchingitem>
+                <matchingitem matchingvalue='1' pos="right">Why 1</matchingitem>
+
+                <matchingitem matchingvalue='2' pos="left">Các kênh mà khách hàng của bạn sử dụng:</matchingitem>
+                <matchingitem matchingvalue='2' pos="right">Where 2</matchingitem>
+
+                <matchingitem pos="left">Left: will be hide, no matchingvalue</matchingitem>
+                <matchingitem pos="right">Yes/No</matchingitem>
+
+              </matchinggroup>
+
+        </matchingresponse>
+
+data: |
+  <problem showanswer="never">
+  <matchingresponse >
+
+        <div question_matching="True" class="question_matching_content">
+          Hãy ghép các thành phần của Marketing Framework tương ứng với các yếu tố trong marketing phía dưới.
+        </div>
+        <div sub_question_matching="True" class="sub_question_matching_content">(Hãy nối từ tương ứng tương ứng với đáp án bạn chọn.)</div>
+
+        <div title="True" class="content_title">
+          <div class="content_title_desc">Marketing Plan1</div>
+          <div class="content_title_desc">Marketing Framework</div>
+        </div>
+
+        <matchinggroup>
+          <matchingitem matchingvalue='1' pos="left">Mục tiêu Marketing của bạn:</matchingitem>
+          <matchingitem matchingvalue='1' pos="right">Why 1</matchingitem>
+
+          <matchingitem matchingvalue='2' pos="left">Các kênh mà khách hàng của bạn sử dụng:</matchingitem>
+          <matchingitem matchingvalue='2' pos="right">Where 2</matchingitem>
+
+          <matchingitem pos="left">Left: will be hide, no matchingvalue</matchingitem>
+          <matchingitem pos="right">Yes/No</matchingitem>
+        </matchinggroup>
+
+  </matchingresponse>
+  </problem>
