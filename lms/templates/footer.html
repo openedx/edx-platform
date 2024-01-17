@@ -129,7 +129,11 @@
         </div>
 
         ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
-          <p id="footer_copyright">${footer['copyright']}
+          <p id="footer_copyright">  
+          <% copyright_part1, copyright_part2 = footer['copyright'] %>
+  ${copyright_part1}
+  <br>
+  ${copyright_part2}
               % if icp_license_info.get('icp_license'):
                 ${u" | {text}".format(text=icp_license_info.get('text'))}
                 <a href="${icp_license_info.get('icp_license_link', '#')}">

@@ -1,75 +1,13 @@
-#discovery-form {
-    padding-left: 2.4rem;
-    padding-right: 2.4rem;
+body {
+    min-height: 100vh;
 }
 
-#filter-bar > div {
-    padding-left: 2.4rem;
-    padding-right: 2.4rem;
+#content {
+    min-height: calc(100vh - #{$footer-height} - #{$header-height});
+    margin-top: 0;
+
+    @media only screen and (min-width: $breakpoint-tablet-lg) {
+        padding-left: 80px;
+        padding-right: 80px;
+    }
 }
-
-#main > section > section > div.courses > ul {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-#main > section > section > div.courses {
-    width: 100%;
-}
-
-#main > section > section > div.courses > ul > li > article > a > section.course-info {
-    height: 100px;
-}
-
-.courses-container .courses .course .course-image .cover-image {
-    height: 12.5rem !important;
-}
-
-#main > section > section > div.courses > ul > li > article > a > section > h2 > span.course-title {
-    margin-top: 15px;
-}
-
-#main > section > section > div.courses > ul > li > article > a > section > div.course-date {
-    display:none;
-    
-}
-
-
-#main > section > section > div.courses > ul > li > article > a > section > h2 > span.course-code,
-#main > section > section > div.courses > ul > li > article > a > section > h2 > span.course-organization {
-    display: none;
-}
-
-
-@media only screen and (min-width : 1224px) {
-/* Styles */
-  
-
-
-#main > section > section > div.courses > ul > li {
-    width: 22% !important;
-    box-sizing: border-box;
-    margin-left:20px !important;
-}
-}
-
-@media only screen and (min-width : 1024px) and (max-width : 1224px) {
-/* Styles */
-    #main > section > section > div.courses > ul > li {
-    width: 30% !important;
-    box-sizing: border-box;
-    margin-left:20px !important;
-}
-}
-
-@media only screen and (min-width : 768px) and (max-width : 1024px) {
-/* Styles */
-    #main > section > section > div.courses > ul > li {
-    width: 45% !important;
-    box-sizing: border-box;
-    margin-left:20px !important;
-}
-}
-
-
-

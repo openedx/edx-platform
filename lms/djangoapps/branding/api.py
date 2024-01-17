@@ -126,13 +126,13 @@ def _footer_copyright():
 
     """
 
-    unique_language_copyright_footer = configuration_helpers.get_value('UNIQUE_LANGUAGE_COPYRIGHT_FOOTER', None)
+    unique_language_copyright_footer = configuration_helpers.get_value(
+        'UNIQUE_LANGUAGE_COPYRIGHT_FOOTER', None)
 
-    if unique_language_copyright_footer: 
+    if unique_language_copyright_footer:
         return unique_language_copyright_footer
 
     return _compose_copyright_footer()
-        
 
     return _(
         # Translators: 'edX' and 'Open edX' are trademarks of 'edX Inc.'.
@@ -174,7 +174,8 @@ def _footer_social_links():
     Returns: list
 
     """
-    platform_name = configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
+    platform_name = configuration_helpers.get_value(
+        'platform_name', settings.PLATFORM_NAME)
     links = []
 
     for social_name in settings.SOCIAL_MEDIA_FOOTER_NAMES:
@@ -224,7 +225,8 @@ def _build_support_form_url(full_path=False):
 
     if configuration_helpers.get_value('CONTACT_US_ENABLE', True):
         # Gets custom url ad check if it's enabled
-        contact_us_page = configuration_helpers.get_value('CONTACT_US_CUSTOM_LINK', '')
+        contact_us_page = configuration_helpers.get_value(
+            'CONTACT_US_CUSTOM_LINK', '')
 
         # If no custom link is set, get default support form using reverse
         if not contact_us_page:
@@ -266,7 +268,8 @@ def _footer_connect_links(language=settings.LANGUAGE_CODE):
     ]
 
     if language == settings.LANGUAGE_CODE:
-        links.append(("media_kit", (marketing_link("MEDIA_KIT"), _("Media Kit"))))
+        links.append(
+            ("media_kit", (marketing_link("MEDIA_KIT"), _("Media Kit"))))
         links.append(("donate", (marketing_link("DONATE"), _("Donate"))))
 
     return [
@@ -289,9 +292,10 @@ def _find_position_of_link(links, key):
 
 def _footer_navigation_links(language=settings.LANGUAGE_CODE):
     """Return the navigation links to display in the footer. """
-    platform_name = configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
+    platform_name = configuration_helpers.get_value(
+        'platform_name', settings.PLATFORM_NAME)
     links = [
-         ("about", ('https://funix.edu.vn/', _("About"))),
+        ("about", ('https://funix.edu.vn/', _("About"))),
         ("blog", ('https://funix.edu.vn/blog/', _("Blog"))),
         # ("about", (marketing_link("ABOUT"), _("About"))),
         # ("enterprise", (
@@ -324,9 +328,11 @@ def _footer_legal_links(language=settings.LANGUAGE_CODE):
     """Return the legal footer links (e.g. terms of service). """
 
     links = [
-        ("terms_of_service_and_honor_code", (marketing_link("TOS_AND_HONOR"), _("Terms of Service & Honor Code"))),
+        ("terms_of_service_and_honor_code", (marketing_link(
+            "TOS_AND_HONOR"), _("Terms of Service & Honor Code"))),
         ("privacy_policy", (marketing_link("PRIVACY"), _("Privacy Policy"))),
-        ("accessibility_policy", (marketing_link("ACCESSIBILITY"), _("Accessibility Policy"))),
+        ("accessibility_policy", (marketing_link(
+            "ACCESSIBILITY"), _("Accessibility Policy"))),
         ("media_kit", (marketing_link("MEDIA_KIT"), _("Media Kit"))),
     ]
 
@@ -341,7 +347,8 @@ def _footer_legal_links(language=settings.LANGUAGE_CODE):
 
     if language == settings.LANGUAGE_CODE:
         position = _find_position_of_link(links, 'accessibility_policy')
-        links.insert(position, ("sitemap", (marketing_link("SITE_MAP"), _("Sitemap"))))
+        links.insert(
+            position, ("sitemap", (marketing_link("SITE_MAP"), _("Sitemap"))))
 
     return [
         {
@@ -367,19 +374,24 @@ def _add_enterprise_marketing_footer_query_params(url):
 
 def _footer_business_links(language=settings.LANGUAGE_CODE):
     """Return the business links to display in the footer. """
-    platform_name = configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
+    platform_name = configuration_helpers.get_value(
+        'platform_name', settings.PLATFORM_NAME)
     links = [
         ("about", (marketing_link("ABOUT"), _("About"))),
         ("enterprise", (
-            _add_enterprise_marketing_footer_query_params(marketing_link("ENTERPRISE")),
-            _("{platform_name} for Business").format(platform_name=platform_name)
+            _add_enterprise_marketing_footer_query_params(
+                marketing_link("ENTERPRISE")),
+            _("{platform_name} for Business").format(
+                platform_name=platform_name)
         )),
     ]
 
     if language == settings.LANGUAGE_CODE:
-        links.append(('affiliates', (marketing_link("AFFILIATES"), _("Affiliates"))))
+        links.append(
+            ('affiliates', (marketing_link("AFFILIATES"), _("Affiliates"))))
         # Translators: 'Open edX' is a trademark, please keep this untranslated
-        links.append(('openedx', (_footer_openedx_link()["url"], _("Open edX"))))
+        links.append(
+            ('openedx', (_footer_openedx_link()["url"], _("Open edX"))))
         links.append(('careers', (marketing_link("CAREERS"), _("Careers"))))
         links.append(("news", (marketing_link("NEWS"), _("News"))))
 
@@ -398,9 +410,11 @@ def _footer_more_info_links(language=settings.LANGUAGE_CODE):
     """Return the More Information footer links (e.g. terms of service). """
 
     links = [
-        ("terms_of_service_and_honor_code", (marketing_link("TOS_AND_HONOR"), _("Terms of Service & Honor Code"))),
+        ("terms_of_service_and_honor_code", (marketing_link(
+            "TOS_AND_HONOR"), _("Terms of Service & Honor Code"))),
         ("privacy_policy", (marketing_link("PRIVACY"), _("Privacy Policy"))),
-        ("accessibility_policy", (marketing_link("ACCESSIBILITY"), _("Accessibility Policy"))),
+        ("accessibility_policy", (marketing_link(
+            "ACCESSIBILITY"), _("Accessibility Policy"))),
     ]
 
     # Backwards compatibility: If a combined "terms of service and honor code"
@@ -413,7 +427,8 @@ def _footer_more_info_links(language=settings.LANGUAGE_CODE):
         ])
 
     if language == settings.LANGUAGE_CODE:
-        links.append(("trademarks", (marketing_link("TRADEMARKS"), _("Trademark Policy"))))
+        links.append(
+            ("trademarks", (marketing_link("TRADEMARKS"), _("Trademark Policy"))))
         links.append(("sitemap", (marketing_link("SITE_MAP"), _("Sitemap"))))
 
     return [
@@ -436,7 +451,8 @@ def _footer_mobile_links(is_secure):
     Returns: list
 
     """
-    platform_name = configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
+    platform_name = configuration_helpers.get_value(
+        'platform_name', settings.PLATFORM_NAME)
 
     mobile_links = []
     if settings.FEATURES.get('ENABLE_FOOTER_MOBILE_APP_LINKS'):
@@ -516,7 +532,8 @@ def _absolute_url(is_secure, url_path):
         unicode
 
     """
-    site_name = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
+    site_name = configuration_helpers.get_value(
+        'SITE_NAME', settings.SITE_NAME)
     parts = ("https" if is_secure else "http", site_name, url_path, '', '', '')
     return six.moves.urllib.parse.urlunparse(parts)
 
@@ -599,7 +616,8 @@ def get_logo_url(is_secure=True):
     """
     brand_logo_url = settings.LOGO_URL
     default_local_path = 'images/logo.png'
-    logo_url_from_site_config = configuration_helpers.get_value('logo_image_url')
+    logo_url_from_site_config = configuration_helpers.get_value(
+        'logo_image_url')
     university = configuration_helpers.get_value('university')
 
     if logo_url_from_site_config:
@@ -624,8 +642,10 @@ def get_favicon_url():
         Default local image path
     """
     brand_favicon_url = settings.FAVICON_URL
-    default_local_path = getattr(settings, 'FAVICON_PATH', 'images/favicon.ico')
-    favicon_url_from_site_config = configuration_helpers.get_value('favicon_path')
+    default_local_path = getattr(
+        settings, 'FAVICON_PATH', 'images/favicon.ico')
+    favicon_url_from_site_config = configuration_helpers.get_value(
+        'favicon_path')
 
     if favicon_url_from_site_config:
         return staticfiles_storage.url(favicon_url_from_site_config)
@@ -673,12 +693,19 @@ def get_logo_url_for_email():
     return (getattr(settings, 'LOGO_URL_PNG_FOR_EMAIL', None) or
             getattr(settings, 'LOGO_URL_PNG', None) or default_logo_url)
 
+
 def _compose_copyright_footer():
-    platform_name = configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
+    platform_name = configuration_helpers.get_value(
+        'PLATFORM_NAME', settings.PLATFORM_NAME) or 'FUNiX'
     copyright_year = configuration_helpers.get_value('COPYRIGHT_YEAR', "2023")
-    org_name = configuration_helpers.get_value('ORGANIZATION_NAME', "Galaxy Education")
+    org_name = configuration_helpers.get_value(
+        'ORGANIZATION_NAME', "Galaxy Education")
     org_type = _(configuration_helpers.get_value('ORGANIZATION_TYPE', "JSC"))
 
-    return _(
-        "@{copyright_year}. Copyrighted. {platform_name} - Member of {org_name} {org_type}"
-    ).format(copyright_year=copyright_year, platform_name=platform_name, org_name=org_name, org_type=org_type)
+    part1 = _(
+        "@{copyright_year}. Copyrighted").format(copyright_year=copyright_year)
+    part2 = _("{platform_name} - Member of {org_name} {org_type}").format(
+        platform_name=platform_name, org_name=org_name, org_type=org_type
+    )
+
+    return part1, part2

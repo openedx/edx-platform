@@ -1,0 +1,35 @@
+body > div.window-wrap > div.wrapper.wrapper-footer {
+    height: $footer-height;
+    padding-top: 0;
+    padding-bottom: 0;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+
+    border-top: 1px solid $color-stroke;
+
+    @media only screen and (min-width: $breakpoint-tablet-lg) {
+        padding-left: 80px;
+        padding-right: 80px;
+    }
+
+    @media only screen and (max-width: $breakpoint-tablet-lg) {
+        padding-left: 40px;
+        padding-right: 40px;
+    }
+
+    p {
+        a {
+            img {
+                width: auto;
+                height: 32px !important;
+            }
+        }
+    }
+}
+
+p#footer_copyright {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 150%;
+}

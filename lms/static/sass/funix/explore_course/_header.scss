@@ -1,0 +1,87 @@
+header.global-header {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    height: $header-height;
+    border-bottom: 1px solid $color-stroke;
+
+    @media only screen and (min-width: $breakpoint-tablet-lg) {
+        padding-left: 80px;
+        padding-right: 80px;
+    }
+
+    @media only screen and (min-width: $breakpoint-mobile) and (max-width: $breakpoint-tablet-lg) {
+        padding-left: 40px;
+        padding-right: 40px;
+    }
+
+    @media only screen and (max-width: $breakpoint-mobile) {
+        padding-left: 36px;
+        padding-right: 36px;
+    }
+}
+
+body > div.window-wrap > header {
+    div.main-header {
+        display: flex;
+        align-items: center;
+
+        @media only screen and (min-width: $breakpoint-mobile) {
+            justify-content: space-between;
+        }
+
+        @media only screen and (max-width: $breakpoint-mobile) {
+            justify-content: center;
+        }
+
+        h1 {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            a {
+                margin: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                img.logo {
+                    width: 60px;
+                    height: auto;
+                    margin-left: 0;
+                }
+            }
+        }
+
+        nav {
+            div.secondary {
+                margin: 0;
+                display: flex;
+                justify-content: flex-end;
+                padding: 0;
+
+                div {
+                    div.mobile-nav-item {
+                        margin: 0;
+
+                        @media only screen and (min-width: 391px) {
+                            display: inline-block;
+                        }
+
+                        a {
+                            align-self: flex-end;
+                            margin: 0;
+                        }
+                    }
+                }
+            }
+        }
+
+        div.hamburger-menu {
+            padding: 2px;
+            @media only screen and (min-width: 391px) {
+                display: none;
+            }
+        }
+    }
+}
