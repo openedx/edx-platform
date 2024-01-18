@@ -185,7 +185,7 @@
 # willyedoo <willyedoo@gmail.com>, 2019
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from French (http://app.transifex.com/open-edx/edx-platform/language/fr/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -220,7 +220,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-12-03 20:43+0000\n"
+"POT-Creation-Date: 2024-01-07 20:43+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Pierre Mailhot <pierre.mailhot@gmail.com>, 2023\n"
 "Language-Team: French (http://app.transifex.com/open-edx/edx-platform/language/fr/)\n"
@@ -3243,24 +3243,6 @@ msgstr ""
 #: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 msgid "Go to dashboard"
 msgstr "Aller au tableau de bord"
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid "Recommendations for you"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid "loading"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid ""
-"Browse recently launched courses and see what's new in your favorite "
-"subjects."
-msgstr ""
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid "Explore courses"
-msgstr ""
 
 #: lms/static/js/learner_dashboard/Static2UCallouts.jsx
 msgid "More opportunities for you"

@@ -1,6 +1,7 @@
 """
 Audience based filters for notifications
 """
+import logging
 
 from abc import abstractmethod
 
@@ -19,6 +20,9 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_STUDENT,
 )
+
+
+log = logging.getLogger(__name__)
 
 
 class NotificationAudienceFilterBase:
@@ -80,10 +84,12 @@ class CourseRoleAudienceFilter(NotificationAudienceFilterBase):
 
         if 'staff' in course_roles:
             staff_users = CourseStaffRole(course_key).users_with_role().values_list('id', flat=True)
+            log.info(f'Temp: Course wide notification, staff users calculated are {staff_users}')
             user_ids.extend(staff_users)
 
         if 'instructor' in course_roles:
             instructor_users = CourseInstructorRole(course_key).users_with_role().values_list('id', flat=True)
+            log.info(f'Temp: Course wide notification, instructor users calculated are {instructor_users}')
             user_ids.extend(instructor_users)
 
         return user_ids

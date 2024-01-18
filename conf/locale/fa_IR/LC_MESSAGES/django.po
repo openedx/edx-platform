@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Persian (Iran) (http://app.transifex.com/open-edx/edx-platform/language/fa_IR/).
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -89,7 +89,7 @@
 # smctech <tech@smallmedia.org.uk>, 2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Persian (Iran) (http://app.transifex.com/open-edx/edx-platform/language/fa_IR/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -107,7 +107,7 @@
 # Somaye Joolaee, 2022
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Persian (Iran) (http://app.transifex.com/open-edx/edx-platform/language/fa_IR/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -122,9 +122,9 @@
 # Zahra Sadat Navabi <z.navabi@gmail.com>, 2015
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Persian (Iran) (https://app.transifex.com/open-edx/teams/6205/fa_IR/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2023.
+# EdX Team <info@edx.org>, 2024.
 #
 # Translators:
 # Reihaneh Iranmanesh <Reihaneh.Iranmanesh@yahoo.com>, 2020
@@ -134,7 +134,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-11-26 20:43+0000\n"
+"POT-Creation-Date: 2024-01-07 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Somaye Joolaee, 2022\n"
 "Language-Team: Persian (Iran) (https://app.transifex.com/open-edx/teams/6205/fa_IR/)\n"
@@ -24239,16 +24239,16 @@ msgid "Select this problem"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy to Clipboard"
-msgstr "کپی به کلیپ بورد"
+msgid "Manage Access"
+msgstr "مدیریت دسترسی"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage tags"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Manage Access"
-msgstr "مدیریت دسترسی"
+msgid "Copy to Clipboard"
+msgstr "کپی به کلیپ بورد"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."

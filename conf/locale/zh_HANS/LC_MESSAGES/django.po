@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (http://app.transifex.com/open-edx/edx-platform/language/zh_CN/).
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -151,7 +151,7 @@
 # 肖寒 <bookman@vip.163.com>, 2013
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (http://app.transifex.com/open-edx/edx-platform/language/zh_CN/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -280,7 +280,7 @@
 # 黄鸿飞 <853885165@qq.com>, 2015
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (http://app.transifex.com/open-edx/edx-platform/language/zh_CN/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -403,7 +403,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-12-10 20:43+0000\n"
+"POT-Creation-Date: 2023-12-31 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
 "Language-Team: Chinese (China) (https://app.transifex.com/open-edx/teams/6205/zh_CN/)\n"
@@ -13642,7 +13642,7 @@ msgstr "已完成"
 
 #: lms/templates/seq_block.html
 msgid "New Unit"
-msgstr ""
+msgstr "新的单元"
 
 #: lms/templates/seq_block.html
 msgid "Paste as new unit"
@@ -22169,7 +22169,7 @@ msgid "Select this problem"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy to Clipboard"
+msgid "Manage Access"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
@@ -22177,7 +22177,7 @@ msgid "Manage tags"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Manage Access"
+msgid "Copy to Clipboard"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html

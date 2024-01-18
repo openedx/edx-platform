@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Arabic (http://app.transifex.com/open-edx/edx-platform/language/ar/).
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -177,7 +177,7 @@
 # طاهر <charaf.le.prince@gmail.com>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Arabic (http://app.transifex.com/open-edx/edx-platform/language/ar/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -259,7 +259,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-12-03 20:43+0000\n"
+"POT-Creation-Date: 2023-12-24 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: NELC Open edX Translation <openedx@elc.edu.sa>, 2020\n"
 "Language-Team: Arabic (https://app.transifex.com/open-edx/teams/6205/ar/)\n"
@@ -23978,7 +23978,7 @@ msgid "Select this problem"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy to Clipboard"
+msgid "Manage Access"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
@@ -23986,7 +23986,7 @@ msgid "Manage tags"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Manage Access"
+msgid "Copy to Clipboard"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
