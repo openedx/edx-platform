@@ -799,10 +799,10 @@ class EmailChangeMiddleware(MiddlewareMixin):
             are_emails_mismatched = user_session_email is not None and request.user.email != user_session_email
             EmailChangeMiddleware._set_session_email_match_custom_attributes(are_emails_mismatched)
             if settings.ENFORCE_SESSION_EMAIL_MATCH and are_emails_mismatched:
+                # Flush the session and mark cookies for deletion.
                 log.info(
                     f'EmailChangeMiddleware invalidating session for user: {request.user.id} due to email mismatch.'
                 )
-                # Flush the session and mark cookies for deletion.
                 request.session.flush()
                 request.user = AnonymousUser()
                 _mark_cookie_for_deletion(request)
