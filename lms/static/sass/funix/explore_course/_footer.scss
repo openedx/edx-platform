@@ -1,21 +1,30 @@
 body > div.window-wrap > div.wrapper.wrapper-footer {
     height: $footer-height;
-    padding-top: 0;
-    padding-bottom: 0;
+    padding: 0;
     display: flex;
     justify-content: flex-start;
     align-items: center;
 
     border-top: 1px solid $color-stroke;
 
-    @media only screen and (min-width: $breakpoint-tablet-lg) {
-        padding-left: 80px;
-        padding-right: 80px;
+    @media only screen and (max-width: $breakpoint-tablet-sm) {
+        padding-left: $padding-mobile;
+        padding-right: $padding-mobile;
     }
 
-    @media only screen and (max-width: $breakpoint-tablet-lg) {
-        padding-left: 40px;
-        padding-right: 40px;
+    @media only screen and (min-width: $breakpoint-tablet-sm) and (max-width: $breakpoint-tablet-lg) {
+        padding-left: $padding-tablet-sm;
+        padding-right: $padding-tablet-sm;
+    }
+
+    @media only screen and (min-width: $breakpoint-tablet-lg) and (max-width: $breakpoint-desktop) {
+        padding-left: $padding-tablet-lg;
+        padding-right: $padding-tablet-lg;
+    }
+
+    @media only screen and (min-width: $breakpoint-desktop) {
+        padding-left: $padding-desktop;
+        padding-right: $padding-desktop;
     }
 
     p {

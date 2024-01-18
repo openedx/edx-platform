@@ -47,12 +47,15 @@ $fz-h6: 13px;
 $fz-p: 1rem;
 
 // Bootstrap Breakpoints
-$breakpoint-xs: 0;
-$breakpoint-mobile: 390px;
-$breakpoint-tablet-sm: 744px;
-$breakpoint-tablet-md: 834px;
-$breakpoint-tablet-lg: 1024px;
-$breakpoint-xxl: 1440px;
+$breakpoint-mobile: 375px;
+$breakpoint-tablet-sm: 746px;
+$breakpoint-tablet-lg: 1133px;
+$breakpoint-desktop: 1440px;
+
+$padding-mobile: 36px;
+$padding-tablet-sm: 56px;
+$padding-tablet-lg: 88px;
+$padding-desktop: 80px;
 
 $footer-height: 148px;
 $header-height: 58px;
