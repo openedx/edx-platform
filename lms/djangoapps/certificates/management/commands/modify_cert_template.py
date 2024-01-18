@@ -16,7 +16,7 @@ log = logging.getLogger(__name__)
 class Command(BaseCommand):
     """Management command to modify certificate templates.
     Example usage:
-    ./manage.py lms modify_cert_template --old-text
+    ./manage.py lms modify_cert_template --old-text "</head>" --new text "<p>boo!</p></head>" --templates 867 3509
     """
 
     help = """Modify one or more certificate templates.
