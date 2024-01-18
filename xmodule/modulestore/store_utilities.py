@@ -1,5 +1,4 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
-import hashlib
 import logging
 import re
 import uuid
@@ -7,7 +6,6 @@ from collections import namedtuple
 
 from xblock.core import XBlock
 
-from xmodule.modulestore.split_mongo import BlockKey
 
 DETACHED_XBLOCK_TYPES = {name for name, __ in XBlock.load_tagged_classes("detached")}
 
@@ -17,11 +15,11 @@ def _prefix_only_url_replace_regex(pattern):
     Match urls in quotes pulling out the fields from pattern
     """
     return re.compile("""
-        (?x)                      # flags=re.VERBOSE
         (?P<quote>\\\\?['"])      # the opening quotes
         {}
         (?P=quote)                # the first matching closing quote
-        """.format(pattern))
+        """.format(pattern),
+        flags=re.VERBOSE)
 
 
 def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
@@ -106,31 +104,3 @@ def get_draft_subtree_roots(draft_nodes):
     for draft_node in draft_nodes:
         if draft_node.parent_url not in urls:
             yield draft_node
-
-
-def derived_key(courselike_source_key, block_key, dest_parent: BlockKey):
-    """
-    Return a new reproducible block ID for a given root, source block, and destination parent.
-
-    When recursively copying a block structure, we need to generate new block IDs for the
-    blocks. We don't want to use the exact same IDs as we might copy blocks multiple times.
-    However, we do want to be able to reproduce the same IDs when copying the same block
-    so that if we ever need to re-copy the block from its source (that is, to update it with
-    upstream changes) we don't affect any data tied to the ID, such as grades.
-
-    This is used by the copy_from_template function of the modulestore, and can be used by
-    pluggable django apps that need to copy blocks from one course to another in an
-    idempotent way. In the future, this should be created into a proper API function
-    in the spirit of OEP-49.
-    """
-    hashable_source_id = courselike_source_key.for_version(None)
-
-    # Compute a new block ID. This new block ID must be consistent when this
-    # method is called with the same (source_key, dest_structure) pair
-    unique_data = "{}:{}:{}".format(
-        str(hashable_source_id).encode("utf-8"),
-        block_key.id,
-        dest_parent.id,
-    )
-    new_block_id = hashlib.sha1(unique_data.encode('utf-8')).hexdigest()[:20]
-    return BlockKey(block_key.type, new_block_id)

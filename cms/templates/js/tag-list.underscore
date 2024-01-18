@@ -1,0 +1,32 @@
+<% if (tags !== null) { %>
+    <div class="wrapper wrapper-tags">
+        <div class="wrapper-tag-header" tabindex=0 role="button" aria-controls="tag-list-content" aria-expanded=false>
+            <span>
+                <span class="tag-title label">
+                    <%- gettext("Tags") %>
+                </span>
+                <span class="count-badge">
+                    <%- tags.count %>
+                </span>
+            </span>
+            <span class="icon fa fa-caret-down" aria-hidden="true"></span>
+        </div>
+        <div class="wrapper wrapper-tag-content is-hidden" id="tag-list-content">
+            <div class="content-taxonomies">
+                <% for (var i = 0; i < tags.taxonomies.length; i++) {
+                    var taxonomy = tags.taxonomies[i];
+                %>
+                    <div class="tagging-label tagging-label-link tagging-label-tax-<%- taxonomy.id %>" id="tax-<%- taxonomy.id %>" tabindex=0 role="button" aria-controls="content-tags-tax-<%- taxonomy.id %>" aria-expanded=false>
+                        <span class="tagging-label-value" id="tax-<%- taxonomy.id %>"><%- taxonomy.value %></span>
+                        <span class="tagging-label-count" id="tax-<%- taxonomy.id %>">(<%- taxonomy.count %>)</span>
+                        <span class="icon fa fa-caret-down" aria-hidden="true" id="tax-<%- taxonomy.id %>"></span>
+                    </div>
+                    <div class="content-tags-tax-<%- taxonomy.id %> is-hidden" id="content-tags-tax-<%- taxonomy.id %>"></div>
+                <% } %>
+            </div>
+            <a class="action-primary manage-tag-button" tabindex=0 role="button">
+                <%- gettext("Manage tags") %>
+            </a>
+        </div>
+    </div>
+<% } %>

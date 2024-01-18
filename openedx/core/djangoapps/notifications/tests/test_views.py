@@ -17,14 +17,24 @@ from rest_framework.test import APIClient, APITestCase
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, SHOW_NOTIFICATIONS_TRAY
+from openedx.core.djangoapps.django_comment_common.models import (
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_MODERATOR
+)
+from openedx.core.djangoapps.notifications.config.waffle import (
+    ENABLE_COURSEWIDE_NOTIFICATIONS,
+    ENABLE_NOTIFICATIONS,
+    SHOW_NOTIFICATIONS_TRAY
+)
 from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, Notification
 from openedx.core.djangoapps.notifications.serializers import NotificationCourseEnrollmentSerializer
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..base_notification import COURSE_NOTIFICATION_APPS, NotificationAppManager
+from ..base_notification import COURSE_NOTIFICATION_APPS, COURSE_NOTIFICATION_TYPES, NotificationAppManager
 
 
 @ddt.ddt
@@ -206,11 +216,13 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
             enrollment=enrollment_data
         )
 
-    def _expected_api_response(self):
+    def _expected_api_response(self, course=None):
         """
         Helper method to return expected API response.
         """
-        return {
+        if course is None:
+            course = self.course
+        response = {
             'id': 1,
             'course_name': 'course-v1:testorg+testcourse+testrun Course',
             'course_id': 'course-v1:testorg+testcourse+testrun',
@@ -241,6 +253,12 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                 }
             }
         }
+        if not ENABLE_COURSEWIDE_NOTIFICATIONS.is_enabled(course.id):
+            app_prefs = response['notification_preference_config']['discussion']
+            notification_types = app_prefs['notification_types']
+            for notification_type in ['new_discussion_post', 'new_question_post']:
+                notification_types.pop(notification_type)
+        return response
 
     def test_get_user_notification_preference_without_login(self):
         """
@@ -250,6 +268,7 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     @mock.patch("eventtracking.tracker.emit")
+    @override_waffle_flag(ENABLE_COURSEWIDE_NOTIFICATIONS, active=True)
     def test_get_user_notification_preference(self, mock_emit):
         """
         Test get user notification preference.
@@ -260,6 +279,47 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         self.assertEqual(response.data, self._expected_api_response())
         event_name, event_data = mock_emit.call_args[0]
         self.assertEqual(event_name, 'edx.notifications.preferences.viewed')
+
+    @mock.patch("eventtracking.tracker.emit")
+    @override_waffle_flag(ENABLE_COURSEWIDE_NOTIFICATIONS, active=True)
+    @mock.patch.dict(COURSE_NOTIFICATION_TYPES, {
+        **COURSE_NOTIFICATION_TYPES,
+        **{
+            'new_question_post': {
+                'name': 'new_question_post',
+                'visible_to': [FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_ADMINISTRATOR]
+            }
+        }
+    })
+    @ddt.data(
+        FORUM_ROLE_MODERATOR,
+        FORUM_ROLE_COMMUNITY_TA,
+        FORUM_ROLE_ADMINISTRATOR,
+        None
+    )
+    def test_get_user_notification_preference_with_visibility_settings(self, role, mock_emit):
+        """
+        Test get user notification preference.
+        """
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
+
+        role_instance = None
+        if role:
+            role_instance = RoleFactory(name=role, course_id=self.course.id)
+            role_instance.users.add(self.user)
+
+        response = self.client.get(self.path)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected_response = self._expected_api_response()
+        if not role:
+            expected_response['notification_preference_config']['discussion']['notification_types'].pop(
+                'new_question_post'
+            )
+        self.assertEqual(response.data, expected_response)
+        event_name, event_data = mock_emit.call_args[0]
+        self.assertEqual(event_name, 'edx.notifications.preferences.viewed')
+        if role_instance:
+            role_instance.users.clear()
 
     @ddt.data(
         ('discussion', None, None, True, status.HTTP_200_OK, 'app_update'),
@@ -528,7 +588,6 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
 
         # Enable or disable the waffle flag based on the test case data
         with override_waffle_flag(SHOW_NOTIFICATIONS_TRAY, active=show_notifications_tray_enabled):
-
             # Make a request to the view
             response = self.client.get(self.url)
 

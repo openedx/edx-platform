@@ -18,7 +18,7 @@ def create_taxonomy(
     name: str,
     description: str | None = None,
     enabled=True,
-    allow_multiple=False,
+    allow_multiple=True,
     allow_free_text=False,
     orgs: list[Organization] | None = None,
 ) -> Taxonomy:
@@ -58,6 +58,9 @@ def set_taxonomy_orgs(
     If not `all_orgs`, the taxonomy is associated with each org in the `orgs` list. If that list is empty, the
     taxonomy is not associated with any orgs.
     """
+    if taxonomy.system_defined:
+        raise ValueError("Cannot set orgs for a system-defined taxonomy")
+
     TaxonomyOrg.objects.filter(
         taxonomy=taxonomy,
         rel_type=relationship,
@@ -101,6 +104,24 @@ def get_taxonomies_for_org(
                 taxonomy=OuterRef("pk"),
                 rel_type=TaxonomyOrg.RelType.OWNER,
                 org_short_name=org_short_name,
+            )
+        )
+    )
+
+
+def get_unassigned_taxonomies(enabled=True) -> QuerySet:
+    """
+    Generate a list of the enabled orphaned Taxomonies, i.e. that do not belong to any
+    organization. We don't use `TaxonomyOrg.get_relationships` as that returns
+    Taxonomies which are available for all Organizations when no `org` is provided
+    """
+    return oel_tagging.get_taxonomies(enabled=enabled).filter(
+        ~(
+            Exists(
+                TaxonomyOrg.objects.filter(
+                    taxonomy=OuterRef("pk"),
+                    rel_type=TaxonomyOrg.RelType.OWNER,
+                )
             )
         )
     )
@@ -161,5 +182,6 @@ def tag_content_object(
 get_taxonomy = oel_tagging.get_taxonomy
 get_taxonomies = oel_tagging.get_taxonomies
 get_tags = oel_tagging.get_tags
+get_object_tag_counts = oel_tagging.get_object_tag_counts
 delete_object_tags = oel_tagging.delete_object_tags
 resync_object_tags = oel_tagging.resync_object_tags

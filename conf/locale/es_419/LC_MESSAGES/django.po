@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Spanish (Latin America) (http://app.transifex.com/open-edx/edx-platform/language/es_419/).
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -227,7 +227,7 @@
 # Zimeng Chen, 2021
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Spanish (Latin America) (http://app.transifex.com/open-edx/edx-platform/language/es_419/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -296,7 +296,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-01 20:43+0000\n"
+"POT-Creation-Date: 2023-12-24 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://app.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -487,6 +487,7 @@ msgid "You're enrolled as an honor code student"
 msgstr "Usted está inscrito como estudiante con código de honor"
 
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
+#: lms/djangoapps/courseware/views/views.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
@@ -2358,73 +2359,6 @@ msgstr "El archivo de imagen de la insignia debe de menos de 250KB."
 msgid "This value must be all lowercase."
 msgstr "Este valor debe expresarse en letra minúscula. "
 
-#: lms/djangoapps/badges/models.py
-msgid "The course mode for this badge image. For example, \"verified\" or \"honor\"."
-msgstr ""
-"Modo de curso para esta imagen de insignia. Por ejemplo, \"Verificado\" o "
-"\"Código de honor\"."
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Badge images must be square PNG files. The file size should be under 250KB."
-msgstr ""
-"Las imágenes de las insignias deben ser cuadradas y en formato PNG. El "
-"tamaño debe ser menor a 250KB."
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Set this value to True if you want this image to be the default image for "
-"any course modes that do not have a specified badge image. You can have only"
-" one default image."
-msgstr ""
-"Configure el valor en True si desea que esta sea la imagen por defecto para "
-"cualquier modo del curso que no tenga una imagen de insignia específica. "
-"Solo puede tener una imagen por defecto."
-
-#: lms/djangoapps/badges/models.py
-msgid "There can be only one default image."
-msgstr "Solo puede tener una imagen por defecto."
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"On each line, put the number of completed courses to award a badge for, a "
-"comma, and the slug of a badge class you have created that has the issuing "
-"component 'openedx__course'. For example: 3,enrolled_3_courses"
-msgstr ""
-"En cada línea, indique el número de cursos completados para otorgar una "
-"medalla, una coma, y el slug o clase de medala que usted ha creado que tenga"
-" el componente emisor 'openedx__course'.  Por ejemplo: 3,enrolled_3_courses"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"On each line, put the number of enrolled courses to award a badge for, a "
-"comma, and the slug of a badge class you have created that has the issuing "
-"component 'openedx__course'. For example: 3,enrolled_3_courses"
-msgstr ""
-"En cada línea, indique el número de cursos inscritos para otorgar una "
-"tarjeta medalla, una coma, y el slug o clase de medala que usted ha creado "
-"que tenga el componente emisor 'openedx__course'.  Por ejemplo: "
-"3,enrolled_3_courses"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Each line is a comma-separated list. The first item in each line is the slug"
-" of a badge class you have created that has an issuing component of "
-"'openedx__course'. The remaining items in each line are the course keys the "
-"learner needs to complete to be awarded the badge. For example: "
-"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
-msgstr ""
-"Cada línea es una lista separada por comas. El primer elemento de cada línea"
-" es el slug de una clase de medalla que usted ha creado que tiene un "
-"componente emisor de 'openedx__course'. Los elementos restantes en cada "
-"línea son las claves de los cursos que el estudiante necesita completar para"
-" obtener la medalla. Por ejemplo: "
-"slug_for_compsci_courses_group_badge,course-v1:CompSci+Curso+1,course-v1:CompsSci+Curso+2"
-
-#: lms/djangoapps/badges/models.py
-msgid "Please check the syntax of your entry."
-msgstr "Por favor revise la sintaxis de su entrada."
-
 #. Translators: This string is used across Open edX installations
 #. as a callback to edX. Please do not translate `edX.org`
 #: lms/djangoapps/branding/api.py
@@ -3822,6 +3756,7 @@ msgstr "{sign_in_link} o {register_link}."
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
 #: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/lti_provider/user-auth-error.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Sign in"
 msgstr "Iniciar sesión"
@@ -3875,46 +3810,22 @@ msgid "Certificate is being created."
 msgstr "Ha comenzado a crearse el certificado"
 
 #: lms/djangoapps/courseware/views/views.py
-#, python-brace-format
 msgid ""
-"{platform_name} now offers financial assistance for learners who want to earn Verified Certificates but who may not be able to pay the Verified Certificate fee. Eligible learners may receive up to 90{percent_sign} off the Verified Certificate fee for a course.\n"
-"To apply for financial assistance, enroll in the audit track for a course that offers Verified Certificates, and then complete this application. Note that you must complete a separate application for each course you take.\n"
-" We plan to use this information to evaluate your application for financial assistance and to further develop our financial assistance program."
+"We plan to use this information to evaluate your application for financial assistance and to further develop our financial assistance program. Please note that while \n"
+"assistance is available in most courses that offer verified certificates, a few courses and programs are not eligible. You must complete a separate application \n"
+"for each course you take. You may be approved for financial assistance five (5) times each year (based on 12-month period from you first approval). \n"
+"To apply for financial assistance: \n"
+"1. Enroll in the audit track for an eligible course that offers Verified Certificates \n"
+"2. Complete this  application \n"
+"3. Check your email, your application will be reviewed in 3-4 business days"
 msgstr ""
-"{platform_name} ahora ofrece asistencia financiera para los estudiantes que quieran obtener un certificado verificado pero no tengan la capacidad de pagar la tarifa correspondiente. Los estudiantes elegibles podrán recibir hasta 90{percent_sign} de descuento en la tarifa de certificados verificados para un curso.\n"
-"Para aplicar a la asistencia financiera, inscríbase al curso como asistente y luego complete esta aplicación. Tenga en cuenta que usted debe completar una aplicación diferente por cada curso tomado.\n"
-"Planeamos usar esta información para evaluar su solicitud de asistencia financiera y desarrollar en mayor medida nuestro programa de asistencia."
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Annual Household Income"
-msgstr "Ingresos anuales en tu hogar"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your current financial situation. Why do you need assistance?"
-msgstr ""
-"Cuéntenos sobre su situación financiera actual. ¿Por qué requiere "
-"asistencia?"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your learning or professional goals. How will a Verified "
-"Certificate in this course help you achieve these goals?"
-msgstr ""
-"Cuéntenos sobre sus metas de aprendizaje y profesionales. ¿Cómo le puede "
-"ayudar a lograr estas metas un Certificado Verificado?"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your plans for this course. What steps will you take to help "
-"you complete the course work and receive a certificate?"
-msgstr ""
-"Cuéntenos sobre sus planes respecto a este curso. ¿Cuáles son los pasos que "
-"tomará para completar las asignaciones del curso y recibir un certificado?"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Use between 1250 and 2500 characters or so in your response."
-msgstr "Use entre 1250 y 2500 caracteres más o menos en su respuesta"
+"Planeamos utilizar esta información para evaluar su solicitud de asistencia financiera y desarrollar aún más nuestro programa de asistencia financiera. Tenga en cuenta que mientras\n"
+" La asistencia está disponible en la mayoría de los cursos que ofrecen certificados verificados; algunos cursos y programas no son elegibles. Debe completar una solicitud por separado\n"
+" por cada curso que tomes. Es posible que se le apruebe asistencia financiera cinco (5) veces al año (basado en Período de 12 meses desde su primera aprobación).\n"
+" Para solicitar asistencia financiera:\n"
+" 1. inscribirse en Tomar el curso de forma gratuita, sin certificado Certificado Verificado para un curso elegible que ofrezca Certificados Verificados\n"
+" 2. Complete esta solicitud\n"
+" 3. Revise su correo electrónico, su solicitud será revisada en 3-4 días hábiles"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
@@ -3927,19 +3838,30 @@ msgstr ""
 " de asistente para el curso."
 
 #: lms/djangoapps/courseware/views/views.py
-msgid "Specify your annual household income in US Dollars."
+msgid "I certify that: "
+msgstr "Certifico que:"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"Paying the verified certificate fee for the above course would cause me "
+"economic hardship"
 msgstr ""
-"Especifica los ingresos anuales en tu hogar en dólares estadounidenses."
+"Pagar la tarifa Certificado Verificado por el curso anterior me causaría "
+"dificultades económicas"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"I will work diligently to complete the course work and receive a certificate"
+msgstr ""
+"Trabajaré en para completar el trabajo del curso y recibir un Certificado"
 
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid ""
-"I allow {platform_name} to use the information provided in this application "
-"(except for financial information) for {platform_name} marketing purposes."
+"I have read, understand, and will abide by the {honor_code_link} for the edX"
+" Site"
 msgstr ""
-"Autorizo a {platform_name} de usar la información entregada en esta "
-"aplicación (excepto por la información financiera) para propósitos de "
-"marketing de {platform_name}."
+"He leído, entiendo y cumpliré por {honor_code_link} para el sitio edX."
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Title can't be empty"
@@ -5374,6 +5296,18 @@ msgid ""
 msgstr ""
 "Lista de configuraciones de grupos para dividir a los estudiantes en "
 "contenidos experimentales."
+
+#: lms/djangoapps/lti_provider/models.py
+msgid ""
+"When checked, the LTI content will load only for learners who have an "
+"account in this instance. This is required only for linking learner accounts"
+" with the LTI consumer. See the Open edX LTI Provider documentation for more"
+" details."
+msgstr ""
+"Cuando esté marcado, el contenido LTI se cargará solo para los estudiante "
+"que tengan una Cuenta en este caso. Esto es requiere únicamente para "
+"vincular cuentas estudiante con el consumidor LTI . Consulte la "
+"documentación del proveedor Open edX LTI para obtener más detalles."
 
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
@@ -8728,6 +8662,10 @@ msgid "The '{field_name}' field cannot be edited."
 msgstr "El campo '{field_name}' no puede ser editado."
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
+msgid "Full name can't be longer than 255 symbols"
+msgstr "Nombrar completo no puede tener más de 255 símbolos."
+
+#: openedx/core/djangoapps/user_api/accounts/api.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Enter a valid name"
 msgstr "Introduce un nombre válido"
@@ -11378,18 +11316,6 @@ msgstr ""
 "configurar la imagen de miniatura en la página de Configuración y Detalles."
 
 #: xmodule/course_block.py
-msgid "Issue Open Badges"
-msgstr "Emitir Open Badges"
-
-#: xmodule/course_block.py
-msgid ""
-"Issue Open Badges badges for this course. Badges are generated when "
-"certificates are created."
-msgstr ""
-"Emitir insignias de Open Badges para este curso. Las insignias serán "
-"generadas cuando sean creados los certificados."
-
-#: xmodule/course_block.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
 "marks, enter the short name of the type of certificate that students receive"
@@ -12133,6 +12059,21 @@ msgstr ""
 "elementos seleccionados."
 
 #: xmodule/library_content_block.py
+msgid "Source content library has not been specified."
+msgstr "No se ha especificado la librería del contenido fuente."
+
+#: xmodule/library_content_block.py
+msgid "Content libraries are not available in the current runtime."
+msgstr ""
+"Las librerías de contenido no están disponibles en el tiempo de ejecución "
+"actual."
+
+#: xmodule/library_content_block.py
+#, python-brace-format
+msgid "Source content library does not exist: {source_library_id}"
+msgstr "La librería de contenido fuente no existe: {source_library_id}"
+
+#: xmodule/library_content_block.py
 msgid "This component is out of date. The library has new content."
 msgstr ""
 "Este componente está desactualizado. La librería ya tiene nuevo contenido."
@@ -12169,9 +12110,9 @@ msgid "Select a Library."
 msgstr "Seleccione una librería"
 
 #: xmodule/library_content_block.py
-msgid "There are no matching problem types in the specified libraries."
-msgstr ""
-"No hay problemas que coincidan con este tipo en las librerías especificadas"
+#, python-brace-format
+msgid "There are no problems in the specified library of type {capa_type}."
+msgstr "No hay problemas en la librería especificada de tipo {capa_type} ."
 
 #: xmodule/library_content_block.py
 msgid "Select another problem type."
@@ -13750,13 +13691,11 @@ msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}, {current_group}"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "Duplicado de {0}"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "Duplicado de '{0}'"
@@ -14488,14 +14427,6 @@ msgstr "Requerimientos"
 msgid "Details"
 msgstr "Detalles"
 
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-#. Translators: this is a verb describing the action of viewing more details
-#: cms/templates/studio_xblock_wrapper.html
-#: lms/templates/wiki/includes/article_menu.html
-#: wiki/templates/wiki/includes/article_menu.html
-msgid "View"
-msgstr "Ver"
-
 #: cms/templates/maintenance/_announcement_edit.html
 #: lms/templates/problem.html lms/templates/word_cloud.html
 msgid "Save"
@@ -14960,10 +14891,11 @@ msgid "Welcome to {platform_name}"
 msgstr "Bienvenido a la plataforma {platform_name}"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See https://open.edx.org for more information.
+#. untranslated. See https://openedx.org for more information.
 #: lms/templates/index_overlay.html
-msgid "It works! Powered by Open edX{registered_trademark}"
-msgstr "¡Funciona! Impulsado por Open edX{registered_trademark}"
+msgid "It works! Powered by the Open edX{registered_trademark} Platform"
+msgstr ""
+"¡Funciona! Desarrollado por la plataforma Open edX {registered_trademark}"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -15284,6 +15216,14 @@ msgstr "Secuencia"
 #: lms/templates/seq_block.html lms/templates/vert_module.html
 msgid "Completed"
 msgstr "Completado"
+
+#: lms/templates/seq_block.html
+msgid "New Unit"
+msgstr "Nueva Unidad"
+
+#: lms/templates/seq_block.html
+msgid "Paste as new unit"
+msgstr "Pegar como nueva unidad"
 
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"
@@ -15649,6 +15589,10 @@ msgstr "Materiales del curso"
 #: lms/templates/video.html
 msgid "Download Handout"
 msgstr "Descargar documento"
+
+#: lms/templates/video.html
+msgid "How is the transcript quality ?"
+msgstr "¿Cómo es la calidad de la transcripción ?"
 
 #: lms/templates/word_cloud.html
 msgid "{num} of {total}"
@@ -19020,20 +18964,6 @@ msgstr ""
 #. Translators: This string will not be used in Open edX installations.
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
-"In order to be eligible for edX Financial Assistance, you must demonstrate "
-"that paying the Verified Certificate fee would cause you economic hardship. "
-"To apply, you will be asked to answer a few questions about why you are "
-"applying and how the Verified Certificate will benefit you."
-msgstr ""
-"Para ser elegible para la asistencia financiera de edX, debe demostrar que "
-"el pago de la tarifa correspondiente al certificado verificado le causará "
-"problemas económicos. Para aplicar, se le pedirá responder algunas preguntas"
-" acerca de sus motivos para aplicar y sobre cómo se beneficiará con el "
-"certificado verificado."
-
-#. Translators: This string will not be used in Open edX installations.
-#: lms/templates/financial-assistance/financial-assistance.html
-msgid ""
 "If your application is approved, we'll give you instructions for verifying "
 "your identity on edx.org so you can start working toward completing your edX"
 " course."
@@ -19058,10 +18988,6 @@ msgstr ""
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Sincerely, Anant"
 msgstr "Sinceramente,  Anant"
-
-#: lms/templates/financial-assistance/financial-assistance.html
-msgid "Back to Student FAQs"
-msgstr "Regresar a FAQs para estudiantes"
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Apply for Financial Assistance"
@@ -20800,6 +20726,30 @@ msgstr ""
 msgid "My Courses"
 msgstr "Mis cursos"
 
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "There was an error when loading this module!"
+msgstr "¡Hubo un error al cargar este módulo!"
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"This module is available only for users who are signed into {platform}. "
+"Kindly sign in and refresh this page to load the content."
+msgstr ""
+"Este módulo está disponible solo para usuarios que hayan iniciado sesión en "
+"{platform} . Por favor inicie en y actualice esta página para cargar el "
+"contenido en ido."
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "NOTE:"
+msgstr "NOTA:"
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"The email used to sign into this platform and {platform} should be the same."
+msgstr ""
+"El correo electrónico utilizado para iniciar sesión en esta plataforma y "
+"{platform} deben ser el mismo."
+
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
 msgstr "Cambiar preferencia de idioma"
@@ -21385,6 +21335,11 @@ msgid "Learn more"
 msgstr "Aprender más"
 
 #: lms/templates/wiki/includes/article_menu.html
+#: wiki/templates/wiki/includes/article_menu.html
+msgid "View"
+msgstr "Ver"
+
+#: lms/templates/wiki/includes/article_menu.html
 msgid "{span_start}(active){span_end}"
 msgstr "{span_start}(activo){span_end}"
 
@@ -21941,8 +21896,8 @@ msgid "Studio Accessibility Policy"
 msgstr "Política de Accesibilidad a Studio."
 
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
-msgid "Files & Uploads"
-msgstr "Administración de archivos"
+msgid "Files"
+msgstr "Archivos"
 
 #: cms/templates/certificates.html
 msgid "Course Certificates"
@@ -22104,6 +22059,10 @@ msgstr "Ver la versión publicada"
 #: cms/templates/container.html
 msgid "Preview the courseware in the LMS"
 msgstr "Previsualizar el contenido del curso en el LMS"
+
+#: cms/templates/container.html
+msgid "Collapse All"
+msgstr "Colapsar todo"
 
 #: cms/templates/container.html
 msgid "Adding components"
@@ -23912,6 +23871,10 @@ msgid "Libraries"
 msgstr "Librerías"
 
 #: cms/templates/index.html
+msgid "Taxonomies"
+msgstr "Taxonomías"
+
+#: cms/templates/index.html
 msgid "Are you staff on an existing {studio_name} course?"
 msgstr "¿Es usted parte del equipo en un curso {studio_name} existente?"
 
@@ -25157,16 +25120,28 @@ msgstr ""
 " final del estudiante."
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Importing components"
+msgstr "Importar componentes"
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
 msgstr "Expandir o Colapsar"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy to Clipboard"
-msgstr "Copiar al portapapeles"
+msgid "Select this problem"
+msgstr "Seleccionar este problema"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"
 msgstr "Administrar acceso"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage tags"
+msgstr "Administrar etiquetas"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy to Clipboard"
+msgstr "Copiar al portapapeles"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."

@@ -13,7 +13,6 @@ import ddt
 import httpretty
 import pytest
 from django.test import override_settings
-from edx_toggles.toggles.testutils import override_waffle_flag
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test.client import RequestFactory
@@ -38,7 +37,6 @@ from common.djangoapps.student.tests.factories import (
 from common.djangoapps.util.testing import UrlResetMixin
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
-from lms.djangoapps.discussion.toggles import ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.rest_api import api
 from lms.djangoapps.discussion.rest_api.api import (
     create_comment,
@@ -211,8 +209,6 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
             'is_group_ta': False,
             'is_user_admin': False,
             'user_roles': {'Student'},
-            'learners_tab_enabled': False,
-            'reason_codes_enabled': False,
             'edit_reasons': [{'code': 'test-edit-reason', 'label': 'Test Edit Reason'}],
             'post_close_reasons': [{'code': 'test-close-reason', 'label': 'Test Close Reason'}],
         }
@@ -230,15 +226,6 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
         course_meta = get_course(self.request, self.course.id)
         assert course_meta["has_moderation_privileges"]
         assert course_meta["user_roles"] == {FORUM_ROLE_STUDENT} | {role}
-
-    @ddt.data(True, False)
-    def test_learner_tab_enabled_flag(self, learners_tab_enabled):
-        """
-        Test the 'learners_tab_enabled' flag.
-        """
-        with override_waffle_flag(ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE, learners_tab_enabled):
-            course_meta = get_course(self.request, self.course.id)
-            assert course_meta['learners_tab_enabled'] == learners_tab_enabled
 
 
 @ddt.ddt
@@ -1478,6 +1465,13 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "anonymous_to_peers": False,
                 "last_edit": None,
                 "edit_by_label": None,
+                "profile_image": {
+                    "has_image": False,
+                    "image_url_full": "http://testserver/static/default_500.png",
+                    "image_url_large": "http://testserver/static/default_120.png",
+                    "image_url_medium": "http://testserver/static/default_50.png",
+                    "image_url_small": "http://testserver/static/default_30.png",
+                },
             },
             {
                 "id": "test_comment_2",
@@ -1505,6 +1499,13 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "anonymous_to_peers": False,
                 "last_edit": None,
                 "edit_by_label": None,
+                "profile_image": {
+                    "has_image": False,
+                    "image_url_full": "http://testserver/static/default_500.png",
+                    "image_url_large": "http://testserver/static/default_120.png",
+                    "image_url_medium": "http://testserver/static/default_50.png",
+                    "image_url_small": "http://testserver/static/default_30.png",
+                },
             },
         ]
         actual_comments = self.get_comment_list(
@@ -2252,6 +2253,13 @@ class CreateCommentTest(
             "anonymous_to_peers": False,
             "last_edit": None,
             "edit_by_label": None,
+            "profile_image": {
+                "has_image": False,
+                "image_url_full": "http://testserver/static/default_500.png",
+                "image_url_large": "http://testserver/static/default_120.png",
+                "image_url_medium": "http://testserver/static/default_50.png",
+                "image_url_small": "http://testserver/static/default_30.png",
+            },
         }
         assert actual == expected
         expected_url = (
@@ -2352,6 +2360,13 @@ class CreateCommentTest(
             "anonymous_to_peers": False,
             "last_edit": None,
             "edit_by_label": None,
+            "profile_image": {
+                "has_image": False,
+                "image_url_full": "http://testserver/static/default_500.png",
+                "image_url_large": "http://testserver/static/default_120.png",
+                "image_url_medium": "http://testserver/static/default_50.png",
+                "image_url_small": "http://testserver/static/default_30.png",
+            },
         }
         assert actual == expected
         expected_url = (
@@ -2725,7 +2740,12 @@ class UpdateThreadTest(
         self.register_subscription_response(self.user)
         self.register_thread()
         data = {"following": new_following}
-        result = update_thread(self.request, "test_thread", data)
+        signal_name = "thread_followed" if new_following else "thread_unfollowed"
+        mock_path = f"openedx.core.djangoapps.django_comment_common.signals.{signal_name}.send"
+        with mock.patch(mock_path) as signal_patch:
+            result = update_thread(self.request, "test_thread", data)
+            if old_following != new_following:
+                self.assertEqual(signal_patch.call_count, 1)
         assert result['following'] == new_following
         last_request_path = urlparse(httpretty.last_request().path).path  # lint-amnesty, pylint: disable=no-member
         subscription_url = f"/api/v1/users/{self.user.id}/subscriptions"
@@ -3188,6 +3208,13 @@ class UpdateCommentTest(
             "can_delete": True,
             "last_edit": None,
             "edit_by_label": None,
+            "profile_image": {
+                "has_image": False,
+                "image_url_full": "http://testserver/static/default_500.png",
+                "image_url_large": "http://testserver/static/default_120.png",
+                "image_url_medium": "http://testserver/static/default_50.png",
+                "image_url_small": "http://testserver/static/default_30.png",
+            },
         }
         assert actual == expected
         assert parsed_body(httpretty.last_request()) == {
@@ -3299,7 +3326,8 @@ class UpdateCommentTest(
         [True, False],
     ))
     @ddt.unpack
-    def test_endorsed_access(self, role_name, is_thread_author, thread_type, is_comment_author):
+    @mock.patch('openedx.core.djangoapps.django_comment_common.signals.comment_endorsed.send')
+    def test_endorsed_access(self, role_name, is_thread_author, thread_type, is_comment_author, endorsed_mock):
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=role_name)
         self.register_comment(
             {"user_id": str(self.user.id if is_comment_author else (self.user.id + 1))},
@@ -3314,6 +3342,7 @@ class UpdateCommentTest(
         )
         try:
             update_comment(self.request, "test_comment", {"endorsed": True})
+            self.assertEqual(endorsed_mock.call_count, 1)
             assert not expected_error
         except ValidationError as err:
             assert expected_error

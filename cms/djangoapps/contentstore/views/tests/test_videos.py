@@ -358,6 +358,7 @@ class VideosHandlerTestCase(
         for i, response_video in enumerate(response_videos):
             # Videos should be returned by creation date descending
             original_video = self.previous_uploads[-(i + 1)]
+            print(response_video.keys())
             self.assertEqual(
                 set(response_video.keys()),
                 {
@@ -367,10 +368,12 @@ class VideosHandlerTestCase(
                     'duration',
                     'status',
                     'course_video_image_url',
+                    'file_size',
+                    'download_link',
                     'transcripts',
                     'transcription_status',
                     'transcript_urls',
-                    'error_description'
+                    'error_description',
                 }
             )
             dateutil.parser.parse(response_video['created'])
@@ -385,8 +388,9 @@ class VideosHandlerTestCase(
         (
             [
                 'edx_video_id', 'client_video_id', 'created', 'duration',
-                'status', 'course_video_image_url', 'transcripts', 'transcription_status',
-                'transcript_urls', 'error_description'
+                'status', 'course_video_image_url', 'file_size', 'download_link',
+                'transcripts', 'transcription_status', 'transcript_urls',
+                'error_description'
             ],
             [
                 {
@@ -402,8 +406,9 @@ class VideosHandlerTestCase(
         (
             [
                 'edx_video_id', 'client_video_id', 'created', 'duration',
-                'status', 'course_video_image_url', 'transcripts', 'transcription_status',
-                'transcript_urls', 'error_description'
+                'status', 'course_video_image_url', 'file_size', 'download_link',
+                'transcripts', 'transcription_status', 'transcript_urls',
+                'error_description'
             ],
             [
                 {
@@ -444,8 +449,9 @@ class VideosHandlerTestCase(
         self.assertEqual(response.status_code, 200)
         response_videos = json.loads(response.content.decode('utf-8'))['videos']
         self.assertEqual(len(response_videos), len(self.previous_uploads))
-
         for response_video in response_videos:
+            print(response_video)
+
             self.assertEqual(set(response_video.keys()), set(expected_video_keys))
             if response_video['edx_video_id'] == self.previous_uploads[0]['edx_video_id']:
                 self.assertEqual(response_video.get('transcripts', []), expected_transcripts)

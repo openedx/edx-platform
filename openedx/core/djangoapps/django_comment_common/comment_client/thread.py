@@ -30,12 +30,6 @@ class Thread(models.Model):
         'close_reason_code', 'edit_reason_code', 'closing_user_id', 'editing_user_id',
     ]
 
-    # metric_tag_fields are used by Datadog to record metrics about the model
-    metric_tag_fields = [
-        'course_id', 'group_id', 'pinned', 'closed', 'anonymous', 'anonymous_to_peers',
-        'endorsed', 'read',
-    ]
-
     # initializable_fields are sent in POST requests
     initializable_fields = updatable_fields + ['thread_type', 'context']
 

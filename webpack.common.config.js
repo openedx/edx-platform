@@ -101,7 +101,6 @@ module.exports = Merge.smart({
             DemographicsCollectionModal: './lms/static/js/demographics_collection/DemographicsCollectionModal.jsx',
             AxiosJwtTokenService: './lms/static/js/jwt_auth/AxiosJwtTokenService.js',
             EnterpriseLearnerPortalModal: './lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx',
-            RecommendationsPanel: './lms/static/js/learner_dashboard/RecommendationsPanel.jsx',
             Static2UCallouts: './lms/static/js/learner_dashboard/Static2UCallouts.jsx',
 
             // Learner Dashboard
@@ -458,18 +457,6 @@ module.exports = Merge.smart({
                 {
                     test: /logger/,
                     loader: 'imports-loader?this=>window'
-                },
-                {
-                    test: /\.css$/,
-                    use: [
-                        'style-loader',
-                        {
-                            loader: 'css-loader',
-                            options: {
-                                modules: true
-                            }
-                        }
-                    ]
                 }
             ]
         },

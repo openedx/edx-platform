@@ -61,6 +61,8 @@ conf/locale/fake*/LC_MESSAGES/*.po
 conf/locale/fake*/LC_MESSAGES/*.mo
 # this was a mistake in i18n_tools, now fixed.
 conf/locale/messages.mo
+conf/plugins-locale/
+/*/static/js/xblock.v1-i18n/
 
 ### Testing artifacts
 .testids/
@@ -86,7 +88,6 @@ test_root/paver_logs/
 test_root/uploads/
 django-pyfs
 .tox/
-common/test/db_cache/bok_choy_*.yaml
 common/test/data/badges/*.png
 
 ### Installation artifacts

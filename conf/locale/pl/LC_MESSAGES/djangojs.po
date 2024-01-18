@@ -92,7 +92,7 @@
 # Monika Olszewska <molszewska1995@gmail.com>, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Polish (http://app.transifex.com/open-edx/edx-platform/language/pl/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -116,7 +116,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-08 20:42+0000\n"
+"POT-Creation-Date: 2024-01-07 20:43+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Klara Sielicka-Baryłka, 2022\n"
 "Language-Team: Polish (http://app.transifex.com/open-edx/edx-platform/language/pl/)\n"
@@ -216,7 +216,6 @@ msgstr "Przesyłanie"
 #: cms/templates/js/course-video-settings.underscore
 #: common/static/common/templates/discussion/templates.underscore
 #: common/static/common/templates/image-modal.underscore
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Close"
 msgstr "Zamknij"
 
@@ -239,7 +238,8 @@ msgstr "Wybierz plik"
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js cms/static/js/views/tabs.js
-#: lms/static/js/Markdown.Editor.js xmodule/js/src/html/edit.js
+#: cms/static/js/views/utils/xblock_utils.js lms/static/js/Markdown.Editor.js
+#: xmodule/js/src/html/edit.js
 #: common/static/common/templates/discussion/templates.underscore
 #: lms/templates/learner_dashboard/verification_popover.underscore
 msgid "OK"
@@ -863,6 +863,7 @@ msgid "Select a category"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "Ustawienia konta"
@@ -3015,24 +3016,6 @@ msgstr ""
 msgid "Go to dashboard"
 msgstr ""
 
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid "Recommendations for you"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid "loading"
-msgstr "ładowanie"
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid ""
-"Browse recently launched courses and see what's new in your favorite "
-"subjects."
-msgstr ""
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid "Explore courses"
-msgstr ""
-
 #: lms/static/js/learner_dashboard/Static2UCallouts.jsx
 msgid "More opportunities for you"
 msgstr ""
@@ -4041,10 +4024,6 @@ msgstr ""
 "zainteresowania, dlaczego bierzesz udział w kursach lub czego masz nadzieje "
 "się nauczyć."
 
-#: openedx/features/learner_profile/static/learner_profile/js/views/badge_list_container.js
-msgid "Accomplishments Pagination"
-msgstr "Paginacja osiągnięć"
-
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
 msgid "Account Settings page."
 msgstr "Ustawienia konta"
@@ -4077,10 +4056,6 @@ msgstr "Zdjęcie profilowe użytkownika \"{username}\""
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "About Me"
 msgstr "O mnie"
-
-#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
-msgid "Accomplishments"
-msgstr "Osiągnięcia"
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "Profile"
@@ -6236,6 +6211,7 @@ msgstr "Czy na pewno chcesz usunąć tę zmianę?"
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/pages/container_subviews.js
 msgid "Copying"
 msgstr ""
 
@@ -6245,26 +6221,31 @@ msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "Pasting"
 msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "Some errors occurred"
 msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "The following required files could not be added to the course:"
 msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "You may need to update a file(s) manually"
 msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid ""
 "The following files already exist in this course but don't match the version"
 " used by the component you pasted:"
@@ -6272,21 +6253,25 @@ msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "New file(s) added to Files & Uploads."
 msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "The following required files were imported to this course:"
 msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "View files"
 msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "Dismiss"
 msgstr ""
 
@@ -8150,13 +8135,13 @@ msgid "Financial Assistance Application"
 msgstr "Program wsparcia finansowego"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid "About You"
-msgstr "O tobie"
+msgid "Profile Information"
+msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
-"The following information is already a part of your {platform} profile. "
-"We've included it here for your application."
+"The following information is already a part of your {platform} profile and "
+"is required for your application. To edit this information go to "
 msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
@@ -8172,8 +8157,8 @@ msgid "Country of residence"
 msgstr "Kraj zamieszkania"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid "Back to {platform} FAQs"
-msgstr "Powrót do PiO {platform}"
+msgid "Application Details"
+msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Submit Application"
@@ -9739,32 +9724,6 @@ msgstr[3] "Załaduj kolejnych {num_items} wyników"
 msgid "Sorry, no results were found."
 msgstr "Przepraszamy, nie znaleziono żadnych wyników."
 
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-#, python-format
-msgid "Share your \"%(display_name)s\" award"
-msgstr "Pochwal się swoim osiągnięciem: \"%(display_name)s\""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-msgid "Share"
-msgstr "Pochwal się"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-#, python-format
-msgid "Earned %(created)s."
-msgstr "Zdobyłeś %(created)s."
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "What's Your Next Accomplishment?"
-msgstr "Co będzie twoim kolejnym osiągnięciem?"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "Start working toward your next learning goal."
-msgstr "Rozpocznij naukę w kierunku osiągnięcia swojego kolejnego celu."
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "Find a course"
-msgstr "Znajdź kurs"
-
 #: openedx/features/learner_profile/static/learner_profile/templates/section_two.underscore
 msgid "You are currently sharing a limited profile."
 msgstr "Obecnie dzielisz się ograniczonym profilem."
@@ -9772,33 +9731,6 @@ msgstr "Obecnie dzielisz się ograniczonym profilem."
 #: openedx/features/learner_profile/static/learner_profile/templates/section_two.underscore
 msgid "This learner is currently sharing a limited profile."
 msgstr "Student obecnie dzieli się ograniczonym profilem."
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid "Share on Mozilla Backpack"
-msgstr "Podziel się w Mozilla Backpack."
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"To share your certificate on Mozilla Backpack, you must first have a "
-"Backpack account. Complete the following steps to add your certificate to "
-"Backpack."
-msgstr ""
-"Aby podzielić się swoim certyfikatem w Mozilla Backpack, najpierw musisz "
-"posiadać konto w Backpack. Wykonaj poniższe czynności w celu dodania swojego"
-" certyfikatu do Backpack."
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"Create a {link_start}Mozilla Backpack{link_end} account, or log in to your "
-"existing account"
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"{download_link_start}Download this image (right-click or option-click, save "
-"as){link_end} and then {upload_link_start}upload{link_end} it to your "
-"backpack."
-msgstr ""
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"
@@ -10309,6 +10241,10 @@ msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Proctoring Settings"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+msgid "Manage Tags"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore
@@ -11010,6 +10946,10 @@ msgid "Note: Do not hide graded assignments after they have been released."
 msgstr ""
 "Uwaga: nie ukrywaj zadań, które podlegają ocenie, po ich upublicznieniu."
 
+#: cms/templates/js/publish-xblock.underscore
+msgid "Copy Unit"
+msgstr ""
+
 #: cms/templates/js/release-date-editor.underscore
 msgid "Release Date and Time"
 msgstr "Data i czas upublicznienia"
@@ -11208,6 +11148,10 @@ msgstr ""
 
 #: cms/templates/js/summary-configuration-editor.underscore
 msgid "Enable summaries"
+msgstr ""
+
+#: cms/templates/js/tag-list.underscore
+msgid "Manage tags"
 msgstr ""
 
 #: cms/templates/js/team-member.underscore

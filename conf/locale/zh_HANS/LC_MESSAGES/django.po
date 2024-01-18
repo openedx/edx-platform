@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (http://app.transifex.com/open-edx/edx-platform/language/zh_CN/).
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -151,7 +151,7 @@
 # 肖寒 <bookman@vip.163.com>, 2013
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (http://app.transifex.com/open-edx/edx-platform/language/zh_CN/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -280,7 +280,7 @@
 # 黄鸿飞 <853885165@qq.com>, 2015
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (http://app.transifex.com/open-edx/edx-platform/language/zh_CN/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -403,7 +403,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-08 20:43+0000\n"
+"POT-Creation-Date: 2023-12-31 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
 "Language-Team: Chinese (China) (https://app.transifex.com/open-edx/teams/6205/zh_CN/)\n"
@@ -589,6 +589,7 @@ msgid "You're enrolled as an honor code student"
 msgstr "您已作为诚信准则学员选课"
 
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
+#: lms/djangoapps/courseware/views/views.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
@@ -2204,58 +2205,6 @@ msgstr "徽章图片的文件大小必须小于250KB。"
 msgid "This value must be all lowercase."
 msgstr "该值必须全部为小写字母。"
 
-#: lms/djangoapps/badges/models.py
-msgid "The course mode for this badge image. For example, \"verified\" or \"honor\"."
-msgstr "该课程模式的徽章图像。例如，“合格”或“荣誉”。"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Badge images must be square PNG files. The file size should be under 250KB."
-msgstr "徽章图片必须为正方形的PNG文件，且文件大小应小于250KB。"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Set this value to True if you want this image to be the default image for "
-"any course modes that do not have a specified badge image. You can have only"
-" one default image."
-msgstr "对于那些没有指定徽章图片的课程模式，如果您想设置此图为其默认图片，则将该值设为True。您只能设置一张默认图片。"
-
-#: lms/djangoapps/badges/models.py
-msgid "There can be only one default image."
-msgstr "只能有一张默认图片。"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"On each line, put the number of completed courses to award a badge for, a "
-"comma, and the slug of a badge class you have created that has the issuing "
-"component 'openedx__course'. For example: 3,enrolled_3_courses"
-msgstr ""
-"在每一行上，列出为了获得徽章的已完成课程的数目、一个逗号以及您创建的具有发行组件“openedx__course”的徽章类别标语。例如：3, "
-"已登记_3_个课程"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"On each line, put the number of enrolled courses to award a badge for, a "
-"comma, and the slug of a badge class you have created that has the issuing "
-"component 'openedx__course'. For example: 3,enrolled_3_courses"
-msgstr ""
-"在每一行上，列出为了获得徽章的已登记课程的数目、一个逗号以及您创建的具有发行组件“openedx__course”的徽章类别标语。例如：3, "
-"已登记_3_个课程"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Each line is a comma-separated list. The first item in each line is the slug"
-" of a badge class you have created that has an issuing component of "
-"'openedx__course'. The remaining items in each line are the course keys the "
-"learner needs to complete to be awarded the badge. For example: "
-"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
-msgstr ""
-"每一行都是以逗号分隔的列表。每一行的第一项是您创建的具有发行组件“openedx__course”的徽章类别标语。每一行的其余项是学员为了获得徽章需要完成的课程要领。例如：slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
-
-#: lms/djangoapps/badges/models.py
-msgid "Please check the syntax of your entry."
-msgstr "请检查条目的句法。"
-
 #. Translators: This string is used across Open edX installations
 #. as a callback to edX. Please do not translate `edX.org`
 #: lms/djangoapps/branding/api.py
@@ -3499,6 +3448,7 @@ msgstr "{sign_in_link} 或 {register_link}."
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
 #: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/lti_provider/user-auth-error.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Sign in"
 msgstr "登录"
@@ -3550,40 +3500,15 @@ msgid "Certificate is being created."
 msgstr "认证已被创建。"
 
 #: lms/djangoapps/courseware/views/views.py
-#, python-brace-format
 msgid ""
-"{platform_name} now offers financial assistance for learners who want to earn Verified Certificates but who may not be able to pay the Verified Certificate fee. Eligible learners may receive up to 90{percent_sign} off the Verified Certificate fee for a course.\n"
-"To apply for financial assistance, enroll in the audit track for a course that offers Verified Certificates, and then complete this application. Note that you must complete a separate application for each course you take.\n"
-" We plan to use this information to evaluate your application for financial assistance and to further develop our financial assistance program."
+"We plan to use this information to evaluate your application for financial assistance and to further develop our financial assistance program. Please note that while \n"
+"assistance is available in most courses that offer verified certificates, a few courses and programs are not eligible. You must complete a separate application \n"
+"for each course you take. You may be approved for financial assistance five (5) times each year (based on 12-month period from you first approval). \n"
+"To apply for financial assistance: \n"
+"1. Enroll in the audit track for an eligible course that offers Verified Certificates \n"
+"2. Complete this  application \n"
+"3. Check your email, your application will be reviewed in 3-4 business days"
 msgstr ""
-"{platform_name} 现今提供经济援助，使想获得合格证书却无法支付证书费用之学习者能拿到证书。有资格的学习者可获得高达免 90 {percent_sign} 的合格证书优惠价。\n"
-"申请经济援助，报名参加提供合格证书之审核作业，接着完成申请。请注意，您必须分別申请每一门您修习完毕之课程。\n"
-"计画利用这些讯息来评估您的经济援助申请，并进一步发展经济援助计划。"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Annual Household Income"
-msgstr "家庭年收入"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your current financial situation. Why do you need assistance?"
-msgstr "请告诉我们关于您目前的经济状况。为什么您需要协助？"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your learning or professional goals. How will a Verified "
-"Certificate in this course help you achieve these goals?"
-msgstr "请告诉我们关于您的学习或专业目标。一份这门课的认证证书，将会如何帮助您达成这些目标？"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your plans for this course. What steps will you take to help "
-"you complete the course work and receive a certificate?"
-msgstr "告诉我们有关于您计划的这门课程。您会采取什么措施来帮助您完成课程学习，并获得证书？"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Use between 1250 and 2500 characters or so in your response."
-msgstr "在您的回复中使用 1250 到 2500 个字符左右。"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
@@ -3593,15 +3518,26 @@ msgid ""
 msgstr "选择您想要获得修课证明之课程。如果课程没出现在列表中，请确认您已经注册及追踪该课程。"
 
 #: lms/djangoapps/courseware/views/views.py
-msgid "Specify your annual household income in US Dollars."
-msgstr "说明您以美金计算之家庭年收入。"
+msgid "I certify that: "
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"Paying the verified certificate fee for the above course would cause me "
+"economic hardship"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"I will work diligently to complete the course work and receive a certificate"
+msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid ""
-"I allow {platform_name} to use the information provided in this application "
-"(except for financial information) for {platform_name} marketing purposes."
-msgstr "我允许 {platform_name} 将此应用程序中提供的信息（财务信息除外）用于 {platform_name} 营销目的。"
+"I have read, understand, and will abide by the {honor_code_link} for the edX"
+" Site"
+msgstr ""
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Title can't be empty"
@@ -4884,6 +4820,14 @@ msgid ""
 "The list of group configurations for partitioning students in content "
 "experiments."
 msgstr "在内容实验中学生分组的组配置列表。"
+
+#: lms/djangoapps/lti_provider/models.py
+msgid ""
+"When checked, the LTI content will load only for learners who have an "
+"account in this instance. This is required only for linking learner accounts"
+" with the LTI consumer. See the Open edX LTI Provider documentation for more"
+" details."
+msgstr ""
 
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
@@ -7895,6 +7839,10 @@ msgid "The '{field_name}' field cannot be edited."
 msgstr "'{field_name}'字段无法编辑。"
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
+msgid "Full name can't be longer than 255 symbols"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/api.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Enter a valid name"
 msgstr "输入有效名称"
@@ -10242,16 +10190,6 @@ msgid ""
 msgstr "编辑视频缩略图图像文件的名称。您可以在“设置和详细信息”页面上设置视频缩略图图像。"
 
 #: xmodule/course_block.py
-msgid "Issue Open Badges"
-msgstr "颁发徽章"
-
-#: xmodule/course_block.py
-msgid ""
-"Issue Open Badges badges for this course. Badges are generated when "
-"certificates are created."
-msgstr "为该课程颁发徽章。徽章在证书创建的时候已经生成了。"
-
-#: xmodule/course_block.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
 "marks, enter the short name of the type of certificate that students receive"
@@ -10880,6 +10818,19 @@ msgid ""
 msgstr "确定是否显示“重置问题”按钮，以便用户可以重置他们的答案并重新排列所选项目。"
 
 #: xmodule/library_content_block.py
+msgid "Source content library has not been specified."
+msgstr ""
+
+#: xmodule/library_content_block.py
+msgid "Content libraries are not available in the current runtime."
+msgstr ""
+
+#: xmodule/library_content_block.py
+#, python-brace-format
+msgid "Source content library does not exist: {source_library_id}"
+msgstr ""
+
+#: xmodule/library_content_block.py
 msgid "This component is out of date. The library has new content."
 msgstr "该组件已过时。知识库有新的内容。"
 
@@ -10913,8 +10864,9 @@ msgid "Select a Library."
 msgstr "选择一个知识库。"
 
 #: xmodule/library_content_block.py
-msgid "There are no matching problem types in the specified libraries."
-msgstr "指定知识库中没有匹配的问题类型。"
+#, python-brace-format
+msgid "There are no problems in the specified library of type {capa_type}."
+msgstr ""
 
 #: xmodule/library_content_block.py
 msgid "Select another problem type."
@@ -12218,31 +12170,31 @@ msgstr "此选项卡只应为教师"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "Name of the tab displayed to users. Overrides title."
-msgstr ""
+msgstr "向用户显示的选项卡的名称。覆盖掉名称。"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "Additional settings specific to the tab"
-msgstr ""
+msgstr "特定选项卡的其他设置"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "ID of tab to update"
-msgstr ""
+msgstr "更新的选项卡 ID"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "Location (Usage Key) of tab to update"
-msgstr ""
+msgstr "更新的选项卡（使用密钥）"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "Need to supply either a valid tab_id or a tab_location."
-msgstr ""
+msgstr "需要提供有效的 tab_id 或 tab_location。"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "True to hide the tab, and False to show it."
-msgstr ""
+msgstr "True为隐藏选项卡，False为显示选项卡。"
 
 #: cms/djangoapps/contentstore/rest_api/v0/views/tabs.py
 msgid "Change the visibility of tabs in a course."
-msgstr ""
+msgstr "更改选项卡在课程中的可见性。"
 
 #: cms/djangoapps/contentstore/transcript_storage_handlers.py
 msgid "The information you entered is incorrect."
@@ -12261,13 +12213,11 @@ msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}, {current_group}"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "“{0}”的副本"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "“{0}”的副本"
@@ -12350,13 +12300,13 @@ msgstr "字幕完成"
 #. failed for some languages
 #: cms/djangoapps/contentstore/video_storage_handlers.py
 msgid "Partial Failure"
-msgstr ""
+msgstr "部分失效"
 
 #. Translators: This is the status for a video whose transcription job has
 #. failed altogether
 #: cms/djangoapps/contentstore/video_storage_handlers.py
 msgid "Transcript Failed"
-msgstr ""
+msgstr "成绩单失效"
 
 #: cms/djangoapps/contentstore/video_storage_handlers.py
 msgid "An image file is required."
@@ -12466,11 +12416,11 @@ msgstr "开放性题目"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Library Content"
-msgstr ""
+msgstr "图书馆内容"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Drag and Drop"
-msgstr ""
+msgstr "拖放"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
@@ -12478,7 +12428,7 @@ msgstr "空白"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Peer Assessment Only"
-msgstr ""
+msgstr "仅限同行评估"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Course has been successfully reindexed."
@@ -12520,7 +12470,7 @@ msgstr ""
 msgid ""
 "User does not have the permission to create courses in this organization or "
 "course creation is disabled"
-msgstr ""
+msgstr "用户无权在此组织中创建课程或创建课程被禁用"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -12559,17 +12509,17 @@ msgstr "课程成功被导出到Git源"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "Some chunks missed during file upload. Please try again"
-msgstr ""
+msgstr "文件上传过程中发生丢失。请再试一次"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "File upload failed. Please try again"
-msgstr ""
+msgstr "文件上传失败。请再试一次"
 
 #: cms/djangoapps/contentstore/views/library.py
 msgid ""
 "User does not have the permission to create library in this organization or "
 "course creation is disabled"
-msgstr ""
+msgstr "用户无权在此组织中创建库或课程创建被禁用"
 
 #: cms/djangoapps/contentstore/views/library.py
 #, python-brace-format
@@ -12597,7 +12547,7 @@ msgstr "已经存在一个具有相同机构和知识库编号的知识库，请
 #: cms/djangoapps/contentstore/views/library.py
 #, python-brace-format
 msgid "'{organization_key}' is not a valid organization identifier."
-msgstr ""
+msgstr "“{organization_key}”不是有效的组织标识符。"
 
 #: cms/djangoapps/contentstore/views/preview.py
 #, python-brace-format
@@ -12606,7 +12556,7 @@ msgstr "仅限可访问人群：{list_of_groups}"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Transcripts are supported only for \"video\" blocks."
-msgstr ""
+msgstr "仅“视频”块支持字幕。"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Cannot find item by locator."
@@ -12670,7 +12620,7 @@ msgstr "“角色”未指定。"
 #: cms/djangoapps/contentstore/views/user.py
 #, python-brace-format
 msgid "User {email} has registered but has not yet activated their account."
-msgstr ""
+msgstr "用户 {email} 已注册但尚未激活帐户。"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Invalid `role` specified."
@@ -12683,15 +12633,15 @@ msgstr "您不能移除最后一个管理员，请先添加另一个管理员后
 #: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Libraries cannot have more than {limit} components"
-msgstr ""
+msgstr "资源库不能有超过 {limit} 个组件"
 
 #: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "There was a problem pasting your component."
-msgstr ""
+msgstr "黏贴课程内容时发生错误。"
 
 #: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "Your clipboard is empty or invalid."
-msgstr ""
+msgstr "您的剪切板为空白或无效"
 
 #: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
@@ -12783,35 +12733,35 @@ msgstr "关于本用户的可选备注（例如，课程创建被拒绝的原因
 
 #: cms/djangoapps/course_creators/models.py
 msgid "Organizations under which the user is allowed to create courses."
-msgstr ""
+msgstr "允许用户创建课程的组织。"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "Grant the user the permission to create courses in ALL organizations"
-msgstr ""
+msgstr "授予用户在所有组织中创建课程的权限"
 
 #: cms/djangoapps/coursegraph/admin.py
 msgid "Dump courses to CourseGraph (respect cache)"
-msgstr ""
+msgstr "将课程转储到 课程库（遵守缓存）"
 
 #: cms/djangoapps/coursegraph/admin.py
 msgid "Error enqueueing dumps for {} course(s): {}"
-msgstr ""
+msgstr "为 {} 个课程排队转储时出错：{}"
 
 #: cms/djangoapps/coursegraph/admin.py
 msgid "Enqueued dumps for {} course(s). Skipped {} unchanged course(s)."
-msgstr ""
+msgstr "{} 门课程的排队转储。跳过 {} 个不变的课程。"
 
 #: cms/djangoapps/coursegraph/admin.py
 msgid "Skipped all {} course(s), as they were unchanged."
-msgstr ""
+msgstr "跳过所有 {} 门课程，因为课程内容没有变化。"
 
 #: cms/djangoapps/coursegraph/admin.py
 msgid "Dump courses to CourseGraph (override cache)"
-msgstr ""
+msgstr "将课程转储到 课程库（覆盖缓存）"
 
 #: cms/djangoapps/coursegraph/admin.py
 msgid "Enqueued dumps for {} course(s)."
-msgstr ""
+msgstr "{} 门课程的排队转储。"
 
 #: cms/djangoapps/maintenance/views.py
 #: cms/templates/maintenance/_force_publish_course.html
@@ -12946,14 +12896,6 @@ msgstr "修习要求"
 #: lms/templates/module-error.html
 msgid "Details"
 msgstr "细节"
-
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-#. Translators: this is a verb describing the action of viewing more details
-#: cms/templates/studio_xblock_wrapper.html
-#: lms/templates/wiki/includes/article_menu.html
-#: wiki/templates/wiki/includes/article_menu.html
-msgid "View"
-msgstr "阅览"
 
 #: cms/templates/maintenance/_announcement_edit.html
 #: lms/templates/problem.html lms/templates/word_cloud.html
@@ -13391,10 +13333,10 @@ msgid "Welcome to {platform_name}"
 msgstr "欢迎来到{platform_name}"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See https://open.edx.org for more information.
+#. untranslated. See https://openedx.org for more information.
 #: lms/templates/index_overlay.html
-msgid "It works! Powered by Open edX{registered_trademark}"
-msgstr "由Open edX{registered_trademark}提供技术支持"
+msgid "It works! Powered by the Open edX{registered_trademark} Platform"
+msgstr ""
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -13697,6 +13639,14 @@ msgstr "序列"
 #: lms/templates/seq_block.html lms/templates/vert_module.html
 msgid "Completed"
 msgstr "已完成"
+
+#: lms/templates/seq_block.html
+msgid "New Unit"
+msgstr "新的单元"
+
+#: lms/templates/seq_block.html
+msgid "Paste as new unit"
+msgstr ""
 
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"
@@ -14047,6 +13997,10 @@ msgstr "讲义"
 #: lms/templates/video.html
 msgid "Download Handout"
 msgstr "下载讲义"
+
+#: lms/templates/video.html
+msgid "How is the transcript quality ?"
+msgstr ""
 
 #: lms/templates/word_cloud.html
 msgid "{num} of {total}"
@@ -16904,17 +16858,6 @@ msgstr "如果您对获得验证证书感兴趣但无法承担费用，请现在
 #. Translators: This string will not be used in Open edX installations.
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
-"In order to be eligible for edX Financial Assistance, you must demonstrate "
-"that paying the Verified Certificate fee would cause you economic hardship. "
-"To apply, you will be asked to answer a few questions about why you are "
-"applying and how the Verified Certificate will benefit you."
-msgstr ""
-"要符合 edX "
-"经济援助的资格条件，您必须证明支付验证证书费用会导致您经济困难。为了进行申请，您可能会被要求回答一些关于您为何申请验证证书以及验证证书会给您带来哪些好处的问题。"
-
-#. Translators: This string will not be used in Open edX installations.
-#: lms/templates/financial-assistance/financial-assistance.html
-msgid ""
 "If your application is approved, we'll give you instructions for verifying "
 "your identity on edx.org so you can start working toward completing your edX"
 " course."
@@ -16933,10 +16876,6 @@ msgstr "无论您的经济状况如何，EdX 都致力于让您从各领先机�
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Sincerely, Anant"
 msgstr "Anant 谨上"
-
-#: lms/templates/financial-assistance/financial-assistance.html
-msgid "Back to Student FAQs"
-msgstr "返回至学生常见问题解答"
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Apply for Financial Assistance"
@@ -18418,6 +18357,25 @@ msgstr ""
 msgid "My Courses"
 msgstr "我的课程"
 
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "There was an error when loading this module!"
+msgstr ""
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"This module is available only for users who are signed into {platform}. "
+"Kindly sign in and refresh this page to load the content."
+msgstr ""
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "NOTE:"
+msgstr ""
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"The email used to sign into this platform and {platform} should be the same."
+msgstr ""
+
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
 msgstr "更改常用语言"
@@ -18939,6 +18897,11 @@ msgid "Learn more"
 msgstr "了解更多"
 
 #: lms/templates/wiki/includes/article_menu.html
+#: wiki/templates/wiki/includes/article_menu.html
+msgid "View"
+msgstr "阅览"
+
+#: lms/templates/wiki/includes/article_menu.html
 msgid "{span_start}(active){span_end}"
 msgstr "{span_start}(激活){span_end}"
 
@@ -19448,8 +19411,8 @@ msgid "Studio Accessibility Policy"
 msgstr "教室可访问性政策"
 
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
-msgid "Files & Uploads"
-msgstr "文件&上传"
+msgid "Files"
+msgstr ""
 
 #: cms/templates/certificates.html
 msgid "Course Certificates"
@@ -19596,6 +19559,10 @@ msgstr "观看在线版本"
 #: cms/templates/container.html
 msgid "Preview the courseware in the LMS"
 msgstr "在LMS中预览课件"
+
+#: cms/templates/container.html
+msgid "Collapse All"
+msgstr ""
 
 #: cms/templates/container.html
 msgid "Adding components"
@@ -21139,6 +21106,10 @@ msgid "Libraries"
 msgstr "知识库"
 
 #: cms/templates/index.html
+msgid "Taxonomies"
+msgstr ""
+
+#: cms/templates/index.html
 msgid "Are you staff on an existing {studio_name} course?"
 msgstr "您是否是一个{studio_name}现有课程的工作人员？"
 
@@ -22186,15 +22157,27 @@ msgid ""
 msgstr "您也可以创建作业类型，比如家庭作业、实验、测验、以及考试，并且指定每个作业是否计入最终的成绩及其评价分值。"
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Importing components"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
 msgstr "展开或折叠"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy to Clipboard"
+msgid "Select this problem"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage tags"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy to Clipboard"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html

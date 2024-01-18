@@ -9,7 +9,7 @@
 # Lasha Kokilashvili, 2016,2018
 # Natia Gogua <natiagogua79@gmail.com>, 2016
 # Nino Asatiani <niasatiani110@gmail.com>, 2016
-# Razmik Badalyan <badalyanrazmik@gmail.com>, 2016
+# რაზმიკ ბადალიანი <badalyanrazmik@gmail.com>, 2016
 # Razmik Badalyan <rbadalyan@educaregeorgia.com>, 2016
 # Simon Janashia <sjanashia@aat.ge>, 2019
 # Tamta Tchumburidze <tamtatioon@gmail.com>, 2016
@@ -45,7 +45,7 @@
 # Lasha Kokilashvili, 2018
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Georgian (http://app.transifex.com/open-edx/edx-platform/language/ka/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -56,7 +56,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-08 20:42+0000\n"
+"POT-Creation-Date: 2024-01-07 20:43+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Lasha Kokilashvili, 2018\n"
 "Language-Team: Georgian (http://app.transifex.com/open-edx/edx-platform/language/ka/)\n"
@@ -140,7 +140,6 @@ msgstr "ატვირთვა"
 #: cms/templates/js/course-video-settings.underscore
 #: common/static/common/templates/discussion/templates.underscore
 #: common/static/common/templates/image-modal.underscore
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Close"
 msgstr "დახურვა"
 
@@ -163,7 +162,8 @@ msgstr "ფაილის არჩევა"
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js cms/static/js/views/tabs.js
-#: lms/static/js/Markdown.Editor.js xmodule/js/src/html/edit.js
+#: cms/static/js/views/utils/xblock_utils.js lms/static/js/Markdown.Editor.js
+#: xmodule/js/src/html/edit.js
 #: common/static/common/templates/discussion/templates.underscore
 #: lms/templates/learner_dashboard/verification_popover.underscore
 msgid "OK"
@@ -743,6 +743,7 @@ msgstr "თემა"
 msgid "Select a category"
 msgstr ""
 
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "ანგარიშის პარამეტრები"
@@ -2811,24 +2812,6 @@ msgstr ""
 msgid "Go to dashboard"
 msgstr ""
 
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid "Recommendations for you"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid "loading"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid ""
-"Browse recently launched courses and see what's new in your favorite "
-"subjects."
-msgstr ""
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid "Explore courses"
-msgstr ""
-
 #: lms/static/js/learner_dashboard/Static2UCallouts.jsx
 msgid "More opportunities for you"
 msgstr ""
@@ -3807,10 +3790,6 @@ msgid ""
 "interests are, why you're taking courses, or what you hope to learn."
 msgstr ""
 
-#: openedx/features/learner_profile/static/learner_profile/js/views/badge_list_container.js
-msgid "Accomplishments Pagination"
-msgstr ""
-
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
 msgid "Account Settings page."
 msgstr ""
@@ -3837,10 +3816,6 @@ msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "About Me"
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
-msgid "Accomplishments"
 msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
@@ -5981,6 +5956,7 @@ msgstr "დარწმუნებული ხართ, რომ გან�
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/pages/container_subviews.js
 msgid "Copying"
 msgstr ""
 
@@ -5990,26 +5966,31 @@ msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "Pasting"
 msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "Some errors occurred"
 msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "The following required files could not be added to the course:"
 msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "You may need to update a file(s) manually"
 msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid ""
 "The following files already exist in this course but don't match the version"
 " used by the component you pasted:"
@@ -6017,21 +5998,25 @@ msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "New file(s) added to Files & Uploads."
 msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "The following required files were imported to this course:"
 msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "View files"
 msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "Dismiss"
 msgstr ""
 
@@ -7871,13 +7856,13 @@ msgid "Financial Assistance Application"
 msgstr "განცხადება ფინანსური მხარდაჭერის შესახებ"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid "About You"
-msgstr "თქვენ შესახებ"
+msgid "Profile Information"
+msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
-"The following information is already a part of your {platform} profile. "
-"We've included it here for your application."
+"The following information is already a part of your {platform} profile and "
+"is required for your application. To edit this information go to "
 msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
@@ -7893,8 +7878,8 @@ msgid "Country of residence"
 msgstr "ქვეყანა რომელშიც ცხოვრობთ"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid "Back to {platform} FAQs"
-msgstr "უკან, {platform}-ის ხშირად დასმულ კითხვებთან"
+msgid "Application Details"
+msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Submit Application"
@@ -9448,32 +9433,6 @@ msgstr[1] ""
 msgid "Sorry, no results were found."
 msgstr "სამწუხაროდ ძიება უშედეგოდ დასრულდა."
 
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-#, python-format
-msgid "Share your \"%(display_name)s\" award"
-msgstr "გააზიარეთ თქვენი „%(display_name)s“ ჯილდო."
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-msgid "Share"
-msgstr "გაზიარება"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-#, python-format
-msgid "Earned %(created)s."
-msgstr "მიღებული %(created)s."
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "What's Your Next Accomplishment?"
-msgstr "რა არის თქვენი შემდეგი მიღწევა?"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "Start working toward your next learning goal."
-msgstr "დაიწყე მუშაობა შემდეგი მიზნის მისაღწევად."
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "Find a course"
-msgstr "იპოვეთ კურსი"
-
 #: openedx/features/learner_profile/static/learner_profile/templates/section_two.underscore
 msgid "You are currently sharing a limited profile."
 msgstr "ამჟამად თქვენს პროფაილზე წვდომა შეზღუდულია."
@@ -9481,33 +9440,6 @@ msgstr "ამჟამად თქვენს პროფაილზე წ
 #: openedx/features/learner_profile/static/learner_profile/templates/section_two.underscore
 msgid "This learner is currently sharing a limited profile."
 msgstr "მსმენელის პროფილზე წვდომა ამჟამად შეზღუდულია."
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid "Share on Mozilla Backpack"
-msgstr "გააზიარეთ Mozilla Backpack-ზე "
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"To share your certificate on Mozilla Backpack, you must first have a "
-"Backpack account. Complete the following steps to add your certificate to "
-"Backpack."
-msgstr ""
-"Mozilla Backpack-ზე სერტიფიკატის გაზიარებისთვის პირველ რიგში უნდა ფლობდეთ "
-"Backpack-ის ანგარიშს. Backpack-ზე სერტიფიკატის დასამატებლად, შეასრულეთ "
-"შემდეგი საფეხურები."
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"Create a {link_start}Mozilla Backpack{link_end} account, or log in to your "
-"existing account"
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"{download_link_start}Download this image (right-click or option-click, save "
-"as){link_end} and then {upload_link_start}upload{link_end} it to your "
-"backpack."
-msgstr ""
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"
@@ -10007,6 +9939,10 @@ msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Proctoring Settings"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+msgid "Manage Tags"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore
@@ -10699,6 +10635,10 @@ msgid "Note: Do not hide graded assignments after they have been released."
 msgstr ""
 "გაითვალისწინეთ: არ დამალოთ შეფასებული დავალებები მათი გამოქვეყნების შემდეგ."
 
+#: cms/templates/js/publish-xblock.underscore
+msgid "Copy Unit"
+msgstr ""
+
 #: cms/templates/js/release-date-editor.underscore
 msgid "Release Date and Time"
 msgstr "გამოქვეყნების თარიღი და დრო"
@@ -10886,6 +10826,10 @@ msgstr ""
 
 #: cms/templates/js/summary-configuration-editor.underscore
 msgid "Enable summaries"
+msgstr ""
+
+#: cms/templates/js/tag-list.underscore
+msgid "Manage tags"
 msgstr ""
 
 #: cms/templates/js/team-member.underscore

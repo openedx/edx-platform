@@ -448,6 +448,13 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
             "can_delete": False,
             "last_edit": None,
             "edit_by_label": None,
+            "profile_image": {
+                "has_image": False,
+                "image_url_full": "http://testserver/static/default_500.png",
+                "image_url_large": "http://testserver/static/default_120.png",
+                "image_url_medium": "http://testserver/static/default_50.png",
+                "image_url_small": "http://testserver/static/default_30.png",
+            },
         }
 
         assert self.serialize(comment) == expected

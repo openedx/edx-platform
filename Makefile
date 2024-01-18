@@ -4,7 +4,8 @@
   docker_auth docker_build docker_tag_build_push_lms docker_tag_build_push_lms_dev \
   docker_tag_build_push_cms docker_tag_build_push_cms_dev docs extract_translations \
   guides help lint-imports local-requirements migrate migrate-lms migrate-cms \
-  pre-requirements pull pull_translations push_translations requirements shell swagger \
+  pre-requirements pull pull_xblock_translations pull_translations push_translations \
+  requirements shell swagger \
   technical-docs test-requirements ubuntu-requirements upgrade-package upgrade
 
 # Careful with mktemp syntax: it has to work on Mac and Ubuntu, which have differences.
@@ -37,14 +38,35 @@ technical-docs:  ## build the technical docs
 guides:	swagger ## build the developer guide docs
 	cd docs/guides; make clean html
 
+# (IS_OPENEDX_TRANSLATIONS_WORKFLOW) is set to "yes" in the `extract-translation-source-files` GitHub actions
+# workflow on the `openedx-translations` repository. See (extract translation source files) step here:
+# https://github.com/openedx/openedx-translations/blob/main/.github/workflows/extract-translation-source-files.yml
+# Related doc: https://docs.openedx.org/en/latest/developers/how-tos/enable-translations-new-repo.html
+ifeq ($(IS_OPENEDX_TRANSLATIONS_WORKFLOW),yes)
 extract_translations: ## extract localizable strings from sources
-	i18n_tool extract -v
+	i18n_tool extract --no-segment -v
+	cd conf/locale/en/LC_MESSAGES && msgcat djangojs.po underscore.po -o djangojs.po
+	cd conf/locale/en/LC_MESSAGES && msgcat django.po wiki.po edx_proctoring_proctortrack.po mako.po -o django.po
+	cd conf/locale/en/LC_MESSAGES && rm wiki.po edx_proctoring_proctortrack.po mako.po underscore.po
+else
+extract_translations: ## extract localizable strings from sources
+	i18n_tool extract -v;
+endif
 
 push_translations: ## push source strings to Transifex for translation
 	i18n_tool transifex push
 
-pull_translations:  ## pull translations from Transifex
+pull_xblock_translations:  ## pull xblock translations via atlas
+	rm -rf conf/plugins-locale  # Clean up existing atlas translations
+	rm -rf lms/static/i18n/xblock.v1 cms/static/i18n/xblock.v1  # Clean up existing xblock compiled translations
+	mkdir -p conf/plugins-locale/xblock.v1/ lms/static/js/xblock.v1-i18n cms/static/js
+	python manage.py lms pull_xblock_translations --verbose $(ATLAS_OPTIONS)
+	python manage.py lms compile_xblock_translations
+	cp -r lms/static/js/xblock.v1-i18n cms/static/js
+
+pull_translations: ## pull translations from Transifex
 	git clean -fdX conf/locale
+ifeq ($(OPENEDX_ATLAS_PULL),)
 	i18n_tool transifex pull
 	i18n_tool extract
 	i18n_tool dummy
@@ -52,6 +74,12 @@ pull_translations:  ## pull translations from Transifex
 	git clean -fdX conf/locale/rtl
 	git clean -fdX conf/locale/eo
 	i18n_tool validate --verbose
+else
+	make pull_xblock_translations
+	find conf/locale -mindepth 1 -maxdepth 1 -type d -exec rm -r {} \;
+	atlas pull $(ATLAS_OPTIONS) translations/edx-platform/conf/locale:conf/locale
+	i18n_tool generate
+endif
 	paver i18n_compilejs
 
 
@@ -141,7 +169,7 @@ upgrade:  ## update the pip requirements files to use the latest releases satisf
 	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade"
 
 upgrade-package: ## update just one package to the latest usable release
-	@test -n "$(package)" || { echo "\nUsage: make upgrade_package package=...\n"; exit 1; }
+	@test -n "$(package)" || { echo "\nUsage: make upgrade-package package=...\n"; exit 1; }
 	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade-package $(package)"
 
 check-types: ## run static type-checking tests
