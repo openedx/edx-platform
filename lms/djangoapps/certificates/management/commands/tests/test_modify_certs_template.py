@@ -4,10 +4,7 @@ Tests for the modify_cert_template command
 
 import pytest
 from django.core.management import CommandError, call_command
-from django.test import (
-    TestCase,
-    override_settings,
-)  # lint-amnesty, pylint: disable=unused-import
+from django.test import TestCase
 
 
 class ModifyCertTemplateTests(TestCase):
