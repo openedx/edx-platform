@@ -631,9 +631,14 @@ def course_listing(request):
     frontend_url = [url for url in settings.CORS_ORIGIN_WHITELIST if 'apps' in url]   
     if len(frontend_url):
         frontent_redirect_url = '{}/panel/settings/billing'.format(frontend_url[0])
+    
+    try:
+        destination_course_id = DESTINATION_COURSE_ID_PATTERN.format(org[0])
+    except Exception:
+        destination_course_id = "dummy"
 
     return render_to_response(u'index.html', {
-        u'default_course_id': DESTINATION_COURSE_ID_PATTERN.format(org[0]),
+        u'default_course_id': destination_course_id,
         u'tracking_api_url': tracking_api_url,
         u'courses': active_courses,
         u'archived_courses': archived_courses,

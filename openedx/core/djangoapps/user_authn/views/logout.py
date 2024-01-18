@@ -12,6 +12,8 @@ from oauth2_provider.models import Application
 from six.moves.urllib.parse import parse_qs, urlsplit, urlunsplit  # pylint: disable=import-error
 
 from lms.envs.common import EDLY_PANEL_ADMIN_USERS_GROUP
+from openedx.features.edly.models import EdlyMultiSiteAccess
+from openedx.features.edly.utils import get_edly_sub_org_from_request
 from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 from common.djangoapps.third_party_auth import pipeline as tpa_pipeline
@@ -76,17 +78,24 @@ class LogoutView(TemplateView):
             require_https=self.request.is_secure(),
         )
 
-        if use_target_url:
-            return target_url
-
         if self.is_user_panel_admin:
             return settings.PANEL_ADMIN_LOGOUT_REDIRECT_URL
+
+        if use_target_url:
+            return target_url
 
         return self.default_target
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.groups.filter(name=EDLY_PANEL_ADMIN_USERS_GROUP):
-            self.is_user_panel_admin = True
+        sub_org = get_edly_sub_org_from_request(request)
+        if request.user.is_authenticated:
+            edly_multisite_access = EdlyMultiSiteAccess.objects.filter(
+                sub_org=sub_org, 
+                user=request.user, 
+                groups__name=EDLY_PANEL_ADMIN_USERS_GROUP
+            )
+            if edly_multisite_access.exists():
+                self.is_user_panel_admin = True
 
         # We do not log here, because we have a handler registered to perform logging on successful logouts.
         request.is_from_logout = True
