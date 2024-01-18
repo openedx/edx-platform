@@ -10,6 +10,8 @@ body {
 #content {
     min-height: calc(100vh - #{$footer-height} - #{$header-height});
     margin-top: 0;
+    margin-bottom: 48px;
+    padding-bottom: 0;
 
     @media only screen and (max-width: $breakpoint-tablet-sm) {
         padding-left: $padding-mobile;
