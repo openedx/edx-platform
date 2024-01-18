@@ -42,7 +42,7 @@ define(['jquery', 'underscore', 'js/views/baseview', 'edx-ui-toolkit/js/utils/ht
                     this.$el,
                     HtmlUtils.HTML(
                         this.template({
-                            tags_count: this.model.get('tags_count'),
+                            tags_count: this.model.get("tags_count"),
                         })
                     )
                 );
