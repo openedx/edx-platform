@@ -29,6 +29,9 @@ block_is_unit = is_unit(xblock)
 <script type="text/template" id="xblock-validation-messages-tpl">
     <%static:include path="js/xblock-validation-messages.underscore" />
 </script>
+<script type="text/template" id="tag-count-tpl">
+    <%static:include path="js/tag-count.underscore" />
+</script>
 </%block>
 
 <script type="text/javascript">
@@ -40,6 +43,16 @@ block_is_unit = is_unit(xblock)
         $('div.xblock-validation-messages[data-locator="${xblock.location | n, js_escaped_string}"]')
     );
 </script>
+
+<%static:webpack entry="js/factories/tag_count">
+    TagCountFactory({
+        tags_count: ${tags_count},
+        content_id: `${xblock.location}`,
+        course_authoring_url: `${course_authoring_url}`,
+    },
+        $('li.tag-count[data-locator="${xblock.location | n, js_escaped_string}"]')
+    );
+</%static:webpack>
 
 % if not is_root:
     % if is_reorderable:
@@ -100,13 +113,7 @@ block_is_unit = is_unit(xblock)
                 % if not is_root:
                     % if can_edit:
                         % if use_tagging and tags_count:
-                            <li class="action-item">
-                                <button data-tooltip="${_("Manage Tags")}" class="btn-default action-button manage-tags-button" data-testid="tag-count-button">
-                                    <span class="icon fa fa-tag" aria-hidden="true"></span>
-                                    <span>${tags_count}</span>
-                                    <span class="sr action-button-text">${_("Manage Tags")}</span>
-                                </button>
-                            </li>
+                            <li class="action-item tag-count" data-locator="${xblock.location}"></li>
                         % endif
                         % if not show_inline:
                             <li class="action-item action-edit">

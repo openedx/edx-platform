@@ -382,8 +382,10 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
                         // The message contains the new list of tags.
                         let jsonData = data.replace(/\[Manage tags drawer\] Tags updated: /g, "");
                         jsonData = JSON.parse(jsonData);
-                        this.model.set('tags', this.buildTaxonomyTree(jsonData));
-                        this.render();
+                        if (jsonData.contentId == this.model.id) {
+                            this.model.set('tags', this.buildTaxonomyTree(jsonData));
+                            this.render();
+                        }
                     }
                 },
             );
