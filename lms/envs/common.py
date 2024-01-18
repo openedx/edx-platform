@@ -5052,6 +5052,7 @@ ENABLE_DYNAMIC_REGISTRATION_FIELDS = False
 # .. toggle_description: When enabled, this setting invalidates sessions in other browsers
 #       upon email change, while preserving the session validity in the browser where the
 #       email change occurs. This toggle is just being used for rollout.
+#       This toggle will be removed in https://2u-internal.atlassian.net/browse/VAN-1797
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2023-12-07
 # .. toggle_target_removal_date: None

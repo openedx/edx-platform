@@ -690,7 +690,8 @@ class TestEmailChangeMiddleware(TestSafeSessionsLogMixin, TestCase):
         self.request.session = self.client.session
         self.client.response.set_cookie(settings.SESSION_COOKIE_NAME, 'authenticated')  # Add some logged-in cookie
 
-        # Registering email change
+        # Registering email change (store user's email in session for later comparison by
+        # process_request function of middleware)
         EmailChangeMiddleware.register_email_change(request=self.request, email=self.user.email)
 
         # Ensure email is set in the session
@@ -698,7 +699,7 @@ class TestEmailChangeMiddleware(TestSafeSessionsLogMixin, TestCase):
         # Ensure session cookie exist
         self.assertEqual(len(self.client.response.cookies), 1)
 
-        # No email change occurred
+        # No email change occurred in any browser
 
         # Call process_request
         EmailChangeMiddleware(get_response=lambda request: None).process_request(self.request)
@@ -724,7 +725,8 @@ class TestEmailChangeMiddleware(TestSafeSessionsLogMixin, TestCase):
     ):
         """
         Calls EmailChangeMiddleware.process_request when user is authenticated,
-        ENFORCE_SESSION_EMAIL_MATCH is enabled and user session and request email mismatch.
+        ENFORCE_SESSION_EMAIL_MATCH is enabled and user session and request
+        email mismatch. (Email was changed in some other browser)
         Verifies that session is flushed and cookies are marked for deletion.
         """
         # Log in the user
@@ -732,7 +734,8 @@ class TestEmailChangeMiddleware(TestSafeSessionsLogMixin, TestCase):
         self.request.session = self.client.session
         self.client.response.set_cookie(settings.SESSION_COOKIE_NAME, 'authenticated')  # Add some logged-in cookie
 
-        # Registering email change
+        # Registering email change (store user's email in session for later comparison by
+        # process_request function of middleware)
         EmailChangeMiddleware.register_email_change(request=self.request, email=self.user.email)
 
         # Ensure email is set in the session
@@ -740,7 +743,7 @@ class TestEmailChangeMiddleware(TestSafeSessionsLogMixin, TestCase):
         # Ensure session cookie exist
         self.assertEqual(len(self.client.response.cookies), 1)
 
-        # simulating email changed
+        # simulating email changed in some other browser
         self.user.email = 'new_email@test.com'
         self.user.save()
 
@@ -759,16 +762,16 @@ class TestEmailChangeMiddleware(TestSafeSessionsLogMixin, TestCase):
 
     @override_settings(ENFORCE_SESSION_EMAIL_MATCH=True)
     @patch('openedx.core.djangoapps.safe_sessions.middleware._mark_cookie_for_deletion')
-    @patch("openedx.core.djangoapps.safe_sessions.middleware.set_custom_attribute")
     def test_process_request_no_email_change_history(
-        self, mock_set_custom_attribute, mock_mark_cookie_for_deletion
+        self, mock_mark_cookie_for_deletion
     ):
         """
         Calls EmailChangeMiddleware.process_request when there is no previous
         history of an email change.
         Verifies that existing sessions are not affected.
+        Test that sessions predating this code are not affected.
         """
-        # Log in the user
+        # Log in the user (Simulating user logged-in before this code and email was not set in session)
         self.client.login(email=self.user.email, password=self.TEST_PASSWORD)
         self.request.session = self.client.session
         self.client.response.set_cookie(settings.SESSION_COOKIE_NAME, 'authenticated')  # Add some logged-in cookie
@@ -779,7 +782,7 @@ class TestEmailChangeMiddleware(TestSafeSessionsLogMixin, TestCase):
         # Ensure session cookie exist
         self.assertEqual(len(self.client.response.cookies), 1)
 
-        # simulating email changed
+        # simulating email changed in some other browser
         self.user.email = 'new_email@test.com'
         self.user.save()
 
@@ -830,10 +833,11 @@ class TestEmailChangeMiddleware(TestSafeSessionsLogMixin, TestCase):
         self.request.session = self.client.session
         self.client.response.set_cookie(settings.SESSION_COOKIE_NAME, 'authenticated')  # Add some logged-in cookie
 
-        # Registering email change (simulating email change requested)
+        # Registering email change (setting a variable `email_change_requested` to indicate email was changed)
+        # so that process_response can update cookies
         EmailChangeMiddleware.register_email_change(request=self.request, email=self.user.email)
 
-        # Call process_response without authenticating a user
+        # Call process_response
         response = EmailChangeMiddleware(get_response=lambda request: None).process_response(
             self.request, self.client.response
         )
@@ -858,7 +862,9 @@ class TestEmailChangeMiddleware(TestSafeSessionsLogMixin, TestCase):
         self.request.session = self.client.session
         self.client.response.set_cookie(settings.SESSION_COOKIE_NAME, 'authenticated')  # Add some logged-in cookie
 
-        # Call process_response without authenticating a user
+        # No call to register_email_change to indicate email was not changed
+
+        # Call process_response
         response = EmailChangeMiddleware(get_response=lambda request: None).process_response(
             self.request, self.client.response
         )
