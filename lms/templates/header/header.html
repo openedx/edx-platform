@@ -64,8 +64,9 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
             <%include file="navbar-not-authenticated.html" args="online_help_token=online_help_token"/>
         % endif
     </div>
-    <div class="mobile-menu hidden" aria-label=${_("More Options")} role="menu" id="mobile-menu"></div>
+
 </header>
+    <div class="mobile-menu hidden" aria-label=${_("More Options")} role="menu" id="mobile-menu"></div>
 
 % if course:
 <!--[if lte IE 9]>

@@ -1,0 +1,123 @@
+#main {
+    width: 100%;
+    height: 100%;
+
+    section.find-courses {
+        padding: 0;
+        background-color: #fff;
+
+        section.courses-container {
+            padding: 0;
+            width: 100%;
+            height: 100%;
+
+            div.courses {
+                padding: 0;
+                width: 100%;
+                height: 100%;
+
+                ul.courses-list {
+                    display: flex;
+                    flex-wrap: wrap;
+                    padding: 0 !important;
+                    row-gap: 24px;
+                    column-gap: 24px;
+                    justify-content: center;
+
+                    li.courses-listing-item {
+                        margin: 0 !important;
+                        height: 258px !important;
+                        width: 302px !important;
+
+                        article.course {
+                            margin: 0;
+                            border: 0px !important;
+                            border-radius: 4px !important;
+                            width: 302px !important;
+                            height: 258px !important;
+                            a {
+                                header.course-image > div.cover-image {
+                                    width: 302px !important;
+                                    height: 170px !important;
+
+                                    img {
+                                        width: 302px !important;
+                                        height: 170px !important;
+                                    }
+                                }
+
+                                section.course-info {
+                                    height: 88px;
+
+                                    h2.course-name {
+                                        span.course-title {
+                                            margin: 0;
+                                            padding: 16px;
+                                            margin-top: 15px;
+                                            height: 88px !important;
+                                            overflow: hidden;
+                                            color: var(--Text-Default, #2c3744);
+                                            font-feature-settings: "clig" off, "liga" off;
+
+                                            /* Unit text/Header 4 */
+                                            font-family: Roboto;
+                                            font-size: 18px;
+                                            font-style: normal;
+                                            font-weight: 500;
+                                            line-height: 150%; /* 27px */
+                                        }
+
+                                        span.course-code,
+                                        span.course-organization {
+                                            display: none;
+                                        }
+                                    }
+
+                                    div.course-date {
+                                        display: none;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.courses-container .course .course-image .cover-image {
+    height: 12.5rem !important;
+}
+
+@media only screen and (min-width: $breakpoint-desktop) {
+    .courses-listing-item {
+        width: 22% !important;
+        box-sizing: border-box;
+        margin-left: 24px !important;
+    }
+}
+
+@media only screen and (min-width: $breakpoint-tablet-sm) and (max-width: $breakpoint-tablet-lg) {
+    .courses-listing-item {
+        width: 30% !important;
+        box-sizing: border-box;
+        margin-left: 24px !important;
+    }
+}
+
+@media only screen and (min-width: $breakpoint-mobile) and (max-width: $breakpoint-tablet-sm) {
+    .courses-listing-item {
+        width: 45% !important;
+        box-sizing: border-box;
+        margin-left: 24px !important;
+    }
+}
+
+@media only screen and (max-width: $breakpoint-mobile) {
+    .courses-listing-item {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}

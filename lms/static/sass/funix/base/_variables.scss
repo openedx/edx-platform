@@ -36,7 +36,7 @@ $border-radius: 6px;
 $fw-medium: 500;
 $fw-normal: 400;
 
-$font-family-default: 'Roboto', sans-serif;
+$font-family-default: "Roboto", sans-serif;
 
 $fz-h1: 33px;
 $fz-h2: 27px;
@@ -45,3 +45,17 @@ $fz-h4: 19px;
 $fz-h5: 16px;
 $fz-h6: 13px;
 $fz-p: 1rem;
+
+// Bootstrap Breakpoints
+$breakpoint-mobile: 375px;
+$breakpoint-tablet-sm: 746px;
+$breakpoint-tablet-lg: 1133px;
+$breakpoint-desktop: 1440px;
+
+$padding-mobile: 36px;
+$padding-tablet-sm: 56px;
+$padding-tablet-lg: 88px;
+$padding-desktop: 80px;
+
+$footer-height: 148px;
+$header-height: 58px;

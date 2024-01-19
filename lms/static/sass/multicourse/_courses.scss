@@ -306,8 +306,8 @@ $facet-background-color: #007db8;
     @extend %t-icon3;
     @extend %t-strong;
 
-    @include margin-left(-2px);
-    @include right(0);
+    @include margin-right(-2px);
+    @include left(0);
 
     position: absolute;
     top: 0;
@@ -330,7 +330,8 @@ $facet-background-color: #007db8;
   .loading-spinner {
     @include transition(all $tmg-f1 ease-out 0s);
 
-    background: $blue;
+    background: #fff;
+    color: #576f8a;
     position: absolute;
     top: ($baseline*0.7); // same as padding rule for .discovery-submit
   }

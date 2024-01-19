@@ -38,24 +38,34 @@
         
 
           <div id="discovery-form" role="search" aria-label="course" class="wrapper-search-context">
-            <div id="discovery-message" class="search-status-label"></div>
+            <!--
+              <div id="discovery-message" class="search-status-label"></div>
+            -->
+            
             <form class="wrapper-search-input">
+              <button type="submit" class="button postfix discovery-submit" title="${_('Search')}">
+                <span class="search-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+  <path d="M12.6667 21.3333C10.2444 21.3333 8.19444 20.4944 6.51667 18.8167C4.83889 17.1389 4 15.0889 4 12.6667C4 10.2444 4.83889 8.19444 6.51667 6.51667C8.19444 4.83889 10.2444 4 12.6667 4C15.0889 4 17.1389 4.83889 18.8167 6.51667C20.4944 8.19444 21.3333 10.2444 21.3333 12.6667C21.3333 13.6444 21.1778 14.5667 20.8667 15.4333C20.5556 16.3 20.1333 17.0667 19.6 17.7333L27.0667 25.2C27.3111 25.4444 27.4333 25.7556 27.4333 26.1333C27.4333 26.5111 27.3111 26.8222 27.0667 27.0667C26.8222 27.3111 26.5111 27.4333 26.1333 27.4333C25.7556 27.4333 25.4444 27.3111 25.2 27.0667L17.7333 19.6C17.0667 20.1333 16.3 20.5556 15.4333 20.8667C14.5667 21.1778 13.6444 21.3333 12.6667 21.3333ZM12.6667 18.6667C14.3333 18.6667 15.75 18.0833 16.9167 16.9167C18.0833 15.75 18.6667 14.3333 18.6667 12.6667C18.6667 11 18.0833 9.58333 16.9167 8.41667C15.75 7.25 14.3333 6.66667 12.6667 6.66667C11 6.66667 9.58333 7.25 8.41667 8.41667C7.25 9.58333 6.66667 11 6.66667 12.6667C6.66667 14.3333 7.25 15.75 8.41667 16.9167C9.58333 18.0833 11 18.6667 12.6667 18.6667Z" fill="#576F8A"/>
+</svg>
+
+</span>
+                <div aria-live="polite" aria-relevant="all">
+    <div id="loading-indicator" class="loading-spinner hidden" style="width: 34px; height: 34px;">
+      <span class="icon fa fa-spinner fa-spin" aria-hidden="true"></span>
+      <span class="sr">${_('Loading')}</span>
+    </div>
+              </button>
               <label for="discovery-input" class="sr">${_('Search for a course')}</label>
               <input id="discovery-input" class="discovery-input" placeholder="${_('Search for a course')}" type="text"/>
-              <button type="submit" class="button postfix discovery-submit" title="${_('Search')}">
-                <span class="icon fa fa-search" aria-hidden="true"></span>
-                <div aria-live="polite" aria-relevant="all">
-                  <div id="loading-indicator" class="loading-spinner hidden">
-                    <span class="icon fa fa-spinner fa-spin" aria-hidden="true"></span>
-                    <span class="sr">${_('Loading')}</span>
-                  </div>
-                </div>
-              </button>
+
             </form>
           </div>
           
-          <div id="filter-bar" class="filters hide-phone is-collapsed">
-          </div> 
+          <!--
+
+            <div id="filter-bar" class="filters hide-phone is-collapsed">
+            </div> 
+          -->
         
         % endif
 
