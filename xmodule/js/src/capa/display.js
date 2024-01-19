@@ -674,16 +674,20 @@
                 matchingQuiz.remove()
                 matchingGroup.append(matchingResultParsed)
     
-                var matchingErrorParsed =  $(listProblemParsed[currentIndex]).find('.error_result');
-                var matchingSuccessParsed =  $(listProblemParsed[currentIndex]).find('.success_result');
-                if (matchingErrorParsed){
-                   problemQuestionNumbers[currentIndex].classList.add('err-number-qusetion')
-                }else if (matchingSuccessParsed){
-                    problemQuestionNumbers[currentIndex].classList.add('submitted-question')
-                    that.$('.btn-submit-qz').css('display', 'none');
-                    that.$('#btn-next').css('display', 'block');
-                    that.$('.matching_quiz_custom').css('display', 'none');
-                    that.$('#btn-next-lesson').css('display', 'none');
+                var matchingErrorParsed =  $(listQz[currentIndex]).find('.error_result');
+                var matchingSuccessParsed =  $(listQz[currentIndex]).find('.success_result');
+                if (matchingErrorParsed.length > 0){
+                   problemQuestionNumbers[currentIndex].classList.add('err-number-qusetion')  
+                   that.$('.btn-submit-qz').css('display', 'none');
+                   that.$('#btn-next').css('display', 'none');
+                   that.$('.matching_quiz_custom').css('display', 'block');
+                }
+                if (matchingSuccessParsed.length > 0){
+                  problemQuestionNumbers[currentIndex].classList.add('submitted-question')
+                  problemQuestionNumbers[currentIndex].classList.remove('err-number-qusetion')
+                  that.$('.btn-submit-qz').css('display', 'none');
+                  that.$('#btn-next').css('display', 'block');
+                  that.$('.matching_quiz_custom').css('display', 'none');
                 }
     
               }
@@ -696,7 +700,7 @@
             var checkedInput = that.$('.field input:checked');
             var indicatorError = $(listQz[currentIndex]).find('.indicator-container');
             return $.postWithPrefix('' + this.url + '/problem_check', that.answers, function (response) {
-              console.log(response);
+                console.log('======1====' , response);
     
               if (response.success === 'submitted' || response.success === 'incorrect' || response.success === 'correct') {
                 var problemQuestionNumbers = that.$('.problem-question-number');

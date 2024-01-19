@@ -663,11 +663,17 @@ from openedx.core.djangolib.markup import HTML
             const matchingDiv = problemList[i].querySelector('div[question_matching="True"]')
             const resultMatchingCorrect = problemList[i].querySelector('.matching_result_container.success_result')
             const resultMatchingIncorrect = problemList[i].querySelector('.matching_result_container.error_result')
-            console.log("matchingDiv", matchingDiv)
-            // console.log("resultMatching", resultMatching)
+            const matchingSucces =  problemList[i].querySelector('.success_result')
+           
             if (matchingDiv) {
+              btnSubmit.style.display = 'none';
+              if (matchingSucces){
                 matchingBtn.style.display = 'block'
-                btnSubmit.style.display = 'none';
+                btnNext.style.display = 'block'
+              }else {
+                matchingBtn.style.display = 'block'
+              }
+            
             } else {
                 matchingBtn.style.display = 'none'
             }
@@ -897,6 +903,7 @@ from openedx.core.djangolib.markup import HTML
             }
             else {
               matchingBtn.style.display ='block'
+              btnSubmit.style.display = 'none';
             }
            
           } else {
