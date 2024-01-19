@@ -46,7 +46,7 @@ jobs:
         image: mongo:${{ matrix.mongo-version }}
         ports:
           - 27017:27017
-        # Note: Calling mongo here only works with mongo 4, in newer versions of mongo
+        # Note: Calling `mongo` here only works with mongo 4, in newer versions of mongo
         # we'll have to use `mongosh`
         options: >-
           --health-cmd "mongo --quiet --eval 'db.runCommand(\"ping\")'"
@@ -70,24 +70,24 @@ jobs:
     steps:
 #      - name: sync directory owner
 #        run: sudo chown runner:runner -R .*
-      - name: Setup mongodb user
-        run: |
-          mongo edxapp --eval '
-            db.createUser(
-              {
-                user: "edxapp",
-                pwd:  "password",
-                roles: [
-                     { role: "readWrite", db: "edxapp" },
-                ]
-              }
-            );
-          '
-
-      - name: Verify mongo and mysql db credentials
-        run: |
-          mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select 1;" edxapp
-          mongo --host 127.0.0.1 --username edxapp --password password --eval 'use edxapp; db.adminCommand("ping");' edxapp
+#      - name: Setup mongodb user
+#        run: |
+#          mongo edxapp --eval '
+#            db.createUser(
+#              {
+#                user: "edxapp",
+#                pwd:  "password",
+#                roles: [
+#                     { role: "readWrite", db: "edxapp" },
+#                ]
+#              }
+#            );
+#          '
+#
+#      - name: Verify mongo and mysql db credentials
+#        run: |
+#          mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select 1;" edxapp
+#          mongo --host 127.0.0.1 --username edxapp --password password --eval 'use edxapp; db.adminCommand("ping");' edxapp
 
 
       - name: Setup Python ${{ matrix.python-version }}
