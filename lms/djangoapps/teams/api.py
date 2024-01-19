@@ -16,6 +16,7 @@ from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRol
 from lms.djangoapps.courseware.courses import has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.core.lib.teams_config import TeamsetType
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -144,6 +145,9 @@ def has_course_staff_privileges(user, course_key):
         return True
     if CourseInstructorRole(course_key).has_user(user):
         return True
+    # TODO: remove role checks once course_roles is fully impelented and data is migrated
+    if user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name, course_key):
+        return True
     return False
 
 
@@ -176,7 +180,11 @@ def user_organization_protection_status(user, course_key):
     If the user is a staff of the course, we return the protection_exempt status
     else, we return the unprotected status
     """
-    if has_course_staff_privileges(user, course_key):
+    # TODO: remove role checks once course_roles is fully impelented and data is migrated
+    if (
+        has_course_staff_privileges(user, course_key) or
+        user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name, course_key)
+    ):
         return OrganizationProtectionStatus.protection_exempt
     enrollment = CourseEnrollment.get_enrollment(user, course_key)
     if enrollment and enrollment.is_active:
@@ -200,8 +208,13 @@ def has_specific_team_access(user, team):
         - be in the correct bubble
         - be in the team if it is private
     """
-    return has_course_staff_privileges(user, team.course_id) or (
-        user_protection_status_matches_team(user, team) and user_on_team_or_team_is_public(user, team)
+    # TODO: remove role checks once course_roles is fully impelented and data is migrated
+    user_has_manage_student_permission = user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name, team.course_id)
+    return (
+        has_course_staff_privileges(user, team.course_id) or
+        user_has_manage_student_permission or (
+            user_protection_status_matches_team(user, team) and user_on_team_or_team_is_public(user, team)
+        )
     )
 
 
@@ -211,8 +224,13 @@ def has_specific_teamset_access(user, course_block, teamset_id):
     All non-staff users have access to open and public_managed teamsets.
     Non-staff users only have access to a private_managed teamset if they are in a team in that teamset
     """
-    return has_course_staff_privileges(user, course_block.id) or \
+    # TODO: remove role checks once course_roles is fully impelented and data is migrated
+    user_has_manage_student_permission = user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name, course_block.id)
+    return (
+        has_course_staff_privileges(user, course_block.id) or
+        user_has_manage_student_permission or
         teamset_is_public_or_user_is_on_team_in_teamset(user, course_block, teamset_id)
+    )
 
 
 def teamset_is_public_or_user_is_on_team_in_teamset(user, course_block, teamset_id):
@@ -322,9 +340,11 @@ def can_user_modify_team(user, team):
 
     Assumes that user is enrolled in course run.
     """
+    # TODO: remove role checks once course_roles is fully impelented and data is migrated
     return (
         (not is_instructor_managed_team(team)) or
-        has_course_staff_privileges(user, team.course_id)
+        has_course_staff_privileges(user, team.course_id) or
+        user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name, team.course_id)
     )
 
 
@@ -334,9 +354,11 @@ def can_user_create_team_in_topic(user, course_id, topic_id):
 
     Assumes that user is enrolled in course run.
     """
+    # TODO: remove role checks once course_roles is fully impelented and data is migrated
     return (
         (not is_instructor_managed_topic(course_id, topic_id)) or
-        has_course_staff_privileges(user, course_id)
+        has_course_staff_privileges(user, course_id) or
+        user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name, course_id)
     )
 
 
@@ -401,7 +423,11 @@ def anonymous_user_ids_for_team(user, team):
     if not user or not team:
         raise Exception("User and team must be provided for ID lookup")
 
-    if not has_course_staff_privileges(user, team.course_id) and not user_is_a_team_member(user, team):
+    # TODO: remove role checks once course_roles is fully impelented and data is migrated
+    if (
+        not has_course_staff_privileges(user, team.course_id) and not
+        user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name, team.course_id)
+    ) and not user_is_a_team_member(user, team):
         raise Exception("User {user} is not permitted to access team info for {team}".format(
             user=user.username,
             team=team.team_id

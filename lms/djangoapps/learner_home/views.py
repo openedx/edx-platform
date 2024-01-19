@@ -53,6 +53,7 @@ from lms.djangoapps.learner_home.utils import (
     get_masquerade_user,
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
@@ -327,10 +328,12 @@ def check_course_access(user, course_enrollments):
             "is_too_early_to_view": not check_course_open_for_learner(
                 user, course_enrollment.course
             ),
+            # TODO: remove role checks once course_roles is fully impelented and data is migrated
             "user_has_staff_access": any(
                 administrative_accesses_to_course_for_user(
                     user, course_enrollment.course_id
-                )
+                ) or
+                user.has_perm(CourseRolesPermission.VIEW_ALL_CONTENT.perm_name, course_enrollment.course_id)
             ),
         }
 

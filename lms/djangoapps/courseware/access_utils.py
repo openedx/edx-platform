@@ -25,6 +25,7 @@ from lms.djangoapps.courseware.access_response import (
     StartDateError
 )
 from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_student
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, COURSE_PRE_START_ACCESS_FLAG
 from xmodule.course_block import COURSE_VISIBILITY_PUBLIC  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.util.xmodule_django import get_current_request_hostname  # lint-amnesty, pylint: disable=wrong-import-order
@@ -57,7 +58,11 @@ def adjust_start_date(user, days_early_for_beta, start, course_key):
         # bail early if no beta testing is set up
         return start
 
-    if CourseBetaTesterRole(course_key).has_user(user):
+    # TODO: remove role check once course_roles is fully impelented and data is migrated
+    if (
+        CourseBetaTesterRole(course_key).has_user(user) or
+        user.has_perm(CourseRolesPermission.VIEW_LIVE_PUBLISHED_CONTENT.perm_name, course_key)
+    ):
         debug("Adjust start time: user in beta role for %s", course_key)
         delta = timedelta(days_early_for_beta)
         effective = start - delta

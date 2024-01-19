@@ -42,6 +42,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.mobile_api.models import IgnoreMobileAvailableFlagConfig
 from lms.djangoapps.courseware.toggles import course_is_invitation_only
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.features.course_duration_limits.access import check_course_expired
 from common.djangoapps.student import auth
 from common.djangoapps.student.models import CourseEnrollmentAllowed
@@ -83,7 +84,8 @@ def has_ccx_coach_role(user, course_key):
         ccx_id = course_key.ccx
         role = CourseCcxCoachRole(course_key)
 
-        if role.has_user(user):
+        # TODO: remove role check once course_roles is fully impelented and data is migrated
+        if role.has_user(user) or user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name, course_key):
             list_ccx = CustomCourseForEdX.objects.filter(
                 course_id=course_key.to_course_locator(),
                 coach=user
@@ -174,7 +176,12 @@ def has_staff_access_to_preview_mode(user, course_key):
     """
     has_admin_access_to_course = any(administrative_accesses_to_course_for_user(user, course_key))
 
-    return has_admin_access_to_course or is_masquerading_as_student(user, course_key)
+    # TODO: remove role check once course_roles is fully impelented and data is migrated
+    return (
+        has_admin_access_to_course or
+        is_masquerading_as_student(user, course_key) or
+        user.has_perm(CourseRolesPermission.VIEW_ALL_CONTENT.perm_name, course_key)
+    )
 
 
 def _can_view_courseware_with_prerequisites(user, course):
@@ -721,12 +728,12 @@ def _has_access_to_course(user, access_level, course_key):
         return ACCESS_DENIED
 
     global_staff, staff_access, instructor_access = administrative_accesses_to_course_for_user(user, course_key)
-
+    permissions_access = user.has_perm(CourseRolesPermission.VIEW_ALL_CONTENT.perm_name, course_key)
     if global_staff:
         debug("Allow: user.is_staff")
         return ACCESS_GRANTED
 
-    if access_level not in ('staff', 'instructor'):
+    if access_level not in ('staff', 'instructor') and not permissions_access:
         log.debug("Error in access._has_access_to_course access_level=%s unknown", access_level)
         debug("Deny: unknown access level")
         return ACCESS_DENIED
@@ -737,6 +744,10 @@ def _has_access_to_course(user, access_level, course_key):
 
     if instructor_access and access_level in ('staff', 'instructor'):
         debug("Allow: user has course instructor access")
+        return ACCESS_GRANTED
+
+    if permissions_access:
+        debug("Allow: user has view all content permission")
         return ACCESS_GRANTED
 
     debug("Deny: user did not have correct access")
@@ -875,11 +886,21 @@ def is_mobile_available_for_user(user, block):
     Checks:
         mobile_available flag on the course
         Beta User and staff access overrides the mobile_available flag
+        Permission to view_all_published_content or
+        view_only_published_content overrides mobile_available flag
     Arguments:
         block (CourseBlock|CourseOverview): course or overview of course in question
     """
+    permissions_access = (
+        user.has_perms([
+            CourseRolesPermission.VIEW_LIVE_PUBLISHED_CONTENT.perm_name,
+            CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.perm_name
+        ], block.id)
+    )
+    # TODO: remove role check once course_roles is fully impelented and data is migrated
     return (
         auth.user_has_role(user, CourseBetaTesterRole(block.id))
+        or permissions_access
         or _has_staff_access_to_block(user, block, block.id)
         or _is_block_mobile_available(block)
     )

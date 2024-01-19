@@ -20,6 +20,7 @@ from web_fragments.fragment import Fragment
 from xblock.runtime import KeyValueStore
 
 from common.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID
@@ -98,8 +99,13 @@ class MasqueradeView(View):
         Retrieve data on the active and available masquerade options
         """
         course_key = CourseKey.from_string(course_key_string)
+        # TODO: remove role check once course_roles is fully impelented and data is migrated
         is_staff = has_staff_roles(request.user, course_key)
-        if not is_staff:
+        has_permissions = (
+            request.user.has_perm(CourseRolesPermission.GENERAL_MASQUERADING.perm_name, course_key) or
+            request.user.has_perm(CourseRolesPermission.SPECIFIC_MASQUERADING.perm_name, course_key)
+        )
+        if not is_staff and not has_permissions:
             return JsonResponse({
                 'success': False,
             })
@@ -165,8 +171,13 @@ class MasqueradeView(View):
         to CourseMasquerade objects.
         """
         course_key = CourseKey.from_string(course_key_string)
+        # TODO: remove role check once course_roles is fully impelented and data is migrated
         is_staff = has_staff_roles(request.user, course_key)
-        if not is_staff:
+        has_permissions = (
+            request.user.has_perm(CourseRolesPermission.GENERAL_MASQUERADING.perm_name, course_key) or
+            request.user.has_perm(CourseRolesPermission.SPECIFIC_MASQUERADING.perm_name, course_key)
+        )
+        if not is_staff and not has_permissions:
             return JsonResponse({
                 'success': False,
             })
@@ -395,8 +406,22 @@ def check_content_start_date_for_masquerade_user(course_key, user, request, cour
     if now < most_future_date and _is_masquerading:
         group_masquerade = is_masquerading_as_student(user, course_key)
         specific_student_masquerade = is_masquerading_as_specific_student(user, course_key)
+        # TODO: remove role check once course_roles is fully impelented and data is migrated
         is_staff = has_staff_roles(user, course_key)
-        if group_masquerade or (specific_student_masquerade and not is_staff):
+        has_permissions = (
+            user.has_perm(CourseRolesPermission.SPECIFIC_MASQUERADING.perm_name, course_key) and
+            (
+                user.has_perm(CourseRolesPermission.MANAGE_CONTENT.perm_name, course_key) or
+                user.has_perm(CourseRolesPermission.VIEW_ALL_CONTENT.perm_name, course_key) or
+                user.has_perm(CourseRolesPermission.VIEW_LIVE_AND_PUBLISHED_CONTENT.perm_name, course_key) or
+                user.has_perm(CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.perm_name, course_key)
+            )
+        )
+        if group_masquerade or (
+            specific_student_masquerade and (
+                not is_staff and not has_permissions
+            )
+        ):
             PageLevelMessages.register_warning_message(
                 request,
                 HTML(_('This user does not have access to this content because \
