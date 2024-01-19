@@ -19,6 +19,7 @@ jobs:
           - "pinned"
           - "4.2"
         mongo-version: ["4"]
+        mysql-version: ["8"]
         # When updating the shards, remember to make the same changes in
         # .github/workflows/unit-tests-gh-hosted.yml
         shard_name:
