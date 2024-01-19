@@ -69,7 +69,7 @@ body > div.window-wrap > header {
                     div.mobile-nav-item {
                         margin: 0;
 
-                        @media only screen and (min-width: 376px) {
+                        @media only screen and (min-width: 396px) {
                             display: inline-block;
                         }
 
@@ -84,7 +84,7 @@ body > div.window-wrap > header {
 
         div.hamburger-menu {
             padding: 2px;
-            @media only screen and (min-width: 376px) {
+            @media only screen and (min-width: 396px) {
                 display: none;
             }
         }

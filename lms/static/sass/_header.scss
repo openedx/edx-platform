@@ -258,7 +258,7 @@
 
         // Display the menu icon and allow for transition to an X on click
         .hamburger-menu {
-            @include right($baseline);
+            @include right($baseline * 1.9);
 
             position: absolute;
             top: $baseline * 0.95;
