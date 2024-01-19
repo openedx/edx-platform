@@ -18,6 +18,7 @@ jobs:
         django-version:
           - "pinned"
           - "4.2"
+        mongo-version: ["4"]
         # When updating the shards, remember to make the same changes in
         # .github/workflows/unit-tests-gh-hosted.yml
         shard_name:
@@ -39,19 +40,29 @@ jobs:
           - "xmodule-with-cms"
     # We expect Django 4.0 to fail, so don't stop when it fails.
     continue-on-error: ${{ matrix.django-version == '4.0' }}
-
+    services:
+      mongo:
+        image: mongo:${{ matrix.mongo-version }}
+        ports:
+          - 27017:27017
+        # Note: Calling mongo here only works with mongo 4, in newer versions of mongo
+        # we'll have to use `mongosh`
+        options: >-
+          --health-cmd "mongo --quiet --eval 'db.runCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
     steps:
       - name: sync directory owner
         run: sudo chown runner:runner -R .*
 
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
       - name: checkout repo
         uses: actions/checkout@v3
-
-      - name: start mongod server for tests
-        run: |
-          sudo mkdir -p /data/db
-          sudo chmod -R a+rw /data/db
-          mongod &
 
       - name: install requirements
         run: |
