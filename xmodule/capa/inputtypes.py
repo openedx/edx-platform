@@ -46,6 +46,7 @@ import shlex  # for splitting quoted strings
 import sys
 import time
 from datetime import datetime
+import random
 
 import bleach
 import html5lib
@@ -65,6 +66,7 @@ from xmodule.stringify import stringify_children
 from . import xqueue_interface
 from .registry import TagRegistry
 from .util import sanitize_html
+import xml.etree.ElementTree as ET
 
 log = logging.getLogger(__name__)
 
@@ -1818,3 +1820,209 @@ class ChoiceTextGroup(InputTypeBase):
             # Add the tuple for the current choice to the list of choices
             choices.append((choice.get("name"), components))
         return choices
+
+#---------------------------------------------------------------------
+
+# UFC - dùng tag <matchinggroup> để render ra template = "matchinggroup.html", đăng ký các tag mới định nghĩa (matchinggroup...)
+@registry.register
+class MatchingGroup(InputTypeBase):
+    """
+    Example:
+      <matchinggroup>
+
+        <matchingitem matchingvalue='1' pos="left">Left 1</matchingitem>
+        <matchingitem matchingvalue='1' pos="right">Right 1</matchingitem>
+
+        <matchingitem matchingvalue='2' pos="left">Left 2</matchingitem>
+        <matchingitem matchingvalue='2' pos="right">Right 2</matchingitem>
+
+        <matchingitem pos="left">Left 3: will be hide, no matchingvalue</matchingitem>
+        <matchingitem pos="right">Right 3</matchingitem>
+
+      </matchinggroup>
+
+
+        <matchingresponse>
+            <matchinggroup>
+
+                <matchingitem matchingvalue='1' pos="left">Left 1</matchingitem>
+                <matchingitem matchingvalue='1' pos="right">Right 1</matchingitem>
+
+                <matchingitem matchingvalue='2' pos="left">Left 2</matchingitem>
+                <matchingitem matchingvalue='2' pos="right">Right 2</matchingitem>
+
+                <matchingitem pos="left">Left 3: will be hide, no matchingvalue</matchingitem>
+                <matchingitem pos="right">Right 3</matchingitem>
+
+            </matchinggroup>
+        </matchingresponse>
+    """
+
+    template = "matchinggroup.html"
+    tags = ['matchinggroup']
+    # tags = ['matchinggroup', 'matchingitem']
+
+    def setup(self):
+        i18n = self.capa_system.i18n
+
+        try:
+            # print("self MatchingGroup new", vars(self))
+            # print("self MatchingGroup new", self.status)
+            print("setup_func")
+
+            matching_items, left_items, right_items, matchingitems = self.extract_matching_items(self.xml, i18n, False, self.value)
+            self.matching_items = matching_items
+            self.left_items = left_items
+            self.right_items = right_items
+            self.matchingitems = matchingitems
+            self.matching_result_status = self.status
+            self._matching_items_map = dict(self.matching_items,)
+
+        except Exception as e:
+            raise Exception(str(e))
+
+    @classmethod
+    def get_attributes(cls):
+        # print("MatchingGroup_02")
+        # Make '_' a no-op so we can scrape strings. Using lambda instead of
+        #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
+        _ = lambda text: text
+        return [Attribute("show_correctness", "always"),
+                Attribute("submitted_message", _("Answer received."))]
+
+    # UFC - biến truyền vào dùng để render ra template = "matchinggroup.html"
+    def _extra_context(self):
+        # print("MatchingGroup_03")
+        # print("MatchingGroup_03 new", vars(self))
+        # print("MatchingGroup_03 new", self.status)
+
+        print("_extra_context")
+        for left_item, right_item in self.matchingitems:
+
+            # print("left_item", left_item)
+            # print("right_item", right_item)
+
+
+            pass
+
+
+        return {
+            'matching_items': self.matching_items,
+            'left_items': self.left_items,
+            'right_items': self.right_items,
+            'matchingitems': self.matchingitems,
+            'test_name_context': 'test_name_context',
+            'matching_result_status': self.matching_result_status,
+        }
+
+    @staticmethod
+    def extract_matching_items(element, i18n, text_only=False, value=None):
+        # print("MatchingGroup_04", value)
+        xml_str = ET.tostring(element, encoding='utf8').decode('utf8')
+        root = ET.fromstring(xml_str)
+        print("rootXML_new", xml_str)
+
+        student_answer = {}
+
+        print("value_new", value)
+        # UFC - có thể chỗ này gây ra bug student_answer
+        if value:
+            for answer_item in list(map(lambda item: item.split('+'), value)):
+                student_answer[answer_item[0]] = answer_item[1]
+
+        matching_items = []
+        left_items = []
+        left_items_obj = {}
+        right_items_obj = {}
+        right_items = []
+        macthingitems = []
+        _ = edx_six.get_gettext(i18n)
+        for mitem in element:
+            if mitem.tag == 'matchingitem':
+                if not text_only:
+                    text = stringify_children(mitem)
+                else:
+                    text = mitem.text
+                if mitem.get('pos') == 'left':
+                    left_items.append((mitem.get("name"), text, mitem.get("matchingvalue")))
+                    left_items_obj[mitem.get('name')] =  (mitem.get('name'), text, mitem.get("matchingvalue"))
+                else:
+                    right_items.append((mitem.get("name"), text, mitem.get("matchingvalue")))
+                    right_items_obj[mitem.get('name')] = (mitem.get('name'), text, mitem.get("matchingvalue"))
+
+                matching_items.append((mitem.get("name"), mitem.get('pos')))
+
+        # print("matching_items", matching_items)
+
+        # UFC có thể chỗ này gây ra bug
+        # print("macthingitems rerun left_items", left_items)
+        print("left_items first", left_items)
+        print("left_items_obj first", left_items_obj)
+        print("right_items first", right_items)
+        print("right_items_obj first", right_items_obj)
+
+
+        print("student_answer first", student_answer)
+        i = 0
+        for ritem in right_items:
+            # Nếu student đã submit thì sort lại
+            if student_answer and i < len(right_items):
+                left_name = left_items[i][0]
+                right_name = student_answer[left_name]
+                # right_name = student_answer.get(left_name)
+                print("left_name-new", left_name)
+                print("right_name-new", right_name)
+
+                # right_item = right_items_obj.get(right_name)
+                right_item = right_items_obj[right_name]
+                macthingitems.append((left_items[i], right_item))
+                pass
+            else:
+                macthingitems.append((left_items[i], ritem))
+
+            # macthingitems.append((left_items[i], ritem))
+
+            i += 1
+
+        # Nếu student chưa submit thì shuffle
+        print("macthingitems first", macthingitems)
+        if not value:
+            macthingitems = MatchingGroup.do_shuffle(macthingitems)
+
+            pass
+
+        # print("macthingitems rerun after", macthingitems)
+        return [matching_items, left_items, right_items, macthingitems]
+
+    def get_user_visible_answer(self, internal_answer):
+        # print("MatchingGroup_05")
+
+        if isinstance(internal_answer, six.string_types):
+            return self._matching_items_map[internal_answer]
+
+        return [self._matching_items_map[i] for i in internal_answer]
+
+    @staticmethod
+    def do_shuffle(matchingitems):
+        # print("MatchingGroup_06_do_shuffle")
+
+        # matchingitems: [(left_item, right_item)]
+        # left_item, right_item: (name, text, matchingvalue)
+        # keep left items order
+
+        remain_right_items = list(map(lambda items: items[1], matchingitems))
+        shuffled = []
+
+        for left_item, right_item in matchingitems:
+            remain_right_items_other = list(filter(lambda item: item[2] != right_item[2], remain_right_items))
+            if len(remain_right_items_other) == 1:
+                new_right_item = remain_right_items_other[0]
+            elif len(remain_right_items_other) == 0:
+                new_right_item = remain_right_items[0]
+            else:
+                new_right_item = remain_right_items_other[random.randint(0, len(remain_right_items_other) - 1)]
+
+            remain_right_items = list(filter(lambda item: item[0] != new_right_item[0], remain_right_items))
+            shuffled.append((left_item, new_right_item))
+
+        return shuffled

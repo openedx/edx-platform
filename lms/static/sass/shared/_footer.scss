@@ -2,6 +2,7 @@
 // ====================
 @import '../base/grid-settings';
 @import 'neat/neat'; // lib - Neat
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Serif:opsz,wght@8..144,500&family=Roboto:wght@400;500&display=swap');
 
 .wrapper-footer {
   @extend %ui-print-excluded;
@@ -24,11 +25,11 @@
     p,
     ol,
     ul {
-      font-family: $font-family-sans-serif;
+      font-family: 'Roboto', sans-serif ;
 
       // override needed for poorly scoped font-family styling on p a:link {}
       a {
-        font-family: $font-family-sans-serif;
+        font-family: 'Roboto', sans-serif ;
       }
     }
 

@@ -1,0 +1,67 @@
+<%!
+from xmodule.capa.util import remove_markup
+from openedx.core.djangolib.markup import HTML
+import six
+%>
+
+## <!-- UFC - template hiển thị ra matching problem -->
+
+<div class="matchinggroup capa_inputtype" id="inputtype_${id}" >
+    ##<h1>${test_name_context}</h1>
+
+    % for left_item, right_item in matchingitems:
+        <div class="content_container">
+            <div class="left left_content">
+
+                % if not left_item[2]:
+                <div style="display: none">
+                % else:
+                <div class="left_content_desc">
+                % endif
+                    ${HTML(left_item[1])}
+                </div>
+
+                <input style="display: none;" type="checkbox" checked data-left-value="${left_item[0]}" id="input_${id}_${left_item[0]}"  value="${left_item[0]}+${right_item[0]}" name="input_${id}[]"/>
+            </div>
+
+
+            <div class="right right_content" data-right-value="${right_item[0]}" id="right_${id}_${right_item[0]}" class="matching_right_item">
+                <div class="right_content_item">
+                    <div class="right_content_item_drap_drop" draggable="true" style="width: 100%; height: 100%;" data-input-name="input_${id}[]" >
+                        <div class="image_container">
+                            <img class="img_right" src="https://svgshare.com/i/118B.svg" alt="Icon_Drag" data-right-result="${right_item[0]}" name="input_${id}[]">
+                        </div>
+                        ${HTML(right_item[1])}
+                    </div>
+                </div>
+            </div>
+        </div>
+    % endfor
+
+    % if matching_result_status == 'unsubmitted':
+    <div style="display: none;">${matching_result_status}</div>
+    % elif matching_result_status == 'incorrect':
+    <div class="matching_result">
+        <div class="matching_result_container error_result">
+            <div class="matching_result_title">Bạn đã trả lời sai</div>
+            <div class="matching_result_content">
+                Giải thích
+            </div>
+        </div>
+    </div>
+    % elif matching_result_status == 'correct':
+    <div class="matching_result">
+        <div class="matching_result_container success_result">
+            <div class="matching_result_title">Bạn đã trả lời đúng</div>
+            <div class="matching_result_content">
+                Giải thích
+            </div>
+        </div>
+    </div>
+    % endif
+
+
+
+
+</div>
+

@@ -2,6 +2,7 @@
                                    notification_message, should_enable_next_hint, is_hidden=True"/>
 <%! from django.utils.translation import gettext as _ %>
 
+
 <div class="notification ${notification_type} ${'notification-'}${notification_name}
       ${'' if not is_hidden else 'is-hidden' }"
      tabindex="-1">
