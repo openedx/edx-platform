@@ -82,6 +82,17 @@
     }
 }
 
+.learn-more {
+    color:  #FFF;
+    font-feature-settings: 'clig' off, 'liga' off;
+
+    /* Unit text/Paragraph 1 Medium */
+    font-family: Roboto;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 150%; /* 24px */
+}
 
 .courses-container .course .course-image .cover-image {
     height: 12.5rem !important;
