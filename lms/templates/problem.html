@@ -113,7 +113,7 @@ from openedx.core.djangolib.markup import HTML
   line-height: 1.5;
   letter-spacing: normal;
   text-align: left;
-
+  color : #2C3744 !important;
   padding-bottom: 10px;
 }
 
@@ -139,6 +139,9 @@ from openedx.core.djangolib.markup import HTML
   cursor: pointer;
 }
 
+.feedback-hint-multi {
+  margin: 0 !important;
+}
 
 </style>
 
@@ -668,7 +671,7 @@ from openedx.core.djangolib.markup import HTML
             if (matchingDiv) {
               btnSubmit.style.display = 'none';
               if (matchingSucces){
-                matchingBtn.style.display = 'block'
+                matchingBtn.style.display = 'none'
                 btnNext.style.display = 'block'
               }else {
                 matchingBtn.style.display = 'block'
@@ -681,8 +684,6 @@ from openedx.core.djangolib.markup import HTML
           spanElement.classList.add('active-number')
 
           if (submittedInput && incorrectLabel) {
-            console.log("spanElement i = 0", spanElement)
-            console.log("resultMatching i = 0", resultMatchingCorrect)
             btnSubmit.style.display = 'none';
             btnNext.style.display = 'block';
             spanElement.classList.add('submitted-question');
@@ -700,7 +701,7 @@ from openedx.core.djangolib.markup import HTML
 
 
         } else {
-            console.log("spanElement i != 0", spanElement)
+           
             // console.log("resultMatching i != 0", resultMatching)
             const resultMatchingCorrect = problemList[i].querySelector('.matching_result_container.success_result')
             const resultMatchingIncorrect = problemList[i].querySelector('.matching_result_container.error_result')

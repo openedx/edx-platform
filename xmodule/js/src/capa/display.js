@@ -924,19 +924,21 @@
             });
     
     
-            var matchingSuccess =  listQz[currentIndex].querySelector('.success_result')
-            var matchingError =  listQz[currentIndex].querySelector('.error_result')
-            if (matchingSuccess){
-              that.$('.btn-submit-qz').css('display', 'none');
-              that.$('#btn-next').css('display', 'block');
-              that.$('.matching_quiz_custom').css('display', 'none');
-              that.$('#btn-next-lesson').css('display', 'none');
-            }
-            else {
-              that.$('.btn-submit-qz').css('display', 'none');
-              that.$('#btn-next').css('display', 'none');
-              that.$('.matching_quiz_custom').css('display', 'block');
-              that.$('#btn-next-lesson').css('display', 'none');
+            var matchingQuiz  = listQz[currentIndex].querySelector('div[question_matching="True"]')
+            if (matchingQuiz){
+              var matchingSuccess =  listQz[currentIndex].querySelector('.success_result')
+              var matchingError =  listQz[currentIndex].querySelector('.error_result')
+              if (matchingSuccess){
+                that.$('.btn-submit-qz').css('display', 'none');
+                that.$('#btn-next').css('display', 'block');
+                that.$('.matching_quiz_custom').css('display', 'none');
+                that.$('#btn-next-lesson').css('display', 'none');
+              }else if (matchingError){
+                that.$('.btn-submit-qz').css('display', 'none');
+                that.$('#btn-next').css('display', 'none');
+                that.$('.matching_quiz_custom').css('display', 'block');
+                that.$('#btn-next-lesson').css('display', 'none');
+              }
             }
     
             if (that.$('.submitted-question').length === currentIndex + 1 && that.$('.problem-question-number').length === currentIndex +1) {
