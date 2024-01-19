@@ -4,6 +4,7 @@
 import logging
 from textwrap import dedent
 from time import time
+from datetime import date
 
 from django.core.management import BaseCommand, CommandError
 from elasticsearch import exceptions
@@ -38,6 +39,9 @@ class Command(BaseCommand):
         parser.add_argument('--all',
                             action='store_true',
                             help='Reindex all courses')
+        parser.add_argument('--active',
+                            action='store_true',
+                            help='Reindex active courses only')
         parser.add_argument('--setup',
                             action='store_true',
                             help='Reindex all courses on developers stack setup')
@@ -65,12 +69,17 @@ class Command(BaseCommand):
         """
         course_ids = options['course_ids']
         all_option = options['all']
+        active_option = options['active']
         setup_option = options['setup']
         readable_option = options['warning']
         index_all_courses_option = all_option or setup_option
 
-        if (not len(course_ids) and not index_all_courses_option) or (len(course_ids) and index_all_courses_option):  # lint-amnesty, pylint: disable=len-as-condition
-            raise CommandError("reindex_course requires one or more <course_id>s OR the --all or --setup flags.")
+        if ((not course_ids and not (index_all_courses_option or active_option)) or
+                (course_ids and (index_all_courses_option or active_option))):
+            raise CommandError((
+                "reindex_course requires one or more <course_id>s"
+                " OR the --all, --active or --setup flags."
+            ))
 
         store = modulestore()
 
@@ -104,12 +113,28 @@ class Command(BaseCommand):
                 course_keys = [course.id for course in modulestore().get_courses()]
             else:
                 return
+        elif active_option:
+            # in case of --active, we get the list of course keys from all courses
+            # that are stored in the modulestore and filter out the non-active
+            course_keys = []
+
+            today = date.today()
+            all_courses = modulestore().get_courses()
+            for course in all_courses:
+                # Omitting courses without a start date as well as
+                # couses that already ended (end date is in the past)
+                if not course.start or (course.end and course.end.date() < today):
+                    continue
+                course_keys.append(course.id)
+
+            logging.warning(f'Selected {len(course_keys)} active courses over a total of {len(all_courses)}.')
+
         else:
             # in case course keys are provided as arguments
             course_keys = list(map(self._parse_course_key, course_ids))
 
         total = len(course_keys)
-        logging.warning(f'Reindexing {total} courses')
+        logging.warning(f'Reindexing {total} courses...')
         reindexed = 0
         start = time()
 
@@ -120,6 +145,6 @@ class Command(BaseCommand):
                 if reindexed % 10 == 0 or reindexed == total:
                     now = time()
                     t = now - start
-                    logging.warning(f'{reindexed}/{total} reindexed in {t:.1f} seconds')
+                    logging.warning(f'{reindexed}/{total} reindexed in {t:.1f} seconds.')
             except Exception as exc:  # lint-amnesty, pylint: disable=broad-except
-                logging.exception('Error indexing course %s due to the error: %s', course_key, exc)
+                logging.exception('Error indexing course %s due to the error: %s.', course_key, exc)
