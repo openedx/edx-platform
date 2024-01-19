@@ -12,6 +12,8 @@ from openedx.core import types
 from common.djangoapps.student.auth import user_has_role
 from common.djangoapps.student.roles import CourseBetaTesterRole
 
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
+
 from ...data import ScheduleData, ScheduleItemData, UserCourseOutlineData
 from .base import OutlineProcessor
 
@@ -60,7 +62,12 @@ class ScheduleOutlineProcessor(OutlineProcessor):
         course_usage_key = self.course_key.make_usage_key('course', 'course')
         self._course_start = self.keys_to_schedule_fields[course_usage_key].get('start')
         self._course_end = self.keys_to_schedule_fields[course_usage_key].get('end')
-        self._is_beta_tester = user_has_role(self.user, CourseBetaTesterRole(self.course_key))
+        # TODO: remove role checks once course_roles is fully impelented and data is migrated
+        self._is_beta_tester = (
+            user_has_role(self.user, CourseBetaTesterRole(self.course_key)) or
+            self.user.has_perm(CourseRolesPermission.VIEW_ALL_PUBLISHED_CONTENT.perm_name, self.course_key) or
+            self.user.has_perm(CourseRolesPermission.VIEW_LIVE_PUBLISHED_CONTENT.perm_name, self.course_key)
+        )
 
     def inaccessible_sequences(self, full_course_outline):
         """
