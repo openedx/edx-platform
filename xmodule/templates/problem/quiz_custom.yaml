@@ -1,117 +1,112 @@
 ---
 metadata:
-    display_name: Quiz Problem Custom
-    markdown: |
+  display_name: Quiz Problem Custom
+  markdown: |
+        <matchingresponse >
 
+              <div question_matching="True" class="question_matching_content">Hãy ghép các thành phần của Marketing Framework tương ứng với các yếu tố trong marketing phía dưới.</div>
+              <div sub_question_matching="True" class="sub_question_matching_content">(Hãy nối từ tương ứng tương ứng với đáp án bạn chọn.)</div>
 
-      >> Question 1 <<
+              <div title="True" class="content_title">
+                <div class="content_title_desc">Marketing Plan</div>
+                <div class="content_title_desc">Marketing Framework</div>
+              </div>
 
-      [x] a correct answer {{ selected:  giai thich 1 }}
-      [ ] an incorrect answer {{ selected: incorrect answer. }}
-      [ ] an incorrect answer {{ selected: incorrect answer. }}
-      [x] a correct answer {{ selected:  giai thich  2 }}
+              <matchinggroup>
+                <matchingitem matchingvalue='1' pos="left">Mục tiêu Marketing của bạn:</matchingitem>
+                <matchingitem matchingvalue='1' pos="right">Why 1</matchingitem>
 
+                <matchingitem matchingvalue='2' pos="left">Các kênh mà khách hàng của bạn sử dụng:</matchingitem>
+                <matchingitem matchingvalue='2' pos="right">Where 2</matchingitem>
 
+                <matchingitem pos="left">Left: will be hide, no matchingvalue</matchingitem>
+                <matchingitem pos="right">Yes/No</matchingitem>
 
-      >> Question 2 <<
+              </matchinggroup>
 
-      [x] a correct answer {{ selected:  giai thich 1 }}
-      [ ] an incorrect answer {{ selected: incorrect answer. }}
-      [ ] an incorrect answer {{ selected: incorrect answer. }}
-      [x] a correct answer {{ selected:  giai thich  2  }}
+        </matchingresponse>
 
+        >> Question 2 <<
 
+        [x] a correct answer {{ selected:  giai thich 1 }}
+        [ ] an incorrect answer {{ selected: incorrect answer. }}
+        [ ] an incorrect answer {{ selected: incorrect answer. }}
+        [x] a correct answer {{ selected:  giai thich  2  }}
+  
+  
+  
+  
+        >> Question 3 <<
+  
+        (x) Yes {{ giai thich  }}
+        ( ) No {{ incorrect answer }}
+        ( ) No {{  incorrect answer }}
+        ( ) No {{  incorrect answer }}
+  
+  
+  
+        >> Question 4 <<
+  
+        (x) Yes  {{ giai thich   }}
+        ( ) No {{  incorrect answer }}
+        ( ) No {{  incorrect answer }}
+        ( ) No {{  incorrect answer }}
 
+data: |
+  <problem showanswer="never">
+  <matchingresponse >
 
-      >> Question 3 <<
+        <div question_matching="True" class="question_matching_content">
+          Hãy ghép các thành phần của Marketing Framework tương ứng với các yếu tố trong marketing phía dưới.
+        </div>
+        <div sub_question_matching="True" class="sub_question_matching_content">(Hãy nối từ tương ứng tương ứng với đáp án bạn chọn.)</div>
 
-      (x) Yes {{ giai thich  }}
-      ( ) No {{ incorrect answer }}
-      ( ) No {{  incorrect answer }}
-      ( ) No {{  incorrect answer }}
+        <div title="True" class="content_title">
+          <div class="content_title_desc">Marketing Plan1</div>
+          <div class="content_title_desc">Marketing Framework</div>
+        </div>
 
+        <matchinggroup>
+          <matchingitem matchingvalue='1' pos="left">Mục tiêu Marketing của bạn:</matchingitem>
+          <matchingitem matchingvalue='1' pos="right">Why 1</matchingitem>
 
+          <matchingitem matchingvalue='2' pos="left">Các kênh mà khách hàng của bạn sử dụng:</matchingitem>
+          <matchingitem matchingvalue='2' pos="right">Where 2</matchingitem>
 
-      >> Question 4 <<
+          <matchingitem pos="left">Left: will be hide, no matchingvalue</matchingitem>
+          <matchingitem pos="right">Yes/No</matchingitem>
+        </matchinggroup>
+  </matchingresponse>
 
-      (x) Yes  {{ giai thich   }}
-      ( ) No {{  incorrect answer }}
-      ( ) No {{  incorrect answer }}
-      ( ) No {{  incorrect answer }}
+        <label>Question 2</label>
+        <choiceresponse>
+            <checkboxgroup>
+            <choice correct="true">a correct answer
+                <choicehint selected="true">giai thich 1</choicehint></choice>
+            <choice correct="false">an incorrect answer</choice>
+            <choice correct="false">an incorrect answer </choice>
+            <choice correct="true">a correct answer
+                <choicehint selected="true">giai thich  2</choicehint></choice>
+            </checkboxgroup>
+        </choiceresponse>
 
+        <label> Question 3 </label>
+        <multiplechoiceresponse>
+            <choicegroup type="MultipleChoice">
+            <choice correct="true">Yes <choicehint>giai thich</choicehint></choice>
+            <choice correct="false">No</choice>
+            <choice correct="false">No</choice>
+            <choice correct="false">No</choice>
+            </choicegroup>
+        </multiplechoiceresponse>
 
-
-
-hinted: true
-data:   |
-            <problem>
-                <label> <b>Question 1</b> 123</label>
-            <choiceresponse>
-                <checkboxgroup>
-                <choice correct="true">a correct answer
-                    <choicehint selected="true">giai thich 1</choicehint></choice>
-                <choice correct="false">an incorrect answer</choice>
-                <choice correct="false">an incorrect answer </choice>
-                <choice correct="true">a correct answer
-                    <choicehint selected="true">giai thich  2</choicehint></choice>
-                </checkboxgroup>
-            </choiceresponse>
-
-                <label> <b>Question 2</b> 123</label>
-            <choiceresponse>
-                <checkboxgroup>
-                <choice correct="true">a correct answer
-                    <choicehint selected="true">giai thich 1</choicehint></choice>
-                <choice correct="false">an incorrect answer</choice>
-                <choice correct="false">an incorrect answer </choice>
-                <choice correct="true">a correct answer
-                    <choicehint selected="true">giai thich  2</choicehint></choice>
-                </checkboxgroup>
-            </choiceresponse>
-
-            <label> Question 3 </label>
-            <multiplechoiceresponse>
-                <choicegroup type="MultipleChoice">
-                <choice correct="true">Yes <choicehint>giai thich</choicehint></choice>
-                <choice correct="false">No</choice>
-                <choice correct="false">No</choice>
-                <choice correct="false">No</choice>
-                </choicegroup>
-            </multiplechoiceresponse>
-
-            <label> Question 4 </label>
-            <multiplechoiceresponse>
-                <choicegroup type="MultipleChoice">
-                <choice correct="true">Yes <choicehint>giai thich</choicehint></choice>
-                <choice correct="false">No</choice>
-                <choice correct="false">No</choice>
-                <choice correct="false">No</choice>
-                </choicegroup>
-            </multiplechoiceresponse>
-
-
-            <matchingresponse>
-                <div question_matching="True" class="question_matching_content">
-                  Hãy ghép các thành phần của Marketing Framework tương ứng với các yếu tố trong marketing phía dưới.
-                </div>
-                <div sub_question_matching="True" class="sub_question_matching_content">(Hãy nối từ tương ứng tương ứng với đáp án bạn chọn.)</div>
-
-                <div title="True" class="content_title">
-                  <div class="content_title_desc">Marketing Plan1</div>
-                  <div class="content_title_desc">Marketing Framework</div>
-                </div>
-
-                <matchinggroup>
-                  <matchingitem matchingvalue='1' pos="left">Mục tiêu Marketing của bạn:</matchingitem>
-                  <matchingitem matchingvalue='1' pos="right">Why 1</matchingitem>
-
-                  <matchingitem matchingvalue='2' pos="left">Các kênh mà khách hàng của bạn sử dụng:</matchingitem>
-                  <matchingitem matchingvalue='2' pos="right">Where 2</matchingitem>
-
-                  <matchingitem pos="left">Left 3: will be hide, no matchingvalue</matchingitem>
-                  <matchingitem pos="right">Yes/No</matchingitem>
-                </matchinggroup>
-            </matchingresponse>
-
-
-            </problem>
+        <label> Question 4 </label>
+        <multiplechoiceresponse>
+            <choicegroup type="MultipleChoice">
+            <choice correct="true">Yes <choicehint>giai thich</choicehint></choice>
+            <choice correct="false">No</choice>
+            <choice correct="false">No</choice>
+            <choice correct="false">No</choice>
+            </choicegroup>
+        </multiplechoiceresponse>
+  </problem>

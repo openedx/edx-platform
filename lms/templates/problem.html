@@ -113,7 +113,7 @@ from openedx.core.djangolib.markup import HTML
   line-height: 1.5;
   letter-spacing: normal;
   text-align: left;
-
+  color : #2C3744 !important;
   padding-bottom: 10px;
 }
 
@@ -139,6 +139,9 @@ from openedx.core.djangolib.markup import HTML
   cursor: pointer;
 }
 
+.feedback-hint-multi {
+  margin: 0 !important;
+}
 
 </style>
 
@@ -419,9 +422,10 @@ from openedx.core.djangolib.markup import HTML
           </span></button>
 
           <button class='btn-submit-qz btn-custom' > Trả lời  </button>
-          <button type="button" class="submit btn-brand submit_matching_btn matching_quiz_custom" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" data-should-enable-submit-button="${ should_enable_submit_button }" aria-describedby="submission_feedback_${short_id}">
+          <button  class=" btn-custom  matching_quiz_custom" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" data-should-enable-submit-button="${ should_enable_submit_button }" aria-describedby="submission_feedback_${short_id}">
                 Trả lời
           </button>
+
 
           <button class=' btn-custom' id='btn-next-lesson'  style='display:none'> Hoàn thành   </button>
 
@@ -641,17 +645,40 @@ from openedx.core.djangolib.markup import HTML
           indicatorError.style.display = 'none'
         }
 
+
+      
+        
         const matchingDiv = problemList[i].querySelector('div[question_matching="True"]')
+
+        
+        if(matchingDiv){
+          const matchingError = problemList[i].querySelector('.error_result')
+          const matchingSucces =  problemList[i].querySelector('.success_result')
+          if ( matchingError){
+            spanElement.classList.add('err-number-qusetion')
+          } else if (matchingSucces){
+            spanElement.classList.add('submitted-question')
+          }
+        }
+
 
         if (i == 0){
             const matchingDiv = problemList[i].querySelector('div[question_matching="True"]')
             const resultMatchingCorrect = problemList[i].querySelector('.matching_result_container.success_result')
             const resultMatchingIncorrect = problemList[i].querySelector('.matching_result_container.error_result')
-            console.log("matchingDiv", matchingDiv)
-            // console.log("resultMatching", resultMatching)
+
+            const matchingSucces =  problemList[i].querySelector('.success_result')
+           
+
             if (matchingDiv) {
+              btnSubmit.style.display = 'none';
+              if (matchingSucces){
+                matchingBtn.style.display = 'none'
+                btnNext.style.display = 'block'
+              }else {
                 matchingBtn.style.display = 'block'
-                btnSubmit.style.display = 'none';
+              }
+            
             } else {
                 matchingBtn.style.display = 'none'
             }
@@ -678,7 +705,7 @@ from openedx.core.djangolib.markup import HTML
 
 
         } else {
-            console.log("spanElement i != 0", spanElement)
+
             // console.log("resultMatching i != 0", resultMatching)
             const resultMatchingCorrect = problemList[i].querySelector('.matching_result_container.success_result')
             const resultMatchingIncorrect = problemList[i].querySelector('.matching_result_container.error_result')
@@ -716,6 +743,8 @@ from openedx.core.djangolib.markup import HTML
         });
 
 
+
+
       }
 
       problemElement.insertBefore(divContainer, problemElement.firstChild);
@@ -724,10 +753,18 @@ from openedx.core.djangolib.markup import HTML
       }
 
 
+
+
       const elementsError = document.querySelectorAll('.err-number-qusetion');
       elementsError.forEach((elementError) => {
         const numberError = elementError.textContent;
         const indicatorError = problemList[numberError - 1].querySelector('.indicator-container');
+        const matchingQz = problemList[numberError - 1].querySelector('div[question_matching="True"]')
+       
+        if (matchingQz){
+          return 
+        }
+
         if (indicatorError){
           indicatorError.style.display = 'block';
         }
@@ -755,6 +792,10 @@ from openedx.core.djangolib.markup import HTML
     elementsSubmitted.forEach((element)=>{
       const numberSubmitted = element.textContent;
       const problemElement = problemList[numberSubmitted - 1];
+      const matchingQz = problemElement.querySelector('div[question_matching="True"]')
+      if (matchingQz){
+        return 
+      }
       if (problemElement) {
         const titleElement = problemElement.querySelector('.explanation-title');
         if (titleElement) {
@@ -810,13 +851,19 @@ from openedx.core.djangolib.markup import HTML
 
           if (element.classList.contains('err-number-qusetion')) {
             const indicator = problemList[currentIndex].querySelector('.indicator-container')
-            indicator.style.display = 'block';
+            if (indicator){
+
+              indicator.style.display = 'block';
+            }
 
             btnNext.style.display = 'none';
             btnSubmit.style.display = 'block';
 
             const messgasBox = problemList[currentIndex].querySelector('.feedback-hint-incorrect');
-            messgasBox.classList.add('error-problem-answer');
+            if (messgasBox){
+
+              messgasBox.classList.add('error-problem-answer');
+            }
 
 
               const checkedInput = problemList[currentIndex].querySelectorAll('.field input:checked')
@@ -846,13 +893,26 @@ from openedx.core.djangolib.markup import HTML
             btnNext.style.display = 'none';
             btnSubmit.style.display = 'block';
           }
-
           if (matchingDiv) {
-            matchingBtn.style.display = 'block'
-            matchingBtn.removeAttribute('disabled');
-            btnSubmit.style.display = 'none';
+            const matchingSuccess = problemList[currentIndex].querySelector('.success_result')
+            const matchingError = problemList[currentIndex].querySelector('.error_result')
+  
+            if (matchingSuccess){
+              matchingBtn.style.display ='none'
+              btnSubmit.style.display = 'none';
+              btnNext.style.display = 'block';
+            }else if (matchingError){
+              matchingBtn.style.display ='block'
+              btnSubmit.style.display = 'none';
+              btnNext.style.display = 'none';
+            }
+            else {
+              matchingBtn.style.display ='block'
+              btnSubmit.style.display = 'none';
+            }
+           
           } else {
-            matchingBtn.style.display = 'none'
+            matchingBtn.style.display ='none'
           }
 
           const checkInput = problemList[currentIndex].querySelectorAll('input[type="checkbox"], input[type="radio"]' )
