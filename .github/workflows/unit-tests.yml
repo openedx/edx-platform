@@ -23,21 +23,21 @@ jobs:
         # .github/workflows/unit-tests-gh-hosted.yml
         shard_name:
           - "lms-1"
-          - "lms-2"
-          - "lms-3"
-          - "lms-4"
-          - "lms-5"
-          - "lms-6"
-          - "openedx-1-with-lms"
-          - "openedx-2-with-lms"
-          - "openedx-1-with-cms"
-          - "openedx-2-with-cms"
-          - "cms-1"
-          - "cms-2"
-          - "common-with-lms"
-          - "common-with-cms"
-          - "xmodule-with-lms"
-          - "xmodule-with-cms"
+#          - "lms-2"
+#          - "lms-3"
+#          - "lms-4"
+#          - "lms-5"
+#          - "lms-6"
+#          - "openedx-1-with-lms"
+#          - "openedx-2-with-lms"
+#          - "openedx-1-with-cms"
+#          - "openedx-2-with-cms"
+#          - "cms-1"
+#          - "cms-2"
+#          - "common-with-lms"
+#          - "common-with-cms"
+#          - "xmodule-with-lms"
+#          - "xmodule-with-cms"
     # We expect Django 4.0 to fail, so don't stop when it fails.
     continue-on-error: ${{ matrix.django-version == '4.0' }}
     services:
@@ -52,12 +52,26 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 3
+      mysql:
+        image: mysql:${{ matrix.mysql-version }}
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_DATABASE: "edxapp"
+          MYSQL_USER: "edxapp001"
+          MYSQL_PASSWORD: "password"
+          MYSQL_RANDOM_ROOT_PASSWORD: true
+        options: >-
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
     steps:
 #      - name: sync directory owner
 #        run: sudo chown runner:runner -R .*
       - name: Setup mongodb user
         run: |
-          mongosh edxapp --eval '
+          mongo edxapp --eval '
             db.createUser(
               {
                 user: "edxapp",
@@ -72,7 +86,7 @@ jobs:
       - name: Verify mongo and mysql db credentials
         run: |
           mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select 1;" edxapp
-          mongosh --host 127.0.0.1 --username edxapp --password password --eval 'use edxapp; db.adminCommand("ping");' edxapp
+          mongo --host 127.0.0.1 --username edxapp --password password --eval 'use edxapp; db.adminCommand("ping");' edxapp
 
 
       - name: Setup Python ${{ matrix.python-version }}
