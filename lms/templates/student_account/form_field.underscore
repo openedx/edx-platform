@@ -140,7 +140,6 @@
                 <span><a class="field-link" href="<%- loginIssueSupportLink %>"><%- gettext("Other sign-in issues") %></a></span>
             <% } %>
         </div>
-        <button type="button" class="enterprise-login field-link"><%- gettext("Sign in with your company or school") %></button>
     <% } %>
     <% if( form === 'password-reset' && name === 'email' ) { %>
         <button type="button" class="reset-help field-link" ><i class="fa fa-caret-right" /><%- gettext("Need other help signing in?") %></button>
