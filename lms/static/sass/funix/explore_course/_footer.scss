@@ -8,29 +8,29 @@ body > div.window-wrap > div.wrapper.wrapper-footer {
     border-top: 1px solid $color-stroke;
 
     @media only screen and (max-width: $breakpoint-tablet-sm) {
-        padding-left: $padding-mobile;
-        padding-right: $padding-mobile;
+        padding-left: $padding-mobile !important;
+        padding-right: $padding-mobile !important;
     }
 
     @media only screen and (min-width: $breakpoint-tablet-sm) and (max-width: $breakpoint-tablet-lg) {
-        padding-left: $padding-tablet-sm;
-        padding-right: $padding-tablet-sm;
+        padding-left: $padding-tablet-sm !important;
+        padding-right: $padding-tablet-sm !important;
     }
 
     @media only screen and (min-width: $breakpoint-tablet-lg) and (max-width: $breakpoint-desktop) {
-        padding-left: $padding-tablet-lg;
-        padding-right: $padding-tablet-lg;
+        padding-left: $padding-tablet-lg !important;
+        padding-right: $padding-tablet-lg !important;
     }
 
     @media only screen and (min-width: $breakpoint-desktop) {
-        padding-left: $padding-desktop;
-        padding-right: $padding-desktop;
+        padding-left: $padding-desktop !important;
+        padding-right: $padding-desktop !important;
     }
 
     p {
         a {
             img {
-                width: auto;
+                width: auto !important;
                 height: 32px !important;
             }
         }
