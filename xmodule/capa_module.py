@@ -1603,6 +1603,7 @@ class ProblemBlock(
         """
         return {'html': self.get_problem_html(encapsulate=False, submit_notification=True)}
 
+    # UFC - hàm này được gọi khi người dùng nhấn nút "answer" để kiểm tra đáp án, hàm này sẽ trả về kết quả đúng sai
     @staticmethod
     def make_dict_of_responses(data):
         """
@@ -1686,6 +1687,7 @@ class ProblemBlock(
 
         return answers
 
+    # UFC - hàm này sẽ lưu điểm xuống DB
     def publish_grade(self, score=None, only_if_higher=None, **kwargs):
         """
         Publishes the student's current grade to the system as an event

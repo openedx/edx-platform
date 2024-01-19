@@ -1,6 +1,6 @@
 ---
 metadata:
-  display_name: Quiz Problem Custom
+  display_name: Matching Problem
   markdown: |
         <matchingresponse >
 
@@ -26,32 +26,6 @@ metadata:
 
         </matchingresponse>
 
-        >> Question 2 <<
-
-        [x] a correct answer {{ selected:  giai thich 1 }}
-        [ ] an incorrect answer {{ selected: incorrect answer. }}
-        [ ] an incorrect answer {{ selected: incorrect answer. }}
-        [x] a correct answer {{ selected:  giai thich  2  }}
-  
-  
-  
-  
-        >> Question 3 <<
-  
-        (x) Yes {{ giai thich  }}
-        ( ) No {{ incorrect answer }}
-        ( ) No {{  incorrect answer }}
-        ( ) No {{  incorrect answer }}
-  
-  
-  
-        >> Question 4 <<
-  
-        (x) Yes  {{ giai thich   }}
-        ( ) No {{  incorrect answer }}
-        ( ) No {{  incorrect answer }}
-        ( ) No {{  incorrect answer }}
-
 data: |
   <problem showanswer="never">
   <matchingresponse >
@@ -76,37 +50,6 @@ data: |
           <matchingitem pos="left">Left: will be hide, no matchingvalue</matchingitem>
           <matchingitem pos="right">Yes/No</matchingitem>
         </matchinggroup>
+
   </matchingresponse>
-
-        <label>Question 2</label>
-        <choiceresponse>
-            <checkboxgroup>
-            <choice correct="true">a correct answer
-                <choicehint selected="true">giai thich 1</choicehint></choice>
-            <choice correct="false">an incorrect answer</choice>
-            <choice correct="false">an incorrect answer </choice>
-            <choice correct="true">a correct answer
-                <choicehint selected="true">giai thich  2</choicehint></choice>
-            </checkboxgroup>
-        </choiceresponse>
-
-        <label> Question 3 </label>
-        <multiplechoiceresponse>
-            <choicegroup type="MultipleChoice">
-            <choice correct="true">Yes <choicehint>giai thich</choicehint></choice>
-            <choice correct="false">No</choice>
-            <choice correct="false">No</choice>
-            <choice correct="false">No</choice>
-            </choicegroup>
-        </multiplechoiceresponse>
-
-        <label> Question 4 </label>
-        <multiplechoiceresponse>
-            <choicegroup type="MultipleChoice">
-            <choice correct="true">Yes <choicehint>giai thich</choicehint></choice>
-            <choice correct="false">No</choice>
-            <choice correct="false">No</choice>
-            <choice correct="false">No</choice>
-            </choicegroup>
-        </multiplechoiceresponse>
   </problem>
