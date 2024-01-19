@@ -666,8 +666,10 @@ from openedx.core.djangolib.markup import HTML
             const matchingDiv = problemList[i].querySelector('div[question_matching="True"]')
             const resultMatchingCorrect = problemList[i].querySelector('.matching_result_container.success_result')
             const resultMatchingIncorrect = problemList[i].querySelector('.matching_result_container.error_result')
+
             const matchingSucces =  problemList[i].querySelector('.success_result')
            
+
             if (matchingDiv) {
               btnSubmit.style.display = 'none';
               if (matchingSucces){
@@ -684,6 +686,8 @@ from openedx.core.djangolib.markup import HTML
           spanElement.classList.add('active-number')
 
           if (submittedInput && incorrectLabel) {
+            console.log("spanElement i = 0", spanElement)
+            console.log("resultMatching i = 0", resultMatchingCorrect)
             btnSubmit.style.display = 'none';
             btnNext.style.display = 'block';
             spanElement.classList.add('submitted-question');
@@ -701,7 +705,7 @@ from openedx.core.djangolib.markup import HTML
 
 
         } else {
-           
+
             // console.log("resultMatching i != 0", resultMatching)
             const resultMatchingCorrect = problemList[i].querySelector('.matching_result_container.success_result')
             const resultMatchingIncorrect = problemList[i].querySelector('.matching_result_container.error_result')
