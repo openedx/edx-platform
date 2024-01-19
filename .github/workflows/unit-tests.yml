@@ -53,8 +53,27 @@ jobs:
           --health-timeout 5s
           --health-retries 3
     steps:
-      - name: sync directory owner
-        run: sudo chown runner:runner -R .*
+#      - name: sync directory owner
+#        run: sudo chown runner:runner -R .*
+      - name: Setup mongodb user
+        run: |
+          mongosh edxapp --eval '
+            db.createUser(
+              {
+                user: "edxapp",
+                pwd:  "password",
+                roles: [
+                     { role: "readWrite", db: "edxapp" },
+                ]
+              }
+            );
+          '
+
+      - name: Verify mongo and mysql db credentials
+        run: |
+          mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select 1;" edxapp
+          mongosh --host 127.0.0.1 --username edxapp --password password --eval 'use edxapp; db.adminCommand("ping");' edxapp
+
 
       - name: Setup Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
@@ -66,15 +85,15 @@ jobs:
 
       - name: install requirements
         run: |
-          sudo make test-requirements
+          make test-requirements
           if [[ "${{ matrix.django-version }}" != "pinned" ]]; then
-            sudo pip install "django~=${{ matrix.django-version }}.0"
-            sudo pip check # fail if this test-reqs/Django combination is broken
+            pip install "django~=${{ matrix.django-version }}.0"
+            pip check # fail if this test-reqs/Django combination is broken
           fi
 
       - name: list installed package versions
         run: |
-          sudo pip freeze
+          pip freeze
 
       - name: Setup and run tests
         uses: ./.github/actions/unit-tests
