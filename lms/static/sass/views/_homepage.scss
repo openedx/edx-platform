@@ -45,10 +45,12 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
 
           position: absolute;
           top: 0;
+          bottom: 88px;
           opacity: 0;
-          background: $black;
+          background-image: url('#{$static-path}/images/default_course_hover_thumb.jpeg');
+          z-index: 10;
           width: 100%;
-          height: $course-image-height;
+          height: 100%;
           content: '';
         }
 
