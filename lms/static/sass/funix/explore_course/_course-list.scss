@@ -22,7 +22,7 @@
                     padding: 0 !important;
                     row-gap: 24px;
                     column-gap: 24px;
-                    justify-content: center;
+                    justify-content: flex-start;
 
                     li.courses-listing-item {
                         margin: 0 !important;
@@ -51,7 +51,7 @@
 
                                     h2.course-name {
                                         span.course-title {
-                                            margin: 0;
+                                            margin: 0 !important;
                                             padding: 16px;
                                             margin-top: 15px;
                                             height: 88px !important;
