@@ -164,11 +164,7 @@ def has_team_api_access(user, course_key, access_username=None):
     Returns:
       bool: True if the user has access, False otherwise.
     """
-    # TODO: remove role checks once course_roles is fully impelented and data is migrated
-    if (
-        has_course_staff_privileges(user, course_key) or
-        user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name, course_key)
-    ):
+    if has_course_staff_privileges(user, course_key):
         return True
     if has_discussion_privileges(user, course_key):
         return True
