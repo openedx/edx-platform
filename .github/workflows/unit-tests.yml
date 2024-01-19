@@ -98,6 +98,11 @@ jobs:
       - name: checkout repo
         uses: actions/checkout@v3
 
+      - name: Install system Packages
+        run: |
+          sudo apt-get update
+          make ubuntu-requirements
+
       - name: install requirements
         run: |
           make test-requirements
