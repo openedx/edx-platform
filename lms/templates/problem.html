@@ -150,13 +150,15 @@ from openedx.core.djangolib.markup import HTML
         box-sizing: border-box;
     }
 
+
+
     .question_matching_content {
-        margin-top: 1.5rem;
-        padding: 0 2rem;
+        margin-top: 1.5rem !important;
+        padding: 0 2rem !important;
         font-size: 1rem;
         font-weight: 500;
         color: #2c3744;
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.25rem !important;
     }
 
     .sub_question_matching_content {
@@ -165,7 +167,7 @@ from openedx.core.djangolib.markup import HTML
         font-weight: normal;
         color: #576f8a;
         text-align: left;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.5rem !important;
     }
 
     .content_title {
@@ -174,18 +176,21 @@ from openedx.core.djangolib.markup import HTML
         column-gap: 1rem;
         background-color: #e6e6e8;
         text-align: center;
+        padding: 0 !important;
+        margin: 0 !important;
     }
 
     .content_title_desc {
         padding: 0.5rem 1rem;
         font-size: 1.25rem;
         font-weight: 500;
+        margin: 0 !important;
     }
 
     .matchinggroup {
         padding: 0;
         margin: 0;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.5rem !important;
     }
 
     .content_container {
@@ -194,10 +199,12 @@ from openedx.core.djangolib.markup import HTML
         justify-items: stretch;
         grid-gap: 0 2rem;
         grid-template-areas: "left right";
+        margin: 0 !important;
     }
 
     .left_content {
         padding: 0.5rem 1rem;
+        margin: 0 !important;
         /* font-size: 1rem;
         font-weight: normal; */
         /* color: #2c3744; */
@@ -208,10 +215,12 @@ from openedx.core.djangolib.markup import HTML
         font-size: 1rem;
         font-weight: normal;
         color: #2c3744;
+        margin: 0 !important;
     }
 
     .right_content {
-        padding: 0.5rem 1rem 0.5rem 0;
+        margin: 0 !important;
+        padding: 0.5rem 1rem 0.5rem 0 !important;
         position: relative;
     }
 
@@ -229,9 +238,10 @@ from openedx.core.djangolib.markup import HTML
 
     .right_content_item {
         display: inline-block;
+        margin: 0 !important;
     }
 
-    .right_content_item .btn {
+    .right_content_item .right_content_item_drap_drop {
         outline: none;
         border: none;
         background: none;
@@ -248,31 +258,33 @@ from openedx.core.djangolib.markup import HTML
         border-radius: 6px;
         cursor: grab;
         transition: all 0.3s ease-in-out;
+        margin: 0 !important;
 
         /* New logic */
         user-select: none;
     }
 
-    .right_content_item .btn .image_container {
+    .right_content_item .right_content_item_drap_drop .image_container {
         display: block;
         /* min-width: 0; */
         /* width: 100%;
         height: 100%; */
         flex-shrink: 0;
+        margin: 0 !important;
     }
 
 
-    .right_content_item .btn .image_container .img_right {
-        margin: 0;
+    .right_content_item .right_content_item_drap_drop .image_container .img_right {
+        margin: 0 !important;
         padding: 0;
         outline: none;
-        border: none;
+        border: none !important;
         background: none;
         width: 16px;
         height: 16px;
     }
 
-    .right_content_item .btn:hover {
+    .right_content_item .right_content_item_drap_drop:hover {
         outline: none;
         border: none;
         background: none;
@@ -298,26 +310,28 @@ from openedx.core.djangolib.markup import HTML
     }
 
     .submit_matching_btn {
+        height: auto !important;
         display: inline-block;
+        line-height: 1.5 !important;
         margin-top: 1.5rem;
         margin-left: auto;
         margin-right: 2rem;
         margin-bottom: 2rem;
-        padding: 0.5rem 1rem;
-        background-color: #007ae6;
+        padding: 0.5rem 1rem !important;
+        background-color: #007ae6 !important;
         color: #fff  !important;
-        border-radius: 0.375rem;
-        font-size: 1rem;
-        font-weight: bold;
-        cursor: pointer;
+        border-radius: 0.375rem !important;
+        font-size: 1rem !important;
+        font-weight: bold !important;
+        cursor: pointer !important;
     }
 
     .submit_matching_btn:hover {
-        background-color: #025dae;
+        background-color: #025dae !important;
     }
 
     .matching_result {
-        margin: 1.5rem 2rem 0;
+        margin: 1.5rem 2rem 0 !important;
         border-top: 1px solid #d7d7d7;
         padding-top: 1.5rem;
     }
@@ -329,6 +343,15 @@ from openedx.core.djangolib.markup import HTML
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
+        margin: 0 !important;
+    }
+
+    .matching_result_title {
+        margin: 0 0 1.5rem 0 !important;
+    }
+
+    .matching_result_content {
+        margin: 0 !important;
     }
 
     .matching_hidden {
@@ -409,7 +432,7 @@ from openedx.core.djangolib.markup import HTML
 
       % elif problem['name'] == 'Matching Problem':
       <button type="button" class="submit btn-brand submit_matching_btn" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" data-should-enable-submit-button="${ should_enable_submit_button }" aria-describedby="submission_feedback_${short_id}" ${'' if should_enable_submit_button else 'disabled'}>
-        Trả lời
+        Trả lời matching
       </button>
 
       %endif
@@ -444,8 +467,14 @@ from openedx.core.djangolib.markup import HTML
     <div class="submit-attempt-container">
 
       % if problem['name'] != 'Quiz Problem Custom':
+        % if problem['name'] != 'Matching Problem':
         <button type="button" class="submit btn-brand" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" data-should-enable-submit-button="${ should_enable_submit_button }" aria-describedby="submission_feedback_${short_id}" ${'' if should_enable_submit_button else 'disabled'}>
           <span class="submit-label">${ submit_button }</span>
+        </button>
+        % endif
+      % elif problem['name'] != 'Matching Problem':
+        <button style="display: none;" type="button" class="submit btn-brand" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" data-should-enable-submit-button="${ should_enable_submit_button }" aria-describedby="submission_feedback_${short_id}" ${'' if should_enable_submit_button else 'disabled'}>
+            <span class="submit-label">${ submit_button }</span>
         </button>
       % endif
 
@@ -632,6 +661,10 @@ from openedx.core.djangolib.markup import HTML
 
         if (i == 0){
             const matchingDiv = problemList[i].querySelector('div[question_matching="True"]')
+            const resultMatchingCorrect = problemList[i].querySelector('.matching_result_container.success_result')
+            const resultMatchingIncorrect = problemList[i].querySelector('.matching_result_container.error_result')
+            console.log("matchingDiv", matchingDiv)
+            // console.log("resultMatching", resultMatching)
             if (matchingDiv) {
                 matchingBtn.style.display = 'block'
                 btnSubmit.style.display = 'none';
@@ -642,6 +675,8 @@ from openedx.core.djangolib.markup import HTML
           spanElement.classList.add('active-number')
 
           if (submittedInput && incorrectLabel) {
+            console.log("spanElement i = 0", spanElement)
+            console.log("resultMatching i = 0", resultMatchingCorrect)
             btnSubmit.style.display = 'none';
             btnNext.style.display = 'block';
             spanElement.classList.add('submitted-question');
@@ -651,9 +686,19 @@ from openedx.core.djangolib.markup import HTML
           else if (submittedInput && wrongLabel){
             spanElement.classList.add('err-number-qusetion');
           }
+          else if (resultMatchingCorrect){
+            spanElement.classList.add('submitted-question');
+          } else if (resultMatchingIncorrect) {
+            spanElement.classList.add('err-number-qusetion');
+          }
 
 
-        }else {
+        } else {
+            console.log("spanElement i != 0", spanElement)
+            // console.log("resultMatching i != 0", resultMatching)
+            const resultMatchingCorrect = problemList[i].querySelector('.matching_result_container.success_result')
+            const resultMatchingIncorrect = problemList[i].querySelector('.matching_result_container.error_result')
+
 
             if (submittedInput && incorrectLabel) {
           spanElement.classList.add('submitted-question');
@@ -665,6 +710,10 @@ from openedx.core.djangolib.markup import HTML
           else if (submittedInput && wrongLabel){
             spanElement.classList.add('err-number-qusetion');
 
+          } else if (resultMatchingCorrect){
+            spanElement.classList.add('submitted-question');
+          } else if (resultMatchingIncorrect) {
+            spanElement.classList.add('err-number-qusetion');
           }
         }
 
@@ -896,7 +945,7 @@ from openedx.core.djangolib.markup import HTML
 % if problem['name'] == 'Matching Problem' or problem['name'] == 'Quiz Problem Custom':
 <script>
     const rightItem = document.querySelectorAll(".right_content_item");
-    const rightItemBtn = document.querySelectorAll(".right_content_item .btn");
+    const rightItemBtn = document.querySelectorAll(".right_content_item .right_content_item_drap_drop");
     let draggedItem = null;
 
     rightItemBtn.forEach(function(btn) {
@@ -964,9 +1013,9 @@ from openedx.core.djangolib.markup import HTML
 
         item.addEventListener("drop", function (e) {
             e.preventDefault();
-            const cloneItem = item.querySelector(".btn").innerHTML;
+            const cloneItem = item.querySelector(".right_content_item_drap_drop").innerHTML;
 
-            item.querySelector(".btn").innerHTML = draggedItem;
+            item.querySelector(".right_content_item_drap_drop").innerHTML = draggedItem;
 
             draggedItem = cloneItem;
 
