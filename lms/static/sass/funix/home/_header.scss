@@ -3,6 +3,11 @@ header.global-header {
     padding-bottom: 10px;
     height: $header-height;
     border-bottom: 1px solid $color-stroke;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
 
     @media only screen and (max-width: $breakpoint-tablet-sm) {
         padding-left: $padding-mobile;
