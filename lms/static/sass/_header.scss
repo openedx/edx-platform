@@ -32,7 +32,7 @@
     box-sizing: border-box;
     width: 100%;
     position: relative;
-    overflow: hidden;
+    // overflow: hidden;
     padding-bottom: $baseline/2;
     border-bottom: 1px solid theme-color("primary");
     box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.1);

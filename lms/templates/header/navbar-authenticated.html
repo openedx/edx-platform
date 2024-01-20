@@ -75,31 +75,38 @@ from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_en
              ${_("Courses")}
         </a>
       </div>
+
       % if show_program_listing:
+      <!--
         <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
           <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}"
              aria-current="${'page' if reverse('program_listing_view') == request.path else 'false'}">
              ${_("Programs")}
           </a>
         </div>
+      -->
       % endif
    
     % if show_explore_courses:
+    <!--
       <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
           <a class="tab-nav-link discover-new-link" href="${marketing_link('COURSES')}"
              aria-current="${'page' if '/courses' in request.path else 'false'}">
              Explore Courses
           </a>
       </div>
+    -->
     % endif
    
   </div>
-  <div class="secondary" style="display:flex;">
+  <div class="secondary" style="display:flex; margin: 0 !important;">
     <div style="display:flex">
         % if enable_help_link:
+        <!--
         <div class="mobile-nav-item hidden-mobile nav-item">
           <a class="help-link" href="${help_link}" rel="noopener" target="_blank">${_("Help")}</a>
         </div>
+        -->
       % endif
 
        % if header_language_selector_is_enabled():

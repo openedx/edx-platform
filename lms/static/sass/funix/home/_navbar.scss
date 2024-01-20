@@ -1,0 +1,51 @@
+.nav-links {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    
+    div.main {
+        margin: 0 !important;
+
+        div.mobile-nav-item {
+
+            a.tab-nav-link {
+                padding: 0 0 15px 0;
+            }
+        }
+    }
+
+    div.secondary {
+        div.nav-item {
+            margin: 0 !important;
+    
+            a.menu-title {
+                padding: 0 !important;
+            }
+    
+        }
+
+        div.nav-item-dropdown {
+            a {
+                display: flex !important;
+                justify-content: left;
+                align-items: center;
+                gap: 10px;
+            }
+
+            div.dropdown-user-menu {
+                border-radius: 4px;
+            
+                div.dropdown-nav-item {
+                    a {
+                    font-family: 'Roboto', sans-serif;
+                    font-style: normal;
+                    color: $color-text-default;
+                    }
+
+                }
+            }
+        }
+    }
+}
+
