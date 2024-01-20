@@ -12,9 +12,10 @@ from django.utils.translation import ugettext as _
 <div class="collapse navbar-collapse" id="navbarSupportedContent">
   <ul class="navbar-nav mr-auto">
      % if course:
+     <!--
       <div class="course-header">
         <span class="provider">${course.display_org_with_default}:</span>
-        <span class="course-number">${course.display_number_with_default}</span>
+        <span class="course-number">${course.ßdisplay_number_with_default}</span>
         <%
         display_name = course.display_name_with_default
         if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
@@ -24,6 +25,7 @@ from django.utils.translation import ugettext as _
         %>
         <span class="course-name">${display_name}</span>
       </div>
+     -->
     % endif
 
 

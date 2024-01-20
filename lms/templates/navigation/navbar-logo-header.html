@@ -22,6 +22,7 @@ from lms.djangoapps.branding import api as branding_api
     </a>
   </div>
   % if course:
+  <!--
     <div class="course-header">
       <span class="provider">${course.display_org_with_default}:</span>
       <span class="course-number">${course.display_number_with_default}</span>
@@ -34,6 +35,7 @@ from lms.djangoapps.branding import api as branding_api
       %>
       <span class="course-name">${display_name}</span>
     </div>
+  -->
   % endif
 </h1>
 % if enable_enterprise_sidebar:

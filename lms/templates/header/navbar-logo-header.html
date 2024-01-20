@@ -27,6 +27,7 @@ enterprise_customer_link = get_enterprise_learner_portal(request)
         % endif
     </a>
   % else:
+  
     <a href="/courses">
       <%block name="navigation_logo">
         <img  class="logo" src="${branding_api.get_logo_url(is_secure)}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/>
@@ -34,9 +35,11 @@ enterprise_customer_link = get_enterprise_learner_portal(request)
         % if settings.LOGO_IMAGE_EXTRA_TEXT == 'edge':
             <span class="font-italic"> | EDGE</span>
         % endif
+  
     </a>
   % endif
   % if course:
+  <!--
     <div class="course-header">
       <span class="provider">${course.display_org_with_default}:</span>
       <span class="course-number">${course.display_number_with_default}</span>
@@ -49,6 +52,7 @@ enterprise_customer_link = get_enterprise_learner_portal(request)
       %>
       <span class="course-name">${display_name}</span>
     </div>
+  -->
   % endif
 </h1>
 % if enable_enterprise_sidebar:
