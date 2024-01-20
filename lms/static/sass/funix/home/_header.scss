@@ -29,6 +29,8 @@ body > div.window-wrap > header {
     div.main-header {
         display: flex;
         align-items: center;
+        max-width: 1440px !important;
+        margin: auto;
 
         @media only screen and (min-width: $breakpoint-mobile) {
             justify-content: space-between;
