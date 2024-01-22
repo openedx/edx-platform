@@ -3,7 +3,7 @@ Outline processors for applying team user partition groups.
 """
 import logging
 from datetime import datetime
-from typing import Dict
+from typing import Dict, List
 
 from opaque_keys.edx.keys import CourseKey
 
@@ -29,7 +29,7 @@ class TeamPartitionGroupsOutlineProcessor(OutlineProcessor):
         super().__init__(course_key, user, at_time)
         self.team_groups: Dict[str, Group] = {}
         self.user_group = None
-        self.user_groups = []
+        self.user_groups: List[int] = []
 
     def load_data(self, _) -> None:
         """

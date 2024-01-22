@@ -11,12 +11,14 @@ import ddt
 from dateutil import parser
 from django.conf import settings
 from django.test import override_settings
+from edx_toggles.toggles.testutils import override_waffle_flag
 from fs.memoryfs import MemoryFS
 from opaque_keys.edx.keys import CourseKey
 import pytest
 from pytz import utc
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 
+from openedx.core.djangoapps.course_groups.flags import CONTENT_GROUPS_FOR_TEAMS
 from openedx.core.lib.teams_config import TeamsConfig, DEFAULT_COURSE_RUN_MAX_TEAM_SIZE
 import xmodule.course_block
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
@@ -288,6 +290,7 @@ class DiscussionTopicsTestCase(unittest.TestCase):
         assert {'General': {'id': 'i4x-test_org-test_course-course-test'}} == d.discussion_topics
 
 
+@override_waffle_flag(CONTENT_GROUPS_FOR_TEAMS, active=False)
 class TeamsConfigurationTestCase(unittest.TestCase):
     """
     Tests for the configuration of teams and the helper methods for accessing them.
