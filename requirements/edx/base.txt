@@ -733,6 +733,8 @@ newrelic==9.3.0
     # via
     #   -r requirements/edx/bundled.in
     #   edx-django-utils
+nh3==0.2.15
+    # via -r requirements/edx/kernel.in
 nltk==3.8.1
     # via chem
 nodeenv==1.8.0
