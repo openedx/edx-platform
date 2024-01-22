@@ -288,7 +288,7 @@ class DiscussionTopicsTestCase(unittest.TestCase):
         assert {'General': {'id': 'i4x-test_org-test_course-course-test'}} == d.discussion_topics
 
 
-@patch("openedx.core.lib.teams_config.CONTENT_GROUPS_FOR_TEAMS.is_enabled", lambda _: True)
+@patch("openedx.core.lib.teams_config.CONTENT_GROUPS_FOR_TEAMS.is_enabled", lambda _: False)
 class TeamsConfigurationTestCase(unittest.TestCase):
     """
     Tests for the configuration of teams and the helper methods for accessing them.
