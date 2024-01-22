@@ -172,7 +172,7 @@ jobs:
         number1=${{ env.FIRST_QUERY }}
         diff=$((number2 - number1))
         if [ $number2 -gt $number1 ]; then
-          data=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select app_label, name from django_migrations ORDER by -id limit $diff;" edxapp;)
+          data=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select app, name from django_migrations ORDER by -id limit $diff;" edxapp;)
           echo "$data" > cleaned_data.txt
         elif [ $number1 -gt $number2 ]; then
            echo "Your PR removed migrations." > cleaned_data.txt
