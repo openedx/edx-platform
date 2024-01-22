@@ -6,7 +6,7 @@ import logging
 
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from openedx.core.djangoapps.course_groups.partition_scheme import CONTENT_GROUPS_FOR_TEAMS
+from openedx.core.djangoapps.course_groups.flags import CONTENT_GROUPS_FOR_TEAMS
 
 from xmodule.partitions.partitions import UserPartition, UserPartitionError
 from xmodule.services import TeamsConfigurationService

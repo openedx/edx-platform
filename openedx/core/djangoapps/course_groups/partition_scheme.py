@@ -20,22 +20,11 @@ from xmodule.partitions.partitions import (  # lint-amnesty, pylint: disable=wro
     UserPartition
 )
 from xmodule.services import TeamsConfigurationService
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
+from openedx.core.djangoapps.course_groups.flags import CONTENT_GROUPS_FOR_TEAMS
 
 from .cohorts import get_cohort, get_group_info_for_cohort
 
 log = logging.getLogger(__name__)
-COURSE_GROUPS_NAMESPACE = "course_groups"
-
-# .. toggle_name: course_groups.content_groups_for_teams
-# .. toggle_implementation: CourseWaffleFlag
-# .. toggle_default: False
-# .. toggle_description: This flag enables the use of content groups for teams.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2023-11-23
-CONTENT_GROUPS_FOR_TEAMS = CourseWaffleFlag(
-    f"{COURSE_GROUPS_NAMESPACE}.content_groups_for_teams", __name__
-)
 
 
 class CohortPartitionScheme:

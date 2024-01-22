@@ -16,7 +16,7 @@ from cms.djangoapps.contentstore import toggles
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from openedx.core.djangoapps.course_apps.toggles import exams_ida_enabled
 from openedx.core.djangoapps.course_groups.partition_generator import MINIMUM_DYNAMIC_TEAM_PARTITION_ID
-from openedx.core.djangoapps.course_groups.partition_scheme import CONTENT_GROUPS_FOR_TEAMS
+from openedx.core.djangoapps.course_groups.flags import CONTENT_GROUPS_FOR_TEAMS
 from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
 from openedx.core.lib.teams_config import TeamsetType
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG

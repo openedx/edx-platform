@@ -10,7 +10,7 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.core import types
 from openedx.core.djangoapps.content.learning_sequences.api.processors.base import OutlineProcessor
 from openedx.core.djangoapps.course_groups.partition_generator import create_team_set_partition_with_course_id
-from openedx.core.djangoapps.course_groups.partition_scheme import CONTENT_GROUPS_FOR_TEAMS
+from openedx.core.djangoapps.course_groups.flags import CONTENT_GROUPS_FOR_TEAMS
 from xmodule.partitions.partitions import Group
 from xmodule.partitions.partitions_service import get_user_partition_groups
 
