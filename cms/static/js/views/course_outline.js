@@ -28,12 +28,12 @@ function(
             this.makeContentDraggable(this.el);
             // Show/hide the paste button
             this.initializePasteButton(this.el);
-            this.renderTagCount();
+            //this.renderTagCount();
             return renderResult;
         },
 
         renderTagCount: function() {
-            const contentId = this.model.get('id')
+            const contentId = this.model.get('id');
             var countModel = new TagCountModel({
                 content_id: contentId,
                 tags_count: this.model.get('tag_counts_by_unit')[contentId],
@@ -478,7 +478,7 @@ function(
         },
 
         openManageTagsDrawer() {
-            const taxonomyTagsWidgetUrl = this.model.get('taxonomy_tags_widget_url')
+            const taxonomyTagsWidgetUrl = this.model.get('taxonomy_tags_widget_url');
             const contentId = this.model.get('id');
             TaggingDrawerUtils.openDrawer(taxonomyTagsWidgetUrl, contentId);
         },

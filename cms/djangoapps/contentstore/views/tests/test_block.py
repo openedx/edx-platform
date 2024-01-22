@@ -294,7 +294,7 @@ class GetItemTest(ItemTest):
         }
         html, __ = self._get_container_preview(root_usage_key)
         self.assertIn("wrapper-xblock", html)
-        self.assertIn(f'data-testid="tag-count-button', html)
+        self.assertIn('data-testid="tag-count-button"', html)
 
     def test_split_test(self):
         """
