@@ -62,9 +62,6 @@ RUN pip install pip==20.3.4 \
   && pip install boto==2.49.0 \
   && pip install -e git+https://github.com/eol-uchile/edx-s3-compatibility@c43347d36d5a20590a2e2f91e31d5270934ee993#egg=edx_s3_compatiblity
 
-# Remove the original versions of ora2 and edx-sga
-#RUN pip uninstall -y ora2 edx-sga
-
 # Manually update pytz (Timezones)
 RUN pip install pytz --upgrade
 
