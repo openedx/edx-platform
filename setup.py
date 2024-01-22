@@ -107,7 +107,7 @@ setup(
             "verification = openedx.core.djangoapps.user_api.partition_schemes:ReturnGroup1PartitionScheme",
             "enrollment_track = openedx.core.djangoapps.verified_track_content.partition_scheme:EnrollmentTrackPartitionScheme",  # lint-amnesty, pylint: disable=line-too-long
             "content_type_gate = openedx.features.content_type_gating.partitions:ContentTypeGatingPartitionScheme",
-            "team = openedx.core.djangoapps.course_groups.partition_scheme:TeamPartitionScheme",
+            "team = openedx.core.djangoapps.course_groups.team_partition_scheme:TeamPartitionScheme",
         ],
         "openedx.block_structure_transformer": [
             "library_content = lms.djangoapps.course_blocks.transformers.library_content:ContentLibraryTransformer",
