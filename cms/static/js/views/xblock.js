@@ -14,6 +14,10 @@ function($, _, ViewUtils, BaseView, XBlock, HtmlUtils) {
             'click .notification-action-button': 'fireNotificationActionEvent'
         },
 
+        options: {
+            clipboardData: { content: null },
+        },
+
         initialize: function() {
             BaseView.prototype.initialize.call(this);
             this.view = this.options.view;

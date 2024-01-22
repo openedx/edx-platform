@@ -4,24 +4,17 @@ Tests for Blockstore-based Content Libraries
 from contextlib import contextmanager
 from io import BytesIO
 from urllib.parse import urlencode
-from unittest import mock
 
-from django.conf import settings
 from django.test import LiveServerTestCase
-from django.test.utils import override_settings
 from organizations.models import Organization
 from rest_framework.test import APITestCase, APIClient
-from search.search_engine_base import SearchEngine
 
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangoapps.content_libraries.libraries_index import MAX_SIZE
 from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIGHTS_RESERVED
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.core.lib import blockstore_api
 from openedx.core.lib.blockstore_api.tests.base import (
     BlockstoreAppTestMixin,
-    requires_blockstore,
-    requires_blockstore_app,
 )
 
 # Define the URLs here - don't use reverse() because we want to detect
@@ -51,45 +44,6 @@ URL_BLOCK_GET_HANDLER_URL = '/api/xblock/v2/xblocks/{block_key}/handler_url/{han
 URL_BLOCK_METADATA_URL = '/api/xblock/v2/xblocks/{block_key}/'
 URL_BLOCK_FIELDS_URL = '/api/xblock/v2/xblocks/{block_key}/fields/'
 URL_BLOCK_XBLOCK_HANDLER = '/api/xblock/v2/xblocks/{block_key}/handler/{user_id}-{secure_token}/{handler_name}/'
-
-
-def elasticsearch_test(func):
-    """
-    Decorator for tests which connect to elasticsearch when needed
-    """
-    # This is disabled by default. Set to True if the elasticsearch engine is needed to test parts of code.
-    if settings.ENABLE_ELASTICSEARCH_FOR_TESTS:
-        func = override_settings(SEARCH_ENGINE="search.elastic.ElasticSearchEngine")(func)
-        func = override_settings(ELASTIC_SEARCH_CONFIG=[{
-            'use_ssl': settings.TEST_ELASTICSEARCH_USE_SSL,
-            'host': settings.TEST_ELASTICSEARCH_HOST,
-            'port': settings.TEST_ELASTICSEARCH_PORT,
-        }])(func)
-        func = mock.patch(
-            "openedx.core.djangoapps.content_libraries.libraries_index.SearchIndexerBase.SEARCH_KWARGS",
-            new={
-                'refresh': 'wait_for'
-            })(func)
-        return func
-    else:
-        @classmethod
-        def mock_perform(cls, filter_terms, text_search):
-            # pylint: disable=no-member
-            return SearchEngine.get_search_engine(cls.INDEX_NAME).search(
-                field_dictionary=filter_terms,
-                query_string=text_search,
-                size=MAX_SIZE
-            )
-
-        func = mock.patch(
-            "openedx.core.djangoapps.content_libraries.libraries_index.SearchIndexerBase.SEARCH_KWARGS",
-            new={}
-        )(func)
-        func = mock.patch(
-            "openedx.core.djangoapps.content_libraries.libraries_index.SearchIndexerBase._perform_elastic_search",
-            new=mock_perform
-        )(func)
-        return func
 
 
 @skip_unless_cms  # Content Libraries REST API is only available in Studio
@@ -355,15 +309,6 @@ class _ContentLibrariesRestApiTestMixin:
         return self._api('get', url, None, expect_response=200)["handler_url"]
 
 
-@requires_blockstore
-class ContentLibrariesRestApiBlockstoreServiceTest(_ContentLibrariesRestApiTestMixin, APITestCase):
-    """
-    Base class for Blockstore-based Content Libraries test that use the REST API
-    and the standalone Blockstore service.
-    """
-
-
-@requires_blockstore_app
 class ContentLibrariesRestApiTest(
     _ContentLibrariesRestApiTestMixin,
     BlockstoreAppTestMixin,

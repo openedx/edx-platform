@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Greek (http://app.transifex.com/open-edx/edx-platform/language/el/).
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -22,10 +22,10 @@
 # Panos Chronis <panosfyra4@yahoo.gr>, 2014
 # Anestis, 2014
 # kafroulitsa <zasimak@gmail.com>, 2014
-# Ειρήνη Απέργη, 2023
+# Ειρήνη Απέργη, 2023-2024
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Greek (http://app.transifex.com/open-edx/edx-platform/language/el/).
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -37,9 +37,10 @@
 # Katerina Ligkovanli <kaligova@gmail.com>, 2016,2019
 # Theofilos Chamalis <theofxam@gmail.com>, 2014
 # Zacharias Sdregas <azdrax@gmail.com>, 2014
+# Ειρήνη Απέργη, 2023
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Greek (http://app.transifex.com/open-edx/edx-platform/language/el/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -61,7 +62,7 @@
 # Ειρήνη Απέργη, 2023
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Greek (http://app.transifex.com/open-edx/edx-platform/language/el/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -72,9 +73,10 @@
 # Konstantina Samara <kon.samara@hotmail.com>, 2015
 # kostas kalatzis <koskalat@gmail.com>, 2015
 # Nick Gikopoulos, 2014-2015
+# Ειρήνη Απέργη, 2023
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Greek (http://app.transifex.com/open-edx/edx-platform/language/el/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -98,7 +100,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-11-19 20:43+0000\n"
+"POT-Creation-Date: 2023-12-31 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Greek (https://app.transifex.com/open-edx/teams/6205/el/)\n"
@@ -273,7 +275,7 @@ msgstr ""
 #: common/djangoapps/course_modes/helpers.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Verified"
-msgstr "Με πιστοποίηση ταυτότητας"
+msgstr "Επαληθευμένοι"
 
 #: common/djangoapps/course_modes/helpers.py
 msgid "ID Verified Ribbon/Badge"
@@ -284,6 +286,7 @@ msgid "You're enrolled as an honor code student"
 msgstr ""
 
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
+#: lms/djangoapps/courseware/views/views.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
@@ -1621,10 +1624,10 @@ msgid ""
 "able to log back into your account until you have activated it."
 msgstr ""
 "Έχετε σχεδόν ολοκληρώσει την εγγραφή σας! Κάντε κλικ στο κουμπί που θα "
-"βρείτε λίγο παρακάτω για να ενεργοποιήσετε το λογαριασμό σας και να "
-"αποκτήσετε πρόσβαση στα συναρπαστικά και υψηλής ποιότητας μαθήματα του  "
-"%(platform_name)s.  Υπενθυμίζουμε πως δεν θα μπορέσετε να ξανασυνδεθείτε  "
-"στο λογαριασμό σας εάν δεν τον ενεργοποιήσετε."
+"βρείτε λίγο παρακάτω, για να ενεργοποιήσετε τον λογαριασμό σας και να "
+"αποκτήσετε πρόσβαση στα μαθήματα του  %(platform_name)s.  Υπενθυμίζουμε πως "
+"δε θα μπορέσετε να συνδεθείτε στον λογαριασμό σας, εάν δεν τον "
+"ενεργοποιήσετε πρώτα."
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
 msgid "Activate your account"
@@ -1655,7 +1658,7 @@ msgid ""
 "attempted to create an account on %(platform_name)s using this email "
 "address."
 msgstr ""
-"Το μήνυμα αυτό στάλθηκε αυτόματα από το %(lms_url)s γιατί  κάποιος "
+"Το μήνυμα αυτό στάλθηκε αυτόματα από το %(lms_url)s, γιατί  κάποιος "
 "προσπάθησε να δημιουργήσει λογαριασμό στο %(platform_name)s χρησιμοποιώντας "
 "τη συγκεκριμένη διεύθυνση ηλεκτρονικού ταχυδρομείου."
 
@@ -1815,7 +1818,7 @@ msgid ""
 "                "
 msgstr ""
 "\n"
-"Αγαπητέ/αγαπητή %(full_name)s,"
+"Αγαπητέ/Αγαπητή %(full_name)s,"
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.html
 #, python-format
@@ -1872,7 +1875,7 @@ msgstr ""
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
 #, python-format
 msgid "Hello %(full_name)s"
-msgstr "Αγαπητέ/αγαπητή %(full_name)s"
+msgstr "Αγαπητέ/Αγαπητή %(full_name)s,"
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
 #, python-format
@@ -2888,6 +2891,10 @@ msgid ""
 " course content but can no longer participate in graded assignments or work "
 "towards earning a certificate."
 msgstr ""
+"Μετά από αυτήν την ημερομηνία, το μάθημα θα μπει σε καθεστώς αυτομελέτης, "
+"που σημαίνει ότι θα μπορείτε να δείτε το περιεχόμενο του μαθήματος, αλλά δε "
+"θα μπορείτε πλέον να υποβάλετε τα τεστ και την τελική εξέταση για την "
+"απόκτηση της βεβαίωσης παρακολούθησης."
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid ""
@@ -3254,36 +3261,14 @@ msgid "Certificate is being created."
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
-#, python-brace-format
 msgid ""
-"{platform_name} now offers financial assistance for learners who want to earn Verified Certificates but who may not be able to pay the Verified Certificate fee. Eligible learners may receive up to 90{percent_sign} off the Verified Certificate fee for a course.\n"
-"To apply for financial assistance, enroll in the audit track for a course that offers Verified Certificates, and then complete this application. Note that you must complete a separate application for each course you take.\n"
-" We plan to use this information to evaluate your application for financial assistance and to further develop our financial assistance program."
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Annual Household Income"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your current financial situation. Why do you need assistance?"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your learning or professional goals. How will a Verified "
-"Certificate in this course help you achieve these goals?"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your plans for this course. What steps will you take to help "
-"you complete the course work and receive a certificate?"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Use between 1250 and 2500 characters or so in your response."
+"We plan to use this information to evaluate your application for financial assistance and to further develop our financial assistance program. Please note that while \n"
+"assistance is available in most courses that offer verified certificates, a few courses and programs are not eligible. You must complete a separate application \n"
+"for each course you take. You may be approved for financial assistance five (5) times each year (based on 12-month period from you first approval). \n"
+"To apply for financial assistance: \n"
+"1. Enroll in the audit track for an eligible course that offers Verified Certificates \n"
+"2. Complete this  application \n"
+"3. Check your email, your application will be reviewed in 3-4 business days"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
@@ -3294,14 +3279,25 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
-msgid "Specify your annual household income in US Dollars."
+msgid "I certify that: "
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"Paying the verified certificate fee for the above course would cause me "
+"economic hardship"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"I will work diligently to complete the course work and receive a certificate"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid ""
-"I allow {platform_name} to use the information provided in this application "
-"(except for financial information) for {platform_name} marketing purposes."
+"I have read, understand, and will abide by the {honor_code_link} for the edX"
+" Site"
 msgstr ""
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
@@ -3439,6 +3435,8 @@ msgid ""
 "The {report_type} report is being created. To view the status of the report,"
 " see Pending Tasks below."
 msgstr ""
+"Η αναφορά {report_type} δημιουργείται. Για να δείτε την κατάσταση της "
+"αναφοράς, ανατρέξτε στην ενότητα 'Εκκρεμείς διεργασίες' παρακάτω."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -3710,7 +3708,7 @@ msgstr ""
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "enrollment"
-msgstr "εγγραφή"
+msgstr "\"Εγγραφή\""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The file must contain a 'cohort' column containing cohort names."
@@ -4221,6 +4219,9 @@ msgid ""
 " see Pending Tasks below. You will be able to download the report when it is"
 " complete."
 msgstr ""
+"Η αναφορά {report_type} δημιουργείται. Για να δείτε την κατάσταση της "
+"αναφοράς, ανατρέξτε στην ενότητα 'Εκκρεμείς διεργασίες' παρακάτω. Θα "
+"μπορείτε να κάνετε λήψη της αναφοράς, όταν ολοκληρωθεί."
 
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "This component cannot be rescored."
@@ -5385,7 +5386,7 @@ msgstr ""
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
 #, python-format
 msgid "Hello %(full_name)s,"
-msgstr "Αγαπητέ/αγαπητή %(full_name)s,"
+msgstr "Αγαπητέ/Αγαπητή %(full_name)s,"
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
@@ -5412,7 +5413,7 @@ msgstr ""
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
 #, python-format
 msgid "Hello %(full_name)s, "
-msgstr "Αγαπητέ/αγαπητή %(full_name)s,"
+msgstr "Αγαπητέ/Αγαπητή %(full_name)s,"
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/subject.txt
 #, python-format
@@ -6657,6 +6658,9 @@ msgid ""
 "eligibility email content which is sent when user has met all credit "
 "eligibility requirements."
 msgstr ""
+"Περιεχόμενο απλού κειμένου ή html για εμφάνιση προσαρμοσμένου μηνύματος "
+"εντός περιεχομένου email επιλεξιμότητας αναγνώρισης, το οποίο αποστέλλεται "
+"όταν ο χρήστης πληροί όλες τις απαιτήσεις καταλληλότητας αναγνώρισης."
 
 #: openedx/core/djangoapps/credit/models.py
 msgid ""
@@ -7481,7 +7485,7 @@ msgstr "Το email που εισάγετε θα πρέπει να έχει το�
 #. into the required field or enter it incorrectly.
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your full name"
-msgstr "Εισάγετε ένα πλήρες ονοματεπώνυμο"
+msgstr "Εισαγάγετε ένα πλήρες ονοματεπώνυμο"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your first name"
@@ -7562,6 +7566,10 @@ msgstr ""
 #: openedx/core/djangoapps/user_api/accounts/api.py
 #, python-brace-format
 msgid "The '{field_name}' field cannot be edited."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/api.py
+msgid "Full name can't be longer than 255 symbols"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
@@ -7674,6 +7682,13 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Specialty"
+msgstr ""
+
+#. Translators: This label appears above a dropdown menu to select
+#. the user's work experience
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
+msgid "Work experience"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/utils.py
@@ -7871,7 +7886,7 @@ msgstr "Επιτυχής αλλαγή του κωδικού σας"
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
 #, python-format
 msgid "Hello %(name)s,"
-msgstr "Αγαπητέ/αγαπητή %(name)s,"
+msgstr "Αγαπητέ/Αγαπητή %(name)s,"
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.txt
@@ -7886,7 +7901,7 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.txt
 #, python-format
 msgid "Hello %(name)s, "
-msgstr "Αγαπητέ/αγαπητή %(name)s,"
+msgstr "Αγαπητέ/Αγαπητή %(name)s,"
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/subject.txt
 #, python-format
@@ -10534,6 +10549,19 @@ msgid ""
 msgstr ""
 
 #: xmodule/library_content_block.py
+msgid "Source content library has not been specified."
+msgstr ""
+
+#: xmodule/library_content_block.py
+msgid "Content libraries are not available in the current runtime."
+msgstr ""
+
+#: xmodule/library_content_block.py
+#, python-brace-format
+msgid "Source content library does not exist: {source_library_id}"
+msgstr ""
+
+#: xmodule/library_content_block.py
 msgid "This component is out of date. The library has new content."
 msgstr ""
 
@@ -10567,7 +10595,8 @@ msgid "Select a Library."
 msgstr ""
 
 #: xmodule/library_content_block.py
-msgid "There are no matching problem types in the specified libraries."
+#, python-brace-format
+msgid "There are no problems in the specified library of type {capa_type}."
 msgstr ""
 
 #: xmodule/library_content_block.py
@@ -11883,19 +11912,21 @@ msgid "{previous_groups}, {current_group}"
 msgstr ""
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr ""
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr ""
 
 #: cms/djangoapps/contentstore/utils.py
 msgid "Invalid prerequisite course key"
+msgstr ""
+
+#: cms/djangoapps/contentstore/utils.py
+msgid "Set Date"
 msgstr ""
 
 #. #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
@@ -12103,10 +12134,6 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Course has been successfully reindexed."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "Set Date"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
@@ -12565,12 +12592,6 @@ msgstr ""
 msgid "Details"
 msgstr ""
 
-#. Translators: this is a verb describing the action of viewing more details
-#: cms/templates/studio_xblock_wrapper.html
-#: lms/templates/wiki/includes/article_menu.html
-msgid "View"
-msgstr "Προβολή"
-
 #: cms/templates/maintenance/_announcement_edit.html
 #: lms/templates/problem.html lms/templates/word_cloud.html
 msgid "Save"
@@ -12786,7 +12807,7 @@ msgstr ""
 #: lms/templates/dashboard.html lms/templates/header/user_dropdown.html
 #: lms/templates/user_dropdown.html
 msgid "Dashboard"
-msgstr ""
+msgstr "Μαθήματα"
 
 #: lms/templates/dashboard.html
 msgid "results successfully populated,"
@@ -12861,7 +12882,7 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Unenroll"
-msgstr "ΔΙΑΓΡΑΦΗ"
+msgstr "Διαγραφή"
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
@@ -13341,6 +13362,14 @@ msgstr ""
 msgid "Completed"
 msgstr ""
 
+#: lms/templates/seq_block.html
+msgid "New Unit"
+msgstr ""
+
+#: lms/templates/seq_block.html
+msgid "Paste as new unit"
+msgstr ""
+
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"
 msgstr ""
@@ -13468,12 +13497,12 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 #: lms/templates/staff_problem_info.html
 msgid "Delete Learner's State"
-msgstr ""
+msgstr "Διαγραφή απαντήσεων και βαθμών"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 #: lms/templates/staff_problem_info.html
 msgid "Rescore Learner's Submission"
-msgstr ""
+msgstr "Υποβολή αναβαθμολόγησης"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 #: lms/templates/staff_problem_info.html
@@ -13503,6 +13532,8 @@ msgstr ""
 #: lms/templates/staff_problem_info.html
 msgid "Enter the learner email address or username"
 msgstr ""
+"Εισαγάγετε τη διεύθυνση ηλεκτρονικού ταχυδρομείου ή το όνομα χρήστη του "
+"φοιτητή"
 
 #: lms/templates/staff_problem_info.html
 msgid "View History"
@@ -14701,7 +14732,7 @@ msgstr ""
 
 #: lms/templates/ccx/student_admin.html
 msgid "View gradebook"
-msgstr ""
+msgstr "Προβολή βαθμών"
 
 #: lms/templates/ccx/student_admin.html
 msgid "Download student grades"
@@ -15634,7 +15665,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "View my {cert_name_short}"
-msgstr ""
+msgstr "Δείτε τη {cert_name_short} "
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Complete our course feedback survey"
@@ -16341,7 +16372,7 @@ msgstr ""
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid "Hello {full_name},"
-msgstr "Αγαπητέ/αγαπητή {full_name},"
+msgstr "Αγαπητέ/Αγαπητή {full_name},"
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid "Your {platform_name} ID verification photos have been approved."
@@ -16368,6 +16399,11 @@ msgid ""
 "your verification was successful.You can also check the status of the "
 "verification process on your dashboard."
 msgstr ""
+"Λάβαμε τα στοιχεία σας και ξεκίνησε η διαδικασία επαλήθευσης ταυτότητας. "
+"Ελέγξτε αν θα λάβετε μήνυμα ηλεκτρονικού ταχυδρομείου από εμάς τις επόμενες "
+"ημέρες, για να επιβεβαιώσετε αν η επαλήθευσή σας ήταν επιτυχής. Μπορείτε "
+"επίσης να ελέγξετε την κατάσταση της διαδικασίας επαλήθευσης στην καρτέλα "
+"\"Μαθήματα\"."
 
 #: lms/templates/emails/reject_name_change.txt
 msgid ""
@@ -16503,15 +16539,6 @@ msgstr ""
 #. Translators: This string will not be used in Open edX installations.
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
-"In order to be eligible for edX Financial Assistance, you must demonstrate "
-"that paying the Verified Certificate fee would cause you economic hardship. "
-"To apply, you will be asked to answer a few questions about why you are "
-"applying and how the Verified Certificate will benefit you."
-msgstr ""
-
-#. Translators: This string will not be used in Open edX installations.
-#: lms/templates/financial-assistance/financial-assistance.html
-msgid ""
 "If your application is approved, we'll give you instructions for verifying "
 "your identity on edx.org so you can start working toward completing your edX"
 " course."
@@ -16529,10 +16556,6 @@ msgstr ""
 #. translate the name "Anant".
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Sincerely, Anant"
-msgstr ""
-
-#: lms/templates/financial-assistance/financial-assistance.html
-msgid "Back to Student FAQs"
 msgstr ""
 
 #: lms/templates/financial-assistance/financial-assistance.html
@@ -16562,7 +16585,7 @@ msgstr "Αναζήτηση Μαθημάτων"
 
 #: lms/templates/header/navbar-logo-header.html
 msgid "{name} Dashboard"
-msgstr ""
+msgstr "{name} Μαθήματα"
 
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Supplemental Links"
@@ -16580,7 +16603,7 @@ msgstr ""
 
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Register for free"
-msgstr ""
+msgstr "Εγγραφή"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Profile"
@@ -16693,7 +16716,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Pending Tasks"
-msgstr ""
+msgstr "Εκκρεμείς διαδικασίες"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -16760,7 +16783,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Invalidate Certificates"
-msgstr ""
+msgstr "Ακύρωση βεβαιώσεων"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Enrollment Information"
@@ -16776,7 +16799,7 @@ msgstr "Ακροατές"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Honor"
-msgstr "Με Κώδικα Τιμής."
+msgstr "Με κώδικα τιμής"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Professional"
@@ -16861,10 +16884,14 @@ msgid ""
 "exams and problem sets), and can be changed on the 'Grading' page (under "
 "'Settings') in Studio."
 msgstr ""
+"Κάντε κλικ, για να εμφανίσετε τη διαμόρφωση βαθμολογίας για το μάθημα. Η "
+"διαμόρφωση βαθμολογίας είναι η ανάλυση των βαθμολογούμενων κεφαλαίων του "
+"μαθήματος (όπως τεστ και τελική εξέταση) και μπορεί να αλλάξει στη σελίδα "
+"\"Βαθμολογία\" (στην καρτέλα \"Ρυθμίσεις\") στο Studio."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Grading Configuration"
-msgstr ""
+msgstr "Διαμόρφωση βαθμολογίας"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -16884,18 +16911,30 @@ msgid ""
 "background, meaning it is OK to navigate away from this page while your "
 "report is generating."
 msgstr ""
+"Για μεγάλα μαθήματα, η δημιουργία ορισμένων αναφορών μπορεί να διαρκέσει "
+"αρκετές ώρες. Όταν ολοκληρωθεί η δημιουργία αναφορών, ένας σύνδεσμος που "
+"περιλαμβάνει την ημερομηνία και την ώρα δημιουργίας εμφανίζεται στον "
+"παρακάτω πίνακα. Αυτές οι αναφορές δημιουργούνται στο παρασκήνιο, που "
+"σημαίνει ότι μπορείτε να απομακρυνθείτε από αυτήν τη σελίδα κατά τη "
+"δημιουργία της αναφοράς σας."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
 "Please be patient and do not click these buttons multiple times. Clicking "
 "these buttons multiple times will significantly slow the generation process."
 msgstr ""
+"Παρακαλούμε να είστε υπομονετικοί και μην κάνετε πολλές φορές κλικ σε αυτά "
+"τα κουμπιά. Εάν κάνετε πολλές φορές κλικ σε αυτά τα κουμπιά, θα επιβραδυνθεί"
+" σημαντικά η διαδικασία δημιουργίας."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
 "Click to generate a CSV file of all students enrolled in this course, along "
 "with profile information such as email address and username:"
 msgstr ""
+"Κάνετε κλικ, για να δημιουργήσετε ένα αρχείο CSV όλων των φοιτητών που είναι"
+" εγγεγραμμένοι σε αυτό το μάθημα, μαζί με πληροφορίες της προσωπικής σελίδας"
+" τους, όπως email και όνομα χρήστη:"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download profile information as a CSV"
@@ -16906,18 +16945,20 @@ msgid ""
 "Click to generate a CSV file that lists learners who can enroll in the "
 "course but have not yet done so."
 msgstr ""
+"Κάνετε κλικ, για να δημιουργήσετε ένα αρχείο CSV με τη λίστα φοιτητών που "
+"μπορούν να εγγραφούν στο μάθημα, αλλά δεν το έχουν κάνει ακόμη."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download a CSV of learners who can enroll"
-msgstr ""
+msgstr "Λήψη CSV "
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Click to download a CSV of anonymized student IDs:"
-msgstr ""
+msgstr "Κάνετε κλικ για λήψη ενός αρχείου CSV με τα ανώνυμα IDs των φοιτητών:"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Get Student Anonymized IDs CSV"
-msgstr ""
+msgstr "Λήψη CSV"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -16942,6 +16983,9 @@ msgid ""
 "the problem. You also select a section or chapter to include results of all "
 "problems in that section or chapter."
 msgstr ""
+"Επιλέξτε ένα τεστ, για να δημιουργήσετε ένα αρχείο CSV με όλες τις "
+"απαντήσεις των μαθητών στο συγκεκριμένο τεστ. Μπορείτε επίσης να επιλέξετε "
+"μια ενότητα ή κεφάλαιο, για να συμπεριλάβετε τα αποτελέσματα όλων των τεστ."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/problem_report.html
@@ -16961,14 +17005,16 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/certificates.html
 msgid "Click to list certificates that are issued for this course:"
 msgstr ""
+"Κάνετε κλικ, για να δημιουργήσετε μια λίστα των βεβαιώσεων που εκδόθηκαν για"
+" αυτό το μάθημα:"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "View Certificates Issued"
-msgstr ""
+msgstr "Προβολή βεβαιώσεων"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download CSV of Certificates Issued"
-msgstr ""
+msgstr "Λήψη CSV"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -16985,6 +17031,8 @@ msgstr ""
 msgid ""
 "Click to generate a CSV grade report for all currently enrolled students."
 msgstr ""
+"Κάνετε κλικ, για να δημιουργήσετε μια αναφορά βαθμολογίας σε μορφή CSV για "
+"όλους τους εγγεγραμμένους φοιτητές."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate Grade Report"
@@ -16992,7 +17040,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate Problem Grade Report"
-msgstr ""
+msgstr "Δημιουργία αναφοράς βαθμολογίας τεστ"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate ORA Data Report"
@@ -17007,6 +17055,8 @@ msgid ""
 "Click to generate a ZIP file that contains all submission texts and "
 "attachments."
 msgstr ""
+"Κάντε κλικ για να δημιουργήσετε ένα αρχείο ZIP με όλα τα κείμενα και τα "
+"συνημμένα που έχουν υποβληθεί."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate Submission Files Archive"
@@ -17104,6 +17154,8 @@ msgstr ""
 msgid ""
 "Specify the {platform_name} email address or username of a student here:"
 msgstr ""
+"Συμπληρώστε τη διεύθυνση ηλεκτρονικού ταχυδρομείου που έχει δηλωθεί στο "
+"{platform_name} ή το όνομα χρήστη του φοιτητή, εδώ:"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Student Email or Username"
@@ -17147,7 +17199,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "List all students with due date extensions"
-msgstr ""
+msgstr "Λίστα φοιτητών"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Specify a student to see all of that student's extensions."
@@ -17167,6 +17219,9 @@ msgid ""
 "on a particular subsection. This will revert the due date for the student "
 "back to the problem's original due date."
 msgstr ""
+"Η επαναφορά της ημερομηνίας λήξης ενός τεστ ακυρώνει την παράταση προθεσμίας"
+" για έναν φοιτητή σε ένα συγκεκριμένο κεφάλαιο. Αυτό θα επαναφέρει την "
+"ημερομηνία λήξης για τον μαθητή στην αρχική ημερομηνία λήξης του τεστ."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Reason for reset"
@@ -17715,7 +17770,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Gradebook"
-msgstr ""
+msgstr "Προβολή βαθμών"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
@@ -17725,7 +17780,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View a specific learner's enrollment status"
-msgstr ""
+msgstr "Δείτε την κατάσταση εγγραφής ενός συγκεκριμένου φοιτητή"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Learner's {platform_name} email address or username *"
@@ -17733,7 +17788,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Learner email address or username"
-msgstr ""
+msgstr "Διεύθυνση ηλεκτρονικού ταχυδρομείου ή όνομα χρήστη φοιτητή"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Enrollment Status"
@@ -17753,7 +17808,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Adjust a learner's grade for a specific problem"
-msgstr ""
+msgstr "Προσαρμόστε τη βαθμολογία ενός φοιτητή για ένα συγκεκριμένο τεστ"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Location of problem in course"
@@ -17790,6 +17845,9 @@ msgid ""
 "Only If Score Improves' option updates the learner's score only if it "
 "improves in the learner's favor."
 msgstr ""
+"Για το καθορισμένο πρόβλημα, βαθμολογήστε ξανά τις απαντήσεις του φοιτητή. Η"
+" επιλογή \"Αναβαθμολόγηση μόνο για βελτίωση της βαθμολογίας\" ενημερώνει τη "
+"βαθμολογία του φοιτητή, μόνο εάν βελτιωθεί προς όφελός του."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Score Override"
@@ -17803,6 +17861,8 @@ msgstr ""
 msgid ""
 "New score for problem, out of the total points available for the problem"
 msgstr ""
+"Νέα βαθμολογία για το τεστ, από τους συνολικούς διαθέσιμους βαθμούς για το "
+"τεστ"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Score"
@@ -17814,7 +17874,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Problem History"
-msgstr ""
+msgstr "Ιστορικό ενός τεστ"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
@@ -17824,7 +17884,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Task Status"
-msgstr ""
+msgstr "Κατάσταση διαδικασίας"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
@@ -17890,6 +17950,8 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Adjust all enrolled learners' grades for a specific problem"
 msgstr ""
+"Προσαρμόστε τους βαθμούς όλων των εγγεγραμμένων φοιτητών για ένα "
+"συγκεκριμένο τεστ"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Allows all learners to work on the problem again."
@@ -17900,6 +17962,9 @@ msgid ""
 "Rescore submitted responses. The 'Rescore Only If Scores Improve' option "
 "updates a learner's score only if it improves in the learner's favor."
 msgstr ""
+"Αναβαθμολογήστε τις απαντήσεις που υποβλήθηκαν. Η επιλογή \"Αναβαθμολόγηση "
+"μόνο για βελτίωση της βαθμολογίας\" ενημερώνει τη βαθμολογία ενός φοιτητή, "
+"μόνο εάν βελτιωθεί προς όφελός του."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore All Learners' Submissions"
@@ -17907,7 +17972,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore Only If Scores Improve"
-msgstr ""
+msgstr "Αναβαθμολόγηση μόνο για τη βελτίωση της βαθμολογίας"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show the status for the tasks that you submitted for this problem."
@@ -17933,10 +17998,14 @@ msgid ""
 "course                 (such as exams and problem sets), and can be changed "
 "on the 'Grading'                 page (under 'Settings') in Studio."
 msgstr ""
+"Κάντε κλικ, για να εμφανίσετε τη διαμόρφωση βαθμολογίας για το μάθημα. Η "
+"διαμόρφωση βαθμολογίας είναι η ανάλυση των βαθμολογούμενων κεφαλαίων του "
+"μαθήματος (όπως τεστ και τελική εξέταση) και μπορεί να αλλάξει στη σελίδα "
+"\"Βαθμολόγηση\" (στην καρτέλα \"Ρυθμίσεις\") στο Studio."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
 msgid "Click to download a CSV of                 anonymized student IDs:"
-msgstr ""
+msgstr "Κάνετε κλικ για λήψη ενός αρχείου CSV με τα ανώνυμα IDs των φοιτητών:"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
 msgid ""
@@ -17954,6 +18023,9 @@ msgid ""
 "times. Clicking these buttons multiple times will significantly slow the "
 "generation                 process."
 msgstr ""
+"Παρακαλούμε να είστε υπομονετικοί και μην κάνετε πολλές φορές κλικ σε αυτά "
+"τα κουμπιά. Εάν κάνετε πολλές φορές κλικ σε αυτά τα κουμπιά, θα επιβραδυνθεί"
+" σημαντικά η διαδικασία δημιουργίας."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
 msgid ""
@@ -18215,7 +18287,7 @@ msgstr "Η αλλαγή του κωδικού σας έχει ολοκληρωθ
 msgid ""
 "Your password has been reset. {start_link}Sign-in to your account.{end_link}"
 msgstr ""
-"Ο κωδικός πρόσβασής σας έχει αλλάξει. {start_link} Εισέλθετε στο λογαριασμό "
+"Ο κωδικός σας έχει αλλάξει. {start_link} Συνδεθείτε στον λογαριασμό "
 "σας.{end_link}"
 
 #: lms/templates/registration/password_reset_confirm.html
@@ -18544,6 +18616,10 @@ msgstr ""
 #: lms/templates/widgets/cookie-consent.html
 msgid "Learn more"
 msgstr ""
+
+#: lms/templates/wiki/includes/article_menu.html
+msgid "View"
+msgstr "Προβολή"
 
 #: lms/templates/wiki/includes/article_menu.html
 msgid "{span_start}(active){span_end}"
@@ -19227,6 +19303,10 @@ msgid "Preview the courseware in the LMS"
 msgstr ""
 
 #: cms/templates/container.html
+msgid "Collapse All"
+msgstr ""
+
+#: cms/templates/container.html
 msgid "Adding components"
 msgstr ""
 
@@ -19431,12 +19511,12 @@ msgid ""
 " particular discussions in the forums, announce schedule changes, and "
 "respond to student questions. You add or edit updates in HTML."
 msgstr ""
-"Χρησιμοποιείστε τις ενημερώσεις για να γνωστοποιήσετε στους σπουδαστές "
-"σημαντικές ημερομηνίες στο πρόγραμμα των εργασιών και εξετάσεων τους, για να"
+"Χρησιμοποιείστε τις ενημερώσεις για να γνωστοποιήσετε στους φοιτητές "
+"σημαντικές ημερομηνίες στο πρόγραμμα των εργασιών και εξετάσεών τους, για να"
 " επισημάνετε συγκεκριμένες συζητήσεις στο φόρουμ, για να ανακοινώσετε "
 "αλλαγές στον προγραμματισμό του μαθήματος και να απαντήσετε σε ερωτήσεις "
-"σπουδαστών. Μπορείτε να προσθέτετε ή να επεξεργάζεστε τις ενημερώσεις σας με"
-" χρήση HTML."
+"φοιτητών. Μπορείτε να προσθέτετε ή να επεξεργάζεστε τις ενημερώσεις σας με "
+"χρήση HTML."
 
 #: cms/templates/course_outline.html
 msgid "Course Outline"
@@ -20003,6 +20083,7 @@ msgstr ""
 msgid ""
 "Learner-specific content, such as learner grades and discussion forum data"
 msgstr ""
+"Περιεχόμενο συγκεκριμένου φοιτητή, όπως βαθμοί και δεδομένα συζητήσεων"
 
 #: cms/templates/export.html cms/templates/import.html
 msgid "The course team"
@@ -20525,7 +20606,7 @@ msgstr ""
 
 #: cms/templates/import.html
 msgid "Why import a course?"
-msgstr ""
+msgstr "Γιατί να εισαγάγετε ένα μάθημα;"
 
 #: cms/templates/import.html
 msgid ""
@@ -20533,6 +20614,9 @@ msgid ""
 "existing course altogether. Or, you may have developed a course outside "
 "{studio_name}."
 msgstr ""
+"Μπορεί να θέλετε να εκτελέσετε μια νέα έκδοση ενός υπάρχοντος μαθήματος ή να"
+" αντικαταστήσετε ένα υπάρχον μάθημα εντελώς∙ ή μπορεί να έχετε δημιουργήσει "
+"ένα μάθημα εκτός του {studio_name}."
 
 #: cms/templates/import.html
 msgid "What content is imported?"
@@ -20544,7 +20628,7 @@ msgstr ""
 
 #: cms/templates/import.html
 msgid "The following content is not imported."
-msgstr ""
+msgstr "Δεν εισάγεται το παρακάτω περιεχόμενο:"
 
 #: cms/templates/import.html
 msgid "Warning: Importing while a course is running"
@@ -20557,6 +20641,10 @@ msgid ""
 "associated with those Problem components may be lost. This data includes "
 "students' problem scores."
 msgstr ""
+"Εάν πραγματοποιήσετε μια εισαγωγή μαθήματος ενώ είναι ενεργό το μάθημά σας "
+"και αλλάξετε τις διευθύνσεις URL (ή τους κόμβους url_name) οποιωνδήποτε "
+"τεστ, τα δεδομένα του φοιτητή που σχετίζονται με αυτά ενδέχεται να χαθούν, "
+"π.χ. οι βαθμολογίες του."
 
 #: cms/templates/import.html
 msgid "Learn more about importing a course"
@@ -21776,15 +21864,31 @@ msgid ""
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Importing components"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy to Clipboard"
+msgid "Select this problem"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Tags"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage tags"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy to Clipboard"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
@@ -22101,6 +22205,10 @@ msgid "Outline"
 msgstr ""
 
 #: cms/templates/widgets/header.html
+msgid "Videos"
+msgstr ""
+
+#: cms/templates/widgets/header.html
 msgid "Publisher"
 msgstr ""
 
@@ -22110,7 +22218,7 @@ msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Export"
-msgstr ""
+msgstr "Εξαγωγή"
 
 #: cms/templates/widgets/header.html
 msgid "Current Library:"
