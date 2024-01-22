@@ -22,7 +22,7 @@ from openedx.core.lib.teams_config import TeamsetType
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from xmodule.course_block import get_available_providers  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.exceptions import InvalidProctoringProvider # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import InvalidProctoringProvider  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID
 
 LOGGER = logging.getLogger(__name__)
@@ -380,9 +380,12 @@ class CourseMetadata:
             dynamic_user_partition_id = proposed_topic.get('dynamic_user_partition_id')
             if dynamic_user_partition_id is None:
                 continue
-            if dynamic_user_partition_id > MINIMUM_STATIC_PARTITION_ID or dynamic_user_partition_id < MINIMUM_DYNAMIC_TEAM_PARTITION_ID:
-                message = 'dynamic_user_partition_id must be greater than ' + str(MINIMUM_DYNAMIC_TEAM_PARTITION_ID) + \
-                          ' and less than ' + str(MINIMUM_STATIC_PARTITION_ID)
+            if dynamic_user_partition_id > MINIMUM_STATIC_PARTITION_ID or \
+                dynamic_user_partition_id < MINIMUM_DYNAMIC_TEAM_PARTITION_ID:
+                message = (
+                    f"dynamic_user_partition_id must be greater than {str(MINIMUM_DYNAMIC_TEAM_PARTITION_ID)}"
+                    f" and less than {str(MINIMUM_STATIC_PARTITION_ID)}."
+                )
                 errors.append({'key': 'teams_configuration', 'message': message, 'model': teams_configuration_model})
 
         return errors

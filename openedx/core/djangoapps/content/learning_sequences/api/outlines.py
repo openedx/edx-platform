@@ -17,7 +17,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from openedx.core import types
 from openedx.core.djangoapps.content.learning_sequences.api.processors.team_partition_groups \
-import TeamPartitionGroupsOutlineProcessor
+    import TeamPartitionGroupsOutlineProcessor
 
 from ..data import (
     ContentErrorData,

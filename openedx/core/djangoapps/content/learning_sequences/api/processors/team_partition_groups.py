@@ -50,8 +50,9 @@ class TeamPartitionGroupsOutlineProcessor(OutlineProcessor):
         """
         Is the user part of the group to which the block is restricting content?
 
-        The user is excluded if the block is in a partition group, but the user
-        is not in that group.
+        This method returns True if the user is not part of the group to which
+        the block is restricting content. This means that the block should be
+        removed from the course outline.
         """
         if not CONTENT_GROUPS_FOR_TEAMS.is_enabled(self.course_key):
             return False

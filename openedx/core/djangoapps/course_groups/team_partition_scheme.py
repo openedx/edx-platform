@@ -75,7 +75,7 @@ class TeamPartitionScheme:
         return Group(user_team.team.id, str(user_team.team.name))
 
     @classmethod
-    def create_user_partition(cls, id, name, description, groups=None, parameters=None, active=True):
+    def create_user_partition(cls, id, name, description, groups=None, parameters=None, active=True):    # pylint: disable=redefined-builtin, invalid-name, unused-argument
         """
         Create a custom UserPartition to support dynamic groups.
 
