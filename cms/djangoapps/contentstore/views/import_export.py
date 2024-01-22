@@ -91,7 +91,8 @@ def import_handler(request, course_key_string):
         else:
             return _write_chunk(request, courselike_key)
     elif request.method == 'GET':  # assume html
-        if use_new_import_page(courselike_key):
+
+        if use_new_import_page(courselike_key) and not library:
             return redirect(get_import_url(courselike_key))
         status_url = reverse_course_url(
             "import_status_handler", courselike_key, kwargs={'filename': "fillerName"}
@@ -314,8 +315,8 @@ def export_handler(request, course_key_string):
     course_key = CourseKey.from_string(course_key_string)
     if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
-
-    if isinstance(course_key, LibraryLocator):
+    library = isinstance(course_key, LibraryLocator)
+    if library:
         courselike_block = modulestore().get_library(course_key)
         context = {
             'context_library': courselike_block,
@@ -340,7 +341,7 @@ def export_handler(request, course_key_string):
         export_olx.delay(request.user.id, course_key_string, request.LANGUAGE_CODE)
         return JsonResponse({'ExportStatus': 1})
     elif 'text/html' in requested_format:
-        if use_new_export_page(course_key):
+        if use_new_export_page(course_key) and not library:
             return redirect(get_export_url(course_key))
         return render_to_response('export.html', context)
     else:

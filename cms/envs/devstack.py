@@ -147,7 +147,6 @@ XBLOCK_SETTINGS.update({'VideoBlock': {'licensing_enabled': True}})
 ################################ SEARCH INDEX ################################
 FEATURES['ENABLE_COURSEWARE_INDEX'] = True
 FEATURES['ENABLE_LIBRARY_INDEX'] = False
-FEATURES['ENABLE_CONTENT_LIBRARY_INDEX'] = False
 SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
 
 ELASTIC_SEARCH_CONFIG = [
@@ -259,6 +258,8 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_HEADERS = corsheaders_default_headers + (
     'use-jwt-cookie',
+    'content-range',
+    'content-disposition',
 )
 
 ################### Special Exams (Proctoring) and Prereqs ###################

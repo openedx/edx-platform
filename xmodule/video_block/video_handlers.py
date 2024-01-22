@@ -315,6 +315,12 @@ class VideoStudentViewHandlers:
         if dispatch.startswith('translation'):
             language = dispatch.replace('translation', '').strip('/')
 
+            # Because scrapers hit video blocks, verify that a user exists.
+            # use the _request attr to get the django request object.
+            if not request._request.user:  # pylint: disable=protected-access
+                log.info("Transcript: user must be logged or public view enabled to get transcript")
+                return Response(status=403)
+
             if not language:
                 log.info("Invalid /translation request: no language.")
                 return Response(status=400)
@@ -324,6 +330,7 @@ class VideoStudentViewHandlers:
                 return Response(status=404)
 
             if language != self.transcript_language:
+
                 self.transcript_language = language
 
             try:

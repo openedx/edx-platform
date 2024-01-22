@@ -32,7 +32,7 @@ function($, _, Backbone, gettext, BasePage,
             'click .new-component-button': 'scrollToNewComponentButtons',
             'click .save-button': 'saveSelectedLibraryComponents',
             'click .paste-component-button': 'pasteComponent',
-            'click .tags-button': 'openManageTags',
+            'click .manage-tags-button': 'openManageTags',
             'change .header-library-checkbox': 'toggleLibraryComponent',
             'click .collapse-button': 'collapseXBlock',
         },
@@ -77,6 +77,7 @@ function($, _, Backbone, gettext, BasePage,
                 model: this.model
             });
             this.messageView.render();
+            this.clipboardBroadcastChannel = new BroadcastChannel("studio_clipboard_channel");
             // Display access message on units and split test components
             if (!this.isLibraryPage) {
                 this.containerAccessView = new ContainerSubviews.ContainerAccess({
@@ -89,7 +90,8 @@ function($, _, Backbone, gettext, BasePage,
                     el: this.$('#publish-unit'),
                     model: this.model,
                     // When "Discard Changes" is clicked, the whole page must be re-rendered.
-                    renderPage: this.render
+                    renderPage: this.render,
+                    clipboardBroadcastChannel: this.clipboardBroadcastChannel,
                 });
                 this.xblockPublisher.render();
 
@@ -120,7 +122,6 @@ function($, _, Backbone, gettext, BasePage,
             }
 
             this.listenTo(Backbone, 'move:onXBlockMoved', this.onXBlockMoved);
-            this.clipboardBroadcastChannel = new BroadcastChannel("studio_clipboard_channel");
         },
 
         getViewParameters: function() {
@@ -175,6 +176,13 @@ function($, _, Backbone, gettext, BasePage,
                     if (!self.isLibraryPage && !self.isLibraryContentPage) {
                         self.initializePasteButton();
                     }
+
+                    var targetId = window.location.hash.slice(1);
+                    if (targetId) {
+                        var target = document.getElementById(targetId);
+                        target.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+                    }
+
                 },
                 block_added: options && options.block_added
             });

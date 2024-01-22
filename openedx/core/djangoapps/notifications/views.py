@@ -27,7 +27,8 @@ from .events import (
     notification_preference_update_event,
     notification_preferences_viewed_event,
     notification_read_event,
-    notifications_app_all_read_event, notification_tray_opened_event,
+    notification_tray_opened_event,
+    notifications_app_all_read_event
 )
 from .models import Notification
 from .serializers import (
@@ -36,7 +37,7 @@ from .serializers import (
     UserCourseNotificationPreferenceSerializer,
     UserNotificationPreferenceUpdateSerializer
 )
-from .utils import filter_course_wide_preferences, get_show_notifications_tray
+from .utils import get_show_notifications_tray
 
 
 @allow_any_authenticated_user()
@@ -181,10 +182,13 @@ class UserNotificationPreferenceView(APIView):
          """
         course_id = CourseKey.from_string(course_key_string)
         user_preference = CourseNotificationPreference.get_updated_user_course_preferences(request.user, course_id)
-        serializer = UserCourseNotificationPreferenceSerializer(user_preference)
+        serializer_context = {
+            'course_id': course_id,
+            'user': request.user
+        }
+        serializer = UserCourseNotificationPreferenceSerializer(user_preference, context=serializer_context)
         notification_preferences_viewed_event(request, course_id)
-        preferences = filter_course_wide_preferences(course_id, serializer.data)
-        return Response(preferences)
+        return Response(serializer.data)
 
     def patch(self, request, course_key_string):
         """
@@ -218,9 +222,14 @@ class UserNotificationPreferenceView(APIView):
         preference_update.is_valid(raise_exception=True)
         updated_notification_preferences = preference_update.save()
         notification_preference_update_event(request.user, course_id, preference_update.validated_data)
-        serializer = UserCourseNotificationPreferenceSerializer(updated_notification_preferences)
-        preferences = filter_course_wide_preferences(course_id, serializer.data)
-        return Response(preferences, status=status.HTTP_200_OK)
+
+        serializer_context = {
+            'course_id': course_id,
+            'user': request.user
+        }
+        serializer = UserCourseNotificationPreferenceSerializer(updated_notification_preferences,
+                                                                context=serializer_context)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @allow_any_authenticated_user()

@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://app.transifex.com/open-edx/edx-platform/language/tr_TR/).
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -28,7 +28,7 @@
 # ca47f5bf05c27c3888896d9870e257ad_00aad6f <5addf4166015f6e11583e89fe2c53975_164880>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://app.transifex.com/open-edx/edx-platform/language/tr_TR/).
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -49,12 +49,12 @@
 # Mustafa Tat, 2015
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://app.transifex.com/open-edx/edx-platform/language/tr_TR/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # Adem Özgür <admozgur@gmail.com>, 2015
-# Ali Işıngör <ali@artistanbul.io>, 2017-2023
+# Ali Işıngör <ali@artistanbul.io>, 2017-2024
 # Ali Özcan <aliozcan@yandex.com>, 2014
 # ali selek <aliselek01@gmail.com>, 2015
 # baris <brscvs@gmail.com>, 2013
@@ -84,7 +84,7 @@
 # ca47f5bf05c27c3888896d9870e257ad_00aad6f <5addf4166015f6e11583e89fe2c53975_164880>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://app.transifex.com/open-edx/edx-platform/language/tr_TR/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -121,9 +121,9 @@
 # a56fc07028489bb2b53400de33ba6a83, 2014
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (https://app.transifex.com/open-edx/teams/6205/tr_TR/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2023.
+# EdX Team <info@edx.org>, 2024.
 #
 # Translators:
 # Ali Işıngör <ali@artistanbul.io>, 2021
@@ -132,7 +132,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-11-12 20:43+0000\n"
+"POT-Creation-Date: 2024-01-14 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2021\n"
 "Language-Team: Turkish (Turkey) (https://app.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -322,6 +322,7 @@ msgid "You're enrolled as an honor code student"
 msgstr "Onur öğrencisi olarak kaydoldunuz"
 
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
+#: lms/djangoapps/courseware/views/views.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
@@ -3555,45 +3556,15 @@ msgid "Certificate is being created."
 msgstr "Sertifikanız oluşturuluyor."
 
 #: lms/djangoapps/courseware/views/views.py
-#, python-brace-format
 msgid ""
-"{platform_name} now offers financial assistance for learners who want to earn Verified Certificates but who may not be able to pay the Verified Certificate fee. Eligible learners may receive up to 90{percent_sign} off the Verified Certificate fee for a course.\n"
-"To apply for financial assistance, enroll in the audit track for a course that offers Verified Certificates, and then complete this application. Note that you must complete a separate application for each course you take.\n"
-" We plan to use this information to evaluate your application for financial assistance and to further develop our financial assistance program."
+"We plan to use this information to evaluate your application for financial assistance and to further develop our financial assistance program. Please note that while \n"
+"assistance is available in most courses that offer verified certificates, a few courses and programs are not eligible. You must complete a separate application \n"
+"for each course you take. You may be approved for financial assistance five (5) times each year (based on 12-month period from you first approval). \n"
+"To apply for financial assistance: \n"
+"1. Enroll in the audit track for an eligible course that offers Verified Certificates \n"
+"2. Complete this  application \n"
+"3. Check your email, your application will be reviewed in 3-4 business days"
 msgstr ""
-"{platform_name} Onaylı Sertifika almak isteyen ancak Onaylı Sertifika ücretini ödeyemeyebilecek öğrencilere mâli yardım sağlıyor. Uygun öğrenciler bir ders için olan Onaylı Sertifika ücretinin {percent_sign}90'ına kadar karşılayacak indirim alabilir.\n"
-"Mâli yardıma başvurmak için Onaylı Sertifika veren bir derse gözlemci olarak katılın ve ardından bu başvuruyu tamamlayın. Aldığınız her ders için ayrı başvuru yapmanız gerektiğini unutmayın.\n"
-"Sizden aldığımız bilgileri mâli yardım başvurunuzu değerlendirmek ve mâli yardım programımızı geliştirmek için kullanmayı planlıyoruz."
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Annual Household Income"
-msgstr "Yıllık Hanehalkı Geliri"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your current financial situation. Why do you need assistance?"
-msgstr "Mâli durumunuzdan bahsedin. Neden yardıma ihtiyacınız var?"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your learning or professional goals. How will a Verified "
-"Certificate in this course help you achieve these goals?"
-msgstr ""
-"Öğrenme ya da mesleki hedeflerinizden bahsedin. Bu dersten alacağınız Onaylı"
-" Sertifika belirttiğiniz hedeflerinizi gerçekleştirmenize nasıl yardımcı "
-"olacak?"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your plans for this course. What steps will you take to help "
-"you complete the course work and receive a certificate?"
-msgstr ""
-"Bu ders için planlarınızdan bahsedin. Bu ders çalışmalarını tamamlamada ve "
-"sertifika almanızda size yardımcı olacak hangi adımları izleyeceksiniz?"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Use between 1250 and 2500 characters or so in your response."
-msgstr "Cevabınızı yaklaşık 1250 ila 2500 karakter olacak şekilde yazın."
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
@@ -3605,18 +3576,26 @@ msgstr ""
 "bulunmuyorsa derse gözlemci olarak katılmış olduğunuzdan emin olun."
 
 #: lms/djangoapps/courseware/views/views.py
-msgid "Specify your annual household income in US Dollars."
-msgstr "Yıllık toplam hane gelirinizi TL cinsinden belirtin."
+msgid "I certify that: "
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"Paying the verified certificate fee for the above course would cause me "
+"economic hardship"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"I will work diligently to complete the course work and receive a certificate"
+msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid ""
-"I allow {platform_name} to use the information provided in this application "
-"(except for financial information) for {platform_name} marketing purposes."
+"I have read, understand, and will abide by the {honor_code_link} for the edX"
+" Site"
 msgstr ""
-"Bu başvuruda sağladığım bilgilerin (mali bilgiler hariç) {platform_name} "
-"platformunun pazarlanması amacıyla {platform_name} platformu tarafından "
-"kullanılmasına izin veriyorum."
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Title can't be empty"
@@ -5059,6 +5038,7 @@ msgid "Disable User Account"
 msgstr "Kullanıcı Hesabını Askıya Al"
 
 #: lms/djangoapps/support/views/index.py
+#: lms/templates/support/entitlement.html
 msgid "Entitlements"
 msgstr "Yetkiler"
 
@@ -8332,6 +8312,10 @@ msgid "The '{field_name}' field cannot be edited."
 msgstr "'{field_name}' alanı düzenlenemez."
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
+msgid "Full name can't be longer than 255 symbols"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/api.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Enter a valid name"
 msgstr "Geçerli bir ad giriniz"
@@ -8442,6 +8426,13 @@ msgstr "Meslek"
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Specialty"
 msgstr "Uzmanlık"
+
+#. Translators: This label appears above a dropdown menu to select
+#. the user's work experience
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
+msgid "Work experience"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/utils.py
 #, python-brace-format
@@ -11657,6 +11648,19 @@ msgstr ""
 "düzenleyebilirler."
 
 #: xmodule/library_content_block.py
+msgid "Source content library has not been specified."
+msgstr ""
+
+#: xmodule/library_content_block.py
+msgid "Content libraries are not available in the current runtime."
+msgstr ""
+
+#: xmodule/library_content_block.py
+#, python-brace-format
+msgid "Source content library does not exist: {source_library_id}"
+msgstr ""
+
+#: xmodule/library_content_block.py
 msgid "This component is out of date. The library has new content."
 msgstr "Bu bileşen güncel değil. Kütüphane yeni içeriğe sahip."
 
@@ -11692,8 +11696,9 @@ msgid "Select a Library."
 msgstr "Bir Kütüphane Seçin."
 
 #: xmodule/library_content_block.py
-msgid "There are no matching problem types in the specified libraries."
-msgstr "Belirtilen kütüphanelerde, eşleşen problem türleri yoktur."
+#, python-brace-format
+msgid "There are no problems in the specified library of type {capa_type}."
+msgstr ""
 
 #: xmodule/library_content_block.py
 msgid "Select another problem type."
@@ -13226,13 +13231,11 @@ msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}, {current_group}"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "{0}'ın kopyası"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "'{0}'ın tekrarı"
@@ -13240,6 +13243,10 @@ msgstr "'{0}'ın tekrarı"
 #: cms/djangoapps/contentstore/utils.py
 msgid "Invalid prerequisite course key"
 msgstr "Geçersiz ders anahtar koşulu."
+
+#: cms/djangoapps/contentstore/utils.py
+msgid "Set Date"
+msgstr "Tarihi Belirle"
 
 #. #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the status of an active video upload
@@ -13457,10 +13464,6 @@ msgstr "Sadece Akran Değerlendirmesi"
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Course has been successfully reindexed."
 msgstr "Dersin tekrar indekslenme işlemi başarılı."
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "Set Date"
-msgstr "Tarihi Belirle"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -13947,14 +13950,6 @@ msgstr "Gereklilikler"
 msgid "Details"
 msgstr "Ayrıntılar"
 
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-#. Translators: this is a verb describing the action of viewing more details
-#: cms/templates/studio_xblock_wrapper.html
-#: lms/templates/wiki/includes/article_menu.html
-#: wiki/templates/wiki/includes/article_menu.html
-msgid "View"
-msgstr "Görüntüle"
-
 #: cms/templates/maintenance/_announcement_edit.html
 #: lms/templates/problem.html lms/templates/word_cloud.html
 msgid "Save"
@@ -14412,7 +14407,7 @@ msgstr "{platform_name} platformuna hoş geldiniz"
 #. untranslated. See https://openedx.org for more information.
 #: lms/templates/index_overlay.html
 msgid "It works! Powered by the Open edX{registered_trademark} Platform"
-msgstr ""
+msgstr "Çalışıyor! İçinde Open edX{registered_trademark} Platformu Var"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -14731,6 +14726,14 @@ msgstr "Sıralı"
 #: lms/templates/seq_block.html lms/templates/vert_module.html
 msgid "Completed"
 msgstr "Tamamlandı"
+
+#: lms/templates/seq_block.html
+msgid "New Unit"
+msgstr "Yeni Ünite"
+
+#: lms/templates/seq_block.html
+msgid "Paste as new unit"
+msgstr "Yeni ünite olarak yapıştır"
 
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"
@@ -17360,7 +17363,7 @@ msgstr "Bu bağlantı sertifika web görüntüsünü açacak"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "View my {cert_name_short}"
-msgstr "{cert_name_short} serfifikamı göster"
+msgstr "{cert_name_short} sertifikamı göster"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Complete our course feedback survey"
@@ -18318,19 +18321,6 @@ msgstr ""
 #. Translators: This string will not be used in Open edX installations.
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
-"In order to be eligible for edX Financial Assistance, you must demonstrate "
-"that paying the Verified Certificate fee would cause you economic hardship. "
-"To apply, you will be asked to answer a few questions about why you are "
-"applying and how the Verified Certificate will benefit you."
-msgstr ""
-"edX Mali Yardımına uygun olmak için yaşadığınız mali zorluk nedeniyle Onaylı"
-" Sertifika ücretini ödeyemeyecek durumda olduğunuzu göstermeniz gerekiyor. "
-"Başvuru için derse neden başvurduğunuz ve Onaylı Sertifikanın size nasıl "
-"yararlı olacağıyla ilgili birkaç soru cevaplayacaksınız."
-
-#. Translators: This string will not be used in Open edX installations.
-#: lms/templates/financial-assistance/financial-assistance.html
-msgid ""
 "If your application is approved, we'll give you instructions for verifying "
 "your identity on edx.org so you can start working toward completing your edX"
 " course."
@@ -18355,10 +18345,6 @@ msgstr ""
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Sincerely, Anant"
 msgstr "Saygılarımla, Anant"
-
-#: lms/templates/financial-assistance/financial-assistance.html
-msgid "Back to Student FAQs"
-msgstr "Öğrenci Sık Sorulan Soruları'na Geri Dön"
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Apply for Financial Assistance"
@@ -20059,22 +20045,27 @@ msgstr "Derslerim"
 
 #: lms/templates/lti_provider/user-auth-error.html
 msgid "There was an error when loading this module!"
-msgstr ""
+msgstr "Bu modül yüklenirken bir hata oluştu!"
 
 #: lms/templates/lti_provider/user-auth-error.html
 msgid ""
 "This module is available only for users who are signed into {platform}. "
 "Kindly sign in and refresh this page to load the content."
 msgstr ""
+"Bu modül yalnızca {platform} platformunda oturum açan kullanıcılar "
+"tarafından kullanılabilir. İçeriği yüklemek için lütfen oturum açın ve bu "
+"sayfayı yenileyin."
 
 #: lms/templates/lti_provider/user-auth-error.html
 msgid "NOTE:"
-msgstr ""
+msgstr "NOT:"
 
 #: lms/templates/lti_provider/user-auth-error.html
 msgid ""
 "The email used to sign into this platform and {platform} should be the same."
 msgstr ""
+"Bu platformda oturum açmak için kullanılan e-posta adresi ile {platform} "
+"aynı olmalıdır."
 
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
@@ -20643,6 +20634,11 @@ msgstr "Anladım!"
 #: lms/templates/widgets/cookie-consent.html
 msgid "Learn more"
 msgstr "Daha fazlasını öğren"
+
+#: lms/templates/wiki/includes/article_menu.html
+#: wiki/templates/wiki/includes/article_menu.html
+msgid "View"
+msgstr "Görüntüle"
 
 #: lms/templates/wiki/includes/article_menu.html
 msgid "{span_start}(active){span_end}"
@@ -21358,6 +21354,10 @@ msgstr "Canlı Sürümü Görüntüle"
 #: cms/templates/container.html
 msgid "Preview the courseware in the LMS"
 msgstr "LMS'deki ders içeriğini önizle"
+
+#: cms/templates/container.html
+msgid "Collapse All"
+msgstr ""
 
 #: cms/templates/container.html
 msgid "Adding components"
@@ -24330,16 +24330,32 @@ msgstr ""
 "belirleyebilirsiniz."
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Importing components"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
 msgstr "Genişlet veya Daralt"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy to Clipboard"
+msgid "Select this problem"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Tags"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"
 msgstr "Erişimi Yönet"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage tags"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy to Clipboard"
+msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
@@ -24699,6 +24715,10 @@ msgstr "Ders Navigasyonu"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Taslak"
+
+#: cms/templates/widgets/header.html
+msgid "Videos"
+msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

@@ -665,6 +665,14 @@ class TestCourseOutline(CourseTestCase):
         proctored_exam_settings_url = get_proctored_exam_settings_url(self.course.id)
         self.assertContains(response, proctored_exam_settings_url, 2)
 
+    def test_number_of_calls_to_db(self):
+        """
+        Test to check number of queries made to mysql and mongo
+        """
+        with self.assertNumQueries(26, table_ignorelist=WAFFLE_TABLES):
+            with check_mongo_calls(3):
+                self.client.get_html(reverse_course_url('course_handler', self.course.id))
+
 
 class TestCourseReIndex(CourseTestCase):
     """

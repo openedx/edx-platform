@@ -56,9 +56,6 @@ class VideoModelSerializer(serializers.Serializer):
     transcripts = serializers.ListField(
         child=serializers.CharField()
     )
-    usage_locations = serializers.ListField(
-        child=serializers.CharField()
-    )
 
 
 class VideoActiveTranscriptPreferencesSerializer(serializers.Serializer):
@@ -89,6 +86,7 @@ class CourseVideosSerializer(serializers.Serializer):
     video_upload_max_file_size = serializers.CharField()
     video_image_settings = VideoImageSettingsSerializer(required=True, allow_null=False)
     is_video_transcript_enabled = serializers.BooleanField()
+    is_ai_translations_enabled = serializers.BooleanField()
     active_transcript_preferences = VideoActiveTranscriptPreferencesSerializer(required=False, allow_null=True)
     transcript_credentials = serializers.DictField(
         child=serializers.BooleanField()
@@ -98,7 +96,6 @@ class CourseVideosSerializer(serializers.Serializer):
             child=serializers.CharField()
         )
     )
-    # transcript_available_languages = serializers.BooleanField(required=False, allow_null=True)
     video_transcript_settings = VideoTranscriptSettingsSerializer()
     pagination_context = serializers.DictField(
         child=serializers.CharField(),
@@ -110,7 +107,16 @@ class CourseVideosSerializer(serializers.Serializer):
 class VideoUsageSerializer(serializers.Serializer):
     """Serializer for video usage"""
     usage_locations = serializers.ListField(
-        child=serializers.CharField()
+        child=serializers.DictField()
+    )
+
+
+class VideoDownloadSerializer(serializers.Serializer):
+    """Serializer for video downloads"""
+    files = serializers.ListField(
+        child=serializers.DictField(
+            child=serializers.CharField()
+        )
     )
 
 

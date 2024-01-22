@@ -240,9 +240,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         even though the actual stored state in the database will be ``"{}"``).
     """
 
-    # Use this sample rate for DataDog events.
-    API_DATADOG_SAMPLE_RATE = 0.1
-
     class ServiceUnavailable(XBlockUserStateClient.ServiceUnavailable):
         """
         This error is raised if the service backing this client is currently unavailable.
@@ -603,7 +600,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         if scope != Scope.user_state:
             raise ValueError("Only Scope.user_state is supported")
 
-        results = StudentModule.objects.order_by('id').filter(module_state_key=block_key)
+        results = StudentModule.objects.order_by('id').filter(module_state_key=block_key).select_related('student')
         p = Paginator(results, settings.USER_STATE_BATCH_SIZE)
 
         for page_number in p.page_range:

@@ -43,9 +43,9 @@ block_is_unit = is_unit(xblock)
 
 % if not is_root:
     % if is_reorderable:
-    <li class="studio-xblock-wrapper is-draggable" data-locator="${xblock.location}" data-course-key="${xblock.location.course_key}">
+    <li class="studio-xblock-wrapper is-draggable" id="${xblock.location}" data-locator="${xblock.location}" data-course-key="${xblock.location.course_key}">
     % else:
-    <div class="studio-xblock-wrapper" data-locator="${xblock.location}" data-course-key="${xblock.location.course_key}">
+    <div class="studio-xblock-wrapper" id="${xblock.location}" data-locator="${xblock.location}" data-course-key="${xblock.location.course_key}">
     % endif
 
     <section class="wrapper-xblock is-collapsible ${section_class}
@@ -99,6 +99,15 @@ block_is_unit = is_unit(xblock)
             <ul class="actions-list nav-dd ui-right">
                 % if not is_root:
                     % if can_edit:
+                        % if use_tagging and tags_count:
+                            <li class="action-item">
+                                <button data-tooltip="${_("Manage Tags")}" class="btn-default action-button manage-tags-button" data-testid="tag-count-button">
+                                    <span class="icon fa fa-tag" aria-hidden="true"></span>
+                                    <span>${tags_count}</span>
+                                    <span class="sr action-button-text">${_("Manage Tags")}</span>
+                                </button>
+                            </li>
+                        % endif
                         % if not show_inline:
                             <li class="action-item action-edit">
                                 <button class="btn-default edit-button action-button" data-usage-id=${xblock.scope_ids.usage_id}>
@@ -116,6 +125,21 @@ block_is_unit = is_unit(xblock)
                                 <div class="nav-sub">
                                   <ul>
                                     % if not show_inline:
+                                        % if can_edit_visibility:
+                                            <li class="nav-item">
+                                                <a class="access-button" href="#" role="button">${_("Manage Access")}</a>
+                                            </li>
+                                        % endif
+                                        % if can_move:
+                                            <li class="nav-item">
+                                                <a class="move-button" href="#" role="button">${_("Move")}</a>
+                                            </li>
+                                        % endif
+                                        % if use_tagging:
+                                            <li class="nav-item">
+                                                <a class="manage-tags-button" href="#" role="button">${_("Manage Tags")}</a>
+                                            </li>
+                                        % endif
                                         % if is_course:
                                             <!--
                                                 Only show the "Copy to Clipboard" button for xblocks inside courses since
@@ -128,21 +152,6 @@ block_is_unit = is_unit(xblock)
                                         % if can_add:
                                             <li class="nav-item">
                                                 <a class="duplicate-button" href="#" role="button">${_("Duplicate")}</a>
-                                            </li>
-                                        % endif
-                                        % if use_tagging:
-                                            <li class="nav-item">
-                                                <a class="tags-button" href="#" role="button">${_("Manage tags")}</a>
-                                            </li>
-                                        % endif
-                                        % if can_move:
-                                            <li class="nav-item">
-                                                <a class="move-button" href="#" role="button">${_("Move")}</a>
-                                            </li>
-                                        % endif
-                                        % if can_edit_visibility:
-                                            <li class="nav-item">
-                                                <a class="access-button" href="#" role="button">${_("Manage Access")}</a>
                                             </li>
                                         % endif
                                     % endif
