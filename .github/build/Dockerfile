@@ -54,7 +54,7 @@ ADD . /openedx/edx-platform
 
 # Install python requirements (clone source repos in a separate dir, otherwise
 # they will be overwritten when we mount edx-platform)
-# Also update boto from 2.39.0 to 2.40.0 as it has an exception on python3
+# Also update boto from 2.39.0 to 2.49.0 as it has an exception on python3
 # Finally, install a compatibility layer for s3 (VIDEO_TRANSCRIPTS_SETTINGS save has an ASCII error on data)
 ENV NO_PYTHON_UNINSTALL 1
 RUN pip install pip==20.3.4 \
