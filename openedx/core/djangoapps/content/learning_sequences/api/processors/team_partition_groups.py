@@ -29,6 +29,7 @@ class TeamPartitionGroupsOutlineProcessor(OutlineProcessor):
         super().__init__(course_key, user, at_time)
         self.team_groups: Dict[str, Group] = {}
         self.user_group = None
+        self.user_groups = []
 
     def load_data(self, _) -> None:
         """

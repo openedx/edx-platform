@@ -5,14 +5,12 @@ Tests for Course Teams configuration.
 
 import ddt
 from django.test import TestCase
-from edx_toggles.toggles.testutils import override_waffle_flag
 
 from openedx.core.djangoapps.course_groups.flags import CONTENT_GROUPS_FOR_TEAMS
 
 from ..teams_config import TeamsConfig, TeamsetConfig, MANAGED_TEAM_MAX_TEAM_SIZE, DEFAULT_COURSE_RUN_MAX_TEAM_SIZE
 
 
-@override_waffle_flag(CONTENT_GROUPS_FOR_TEAMS, active=False)
 @ddt.ddt
 class TeamsConfigTests(TestCase):
     """

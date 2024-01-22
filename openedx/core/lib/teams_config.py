@@ -8,6 +8,8 @@ from enum import Enum
 
 from django.utils.functional import cached_property
 
+from openedx.core.djangoapps.course_groups.flags import CONTENT_GROUPS_FOR_TEAMS
+
 # "Arbitrarily large" but still limited
 MANAGED_TEAM_MAX_TEAM_SIZE = 200
 # Arbitrarily arbitrary
@@ -224,14 +226,16 @@ class TeamsetConfig:
         """
         JSON-friendly dictionary containing cleaned data from this TeamsConfig.
         """
-        return {
+        cleaned_data = {
             'id': self.teamset_id,
             'name': self.name,
             'description': self.description,
             'max_team_size': self.max_team_size,
             'type': self.teamset_type.value,
-            'dynamic_user_partition_id': self.dynamic_user_partition_id,
         }
+        if CONTENT_GROUPS_FOR_TEAMS.is_enabled(self._data.get('course_id')):
+            cleaned_data['dynamic_user_partition_id'] = self.dynamic_user_partition_id
+        return cleaned_data
 
     @cached_property
     def teamset_id(self):
@@ -295,6 +299,7 @@ class TeamsetConfig:
         falling back to None.
         """
         return self._data.get('dynamic_user_partition_id')
+
 
 class TeamsetType(Enum):
     """

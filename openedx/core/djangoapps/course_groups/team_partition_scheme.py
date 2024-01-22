@@ -18,7 +18,6 @@ from xmodule.services import TeamsConfigurationService
 log = logging.getLogger(__name__)
 
 
-
 class TeamUserPartition(UserPartition):
     """
     Extends UserPartition to support dynamic groups pulled from the current course teams.
@@ -47,6 +46,15 @@ class TeamUserPartition(UserPartition):
 
 
 class TeamPartitionScheme:
+    """
+    Uses course team memberships to map learners into partition groups.
+
+    The scheme is only available if the CONTENT_GROUPS_FOR_TEAMS feature flag is enabled.
+    This is how it works:
+    - A user partition is created for each team-set in the course.
+    - A (Content) group is created for each team in the team-set.
+    - A user is assigned to a group if they are a member of the team.
+    """
 
     @classmethod
     def get_group_for_user(cls, course_key, user, user_partition):
@@ -67,7 +75,7 @@ class TeamPartitionScheme:
         return Group(user_team.team.id, str(user_team.team.name))
 
     @classmethod
-    def create_user_partition(self, id, name, description, groups=None, parameters=None, active=True):
+    def create_user_partition(cls, id, name, description, groups=None, parameters=None, active=True):
         """
         Create a custom UserPartition to support dynamic groups.
 
@@ -97,7 +105,7 @@ class TeamPartitionScheme:
             str(name),
             str(description),
             groups,
-            self,
+            cls,
             parameters,
             active=True,
         )

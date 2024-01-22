@@ -10,11 +10,7 @@ from lms.djangoapps.courseware.masquerade import (
     get_masquerading_user_group,
     is_masquerading_as_specific_student
 )
-from xmodule.partitions.partitions import (  # lint-amnesty, pylint: disable=wrong-import-order
-    Group,
-    NoSuchUserPartitionGroupError,
-    UserPartition
-)
+from xmodule.partitions.partitions import NoSuchUserPartitionGroupError  # lint-amnesty, pylint: disable=wrong-import-order
 from .cohorts import get_cohort, get_group_info_for_cohort
 
 log = logging.getLogger(__name__)
