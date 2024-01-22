@@ -1007,6 +1007,29 @@ class TestEmailChangeMiddleware(TestSafeSessionsLogMixin, TestCase):
         # Assert that mock_set_logged_in_cookies is called
         mock_set_logged_in_cookies.assert_called()
 
+    def test_process_response_no_email_in_session(self):
+        """
+        Calls EmailChangeMiddleware.process_response when user is authenticated and
+        user's email was not stored in user's session.
+        Verify that the user's email is stored in session
+        """
+        # Log in the user
+        self.client.login(email=self.user.email, password=self.PASSWORD)
+        self.request.session = self.client.session
+        self.client.response.set_cookie(settings.SESSION_COOKIE_NAME, 'authenticated')  # Add some logged-in cookie
+
+        # Ensure there is no email in the session
+        self.assertEqual(self.request.session.get('email'), None)
+
+        # Call process_response
+        response = EmailChangeMiddleware(get_response=lambda request: None).process_response(
+            self.request, self.client.response
+        )
+
+        assert response.status_code == 200
+        # Verify that email is set in the session
+        self.assertEqual(self.request.session.get('email'), self.user.email)
+
     @patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": False})
     def test_user_remain_authenticated_on_email_change_in_other_browser_with_toggle_disabled(self):
         """

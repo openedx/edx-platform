@@ -809,11 +809,20 @@ class EmailChangeMiddleware(MiddlewareMixin):
 
     def process_response(self, request, response):
         """
-        Update the logged-in cookies if the email change was requested
+        1. Update the logged-in cookies if the email change was requested
+        2. Store user's email in session if not already
         """
-        if request.user.is_authenticated and request_cache.get_cached_response('email_change_requested').is_found:
-            # Update the JWT cookies with new user email
-            response = set_logged_in_cookies(request, response, request.user)
+        if request.user.is_authenticated:
+            if request.session.get('email', None) is None:
+                # .. custom_attribute_name: session_with_no_email_found
+                # .. custom_attribute_description: Indicates that user's email was not
+                #      stored in the user's session.
+                set_custom_attribute('session_with_no_email_found', True)
+                request.session['email'] = request.user.email
+
+            if request_cache.get_cached_response('email_change_requested').is_found:
+                # Update the JWT cookies with new user email
+                response = set_logged_in_cookies(request, response, request.user)
 
         return response
 
