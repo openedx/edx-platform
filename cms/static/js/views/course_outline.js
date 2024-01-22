@@ -28,15 +28,17 @@ function(
             this.makeContentDraggable(this.el);
             // Show/hide the paste button
             this.initializePasteButton(this.el);
-            //this.renderTagCount();
+            this.renderTagCount();
             return renderResult;
         },
 
         renderTagCount: function() {
             const contentId = this.model.get('id');
+            const tagCountsByUnit = this.model.get('tag_counts_by_unit')
+            const tagsCount = tagCountsByUnit !== undefined ? tagCountsByUnit[contentId] : 0
             var countModel = new TagCountModel({
                 content_id: contentId,
-                tags_count: this.model.get('tag_counts_by_unit')[contentId],
+                tags_count: tagsCount,
                 course_authoring_url: this.model.get('course_authoring_url'),
             }, {parse: true});
             var tagCountView = new TagCountView({el: this.$('.tag-count'), model: countModel});
