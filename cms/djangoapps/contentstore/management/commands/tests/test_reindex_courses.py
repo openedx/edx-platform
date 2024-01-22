@@ -126,8 +126,10 @@ class TestReindexCourse(ModuleStoreTestCase):
                 patched_index.assert_not_called()
 
     def test_given_active_key_prompt(self):
-        """ Test that reindexes all courses when --active key is given """
-
+        """
+            Test that reindexes all active courses when --active key is given
+            Active courses have a start date but no end date, or the end date is in the future.
+        """
         with mock.patch(self.REINDEX_PATH_LOCATION) as patched_index, \
                 mock.patch(self.MODULESTORE_PATCH_LOCATION, mock.Mock(return_value=self.store)):
             call_command('reindex_course', active=True)
