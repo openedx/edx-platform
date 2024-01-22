@@ -15,7 +15,7 @@ from lms.djangoapps.discussion.toggles import ENABLE_REPORTED_CONTENT_NOTIFICATI
 from xmodule.modulestore.django import SignalHandler, modulestore
 
 from lms.djangoapps.discussion import tasks
-from lms.djangoapps.discussion.rest_api.tasks import send_response_notifications, send_thread_created_notification
+from lms.djangoapps.discussion.rest_api.tasks import send_response_notifications, send_thread_created_notification, send_response_endorsed_notification
 from openedx.core.djangoapps.django_comment_common import signals
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_current_site
@@ -178,3 +178,16 @@ def create_comment_created_notification(*args, **kwargs):
     parent_id = comment.attributes['parent_id']
     course_key_str = comment.attributes['course_id']
     send_response_notifications.apply_async(args=[thread_id, course_key_str, user.id, parent_id])
+
+
+@receiver(signals.comment_endorsed)
+def create_response_endorsed_notification(*args, **kwargs):
+    """
+    Creates a notification when new response is endorsed
+    """
+    comment = kwargs['post']
+    comment_author_id = comment.attributes['user_id']
+    thread_id = comment.attributes['thread_id']
+    course_key_str = comment.attributes['course_id']
+
+    send_response_endorsed_notification.apply_async(args=[thread_id, course_key_str, comment_author_id])
