@@ -381,7 +381,7 @@ class CourseMetadata:
             if dynamic_user_partition_id is None:
                 continue
             if dynamic_user_partition_id > MINIMUM_STATIC_PARTITION_ID or \
-                dynamic_user_partition_id < MINIMUM_DYNAMIC_TEAM_PARTITION_ID:
+            dynamic_user_partition_id < MINIMUM_DYNAMIC_TEAM_PARTITION_ID:
                 message = (
                     f"dynamic_user_partition_id must be greater than {str(MINIMUM_DYNAMIC_TEAM_PARTITION_ID)}"
                     f" and less than {str(MINIMUM_STATIC_PARTITION_ID)}."

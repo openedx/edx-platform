@@ -35,6 +35,9 @@ class TeamPartitionGroupsOutlineProcessor(OutlineProcessor):
         """
         Pull team groups for this course and which group the user is in.
         """
+        if not CONTENT_GROUPS_FOR_TEAMS.is_enabled(self.course_key):
+            return
+
         user_partitions = create_team_set_partition_with_course_id(self.course_key)
         self.team_groups = get_user_partition_groups(
             self.course_key,
