@@ -1342,7 +1342,12 @@ CONTEXT_PROCESSORS = [
     'openedx.core.djangoapps.site_configuration.context_processors.configuration_context',
 
     # Mobile App processor (Detects if request is from the mobile app)
-    'lms.djangoapps.mobile_api.context_processor.is_from_mobile_app'
+    'lms.djangoapps.mobile_api.context_processor.is_from_mobile_app',
+
+    # Context processor necesarry for the survey report message appear on the admin site
+    'openedx.features.survey_report.context_processors.admin_extra_context'
+
+
 ]
 
 # Django templating
@@ -1613,7 +1618,6 @@ HOTJAR_SITE_ID = 00000
 ######################## ALGOLIA SEARCH ###########################
 ALGOLIA_APP_ID = None
 ALGOLIA_SEARCH_API_KEY = None
-ALGOLIA_COURSES_RECOMMENDATION_INDEX_NAME = ''
 
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
@@ -4672,6 +4676,19 @@ DATA_CONSENT_SHARE_CACHE_TIMEOUT = 8 * 60 * 60  # 8 hours
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
 ENTERPRISE_TAGLINE = ''
 
+# .. toggle_name: COURSEWARE_COURSE_NOT_STARTED_ENTERPRISE_LEARNER_ERROR
+# .. toggle_implementation: SettingToggle
+# .. toggle_default: False
+# .. toggle_description: If disabled (False), this switch causes the CourseTabView API (or whatever else calls
+#    check_course_open_for_learner()) to always return the legacy `course_not_started` error code in ALL cases where the
+#    course has not started.  If enabled (True), the API will respond with `course_not_started_enterprise_learner` in a
+#    subset of cases where the learner is enrolled via subsidy, and `course_not_started` in all other cases.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-12-18
+# .. toggle_target_removal_date: 2023-12-19
+# .. toggle_tickets: ENT-8078
+COURSEWARE_COURSE_NOT_STARTED_ENTERPRISE_LEARNER_ERROR = False
+
 ############## Settings for Course Enrollment Modes ######################
 # The min_price key refers to the minimum price allowed for an instance
 # of a particular type of course enrollment mode. This is not to be confused
@@ -4815,18 +4832,8 @@ EDX_BRAZE_API_KEY = None
 EDX_BRAZE_API_SERVER = None
 BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
 
-### SETTINGS FOR AMPLITUDE ####
-AMPLITUDE_URL = ''
-AMPLITUDE_API_KEY = ''
-DASHBOARD_AMPLITUDE_RECOMMENDATION_ID = ''
-COURSE_ABOUT_PAGE_AMPLITUDE_RECOMMENDATION_ID = ''
 # Keeping this for back compatibility with learner dashboard api
 GENERAL_RECOMMENDATION = {}
-
-GENERAL_RECOMMENDATIONS = []
-
-### DEFAULT KEY DICTIONARY FOR CROSS_PRODUCT_RECOMMENDATIONS ###
-CROSS_PRODUCT_RECOMMENDATIONS_KEYS = {}
 
 ############### Settings for Retirement #####################
 # .. setting_name: RETIRED_USERNAME_PREFIX

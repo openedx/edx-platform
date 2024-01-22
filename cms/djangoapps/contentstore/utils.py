@@ -14,6 +14,7 @@ from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils import translation
 from django.utils.translation import gettext as _
+from eventtracking import tracker
 from help_tokens.core import HelpUrlExpert
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -37,6 +38,7 @@ from common.djangoapps.student.roles import (
     CourseStaffRole,
     GlobalStaff,
 )
+from common.djangoapps.track import contexts
 from common.djangoapps.util.course import get_link_for_about_page
 from common.djangoapps.util.milestones_helpers import (
     is_prerequisite_courses_enabled,
@@ -1477,44 +1479,17 @@ def get_library_context(request, request_is_json=False):
     return data
 
 
-def get_home_context(request):
+def get_course_context(request):
     """
-    Utils is used to get context of course home.
+    Utils is used to get context of course home library tab.
     It is used for both DRF and django views.
     """
 
     from cms.djangoapps.contentstore.views.course import (
-        get_allowed_organizations,
-        get_allowed_organizations_for_libraries,
         get_courses_accessible_to_user,
-        user_can_create_organizations,
-        _accessible_libraries_iter,
-        _get_course_creator_status,
-        _format_library_for_view,
         _process_courses_list,
         ENABLE_GLOBAL_STAFF_OPTIMIZATION,
     )
-    from cms.djangoapps.contentstore.views.library import (
-        LIBRARY_AUTHORING_MICROFRONTEND_URL,
-        LIBRARIES_ENABLED,
-        should_redirect_to_library_authoring_mfe,
-        user_can_create_library,
-    )
-
-    optimization_enabled = GlobalStaff().has_user(request.user) and ENABLE_GLOBAL_STAFF_OPTIMIZATION.is_enabled()
-
-    org = request.GET.get('org', '') if optimization_enabled else None
-    courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
-    user = request.user
-    libraries = []
-    response_format = get_response_format(request)
-
-    if not split_library_view_on_dashboard() and LIBRARIES_ENABLED:
-        accessible_libraries = _accessible_libraries_iter(user)
-        libraries = [_format_library_for_view(lib, request) for lib in accessible_libraries]
-
-    if split_library_view_on_dashboard() and request_response_format_is_json(request, response_format):
-        libraries = get_library_context(request, True)['libraries']
 
     def format_in_process_course_view(uca):
         """
@@ -1537,9 +1512,52 @@ def get_home_context(request):
             ) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
         }
 
+    optimization_enabled = GlobalStaff().has_user(request.user) and ENABLE_GLOBAL_STAFF_OPTIMIZATION.is_enabled()
+
+    org = request.GET.get('org', '') if optimization_enabled else None
+    courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
     split_archived = settings.FEATURES.get('ENABLE_SEPARATE_ARCHIVED_COURSES', False)
     active_courses, archived_courses = _process_courses_list(courses_iter, in_process_course_actions, split_archived)
     in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
+    return active_courses, archived_courses, in_process_course_actions
+
+
+def get_home_context(request, no_course=False):
+    """
+    Utils is used to get context of course home.
+    It is used for both DRF and django views.
+    """
+
+    from cms.djangoapps.contentstore.views.course import (
+        get_allowed_organizations,
+        get_allowed_organizations_for_libraries,
+        user_can_create_organizations,
+        _accessible_libraries_iter,
+        _get_course_creator_status,
+        _format_library_for_view,
+        ENABLE_GLOBAL_STAFF_OPTIMIZATION,
+    )
+    from cms.djangoapps.contentstore.views.library import (
+        LIBRARY_AUTHORING_MICROFRONTEND_URL,
+        LIBRARIES_ENABLED,
+        should_redirect_to_library_authoring_mfe,
+        user_can_create_library,
+    )
+
+    active_courses = []
+    archived_courses = []
+    in_process_course_actions = []
+
+    optimization_enabled = GlobalStaff().has_user(request.user) and ENABLE_GLOBAL_STAFF_OPTIMIZATION.is_enabled()
+
+    user = request.user
+    libraries = []
+
+    if not no_course:
+        active_courses, archived_courses, in_process_course_actions = get_course_context(request)
+
+    if not split_library_view_on_dashboard() and LIBRARIES_ENABLED and not no_course:
+        libraries = get_library_context(request, True)['libraries']
 
     home_context = {
         'courses': active_courses,
@@ -1679,6 +1697,18 @@ def get_course_videos_context(course_block, pagination_conf, course_key=None):
 
 def get_course_index_context(request, course_key, course_block=None):
     """
+    Wrapper function to wrap _get_course_index_context in bulk operation
+    if course_block is None.
+    """
+    if not course_block:
+        with modulestore().bulk_operations(course_key):
+            course_block = modulestore().get_course(course_key)
+            return _get_course_index_context(request, course_key, course_block)
+    return _get_course_index_context(request, course_key, course_block)
+
+
+def _get_course_index_context(request, course_key, course_block):
+    """
     Utils is used to get context of course index outline.
     It is used for both DRF and django views.
     """
@@ -1689,10 +1719,6 @@ def get_course_index_context(request, course_key, course_block=None):
         _deprecated_blocks_info,
     )
     from openedx.core.djangoapps.content_staging import api as content_staging_api
-
-    if not course_block:
-        with modulestore().bulk_operations(course_key):
-            course_block = modulestore().get_course(course_key)
 
     lms_link = get_lms_link_for_item(course_block.location)
     reindex_link = None
@@ -1779,3 +1805,21 @@ class StudioPermissionsService:
     def can_write(self, course_key):
         """ Does the user have read access to the given course/library? """
         return has_studio_write_access(self._user, course_key)
+
+
+def track_course_update_event(course_key, user, event_data=None):
+    """
+    Track course update event
+    """
+    event_name = 'edx.contentstore.course_update'
+    event_data['course_id'] = str(course_key)
+    event_data['user_id'] = str(user.id)
+    event_data['user_forums_roles'] = [
+        role.name for role in user.roles.filter(course_id=str(course_key))
+    ]
+    event_data['user_course_roles'] = [
+        role.role for role in user.courseaccessrole_set.filter(course_id=str(course_key))
+    ]
+    context = contexts.course_context_from_course_id(course_key)
+    with tracker.get_tracker().context(event_name, context):
+        tracker.emit(event_name, event_data)
