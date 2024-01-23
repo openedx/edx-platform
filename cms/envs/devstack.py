@@ -322,7 +322,6 @@ EVENT_BUS_PRODUCER = 'edx_event_bus_redis.create_producer'
 EVENT_BUS_REDIS_CONNECTION_URL = 'redis://:password@edx.devstack.redis:6379/'
 EVENT_BUS_TOPIC_PREFIX = 'dev'
 EVENT_BUS_CONSUMER = 'edx_event_bus_redis.RedisEventConsumer'
-<<<<<<< HEAD
 
 course_catalog_event_setting = EVENT_BUS_PRODUCER_CONFIG['org.openedx.content_authoring.course.catalog_info.changed.v1']
 course_catalog_event_setting['course-catalog-info-changed']['enabled'] = True
@@ -334,16 +333,9 @@ xblock_deleted_event_setting['course-authoring-xblock-lifecycle']['enabled'] = T
 xblock_duplicated_event_setting = EVENT_BUS_PRODUCER_CONFIG['org.openedx.content_authoring.xblock.duplicated.v1']
 xblock_duplicated_event_setting['course-authoring-xblock-lifecycle']['enabled'] = True
 
-
-=======
 EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC = 'course-authoring-xblock-lifecycle'
 EVENT_BUS_ENROLLMENT_LIFECYCLE_TOPIC = 'course-authoring-enrollment-lifecycle'
-<<<<<<< HEAD
-ENABLE_RAPID_RESPONSE_AUTHOR_VIEW= True or False
->>>>>>> feat: able to render aside only without xblock
-=======
 
->>>>>>> feat: some cleaning
 ################# New settings must go ABOVE this line #################
 ########################################################################
 # See if the developer has any local overrides.

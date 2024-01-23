@@ -7,23 +7,15 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
     'js/views/components/add_xblock', 'js/views/modals/edit_xblock', 'js/views/modals/move_xblock_modal',
     'js/models/xblock_info', 'js/views/xblock_string_field_editor', 'js/views/xblock_access_editor',
     'js/views/pages/container_subviews', 'js/views/unit_outline', 'js/views/utils/xblock_utils',
-<<<<<<< HEAD
     'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
-    'js/views/utils/tagging_drawer_utils', 'js/utils/module',
+    'js/views/utils/tagging_drawer_utils', 'js/utils/module','xblock/runtime.v1',
 ],
 function($, _, Backbone, gettext, BasePage,
     ViewUtils, ContainerView, XBlockView,
     AddXBlockComponent, EditXBlockModal, MoveXBlockModal,
     XBlockInfo, XBlockStringFieldEditor, XBlockAccessEditor,
     ContainerSubviews, UnitOutlineView, XBlockUtils,
-    NotificationView, PromptView, TaggingDrawerUtils, ModuleUtils) {
-=======
-    'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt','xblock/runtime.v1',
-],
-function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView, AddXBlockComponent,
-    EditXBlockModal, MoveXBlockModal, XBlockInfo, XBlockStringFieldEditor, XBlockAccessEditor,
-    ContainerSubviews, UnitOutlineView, XBlockUtils, NotificationView, PromptView, XBlock) {
->>>>>>> feat: able to render aside only without xblock
+    NotificationView, PromptView, TaggingDrawerUtils, ModuleUtils, XBlock) {
     'use strict';
 
     var XBlockContainerPage = BasePage.extend({
@@ -198,18 +190,15 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     if (!self.isLibraryPage && !self.isLibraryContentPage) {
                         self.initializePasteButton();
                     }
-<<<<<<< HEAD
 
                     var targetId = window.location.hash.slice(1);
                     if (targetId) {
                         var target = document.getElementById(targetId);
                         target.scrollIntoView({ behavior: 'smooth', inline: 'center' });
                     }
-=======
                 }
                 // Hide the loading indicator
                 loadingElement.addClass(hiddenCss);
->>>>>>> feat: asides only view working
 
                 },
                 block_added: options && options.block_added
