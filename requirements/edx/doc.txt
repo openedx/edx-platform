@@ -921,7 +921,7 @@ openedx-filters==1.6.0
     # via
     #   -r requirements/edx/base.txt
     #   lti-consumer-xblock
-openedx-learning @ git+https://github.com/openedx/openedx-learning.git@jill/serialize-permissions
+openedx-learning==0.4.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
