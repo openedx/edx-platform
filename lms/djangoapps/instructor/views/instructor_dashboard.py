@@ -28,9 +28,7 @@ from common.djangoapps.course_modes.models import CourseMode, CourseModesArchive
 from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import (
-    CourseFinanceAdminRole,
     CourseInstructorRole,
-    CourseSalesAdminRole,
     CourseStaffRole
 )
 from common.djangoapps.util.json_request import JsonResponse
@@ -44,18 +42,16 @@ from lms.djangoapps.certificates.models import (
     CertificateInvalidation,
     GeneratedCertificate
 )
-from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_studio_url
 from lms.djangoapps.courseware.block_render import get_block_by_usage_id
 from lms.djangoapps.courseware.masquerade import get_masquerade_role
-from lms.djangoapps.discussion.django_comment_client.utils import has_forum_access
 from lms.djangoapps.grades.api import is_writable_gradebook_enabled
 from lms.djangoapps.instructor.constants import INSTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
 from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, get_course_cohorts, is_course_cohorted
 from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
 from openedx.core.djangoapps.discussions.utils import available_division_schemes
-from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
+from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.djangoapps.plugins.constants import ProjectType
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import HTML, Text
@@ -122,42 +118,40 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
 
     # TODO: remove role checks once course_roles is fully implemented and data is migrated
     access = {
+        'data_research': request.user.has_perm(permissions.CAN_RESEARCH, course_key),
         'admin': request.user.is_staff,
-        'instructor': bool(has_access(request.user, 'instructor', course)),
-        'finance_admin': CourseFinanceAdminRole(course_key).has_user(request.user),
-        'sales_admin': CourseSalesAdminRole(course_key).has_user(request.user),
-        'staff': bool(has_access(request.user, 'staff', course)),
-        'forum_admin': (
-            has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR) or
-            request.user.has_perm(CourseRolesPermission.MANAGE_DISCUSSION_MODERATORS.perm_name, course_key)
+        'manage_oras': request.user.has_perm(permissions.MANAGE_ORAS, course_key),
+        'manage_discussions': request.user.has_perm(permissions.MANAGE_DISCUSSIONS, course_key),
+        'manage_students': request.user.has_perm(permissions.MANAGE_STUDENTS, course_key),
+        'manage_membership_limited': request.user.has_perm(
+            permissions.MANAGE_MEMBERSHIP_LIMITED, course_key
         ),
-        'data_researcher': (
-            request.user.has_perm(permissions.CAN_RESEARCH, course_key) or
-            request.user.has_perm(CourseRolesPermission.ACCESS_DATA_DOWNLOADS.perm_name, course_key)
-        ),
+        'manage_membership_full': request.user.has_perm(permissions.MANAGE_MEMBERSHIP_FULL, course_key),
+        'manage_cohorts': request.user.has_perm(permissions.MANAGE_COHORTS, course_key)
     }
 
     if not request.user.has_perm(permissions.VIEW_DASHBOARD, course_key):
         raise Http404()
 
     sections = []
-    if access['staff']:
-        sections_content = [
-            _section_course_info(course, access),
-            _section_membership(course, access),
-            _section_cohort_management(course, access),
-            _section_student_admin(course, access),
-        ]
+    if access['manage_membership_full'] or access['manage_membership_limited']:
+        sections.append(_section_course_info(course, access))
+        sections.append(_section_membership(course, access))
+    if access['manage_cohorts']:
+        sections.append(_section_cohort_management(course, access))
+    # consider this instead: if access['manage_students']:
+    if access['manage_membership_full'] or access['manage_membership_limited']:
+        sections.append(_section_student_admin(course, access))
 
         if legacy_discussion_experience_enabled(course_key):
-            sections_content.append(_section_discussions_management(course, access))
-        sections.extend(sections_content)
+            sections.append(_section_discussions_management(course, access))
 
-    if access['data_researcher']:
+    log.info(f'data_research {access["data_research"]}')
+    if access['data_research']:
         sections.append(_section_data_download(course, access))
 
     analytics_dashboard_message = None
-    if show_analytics_dashboard_message(course_key) and (access['staff'] or access['instructor']):
+    if show_analytics_dashboard_message(course_key) and access['manage_students']:
         # Construct a URL to the external analytics dashboard
         analytics_dashboard_url = f'{settings.ANALYTICS_DASHBOARD_URL}/courses/{str(course_key)}'
         link_start = HTML("<a href=\"{}\" rel=\"noopener\" target=\"_blank\">").format(analytics_dashboard_url)
@@ -183,14 +177,14 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
             str(course_key), len(paid_modes)
         )
 
-    if access['instructor'] and is_enabled_for_course(course_key):
+    if access['manage_membership_full'] and is_enabled_for_course(course_key):
         sections.insert(3, _section_extensions(course))
 
     # Gate access to course email by feature flag & by course-specific authorization
     if (
         is_bulk_email_feature_enabled(course_key) and not
         is_bulk_email_disabled_for_course(course_key) and
-        (access['staff'] or access['instructor'])
+        access['manage_students']
     ):
         sections.append(_section_send_email(course, access))
 
@@ -225,7 +219,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
     openassessment_blocks = [
         block for block in openassessment_blocks if block.parent is not None
     ]
-    if len(openassessment_blocks) > 0 and access['staff']:
+    if len(openassessment_blocks) > 0 and access['manage_oras']:
         sections.append(_section_open_response_assessment(request, course, openassessment_blocks, access))
 
     disable_buttons = not CourseEnrollment.objects.is_small_course(course_key)
@@ -667,7 +661,7 @@ def _section_data_download(course, access):
         ),
         'export_ora2_summary_url': reverse('export_ora2_summary', kwargs={'course_id': str(course_key)}),
     }
-    if not access.get('data_researcher'):
+    if not access.get('data_research'):
         section_data['is_hidden'] = True
     return section_data
 
