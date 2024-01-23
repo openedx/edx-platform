@@ -777,14 +777,9 @@ def is_privileged_user(course_key: CourseKey, user: User):
         FORUM_ROLE_MODERATOR,
         FORUM_ROLE_ADMINISTRATOR,
     ]
+    # TODO: consider switching this to check for a specific discussion permission instead of the role
     has_course_role = Role.user_has_role_for_course(user, course_key, forum_roles)
-    # TODO: remove role checks once course_roles is fully impelented and data is migrated
-    has_moderate_discussion_permissions = user.has_perm(
-        CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.perm_name, course_key
-    ) or user.has_perm(
-        CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.perm_name, course_key
-    )
-    return GlobalStaff().has_user(user) or has_course_role or has_moderate_discussion_permissions
+    return GlobalStaff().has_user(user) or has_course_role
 
 
 class DiscussionBoardFragmentView(EdxFragmentView):
@@ -816,10 +811,8 @@ class DiscussionBoardFragmentView(EdxFragmentView):
         course_key = CourseKey.from_string(course_id)
         # Force using the legacy view if a user profile is requested or the URL contains a specific topic or thread
         force_legacy_view = (profile_page_context or thread_id or discussion_id)
-        # TODO: remove role checks once course_roles is fully impelented and data is migrated
         is_educator_or_staff = (
-            is_course_staff(course_key, request.user) or GlobalStaff().has_user(request.user) or
-            request.user.has_perm(CourseRolesPermission.MANAGE_DISCUSSION_MODERATORS.perm_name, course_key)
+            is_course_staff(course_key, request.user) or GlobalStaff().has_user(request.user)
         )
         try:
             base_context = _create_base_discussion_view_context(request, course_key)

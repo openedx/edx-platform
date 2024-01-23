@@ -127,18 +127,12 @@ def has_discussion_privileges(user, course_id):
     Returns:
       bool
     """
-    # TODO: remove user_ids check once course_roles is fully impelented and data is migrated
+    # TODO: consider switching this to check for a specific discussion permission, instead of the role
     roles = get_role_ids(course_id)
 
     for user_ids in roles.values():
         if user.id in user_ids:
             return True
-    if user.has_perm(
-        CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.perm_name, course_id
-    ) and user.has_perm(
-        CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.perm_name, course_id
-    ):
-        return True
     return False
 
 
