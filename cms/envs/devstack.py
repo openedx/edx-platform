@@ -333,8 +333,6 @@ xblock_deleted_event_setting['course-authoring-xblock-lifecycle']['enabled'] = T
 xblock_duplicated_event_setting = EVENT_BUS_PRODUCER_CONFIG['org.openedx.content_authoring.xblock.duplicated.v1']
 xblock_duplicated_event_setting['course-authoring-xblock-lifecycle']['enabled'] = True
 
-EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC = 'course-authoring-xblock-lifecycle'
-EVENT_BUS_ENROLLMENT_LIFECYCLE_TOPIC = 'course-authoring-enrollment-lifecycle'
 
 ################# New settings must go ABOVE this line #################
 ########################################################################

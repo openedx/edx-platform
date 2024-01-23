@@ -45,11 +45,7 @@ class TestSurveyReportCommands(ModuleStoreTestCase):
         """
         Test that get_unique_courses_offered returns the correct number of courses.
         """
-<<<<<<< HEAD
         course_overview = CourseOverviewFactory.create(id=self.first_course.id, start="2019-01-01", end="9999-01-01")
-=======
-        course_overview = CourseOverviewFactory.create(id=self.first_course.id, start="2019-01-01", end="2025-01-01")
->>>>>>> feat: xblock asides view for rendering in an iframe in MFE
         CourseEnrollmentFactory.create(user=self.user, course_id=course_overview.id)
         CourseEnrollmentFactory.create(user=self.user1, course_id=course_overview.id)
         CourseEnrollmentFactory.create(user=self.user2, course_id=course_overview.id)
