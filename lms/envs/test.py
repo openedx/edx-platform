@@ -664,6 +664,7 @@ MFE_CONFIG_OVERRIDES = {
 SURVEY_REPORT_EXTRA_DATA = {}
 SURVEY_REPORT_ENDPOINT = "https://example.com/survey_report"
 SURVEY_REPORT_CHECK_THRESHOLD = 6
+ENABLE_SURVEY_REPORT = True
 ANONYMOUS_SURVEY_REPORT = False
 
 ######################## Subscriptions API SETTINGS ########################
