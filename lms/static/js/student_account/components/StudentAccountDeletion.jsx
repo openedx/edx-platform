@@ -107,11 +107,9 @@ export class StudentAccountDeletion extends React.Component {
                     <span>{bodyDeletion} </span>
                     <span>{bodyDeletion2}</span>
                 </p>
-                <p
-                    className="account-settings-header-subtitle"
-                    // eslint-disable-next-line react/no-danger
-                    dangerouslySetInnerHTML={{ __html: loseAccessText }}
-                />
+                <p className="account-settings-header-subtitle">
+                    <span>{loseAccessText}</span>
+                </p>
                 <p
                     className="account-settings-header-subtitle-warning"
                     // eslint-disable-next-line react/no-danger
