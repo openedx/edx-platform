@@ -102,13 +102,13 @@ bleach[css]==6.1.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.34.24
+boto3==1.34.25
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.34.24
+botocore==1.34.25
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -1484,7 +1484,7 @@ xblock[django]==1.9.1
     #   xblock-utils
 xblock-drag-and-drop-v2==3.4.0
     # via -r requirements/edx/base.txt
-xblock-google-drive==0.6.0
+xblock-google-drive==0.6.1
     # via -r requirements/edx/base.txt
 xblock-poll==1.13.0
     # via -r requirements/edx/base.txt
