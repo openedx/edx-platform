@@ -79,7 +79,6 @@ backports-zoneinfo[tzdata]==0.2.1
     #   -r requirements/edx/base.txt
     #   backports-zoneinfo
     #   celery
-    #   django
     #   icalendar
     #   kombu
 beautifulsoup4==4.12.2
@@ -224,9 +223,9 @@ deprecated==1.2.14
     # via
     #   -r requirements/edx/base.txt
     #   jwcrypto
-django==4.2.8
+django==3.2.23
     # via
-    #   -c requirements/edx/../constraints.txt
+    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.txt
     #   django-appconf
     #   django-celery-results
@@ -404,7 +403,6 @@ django-ses==3.5.2
     # via -r requirements/edx/base.txt
 django-simple-history==3.4.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   edx-name-affirmation
@@ -1122,6 +1120,7 @@ pytz==2023.3.post1
     # via
     #   -r requirements/edx/base.txt
     #   babel
+    #   django
     #   django-ses
     #   djangorestframework
     #   drf-yasg
