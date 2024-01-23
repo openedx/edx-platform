@@ -582,7 +582,7 @@ edx-drf-extensions==9.1.2
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.10.2
+edx-enterprise==4.10.6
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -991,7 +991,7 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/base.txt
 optimizely-sdk==4.1.1
     # via -r requirements/edx/base.txt
-ora2==6.0.26
+ora2==6.0.28
     # via -r requirements/edx/base.txt
 packaging==23.2
     # via
