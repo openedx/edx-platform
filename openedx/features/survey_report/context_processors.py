@@ -20,19 +20,21 @@ def admin_extra_context(request):
     The current treshhold to show the banner is one month but this can be redefined in the future
 
     """
-    show_survey_report_banner = False
-    months = settings.SURVEY_REPORT_CHECK_THRESHOLD
+    if not settings.ENABLE_SURVEY_REPORT:
+        return {'show_survey_report_banner': False, }
+
     if not request.path.startswith(reverse('admin:index')):
         return {'show_survey_report_banner': False, }
 
+    show_survey_report_banner = False
+    months = settings.SURVEY_REPORT_CHECK_THRESHOLD
+
     try:
         latest_report = SurveyReport.objects.latest('created_at')
-        months_treshhold = datetime.today().date() - relativedelta(months=months)  # Calculate date one month ago
-        threshold = latest_report.created_at.date() <= months_treshhold
-        if threshold and settings.ENABLE_SURVEY_REPORT:
+        months_threshold = datetime.today().date() - relativedelta(months=months)  # Calculate date one month ago
+        if latest_report.created_at.date() <= months_threshold:
             show_survey_report_banner = True
     except SurveyReport.DoesNotExist:
-        if settings.ENABLE_SURVEY_REPORT:
-            show_survey_report_banner = True
+        show_survey_report_banner = True
 
     return {'show_survey_report_banner': show_survey_report_banner, }
