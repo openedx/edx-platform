@@ -107,3 +107,6 @@ openedx-learning==0.4.2
 
 # Open AI version 1.0.0 dropped support for openai.ChatCompletion which is currently in use in enterprise.
 openai<=0.28.1
+
+# Test shards breaking with greater version
+pytest<7.4.4
