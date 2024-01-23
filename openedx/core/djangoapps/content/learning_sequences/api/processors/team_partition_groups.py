@@ -27,9 +27,7 @@ class TeamPartitionGroupsOutlineProcessor(OutlineProcessor):
     """
     def __init__(self, course_key: CourseKey, user: types.User, at_time: datetime):
         super().__init__(course_key, user, at_time)
-        self.team_groups: Dict[str, Group] = {}
-        self.user_group = None
-        self.user_groups: List[int] = []
+        self.current_user_groups: Dict[str, Group] = {}
 
     def load_data(self, _) -> None:
         """
@@ -39,15 +37,12 @@ class TeamPartitionGroupsOutlineProcessor(OutlineProcessor):
             return
 
         user_partitions = create_team_set_partition_with_course_id(self.course_key)
-        self.team_groups = get_user_partition_groups(
+        self.current_user_groups = get_user_partition_groups(
             self.course_key,
             user_partitions,
             self.user,
             partition_dict_key="id",
         )
-        self.user_groups = []
-        for _, group in self.team_groups.items():
-            self.user_groups.append(group.id)
 
     def _is_user_excluded_by_partition_group(self, user_partition_groups):
         """
@@ -63,13 +58,10 @@ class TeamPartitionGroupsOutlineProcessor(OutlineProcessor):
         if not user_partition_groups:
             return False
 
-        if not self.user_groups:
-            return False
-
         for partition_id, groups in user_partition_groups.items():
-            if partition_id not in self.team_groups:
+            if partition_id not in self.current_user_groups:
                 continue
-            if self.team_groups[partition_id].id in groups:
+            if self.current_user_groups[partition_id].id in groups:
                 return False
 
         return True
