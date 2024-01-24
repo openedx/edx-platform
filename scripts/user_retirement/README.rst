@@ -1,13 +1,13 @@
 User Retirement Scripts
 =======================
 
-This directory contains python scripts which are migrated from the `tubular <https://github.com/openedx/tubular/tree/master/scripts>`_ respository. 
+`This <https://github.com/openedx/edx-platform/tree/master/scripts/user_retirement>`_ directory contains python scripts which are migrated from the `tubular <https://github.com/openedx/tubular/tree/master/scripts>`_ respository. 
 These scripts are intended to drive the user retirement workflow which involves handling the deactivation or removal of user accounts as part of the platform's management process.
 
 These scripts could be called from any automation/CD framework.
 
-Getting Started
-===============
+How to run the scripts
+======================
 
 Download the Scripts
 --------------------
@@ -26,7 +26,7 @@ To download the scripts, you can perform a partial clone of the edx-platform rep
     git sparse-checkout set $directory
 
 Create Python Virtual Environment
------------------------------------
+---------------------------------
 
 Create a Python virtual environment using Python 3.8:
 
@@ -36,7 +36,7 @@ Create a Python virtual environment using Python 3.8:
     source venv/bin/activate
 
 Install Pip Packages
----------------------
+--------------------
 
 Install the required pip packages using the provided requirements file:
 
@@ -44,8 +44,32 @@ Install the required pip packages using the provided requirements file:
 
     pip install -r scripts/user_retirement/requirements/base.txt
 
-Run Test Cases
+In-depth Documentation and Configuration Steps
+----------------------------------------------
+
+For in-depth documentation and essential configurations follow these docs
+
+`Documentation <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/user_retire/index.html>`_
+
+`Configuration Docs <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/user_retire/driver_setup.html>`_
+
+Example Script
 --------------
+
+To retire a specific learner, you can use the provided example script:
+
+.. code-block:: bash
+
+    python scripts/user_retirement/retire_one_learner.py \
+    --config_file=src/config.yml \
+    --username=user1
+
+Make sure to replace ``src/config.yml`` with the actual path to your configuration file.
+
+Feel free to customize these steps according to your specific environment and requirements.
+
+Run Test Cases
+==============
 
 Before running test cases, install the testing requirements:
 
@@ -59,26 +83,3 @@ Run the test cases using pytest:
 
     pytest scripts/user_retirement
 
-Comprehensive Documentation and Configuration Steps
-===================================================
-
-For in-depth documentation and essential configurations follow these docs
-
-`Documentation <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/user_retire/index.html#>`_
-
-`Configuration <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/user_retire/driver_setup.html>`_
-
-Example Script
-==============
-
-To retire a specific learner, you can use the provided example script:
-
-.. code-block:: bash
-
-    python scripts/user_retirement/retire_one_learner.py \
-    --config_file=src/config.yml \
-    --username=user1
-
-Make sure to replace ``src/config.yml`` with the actual path to your configuration file.
-
-Feel free to customize these steps according to your specific environment and requirements.
