@@ -313,7 +313,7 @@ class RegistrationFormFactory:
     Construct Registration forms and associated fields.
     """
 
-    DEFAULT_FIELDS = ["email", "name", "username", "password"]
+    DEFAULT_FIELDS = ["email", "first_name", "last_name", "username", "password"]
 
     def _is_field_visible(self, field_name):
         """Check whether a field is visible based on Django settings. """
@@ -331,8 +331,6 @@ class RegistrationFormFactory:
 
         self.EXTRA_FIELDS = [
             "confirm_email",
-            "first_name",
-            "last_name",
             "city",
             "state",
             "country",
@@ -915,9 +913,15 @@ class RegistrationFormFactory:
         # which allows the user to input the First Name
         first_name_label = _("First Name")
 
+        first_name_instructions = _("This name will be used on any certificates that you earn.")
+
         form_desc.add_field(
             "first_name",
             label=first_name_label,
+            instructions=first_name_instructions,
+            restrictions={
+                "max_length": accounts.NAME_MAX_LENGTH,
+            },
             required=required
         )
 
@@ -932,9 +936,15 @@ class RegistrationFormFactory:
         # which allows the user to input the First Name
         last_name_label = _("Last Name")
 
+        last_name_instructions = _("This name will be used on any certificates that you earn.")
+
         form_desc.add_field(
             "last_name",
             label=last_name_label,
+            instructions=last_name_instructions,
+            restrictions={
+                "max_length": accounts.NAME_MAX_LENGTH,
+            },
             required=required
         )
 
