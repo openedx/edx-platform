@@ -406,9 +406,10 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
             subject='Request to change édX account e-mail',
             body_fragments=[
                 'We received a request to change the e-mail associated with',
-                'your édX account from',
-                old_email,
-                new_email,
+                'your édX account from {old_email} to {new_email}.'.format(
+                    old_email=old_email,
+                    new_email=new_email,
+                ),
                 'If this is correct, please confirm your new e-mail address by visiting:',
                 f'http://edx.org/email_confirm/{registration_key}',
                 'Please do not reply to this e-mail; if you require assistance,',
@@ -466,11 +467,13 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
 
         # Text fragments we expect in the body of the confirmation email
         self.email_fragments = [
-            "This is to confirm that you changed the e-mail associated with ",
-            str(settings.PLATFORM_NAME),
-            "If you did not make this request, please contact us immediately. Contact information is listed at:",
-            self.user.email,
-            PendingEmailChange.objects.get(activation_key=self.key).new_email,
+            "This is to confirm that you changed the e-mail associated with {platform_name}"
+            " from {old_email} to {new_email}. If you did not make this request, please contact us immediately."
+            " Contact information is listed at:".format(
+                platform_name=settings.PLATFORM_NAME,
+                old_email=self.user.email,
+                new_email=PendingEmailChange.objects.get(activation_key=self.key).new_email
+            ),
             "We keep a log of old e-mails, so if this request was unintentional, we can investigate."
         ]
 

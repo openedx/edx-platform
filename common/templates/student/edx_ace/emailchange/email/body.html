@@ -3,7 +3,6 @@
 {% load i18n %}
 {% load static %}
 {% block content %}
-{% with old_email='<a href="mailto:'|add:old_email|add:'" style="color: '|add:brand_color|add:';">'|add:old_email|add:'</a>'|safe new_email='<a href="mailto:'|add:new_email|add:'" style="color: '|add:brand_color|add:';">'|add:new_email|add:'</a>'|safe %}
 <table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
     <tr>
         <td>
@@ -32,5 +31,4 @@
         </td>
     </tr>
 </table>
-{% endwith %}
 {% endblock %}
