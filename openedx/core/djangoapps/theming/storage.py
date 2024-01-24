@@ -3,7 +3,7 @@ Comprehensive Theming support for Django's collectstatic functionality.
 See https://docs.djangoproject.com/en/1.8/ref/contrib/staticfiles/
 """
 
-
+import logging
 import os.path
 import posixpath
 import re
