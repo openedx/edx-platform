@@ -16,7 +16,7 @@ define(['jquery', 'underscore', 'js/views/xblock_outline', 'edx-ui-toolkit/js/ut
 function(
     $, _, XBlockOutlineView, StringUtils, ViewUtils, XBlockViewUtils,
     XBlockOutlineInfo, CourseOutlineModalsFactory, ContentDragger, NotificationView, PromptView,
-    TaggingDrawerUtils, TagCountView, TagCountModel,
+    TaggingDrawerUtils, TagCountView, TagCountModel
 ) {
     var CourseOutlineView = XBlockOutlineView.extend({
         // takes XBlockOutlineInfo as a model
