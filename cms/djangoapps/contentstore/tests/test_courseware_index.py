@@ -5,7 +5,7 @@ import json
 import time
 from datetime import datetime
 from unittest import skip
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 import ddt
 import pytest
@@ -585,6 +585,8 @@ class TestLargeCourseDeletions(MixedWithOptionsTestCase):
         self._test_large_course_deletion(self.store)
 
 
+@patch('cms.djangoapps.contentstore.signals.handlers.transaction.on_commit',
+       new=Mock(side_effect=lambda func: func()),)  # run right away
 class TestTaskExecution(SharedModuleStoreTestCase):
     """
     Set of tests to ensure that the task code will do the right thing when
