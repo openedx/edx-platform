@@ -14,7 +14,7 @@ from jenkinsapi.jenkins import Jenkins
 from jenkinsapi.utils.crumb_requester import CrumbRequester
 from requests.exceptions import HTTPError
 
-from .exception import BackendError
+from scripts.user_retirement.utils.exception import BackendError
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 LOG = logging.getLogger(__name__)

@@ -1,5 +1,5 @@
 """
-Common helper methods to use in tubular scripts.
+Common helper methods to use in user retirement scripts.
 """
 # NOTE: Make sure that all non-ascii text written to standard output (including
 # print statements and logging) is manually encoded to bytes using a utf-8 or
@@ -13,13 +13,9 @@ import json
 import sys
 import traceback
 import unicodedata
-from os import path
 
 import yaml
 from six import text_type
-
-# Add top-level module path to sys.path before importing tubular code.
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
 from scripts.user_retirement.utils.edx_api import LmsApi  # pylint: disable=wrong-import-position
 from scripts.user_retirement.utils.edx_api import CredentialsApi, DemographicsApi, EcommerceApi, LicenseManagerApi

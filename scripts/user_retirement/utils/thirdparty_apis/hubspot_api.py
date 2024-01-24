@@ -7,7 +7,7 @@ import os
 import backoff
 import requests
 
-from ..tubular_email import send_email
+from scripts.user_retirement.utils.email_utils import send_email
 
 LOG = logging.getLogger(__name__)
 MAX_ATTEMPTS = int(os.environ.get('RETRY_HUBSPOT_MAX_ATTEMPTS', 5))

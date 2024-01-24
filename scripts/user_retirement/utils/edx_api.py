@@ -10,7 +10,7 @@ from edx_rest_api_client.auth import SuppliedJwtAuth
 from edx_rest_api_client.client import REQUEST_CONNECT_TIMEOUT, REQUEST_READ_TIMEOUT
 from requests.exceptions import ConnectionError, HTTPError, Timeout
 
-from .exception import HttpDoesNotExistException
+from scripts.user_retirement.utils.exception import HttpDoesNotExistException
 
 LOG = logging.getLogger(__name__)
 

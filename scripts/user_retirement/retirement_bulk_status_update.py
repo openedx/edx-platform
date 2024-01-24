@@ -81,7 +81,7 @@ def _update_learners_or_exit(config, learners, new_state=None, rewind_state=Fals
             config['LMS'].update_learner_retirement_state(
                 learner['original_username'],
                 new_state,
-                'Force updated via retirement_bulk_status_update Tubular script',
+                'Force updated via retirement_bulk_status_update script',
                 force=True
             )
     except Exception as exc:  # pylint: disable=broad-except

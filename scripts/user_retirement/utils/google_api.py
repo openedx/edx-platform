@@ -25,7 +25,7 @@ from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaIoBaseUpload, _should_retry_response
 from six import iteritems, text_type
 
-from .utils import batch
+from scripts.user_retirement.utils.utils import batch
 
 LOG = logging.getLogger(__name__)
 

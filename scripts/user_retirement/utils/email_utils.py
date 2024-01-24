@@ -7,8 +7,8 @@ import logging
 import backoff
 import boto3
 
-from .exception import BackendError
-from .utils import envvar_get_int
+from scripts.user_retirement.utils.exception import BackendError
+from scripts.user_retirement.utils.utils import envvar_get_int
 
 LOG = logging.getLogger(__name__)
 
