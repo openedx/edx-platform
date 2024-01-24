@@ -6,7 +6,7 @@ from gettext import GNUTranslations
 
 from completion.test_utils import CompletionWaffleTestMixin
 from django.db import connections, transaction
-from django.test import LiveServerTestCase, TestCase
+from django.test import LiveServerTestCase
 from django.utils.text import slugify
 from organizations.models import Organization
 from rest_framework.test import APIClient
@@ -16,8 +16,6 @@ from lms.djangoapps.courseware.model_data import get_score
 from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.content_libraries.tests.base import (
     BlockstoreAppTestMixin,
-    requires_blockstore,
-    requires_blockstore_app,
     URL_BLOCK_RENDER_VIEW,
     URL_BLOCK_GET_HANDLER_URL,
     URL_BLOCK_METADATA_URL,
@@ -224,14 +222,6 @@ class ContentLibraryRuntimeTestMixin(ContentLibraryContentTestMixin):
         assert xblock_api.get_block_display_name(block_saved) == 'New Display Name'
 
 
-@requires_blockstore
-class ContentLibraryRuntimeBServiceTest(ContentLibraryRuntimeTestMixin, TestCase):
-    """
-    Tests XBlock runtime using XBlocks in a content library using the standalone Blockstore service.
-    """
-
-
-@requires_blockstore_app
 class ContentLibraryRuntimeTest(ContentLibraryRuntimeTestMixin, BlockstoreAppTestMixin, LiveServerTestCase):
     """
     Tests XBlock runtime using XBlocks in a content library using the installed Blockstore app.
@@ -545,14 +535,6 @@ class ContentLibraryXBlockUserStateTestMixin(ContentLibraryContentTestMixin):
         assert 'Submit' not in dummy_public_view.data['content']
 
 
-@requires_blockstore
-class ContentLibraryXBlockUserStateBServiceTest(ContentLibraryXBlockUserStateTestMixin, TestCase):  # type: ignore[misc]
-    """
-    Tests XBlock user state for XBlocks in a content library using the standalone Blockstore service.
-    """
-
-
-@requires_blockstore_app
 class ContentLibraryXBlockUserStateTest(  # type: ignore[misc]
     ContentLibraryXBlockUserStateTestMixin,
     BlockstoreAppTestMixin,
@@ -619,19 +601,6 @@ class ContentLibraryXBlockCompletionTestMixin(ContentLibraryContentTestMixin, Co
         assert get_block_completion_status() == 1
 
 
-@requires_blockstore
-class ContentLibraryXBlockCompletionBServiceTest(
-    ContentLibraryXBlockCompletionTestMixin,
-    CompletionWaffleTestMixin,
-    TestCase,
-):
-    """
-    Test that the Blockstore-based XBlocks can track their completion status
-    using the standalone Blockstore service.
-    """
-
-
-@requires_blockstore_app
 class ContentLibraryXBlockCompletionTest(
     ContentLibraryXBlockCompletionTestMixin,
     CompletionWaffleTestMixin,

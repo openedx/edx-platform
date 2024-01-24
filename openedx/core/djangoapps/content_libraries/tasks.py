@@ -17,7 +17,6 @@ Architecture note:
 from __future__ import annotations
 
 import logging
-import hashlib
 
 from celery import shared_task
 from celery_utils.logged_task import LoggedTask
@@ -28,10 +27,10 @@ from edx_django_utils.monitoring import set_code_owner_attribute, set_code_owner
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import (
     BlockUsageLocator,
-    LibraryUsageLocator,
-    LibraryUsageLocatorV2
+    LibraryLocatorV2,
+    LibraryUsageLocatorV2,
+    LibraryLocator as LibraryLocatorV1
 )
-from search.search_engine_base import SearchEngine
 
 from user_tasks.tasks import UserTask, UserTaskStatus
 from xblock.fields import Scope
@@ -47,6 +46,8 @@ from xmodule.library_root_xblock import LibraryRoot as LibraryRootV1
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.mixed import MixedModuleStore
+from xmodule.modulestore.split_mongo import BlockKey
+from xmodule.util.keys import derive_key
 
 from . import api
 from .models import ContentLibraryBlockImportTask
@@ -57,7 +58,7 @@ TASK_LOGGER = get_task_logger(__name__)
 
 @shared_task(base=LoggedTask)
 @set_code_owner_attribute
-def import_blocks_from_course(import_task_id, course_key_str):
+def import_blocks_from_course(import_task_id, course_key_str, use_course_key_as_block_id_suffix=True):
     """
     A Celery task to import blocks from a course through modulestore.
     """
@@ -74,15 +75,13 @@ def import_blocks_from_course(import_task_id, course_key_str):
                 logger.info('Import block succesful: %s', block_key)
             import_task.save_progress(block_num / block_count)
 
-        edx_client = api.EdxModulestoreImportClient(library=import_task.library)
+        edx_client = api.EdxModulestoreImportClient(
+            library=import_task.library,
+            use_course_key_as_block_id_suffix=use_course_key_as_block_id_suffix
+        )
         edx_client.import_blocks_from_course(
             course_key, on_progress
         )
-
-
-def _normalize_key_for_search(library_key):
-    """ Normalizes library key for use with search indexing """
-    return library_key.replace(version_guid=None, branch=None)
 
 
 def _import_block(store, user_id, source_block, dest_parent_key):
@@ -91,14 +90,22 @@ def _import_block(store, user_id, source_block, dest_parent_key):
     """
     def generate_block_key(source_key, dest_parent_key):
         """
-        Deterministically generate an ID for the new block and return the key
+        Deterministically generate an ID for the new block and return the key.
+        Keys are generated such that they appear identical to a v1 library with
+        the same input block_id, library name, library organization, and parent block using derive_key
         """
-        block_id = (
-            dest_parent_key.block_id[:10] +
-            '-' +
-            hashlib.sha1(str(source_key).encode('utf-8')).hexdigest()[:10]
+        if not isinstance(source_key.lib_key, LibraryLocatorV2):
+            raise TypeError(f"Expected source library key of type LibraryLocatorV2, got {source_key.lib_key} instead.")
+        source_key_as_v1_course_key = LibraryLocatorV1(
+            org=source_key.lib_key.org,
+            library=source_key.lib_key.slug,
+            branch='library'
         )
-        return dest_parent_key.context_key.make_usage_key(source_key.block_type, block_id)
+        derived_block_key = derive_key(
+            source=source_key_as_v1_course_key.make_usage_key(source_key.block_type, source_key.block_id),
+            dest_parent=BlockKey(dest_parent_key.block_type, dest_parent_key.block_id),
+        )
+        return dest_parent_key.context_key.make_usage_key(*derived_block_key)
 
     source_key = source_block.scope_ids.usage_id
     new_block_key = generate_block_key(source_key, dest_parent_key)
@@ -168,21 +175,7 @@ def _filter_child(store, usage_key, capa_type):
 
 def _problem_type_filter(store, library, capa_type):
     """ Filters library children by capa type."""
-    try:
-        search_engine = SearchEngine.get_search_engine(index="library_index")
-    except:  # pylint: disable=bare-except
-        search_engine = None
-    if search_engine:
-        filter_clause = {
-            "library": str(_normalize_key_for_search(library.location.library_key)),
-            "content_type": ProblemBlock.INDEX_CONTENT_TYPE,
-            "problem_types": capa_type
-        }
-        search_result = search_engine.search(field_dictionary=filter_clause)
-        results = search_result.get('results', [])
-        return [LibraryUsageLocator.from_string(item['data']['id']) for item in results]
-    else:
-        return [key for key in library.children if _filter_child(store, key, capa_type)]
+    return [key for key in library.children if _filter_child(store, key, capa_type)]
 
 
 def _import_from_blockstore(user_id, store, dest_block, blockstore_block_ids):
@@ -300,7 +293,13 @@ def duplicate_children(
     # Then, copy over any overridden settings the course author may have applied to the blocks.
     source_block = store.get_item(BlockUsageLocator.from_string(source_block_id))
     with store.bulk_operations(source_block.scope_ids.usage_id.context_key):
-        _copy_overrides(store=store, user_id=user_id, source_block=source_block, dest_block=dest_block)
+        try:
+            TASK_LOGGER.info('Copying Overrides from %s to %s', source_block_id, dest_block_id)
+            _copy_overrides(store=store, user_id=user_id, source_block=source_block, dest_block=dest_block)
+        except Exception as exception:  # pylint: disable=broad-except
+            TASK_LOGGER.exception('Error Copying Overrides from %s to %s', source_block_id, dest_block_id)
+            if self.status.state != UserTaskStatus.FAILED:
+                self.status.fail({'raw_error_msg': str(exception)})
 
 
 def _sync_children(
@@ -373,7 +372,7 @@ def _copy_overrides(
             _copy_overrides(
                 store=store,
                 user_id=user_id,
-                source_block=source_block.runtime.get_block(source_child_key),
-                dest_block=dest_block.runtime.get_block(dest_child_key),
+                source_block=store.get_item(source_child_key),
+                dest_block=store.get_item(dest_child_key),
             )
     store.update_item(dest_block, user_id)
