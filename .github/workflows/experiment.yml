@@ -1,0 +1,21 @@
+name: experiment
+
+on:
+  pull_request:
+
+jobs:
+  run-tests:
+    runs-on: [ edx-platform-runner ]
+    steps:
+      - name: try something
+        run: |
+          hostname
+          echo ========
+          pwd
+          echo ========
+          ls -Al
+          echo ========
+          cat /tmp/calling-card
+          echo ========
+          date > /tmp/calling-card
+          cat /tmp/calling-card
