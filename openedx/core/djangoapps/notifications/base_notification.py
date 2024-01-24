@@ -142,7 +142,7 @@ COURSE_NOTIFICATION_TYPES = {
                               '<{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
             'post_title': 'Post title',
-            'username': 'Post author name',
+            'username': 'Response author name',
         },
         'email_template': '',
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]

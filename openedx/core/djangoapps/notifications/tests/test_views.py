@@ -236,7 +236,8 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                         'new_comment',
                         'new_response',
                         'response_on_followed_post',
-                        'comment_on_followed_post'
+                        'comment_on_followed_post',
+                        'response_endorsed_on_thread'
                     ],
                     'notification_types': {
                         'core': {

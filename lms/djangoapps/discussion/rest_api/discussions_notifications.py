@@ -241,8 +241,7 @@ class DiscussionNotificationSender:
         response on his thread has been endorsed
         """
         context = {
-            "author_name": self.creator.username,
-            "post_title": self.thread.title
+            "username": self.creator.username,
         }
         self._send_notification([self.thread.user_id], "response_endorsed_on_thread", context)
 

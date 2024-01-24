@@ -13,8 +13,11 @@ from openedx_events.learning.signals import USER_NOTIFICATION_REQUESTED, COURSE_
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import StaffFactory, UserFactory
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
-from lms.djangoapps.discussion.rest_api.tasks import send_response_notifications, send_thread_created_notification
-from lms.djangoapps.discussion.rest_api.tests.utils import ThreadMock, make_minimal_cs_thread
+from lms.djangoapps.discussion.rest_api.tasks import (
+    send_response_notifications,
+    send_thread_created_notification,
+    send_response_endorsed_notification)
+from lms.djangoapps.discussion.rest_api.tests.utils import ThreadMock, make_minimal_cs_thread, make_minimal_cs_comment
 from openedx.core.djangoapps.course_groups.models import CohortMembership, CourseCohortsSettings
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.discussions.models import DiscussionTopicLink
@@ -158,6 +161,23 @@ class TestNewThreadCreatedNotification(DiscussionAPIViewTestMixin, ModuleStoreTe
         self.register_get_thread_response(thread)
         return thread
 
+    def _create_response(self, thread_id):
+        """
+        Create a response
+        """
+        response = make_minimal_cs_comment({
+            "id": 2,
+            "thread_id": thread_id,
+            "raw_body": "<p>response</p>",
+            "user_id": str(self.student_role.users.first().id),
+            "username": self.student_role.users.first().username,
+            "course_id": str(self.course.id),
+            "parent_id": None,
+            "endorsed": False,
+        })
+        self.register_get_comment_response(response)
+        return response
+
     def test_basic(self):
         """
         Left empty intentionally. This test case is inherited from DiscussionAPIViewTestMixin
@@ -192,6 +212,33 @@ class TestNewThreadCreatedNotification(DiscussionAPIViewTestMixin, ModuleStoreTe
         assert notification_type == course_notification_data.notification_type
         notification_audience_filters = {}
         assert notification_audience_filters == course_notification_data.audience_filters
+
+    def test_notification_sent_to_thread_author_on_response_endorsement(self):
+        """
+        Test that a notification is sent to the thread author when a response on their thread is endorsed.
+        """
+        self._assign_enrollments()
+        thread = self._create_thread()
+        response = self._create_response(thread_id=thread['id'])
+        handler = mock.Mock()
+        USER_NOTIFICATION_REQUESTED.connect(handler)
+        send_response_endorsed_notification(thread['id'], str(self.course.id), str(self.student_role.users.first().id))
+        self.assertEqual(handler.call_count, 1)
+        notification_data = handler.call_args_list[0][1]['notification_data']
+        self.assertEqual([int(user_id) for user_id in notification_data.user_ids], [int(thread['user_id'])])  # Target only the thread author
+        self.assertEqual(notification_data.notification_type, 'response_endorsed_on_thread')
+
+        expected_context = {
+            'replier_name': response['username'],
+            'post_title': 'Test Title',
+            'course_name': self.course.display_name,
+            'sender_id': int(response['user_id']),
+            'username': response['username'],
+        }
+        self.assertDictEqual(notification_data.context, expected_context)
+        self.assertEqual(notification_data.content_url, _get_mfe_url(self.course.id, thread['id']))
+        self.assertEqual(notification_data.app_name, 'discussion')
+        self.assertEqual('response_endorsed_on_thread', notification_data.notification_type)
 
     @ddt.data(
         ('cohort_1', 'new_question_post'),
@@ -478,6 +525,7 @@ class TestSendCommentNotification(DiscussionAPIViewTestMixin, ModuleStoreTestCas
     """
     Test case to send new_comment notification
     """
+
     def setUp(self):
         super().setUp()
         httpretty.reset()
