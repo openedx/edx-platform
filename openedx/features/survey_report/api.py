@@ -45,6 +45,8 @@ def get_report_data() -> dict:
 
 def generate_report() -> None:
     """ Generate a report with relevant data."""
+    if not settings.ENABLE_SURVEY_REPORT:
+        raise Exception("Survey report generation is not enabled")
     data = {}
     survey_report = SurveyReport(**data)
     survey_report.save()
