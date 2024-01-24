@@ -60,11 +60,11 @@ Run the test cases using pytest:
 Comprehensive Documentation and Configuration Steps
 ===================================================
 
-For in-depth documentation and essential configurations follow these references
+For in-depth documentation and essential configurations follow these docs
 
-`documentation <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/user_retire/index.html#>`_
+`Documentation <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/user_retire/index.html#>`_
 
-`configuration <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/user_retire/driver_setup.html>`_
+`Configuration <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/user_retire/driver_setup.html>`_
 
 Example Script
 ==============

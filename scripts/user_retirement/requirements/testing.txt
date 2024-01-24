@@ -19,11 +19,11 @@ backports-zoneinfo==0.2.1
     #   -r scripts/user_retirement/requirements/base.txt
     #   django
     #   pendulum
-boto3==1.34.23
+boto3==1.34.26
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.34.23
+botocore==1.34.26
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -50,7 +50,7 @@ click==8.1.7
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
-cryptography==41.0.7
+cryptography==42.0.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
@@ -83,7 +83,7 @@ google-api-core==2.15.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
-google-api-python-client==2.114.0
+google-api-python-client==2.115.0
     # via -r scripts/user_retirement/requirements/base.txt
 google-auth==2.26.2
     # via
