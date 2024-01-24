@@ -24,6 +24,9 @@ from openedx.core.djangoapps.theming.helpers import (
 )
 
 
+log = logging.getLogger(__name__)
+
+
 class ThemeMixin:
     """
     Comprehensive theme aware Static files storage.
@@ -285,6 +288,11 @@ class ThemePipelineMixin(PipelineMixin):
 
         super_class = super()
         if hasattr(super_class, 'post_process'):
+            log.info(
+                "Calling super_class.post_process for following paths \n%s\nOptions\n%s",
+                paths.copy(),
+                options
+            )
             yield from super_class.post_process(paths.copy(), dry_run, **options)
 
     @staticmethod
