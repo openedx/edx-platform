@@ -4,6 +4,8 @@ User Retirement Scripts
 This directory contains python scripts which are migrated from the `tubular <https://github.com/openedx/tubular/tree/master/scripts>`_ respository. 
 These scripts are intended to drive the user retirement workflow which involves handling the deactivation or removal of user accounts as part of the platform's management process.
 
+These scripts could be called from any automation/CD framework.
+
 Getting Started
 ===============
 
