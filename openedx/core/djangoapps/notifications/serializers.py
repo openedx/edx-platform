@@ -200,15 +200,11 @@ class UserNotificationChannelPreferenceUpdateSerializer(serializers.Serializer):
         value = validated_data.get('value')
         user_notification_preference_config = instance.notification_preference_config
 
-        for notification_type_name, notification_type_preferences in user_notification_preference_config[
-                notification_app]['notification_types'].items():
-            if notification_type_name not in user_notification_preference_config[notification_app]['non_editable']:
-                user_notification_preference_config[notification_app]['notification_types'][notification_type_name][
-                    notification_channel] = value
-            elif notification_channel not in user_notification_preference_config[notification_app]['non_editable'][
-                    notification_type_name]:
-                user_notification_preference_config[notification_app]['notification_types'][notification_type_name][
-                    notification_channel] = value
+        app_prefs = user_notification_preference_config[notification_app]
+        for notification_type_name, notification_type_preferences in app_prefs['notification_types'].items():
+            non_editable_channels = app_prefs['non_editable'].get(notification_type_name, [])
+            if notification_channel not in non_editable_channels:
+                app_prefs['notification_types'][notification_type_name][notification_channel] = value
 
         instance.save()
         return instance
