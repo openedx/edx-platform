@@ -818,7 +818,14 @@ class EmailChangeMiddleware(MiddlewareMixin):
                 # .. custom_attribute_description: Indicates that user's email was not
                 #      stored in the user's session.
                 set_custom_attribute('session_with_no_email_found', True)
-                request.session['email'] = request.user.email
+
+                # Skip setting user emails in session for specific unit tests. This is necessary
+                # because certain views raise Http404() exceptions, and since Django wraps all
+                # tests in transactions, modifying the session and attempting to save it after
+                # a transaction failure due to Http404() can result in test failures. This is
+                # because errors within a transaction affect subsequent DB operations.
+                if not settings.FEATURES.get('DISABLE_SET_EMAIL_IN_SESSION_FOR_TESTS', False):
+                    request.session['email'] = request.user.email
 
             if request_cache.get_cached_response('email_change_requested').is_found:
                 # Update the JWT cookies with new user email

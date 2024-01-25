@@ -85,6 +85,7 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
         self.update_masquerade(username=self.user.username)
         assert self.client.get(self.url).data['username'] == self.user.username
 
+    @patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_EMAIL_IN_SESSION_FOR_TESTS": True})
     def test_get_unknown_course(self):
         url = reverse('course-home:course-metadata', args=['course-v1:unknown+course+2T2020'])
         # Django TestCase wraps every test in a transaction, so we must specifically wrap this when we expect an error
