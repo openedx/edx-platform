@@ -53,6 +53,16 @@ For in-depth documentation and essential configurations follow these docs
 
 `Configuration Docs <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/user_retire/driver_setup.html>`_
 
+Create entry points
+-------------------
+
+Execute the following shell command to establish entry points for the scripts:
+
+.. code-block:: bash
+
+    chmod +x scripts/user_retirement/entry_points.sh
+
+
 Example Script
 --------------
 
@@ -60,11 +70,11 @@ To retire a specific learner, you can use the provided example script:
 
 .. code-block:: bash
 
-    python scripts/user_retirement/retire_one_learner.py \
+    retire_one_learner.py \
     --config_file=src/config.yml \
     --username=user1
 
-Make sure to replace ``src/config.yml`` with the actual path to your configuration file.
+Make sure to replace ``src/config.yml`` with the actual path to your configuration file and ``user1`` with the actual username.
 
 Feel free to customize these steps according to your specific environment and requirements.
 
