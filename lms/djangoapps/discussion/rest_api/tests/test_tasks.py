@@ -52,6 +52,7 @@ class TestNewThreadCreatedNotification(DiscussionAPIViewTestMixin, ModuleStoreTe
     """
     Test cases related to new_discussion_post and new_question_post notification types
     """
+
     def setUp(self):
         """
         Setup test case
@@ -225,7 +226,8 @@ class TestNewThreadCreatedNotification(DiscussionAPIViewTestMixin, ModuleStoreTe
         send_response_endorsed_notification(thread['id'], str(self.course.id), str(self.student_role.users.first().id))
         self.assertEqual(handler.call_count, 1)
         notification_data = handler.call_args_list[0][1]['notification_data']
-        self.assertEqual([int(user_id) for user_id in notification_data.user_ids], [int(thread['user_id'])])  # Target only the thread author
+        # Target only the thread author
+        self.assertEqual([int(user_id) for user_id in notification_data.user_ids], [int(thread['user_id'])])
         self.assertEqual(notification_data.notification_type, 'response_endorsed_on_thread')
 
         expected_context = {
