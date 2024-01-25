@@ -127,20 +127,31 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
             permissions.MANAGE_MEMBERSHIP_LIMITED, course_key
         ),
         'manage_membership_full': request.user.has_perm(permissions.MANAGE_MEMBERSHIP_FULL, course_key),
-        'manage_cohorts': request.user.has_perm(permissions.MANAGE_COHORTS, course_key)
+        'manage_cohorts': request.user.has_perm(permissions.MANAGE_COHORTS, course_key),
+        'manage_course_info': request.user.has_perm(permissions.MANAGE_COURSE_INFO, course_key),
     }
 
     if not request.user.has_perm(permissions.VIEW_DASHBOARD, course_key):
         raise Http404()
 
     sections = []
-    if access['manage_membership_full'] or access['manage_membership_limited']:
+    if access['manage_course_info']:
         sections.append(_section_course_info(course, access))
+    if (
+        access['manage_membership_full'] or
+        access['manage_membership_limited'] or
+        access['manage_discussions'] or
+        access['manage_students']
+    ):
         sections.append(_section_membership(course, access))
-    if access['manage_cohorts']:
+    if access['manage_cohorts'] or access['manage_students']:
         sections.append(_section_cohort_management(course, access))
     # consider this instead: if access['manage_students']:
-    if access['manage_membership_full'] or access['manage_membership_limited']:
+    if (
+        access['manage_membership_full'] or
+        access['manage_membership_limited'] or
+        access['manage_students']
+    ):
         sections.append(_section_student_admin(course, access))
 
         if legacy_discussion_experience_enabled(course_key):
@@ -177,7 +188,10 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
             str(course_key), len(paid_modes)
         )
 
-    if access['manage_membership_full'] and is_enabled_for_course(course_key):
+    if (
+        access['manage_membership_full'] or
+        access['manage_students']
+    ) and is_enabled_for_course(course_key):
         sections.insert(3, _section_extensions(course))
 
     # Gate access to course email by feature flag & by course-specific authorization
@@ -194,9 +208,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
     # TODO: remove role checks once course_roles is fully implemented and data is migrated
     user_has_access = any([
         request.user.is_staff,
-        CourseStaffRole(course_key).has_user(request.user),
-        CourseInstructorRole(course_key).has_user(request.user),
-        request.user.has_perm(CourseRolesPermission.MANAGE_STUDENTS.perm_name, course_key)
+        access['manage_students']
     ])
     course_has_special_exams = course.enable_proctored_exams or course.enable_timed_exams
     can_see_special_exams = course_has_special_exams and user_has_access and settings.FEATURES.get(
@@ -219,7 +231,9 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
     openassessment_blocks = [
         block for block in openassessment_blocks if block.parent is not None
     ]
-    if len(openassessment_blocks) > 0 and access['manage_oras']:
+    if len(openassessment_blocks) > 0 and (
+        access['manage_oras'] or access['manage_students']
+    ):
         sections.append(_section_open_response_assessment(request, course, openassessment_blocks, access))
 
     disable_buttons = not CourseEnrollment.objects.is_small_course(course_key)
