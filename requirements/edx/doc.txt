@@ -540,7 +540,7 @@ edx-django-utils==5.9.0
     #   openedx-blockstore
     #   ora2
     #   super-csv
-edx-drf-extensions==9.1.2
+edx-drf-extensions==10.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-completion
@@ -556,7 +556,7 @@ edx-enterprise==4.10.9
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-edx-event-bus-kafka==5.5.0
+edx-event-bus-kafka==5.6.0
     # via -r requirements/edx/base.txt
 edx-event-bus-redis==0.3.2
     # via -r requirements/edx/base.txt
@@ -912,7 +912,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.0.3
     # via -r requirements/edx/base.txt
-openedx-events==9.2.0
+openedx-events==9.3.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-event-bus-kafka
@@ -921,7 +921,7 @@ openedx-filters==1.6.0
     # via
     #   -r requirements/edx/base.txt
     #   lti-consumer-xblock
-openedx-learning==0.4.2
+openedx-learning==0.4.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
