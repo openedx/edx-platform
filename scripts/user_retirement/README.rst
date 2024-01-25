@@ -32,8 +32,8 @@ Create a Python virtual environment using Python 3.8:
 
 .. code-block:: bash
 
-    python3.8 -m venv venv
-    source venv/bin/activate
+    python3.8 -m venv ../venv
+    source ../venv/bin/activate
 
 Install Pip Packages
 --------------------
