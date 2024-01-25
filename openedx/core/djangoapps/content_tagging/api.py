@@ -322,6 +322,8 @@ def export_content_object_children_tags(
 
     # Prepare the header for the taxonomies
     # We are using the taxonomy id as the field name to avoid collisions
+    # ToDo: Change name -> export_id after done:
+    # - https://github.com/openedx/modular-learning/issues/183
     for taxonomy_id, name in taxonomies.items():
         header[f"taxonomy_{taxonomy_id}"] = name
 
