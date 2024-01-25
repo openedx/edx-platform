@@ -235,7 +235,7 @@ class DiscussionNotificationSender:
             }
         return {}
 
-    def send_new_response_endorsed_notification(self):
+    def send_new_response_endorsed_on_thread_notification(self):
         """
         Sends a notification to the author of the thread
         response on his thread has been endorsed

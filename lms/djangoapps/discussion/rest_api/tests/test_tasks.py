@@ -16,7 +16,7 @@ from lms.djangoapps.discussion.django_comment_client.tests.factories import Role
 from lms.djangoapps.discussion.rest_api.tasks import (
     send_response_notifications,
     send_thread_created_notification,
-    send_response_endorsed_notification)
+    send_response_endorsed_on_thread_notification)
 from lms.djangoapps.discussion.rest_api.tests.utils import ThreadMock, make_minimal_cs_thread, make_minimal_cs_comment
 from openedx.core.djangoapps.course_groups.models import CohortMembership, CourseCohortsSettings
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
@@ -223,7 +223,7 @@ class TestNewThreadCreatedNotification(DiscussionAPIViewTestMixin, ModuleStoreTe
         response = self._create_response(thread_id=thread['id'])
         handler = mock.Mock()
         USER_NOTIFICATION_REQUESTED.connect(handler)
-        send_response_endorsed_notification(thread['id'], str(self.course.id), str(self.student_role.users.first().id))
+        send_response_endorsed_on_thread_notification(thread['id'], str(self.course.id), str(self.student_role.users.first().id))
         self.assertEqual(handler.call_count, 1)
         notification_data = handler.call_args_list[0][1]['notification_data']
         # Target only the thread author

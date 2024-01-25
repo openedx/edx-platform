@@ -18,7 +18,7 @@ from lms.djangoapps.discussion import tasks
 from lms.djangoapps.discussion.rest_api.tasks import (
     send_response_notifications,
     send_thread_created_notification,
-    send_response_endorsed_notification
+    send_response_endorsed_on_thread_notification
 )
 from openedx.core.djangoapps.django_comment_common import signals
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
@@ -185,7 +185,7 @@ def create_comment_created_notification(*args, **kwargs):
 
 
 @receiver(signals.comment_endorsed)
-def create_response_endorsed_notification(*args, **kwargs):
+def create_response_endorsed_on_thread_notification(*args, **kwargs):
     """
     Creates a notification when new response is endorsed
     """
