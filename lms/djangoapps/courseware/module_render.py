@@ -29,6 +29,7 @@ from edx_django_utils.monitoring import set_custom_attributes_for_course_key, se
 from edx_proctoring.api import get_attempt_status_summary
 from edx_proctoring.services import ProctoringService
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.permissions import JwtRestrictedApplication
 from edx_when.field_data import DateLookupFieldData
 from eventtracking import tracker
 from opaque_keys import InvalidKeyError
@@ -944,12 +945,19 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
                 )
             else:
                 if user_auth_tuple is not None:
-                    request.user, _ = user_auth_tuple
+                    # When using JWT authentication, the second element contains the JWT token. We need it to determine
+                    # whether the application that issued the token is restricted.
+                    request.user, request.auth = user_auth_tuple
+                    # This is verified by the `JwtRestrictedApplication` before it decodes the token.
+                    request.successful_authenticator = authenticator
                     break
 
     # NOTE (CCB): Allow anonymous GET calls (e.g. for transcripts). Modifying this view is simpler than updating
     # the XBlocks to use `handle_xblock_callback_noauth`, which is practically identical to this view.
-    if request.method != 'GET' and not (request.user and request.user.is_authenticated):
+    # Block all request types coming from restricted applications.
+    if (
+        request.method != 'GET' and not (request.user and request.user.is_authenticated)
+    ) or JwtRestrictedApplication().has_permission(request, None):  # type: ignore
         return HttpResponseForbidden('Unauthenticated')
 
     request.user.known = request.user.is_authenticated
