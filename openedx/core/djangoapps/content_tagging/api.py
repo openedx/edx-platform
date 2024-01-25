@@ -3,8 +3,6 @@ Content Tagging APIs
 """
 from __future__ import annotations
 
-from typing import Iterator
-
 import openedx_tagging.core.tagging.api as oel_tagging
 from django.db.models import Q, QuerySet, Exists, OuterRef
 from openedx_tagging.core.tagging.models import Taxonomy
@@ -101,7 +99,7 @@ def get_taxonomies_for_org(
     return oel_tagging.get_taxonomies(enabled=enabled).filter(
         Exists(
             TaxonomyOrg.get_relationships(
-                taxonomy=OuterRef("pk"),
+                taxonomy=OuterRef("pk"),  # type: ignore
                 rel_type=TaxonomyOrg.RelType.OWNER,
                 org_short_name=org_short_name,
             )
@@ -130,7 +128,7 @@ def get_unassigned_taxonomies(enabled=True) -> QuerySet:
 def get_content_tags(
     object_key: ContentKey,
     taxonomy_id: int | None = None,
-) -> Iterator[ContentObjectTag]:
+) -> QuerySet:
     """
     Generates a list of content tags for a given object.
 
@@ -147,7 +145,7 @@ def tag_content_object(
     object_key: ContentKey,
     taxonomy: Taxonomy,
     tags: list,
-) -> Iterator[ContentObjectTag]:
+) -> QuerySet:
     """
     This is the main API to use when you want to add/update/delete tags from a content object (e.g. an XBlock or
     course).
