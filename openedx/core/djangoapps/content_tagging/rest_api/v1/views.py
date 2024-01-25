@@ -1,7 +1,10 @@
 """
 Tagging Org API Views
 """
+from django.db.models.query import QuerySet
+from django.http import HttpResponse
 from openedx_tagging.core.tagging import rules as oel_tagging_rules
+from openedx_tagging.core.tagging.models import ObjectTag
 from openedx_tagging.core.tagging.rest_api.v1.views import ObjectTagView, TaxonomyView
 from rest_framework import status
 from rest_framework.decorators import action
@@ -11,6 +14,7 @@ from rest_framework.response import Response
 
 from ...api import (
     create_taxonomy,
+    export_content_object_children_tags,
     get_taxonomy,
     get_taxonomies,
     get_taxonomies_for_org,
@@ -18,7 +22,12 @@ from ...api import (
     set_taxonomy_orgs,
 )
 from ...rules import get_admin_orgs
-from .serializers import TaxonomyOrgListQueryParamsSerializer, TaxonomyOrgSerializer, TaxonomyUpdateOrgBodySerializer
+from .serializers import (
+    ContentObjectChildrenTagsExportQueryParamsSerializer,
+    TaxonomyOrgListQueryParamsSerializer,
+    TaxonomyOrgSerializer,
+    TaxonomyUpdateOrgBodySerializer,
+)
 from .filters import ObjectTagTaxonomyOrgFilterBackend, UserOrgFilterBackend
 
 
@@ -130,8 +139,57 @@ class TaxonomyOrgView(TaxonomyView):
 class ObjectTagOrgView(ObjectTagView):
     """
     View to create and retrieve ObjectTags for a provided Object ID (object_id).
-    This view extends the ObjectTagView to add Organization filters for the results.
+    This view extends the ObjectTagView to add Organization filters for the results and
+    new actions like: export.
 
     Refer to ObjectTagView docstring for usage details.
     """
     filter_backends = [ObjectTagTaxonomyOrgFilterBackend]
+
+    def get_queryset(self):
+        if self.action == "retrieve":
+            return super().get_queryset()
+
+        # For other actions, return a dummy queryset only for permission checking
+        dummy_queryset = QuerySet(model=ObjectTag)
+
+        return dummy_queryset
+
+    @action(detail=True, url_path="export", methods=["get"])
+    def export_children_object_tags(self, request: Request, **kwargs) -> HttpResponse:
+        """
+        Export all the object tags for the given object_id children.
+        """
+        object_id: str = kwargs.get('object_id', None)
+
+        query_params = ContentObjectChildrenTagsExportQueryParamsSerializer(
+            data=request.query_params.dict()
+        )
+        query_params.is_valid(raise_exception=True)
+
+        # Check if the user has permission to view object tags for this object_id
+        try:
+            if not self.request.user.has_perm(
+                "oel_tagging.view_objecttag",
+                # The obj arg expects a model, but we are passing an object
+                oel_tagging_rules.ObjectTagPermissionItem(taxonomy=None, object_id=object_id),  # type: ignore[arg-type]
+            ):
+                raise PermissionDenied(
+                    "You do not have permission to view object tags for this object_id."
+                )
+        except ValueError as e:
+            raise ValidationError from e
+
+        if query_params.data.get("download"):
+            content_type = "text/csv"
+        else:
+            content_type = "text"
+
+        tags = export_content_object_children_tags(object_id)
+
+        if query_params.data.get("download"):
+            response = HttpResponse(tags.encode('utf-8'), content_type=content_type)
+            response["Content-Disposition"] = f'attachment; filename="{object_id}_tags.csv"'
+            return response
+
+        return HttpResponse(tags, content_type=content_type)

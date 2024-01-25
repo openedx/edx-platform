@@ -4,6 +4,10 @@ from django.test.testcases import TestCase
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx_tagging.core.tagging.models import Tag
 from organizations.models import Organization
+from unittest.mock import patch
+
+from common.djangoapps.student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
 
 from .. import api
 
@@ -248,3 +252,103 @@ class TestAPITaxonomy(TestTaxonomyMixin, TestCase):
             taxonomy=self.taxonomy_both_orgs,
             tags=[self.tag_both_orgs.value],
         )
+
+
+class TaggedCourseMixin(ModuleStoreTestCase):
+    """
+    Mixin with a course structure and taxonomies
+    """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
+    def setUp(self):
+        super().setUp()
+        # Create user
+        self.user = UserFactory.create()
+        self.user_id = self.user.id
+
+        self.orgA = Organization.objects.create(name="Organization A", short_name="orgA")
+        self.taxonomy_1 = api.create_taxonomy(name="Taxonomy 1")
+        api.set_taxonomy_orgs(self.taxonomy_1, all_orgs=True)
+        Tag.objects.create(
+            taxonomy=self.taxonomy_1,
+            value="Tag 1.1",
+        )
+        Tag.objects.create(
+            taxonomy=self.taxonomy_1,
+            value="Tag 1.2",
+        )
+
+        self.taxonomy_2 = api.create_taxonomy(name="Taxonomy 2")
+        api.set_taxonomy_orgs(self.taxonomy_2, all_orgs=True)
+
+        Tag.objects.create(
+            taxonomy=self.taxonomy_2,
+            value="Tag 2.1",
+        )
+        Tag.objects.create(
+            taxonomy=self.taxonomy_2,
+            value="Tag 2.2",
+        )
+
+        self.patcher = patch("openedx.core.djangoapps.content_tagging.tasks.modulestore", return_value=self.store)
+        self.addCleanup(self.patcher.stop)
+        self.patcher.start()
+
+        # Create course
+        self.course = self.store.create_course(
+            self.orgA.short_name,
+            "test_course",
+            "test_run",
+            self.user_id,
+        )
+
+        # Create XBlocks
+        sequential = self.store.create_child(self.user_id, self.course.location, "sequential", "test_sequential")
+        vertical = self.store.create_child(self.user_id, sequential.location, "vertical", "test_vertical1")
+        vertical2 = self.store.create_child(self.user_id, sequential.location, "vertical", "test_vertical2")
+        text = self.store.create_child(self.user_id, vertical2.location, "html", "test_html")
+
+        # Tag blocks
+        api.tag_content_object(
+            object_key=sequential.location,
+            taxonomy=self.taxonomy_1,
+            tags=['Tag 1.1', 'Tag 1.2'],
+        )
+        api.tag_content_object(
+            object_key=sequential.location,
+            taxonomy=self.taxonomy_2,
+            tags=['Tag 2.1'],
+        )
+        api.tag_content_object(
+            object_key=vertical.location,
+            taxonomy=self.taxonomy_2,
+            tags=['Tag 2.2'],
+        )
+        api.tag_content_object(
+            object_key=text.location,
+            taxonomy=self.taxonomy_2,
+            tags=['Tag 2.1'],
+        )
+
+        self.expected_csv = (
+            "Name,Type,ID,Taxonomy 1,Taxonomy 2\r\n"
+            'test sequential,sequential,block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential,'
+            '"Tag 1.1, Tag 1.2",Tag 2.1\r\n'
+            '  test vertical2,vertical,block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical2,,\r\n'
+            '    Text,html,block-v1:orgA+test_course+test_run+type@html+block@test_html,,Tag 2.1\r\n'
+            '  test vertical1,vertical,block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1,'
+            ',Tag 2.2\r\n'
+        )
+
+
+class TestContetTagChildrenExport(TaggedCourseMixin):  # type: ignore[misc]
+    """
+    Test exporting content objects
+    """
+
+    def test_export_tagged_course_children(self):
+        """
+        Test if we can export a course with tagged children
+        """
+        result = api.export_content_object_children_tags(str(self.course.id))
+        assert result == self.expected_csv

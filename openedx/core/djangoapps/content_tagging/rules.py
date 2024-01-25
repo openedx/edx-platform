@@ -257,7 +257,10 @@ def can_view_object_tag_objectid(user: UserType, object_id: str) -> bool:
             raise ValueError("object_id must be from a block or a course")
         course_key = usage_key.course_key
     except InvalidKeyError:
-        course_key = CourseKey.from_string(object_id)
+        try:
+            course_key = CourseKey.from_string(object_id)
+        except InvalidKeyError as e:
+            raise ValueError("object_id must be from a block or a course") from e
 
     return has_studio_read_access(user, course_key)
 

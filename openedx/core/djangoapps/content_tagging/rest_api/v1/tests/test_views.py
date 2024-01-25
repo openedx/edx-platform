@@ -39,12 +39,15 @@ from openedx.core.djangoapps.content_tagging.models import TaxonomyOrg
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.core.lib import blockstore_api
 
+from ....tests.test_api import TaggedCourseMixin
+
 User = get_user_model()
 
 TAXONOMY_ORG_LIST_URL = "/api/content_tagging/v1/taxonomies/"
 TAXONOMY_ORG_DETAIL_URL = "/api/content_tagging/v1/taxonomies/{pk}/"
 TAXONOMY_ORG_UPDATE_ORG_URL = "/api/content_tagging/v1/taxonomies/{pk}/orgs/"
 OBJECT_TAG_UPDATE_URL = "/api/content_tagging/v1/object_tags/{object_id}/?taxonomy={taxonomy_id}"
+OBJECT_TAGS_EXPORT_URL = "/api/content_tagging/v1/object_tags/{object_id}/export/"
 OBJECT_TAGS_URL = "/api/content_tagging/v1/object_tags/{object_id}/"
 TAXONOMY_TEMPLATE_URL = "/api/content_tagging/v1/taxonomies/import/{filename}"
 TAXONOMY_CREATE_IMPORT_URL = "/api/content_tagging/v1/taxonomies/import/"
@@ -1626,6 +1629,63 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
 
 @skip_unless_cms
 @ddt.ddt
+class TestContentObjectChildrenExportView(TaggedCourseMixin, APITestCase):  # type: ignore[misc]
+    """
+    Tests exporting course children with tags
+    """
+    def setUp(self):
+        super().setUp()
+        self.user = User.objects.create(
+            username="user",
+            email="user@example.com",
+        )
+        self.staff = User.objects.create(
+            username="staff",
+            email="staff@example.com",
+            is_staff=True,
+        )
+
+        self.staffA = User.objects.create(
+            username="staffA",
+            email="userA@example.com",
+        )
+        update_org_role(self.staff, OrgStaffRole, self.staffA, [self.orgA.short_name])
+
+    @ddt.data(
+        "staff",
+        "staffA",
+    )
+    def test_export_course(self, user_attr) -> None:
+        url = OBJECT_TAGS_EXPORT_URL.format(object_id=str(self.course.id))
+
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.headers['Content-Type'] == 'text'
+        assert int(response.headers['Content-Length']) > 0
+        assert response.content == self.expected_csv.encode("utf-8")
+
+    def test_export_course_anoymous_unauthorized(self) -> None:
+        url = OBJECT_TAGS_EXPORT_URL.format(object_id=str(self.course.id))
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_export_course_user_forbidden(self) -> None:
+        url = OBJECT_TAGS_EXPORT_URL.format(object_id=str(self.course.id))
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_export_course_invalid_id(self) -> None:
+        url = OBJECT_TAGS_EXPORT_URL.format(object_id="invalid")
+        self.client.force_authenticate(user=self.staff)
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@skip_unless_cms
+@ddt.ddt
 class TestDownloadTemplateView(APITestCase):
     """
     Tests the taxonomy template downloads.
@@ -1635,7 +1695,7 @@ class TestDownloadTemplateView(APITestCase):
         ("template.json", "application/json"),
     )
     @ddt.unpack
-    def test_download(self, filename, content_type):
+    def test_download(self, filename, content_type) -> None:
         url = TAXONOMY_TEMPLATE_URL.format(filename=filename)
         response = self.client.get(url)
         assert response.status_code == status.HTTP_200_OK
@@ -1643,12 +1703,12 @@ class TestDownloadTemplateView(APITestCase):
         assert response.headers['Content-Disposition'] == f'attachment; filename="{filename}"'
         assert int(response.headers['Content-Length']) > 0
 
-    def test_download_not_found(self):
+    def test_download_not_found(self) -> None:
         url = TAXONOMY_TEMPLATE_URL.format(filename="template.txt")
         response = self.client.get(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_download_method_not_allowed(self):
+    def test_download_method_not_allowed(self) -> None:
         url = TAXONOMY_TEMPLATE_URL.format(filename="template.txt")
         response = self.client.post(url)
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
