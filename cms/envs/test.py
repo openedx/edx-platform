@@ -223,13 +223,6 @@ CMS_SEGMENT_KEY = None
 
 FEATURES['DISABLE_SET_JWT_COOKIES_FOR_TESTS'] = True
 
-# Skip setting user emails in session for specific unit tests. This is necessary
-# because certain views raise Http404() exceptions, and since Django wraps all
-# tests in transactions, modifying the session and attempting to save it after
-# a transaction failure due to Http404() can result in test failures. This is
-# because errors within a transaction affect subsequent DB operations.
-FEATURES['DISABLE_SET_EMAIL_IN_SESSION_FOR_TESTS'] = False
-
 FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 # Toggles embargo on for testing
