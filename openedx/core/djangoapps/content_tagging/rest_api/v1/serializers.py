@@ -101,7 +101,7 @@ class TaxonomyOrgSerializer(TaxonomySerializer):
         read_only_fields = ["orgs", "all_orgs"]
 
 
-class ContentObjectChildrenTagsExportQueryParamsSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+class ExportContentTagsQueryParamsSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Serializer for the query params for the export objecttags GET view
     """

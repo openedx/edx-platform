@@ -23,7 +23,7 @@ from ...api import (
 )
 from ...rules import get_admin_orgs
 from .serializers import (
-    ContentObjectChildrenTagsExportQueryParamsSerializer,
+    ExportContentTagsQueryParamsSerializer,
     TaxonomyOrgListQueryParamsSerializer,
     TaxonomyOrgSerializer,
     TaxonomyUpdateOrgBodySerializer,
@@ -162,7 +162,7 @@ class ObjectTagOrgView(ObjectTagView):
         """
         object_id: str = kwargs.get('object_id', None)
 
-        query_params = ContentObjectChildrenTagsExportQueryParamsSerializer(
+        query_params = ExportContentTagsQueryParamsSerializer(
             data=request.query_params.dict()
         )
         query_params.is_valid(raise_exception=True)
