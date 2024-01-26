@@ -1662,7 +1662,7 @@ class TestContentObjectChildrenExportView(TaggedCourseMixin, APITestCase):  # ty
         self.client.force_authenticate(user=user)
         response = self.client.get(url)
         assert response.status_code == status.HTTP_200_OK
-        assert response.headers['Content-Type'] == 'text'
+        assert response.headers['Content-Type'] == 'text/csv'
         assert int(response.headers['Content-Length']) > 0
         assert response.content == self.expected_csv.encode("utf-8")
 

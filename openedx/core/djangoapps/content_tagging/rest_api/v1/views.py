@@ -23,7 +23,6 @@ from ...api import (
 )
 from ...rules import get_admin_orgs
 from .serializers import (
-    ExportContentTagsQueryParamsSerializer,
     TaxonomyOrgListQueryParamsSerializer,
     TaxonomyOrgSerializer,
     TaxonomyUpdateOrgBodySerializer,
@@ -162,11 +161,6 @@ class ObjectTagOrgView(ObjectTagView):
         """
         object_id: str = kwargs.get('object_id', None)
 
-        query_params = ExportContentTagsQueryParamsSerializer(
-            data=request.query_params.dict()
-        )
-        query_params.is_valid(raise_exception=True)
-
         # Check if the user has permission to view object tags for this object_id
         try:
             if not self.request.user.has_perm(
@@ -180,16 +174,8 @@ class ObjectTagOrgView(ObjectTagView):
         except ValueError as e:
             raise ValidationError from e
 
-        if query_params.data.get("download"):
-            content_type = "text/csv"
-        else:
-            content_type = "text"
-
         tags = export_content_object_children_tags(object_id)
 
-        if query_params.data.get("download"):
-            response = HttpResponse(tags.encode('utf-8'), content_type=content_type)
-            response["Content-Disposition"] = f'attachment; filename="{object_id}_tags.csv"'
-            return response
-
-        return HttpResponse(tags, content_type=content_type)
+        response = HttpResponse(tags.encode('utf-8'), content_type="text/csv")
+        response["Content-Disposition"] = f'attachment; filename="{object_id}_tags.csv"'
+        return response
