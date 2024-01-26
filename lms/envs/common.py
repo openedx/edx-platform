@@ -5455,3 +5455,26 @@ derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.cert
 derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.certificate.revoked.v1',
                          'learning-certificate-lifecycle', 'enabled')
 BEAMER_PRODUCT_ID = ""
+
+#### Survey Report ####
+# .. setting_name: ENABLE_SURVEY_REPORT
+# .. setting_default: True
+# .. setting_description: Set to True to enable the feature to generate and send survey reports.
+ENABLE_SURVEY_REPORT = os.environ.get('ENABLE_SURVEY_REPORT', True)
+# .. setting_name: SURVEY_REPORT_ENDPOINT
+# .. setting_default: Open edX organization endpoint
+# .. setting_description: Endpoint where the report will be sent.
+SURVEY_REPORT_ENDPOINT = os.environ.get('SURVEY_REPORT_ENDPOINT',
+                                        'https://hooks.zapier.com/hooks/catch/11595998/3ouwv7m/')
+# .. setting_name: ANONYMOUS_SURVEY_REPORT
+# .. setting_default: no anonymous
+# .. setting_description: Send UUID as ID instead of use lms site name.
+ANONYMOUS_SURVEY_REPORT = os.environ.get('ANONYMOUS_SURVEY_REPORT', False)
+# .. setting_name: SURVEY_REPORT_CHECK_THRESHOLD
+# .. setting_default: every 6 months
+# .. setting_description: Survey report banner will appear if a survey report is not sent in the months defined.
+SURVEY_REPORT_CHECK_THRESHOLD = os.environ.get('SURVEY_REPORT_CHECK_THRESHOLD', 6)
+# .. setting_name: SURVEY_REPORT_EXTRA_DATA
+# .. setting_default: empty dictionary
+# .. setting_description: Dictionary with additional information that you want to share in the report.
+SURVEY_REPORT_EXTRA_DATA = os.environ.get('SURVEY_REPORT_EXTRA_DATA', {})

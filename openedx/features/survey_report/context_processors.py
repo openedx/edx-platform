@@ -1,40 +1,34 @@
-"""
-This is the survey report contex_processor modules
-
-This is meant to determine the visibility of the survey report banner
-across all admin pages in case a survey report has not been generated
-
-"""
-
-from datetime import datetime
-from dateutil.relativedelta import relativedelta  # for months test
-from .models import SurveyReport
-from django.urls import reverse
 from django.conf import settings
-
+from django.urls import reverse
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from django.shortcuts import get_object_or_404
+from .models import SurveyReport
 
 def admin_extra_context(request):
     """
-    This function sends extra context to every admin site
-
-    The current treshhold to show the banner is one month but this can be redefined in the future
-
+    This function sends extra context to every admin site.
+    The current threshold to show the banner is one month but this can be redefined in the future.
     """
-    if not settings.ENABLE_SURVEY_REPORT:
-        return {'show_survey_report_banner': False, }
+    if not settings.ENABLE_SURVEY_REPORT or not request.path.startswith(reverse('admin:index')):
+        return {'show_survey_report_banner': False}
 
-    if not request.path.startswith(reverse('admin:index')):
-        return {'show_survey_report_banner': False, }
+    return {'show_survey_report_banner': should_show_survey_report_banner()}
 
-    show_survey_report_banner = False
-    months = settings.SURVEY_REPORT_CHECK_THRESHOLD
+def should_show_survey_report_banner():
+    """
+    Determine whether to show the survey report banner based on the threshold.
+    """
+    months_threshold = get_months_threshold(settings.SURVEY_REPORT_CHECK_THRESHOLD)
 
     try:
         latest_report = SurveyReport.objects.latest('created_at')
-        months_threshold = datetime.today().date() - relativedelta(months=months)  # Calculate date one month ago
-        if latest_report.created_at.date() <= months_threshold:
-            show_survey_report_banner = True
+        return latest_report.created_at.date() <= months_threshold
     except SurveyReport.DoesNotExist:
-        show_survey_report_banner = True
+        return True
 
-    return {'show_survey_report_banner': show_survey_report_banner, }
+def get_months_threshold(months):
+    """
+    Calculate the date threshold based on the specified number of months.
+    """
+    return datetime.today().date() - relativedelta(months=months)
