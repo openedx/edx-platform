@@ -1666,10 +1666,10 @@ class TestContentObjectChildrenExportView(TaggedCourseMixin, APITestCase):  # ty
         assert int(response.headers['Content-Length']) > 0
         assert response.content == self.expected_csv.encode("utf-8")
 
-    def test_export_course_anoymous_unauthorized(self) -> None:
+    def test_export_course_anoymous_forbidden(self) -> None:
         url = OBJECT_TAGS_EXPORT_URL.format(object_id=str(self.course.id))
         response = self.client.get(url)
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_export_course_user_forbidden(self) -> None:
         url = OBJECT_TAGS_EXPORT_URL.format(object_id=str(self.course.id))

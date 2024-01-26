@@ -11,6 +11,7 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from ...api import (
     create_taxonomy,
@@ -145,20 +146,12 @@ class ObjectTagOrgView(ObjectTagView):
     """
     filter_backends = [ObjectTagTaxonomyOrgFilterBackend]
 
-    def get_queryset(self):
-        if self.action == "retrieve":
-            return super().get_queryset()
 
-        # For other actions, return a dummy queryset only for permission checking
-        dummy_queryset = QuerySet(model=ObjectTag)
-
-        return dummy_queryset
-
-    @action(detail=True, url_path="export", methods=["get"])
-    def export_children_object_tags(self, request: Request, **kwargs) -> HttpResponse:
-        """
-        Export all the object tags for the given object_id children.
-        """
+class ObjectTagExportView(APIView):
+    """"
+    Export a CSV with all children and tags for a given object_id.
+    """
+    def get(self, request: Request, **kwargs) -> HttpResponse:
         object_id: str = kwargs.get('object_id', None)
 
         # Check if the user has permission to view object tags for this object_id

@@ -30,5 +30,9 @@ urlpatterns = [
         oel_tagging_views_import.TemplateView.as_view(),
         name="taxonomy-import-template",
     ),
+    path(
+        "object_tags/<str:object_id>/export/",
+        views.ObjectTagExportView.as_view(),
+    ),
     path('', include(router.urls))
 ]
