@@ -112,4 +112,4 @@ openai<=0.28.1
 # common/djangoapps/third_party_auth/tests/test_views.py::SAMLMetadataTest::test_secure_key_configuration
 # needs to be fixed in the follow up issue 
 # https://github.com/openedx/edx-platform/issues/34103
-optimizely-sdk==4.1.1
+optimizely-sdk<5.0
