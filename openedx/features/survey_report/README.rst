@@ -65,7 +65,7 @@ You have the following settings to customize the behavior of your reports.
 
 - ``ANONYMOUS_SURVEY_REPORT``: This is a boolean to specify if you want to use your LMS domain as ID for your report or to send the information anonymously with a UUID. By default, this setting is False.
 
-- ``ENABLE_SURVEY_REPORT``: This is a boolean to specify if you want to enable or disable the survey report feature completly. The banner will dissapear and the report generation will be disabled if set to False. By default, this setting is True.
+- ``ENABLE_SURVEY_REPORT``: This is a boolean to specify if you want to enable or disable the survey report feature completely. The banner will disappear and the report generation will be disabled if set to False. By default, this setting is True.
 
 About the Survey Report Admin Banner
 -------------------------------------
