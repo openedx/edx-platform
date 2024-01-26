@@ -147,6 +147,19 @@ COURSE_NOTIFICATION_TYPES = {
         'email_template': '',
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
+    'response_endorsed': {
+        'notification_app': 'discussion',
+        'name': 'response_endorsed',
+        'is_core': True,
+        'info': '',
+        'non_editable': [],
+        'content_template': _('<{p}><Your response has been endorsed <{strong}>{post_title}</{strong}></{p}>'),
+        'content_context': {
+            'post_title': 'Post title',
+        },
+        'email_template': '',
+        'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
+    }
 }
 
 COURSE_NOTIFICATION_APPS = {

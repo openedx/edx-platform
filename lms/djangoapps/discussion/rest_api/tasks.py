@@ -51,9 +51,9 @@ def send_response_notifications(thread_id, course_key_str, user_id, parent_id=No
 
 @shared_task
 @set_code_owner_attribute
-def send_response_endorsed_on_thread_notification(thread_id, course_key_str, comment_author_id):
+def send_response_endorsed_notifications(thread_id, course_key_str, comment_author_id):
     """
-    Send notification when a response is marked answered/ endorsed
+    Send notifications when a response is marked answered/ endorsed
     """
     course_key = CourseKey.from_string(course_key_str)
     if not ENABLE_NOTIFICATIONS.is_enabled(course_key):
@@ -62,4 +62,7 @@ def send_response_endorsed_on_thread_notification(thread_id, course_key_str, com
     comment_author = User.objects.get(id=comment_author_id)
     course = get_course_with_access(comment_author, 'load', course_key, check_if_enrolled=True)
     notification_sender = DiscussionNotificationSender(thread, course, comment_author)
-    notification_sender.send_new_response_endorsed_on_thread_notification()
+    #sends notification to author of thread
+    notification_sender.send_response_endorsed_on_thread_notification()
+    #sends notification to author of response
+    notification_sender.send_response_endorsed_notification()
