@@ -237,7 +237,8 @@ def export_content_object_children_tags(
         }
         """
         block_id_prefix = str(course_key).replace("course-v1:", "block-v1:", 1)
-        block_tags_records = ObjectTag.objects.filter(object_id__startswith=block_id_prefix).all()
+        block_tags_records = ObjectTag.objects.filter(object_id__startswith=block_id_prefix) \
+            .select_related("tag__taxonomy").all()
 
         result: dict[str, dict[int, list[str]]] = {}
         taxonomies: dict[int, str] = {}
