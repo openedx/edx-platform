@@ -113,3 +113,7 @@ openai<=0.28.1
 # needs to be fixed in the follow up issue 
 # https://github.com/openedx/edx-platform/issues/34103
 optimizely-sdk<5.0
+
+# lxml 5.1.0 introduced a breaking change in unit test shards
+# This constraint can probably be removed once lxml==5.1.1 is released on PyPI
+lxml<5.0
