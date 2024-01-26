@@ -671,7 +671,7 @@ loremipsum==1.0.5
     # via ora2
 lti-consumer-xblock==9.8.3
     # via -r requirements/edx/kernel.in
-lxml==5.1.0
+lxml==4.9.3
     # via
     #   -r requirements/edx/kernel.in
     #   edx-i18n-tools
