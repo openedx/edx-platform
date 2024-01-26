@@ -1322,6 +1322,7 @@ openedx-mongodbproxy==0.2.0
     #   -r requirements/edx/testing.txt
 optimizely-sdk==4.1.1
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
 ora2==6.0.29
