@@ -824,7 +824,7 @@ edx-search==3.8.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-sga==0.23.0
+edx-sga==0.23.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1134,8 +1134,9 @@ lti-consumer-xblock==9.8.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-lxml==4.9.3
+lxml==4.9.4
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-i18n-tools

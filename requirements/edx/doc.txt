@@ -602,7 +602,7 @@ edx-rest-api-client==5.6.1
     #   edx-proctoring
 edx-search==3.8.2
     # via -r requirements/edx/base.txt
-edx-sga==0.23.0
+edx-sga==0.23.1
     # via -r requirements/edx/base.txt
 edx-submissions==3.6.0
     # via
@@ -798,8 +798,9 @@ loremipsum==1.0.5
     #   ora2
 lti-consumer-xblock==9.8.3
     # via -r requirements/edx/base.txt
-lxml==4.9.3
+lxml==4.9.4
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-i18n-tools
     #   edxval
