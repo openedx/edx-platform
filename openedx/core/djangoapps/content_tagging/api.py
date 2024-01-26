@@ -248,8 +248,7 @@ def export_content_object_children_tags(
             for taxonomy_id, taxonomy_tags in groupby(block_tags, lambda x: x.tag.taxonomy_id):
                 object_tag_list = list(taxonomy_tags)
                 result[object_id][taxonomy_id] = [
-                    # If the tag is not found (deleted or freeText), use the objecttag._name instead
-                    objecttag.tag.value if objecttag.tag else objecttag.name
+                    objecttag.value
                     for objecttag in object_tag_list
                 ]
 
