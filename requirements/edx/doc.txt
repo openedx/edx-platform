@@ -391,7 +391,7 @@ django-object-actions==4.2.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-django-pipeline==2.1.0
+django-pipeline==3.0.0
     # via -r requirements/edx/base.txt
 django-ratelimit==4.1.0
     # via -r requirements/edx/base.txt
