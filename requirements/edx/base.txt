@@ -174,7 +174,7 @@ defusedxml==0.7.1
     #   social-auth-core
 deprecated==1.2.14
     # via jwcrypto
-django==4.2.8
+django==4.2.9
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
