@@ -988,7 +988,9 @@ openedx-learning==0.4.4
 openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/base.txt
 optimizely-sdk==4.1.1
-    # via -r requirements/edx/base.txt
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/base.txt
 ora2==6.0.29
     # via -r requirements/edx/base.txt
 packaging==23.2
