@@ -98,4 +98,10 @@ class TaxonomyOrgSerializer(TaxonomySerializer):
     class Meta:
         model = TaxonomySerializer.Meta.model
         fields = TaxonomySerializer.Meta.fields + ["orgs", "all_orgs"]
-        read_only_fields = ["orgs", "all_orgs"]
+
+
+class ExportContentTagsQueryParamsSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+    """
+    Serializer for the query params for the export objecttags GET view
+    """
+    include_children = serializers.BooleanField(required=False, default=True)

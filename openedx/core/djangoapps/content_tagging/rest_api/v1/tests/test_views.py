@@ -4,8 +4,9 @@ Tests tagging rest api views
 
 from __future__ import annotations
 
-from urllib.parse import parse_qs, urlparse
 import json
+from io import BytesIO
+from urllib.parse import parse_qs, urlparse
 from unittest.mock import MagicMock
 
 import abc
@@ -1663,8 +1664,36 @@ class TestContentObjectChildrenExportView(TaggedCourseMixin, APITestCase):  # ty
         response = self.client.get(url)
         assert response.status_code == status.HTTP_200_OK
         assert response.headers['Content-Type'] == 'text/csv'
-        assert int(response.headers['Content-Length']) > 0
-        assert response.content == self.expected_csv.encode("utf-8")
+
+        expected_csv = (
+            "Name,Type,ID,Taxonomy 1,Taxonomy 2\r\n"
+            'Test Course,course,course-v1:orgA+test_course+test_run,Tag 1.1,\r\n'
+            '  test sequential,sequential,block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential,'
+            '"Tag 1.1, Tag 1.2",Tag 2.1\r\n'
+            '    test vertical1,vertical,block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1,'
+            ',Tag 2.2\r\n'
+            '    test vertical2,vertical,block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical2,,\r\n'
+            '      Text,html,block-v1:orgA+test_course+test_run+type@html+block@test_html,,Tag 2.1\r\n'
+        )
+
+        zip_content = BytesIO(b"".join(response.streaming_content)).getvalue()  # type: ignore[attr-defined]
+        assert zip_content == expected_csv.encode()
+
+    def test_export_course_no_children(self) -> None:
+        url = OBJECT_TAGS_EXPORT_URL.format(object_id=str(self.course.id))
+
+        self.client.force_authenticate(user=self.staff)
+        response = self.client.get(url, {"include_children": False})
+        assert response.status_code == status.HTTP_200_OK
+        assert response.headers['Content-Type'] == 'text/csv'
+
+        expected_csv = (
+            "Name,Type,ID,Taxonomy 1\r\n"
+            'Test Course,course,course-v1:orgA+test_course+test_run,Tag 1.1\r\n'
+        )
+
+        zip_content = BytesIO(b"".join(response.streaming_content)).getvalue()  # type: ignore[attr-defined]
+        assert zip_content == expected_csv.encode()
 
     def test_export_course_anoymous_forbidden(self) -> None:
         url = OBJECT_TAGS_EXPORT_URL.format(object_id=str(self.course.id))

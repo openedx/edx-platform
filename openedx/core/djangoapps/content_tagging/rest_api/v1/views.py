@@ -1,10 +1,15 @@
 """
 Tagging Org API Views
 """
-from django.db.models.query import QuerySet
-from django.http import HttpResponse
+from __future__ import annotations
+
+import csv
+from typing import Iterator
+
+from django.http import StreamingHttpResponse
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx_tagging.core.tagging import rules as oel_tagging_rules
-from openedx_tagging.core.tagging.models import ObjectTag
 from openedx_tagging.core.tagging.rest_api.v1.views import ObjectTagView, TaxonomyView
 from rest_framework import status
 from rest_framework.decorators import action
@@ -15,7 +20,7 @@ from rest_framework.views import APIView
 
 from ...api import (
     create_taxonomy,
-    export_content_object_children_tags,
+    get_content_tags_for_object,
     get_taxonomy,
     get_taxonomies,
     get_taxonomies_for_org,
@@ -23,7 +28,9 @@ from ...api import (
     set_taxonomy_orgs,
 )
 from ...rules import get_admin_orgs
+from ...types import TaggedContent, TaxonomyDict
 from .serializers import (
+    ExportContentTagsQueryParamsSerializer,
     TaxonomyOrgListQueryParamsSerializer,
     TaxonomyOrgSerializer,
     TaxonomyUpdateOrgBodySerializer,
@@ -149,10 +156,85 @@ class ObjectTagOrgView(ObjectTagView):
 
 class ObjectTagExportView(APIView):
     """"
-    Export a CSV with all children and tags for a given object_id.
+    View to export a CSV with all children and tags for a given object_id.
     """
-    def get(self, request: Request, **kwargs) -> HttpResponse:
+    def get(self, request: Request, **kwargs) -> StreamingHttpResponse:
+        """
+        Export a CSV with all children and tags for a given object_id.
+        """
+
+        def _content_generator(
+            tagged_content: TaggedContent, level: int = 0
+        ) -> Iterator[tuple[TaggedContent, int]]:
+            """
+            Generator that yields the tagged content and the level of the block
+            """
+            yield tagged_content, level
+            if tagged_content.children:
+                for child in tagged_content.children:
+                    yield from _content_generator(child, level + 1)
+
+        class Echo(object):
+            """
+            Class that implements just the write method of the file-like interface,
+            used for the streaming response.
+            """
+            def write(self, value):
+                return value
+
+        def _generate_csv_rows(
+            tagged_content: TaggedContent,
+            taxonomies: TaxonomyDict,
+            pseudo_buffer: Echo,
+        ) -> Iterator[str]:
+            """
+            Receives the blocks, tags and taxonomies and returns a CSV string
+            """
+
+            header = {"name": "Name", "type": "Type", "id": "ID"}
+
+            # Prepare the header for the taxonomies
+            for taxonomy_id, taxonomy in taxonomies.items():
+                # ToDo: change to taxonomy.external_id after the external_id is implemented
+                header[f"taxonomy_{taxonomy_id}"] = taxonomy.name
+
+            csv_writer = csv.DictWriter(pseudo_buffer, fieldnames=header.keys())
+            yield csv_writer.writerow(header)
+
+            # Iterate over the blocks and yield the rows
+            for item, level in _content_generator(tagged_content):
+                if item.xblock.category == "course":
+                    block_id = item.xblock.id
+                else:
+                    block_id = item.xblock.location
+
+                block_data = {
+                    "name": level * "  " + item.xblock.display_name_with_default,
+                    "type": item.xblock.category,
+                    "id": str(block_id),
+                }
+
+                # Add the tags for each taxonomy
+                for taxonomy_id in taxonomies:
+                    if taxonomy_id in item.object_tags:
+                        block_data[f"taxonomy_{taxonomy_id}"] = ", ".join([
+                            object_tag.value
+                            for object_tag in item.object_tags[taxonomy_id]
+                        ])
+
+                yield csv_writer.writerow(block_data)
+
         object_id: str = kwargs.get('object_id', None)
+
+        content_key: UsageKey | CourseKey
+
+        try:
+            content_key = UsageKey.from_string(object_id)
+        except InvalidKeyError:
+            try:
+                content_key = CourseKey.from_string(object_id)
+            except InvalidKeyError as e:
+                raise ValidationError("object_id is not a valid content key.") from e
 
         # Check if the user has permission to view object tags for this object_id
         try:
@@ -167,8 +249,17 @@ class ObjectTagExportView(APIView):
         except ValueError as e:
             raise ValidationError from e
 
-        tags = export_content_object_children_tags(object_id)
+        query_params = ExportContentTagsQueryParamsSerializer(
+            data=request.query_params.dict()
+        )
+        query_params.is_valid(raise_exception=True)
 
-        response = HttpResponse(tags.encode('utf-8'), content_type="text/csv")
-        response["Content-Disposition"] = f'attachment; filename="{object_id}_tags.csv"'
-        return response
+        include_children = query_params.validated_data.get("include_children")
+
+        tagged_block, taxonomies = get_content_tags_for_object(content_key, include_children=include_children)
+
+        return StreamingHttpResponse(
+            streaming_content=_generate_csv_rows(tagged_block, taxonomies, Echo()),
+            content_type="text/csv",
+            headers={'Content-Disposition': f'attachment; filename="{object_id}_tags.csv"'},
+        )

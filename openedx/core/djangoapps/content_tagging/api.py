@@ -2,26 +2,23 @@
 Content Tagging APIs
 """
 from __future__ import annotations
-from typing import TYPE_CHECKING
 
-import csv
 from itertools import groupby
-from io import StringIO
 
 import openedx_tagging.core.tagging.api as oel_tagging
 from django.db.models import Q, QuerySet, Exists, OuterRef
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from openedx_tagging.core.tagging.models import ObjectTag
-
+from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
+from organizations.models import Organization
 from xmodule.modulestore.django import modulestore
 
 from .models import ContentObjectTag, TaxonomyOrg
-
-if TYPE_CHECKING:
-    from openedx_tagging.core.tagging.models import Taxonomy
-    from xblock.runtime import Runtime
-    from organizations.models import Organization
-    from .types import ContentKey
+from .types import (
+    ContentKey,
+    ObjectTagByObjectIdDict,
+    TaggedContent,
+    TaxonomyDict,
+)
 
 
 def create_taxonomy(
@@ -140,17 +137,21 @@ def get_unassigned_taxonomies(enabled=True) -> QuerySet:
 def get_content_tags(
     object_key: ContentKey,
     taxonomy_id: int | None = None,
-) -> QuerySet:
+) -> QuerySet[ContentObjectTag]:
     """
     Generates a list of content tags for a given object.
 
     Pass taxonomy to limit the returned object_tags to a specific taxonomy.
     """
-    return oel_tagging.get_object_tags(
+
+    tags = oel_tagging.get_object_tags(
         object_id=str(object_key),
         taxonomy_id=taxonomy_id,
         object_tag_class=ContentObjectTag,
     )
+
+    # Add a generic type to get_object_tags to fix this
+    return tags  # type: ignore
 
 
 # FixMe: The following method (tag_content_object) is only used in tasks.py for auto-tagging. To tag object we are
@@ -159,7 +160,7 @@ def tag_content_object(
     object_key: ContentKey,
     taxonomy: Taxonomy,
     tags: list,
-) -> QuerySet:
+) -> QuerySet[ContentObjectTag]:
     """
     This is the main API to use when you want to add/update/delete tags from a content object (e.g. an XBlock or
     course).
@@ -189,144 +190,112 @@ def tag_content_object(
     return get_content_tags(object_key, taxonomy_id=taxonomy.id)
 
 
-def export_content_object_children_tags(
-    course_key_str: str,
-) -> str:
+def get_content_tags_for_object(
+    content_key: ContentKey,
+    include_children: bool,
+) -> tuple[TaggedContent, TaxonomyDict]:
     """
-    Generates a CSV file with the tags for all the children of a course.
+    Returns the object with the tags associated with it. If include_children is True, then it will also include
+    the children of the object and their tags.
     """
-    def _get_course_children_tags(course_key: CourseKey) -> tuple[dict[str, dict[int, list[str]]], dict[int, str]]:
-        """
-        Returns a tuple with a dictionary of object tags for all blocks of a course,
-        grouping by the block id and taxonomy id; and a dictionary of taxonomy ids and names.
 
-        I.e.
-        // result
-        {
-            // Block with id block-v1:edX+DemoX+Demo_Course+type@chapter+block@chapter
-            "block-v1:edX+DemoX+Demo_Course+type@chapter+block@chapter": {
-                // ObjectTags from Taxonomy with id 1
-                "1": (
-                    "Tag1",
-                    "Tag2",
-                    ...
-                ),
-                // ObjectTags from Taxonomy with id 2
-                "2": (
-                    "Tag3",
-                    ...
-                ),
-                ...
-            },
-            // Block with id block-v1:edX+DemoX+Demo_Course+type@sequential+block@sequential
-            "block-v1:edX+DemoX+Demo_Course+type@sequential+block@sequential": {
-                // ObjectTags from Taxonomy with id 1
-                "1": (
-                    "Tag2",
-                    ...
-                ),
-                ...
-            },
-        }
-
-        // taxonomies
-        {
-            "1": "Taxonomy A",
-            "2": "Taxonomy B",
-            ...
-        }
+    def _get_object_tags(content_key: ContentKey, include_children: bool) -> QuerySet[ObjectTag]:
         """
-        block_id_prefix = str(course_key).replace("course-v1:", "block-v1:", 1)
-        block_tags_records = ObjectTag.objects.filter(object_id__startswith=block_id_prefix) \
+        Return the tags for the object and its children using a single db query.
+        """
+        content_key_str = str(content_key)
+        if not include_children:
+            return ObjectTag.objects.filter(object_id=content_key_str).select_related("tag__taxonomy").all()
+
+        # We use a block_id_prefix (i.e. the modified course id) to get the tags for the children of the Content
+        # (course) in a single db query.
+        # ToDo: Add support for other content types (like LibraryContent and LibraryBlock)
+        if isinstance(content_key, UsageKey):
+            course_key_str = str(content_key.course_key)
+            block_id_prefix = course_key_str.replace("course-v1:", "block-v1:", 1)
+        elif isinstance(content_key, CourseKey):
+            course_key_str = str(content_key)
+            block_id_prefix = str(content_key).replace("course-v1:", "block-v1:", 1)
+        else:
+            raise NotImplementedError(f"Invalid content_key: {type(content_key)} -> {content_key}")
+
+        return ObjectTag.objects.filter(Q(object_id__startswith=block_id_prefix) | Q(object_id=course_key_str)) \
             .select_related("tag__taxonomy").all()
 
-        result: dict[str, dict[int, list[str]]] = {}
-        taxonomies: dict[int, str] = {}
+    def _group_object_tags_by_objectid_taxonomy(
+        all_object_tags: list[ObjectTag]
+    ) -> tuple[ObjectTagByObjectIdDict, TaxonomyDict]:
+        """
+        Returns a tuple with a dictionary of grouped object tags for all blocks and a dictionary of taxonomies.
+        """
 
-        for object_id, block_tags in groupby(block_tags_records, lambda x: x.object_id):
-            result[object_id] = {}
+        groupedObjectTags: ObjectTagByObjectIdDict = {}
+        taxonomies: TaxonomyDict = {}
+
+        for object_id, block_tags in groupby(all_object_tags, lambda x: x.object_id):
+            groupedObjectTags[object_id] = {}
             for taxonomy_id, taxonomy_tags in groupby(block_tags, lambda x: x.tag.taxonomy_id):
-                object_tag_list = list(taxonomy_tags)
-                result[object_id][taxonomy_id] = [
-                    objecttag.value
-                    for objecttag in object_tag_list
-                ]
+                object_tags_list = list(taxonomy_tags)
+                groupedObjectTags[object_id][taxonomy_id] = object_tags_list
 
                 if taxonomy_id not in taxonomies:
                     # ToDo: Change name -> export_id after done:
                     # - https://github.com/openedx/modular-learning/issues/183
-                    taxonomies[taxonomy_id] = object_tag_list[0].tag.taxonomy.name
+                    taxonomies[taxonomy_id] = object_tags_list[0].tag.taxonomy
 
-        return result, taxonomies
+        return groupedObjectTags, taxonomies
 
-    def _generate_csv(
-            header: dict[str, str],
-            blocks: list[tuple[int, UsageKey]],
-            tags: dict[str, dict[int, list[str]]],
-            taxonomies: dict[int, str],
-            runtime: Runtime,
-    ) -> str:
+    def _get_object_with_tags(
+        content_key: ContentKey,
+        include_children: bool,
+        objectTagCache: ObjectTagByObjectIdDict,
+        store
+    ) -> TaggedContent:
         """
-        Receives the blocks, tags and taxonomies and returns a CSV string
+        Returns the object with the tags associated with it. If include_children is True, then it will also include
+        the children of the object and their tags.
         """
+        if isinstance(content_key, CourseKey):
+            xblock = store.get_course(content_key)
+        elif isinstance(content_key, UsageKey):
+            xblock = store.get_item(content_key)
+        else:
+            raise NotImplementedError(f"Invalid content_key: {type(content_key)} -> {content_key}")
 
-        with StringIO() as csv_buffer:
-            csv_writer = csv.DictWriter(csv_buffer, fieldnames=header.keys())
-            csv_writer.writerow(header)
+        tagged_xblock = TaggedContent(
+            xblock=xblock,
+            object_tags=objectTagCache.get(str(content_key), {}),
+            children=None,
+        )
 
-            # Iterate over the blocks stack and write the block rows
-            while blocks:
-                level, block_id = blocks.pop()
-                # ToDo: fix block typing
-                block = runtime.get_block(block_id)
+        if not include_children:
+            return tagged_xblock
 
-                block_data = {
-                    "name": level * "  " + block.display_name_with_default,
-                    "type": block.category,
-                    "id": block_id
-                }
+        blocks = [tagged_xblock]
 
-                block_id_str = str(block_id)
+        while blocks:
+            block = blocks.pop()
+            block.children = []
 
-                # Add the tags for each taxonomy
-                for taxonomy_id in taxonomies:
-                    if block_id_str in tags and taxonomy_id in tags[block_id_str]:
-                        block_data[f"taxonomy_{taxonomy_id}"] = ", ".join(tags[block_id_str][taxonomy_id])
+            if block.xblock.has_children:
+                for child_id in block.xblock.children:
+                    child = TaggedContent(
+                        xblock=store.get_item(child_id),
+                        object_tags=objectTagCache.get(str(child_id), {}),
+                        children=None,
+                    )
+                    block.children.append(child)
 
-                csv_writer.writerow(block_data)
+                    blocks.append(child)
 
-                # Add children to the stack
-                if block.has_children:
-                    for child_id in block.children:
-                        blocks.append((level + 1, child_id))
-
-            return csv_buffer.getvalue()
+        return tagged_xblock
 
     store = modulestore()
-    course_key = CourseKey.from_string(course_key_str)
-    if not course_key.is_course:
-        raise ValueError(f"Invalid course key {course_key_str}")
 
-    # ToDo: fix course typing
-    course = store.get_course(course_key)
-    if course is None:
-        raise ValueError(f"Course {course_key} not found")
+    all_blocks_tag_records = list(_get_object_tags(content_key, include_children))
+    objectTagCache, taxonomies = _group_object_tags_by_objectid_taxonomy(all_blocks_tag_records)
 
-    tags, taxonomies = _get_course_children_tags(course_key)
-
-    blocks = []
-    # Add children to the stack
-    if course.has_children:
-        for child_id in course.children:
-            blocks.append((0, child_id))
-
-    header = {"name": "Name", "type": "Type", "id": "ID"}
-
-    # Prepare the header for the taxonomies
-    for taxonomy_id, name in taxonomies.items():
-        header[f"taxonomy_{taxonomy_id}"] = name
-
-    return _generate_csv(header, blocks, tags, taxonomies, course.runtime)
+    return _get_object_with_tags(content_key, include_children, objectTagCache, store), taxonomies
 
 
 # Expose the oel_tagging APIs

@@ -10,6 +10,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
 
 from .. import api
+from ..types import TaggedContent
 
 
 class TestTaxonomyMixin:
@@ -300,55 +301,152 @@ class TaggedCourseMixin(ModuleStoreTestCase):
             "test_course",
             "test_run",
             self.user_id,
+            fields={'display_name': "Test Course"},
+        )
+        course_tags = api.tag_content_object(
+            object_key=self.course.id,
+            taxonomy=self.taxonomy_1,
+            tags=['Tag 1.1'],
+        )
+
+        self.expected_tagged_xblock = TaggedContent(
+            xblock=self.course,
+            children=[],
+            object_tags={
+                self.taxonomy_1.id: list(course_tags),
+            },
         )
 
         # Create XBlocks
-        sequential = self.store.create_child(self.user_id, self.course.location, "sequential", "test_sequential")
-        vertical = self.store.create_child(self.user_id, sequential.location, "vertical", "test_vertical1")
-        vertical2 = self.store.create_child(self.user_id, sequential.location, "vertical", "test_vertical2")
-        text = self.store.create_child(self.user_id, vertical2.location, "html", "test_html")
-
+        self.sequential = self.store.create_child(self.user_id, self.course.location, "sequential", "test_sequential")
         # Tag blocks
-        api.tag_content_object(
-            object_key=sequential.location,
+        sequential_tags1 = api.tag_content_object(
+            object_key=self.sequential.location,
             taxonomy=self.taxonomy_1,
             tags=['Tag 1.1', 'Tag 1.2'],
         )
-        api.tag_content_object(
-            object_key=sequential.location,
+        sequential_tags2 = api.tag_content_object(
+            object_key=self.sequential.location,
             taxonomy=self.taxonomy_2,
             tags=['Tag 2.1'],
         )
-        api.tag_content_object(
+        tagged_sequential = TaggedContent(
+            xblock=self.store.get_item(self.sequential.location),
+            children=[],
+            object_tags={
+                self.taxonomy_1.id: list(sequential_tags1),
+                self.taxonomy_2.id: list(sequential_tags2),
+            },
+        )
+
+        assert self.expected_tagged_xblock.children is not None  # type guard
+        self.expected_tagged_xblock.children.append(tagged_sequential)
+
+        vertical = self.store.create_child(self.user_id, self.sequential.location, "vertical", "test_vertical1")
+        vertical_tags = api.tag_content_object(
             object_key=vertical.location,
             taxonomy=self.taxonomy_2,
             tags=['Tag 2.2'],
         )
-        api.tag_content_object(
+        tagged_vertical = TaggedContent(
+            xblock=self.store.get_item(vertical.location),
+            children=[],
+            object_tags={
+                self.taxonomy_2.id: list(vertical_tags),
+            },
+        )
+
+        assert tagged_sequential.children is not None  # type guard
+        tagged_sequential.children.append(tagged_vertical)
+
+        vertical2 = self.store.create_child(self.user_id, self.sequential.location, "vertical", "test_vertical2")
+        tagged_vertical2 = TaggedContent(
+            xblock=self.store.get_item(vertical2.location),
+            children=[],
+            object_tags={},
+        )
+        assert tagged_sequential.children is not None  # type guard
+        tagged_sequential.children.append(tagged_vertical2)
+
+        text = self.store.create_child(self.user_id, vertical2.location, "html", "test_html")
+        text_tags = api.tag_content_object(
             object_key=text.location,
             taxonomy=self.taxonomy_2,
             tags=['Tag 2.1'],
         )
-
-        self.expected_csv = (
-            "Name,Type,ID,Taxonomy 1,Taxonomy 2\r\n"
-            'test sequential,sequential,block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential,'
-            '"Tag 1.1, Tag 1.2",Tag 2.1\r\n'
-            '  test vertical2,vertical,block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical2,,\r\n'
-            '    Text,html,block-v1:orgA+test_course+test_run+type@html+block@test_html,,Tag 2.1\r\n'
-            '  test vertical1,vertical,block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1,'
-            ',Tag 2.2\r\n'
+        tagged_text = TaggedContent(
+            xblock=self.store.get_item(text.location),
+            children=[],
+            object_tags={
+                self.taxonomy_2.id: list(text_tags),
+            },
         )
 
+        assert tagged_vertical2.children is not None  # type guard
+        tagged_vertical2.children.append(tagged_text)
 
-class TestContetTagChildrenExport(TaggedCourseMixin):  # type: ignore[misc]
+
+@ddt.ddt
+class TestContentTagChildrenExport(TaggedCourseMixin):  # type: ignore[misc]
     """
     Test exporting content objects
     """
+    def _compare_tagged_xblock(self, expected: TaggedContent, actual: TaggedContent):
+        """
+        Compare two TaggedContent objects
+        """
+        assert expected.xblock.location == actual.xblock.location
+        assert expected.object_tags == actual.object_tags
+        if expected.children is None:
+            assert actual.children is None
+            return
 
-    def test_export_tagged_course_children(self):
+        assert actual.children is not None
+        for i in range(len(expected.children)):
+            self._compare_tagged_xblock(expected.children[i], actual.children[i])
+
+    @ddt.data(
+        True,
+        False,
+    )
+    def test_export_tagged_course(self, include_children: bool) -> None:
         """
-        Test if we can export a course with tagged children
+        Test if we can export a course
         """
-        result = api.export_content_object_children_tags(str(self.course.id))
-        assert result == self.expected_csv
+        tagged_xblock, taxonomies = api.get_content_tags_for_object(self.course.id, include_children=include_children)
+        if include_children:
+            expected_taxonomies = {
+                self.taxonomy_1.id: self.taxonomy_1,
+                self.taxonomy_2.id: self.taxonomy_2,
+            }
+        else:
+            self.expected_tagged_xblock.children = None
+            expected_taxonomies = {
+                self.taxonomy_1.id: self.taxonomy_1,
+            }
+
+        self._compare_tagged_xblock(self.expected_tagged_xblock, tagged_xblock)
+        assert taxonomies == expected_taxonomies
+
+    @ddt.data(
+        True,
+        False,
+    )
+    def test_export_tagged_block(self, include_children: bool) -> None:
+        """
+        Test if we can export a course
+        """
+        tagged_xblock, taxonomies = api.get_content_tags_for_object(self.course.id, include_children=include_children)
+        if include_children:
+            expected_taxonomies = {
+                self.taxonomy_1.id: self.taxonomy_1,
+                self.taxonomy_2.id: self.taxonomy_2,
+            }
+        else:
+            self.expected_tagged_xblock.children = None
+            expected_taxonomies = {
+                self.taxonomy_1.id: self.taxonomy_1,
+            }
+
+        self._compare_tagged_xblock(self.expected_tagged_xblock, tagged_xblock)
+        assert taxonomies == expected_taxonomies
