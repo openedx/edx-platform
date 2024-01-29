@@ -113,7 +113,7 @@ perms[MANAGE_DISCUSSIONS] = (
     HasPermissionRule(CourseRolesPermission.MANAGE_DISCUSSION_MODERATORS) |
     HasForumsRolesRule(FORUM_ROLE_ADMINISTRATOR)
 )
-# # TODO: remove role checks once course_roles is fully implemented and data is migrated
+# TODO: remove role checks once course_roles is fully implemented and data is migrated
 perms[MANAGE_STUDENTS] = (
     HasAccessRule('instructor') |
     HasAccessRule('staff') |
