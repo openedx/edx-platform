@@ -1438,7 +1438,7 @@ py==1.11.0
     # via
     #   -r requirements/edx/testing.txt
     #   tox
-py2neo==2021.2.3
+py2neo @ https://github.com/overhangio/py2neo/releases/download/2021.2.3/py2neo-2021.2.3.tar.gz
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -2037,7 +2037,6 @@ tomlkit==0.12.1
     #   snowflake-connector-python
 tox==3.28.0
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/testing.txt
     #   tox-battery
 tox-battery==0.6.2

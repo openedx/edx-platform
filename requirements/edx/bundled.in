@@ -20,7 +20,7 @@
 # 4. If the package is not needed in production, add it to another file such
 #    as development.in or testing.in instead.
 
-py2neo                              # Driver for converting Python modulestore structures to Neo4j's schema (for Coursegraph).
+py2neo @ https://github.com/overhangio/py2neo/releases/download/2021.2.3/py2neo-2021.2.3.tar.gz                              # Driver for converting Python modulestore structures to Neo4j's schema (for Coursegraph).
 pygments                            # Used to support colors in paver command output
 
 ## Third party integrations
