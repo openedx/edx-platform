@@ -2,6 +2,8 @@
 
 from django.db import migrations
 
+from lms.djangoapps.certificates.data import CertificateStatuses
+
 
 class Migration(migrations.Migration):
     """
@@ -18,7 +20,9 @@ class Migration(migrations.Migration):
 
         GeneratedCertificate.objects.filter(
             certificateinvalidation__active=True
-        ).exclude(status="unavailable").update(status="unavailable")
+        ).exclude(status=CertificateStatuses.unavailable).update(
+            status=CertificateStatuses.unavailable
+        )
 
     operations = [
         migrations.RunPython(
