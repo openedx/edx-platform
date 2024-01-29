@@ -567,7 +567,7 @@ edx-django-utils==5.10.1
     #   openedx-blockstore
     #   ora2
     #   super-csv
-edx-drf-extensions==10.0.0
+edx-drf-extensions==10.1.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-completion
@@ -579,7 +579,7 @@ edx-drf-extensions==10.0.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.10.9
+edx-enterprise==4.10.11
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
