@@ -239,8 +239,6 @@ def get_content_tags_for_object(
                 groupedObjectTags[object_id][taxonomy_id] = object_tags_list
 
                 if taxonomy_id not in taxonomies:
-                    # ToDo: Change name -> export_id after done:
-                    # - https://github.com/openedx/modular-learning/issues/183
                     taxonomies[taxonomy_id] = object_tags_list[0].tag.taxonomy
 
         return groupedObjectTags, taxonomies
