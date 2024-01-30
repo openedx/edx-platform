@@ -195,7 +195,7 @@ class ObjectTagExportView(APIView):
                 # ToDo: change to taxonomy.external_id after the external_id is implemented
                 header[f"taxonomy_{taxonomy_id}"] = taxonomy.name
 
-            csv_writer = csv.DictWriter(pseudo_buffer, fieldnames=header.keys())
+            csv_writer = csv.DictWriter(pseudo_buffer, fieldnames=header.keys(), quoting=csv.QUOTE_NONNUMERIC)
             yield csv_writer.writerow(header)
 
             # Iterate over the blocks and yield the rows

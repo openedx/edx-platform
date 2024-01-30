@@ -1666,14 +1666,15 @@ class TestContentObjectChildrenExportView(TaggedCourseMixin, APITestCase):  # ty
         assert response.headers['Content-Type'] == 'text/csv'
 
         expected_csv = (
-            "Name,Type,ID,Taxonomy 1,Taxonomy 2\r\n"
-            'Test Course,course,course-v1:orgA+test_course+test_run,Tag 1.1,\r\n'
-            '  test sequential,sequential,block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential,'
-            '"Tag 1.1, Tag 1.2",Tag 2.1\r\n'
-            '    test vertical1,vertical,block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1,'
-            ',Tag 2.2\r\n'
-            '    test vertical2,vertical,block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical2,,\r\n'
-            '      Text,html,block-v1:orgA+test_course+test_run+type@html+block@test_html,,Tag 2.1\r\n'
+            '"Name","Type","ID","Taxonomy 1","Taxonomy 2"\r\n'
+            '"Test Course","course","course-v1:orgA+test_course+test_run","Tag 1.1",""\r\n'
+            '"  test sequential","sequential","block-v1:orgA+test_course+test_run+type@sequential+block@test_'
+                'sequential","Tag 1.1, Tag 1.2","Tag 2.1"\r\n'
+            '"    test vertical1","vertical","block-v1:orgA+test_course+test_run+type@vertical+block@test_'
+                'vertical1","","Tag 2.2"\r\n'
+            '"    test vertical2","vertical","block-v1:orgA+test_course+test_run+type@vertical+block@test_'
+                'vertical2","",""\r\n'
+            '"      Text","html","block-v1:orgA+test_course+test_run+type@html+block@test_html","","Tag 2.1"\r\n'
         )
 
         zip_content = BytesIO(b"".join(response.streaming_content)).getvalue()  # type: ignore[attr-defined]
