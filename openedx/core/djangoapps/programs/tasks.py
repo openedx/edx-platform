@@ -482,7 +482,6 @@ def award_course_certificate(self, username, course_run_key):
             reason=error_msg,
             countdown=countdown,
         )
-
     try:
         course_key = CourseKey.from_string(course_run_key)
         try:
@@ -496,7 +495,8 @@ def award_course_certificate(self, username, course_run_key):
         # Get the cert for the course key and username if it's both passing and available in professional/verified
         try:
             certificate = GeneratedCertificate.eligible_certificates.get(
-                user=user.id, course_id=course_key
+                user=user.id,
+                course_id=course_key,
             )
         except GeneratedCertificate.DoesNotExist:
             LOGGER.exception(
