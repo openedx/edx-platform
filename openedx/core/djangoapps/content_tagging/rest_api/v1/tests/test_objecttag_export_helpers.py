@@ -8,6 +8,7 @@ from organizations.models import Organization
 
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
 from .... import api
 from ..objecttag_export_helpers import TaggedContent, build_object_tree_with_objecttags, iterate_with_level
@@ -23,7 +24,6 @@ class TaggedCourseMixin(ModuleStoreTestCase):
         super().setUp()
         # Create user
         self.user = UserFactory.create()
-        self.user_id = self.user.id
 
         self.orgA = Organization.objects.create(name="Organization A", short_name="orgA")
         self.taxonomy_1 = api.create_taxonomy(name="Taxonomy 1")
@@ -54,12 +54,11 @@ class TaggedCourseMixin(ModuleStoreTestCase):
         self.patcher.start()
 
         # Create course
-        self.course = self.store.create_course(
-            self.orgA.short_name,
-            "test_course",
-            "test_run",
-            self.user_id,
-            fields={'display_name': "Test Course"},
+        self.course = CourseFactory.create(
+            org=self.orgA.short_name,
+            number="test_course",
+            run="test_run",
+            display_name="Test Course",
         )
         course_tags = api.tag_content_object(
             object_key=self.course.id,
@@ -78,7 +77,11 @@ class TaggedCourseMixin(ModuleStoreTestCase):
         )
 
         # Create XBlocks
-        self.sequential = self.store.create_child(self.user_id, self.course.location, "sequential", "test_sequential")
+        self.sequential = BlockFactory.create(
+            parent=self.course,
+            category="sequential",
+            display_name="test sequential",
+        )
         # Tag blocks
         sequential_tags1 = api.tag_content_object(
             object_key=self.sequential.location,
@@ -105,7 +108,11 @@ class TaggedCourseMixin(ModuleStoreTestCase):
         assert self.expected_tagged_xblock.children is not None  # type guard
         self.expected_tagged_xblock.children.append(tagged_sequential)
 
-        vertical = self.store.create_child(self.user_id, self.sequential.location, "vertical", "test_vertical1")
+        vertical = BlockFactory.create(
+            parent=self.sequential,
+            category="vertical",
+            display_name="test vertical1",
+        )
         vertical_tags = api.tag_content_object(
             object_key=vertical.location,
             taxonomy=self.taxonomy_2,
@@ -125,7 +132,11 @@ class TaggedCourseMixin(ModuleStoreTestCase):
         assert tagged_sequential.children is not None  # type guard
         tagged_sequential.children.append(tagged_vertical)
 
-        vertical2 = self.store.create_child(self.user_id, self.sequential.location, "vertical", "test_vertical2")
+        vertical2 = BlockFactory.create(
+            parent=self.sequential,
+            category="vertical",
+            display_name="test vertical2",
+        )
         xblock = self.store.get_item(vertical2.location)
         tagged_vertical2 = TaggedContent(
             display_name=xblock.display_name_with_default,
@@ -137,7 +148,11 @@ class TaggedCourseMixin(ModuleStoreTestCase):
         assert tagged_sequential.children is not None  # type guard
         tagged_sequential.children.append(tagged_vertical2)
 
-        html = self.store.create_child(self.user_id, vertical2.location, "html", "test_html")
+        html = BlockFactory.create(
+            parent=vertical2,
+            category="html",
+            display_name="test html",
+        )
         html_tags = api.tag_content_object(
             object_key=html.location,
             taxonomy=self.taxonomy_2,
