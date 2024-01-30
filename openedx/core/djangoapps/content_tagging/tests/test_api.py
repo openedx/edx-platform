@@ -413,7 +413,10 @@ class TestContentTagChildrenExport(TaggedCourseMixin):  # type: ignore[misc]
         """
         Test if we can export a course
         """
-        tagged_xblock, taxonomies = api.get_object_tree_with_objecttags(self.course.id, include_children=include_children)
+        # 2 from get_course() / get_item() + 1 from _get_object_tags()
+        with self.assertNumQueries(3):
+            tagged_xblock, taxonomies = api.get_object_tree_with_objecttags(self.course.id, include_children=include_children)
+
         if include_children:
             expected_taxonomies = {
                 self.taxonomy_1.id: self.taxonomy_1,
@@ -436,7 +439,10 @@ class TestContentTagChildrenExport(TaggedCourseMixin):  # type: ignore[misc]
         """
         Test if we can export a course
         """
-        tagged_xblock, taxonomies = api.get_object_tree_with_objecttags(self.course.id, include_children=include_children)
+        # 2 from get_course() / get_item() + 1 from _get_object_tags()
+        with self.assertNumQueries(3):
+            tagged_xblock, taxonomies = api.get_object_tree_with_objecttags(self.course.id, include_children=include_children)
+
         if include_children:
             expected_taxonomies = {
                 self.taxonomy_1.id: self.taxonomy_1,
