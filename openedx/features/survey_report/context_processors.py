@@ -1,8 +1,35 @@
+"""
+This module provides context processors for integrating survey report functionality
+into Django admin sites.
+
+It includes functions for determining whether to display a survey report banner and
+calculating the date threshold for displaying the banner.
+
+Functions:
+- admin_extra_context(request):
+Sends extra context to every admin site, determining whether to display the
+survey report banner based on defined settings and conditions.
+
+- should_show_survey_report_banner():
+Determines whether to show the survey report banner based on the threshold.
+
+- get_months_threshold(months):
+Calculates the date threshold based on the specified number of months.
+
+Dependencies:
+- Django: settings, reverse, shortcuts
+- datetime: datetime
+- dateutil.relativedelta: relativedelta
+
+Usage:
+This module is designed to be imported into Django projects with admin functionality.
+It enhances the admin interface by providing dynamic context for displaying a survey
+report banner based on defined conditions and settings.
+"""
 from django.conf import settings
 from django.urls import reverse
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from django.shortcuts import get_object_or_404
 from .models import SurveyReport
 
 
