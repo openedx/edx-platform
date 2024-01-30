@@ -7,7 +7,6 @@ from urllib.parse import urljoin
 
 import httpretty
 from django.core.cache import cache
-from requests.exceptions import HTTPError
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
