@@ -15,3 +15,4 @@ from .videos import (
     VideoDownloadView
 )
 from .help_urls import HelpUrlsView
+from .vertical_block import ContainerHandlerView
