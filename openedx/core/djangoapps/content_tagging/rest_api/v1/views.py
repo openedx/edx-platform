@@ -146,8 +146,6 @@ class TaxonomyOrgView(TaxonomyView):
 class ObjectTagOrgView(ObjectTagView):
     """
     View to create and retrieve ObjectTags for a provided Object ID (object_id).
-    This view extends the ObjectTagView to add Organization filters for the results and
-    new actions like: export.
 
     Refer to ObjectTagView docstring for usage details.
     """
