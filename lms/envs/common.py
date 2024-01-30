@@ -5394,3 +5394,31 @@ SIMPLE_HISTORY_DATE_INDEX = False
 #### Event bus publishing ####
 ## Will be more filled out as part of https://github.com/edx/edx-arch-experiments/issues/381
 EVENT_BUS_PRODUCER_CONFIG = {}
+
+#### Survey Report ####
+# .. toggle_name: SURVEY_REPORT_ENABLE
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: Set to True to enable the feature to generate and send survey reports.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2024-01-30
+SURVEY_REPORT_ENABLE = True
+# .. setting_name: SURVEY_REPORT_ENDPOINT
+# .. setting_default: Open edX organization endpoint
+# .. setting_description: Endpoint where the report will be sent.
+SURVEY_REPORT_ENDPOINT = 'https://hooks.zapier.com/hooks/catch/11595998/3ouwv7m/'
+# .. toggle_name: ANONYMOUS_SURVEY_REPORT
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: If enable, the survey report will be send a UUID as ID instead of use lms site name.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2023-02-21
+ANONYMOUS_SURVEY_REPORT = False
+# .. setting_name: SURVEY_REPORT_CHECK_THRESHOLD
+# .. setting_default: every 6 months
+# .. setting_description: Survey report banner will appear if a survey report is not sent in the months defined.
+SURVEY_REPORT_CHECK_THRESHOLD = 6
+# .. setting_name: SURVEY_REPORT_EXTRA_DATA
+# .. setting_default: empty dictionary
+# .. setting_description: Dictionary with additional information that you want to share in the report.
+SURVEY_REPORT_EXTRA_DATA = {}
