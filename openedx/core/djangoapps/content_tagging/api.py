@@ -14,6 +14,7 @@ from .types import ContentKey
 
 def create_taxonomy(
     name: str,
+    export_id: str,
     description: str | None = None,
     enabled=True,
     allow_multiple=True,
@@ -25,6 +26,7 @@ def create_taxonomy(
     """
     taxonomy = oel_tagging.create_taxonomy(
         name=name,
+        export_id=export_id,
         description=description,
         enabled=enabled,
         allow_multiple=allow_multiple,

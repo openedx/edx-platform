@@ -273,6 +273,7 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
         """
         system_taxonomy = api.create_taxonomy(
             name="System Languages",
+            export_id="system_languages",
         )
         system_taxonomy.taxonomy_class = UserSystemDefinedTaxonomy
         system_taxonomy = system_taxonomy.cast()
@@ -436,6 +437,7 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
         """
         system_taxonomy = api.create_taxonomy(
             name="System Languages",
+            export_id="system_languages",
         )
         system_taxonomy.taxonomy_class = UserSystemDefinedTaxonomy
         system_taxonomy = system_taxonomy.cast()
@@ -460,6 +462,7 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
         """
         free_text_taxonomy = api.create_taxonomy(
             name="Free text",
+            export_id="free_text",
             allow_free_text=True,
         )
 

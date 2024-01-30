@@ -20,22 +20,35 @@ class TestTaxonomyMixin:
         # Taxonomies
         self.taxonomy_disabled = api.create_taxonomy(
             name="Learning Objectives",
+            export_id="learning_objectives",
             # We will disable this taxonomy below, after we have used it to tag some objects.
             # Note: "disabled" taxonomies are not a supported nor user-exposed feature at the moment, so it's not
             # actually that important to test them.
         )
         api.set_taxonomy_orgs(self.taxonomy_disabled, orgs=[self.org1, self.org2])
 
-        self.taxonomy_all_orgs = api.create_taxonomy(name="Content Types")
+        self.taxonomy_all_orgs = api.create_taxonomy(
+            name="Content Types",
+            export_id="content_types",
+        )
         api.set_taxonomy_orgs(self.taxonomy_all_orgs, all_orgs=True)
 
-        self.taxonomy_both_orgs = api.create_taxonomy(name="OpenedX/Axim Content Types")
+        self.taxonomy_both_orgs = api.create_taxonomy(
+            name="OpenedX/Axim Content Types",
+            export_id="axim_content_types",
+        )
         api.set_taxonomy_orgs(self.taxonomy_both_orgs, orgs=[self.org1, self.org2])
 
-        self.taxonomy_one_org = api.create_taxonomy(name="OpenedX Content Types")
+        self.taxonomy_one_org = api.create_taxonomy(
+            name="OpenedX Content Types",
+            export_id="openedx_content_types",
+        )
         api.set_taxonomy_orgs(self.taxonomy_one_org, orgs=[self.org1])
 
-        self.taxonomy_no_orgs = api.create_taxonomy(name="No orgs")
+        self.taxonomy_no_orgs = api.create_taxonomy(
+            name="No orgs",
+            export_id="no_orgs",
+        )
 
         # Tags
         self.tag_disabled = Tag.objects.create(
