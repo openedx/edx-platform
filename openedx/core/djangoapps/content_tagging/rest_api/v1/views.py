@@ -30,7 +30,6 @@ from ...api import (
 from ...rules import get_admin_orgs
 from ...types import TaggedContent, TaxonomyDict
 from .serializers import (
-    ExportContentTagsQueryParamsSerializer,
     TaxonomyOrgListQueryParamsSerializer,
     TaxonomyOrgSerializer,
     TaxonomyUpdateOrgBodySerializer,
@@ -247,14 +246,7 @@ class ObjectTagExportView(APIView):
         except ValueError as e:
             raise ValidationError from e
 
-        query_params = ExportContentTagsQueryParamsSerializer(
-            data=request.query_params.dict()
-        )
-        query_params.is_valid(raise_exception=True)
-
-        include_children = query_params.validated_data.get("include_children")
-
-        tagged_block, taxonomies = get_content_tags_for_object(content_key, include_children=include_children)
+        tagged_block, taxonomies = get_content_tags_for_object(content_key)
 
         return StreamingHttpResponse(
             streaming_content=_generate_csv_rows(tagged_block, taxonomies, Echo()),

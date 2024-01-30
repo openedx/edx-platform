@@ -192,7 +192,7 @@ def tag_content_object(
 
 def get_content_tags_for_object(
     content_key: ContentKey,
-    include_children: bool,
+    include_children: bool = True,
 ) -> tuple[TaggedContent, TaxonomyDict]:
     """
     Returns the object with the tags associated with it. If include_children is True, then it will also include

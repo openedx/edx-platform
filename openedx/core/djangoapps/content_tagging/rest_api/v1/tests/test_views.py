@@ -1679,22 +1679,6 @@ class TestContentObjectChildrenExportView(TaggedCourseMixin, APITestCase):  # ty
         zip_content = BytesIO(b"".join(response.streaming_content)).getvalue()  # type: ignore[attr-defined]
         assert zip_content == expected_csv.encode()
 
-    def test_export_course_no_children(self) -> None:
-        url = OBJECT_TAGS_EXPORT_URL.format(object_id=str(self.course.id))
-
-        self.client.force_authenticate(user=self.staff)
-        response = self.client.get(url, {"include_children": False})
-        assert response.status_code == status.HTTP_200_OK
-        assert response.headers['Content-Type'] == 'text/csv'
-
-        expected_csv = (
-            "Name,Type,ID,Taxonomy 1\r\n"
-            'Test Course,course,course-v1:orgA+test_course+test_run,Tag 1.1\r\n'
-        )
-
-        zip_content = BytesIO(b"".join(response.streaming_content)).getvalue()  # type: ignore[attr-defined]
-        assert zip_content == expected_csv.encode()
-
     def test_export_course_anoymous_forbidden(self) -> None:
         url = OBJECT_TAGS_EXPORT_URL.format(object_id=str(self.course.id))
         response = self.client.get(url)
