@@ -425,7 +425,7 @@ def award_course_certificate(self, username, course_run_key):
     # mark this task for retry instead of failing it altogether.
     if not CredentialsApiConfig.current().is_learner_issuance_enabled:
         error_msg = (
-            "Task award_course_certificate cannot be executed when credentials issuance is disabled in API " "config"
+            "Task award_course_certificate cannot be executed when credentials issuance is disabled in API config"
         )
         LOGGER.warning(error_msg)
         raise _retry_with_custom_exception(
