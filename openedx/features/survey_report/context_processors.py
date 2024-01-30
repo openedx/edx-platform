@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta
 from django.shortcuts import get_object_or_404
 from .models import SurveyReport
 
+
 def admin_extra_context(request):
     """
     This function sends extra context to every admin site.
@@ -14,6 +15,7 @@ def admin_extra_context(request):
         return {'show_survey_report_banner': False}
 
     return {'show_survey_report_banner': should_show_survey_report_banner()}
+
 
 def should_show_survey_report_banner():
     """
@@ -26,6 +28,7 @@ def should_show_survey_report_banner():
         return latest_report.created_at.date() <= months_threshold
     except SurveyReport.DoesNotExist:
         return True
+
 
 def get_months_threshold(months):
     """
