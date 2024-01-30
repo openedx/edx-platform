@@ -7,7 +7,7 @@ from itertools import groupby
 
 import openedx_tagging.core.tagging.api as oel_tagging
 from django.db.models import Q, QuerySet, Exists, OuterRef
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.keys import CourseKey, LearningContextKey
 from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
 from organizations.models import Organization
 from xmodule.modulestore.django import modulestore
@@ -191,33 +191,22 @@ def tag_content_object(
 
 
 def get_object_tree_with_objecttags(
-    content_key: ContentKey,
-    include_children: bool = True,
+    content_key: LearningContextKey,
 ) -> tuple[TaggedContent, TaxonomyDict]:
     """
-    Returns the object with the tags associated with it. If include_children is True, then it will also include
-    the children of the object and their tags.
+    Returns the object with the tags associated with it.
     """
 
-    def _get_object_tags(content_key: ContentKey, include_children: bool) -> QuerySet[ObjectTag]:
+    def _get_object_tags(content_key: LearningContextKey) -> QuerySet[ObjectTag]:
         """
         Return the tags for the object and its children using a single db query.
         """
         content_key_str = str(content_key)
-        if not include_children:
-            return ObjectTag.objects.filter(
-                object_id=content_key_str,
-                tag__isnull=False,
-                tag__taxonomy__isnull=False,
-            ).select_related("tag__taxonomy")
 
         # We use a block_id_prefix (i.e. the modified course id) to get the tags for the children of the Content
         # (course) in a single db query.
         # ToDo: Add support for other content types (like LibraryContent and LibraryBlock)
-        if isinstance(content_key, UsageKey):
-            course_key_str = str(content_key.course_key)
-            block_id_prefix = course_key_str.replace("course-v1:", "block-v1:", 1)
-        elif isinstance(content_key, CourseKey):
+        if isinstance(content_key, CourseKey):
             course_key_str = str(content_key)
             block_id_prefix = str(content_key).replace("course-v1:", "block-v1:", 1)
         else:
@@ -250,56 +239,57 @@ def get_object_tree_with_objecttags(
         return grouped_object_tags, taxonomies
 
     def _build_object_tree_with_objecttags(
-        content_key: ContentKey,
-        include_children: bool,
+        content_key: LearningContextKey,
         objectTagCache: ObjectTagByObjectIdDict,
         store
     ) -> TaggedContent:
         """
-        Returns the object with the tags associated with it. If include_children is True, then it will also include
-        the children of the object and their tags.
+        Returns the object with the tags associated with it.
         """
         if isinstance(content_key, CourseKey):
-            xblock = store.get_course(content_key)
-        elif isinstance(content_key, UsageKey):
-            xblock = store.get_item(content_key)
+            course = store.get_course(content_key)
         else:
             raise NotImplementedError(f"Invalid content_key: {type(content_key)} -> {content_key}")
 
-        tagged_xblock = TaggedContent(
-            xblock=xblock,
+        display_name = course.display_name_with_default
+        course_id = str(course.id)
+
+        tagged_course = TaggedContent(
+            display_name=display_name,
+            block_id=course_id,
+            category=course.category,
             object_tags=objectTagCache.get(str(content_key), {}),
             children=None,
         )
 
-        if not include_children:
-            return tagged_xblock
-
-        blocks = [tagged_xblock]
+        blocks = [(tagged_course, course)]
 
         while blocks:
-            block = blocks.pop()
-            block.children = []
+            tagged_block, xblock = blocks.pop()
+            tagged_block.children = []
 
-            if block.xblock.has_children:
-                for child_id in block.xblock.children:
-                    child = TaggedContent(
-                        xblock=store.get_item(child_id),
+            if xblock.has_children:
+                for child_id in xblock.children:
+                    child_block = store.get_item(child_id)
+                    tagged_child = TaggedContent(
+                        display_name=child_block.display_name_with_default,
+                        block_id=str(child_id),
+                        category=child_block.category,
                         object_tags=objectTagCache.get(str(child_id), {}),
                         children=None,
                     )
-                    block.children.append(child)
+                    tagged_block.children.append(tagged_child)
 
-                    blocks.append(child)
+                    blocks.append((tagged_child, child_block))
 
-        return tagged_xblock
+        return tagged_course
 
     store = modulestore()
 
-    all_blocks_tag_records = list(_get_object_tags(content_key, include_children))
+    all_blocks_tag_records = list(_get_object_tags(content_key))
     objectTagCache, taxonomies = _group_object_tags_by_objectid_taxonomy(all_blocks_tag_records)
 
-    return _build_object_tree_with_objecttags(content_key, include_children, objectTagCache, store), taxonomies
+    return _build_object_tree_with_objecttags(content_key, objectTagCache, store), taxonomies
 
 
 # Expose the oel_tagging APIs

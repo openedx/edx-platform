@@ -200,15 +200,10 @@ class ObjectTagExportView(APIView):
 
             # Iterate over the blocks and yield the rows
             for item, level in _content_generator(tagged_content):
-                if item.xblock.category == "course":
-                    block_id = item.xblock.id
-                else:
-                    block_id = item.xblock.location
-
                 block_data = {
-                    "name": level * "  " + item.xblock.display_name_with_default,
-                    "type": item.xblock.category,
-                    "id": str(block_id),
+                    "name": level * "  " + item.display_name,
+                    "type": item.category,
+                    "id": item.block_id,
                 }
 
                 # Add the tags for each taxonomy

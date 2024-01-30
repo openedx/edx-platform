@@ -310,7 +310,9 @@ class TaggedCourseMixin(ModuleStoreTestCase):
         )
 
         self.expected_tagged_xblock = TaggedContent(
-            xblock=self.course,
+            display_name=self.course.display_name_with_default,
+            block_id=str(self.course.id),
+            category=self.course.category,
             children=[],
             object_tags={
                 self.taxonomy_1.id: list(course_tags),
@@ -330,8 +332,11 @@ class TaggedCourseMixin(ModuleStoreTestCase):
             taxonomy=self.taxonomy_2,
             tags=['Tag 2.1'],
         )
+        xblock = self.store.get_item(self.sequential.location)
         tagged_sequential = TaggedContent(
-            xblock=self.store.get_item(self.sequential.location),
+            display_name=xblock.display_name_with_default,
+            block_id=str(xblock.location),
+            category=xblock.category,
             children=[],
             object_tags={
                 self.taxonomy_1.id: list(sequential_tags1),
@@ -348,8 +353,11 @@ class TaggedCourseMixin(ModuleStoreTestCase):
             taxonomy=self.taxonomy_2,
             tags=['Tag 2.2'],
         )
+        xblock = self.store.get_item(vertical.location)
         tagged_vertical = TaggedContent(
-            xblock=self.store.get_item(vertical.location),
+            display_name=xblock.display_name_with_default,
+            block_id=str(xblock.location),
+            category=xblock.category,
             children=[],
             object_tags={
                 self.taxonomy_2.id: list(vertical_tags),
@@ -360,25 +368,31 @@ class TaggedCourseMixin(ModuleStoreTestCase):
         tagged_sequential.children.append(tagged_vertical)
 
         vertical2 = self.store.create_child(self.user_id, self.sequential.location, "vertical", "test_vertical2")
+        xblock = self.store.get_item(vertical2.location)
         tagged_vertical2 = TaggedContent(
-            xblock=self.store.get_item(vertical2.location),
+            display_name=xblock.display_name_with_default,
+            block_id=str(xblock.location),
+            category=xblock.category,
             children=[],
             object_tags={},
         )
         assert tagged_sequential.children is not None  # type guard
         tagged_sequential.children.append(tagged_vertical2)
 
-        text = self.store.create_child(self.user_id, vertical2.location, "html", "test_html")
-        text_tags = api.tag_content_object(
-            object_key=text.location,
+        html = self.store.create_child(self.user_id, vertical2.location, "html", "test_html")
+        html_tags = api.tag_content_object(
+            object_key=html.location,
             taxonomy=self.taxonomy_2,
             tags=['Tag 2.1'],
         )
+        xblock = self.store.get_item(html.location)
         tagged_text = TaggedContent(
-            xblock=self.store.get_item(text.location),
+            display_name=xblock.display_name_with_default,
+            block_id=str(xblock.location),
+            category=xblock.category,
             children=[],
             object_tags={
-                self.taxonomy_2.id: list(text_tags),
+                self.taxonomy_2.id: list(html_tags),
             },
         )
 
@@ -391,72 +405,34 @@ class TestContentTagChildrenExport(TaggedCourseMixin):  # type: ignore[misc]
     """
     Test exporting content objects
     """
-    def _compare_tagged_xblock(self, expected: TaggedContent, actual: TaggedContent):
-        """
-        Compare two TaggedContent objects
-        """
-        assert expected.xblock.location == actual.xblock.location
-        assert expected.object_tags == actual.object_tags
-        if expected.children is None:
-            assert actual.children is None
-            return
-
-        assert actual.children is not None
-        for i in range(len(expected.children)):
-            self._compare_tagged_xblock(expected.children[i], actual.children[i])
-
-    @ddt.data(
-        True,
-        False,
-    )
-    def test_export_tagged_course(self, include_children: bool) -> None:
+    def test_export_tagged_course(self) -> None:
         """
         Test if we can export a course
         """
         # 2 from get_course() / get_item() + 1 from _get_object_tags()
         with self.assertNumQueries(3):
-            tagged_xblock, taxonomies = api.get_object_tree_with_objecttags(
-                self.course.id, include_children=include_children
-            )
+            tagged_xblock, taxonomies = api.get_object_tree_with_objecttags(self.course.id)
 
-        if include_children:
-            expected_taxonomies = {
-                self.taxonomy_1.id: self.taxonomy_1,
-                self.taxonomy_2.id: self.taxonomy_2,
-            }
-        else:
-            self.expected_tagged_xblock.children = None
-            expected_taxonomies = {
-                self.taxonomy_1.id: self.taxonomy_1,
-            }
+        expected_taxonomies = {
+            self.taxonomy_1.id: self.taxonomy_1,
+            self.taxonomy_2.id: self.taxonomy_2,
+        }
 
-        self._compare_tagged_xblock(self.expected_tagged_xblock, tagged_xblock)
+        assert tagged_xblock == self.expected_tagged_xblock
         assert taxonomies == expected_taxonomies
 
-    @ddt.data(
-        True,
-        False,
-    )
-    def test_export_tagged_block(self, include_children: bool) -> None:
+    def test_export_tagged_block(self) -> None:
         """
         Test if we can export a course
         """
         # 2 from get_course() / get_item() + 1 from _get_object_tags()
         with self.assertNumQueries(3):
-            tagged_xblock, taxonomies = api.get_object_tree_with_objecttags(
-                self.course.id, include_children=include_children
-            )
+            tagged_xblock, taxonomies = api.get_object_tree_with_objecttags(self.course.id)
 
-        if include_children:
-            expected_taxonomies = {
-                self.taxonomy_1.id: self.taxonomy_1,
-                self.taxonomy_2.id: self.taxonomy_2,
-            }
-        else:
-            self.expected_tagged_xblock.children = None
-            expected_taxonomies = {
-                self.taxonomy_1.id: self.taxonomy_1,
-            }
+        expected_taxonomies = {
+            self.taxonomy_1.id: self.taxonomy_1,
+            self.taxonomy_2.id: self.taxonomy_2,
+        }
 
-        self._compare_tagged_xblock(self.expected_tagged_xblock, tagged_xblock)
+        assert tagged_xblock == self.expected_tagged_xblock
         assert taxonomies == expected_taxonomies
