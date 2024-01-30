@@ -98,3 +98,4 @@ class TaxonomyOrgSerializer(TaxonomySerializer):
     class Meta:
         model = TaxonomySerializer.Meta.model
         fields = TaxonomySerializer.Meta.fields + ["orgs", "all_orgs"]
+        read_only_fields = ["orgs", "all_orgs"]
