@@ -56,6 +56,7 @@ class PureXBlock(XBlock):
 
 
 @ddt.ddt
+@pytest.mark.django_db
 class RoundTripTestCase(unittest.TestCase):
     """
     Check that our test courses roundtrip properly.
