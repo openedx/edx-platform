@@ -218,15 +218,12 @@ class ObjectTagExportView(APIView):
 
         object_id: str = kwargs.get('object_id', None)
 
-        content_key: UsageKey | CourseKey
+        content_key: CourseKey
 
         try:
-            content_key = UsageKey.from_string(object_id)
-        except InvalidKeyError:
-            try:
-                content_key = CourseKey.from_string(object_id)
-            except InvalidKeyError as e:
-                raise ValidationError("object_id is not a valid content key.") from e
+            content_key = CourseKey.from_string(object_id)
+        except InvalidKeyError as e:
+            raise ValidationError("object_id is not a valid content key.") from e
 
         # Check if the user has permission to view object tags for this object_id
         try:
