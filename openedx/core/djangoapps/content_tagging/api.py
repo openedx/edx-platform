@@ -205,7 +205,11 @@ def get_object_tree_with_objecttags(
         """
         content_key_str = str(content_key)
         if not include_children:
-            return ObjectTag.objects.filter(object_id=content_key_str).select_related("tag__taxonomy")
+            return ObjectTag.objects.filter(
+                    object_id=content_key_str,
+                    tag__isnull=False,
+                    tag__taxonomy__isnull=False,
+                ).select_related("tag__taxonomy")
 
         # We use a block_id_prefix (i.e. the modified course id) to get the tags for the children of the Content
         # (course) in a single db query.
@@ -219,8 +223,10 @@ def get_object_tree_with_objecttags(
         else:
             raise NotImplementedError(f"Invalid content_key: {type(content_key)} -> {content_key}")
 
-        return ObjectTag.objects.filter(Q(object_id__startswith=block_id_prefix) | Q(object_id=course_key_str)) \
-            .select_related("tag__taxonomy")
+        return ObjectTag.objects.filter(
+                Q(object_id__startswith=block_id_prefix) | Q(object_id=course_key_str),
+                Q(tag__isnull=False, tag__taxonomy__isnull=False),
+             ).select_related("tag__taxonomy")
 
     def _group_object_tags_by_objectid_taxonomy(
         all_object_tags: list[ObjectTag]
