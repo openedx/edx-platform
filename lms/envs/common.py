@@ -5484,6 +5484,8 @@ BEAMER_PRODUCT_ID = ""
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: True
 # .. toggle_description: Set to True to enable the feature to generate and send survey reports.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2024-01-30
 SURVEY_REPORT_ENABLE = True
 # .. setting_name: SURVEY_REPORT_ENDPOINT
 # .. setting_default: Open edX organization endpoint
@@ -5493,6 +5495,8 @@ SURVEY_REPORT_ENDPOINT = 'https://hooks.zapier.com/hooks/catch/11595998/3ouwv7m/
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
 # .. toggle_description: If enable, the survey report will be send a UUID as ID instead of use lms site name.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2023-02-21
 ANONYMOUS_SURVEY_REPORT = False
 # .. setting_name: SURVEY_REPORT_CHECK_THRESHOLD
 # .. setting_default: every 6 months
