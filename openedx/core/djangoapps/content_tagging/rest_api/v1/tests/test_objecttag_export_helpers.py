@@ -67,9 +67,9 @@ class TaggedCourseMixin(ModuleStoreTestCase):
         )
 
         self.expected_tagged_xblock = TaggedContent(
-            display_name=self.course.display_name_with_default,
-            block_id=str(self.course.id),
-            category=self.course.category,
+            display_name="Test Course",
+            block_id="course-v1:orgA+test_course+test_run",
+            category="course",
             children=[],
             object_tags={
                 self.taxonomy_1.id: list(course_tags),
@@ -93,11 +93,10 @@ class TaggedCourseMixin(ModuleStoreTestCase):
             taxonomy=self.taxonomy_2,
             tags=['Tag 2.1'],
         )
-        xblock = self.store.get_item(self.sequential.location)
         tagged_sequential = TaggedContent(
-            display_name=xblock.display_name_with_default,
-            block_id=str(xblock.location),
-            category=xblock.category,
+            display_name="test sequential",
+            block_id="block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential",
+            category="sequential",
             children=[],
             object_tags={
                 self.taxonomy_1.id: list(sequential_tags1),
@@ -118,11 +117,10 @@ class TaggedCourseMixin(ModuleStoreTestCase):
             taxonomy=self.taxonomy_2,
             tags=['Tag 2.2'],
         )
-        xblock = self.store.get_item(vertical.location)
         tagged_vertical = TaggedContent(
-            display_name=xblock.display_name_with_default,
-            block_id=str(xblock.location),
-            category=xblock.category,
+            display_name="test vertical1",
+            block_id="block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1",
+            category="vertical",
             children=[],
             object_tags={
                 self.taxonomy_2.id: list(vertical_tags),
@@ -137,11 +135,10 @@ class TaggedCourseMixin(ModuleStoreTestCase):
             category="vertical",
             display_name="test vertical2",
         )
-        xblock = self.store.get_item(vertical2.location)
         tagged_vertical2 = TaggedContent(
-            display_name=xblock.display_name_with_default,
-            block_id=str(xblock.location),
-            category=xblock.category,
+            display_name="test vertical2",
+            block_id="block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical2",
+            category="vertical",
             children=[],
             object_tags={},
         )
@@ -158,11 +155,10 @@ class TaggedCourseMixin(ModuleStoreTestCase):
             taxonomy=self.taxonomy_2,
             tags=['Tag 2.1'],
         )
-        xblock = self.store.get_item(html.location)
         tagged_text = TaggedContent(
-            display_name=xblock.display_name_with_default,
-            block_id=str(xblock.location),
-            category=xblock.category,
+            display_name="test html",
+            block_id="block-v1:orgA+test_course+test_run+type@html+block@test_html",
+            category="html",
             children=[],
             object_tags={
                 self.taxonomy_2.id: list(html_tags),
