@@ -5480,17 +5480,19 @@ derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.cert
 BEAMER_PRODUCT_ID = ""
 
 #### Survey Report ####
-# .. setting_name: SURVEY_REPORT_ENABLE
-# .. setting_default: True
-# .. setting_description: Set to True to enable the feature to generate and send survey reports.
+# .. toggle_name: SURVEY_REPORT_ENABLE
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: Set to True to enable the feature to generate and send survey reports.
 SURVEY_REPORT_ENABLE = True
 # .. setting_name: SURVEY_REPORT_ENDPOINT
 # .. setting_default: Open edX organization endpoint
 # .. setting_description: Endpoint where the report will be sent.
 SURVEY_REPORT_ENDPOINT = 'https://hooks.zapier.com/hooks/catch/11595998/3ouwv7m/'
-# .. setting_name: ANONYMOUS_SURVEY_REPORT
-# .. setting_default: no anonymous
-# .. setting_description: Send UUID as ID instead of use lms site name.
+# .. toggle_name: ANONYMOUS_SURVEY_REPORT
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: If enable, the survey report will be send a UUID as ID instead of use lms site name.
 ANONYMOUS_SURVEY_REPORT = False
 # .. setting_name: SURVEY_REPORT_CHECK_THRESHOLD
 # .. setting_default: every 6 months
