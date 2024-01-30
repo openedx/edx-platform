@@ -108,6 +108,37 @@ class TaggedCourseMixin(ModuleStoreTestCase):
         assert self.expected_tagged_xblock.children is not None  # type guard
         self.expected_tagged_xblock.children.append(tagged_sequential)
 
+        # Untagged blocks
+        sequential2 = BlockFactory.create(
+            parent=self.course,
+            category="sequential",
+            display_name="untagged sequential",
+        )
+        untagged_sequential = TaggedContent(
+            display_name="untagged sequential",
+            block_id="block-v1:orgA+test_course+test_run+type@sequential+block@untagged_sequential",
+            category="sequential",
+            children=[],
+            object_tags={},
+        )
+        assert self.expected_tagged_xblock.children is not None  # type guard
+        self.expected_tagged_xblock.children.append(untagged_sequential)
+        BlockFactory.create(
+            parent=sequential2,
+            category="vertical",
+            display_name="untagged vertical",
+        )
+        untagged_vertical = TaggedContent(
+            display_name="untagged vertical",
+            block_id="block-v1:orgA+test_course+test_run+type@vertical+block@untagged_vertical",
+            category="vertical",
+            children=[],
+            object_tags={},
+        )
+        assert untagged_sequential.children is not None  # type guard
+        untagged_sequential.children.append(untagged_vertical)
+        # /Untagged blocks
+
         vertical = BlockFactory.create(
             parent=self.sequential,
             category="vertical",
@@ -191,6 +222,8 @@ class TaggedCourseMixin(ModuleStoreTestCase):
             (tagged_vertical, 2),
             (tagged_vertical2, 2),
             (tagged_text, 3),
+            (untagged_sequential, 1),
+            (untagged_vertical, 2),
         ]
 
 
