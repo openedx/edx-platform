@@ -87,7 +87,7 @@ def get_certified_programs(student: User, raise_on_error: bool = False) -> List[
         student: User object representing the student
 
     Keyword Arguments:
-        raise_on_error (bool): Reraise errors back to the caller, instead if returning empty results.
+        raise_on_error (bool): Reraise errors back to the caller, instead of returning empty results.
 
     Returns:
         str[]: UUIDs of the programs for which the student has been awarded a certificate
@@ -96,7 +96,7 @@ def get_certified_programs(student: User, raise_on_error: bool = False) -> List[
     certified_programs = []
     for credential in get_credentials(
         student,
-        credential_type="program",
+        credential_type=PROGRAM_CERTIFICATE,
         raise_on_error=raise_on_error,
     ):
         certified_programs.append(credential["credential"]["program_uuid"])
@@ -244,7 +244,7 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
                 if exc.response.status_code == 404:
                     LOGGER.exception(
                         f"Certificate for program {program_uuid} could not be found. "
-                        + f"Unable to award certificate to user {username}. The program might not be configured."
+                        f"Unable to award certificate to user {username}. The program might not be configured."
                     )
                 elif exc.response.status_code == 429:
                     rate_limit_countdown = 60
