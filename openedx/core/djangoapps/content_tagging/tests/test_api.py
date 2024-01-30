@@ -415,7 +415,9 @@ class TestContentTagChildrenExport(TaggedCourseMixin):  # type: ignore[misc]
         """
         # 2 from get_course() / get_item() + 1 from _get_object_tags()
         with self.assertNumQueries(3):
-            tagged_xblock, taxonomies = api.get_object_tree_with_objecttags(self.course.id, include_children=include_children)
+            tagged_xblock, taxonomies = api.get_object_tree_with_objecttags(
+                self.course.id, include_children=include_children
+            )
 
         if include_children:
             expected_taxonomies = {
@@ -441,7 +443,9 @@ class TestContentTagChildrenExport(TaggedCourseMixin):  # type: ignore[misc]
         """
         # 2 from get_course() / get_item() + 1 from _get_object_tags()
         with self.assertNumQueries(3):
-            tagged_xblock, taxonomies = api.get_object_tree_with_objecttags(self.course.id, include_children=include_children)
+            tagged_xblock, taxonomies = api.get_object_tree_with_objecttags(
+                self.course.id, include_children=include_children
+            )
 
         if include_children:
             expected_taxonomies = {
