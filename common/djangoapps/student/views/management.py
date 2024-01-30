@@ -910,7 +910,7 @@ def confirm_email_change(request, key):
 
         response = render_to_response("email_change_successful.html", address_context)
 
-        USER_EMAIL_CHANGED.send(sender=None, user=user)
+        USER_EMAIL_CHANGED.send(sender=None, user=user, request=request)
         return response
 
 

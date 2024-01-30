@@ -4,6 +4,7 @@ Django Admin page for SurveyReport.
 
 
 from django.contrib import admin
+from django.conf import settings
 from .models import SurveyReport
 from .api import send_report_to_external_api
 
@@ -80,4 +81,6 @@ class SurveyReportAdmin(admin.ModelAdmin):
             del actions['delete_selected']
         return actions
 
-admin.site.register(SurveyReport, SurveyReportAdmin)
+
+if settings.SURVEY_REPORT_ENABLE:
+    admin.site.register(SurveyReport, SurveyReportAdmin)
