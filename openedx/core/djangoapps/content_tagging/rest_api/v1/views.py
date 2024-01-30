@@ -20,7 +20,7 @@ from rest_framework.views import APIView
 
 from ...api import (
     create_taxonomy,
-    get_content_tags_for_object,
+    get_object_tree_with_objecttags,
     get_taxonomy,
     get_taxonomies,
     get_taxonomies_for_org,
@@ -246,7 +246,7 @@ class ObjectTagExportView(APIView):
         except ValueError as e:
             raise ValidationError from e
 
-        tagged_block, taxonomies = get_content_tags_for_object(content_key)
+        tagged_block, taxonomies = get_object_tree_with_objecttags(content_key)
 
         return StreamingHttpResponse(
             streaming_content=_generate_csv_rows(tagged_block, taxonomies, Echo()),

@@ -190,7 +190,7 @@ def tag_content_object(
     return get_content_tags(object_key, taxonomy_id=taxonomy.id)
 
 
-def get_content_tags_for_object(
+def get_object_tree_with_objecttags(
     content_key: ContentKey,
     include_children: bool = True,
 ) -> tuple[TaggedContent, TaxonomyDict]:
@@ -243,7 +243,7 @@ def get_content_tags_for_object(
 
         return groupedObjectTags, taxonomies
 
-    def _get_object_with_tags(
+    def _build_object_tree_with_objecttags(
         content_key: ContentKey,
         include_children: bool,
         objectTagCache: ObjectTagByObjectIdDict,
@@ -293,7 +293,7 @@ def get_content_tags_for_object(
     all_blocks_tag_records = list(_get_object_tags(content_key, include_children))
     objectTagCache, taxonomies = _group_object_tags_by_objectid_taxonomy(all_blocks_tag_records)
 
-    return _get_object_with_tags(content_key, include_children, objectTagCache, store), taxonomies
+    return _build_object_tree_with_objecttags(content_key, include_children, objectTagCache, store), taxonomies
 
 
 # Expose the oel_tagging APIs
