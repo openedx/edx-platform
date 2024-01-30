@@ -482,3 +482,51 @@ class SymbolValidator(object):
         Returns a key, value pair for the restrictions related to the Validator
         """
         return 'min_symbol', self.min_symbol
+
+
+class SpecialCharactersValidator(object):
+    """
+    Validate whether the password contains at least min_symbol symbols as !@#$%^&*.
+
+    Parameters:
+        min_symbol (int): the minimum number of symbols to require
+            in the password. Must be >= 0.
+    """
+    def __init__(self, min_symbol=0):
+        self.min_symbol = min_symbol
+
+    def validate(self, password, user=None):
+        if _validate_condition(password, lambda c: c in '!@#$%^&*', self.min_symbol):
+            return
+        raise ValidationError(
+            ungettext(
+                'This password must contain at least %(min_symbol)d symbol.',
+                'This password must contain at least %(min_symbol)d symbols.',
+                self.min_symbol
+            ),
+            code='too_few_symbols',
+            params={'min_symbol': self.min_symbol},
+        )
+
+    def get_help_text(self):
+        return ungettext(
+            "Your password must contain at least %(min_symbol)d symbol.",
+            "Your password must contain at least %(min_symbol)d symbols.",
+            self.min_symbol
+        ) % {'min_symbol': self.min_symbol}
+
+    def get_instruction_text(self):
+        if self.min_symbol > 0:
+            return ungettext(
+                '%(num)d symbol',
+                '%(num)d symbols',
+                self.min_symbol
+            ) % {'num': self.min_symbol}
+        else:
+            return ''
+
+    def get_restriction(self):
+        """
+        Returns a key, value pair for the restrictions related to the Validator
+        """
+        return 'min_symbol', self.min_symbol
