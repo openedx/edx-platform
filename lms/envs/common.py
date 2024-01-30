@@ -2238,6 +2238,9 @@ MIDDLEWARE = [
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
     'openedx.core.djangoapps.cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
 
+    # Middleware to flush user's session in other browsers when their email is changed.
+    'openedx.core.djangoapps.safe_sessions.middleware.EmailChangeMiddleware',
+
     'common.djangoapps.student.middleware.UserStandingMiddleware',
     'openedx.core.djangoapps.contentserver.middleware.StaticContentServer',
 
@@ -5040,6 +5043,20 @@ HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-838
 ENABLE_DYNAMIC_REGISTRATION_FIELDS = False
+
+############## Settings for EmailChangeMiddleware ###############
+
+# .. toggle_name: ENFORCE_SESSION_EMAIL_MATCH
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: When enabled, this setting invalidates sessions in other browsers
+#       upon email change, while preserving the session validity in the browser where the
+#       email change occurs. This toggle is just being used for rollout.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-12-07
+# .. toggle_target_removal_date: 2024-04-01
+# .. toggle_tickets: https://2u-internal.atlassian.net/browse/VAN-1797
+ENFORCE_SESSION_EMAIL_MATCH = False
 
 LEARNER_HOME_MFE_REDIRECT_PERCENTAGE = 0
 
