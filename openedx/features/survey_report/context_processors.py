@@ -10,7 +10,7 @@ def admin_extra_context(request):
     This function sends extra context to every admin site.
     The current threshold to show the banner is one month but this can be redefined in the future.
     """
-    if not settings.ENABLE_SURVEY_REPORT or not request.path.startswith(reverse('admin:index')):
+    if not settings.SURVEY_REPORT_ENABLE or not request.path.startswith(reverse('admin:index')):
         return {'show_survey_report_banner': False}
 
     return {'show_survey_report_banner': should_show_survey_report_banner()}

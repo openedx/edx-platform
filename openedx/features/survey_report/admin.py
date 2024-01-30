@@ -82,5 +82,5 @@ class SurveyReportAdmin(admin.ModelAdmin):
         return actions
 
 
-if settings.ENABLE_SURVEY_REPORT:
+if settings.SURVEY_REPORT_ENABLE:
     admin.site.register(SurveyReport, SurveyReportAdmin)

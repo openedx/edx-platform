@@ -5480,10 +5480,10 @@ derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.cert
 BEAMER_PRODUCT_ID = ""
 
 #### Survey Report ####
-# .. setting_name: ENABLE_SURVEY_REPORT
+# .. setting_name: SURVEY_REPORT_ENABLE
 # .. setting_default: True
 # .. setting_description: Set to True to enable the feature to generate and send survey reports.
-ENABLE_SURVEY_REPORT = True
+SURVEY_REPORT_ENABLE = True
 # .. setting_name: SURVEY_REPORT_ENDPOINT
 # .. setting_default: Open edX organization endpoint
 # .. setting_description: Endpoint where the report will be sent.
