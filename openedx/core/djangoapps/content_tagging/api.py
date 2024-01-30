@@ -235,19 +235,19 @@ def get_object_tree_with_objecttags(
         Returns a tuple with a dictionary of grouped object tags for all blocks and a dictionary of taxonomies.
         """
 
-        groupedObjectTags: ObjectTagByObjectIdDict = {}
+        grouped_object_tags: ObjectTagByObjectIdDict = {}
         taxonomies: TaxonomyDict = {}
 
         for object_id, block_tags in groupby(all_object_tags, lambda x: x.object_id):
-            groupedObjectTags[object_id] = {}
+            grouped_object_tags[object_id] = {}
             for taxonomy_id, taxonomy_tags in groupby(block_tags, lambda x: x.tag.taxonomy_id):
                 object_tags_list = list(taxonomy_tags)
-                groupedObjectTags[object_id][taxonomy_id] = object_tags_list
+                grouped_object_tags[object_id][taxonomy_id] = object_tags_list
 
                 if taxonomy_id not in taxonomies:
                     taxonomies[taxonomy_id] = object_tags_list[0].tag.taxonomy
 
-        return groupedObjectTags, taxonomies
+        return grouped_object_tags, taxonomies
 
     def _build_object_tree_with_objecttags(
         content_key: ContentKey,
