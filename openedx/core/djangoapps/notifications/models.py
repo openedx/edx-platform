@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 NOTIFICATION_CHANNELS = ['web', 'push', 'email']
 
 # Update this version when there is a change to any course specific notification type or app.
-COURSE_NOTIFICATION_CONFIG_VERSION = 4
+COURSE_NOTIFICATION_CONFIG_VERSION = 5
 
 
 def get_course_notification_preference_config():
