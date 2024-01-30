@@ -8,7 +8,7 @@
     # via -r requirements/edx/base.txt
 acid-xblock==0.2.1
     # via -r requirements/edx/base.txt
-aiohttp==3.9.1
+aiohttp==3.9.3
     # via
     #   -r requirements/edx/base.txt
     #   geoip2
@@ -104,13 +104,13 @@ bleach[css]==6.1.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.34.28
+boto3==1.34.30
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.34.28
+botocore==1.34.30
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -208,7 +208,7 @@ coreschema==0.0.4
     #   -r requirements/edx/base.txt
     #   coreapi
     #   drf-yasg
-coverage[toml]==7.4.0
+coverage[toml]==7.4.1
     # via
     #   -r requirements/edx/coverage.txt
     #   pytest-cov
@@ -250,7 +250,7 @@ deprecated==1.2.14
     #   jwcrypto
 diff-cover==8.0.3
     # via -r requirements/edx/coverage.txt
-dill==0.3.7
+dill==0.3.8
     # via pylint
 distlib==0.3.8
     # via virtualenv
@@ -523,7 +523,7 @@ edx-auth-backends==4.2.0
     # via
     #   -r requirements/edx/base.txt
     #   openedx-blockstore
-edx-braze-client==0.2.1
+edx-braze-client==0.2.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -567,7 +567,7 @@ edx-django-utils==5.10.1
     #   openedx-blockstore
     #   ora2
     #   super-csv
-edx-drf-extensions==10.0.0
+edx-drf-extensions==10.1.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-completion
@@ -579,7 +579,7 @@ edx-drf-extensions==10.0.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.10.10
+edx-enterprise==4.11.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -685,7 +685,7 @@ execnet==2.0.2
     # via pytest-xdist
 factory-boy==3.3.0
     # via -r requirements/edx/testing.in
-faker==22.5.1
+faker==22.6.0
     # via factory-boy
 fastapi==0.109.0
     # via pact-python
@@ -990,7 +990,7 @@ optimizely-sdk==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-ora2==6.0.29
+ora2==6.0.30
     # via -r requirements/edx/base.txt
 packaging==23.2
     # via
@@ -1095,9 +1095,9 @@ pycryptodomex==3.20.0
     #   edx-proctoring
     #   lti-consumer-xblock
     #   pyjwkest
-pydantic==2.5.3
+pydantic==2.6.0
     # via fastapi
-pydantic-core==2.14.6
+pydantic-core==2.16.1
     # via pydantic
 pygments==2.17.2
     # via
@@ -1185,7 +1185,7 @@ pysrt==1.1.2
     # via
     #   -r requirements/edx/base.txt
     #   edxval
-pytest==7.4.4
+pytest==8.0.0
     # via
     #   -r requirements/edx/testing.in
     #   pylint-pytest
@@ -1247,7 +1247,7 @@ python3-openid==3.2.0 ; python_version >= "3"
     #   social-auth-core
 python3-saml==1.16.0
     # via -r requirements/edx/base.txt
-pytz==2023.3.post1
+pytz==2023.4
     # via
     #   -r requirements/edx/base.txt
     #   babel
@@ -1287,7 +1287,7 @@ redis==5.0.1
     # via
     #   -r requirements/edx/base.txt
     #   walrus
-referencing==0.32.1
+referencing==0.33.0
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
@@ -1546,7 +1546,7 @@ urllib3==1.26.18
     #   snowflake-connector-python
 user-util==1.0.0
     # via -r requirements/edx/base.txt
-uvicorn==0.27.0
+uvicorn==0.27.0.post1
     # via pact-python
 vine==5.1.0
     # via
