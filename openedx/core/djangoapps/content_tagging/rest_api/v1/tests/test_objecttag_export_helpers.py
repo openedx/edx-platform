@@ -11,6 +11,7 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, 
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
 from .... import api
+from ....models import ContentObjectTag
 from ..objecttag_export_helpers import TaggedContent, build_object_tree_with_objecttags, iterate_with_level
 
 
@@ -167,6 +168,21 @@ class TaggedCourseMixin(ModuleStoreTestCase):
 
         assert tagged_vertical2.children is not None  # type guard
         tagged_vertical2.children.append(tagged_text)
+
+        # Create "deleted" object tags, which will be omitted from the results.
+        for object_id in (
+            self.course.id,
+            self.sequential.location,
+            vertical.location,
+            html.location,
+        ):
+            ContentObjectTag.objects.create(
+                object_id=str(object_id),
+                taxonomy=None,
+                tag=None,
+                _value="deleted tag",
+                _name="deleted taxonomy",
+            )
 
         self.all_object_tags, _ = api.get_all_object_tags(self.course.id)
         self.expected_tagged_content_list = [
