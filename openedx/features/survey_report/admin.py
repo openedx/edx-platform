@@ -22,7 +22,7 @@ class SurveyReportAdmin(admin.ModelAdmin):
     )
 
     list_display = (
-        'id', 'summary', 'created_at', 'report_state'
+        'id', 'summary', 'created_at', 'state'
     )
 
     actions = ['send_report']
@@ -81,17 +81,6 @@ class SurveyReportAdmin(admin.ModelAdmin):
             del actions['delete_selected']
         return actions
 
-    def report_state(self, obj):
-        """
-        Method to define the custom State column with the new "send" state,
-        to avoid modifying the current models.
-        """
-        try:
-            if obj.surveyreportupload_set.last().is_uploaded():
-                return "Sent"
-        except AttributeError:
-            return obj.state.capitalize()
-    report_state.short_description = 'State'
 
 if settings.ENABLE_SURVEY_REPORT:
     admin.site.register(SurveyReport, SurveyReportAdmin)

@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from urllib.parse import parse_qs, urlparse
 import json
+from unittest.mock import MagicMock
 
 import abc
 import ddt
@@ -33,6 +34,7 @@ from openedx.core.djangoapps.content_libraries.api import (
     create_library,
     set_library_user_permissions,
 )
+from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.content_tagging.models import TaxonomyOrg
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.core.lib import blockstore_api
@@ -192,7 +194,7 @@ class TestTaxonomyObjectsMixin:
             rel_type=TaxonomyOrg.RelType.OWNER,
         )
 
-        # Global taxonomy
+        # Global taxonomy, which contains tags
         self.t1 = Taxonomy.objects.create(name="t1", enabled=True)
         TaxonomyOrg.objects.create(
             taxonomy=self.t1,
@@ -203,6 +205,12 @@ class TestTaxonomyObjectsMixin:
             taxonomy=self.t2,
             rel_type=TaxonomyOrg.RelType.OWNER,
         )
+        root1 = Tag.objects.create(taxonomy=self.t1, value="ALPHABET")
+        Tag.objects.create(taxonomy=self.t1, value="android", parent=root1)
+        Tag.objects.create(taxonomy=self.t1, value="abacus", parent=root1)
+        Tag.objects.create(taxonomy=self.t1, value="azure", parent=root1)
+        Tag.objects.create(taxonomy=self.t1, value="aardvark", parent=root1)
+        Tag.objects.create(taxonomy=self.t1, value="anvil", parent=root1)
 
         # OrgA taxonomy
         self.tA1 = Taxonomy.objects.create(name="tA1", enabled=True)
@@ -278,7 +286,8 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
             expected_taxonomies: list[str],
             enabled_parameter: bool | None = None,
             org_parameter: str | None = None,
-            unassigned_parameter: bool | None = None
+            unassigned_parameter: bool | None = None,
+            page_size: int | None = None,
     ) -> None:
         """
         Helper function to call the list endpoint and check the response
@@ -293,6 +302,7 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
             "enabled": enabled_parameter,
             "org": org_parameter,
             "unassigned": unassigned_parameter,
+            "page_size": page_size,
         }.items() if v is not None}
 
         response = self.client.get(url, query_params, format="json")
@@ -304,11 +314,12 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
         """
         Tests that staff users see all taxonomies
         """
-        # Default page_size=10, and so "tBA1" and "tBA2" appear on the second page
+        # page_size=10, and so "tBA1" and "tBA2" appear on the second page
         expected_taxonomies = ["ot1", "ot2", "st1", "st2", "t1", "t2", "tA1", "tA2", "tB1", "tB2"]
         self._test_list_taxonomy(
             user_attr="staff",
             expected_taxonomies=expected_taxonomies,
+            page_size=10,
         )
 
     @ddt.data(
@@ -475,6 +486,29 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
             # Also checks if the taxonomy was associated with the org
             if user_attr == "staffA":
                 assert response.data["orgs"] == [self.orgA.short_name]
+
+    def test_list_taxonomy_query_count(self):
+        """
+        Test how many queries are used when retrieving taxonomies and permissions
+        """
+        url = TAXONOMY_ORG_LIST_URL + f'?org=${self.orgA.short_name}&enabled=true'
+
+        self.client.force_authenticate(user=self.staff)
+        with self.assertNumQueries(16):  # TODO Why so many queries?
+            response = self.client.get(url)
+
+        assert response.status_code == 200
+        assert response.data["can_add_taxonomy"]
+        assert len(response.data["results"]) == 2
+        for taxonomy in response.data["results"]:
+            if taxonomy["system_defined"]:
+                assert not taxonomy["can_change_taxonomy"]
+                assert not taxonomy["can_delete_taxonomy"]
+                assert taxonomy["can_tag_object"]
+            else:
+                assert taxonomy["can_change_taxonomy"]
+                assert taxonomy["can_delete_taxonomy"]
+                assert taxonomy["can_tag_object"]
 
 
 @ddt.ddt
@@ -787,7 +821,14 @@ class TestTaxonomyDetailViewSet(TestTaxonomyDetailExportMixin, APITestCase):
         assert response.status_code == expected_status, reason
 
         if status.is_success(expected_status):
-            check_taxonomy(response.data, taxonomy.pk, **(TaxonomySerializer(taxonomy.cast()).data))
+            request = MagicMock()
+            request.user = user
+            context = {"request": request}
+            check_taxonomy(
+                response.data,
+                taxonomy.pk,
+                **(TaxonomySerializer(taxonomy.cast(), context=context)).data,
+            )
 
 
 @skip_unless_cms
@@ -1538,12 +1579,12 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
 
         # Fetch this object's tags for a single taxonomy
         expected_tags = [{
-            'editable': True,
             'name': 'Multiple Taxonomy',
             'taxonomy_id': taxonomy.pk,
+            'can_tag_object': True,
             'tags': [
-                {'value': 'Tag 1', 'lineage': ['Tag 1']},
-                {'value': 'Tag 2', 'lineage': ['Tag 2']},
+                {'value': 'Tag 1', 'lineage': ['Tag 1'], 'can_delete_objecttag': True},
+                {'value': 'Tag 2', 'lineage': ['Tag 2'], 'can_delete_objecttag': True},
             ],
         }]
 
@@ -1559,6 +1600,28 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         response3 = self.client.get(get_all_url, format="json")
         assert status.is_success(response3.status_code)
         assert response3.data[str(self.courseA)]["taxonomies"] == expected_tags
+
+    def test_object_tags_query_count(self):
+        """
+        Test how many queries are used when retrieving object tags and permissions
+        """
+        object_key = self.courseA
+        object_id = str(object_key)
+        tagging_api.tag_content_object(object_key=object_key, taxonomy=self.t1, tags=["anvil", "android"])
+        expected_tags = [
+            {"value": "android", "lineage": ["ALPHABET", "android"], "can_delete_objecttag": True},
+            {"value": "anvil", "lineage": ["ALPHABET", "anvil"], "can_delete_objecttag": True},
+        ]
+
+        url = OBJECT_TAGS_URL.format(object_id=object_id)
+        self.client.force_authenticate(user=self.staff)
+        with self.assertNumQueries(7):  # TODO Why so many queries?
+            response = self.client.get(url)
+
+        assert response.status_code == 200
+        assert len(response.data[object_id]["taxonomies"]) == 1
+        assert response.data[object_id]["taxonomies"][0]["can_tag_object"]
+        assert response.data[object_id]["taxonomies"][0]["tags"] == expected_tags
 
 
 @skip_unless_cms
@@ -2029,3 +2092,27 @@ class TestImportTagsView(ImportTaxonomyMixin, APITestCase):
         assert len(tags) == len(self.old_tags)
         for i, tag in enumerate(tags):
             assert tag["value"] == self.old_tags[i].value
+
+
+@skip_unless_cms
+@ddt.ddt
+class TestTaxonomyTagsViewSet(TestTaxonomyObjectsMixin, APITestCase):
+    """
+    Test cases for TaxonomyTagsViewSet retrive action.
+    """
+    def test_taxonomy_tags_query_count(self):
+        """
+        Test how many queries are used when retrieving small taxonomies+tags and permissions
+        """
+        url = f"{TAXONOMY_TAGS_URL}?search_term=an&parent_tag=ALPHABET".format(pk=self.t1.id)
+
+        self.client.force_authenticate(user=self.staff)
+        with self.assertNumQueries(13):  # TODO Why so many queries?
+            response = self.client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["can_add_tag"]
+        assert len(response.data["results"]) == 2
+        for taxonomy in response.data["results"]:
+            assert taxonomy["can_change_tag"]
+            assert taxonomy["can_delete_tag"]

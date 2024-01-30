@@ -219,7 +219,7 @@ def can_change_object_tag_objectid(user: UserType, object_id: str) -> bool:
     Everyone that has permission to edit the object should be able to tag it.
     """
     if not object_id:
-        raise ValueError("object_id must be provided")
+        return True
     try:
         usage_key = UsageKey.from_string(object_id)
         if not usage_key.course_key.is_course:
@@ -274,7 +274,7 @@ def can_change_taxonomy_tag(user: UserType, tag: oel_tagging.Tag | None = None) 
     return oel_tagging.is_taxonomy_admin(user) and (
         not tag
         or not taxonomy
-        or (taxonomy and not taxonomy.allow_free_text and not taxonomy.system_defined)
+        or (bool(taxonomy) and not taxonomy.allow_free_text and not taxonomy.system_defined)
     )
 
 
