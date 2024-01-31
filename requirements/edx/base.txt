@@ -56,7 +56,6 @@ backoff==1.10.0
 backports-zoneinfo[tzdata]==0.2.1
     # via
     #   celery
-    #   django
     #   icalendar
     #   kombu
 beautifulsoup4==4.12.3
@@ -174,9 +173,9 @@ defusedxml==0.7.1
     #   social-auth-core
 deprecated==1.2.14
     # via jwcrypto
-django==4.2.9
+django==3.2.23
     # via
-    #   -c requirements/edx/../constraints.txt
+    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/kernel.in
     #   django-appconf
     #   django-celery-results
@@ -339,7 +338,6 @@ django-ses==3.5.2
     # via -r requirements/edx/bundled.in
 django-simple-history==3.4.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
     #   edx-name-affirmation
@@ -942,6 +940,7 @@ pytz==2023.4
     # via
     #   -r requirements/edx/kernel.in
     #   babel
+    #   django
     #   django-ses
     #   djangorestframework
     #   drf-yasg
