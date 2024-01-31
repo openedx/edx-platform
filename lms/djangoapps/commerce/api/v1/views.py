@@ -72,7 +72,6 @@ class CourseRetrieveUpdateView(PutAsCreateMixin, RetrieveUpdateAPIView):
 class OrderView(APIView):
     """ Retrieve order details. """
 
-    authentication_classes = (JwtAuthentication, SessionAuthentication,)
     permission_classes = (IsAuthenticatedOrActivationOverridden,)
 
     def get(self, request, number):
