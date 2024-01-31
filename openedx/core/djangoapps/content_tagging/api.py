@@ -207,8 +207,8 @@ def get_object_tree_with_objecttags(
         # (course) in a single db query.
         # ToDo: Add support for other content types (like LibraryContent and LibraryBlock)
         if isinstance(content_key, CourseKey):
-            course_key_str = str(content_key)
-            block_id_prefix = str(content_key).replace("course-v1:", "block-v1:", 1)
+            course_key_str = content_key_str
+            block_id_prefix = content_key_str.replace("course-v1:", "block-v1:", 1)
         else:
             raise NotImplementedError(f"Invalid content_key: {type(content_key)} -> {content_key}")
 
