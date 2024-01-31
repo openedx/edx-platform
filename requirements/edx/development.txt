@@ -1300,7 +1300,7 @@ openedx-django-wiki==2.0.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openedx-events==9.3.0
+openedx-events @ git+https://github.com/Zacharis278/openedx-events@zhancock/course-access-role-events
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
