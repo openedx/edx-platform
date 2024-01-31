@@ -199,6 +199,8 @@ def get_all_object_tags(
     else:
         raise NotImplementedError(f"Invalid content_key: {type(content_key)} -> {content_key}")
 
+    # There is no API method in oel_tagging.api that does this yet,
+    # so for now we have to build the ORM query directly.
     all_object_tags = list(ObjectTag.objects.filter(
         Q(object_id__startswith=block_id_prefix) | Q(object_id=course_key_str),
         Q(tag__isnull=False, tag__taxonomy__isnull=False),
