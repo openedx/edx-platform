@@ -4,6 +4,7 @@ Django Admin page for SurveyReport.
 
 
 from django.contrib import admin
+from django.conf import settings
 from .models import SurveyReport
 from .api import send_report_to_external_api
 
@@ -21,7 +22,7 @@ class SurveyReportAdmin(admin.ModelAdmin):
     )
 
     list_display = (
-        'id', 'summary', 'created_at', 'state'
+        'id', 'summary', 'created_at', 'report_state'
     )
 
     actions = ['send_report']
@@ -80,4 +81,18 @@ class SurveyReportAdmin(admin.ModelAdmin):
             del actions['delete_selected']
         return actions
 
-admin.site.register(SurveyReport, SurveyReportAdmin)
+    def report_state(self, obj):
+        """
+        Method to define the custom State column with the new "send" state,
+        to avoid modifying the current models.
+        """
+        try:
+            if obj.surveyreportupload_set.last().is_uploaded():
+                return "Sent"
+        except AttributeError:
+            return obj.state.capitalize()
+    report_state.short_description = 'State'
+
+
+if settings.SURVEY_REPORT_ENABLE:
+    admin.site.register(SurveyReport, SurveyReportAdmin)

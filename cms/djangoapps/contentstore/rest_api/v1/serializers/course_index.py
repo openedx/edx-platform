@@ -29,3 +29,4 @@ class CourseIndexSerializer(serializers.Serializer):
     proctoring_errors = ProctoringErrorListSerializer(many=True)
     reindex_link = serializers.CharField()
     rerun_notification_id = serializers.IntegerField()
+    is_custom_relative_dates_active = serializers.BooleanField()
