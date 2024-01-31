@@ -11,8 +11,8 @@ from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.courseware.models import StudentModule
 
-from genplus.lms.djangoapps.genplus_core.models import Student, JournalPost
-from genplus.lms.djangoapps.genplus_core.constants import JournalTypes
+from genplus.lms.djangoapps.genplus.models import Student, JournalPost
+from genplus.lms.djangoapps.genplus.constants import JournalTypes
 from openedx.features.genplus_features.genplus_learning.models import Unit
 from openedx.features.genplus_features.genplus_assessments.utils import build_problem_list, get_problem_attributes
 from openedx.features.genplus_features.genplus_assessments.constants import ProblemTypes, JOURNAL_STYLE

@@ -13,8 +13,8 @@ from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from common.config.waffle import TEACHER_PROGRESS_TACKING_DISABLED_SWITCH
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.course_modes.models import CourseMode
-from genplus.lms.djangoapps.genplus_core.models import Class, Student
-from genplus.lms.djangoapps.genplus_core.constants import GenUserRoles
+from genplus.lms.djangoapps.genplus.models import Class, Student
+from genplus.lms.djangoapps.genplus.constants import GenUserRoles
 from openedx.features.genplus_features.genplus_learning.models import (
     Program, ProgramEnrollment, UnitCompletion, UnitBlockCompletion
 )

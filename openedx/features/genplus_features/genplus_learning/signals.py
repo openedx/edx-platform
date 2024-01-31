@@ -7,8 +7,8 @@ from completion.models import BlockCompletion
 from common.djangoapps.student.models import CourseEnrollment
 from xmodule.modulestore.django import SignalHandler, modulestore
 from lms.djangoapps.grades.signals.signals import PROBLEM_RAW_SCORE_CHANGED
-from genplus.lms.djangoapps.genplus_core.models import Class, Teacher, Activity, GenLog
-from genplus.lms.djangoapps.genplus_core.constants import ActivityTypes, GenLogTypes
+from genplus.lms.djangoapps.genplus.models import Class, Teacher, Activity, GenLog
+from genplus.lms.djangoapps.genplus.constants import ActivityTypes, GenLogTypes
 from openedx.features.genplus_features.genplus_learning.constants import ProgramEnrollmentStatuses
 import openedx.features.genplus_features.genplus_learning.tasks as genplus_learning_tasks
 from openedx.features.genplus_features.genplus_learning.models import (
