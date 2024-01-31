@@ -1,7 +1,9 @@
 <%page expression_filter="h"/>
 <%namespace name='static' file='/static_content.html'/>
-<%! from django.utils.translation import gettext as _%>
-
+<%!
+from django.utils.translation import gettext as _
+from openedx.core.djangolib.js_utils import js_escaped_string
+%>
 <%
 # set doc language direction
 from django.utils.translation import get_language_bidi

@@ -68,6 +68,10 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
 from openedx.core.lib.derived import derived, derived_collection_entry
 from openedx.core.release import doc_version
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
+try:
+    from skill_tagging.skill_tagging_mixin import SkillTaggingMixin
+except ImportError:
+    SkillTaggingMixin = None
 
 ################################### FEATURES ###################################
 # .. setting_name: PLATFORM_NAME
@@ -1633,6 +1637,8 @@ from xmodule.x_module import XModuleMixin  # lint-amnesty, pylint: disable=wrong
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin, EditInfoMixin)
+if SkillTaggingMixin:
+    XBLOCK_MIXINS += (SkillTaggingMixin,)
 XBLOCK_EXTRA_MIXINS = ()
 
 # .. setting_name: XBLOCK_FIELD_DATA_WRAPPERS
@@ -5472,3 +5478,31 @@ derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.cert
 derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.certificate.revoked.v1',
                          'learning-certificate-lifecycle', 'enabled')
 BEAMER_PRODUCT_ID = ""
+
+#### Survey Report ####
+# .. toggle_name: SURVEY_REPORT_ENABLE
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: Set to True to enable the feature to generate and send survey reports.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2024-01-30
+SURVEY_REPORT_ENABLE = True
+# .. setting_name: SURVEY_REPORT_ENDPOINT
+# .. setting_default: Open edX organization endpoint
+# .. setting_description: Endpoint where the report will be sent.
+SURVEY_REPORT_ENDPOINT = 'https://hooks.zapier.com/hooks/catch/11595998/3ouwv7m/'
+# .. toggle_name: ANONYMOUS_SURVEY_REPORT
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: If enable, the survey report will be send a UUID as ID instead of use lms site name.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2023-02-21
+ANONYMOUS_SURVEY_REPORT = False
+# .. setting_name: SURVEY_REPORT_CHECK_THRESHOLD
+# .. setting_default: every 6 months
+# .. setting_description: Survey report banner will appear if a survey report is not sent in the months defined.
+SURVEY_REPORT_CHECK_THRESHOLD = 6
+# .. setting_name: SURVEY_REPORT_EXTRA_DATA
+# .. setting_default: empty dictionary
+# .. setting_description: Dictionary with additional information that you want to share in the report.
+SURVEY_REPORT_EXTRA_DATA = {}
