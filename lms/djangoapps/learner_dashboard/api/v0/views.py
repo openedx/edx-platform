@@ -295,7 +295,7 @@ class ProgramProgressDetailView(APIView):
             }
     """
 
-     permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, program_uuid):
         """
