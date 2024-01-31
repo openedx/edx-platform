@@ -459,7 +459,7 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
         Test that even taxonomy administrators cannot edit/delete tags on free text taxonomies.
         """
         free_text_taxonomy = api.create_taxonomy(
-            name="Free text",            
+            name="Free text",
             allow_free_text=True,
         )
 
