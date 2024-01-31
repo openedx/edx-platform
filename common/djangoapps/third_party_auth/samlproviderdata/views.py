@@ -10,7 +10,6 @@ from django.shortcuts import get_object_or_404
 from edx_rbac.mixins import PermissionRequiredMixin
 from enterprise.models import EnterpriseCustomerIdentityProvider
 from rest_framework import permissions, status, viewsets
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action
 from rest_framework.exceptions import ParseError
 from rest_framework.response import Response

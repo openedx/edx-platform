@@ -7,7 +7,6 @@ from django.db.utils import IntegrityError
 from edx_rbac.mixins import PermissionRequiredMixin
 from rest_framework import permissions, viewsets, status
 from rest_framework.response import Response
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import ParseError, ValidationError
 
 from enterprise.models import EnterpriseCustomerIdentityProvider, EnterpriseCustomer

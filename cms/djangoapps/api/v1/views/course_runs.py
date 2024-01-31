@@ -5,7 +5,6 @@ from django.conf import settings
 from django.http import Http404
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import parsers, permissions, status, viewsets
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action
 from rest_framework.response import Response
 

@@ -3,7 +3,6 @@ Viewset for auth/saml/v0/saml_configuration
 """
 
 from rest_framework import permissions, viewsets
-from rest_framework.authentication import SessionAuthentication
 
 from ..models import SAMLConfiguration
 from .serializers import SAMLConfigurationSerializer
