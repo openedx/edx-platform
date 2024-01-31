@@ -1,8 +1,13 @@
 <div class="social-links">
     <% for (var platform in socialLinks) { %>
         <% if (socialLinks[platform]) { %>
-            <a rel="noopener" target="_blank" href= <%-socialLinks[platform]%>>
-                <span class="icon fa fa-<%-platform%>-square" data-platform=<%-platform%> aria-hidden="true"></span>
+            <a rel="noopener" target="_blank" href="<%- socialLinks[platform] %>">
+                <span class="<%- 
+                platform === 'facebook' ? 'fab fa-facebook-f' : 
+                platform === 'twitter' ? 'fab fa-x-twitter' : 
+                platform === 'linkedin' ? 'fab fa-linkedin' : 
+                'icon fa fa-' + platform + '-square' %>" data-platform="<%- platform %>" aria-hidden="true">
+                </span>
             </a>
         <% } %>
     <% } %>

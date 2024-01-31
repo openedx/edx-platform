@@ -404,7 +404,7 @@
         margin: 0 $baseline/2;
 
         .social-links {
-          @include padding($baseline/4, 0, 0, $baseline/4);
+          @include padding($baseline/2, 0, 0, 0);
 
           font-size: 2rem;
 
