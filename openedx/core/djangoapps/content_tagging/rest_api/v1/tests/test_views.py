@@ -1607,7 +1607,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         """
         object_key = self.courseA
         object_id = str(object_key)
-        tagging_api.tag_content_object(object_key=object_key, taxonomy=self.t1, tags=["anvil", "android"])
+        tagging_api.tag_object(object_id=object_id, taxonomy=self.t1, tags=["anvil", "android"])
         expected_tags = [
             {"value": "android", "lineage": ["ALPHABET", "android"], "can_delete_objecttag": True},
             {"value": "anvil", "lineage": ["ALPHABET", "anvil"], "can_delete_objecttag": True},

@@ -5,11 +5,12 @@ from __future__ import annotations
 
 import openedx_tagging.core.tagging.api as oel_tagging
 from django.db.models import Q, QuerySet, Exists, OuterRef
-from openedx_tagging.core.tagging.models import Taxonomy
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
 from organizations.models import Organization
 
-from .models import ContentObjectTag, TaxonomyOrg
-from .types import ContentKey
+from .models import TaxonomyOrg
 
 
 def create_taxonomy(
@@ -125,27 +126,11 @@ def get_unassigned_taxonomies(enabled=True) -> QuerySet:
     )
 
 
-def get_content_tags(
-    object_key: ContentKey,
-    taxonomy_id: int | None = None,
-) -> QuerySet:
-    """
-    Generates a list of content tags for a given object.
-
-    Pass taxonomy to limit the returned object_tags to a specific taxonomy.
-    """
-    return oel_tagging.get_object_tags(
-        object_id=str(object_key),
-        taxonomy_id=taxonomy_id,
-        object_tag_class=ContentObjectTag,
-    )
-
-
-def tag_content_object(
-    object_key: ContentKey,
+def tag_object(
+    object_id: str,
     taxonomy: Taxonomy,
-    tags: list,
-) -> QuerySet:
+    tags: list[str],
+) -> QuerySet[ObjectTag]:
     """
     This is the main API to use when you want to add/update/delete tags from a content object (e.g. an XBlock or
     course).
@@ -160,19 +145,32 @@ def tag_content_object(
 
     Raises ValueError if the proposed tags are invalid for this taxonomy.
     Preserves existing (valid) tags, adds new (valid) tags, and removes omitted (or invalid) tags.
+
+    We require that this taxonomy is linked to the content object's "org" or linked to "all orgs" (None).
     """
+    object_key: UsageKey | CourseKey
+
     if not taxonomy.system_defined:
         # We require that this taxonomy is linked to the content object's "org" or linked to "all orgs" (None):
+        try:
+            object_key = UsageKey.from_string(object_id)
+        except InvalidKeyError:
+            try:
+                object_key = CourseKey.from_string(object_id)
+            except InvalidKeyError as e:
+                raise ValueError("object_id must be from a block or a course") from e
+
         org_short_name = object_key.org  # type: ignore
         if not taxonomy.taxonomyorg_set.filter(Q(org__short_name=org_short_name) | Q(org=None)).exists():
             raise ValueError(f"The specified Taxonomy is not enabled for the content object's org ({org_short_name})")
+
     oel_tagging.tag_object(
+        object_id=object_id,
         taxonomy=taxonomy,
         tags=tags,
-        object_id=str(object_key),
-        object_tag_class=ContentObjectTag,
     )
-    return get_content_tags(object_key, taxonomy_id=taxonomy.id)
+
+    return oel_tagging.get_object_tags(object_id, taxonomy_id=taxonomy.id)
 
 
 # Expose the oel_tagging APIs
@@ -183,3 +181,4 @@ get_tags = oel_tagging.get_tags
 get_object_tag_counts = oel_tagging.get_object_tag_counts
 delete_object_tags = oel_tagging.delete_object_tags
 resync_object_tags = oel_tagging.resync_object_tags
+get_object_tags = oel_tagging.get_object_tags

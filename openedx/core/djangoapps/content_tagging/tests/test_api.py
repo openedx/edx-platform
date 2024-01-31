@@ -1,7 +1,6 @@
 """Tests for the Tagging models"""
 import ddt
 from django.test.testcases import TestCase
-from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx_tagging.core.tagging.models import Tag
 from organizations.models import Organization
 
@@ -59,39 +58,33 @@ class TestTaxonomyMixin:
             value="learning",
         )
         # ObjectTags
-        self.all_orgs_course_tag = api.tag_content_object(
-            object_key=CourseKey.from_string("course-v1:OeX+DemoX+Demo_Course"),
+        self.all_orgs_course_tag = api.tag_object(
+            object_id="course-v1:OeX+DemoX+Demo_Course",
             taxonomy=self.taxonomy_all_orgs,
             tags=[self.tag_all_orgs.value],
         )[0]
-        self.all_orgs_block_tag = api.tag_content_object(
-            object_key=UsageKey.from_string(
-                "block-v1:Ax+DemoX+Demo_Course+type@vertical+block@abcde"
-            ),
+        self.all_orgs_block_tag = api.tag_object(
+            object_id="block-v1:Ax+DemoX+Demo_Course+type@vertical+block@abcde",
             taxonomy=self.taxonomy_all_orgs,
             tags=[self.tag_all_orgs.value],
         )[0]
-        self.both_orgs_course_tag = api.tag_content_object(
-            object_key=CourseKey.from_string("course-v1:Ax+DemoX+Demo_Course"),
+        self.both_orgs_course_tag = api.tag_object(
+            object_id="course-v1:Ax+DemoX+Demo_Course",
             taxonomy=self.taxonomy_both_orgs,
             tags=[self.tag_both_orgs.value],
         )[0]
-        self.both_orgs_block_tag = api.tag_content_object(
-            object_key=UsageKey.from_string(
-                "block-v1:OeX+DemoX+Demo_Course+type@video+block@abcde"
-            ),
+        self.both_orgs_block_tag = api.tag_object(
+            object_id="block-v1:OeX+DemoX+Demo_Course+type@video+block@abcde",
             taxonomy=self.taxonomy_both_orgs,
             tags=[self.tag_both_orgs.value],
         )[0]
-        self.one_org_block_tag = api.tag_content_object(
-            object_key=UsageKey.from_string(
-                "block-v1:OeX+DemoX+Demo_Course+type@html+block@abcde"
-            ),
+        self.one_org_block_tag = api.tag_object(
+            object_id="block-v1:OeX+DemoX+Demo_Course+type@html+block@abcde",
             taxonomy=self.taxonomy_one_org,
             tags=[self.tag_one_org.value],
         )[0]
-        self.disabled_course_tag = api.tag_content_object(
-            object_key=CourseKey.from_string("course-v1:Ax+DemoX+Demo_Course"),
+        self.disabled_course_tag = api.tag_object(
+            object_id="course-v1:Ax+DemoX+Demo_Course",
             taxonomy=self.taxonomy_disabled,
             tags=[self.tag_disabled.value],
         )[0]
@@ -180,8 +173,8 @@ class TestAPITaxonomy(TestTaxonomyMixin, TestCase):
         object_tag = getattr(self, object_tag_attr)
         with self.assertNumQueries(1):
             valid_tags = list(
-                api.get_content_tags(
-                    object_key=object_tag.object_key,
+                api.get_object_tags(
+                    object_id=object_tag.object_id,
                     taxonomy_id=taxonomy_id,
                 )
             )
@@ -205,8 +198,8 @@ class TestAPITaxonomy(TestTaxonomyMixin, TestCase):
         object_tag = getattr(self, object_tag_attr)
         with self.assertNumQueries(1):
             valid_tags = list(
-                api.get_content_tags(
-                    object_key=object_tag.object_key,
+                api.get_object_tags(
+                    object_id=object_tag.object_id,
                     taxonomy_id=taxonomy_id,
                 )
             )
@@ -230,21 +223,21 @@ class TestAPITaxonomy(TestTaxonomyMixin, TestCase):
         taxonomy = self.taxonomy_one_org
         tags = [self.tag_one_org.value]
         with self.assertRaises(ValueError) as exc:
-            api.tag_content_object(
-                object_key=CourseKey.from_string("course-v1:Ax+DemoX+Demo_Course"),
+            api.tag_object(
+                object_id="course-v1:Ax+DemoX+Demo_Course",
                 taxonomy=taxonomy,
                 tags=tags,
             )
         assert "The specified Taxonomy is not enabled for the content object's org (Ax)" in str(exc.exception)
         # But this will work fine:
-        api.tag_content_object(
-            object_key=CourseKey.from_string("course-v1:OeX+DemoX+Demo_Course"),
+        api.tag_object(
+            object_id="course-v1:OeX+DemoX+Demo_Course",
             taxonomy=taxonomy,
             tags=tags,
         )
         # As will this:
-        api.tag_content_object(
-            object_key=CourseKey.from_string("course-v1:Ax+DemoX+Demo_Course"),
+        api.tag_object(
+            object_id="course-v1:Ax+DemoX+Demo_Course",
             taxonomy=self.taxonomy_both_orgs,
             tags=[self.tag_both_orgs.value],
         )
