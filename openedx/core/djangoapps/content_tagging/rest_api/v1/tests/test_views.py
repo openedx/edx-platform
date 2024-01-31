@@ -62,6 +62,7 @@ def check_taxonomy(
     allow_free_text=False,
     system_defined=False,
     visible_to_authors=True,
+    export_id=None,
     **_
 ):
     """
@@ -75,6 +76,7 @@ def check_taxonomy(
     assert data["allow_free_text"] == allow_free_text
     assert data["system_defined"] == system_defined
     assert data["visible_to_authors"] == visible_to_authors
+    assert data["export_id"] == export_id
 
 
 class TestTaxonomyObjectsMixin:
@@ -1078,6 +1080,7 @@ class TestTaxonomyUpdateViewSet(TestTaxonomyChangeMixin, APITestCase):
                     "name": "new name",
                     "description": taxonomy.description,
                     "enabled": taxonomy.enabled,
+                    "export_id": taxonomy.export_id,
                 },
             )
 
@@ -1118,6 +1121,7 @@ class TestTaxonomyPatchViewSet(TestTaxonomyChangeMixin, APITestCase):
                     "name": "new name",
                     "description": taxonomy.description,
                     "enabled": taxonomy.enabled,
+                    "export_id": taxonomy.export_id,
                 },
             )
 

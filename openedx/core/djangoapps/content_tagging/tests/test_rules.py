@@ -273,7 +273,6 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
         """
         system_taxonomy = api.create_taxonomy(
             name="System Languages",
-            export_id="system_languages",
         )
         system_taxonomy.taxonomy_class = UserSystemDefinedTaxonomy
         system_taxonomy = system_taxonomy.cast()
@@ -437,7 +436,6 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
         """
         system_taxonomy = api.create_taxonomy(
             name="System Languages",
-            export_id="system_languages",
         )
         system_taxonomy.taxonomy_class = UserSystemDefinedTaxonomy
         system_taxonomy = system_taxonomy.cast()
@@ -461,8 +459,7 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
         Test that even taxonomy administrators cannot edit/delete tags on free text taxonomies.
         """
         free_text_taxonomy = api.create_taxonomy(
-            name="Free text",
-            export_id="free_text",
+            name="Free text",            
             allow_free_text=True,
         )
 

@@ -14,23 +14,23 @@ from .types import ContentKey
 
 def create_taxonomy(
     name: str,
-    export_id: str,
     description: str | None = None,
     enabled=True,
     allow_multiple=True,
     allow_free_text=False,
     orgs: list[Organization] | None = None,
+    export_id: str | None = None,
 ) -> Taxonomy:
     """
     Creates, saves, and returns a new Taxonomy with the given attributes.
     """
     taxonomy = oel_tagging.create_taxonomy(
         name=name,
-        export_id=export_id,
         description=description,
         enabled=enabled,
         allow_multiple=allow_multiple,
         allow_free_text=allow_free_text,
+        export_id=export_id,
     )
 
     if orgs is not None:
