@@ -6,19 +6,13 @@ from __future__ import annotations
 from itertools import groupby
 
 import openedx_tagging.core.tagging.api as oel_tagging
-from django.db.models import Q, QuerySet, Exists, OuterRef
+from django.db.models import Exists, OuterRef, Q, QuerySet
 from opaque_keys.edx.keys import CourseKey, LearningContextKey
 from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
 from organizations.models import Organization
-from xmodule.modulestore.django import modulestore
 
 from .models import ContentObjectTag, TaxonomyOrg
-from .types import (
-    ContentKey,
-    ObjectTagByObjectIdDict,
-    TaggedContent,
-    TaxonomyDict,
-)
+from .types import ContentKey, ObjectTagByObjectIdDict, TaxonomyDict
 
 
 def create_taxonomy(
@@ -190,106 +184,39 @@ def tag_content_object(
     return get_content_tags(object_key, taxonomy_id=taxonomy.id)
 
 
-def get_object_tree_with_objecttags(
+def get_all_object_tags(
     content_key: LearningContextKey,
-) -> tuple[TaggedContent, TaxonomyDict]:
+) -> tuple[ObjectTagByObjectIdDict, TaxonomyDict]:
     """
-    Returns the object with the tags associated with it.
+    Returns a tuple with a dictionary of grouped object tags for all blocks and a dictionary of taxonomies.
     """
-
-    def _get_object_tags(content_key: LearningContextKey) -> QuerySet[ObjectTag]:
-        """
-        Return the tags for the object and its children using a single db query.
-        """
-        content_key_str = str(content_key)
-
+    # ToDo: Add support for other content types (like LibraryContent and LibraryBlock)
+    if isinstance(content_key, CourseKey):
+        course_key_str = str(content_key)
         # We use a block_id_prefix (i.e. the modified course id) to get the tags for the children of the Content
         # (course) in a single db query.
-        # ToDo: Add support for other content types (like LibraryContent and LibraryBlock)
-        if isinstance(content_key, CourseKey):
-            course_key_str = content_key_str
-            block_id_prefix = content_key_str.replace("course-v1:", "block-v1:", 1)
-        else:
-            raise NotImplementedError(f"Invalid content_key: {type(content_key)} -> {content_key}")
+        block_id_prefix = course_key_str.replace("course-v1:", "block-v1:", 1)
+    else:
+        raise NotImplementedError(f"Invalid content_key: {type(content_key)} -> {content_key}")
 
-        return ObjectTag.objects.filter(
-            Q(object_id__startswith=block_id_prefix) | Q(object_id=course_key_str),
-            Q(tag__isnull=False, tag__taxonomy__isnull=False),
-        ).select_related("tag__taxonomy")
+    all_object_tags = list(ObjectTag.objects.filter(
+        Q(object_id__startswith=block_id_prefix) | Q(object_id=course_key_str),
+        Q(tag__isnull=False, tag__taxonomy__isnull=False),
+    ).select_related("tag__taxonomy"))
 
-    def _group_object_tags_by_objectid_taxonomy(
-        all_object_tags: list[ObjectTag]
-    ) -> tuple[ObjectTagByObjectIdDict, TaxonomyDict]:
-        """
-        Returns a tuple with a dictionary of grouped object tags for all blocks and a dictionary of taxonomies.
-        """
+    grouped_object_tags: ObjectTagByObjectIdDict = {}
+    taxonomies: TaxonomyDict = {}
 
-        grouped_object_tags: ObjectTagByObjectIdDict = {}
-        taxonomies: TaxonomyDict = {}
+    for object_id, block_tags in groupby(all_object_tags, lambda x: x.object_id):
+        grouped_object_tags[object_id] = {}
+        for taxonomy_id, taxonomy_tags in groupby(block_tags, lambda x: x.tag.taxonomy_id):
+            object_tags_list = list(taxonomy_tags)
+            grouped_object_tags[object_id][taxonomy_id] = object_tags_list
 
-        for object_id, block_tags in groupby(all_object_tags, lambda x: x.object_id):
-            grouped_object_tags[object_id] = {}
-            for taxonomy_id, taxonomy_tags in groupby(block_tags, lambda x: x.tag.taxonomy_id):
-                object_tags_list = list(taxonomy_tags)
-                grouped_object_tags[object_id][taxonomy_id] = object_tags_list
+            if taxonomy_id not in taxonomies:
+                taxonomies[taxonomy_id] = object_tags_list[0].tag.taxonomy
 
-                if taxonomy_id not in taxonomies:
-                    taxonomies[taxonomy_id] = object_tags_list[0].tag.taxonomy
-
-        return grouped_object_tags, taxonomies
-
-    def _build_object_tree_with_objecttags(
-        content_key: LearningContextKey,
-        objectTagCache: ObjectTagByObjectIdDict,
-        store
-    ) -> TaggedContent:
-        """
-        Returns the object with the tags associated with it.
-        """
-        if isinstance(content_key, CourseKey):
-            course = store.get_course(content_key)
-        else:
-            raise NotImplementedError(f"Invalid content_key: {type(content_key)} -> {content_key}")
-
-        display_name = course.display_name_with_default
-        course_id = str(course.id)
-
-        tagged_course = TaggedContent(
-            display_name=display_name,
-            block_id=course_id,
-            category=course.category,
-            object_tags=objectTagCache.get(str(content_key), {}),
-            children=None,
-        )
-
-        blocks = [(tagged_course, course)]
-
-        while blocks:
-            tagged_block, xblock = blocks.pop()
-            tagged_block.children = []
-
-            if xblock.has_children:
-                for child_id in xblock.children:
-                    child_block = store.get_item(child_id)
-                    tagged_child = TaggedContent(
-                        display_name=child_block.display_name_with_default,
-                        block_id=str(child_id),
-                        category=child_block.category,
-                        object_tags=objectTagCache.get(str(child_id), {}),
-                        children=None,
-                    )
-                    tagged_block.children.append(tagged_child)
-
-                    blocks.append((tagged_child, child_block))
-
-        return tagged_course
-
-    store = modulestore()
-
-    all_blocks_tag_records = list(_get_object_tags(content_key))
-    objectTagCache, taxonomies = _group_object_tags_by_objectid_taxonomy(all_blocks_tag_records)
-
-    return _build_object_tree_with_objecttags(content_key, objectTagCache, store), taxonomies
+    return grouped_object_tags, taxonomies
 
 
 # Expose the oel_tagging APIs

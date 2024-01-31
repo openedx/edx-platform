@@ -40,7 +40,7 @@ from openedx.core.djangoapps.content_tagging.models import TaxonomyOrg
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.core.lib import blockstore_api
 
-from ....tests.test_api import TaggedCourseMixin
+from .test_objecttag_export_helpers import TaggedCourseMixin
 
 User = get_user_model()
 

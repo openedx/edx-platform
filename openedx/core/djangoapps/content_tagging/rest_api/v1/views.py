@@ -20,7 +20,7 @@ from rest_framework.views import APIView
 
 from ...api import (
     create_taxonomy,
-    get_object_tree_with_objecttags,
+    get_all_object_tags,
     get_taxonomy,
     get_taxonomies,
     get_taxonomies_for_org,
@@ -28,13 +28,10 @@ from ...api import (
     set_taxonomy_orgs,
 )
 from ...rules import get_admin_orgs
-from ...types import TaggedContent, TaxonomyDict
-from .serializers import (
-    TaxonomyOrgListQueryParamsSerializer,
-    TaxonomyOrgSerializer,
-    TaxonomyUpdateOrgBodySerializer,
-)
+from ...types import TaxonomyDict
 from .filters import ObjectTagTaxonomyOrgFilterBackend, UserOrgFilterBackend
+from .objecttag_export_helpers import TaggedContent, build_object_tree_with_objecttags, iterate_with_level
+from .serializers import TaxonomyOrgListQueryParamsSerializer, TaxonomyOrgSerializer, TaxonomyUpdateOrgBodySerializer
 
 
 class TaxonomyOrgView(TaxonomyView):
@@ -160,17 +157,6 @@ class ObjectTagExportView(APIView):
         Export a CSV with all children and tags for a given object_id.
         """
 
-        def _content_generator(
-            tagged_content: TaggedContent, level: int = 0
-        ) -> Iterator[tuple[TaggedContent, int]]:
-            """
-            Generator that yields the tagged content and the level of the block
-            """
-            yield tagged_content, level
-            if tagged_content.children:
-                for child in tagged_content.children:
-                    yield from _content_generator(child, level + 1)
-
         class Echo(object):
             """
             Class that implements just the write method of the file-like interface,
@@ -199,7 +185,7 @@ class ObjectTagExportView(APIView):
             yield csv_writer.writerow(header)
 
             # Iterate over the blocks and yield the rows
-            for item, level in _content_generator(tagged_content):
+            for item, level in iterate_with_level(tagged_content):
                 block_data = {
                     "name": level * "  " + item.display_name,
                     "type": item.category,
@@ -217,8 +203,6 @@ class ObjectTagExportView(APIView):
                 yield csv_writer.writerow(block_data)
 
         object_id: str = kwargs.get('object_id', None)
-
-        content_key: CourseKey
 
         try:
             content_key = CourseKey.from_string(object_id)
@@ -238,10 +222,11 @@ class ObjectTagExportView(APIView):
         except ValueError as e:
             raise ValidationError from e
 
-        tagged_block, taxonomies = get_object_tree_with_objecttags(content_key)
+        all_object_tags, taxonomies = get_all_object_tags(content_key)
+        tagged_content = build_object_tree_with_objecttags(content_key, all_object_tags)
 
         return StreamingHttpResponse(
-            streaming_content=_generate_csv_rows(tagged_block, taxonomies, Echo()),
+            streaming_content=_generate_csv_rows(tagged_content, taxonomies, Echo()),
             content_type="text/csv",
             headers={'Content-Disposition': f'attachment; filename="{object_id}_tags.csv"'},
         )

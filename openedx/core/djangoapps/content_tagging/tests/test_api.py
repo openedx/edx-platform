@@ -4,13 +4,8 @@ from django.test.testcases import TestCase
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx_tagging.core.tagging.models import Tag
 from organizations.models import Organization
-from unittest.mock import patch
-
-from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
 
 from .. import api
-from ..types import TaggedContent
 
 
 class TestTaxonomyMixin:
@@ -255,18 +250,13 @@ class TestAPITaxonomy(TestTaxonomyMixin, TestCase):
         )
 
 
-class TaggedCourseMixin(ModuleStoreTestCase):
+class TestGetAllObjectTags(TestCase):
     """
-    Mixin with a course structure and taxonomies
+    Test the get_all_object_tags function
     """
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         super().setUp()
-        # Create user
-        self.user = UserFactory.create()
-        self.user_id = self.user.id
-
         self.orgA = Organization.objects.create(name="Organization A", short_name="orgA")
         self.taxonomy_1 = api.create_taxonomy(name="Taxonomy 1")
         api.set_taxonomy_orgs(self.taxonomy_1, all_orgs=True)
@@ -291,148 +281,69 @@ class TaggedCourseMixin(ModuleStoreTestCase):
             value="Tag 2.2",
         )
 
-        self.patcher = patch("openedx.core.djangoapps.content_tagging.tasks.modulestore", return_value=self.store)
-        self.addCleanup(self.patcher.stop)
-        self.patcher.start()
-
-        # Create course
-        self.course = self.store.create_course(
-            self.orgA.short_name,
-            "test_course",
-            "test_run",
-            self.user_id,
-            fields={'display_name': "Test Course"},
-        )
         course_tags = api.tag_content_object(
-            object_key=self.course.id,
+            object_key=CourseKey.from_string("course-v1:orgA+test_course+test_run"),
             taxonomy=self.taxonomy_1,
             tags=['Tag 1.1'],
         )
 
-        self.expected_tagged_xblock = TaggedContent(
-            display_name=self.course.display_name_with_default,
-            block_id=str(self.course.id),
-            category=self.course.category,
-            children=[],
-            object_tags={
-                self.taxonomy_1.id: list(course_tags),
-            },
-        )
-
-        # Create XBlocks
-        self.sequential = self.store.create_child(self.user_id, self.course.location, "sequential", "test_sequential")
         # Tag blocks
-        sequential_tags1 = api.tag_content_object(
-            object_key=self.sequential.location,
+        sequential_tags = api.tag_content_object(
+            object_key=UsageKey.from_string(
+                "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential"
+            ),
             taxonomy=self.taxonomy_1,
             tags=['Tag 1.1', 'Tag 1.2'],
         )
         sequential_tags2 = api.tag_content_object(
-            object_key=self.sequential.location,
+            object_key=UsageKey.from_string(
+                "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential"
+            ),
             taxonomy=self.taxonomy_2,
             tags=['Tag 2.1'],
         )
-        xblock = self.store.get_item(self.sequential.location)
-        tagged_sequential = TaggedContent(
-            display_name=xblock.display_name_with_default,
-            block_id=str(xblock.location),
-            category=xblock.category,
-            children=[],
-            object_tags={
-                self.taxonomy_1.id: list(sequential_tags1),
-                self.taxonomy_2.id: list(sequential_tags2),
-            },
-        )
-
-        assert self.expected_tagged_xblock.children is not None  # type guard
-        self.expected_tagged_xblock.children.append(tagged_sequential)
-
-        vertical = self.store.create_child(self.user_id, self.sequential.location, "vertical", "test_vertical1")
-        vertical_tags = api.tag_content_object(
-            object_key=vertical.location,
+        vertical1_tags = api.tag_content_object(
+            object_key=UsageKey.from_string(
+                "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1"
+            ),
             taxonomy=self.taxonomy_2,
             tags=['Tag 2.2'],
         )
-        xblock = self.store.get_item(vertical.location)
-        tagged_vertical = TaggedContent(
-            display_name=xblock.display_name_with_default,
-            block_id=str(xblock.location),
-            category=xblock.category,
-            children=[],
-            object_tags={
-                self.taxonomy_2.id: list(vertical_tags),
-            },
-        )
-
-        assert tagged_sequential.children is not None  # type guard
-        tagged_sequential.children.append(tagged_vertical)
-
-        vertical2 = self.store.create_child(self.user_id, self.sequential.location, "vertical", "test_vertical2")
-        xblock = self.store.get_item(vertical2.location)
-        tagged_vertical2 = TaggedContent(
-            display_name=xblock.display_name_with_default,
-            block_id=str(xblock.location),
-            category=xblock.category,
-            children=[],
-            object_tags={},
-        )
-        assert tagged_sequential.children is not None  # type guard
-        tagged_sequential.children.append(tagged_vertical2)
-
-        html = self.store.create_child(self.user_id, vertical2.location, "html", "test_html")
         html_tags = api.tag_content_object(
-            object_key=html.location,
+            object_key=UsageKey.from_string(
+                "block-v1:orgA+test_course+test_run+type@html+block@test_html"
+            ),
             taxonomy=self.taxonomy_2,
             tags=['Tag 2.1'],
         )
-        xblock = self.store.get_item(html.location)
-        tagged_text = TaggedContent(
-            display_name=xblock.display_name_with_default,
-            block_id=str(xblock.location),
-            category=xblock.category,
-            children=[],
-            object_tags={
+
+        self.expected_objecttags = {
+            "course-v1:orgA+test_course+test_run": {
+                self.taxonomy_1.id: list(course_tags),
+            },
+            "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential": {
+                self.taxonomy_1.id: list(sequential_tags),
+                self.taxonomy_2.id: list(sequential_tags2),
+            },
+            "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1": {
+                self.taxonomy_2.id: list(vertical1_tags),
+            },
+            "block-v1:orgA+test_course+test_run+type@html+block@test_html": {
                 self.taxonomy_2.id: list(html_tags),
             },
-        )
+        }
 
-        assert tagged_vertical2.children is not None  # type guard
-        tagged_vertical2.children.append(tagged_text)
-
-
-@ddt.ddt
-class TestContentTagChildrenExport(TaggedCourseMixin):  # type: ignore[misc]
-    """
-    Test exporting content objects
-    """
-    def test_export_tagged_course(self) -> None:
+    def test_get_all_object_tags(self):
         """
-        Test if we can export a course
+        Test the get_all_object_tags function
         """
-        # 2 from get_course() / get_item() + 1 from _get_object_tags()
-        with self.assertNumQueries(3):
-            tagged_xblock, taxonomies = api.get_object_tree_with_objecttags(self.course.id)
+        with self.assertNumQueries(1):
+            object_tags, taxonomies = api.get_all_object_tags(
+                CourseKey.from_string("course-v1:orgA+test_course+test_run")
+            )
 
-        expected_taxonomies = {
+        assert object_tags == self.expected_objecttags
+        assert taxonomies == {
             self.taxonomy_1.id: self.taxonomy_1,
             self.taxonomy_2.id: self.taxonomy_2,
         }
-
-        assert tagged_xblock == self.expected_tagged_xblock
-        assert taxonomies == expected_taxonomies
-
-    def test_export_tagged_block(self) -> None:
-        """
-        Test if we can export a course
-        """
-        # 2 from get_course() / get_item() + 1 from _get_object_tags()
-        with self.assertNumQueries(3):
-            tagged_xblock, taxonomies = api.get_object_tree_with_objecttags(self.course.id)
-
-        expected_taxonomies = {
-            self.taxonomy_1.id: self.taxonomy_1,
-            self.taxonomy_2.id: self.taxonomy_2,
-        }
-
-        assert tagged_xblock == self.expected_tagged_xblock
-        assert taxonomies == expected_taxonomies
