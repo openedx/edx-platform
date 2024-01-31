@@ -4,14 +4,13 @@ Tests tagging rest api views
 
 from __future__ import annotations
 
+import abc
 import json
 from io import BytesIO
-from urllib.parse import parse_qs, urlparse
 from unittest.mock import MagicMock
+from urllib.parse import parse_qs, urlparse
 
-import abc
 import ddt
-from common.djangoapps.student.tests.factories import UserFactory
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
@@ -29,13 +28,10 @@ from common.djangoapps.student.roles import (
     OrgContentCreatorRole,
     OrgInstructorRole,
     OrgLibraryUserRole,
-    OrgStaffRole,
+    OrgStaffRole
 )
-from openedx.core.djangoapps.content_libraries.api import (
-    AccessLevel,
-    create_library,
-    set_library_user_permissions,
-)
+from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.content_libraries.api import AccessLevel, create_library, set_library_user_permissions
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.content_tagging.models import TaxonomyOrg
 from openedx.core.djangolib.testing.utils import skip_unless_cms
@@ -1637,6 +1633,7 @@ class TestContentObjectChildrenExportView(TaggedCourseMixin, APITestCase):  # ty
     """
     def setUp(self):
         super().setUp()
+        self.user = UserFactory.create()
         self.staff = UserFactory.create(
             username="staff",
             email="staff@example.com",
