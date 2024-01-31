@@ -1534,6 +1534,18 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         response = self.client.put(url, {"tags": ["invalid"]}, format="json")
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    def test_tag_cross_org(self):
+        """
+        Tests that we cannot add a taxonomy from orgA to an object from orgB
+        """
+        self.client.force_authenticate(user=self.staff)
+
+        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.courseB, taxonomy_id=self.tA1.pk)
+
+        response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
     @ddt.data(
         "courseB",
         "xblockB",
@@ -1615,7 +1627,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
 
         url = OBJECT_TAGS_URL.format(object_id=object_id)
         self.client.force_authenticate(user=self.staff)
-        with self.assertNumQueries(7):  # TODO Why so many queries?
+        with self.assertNumQueries(10):  # TODO Why so many queries?
             response = self.client.get(url)
 
         assert response.status_code == 200

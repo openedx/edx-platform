@@ -6,10 +6,11 @@ from typing import Union
 
 import django.contrib.auth.models
 import openedx_tagging.core.tagging.rules as oel_tagging
-from organizations.models import Organization
 import rules
+from django.db.models import Q
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from organizations.models import Organization
 
 from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
 from common.djangoapps.student.models import CourseAccessRole
@@ -263,6 +264,42 @@ def can_view_object_tag_objectid(user: UserType, object_id: str) -> bool:
 
 
 @rules.predicate
+def can_change_object_tag(
+    user: UserType, perm_obj: oel_tagging.ObjectTagPermissionItem | None = None
+) -> bool:
+    """
+    Checks if the user has permissions to create or modify tags on the given taxonomy and object_id.
+    """
+    if not oel_tagging.can_change_object_tag(user, perm_obj):
+        return False
+
+    # The following code allows METHOD permission (PUT) in the viewset for everyone
+    if perm_obj is None:
+        return True
+
+    # TaxonomySerializer use this rule passing object_id = "" to check if the user
+    # can use the taxonomy
+    if perm_obj.object_id == "":
+        return True
+
+    # Library locators are also subclasses of CourseKey
+    context_key: CourseKey
+    try:
+        context_key = CourseKey.from_string(perm_obj.object_id)
+    except InvalidKeyError as course_key_error:
+        try:
+            usage_key = UsageKey.from_string(perm_obj.object_id)
+            if not isinstance(usage_key.context_key, CourseKey):
+                raise ValueError("object_id must be child of a course or a library") from course_key_error
+            context_key = usage_key.context_key
+        except InvalidKeyError as usage_key_error:
+            raise ValueError("object_id must be from a LearningContextKey or a UsageKey") from usage_key_error
+
+    org_short_name = context_key.org
+    return perm_obj.taxonomy.taxonomyorg_set.filter(Q(org__short_name=org_short_name) | Q(org=None)).exists()
+
+
+@rules.predicate
 def can_change_taxonomy_tag(user: UserType, tag: oel_tagging.Tag | None = None) -> bool:
     """
     Even taxonomy admins cannot add tags to system taxonomies (their tags are system-defined), or free-text taxonomies
@@ -292,10 +329,11 @@ rules.set_perm("oel_tagging.delete_tag", can_change_taxonomy_tag)
 rules.set_perm("oel_tagging.view_tag", rules.always_allow)
 
 # ObjectTag
-rules.set_perm("oel_tagging.add_object_tag", oel_tagging.can_change_object_tag)
-rules.set_perm("oel_tagging.change_objecttag", oel_tagging.can_change_object_tag)
-rules.set_perm("oel_tagging.delete_objecttag", oel_tagging.can_change_object_tag)
+rules.set_perm("oel_tagging.add_objecttag", can_change_object_tag)
+rules.set_perm("oel_tagging.change_objecttag", can_change_object_tag)
+rules.set_perm("oel_tagging.delete_objecttag", can_change_object_tag)
 rules.set_perm("oel_tagging.view_objecttag", oel_tagging.can_view_object_tag)
+rules.set_perm("oel_tagging.can_tag_object", can_change_object_tag)
 
 # This perms are used in the tagging rest api from openedx_tagging that is exposed in the CMS. They are overridden here
 # to include Organization and objects permissions.

@@ -58,35 +58,53 @@ class TestTaxonomyMixin:
             value="learning",
         )
         # ObjectTags
-        self.all_orgs_course_tag = api.tag_object(
+        api.tag_object(
             object_id="course-v1:OeX+DemoX+Demo_Course",
             taxonomy=self.taxonomy_all_orgs,
             tags=[self.tag_all_orgs.value],
+        )
+        self.all_orgs_course_tag = api.get_object_tags(
+            object_id="course-v1:OeX+DemoX+Demo_Course",
         )[0]
-        self.all_orgs_block_tag = api.tag_object(
+        api.tag_object(
             object_id="block-v1:Ax+DemoX+Demo_Course+type@vertical+block@abcde",
             taxonomy=self.taxonomy_all_orgs,
             tags=[self.tag_all_orgs.value],
+        )
+        self.all_orgs_block_tag = api.get_object_tags(
+            object_id="block-v1:Ax+DemoX+Demo_Course+type@vertical+block@abcde",
         )[0]
-        self.both_orgs_course_tag = api.tag_object(
+        api.tag_object(
             object_id="course-v1:Ax+DemoX+Demo_Course",
             taxonomy=self.taxonomy_both_orgs,
             tags=[self.tag_both_orgs.value],
+        )
+        self.both_orgs_course_tag = api.get_object_tags(
+            object_id="course-v1:Ax+DemoX+Demo_Course",
         )[0]
-        self.both_orgs_block_tag = api.tag_object(
+        api.tag_object(
             object_id="block-v1:OeX+DemoX+Demo_Course+type@video+block@abcde",
             taxonomy=self.taxonomy_both_orgs,
             tags=[self.tag_both_orgs.value],
+        )
+        self.both_orgs_block_tag = api.get_object_tags(
+            object_id="block-v1:OeX+DemoX+Demo_Course+type@video+block@abcde",
         )[0]
-        self.one_org_block_tag = api.tag_object(
+        api.tag_object(
             object_id="block-v1:OeX+DemoX+Demo_Course+type@html+block@abcde",
             taxonomy=self.taxonomy_one_org,
             tags=[self.tag_one_org.value],
+        )
+        self.one_org_block_tag = api.get_object_tags(
+            object_id="block-v1:OeX+DemoX+Demo_Course+type@html+block@abcde",
         )[0]
-        self.disabled_course_tag = api.tag_object(
+        api.tag_object(
             object_id="course-v1:Ax+DemoX+Demo_Course",
             taxonomy=self.taxonomy_disabled,
             tags=[self.tag_disabled.value],
+        )
+        self.disabled_course_tag = api.get_object_tags(
+            object_id="course-v1:Ax+DemoX+Demo_Course",
         )[0]
         self.taxonomy_disabled.enabled = False
         self.taxonomy_disabled.save()
@@ -213,31 +231,3 @@ class TestAPITaxonomy(TestTaxonomyMixin, TestCase):
         assert result[0]["_id"] == self.tag_all_orgs.id
         assert result[0]["parent_value"] is None
         assert result[0]["depth"] == 0
-
-    def test_cannot_tag_across_orgs(self):
-        """
-        Ensure that I cannot apply tags from a taxonomy that's linked to another
-        org.
-        """
-        # This taxonomy is only linked to the "OpenedX org", so it can't be used for "Axim" content.
-        taxonomy = self.taxonomy_one_org
-        tags = [self.tag_one_org.value]
-        with self.assertRaises(ValueError) as exc:
-            api.tag_object(
-                object_id="course-v1:Ax+DemoX+Demo_Course",
-                taxonomy=taxonomy,
-                tags=tags,
-            )
-        assert "The specified Taxonomy is not enabled for the content object's org (Ax)" in str(exc.exception)
-        # But this will work fine:
-        api.tag_object(
-            object_id="course-v1:OeX+DemoX+Demo_Course",
-            taxonomy=taxonomy,
-            tags=tags,
-        )
-        # As will this:
-        api.tag_object(
-            object_id="course-v1:Ax+DemoX+Demo_Course",
-            taxonomy=self.taxonomy_both_orgs,
-            tags=[self.tag_both_orgs.value],
-        )

@@ -47,7 +47,11 @@ def _set_initial_language_tag(content_key: ContentKey, lang_code: str) -> None:
                 default_lang_code,
             )
             lang_tag = lang_taxonomy.tag_for_external_id(default_lang_code)
-        api.tag_object(str(content_key), lang_taxonomy, [lang_tag.value])
+        api.tag_object(
+            object_id=str(content_key),
+            taxonomy=lang_taxonomy,
+            tags=[lang_tag.value],
+        )
 
 
 def _delete_tags(content_object: ContentKey) -> None:

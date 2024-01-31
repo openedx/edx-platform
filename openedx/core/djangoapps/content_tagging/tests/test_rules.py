@@ -534,10 +534,10 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
     )
     @ddt.unpack
     def test_object_tag_no_orgs(self, perm, tag_attr):
-        """Only staff & superusers can create/edit an ObjectTag with a no-org Taxonomy"""
+        """Only superusers can create/edit an ObjectTag with a no-org Taxonomy"""
         object_tag = getattr(self, tag_attr)
         assert self.superuser.has_perm(perm, object_tag)
-        assert self.staff.has_perm(perm, object_tag)
+        assert not self.staff.has_perm(perm, object_tag)
         assert not self.user_both_orgs.has_perm(perm, object_tag)
         assert not self.user_org2.has_perm(perm, object_tag)
         assert not self.learner.has_perm(perm, object_tag)

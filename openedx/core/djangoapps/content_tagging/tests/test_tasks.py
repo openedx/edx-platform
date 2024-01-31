@@ -166,7 +166,11 @@ class TestAutoTagging(  # type: ignore[misc]
 
         # Simulates user manually changing a tag
         lang_taxonomy = Taxonomy.objects.get(pk=LANGUAGE_TAXONOMY_ID)
-        api.tag_object(str(course.id), lang_taxonomy, ["Español (España)"])
+        api.tag_object(
+            object_id=str(course.id),
+            taxonomy=lang_taxonomy,
+            tags=["Español (España)"]
+        )
 
         # Update course language
         course.language = "en"
