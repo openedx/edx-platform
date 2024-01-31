@@ -143,7 +143,7 @@ ${block_content | n, decode.utf8}
 <script type="text/javascript">
 // assumes courseware.html's loaded this method.
 $(function () {
-    setup_debug('${element_id | n, js_escaped_string}',
+    (typeof setup_debug !== 'undefined') && setup_debug('${element_id | n, js_escaped_string}',
         %if edit_link:
         '${edit_link | n, js_escaped_string}',
         %else:
