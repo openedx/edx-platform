@@ -1589,7 +1589,7 @@ xblock-google-drive==0.3.0
     # via -r requirements/edx/base.txt
 xblock-poll==1.13.0
     # via -r requirements/edx/base.txt
-xblock-utils==3.0.0
+xblock-utils==3.2.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-sga
