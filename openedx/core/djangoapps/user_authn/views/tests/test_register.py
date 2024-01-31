@@ -589,13 +589,27 @@ class RegistrationViewTestV1(
         self._assert_reg_field(
             no_extra_fields_setting,
             {
-                "name": "name",
+                "name": "first_name",
                 "type": "text",
                 "required": True,
-                "label": "Full Name",
+                "label": "First Name",
                 "instructions": "This name will be used on any certificates that you earn.",
                 "restrictions": {
-                    "max_length": 255
+                    "max_length": NAME_MAX_LENGTH
+                },
+            }
+        )
+
+        self._assert_reg_field(
+            no_extra_fields_setting,
+            {
+                "name": "last_name",
+                "type": "text",
+                "required": True,
+                "label": "Last Name",
+                "instructions": "This name will be used on any certificates that you earn.",
+                "restrictions": {
+                    "max_length": NAME_MAX_LENGTH
                 },
             }
         )
@@ -1311,10 +1325,12 @@ class RegistrationViewTestV1(
 
         # Verify that all fields render in the correct order
         form_desc = json.loads(response.content.decode('utf-8'))
+
         field_names = [field["name"] for field in form_desc["fields"]]
         assert field_names == [
             "email",
-            "name",
+            "first_name",
+            "last_name",
             "username",
             "password",
             "city",
@@ -1343,13 +1359,12 @@ class RegistrationViewTestV1(
             "confirm_email": "required",
         },
         REGISTRATION_FIELD_ORDER=[
-            "name",
+            "first_name",
+            "last_name",
             "username",
             "email",
             "confirm_email",
             "password",
-            "first_name",
-            "last_name",
             "city",
             "state",
             "country",
@@ -1374,8 +1389,9 @@ class RegistrationViewTestV1(
         # Verify that all fields render in the correct order
         form_desc = json.loads(response.content.decode('utf-8'))
         field_names = [field["name"] for field in form_desc["fields"]]
-        assert field_names == ['name', 'username', 'email', 'password', 'city', 'state', 'country', 'gender',
-                               'year_of_birth', 'level_of_education', 'mailing_address', 'goals', 'honor_code']
+        assert field_names == ['first_name', 'last_name', 'username', 'email', 'password',
+                               'city', 'state', 'country', 'gender', 'year_of_birth',
+                               'level_of_education', 'mailing_address', 'goals', 'honor_code']
 
     @override_settings(
         REGISTRATION_EXTRA_FIELDS={
@@ -1392,11 +1408,10 @@ class RegistrationViewTestV1(
         },
         REGISTRATION_EXTENSION_FORM='openedx.core.djangoapps.user_api.tests.test_helpers.TestCaseForm',
         REGISTRATION_FIELD_ORDER=[
-            "name",
-            "confirm_email",
-            "password",
             "first_name",
             "last_name",
+            "confirm_email",
+            "password",
             "gender",
             "year_of_birth",
             "level_of_education",
@@ -1414,10 +1429,11 @@ class RegistrationViewTestV1(
 
         # Verify that all fields render in the correct order
         form_desc = json.loads(response.content.decode('utf-8'))
-        field_names = [field["name"] for field in form_desc["fields"]]
 
+        field_names = [field["name"] for field in form_desc["fields"]]
         assert field_names == [
-            "name",
+            "first_name",
+            "last_name",
             "password",
             "gender",
             "year_of_birth",
@@ -1999,11 +2015,10 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
         },
         REGISTRATION_EXTENSION_FORM='openedx.core.djangoapps.user_api.tests.test_helpers.TestCaseForm',
         REGISTRATION_FIELD_ORDER=[
-            "name",
-            "confirm_email",
-            "password",
             "first_name",
             "last_name",
+            "confirm_email",
+            "password",
             "gender",
             "year_of_birth",
             "level_of_education",
@@ -2024,7 +2039,8 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
         field_names = [field["name"] for field in form_desc["fields"]]
 
         assert field_names == [
-            "name",
+            "first_name",
+            "last_name",
             "confirm_email",
             "password",
             "gender",
@@ -2055,13 +2071,12 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
             "confirm_email": "required",
         },
         REGISTRATION_FIELD_ORDER=[
-            "name",
+            "first_name",
+            "last_name",
             "username",
             "email",
             "confirm_email",
             "password",
-            "first_name",
-            "last_name",
             "city",
             "state",
             "country",
@@ -2086,8 +2101,8 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
         # Verify that all fields render in the correct order
         form_desc = json.loads(response.content.decode('utf-8'))
         field_names = [field["name"] for field in form_desc["fields"]]
-        assert field_names == ['name', 'username', 'email', 'confirm_email',
-                               'password', 'city', 'state', 'country',
+        assert field_names == ['first_name', 'last_name', 'username', 'email',
+                               'confirm_email', 'password', 'city', 'state', 'country',
                                'gender', 'year_of_birth', 'level_of_education',
                                'mailing_address', 'goals', 'honor_code']
 
@@ -2116,7 +2131,8 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
         field_names = [field["name"] for field in form_desc["fields"]]
         assert field_names == [
             "email",
-            "name",
+            "first_name",
+            "last_name",
             "username",
             "password",
             "confirm_email",
@@ -2162,7 +2178,8 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
         field_names = [field["name"] for field in form_desc["fields"]]
         assert field_names == [
             "email",
-            "name",
+            "first_name",
+            "last_name",
             "username",
             "password",
             "confirm_email",
