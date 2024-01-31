@@ -116,6 +116,7 @@ backports-zoneinfo[tzdata]==0.2.1
     #   -r requirements/edx/testing.txt
     #   backports-zoneinfo
     #   celery
+    #   django
     #   icalendar
     #   kombu
 beautifulsoup4==4.12.3
@@ -341,9 +342,9 @@ distlib==0.3.8
     # via
     #   -r requirements/edx/testing.txt
     #   virtualenv
-django==3.2.23
+django==4.2.9
     # via
-    #   -c requirements/edx/../common_constraints.txt
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   django-appconf
@@ -559,6 +560,7 @@ django-ses==3.5.2
     #   -r requirements/edx/testing.txt
 django-simple-history==3.4.0
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
@@ -1670,7 +1672,6 @@ pytz==2023.4
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   babel
-    #   django
     #   django-ses
     #   djangorestframework
     #   drf-yasg
