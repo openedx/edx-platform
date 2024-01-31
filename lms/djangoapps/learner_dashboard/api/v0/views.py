@@ -1,7 +1,6 @@
 """ API v0 views. """
 import logging
 
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from enterprise.models import EnterpriseCourseEnrollment
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -80,8 +79,6 @@ class Programs(APIView):
             }
         ]
     """
-
-    authentication_classes = (JwtAuthentication, SessionAuthentication,)
 
     permission_classes = (IsAuthenticated,)
 
@@ -298,12 +295,7 @@ class ProgramProgressDetailView(APIView):
             }
     """
 
-    authentication_classes = (
-        JwtAuthentication,
-        SessionAuthentication,
-    )
-
-    permission_classes = (IsAuthenticated,)
+     permission_classes = (IsAuthenticated,)
 
     def get(self, request, program_uuid):
         """

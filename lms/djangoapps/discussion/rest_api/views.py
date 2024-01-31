@@ -1099,7 +1099,6 @@ class RetireUserView(APIView):
         Empty string
     """
 
-    authentication_classes = (JwtAuthentication,)
     permission_classes = (permissions.IsAuthenticated, CanRetireUser)
 
     def post(self, request):

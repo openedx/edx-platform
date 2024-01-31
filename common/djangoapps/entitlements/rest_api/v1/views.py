@@ -328,7 +328,6 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
         - Unenroll
         - Switch Enrollment
     """
-    authentication_classes = (JwtAuthentication, SessionAuthentication,)
     # TODO: ARCH-91
     # This view is excluded from Swagger doc generation because it
     # does not specify a serializer class.

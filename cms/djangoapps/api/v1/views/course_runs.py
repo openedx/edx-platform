@@ -3,7 +3,6 @@
 
 from django.conf import settings
 from django.http import Http404
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import parsers, permissions, status, viewsets
 from rest_framework.authentication import SessionAuthentication
@@ -21,7 +20,6 @@ from ..serializers.course_runs import (
 
 
 class CourseRunViewSet(viewsets.GenericViewSet):  # lint-amnesty, pylint: disable=missing-class-docstring
-    authentication_classes = (JwtAuthentication, SessionAuthentication,)
     lookup_value_regex = settings.COURSE_KEY_REGEX
     permission_classes = (permissions.IsAdminUser,)
     serializer_class = CourseRunSerializer

@@ -4,7 +4,6 @@ Tests for the Third Party Auth permissions
 
 import ddt
 from django.test import RequestFactory, TestCase
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.jwt.tests.utils import generate_jwt
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
@@ -25,7 +24,6 @@ class ThirdPartyAuthPermissionTest(TestCase):
 
     class SomeTpaClassView(APIView):
         """view used to test TPA_permissions"""
-        authentication_classes = (JwtAuthentication, SessionAuthentication)
         permission_classes = (TPA_PERMISSIONS,)
         required_scopes = ['tpa:read']
 

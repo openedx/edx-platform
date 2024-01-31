@@ -244,7 +244,6 @@ class RetireUserView(APIView):
           - EdxNotesServiceUnavailable is thrown: the edx-notes-api IDA is not available.
     """
 
-    authentication_classes = (JwtAuthentication,)
     permission_classes = (permissions.IsAuthenticated, CanRetireUser)
 
     def post(self, request):

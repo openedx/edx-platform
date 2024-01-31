@@ -8,7 +8,6 @@ from requests.exceptions import SSLError, MissingSchema, HTTPError
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from edx_rbac.mixins import PermissionRequiredMixin
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from enterprise.models import EnterpriseCustomerIdentityProvider
 from rest_framework import permissions, status, viewsets
 from rest_framework.authentication import SessionAuthentication
@@ -31,7 +30,6 @@ log = logging.getLogger(__name__)
 
 
 class SAMLProviderDataMixin:
-    authentication_classes = [JwtAuthentication, SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = SAMLProviderDataSerializer
 

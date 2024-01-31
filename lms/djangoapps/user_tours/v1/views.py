@@ -2,7 +2,6 @@
 from django.conf import settings
 from django.db import transaction, IntegrityError
 from django.shortcuts import get_object_or_404
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -24,7 +23,6 @@ class UserTourView(RetrieveUpdateAPIView):
         GET /api/user_tours/v1/{username}
         PATCH /api/user_tours/v1/{username}
     """
-    authentication_classes = (JwtAuthentication,)
     permission_classes = (IsAuthenticated,)
     serializer_class = UserTourSerializer
 
@@ -104,7 +102,6 @@ class UserDiscussionsToursView(APIView):
     ]
     """
 
-    authentication_classes = (JwtAuthentication, SessionAuthentication)
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, tour_id=None):
