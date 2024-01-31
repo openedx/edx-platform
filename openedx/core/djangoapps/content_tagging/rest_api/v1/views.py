@@ -8,7 +8,7 @@ from typing import Iterator
 
 from django.http import StreamingHttpResponse
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.keys import CourseKey
 from openedx_tagging.core.tagging import rules as oel_tagging_rules
 from openedx_tagging.core.tagging.rest_api.v1.views import ObjectTagView, TaxonomyView
 from rest_framework import status
