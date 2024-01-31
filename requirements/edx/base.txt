@@ -475,7 +475,7 @@ edx-drf-extensions==10.1.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.11.0
+edx-enterprise==4.11.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -790,7 +790,7 @@ optimizely-sdk==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/bundled.in
-ora2==6.0.30
+ora2==6.0.31
     # via -r requirements/edx/bundled.in
 packaging==23.2
     # via
