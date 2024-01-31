@@ -14,7 +14,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.django import modulestore
 from openedx.features.genplus_features.genplus_learning.constants import ProgramEnrollmentStatuses, ProgramStatuses
-from genplus.lms.djangoapps.genplus.models import Student, Class, Skill
+from genplus.lms.djangoapps.genplus_core.models import Student, Class, Skill
 
 USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
@@ -256,3 +256,5 @@ class UnitBlockCompletion(models.Model):
     @property
     def course_name(self):
         return modulestore().get_course(self.course_key).display_name
+
+

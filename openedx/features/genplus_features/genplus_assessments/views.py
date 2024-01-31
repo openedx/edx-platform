@@ -41,11 +41,11 @@ from .utils import (
     get_student_program_skills_assessment,
     get_user_assessment_result
 )
-from genplus.lms.djangoapps.genplus.models import GenUser, Student, JournalPost, Teacher, Skill
+from genplus.lms.djangoapps.genplus_core.models import GenUser, Student, JournalPost, Teacher, Skill
 from openedx.features.genplus_features.genplus_learning.models import Program, Unit, UnitCompletion, ProgramEnrollment
 from openedx.features.genplus_features.genplus_learning.constants import ProgramStatuses
 from openedx.features.genplus_features.genplus_badges.models import BoosterBadgeAward
-from genplus.lms.djangoapps.genplus.constants import JournalTypes
+from genplus.lms.djangoapps.genplus_core.constants import JournalTypes
 from openedx.features.genplus_features.genplus_assessments.api.v1.serializers import RatingAssessmentSerializer, TextAssessmentSerializer
 from ..utils import get_full_name
 

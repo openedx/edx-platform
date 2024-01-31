@@ -5,14 +5,14 @@ from django.conf import settings
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from lms.djangoapps.badges.models import BadgeClass, BadgeAssertion
-from genplus.lms.djangoapps.genplus.api.v1.serializers import TeacherSerializer
+from genplus.lms.djangoapps.genplus_core.api.v1.serializers import TeacherSerializer
 from openedx.features.genplus_features.genplus_badges.models import (BoosterBadge,
                                                                      BoosterBadgeAward,
                                                                      BoosterBadgeType,
                                                                      )
 from openedx.features.genplus_features.genplus_learning.models import Program
-from genplus.lms.djangoapps.genplus.models import Student, Teacher, JournalPost, Skill
-from genplus.lms.djangoapps.genplus.constants import JournalTypes
+from genplus.lms.djangoapps.genplus_core.models import Student, Teacher, JournalPost, Skill
+from genplus.lms.djangoapps.genplus_core.constants import JournalTypes
 from openedx.features.genplus_features.genplus_badges.utils import get_absolute_url
 
 

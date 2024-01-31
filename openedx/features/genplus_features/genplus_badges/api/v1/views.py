@@ -10,7 +10,7 @@ from lms.djangoapps.badges.models import BadgeClass, BadgeAssertion
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.features.genplus_features.genplus_learning.models import Program, ProgramEnrollment, YearGroup, AcademicYear
 from openedx.features.genplus_features.genplus_learning.constants import ProgramEnrollmentStatuses, ProgramStatuses
-from genplus.lms.djangoapps.genplus.api.v1.permissions import IsStudent, IsTeacher, IsStudentOrTeacher
+from genplus.lms.djangoapps.genplus_core.api.v1.permissions import IsStudent, IsTeacher, IsStudentOrTeacher
 from openedx.features.genplus_features.common.display_messages import SuccessMessages
 from openedx.features.genplus_features.genplus_badges.models import (BoosterBadge,
                                                                      BoosterBadgeAward,

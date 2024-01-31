@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerEr
 from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 from common.djangoapps.util.views import fix_crum_request
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
-from genplus.lms.djangoapps.genplus.models import GenError, GenUser
+from genplus.lms.djangoapps.genplus_core.models import GenError, GenUser
 
 __all__ = ['not_found', 'server_error', 'render_404', 'render_500']
 

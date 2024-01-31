@@ -13,8 +13,8 @@ from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from common.config.waffle import TEACHER_PROGRESS_TACKING_DISABLED_SWITCH
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.course_modes.models import CourseMode
-from genplus.lms.djangoapps.genplus.models import Class, Student
-from genplus.lms.djangoapps.genplus.constants import GenUserRoles
+from genplus.lms.djangoapps.genplus_core.models import Class, Student
+from genplus.lms.djangoapps.genplus_core.constants import GenUserRoles
 from openedx.features.genplus_features.genplus_learning.models import (
     Program, ProgramEnrollment, UnitCompletion, UnitBlockCompletion
 )
@@ -232,3 +232,6 @@ def update_unit_and_lesson_completions(self, user_id, course_key_str, usage_key_
 def is_staff_progress_tracking_disabled(user):
     user_is_staff = user.gen_user.is_teacher
     return user_is_staff and TEACHER_PROGRESS_TACKING_DISABLED_SWITCH.is_enabled()
+
+
+

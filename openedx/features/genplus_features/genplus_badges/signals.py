@@ -2,8 +2,8 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from openedx.core.djangoapps.signals.signals import COURSE_COMPLETED
 from openedx.features.genplus_features.genplus_learning.models import UnitCompletion
-from genplus.lms.djangoapps.genplus.models import Activity
-from genplus.lms.djangoapps.genplus.constants import ActivityTypes
+from genplus.lms.djangoapps.genplus_core.models import Activity
+from genplus.lms.djangoapps.genplus_core.constants import ActivityTypes
 from openedx.features.genplus_features.genplus_badges.events.completion import (
     unit_badge_check,
     program_badge_check

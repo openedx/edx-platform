@@ -17,7 +17,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_experience.utils import get_course_outline_block_tree
-from genplus.lms.djangoapps.genplus.models import Student
+from genplus.lms.djangoapps.genplus_core.models import Student
 from openedx.features.genplus_features.genplus_assessments.utils import (
     build_problem_list,
     get_student_unit_skills_assessment
