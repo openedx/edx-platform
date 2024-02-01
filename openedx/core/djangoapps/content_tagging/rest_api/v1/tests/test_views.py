@@ -125,9 +125,15 @@ class TestTaxonomyObjectsMixin:
 
         self.staffA = User.objects.create(
             username="staffA",
-            email="userA@example.com",
+            email="staffA@example.com",
         )
         update_org_role(self.staff, OrgStaffRole, self.staffA, [self.orgA.short_name])
+
+        self.staffB = User.objects.create(
+            username="staffB",
+            email="staffB@example.com",
+        )
+        update_org_role(self.staff, OrgStaffRole, self.staffB, [self.orgB.short_name])
 
         self.content_creatorA = User.objects.create(
             username="content_creatorA",
@@ -1534,17 +1540,43 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         response = self.client.put(url, {"tags": ["invalid"]}, format="json")
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    def test_tag_cross_org(self):
+    @ddt.data(
+        ("staff", status.HTTP_200_OK),
+        ("staffA", status.HTTP_403_FORBIDDEN),
+        ("staffB", status.HTTP_403_FORBIDDEN),
+    )
+    @ddt.unpack
+    def test_tag_cross_org(self, user_attr, expected_status):
         """
-        Tests that we cannot add a taxonomy from orgA to an object from orgB
+        Tests that only global admins can add a taxonomy from orgA to an object from orgB
         """
-        self.client.force_authenticate(user=self.staff)
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
 
         url = OBJECT_TAG_UPDATE_URL.format(object_id=self.courseB, taxonomy_id=self.tA1.pk)
 
         response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
 
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code == expected_status
+
+    @ddt.data(
+        ("staff", status.HTTP_200_OK),
+        ("staffA", status.HTTP_403_FORBIDDEN),
+        ("staffB", status.HTTP_403_FORBIDDEN),
+    )
+    @ddt.unpack
+    def test_tag_no_org(self, user_attr, expected_status):
+        """
+        Tests that only global admins can add a no-org taxonomy to an object
+        """
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+
+        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.courseA, taxonomy_id=self.ot1.pk)
+
+        response = self.client.put(url, {"tags": []}, format="json")
+
+        assert response.status_code == expected_status
 
     @ddt.data(
         "courseB",
@@ -1627,7 +1659,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
 
         url = OBJECT_TAGS_URL.format(object_id=object_id)
         self.client.force_authenticate(user=self.staff)
-        with self.assertNumQueries(10):  # TODO Why so many queries?
+        with self.assertNumQueries(7):  # TODO Why so many queries?
             response = self.client.get(url)
 
         assert response.status_code == 200
