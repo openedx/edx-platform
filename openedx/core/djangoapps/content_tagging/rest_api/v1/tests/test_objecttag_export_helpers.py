@@ -167,7 +167,7 @@ class TaggedCourseMixin(ModuleStoreTestCase):
             category="vertical",
             display_name="test vertical2",
         )
-        tagged_vertical2 = TaggedContent(
+        untagged_vertical2 = TaggedContent(
             display_name="test vertical2",
             block_id="block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical2",
             category="vertical",
@@ -175,7 +175,7 @@ class TaggedCourseMixin(ModuleStoreTestCase):
             object_tags={},
         )
         assert tagged_sequential.children is not None  # type guard
-        tagged_sequential.children.append(tagged_vertical2)
+        tagged_sequential.children.append(untagged_vertical2)
 
         html = BlockFactory.create(
             parent=vertical2,
@@ -197,8 +197,8 @@ class TaggedCourseMixin(ModuleStoreTestCase):
             },
         )
 
-        assert tagged_vertical2.children is not None  # type guard
-        tagged_vertical2.children.append(tagged_text)
+        assert untagged_vertical2.children is not None  # type guard
+        untagged_vertical2.children.append(tagged_text)
 
         # Create "deleted" object tags, which will be omitted from the results.
         for object_id in (
@@ -220,7 +220,7 @@ class TaggedCourseMixin(ModuleStoreTestCase):
             (self.expected_tagged_xblock, 0),
             (tagged_sequential, 1),
             (tagged_vertical, 2),
-            (tagged_vertical2, 2),
+            (untagged_vertical2, 2),
             (tagged_text, 3),
             (untagged_sequential, 1),
             (untagged_vertical, 2),
