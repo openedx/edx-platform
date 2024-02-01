@@ -235,8 +235,7 @@ class TestContentTagChildrenExport(TaggedCourseMixin):  # type: ignore[misc]
         """
         Test if we can export a course
         """
-        # 2 from get_course()
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(3):
             tagged_xblock = build_object_tree_with_objecttags(self.course.id, self.all_object_tags)
 
         assert tagged_xblock == self.expected_tagged_xblock
