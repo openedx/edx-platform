@@ -176,23 +176,11 @@ class TestTaxonomyObjectsMixin:
         Create taxonomies for testing
         """
         # Orphaned taxonomy
-        self.ot1 = Taxonomy.objects.create(
-            name="ot1",
-            enabled=True,
-            export_id="ot1",
-        )
-        self.ot2 = Taxonomy.objects.create(
-            name="ot2",
-            enabled=False,
-            export_id="ot2",
-        )
+        self.ot1 = tagging_api.create_taxonomy(name="ot1", enabled=True)
+        self.ot2 = tagging_api.create_taxonomy(name="ot2", enabled=False)
 
         # System defined taxonomy
-        self.st1 = Taxonomy.objects.create(
-            name="st1",
-            enabled=True,
-            export_id="st1",
-        )
+        self.st1 = tagging_api.create_taxonomy(name="st1", enabled=True)
         self.st1.taxonomy_class = SystemDefinedTaxonomy
         self.st1.save()
         TaxonomyOrg.objects.create(
@@ -200,11 +188,7 @@ class TestTaxonomyObjectsMixin:
             rel_type=TaxonomyOrg.RelType.OWNER,
             org=None,
         )
-        self.st2 = Taxonomy.objects.create(
-            name="st2",
-            enabled=False,
-            export_id="st2",
-        )
+        self.st2 = tagging_api.create_taxonomy(name="st2", enabled=False)
         self.st2.taxonomy_class = SystemDefinedTaxonomy
         self.st2.save()
         TaxonomyOrg.objects.create(
@@ -213,20 +197,12 @@ class TestTaxonomyObjectsMixin:
         )
 
         # Global taxonomy, which contains tags
-        self.t1 = Taxonomy.objects.create(
-            name="t1",
-            enabled=True,
-            export_id="t1",
-        )
+        self.t1 = tagging_api.create_taxonomy(name="t1", enabled=True)
         TaxonomyOrg.objects.create(
             taxonomy=self.t1,
             rel_type=TaxonomyOrg.RelType.OWNER,
         )
-        self.t2 = Taxonomy.objects.create(
-            name="t2",
-            enabled=False,
-            export_id="t2",
-        )
+        self.t2 = tagging_api.create_taxonomy(name="t2", enabled=False)
         TaxonomyOrg.objects.create(
             taxonomy=self.t2,
             rel_type=TaxonomyOrg.RelType.OWNER,
@@ -239,19 +215,11 @@ class TestTaxonomyObjectsMixin:
         Tag.objects.create(taxonomy=self.t1, value="anvil", parent=root1)
 
         # OrgA taxonomy
-        self.tA1 = Taxonomy.objects.create(
-            name="tA1",
-            enabled=True,
-            export_id="tA1",
-        )
+        self.tA1 = tagging_api.create_taxonomy(name="tA1", enabled=True)
         TaxonomyOrg.objects.create(
             taxonomy=self.tA1,
             org=self.orgA, rel_type=TaxonomyOrg.RelType.OWNER,)
-        self.tA2 = Taxonomy.objects.create(
-            name="tA2",
-            enabled=False,
-            export_id="tA2",
-        )
+        self.tA2 = tagging_api.create_taxonomy(name="tA2", enabled=False)
         TaxonomyOrg.objects.create(
             taxonomy=self.tA2,
             org=self.orgA,
@@ -259,21 +227,13 @@ class TestTaxonomyObjectsMixin:
         )
 
         # OrgB taxonomy
-        self.tB1 = Taxonomy.objects.create(
-            name="tB1",
-            enabled=True,
-            export_id="tB1",
-        )
+        self.tB1 = tagging_api.create_taxonomy(name="tB1", enabled=True)
         TaxonomyOrg.objects.create(
             taxonomy=self.tB1,
             org=self.orgB,
             rel_type=TaxonomyOrg.RelType.OWNER,
         )
-        self.tB2 = Taxonomy.objects.create(
-            name="tB2",
-            enabled=False,
-            export_id="tB2",
-        )
+        self.tB2 = tagging_api.create_taxonomy(name="tB2", enabled=False)
         TaxonomyOrg.objects.create(
             taxonomy=self.tB2,
             org=self.orgB,
@@ -281,11 +241,7 @@ class TestTaxonomyObjectsMixin:
         )
 
         # OrgA and OrgB taxonomy
-        self.tBA1 = Taxonomy.objects.create(
-            name="tBA1",
-            enabled=True,
-            export_id="tBA1",
-        )
+        self.tBA1 = tagging_api.create_taxonomy(name="tBA1", enabled=True)
         TaxonomyOrg.objects.create(
             taxonomy=self.tBA1,
             org=self.orgA,
@@ -296,11 +252,7 @@ class TestTaxonomyObjectsMixin:
             org=self.orgB,
             rel_type=TaxonomyOrg.RelType.OWNER,
         )
-        self.tBA2 = Taxonomy.objects.create(
-            name="tBA2",
-            enabled=False,
-            export_id="tBA2",
-        )
+        self.tBA2 = tagging_api.create_taxonomy(name="tBA2", enabled=False)
         TaxonomyOrg.objects.create(
             taxonomy=self.tBA2,
             org=self.orgA,
@@ -1380,15 +1332,13 @@ class TestObjectTagMixin(TestTaxonomyObjectsMixin):
             block_id='block_id'
         )
 
-        self.multiple_taxonomy = Taxonomy.objects.create(
+        self.multiple_taxonomy = tagging_api.create_taxonomy(
             name="Multiple Taxonomy",
             allow_multiple=True,
-            export_id="multiple_taxonomy",
         )
-        self.single_value_taxonomy = Taxonomy.objects.create(
+        self.single_value_taxonomy = tagging_api.create_taxonomy(
             name="Required Taxonomy",
             allow_multiple=False,
-            export_id="required_taxonomy",
         )
         for i in range(20):
             # Valid ObjectTags
@@ -1397,10 +1347,9 @@ class TestObjectTagMixin(TestTaxonomyObjectsMixin):
             Tag.objects.create(taxonomy=self.multiple_taxonomy, value=f"Tag {i}")
             Tag.objects.create(taxonomy=self.single_value_taxonomy, value=f"Tag {i}")
 
-        self.open_taxonomy = Taxonomy.objects.create(
+        self.open_taxonomy = tagging_api.create_taxonomy(
             name="Enabled Free-Text Taxonomy",
             allow_free_text=True,
-            export_id="enabled_free_text_taxonomy",
         )
 
         # Add org permissions to taxonomy
@@ -1997,9 +1946,8 @@ class TestImportTagsView(ImportTaxonomyMixin, APITestCase):
     def setUp(self):
         ImportTaxonomyMixin.setUp(self)
 
-        self.taxonomy = Taxonomy.objects.create(
+        self.taxonomy = tagging_api.create_taxonomy(
             name="Test import taxonomy",
-            export_id="test_import_taxonomy",
         )
         tag_1 = Tag.objects.create(
             taxonomy=self.taxonomy,
