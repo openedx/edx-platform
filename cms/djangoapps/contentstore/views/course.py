@@ -595,13 +595,7 @@ def get_courses_by_search_query(search_query, base_queryset):
     """
     if not search_query:
         return base_queryset
-    return CourseOverview.get_courses_matching_any_filter(
-        filters={
-            'org__icontains': search_query,
-            'display_name__icontains': search_query,
-        },
-        base_queryset=base_queryset,
-    )
+    return CourseOverview.get_courses_matching_query(search_query, base_queryset=base_queryset)
 
 
 def get_courses_order_by(order_query, base_queryset):
