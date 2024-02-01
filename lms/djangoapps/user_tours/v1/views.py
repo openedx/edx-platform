@@ -2,7 +2,6 @@
 from django.conf import settings
 from django.db import transaction, IntegrityError
 from django.shortcuts import get_object_or_404
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response

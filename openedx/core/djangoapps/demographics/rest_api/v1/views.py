@@ -1,6 +1,5 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 from rest_framework import permissions, status
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
