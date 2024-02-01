@@ -10,6 +10,7 @@ from django.core.exceptions import SuspiciousOperation
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from edx_django_utils.cache import RequestCache
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtUserEmailMismatchError
 
 from openedx.core.lib.request_utils import (
     IgnoredErrorMiddleware,
@@ -429,3 +430,11 @@ class TestIgnoredErrorExceptionHandler(unittest.TestCase):
             ],
             any_order=True
         )
+
+    def test_handler_returns_401_for_jwt_user_email_mismatch_error(self):
+        mock_context = {'request': self.mock_request}
+        exception = JwtUserEmailMismatchError('test error')
+        response = ignored_error_exception_handler(exception, mock_context)
+
+        assert response.status_code == 401
+        assert response.data['error'] == 'test error'

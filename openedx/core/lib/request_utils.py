@@ -12,6 +12,9 @@ from edx_django_utils.monitoring import set_custom_attribute
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.views import exception_handler
+from rest_framework import status
+from rest_framework.response import Response
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtUserEmailMismatchError
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
@@ -97,6 +100,11 @@ def ignored_error_exception_handler(exc, context):
     """
     # Call REST framework's default exception handler first to get the standard error response.
     response = exception_handler(exc, context)
+
+    # Check if the default exception handler returned None for JwtUserEmailMismatchError
+    # If so, respond with a 401 Unauthorized status code
+    if response is None and isinstance(exc, JwtUserEmailMismatchError):
+        response = Response({'error': str(exc)}, status=status.HTTP_401_UNAUTHORIZED)
 
     try:
         request = context['request'] if 'request' in context else None
