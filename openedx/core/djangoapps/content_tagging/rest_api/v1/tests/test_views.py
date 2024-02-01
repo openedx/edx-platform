@@ -11,6 +11,7 @@ from unittest.mock import MagicMock
 
 import abc
 import ddt
+from common.djangoapps.student.tests.factories import UserFactory
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
@@ -1636,17 +1637,13 @@ class TestContentObjectChildrenExportView(TaggedCourseMixin, APITestCase):  # ty
     """
     def setUp(self):
         super().setUp()
-        self.user = User.objects.create(
-            username="user",
-            email="user@example.com",
-        )
-        self.staff = User.objects.create(
+        self.staff = UserFactory.create(
             username="staff",
             email="staff@example.com",
             is_staff=True,
         )
 
-        self.staffA = User.objects.create(
+        self.staffA = UserFactory.create(
             username="staffA",
             email="userA@example.com",
         )
