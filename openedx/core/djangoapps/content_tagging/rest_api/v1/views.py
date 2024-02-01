@@ -165,11 +165,7 @@ class ObjectTagExportView(APIView):
             def write(self, value):
                 return value
 
-        def _generate_csv_rows(
-            tagged_content: TaggedContent,
-            taxonomies: TaxonomyDict,
-            pseudo_buffer: Echo,
-        ) -> Iterator[str]:
+        def _generate_csv_rows() -> Iterator[str]:
             """
             Receives the blocks, tags and taxonomies and returns a CSV string
             """
@@ -224,9 +220,10 @@ class ObjectTagExportView(APIView):
 
         all_object_tags, taxonomies = get_all_object_tags(content_key)
         tagged_content = build_object_tree_with_objecttags(content_key, all_object_tags)
+        pseudo_buffer = Echo()
 
         return StreamingHttpResponse(
-            streaming_content=_generate_csv_rows(tagged_content, taxonomies, Echo()),
+            streaming_content=_generate_csv_rows(),
             content_type="text/csv",
             headers={'Content-Disposition': f'attachment; filename="{object_id}_tags.csv"'},
         )
