@@ -607,7 +607,11 @@ def get_courses_order_by(order_query, base_queryset):
     """
     if not order_query:
         return base_queryset
-    return base_queryset.order_by(order_query)
+    try:
+        return base_queryset.order_by(order_query)
+    except FieldError as e:
+        log.exception(f"Error ordering courses by {order_query}: {e}")
+        return base_queryset
 
 
 @function_trace('_accessible_libraries_iter')

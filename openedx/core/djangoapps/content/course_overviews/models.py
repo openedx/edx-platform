@@ -703,7 +703,7 @@ class CourseOverview(TimeStampedModel):
     @classmethod
     def get_courses_matching_query(cls, query, base_queryset=None):
         """
-        Return a queryset of CourseOverview objects based on the given filter(s).
+        Return a queryset of CourseOverview objects based on the given query.
 
         Arguments:
             filters (dict): required parameter that allows filtering based on the CourseOverview
