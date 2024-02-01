@@ -1674,7 +1674,11 @@ class TestContentObjectChildrenExportView(TaggedCourseMixin, APITestCase):  # ty
             'vertical1","","Tag 2.2"\r\n'
             '"    test vertical2","vertical","block-v1:orgA+test_course+test_run+type@vertical+block@test_'
             'vertical2","",""\r\n'
-            '"      Text","html","block-v1:orgA+test_course+test_run+type@html+block@test_html","","Tag 2.1"\r\n'
+            '"      test html","html","block-v1:orgA+test_course+test_run+type@html+block@test_html","","Tag 2.1"\r\n'
+            '"  untagged sequential","sequential","block-v1:orgA+test_course+test_run+type@sequential+block@untagged_'
+            'sequential","",""\r\n'
+            '"    untagged vertical","vertical","block-v1:orgA+test_course+test_run+type@vertical+block@untagged_'
+            'vertical","",""\r\n'
         )
 
         zip_content = BytesIO(b"".join(response.streaming_content)).getvalue()  # type: ignore[attr-defined]
