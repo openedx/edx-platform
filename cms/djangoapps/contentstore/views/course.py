@@ -598,7 +598,7 @@ def get_courses_by_search_query(search_query, base_queryset):
     return CourseOverview.get_courses_matching_query(search_query, base_queryset=base_queryset)
 
 
-def get_courses_order_by(order_query, base_queryset):
+def get_courses_order_by(order_query, course_overviews):
     """Return course overviews based on a base queryset ordered by a query.
 
     Args:
@@ -606,12 +606,12 @@ def get_courses_order_by(order_query, base_queryset):
         base_queryset (Course Overview objects): queryset to be ordered.
     """
     if not order_query:
-        return base_queryset
+        return course_overviews
     try:
-        return base_queryset.order_by(order_query)
+        return course_overviews.order_by(order_query)
     except FieldError as e:
         log.exception(f"Error ordering courses by {order_query}: {e}")
-        return base_queryset
+        return course_overviews
 
 
 @function_trace('_accessible_libraries_iter')
