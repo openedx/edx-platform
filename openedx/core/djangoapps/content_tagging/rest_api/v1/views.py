@@ -28,9 +28,8 @@ from ...api import (
     set_taxonomy_orgs,
 )
 from ...rules import get_admin_orgs
-from ...types import TaxonomyDict
 from .filters import ObjectTagTaxonomyOrgFilterBackend, UserOrgFilterBackend
-from .objecttag_export_helpers import TaggedContent, build_object_tree_with_objecttags, iterate_with_level
+from .objecttag_export_helpers import build_object_tree_with_objecttags, iterate_with_level
 from .serializers import TaxonomyOrgListQueryParamsSerializer, TaxonomyOrgSerializer, TaxonomyUpdateOrgBodySerializer
 
 
