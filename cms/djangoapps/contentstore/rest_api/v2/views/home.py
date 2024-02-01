@@ -24,7 +24,13 @@ class HomePageCoursesView(APIView):
                 "query",
                 apidocs.ParameterLocation.QUERY,
                 description="Query param to filter by course name, org, or number",
-    )],
+            ),
+            apidocs.string_parameter(
+                "order",
+                apidocs.ParameterLocation.QUERY,
+                description="Query param to order by course name, org, or number",
+            ),
+    ],
         responses={
             200: CourseHomeTabSerializer,
             401: "The requester is not authenticated.",
@@ -36,7 +42,7 @@ class HomePageCoursesView(APIView):
 
         **Example Request**
 
-            GET /api/contentstore/v1/home/courses
+            GET /api/contentstore/v2/home/courses
 
         **Response Values**
 

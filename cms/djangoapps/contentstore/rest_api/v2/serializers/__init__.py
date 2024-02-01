@@ -1,1 +1,1 @@
-from .home import CourseHomeSerializer, CourseHomeTabSerializer, LibraryTabSerializer
+from .home import CourseHomeTabSerializer

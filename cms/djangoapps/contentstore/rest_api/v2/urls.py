@@ -11,5 +11,6 @@ urlpatterns = [
     path(
         'home/courses',
         HomePageCoursesView.as_view(),
-        name="courses"),
+        name="courses",
+    ),
 ]

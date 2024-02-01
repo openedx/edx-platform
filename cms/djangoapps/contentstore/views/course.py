@@ -449,6 +449,8 @@ def _accessible_courses_summary_iter_v2(request, org=None):
     courses_summary = get_courses_by_search_query(search_query, order, courses_summary)
     courses_summary = filter(course_filter, courses_summary)
     in_process_course_actions = get_in_process_course_actions(request)
+    courses_summary = get_courses_by_search_query(search_query, courses_summary)
+    courses_summary = get_courses_order_by(order, courses_summary)
     return courses_summary, in_process_course_actions
 
 
@@ -582,10 +584,12 @@ def _accessible_courses_list_from_groups_v2(request):
     order = request.GET.get('order')
     courses_list = get_courses_by_search_query(search_query, order, courses_list)
 
+    courses_list = get_courses_by_search_query(search_query, courses_list)
+    courses_list = get_courses_order_by(order, courses_list)
     return courses_list, []
 
 
-def get_courses_by_search_query(search_query, order_query, base_queryset):
+def get_courses_by_search_query(search_query, base_queryset):
     """Return course overviews based on a base queryset filtered by a search query.
 
     Args:
@@ -594,8 +598,6 @@ def get_courses_by_search_query(search_query, order_query, base_queryset):
     """
     if not search_query:
         return base_queryset
-    if order_query:
-        base_queryset = base_queryset.order_by(order_query)
     return CourseOverview.get_courses_matching_any_filter(
         filters={
             'org__icontains': search_query,
@@ -603,6 +605,18 @@ def get_courses_by_search_query(search_query, order_query, base_queryset):
         },
         base_queryset=base_queryset,
     )
+
+
+def get_courses_order_by(order_query, base_queryset):
+    """Return course overviews based on a base queryset ordered by a query.
+
+    Args:
+        order_query (str): any string used to order Course Overviews.
+        base_queryset (Course Overview objects): queryset to be ordered.
+    """
+    if not order_query:
+        return base_queryset
+    return base_queryset.order_by(order_query)
 
 
 @function_trace('_accessible_libraries_iter')
