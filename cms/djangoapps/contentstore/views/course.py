@@ -446,11 +446,10 @@ def _accessible_courses_summary_iter_v2(request, org=None):
 
     search_query = request.GET.get('query')
     order = request.GET.get('order')
-    courses_summary = get_courses_by_search_query(search_query, order, courses_summary)
-    courses_summary = filter(course_filter, courses_summary)
-    in_process_course_actions = get_in_process_course_actions(request)
     courses_summary = get_courses_by_search_query(search_query, courses_summary)
     courses_summary = get_courses_order_by(order, courses_summary)
+    courses_summary = filter(course_filter, courses_summary)
+    in_process_course_actions = get_in_process_course_actions(request)
     return courses_summary, in_process_course_actions
 
 
@@ -582,8 +581,6 @@ def _accessible_courses_list_from_groups_v2(request):
 
     search_query = request.GET.get('query')
     order = request.GET.get('order')
-    courses_list = get_courses_by_search_query(search_query, order, courses_list)
-
     courses_list = get_courses_by_search_query(search_query, courses_list)
     courses_list = get_courses_order_by(order, courses_list)
     return courses_list, []
