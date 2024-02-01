@@ -56,8 +56,14 @@ endif
 push_translations: ## push source strings to Transifex for translation
 	i18n_tool transifex push
 
+pull_plugin_translations:  ## Pull translations from Transifex for edx_django_utils.plugins for both lms and cms
+	rm -rf conf/plugins-locale/plugins  # Clean up existing atlas translations
+	mkdir -p conf/plugins-locale/plugins
+	python manage.py lms pull_plugin_translations --verbose $(ATLAS_OPTIONS)
+	python manage.py lms compile_plugin_translations
+
 pull_xblock_translations:  ## pull xblock translations via atlas
-	rm -rf conf/plugins-locale  # Clean up existing atlas translations
+	rm -rf conf/plugins-locale/xblock.v1  # Clean up existing atlas translations
 	rm -rf lms/static/i18n/xblock.v1 cms/static/i18n/xblock.v1  # Clean up existing xblock compiled translations
 	mkdir -p conf/plugins-locale/xblock.v1/ lms/static/js/xblock.v1-i18n cms/static/js
 	python manage.py lms pull_xblock_translations --verbose $(ATLAS_OPTIONS)
@@ -76,6 +82,7 @@ ifeq ($(OPENEDX_ATLAS_PULL),)
 	i18n_tool validate --verbose
 else
 	make pull_xblock_translations
+	make pull_plugin_translations
 	find conf/locale -mindepth 1 -maxdepth 1 -type d -exec rm -r {} \;
 	atlas pull $(ATLAS_OPTIONS) translations/edx-platform/conf/locale:conf/locale
 	i18n_tool generate
