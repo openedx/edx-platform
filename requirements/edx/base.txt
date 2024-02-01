@@ -771,7 +771,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/kernel.in
 openedx-django-wiki==2.0.3
     # via -r requirements/edx/kernel.in
-openedx-events @ git+https://github.com/Zacharis278/openedx-events@zhancock/course-access-role-events
+openedx-events==9.4.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-event-bus-kafka

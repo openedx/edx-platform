@@ -97,9 +97,8 @@ def on_course_access_role_created(sender, instance, created, **kwargs):
     """
     Emit an event to the event-bus when a CourseAccessRole is created
     """
-    # do we want to handle updating an existing role instance in place
-    # with a new value and emit both a delete+create event?
-    # Theoretically possible but why would the LMS ever do this?
+    # Updating a role instance to a different role is unhandled behavior at the moment
+    # this event assumes roles are only created or deleted
     if not created:
         return
 
