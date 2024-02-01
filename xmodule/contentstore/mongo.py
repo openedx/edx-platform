@@ -5,6 +5,7 @@ MongoDB/GridFS-level code for the contentstore.
 
 import json
 import os
+import logging
 
 import gridfs
 import pymongo
@@ -13,6 +14,7 @@ from fs.osfs import OSFS
 from gridfs.errors import NoFile, FileExists
 from mongodb_proxy import autoretry_read
 from opaque_keys.edx.keys import AssetKey
+from django.conf import settings
 
 from xmodule.contentstore.content import XASSET_LOCATION_TAG
 from xmodule.exceptions import NotFoundError
@@ -21,6 +23,9 @@ from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
 from xmodule.util.misc import escape_invalid_characters, get_library_or_course_attribute
 
 from .content import ContentStore, StaticContent, StaticContentStream
+
+
+LOG = logging.getLogger(__name__)
 
 
 class MongoContentStore(ContentStore):
@@ -276,8 +281,10 @@ class MongoContentStore(ContentStore):
         # Mongo 3.4 does not require this hack. When upgraded, change this aggregation back to a find and specifiy
         # a collation based on user's language locale instead.
         # See: https://openedx.atlassian.net/browse/EDUCATOR-2221
+        log_prefix = f"MongoContentStore._get_all_content_for_course({course_key})"
         pipeline_stages = []
         query = query_for_course(course_key, 'asset' if not get_thumbnails else 'thumbnail')
+
         if filter_params:
             query.update(filter_params)
         pipeline_stages.append({'$match': query})
@@ -319,10 +326,22 @@ class MongoContentStore(ContentStore):
                 }
             })
 
-        cursor = self.fs_files.aggregate(pipeline_stages)
+
         # Set values if result of query is empty
         count = 0
         assets = []
+        cursor = None
+
+        try:
+            if settings.FEATURES.get('VERBOSE_EXPORT_LOGS', False):
+                LOG.info(f"{log_prefix}: Running aggregate query: {pipeline_stages}")
+            cursor = self.fs_files.aggregate(pipeline_stages)
+            if settings.FEATURES.get('VERBOSE_EXPORT_LOGS', False):
+                LOG.info(f'{log_prefix}: MongoDB query result: {cursor}')
+        except Exception as exc:
+            LOG.info(f"{log_prefix}: Running aggregate query: {pipeline_stages}")
+            raise exc
+
         try:
             result = cursor.next()
             if result:
