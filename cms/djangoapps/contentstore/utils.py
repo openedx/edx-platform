@@ -1566,47 +1566,6 @@ def get_course_context_v2(request):
     return active_courses, archived_courses, in_process_course_actions
 
 
-def get_courses_filtered_by_query(request, active_courses, archived_courses):
-    """Return tuple of Course Overviews filtered by a query parameter sent in the request.
-
-    The query parameter is used to filter the Course Overviews by:
-    - Course display name
-    - Course number
-    - Course Key
-    - Course run
-    - Organization
-
-    Args:
-        request (HttpRequest): The request object.
-        active_courses (list): List of active Course Overviews.
-        archived_courses (list): List of archived Course Overviews.
-
-    Returns:
-        tuple: Tuple of filtered Course Overviews.
-    """
-    query = request.GET.get('query', '')
-    if not query:
-        return active_courses, archived_courses
-
-    def filter_course_overviews(course_overviews):
-        """Filter course overviews by the query parameter."""
-        courses = []
-        for course_overview in course_overviews:
-            if query.lower() in course_overview.get('display_name').lower():
-                courses.append(course_overview)
-            elif query.lower() in course_overview.get('number').lower():
-                courses.append(course_overview)
-            elif query.lower() in course_overview.get('course_key').lower():
-                courses.append(course_overview)
-            elif query.lower() in course_overview.get('run').lower():
-                courses.append(course_overview)
-            elif query.lower() in course_overview.get('org').lower():
-                courses.append(course_overview)
-        return courses
-
-    return filter_course_overviews(active_courses), filter_course_overviews(archived_courses)
-
-
 def get_home_context(request, no_course=False):
     """
     Utils is used to get context of course home.
