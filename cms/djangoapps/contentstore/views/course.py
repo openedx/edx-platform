@@ -586,12 +586,12 @@ def _accessible_courses_list_from_groups_v2(request):
     return courses_list, []
 
 
-def get_courses_by_search_query(search_query, base_queryset):
+def get_courses_by_search_query(search_query, course_overviews):
     """Return course overviews based on a base queryset filtered by a search query.
 
     Args:
-        search_query (str): any string used to filter Course Overviews.
-        base_queryset (Course Overview objects): queryset to be filtered.
+        search_query (str): any string used to filter Course Overviews based on visible fields.
+        course_overviews (Course Overview objects): course overview queryset to be filtered.
     """
     if not search_query:
         return base_queryset
