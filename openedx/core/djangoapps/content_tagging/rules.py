@@ -282,6 +282,10 @@ def can_change_object_tag(
     if perm_obj.object_id == "":
         return True
 
+    # Also skip taxonomy check if the taxonomy is not set
+    if not perm_obj.taxonomy:
+        return True
+
     # Taxonomy admins can tag any object using any taxonomy
     if oel_tagging.is_taxonomy_admin(user):
         return True
