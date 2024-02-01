@@ -7,7 +7,6 @@ from django.db.models import Q
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 from rest_framework.views import APIView
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from social_django.models import UserSocialAuth
