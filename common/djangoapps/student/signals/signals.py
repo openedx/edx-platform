@@ -37,7 +37,6 @@ def emit_course_access_role_added(user, course_id, org_key, role):
                 pii=UserPersonalData(
                     username=user.username,
                     email=user.email,
-                    name=user.profile.name,
                 ),
                 id=user.id,
                 is_active=user.is_active,
@@ -59,7 +58,6 @@ def emit_course_access_role_removed(user, course_id, org_key, role):
                 pii=UserPersonalData(
                     username=user.username,
                     email=user.email,
-                    name=user.profile.name,
                 ),
                 id=user.id,
                 is_active=user.is_active,
