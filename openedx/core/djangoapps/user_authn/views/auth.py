@@ -1,6 +1,6 @@
 """ Views related to auth. """
 
-
+import json
 from common.djangoapps.util.json_request import JsonResponse
 from django.conf import settings
 
@@ -13,4 +13,5 @@ def get_public_signing_jwks(request):
     if not jwt_dict.get('JWT_PUBLIC_SIGNING_JWK_SET'):
         return JsonResponse({'error': 'JWK set is not found'}, status=400)
     jwks = jwt_dict['JWT_PUBLIC_SIGNING_JWK_SET']
-    return JsonResponse(jwks, status=200)
+    # jwks is a string here, need to convert it to dict
+    return JsonResponse(json.loads(jwks), status=200)

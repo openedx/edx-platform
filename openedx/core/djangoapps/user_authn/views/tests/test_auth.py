@@ -20,7 +20,7 @@ class getPublicSigningJWKSFunctionTest(TestCase):
 
         return self.client.get(url, HTTP_ACCEPT=accepts)
 
-    @mock.patch.dict(settings.JWT_AUTH, {'JWT_PUBLIC_SIGNING_JWK_SET': None})
+    @mock.patch.dict(settings.JWT_AUTH, {'JWT_PUBLIC_SIGNING_JWK_SET': ''})
     def test_get_public_signing_jwks_with_no_jwk_set(self):
         """ Test JWT_PUBLIC_SIGNING_JWK_SET is undefined """
         resp = self._get_jwks()
@@ -28,7 +28,7 @@ class getPublicSigningJWKSFunctionTest(TestCase):
         assert resp.status_code == 400
         assert 'JWK set is not found' in content['error']
 
-    @mock.patch.dict(settings.JWT_AUTH, {'JWT_PUBLIC_SIGNING_JWK_SET': {'keys': []}})
+    @mock.patch.dict(settings.JWT_AUTH, {'JWT_PUBLIC_SIGNING_JWK_SET': '{"keys": []}'})
     def test_get_public_signing_jwks_with_jwk_set(self):
         """ Test JWT_PUBLIC_SIGNING_JWK_SET is defined """
         resp = self._get_jwks()
