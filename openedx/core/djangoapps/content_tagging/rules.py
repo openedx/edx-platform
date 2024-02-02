@@ -8,8 +8,6 @@ import django.contrib.auth.models
 import openedx_tagging.core.tagging.rules as oel_tagging
 import rules
 from django.db.models import Q
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, UsageKey
 from organizations.models import Organization
 
 from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
@@ -25,6 +23,7 @@ from common.djangoapps.student.roles import (
 from openedx.core.djangoapps.content_libraries.api import get_libraries_for_user
 
 from .models import TaxonomyOrg
+from .utils import get_context_key_from_key_string
 
 UserType = Union[django.contrib.auth.models.User, django.contrib.auth.models.AnonymousUser]
 
@@ -221,15 +220,10 @@ def can_change_object_tag_objectid(user: UserType, object_id: str) -> bool:
     """
     if not object_id:
         return True
-    try:
-        usage_key = UsageKey.from_string(object_id)
-        if not usage_key.course_key.is_course:
-            raise ValueError("object_id must be from a block or a course")
-        course_key = usage_key.course_key
-    except InvalidKeyError:
-        course_key = CourseKey.from_string(object_id)
 
-    return has_studio_write_access(user, course_key)
+    context_key = get_context_key_from_key_string(object_id)
+
+    return has_studio_write_access(user, context_key)
 
 
 @rules.predicate
@@ -252,15 +246,10 @@ def can_view_object_tag_objectid(user: UserType, object_id: str) -> bool:
     """
     if not object_id:
         raise ValueError("object_id must be provided")
-    try:
-        usage_key = UsageKey.from_string(object_id)
-        if not usage_key.course_key.is_course:
-            raise ValueError("object_id must be from a block or a course")
-        course_key = usage_key.course_key
-    except InvalidKeyError:
-        course_key = CourseKey.from_string(object_id)
 
-    return has_studio_read_access(user, course_key)
+    context_key = get_context_key_from_key_string(object_id)
+
+    return has_studio_read_access(user, context_key)
 
 
 @rules.predicate
@@ -290,18 +279,7 @@ def can_change_object_tag(
     if oel_tagging.is_taxonomy_admin(user):
         return True
 
-    # Library locators are also subclasses of CourseKey
-    context_key: CourseKey
-    try:
-        context_key = CourseKey.from_string(perm_obj.object_id)
-    except InvalidKeyError as course_key_error:
-        try:
-            usage_key = UsageKey.from_string(perm_obj.object_id)
-            if not isinstance(usage_key.context_key, CourseKey):
-                raise ValueError("object_id must be child of a course or a library") from course_key_error
-            context_key = usage_key.context_key
-        except InvalidKeyError as usage_key_error:
-            raise ValueError("object_id must be from a LearningContextKey or a UsageKey") from usage_key_error
+    context_key = get_context_key_from_key_string(perm_obj.object_id)
 
     org_short_name = context_key.org
     return perm_obj.taxonomy.taxonomyorg_set.filter(Q(org__short_name=org_short_name) | Q(org=None)).exists()
