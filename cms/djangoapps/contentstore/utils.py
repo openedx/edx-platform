@@ -1760,6 +1760,7 @@ def _get_course_index_context(request, course_key, course_block):
     course_index_context = {
         'language_code': request.LANGUAGE_CODE,
         'context_course': course_block,
+        'discussions_settings': course_block.discussions_settings,
         'lms_link': lms_link,
         'sections': sections,
         'course_structure': course_structure,

@@ -77,7 +77,13 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
             "notification_dismiss_url": None,
             "proctoring_errors": [],
             "reindex_link": f"/course/{self.course.id}/search_reindex",
-            "rerun_notification_id": None
+            "rerun_notification_id": None,
+            "discussions_settings": {
+                "enable_in_context": True,
+                "enable_graded_units": False,
+                "unit_level_visibility": True,
+            },
+            "advance_settings_url": f"/settings/advanced/{self.course.id}",
         }
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -117,7 +123,13 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
             "notification_dismiss_url": None,
             "proctoring_errors": [],
             "reindex_link": f"/course/{self.course.id}/search_reindex",
-            "rerun_notification_id": None
+            "rerun_notification_id": None,
+            "discussions_settings": {
+                "enable_in_context": True,
+                "enable_graded_units": False,
+                "unit_level_visibility": True,
+            },
+            "advance_settings_url": f"/settings/advanced/{self.course.id}",
         }
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
