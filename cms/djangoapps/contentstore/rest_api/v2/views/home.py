@@ -3,6 +3,8 @@ import edx_api_doc_tools as apidocs
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.pagination import PageNumberPagination
+
 from openedx.core.lib.api.view_utils import view_auth_classes
 
 from cms.djangoapps.contentstore.utils import get_course_context_v2
@@ -88,11 +90,11 @@ class HomePageCoursesViewV2(APIView):
         }
         ```
         """
-
         courses, in_process_course_actions = get_course_context_v2(request)
-        courses_context = {
-            "courses": courses,
-            "in_process_course_actions": in_process_course_actions,
-        }
-        serializer = CourseHomeTabSerializerV2(courses_context)
-        return Response(serializer.data)
+        paginator = PageNumberPagination()
+        courses_page = paginator.paginate_queryset(courses, self.request, view=self)
+        serializer = CourseHomeTabSerializerV2({
+            'courses': courses_page,
+            'in_process_course_actions': in_process_course_actions,
+        })
+        return paginator.get_paginated_response(serializer.data)
