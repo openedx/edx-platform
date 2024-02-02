@@ -701,7 +701,7 @@ class CourseOverview(TimeStampedModel):
         return course_overviews
 
     @classmethod
-    def get_courses_matching_query(cls, query, base_queryset=None):
+    def get_courses_matching_query(cls, query, course_overviews=None):
         """
         Return a queryset of CourseOverview objects based on the given query.
 
@@ -709,9 +709,9 @@ class CourseOverview(TimeStampedModel):
             filters (dict): required parameter that allows filtering based on the CourseOverview
             parameters and the available Django field lookups.
         """
-        if not base_queryset:
-            base_queryset = CourseOverview.objects.all()
-        return base_queryset.filter(
+        if not course_overviews:
+            course_overviews = CourseOverview.objects.all()
+        return course_overviews.filter(
             Q(display_name__icontains=query) |
             Q(org__icontains=query) |
             Q(id__icontains=query)

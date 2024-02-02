@@ -594,8 +594,8 @@ def get_courses_by_search_query(search_query, course_overviews):
         course_overviews (Course Overview objects): course overview queryset to be filtered.
     """
     if not search_query:
-        return base_queryset
-    return CourseOverview.get_courses_matching_query(search_query, base_queryset=base_queryset)
+        return course_overviews
+    return CourseOverview.get_courses_matching_query(search_query, course_overviews=course_overviews)
 
 
 def get_courses_order_by(order_query, course_overviews):
