@@ -104,6 +104,7 @@ class EnrollmentAudienceFilter(NotificationAudienceFilterBase):
         return CourseEnrollment.objects.filter(
             course_id=self.course_key,
             mode__in=enrollment_modes,
+            is_active=True,
         ).values_list('user_id', flat=True)
 
 

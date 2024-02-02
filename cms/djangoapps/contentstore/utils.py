@@ -4,6 +4,7 @@ Common utility functions useful throughout the contentstore
 from __future__ import annotations
 import configparser
 import logging
+import re
 from collections import defaultdict
 from contextlib import contextmanager
 from datetime import datetime, timezone
@@ -22,6 +23,9 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocator
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
+from openedx_events.learning.data import CourseNotificationData
+from openedx_events.learning.signals import COURSE_NOTIFICATION_REQUESTED
+
 from milestones import api as milestones_api
 from pytz import UTC
 from xblock.fields import Scope
@@ -62,6 +66,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.courses import course_image_url
+from openedx.core.lib.html_to_text import html_to_text
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
@@ -1951,3 +1956,27 @@ def track_course_update_event(course_key, user, event_data=None):
     context = contexts.course_context_from_course_id(course_key)
     with tracker.get_tracker().context(event_name, context):
         tracker.emit(event_name, event_data)
+
+
+def send_course_update_notification(course_key, content, user):
+    """
+    Send course update notification
+    """
+    text_content = re.sub(r"(\s|&nbsp;|//)+", " ", html_to_text(content))
+    course = modulestore().get_course(course_key)
+    extra_context = {
+        'author_id': user.id,
+        'course_name': course.display_name,
+    }
+    notification_data = CourseNotificationData(
+        course_key=course_key,
+        content_context={
+            "course_update_content": text_content,
+            **extra_context,
+        },
+        notification_type="course_update",
+        content_url=f"{settings.LMS_BASE}/courses/{str(course_key)}/course/updates",
+        app_name="updates",
+        audience_filters={},
+    )
+    COURSE_NOTIFICATION_REQUESTED.send_event(course_notification_data=notification_data)
