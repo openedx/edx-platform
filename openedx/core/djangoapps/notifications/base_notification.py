@@ -161,7 +161,24 @@ COURSE_NOTIFICATION_TYPES = {
         },
         'email_template': '',
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
-    }
+    },
+    'course_update': {
+        'notification_app': 'updates',
+        'name': 'course_update',
+        'is_core': False,
+        'info': '',
+        'web': True,
+        'email': True,
+        'push': True,
+        'non_editable': [],
+        'content_template': _('<{p}>You have a new course update: '
+                              '<{strong}>{course_update_content}</{strong}></{p}>'),
+        'content_context': {
+            'course_update_content': 'Course update',
+        },
+        'email_template': '',
+        'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
+    },
 }
 
 COURSE_NOTIFICATION_APPS = {
@@ -173,7 +190,15 @@ COURSE_NOTIFICATION_APPS = {
         'core_email': True,
         'core_push': True,
         'non_editable': ['web']
-    }
+    },
+    'updates': {
+        'enabled': True,
+        'core_info': _('Notifications for new announcements and updates from the course team.'),
+        'core_web': True,
+        'core_email': True,
+        'core_push': True,
+        'non_editable': []
+    },
 }
 
 
