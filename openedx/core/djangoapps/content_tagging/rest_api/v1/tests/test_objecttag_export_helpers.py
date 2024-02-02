@@ -20,6 +20,7 @@ class TaggedCourseMixin(ModuleStoreTestCase):
     Mixin with a course structure and taxonomies
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+    CREATE_USER = False
 
     def setUp(self):
         super().setUp()
