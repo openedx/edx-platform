@@ -85,6 +85,7 @@ def get_context(course, request, thread=None):
         "cc_requester": cc_requester,
         "has_moderation_privilege": has_moderation_privilege,
         "is_global_staff": is_global_staff,
+        "is_staff_or_admin": requester.id in course_staff_user_ids,
     }
 
 
