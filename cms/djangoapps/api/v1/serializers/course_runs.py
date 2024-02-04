@@ -199,7 +199,9 @@ class CourseRunRerunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTe
             'display_name': instance.display_name
         }
         fields.update(validated_data)
-        new_course_run_key = rerun_course(user, course_run_key, course_run_key.org, number, run, fields, False)
+        new_course_run_key = rerun_course(
+            user, course_run_key, course_run_key.org, number, run, fields, background=False,
+        )
 
         course_run = get_course_and_check_access(new_course_run_key, user)
         self.update_team(course_run, team)
@@ -229,10 +231,18 @@ class CourseCloneSerializer(serializers.Serializer):  # lint-amnesty, pylint: di
     def create(self, validated_data):
         source_course_id = validated_data.get('source_course_id')
         destination_course_id = validated_data.get('destination_course_id')
-        user_id = self.context['request'].user.id
-        store = modulestore()
-        source_key = CourseKey.from_string(source_course_id)
-        dest_key = CourseKey.from_string(destination_course_id)
-        with store.default_store('split'):
-            new_course = store.clone_course(source_key, dest_key, user_id)
-        return new_course
+        user = self.context['request'].user
+        source_course_key = CourseKey.from_string(source_course_id)
+        destination_course_key = CourseKey.from_string(destination_course_id)
+        source_course_run = get_course_and_check_access(source_course_key, user)
+        fields = {
+            'display_name': source_course_run.display_name,
+        }
+
+        destination_course_run_key = rerun_course(
+            user, source_course_key, destination_course_key.org, destination_course_key.course,
+            destination_course_key.run, fields, background=False,
+        )
+
+        destination_course_run = get_course_and_check_access(destination_course_run_key, user)
+        return destination_course_run
