@@ -96,5 +96,6 @@ class CourseRunViewSet(viewsets.GenericViewSet):  # lint-amnesty, pylint: disabl
     def clone(self, request, *args, **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring, unused-argument
         serializer = CourseCloneSerializer(data=request.data, context=self.get_serializer_context())
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        new_course_run = serializer.save()
+        serializer = self.get_serializer(new_course_run)
         return Response({"message": "Course cloned successfully."}, status=status.HTTP_201_CREATED)
