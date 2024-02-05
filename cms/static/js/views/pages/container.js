@@ -111,6 +111,7 @@ function($, _, Backbone, gettext, BasePage,
                     el: this.$('.unit-tags'),
                     model: this.model
                 });
+                this.tagListView.setupMessageListener();
                 this.tagListView.render();
 
                 this.unitOutlineView = new UnitOutlineView({

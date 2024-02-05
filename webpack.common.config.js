@@ -84,6 +84,7 @@ module.exports = Merge.smart({
             'js/factories/xblock_validation': './cms/static/js/factories/xblock_validation.js',
             'js/factories/edit_tabs': './cms/static/js/factories/edit_tabs.js',
             'js/sock': './cms/static/js/sock.js',
+            'js/factories/tag_count': './cms/static/js/factories/tag_count.js',
 
             // LMS
             SingleSupportForm: './lms/static/support/jsx/single_support_form.jsx',

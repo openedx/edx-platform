@@ -81,11 +81,11 @@ class TaxonomyOrgView(TaxonomyView):
         serializer.instance = create_taxonomy(**serializer.validated_data, orgs=user_admin_orgs)
 
     @action(detail=False, url_path="import", methods=["post"])
-    def create_import(self, request: Request, **kwargs) -> Response:
+    def create_import(self, request: Request, **kwargs) -> Response:  # type: ignore
         """
         Creates a new taxonomy with the given orgs and imports the tags from the uploaded file.
         """
-        response = super().create_import(request, **kwargs)
+        response = super().create_import(request=request, **kwargs)  # type: ignore
 
         # If creation was successful, set the orgs for the new taxonomy
         if status.is_success(response.status_code):

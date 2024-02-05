@@ -332,7 +332,7 @@ define(
              * @return {JSON} the data of the previous import
              */
             storedImport: function() {
-                return JSON.parse($.cookie(COOKIE_NAME));
+                return JSON.parse($.cookie(COOKIE_NAME) || null);
             }
         };
 

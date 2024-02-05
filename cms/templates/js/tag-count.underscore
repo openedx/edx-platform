@@ -1,0 +1,7 @@
+<% if (tags_count && tags_count > 0) { %>
+<button data-tooltip="<%- gettext("Manage Tags") %>" class="btn-default action-button manage-tags-button" data-testid="tag-count-button">
+    <span class="icon fa fa-tag" aria-hidden="true"></span>
+    <span><%- tags_count %></span>
+    <span class="sr action-button-text"><%- gettext("Manage Tags") %></span>
+</button>
+<% } %>

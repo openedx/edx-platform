@@ -6,7 +6,6 @@ import time
 from urllib.parse import urljoin
 
 from celery import shared_task
-from celery.exceptions import MaxRetriesExceededError
 from celery.utils.log import get_task_logger
 from celery_utils.logged_task import LoggedTask
 from django.conf import settings
@@ -43,12 +42,16 @@ INTERESTING_STATUSES = [
     CertificateStatuses.downloadable,
 ]
 
-# Maximum number of retries before giving up. For reference, 11 retries with exponential backoff yields a maximum
-# waiting time of 2047 seconds (about 30 minutes). Setting this to None could yield unwanted behavior: infinite retries.
-MAX_RETRIES = 11
 
-
-@shared_task(bind=True, ignore_result=True)
+@shared_task(
+    bind=True,
+    ignore_result=True,
+    autoretry_for=(Exception,),
+    max_retries=10,
+    retry_backoff=30,
+    retry_backoff_max=600,
+    retry_jitter=True,
+)
 @set_code_owner_attribute
 def send_grade_to_credentials(
     self,
@@ -62,6 +65,10 @@ def send_grade_to_credentials(
     """
     Celery task to notify the Credentials IDA of an "interesting" grade change via an API call.
 
+    If an exception occurs when trying to send data to the Credentials IDA, we will retry the task a maximum number of
+    11 times (initial attempt + 10 retries). We are relying on built-in functionality of Celery to add a randomized
+    jitter to the retries so that the tasks don't retry exactly at the same time.
+
     Args:
         username (string): The username of the learner we are currently processing
         course_run_key (string): String identifier of the course run associated with the grade update
@@ -70,35 +77,26 @@ def send_grade_to_credentials(
         percent_grade (float): Number representing the learner's grade in this course run
         grade_last_updated (string): String describing the last time this grade was modified in the LMS
     """
-    logger.info(f"Running task send_grade_to_credentials for username {username} and course {course_run_key}")
+    data = {
+        'username': username,
+        'course_run': course_run_key,
+        'letter_grade': letter_grade,
+        'percent_grade': percent_grade,
+        'verified': verified,
+        'lms_last_updated_at': grade_last_updated
+    }
+    logger.info(f"Running task `send_grade_to_credentials` for username {username} with data: {data}")
 
-    countdown = 2 ** self.request.retries
     course_key = CourseKey.from_string(course_run_key)
+    credentials_client = get_credentials_api_client(User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME))
+    api_url = urljoin(f"{get_credentials_api_base_url(org=course_key.org)}/", "grades/")
 
-    try:
-        credentials_client = get_credentials_api_client(
-            User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME)
-        )
-        api_url = urljoin(f"{get_credentials_api_base_url(org=course_key.org)}/", "grades/")
-        response = credentials_client.post(
-            api_url,
-            data={
-                'username': username,
-                'course_run': course_run_key,
-                'letter_grade': letter_grade,
-                'percent_grade': percent_grade,
-                'verified': verified,
-                'lms_last_updated_at': grade_last_updated
-            }
-        )
-        response.raise_for_status()
-        logger.info(f"Sent grade for course {course_run_key} for user {username}")
-    except Exception:  # lint-amnesty, pylint: disable=W0703
-        grade_str = f'(percent: {percent_grade} letter: {letter_grade})'
-        error_msg = f'Failed to send grade {grade_str} for course {course_run_key} for user {username}.'
-        logger.exception(error_msg)
-        exception = MaxRetriesExceededError(f"Failed to send grade to credentials. Reason: {error_msg}")
-        raise self.retry(exc=exception, countdown=countdown, max_retries=MAX_RETRIES)  # pylint: disable=raise-missing-from
+    response = credentials_client.post(
+        api_url,
+        data=data,
+    )
+    response.raise_for_status()
+    logger.info(f"Sent grade for user {username} in course {course_run_key} to Credentials")
 
 
 @shared_task(base=LoggedTask, ignore_result=True)

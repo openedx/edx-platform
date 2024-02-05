@@ -20,7 +20,8 @@ from lms.djangoapps.certificates.models import (
     CertificateHtmlViewConfiguration,
     CertificateTemplate,
     CertificateTemplateAsset,
-    GeneratedCertificate
+    GeneratedCertificate,
+    ModifiedCertificateTemplateCommandConfiguration,
 )
 
 
@@ -90,6 +91,11 @@ class CertificateGenerationCourseSettingAdmin(admin.ModelAdmin):
     list_display = ('course_key', 'self_generation_enabled', 'language_specific_templates_enabled')
     search_fields = ('course_key',)
     show_full_result_count = False
+
+
+@admin.register(ModifiedCertificateTemplateCommandConfiguration)
+class ModifiedCertificateTemplateCommandConfigurationAdmin(ConfigurationModelAdmin):
+    pass
 
 
 @admin.register(CertificateGenerationCommandConfiguration)
