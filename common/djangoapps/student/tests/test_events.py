@@ -384,11 +384,21 @@ class EnrollmentEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
         )
 
 
+@skip_unless_lms
 @ddt.ddt
-class TestCourseAccessRoleEvents(TestCase):
+class TestCourseAccessRoleEvents(TestCase, OpenEdxEventsTestMixin):
     """
     Tests for the events associated with the CourseAccessRole model.
     """
+    ENABLED_OPENEDX_EVENTS = [
+        'org.openedx.learning.user.course_access_role.added.v1',
+        'org.openedx.learning.user.course_access_role.removed.v1',
+    ]
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.start_events_isolation()
 
     def setUp(self):
         self.course_key = CourseKey.from_string("course-v1:test+blah+blah")
@@ -419,6 +429,7 @@ class TestCourseAccessRoleEvents(TestCase):
         role = AccessRole(self.course_key)
         role.add_users(self.user)
 
+        event_receiver.assert_called_once()
         self.assertTrue(self.receiver_called)
         self.assertDictContainsSubset(
             {
