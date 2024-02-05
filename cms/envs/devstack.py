@@ -30,6 +30,8 @@ SESSION_COOKIE_NAME = 'studio_sessionid'
 for pkg_name in ['common.djangoapps.track.contexts', 'common.djangoapps.track.middleware']:
     logging.getLogger(pkg_name).setLevel(logging.CRITICAL)
 
+FEATURES['VERBOSE_EXPORT_LOGS'] = 'ALWAYS' # value can be 'ALWAYS', 'NEVER', or 'ON_ERROR'
+
 # Docker does not support the syslog socket at /dev/log. Rely on the console.
 LOGGING['handlers']['local'] = LOGGING['handlers']['tracking'] = {
     'class': 'logging.NullHandler',
