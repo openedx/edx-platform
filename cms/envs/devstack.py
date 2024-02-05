@@ -301,6 +301,9 @@ CLOSEST_CLIENT_IP_FROM_HEADERS = []
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:18150'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 
+########################## ORA MFE APP ##############################
+ORA_MICROFRONTEND_URL = 'http://localhost:1992'
+
 ############################ AI_TRANSLATIONS ##################################
 AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
 

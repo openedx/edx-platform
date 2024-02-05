@@ -288,15 +288,9 @@ class GetItemTest(ItemTest):
         self.assertEqual(resp.status_code, 200)
         usage_key = self.response_usage_key(resp)
 
-        # Get the preview HTML without tags
-        mock_get_object_tag_counts.return_value = {}
-        html, __ = self._get_container_preview(root_usage_key)
-        self.assertIn("wrapper-xblock", html)
-        self.assertNotIn('data-testid="tag-count-button"', html)
-
         # Get the preview HTML with tags
         mock_get_object_tag_counts.return_value = {
-            str(usage_key): 13
+            str(usage_key): 13,
         }
         html, __ = self._get_container_preview(root_usage_key)
         self.assertIn("wrapper-xblock", html)

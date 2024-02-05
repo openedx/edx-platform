@@ -1,18 +1,18 @@
 Allow content libraries to be used by LTI consumers
----------------------------------------------------
+###################################################
 
 Status
-------
+******
 
 Pending
 
 Context
--------
+*******
 
 Currently, there's no way for xblocks in blockstore-based content libraries to be served to other LTI consumers. This ADR explores ways in which this can be achieved, without overly complicating the codebase. The platform currently does have an :code:`lms.lti_provider` app which implements the LTI 1.1 spec, but it only works for modulestore-based courses, and the LTI 1.1 spec itself is also deprecated and deemed insecure.
 
 Decision
---------
+********
 
 We will use the latest LTI spec (`LTI 1.3`_) to serve the xblocks. This would be independent of the existing LTI 1.1 implementation, and will not require any changes in that app.
 
@@ -33,7 +33,7 @@ The rest of the functionality would be similar to how the current LTI 1.1 provid
 
 
 Consequences
-------------
+************
 
 Once implemented, content from blockstore-based libraries can be easily embedded into other LMS platforms. This is made easier by the fact that these libraries are designed to be embeddable, and can be easily rendered inside iframes. The library content can be used independently of courseware, are independent from course enrollments, and supports grading outside courses.  Including the ability to forward learner scoring via LTI.
 
