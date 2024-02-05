@@ -11,6 +11,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import LearningContextKey, UsageKey
+from opaque_keys.edx.locator import LibraryUsageLocatorV2
 from openedx_tagging.core.tagging.models import Taxonomy
 
 from xmodule.modulestore.django import modulestore
@@ -151,4 +152,49 @@ def delete_xblock_tags(usage_key_str: str) -> bool:
         return True
     except Exception as e:  # pylint: disable=broad-except
         log.error("Error deleting tags for XBlock with id: %s. %s", usage_key, e)
+        return False
+
+
+@shared_task(base=LoggedTask)
+@set_code_owner_attribute
+def update_library_block_tags(usage_key_str: str, language_code: str) -> bool:
+    """
+    Updates the automatically-managed tags for a content library block
+    whenever it is created/updated
+
+    Params:
+        usage_key_str (str): identifier of the Library Block
+        langauge_code (str): the preferred language code of the user
+    """
+    try:
+        usage_key = LibraryUsageLocatorV2.from_string(usage_key_str)
+
+        log.info("Updating tags for Library Block with id: %s", usage_key)
+
+        _set_initial_language_tag(usage_key, language_code)
+        return True
+    except Exception as e:  # pylint: disable=broad-except
+        log.error("Error updating tags for XBlock with id: %s. %s", usage_key, e)
+        return False
+
+
+@shared_task(base=LoggedTask)
+@set_code_owner_attribute
+def delete_library_block_tags(usage_key_str: str) -> bool:
+    """
+    Delete the tags for a Library Block (when the Library Block itself is deleted).
+
+    Params:
+        usage_key_str (str): identifier of the Library Block
+    """
+    try:
+        usage_key = LibraryUsageLocatorV2.from_string(usage_key_str)
+
+        log.info("Deleting tags for Library Block with id: %s", usage_key)
+
+        _delete_tags(usage_key)
+
+        return True
+    except Exception as e:  # pylint: disable=broad-except
+        log.error("Error deleting tags for Library Block with id: %s. %s", usage_key, e)
         return False
