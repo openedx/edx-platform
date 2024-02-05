@@ -40,7 +40,7 @@ def iterate_with_level(
 
 def build_object_tree_with_objecttags(
     content_key: LearningContextKey,
-    objectTagCache: ObjectTagByObjectIdDict,
+    object_tag_cache: ObjectTagByObjectIdDict,
 ) -> TaggedContent:
     """
     Returns the object with the tags associated with it.
@@ -61,7 +61,7 @@ def build_object_tree_with_objecttags(
         display_name=display_name,
         block_id=course_id,
         category=course.category,
-        object_tags=objectTagCache.get(str(content_key), {}),
+        object_tags=object_tag_cache.get(str(content_key), {}),
         children=None,
     )
 
@@ -78,7 +78,7 @@ def build_object_tree_with_objecttags(
                     display_name=child_block.display_name_with_default,
                     block_id=str(child_id),
                     category=child_block.category,
-                    object_tags=objectTagCache.get(str(child_id), {}),
+                    object_tags=object_tag_cache.get(str(child_id), {}),
                     children=None,
                 )
                 tagged_block.children.append(tagged_child)
