@@ -35,7 +35,7 @@ lxml==4.9.4
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
     #   openedx-calc
-markupsafe==2.1.4
+markupsafe==2.1.5
     # via
     #   chem
     #   openedx-calc
