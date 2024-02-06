@@ -385,6 +385,7 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
 
 
 @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+@override_waffle_flag(ENABLE_REPORTED_CONTENT_NOTIFICATIONS, active=True)
 @ddt.ddt
 class UserNotificationChannelPreferenceAPITest(ModuleStoreTestCase):
     """
@@ -450,7 +451,9 @@ class UserNotificationChannelPreferenceAPITest(ModuleStoreTestCase):
                         'new_comment',
                         'new_response',
                         'response_on_followed_post',
-                        'comment_on_followed_post'
+                        'comment_on_followed_post',
+                        'response_endorsed_on_thread',
+                        'response_endorsed'
                     ],
                     'notification_types': {
                         'core': {
@@ -462,6 +465,7 @@ class UserNotificationChannelPreferenceAPITest(ModuleStoreTestCase):
                         },
                         'new_discussion_post': {'web': False, 'email': False, 'push': False, 'info': ''},
                         'new_question_post': {'web': False, 'email': False, 'push': False, 'info': ''},
+                        'content_reported': {'web': True, 'email': True, 'push': True, 'info': ''},
                     },
                     'non_editable': {
                         'core': ['web']
