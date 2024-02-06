@@ -32,14 +32,13 @@ def get_context_key_from_key_string(key_str: str) -> CourseKey | LibraryLocatorV
     """
     content_key = get_content_key_from_string(key_str)
     # If the content key is a CourseKey or a LibraryLocatorV2, return it
-    if isinstance(content_key, CourseKey) or isinstance(content_key, LibraryLocatorV2):
+    if isinstance(content_key, (CourseKey, LibraryLocatorV2)):
         return content_key
 
     # If the content key is a UsageKey, return the context key
     context_key = content_key.context_key
 
-    if isinstance(context_key, CourseKey) or isinstance(context_key, LibraryLocatorV2):
+    if isinstance(context_key, (CourseKey, LibraryLocatorV2)):
         return context_key
 
     raise ValueError("context must be a CourseKey or a LibraryLocatorV2")
-
