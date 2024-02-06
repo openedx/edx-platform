@@ -4,7 +4,6 @@ API Serializers for course home V2 API.
 from django.conf import settings
 from rest_framework import serializers
 
-from cms.djangoapps.contentstore.rest_api.serializers.common import CourseCommonSerializer
 from cms.djangoapps.contentstore.utils import get_lms_link_for_item, reverse_course_url
 from cms.djangoapps.contentstore.views.course import _get_rerun_link_for_item
 from openedx.core.lib.api.serializers import CourseKeyField
