@@ -984,16 +984,8 @@ def get_thread_list(
     ]
 
     if request.GET.get("group_id", None):
-        # TODO: remove role check once course_roles is fully impelented and data is migrated
-        if (
-            Role.user_has_role_for_course(request.user, course_key, allowed_roles) or
-            request.user.has_perm(
-                CourseRolesPermission.MODERATE_DISCUSSION_FORUMS.perm_name, course_key
-            ) or
-            request.user.has_perm(
-                CourseRolesPermission.MODERATE_DISCUSSION_FORUMS_FOR_A_COHORT.perm_name, course_key
-            )
-        ):
+        # TODO: consider switching this to check for a specific discussion permission
+        if Role.user_has_role_for_course(request.user, course_key, allowed_roles):
             try:
                 group_id = int(request.GET.get("group_id", None))
             except ValueError:

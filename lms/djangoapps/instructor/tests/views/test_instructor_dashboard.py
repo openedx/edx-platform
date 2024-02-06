@@ -201,7 +201,11 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         (CourseRolesPermission.MANAGE_ALL_USERS.value.name, False, False, True),
         (CourseRolesPermission.MANAGE_ALL_USERS.value.name, True, False, False),
         (CourseRolesPermission.MANAGE_ALL_USERS.value.name, True, True, True),
-        (CourseRolesPermission.MANAGE_ALL_USERS.value.name, False, True, True)
+        (CourseRolesPermission.MANAGE_ALL_USERS.value.name, False, True, True),
+        (CourseRolesPermission.MANAGE_DISCUSSION_MODERATORS.value.name, False, False, True),
+        (CourseRolesPermission.MANAGE_DISCUSSION_MODERATORS.value.name, True, False, False),
+        (CourseRolesPermission.MANAGE_DISCUSSION_MODERATORS.value.name, True, True, True),
+        (CourseRolesPermission.MANAGE_DISCUSSION_MODERATORS.value.name, False, True, True),
     )
     @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=True)
     @ddt.unpack
