@@ -41,7 +41,7 @@ class CourseCommonSerializerV2(serializers.Serializer):
 
     def get_cms_link(self, obj):
         """Get CMS link for course."""
-        return f"//{settings.CMS_BASE}/{reverse_course_url('course_handler', obj.id)}"
+        return f"//{settings.CMS_BASE}{reverse_course_url('course_handler', obj.id)}"
 
     def get_rerun_link(self, obj):
         """Get rerun link for course."""
