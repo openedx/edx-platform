@@ -49,7 +49,7 @@ class Command(BaseCommand):
         try:
             safe_extractall(archive_path, course_dir)
         except SuspiciousOperation as exc:
-            raise CommandError(f'\n=== Course import {archive_path}: Unsafe tar file - {exc.args[0]}\n')  # lint-amnesty, pylint: disable=raise-missing-from
+            raise CommandError(f'\n=== Course import {archive_path}: Unsafe tar file - {exc.args[0]}\n') from exc
 
         # Paths to the library.xml file
         abs_xml_path = os.path.join(course_dir, 'library')
