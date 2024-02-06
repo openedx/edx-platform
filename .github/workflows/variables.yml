@@ -9,8 +9,11 @@ on:
         description: "Name of the edX release taken from the branch name"
         value: ${{ jobs.variables.outputs.RELEASE-NAME }}
       project:
-        description: "Code of the EOL project taken from the branch name"
+        description: "Name of the EOL project taken from the branch name"
         value: ${{ jobs.variables.outputs.PROJECT }}
+      code:
+        description: "Code of the EOL project taken from the project name"
+        value: ${{ jobs.variables.outputs.CODE }}
 
 jobs:
   variables:
@@ -19,6 +22,7 @@ jobs:
       TIMESTAMP: ${{ steps.ts.outputs.TS }}
       RELEASE-NAME: ${{ steps.release.outputs.result }}
       PROJECT: ${{ steps.project.outputs.result }}
+      CODE: ${{ steps.code.outputs.result }}
     steps:
       - name: Take current date
         id: ts
@@ -31,12 +35,12 @@ jobs:
           result-encoding: string
           script: |
             console.log("github.ref='${{ github.ref }}'");
-            if ( "${{ github.ref }}".match(/^refs\/heads\/(eol|openuchile|vlabx)\/(\w+)\.master$/) ) { // push to development branch case
-              return "${{ github.ref }}".replace(/^refs\/heads\/(eol|openuchile|vlabx)\/(\w+)\.master$/,'$2')
-            } else if ( "${{ github.ref }}".match(/^refs\/heads\/(eol|openuchile|vlabx)-release\/(\w+)\.master$/) ) { // push to production branch case
-              return "${{ github.ref }}".replace(/^refs\/heads\/(eol|openuchile|vlabx)-release\/(\w+)\.master$/,'$2')
-            } else if ( "${{ github.event.pull_request.base.ref }}".match(/^refs\/heads\/(eol|openuchile|vlabx)\/(\w+)\.master$/) ) { // pr to development branch case
-              return "${{ github.event.pull_request.base.ref }}".replace(/^refs\/heads\/(eol|openuchile|vlabx)\/(\w+)\.master$/,'$2')
+            if ( "${{ github.ref }}".match(/^refs\/heads\/(eol|openuchile|vlabx)\/(\w+)(\.master)?$/) ) { // push to development branch case
+              return "${{ github.ref }}".replace(/^refs\/heads\/(eol|openuchile|vlabx)\/(\w+)(\.master)?$/,'$2')
+            } else if ( "${{ github.ref }}".match(/^refs\/heads\/(eol|openuchile|vlabx)-release\/(\w+)(\.master)?$/) ) { // push to production branch case
+              return "${{ github.ref }}".replace(/^refs\/heads\/(eol|openuchile|vlabx)-release\/(\w+)(\.master)?$/,'$2')
+            } else if ( "${{ github.event.pull_request.base.ref }}".match(/^refs\/heads\/(eol|openuchile|vlabx)\/(\w+)(\.master)?$/) ) { // pr to development branch case
+              return "${{ github.event.pull_request.base.ref }}".replace(/^refs\/heads\/(eol|openuchile|vlabx)\/(\w+)(\.master)?$/,'$2')
             } else throw 'No version'
 
       - name: Obtain release project
@@ -54,12 +58,27 @@ jobs:
               return "${{ github.event.pull_request.base.ref }}".replace(/^refs\/heads\/(eol|openuchile|vlabx)\/.+$/,'$1')
             } else throw 'No project'
 
+      - name: Obtain release code
+        id: code
+        uses: actions/script@v7
+        with:
+          result-encoding: string
+          script: |
+            if ( "${{ steps.project.outputs.result }}" == "eol" ) {
+              return "eol"
+            } else if ( "${{ steps.project.outputs.result }}" == "openuchile" ) {
+              return "ou"
+            } else if ( "${{ steps.project.outputs.result }}" == "vlabx" ) {
+              return "vl"
+            } else throw 'No code'
+
       - name: Print variables
         run: |
           echo TS=${{ steps.ts.outputs.TS }}
           echo RELEASE-NAME=${{ steps.release.outputs.result }}
           echo PROJECT=${{ steps.project.outputs.result }}
+          echo CODE=${{ steps.code.outputs.result }}
 
       - name: Fail on empty values
-        if: steps.ts.outputs.TS == '' || steps.release.outputs.result == '' || steps.project.outputs.result == ''
+        if: steps.ts.outputs.TS == '' || steps.release.outputs.result == '' || steps.project.outputs.result == '' || steps.code.outputs.result == ''
         run: exit 1

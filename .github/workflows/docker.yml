@@ -27,7 +27,7 @@ jobs:
     env:
       TS: ${{ needs.variables.outputs.timestamp }}
       RELEASE-NAME: ${{ needs.variables.outputs.release-name }}
-      PROJECT: ${{ needs.variables.outputs.project }}
+      CODE: ${{ needs.variables.outputs.code }}
     permissions:
       packages: write
 
@@ -53,8 +53,8 @@ jobs:
             --target base \
             --build-arg EDX_PLATFORM_VERSION=${GITHUB_SHA} \
             --tag ghcr.io/eol-uchile/edx-platform:${GITHUB_SHA} \
-            --tag ghcr.io/eol-uchile/edx-platform:${{ env.PROJECT }}-${{ env.RELEASE-NAME }}-${{ env.TS }} \
-            --tag ghcr.io/eol-uchile/edx-platform:${{ env.PROJECT }}-${{ env.RELEASE-NAME }} \
+            --tag ghcr.io/eol-uchile/edx-platform:${{ env.CODE }}-${{ env.RELEASE-NAME }}-${{ env.TS }} \
+            --tag ghcr.io/eol-uchile/edx-platform:${{ env.CODE }}-${{ env.RELEASE-NAME }} \
             --cache-from "type=local,src=/tmp/.buildx-cache" \
             --cache-to "type=local,dest=/tmp/.buildx-cache-new" \
             --output "type=docker,push=false"
@@ -64,7 +64,7 @@ jobs:
           docker buildx build . \
             --file .github/build/Dockerfile \
             --target testing \
-            --build-arg EDX_PLATFORM_VERSION=${{ env.PROJECT }}-${{ env.RELEASE-NAME }}-${{ env.TS }} \
+            --build-arg EDX_PLATFORM_VERSION=${{ env.CODE }}-${{ env.RELEASE-NAME }}-${{ env.TS }} \
             --cache-from "type=local,src=/tmp/.buildx-cache" \
             --cache-to "type=local,dest=/tmp/.buildx-cache-new" \
             --output "type=docker,push=false"
@@ -79,8 +79,8 @@ jobs:
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io --username ${{ github.actor }} --password-stdin
           docker push ghcr.io/eol-uchile/edx-platform:${GITHUB_SHA}
-          docker push ghcr.io/eol-uchile/edx-platform:${{ env.PROJECT }}-${{ env.RELEASE-NAME }}-${{ env.TS }}
-          docker push ghcr.io/eol-uchile/edx-platform:${{ env.PROJECT }}-${{ env.RELEASE-NAME }}
+          docker push ghcr.io/eol-uchile/edx-platform:${{ env.CODE }}-${{ env.RELEASE-NAME }}-${{ env.TS }}
+          docker push ghcr.io/eol-uchile/edx-platform:${{ env.CODE }}-${{ env.RELEASE-NAME }}
 
       - name: Move cache
         run: |
