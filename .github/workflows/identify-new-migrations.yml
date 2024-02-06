@@ -172,7 +172,7 @@ jobs:
         number1=${{ env.FIRST_QUERY }}
         diff=$((number2 - number1))
         if [ $number2 -gt $number1 ]; then
-          data=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select app, "  ", name as from django_migrations ORDER by -id limit $diff;" edxapp;)
+          data=$(mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select app, name as from django_migrations ORDER by -id limit $diff;" edxapp;)
           echo -e "**Migrations added in this PR\n$data**" > cleaned_data.txt
         elif [ $number1 -gt $number2 ]; then
            echo "**Your pull request has removed migrations. This could pose a risk if it's done unintentionally**" > cleaned_data.txt
