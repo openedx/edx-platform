@@ -1,7 +1,6 @@
 """HomePageCoursesViewV2 APIView for getting content available to the logged in user."""
 import edx_api_doc_tools as apidocs
 from rest_framework.request import Request
-from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
 
