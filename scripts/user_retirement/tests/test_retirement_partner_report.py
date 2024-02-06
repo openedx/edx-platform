@@ -216,11 +216,11 @@ def test_report_generation_multiple_partners(*args, **kwargs):
     assert orgs['Org2X'] == orgs['Org2Xb']
 
 
-@patch('scripts.user_retirement.utils.google_api.DriveApi.__init__')
-@patch('scripts.user_retirement.utils.google_api.DriveApi.create_file_in_folder')
-@patch('scripts.user_retirement.utils.google_api.DriveApi.walk_files')
-@patch('scripts.user_retirement.utils.google_api.DriveApi.list_permissions_for_files')
-@patch('scripts.user_retirement.utils.google_api.DriveApi.create_comments_for_files')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.__init__')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.create_file_in_folder')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.walk_files')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.list_permissions_for_files')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.create_comments_for_files')
 @patch('scripts.user_retirement.utils.edx_api.BaseApiClient.get_access_token')
 @patch.multiple(
     'scripts.user_retirement.utils.edx_api.LmsApi',
@@ -291,11 +291,11 @@ def test_successful_report(*args, **kwargs):
     assert 'All reports completed and uploaded to Google.' in result.output
 
 
-@patch('scripts.user_retirement.utils.google_api.DriveApi.__init__')
-@patch('scripts.user_retirement.utils.google_api.DriveApi.create_file_in_folder')
-@patch('scripts.user_retirement.utils.google_api.DriveApi.walk_files')
-@patch('scripts.user_retirement.utils.google_api.DriveApi.list_permissions_for_files')
-@patch('scripts.user_retirement.utils.google_api.DriveApi.create_comments_for_files')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.__init__')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.create_file_in_folder')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.walk_files')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.list_permissions_for_files')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.create_comments_for_files')
 @patch('scripts.user_retirement.utils.edx_api.BaseApiClient.get_access_token')
 @patch.multiple(
     'scripts.user_retirement.utils.edx_api.LmsApi',
@@ -506,8 +506,8 @@ def test_setup_failed(*args):
     assert result.exit_code == ERR_SETUP_FAILED
 
 
-@patch('scripts.user_retirement.utils.google_api.DriveApi.__init__')
-@patch('scripts.user_retirement.utils.google_api.DriveApi.walk_files')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.__init__')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.walk_files')
 @patch('scripts.user_retirement.utils.edx_api.BaseApiClient.get_access_token')
 @patch.multiple(
     'scripts.user_retirement.utils.edx_api.LmsApi',
@@ -529,8 +529,8 @@ def test_fetching_learners_failed(*args, **kwargs):
     assert 'failed to get learners' in result.output
 
 
-@patch('scripts.user_retirement.utils.google_api.DriveApi.__init__')
-@patch('scripts.user_retirement.utils.google_api.DriveApi.walk_files')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.__init__')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.walk_files')
 @patch('scripts.user_retirement.utils.edx_api.BaseApiClient.get_access_token')
 def test_listing_folders_failed(*args):
     mock_get_access_token = args[0]
@@ -554,8 +554,8 @@ def test_listing_folders_failed(*args):
     assert 'Finding partner directories on Drive failed' in result.output
 
 
-@patch('scripts.user_retirement.utils.google_api.DriveApi.__init__')
-@patch('scripts.user_retirement.utils.google_api.DriveApi.walk_files')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.__init__')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.walk_files')
 @patch('scripts.user_retirement.utils.edx_api.BaseApiClient.get_access_token')
 @patch.multiple(
     'scripts.user_retirement.utils.edx_api.LmsApi',
@@ -581,8 +581,8 @@ def test_unknown_org(*args, **kwargs):
     assert 'otherCustomOrg' in result.output
 
 
-@patch('scripts.user_retirement.utils.google_api.DriveApi.__init__')
-@patch('scripts.user_retirement.utils.google_api.DriveApi.walk_files')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.__init__')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.walk_files')
 @patch('scripts.user_retirement.utils.edx_api.BaseApiClient.get_access_token')
 @patch.multiple(
     'scripts.user_retirement.utils.edx_api.LmsApi',
@@ -610,8 +610,8 @@ def test_unknown_org_custom(*args, **kwargs):
     assert 'organizations {\'singleCustomOrg\'} do not exist' in result.output
 
 
-@patch('scripts.user_retirement.utils.google_api.DriveApi.__init__')
-@patch('scripts.user_retirement.utils.google_api.DriveApi.walk_files')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.__init__')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.walk_files')
 @patch('scripts.user_retirement.utils.edx_api.BaseApiClient.get_access_token')
 @patch('unicodecsv.DictWriter')
 @patch('scripts.user_retirement.utils.edx_api.LmsApi.retirement_partner_report')
@@ -634,11 +634,11 @@ def test_reporting_error(*args):
     assert error_msg in result.output
 
 
-@patch('scripts.user_retirement.utils.google_api.DriveApi.list_permissions_for_files')
-@patch('scripts.user_retirement.utils.google_api.DriveApi.create_comments_for_files')
-@patch('scripts.user_retirement.utils.google_api.DriveApi.walk_files')
-@patch('scripts.user_retirement.utils.google_api.DriveApi.__init__')
-@patch('scripts.user_retirement.utils.google_api.DriveApi.create_file_in_folder')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.list_permissions_for_files')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.create_comments_for_files')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.walk_files')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.__init__')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.create_file_in_folder')
 @patch('scripts.user_retirement.utils.edx_api.BaseApiClient.get_access_token')
 @patch.multiple(
     'scripts.user_retirement.utils.edx_api.LmsApi',
@@ -685,11 +685,11 @@ def test_cleanup_error(*args, **kwargs):
     assert 'Users may be stuck in the processing state!' in result.output
 
 
-@patch('scripts.user_retirement.utils.google_api.DriveApi.__init__')
-@patch('scripts.user_retirement.utils.google_api.DriveApi.create_file_in_folder')
-@patch('scripts.user_retirement.utils.google_api.DriveApi.walk_files')
-@patch('scripts.user_retirement.utils.google_api.DriveApi.list_permissions_for_files')
-@patch('scripts.user_retirement.utils.google_api.DriveApi.create_comments_for_files')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.__init__')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.create_file_in_folder')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.walk_files')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.list_permissions_for_files')
+@patch('scripts.user_retirement.utils.thirdparty_apis.google_api.DriveApi.create_comments_for_files')
 @patch('scripts.user_retirement.utils.edx_api.BaseApiClient.get_access_token')
 @patch.multiple(
     'scripts.user_retirement.utils.edx_api.LmsApi',
