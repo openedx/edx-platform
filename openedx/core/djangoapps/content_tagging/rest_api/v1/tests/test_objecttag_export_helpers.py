@@ -3,6 +3,8 @@ Test the objecttag_export_helpers module
 """
 from unittest.mock import patch
 
+from openedx.core.djangoapps.content_libraries import api as library_api
+from openedx.core.lib import blockstore_api
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
@@ -33,7 +35,8 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
             run="test_run",
             display_name="Test Course",
         )
-        self.expected_tagged_xblock = TaggedContent(
+
+        self.expected_course_tagged_xblock = TaggedContent(
             display_name="Test Course",
             block_id="course-v1:orgA+test_course+test_run",
             category="course",
@@ -61,8 +64,8 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
             },
         )
 
-        assert self.expected_tagged_xblock.children is not None  # type guard
-        self.expected_tagged_xblock.children.append(tagged_sequential)
+        assert self.expected_course_tagged_xblock.children is not None  # type guard
+        self.expected_course_tagged_xblock.children.append(tagged_sequential)
 
         # Untagged blocks
         sequential2 = BlockFactory.create(
@@ -77,8 +80,8 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
             children=[],
             object_tags={},
         )
-        assert self.expected_tagged_xblock.children is not None  # type guard
-        self.expected_tagged_xblock.children.append(untagged_sequential)
+        assert self.expected_course_tagged_xblock.children is not None  # type guard
+        self.expected_course_tagged_xblock.children.append(untagged_sequential)
         BlockFactory.create(
             parent=sequential2,
             category="vertical",
@@ -127,12 +130,12 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
         assert tagged_sequential.children is not None  # type guard
         tagged_sequential.children.append(untagged_vertical2)
 
-        html = BlockFactory.create(
+        BlockFactory.create(
             parent=vertical2,
             category="html",
             display_name="test html",
         )
-        tagged_text = TaggedContent(
+        tagged_html = TaggedContent(
             display_name="test html",
             block_id="block-v1:orgA+test_course+test_run+type@html+block@test_html",
             category="html",
@@ -142,17 +145,94 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
             },
         )
         assert untagged_vertical2.children is not None  # type guard
-        untagged_vertical2.children.append(tagged_text)
+        untagged_vertical2.children.append(tagged_html)
 
-        self.all_object_tags, _ = api.get_all_object_tags(self.course.id)
-        self.expected_tagged_content_list = [
-            (self.expected_tagged_xblock, 0),
+        self.all_course_object_tags, _ = api.get_all_object_tags(self.course.id)
+        self.expected_course_tagged_content_list = [
+            (self.expected_course_tagged_xblock, 0),
             (tagged_sequential, 1),
             (tagged_vertical, 2),
             (untagged_vertical2, 2),
-            (tagged_text, 3),
+            (tagged_html, 3),
             (untagged_sequential, 1),
             (untagged_vertical, 2),
+        ]
+
+        # Create a library
+        collection = blockstore_api.create_collection("Content Library Test Collection")
+
+        self.library = library_api.create_library(
+            collection.uuid,
+            self.orgA,
+            f"lib_{self.block_sufix}",
+            "Test Library",
+        )
+        self.expected_library_tagged_xblock = TaggedContent(
+            display_name="Test Library",
+            block_id=f"lib:orgA:lib_{self.block_sufix}",
+            category="library",
+            children=[],
+            object_tags={
+                self.taxonomy_2.id: list(self.library_tags),
+            },
+        )
+
+        library_api.create_library_block(
+            self.library.key,
+            "problem",
+            f"problem1_{self.block_sufix}",
+        )
+        tagged_problem = TaggedContent(
+            display_name="Blank Problem",
+            block_id=f"lb:orgA:lib_{self.block_sufix}:problem:problem1_{self.block_sufix}",
+            category="problem",
+            children=[],
+            object_tags={
+                self.taxonomy_1.id: list(self.problem1_tags),
+            },
+        )
+
+        library_api.create_library_block(
+            self.library.key,
+            "problem",
+            f"problem2_{self.block_sufix}",
+        )
+        untagged_problem = TaggedContent(
+            display_name="Blank Problem",
+            block_id=f"lb:orgA:lib_{self.block_sufix}:problem:problem2_{self.block_sufix}",
+            category="problem",
+            children=[],
+            object_tags={},
+        )
+
+        library_api.create_library_block(
+            self.library.key,
+            "html",
+            f"html_{self.block_sufix}",
+        )
+        tagged_library_html = TaggedContent(
+            display_name="Text",
+            block_id=f"lb:orgA:lib_{self.block_sufix}:html:html_{self.block_sufix}",
+            category="html",
+            children=[],
+            object_tags={
+                self.taxonomy_1.id: list(self.library_html_tags1),
+                self.taxonomy_2.id: list(self.library_html_tags2),
+            },
+        )
+
+        assert self.expected_library_tagged_xblock.children is not None  # type guard
+        # ToDo: Check the order of the children
+        self.expected_library_tagged_xblock.children.append(tagged_library_html)
+        self.expected_library_tagged_xblock.children.append(tagged_problem)
+        self.expected_library_tagged_xblock.children.append(untagged_problem)
+
+        self.all_library_object_tags, _ = api.get_all_object_tags(self.library.key)
+        self.expected_library_tagged_content_list = [
+            (self.expected_library_tagged_xblock, 0),
+            (tagged_library_html, 1),
+            (tagged_problem, 1),
+            (untagged_problem, 1),
         ]
 
 
@@ -160,18 +240,34 @@ class TestContentTagChildrenExport(TaggedCourseMixin):  # type: ignore[misc]
     """
     Test helper functions for exporting tagged content
     """
-    def test_build_object_tree(self) -> None:
+    def test_build_course_object_tree(self) -> None:
         """
         Test if we can export a course
         """
         with self.assertNumQueries(3):
-            tagged_xblock = build_object_tree_with_objecttags(self.course.id, self.all_object_tags)
+            tagged_course = build_object_tree_with_objecttags(self.course.id, self.all_course_object_tags)
 
-        assert tagged_xblock == self.expected_tagged_xblock
+        assert tagged_course == self.expected_course_tagged_xblock
 
-    def test_iterate_with_level(self) -> None:
+    def test_build_library_object_tree(self) -> None:
         """
-        Test if we can iterate over the tagged content in the correct order
+        Test if we can export a library
         """
-        tagged_content_list = list(iterate_with_level(self.expected_tagged_xblock))
-        assert tagged_content_list == self.expected_tagged_content_list
+        with self.assertNumQueries(12):
+            tagged_library = build_object_tree_with_objecttags(self.library.key, self.all_library_object_tags)
+
+        assert tagged_library == self.expected_library_tagged_xblock
+
+    def test_course_iterate_with_level(self) -> None:
+        """
+        Test if we can iterate over the tagged course in the correct order
+        """
+        tagged_content_list = list(iterate_with_level(self.expected_course_tagged_xblock))
+        assert tagged_content_list == self.expected_course_tagged_content_list
+
+    def test_library_iterate_with_level(self) -> None:
+        """
+        Test if we can iterate over the tagged library in the correct order
+        """
+        tagged_content_list = list(iterate_with_level(self.expected_library_tagged_xblock))
+        assert tagged_content_list == self.expected_library_tagged_content_list

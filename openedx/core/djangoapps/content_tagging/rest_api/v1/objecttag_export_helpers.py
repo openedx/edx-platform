@@ -7,9 +7,13 @@ from __future__ import annotations
 from typing import Iterator
 
 from attrs import define
-from opaque_keys.edx.keys import CourseKey, LearningContextKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locator import LibraryLocatorV2
+from xblock.core import XBlock
 
-from xmodule.modulestore.django import modulestore
+import openedx.core.djangoapps.content_libraries.api as library_api
+from openedx.core.djangoapps.content_libraries.api import LibraryXBlockMetadata
+from xmodule.modulestore.django import ModuleStore, modulestore
 
 from ...types import ObjectTagByObjectIdDict, ObjectTagByTaxonomyIdDict
 
@@ -38,51 +42,127 @@ def iterate_with_level(
             yield from iterate_with_level(child, level + 1)
 
 
+def get_course_tagged_object_and_children(
+    course_key: CourseKey, object_tag_cache: ObjectTagByObjectIdDict
+) -> tuple[TaggedContent, list[XBlock]]:
+    store = modulestore()
+
+    course = store.get_course(course_key)
+    assert course is not None
+    course_id = str(course_key)
+
+    tagged_course = TaggedContent(
+        display_name=course.display_name_with_default,
+        block_id=course_id,
+        category=course.category,
+        object_tags=object_tag_cache.get(course_id, {}),
+        children=None,
+    )
+    if course.has_children:
+        children = course.children
+    else:
+        children = []
+
+    return tagged_course, children
+
+
+def get_library_tagged_object_and_children(
+    library_key: LibraryLocatorV2, object_tag_cache: ObjectTagByObjectIdDict
+) -> tuple[TaggedContent, list[LibraryXBlockMetadata]]:
+    library = library_api.get_library(library_key)
+    assert library is not None
+
+    library_id = str(library_key)
+
+    tagged_library = TaggedContent(
+        display_name=library.title,
+        block_id=library_id,
+        category='library',
+        object_tags=object_tag_cache.get(library_id, {}),
+        children=None,
+    )
+
+    children = library_api.get_library_blocks(library_key)
+
+    return tagged_library, children
+
+
+def get_xblock_tagged_object_and_children(
+    usage_key: UsageKey, object_tag_cache: ObjectTagByObjectIdDict, store
+) -> tuple[TaggedContent, list[XBlock]]:
+    block = store.get_item(usage_key)
+    block_id = str(usage_key)
+    tagged_block = TaggedContent(
+        display_name=block.display_name_with_default,
+        block_id=block_id,
+        category=block.category,
+        object_tags=object_tag_cache.get(block_id, {}),
+        children=None,
+    )
+
+    return tagged_block, block.children if block.has_children else []
+
+
+def get_library_block_tagged_object(
+    library_block: LibraryXBlockMetadata, object_tag_cache: ObjectTagByObjectIdDict
+) -> tuple[TaggedContent, None]:
+    block_id = str(library_block.usage_key)
+    tagged_library_block = TaggedContent(
+        display_name=library_block.display_name,
+        block_id=block_id,
+        category=library_block.usage_key.block_type,
+        object_tags=object_tag_cache.get(block_id, {}),
+        children=None,
+    )
+
+    return tagged_library_block, None
+
+
 def build_object_tree_with_objecttags(
-    content_key: LearningContextKey,
+    content_key: LibraryLocatorV2 | CourseKey,
     object_tag_cache: ObjectTagByObjectIdDict,
 ) -> TaggedContent:
     """
     Returns the object with the tags associated with it.
     """
-    store = modulestore()
-
     if isinstance(content_key, CourseKey):
-        course = store.get_course(content_key)
-        if course is None:
-            raise ValueError(f"Course not found: {content_key}")
+        tagged_content, children = get_course_tagged_object_and_children(
+            content_key, object_tag_cache
+        )
+    elif isinstance(content_key, LibraryLocatorV2):
+        tagged_content, children = get_library_tagged_object_and_children(
+            content_key, object_tag_cache
+        )
     else:
         raise NotImplementedError(f"Invalid content_key: {type(content_key)} -> {content_key}")
 
-    display_name = course.display_name_with_default
-    course_id = str(course.id)
+    blocks: list[tuple[TaggedContent, list | None]] = [(tagged_content, children)]
 
-    tagged_course = TaggedContent(
-        display_name=display_name,
-        block_id=course_id,
-        category=course.category,
-        object_tags=object_tag_cache.get(str(content_key), {}),
-        children=None,
-    )
-
-    blocks = [(tagged_course, course)]
+    store = modulestore()
 
     while blocks:
-        tagged_block, xblock = blocks.pop()
+        tagged_block, children = blocks.pop()
         tagged_block.children = []
 
-        if xblock.has_children:
-            for child_id in xblock.children:
-                child_block = store.get_item(child_id)
-                tagged_child = TaggedContent(
-                    display_name=child_block.display_name_with_default,
-                    block_id=str(child_id),
-                    category=child_block.category,
-                    object_tags=object_tag_cache.get(str(child_id), {}),
-                    children=None,
+        if not children:
+            continue
+
+        for child in children:
+            child_children: list | None
+
+            if isinstance(child, UsageKey):
+                tagged_child, child_children = get_xblock_tagged_object_and_children(
+                    child, object_tag_cache, store
                 )
-                tagged_block.children.append(tagged_child)
+            elif isinstance(child, LibraryXBlockMetadata):
+                tagged_child, child_children = get_library_block_tagged_object(
+                    child, object_tag_cache
+                )
+            else:
+                raise NotImplementedError(f"Invalid child: {type(child)} -> {child}")
 
-                blocks.append((tagged_child, child_block))
+            tagged_block.children.append(tagged_child)
 
-    return tagged_course
+            blocks.append((tagged_child, child_children))
+
+    return tagged_content
