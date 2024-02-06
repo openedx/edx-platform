@@ -3,8 +3,10 @@ Unit tests for the vertical block.
 """
 from django.urls import reverse
 from rest_framework import status
+from edx_toggles.toggles.testutils import override_waffle_flag
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.toggles import ENABLE_TAGGING_TAXONOMY_LIST_PAGE
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 from xmodule.modulestore.django import (
     modulestore,
@@ -148,6 +150,7 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
         response = self.client.get(url)
         self.assertTrue(response.data["is_published"])
 
+    @override_waffle_flag(ENABLE_TAGGING_TAXONOMY_LIST_PAGE, True)
     def test_children_content(self):
         """
         Check that returns valid response with children of vertical container.
@@ -183,7 +186,10 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
                 "block_id": str(self.html_unit_first.location),
                 "block_type": self.html_unit_first.location.block_type,
                 "user_partition_info": expected_user_partition_info,
-                "user_partitions": expected_user_partitions
+                "user_partitions": expected_user_partitions,
+                "actions": {
+                    "can_manage_tags": True,
+                },
             },
             {
                 "name": self.html_unit_second.display_name_with_default,
@@ -191,6 +197,9 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
                 "block_type": self.html_unit_second.location.block_type,
                 "user_partition_info": expected_user_partition_info,
                 "user_partitions": expected_user_partitions,
+                "actions": {
+                    "can_manage_tags": True,
+                },
             },
         ]
         self.assertEqual(response.data["children"], expected_response)
@@ -204,4 +213,14 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
         )
         url = self.get_reverse_url(usage_key_string)
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    @override_waffle_flag(ENABLE_TAGGING_TAXONOMY_LIST_PAGE, False)
+    def test_actions_with_turned_off_taxonomy_flag(self):
+        """
+        Check that action manage_tags for each child item has the same value as taxonomy flag.
+        """
+        url = self.get_reverse_url(self.vertical.location)
+        response = self.client.get(url)
+        for children in response.data["children"]:
+            self.assertFalse(children["actions"]["can_manage_tags"])
