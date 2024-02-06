@@ -42,6 +42,11 @@ class HomePageCoursesViewV2(APIView):
                 apidocs.ParameterLocation.QUERY,
                 description="Query param to filter by archived courses only",
             ),
+            apidocs.integer_parameter(
+                "page",
+                apidocs.ParameterLocation.QUERY,
+                description="Query param to paginate the courses",
+            ),
         ],
         responses={
             200: CourseHomeTabSerializerV2,
@@ -60,6 +65,7 @@ class HomePageCoursesViewV2(APIView):
             GET /api/contentstore/v2/home/courses?order=-org
             GET /api/contentstore/v2/home/courses?active_only=true
             GET /api/contentstore/v2/home/courses?archived_only=true
+            GET /api/contentstore/v2/home/courses?page=2
 
         **Response Values**
 
@@ -90,6 +96,7 @@ class HomePageCoursesViewV2(APIView):
         }
         ```
         """
+
         courses, in_process_course_actions = get_course_context_v2(request)
         paginator = PageNumberPagination()
         courses_page = paginator.paginate_queryset(courses, self.request, view=self)
