@@ -37,6 +37,7 @@ from cms.djangoapps.course_creators.models import CourseCreator
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from cms.djangoapps.models.settings.encoder import CourseSettingsEncoder
+from cms.djangoapps.contentstore.api.views.utils import get_bool_param
 from common.djangoapps.course_action_state.managers import CourseActionStateItemNotFoundError
 from common.djangoapps.course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from common.djangoapps.edxmako.shortcuts import render_to_response
@@ -445,8 +446,8 @@ def _accessible_courses_summary_iter_v2(request, org=None):
 
     search_query = request.GET.get('search')
     order = request.GET.get('order')
-    active_only = request.GET.get('active_only')
-    archived_only = request.GET.get('archived_only')
+    active_only = get_bool_param(request, 'active_only', None)
+    archived_only = get_bool_param(request, 'archived_only', None)
     courses_summary = get_courses_by_status(active_only, archived_only, courses_summary)
     courses_summary = get_courses_by_search_query(search_query, courses_summary)
     courses_summary = get_courses_order_by(order, courses_summary)
@@ -587,8 +588,8 @@ def _accessible_courses_list_from_groups_v2(request):
 
     search_query = request.GET.get('search')
     order = request.GET.get('order')
-    active_only = request.GET.get('active_only')
-    archived_only = request.GET.get('archived_only')
+    active_only = get_bool_param(request, 'active_only', None)
+    archived_only = get_bool_param(request, 'archived_only', None)
     courses_list = get_courses_by_status(active_only, archived_only, courses_list)
     courses_list = get_courses_by_search_query(search_query, courses_list)
     courses_list = get_courses_order_by(order, courses_list)
@@ -626,7 +627,7 @@ def get_courses_order_by(order_query, course_overviews):
 
     Args:
         order_query (str): any string used to order Course Overviews.
-        base_queryset (Course Overview objects): queryset to be ordered.
+        course_overviews (Course Overview objects): queryset to be ordered.
     """
     if not order_query:
         return course_overviews
