@@ -42,7 +42,7 @@ class HomePageCoursesViewV2(APIView):
                 apidocs.ParameterLocation.QUERY,
                 description="Query param to filter by archived courses only",
             ),
-            apidocs.integer_parameter(
+            apidocs.string_parameter(
                 "page",
                 apidocs.ParameterLocation.QUERY,
                 description="Query param to paginate the courses",
