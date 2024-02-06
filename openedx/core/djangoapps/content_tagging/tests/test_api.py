@@ -6,6 +6,7 @@ from openedx_tagging.core.tagging.models import Tag
 from organizations.models import Organization
 
 from .. import api
+from ..models import ContentObjectTag
 
 
 class TestTaxonomyMixin:
@@ -250,13 +251,14 @@ class TestAPITaxonomy(TestTaxonomyMixin, TestCase):
         )
 
 
-class TestGetAllObjectTags(TestCase):
+class TestGetAllObjectTagsMixin:
     """
-    Test the get_all_object_tags function
+    Set up data to test get_all_object_tags functions
     """
 
     def setUp(self):
         super().setUp()
+
         self.orgA = Organization.objects.create(name="Organization A", short_name="orgA")
         self.taxonomy_1 = api.create_taxonomy(name="Taxonomy 1")
         api.set_taxonomy_orgs(self.taxonomy_1, all_orgs=True)
@@ -281,35 +283,35 @@ class TestGetAllObjectTags(TestCase):
             value="Tag 2.2",
         )
 
-        course_tags = api.tag_content_object(
+        self.course_tags = api.tag_content_object(
             object_key=CourseKey.from_string("course-v1:orgA+test_course+test_run"),
             taxonomy=self.taxonomy_1,
             tags=['Tag 1.1'],
         )
 
         # Tag blocks
-        sequential_tags = api.tag_content_object(
+        self.sequential_tags1 = api.tag_content_object(
             object_key=UsageKey.from_string(
                 "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential"
             ),
             taxonomy=self.taxonomy_1,
             tags=['Tag 1.1', 'Tag 1.2'],
         )
-        sequential_tags2 = api.tag_content_object(
+        self.sequential_tags2 = api.tag_content_object(
             object_key=UsageKey.from_string(
                 "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential"
             ),
             taxonomy=self.taxonomy_2,
             tags=['Tag 2.1'],
         )
-        vertical1_tags = api.tag_content_object(
+        self.vertical1_tags = api.tag_content_object(
             object_key=UsageKey.from_string(
                 "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1"
             ),
             taxonomy=self.taxonomy_2,
             tags=['Tag 2.2'],
         )
-        html_tags = api.tag_content_object(
+        self.html_tags = api.tag_content_object(
             object_key=UsageKey.from_string(
                 "block-v1:orgA+test_course+test_run+type@html+block@test_html"
             ),
@@ -317,21 +319,42 @@ class TestGetAllObjectTags(TestCase):
             tags=['Tag 2.1'],
         )
 
+        # Create "deleted" object tags, which will be omitted from the results.
+        for object_id in (
+            "course-v1:orgA+test_course+test_run",
+            "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential",
+            "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1",
+            "block-v1:orgA+test_course+test_run+type@html+block@test_html",
+        ):
+            ContentObjectTag.objects.create(
+                object_id=str(object_id),
+                taxonomy=None,
+                tag=None,
+                _value="deleted tag",
+                _name="deleted taxonomy",
+            )
+
         self.expected_objecttags = {
             "course-v1:orgA+test_course+test_run": {
-                self.taxonomy_1.id: list(course_tags),
+                self.taxonomy_1.id: list(self.course_tags),
             },
             "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential": {
-                self.taxonomy_1.id: list(sequential_tags),
-                self.taxonomy_2.id: list(sequential_tags2),
+                self.taxonomy_1.id: list(self.sequential_tags1),
+                self.taxonomy_2.id: list(self.sequential_tags2),
             },
             "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1": {
-                self.taxonomy_2.id: list(vertical1_tags),
+                self.taxonomy_2.id: list(self.vertical1_tags),
             },
             "block-v1:orgA+test_course+test_run+type@html+block@test_html": {
-                self.taxonomy_2.id: list(html_tags),
+                self.taxonomy_2.id: list(self.html_tags),
             },
         }
+
+
+class TestGetAllObjectTags(TestGetAllObjectTagsMixin, TestCase):
+    """
+    Test get_all_object_tags api function
+    """
 
     def test_get_all_object_tags(self):
         """
