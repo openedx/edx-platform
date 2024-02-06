@@ -537,6 +537,16 @@ AUTH_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/lat
 ############################ AI_TRANSLATIONS ##################################
 AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
 
+############################ CSRF ##################################
+
+# MFEs that will call this service in devstack
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:2000',  # frontend-app-learning
+    'http://localhost:1997',  # frontend-app-account
+    'http://localhost:1995',  # frontend-app-profile
+]
+
+
 ################# New settings must go ABOVE this line #################
 ########################################################################
 # See if the developer has any local overrides.

@@ -307,6 +307,14 @@ ORA_MICROFRONTEND_URL = 'http://localhost:1992'
 ############################ AI_TRANSLATIONS ##################################
 AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
 
+############################ CSRF ##################################
+
+# MFEs that will call this service in devstack
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3001',  # frontend-app-library-authoring
+    'http://localhost:2001',  # frontend-app-course-authoring
+]
+
 #################### Event bus backend ########################
 
 EVENT_BUS_PRODUCER = 'edx_event_bus_redis.create_producer'
