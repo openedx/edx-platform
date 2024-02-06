@@ -313,6 +313,7 @@ AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3001',  # frontend-app-library-authoring
     'http://localhost:2001',  # frontend-app-course-authoring
+    'http://localhost:1992',  # frontend-app-ora
 ]
 
 #################### Event bus backend ########################
