@@ -744,7 +744,7 @@ edx-django-utils==5.10.1
     #   openedx-blockstore
     #   ora2
     #   super-csv
-edx-drf-extensions==10.1.0
+edx-drf-extensions==10.2.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
