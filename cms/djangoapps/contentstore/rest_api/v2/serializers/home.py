@@ -59,5 +59,6 @@ class CourseCommonSerializerV2(serializers.Serializer):
 
 class CourseHomeTabSerializerV2(serializers.Serializer):
     """Serializer for course home tab V2 with unsucceeded courses and in process course actions."""
+
     courses = CourseCommonSerializerV2(required=False, many=True)
     in_process_course_actions = UnsucceededCourseSerializerV2(many=True, required=False, allow_null=True)
