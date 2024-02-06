@@ -136,6 +136,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
     sections = []
     if access['manage_membership_full'] or access['manage_membership_limited']:
         sections.append(_section_course_info(course, access))
+    if access['manage_membership_full'] or access['manage_membership_limited'] or access['manage_discussions']:
         sections.append(_section_membership(course, access))
     if access['manage_cohorts']:
         sections.append(_section_cohort_management(course, access))
