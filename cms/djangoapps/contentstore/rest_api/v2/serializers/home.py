@@ -56,6 +56,7 @@ class CourseCommonSerializerV2(serializers.Serializer):
         """Check if the course is active."""
         return not obj.has_ended()
 
+
 class CourseHomeTabSerializerV2(serializers.Serializer):
     """Serializer for course home tab V2 with unsucceeded courses and in process course actions."""
     courses = CourseCommonSerializerV2(required=False, many=True)

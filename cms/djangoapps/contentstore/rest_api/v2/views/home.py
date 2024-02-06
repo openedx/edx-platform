@@ -53,6 +53,11 @@ class HomePageCoursesViewV2(APIView):
         **Example Request**
 
             GET /api/contentstore/v2/home/courses
+            GET /api/contentstore/v2/home/courses?org=edX
+            GET /api/contentstore/v2/home/courses?search=E2E
+            GET /api/contentstore/v2/home/courses?order=-org
+            GET /api/contentstore/v2/home/courses?active_only=true
+            GET /api/contentstore/v2/home/courses?archived_only=true
 
         **Response Values**
 
@@ -70,11 +75,13 @@ class HomePageCoursesViewV2(APIView):
                     "course_key": "course-v1:edX+E2E-101+course",
                     "display_name": "E2E Test Course",
                     "lms_link": "//localhost:18000/courses/course-v1:edX+E2E-101+course",
+                    "cms_link": "//localhost:18010/course/course-v1:edX+E2E-101+course",
                     "number": "E2E-101",
                     "org": "edX",
                     "rerun_link": "/course_rerun/course-v1:edX+E2E-101+course",
                     "run": "course",
-                    "url": "/course/course-v1:edX+E2E-101+course"
+                    "url": "/course/course-v1:edX+E2E-101+course",
+                    "is_active": true
                 },
             ],
             "in_process_course_actions": [],
