@@ -1,5 +1,7 @@
 """HomePageCoursesViewV2 APIView for getting content available to the logged in user."""
 import edx_api_doc_tools as apidocs
+from collections import OrderedDict
+from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
@@ -103,4 +105,10 @@ class HomePageCoursesViewV2(APIView):
             'courses': courses_page,
             'in_process_course_actions': in_process_course_actions,
         })
-        return paginator.get_paginated_response(serializer.data)
+        return Response(OrderedDict([
+            ('count', paginator.page.paginator.count),
+            ('num_pages', paginator.page.paginator.num_pages),
+            ('next', paginator.get_next_link()),
+            ('previous', paginator.get_previous_link()),
+            ('results', serializer.data),
+        ]))
