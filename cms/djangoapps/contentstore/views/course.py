@@ -451,7 +451,7 @@ def _accessible_courses_summary_iter_v2(request, org=None):
     courses_summary = get_courses_by_status(active_only, archived_only, courses_summary)
     courses_summary = get_courses_by_search_query(search_query, courses_summary)
     courses_summary = get_courses_order_by(order, courses_summary)
-    courses_summary = filter(course_filter, courses_summary)
+    courses_summary = list(filter(course_filter, courses_summary))
     in_process_course_actions = get_in_process_course_actions(request)
     return courses_summary, in_process_course_actions
 
@@ -562,7 +562,7 @@ def _accessible_courses_list_from_groups_v2(request):
 
     instructor_courses = UserBasedRole(request.user, CourseInstructorRole.ROLE).courses_with_role()
     staff_courses = UserBasedRole(request.user, CourseStaffRole.ROLE).courses_with_role()
-    all_courses = list(filter(filter_ccx, instructor_courses | staff_courses))
+    all_courses = filter(filter_ccx, instructor_courses | staff_courses)
     courses_list = []
     course_keys = {}
 
