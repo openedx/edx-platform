@@ -740,7 +740,7 @@ nltk==3.8.1
     # via chem
 nodeenv==1.8.0
     # via -r requirements/edx/kernel.in
-numpy==1.26.4
+numpy
     # via
     #   chem
     #   openedx-calc
@@ -1029,7 +1029,7 @@ s3transfer==0.10.0
     # via boto3
 sailthru-client==2.2.3
     # via edx-ace
-scipy==1.12.0
+scipy
     # via
     #   -c requirements/edx/../constraints.txt
     #   chem

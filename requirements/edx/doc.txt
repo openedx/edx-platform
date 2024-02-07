@@ -879,7 +879,7 @@ nltk==3.8.1
     #   chem
 nodeenv==1.8.0
     # via -r requirements/edx/base.txt
-numpy==1.26.4
+numpy
     # via
     #   -r requirements/edx/base.txt
     #   chem
@@ -1226,7 +1226,7 @@ sailthru-client==2.2.3
     # via
     #   -r requirements/edx/base.txt
     #   edx-ace
-scipy==1.12.0
+scipy
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt

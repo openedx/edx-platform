@@ -1250,7 +1250,7 @@ nodeenv==1.8.0
     #   -r requirements/edx/assets.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-numpy==1.26.4
+numpy
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1795,7 +1795,7 @@ sailthru-client==2.2.3
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-ace
-scipy==1.12.0
+scipy
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
