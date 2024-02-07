@@ -213,6 +213,12 @@ class LibraryRootView(APIView):
                 detail={"org": f"No such organization '{org_name}' found."}
             )
         org = Organization.objects.get(short_name=org_name)
+
+        # Backwards compatibility: ignore the no-longer used "collection_uuid"
+        # parameter. This was necessary with Blockstore, but not used for
+        # Learning Core.
+        data.pop("collection_uuid", None)
+
         try:
             result = api.create_library(org=org, **data)
         except api.LibraryAlreadyExists:

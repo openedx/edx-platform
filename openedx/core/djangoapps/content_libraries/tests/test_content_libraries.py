@@ -33,7 +33,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 
 
 @ddt.ddt
-class ContentLibrariesTestMixin:
+class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
     """
     General tests for Blockstore-based Content Libraries
 
@@ -1207,15 +1207,6 @@ class ContentLibrariesTestMixin:
             },
             event_receiver.call_args.kwargs
         )
-
-
-class ContentLibrariesTest(
-    ContentLibrariesTestMixin,
-    ContentLibrariesRestApiTest,
-):
-    """
-    General tests for Blockstore-based Content Libraries, using the installed Blockstore app.
-    """
 
 
 @ddt.ddt

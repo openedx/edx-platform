@@ -6,7 +6,6 @@ from gettext import GNUTranslations
 
 from completion.test_utils import CompletionWaffleTestMixin
 from django.db import connections, transaction
-from django.test import LiveServerTestCase
 from django.utils.text import slugify
 from organizations.models import Organization
 from rest_framework.test import APIClient
@@ -30,6 +29,8 @@ from openedx.core.lib import blockstore_api
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.unit_block import UnitBlock  # lint-amnesty, pylint: disable=wrong-import-order
 
+from openedx_learning.core.publishing import api as publishing_api
+
 
 class ContentLibraryContentTestMixin:
     """
@@ -44,9 +45,6 @@ class ContentLibraryContentTestMixin:
         # staff user
         self.staff_user = UserFactory(password="edx", is_staff=True)
 
-        # Create a collection using Blockstore API directly only because there
-        # is not yet any Studio REST API for doing so:
-        self.collection = blockstore_api.create_collection("Content Library Test Collection")
         # Create an organization
         self.organization = Organization.objects.create(
             name="Content Libraries Tachyon Exploration & Survey Team",
@@ -55,7 +53,6 @@ class ContentLibraryContentTestMixin:
         _, slug = self.id().rsplit('.', 1)
         with transaction.atomic():
             self.library = library_api.create_library(
-                collection_uuid=self.collection.uuid,
                 library_type=COMPLEX,
                 org=self.organization,
                 slug=slugify(slug),
@@ -73,40 +70,6 @@ class ContentLibraryRuntimeTestMixin(ContentLibraryContentTestMixin):
     content library.
     """
 
-    @skip_unless_cms  # creating child blocks only works properly in Studio
-    def test_identical_olx(self):
-        """
-        Test library blocks with children that also have identical OLX. Since
-        the blockstore runtime caches authored field data based on the hash of
-        the OLX, this can catch some potential bugs, especially given that the
-        "children" field stores usage IDs, not definition IDs.
-        """
-        # Create a unit containing a <problem>
-        unit_block_key = library_api.create_library_block(self.library.key, "unit", "u1").usage_key
-        library_api.create_library_block_child(unit_block_key, "problem", "p1")
-        library_api.publish_changes(self.library.key)
-        # Now do the same in a different library:
-        with transaction.atomic():
-            library2 = library_api.create_library(
-                collection_uuid=self.collection.uuid,
-                org=self.organization,
-                slug="idolx",
-                title=("Identical OLX Test Lib 2"),
-                description="",
-                library_type=COMPLEX,
-                allow_public_learning=True,
-                allow_public_read=False,
-                library_license=CC_4_BY,
-            )
-        unit_block2_key = library_api.create_library_block(library2.key, "unit", "u1").usage_key
-        library_api.create_library_block_child(unit_block2_key, "problem", "p1")
-        library_api.publish_changes(library2.key)
-        # Load both blocks:
-        unit_block = xblock_api.load_block(unit_block_key, self.student_a)
-        unit_block2 = xblock_api.load_block(unit_block2_key, self.student_a)
-        assert library_api.get_library_block_olx(unit_block_key) == library_api.get_library_block_olx(unit_block2_key)
-        assert unit_block.children != unit_block2.children
-
     def test_dndv2_sets_translator(self):
         dnd_block_key = library_api.create_library_block(self.library.key, "drag-and-drop-v2", "dnd1").usage_key
         library_api.publish_changes(self.library.key)
@@ -119,17 +82,10 @@ class ContentLibraryRuntimeTestMixin(ContentLibraryContentTestMixin):
         Test that the LMS-specific 'has_score' attribute is getting added to
         blocks.
         """
-        unit_block_key = library_api.create_library_block(self.library.key, "unit", "score-unit1").usage_key
         problem_block_key = library_api.create_library_block(self.library.key, "problem", "score-prob1").usage_key
         library_api.publish_changes(self.library.key)
-        unit_block = xblock_api.load_block(unit_block_key, self.student_a)
         problem_block = xblock_api.load_block(problem_block_key, self.student_a)
-
-        assert not hasattr(UnitBlock, 'has_score')
-        # The block class doesn't declare 'has_score'
-        assert unit_block.has_score is False
-        # But it gets added by the runtime and defaults to False
-        # And problems do have has_score True:
+        # problems do have has_score True:
         assert problem_block.has_score is True
 
     @skip_unless_cms  # creating child blocks only works properly in Studio
@@ -222,7 +178,7 @@ class ContentLibraryRuntimeTestMixin(ContentLibraryContentTestMixin):
         assert xblock_api.get_block_display_name(block_saved) == 'New Display Name'
 
 
-class ContentLibraryRuntimeTest(ContentLibraryRuntimeTestMixin, BlockstoreAppTestMixin, LiveServerTestCase):
+class ContentLibraryRuntimeTest(ContentLibraryRuntimeTestMixin, BlockstoreAppTestMixin):
     """
     Tests XBlock runtime using XBlocks in a content library using the installed Blockstore app.
 
@@ -538,7 +494,6 @@ class ContentLibraryXBlockUserStateTestMixin(ContentLibraryContentTestMixin):
 class ContentLibraryXBlockUserStateTest(  # type: ignore[misc]
     ContentLibraryXBlockUserStateTestMixin,
     BlockstoreAppTestMixin,
-    LiveServerTestCase,
 ):
     """
     Tests XBlock user state for XBlocks in a content library using the installed Blockstore app.
@@ -605,7 +560,6 @@ class ContentLibraryXBlockCompletionTest(
     ContentLibraryXBlockCompletionTestMixin,
     CompletionWaffleTestMixin,
     BlockstoreAppTestMixin,
-    LiveServerTestCase,
 ):
     """
     Test that the Blockstore-based XBlocks can track their completion status

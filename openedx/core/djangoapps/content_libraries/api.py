@@ -374,7 +374,6 @@ def get_library(library_key):
 
 
 def create_library(
-        collection_uuid,
         org,
         slug,
         title,
