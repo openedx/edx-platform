@@ -67,7 +67,7 @@ from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration,
 from openedx.core.djangoapps.discussions.tasks import update_unit_discussion_state_from_discussion_blocks
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
 from openedx.core.lib.blockstore_api import get_collection
-from openedx.core.lib.extract_tar import safe_extractall
+from openedx.core.lib.extract_archive import safe_extractall
 from xmodule.contentstore.django import contentstore
 from xmodule.course_block import CourseFields
 from xmodule.exceptions import SerializationError
