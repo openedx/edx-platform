@@ -20,6 +20,7 @@ from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords
 
+from common.djangoapps.course_modes.toggles import EXTEND_CERTIFICATE_RELEVANT_MODES_WITH_HONOR_FLAG
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.cache_utils import request_cached
 
@@ -834,6 +835,21 @@ class CourseMode(models.Model):
                 ineligible_modes.append(cls.HONOR)
 
         return mode_slug not in ineligible_modes
+
+    @classmethod
+    def get_certificate_relevant_modes(cls):
+        """
+        Wrapper for CERTIFICATE_RELEVANT_MODES.
+        When EXTEND_CERTIFICATE_RELEVANT_MODES_WITH_HONOR_FLAG is enabled we want to add HONOR mode.
+        We may want that when using the HONOR courses in the programs and need to notify credentials
+        about such course certificates.
+        """
+        cert_relevant_modes = cls.CERTIFICATE_RELEVANT_MODES
+
+        if EXTEND_CERTIFICATE_RELEVANT_MODES_WITH_HONOR_FLAG.is_enabled():
+            cert_relevant_modes += [cls.HONOR]
+
+        return cert_relevant_modes
 
     def to_tuple(self):
         """

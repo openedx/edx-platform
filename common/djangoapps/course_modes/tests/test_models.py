@@ -14,6 +14,7 @@ import ddt
 from django.core.exceptions import ValidationError
 from django.test import TestCase, override_settings
 from django.utils.timezone import now
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.locator import CourseLocator
 
 from common.djangoapps.course_modes.helpers import enrollment_mode_display
@@ -24,6 +25,7 @@ from common.djangoapps.course_modes.models import (
     invalidate_course_mode_cache
 )
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.toggles import EXTEND_CERTIFICATE_RELEVANT_MODES_WITH_HONOR_FLAG
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
@@ -490,6 +492,18 @@ class CourseModeModelTest(TestCase):
             self.create_mode(mode, mode, 10)
 
         assert CourseMode.is_masters_only(self.course_key) == expected_is_masters_only
+
+    def test_get_certificate_relevant_modes(self):
+        """
+        Test get_certificate_relevant_modes.
+        Depending on the EXTEND_CERTIFICATE_RELEVANT_MODES_WITH_HONOR_FLAG WaffleFlag it could
+        include the HONOR mode (flag enabled) or not (flag disabled).
+        """
+        with override_waffle_flag(EXTEND_CERTIFICATE_RELEVANT_MODES_WITH_HONOR_FLAG, active=False):
+            assert CourseMode.get_certificate_relevant_modes() == CourseMode.CERTIFICATE_RELEVANT_MODES
+            assert CourseMode.HONOR not in CourseMode.get_certificate_relevant_modes()
+        with override_waffle_flag(EXTEND_CERTIFICATE_RELEVANT_MODES_WITH_HONOR_FLAG, active=True):
+            assert CourseMode.HONOR in CourseMode.get_certificate_relevant_modes()
 
 
 class TestCourseOverviewIntegration(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
