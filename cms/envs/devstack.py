@@ -298,7 +298,7 @@ SOCIAL_AUTH_REDIRECT_IS_HTTPS = False
 CLOSEST_CLIENT_IP_FROM_HEADERS = []
 
 #################### Credentials Settings ####################
-CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:18150'
+CREDENTIALS_INTERNAL_SERVICE_URL = 'http://edx.devstack.credentials:18150'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 
 ########################## ORA MFE APP ##############################
