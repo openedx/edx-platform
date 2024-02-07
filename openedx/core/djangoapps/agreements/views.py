@@ -3,7 +3,6 @@ Views served by the Agreements app
 """
 
 from django.conf import settings
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
