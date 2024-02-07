@@ -67,7 +67,7 @@ class TaxonomyOrgView(TaxonomyView):
             queryset = get_taxonomies(enabled)
 
         # Prefetch tag_set so we can serialize the tag counts
-        return queryset.prefetch_related("taxonomyorg_set", "tag_set")
+        return queryset.prefetch_related("taxonomyorg_set__org", "tag_set")
 
     def perform_create(self, serializer):
         """
