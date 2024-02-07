@@ -8,9 +8,9 @@ jobs:
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/
   push:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push'     
-    
+    runs-on: ubuntu-20.04
+    if: github.event_name == 'push'
+
     strategy:
       matrix:
         variant:
@@ -38,6 +38,5 @@ jobs:
       - name: Build and push lms base docker image
         env:
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}                
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         run : make docker_tag_build_push_${{matrix.variant}}
-        

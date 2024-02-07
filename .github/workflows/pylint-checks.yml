@@ -39,7 +39,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.8
+          python-version: "3.9"
 
       - name: Get pip cache dir
         id: pip-cache-dir
@@ -75,7 +75,7 @@ jobs:
     if: always()
     needs:
       - run-pylint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Decide whether the needed jobs succeeded or failed
         # uses: re-actors/alls-green@v1.2.1
