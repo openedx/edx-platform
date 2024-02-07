@@ -91,7 +91,7 @@ class Command(BaseCommand):
             'meta': '{}',
             'location': 'gdpr test location',
             'year_of_birth': 1950,
-            'gender': 'gdpr test gender',
+            'gender': 'o',
             'mailing_address': 'gdpr test mailing address',
             'city': 'Boston',
             'country': 'US',
