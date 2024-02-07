@@ -4,7 +4,6 @@ API Serializers for content tagging org
 
 from __future__ import annotations
 
-from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers, fields
 
 from openedx_tagging.core.tagging.rest_api.v1.serializers import (
