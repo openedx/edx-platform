@@ -308,10 +308,10 @@ def get_metadata(queryset, text_search=None):
             version=None,
             allow_public_learning=lib.allow_public_learning,
             allow_public_read=lib.allow_public_read,
-            num_blocks=0, # metadata[i].get('num_blocks'),
-            last_published=None, # metadata[i].get('last_published'),
-            has_unpublished_changes=False, # metadata[i].get('has_unpublished_changes'),
-            has_unpublished_deletes=False, # metadata[i].get('has_unpublished_deletes'),
+            num_blocks=0,
+            last_published=None,
+            has_unpublished_changes=False,
+            has_unpublished_deletes=False,
             license=lib.license,
         )
         for lib in queryset
@@ -345,16 +345,12 @@ def get_library(library_key):
     learning_package = ref.learning_package
     num_blocks = publishing_api.get_all_drafts(learning_package.id).count()
     last_publish_log = publishing_api.get_last_publish(learning_package.id)
-    has_unpublished_changes = (
-        publishing_api
-            .get_entities_with_unpublished_changes(learning_package.id)
-            .exists()
-    )
-    has_unpublished_deletes = (
-        publishing_api
-            .get_entities_with_unpublished_deletes(learning_package.id)
-            .exists()
-    )
+    has_unpublished_changes = publishing_api.get_entities_with_unpublished_changes(
+                                  learning_package.id
+                              ).exists()
+    has_unpublished_deletes = publishing_api.get_entities_with_unpublished_deletes(
+                                  learning_package.id
+                              ).exists()
 
     return ContentLibraryMetadata(
         key=library_key,
@@ -574,15 +570,18 @@ def delete_library(library_key):
     """
     Delete a content library
     """
-    raise NotImplementedError(
-        "This is not currently accessible via the UI and we need to think "
-        "about the implications of removing linked content."
+    content_lib = ContentLibrary.objects.get_by_key(library_key)
+
+    # TODO: Move the delete() operation to an API call
+    # TODO: Should we detach the LearningPackage and delete it asynchronously?
+    content_lib.learning_package.delete()
+    content_lib.delete()
+
+    CONTENT_LIBRARY_DELETED.send_event(
+        content_library=ContentLibraryData(
+            library_key=library_key
+        )
     )
-    #CONTENT_LIBRARY_DELETED.send_event(
-    #    content_library=ContentLibraryData(
-    #        library_key=ref.library_key
-    #    )
-    #
 
 
 def _get_library_component_tags_count(library_key) -> dict:
@@ -715,6 +714,15 @@ def create_library_block(library_key, block_type, definition_id):
                     block_type=block_type, library_type=ref.type,
                 )
             )
+
+    # If adding a component would take us over our max, return an error.
+    component_count = publishing_api.get_all_drafts(ref.learning_package.id).count()
+    if component_count + 1 > settings.MAX_BLOCKS_PER_CONTENT_LIBRARY:
+        raise BlockLimitReachedError(
+            _("Library cannot have more than {} Components").format(
+                settings.MAX_BLOCKS_PER_CONTENT_LIBRARY
+            )
+        )
 
     # Make sure the proposed ID will be valid:
     validate_unicode_slug(definition_id)
