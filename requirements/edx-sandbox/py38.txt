@@ -76,7 +76,7 @@ random2==1.0.2
     # via -r requirements/edx-sandbox/py38.in
 regex==2023.12.25
     # via nltk
-scipy==1.7.3
+scipy==1.12.0
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
