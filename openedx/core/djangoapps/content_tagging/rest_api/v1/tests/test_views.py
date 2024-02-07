@@ -491,15 +491,15 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
         """
         Test how many queries are used when retrieving taxonomies and permissions
         """
-        url = TAXONOMY_ORG_LIST_URL + f'?org=${self.orgA.short_name}&enabled=true'
+        url = TAXONOMY_ORG_LIST_URL + f'?org={self.orgA.short_name}&enabled=true'
 
         self.client.force_authenticate(user=self.staff)
-        with self.assertNumQueries(16):  # TODO Why so many queries?
+        with self.assertNumQueries(23):  # TODO Why so many queries?
             response = self.client.get(url)
 
         assert response.status_code == 200
         assert response.data["can_add_taxonomy"]
-        assert len(response.data["results"]) == 2
+        assert len(response.data["results"]) == 4
         for taxonomy in response.data["results"]:
             if taxonomy["system_defined"]:
                 assert not taxonomy["can_change_taxonomy"]
