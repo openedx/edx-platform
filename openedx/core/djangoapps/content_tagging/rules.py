@@ -141,20 +141,11 @@ def can_view_taxonomy(user: UserType, taxonomy: oel_tagging.Taxonomy) -> bool:
     if oel_tagging.is_taxonomy_admin(user):
         return True
 
-    is_all_org = TaxonomyOrg.objects.filter(
-        taxonomy=taxonomy,
-        org=None,
-        rel_type=TaxonomyOrg.RelType.OWNER,
-    ).exists()
+    is_all_org, taxonomy_orgs = TaxonomyOrg.get_organizations(taxonomy)
 
     # Enabled all-org taxonomies can be viewed by any registred user
     if is_all_org:
         return taxonomy.enabled
-
-    taxonomy_orgs = TaxonomyOrg.get_organizations(
-        taxonomy=taxonomy,
-        rel_type=TaxonomyOrg.RelType.OWNER,
-    )
 
     # Org-level staff can view any taxonomy that is associated with one of their orgs.
     if is_org_admin(user, taxonomy_orgs):
@@ -191,20 +182,11 @@ def can_change_taxonomy(user: UserType, taxonomy: oel_tagging.Taxonomy) -> bool:
     if oel_tagging.is_taxonomy_admin(user):
         return True
 
-    is_all_org = TaxonomyOrg.objects.filter(
-        taxonomy=taxonomy,
-        org=None,
-        rel_type=TaxonomyOrg.RelType.OWNER,
-    ).exists()
+    is_all_org, taxonomy_orgs = TaxonomyOrg.get_organizations(taxonomy)
 
     # Only taxonomy admins can edit all org taxonomies
     if is_all_org:
         return False
-
-    taxonomy_orgs = TaxonomyOrg.get_organizations(
-        taxonomy=taxonomy,
-        rel_type=TaxonomyOrg.RelType.OWNER,
-    )
 
     # Org-level staff can edit any taxonomy that is associated with one of their orgs.
     if is_org_admin(user, taxonomy_orgs):

@@ -504,7 +504,7 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
         url = TAXONOMY_ORG_LIST_URL + f'?org={self.orgA.short_name}&enabled=true'
 
         self.client.force_authenticate(user=self.staff)
-        with self.assertNumQueries(15):  # TODO Why so many queries?
+        with self.assertNumQueries(11):
             response = self.client.get(url)
 
         assert response.status_code == 200

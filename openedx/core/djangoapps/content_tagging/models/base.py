@@ -64,16 +64,21 @@ class TaxonomyOrg(models.Model):
 
     @classmethod
     def get_organizations(
-        cls, taxonomy: Taxonomy, rel_type: RelType
-    ) -> list[Organization]:
+        cls, taxonomy: Taxonomy, rel_type=RelType.OWNER,
+    ) -> tuple[bool, list[Organization]]:
         """
-        Returns the list of Organizations which have the given relationship to the taxonomy.
+        Returns a tuple containing:
+        * bool: flag indicating whether "all organizations" have the given relationship to the taxonomy
+        * orgs: list of Organizations which have the given relationship to the taxonomy
         """
-        rels = cls.objects.filter(
-            taxonomy=taxonomy,
-            rel_type=rel_type,
-        )
-        # A relationship with org=None means all Organizations
-        if rels.filter(org=None).exists():
-            return list(Organization.objects.all())
-        return [rel.org for rel in rels]
+        is_all_org = False
+        orgs = []
+        # Iterate over the taxonomyorgs instead of filtering to take advantage of prefetched data.
+        for taxonomy_org in taxonomy.taxonomyorg_set.all():
+            if taxonomy_org.rel_type == rel_type:
+                if taxonomy_org.org is None:
+                    is_all_org = True
+                else:
+                    orgs.append(taxonomy_org.org)
+
+        return (is_all_org, orgs)

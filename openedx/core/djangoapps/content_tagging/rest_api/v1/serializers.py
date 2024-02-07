@@ -80,7 +80,11 @@ class TaxonomyOrgSerializer(TaxonomySerializer):
         """
         Return True if the taxonomy is associated with all orgs.
         """
-        return obj.taxonomyorg_set.filter(org__isnull=True).exists()
+        is_all_orgs = False
+        for taxonomy_org in obj.taxonomyorg_set.all():
+            if taxonomy_org.org_id is None:
+                return True
+        return False
 
     class Meta:
         model = TaxonomySerializer.Meta.model
