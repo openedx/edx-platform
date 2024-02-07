@@ -513,24 +513,15 @@ class LibraryBlocksView(APIView):
         api.require_permission_for_library_key(library_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
         serializer = LibraryXBlockCreationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        parent_block_usage_str = serializer.validated_data.pop("parent_block", None)
 
-        if parent_block_usage_str:
-            # Add this as a child of an existing block:
-            parent_block_usage = LibraryUsageLocatorV2.from_string(parent_block_usage_str)
-            if parent_block_usage.context_key != library_key:
-                raise ValidationError(detail={"parent_block": "Usage ID doesn't match library ID in the URL."})
+        # Create a new regular top-level block:
+        try:
+            result = api.create_library_block(library_key, **serializer.validated_data)
+        except api.IncompatibleTypesError as err:
+            raise ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
+                detail={'block_type': str(err)},
+            )
 
-            result = api.create_library_block_child(parent_block_usage, **serializer.validated_data)
-
-        else:
-            # Create a new regular top-level block:
-            try:
-                result = api.create_library_block(library_key, **serializer.validated_data)
-            except api.IncompatibleTypesError as err:
-                raise ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
-                    detail={'block_type': str(err)},
-                )
         return Response(LibraryXBlockMetadataSerializer(result).data)
 
 

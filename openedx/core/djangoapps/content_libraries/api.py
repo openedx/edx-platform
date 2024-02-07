@@ -660,13 +660,46 @@ def set_library_block_olx(usage_key, new_olx_str):
     very little validation is done and this can easily result in a broken XBlock
     that won't load.
     """
-    raise NotImplementedError
-    #LIBRARY_BLOCK_UPDATED.send_event(
-    #    library_block=LibraryBlockData(
-    #        library_key=usage_key.context_key,
-    #        usage_key=usage_key
-    #    )
-    #)
+    # because this old pylint can't understand attr.ib() objects, pylint: disable=no-member
+    assert isinstance(usage_key, LibraryUsageLocatorV2)
+    # Make sure the block exists:
+    metadata = get_library_block(usage_key)
+    block_type = usage_key.block_type
+
+    # Verify that the OLX parses, at least as generic XML:
+    node = etree.fromstring(new_olx_str)
+
+    # We're intentionally NOT checking if the XBlock type is installed, since
+    # this is one of the only tools you can reach for to edit content for an
+    # XBlock that's broken or missing.
+    component = get_component_from_usage_key(usage_key)
+
+    # Get the title from the new OLX
+    new_title = node.attrib.get("display_name", "")
+
+    now = datetime.now(tz=timezone.utc)
+
+    new_content = contents_api.get_or_create_text_content(
+        component.learning_package_id,
+        media_type_id=get_or_create_olx_media_type(usage_key.block_type).id,
+        text=new_olx_str,
+        created=now,
+    )
+    components_api.create_next_version(
+        component.pk,
+        title=new_title,
+        content_to_replace={
+            'block.xml': new_content.pk,
+        },
+        created=now,
+    )
+
+    LIBRARY_BLOCK_UPDATED.send_event(
+        library_block=LibraryBlockData(
+            library_key=usage_key.context_key,
+            usage_key=usage_key
+        )
+    )
 
 
 def create_library_block(library_key, block_type, definition_id):
@@ -730,6 +763,12 @@ def get_component_from_usage_key(usage_key):
     )
 
 
+def get_or_create_olx_media_type(block_type):
+    return contents_api.get_or_create_media_type(
+        f"application/vnd.openedx.xblock.v1.{block_type}+xml"
+    )
+
+
 def create_component_for_block(content_lib, usage_key):
     """
     TODO: We should probably shift this to openedx.core.djangoapps.xblock.api
@@ -755,12 +794,9 @@ def create_component_for_block(content_lib, usage_key):
         created=now,
         created_by=None,
     )
-    block_media_type = contents_api.get_or_create_media_type(
-        f"application/vnd.openedx.xblock.v1.{usage_key.block_type}+xml"
-    )
     content = contents_api.get_or_create_text_content(
         learning_package.id,
-        media_type_id=block_media_type.id,
+        media_type_id=get_or_create_olx_media_type(usage_key.block_type).id,
         text=xml_text,
         created=now,
     )

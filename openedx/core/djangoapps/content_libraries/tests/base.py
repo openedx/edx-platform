@@ -46,7 +46,7 @@ URL_BLOCK_FIELDS_URL = '/api/xblock/v2/xblocks/{block_key}/fields/'
 URL_BLOCK_XBLOCK_HANDLER = '/api/xblock/v2/xblocks/{block_key}/handler/{user_id}-{secure_token}/{handler_name}/'
 
 
-# @skip_unless_cms  # Content Libraries REST API is only available in Studio
+@skip_unless_cms  # Content Libraries REST API is only available in Studio
 class _ContentLibrariesRestApiTestMixin:
     """
     Base class for Blockstore-based Content Libraries test that use the REST API
@@ -313,7 +313,7 @@ class ContentLibrariesRestApiTest(
     _ContentLibrariesRestApiTestMixin,
     BlockstoreAppTestMixin,
     APITestCase,
-    LiveServerTestCase,
+#    LiveServerTestCase,  # dave note: I don't think this is necessary any longer...?
 ):
     """
     Base class for Blockstore-based Content Libraries test that use the REST API
