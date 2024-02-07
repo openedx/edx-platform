@@ -48,6 +48,7 @@ from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.cache_utils import request_cached
+from openedx.core.lib.xblock_utils import get_icon
 from openedx.core.toggles import ENTRANCE_EXAMS
 from xmodule.course_block import DEFAULT_START_DATE
 from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
@@ -86,6 +87,11 @@ from ..helpers import (
 log = logging.getLogger(__name__)
 
 CREATE_IF_NOT_FOUND = ["course_info"]
+
+# List of categories to check for presence in the children of the XBlock.
+# This list is used to determine if all of the specified categories are absent
+# in the categories of the children XBlock instances otherwise icon class variable will be set to `None`.
+CATEGORIES_WITH_ABSENT_ICON = ["split_test"]
 
 # Useful constants for defining predicates
 NEVER = lambda x: False
@@ -1062,6 +1068,10 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
         )
     else:
         user_partitions = get_user_partition_info(xblock, course=course)
+        all_excluded_categories_absent = all(
+            category not in [child.category for child in xblock.get_children()]
+            for category in CATEGORIES_WITH_ABSENT_ICON
+        )
         xblock_info.update(
             {
                 "edited_on": get_default_time_display(xblock.subtree_edited_on)
@@ -1091,6 +1101,7 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
                 "show_correctness": xblock.show_correctness,
                 "hide_from_toc": xblock.hide_from_toc,
                 "enable_hide_from_toc_ui": settings.FEATURES.get("ENABLE_HIDE_FROM_TOC_UI", False),
+                "xblock_type": get_icon(xblock) if is_xblock_unit and all_excluded_categories_absent else None,
             }
         )
 

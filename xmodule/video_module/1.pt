@@ -1,0 +1,2233 @@
+{
+  "language_code": "en",
+  "action": "view",
+  "xblock": {
+    "display_name": "Unit",
+    "display_type": "Unit",
+    "category": "vertical"
+  },
+  "is_unit_page": true,
+  "is_collapsible": false,
+  "position": 2,
+  "prev_url": "%2Fcontainer%2Fblock-v1%3A2u%2B1%2B1%2Btype%40vertical%2Bblock%402045839cff4941e8af799bd1483b3a33",
+  "next_url": "%2Fcontainer%2Fblock-v1%3A2u%2B1%2B1%2Btype%40vertical%2Bblock%407d1aa3dca0f14beb9e7190e9ed90aeca",
+  "new_unit_category": "vertical",
+  "outline_url": "/course/course-v1:2u+1+1?format=concise",
+  "ancestor_xblocks": [
+    {
+      "children": [
+        {
+          "url": "/course/course-v1:2u+1+1?show=block-v1%3A2u%2B1%2B1%2Btype%40chapter%2Bblock%40a4df5bb094204b458fea6d471e7999cf",
+          "display_name": "Section1"
+        },
+        {
+          "url": "/course/course-v1:2u+1+1?show=block-v1%3A2u%2B1%2B1%2Btype%40chapter%2Bblock%4028463c288a7f43658a688ab93d984a74",
+          "display_name": "Section2"
+        },
+        {
+          "url": "/course/course-v1:2u+1+1?show=block-v1%3A2u%2B1%2B1%2Btype%40chapter%2Bblock%40472b54b89b1a4143abc68dd263fec732",
+          "display_name": "Section"
+        },
+        {
+          "url": "/course/course-v1:2u+1+1?show=block-v1%3A2u%2B1%2B1%2Btype%40chapter%2Bblock%40b7990b810cf64f718ca4971e396c3d90",
+          "display_name": "MY UNPUBLISHED SECTION"
+        },
+        {
+          "url": "/course/course-v1:2u+1+1?show=block-v1%3A2u%2B1%2B1%2Btype%40chapter%2Bblock%40aabecb612c5a41d1ab0809a2598e0ab9",
+          "display_name": "Test split_test"
+        },
+        {
+          "url": "/course/course-v1:2u+1+1?show=block-v1%3A2u%2B1%2B1%2Btype%40chapter%2Bblock%408fcff57d28844d799c45d9c260fbd4ae",
+          "display_name": "Section"
+        }
+      ],
+      "title": "Test split_test",
+      "is_last": false
+    },
+    {
+      "children": [
+        {
+          "url": "/course/course-v1:2u+1+1?show=block-v1%3A2u%2B1%2B1%2Btype%40sequential%2Bblock%405bfa4a58036e4e748ef0693a70e5a325",
+          "display_name": "Subsection"
+        }
+      ],
+      "title": "Subsection",
+      "is_last": true
+    }
+  ],
+  "component_templates": [
+    {
+      "type": "advanced",
+      "templates": [
+        {
+          "display_name": "Content Experiment",
+          "category": "split_test",
+          "boilerplate_name": null,
+          "hinted": false,
+          "tab": "common",
+          "support_level": true
+        }
+      ],
+      "display_name": "Advanced",
+      "support_legend": {
+        "show_legend": false,
+        "allow_unsupported_xblocks": false,
+        "documentation_label": "PLATFORM_NAME Support Levels:"
+      }
+    },
+    {
+      "type": "discussion",
+      "templates": [
+        {
+          "display_name": "Discussion",
+          "category": "discussion",
+          "boilerplate_name": null,
+          "hinted": false,
+          "tab": "advanced",
+          "support_level": true
+        }
+      ],
+      "display_name": "Discussion",
+      "support_legend": {
+        "show_legend": false,
+        "allow_unsupported_xblocks": false,
+        "documentation_label": "PLATFORM_NAME Support Levels:"
+      }
+    },
+    {
+      "type": "library",
+      "templates": [
+        {
+          "display_name": "Randomized Content Block",
+          "category": "library_content",
+          "boilerplate_name": null,
+          "hinted": false,
+          "tab": "common",
+          "support_level": true
+        }
+      ],
+      "display_name": "Library Content",
+      "support_legend": {
+        "show_legend": false,
+        "allow_unsupported_xblocks": false,
+        "documentation_label": "PLATFORM_NAME Support Levels:"
+      }
+    },
+    {
+      "type": "html",
+      "templates": [
+        {
+          "display_name": "Text",
+          "category": "html",
+          "boilerplate_name": null,
+          "hinted": false,
+          "tab": "advanced",
+          "support_level": true
+        },
+        {
+          "display_name": "Raw HTML",
+          "category": "html",
+          "boilerplate_name": "raw.yaml",
+          "hinted": false,
+          "tab": "advanced",
+          "support_level": true
+        },
+        {
+          "display_name": "Zooming Image Tool",
+          "category": "html",
+          "boilerplate_name": "zooming_image.yaml",
+          "hinted": false,
+          "tab": "advanced",
+          "support_level": true
+        },
+        {
+          "display_name": "IFrame Tool",
+          "category": "html",
+          "boilerplate_name": "iframe.yaml",
+          "hinted": false,
+          "tab": "advanced",
+          "support_level": true
+        },
+        {
+          "display_name": "Anonymous User ID",
+          "category": "html",
+          "boilerplate_name": "anon_user_id.yaml",
+          "hinted": false,
+          "tab": "advanced",
+          "support_level": true
+        },
+        {
+          "display_name": "Announcement",
+          "category": "html",
+          "boilerplate_name": "announcement.yaml",
+          "hinted": false,
+          "tab": "advanced",
+          "support_level": true
+        }
+      ],
+      "display_name": "Text",
+      "support_legend": {
+        "show_legend": false,
+        "allow_unsupported_xblocks": false,
+        "documentation_label": "PLATFORM_NAME Support Levels:"
+      }
+    },
+    {
+      "type": "openassessment",
+      "templates": [
+        {
+          "display_name": "Peer Assessment Only",
+          "category": "openassessment",
+          "boilerplate_name": "peer-assessment",
+          "hinted": false,
+          "tab": "advanced",
+          "support_level": true
+        },
+        {
+          "display_name": "Self Assessment Only",
+          "category": "openassessment",
+          "boilerplate_name": "self-assessment",
+          "hinted": false,
+          "tab": "advanced",
+          "support_level": true
+        },
+        {
+          "display_name": "Staff Assessment Only",
+          "category": "openassessment",
+          "boilerplate_name": "staff-assessment",
+          "hinted": false,
+          "tab": "advanced",
+          "support_level": true
+        },
+        {
+          "display_name": "Self Assessment to Peer Assessment",
+          "category": "openassessment",
+          "boilerplate_name": "self-to-peer",
+          "hinted": false,
+          "tab": "advanced",
+          "support_level": true
+        },
+        {
+          "display_name": "Self Assessment to Staff Assessment",
+          "category": "openassessment",
+          "boilerplate_name": "self-to-staff",
+          "hinted": false,
+          "tab": "advanced",
+          "support_level": true
+        }
+      ],
+      "display_name": "Open Response",
+      "support_legend": {
+        "show_legend": false,
+        "allow_unsupported_xblocks": false,
+        "documentation_label": "PLATFORM_NAME Support Levels:"
+      }
+    },
+    {
+      "type": "problem",
+      "templates": [
+        {
+          "display_name": "Blank Common Problem",
+          "category": "problem",
+          "boilerplate_name": "blank_common.yaml",
+          "hinted": false,
+          "tab": "common",
+          "support_level": true
+        }
+      ],
+      "display_name": "Problem",
+      "support_legend": {
+        "show_legend": false,
+        "allow_unsupported_xblocks": false,
+        "documentation_label": "PLATFORM_NAME Support Levels:"
+      }
+    },
+    {
+      "type": "video",
+      "templates": [
+        {
+          "display_name": "Video",
+          "category": "video",
+          "boilerplate_name": null,
+          "hinted": false,
+          "tab": "advanced",
+          "support_level": true
+        }
+      ],
+      "display_name": "Video",
+      "support_legend": {
+        "show_legend": false,
+        "allow_unsupported_xblocks": false,
+        "documentation_label": "PLATFORM_NAME Support Levels:"
+      }
+    },
+    {
+      "type": "drag-and-drop-v2",
+      "templates": [
+        {
+          "display_name": "Drag and Drop",
+          "category": "drag-and-drop-v2",
+          "boilerplate_name": null,
+          "hinted": false,
+          "tab": "advanced",
+          "support_level": true
+        }
+      ],
+      "display_name": "Drag and Drop",
+      "support_legend": {
+        "show_legend": false,
+        "allow_unsupported_xblocks": false,
+        "documentation_label": "PLATFORM_NAME Support Levels:"
+      }
+    }
+  ],
+  "xblock_info": {
+    "id": "block-v1:2u+1+1+type@vertical+block@33ffa0bc46134b1599f98af8253ce709",
+    "display_name": "Unit",
+    "category": "vertical",
+    "has_children": true,
+    "edited_on": "Mar 01, 2024 at 12:04 UTC",
+    "published": true,
+    "published_on": "Feb 27, 2024 at 10:24 UTC",
+    "studio_url": "/container/block-v1:2u+1+1+type@vertical+block@33ffa0bc46134b1599f98af8253ce709",
+    "released_to_students": false,
+    "release_date": null,
+    "visibility_state": "needs_attention",
+    "has_explicit_staff_lock": false,
+    "start": "2030-01-01T00:00:00Z",
+    "graded": false,
+    "due_date": "",
+    "due": null,
+    "relative_weeks_due": null,
+    "format": null,
+    "course_graders": [
+      "Homework",
+      "Lab",
+      "Midterm Exam",
+      "Final Exam"
+    ],
+    "has_changes": true,
+    "actions": {
+      "deletable": true,
+      "draggable": true,
+      "childAddable": true,
+      "duplicable": true
+    },
+    "explanatory_message": null,
+    "group_access": {},
+    "user_partitions": [
+      {
+        "id": 1903135906,
+        "name": "   aaa",
+        "scheme": "random",
+        "groups": [
+          {
+            "id": 1213918239,
+            "name": "Group A",
+            "selected": false,
+            "deleted": false
+          },
+          {
+            "id": 1563048958,
+            "name": "Group B",
+            "selected": false,
+            "deleted": false
+          },
+          {
+            "id": 1814636452,
+            "name": "Group C",
+            "selected": false,
+            "deleted": false
+          },
+          {
+            "id": 1114080836,
+            "name": "Group D",
+            "selected": false,
+            "deleted": false
+          },
+          {
+            "id": 1468368722,
+            "name": "Group E",
+            "selected": false,
+            "deleted": false
+          },
+          {
+            "id": 1858618704,
+            "name": "Group F",
+            "selected": false,
+            "deleted": false
+          },
+          {
+            "id": 695295459,
+            "name": "Group G",
+            "selected": false,
+            "deleted": false
+          },
+          {
+            "id": 1042419244,
+            "name": "Group H",
+            "selected": false,
+            "deleted": false
+          },
+          {
+            "id": 1203121571,
+            "name": "Group I",
+            "selected": false,
+            "deleted": false
+          },
+          {
+            "id": 1671531224,
+            "name": "Group J",
+            "selected": false,
+            "deleted": false
+          },
+          {
+            "id": 1068960935,
+            "name": "Group K",
+            "selected": false,
+            "deleted": false
+          },
+          {
+            "id": 213846840,
+            "name": "Group L",
+            "selected": false,
+            "deleted": false
+          },
+          {
+            "id": 1520039571,
+            "name": "Group M",
+            "selected": false,
+            "deleted": false
+          },
+          {
+            "id": 1071048650,
+            "name": "Group N",
+            "selected": false,
+            "deleted": false
+          },
+          {
+            "id": 150065208,
+            "name": "Group O",
+            "selected": false,
+            "deleted": false
+          },
+          {
+            "id": 1341374482,
+            "name": "Group P",
+            "selected": false,
+            "deleted": false
+          },
+          {
+            "id": 1614792569,
+            "name": "Group Q",
+            "selected": false,
+            "deleted": false
+          },
+          {
+            "id": 1654086061,
+            "name": "Group R",
+            "selected": false,
+            "deleted": false
+          },
+          {
+            "id": 879601505,
+            "name": "Group S",
+            "selected": false,
+            "deleted": false
+          },
+          {
+            "id": 635805169,
+            "name": "Group T",
+            "selected": false,
+            "deleted": false
+          },
+          {
+            "id": 1969306579,
+            "name": "Group U",
+            "selected": false,
+            "deleted": false
+          }
+        ]
+      },
+      {
+        "id": 672590462,
+        "name": "Content Groups",
+        "scheme": "cohort",
+        "groups": [
+          {
+            "id": 1142499850,
+            "name": "first updatedddf",
+            "selected": false,
+            "deleted": false
+          },
+          {
+            "id": 1572495963,
+            "name": "second",
+            "selected": false,
+            "deleted": false
+          },
+          {
+            "id": 403485345,
+            "name": "mmmmsdffqqqqd",
+            "selected": false,
+            "deleted": false
+          }
+        ]
+      },
+      {
+        "id": 50,
+        "name": "Enrollment Track Groups",
+        "scheme": "enrollment_track",
+        "groups": [
+          {
+            "id": 6,
+            "name": "ds",
+            "selected": false,
+            "deleted": false
+          },
+          {
+            "id": 2,
+            "name": "name",
+            "selected": false,
+            "deleted": false
+          }
+        ]
+      }
+    ],
+    "show_correctness": "always",
+    "xblock_type": "problem",
+    "discussion_enabled": true,
+    "ancestor_info": {
+      "ancestors": [
+        {
+          "id": "block-v1:2u+1+1+type@sequential+block@5bfa4a58036e4e748ef0693a70e5a325",
+          "display_name": "Subsection",
+          "category": "sequential",
+          "has_children": true,
+          "edited_on": "Mar 05, 2024 at 15:36 UTC",
+          "published": true,
+          "published_on": "Feb 15, 2024 at 13:31 UTC",
+          "studio_url": "/course/course-v1:2u+1+1?show=block-v1%3A2u%2B1%2B1%2Btype%40sequential%2Bblock%405bfa4a58036e4e748ef0693a70e5a325",
+          "released_to_students": false,
+          "release_date": null,
+          "visibility_state": "needs_attention",
+          "has_explicit_staff_lock": false,
+          "start": "2030-01-01T00:00:00Z",
+          "graded": false,
+          "due_date": "",
+          "due": null,
+          "relative_weeks_due": null,
+          "format": null,
+          "course_graders": [
+            "Homework",
+            "Lab",
+            "Midterm Exam",
+            "Final Exam"
+          ],
+          "has_changes": null,
+          "actions": {
+            "deletable": true,
+            "draggable": true,
+            "childAddable": true,
+            "duplicable": true
+          },
+          "explanatory_message": null,
+          "group_access": {},
+          "user_partitions": [
+            {
+              "id": 1903135906,
+              "name": "   aaa",
+              "scheme": "random",
+              "groups": [
+                {
+                  "id": 1213918239,
+                  "name": "Group A",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1563048958,
+                  "name": "Group B",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1814636452,
+                  "name": "Group C",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1114080836,
+                  "name": "Group D",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1468368722,
+                  "name": "Group E",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1858618704,
+                  "name": "Group F",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 695295459,
+                  "name": "Group G",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1042419244,
+                  "name": "Group H",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1203121571,
+                  "name": "Group I",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1671531224,
+                  "name": "Group J",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1068960935,
+                  "name": "Group K",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 213846840,
+                  "name": "Group L",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1520039571,
+                  "name": "Group M",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1071048650,
+                  "name": "Group N",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 150065208,
+                  "name": "Group O",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1341374482,
+                  "name": "Group P",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1614792569,
+                  "name": "Group Q",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1654086061,
+                  "name": "Group R",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 879601505,
+                  "name": "Group S",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 635805169,
+                  "name": "Group T",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1969306579,
+                  "name": "Group U",
+                  "selected": false,
+                  "deleted": false
+                }
+              ]
+            },
+            {
+              "id": 672590462,
+              "name": "Content Groups",
+              "scheme": "cohort",
+              "groups": [
+                {
+                  "id": 1142499850,
+                  "name": "first updatedddf",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1572495963,
+                  "name": "second",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 403485345,
+                  "name": "mmmmsdffqqqqd",
+                  "selected": false,
+                  "deleted": false
+                }
+              ]
+            },
+            {
+              "id": 50,
+              "name": "Enrollment Track Groups",
+              "scheme": "enrollment_track",
+              "groups": [
+                {
+                  "id": 6,
+                  "name": "ds",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 2,
+                  "name": "name",
+                  "selected": false,
+                  "deleted": false
+                }
+              ]
+            }
+          ],
+          "show_correctness": "always",
+          "xblock_type": "problem",
+          "hide_after_due": false,
+          "is_proctored_exam": false,
+          "was_exam_ever_linked_with_external": false,
+          "online_proctoring_rules": "",
+          "is_practice_exam": false,
+          "is_onboarding_exam": false,
+          "is_time_limited": false,
+          "exam_review_rules": "",
+          "default_time_limit_minutes": null,
+          "proctoring_exam_configuration_link": null,
+          "supports_onboarding": false,
+          "show_review_rules": true,
+          "child_info": {
+            "category": "vertical",
+            "display_name": "Unit",
+            "children": [
+              {
+                "id": "block-v1:2u+1+1+type@vertical+block@2045839cff4941e8af799bd1483b3a33",
+                "display_name": "Unit",
+                "category": "vertical",
+                "has_children": true,
+                "edited_on": "Feb 27, 2024 at 10:23 UTC",
+                "published": true,
+                "published_on": "Feb 27, 2024 at 10:24 UTC",
+                "studio_url": "/container/block-v1:2u+1+1+type@vertical+block@2045839cff4941e8af799bd1483b3a33",
+                "released_to_students": false,
+                "release_date": null,
+                "visibility_state": "unscheduled",
+                "has_explicit_staff_lock": false,
+                "start": "2030-01-01T00:00:00Z",
+                "graded": false,
+                "due_date": "",
+                "due": null,
+                "relative_weeks_due": null,
+                "format": null,
+                "course_graders": [
+                  "Homework",
+                  "Lab",
+                  "Midterm Exam",
+                  "Final Exam"
+                ],
+                "has_changes": false,
+                "actions": {
+                  "deletable": true,
+                  "draggable": true,
+                  "childAddable": true,
+                  "duplicable": true
+                },
+                "explanatory_message": null,
+                "group_access": {},
+                "user_partitions": [
+                  {
+                    "id": 1903135906,
+                    "name": "   aaa",
+                    "scheme": "random",
+                    "groups": [
+                      {
+                        "id": 1213918239,
+                        "name": "Group A",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1563048958,
+                        "name": "Group B",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1814636452,
+                        "name": "Group C",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1114080836,
+                        "name": "Group D",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1468368722,
+                        "name": "Group E",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1858618704,
+                        "name": "Group F",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 695295459,
+                        "name": "Group G",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1042419244,
+                        "name": "Group H",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1203121571,
+                        "name": "Group I",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1671531224,
+                        "name": "Group J",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1068960935,
+                        "name": "Group K",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 213846840,
+                        "name": "Group L",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1520039571,
+                        "name": "Group M",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1071048650,
+                        "name": "Group N",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 150065208,
+                        "name": "Group O",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1341374482,
+                        "name": "Group P",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1614792569,
+                        "name": "Group Q",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1654086061,
+                        "name": "Group R",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 879601505,
+                        "name": "Group S",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 635805169,
+                        "name": "Group T",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1969306579,
+                        "name": "Group U",
+                        "selected": false,
+                        "deleted": false
+                      }
+                    ]
+                  },
+                  {
+                    "id": 672590462,
+                    "name": "Content Groups",
+                    "scheme": "cohort",
+                    "groups": [
+                      {
+                        "id": 1142499850,
+                        "name": "first updatedddf",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1572495963,
+                        "name": "second",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 403485345,
+                        "name": "mmmmsdffqqqqd",
+                        "selected": false,
+                        "deleted": false
+                      }
+                    ]
+                  },
+                  {
+                    "id": 50,
+                    "name": "Enrollment Track Groups",
+                    "scheme": "enrollment_track",
+                    "groups": [
+                      {
+                        "id": 6,
+                        "name": "ds",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 2,
+                        "name": "name",
+                        "selected": false,
+                        "deleted": false
+                      }
+                    ]
+                  }
+                ],
+                "show_correctness": "always",
+                "xblock_type": "problem",
+                "discussion_enabled": true,
+                "ancestor_has_staff_lock": false,
+                "user_partition_info": {
+                  "selectable_partitions": [
+                    {
+                      "id": 50,
+                      "name": "Enrollment Track Groups",
+                      "scheme": "enrollment_track",
+                      "groups": [
+                        {
+                          "id": 6,
+                          "name": "ds",
+                          "selected": false,
+                          "deleted": false
+                        },
+                        {
+                          "id": 2,
+                          "name": "name",
+                          "selected": false,
+                          "deleted": false
+                        }
+                      ]
+                    },
+                    {
+                      "id": 672590462,
+                      "name": "Content Groups",
+                      "scheme": "cohort",
+                      "groups": [
+                        {
+                          "id": 1142499850,
+                          "name": "first updatedddf",
+                          "selected": false,
+                          "deleted": false
+                        },
+                        {
+                          "id": 1572495963,
+                          "name": "second",
+                          "selected": false,
+                          "deleted": false
+                        },
+                        {
+                          "id": 403485345,
+                          "name": "mmmmsdffqqqqd",
+                          "selected": false,
+                          "deleted": false
+                        }
+                      ]
+                    }
+                  ],
+                  "selected_partition_index": -1,
+                  "selected_groups_label": ""
+                },
+                "enable_copy_paste_units": false
+              },
+              {
+                "id": "block-v1:2u+1+1+type@vertical+block@33ffa0bc46134b1599f98af8253ce709",
+                "display_name": "Unit",
+                "category": "vertical",
+                "has_children": true,
+                "edited_on": "Mar 01, 2024 at 12:04 UTC",
+                "published": true,
+                "published_on": "Feb 27, 2024 at 10:24 UTC",
+                "studio_url": "/container/block-v1:2u+1+1+type@vertical+block@33ffa0bc46134b1599f98af8253ce709",
+                "released_to_students": false,
+                "release_date": null,
+                "visibility_state": "needs_attention",
+                "has_explicit_staff_lock": false,
+                "start": "2030-01-01T00:00:00Z",
+                "graded": false,
+                "due_date": "",
+                "due": null,
+                "relative_weeks_due": null,
+                "format": null,
+                "course_graders": [
+                  "Homework",
+                  "Lab",
+                  "Midterm Exam",
+                  "Final Exam"
+                ],
+                "has_changes": true,
+                "actions": {
+                  "deletable": true,
+                  "draggable": true,
+                  "childAddable": true,
+                  "duplicable": true
+                },
+                "explanatory_message": null,
+                "group_access": {},
+                "user_partitions": [
+                  {
+                    "id": 1903135906,
+                    "name": "   aaa",
+                    "scheme": "random",
+                    "groups": [
+                      {
+                        "id": 1213918239,
+                        "name": "Group A",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1563048958,
+                        "name": "Group B",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1814636452,
+                        "name": "Group C",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1114080836,
+                        "name": "Group D",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1468368722,
+                        "name": "Group E",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1858618704,
+                        "name": "Group F",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 695295459,
+                        "name": "Group G",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1042419244,
+                        "name": "Group H",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1203121571,
+                        "name": "Group I",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1671531224,
+                        "name": "Group J",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1068960935,
+                        "name": "Group K",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 213846840,
+                        "name": "Group L",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1520039571,
+                        "name": "Group M",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1071048650,
+                        "name": "Group N",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 150065208,
+                        "name": "Group O",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1341374482,
+                        "name": "Group P",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1614792569,
+                        "name": "Group Q",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1654086061,
+                        "name": "Group R",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 879601505,
+                        "name": "Group S",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 635805169,
+                        "name": "Group T",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1969306579,
+                        "name": "Group U",
+                        "selected": false,
+                        "deleted": false
+                      }
+                    ]
+                  },
+                  {
+                    "id": 672590462,
+                    "name": "Content Groups",
+                    "scheme": "cohort",
+                    "groups": [
+                      {
+                        "id": 1142499850,
+                        "name": "first updatedddf",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1572495963,
+                        "name": "second",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 403485345,
+                        "name": "mmmmsdffqqqqd",
+                        "selected": false,
+                        "deleted": false
+                      }
+                    ]
+                  },
+                  {
+                    "id": 50,
+                    "name": "Enrollment Track Groups",
+                    "scheme": "enrollment_track",
+                    "groups": [
+                      {
+                        "id": 6,
+                        "name": "ds",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 2,
+                        "name": "name",
+                        "selected": false,
+                        "deleted": false
+                      }
+                    ]
+                  }
+                ],
+                "show_correctness": "always",
+                "xblock_type": "problem",
+                "discussion_enabled": true,
+                "ancestor_has_staff_lock": false,
+                "user_partition_info": {
+                  "selectable_partitions": [
+                    {
+                      "id": 50,
+                      "name": "Enrollment Track Groups",
+                      "scheme": "enrollment_track",
+                      "groups": [
+                        {
+                          "id": 6,
+                          "name": "ds",
+                          "selected": false,
+                          "deleted": false
+                        },
+                        {
+                          "id": 2,
+                          "name": "name",
+                          "selected": false,
+                          "deleted": false
+                        }
+                      ]
+                    },
+                    {
+                      "id": 672590462,
+                      "name": "Content Groups",
+                      "scheme": "cohort",
+                      "groups": [
+                        {
+                          "id": 1142499850,
+                          "name": "first updatedddf",
+                          "selected": false,
+                          "deleted": false
+                        },
+                        {
+                          "id": 1572495963,
+                          "name": "second",
+                          "selected": false,
+                          "deleted": false
+                        },
+                        {
+                          "id": 403485345,
+                          "name": "mmmmsdffqqqqd",
+                          "selected": false,
+                          "deleted": false
+                        }
+                      ]
+                    }
+                  ],
+                  "selected_partition_index": -1,
+                  "selected_groups_label": ""
+                },
+                "enable_copy_paste_units": false
+              },
+              {
+                "id": "block-v1:2u+1+1+type@vertical+block@7d1aa3dca0f14beb9e7190e9ed90aeca",
+                "display_name": "Unit",
+                "category": "vertical",
+                "has_children": true,
+                "edited_on": "Mar 05, 2024 at 15:36 UTC",
+                "published": true,
+                "published_on": "Feb 27, 2024 at 10:32 UTC",
+                "studio_url": "/container/block-v1:2u+1+1+type@vertical+block@7d1aa3dca0f14beb9e7190e9ed90aeca",
+                "released_to_students": false,
+                "release_date": null,
+                "visibility_state": "needs_attention",
+                "has_explicit_staff_lock": false,
+                "start": "2030-01-01T00:00:00Z",
+                "graded": false,
+                "due_date": "",
+                "due": null,
+                "relative_weeks_due": null,
+                "format": null,
+                "course_graders": [
+                  "Homework",
+                  "Lab",
+                  "Midterm Exam",
+                  "Final Exam"
+                ],
+                "has_changes": true,
+                "actions": {
+                  "deletable": true,
+                  "draggable": true,
+                  "childAddable": true,
+                  "duplicable": true
+                },
+                "explanatory_message": null,
+                "group_access": {},
+                "user_partitions": [
+                  {
+                    "id": 1903135906,
+                    "name": "   aaa",
+                    "scheme": "random",
+                    "groups": [
+                      {
+                        "id": 1213918239,
+                        "name": "Group A",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1563048958,
+                        "name": "Group B",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1814636452,
+                        "name": "Group C",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1114080836,
+                        "name": "Group D",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1468368722,
+                        "name": "Group E",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1858618704,
+                        "name": "Group F",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 695295459,
+                        "name": "Group G",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1042419244,
+                        "name": "Group H",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1203121571,
+                        "name": "Group I",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1671531224,
+                        "name": "Group J",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1068960935,
+                        "name": "Group K",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 213846840,
+                        "name": "Group L",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1520039571,
+                        "name": "Group M",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1071048650,
+                        "name": "Group N",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 150065208,
+                        "name": "Group O",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1341374482,
+                        "name": "Group P",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1614792569,
+                        "name": "Group Q",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1654086061,
+                        "name": "Group R",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 879601505,
+                        "name": "Group S",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 635805169,
+                        "name": "Group T",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1969306579,
+                        "name": "Group U",
+                        "selected": false,
+                        "deleted": false
+                      }
+                    ]
+                  },
+                  {
+                    "id": 672590462,
+                    "name": "Content Groups",
+                    "scheme": "cohort",
+                    "groups": [
+                      {
+                        "id": 1142499850,
+                        "name": "first updatedddf",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 1572495963,
+                        "name": "second",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 403485345,
+                        "name": "mmmmsdffqqqqd",
+                        "selected": false,
+                        "deleted": false
+                      }
+                    ]
+                  },
+                  {
+                    "id": 50,
+                    "name": "Enrollment Track Groups",
+                    "scheme": "enrollment_track",
+                    "groups": [
+                      {
+                        "id": 6,
+                        "name": "ds",
+                        "selected": false,
+                        "deleted": false
+                      },
+                      {
+                        "id": 2,
+                        "name": "name",
+                        "selected": false,
+                        "deleted": false
+                      }
+                    ]
+                  }
+                ],
+                "show_correctness": "always",
+                "xblock_type": "video",
+                "discussion_enabled": true,
+                "ancestor_has_staff_lock": false,
+                "user_partition_info": {
+                  "selectable_partitions": [
+                    {
+                      "id": 50,
+                      "name": "Enrollment Track Groups",
+                      "scheme": "enrollment_track",
+                      "groups": [
+                        {
+                          "id": 6,
+                          "name": "ds",
+                          "selected": false,
+                          "deleted": false
+                        },
+                        {
+                          "id": 2,
+                          "name": "name",
+                          "selected": false,
+                          "deleted": false
+                        }
+                      ]
+                    },
+                    {
+                      "id": 672590462,
+                      "name": "Content Groups",
+                      "scheme": "cohort",
+                      "groups": [
+                        {
+                          "id": 1142499850,
+                          "name": "first updatedddf",
+                          "selected": false,
+                          "deleted": false
+                        },
+                        {
+                          "id": 1572495963,
+                          "name": "second",
+                          "selected": false,
+                          "deleted": false
+                        },
+                        {
+                          "id": 403485345,
+                          "name": "mmmmsdffqqqqd",
+                          "selected": false,
+                          "deleted": false
+                        }
+                      ]
+                    }
+                  ],
+                  "selected_partition_index": -1,
+                  "selected_groups_label": ""
+                },
+                "enable_copy_paste_units": false
+              }
+            ]
+          },
+          "ancestor_has_staff_lock": false,
+          "user_partition_info": {
+            "selectable_partitions": [
+              {
+                "id": 50,
+                "name": "Enrollment Track Groups",
+                "scheme": "enrollment_track",
+                "groups": [
+                  {
+                    "id": 6,
+                    "name": "ds",
+                    "selected": false,
+                    "deleted": false
+                  },
+                  {
+                    "id": 2,
+                    "name": "name",
+                    "selected": false,
+                    "deleted": false
+                  }
+                ]
+              },
+              {
+                "id": 672590462,
+                "name": "Content Groups",
+                "scheme": "cohort",
+                "groups": [
+                  {
+                    "id": 1142499850,
+                    "name": "first updatedddf",
+                    "selected": false,
+                    "deleted": false
+                  },
+                  {
+                    "id": 1572495963,
+                    "name": "second",
+                    "selected": false,
+                    "deleted": false
+                  },
+                  {
+                    "id": 403485345,
+                    "name": "mmmmsdffqqqqd",
+                    "selected": false,
+                    "deleted": false
+                  }
+                ]
+              }
+            ],
+            "selected_partition_index": -1,
+            "selected_groups_label": ""
+          }
+        },
+        {
+          "id": "block-v1:2u+1+1+type@chapter+block@aabecb612c5a41d1ab0809a2598e0ab9",
+          "display_name": "Test split_test",
+          "category": "chapter",
+          "has_children": true,
+          "edited_on": "Mar 05, 2024 at 15:36 UTC",
+          "published": true,
+          "published_on": "Feb 15, 2024 at 13:31 UTC",
+          "studio_url": "/course/course-v1:2u+1+1?show=block-v1%3A2u%2B1%2B1%2Btype%40chapter%2Bblock%40aabecb612c5a41d1ab0809a2598e0ab9",
+          "released_to_students": false,
+          "release_date": null,
+          "visibility_state": "unscheduled",
+          "has_explicit_staff_lock": false,
+          "start": "2030-01-01T00:00:00Z",
+          "graded": false,
+          "due_date": "",
+          "due": null,
+          "relative_weeks_due": null,
+          "format": null,
+          "course_graders": [
+            "Homework",
+            "Lab",
+            "Midterm Exam",
+            "Final Exam"
+          ],
+          "has_changes": null,
+          "actions": {
+            "deletable": true,
+            "draggable": true,
+            "childAddable": true,
+            "duplicable": true
+          },
+          "explanatory_message": null,
+          "group_access": {},
+          "user_partitions": [
+            {
+              "id": 1903135906,
+              "name": "   aaa",
+              "scheme": "random",
+              "groups": [
+                {
+                  "id": 1213918239,
+                  "name": "Group A",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1563048958,
+                  "name": "Group B",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1814636452,
+                  "name": "Group C",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1114080836,
+                  "name": "Group D",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1468368722,
+                  "name": "Group E",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1858618704,
+                  "name": "Group F",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 695295459,
+                  "name": "Group G",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1042419244,
+                  "name": "Group H",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1203121571,
+                  "name": "Group I",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1671531224,
+                  "name": "Group J",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1068960935,
+                  "name": "Group K",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 213846840,
+                  "name": "Group L",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1520039571,
+                  "name": "Group M",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1071048650,
+                  "name": "Group N",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 150065208,
+                  "name": "Group O",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1341374482,
+                  "name": "Group P",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1614792569,
+                  "name": "Group Q",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1654086061,
+                  "name": "Group R",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 879601505,
+                  "name": "Group S",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 635805169,
+                  "name": "Group T",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1969306579,
+                  "name": "Group U",
+                  "selected": false,
+                  "deleted": false
+                }
+              ]
+            },
+            {
+              "id": 672590462,
+              "name": "Content Groups",
+              "scheme": "cohort",
+              "groups": [
+                {
+                  "id": 1142499850,
+                  "name": "first updatedddf",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1572495963,
+                  "name": "second",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 403485345,
+                  "name": "mmmmsdffqqqqd",
+                  "selected": false,
+                  "deleted": false
+                }
+              ]
+            },
+            {
+              "id": 50,
+              "name": "Enrollment Track Groups",
+              "scheme": "enrollment_track",
+              "groups": [
+                {
+                  "id": 6,
+                  "name": "ds",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 2,
+                  "name": "name",
+                  "selected": false,
+                  "deleted": false
+                }
+              ]
+            }
+          ],
+          "show_correctness": "always",
+          "xblock_type": "problem",
+          "highlights": [],
+          "highlights_enabled": true,
+          "highlights_preview_only": false,
+          "highlights_doc_url": "http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/developing_course/course_sections.html#set-section-highlights-for-weekly-course-highlight-messages",
+          "ancestor_has_staff_lock": false,
+          "user_partition_info": {
+            "selectable_partitions": [
+              {
+                "id": 50,
+                "name": "Enrollment Track Groups",
+                "scheme": "enrollment_track",
+                "groups": [
+                  {
+                    "id": 6,
+                    "name": "ds",
+                    "selected": false,
+                    "deleted": false
+                  },
+                  {
+                    "id": 2,
+                    "name": "name",
+                    "selected": false,
+                    "deleted": false
+                  }
+                ]
+              },
+              {
+                "id": 672590462,
+                "name": "Content Groups",
+                "scheme": "cohort",
+                "groups": [
+                  {
+                    "id": 1142499850,
+                    "name": "first updatedddf",
+                    "selected": false,
+                    "deleted": false
+                  },
+                  {
+                    "id": 1572495963,
+                    "name": "second",
+                    "selected": false,
+                    "deleted": false
+                  },
+                  {
+                    "id": 403485345,
+                    "name": "mmmmsdffqqqqd",
+                    "selected": false,
+                    "deleted": false
+                  }
+                ]
+              }
+            ],
+            "selected_partition_index": -1,
+            "selected_groups_label": ""
+          }
+        },
+        {
+          "id": "block-v1:2u+1+1+type@course+block@course",
+          "display_name": "2U/AXIM ",
+          "category": "course",
+          "has_children": true,
+          "unit_level_discussions": false,
+          "edited_on": "Mar 05, 2024 at 15:36 UTC",
+          "published": true,
+          "published_on": "Mar 05, 2024 at 13:05 UTC",
+          "studio_url": "/course/course-v1:2u+1+1",
+          "released_to_students": false,
+          "release_date": null,
+          "visibility_state": null,
+          "has_explicit_staff_lock": false,
+          "start": "2030-01-01T00:00:00Z",
+          "graded": false,
+          "due_date": "",
+          "due": null,
+          "relative_weeks_due": null,
+          "format": null,
+          "course_graders": [
+            "Homework",
+            "Lab",
+            "Midterm Exam",
+            "Final Exam"
+          ],
+          "has_changes": null,
+          "actions": {
+            "deletable": true,
+            "draggable": true,
+            "childAddable": true,
+            "duplicable": true
+          },
+          "explanatory_message": null,
+          "group_access": {},
+          "user_partitions": [
+            {
+              "id": 1903135906,
+              "name": "   aaa",
+              "scheme": "random",
+              "groups": [
+                {
+                  "id": 1213918239,
+                  "name": "Group A",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1563048958,
+                  "name": "Group B",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1814636452,
+                  "name": "Group C",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1114080836,
+                  "name": "Group D",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1468368722,
+                  "name": "Group E",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1858618704,
+                  "name": "Group F",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 695295459,
+                  "name": "Group G",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1042419244,
+                  "name": "Group H",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1203121571,
+                  "name": "Group I",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1671531224,
+                  "name": "Group J",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1068960935,
+                  "name": "Group K",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 213846840,
+                  "name": "Group L",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1520039571,
+                  "name": "Group M",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1071048650,
+                  "name": "Group N",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 150065208,
+                  "name": "Group O",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1341374482,
+                  "name": "Group P",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1614792569,
+                  "name": "Group Q",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1654086061,
+                  "name": "Group R",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 879601505,
+                  "name": "Group S",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 635805169,
+                  "name": "Group T",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1969306579,
+                  "name": "Group U",
+                  "selected": false,
+                  "deleted": false
+                }
+              ]
+            },
+            {
+              "id": 672590462,
+              "name": "Content Groups",
+              "scheme": "cohort",
+              "groups": [
+                {
+                  "id": 1142499850,
+                  "name": "first updatedddf",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 1572495963,
+                  "name": "second",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 403485345,
+                  "name": "mmmmsdffqqqqd",
+                  "selected": false,
+                  "deleted": false
+                }
+              ]
+            },
+            {
+              "id": 50,
+              "name": "Enrollment Track Groups",
+              "scheme": "enrollment_track",
+              "groups": [
+                {
+                  "id": 6,
+                  "name": "ds",
+                  "selected": false,
+                  "deleted": false
+                },
+                {
+                  "id": 2,
+                  "name": "name",
+                  "selected": false,
+                  "deleted": false
+                }
+              ]
+            }
+          ],
+          "show_correctness": "always",
+          "xblock_type": "problem",
+          "highlights_enabled_for_messaging": false,
+          "highlights_enabled": true,
+          "highlights_preview_only": false,
+          "highlights_doc_url": "http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/developing_course/course_sections.html#set-section-highlights-for-weekly-course-highlight-messages",
+          "enable_proctored_exams": false,
+          "create_zendesk_tickets": true,
+          "enable_timed_exams": true,
+          "ancestor_has_staff_lock": false,
+          "user_partition_info": {
+            "selectable_partitions": [
+              {
+                "id": 50,
+                "name": "Enrollment Track Groups",
+                "scheme": "enrollment_track",
+                "groups": [
+                  {
+                    "id": 6,
+                    "name": "ds",
+                    "selected": false,
+                    "deleted": false
+                  },
+                  {
+                    "id": 2,
+                    "name": "name",
+                    "selected": false,
+                    "deleted": false
+                  }
+                ]
+              },
+              {
+                "id": 672590462,
+                "name": "Content Groups",
+                "scheme": "cohort",
+                "groups": [
+                  {
+                    "id": 1142499850,
+                    "name": "first updatedddf",
+                    "selected": false,
+                    "deleted": false
+                  },
+                  {
+                    "id": 1572495963,
+                    "name": "second",
+                    "selected": false,
+                    "deleted": false
+                  },
+                  {
+                    "id": 403485345,
+                    "name": "mmmmsdffqqqqd",
+                    "selected": false,
+                    "deleted": false
+                  }
+                ]
+              }
+            ],
+            "selected_partition_index": -1,
+            "selected_groups_label": ""
+          }
+        }
+      ]
+    },
+    "ancestor_has_staff_lock": false,
+    "user_partition_info": {
+      "selectable_partitions": [
+        {
+          "id": 50,
+          "name": "Enrollment Track Groups",
+          "scheme": "enrollment_track",
+          "groups": [
+            {
+              "id": 6,
+              "name": "ds",
+              "selected": false,
+              "deleted": false
+            },
+            {
+              "id": 2,
+              "name": "name",
+              "selected": false,
+              "deleted": false
+            }
+          ]
+        },
+        {
+          "id": 672590462,
+          "name": "Content Groups",
+          "scheme": "cohort",
+          "groups": [
+            {
+              "id": 1142499850,
+              "name": "first updatedddf",
+              "selected": false,
+              "deleted": false
+            },
+            {
+              "id": 1572495963,
+              "name": "second",
+              "selected": false,
+              "deleted": false
+            },
+            {
+              "id": 403485345,
+              "name": "mmmmsdffqqqqd",
+              "selected": false,
+              "deleted": false
+            }
+          ]
+        }
+      ],
+      "selected_partition_index": -1,
+      "selected_groups_label": ""
+    },
+    "enable_copy_paste_units": false,
+    "edited_by": "edx",
+    "published_by": "edx",
+    "currently_visible_to_students": false,
+    "has_partition_group_components": false,
+    "staff_lock_from": null
+  },
+  "draft_preview_link": "//preview.localhost:18000/courses/course-v1:2u+1+1/jump_to/block-v1:2u+1+1+type@vertical+block@33ffa0bc46134b1599f98af8253ce709",
+  "published_preview_link": "///courses/course-v1:2u+1+1/jump_to/block-v1:2u+1+1+type@vertical+block@33ffa0bc46134b1599f98af8253ce709",
+  "show_unit_tags": false,
+  "user_clipboard": {
+    "content": {
+      "id": 9,
+      "user_id": 3,
+      "created": "2024-02-06T17:58:53.282964Z",
+      "purpose": "clipboard",
+      "status": "ready",
+      "block_type": "html",
+      "block_type_display": "Text",
+      "olx_url": "http://localhost:18010/api/content-staging/v1/staged-content/9/olx",
+      "display_name": "Text"
+    },
+    "source_usage_key": "block-v1:2u+1+1+type@html+block@c47d47dc3acd4d17840fc9281359f97e",
+    "source_context_title": "2U/AXIM ",
+    "source_edit_url": "http://localhost:18010/container/block-v1:2u+1+1+type@vertical+block@16f80eb708b6489ea69ecf9b4f3a28f4"
+  },
+  "is_fullwidth_content": false,
+  "assets_url": "/assets/course-v1:2u+1+1/",
+  "unit_block_id": "33ffa0bc46134b1599f98af8253ce709",
+  "subsection_location": "block-v1:2u+1+1+type@sequential+block@5bfa4a58036e4e748ef0693a70e5a325",
+  "course_sequence_ids": [
+    "block-v1:2u+1+1+type@sequential+block@74686b71fb6247678dc39f8a5d9e1bef",
+    "block-v1:2u+1+1+type@sequential+block@19167b583b1143d79be52b70e65f15ec",
+    "block-v1:2u+1+1+type@sequential+block@5eca148dc9d24a359a6f05745b49ec7e",
+    "block-v1:2u+1+1+type@sequential+block@d832ab22ac08472fb94cda4f08fce78e",
+    "block-v1:2u+1+1+type@sequential+block@362f73276ffd4bb0b693b6423ffa3892",
+    "block-v1:2u+1+1+type@sequential+block@6fbc1029b52e46aab0a107ccd0be67fe",
+    "block-v1:2u+1+1+type@sequential+block@5bfa4a58036e4e748ef0693a70e5a325",
+    "block-v1:2u+1+1+type@sequential+block@7867dba59dfd4016b51f37a95527f03d"
+  ]
+}
